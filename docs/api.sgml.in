@@ -77,6 +77,10 @@ for hashes and identifiers based on content.
 <title>OpenSSL Digests Implementation</title>
 @INCLUDE digest_openssl.sgml
 </sect1>
+<sect1>
+<title>Local MD5 Digest Implementation</title>
+@INCLUDE digest_md5.sgml
+</sect1>
 </chapter>
 
 <chapter id="hash">
