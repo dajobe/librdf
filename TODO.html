@@ -26,19 +26,19 @@
 <li>module - xml parser - dom</li>
 <li>module - rdf parser - libwww</li>
 <li>module - uri syntax / representation</li>
-<li>module - uri resolving</li>
+<li>module - uri resolving - (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml </li>
 <li>module - xml namespaces</li>
-<li>find a decent documentation generation system - doc++ fixed by
-me? or write a quick hack Perl doc generator for the style of C I have</li>
 <li>check out if the library can be built shared</li>
-<li>wrap the code with <tt>#ifdef IMPLEMENTATION</tt> etc. to prevent exposing too many internal functions?</li>
-<li>modularise the library so some parts can be removed?</li>
+<li>modularise the library so some parts can be removed</li>
 <li>added #ifdef WIN32 around including config file - win32 build?</li>
-<li>If GPL license, pull in other code - libxml OR add separate package?</li>
-<li>If ??? license, include other code - libwww</li>
-<li>license issues with code contributed by others?</li>
-<li>change all functions to start with librdf?</li>
+<li>If GPL license, include compatible code OR add separate package?</li>
+<li>If BSD license, include compatible code?</li>
+<li>sort out the license issues with contributed code</li>
 <li>anonymous resources</li>
+<li>C++ interface</li>
+<li>perl interface</li>
+<li>RDF schemas</li>
+<li>query language interface</li>
 </ul>
 
 
@@ -51,6 +51,11 @@ me? or write a quick hack Perl doc generator for the style of C I have</li>
 <li>module - storage factory</li>
 <li>module - model</li>
 <li>module - memory allocation</li>
+<li>change all functions to start with librdf_</li>
+<li>a decent source-code based documentation system - GNOME / Linux kernel
+gnome-doc / kernel-doc programs based on the Javadoc formatted comments
+style, but for C</li>
+<li>wrap the code with <tt>#ifdef</tt> etc. to prevent exposing internals to user code</li>
 <li>module - berkeley DB hash</li>
 <li>change functions to all start with RDF_ - new and free functions</li>
 <li>decide on the license(s)  - GPL/LGPL and BSDish ???</li>
