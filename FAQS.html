@@ -1,77 +1,78 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-  <TITLE>librdf - Frequently Asked Questions (FAQs)</TITLE>
-</HEAD>
-<BODY BGCOLOR="#ffffff" TEXT="#000085">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "blah">
+<html>
+<head>
+  <title>librdf - Frequently Asked Questions (FAQs)</title>
+</head>
+<body bgcolor="#ffffff" text="#000085">
 
-<H1 ALIGN="CENTER">librdf - Frequently Asked Questions (FAQs)</H1>
+<h1 align="center">librdf - Frequently Asked Questions (FAQs)</h1>
 
 
-<OL>
+<ol>
 
-<LI>What is the license?
+<li>What is the license?
 
-<P>librdf is
-<A HREF="http://www.gnu.org/philosophy/free-sw.html">free software</A>,
+<p>librdf is
+<a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>,
 or
-<A HREF="http://www.opensource.org/">Open Source</A> if you prefer.
-</P>
-</LI>
+<a href="http://www.opensource.org/">Open Source</a> if you prefer.
+</p>
+</li>
 
-<LI>Why is the code released under two licenses - LGPL and BSD?
+<li>Why is the code released under two licenses - LGPL and BSD?
 
-<P>I originally considered just a GPL version of the library but I
+<p>I originally considered just a GPL version of the library but I
 considered this too restrictive, hence the LGPL version.  LGPL also
 allows the user, at their choice, to license the software under the
 GPL (See LGPL Term 3) in which case this software can also be used
-with all the other GPLed code -- see next answer.</P>
+with all the other GPLed code -- see next answer.</p>
 
-<P>As an alternative, the entire library can be used under the terms
+<p>As an alternative, the entire library can be used under the terms
 of the 
-<A HREF="http://www.opensource.org/licenses/bsd-license.html">modified BSD</A>
+<a href="http://www.opensource.org/licenses/bsd-license.html">modified BSD</a>
 style license which allow you use it in whatever way you
 like as long as you don't pretend you wrote it, or use the authors
-name to promote it.</P>
-</LI>
+name to promote it.</p>
+</li>
 
-<LI>Can I link this library with code under license XXX?
+<li>Can I link this library with code under license XXX?
 
-<P>Firstly,  
-<A HREF="http://www.tuxedo.org/~esr/jargon/html/entry/IANAL.html">IANAL</A>
-however here is an overview of how you can use this software:</P>
+<p>Firstly,  
+<a href="http://www.tuxedo.org/~esr/jargon/html/entry/IANAL.html">IANAL</a>
+however here is an overview of how you can use this software:</p>
 
-<UL>
-<LI>If you choose the LGPL/GPL licenses, the <A HREF="http://www.gnu.org/philosophy/license-list.html">GNU project list of licenses page</A> says that you can link the following licensed software with the code:<BR>
-GPLed, LGPLed, X11, original BSD, modified BSD, Perl (as GPL), zlib<BR>
-and <B>not</B> these types:<BR>
-Apache, Zope, IBM, LaTeX (LPPL), MPL, NOSL, Sun PL, NPL, QPL, Artistic, APPL, Sun CSL, Plan 9<BR>
+<ul>
+<li>If you choose the LGPL/GPL licenses, the <a href="http://www.gnu.org/philosophy/license-list.html">GNU project list of licenses page</a> says that you can link the following licensed software with the code:<br />
+GPLed, LGPLed, X11, original BSD, modified BSD, Perl (as GPL), zlib<br />
+and <b>not</b> these types:<br />
+Apache, Zope, IBM, LaTeX (LPPL), MPL, NOSL, Sun PL, NPL, QPL, Artistic, APPL, Sun CSL, Plan 9<br />
 check the link above for updates, since the above is not a definitive
-list.</LI>
+list.</li>
 
-<LI>If you choose the modified BSD license, you should be able to
+<li>If you choose the modified BSD license, you should be able to
 link with most anything else except you might have problems
 distributing stuff which includes GPLed/LGPLed parts, in which case,
-choose the LGPL or GPL licenses.</LI>
-</UL>
-</LI>
+choose the LGPL or GPL licenses.</li>
+</ul>
+</li>
 
-<LI>Why is librdf written in C?
+<li>Why is librdf written in C?
 
-<P>Writing in C allows reuse in lots of ways and the library should
+<p>Writing in C allows reuse in lots of ways and the library should
 be easy to call from languages since most of them allow importing of
-C libraries or calling of C functions.</P>
+C libraries or calling of C functions.</p>
 
-<P>C is also more "portable" (subject to the usual C problems) and
+<p>C is also more "portable" (subject to the usual C problems) and
 should be compilable on many different systems.  I have access to
 Linux 2.2.x, Solaris 2.5 (Sparc), Solaris 7 (Sparc) and HP-UX 10 and
-it configured, built and tested out of the box on all of these.</P>
+it configured, built and tested out of the box on all of these.</p>
 
-<P>See also the W3C Library note on
-<A HREF="http://www.w3.org/Library/User/Style/Cpp.html">C++ in C</A>
-</P>
+<p>See also the W3C Library note on
+<a href="http://www.w3.org/Library/User/Style/Cpp.html">C++ in C</a>
+which covers some of these issues, although I wrote the library before
+finding this.</p>
 
-</OL>
+</ol>
 
-</BODY>
-</HTML>
+</body>
+</html>
