@@ -23,7 +23,8 @@ man_MANS=redland.3
 
 EXTRA_DIST=api.sgml.in api.sgml README.html README \
 perl.html python.html tcl.html java.html ruby.html php.html \
-build-docs fix-pod-xhtml overview.png overview.ps overview.pdf api pod \
+build-docs fix-pod-xhtml fix-python-xhtml \
+overview.png overview.ps overview.pdf api pod pydoc \
 redland.pod kernel-doc \
 $(man_MANS)
 
@@ -35,9 +36,10 @@ DOC_C_FILES=$(DOC_CLASSES:%=$(srcdir)/../librdf/rdf_%.c)
 API_DOCBOOK_FILES=$(DOC_CLASSES:%=%.sgml)
 
 PERL_HTML_POD_FILES=$(POD_MODULES:%=pod/%.html)
+PYTHON_HTML_PYDOC_FILES=pydoc/RDF.html
 
 CLEANFILES=README
-MAINTAINERCLEANFILES=api.sgml api pod $(API_DOCBOOK_FILES)
+MAINTAINERCLEANFILES=api.sgml api pod pydoc $(API_DOCBOOK_FILES)
 
 PERL=perl
 
@@ -50,6 +52,8 @@ SUFFIXES = .html .txt .sgml .ps .pdf .pm .pod .3
 api: api/index.html
 
 pod: $(PERL_HTML_POD_FILES)
+
+pydoc: $(PYTHON_HTML_PYDOC_FILES)
 
 # Generates a tree of HTML files, not 1 file
 api/index.html: api.sgml
@@ -86,6 +90,12 @@ api/index.html: api.sgml
 @MAINT@	mkdir -p pod/RDF/Redland
 @MAINT@	-pod2html --noindex --htmlroot /docs/pod --infile=$< | tidy -asxml -wrap 1000 2>/dev/null | perl $(srcdir)/fix-pod-xhtml $@
 @MAINT@	rm -f pod2htm*
+@MAINT@
+@MAINT@$(srcdir)/../python/RDF.html: $(srcdir)/../python/RDF.py
+@MAINT@	cd $(srcdir)/../python && make RDF.html
+@MAINT@$(PYTHON_HTML_PYDOC_FILES): pydoc/%.html: $(srcdir)/../python/RDF.html $(srcdir)/fix-python-xhtml
+@MAINT@	mkdir -p pydoc
+@MAINT@	-tidy -asxml -wrap 1000 $< 2>/dev/null | perl $(srcdir)/fix-python-xhtml $@
 
 if MAINTAINER_MODE
 redland.3: redland.pod
