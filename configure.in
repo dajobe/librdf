@@ -232,6 +232,7 @@ AC_DEFINE_UNQUOTED(LIBRDF_VERSION_RELEASE, $version_release)
 
 dnl Checks for library functions.
 AC_FUNC_MEMCMP
+AC_CHECK_FUNCS(mkstemp mktemp tmpnam)
 
 dnl Checks for URI resolvers
 AC_ARG_WITH(libwww, [  --with-libww            Use libwww [yes]], enable_libwww="$withval", enable_libwww="yes") 
