@@ -23,7 +23,8 @@
 
 
 /* class methods */
-void rdf_init_model(void)
+void
+rdf_init_model(void)
 {
 }
 
@@ -31,20 +32,23 @@ void rdf_init_model(void)
 /* constructors */
 
 /* Create a new Model */
-rdf_model* rdf_new_model(void)
+rdf_model*
+rdf_new_model(void)
 {
   return NULL;
 }
 
 
 /* Create a new Model from an existing Model - CLONE */
-rdf_model* rdf_new_model_from_model(rdf_model* model)
+rdf_model*
+rdf_new_model_from_model(rdf_model* model)
 {
   return NULL;
 }
 
 /* destructor */
-void rdf_free_model(rdf_model *model)
+void
+rdf_free_model(rdf_model *model)
 {
 }
 
@@ -52,45 +56,52 @@ void rdf_free_model(rdf_model *model)
 
 
 /* functions / methods */
-int rdf_model_size(rdf_model* model)
+int
+rdf_model_size(rdf_model* model)
 {
   return 0;
 }
 
 
 
-int rdf_model_add(rdf_model* model, rdf_node* subject, rdf_node* property, rdf_node* object)
+int
+rdf_model_add(rdf_model* model, rdf_node* subject, rdf_node* property, rdf_node* object)
 {
   return 0;
 }
 
 
-int rdf_model_add_string_literal_statement(rdf_model* model, rdf_node* subject, rdf_node* property, char* string)
+int
+rdf_model_add_string_literal_statement(rdf_model* model, rdf_node* subject, rdf_node* property, char* string)
 {
   return 0;
 }
 
 
-int rdf_model_add_statement(rdf_model* model, rdf_statement* statement)
+int
+rdf_model_add_statement(rdf_model* model, rdf_statement* statement)
 {
   return 0;
 }
 
 
-int rdf_model_remove_statement(rdf_model* model, rdf_statement* statement)
+int
+rdf_model_remove_statement(rdf_model* model, rdf_statement* statement)
 {
   return 0;
 }
 
 
-int rdf_model_contains_statement(rdf_model* model, rdf_statement* statement)
+int
+rdf_model_contains_statement(rdf_model* model, rdf_statement* statement)
 {
   return 0;
 }
 
 
 /* returns an interator that returns all statements */
-rdf_iterator* rdf_model_get_all_statements(rdf_model* model)
+rdf_iterator*
+rdf_model_get_all_statements(rdf_model* model)
 {
   return NULL;
 }
@@ -99,14 +110,16 @@ rdf_iterator* rdf_model_get_all_statements(rdf_model* model)
 
 /* any of subject, property or object can be NULL */
 /* returns count of number of matching statements */
-int rdf_model_find(rdf_model* model, rdf_node* subject, rdf_node* property, rdf_node* object)
+int
+rdf_model_find(rdf_model* model, rdf_node* subject, rdf_node* property, rdf_node* object)
 {
   return 0;
 }
 
 
 /* returns iterator object that returns matching rdf_statements */
-rdf_iterator* rdf_model_find_(rdf_model* model, rdf_node* subject, rdf_node* property, rdf_node* object)
+rdf_iterator*
+rdf_model_find_(rdf_model* model, rdf_node* subject, rdf_node* property, rdf_node* object)
 {
   return NULL;
 }
@@ -114,13 +127,29 @@ rdf_iterator* rdf_model_find_(rdf_model* model, rdf_node* subject, rdf_node* pro
 
 
 /* get/set the model source URI */
-rdf_uri* rdf_model_get_source_uri(rdf_model* model)
+rdf_uri*
+rdf_model_get_source_uri(rdf_model* model)
 {
   return NULL;
 }
 
 
-int rdf_model_set_source_uri(rdf_model* model, rdf_uri *uri)
+int
+rdf_model_set_source_uri(rdf_model* model, rdf_uri *uri)
+{
+  return 0;
+}
+
+
+int
+rdf_model_add_submodel(rdf_model* model, rdf_model* sub_model) 
+{
+  return 0;
+}
+
+  
+int
+rdf_model_remove_submodel(rdf_model* model, rdf_model* sub_model) 
 {
   return 0;
 }
