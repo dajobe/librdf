@@ -291,8 +291,10 @@ main(int argc, char *argv[])
         if(!size) {
           fprintf(stderr, "%s: WARNING: No storage password found on input\n", 
                   program);
-          free(storage_password);
-          storage_password=NULL;
+          if(storage_password) {
+            free(storage_password);
+            storage_password=NULL;
+          }
         }
         break;
 
