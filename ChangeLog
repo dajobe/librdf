@@ -1,3 +1,13 @@
+2004-12-23  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_serializer.c (librdf_get_serializer_factory):
+	Ensure that if mime_type or type_uri are
+	not NULL, the factory must have a non-NULL item and it must match.
+
+	* librdf/rdf_parser.c (librdf_get_parser_factory):
+	Ensure that if mime_type or type_uri are
+	not NULL, the factory must have a non-NULL item and it must match.
+
 2004-12-21  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_storage_mysql.c (librdf_storage_mysql_init): Applied
