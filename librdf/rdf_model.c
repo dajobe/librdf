@@ -1122,6 +1122,41 @@ librdf_model_get_contexts(librdf_model* model)
 }
 
 
+/**
+ * librdf_model_get_feature - get the value of a graph feature 
+ * @model: &librdf_model object
+ * @feature: &librdf_uri feature property
+ * 
+ * Return value: &librdf_node feature value or NULL if no such feature
+ * exists or the value is empty.
+ **/
+librdf_node*
+librdf_model_get_feature(librdf_model* model, librdf_uri* feature)
+{
+  if(model->factory->get_feature)
+    return model->factory->get_feature(model, feature);
+  return NULL;
+}
+
+
+/**
+ * librdf_model_set_feature - set the value of a graph feature
+ * @model: &librdf_model object
+ * @feature: &librdf_uri feature property
+ * @value: &librdf_node feature property value
+ * 
+ * Return value: non 0 on failure (negative if no such feature)
+ **/
+int
+librdf_model_set_feature(librdf_model* model, librdf_uri* feature,
+                         librdf_node* value)
+{
+  if(model->factory->set_feature)
+    return model->factory->set_feature(model, feature, value);
+  return -1;
+}
+
+
 #endif
 
 
