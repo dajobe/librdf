@@ -459,7 +459,7 @@ librdf_parser_libwww_parse_common(void *context,
     HTEventList_loop(scontext->request);
     scontext->request_done=1;
     librdf_parser_libwww_serialise_finished((void*)scontext);
-    return (librdf_stream*)1;
+    return (librdf_stream*)0;
   }
   
   stream=librdf_new_stream(world,
