@@ -5,9 +5,6 @@
 %define release SNAP
 %define prefix  /usr
 
-%define perlinstallsitearch @PERLINSTALLSITEARCH@
-%define perlman3dir @PERLMAN3DIR@
-
 Summary:   Redland RDF Application Framework
 Name:      %{name}
 Version:   %{version}
@@ -52,24 +49,6 @@ Requires: rasqal >= @RASQAL_MIN_VERSION@
 %description devel
 Header files for development with Redland
 
-%package perl
-Summary: Perl modules for the Redland RDF library
-Group: Development/Libraries
-Requires: redland = %{version}
-
-%description perl
-The redland-perl package contains the parts of Redland that provide
-an interface to Perl.
-
-%package python
-Summary: Python modules for the Redland RDF library
-Group: Development/Libraries
-Requires: redland = %{version}
-
-%description python
-The redland-python package contains the parts of Redland that provide
-an interface to Python.
-
 %prep
 %setup
 
@@ -86,20 +65,6 @@ fi
 
 %{__make} OPTIMIZE="$RPM_OPT_FLAGS"
 
-cd perl
-
-make Makefile.perl MAKE_PL_OPTS="PREFIX=$RPM_BUILD_ROOT/%{_prefix} SYSCONFDIR=$RPM_BUILD_ROOT/%{_sysconfdir} INST_PREFIX=%{_prefix} INST_SYSCONFDIR=%{_sysconfdir}"
-make
-
-cd ..
-
-
-cd python
-
-%{__make}
-
-cd ..
-
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -108,21 +73,6 @@ cd ..
 
 find $RPM_BUILD_ROOT -print | xargs chmod u+w
 
-
-cd perl
-
-make prefix=$RPM_BUILD_ROOT%{prefix} exec_prefix=$RPM_BUILD_ROOT%{prefix} bindir=$RPM_BUILD_ROOT%{prefix}/bin sbindir=$RPM_BUILD_ROOT%{prefix}/sbin sysconfdir=$RPM_BUILD_ROOT/etc datadir=$RPM_BUILD_ROOT%{prefix}/share includedir=$RPM_BUILD_ROOT%{prefix}/include libdir=$RPM_BUILD_ROOT%{_libdir} libexecdir=$RPM_BUILD_ROOT%{prefix}/libexec localstatedir=$RPM_BUILD_ROOT/var sharedstatedir=$RPM_BUILD_ROOT%{prefix}/com mandir=$RPM_BUILD_ROOT%{_mandir} infodir=$RPM_BUILD_ROOT%{prefix}/share/info install
-
-find $RPM_BUILD_ROOT -name perllocal.pod -exec rm -v {}  \;
-
-cd ..
-
-cd python
-
-make install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT%{prefix} -name "*.py[co]" -exec rm -f {} \;
-
-cd ..
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -165,30 +115,7 @@ cd ..
 %doc README NEWS LICENSE.txt
 
 %doc docs/README.html
-%doc docs/java.html docs/perl.html docs/php.html
-%doc docs/python.html docs/ruby.html docs/tcl.html
 %doc docs/api
-
-%files perl
-%defattr(-, bin, bin)
-
-%{perlinstallsitearch}/auto
-%{perlinstallsitearch}/RDF/Redland
-%{perlinstallsitearch}/RDF/Redland.pm
-
-%doc %{perlman3dir}/RDF::Redland*.3pm*
-%doc perl/example.pl
-
-%files python
-%defattr(-, bin, bin)
-
-%{_libdir}/python*/site-packages/RDF.py
-%{_libdir}/python*/site-packages/Redland.so*
-
-%doc AUTHORS COPYING COPYING.LIB ChangeLog
-%doc README NEWS LICENSE.txt
-
-%doc docs/pydoc/RDF.html python/example.py
 
 %post
 /sbin/ldconfig
@@ -197,11 +124,16 @@ cd ..
 /sbin/ldconfig
 
 %changelog
+* Mon Jul 19 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
+- move perl, python packages into redland-bindings
+
 * Mon Jul 12 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
 - put /usr/share/redland/Redland.i in redland-devel
+
 * Wed May  5 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
 - require raptor 1.3.0
 - require rasqal 0.2.0
+
 * Fri Jan 30 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
 - require raptor 1.2.0
 - update for removal of python distutils
