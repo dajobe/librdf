@@ -244,7 +244,8 @@ REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_storage_context_serialise(l
   
 /* querying methods */
 REDLAND_API int librdf_storage_supports_query(librdf_storage* storage, librdf_query *query);
-REDLAND_API librdf_stream* librdf_storage_query(librdf_storage* storage, librdf_query *query);
+REDLAND_API librdf_stream* librdf_storage_query_as_stream(librdf_storage* storage, librdf_query *query);
+REDLAND_API int librdf_storage_query_as_bindings(librdf_storage* storage, librdf_query *query);
 
 /* synchronise a storage to the backing store */
 REDLAND_API void librdf_storage_sync(librdf_storage *storage);
