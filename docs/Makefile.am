@@ -75,7 +75,7 @@
 
 
 EXTRA_DIST=api.sgml.in api.sgml README.html README build-docs \
-overview.png overview.ps
+overview.png overview.ps overview.pdf
 
 DOC_CLASSES=digest digest_openssl digest_md5 hash hash_bdb hash_memory iterator list model node parser parser_libwww parser_sirpac statement storage storage_list stream uri
 
@@ -114,6 +114,12 @@ SUFFIXES = .html .txt .sgml .ps .pdf
 @MAINT@api.sgml: $(srcdir)/build-docs api.sgml.in $(API_DOCBOOK_FILES)
 @MAINT@	$(PERL) $(srcdir)/build-docs api.sgml.in > api.sgml
 @MAINT@
+@MAINT@overview.ps: overview.xfig
+@MAINT@	fig2dev -L ps -l dummy -z A4 overview.xfig overview.pdf
+@MAINT@
+@MAINT@overview.pdf: overview.ps
+@MAINT@	ps2pdf overview.ps overview.pdf
+
 clean-local:
 	rm -rf $(API_DOCBOOK_FILES) api.html api.junk DBTOHTML*
 
