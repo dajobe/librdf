@@ -19,6 +19,7 @@
 # 
 # 
 
+noinst_SCRIPTS = redland-src-config
 
 # Subdirectories to build/install etc.
 SUBDIRS=@SD@ repat raptor librdf examples
@@ -35,7 +36,8 @@ README.html NEWS.html TODO.html LICENSE.html \
 INSTALL.html FAQS.html MPL.html \
 Redland.i \
 autogen.sh \
-Makefile.PL
+Makefile.PL \
+redland-src-config.in
 
 # Create some text files from HTML sources
 LYNX=lynx
@@ -57,8 +59,21 @@ TODO: TODO.html
 
 @SET_MAKE@
 
-$(SRCDIR)/repat/librepat.la:
-	cd $(srcdir)/../repat && $(MAKE) $(AM_MAKEFLAGS) all
+$(top_builddir)/repat/librepat.la:
+	cd $(top_builddir)/repat && $(MAKE) $(AM_MAKEFLAGS)
 
-$(SRCDIR)/raptor/libraptor.la:
-	cd $(srcdir)/../raptor && $(MAKE) $(AM_MAKEFLAGS) all
+$(top_builddir)/raptor/libraptor.la:
+	cd raptor && $(MAKE) $(AM_MAKEFLAGS)
+
+$(top_builddir)/raptor/lib/libraptor.la: $(top_builddir)/raptor/libraptor.la
+	cd raptor && $(MAKE) $(AM_MAKEFLAGS) finish LOCAL_LIB_DIR=../lib
+
+$(top_builddir)/librdf/libraptor.la:
+	cd librdf && $(MAKE) $(AM_MAKEFLAGS)
+
+$(top_builddir)/librdf/lib/librdf.la: $(top_builddir)/librdf/librdf.la
+	cd librdf && $(MAKE) $(AM_MAKEFLAGS) finish LOCAL_LIB_DIR=../lib
+
+finish: $(top_builddir)/raptor/lib/libraptor.la $(top_builddir)/librdf/lib/librdf.la
+	rm -rf $(top_builddir)/lib
+	mkdir $(top_builddir)/lib
