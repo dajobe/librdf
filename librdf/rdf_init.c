@@ -96,8 +96,14 @@ librdf_new_world(void) {
 void
 librdf_free_world(librdf_world *world)
 {
+  /* NOTE: raptor is always initialised as a parser and may
+   * be also used as a serializer, but it is NOT finished
+   * in the serializer_raptor registration.  Therefore, always
+   * keep the parser class finishing after the serializer.
+   */
   librdf_finish_serializer(world);
   librdf_finish_parser(world);
+
   librdf_finish_storage(world);
   librdf_finish_query(world);
   librdf_finish_model(world);
@@ -164,6 +170,12 @@ librdf_world_open(librdf_world *world)
   librdf_init_model(world);
   librdf_init_query(world);
   librdf_init_storage(world);
+
+  /* NOTE: raptor is always initialised as a parser and may
+   * be also used as a serializer, but it is NOT initialised
+   * in the serializer_raptor registration.  Therefore, always
+   * keep the parser class initialising before the serializer.
+   */
   librdf_init_parser(world);
   librdf_init_serializer(world);
 }
