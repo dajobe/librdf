@@ -43,17 +43,24 @@ struct librdf_iterator_s {
   int is_finished; /* 1 when have no more elements */
 
   /* Used when mapping */
-  void *next;            /* stores next element */
+  void *current;            /* stores current element */
   librdf_list *map_list; /* non-empty means there is a list of maps */
   
   int (*is_end)(void*);
-  void* (*get_next)(void*);
+  int (*next_method)(void*);
+  void* (*get_method)(void*, int); /* flags: type of get */
   void (*finished)(void*);
 };
 
+/* FIXME - should all short lists be enums */
+#define LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  0
+#define LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT 1
+#define LIBRDF_ITERATOR_GET_METHOD_GET_KEY     2
+#define LIBRDF_ITERATOR_GET_METHOD_GET_VALUE   3
+
 #endif
 
-librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*is_end)(void*), void* (*get_next)(void*), void (*finished)(void*));
+librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*is_end)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished)(void*));
 
 void librdf_free_iterator(librdf_iterator*);
 
@@ -62,7 +69,11 @@ int librdf_iterator_have_elements(librdf_iterator* iterator);
 
 int librdf_iterator_finished(librdf_iterator* iterator);
 
-void* librdf_iterator_get_next(librdf_iterator* iterator);
+int librdf_iterator_next(librdf_iterator* iterator);
+void* librdf_iterator_get_object(librdf_iterator* iterator);
+void* librdf_iterator_get_context(librdf_iterator* iterator);
+void* librdf_iterator_get_key(librdf_iterator* iterator);
+void* librdf_iterator_get_value(librdf_iterator* iterator);
 
 int librdf_iterator_add_map(librdf_iterator* iterator, void* (*fn)(void *context, void *item), void *context);
 
