@@ -91,22 +91,6 @@ typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 #endif
 
 
-#ifdef LIBRDF_MEMORY_DEBUG
-/* DEBUGGING MEMORY ALLOCATIONS */
-
-void* librdf_malloc(char *file, int line, char *type, size_t size);
-void* librdf_calloc(char *file, int line, char *type, size_t nmemb, size_t size);
-void librdf_free(char *file, int line, char *type, void *ptr);
-
-#define LIBRDF_MALLOC(type, size) librdf_malloc(__FILE__, __LINE__, #type, size)
-#define LIBRDF_CALLOC(type, size, count) librdf_calloc(__FILE__, __LINE__, #type, size, count)
-#define LIBRDF_FREE(type, ptr) librdf_free(__FILE__, __LINE__, #type, ptr)
-
-void librdf_memory_report(FILE *fh);
-
-#else
-/* NOT DEBUGGING MEMORY ALLOCATIONS */
-
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #undef HAVE_STDLIB_H
@@ -115,8 +99,6 @@ void librdf_memory_report(FILE *fh);
 #define LIBRDF_MALLOC(type, size) malloc(size)
 #define LIBRDF_CALLOC(type, size, count) calloc(size, count)
 #define LIBRDF_FREE(type, ptr)   free(ptr)
-
-#endif
 
 
 /* Fatal errors - always happen */
