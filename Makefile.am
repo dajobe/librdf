@@ -192,6 +192,9 @@ rdf_concepts_test: rdf_concepts.c librdf.la
 rdf_query_test: rdf_query.c librdf.la
 	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_query.c librdf.la $(LIBS)
 
+rdf_serializer_test: rdf_serializer.c librdf.la
+	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_serializer.c librdf.la $(LIBS)
+
 examples: $(EXAMPLES)
 
 example1_SOURCES = example1.c
