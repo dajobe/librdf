@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -55,7 +55,11 @@ typedef struct {
   librdf_parser_raptor_context* pcontext; /* parser context */
   raptor_parser *rdf_parser;      /* source URI string (for raptor) */
 
+  /* when reading from a file */
   FILE *fh;
+
+  /* when storing into a model - librdf_parser_raptor_parse_uri_into_model */
+  librdf_model *model;
   
   librdf_uri *source_uri;   /* source URI */
   librdf_uri *base_uri;     /* base URI */
@@ -190,7 +194,11 @@ librdf_parser_raptor_new_statement_handler (void *context,
 #endif
 #endif
 
-  librdf_list_add(&scontext->statements, statement);
+  if(scontext->model) {
+    librdf_model_add_statement(scontext->model, statement);
+    librdf_free_statement(statement);
+  } else
+    librdf_list_add(&scontext->statements, statement);
 }
 
 
@@ -302,7 +310,7 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
  **/
 static librdf_stream*
 librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
-                                         librdf_uri *base_uri)
+                                          librdf_uri *base_uri)
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
@@ -327,8 +335,6 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   raptor_set_statement_handler(rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
   
-  /* raptor_set_feature(rdf_parser, RAPTOR_FEATURE_SCANNING, 1); */
-  
   raptor_set_error_handler(rdf_parser, world, 
                            librdf_parser_raptor_error_handler);
   raptor_set_warning_handler(rdf_parser, world,
@@ -348,7 +354,7 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   
   scontext->fh=fopen(filename, "r");
   if(!scontext->fh) {
-    LIBRDF_DEBUG3(librdf_parser_raptor_parse_file_as_stream, "Failed to open file '%s' - %s\n",
+    LIBRDF_DEBUG3(librdf_parser_raptor_parse_uri_as_stream, "Failed to open file '%s' - %s\n",
                   filename, strerror(errno));
     free(filename);
     librdf_parser_raptor_serialise_finished((void*)scontext);
@@ -377,8 +383,116 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
 }
 
 
+static void
+librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler(raptor_www *www,
+                                                             void *userdata,
+                                                             const void *ptr,
+                                                             size_t size,
+                                                             size_t nmemb)
+{
+  librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)userdata;
+  int len=size*nmemb;
+
+  if(raptor_parse_chunk(scontext->rdf_parser, ptr, len, 0))
+    raptor_www_abort(www, "Parsing failed");
+}
+
+
 /**
- * librdf_parser_raptor_parse_file_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
+ * librdf_parser_raptor_parse_uri_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
+ * @context: parser context
+ * @uri: &librdf_uri URI of RDF/XML content source
+ * @base_uri: &librdf_uri URI of the content location or NULL if the same
+ *
+ *
+ **/
+static librdf_stream*
+librdf_parser_raptor_parse_uri_as_stream(void *context, librdf_uri *uri,
+                                         librdf_uri *base_uri)
+{
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+  librdf_parser_raptor_stream_context* scontext;
+  raptor_parser *rdf_parser;
+  librdf_world *world=uri->world;
+  raptor_www *www;
+  librdf_stream *stream;
+  
+  if(librdf_uri_is_file_uri(uri))
+    return librdf_parser_raptor_parse_file_as_stream(context, uri, base_uri);
+
+
+  scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
+  if(!scontext)
+    return NULL;
+
+  if(pcontext->is_ntriples)
+    rdf_parser=raptor_new_parser("ntriples");
+  else
+    rdf_parser=raptor_new_parser("rdfxml");
+
+  if(!rdf_parser) {
+    LIBRDF_FREE(librdf_parser_raptor_stream_context, scontext);
+    return NULL;
+  }
+
+  raptor_set_statement_handler(rdf_parser, scontext, 
+                               librdf_parser_raptor_new_statement_handler);
+  
+  raptor_set_error_handler(rdf_parser, world, 
+                           librdf_parser_raptor_error_handler);
+  raptor_set_warning_handler(rdf_parser, world,
+                             librdf_parser_raptor_warning_handler);
+  
+  scontext->rdf_parser=rdf_parser;
+
+  scontext->pcontext=pcontext;
+  scontext->source_uri = librdf_new_uri_from_uri(uri);
+  if(!base_uri)
+    base_uri=uri;
+  scontext->base_uri = librdf_new_uri_from_uri(base_uri);
+
+  www=raptor_www_new();
+  if(!www) {
+    LIBRDF_FREE(librdf_parser_raptor_stream_context, scontext);
+    raptor_free_parser(rdf_parser);
+    return NULL;
+  }
+
+  raptor_www_set_write_bytes_handler(www, 
+                                     librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler,
+                                     scontext);
+
+  if(raptor_start_parse(rdf_parser, (raptor_uri*)base_uri)) {
+    raptor_www_free(www);
+    return NULL;
+  }
+
+  raptor_www_fetch(www, (raptor_uri*)uri);
+
+  raptor_parse_chunk(rdf_parser, NULL, 0, 1);
+
+  raptor_www_free(www);
+
+  /* get first statement, else is empty */
+  scontext->current=(librdf_statement*)librdf_list_pop(&scontext->statements);
+
+  stream=librdf_new_stream(world,
+                           (void*)scontext,
+                           &librdf_parser_raptor_serialise_end_of_stream,
+                           &librdf_parser_raptor_serialise_next_statement,
+                           &librdf_parser_raptor_serialise_get_statement,
+                           &librdf_parser_raptor_serialise_finished);
+  if(!stream) {
+    librdf_parser_raptor_serialise_finished((void*)scontext);
+    return NULL;
+  }
+
+  return stream;  
+}
+
+
+/**
+ * librdf_parser_raptor_parse_uri_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
  * @context: parser context
  * @uri: &librdf_uri URI of RDF/XML content source
  * @base_uri: &librdf_uri URI of the content location
@@ -389,18 +503,52 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_raptor_parse_file_into_model(void *context, librdf_uri *uri, 
+librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri, 
                                           librdf_uri *base_uri,
                                           librdf_model* model)
 {
   int status=0;
-  librdf_stream* stream=librdf_parser_raptor_parse_file_as_stream(context, 
-                                                                  uri, base_uri);
-  if(!stream)
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+  librdf_parser_raptor_stream_context* scontext;
+  raptor_parser *rdf_parser;
+  librdf_world *world=uri->world;
+  
+  scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
+  if(!scontext)
     return 1;
 
-  status=librdf_model_add_statements(model, stream);
-  librdf_free_stream(stream);
+  if(pcontext->is_ntriples)
+    rdf_parser=raptor_new_parser("ntriples");
+  else
+    rdf_parser=raptor_new_parser("rdfxml");
+
+  if(!rdf_parser) {
+    LIBRDF_FREE(librdf_parser_raptor_stream_context, scontext);
+    return 1;
+  }
+
+  raptor_set_statement_handler(rdf_parser, scontext, 
+                               librdf_parser_raptor_new_statement_handler);
+  
+  raptor_set_error_handler(rdf_parser, world, 
+                           librdf_parser_raptor_error_handler);
+  raptor_set_warning_handler(rdf_parser, world,
+                             librdf_parser_raptor_warning_handler);
+  
+  scontext->rdf_parser=rdf_parser;
+  scontext->pcontext=pcontext;
+  scontext->source_uri = librdf_new_uri_from_uri(uri);
+  if(!base_uri)
+    base_uri=uri;
+  scontext->base_uri = librdf_new_uri_from_uri(base_uri);
+
+  /* direct into model */
+  scontext->model = model;
+
+  status=raptor_parse_uri(rdf_parser, (raptor_uri*)uri, (raptor_uri*)base_uri);
+
+  librdf_parser_raptor_serialise_finished((void*)scontext);
+
   return status;
 }
 
@@ -600,8 +748,8 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
   factory->context_length = sizeof(librdf_parser_raptor_context);
   
   factory->init  = librdf_parser_raptor_init;
-  factory->parse_file_as_stream = librdf_parser_raptor_parse_file_as_stream;
-  factory->parse_file_into_model = librdf_parser_raptor_parse_file_into_model;
+  factory->parse_uri_as_stream = librdf_parser_raptor_parse_uri_as_stream;
+  factory->parse_uri_into_model = librdf_parser_raptor_parse_uri_into_model;
 }
 
 
