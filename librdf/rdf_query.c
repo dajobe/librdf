@@ -201,7 +201,7 @@ librdf_get_query_factory(librdf_world *world,
       if(name && !strcmp(factory->name, name)) {
         break;
       }
-      if(uri && factory->uri && !librdf_uri_equals(factory->uri, uri)) {
+      if(uri && factory->uri && librdf_uri_equals(factory->uri, uri)) {
         break;
       }
     }
