@@ -92,6 +92,7 @@ memcmp.c Redland.i \
 PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \
 autogen.sh \
+Makefile.PL \
 redland.spec redland.spec.in \
 @RAPTOR_INCS@ \
 ex1.rdf ex2.rdf
