@@ -522,6 +522,8 @@ librdf_storage_list_group_serialise_get_statement(void* context, int flags)
       if(!(v=librdf_iterator_get_value(scontext->iterator)))
         return NULL;
 
+      librdf_statement_clear(&scontext->current);
+
       /* decode value content */
       if(!librdf_statement_decode(&scontext->current,
                                   (unsigned char*)v->data, v->size)) {
