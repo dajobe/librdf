@@ -753,6 +753,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
 
 
 typedef struct {
+  librdf_storage *storage;
   librdf_storage_hashes_context *hash_context;
   int index;
   librdf_iterator* iterator;
@@ -813,6 +814,9 @@ librdf_storage_hashes_serialise_common(librdf_storage* storage, int hash_index,
     librdf_storage_hashes_serialise_finished((void*)scontext);
     return NULL;
   }
+
+  scontext->storage=storage;
+  librdf_storage_add_reference(scontext->storage);
 
   stream=librdf_new_stream(storage->world,
                            (void*)scontext,
@@ -950,6 +954,9 @@ librdf_storage_hashes_serialise_finished(void* context)
   }
 
   librdf_statement_clear(&scontext->current);
+
+  if(scontext->storage)
+    librdf_storage_remove_reference(scontext->storage);
 
   LIBRDF_FREE(librdf_storage_hashes_serialise_stream_context, scontext);
 }
@@ -1163,6 +1170,9 @@ librdf_storage_hashes_node_iterator_finished(void* iterator)
   if((node=librdf_statement_get_predicate(&icontext->statement2)))
      librdf_free_node(node);
 
+  if(icontext->storage)
+    librdf_storage_remove_reference(icontext->storage);
+  
   LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
 }
 
@@ -1196,6 +1206,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
     return NULL;
 
   icontext->storage=storage;
+
   icontext->hash_index=hash_index;
   icontext->want=want;
 
@@ -1262,6 +1273,11 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
     return NULL;
   }
        
+  /* after this point the finished method is called on errors
+   * so must bump the reference count
+   */
+  librdf_storage_add_reference(icontext->storage);
+
   if(!librdf_statement_encode_parts(&icontext->statement, NULL,
                                     key_buffer, icontext->key.size, fields)) {
     LIBRDF_FREE(data, key_buffer);
@@ -1408,6 +1424,7 @@ librdf_storage_hashes_context_remove_statement(librdf_storage* storage,
 
 
 typedef struct {
+  librdf_storage *storage;
   librdf_iterator* iterator;
   librdf_hash_datum *key;
   librdf_hash_datum *value;
@@ -1471,6 +1488,9 @@ librdf_storage_hashes_context_serialise(librdf_storage* storage,
     return NULL;
   }
 
+
+  scontext->storage=storage;
+  librdf_storage_add_reference(scontext->storage);
 
   stream=librdf_new_stream(storage->world,
                            (void*)scontext,
@@ -1581,6 +1601,9 @@ librdf_storage_hashes_context_serialise_finished(void* context)
   if(scontext->context_node_data)
     LIBRDF_FREE(cstring, scontext->context_node_data);
 
+  if(scontext->storage)
+    librdf_storage_remove_reference(scontext->storage);
+  
   LIBRDF_FREE(librdf_storage_hashes_context_serialise_stream_context, scontext);
 }
 
@@ -1597,7 +1620,7 @@ librdf_storage_hashes_sync(librdf_storage *storage)
 
 
 typedef struct {
-  librdf_world *world;
+  librdf_storage *storage;
   librdf_iterator *iterator;
   librdf_hash_datum *key;
   librdf_node *current;
@@ -1639,7 +1662,7 @@ librdf_storage_hashes_get_contexts_get_method(void* iterator, int flags)
         librdf_free_node(icontext->current);
 
       /* decode value content */
-      icontext->current=librdf_node_decode(icontext->world, NULL,
+      icontext->current=librdf_node_decode(icontext->storage->world, NULL,
                                            (unsigned char*)k->data, k->size);
       result=icontext->current;
       break;
@@ -1672,6 +1695,9 @@ librdf_storage_hashes_get_contexts_finished(void* iterator)
   if(icontext->current)
     librdf_free_node(icontext->current);
 
+  if(icontext->storage)
+    librdf_storage_remove_reference(icontext->storage);
+  
   LIBRDF_FREE(librdf_storage_hashes_get_contexts_iterator_context, icontext);
 }
 
@@ -1696,8 +1722,6 @@ librdf_storage_hashes_get_contexts(librdf_storage* storage)
   if(!icontext)
     return NULL;
 
-  icontext->world=storage->world;
-  
   icontext->key=librdf_new_hash_datum(storage->world, NULL, 0);
   if(!icontext->key)
     return NULL;
@@ -1709,6 +1733,9 @@ librdf_storage_hashes_get_contexts(librdf_storage* storage)
     return NULL;
   }
 
+
+  icontext->storage=storage;
+  librdf_storage_add_reference(icontext->storage);
 
   iterator=librdf_new_iterator(storage->world,
                                (void*)icontext,
