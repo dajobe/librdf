@@ -58,7 +58,7 @@ librdf_destroy_world(void)
 {
   librdf_finish_digest();
   librdf_finish_hash();
-  /* librdf_finish_uri(); */
+  librdf_finish_uri();
   /* librdf_finish_node(); */
   librdf_finish_statement();
   librdf_finish_model();

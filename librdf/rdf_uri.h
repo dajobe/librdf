@@ -38,6 +38,7 @@ struct librdf_uri_s
 
 /* class methods */
 void librdf_init_uri(librdf_digest_factory *factory);
+void librdf_finish_uri(void);
 
 /* constructors */
 librdf_uri* librdf_new_uri (char *string);
