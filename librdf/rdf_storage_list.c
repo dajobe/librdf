@@ -207,8 +207,17 @@ static int
 librdf_storage_list_add_statement(librdf_storage* storage, librdf_statement* statement)
 {
   librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_statement* statement2;
+  int status;
 
-  return librdf_list_add(context->list, statement);
+  statement2=librdf_new_statement_from_statement(statement);
+  if(!statement2)
+    return 1;
+  
+  status=librdf_list_add(context->list, statement2);
+  if(status)
+    librdf_free_statement(statement2);
+  return status;
 }
 
 
