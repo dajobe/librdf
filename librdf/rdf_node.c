@@ -84,6 +84,7 @@
 #include <rdf_uri.h>
 #include <rdf_node.h>
 #include <rdf_digest.h>
+#include <rdf_utf8.h>
 
 
 /* statics */
@@ -501,6 +502,25 @@ librdf_node_get_literal_value(librdf_node* node)
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return NULL;
   return node->value.literal.string;
+}
+
+
+/**
+ * librdf_node_get_literal_value_as_latin1 - Get the string literal value of the node as ISO Latin-1
+ * @node: the node object
+ * 
+ * Returns a newly allocated string containing the conversion of the
+ * UTF-8 literal value held by the node.
+ *
+ * Return value: the literal string or NULL if node is not a literal
+ **/
+char*
+librdf_node_get_literal_value_as_latin1(librdf_node* node) 
+{
+  if(node->type != LIBRDF_NODE_TYPE_LITERAL)
+    return NULL;
+  return (char*)librdf_utf8_to_latin1((const byte*)node->value.literal.string,
+                                      node->value.literal.string_len, NULL);
 }
 
 
@@ -959,9 +979,10 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_node *node, *node2;
+  librdf_node *node, *node2, *node3;
   char *hp_string1="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
   char *hp_string2="http://purl.org/net/dajobe/";
+  char *lit_string="Dave Beckett";
   librdf_uri *uri, *uri2;
   int size, size2;
   char *buffer;
@@ -1026,8 +1047,20 @@ main(int argc, char *argv[])
   fputs("\n", stdout);
  
   
+  fprintf(stdout, "%s: Creating new literal string node\n", program);
+  node3=librdf_new_node_from_literal(lit_string, NULL, 0, 0);
+  buffer=librdf_node_get_literal_value_as_latin1(node3);
+  if(!buffer) {
+    fprintf(stderr, "%s: Failed to get literal string value as Latin-1\n", program);
+    return(1);
+  }
+  fprintf(stdout, "%s: Node literal string value (Latin-1) is: '%s'\n",
+          program, buffer);
+  LIBRDF_FREE(cstring, buffer);
   
+
   fprintf(stdout, "%s: Freeing nodes\n", program);
+  librdf_free_node(node3);
   librdf_free_node(node2);
   librdf_free_node(node);
   
