@@ -82,9 +82,9 @@ main(int argc, char *argv[])
     goto tidystorage;
   }
 
-  parser=librdf_new_parser(world, "raptor", NULL, NULL);
+  parser=librdf_new_parser(world, "rdfxml", NULL, NULL);
   if(!parser) {
-    fprintf(stderr, "%s: Failed to create new parser 'raptor'\n", program);
+    fprintf(stderr, "%s: Failed to create new parser 'rdfxml'\n", program);
     rc=1;
     goto tidystorage;
   }
