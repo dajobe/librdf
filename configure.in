@@ -70,40 +70,64 @@ if test "$ac_cv_header_gdbm_h" = yes ; then
 fi
 
 dnl Berkeley DB
-AC_CHECK_HEADERS(db.h)
-if test "$ac_cv_header_db_h" = yes ; then
-  oLIBS="$LIBS"
-  AC_CHECK_LIB(db, db_create)
-  AC_CHECK_LIB(db, db_open)
-  AC_CHECK_LIB(db, dbopen)
-  LIBS="$oLIBS"
-  have_libdb=no
-  if test "$ac_cv_lib_db_db_create" = yes; then
-    AC_DEFINE(HAVE_DB_CREATE)
-    have_libdb=yes
-  elif test "$ac_cv_lib_db_db_open" = yes; then
-    AC_DEFINE(HAVE_DB_OPEN)
-    have_libdb=yes
-  elif test "$ac_cv_lib_db_dbopen" = yes; then
-    AC_DEFINE(HAVE_DBOPEN)
-    have_libdb=yes
-  fi
-  if test "$have_libdb" = yes; then
-    LIBS="$oLIBS -ldb"
-  fi
-  AC_MSG_CHECKING(whether DB_TXN defined in db.h)
-  dnl In BDB, DB_TXN is a pointer to a structure never defined
-  AC_TRY_LINK([#include <db.h>], [DB_TXN* ptr=(DB_TXN*)NULL],
-              AC_DEFINE(HAVE_BDB_DB_TXN)
-	      AC_MSG_RESULT(yes),
-	      AC_MSG_RESULT(no))
-  AC_MSG_CHECKING(whether DBC defined in db.h)
-  AC_TRY_LINK([#include <db.h>], [size_t len=sizeof(DBC)],
-              AC_DEFINE(HAVE_BDB_CURSOR)
-	      AC_MSG_RESULT(yes),
-	      AC_MSG_RESULT(no))
-fi
+AC_ARG_WITH(bdb, [  --with-bdb=ROOT            Berkeley DB install area [/usr]], bdb_prefix="$withval", bdb_prefix="/usr") 
 
+AC_MSG_CHECKING(location of BDB)
+AC_MSG_RESULT($bdb_prefix)
+if test "$bdb_prefix" != no; then
+  oCFLAGS="$CFLAGS"
+  oLIBS="$LIBS"
+  if test "$bdb_prefix" != /usr; then
+    nLIBS="-L$bdb_prefix/lib $LIBS";
+    CFLAGS="-I$bdb_prefix/include";
+  else
+    nLIBS="$LIBS"
+  fi
+  LIBS="$nLIBS"
+  AC_CHECK_HEADERS(db.h)
+  if test "$ac_cv_header_db_h" = yes ; then
+    LIBS="$nLIBS"
+    AC_CHECK_LIB(db, db_create)
+    LIBS="$nLIBS"
+    AC_CHECK_LIB(db, db_open)
+    LIBS="$nLIBS"
+    AC_CHECK_LIB(db, dbopen)
+    LIBS="$nLIBS -ldb"
+    have_libdb=no
+    if test "$ac_cv_lib_db_db_create" = yes; then
+      AC_DEFINE(HAVE_DB_CREATE)
+      have_libdb=yes
+    elif test "$ac_cv_lib_db_db_open" = yes; then
+      AC_DEFINE(HAVE_DB_OPEN)
+      have_libdb=yes
+    elif test "$ac_cv_lib_db_dbopen" = yes; then
+      AC_DEFINE(HAVE_DBOPEN)
+      have_libdb=yes
+    fi
+    AC_MSG_CHECKING(whether DB_TXN defined in db.h)
+    dnl In BDB, DB_TXN is a pointer to a structure never defined
+    AC_TRY_LINK([#include <db.h>], [DB_TXN* ptr=(DB_TXN*)NULL],
+		AC_DEFINE(HAVE_BDB_DB_TXN)
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+    AC_MSG_CHECKING(whether DBC defined in db.h)
+    AC_TRY_LINK([#include <db.h>], [size_t len=sizeof(DBC)],
+		AC_DEFINE(HAVE_BDB_CURSOR)
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+    AC_MSG_CHECKING(number of arguments to db_cursor)
+    AC_TRY_LINK([#include <db.h>], [DB* db; db->cursor(db, NULL, NULL, 0);],
+		AC_DEFINE(HAVE_BDB_CURSOR_4_ARGS)
+		AC_MSG_RESULT(4),
+		AC_MSG_RESULT(3))
+  fi
+
+  if test "$have_libdb" != yes; then
+    LIBS="$oLIBS"
+    CFLAGS="$oCFLAGS"
+   fi
+
+fi
 
 
 dnl Checks for header files.
