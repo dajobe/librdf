@@ -142,7 +142,7 @@ struct librdf_model_factory_s {
   librdf_query_results* (*query_execute)(librdf_model* model, librdf_query* query);
 
   /* sync the model to the storage - OPTIONAL */
-  void (*sync)(librdf_model* model);
+  int (*sync)(librdf_model* model);
 
   /* add a statement from the context - OPTIONAL (librdf_model will
    * implement using context_add_statement if missing) 
@@ -269,7 +269,7 @@ REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_model_context_serialize(lib
 /* query language */
 REDLAND_API librdf_query_results* librdf_model_query_execute(librdf_model* model, librdf_query* query);
 
-REDLAND_API void librdf_model_sync(librdf_model* model);
+REDLAND_API int librdf_model_sync(librdf_model* model);
 
 REDLAND_API librdf_storage* librdf_model_get_storage(librdf_model *model);
 
