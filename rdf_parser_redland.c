@@ -121,6 +121,7 @@ typedef struct ns_map_s ns_map;
  * Redland parser context
  */
 typedef struct {
+  librdf_parser *parser;                                           
 #ifdef NEED_EXPAT
   XML_Parser xp;
 #endif
@@ -159,13 +160,14 @@ static void librdf_parser_redland_end_namespace_decl_handler(void *userData,
 
 /* libxml-only prototypes */
 #ifdef NEED_LIBXML
-static void librdf_parser_redland_warning(void *ctx, const char *msg, ...);
-static void librdf_parser_redland_error(void *ctx, const char *msg, ...);
-static void librdf_parser_redland_fatal_error(void *ctx, const char *msg, ...);
+static void librdf_parser_redland_warning(void *context, const char *msg, ...);
+static void librdf_parser_redland_error(void *context, const char *msg, ...);
+static void librdf_parser_redland_fatal_error(void *context, const char *msg, ...);
 #endif
 
 
-static void librdf_parser_redland_free(void *ctx);
+/* free stream context */
+static void librdf_parser_redland_free(void *context);
   
 
 
@@ -176,50 +178,11 @@ static void librdf_parser_redland_free(void *ctx);
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_redland_init(void *context) 
+librdf_parser_redland_init(librdf_parser* parser, void *context) 
 {
-  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)context;
-#ifdef NEED_EXPAT
-  XML_Parser xp;
-  xp=XML_ParserCreate(NULL);
-
-  /* create a new parser in the specified encoding */
-  XML_SetUserData(xp, context);
-
-  /* XML_SetEncoding(xp, "..."); */
-  /* XML_SetBase(xp, ...); */
-
-  XML_SetElementHandler(xp, librdf_parser_redland_start_element_handler,
-                        librdf_parser_redland_end_element_handler);
-  XML_SetCharacterDataHandler(xp, librdf_parser_redland_cdata_handler);
-  XML_SetNamespaceDeclHandler(xp,
-                              librdf_parser_redland_start_namespace_decl_handler,
-                              librdf_parser_redland_end_namespace_decl_handler);
-  scontext->xp=xp;
-#endif
-#ifdef NEED_LIBXML
-  xmlDefaultSAXHandlerInit();
-  scontext->sax.startElement=librdf_parser_redland_start_element_handler;
-  scontext->sax.endElement=librdf_parser_redland_end_element_handler;
-
-  scontext->sax.characters=librdf_parser_redland_cdata_handler;
-  scontext->sax.ignorableWhitespace=librdf_parser_redland_cdata_handler;
-
-  scontext->sax.warning=librdf_parser_redland_warning;
-  scontext->sax.error=librdf_parser_redland_error;
-  scontext->sax.fatalError=librdf_parser_redland_fatal_error;
-
-  /* xmlInitParserCtxt(&scontext->xc); */
-#endif
-
-  scontext->depth=0;
-
-
-/* FIXME
- * XMLNS http://www.w3.org/TR/1999/REC-xml-names-19990114/ says in 4.
- * "The prefix xml is by definition bound to the namespace name http://www.w3.org/XML/1998/namespace"
- */
-
+  librdf_parser_redland_context* pcontext=(librdf_parser_redland_context*)context;
+  pcontext->parser=parser;
+  
   return 0;
 }
 
@@ -228,10 +191,10 @@ static void librdf_parser_redland_start_element_handler(void *userData,
                                                         const XML_Char *name,
                                                         const XML_Char **atts)
 {
-  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)userData;
-/*  XML_Parser xp=scontext->xp;*/
+  librdf_parser_redland_context* pcontext=(librdf_parser_redland_context*)userData;
+/*  XML_Parser xp=pcontext->xp;*/
 
-  scontext->depth++;
+  pcontext->depth++;
 
 /* XMLNS says:
   5.2 Namespace Defaulting
@@ -269,8 +232,8 @@ static void librdf_parser_redland_start_element_handler(void *userData,
     for (i = 0;(atts[i] != NULL);i+=2) {
       /* synthesise the XML NS events */
       if(!strncmp(atts[i], "xmlns", 5)) {
-        const char *prefix;
-        int prefix_length;
+        const char *prefix=NULL;
+        int prefix_length=0;
         int uri_length;
         int len;
         ns_map *map;
@@ -279,8 +242,6 @@ static void librdf_parser_redland_start_element_handler(void *userData,
           prefix=&atts[i][6];
           prefix_length=strlen(prefix);
         }
-        else
-          prefix=NULL;
 
 #if 0
         librdf_parser_redland_start_namespace(userData, prefix, atts[i+1]);
@@ -302,11 +263,11 @@ static void librdf_parser_redland_start_element_handler(void *userData,
         map->uri=strcpy((char*)map+sizeof(ns_map), atts[i+1]);
         if(prefix)
           map->prefix=strcpy((char*)map+sizeof(ns_map)+uri_length+1, prefix);
-        map->depth=scontext->depth;
+        map->depth=pcontext->depth;
 
-        if(scontext->namespaces)
-          map->next=scontext->namespaces;
-        scontext->namespaces=map;
+        if(pcontext->namespaces)
+          map->next=pcontext->namespaces;
+        pcontext->namespaces=map;
 
       }
 
@@ -325,13 +286,13 @@ static void
 librdf_parser_redland_end_element_handler(void *userData,
                                           const XML_Char *name)
 {
-  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)userData;
-/*  XML_Parser xp=scontext->xp;*/
+  librdf_parser_redland_context* pcontext=(librdf_parser_redland_context*)userData;
+/*  XML_Parser xp=pcontext->xp;*/
 
   fprintf(stderr, "redland: saw end element '%s'\n", name);
 
-  while(scontext->namespaces && scontext->namespaces->depth == scontext->depth) {
-    ns_map* ns=scontext->namespaces;
+  while(pcontext->namespaces && pcontext->namespaces->depth == pcontext->depth) {
+    ns_map* ns=pcontext->namespaces;
     ns_map* next=ns->next;
 
 #if 0
@@ -341,10 +302,10 @@ librdf_parser_redland_end_element_handler(void *userData,
             ns->prefix ? ns->prefix : "(None)", ns->uri);
 
     LIBRDF_FREE(ns_map, ns);
-    scontext->namespaces=next;
+    pcontext->namespaces=next;
   }
 
-  scontext->depth--;
+  pcontext->depth--;
 }
 
 
@@ -355,8 +316,9 @@ static void
 librdf_parser_redland_cdata_handler(void *userData, const XML_Char *s,
                                     int len)
 {
-  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)userData;
-  /* XML_Parser xp=scontext->xp;*/
+  /* FIXME : not used */
+  /* librdf_parser_redland_context* pcontext=(librdf_parser_redland_context*)userData; */
+  /* XML_Parser xp=pcontext->xp;*/
   fputs("redland: saw cdata: '", stderr);
   fwrite(s, 1, len, stderr);
   fputs("'\n", stderr);
@@ -368,8 +330,9 @@ librdf_parser_redland_start_namespace_decl_handler(void *userData,
                                                    const XML_Char *prefix,
                                                    const XML_Char *uri)
 {
-  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)userData;
-  /* XML_Parser xp=scontext->xp;*/
+  /* FIXME : not used */
+  /*  librdf_parser_redland_context* pcontext=(librdf_parser_redland_context*)userData; */
+  /* XML_Parser xp=pcontext->xp;*/
 
   fprintf(stderr, "redland: saw namespace %s URI %s\n", prefix, uri);
 }
@@ -379,8 +342,9 @@ static void
 librdf_parser_redland_end_namespace_decl_handler(void *userData,
                                                  const XML_Char *prefix)
 {
-  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)userData;
-  /* XML_Parser xp=scontext->xp;*/
+  /* FIXME : not used */
+  /* librdf_parser_redland_context* pcontext=(librdf_parser_redland_context*)userData; */
+  /* XML_Parser xp=pcontext->xp;*/
 
   fprintf(stderr, "redland: saw end namespace prefix %s\n", prefix);
 }
@@ -441,7 +405,8 @@ librdf_parser_redland_fatal_error(void *ctx, const char *msg, ...)
 static librdf_stream*
 librdf_parser_redland_parse_file_as_stream(void *context, librdf_uri* uri,
                                            librdf_uri *base_uri) {
-  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)context;
+  /* FIXME : not used */
+  /*  librdf_parser_redland_context* pcontext=(librdf_parser_redland_context*)context;*/
 
   return NULL; /* FIXME: NOT IMPLEMENTED */
 }
@@ -490,7 +455,7 @@ librdf_parser_redland_parse_file_into_model(void *context,
                                             librdf_uri *uri,
                                             librdf_uri *base_uri,
                                             librdf_model *model) {
-  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)context;
+  librdf_parser_redland_context* pcontext=(librdf_parser_redland_context*)context;
 #ifdef NEED_EXPAT
   XML_Parser xp;
 #endif
@@ -505,9 +470,51 @@ librdf_parser_redland_parse_file_into_model(void *context,
   int len;
   const char *filename;
   
+
+#ifdef NEED_EXPAT
+  xp=XML_ParserCreate(NULL);
+
+  /* create a new parser in the specified encoding */
+  XML_SetUserData(xp, context);
+
+  /* XML_SetEncoding(xp, "..."); */
+  /* XML_SetBase(xp, ...); */
+
+  XML_SetElementHandler(xp, librdf_parser_redland_start_element_handler,
+                        librdf_parser_redland_end_element_handler);
+  XML_SetCharacterDataHandler(xp, librdf_parser_redland_cdata_handler);
+  XML_SetNamespaceDeclHandler(xp,
+                              librdf_parser_redland_start_namespace_decl_handler,
+                              librdf_parser_redland_end_namespace_decl_handler);
+  pcontext->xp=xp;
+#endif
+#ifdef NEED_LIBXML
+  xmlDefaultSAXHandlerInit();
+  pcontext->sax.startElement=librdf_parser_redland_start_element_handler;
+  pcontext->sax.endElement=librdf_parser_redland_end_element_handler;
+
+  pcontext->sax.characters=librdf_parser_redland_cdata_handler;
+  pcontext->sax.ignorableWhitespace=librdf_parser_redland_cdata_handler;
+
+  pcontext->sax.warning=librdf_parser_redland_warning;
+  pcontext->sax.error=librdf_parser_redland_error;
+  pcontext->sax.fatalError=librdf_parser_redland_fatal_error;
+
+  /* xmlInitParserCtxt(&pcontext->xc); */
+#endif
+
+
+  pcontext->depth=0;
+
+
+/* FIXME
+ * XMLNS http://www.w3.org/TR/1999/REC-xml-names-19990114/ says in 4.
+ * "The prefix xml is by definition bound to the namespace name http://www.w3.org/XML/1998/namespace"
+ */
+
   
 #ifdef NEED_EXPAT
-  xp=scontext->xp;
+  xp=pcontext->xp;
 #endif
 
   filename=librdf_uri_as_filename(uri);
@@ -528,7 +535,7 @@ librdf_parser_redland_parse_file_into_model(void *context,
    * content encoding detection to work */
   len=fread(buffer, 1, 4, fh);
   if(len>0) {
-    xc = xmlCreatePushParserCtxt(&scontext->sax, scontext,
+    xc = xmlCreatePushParserCtxt(&pcontext->sax, pcontext,
                                  buffer, len, filename);
   } else {
     fclose(fh);
@@ -568,15 +575,21 @@ librdf_parser_redland_parse_file_into_model(void *context,
 #ifdef NEED_EXPAT
   if(!rc) {
     int xe=XML_GetErrorCode(xp);
-    
-    fprintf(stderr, "%s:%d XML Parsing failed at column %d byte %ld - %s\n",
-            filename, XML_GetCurrentLineNumber(xp),
-            XML_GetCurrentColumnNumber(xp), XML_GetCurrentByteIndex(xp),
-            XML_ErrorString(xe));
+
+    librdf_parser_error(pcontext->parser, 
+                        "%s:%d XML Parsing failed at column %d byte %ld - %s\n",
+                        filename, XML_GetCurrentLineNumber(xp),
+                        XML_GetCurrentColumnNumber(xp), XML_GetCurrentByteIndex(xp),
+                        XML_ErrorString(xe));
   }
 
   XML_ParserFree(xp);
 #endif /* EXPAT */
+#ifdef NEED_LIBXML
+  if(rc)
+    librdf_parser_error(parser, "%s: XML Parsing failed - unknown reason\n",
+                        filename);
+#endif
 
   librdf_parser_redland_free(context);
 
@@ -587,15 +600,15 @@ librdf_parser_redland_parse_file_into_model(void *context,
 static void
 librdf_parser_redland_free(void *context) 
 {
-  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)context;
+  librdf_parser_redland_context* pcontext=(librdf_parser_redland_context*)context;
 
   fprintf(stderr, "Entering librdf_parser_redland_free\n");
   
-  while(scontext->namespaces) {
-    ns_map* next_map=scontext->namespaces->next;
+  while(pcontext->namespaces) {
+    ns_map* next_map=pcontext->namespaces->next;
 
-    LIBRDF_FREE(ns_map, scontext->namespaces);
-    scontext->namespaces=next_map;
+    LIBRDF_FREE(ns_map, pcontext->namespaces);
+    pcontext->namespaces=next_map;
   }
 }
 
@@ -622,5 +635,6 @@ librdf_parser_redland_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_redland_constructor(void)
 {
-  librdf_parser_register_factory("redland", &librdf_parser_redland_register_factory);
+  librdf_parser_register_factory("redland", NULL, NULL,
+                                 &librdf_parser_redland_register_factory);
 }
