@@ -26,6 +26,7 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for strtol */
 #endif
+
 #ifdef HAVE_STRING_H
 #include <string.h> /* for strncmp */
 #endif
@@ -80,9 +81,9 @@ librdf_init_hash(void)
 #ifdef HAVE_GDBM_HASH
   librdf_init_hash_gdbm();
 #endif
+#endif
 #ifdef HAVE_BDB_HASH
   librdf_init_hash_bdb();
-#endif
 #endif
   /* Always have hash in memory implementation available */
   librdf_init_hash_memory(-1); /* use default load factor */
@@ -249,7 +250,7 @@ librdf_hash_register_factory(const char *name,
  * Return value: the factory object or NULL if there is no such factory
  **/
 librdf_hash_factory*
-librdf_get_hash_factory (const char *name) 
+librdf_get_hash_factory(const char *name) 
 {
   librdf_hash_factory *factory;
 
@@ -284,7 +285,7 @@ librdf_get_hash_factory (const char *name)
  * Return value: a new &librdf_hash object or NULL on failure
  */
 librdf_hash*
-librdf_new_hash (char* name) {
+librdf_new_hash(char* name) {
   librdf_hash_factory *factory;
 
   factory=librdf_get_hash_factory(name);
@@ -452,9 +453,10 @@ typedef struct {
   librdf_hash_datum *key;
   librdf_hash_datum *value;
 
-  librdf_hash_datum *next_key;
+  librdf_hash_datum *next_key; /* not used if one_key set */
   librdf_hash_datum *next_value;
   int have_elements;
+  int one_key;
 } librdf_hash_get_all_iterator_context;
 
 
@@ -481,16 +483,19 @@ librdf_hash_get_all(librdf_hash* hash,
   if(!context)
     return NULL;
 
-
   if(!(context->cursor=librdf_new_hash_cursor(hash))) {
     librdf_hash_get_all_iterator_finished(context);
     return NULL;
   }
 
-  if(!(context->next_key=librdf_new_hash_datum(NULL, 0))) {
-    librdf_hash_get_all_iterator_finished(context);
-    return NULL;
-  }
+  if(key->data)
+    context->one_key=1;
+
+  if(!context->one_key)
+    if(!(context->next_key=librdf_new_hash_datum(NULL, 0))) {
+      librdf_hash_get_all_iterator_finished(context);
+      return NULL;
+    }
 
   if(value)
     if(!(context->next_value=librdf_new_hash_datum(NULL, 0))) {
@@ -502,8 +507,13 @@ librdf_hash_get_all(librdf_hash* hash,
   context->key=key;
   context->value=value;
 
-  status=librdf_hash_cursor_get_first(context->cursor, context->next_key, 
-                                      context->next_value);
+  if(context->one_key)
+    status=librdf_hash_cursor_set(context->cursor, context->key, 
+                                  context->next_value);
+  else
+    status=librdf_hash_cursor_get_first(context->cursor, context->next_key, 
+                                        context->next_value);
+
   context->have_elements=(status == 0);
   
   return librdf_new_iterator((void*)context,
@@ -517,17 +527,27 @@ static int
 librdf_hash_get_all_iterator_have_elements(void* iterator)
 {
   librdf_hash_get_all_iterator_context* context=(librdf_hash_get_all_iterator_context*)iterator;
+  int status;
   
   if(!context->have_elements)
     return 0;
 
-  /* have key or value */
-  if(context->next_key->data || context->next_value->data)
+  /* have key (if not one_key) or value */
+  if((!context->one_key && context->next_key->data) ||
+     context->next_value->data)
     return 1;
   
   /* no stored data, so check for it */
-  if(librdf_hash_cursor_get_next(context->cursor, context->next_key, 
-                                 context->next_value))
+  if(context->one_key)
+    status=librdf_hash_cursor_get_next_value(context->cursor,
+                                             context->key,
+                                             context->next_value);
+  else
+    status=librdf_hash_cursor_get_next(context->cursor, 
+                                       context->next_key, 
+                                       context->next_value);
+
+  if(status)
     context->have_elements=0;
   
   return context->have_elements;
@@ -542,22 +562,38 @@ librdf_hash_get_all_iterator_get_next(void* iterator)
   if(!context->have_elements)
     return NULL;
   
-  /* check stored data */
-  if(context->next_key->data || context->next_value->data) {
-    context->key->data=context->next_key->data;
-    context->key->size=context->next_key->size;
+  /* check stored data - have key (if not one_key) or value? */
+  if((!context->one_key && context->next_key->data) ||
+     context->next_value->data) {
+
+    if(!context->one_key) {
+      context->key->data=context->next_key->data;
+      context->key->size=context->next_key->size;
+    }
+
     if(context->value) {
       context->value->data=context->next_value->data;
       context->value->size=context->next_value->size;
     }
 
-    context->next_key->data=NULL;
+    if(!context->one_key)
+      context->next_key->data=NULL;
+    
     context->next_value->data=NULL;
 
   } else {
+    int status;
+    
     /* no stored data, so check for it */
-    if(librdf_hash_cursor_get_next(context->cursor, context->next_key, 
-                                   context->next_value))
+    if(context->one_key)
+      status=librdf_hash_cursor_get_next_value(context->cursor, 
+                                               context->next_key,
+                                               context->next_value);
+    else
+      status=librdf_hash_cursor_get_next(context->cursor, context->next_key, 
+                                         context->next_value);
+    
+    if(status)
       context->have_elements=0;
   }
   
@@ -574,15 +610,20 @@ librdf_hash_get_all_iterator_finished(void* iterator)
   if(context->cursor)
     librdf_free_hash_cursor(context->cursor);
 
-  context->next_key->data=NULL;
-  if(context->next_key)
-    librdf_free_hash_datum(context->next_key);
-
-  context->next_value->data=NULL;
-  if(context->next_value)
-    librdf_free_hash_datum(context->next_value);
+  if(context->next_key) {
+    context->next_key->data=NULL;
+    if(context->next_key)
+      librdf_free_hash_datum(context->next_key);
+  }
+  
+  if(context->next_value) {
+    context->next_value->data=NULL;
+    if(context->next_value)
+      librdf_free_hash_datum(context->next_value);
+  }
 
   context->key->data=NULL;
+
   if(context->value)
     context->value->data=NULL;
 
@@ -854,7 +895,7 @@ librdf_hash_print_keys(librdf_hash* hash, FILE *fh)
   librdf_iterator* iterator;
   librdf_hash_datum *key;
   
-  fprintf(fh, "%s hash keys: {\n", hash->factory->name);
+  fputs("{\n", fh);
 
   key=librdf_new_hash_datum(NULL, 0);
 
@@ -873,6 +914,53 @@ librdf_hash_print_keys(librdf_hash* hash, FILE *fh)
 
   fputc('}', fh);
 }
+
+
+/**
+ * librdf_hash_print_values - pretty print the values of one key to a file descriptor
+ * @hash: the hash
+ * @key_string: the key as a string
+ * @fh: file handle
+ **/
+void
+librdf_hash_print_values(librdf_hash* hash, char *key_string, FILE *fh)
+{
+  librdf_hash_datum *key, *value;
+  librdf_iterator* iterator;
+  int first=1;
+  
+  key=librdf_new_hash_datum(key_string, strlen(key_string));
+  if(!key)
+    return;
+  
+  value=librdf_new_hash_datum(NULL, 0);
+  if(!value) {
+    key->data=NULL;
+    librdf_free_hash_datum(key);
+    return;
+  }
+  
+  iterator=librdf_hash_get_all(hash, key, value);
+  fputc('(', fh);
+  while(librdf_iterator_have_elements(iterator)) {
+    librdf_iterator_get_next(iterator);
+    if(!first)
+      fputs(", ", fh);
+      
+    fputc('\'', fh);
+    fwrite(value->data, value->size, 1, fh);
+    fputc('\'', fh);
+    first=0;
+  }
+  fputc(')', fh);
+  librdf_free_iterator(iterator);
+
+  key->data=NULL;
+  librdf_free_hash_datum(key);
+
+  librdf_free_hash_datum(value);
+}
+
 
 
 /* private enum */
@@ -1154,11 +1242,14 @@ main(int argc, char *argv[])
 {
   librdf_hash *h, *h2;
   char *test_hash_types[]={"gdbm", "bdb", "memory", NULL};
-  char *test_hash_values[]={"colour", "yellow",
+  char *test_hash_values[]={"colour","yellow", /* Made in UK, can you guess? */
 			    "age", "new",
 			    "size", "large",
+                            "colour", "green",
 			    "fruit", "banana",
+                            "colour", "yellow",
 			    NULL, NULL};
+  char *test_duplicate_key="colour";
   char *test_hash_array[]={"shape", "cube",
 			   "sides", "six",
 			   "colours", "red",
@@ -1186,9 +1277,9 @@ main(int argc, char *argv[])
     
     librdf_hash_open(h, "test", "mode", NULL);
     librdf_hash_from_string(h, argv[1]);
-    fprintf(stderr, "%s: resulting ", program);    
-    librdf_hash_print(h, stderr);
-    fprintf(stderr, "\n");
+    fprintf(stdout, "%s: resulting ", program);    
+    librdf_hash_print(h, stdout);
+    fprintf(stdout, "\n");
     librdf_hash_close(h);
     librdf_free_hash(h);
     return(0);
@@ -1196,7 +1287,7 @@ main(int argc, char *argv[])
   
   
   for(i=0; (type=test_hash_types[i]); i++) {
-    fprintf(stderr, "%s: Trying to create new %s hash\n", program, type);
+    fprintf(stdout, "%s: Trying to create new %s hash\n", program, type);
     h=librdf_new_hash(type);
     if(!h) {
       fprintf(stderr, "%s: Failed to create new hash type '%s'\n", program, type);
@@ -1215,59 +1306,64 @@ main(int argc, char *argv[])
     for(j=0; test_hash_values[j]; j+=2) {
       key=test_hash_values[j];
       value=test_hash_values[j+1];
-      fprintf(stderr, "%s: Adding key/value pair: %s=%s\n", program,
+      fprintf(stdout, "%s: Adding key/value pair: %s=%s\n", program,
 	      key, value);
       
       librdf_hash_put(h, key, strlen(key), value, strlen(value), 0);
       
-      fprintf(stderr, "%s: resulting ", program);    
-      librdf_hash_print(h, stderr);
-      fprintf(stderr, "\n");
+      fprintf(stdout, "%s: resulting ", program);    
+      librdf_hash_print(h, stdout);
+      fprintf(stdout, "\n");
     }
     
-    fprintf(stderr, "%s: Deleting key '%s'\n", program, test_hash_delete_key);
+    fprintf(stdout, "%s: Deleting key '%s'\n", program, test_hash_delete_key);
     librdf_hash_delete(h, test_hash_delete_key, strlen(test_hash_delete_key));
     
-    fprintf(stderr, "%s: resulting ", program);    
-    librdf_hash_print(h, stderr);
-    fprintf(stderr, "\n");
+    fprintf(stdout, "%s: resulting ", program);    
+    librdf_hash_print(h, stdout);
+    fprintf(stdout, "\n");
     
+    fprintf(stdout, "%s: resulting %s hash keys: ", program, type);
+    librdf_hash_print_keys(h, stdout);
+    fprintf(stdout, "\n");
+
+    fprintf(stdout, "%s: all values of key '%s'=", program, test_duplicate_key);
+    librdf_hash_print_values(h, test_duplicate_key, stdout);
+    fprintf(stdout, "\n");
+
     librdf_hash_close(h);
-    
-    fprintf(stderr, "%s: Freeing hash\n", program);
+      
+    fprintf(stdout, "%s: Freeing hash\n", program);
     librdf_free_hash(h);
   }
-  
-  
-  fprintf(stderr, "%s: Getting default hash factory\n", program);
+  fprintf(stdout, "%s: Getting default hash factory\n", program);
   h2=librdf_new_hash(NULL);
   if(!h2) {
     fprintf(stderr, "%s: Failed to create new hash from default factory\n", program);
     return(0);
   }
 
-  fprintf(stderr, "%s: Initialising hash from array of strings\n", program);
+  fprintf(stdout, "%s: Initialising hash from array of strings\n", program);
   if(librdf_hash_from_array_of_strings(h2, test_hash_array)) {
     fprintf(stderr, "%s: Failed to init hash from array of strings\n", program);
     return(0);
   }
   
-  fprintf(stderr, "%s: resulting hash ", program);    
-  librdf_hash_print(h2, stderr);
-  fprintf(stderr, "\n");
+  fprintf(stdout, "%s: resulting hash ", program);    
+  librdf_hash_print(h2, stdout);
+  fprintf(stdout, "\n");
 
-  fprintf(stderr, "%s: resulting hash keys ", program);    
-  librdf_hash_print_keys(h2, stderr);
-  fprintf(stderr, "\n");
+  fprintf(stdout, "%s: resulting hash keys: ", program);    
+  librdf_hash_print_keys(h2, stdout);
+  fprintf(stdout, "\n");
 
   librdf_hash_close(h2);
   
-  fprintf(stderr, "%s: Freeing hash\n", program);
+  fprintf(stdout, "%s: Freeing hash\n", program);
   librdf_free_hash(h2);
   
   /* finish hash module */
   librdf_finish_hash();
-  
   
 #ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);
