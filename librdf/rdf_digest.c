@@ -33,7 +33,7 @@
 
 #include <librdf.h>
 
-
+#ifndef STANDALONE
 /* prototypes for helper functions */
 static void librdf_delete_digest_factories(librdf_world* world);
 
@@ -359,6 +359,7 @@ librdf_finish_digest(librdf_world *world)
 {
   librdf_delete_digest_factories(world);
 }
+#endif
 
 
 #ifdef STANDALONE

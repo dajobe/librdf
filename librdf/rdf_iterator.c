@@ -28,6 +28,7 @@
 #include <librdf.h>
 
 
+#ifndef STANDALONE
 /* prototypes of local helper functions */
 static void* librdf_iterator_update_current_element(librdf_iterator* iterator);
 
@@ -364,6 +365,11 @@ librdf_iterator_map_remove_duplicate_nodes(void *item, void *user_data)
     LIBRDF_FREE(cstring, s);
   return item;
 }
+
+#endif
+
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

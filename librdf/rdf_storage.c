@@ -36,6 +36,9 @@
 #include <rdf_storage_hashes.h>
 #include <rdf_storage_list.h>
 
+
+#ifndef STANDALONE
+
 /* prototypes for helper functions */
 static void librdf_delete_storage_factories(void);
 
@@ -972,7 +975,10 @@ librdf_storage_sync(librdf_storage* storage)
     storage->factory->sync(storage);
 }
 
+#endif
 
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

@@ -31,6 +31,7 @@
 
 #include <librdf.h>
 
+#ifndef STANDALONE
 /* prototypes for helper functions */
 static void librdf_delete_model_factories(void);
 
@@ -1000,7 +1001,10 @@ librdf_model_sync(librdf_model* model)
     model->factory->sync(model);
 }
 
+#endif
 
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE
@@ -1072,6 +1076,10 @@ main(int argc, char *argv[])
   }
   fprintf(stderr, "%s: Creating model\n", program);
   model=librdf_new_model(world, storage, NULL);
+  if(!model) {
+    fprintf(stderr, "%s: Failed to create new model\n", program);
+    return(1);
+  }
 
   statement=librdf_new_statement(world);
   /* after this, nodes become owned by model */

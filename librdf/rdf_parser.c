@@ -32,6 +32,8 @@
 #include <librdf.h>
 
 
+#ifndef STANDALONE
+
 /* prototypes for helper functions */
 static void librdf_delete_parser_factories(librdf_world *world);
 
@@ -525,7 +527,10 @@ librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature,
   return (-1);
 }
 
+#endif
 
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

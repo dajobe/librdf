@@ -32,6 +32,8 @@
 #include <librdf.h>
 
 
+#ifndef STANDALONE
+
 /* class methods */
 
 /**
@@ -763,6 +765,10 @@ librdf_statement_decode_parts(librdf_statement* statement,
   return total_length;
 }
 
+#endif
+
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

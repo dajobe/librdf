@@ -40,6 +40,9 @@
 #define RAPTOR_IN_REDLAND
 #include <raptor.h>
 
+
+#ifndef STANDALONE
+
 /* class methods */
 
 
@@ -565,6 +568,11 @@ librdf_uri_to_filename(librdf_uri* uri)
   return raptor_uri_uri_string_to_filename(uri->string);
   
 }
+
+#endif
+
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

@@ -33,6 +33,9 @@
 /* needed for utf8 functions and definition of 'byte' */
 #include <rdf_utf8.h>
 
+
+#ifndef STANDALONE
+
 /* class functions */
 
 /**
@@ -1228,6 +1231,11 @@ librdf_node_static_iterator_create(librdf_node** nodes,
 
   return iterator;
 }
+
+#endif
+
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

@@ -31,6 +31,8 @@
 #include <rdf_utf8.h>
 
 
+#ifndef STANDALONE
+
 /* UTF-8 encoding of 32 bit Unicode chars
  *
  * Characters  0x00000000 to 0x0000007f are US-ASCII
@@ -410,7 +412,10 @@ librdf_utf8_print(const byte *input, int length, FILE *stream)
   }
 }
 
+#endif
 
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

@@ -32,6 +32,8 @@
 #include <librdf.h>
 
 
+#ifndef STANDALONE
+
 /* prototypes for helper functions */
 static void librdf_delete_serializer_factories(librdf_world *world);
 
@@ -485,6 +487,10 @@ librdf_serializer_set_namespace(librdf_serializer* serializer,
   return 1;
 }
 
+#endif
+
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

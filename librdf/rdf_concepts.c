@@ -35,6 +35,7 @@
 #include <librdf.h>
 #include <rdf_node.h>
 
+#ifndef STANDALONE
 
 librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 librdf_node* librdf_concept_resources[LIBRDF_CONCEPT_LAST+1];
@@ -172,8 +173,10 @@ librdf_finish_concepts(librdf_world *world)
     librdf_free_node(librdf_concept_resources[i]);
 }
 
+#endif
 
 
+/* TEST CODE */
 
 
 #ifdef STANDALONE

@@ -35,6 +35,9 @@
 #include <rdf_query.h>
 #include <rdf_query_triples.h>
 
+
+#ifndef STANDALONE
+
 /* prototypes for helper functions */
 static void librdf_delete_query_factories(void);
 
@@ -389,6 +392,11 @@ librdf_query_run(librdf_query* query, librdf_model* model)
 {
   return query->factory->run(query, model);
 }
+
+#endif
+
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

@@ -42,7 +42,7 @@
 
 #include <librdf.h>
 
-
+#ifndef STANDALONE
 char *
 librdf_files_temporary_file_name(void) 
 {
@@ -102,6 +102,11 @@ HELP
 #endif
 #endif
 }
+
+#endif
+
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

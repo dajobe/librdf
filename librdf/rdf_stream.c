@@ -32,6 +32,8 @@
 #include <librdf.h>
 
 
+#ifndef STANDALONE
+
 /* prototypes of local helper functions */
 static librdf_statement* librdf_stream_update_current_statement(librdf_stream* stream);
 
@@ -457,6 +459,11 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
     librdf_stream_next(stream);
   }
 }
+
+#endif
+
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

@@ -35,6 +35,7 @@
 #include <librdf.h>
 
 
+#ifndef STANDALONE
 /**
  * librdf_heuristic_object_is_literal - try to guess if an object string is a literal or a resource
  * @object: string object to guess type
@@ -124,6 +125,11 @@ librdf_heuristic_gen_name(char *name)
   sprintf(new_name+offset+1, "%ld", l);
   return new_name;
 }
+
+#endif
+
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE

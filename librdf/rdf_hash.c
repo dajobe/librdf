@@ -42,6 +42,7 @@
 #include <rdf_hash_memory.h>
 #include <rdf_heuristics.h>
 
+#ifndef STANDALONE
 
 /* prototypes for helper functions */
 static void librdf_delete_hash_factories(librdf_world *world);
@@ -1412,7 +1413,10 @@ librdf_hash_get_as_long (librdf_hash* hash, char *key)
   return lvalue;
 }
 
+#endif
 
+
+/* TEST CODE */
 
 
 #ifdef STANDALONE
