@@ -124,7 +124,7 @@ static command commands[]={
 #endif
 
 
-#define GETOPT_STRING "chno:s:t:v"
+#define GETOPT_STRING "chno:ps:t:v"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_options[] =
@@ -134,6 +134,7 @@ static struct option long_options[] =
   {"help", 0, 0, 'h'},
   {"new", 0, 0, 'n'},
   {"output", 1, 0, 'o'},
+  {"password", 0, 0, 'p'},
   {"storage", 1, 0, 's'},
   {"storage-options", 1, 0, 't'},
   {"version", 0, 0, 'v'},
@@ -179,11 +180,14 @@ main(int argc, char *argv[])
   int rc;
   char *storage_name="hashes";
   char *storage_options="hash-type='bdb',dir='.'";
+  char *storage_password=NULL;
   unsigned char *uri_string;
   int free_uri_string=0;
   librdf_model* output_model=NULL;
   librdf_storage* output_storage=NULL;
   librdf_serializer* output_serializer=NULL;
+  size_t capacity;
+  size_t size;
 
   program=argv[0];
   if((p=strrchr(program, '/')))
@@ -258,6 +262,36 @@ main(int argc, char *argv[])
             }
             
           }
+        }
+        break;
+
+      case 'p':
+        /* gets() the password from stdin, checking for input overflow */
+        capacity=0;
+        size=0;
+        while(!feof(stdin)) {
+          if((capacity-size) < 10) {
+            capacity += 10;
+            p=(char*)malloc(capacity);
+            if(storage_password) {
+              strncpy(p, storage_password, size);
+              free(storage_password);
+            }
+            storage_password=p;
+          }
+          rc=fgetc(stdin); /* short enough that I don't care to use fread */
+          if(rc == '\n' || rc == EOF) {
+            storage_password[size]='\0';
+            break;
+          }
+          storage_password[size++]=(char)rc;
+        }
+
+        if(!size) {
+          fprintf(stderr, "%s: WARNING: No storage password found on input\n", 
+                  program);
+          free(storage_password);
+          storage_password=NULL;
         }
         break;
 
@@ -348,6 +382,7 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(n, "new             ", "Create a new store (default no)"));
     puts(HELP_TEXT(o, "output FORMAT   ", "Set the triple output format to one of:"));
     puts("    'simple'                A simple format (default)\n    'ntriples'              N-Triples\n    'rdfxml'                RDF/XML");
+    puts(HELP_TEXT(p, "password        ", "Read storage option 'password' from standard input"));
     puts(HELP_TEXT(s, "storage TYPE    ", "Set the graph storage type"));
     puts("    'memory'                In memory\n    'hashes'                Indexed hashes (default)\n    'mysql'                 MySQL - when available\n    '3store'                AKT triplestore - when available");
     printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Storage options (default \"%s\")\n"), storage_options);
@@ -399,6 +434,11 @@ main(int argc, char *argv[])
     librdf_hash_put_strings(options, "write", "yes");
     if (is_new)
       librdf_hash_put_strings(options, "new", "yes");
+  }
+
+  if(storage_password) {
+    librdf_hash_put_strings(options, "password", storage_password);
+    free(storage_password);
   }
   
   librdf_hash_from_string(options, storage_options);
