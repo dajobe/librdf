@@ -28,27 +28,27 @@
 #include <db.h>
 #endif
 
-/* these are alternatives: */
-#if 0
+/* these three are alternatives: */
 /* BDB V3 */
-#undef HAVE_DB_CREATE
+#ifdef HAVE_DB_CREATE
 #define BDB_CLOSE_2_ARGS ?
 #define BDB_FD_2_ARGS ?
 
-#else
+#endif
 
 /* BDB V2 */
-#define HAVE_DB_OPEN 1
+#ifdef HAVE_DB_OPEN
 #define BDB_CLOSE_2_ARGS 1
 #define BDB_FD_2_ARGS 1
 
 #endif
 
-/* set if DB_TXN defined */
-#define HAVE_BDB_DB_TXN 1
+/* BDB V1 - NO CODE OR TESTS WRITTEN FOR DB 1.x */
+#if 0
+#define BDB_CLOSE_2_ARGS ?
+#define BDB_FD_2_ARGS ?
+#endif
 
-/* set if DBC defined */
-#define HAVE_BDB_CURSOR 1
 
 #include <rdf_config.h>
 #include <rdf_hash.h>
