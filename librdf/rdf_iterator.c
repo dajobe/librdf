@@ -47,7 +47,8 @@ librdf_iterator*
 librdf_new_iterator(librdf_world *world,
                     void* context,
 		    int (*is_end)(void*),
-		    void* (*get_next)(void*),
+		    int (*next_method)(void*),
+		    void* (*get_method)(void*, int),
 		    void (*finished)(void*))
 {
   librdf_iterator* new_iterator;
@@ -62,7 +63,8 @@ librdf_new_iterator(librdf_world *world,
   new_iterator->context=context;
   
   new_iterator->is_end=is_end;
-  new_iterator->get_next=get_next;
+  new_iterator->next_method=next_method;
+  new_iterator->get_method=get_method;
   new_iterator->finished=finished;
 
   /* Not needed, calloc ensures this */
@@ -124,7 +126,8 @@ librdf_iterator_get_next_mapped_element(librdf_iterator* iterator)
   /* find next element subject to map */
   while(!iterator->is_end(iterator->context)) {
     librdf_iterator* map_iterator; /* Iterator over iterator->map_list librdf_list */
-    element=iterator->get_next(iterator->context);
+    element=iterator->get_method(iterator->context, 
+                                 LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT);
     if(!element)
       break;
 
@@ -133,7 +136,7 @@ librdf_iterator_get_next_mapped_element(librdf_iterator* iterator)
       break;
     
     while(!librdf_iterator_end(map_iterator)) {
-      librdf_iterator_map *map=(librdf_iterator_map*)librdf_iterator_get_next(map_iterator);
+      librdf_iterator_map *map=(librdf_iterator_map*)librdf_iterator_next(map_iterator);
       if(!map)
         break;
       
@@ -191,52 +194,113 @@ librdf_iterator_end(librdf_iterator* iterator)
   /* mapping from here */
 
   /* already have 1 stored item */
-  if(iterator->next)
+  if(iterator->current)
     return 0;
 
   /* get next item subject to map or NULL if list ended */
-  iterator->next=librdf_iterator_get_next_mapped_element(iterator);
-  if(!iterator->next)
+  iterator->current=librdf_iterator_get_next_mapped_element(iterator);
+  if(!iterator->current)
     iterator->is_finished=1;
   
-  return (iterator->next == NULL);
+  return (iterator->current == NULL);
 }
 
 
 /**
- * librdf_iterator_get_next - Get the next iterator element
+ * librdf_iterator_next - Move to the next iterator element
+ * @iterator: the &librdf_iterator object
+ *
+ * Return value: non 0 if the iterator has finished
+ **/
+int
+librdf_iterator_next(librdf_iterator* iterator)
+{
+  if(iterator->is_finished)
+    return 1;
+
+  iterator->is_finished=iterator->next_method(iterator->context);
+
+  if(!iterator->is_finished && iterator->map_list) {
+    /* mapping */
+    iterator->current=librdf_iterator_get_next_mapped_element(iterator);
+
+    if(!iterator->current)
+      iterator->is_finished=1;
+  }
+  
+  return iterator->is_finished;
+}
+
+
+/**
+ * librdf_iterator_get_object - Get the current object from the iterator
  * @iterator: the &librdf_iterator object
  *
  * Return value: The next element or NULL if the iterator has finished.
  **/
 void*
-librdf_iterator_get_next(librdf_iterator* iterator) 
+librdf_iterator_get_object(librdf_iterator* iterator)
 {
-  void *element;
-  
   if(iterator->is_finished)
     return NULL;
 
-  /* simple case, no mapping so pass on */
-  if(!iterator->map_list)
-    return iterator->get_next(iterator->context);
-
-  /* mapping from here */
-
-  /* return stored element if there is one */
-  if(iterator->next) {
-    element=iterator->next;
-    iterator->next=NULL;
-    return element;
-  }
-
-  /* else get a new one or NULL at end of list */
-  iterator->next=librdf_iterator_get_next_mapped_element(iterator);
-  if(!iterator->next)
-    iterator->is_finished=1;
-  
-  return iterator->next;
+  return iterator->get_method(iterator->context, 
+                              LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT);
 }
+
+
+/**
+ * librdf_iterator_get_object - Get the context of the current object on the iterator
+ * @iterator: the &librdf_iterator object
+ *
+ * Return value: The context or NULL if the iterator has finished.
+ **/
+void*
+librdf_iterator_get_context(librdf_iterator* iterator) 
+{
+  if(iterator->is_finished)
+    return NULL;
+
+  return iterator->get_method(iterator->context, 
+                              LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT);
+}
+
+
+
+/**
+ * librdf_iterator_get_key - Get the key of the current object on the iterator
+ * @iterator: the &librdf_iterator object
+ *
+ * Return value: The context or NULL if the iterator has finished.
+ **/
+void*
+librdf_iterator_get_key(librdf_iterator* iterator) 
+{
+  if(iterator->is_finished)
+    return NULL;
+
+  return iterator->get_method(iterator->context, 
+                              LIBRDF_ITERATOR_GET_METHOD_GET_KEY);
+}
+
+
+
+/**
+ * librdf_iterator_get_value - Get the value of the current object on the iterator
+ * @iterator: the &librdf_iterator object
+ *
+ * Return value: The context or NULL if the iterator has finished.
+ **/
+void*
+librdf_iterator_get_value(librdf_iterator* iterator) 
+{
+  if(iterator->is_finished)
+    return NULL;
+
+  return iterator->get_method(iterator->context, 
+                              LIBRDF_ITERATOR_GET_METHOD_GET_VALUE);
+}
+
 
 
 /**
