@@ -91,14 +91,13 @@
 #include <rdf_model.h>
 
 
-static const char *redland_copyright_string = "Copyright (C) 2000 David Beckett - http://purl.org/net/dajobe/ - Institute for Learning and Research Technology, University of Bristol.";
+static const char * const redland_copyright_string = "Copyright (C) 2000 David Beckett - http://purl.org/net/dajobe/ - Institute for Learning and Research Technology, University of Bristol.";
 
-static const char *redland_version_string = VERSION;
+static const char * const redland_version_string = VERSION;
 
-/* FIXME - should be derived from VERSION */
-static const int redland_version_major = 0;
-static const int redland_version_minor = 9;
-static const int redland_version_release = 1;
+static const int redland_version_major = LIBRDF_VERSION_MAJOR;
+static const int redland_version_minor = LIBRDF_VERSION_MINOR;
+static const int redland_version_release = LIBRDF_VERSION_RELEASE;
 
 
 /**

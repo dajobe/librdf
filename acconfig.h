@@ -4,6 +4,10 @@
 /* package version */
 #define VERSION
 
+#undef LIBRDF_VERSION_MAJOR
+#undef LIBRDF_VERSION_MINOR
+#undef LIBRDF_VERSION_RELEASE
+
 /* type is defined by typedef or MISSING if not present */
 #undef byte
 #undef u16
