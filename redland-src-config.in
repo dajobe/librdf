@@ -29,6 +29,8 @@ known values for OPTION are:
   --cflags              print pre-processor and compiler flags
   --help                display this help and exit
   --version             output version information
+  --run COMMAND         run the COMMAND with the shared libraries for
+                        the source tree
 EOF
   exit $1
 }
@@ -59,6 +61,24 @@ while test $# -gt 0; do
     --usage)
       usage 0 1>&2
       ;;
+    --run)
+      LD_LIBRARY_PATH=@abs_top_builddir@/librdf/.libs
+      if test -d .libs; then
+        LD_LIBRARY_PATH=".libs:$LD_LIBRARY_PATH"
+      fi
+      if test @with_raptor@ = internal; then
+        LD_LIBRARY_PATH="$LD_LIBRARY_PATH:@abs_top_builddir@/raptor/.libs"
+      fi
+      if test `uname` = Darwin; then
+        DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
+        export DYLD_LIBRARY_PATH
+      else
+        export LD_LIBRARY_PATH
+      fi
+      shift
+      exec $*
+      ;;
+
     *)
       usage 1 1>&2
       ;;
