@@ -177,7 +177,9 @@ int librdf_model_has_arc_in(librdf_model *model, librdf_node *node, librdf_node 
 int librdf_model_has_arc_out(librdf_model *model, librdf_node *node, librdf_node *property);
 
 
-/* serialise the entire model */
+/* list the entire model as a stream of statements */
+librdf_stream* librdf_model_as_stream(librdf_model* model);
+/* DEPRECATED serialise the entire model */
 librdf_stream* librdf_model_serialise(librdf_model* model);
 
 /* queries */

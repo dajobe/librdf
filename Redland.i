@@ -422,6 +422,7 @@ int librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 int librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream);
 int librdf_model_remove_statement(librdf_model* model, librdf_statement* statement);
 int librdf_model_contains_statement(librdf_model* model, librdf_statement* statement);
+librdf_stream* librdf_model_as_stream(librdf_model* model);
 librdf_stream* librdf_model_serialise(librdf_model* model);
 librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
 librdf_iterator* librdf_model_get_sources(librdf_model *model, librdf_node *arc, librdf_node *target);
