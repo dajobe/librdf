@@ -31,6 +31,11 @@ my($pod_rdf_rel)=($file =~ m%^pod/RDF/%) ? '' : 'RDF/';
 open(OUT, ">$file") or die "$progname: Cannot create $file - $!\n";
 open(IN, "-");
 while(<IN>) {
+  # Sorry, I'm transitional
+  s%<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"%<?xml version="1.0" encoding="iso-8859-1"?>%;
+  s%^.*"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">%<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">%;
+
+
   if(m%<title>(.*?)</title>%) {
     $doc_title=$1;
     $doc_title =~ s/^(.*) - Redland (.*) Class$/Perl $1 Class/;
