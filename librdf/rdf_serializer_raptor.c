@@ -103,7 +103,7 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
     default:
       /* must be URI */
       fputc('<', stream);
-      librdf_uri_print(librdf_node_get_uri(object), stream);
+      raptor_print_ntriples_string(stream, librdf_uri_as_string(librdf_node_get_uri(object)), '\0');
       fputc('>', stream);
   }
   fputs(" .", stream);
