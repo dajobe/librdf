@@ -78,7 +78,7 @@ SUBDIRS=@SD@
 
 bin_SCRIPTS = redland-config
 lib_LIBRARIES = libredland.a
-include_HEADERS = librdf.h
+include_HEADERS = redland.h
 
 libredland_a_SOURCES = rdf_init.c rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
@@ -87,7 +87,7 @@ rdf_list.c rdf_memory.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c \
-librdf.h rdf_types.h \
+redland.h rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_digest.h rdf_hash.h rdf_hash_gdbm.h \
 rdf_hash_memory.h rdf_model.h rdf_storage.h rdf_iterator.h \
 rdf_context.h rdf_list.h rdf_hash_bdb.h \
