@@ -99,8 +99,8 @@ cd ..
 %{prefix}/lib/librdf.la
 %{prefix}/lib/librdf.so
 
-%doc AUTHORS COPYING COPYING.LIB ChangeLog LICENSE.txt 
-%doc NEWS README TODO RELEASE
+%doc AUTHORS COPYING COPYING.LIB ChangeLog
+%doc README NEWS LICENSE.txt
 %doc *.html
 
 %doc %{_mandir}/man3/redland.3*

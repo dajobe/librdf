@@ -32,9 +32,10 @@ expat repat raptor \
 debian utils
 
 EXTRA_DIST=ChangeLog \
-README      NEWS      TODO      LICENSE.txt  RELEASE \
-README.html NEWS.html TODO.html LICENSE.html RELEASE.html \
-INSTALL.html FAQS.html MPL.html \
+README      NEWS      LICENSE.txt  \
+README.html NEWS.html LICENSE.html \
+TODO.html RELEASE.html INSTALL.html FAQS.html \
+MPL.html \
 Redland.i \
 autogen.sh \
 Makefile.PL \
@@ -55,12 +56,6 @@ README: README.html
 	$(HTML_TO_TEXT) $< > $@
 
 NEWS: NEWS.html
-	$(HTML_TO_TEXT) $< > $@
-
-TODO: TODO.html
-	$(HTML_TO_TEXT) $< > $@
-
-RELEASE: RELEASE.html
 	$(HTML_TO_TEXT) $< > $@
 
 @SET_MAKE@
