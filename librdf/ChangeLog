@@ -1,4 +1,16 @@
 2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+	* rdf_log.c: Replace librdf.h, raptor.h with redland.h.
+
+2004-07-09  Edd Dumbill <edd@usefulinc.com>
+
+	* rdf_log.c: add accessors for components of the 
+	librdf_log_message type.
+
+	* rdf_log.h: add prototypes for the accessors, deleted
+	unused prototypes for librdf_log_set_handler and
+	librdf_log_set_level.
+
+2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* redland.h: Include rasqal.h, reorder so raptor.h is first.
 
