@@ -10,7 +10,7 @@ man_MANS = redland-db-upgrade.1 rdfproc.1
 
 EXTRA_DIST=update-api-0912.pl $(man_MANS)
 
-CLEANFILES=*.db
+CLEANFILES=*.db $(EXTRA_PROGRAMS)
 
 AM_CPPFLAGS=@CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_INTERNAL_CPPFLAGS@ -I$(top_srcdir)/librdf
 AM_CFLAGS=@CFLAGS@ $(MEM)
