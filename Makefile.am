@@ -143,7 +143,7 @@ autogen.sh
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
-rdf_files_test rdf_heuristics_test rdf_utf8_test
+rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test
 
 EXAMPLES=example1 example2 example3 example4
 
@@ -212,6 +212,9 @@ rdf_heuristics_test: rdf_heuristics.c librdf.a
 
 rdf_utf8_test: rdf_utf8.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_utf8.c librdf.a $(LIBS)
+
+rdf_concepts_test: rdf_concepts.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_concepts.c librdf.a $(LIBS)
 
 examples: $(EXAMPLES)
 
