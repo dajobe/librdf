@@ -14,44 +14,48 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>module - rdf parser - internal to librdf written by me</li>
-<li>module - xml dom parser - external</li>
-<li>module - xml dom parser - libxml</li>
-<li>module - xml sax parser - libxml</li>
-<li>module - xml parser - sax</li>
-<li>module - xml parser - dom</li>
-<li>module - uri syntax / representation</li>
-<li>module - uri resolving - (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml </li>
+<li>Add module - rdf parser - internal to librdf written by me</li>
+<li>Add module - xml dom parser - external</li>
+<li>Add module - xml dom parser - libxml</li>
+<li>Add module - xml sax parser - libxml</li>
+<li>Add module - xml parser - sax</li>
+<li>Add module - xml parser - dom</li>
+<liAdd >module - uri syntax / representation</li>
+<li>Add module - uri resolving - (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
 <li>module - xml namespaces</li>
-<li>check out if the library can be built shared</li>
-<li>modularise the library so some parts can be removed</li>
-<li>added #ifdef WIN32 around including config file - win32 build?</li>
-<li>If GPL license, include compatible code OR add separate package?</li>
-<li>If BSD license, include compatible code?</li>
-<li>sort out the license issues with contributed code</li>
-<li>anonymous resources</li>
-<li>C++ interface</li>
-<li>perl interface</li>
-<li>RDF schemas</li>
-<li>query language interface</li>
-<li>write better example code</li>
-<li>write a quickstart / howto document</li>
-<li>split header files into internal / user ones.  Maybe generate
+<li>Check out if the library can be built shared</li>
+<li>Modularise the library so some parts can be removed</li>
+<li>Add <tt>#ifdef WIN32</tt> around parts including config file - create a win32 build?</li>
+<li>If LGPL/MPL license, include compatible code OR add separate package?</li>
+<li>Deal with anonymous resources</li>
+<li>Write a C++ interface</li>
+<li>Write a perl interface</li>
+<li>Support RDF schemas</li>
+<li>Add query language interfaces</li>
+<li>Write some better example code</li>
+<li>Write a quickstart / howto document</li>
+<li>Split the header files into internal / user ones.  Maybe generate
 part of librdf.h automatically to make a 1-header file system.</li>
-<li>make GDBM hash handle duplicates</li>
-<li>make API docbook sgml generate 1 big HTML file</li>
-<li>make API docbook sgml generate decent PostScript / PDF output</li>
-<li>fix URI hash mechanism - currently stores URI/pointer pairs in hash - wrong</lI>
+<li>Make GDBM hash handle duplicates</li>
+<li>Make API docbook sgml generate 1 big HTML file</li>
+<li>Make API docbook sgml generate decent PostScript / PDF output</li>
+<li>Fix the URI hash mechanism - currently stores URI/pointer pairs in hash - wrong</li>
+<li>Make the library thread safe</li>
+<li>The library does not do file locking on e.g. DB files</li>
 </ul>
 
 
 <h2>Known Bugs</h2>
 
-<p>1. string encoding - needs iconv posix function and/or Unicode library.</p>
+<p>(Excluding all the <tt>FIXME</tt>s in the source)</p>
+
+<p>1. String encoding - needs iconv posix function and/or Unicode library.</p>
 
 <p>2. rdf_hash.c <tt>librdf_hash_from_string()</tt> - \ escaping doesn't work properly</p>
 
-<p>3. BerkeleyDB V1 code does not work</p>
+<p>3. BerkeleyDB V1 code has not been tested and probably not worth fixing.</p>
+
+<p>4. GDBM hash code does not support duplicates so not used.</p>
 
 
 <h2>Done</h2>
