@@ -545,9 +545,9 @@ librdf_query_rasqal_results_get_bindings(librdf_query_results *query_results,
   int i;
 
   if(values) {
-    rc=rasqal_query_results_get_bindings(context->results, names, &literals);
+    rc=rasqal_query_results_get_bindings(context->results, (const unsigned char ***)names, &literals);
   } else
-    rc=rasqal_query_results_get_bindings(context->results, names, NULL);
+    rc=rasqal_query_results_get_bindings(context->results, (const unsigned char ***)names, NULL);
 
   if(rc || !values)
     return rc;
