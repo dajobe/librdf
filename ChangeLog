@@ -1,5 +1,11 @@
 2004-07-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* configure.ac: no need for perl dirs
+
+	* librdf/redland.spec.in: remove redland-perl, redland-python
+
+	* redland-src-config.in: Added --libtool-libs
+
 	* docs/Makefile.am, configure.ac, Makefile.am:
 	Updates for move of files and dirs to redland-bindings package
 
