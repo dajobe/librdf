@@ -322,30 +322,33 @@ librdf_statement_to_string(librdf_statement *statement)
   int statement_string_len;
   char *format;
   static char *null_string="(null)";
+  size_t len;
 
   if(LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
-    subject_string=librdf_node_to_string(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
+    subject_string=librdf_node_to_counted_string(LIBRDF_NODE_STATEMENT_SUBJECT(statement), &len);
     if(!subject_string)
       return NULL;
+    statement_string_len += len;
   } else {
     subject_string=null_string;
   }
 
   
   if(LIBRDF_NODE_STATEMENT_PREDICATE(statement)) {
-    predicate_string=librdf_node_to_string(LIBRDF_NODE_STATEMENT_PREDICATE(statement));
+    predicate_string=librdf_node_to_counted_string(LIBRDF_NODE_STATEMENT_PREDICATE(statement), &len);
     if(!predicate_string) {
       if(subject_string != null_string)
         LIBRDF_FREE(cstring, subject_string);
       return NULL;
     }
+    statement_string_len += len;
   } else {
     predicate_string=null_string;
   }
   
 
   if(LIBRDF_NODE_STATEMENT_OBJECT(statement)) {
-    object_string=librdf_node_to_string(LIBRDF_NODE_STATEMENT_OBJECT(statement));
+    object_string=librdf_node_to_counted_string(LIBRDF_NODE_STATEMENT_OBJECT(statement), &len);
     if(!object_string) {
       if(subject_string != null_string)
         LIBRDF_FREE(cstring, subject_string);
@@ -353,6 +356,7 @@ librdf_statement_to_string(librdf_statement *statement)
         LIBRDF_FREE(cstring, predicate_string);
       return NULL;
     }
+    statement_string_len += len;
   } else {
     object_string=null_string;
   }
@@ -361,10 +365,10 @@ librdf_statement_to_string(librdf_statement *statement)
 
 #define LIBRDF_STATEMENT_FORMAT_STRING_LITERAL "{%s, %s, \"%s\"}"
 #define LIBRDF_STATEMENT_FORMAT_RESOURCE_LITERAL "{%s, %s, %s}"
-  statement_string_len=1 + strlen(subject_string) +   /* "{%s" */
-                       2 + strlen(predicate_string) + /* ", %s" */
-                       2 + strlen(object_string) +    /* ", %s" */
-                       1 + 1;                         /* "}\0" */
+  statement_string_len += + 1 + /* "{" %s */
+                            2 + /* "," %s */
+                            2 + /* ", " %s */
+                            1 + 1; /* "}\0" */
   if(LIBRDF_NODE_STATEMENT_OBJECT(statement) &&
      librdf_node_get_type(LIBRDF_NODE_STATEMENT_OBJECT(statement)) == LIBRDF_NODE_TYPE_LITERAL) {
     format=LIBRDF_STATEMENT_FORMAT_STRING_LITERAL;
