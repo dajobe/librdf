@@ -85,6 +85,7 @@
 #include <rdf_node.h>
 
 
+librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 librdf_node* librdf_concept_resources[LIBRDF_CONCEPT_LAST+1];
 
 
@@ -100,8 +101,10 @@ librdf_node* librdf_concept_resources[LIBRDF_CONCEPT_LAST+1];
 static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
   /* RDF M&S */
   "Alt", "Bag", "Property", "Seq", "Statement", "object", "predicate", "subject", "type", "value",
+  /* RDF M&S syntax, not concepts */
+  "aboutEach", "aboutEachPrefix",
   /* RDF S */
-  "Class", "ConstraintProperty", "ConstraintResource", "ContainerMembershipProperty", "Container", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf",
+  "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"
 };
 
 
@@ -111,8 +114,10 @@ static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
 static const char* const librdf_concept_labels[LIBRDF_CONCEPT_LAST+1]={
   /* RDF M&S */
   "Alt", "Bag", "Property", "Sequence", "Statement", "object", "predicate", "subject", "type", "object",
+  /* RDF M&S syntax, not concepts */
+  "aboutEach", "aboutEachPrefix",
   /* RDF S */
-  "Class", "ConstraintProperty", "ConstraintResource", "ContainerMembershipProperty", "Container", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"
+  "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"
 };
 
 
@@ -145,8 +150,13 @@ librdf_init_concepts(void)
     librdf_uri* ns_uri=(i < LIBRDF_CONCEPT_FIRST_S_ID) ? librdf_concept_ms_namespace_uri :
       librdf_concept_schema_namespace_uri;
     const char * token=librdf_concept_tokens[i];
-    
+
     librdf_concept_resources[i]=librdf_new_node_from_uri_qname(ns_uri, token);
+    if(!librdf_concept_resources[i])
+      LIBRDF_FATAL1(librdf_init_concepts, "Failed to create Node from URI\n");
+
+    /* keep shared copy of URI from node */
+    librdf_concept_uris[i]=librdf_node_get_uri(librdf_concept_resources[i]);
   }
 }
 
@@ -165,5 +175,6 @@ librdf_finish_concepts(void)
     librdf_free_uri(librdf_concept_schema_namespace_uri);
 
   for (i=0; i< LIBRDF_CONCEPT_LAST; i++)
+    /* deleted associated URI too */
     librdf_free_node(librdf_concept_resources[i]);
 }
