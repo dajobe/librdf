@@ -27,6 +27,10 @@
 #include <string.h> /* for strcat */
 #include <ctype.h> /* for isalnum */
 
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h> /* for abort() as used in errors */
+#endif
+
 #include <librdf.h>
 
 #include <rdf_uri.h>

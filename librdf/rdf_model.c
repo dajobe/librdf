@@ -25,6 +25,10 @@
 
 #include <stdio.h>
 
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h> /* for exit()  */
+#endif
+
 #include <librdf.h>
 #include <rdf_list.h>
 #include <rdf_node.h>

@@ -24,6 +24,7 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h> /* for isprint() */
 
 #include <librdf.h>

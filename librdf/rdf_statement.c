@@ -24,6 +24,11 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
+#include <string.h>
+
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h> /* for abort() as used in errors */
+#endif
 
 #include <librdf.h>
 #include <rdf_node.h>
