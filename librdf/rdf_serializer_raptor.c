@@ -85,6 +85,74 @@ librdf_serializer_raptor_terminate(void *context)
   if(scontext->rdf_serializer)
     raptor_free_serializer(scontext->rdf_serializer);
 }
+
+
+/**
+ * librdf_serializer_raptor_get_feature - Get a raptor parser feature
+ * @context: context
+ * @feature: &librdf_uri of feature
+ *
+ * Return value: new &librdf_node value or NULL on failure
+ **/
+static librdf_node*
+librdf_serializer_raptor_get_feature(void *context, librdf_uri* feature) {
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
+  static unsigned char intbuffer[20]; /* FIXME */
+  unsigned char *uri_string;
+  raptor_feature feature_i;
+  
+  if(!feature)
+    return NULL;
+
+  uri_string=librdf_uri_as_string(feature);
+  if(!uri_string)
+    return NULL;
+  
+  feature_i=raptor_feature_from_uri((raptor_uri*)feature);
+  if((int)feature_i >= 0) {
+    int value=raptor_serializer_get_feature(scontext->rdf_serializer, feature_i);
+    sprintf((char*)intbuffer, "%d", value);
+    return librdf_new_node_from_typed_literal(scontext->serializer->world,
+                                              intbuffer, NULL, NULL);
+  }
+  
+  return NULL;
+}
+
+
+static int
+librdf_serializer_raptor_set_feature(void *context, 
+                                     librdf_uri *feature, librdf_node* value) 
+{
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
+  raptor_feature feature_i;
+  int value_i;
+  
+  if(!feature)
+    return 1;
+
+  /* try a raptor feature */
+  feature_i=raptor_feature_from_uri((raptor_uri*)feature);
+  if((int)feature_i < 0)
+    return 1;
+  
+  if(!librdf_node_is_literal(value))
+    return 1;
+  
+  value_i=atoi((const char*)librdf_node_get_literal_value(value));
+
+  return raptor_serializer_set_feature(scontext->rdf_serializer, feature_i, value_i);
+}
+
+
+static int
+librdf_serializer_raptor_set_namespace(void* context,
+                                       librdf_uri *uri, const char *prefix) 
+{
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
+  return raptor_serializer_set_namespace(scontext->rdf_serializer, 
+                                         (raptor_uri*)uri, prefix)
+}
   
 
 static int
@@ -284,6 +352,10 @@ librdf_serializer_raptor_register_factory(librdf_serializer_factory *factory)
   
   factory->init  = librdf_serializer_raptor_init;
   factory->terminate = librdf_serializer_raptor_terminate;
+
+  factory->get_feature = librdf_serializer_raptor_get_feature;
+  factory->set_feature = librdf_serializer_raptor_set_feature;
+  factory->set_namespace = librdf_serializer_raptor_set_namespace;
 
   factory->serialize_model_to_file_handle = librdf_serializer_raptor_serialize_model_to_file_handle;
   factory->serialize_model_to_counted_string = librdf_serializer_raptor_serialize_model_to_counted_string;
