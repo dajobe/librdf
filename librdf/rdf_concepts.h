@@ -102,8 +102,11 @@ enum {
   LIBRDF_CONCEPT_MS_type,
   LIBRDF_CONCEPT_MS_value,
 
-  LIBRDF_CONCEPT_SYNTAX_aboutEach,
-  LIBRDF_CONCEPT_SYNTAX_aboutEachPrefix,
+  LIBRDF_CONCEPT_MS_RDF,
+  LIBRDF_CONCEPT_MS_Description,
+
+  LIBRDF_CONCEPT_MS_aboutEach,
+  LIBRDF_CONCEPT_MS_aboutEachPrefix,
 
   /* RDF Schema concepts defined in prose at
    *   http://www.w3.org/TR/2000/CR-rdf-schema-20000327/
@@ -153,6 +156,12 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_MS_type librdf_concept_resources[LIBRDF_CONCEPT_MS_type]
 #define LIBRDF_MS_value librdf_concept_resources[LIBRDF_CONCEPT_MS_value]
 
+#define LIBRDF_MS_RDF librdf_concept_resources[LIBRDF_CONCEPT_MS_RDF]
+#define LIBRDF_MS_Description librdf_concept_resources[LIBRDF_CONCEPT_MS_Description]
+
+#define LIBRDF_MS_aboutEach librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_aboutEach]
+#define LIBRDF_MS_aboutEachPrefix librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_aboutEachPrefix]
+
 
 #define LIBRDF_S_Class librdf_concept_resources[LIBRDF_CONCEPT_S_Class]
 #define LIBRDF_S_ConstraintProperty librdf_concept_resources[LIBRDF_CONCEPT_S_ConstraintProperty]
@@ -169,9 +178,8 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_S_seeAlso librdf_concept_resources[LIBRDF_CONCEPT_S_seeAlso]
 #define LIBRDF_S_subClassOf librdf_concept_resources[LIBRDF_CONCEPT_S_subClassOf]
 #define LIBRDF_S_subPropertyOf librdf_concept_resources[LIBRDF_CONCEPT_S_subPropertyOf]
+#define LIBRDF_S_subPropertyOf librdf_concept_resources[LIBRDF_CONCEPT_S_subPropertyOf]
 
-#define LIBRDF_SYNTAX_aboutEach librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_aboutEach]
-#define LIBRDF_SYNTAX_aboutEachPrefix librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_aboutEachPrefix]
 
 
 /* public macros for the URIs (librdf_uri*) representing the concepts */
@@ -185,6 +193,12 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_MS_subject_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_subject]
 #define LIBRDF_MS_type_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_type]
 #define LIBRDF_MS_value_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_value]
+
+#define LIBRDF_MS_RDF_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_RDF]
+#define LIBRDF_MS_Description_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_Description]
+
+#define LIBRDF_MS_aboutEach_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_aboutEach]
+#define LIBRDF_MS_aboutEachPrefix_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_aboutEachPrefix]
 
 
 #define LIBRDF_S_subPropertyOf_URI librdf_concept_uris[LIBRDF_CONCEPT_S_subPropertyOf]
@@ -202,9 +216,6 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_S_ConstraintResource_URI librdf_concept_uris[LIBRDF_CONCEPT_S_ConstraintResource]
 #define LIBRDF_S_ConstraintProperty_URI librdf_concept_uris[LIBRDF_CONCEPT_S_ConstraintProperty]
 #define LIBRDF_S_Class_URI librdf_concept_uris[LIBRDF_CONCEPT_S_Class]
-
-#define LIBRDF_SYNTAX_aboutEach_URI librdf_concept_uris[LIBRDF_CONCEPT_SYNTAX_aboutEach]
-#define LIBRDF_SYNTAX_aboutEachPrefix_URI librdf_concept_uris[LIBRDF_CONCEPT_SYNTAX_aboutEachPrefix]
 
 
 /* private implementation */

@@ -101,8 +101,10 @@ librdf_node* librdf_concept_resources[LIBRDF_CONCEPT_LAST+1];
 static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
   /* RDF M&S */
   "Alt", "Bag", "Property", "Seq", "Statement", "object", "predicate", "subject", "type", "value",
-  /* RDF M&S syntax, not concepts */
+  "RDF", "Description",
   "aboutEach", "aboutEachPrefix",
+
+
   /* RDF S */
   "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"
 };
@@ -114,8 +116,9 @@ static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
 static const char* const librdf_concept_labels[LIBRDF_CONCEPT_LAST+1]={
   /* RDF M&S */
   "Alt", "Bag", "Property", "Sequence", "Statement", "object", "predicate", "subject", "type", "object",
-  /* RDF M&S syntax, not concepts */
+  "RDF", "Description",
   "aboutEach", "aboutEachPrefix",
+
   /* RDF S */
   "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"
 };
