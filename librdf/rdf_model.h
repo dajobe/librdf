@@ -39,13 +39,13 @@ void init_rdf_model(void);
 /* constructors */
 
 /* Create a new Model */
-rdf_model* new_rdf_model(void);
+rdf_model* rdf_new_model(void);
 
 /* Create a new Model from an existing Model - CLONE */
-rdf_model* new_rdf_model_from_model(rdf_model* model);
+rdf_model* rdf_new_model_from_model(rdf_model* model);
 
 /* destructor */
-void free_rdf_model(rdf_model *model);
+void rdf_free_model(rdf_model *model);
 
 
 /* functions / methods */

@@ -28,12 +28,12 @@ typedef char rdf_uri;
 void init_rdf_uri(rdf_digest_factory *factory);
 
 /* constructors */
-rdf_uri* new_rdf_uri (char *string);
+rdf_uri* rdf_new_uri (char *string);
 /* Create a new URI from an existing URI - CLONE */
-rdf_uri* new_rdf_uri_from_uri (rdf_uri* uri);
+rdf_uri* rdf_new_uri_from_uri (rdf_uri* uri);
 
 /* destructor */
-void free_rdf_uri(rdf_uri *uri);
+void rdf_free_uri(rdf_uri *uri);
 
 /* methods */
 char* rdf_uri_as_string (rdf_uri *uri);

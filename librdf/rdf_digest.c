@@ -111,7 +111,7 @@ get_rdf_digest_factory(const char *name)
  * @param factory the digest factory to use to create this digest
  */
 rdf_digest*
-new_rdf_digest(rdf_digest_factory *factory)
+rdf_new_digest(rdf_digest_factory *factory)
 {
   rdf_digest* d;
 
@@ -121,13 +121,13 @@ new_rdf_digest(rdf_digest_factory *factory)
 
   d->context=(char*)RDF_CALLOC(digest_context, factory->context_length, 1);
   if(!d->context) {
-    free_rdf_digest(d);
+    rdf_free_digest(d);
     return NULL;
   }
 
   d->digest=(unsigned char*)RDF_CALLOC(digest_digest, factory->digest_length, 1);
   if(!d->digest) {
-    free_rdf_digest(d);
+    rdf_free_digest(d);
     return NULL;
   }
 
@@ -141,7 +141,7 @@ new_rdf_digest(rdf_digest_factory *factory)
  * @param digest the digest
  */
 void
-free_rdf_digest(rdf_digest *digest) 
+rdf_free_digest(rdf_digest *digest) 
 {
   if(digest->context)
     RDF_FREE(digest_context, digest->context);
@@ -292,7 +292,7 @@ main(int argc, char *argv[])
       continue;
     }
     
-    d=new_rdf_digest(factory);
+    d=rdf_new_digest(factory);
     if(!d) {
       fprintf(stderr, "%s: Failed to create new digest type %s\n", program, type);
       continue;
@@ -311,7 +311,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "\n");
     
     fprintf(stderr, "%s: Freeing digest\n", program);
-    free_rdf_digest(d);
+    rdf_free_digest(d);
   }
   
     

@@ -47,7 +47,7 @@ typedef struct
 
 /* prototypes for local functions */
 static rdf_hash_list_node* rdf_hash_list_find_node(rdf_hash_list_node* list, char *key, size_t key_len, rdf_hash_list_node** prev);
-static void free_rdf_hash_list_node(rdf_hash_list_node* node);
+static void rdf_free_hash_list_node(rdf_hash_list_node* node);
 
 static int rdf_hash_list_open(void* context, char *identifier, void *mode, void *options);
 static int rdf_hash_list_close(void* context);
@@ -80,7 +80,7 @@ rdf_hash_list_find_node(rdf_hash_list_node* list, char *key, size_t key_len,
 }
 
 static void
-free_rdf_hash_list_node(rdf_hash_list_node* node) 
+rdf_free_hash_list_node(rdf_hash_list_node* node) 
   {
   if(node->key)
     RDF_FREE(cstring, node->key);
@@ -107,7 +107,7 @@ rdf_hash_list_close(void* context)
   
   for(node=list_context->first; node; node=next) {
     next=node->next;
-    free_rdf_hash_list_node(node);
+    rdf_free_hash_list_node(node);
   }
   return 0;
 }
@@ -213,7 +213,7 @@ rdf_hash_list_delete(void* context, rdf_hash_data *key)
     prev->next=node->next;
 
   /* free node */
-  free_rdf_hash_list_node(node);
+  rdf_free_hash_list_node(node);
   return 0;
 }
 

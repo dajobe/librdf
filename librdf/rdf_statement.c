@@ -34,7 +34,7 @@ init_rdf_statement(void)
 /* constructor */
 /* Create a new empty Statement */
 rdf_statement*
-new_rdf_statement(void) 
+rdf_new_statement(void) 
 {
   rdf_statement* new_statement;
   
@@ -49,14 +49,14 @@ new_rdf_statement(void)
 /* destructor */
 
 void
-free_rdf_statement(rdf_statement* statement)
+rdf_free_statement(rdf_statement* statement)
 {
   if(statement->subject)
-    free_rdf_node(statement->subject);
+    rdf_free_node(statement->subject);
   if(statement->predicate)
-    free_rdf_node(statement->predicate);
+    rdf_free_node(statement->predicate);
   if(statement->object)
-    free_rdf_node(statement->object);
+    rdf_free_node(statement->object);
   /* context NOT freed, it is not owned by this object */
   RDF_FREE(rdf_statement, statement);
 }
@@ -77,8 +77,8 @@ rdf_statement_set_subject(rdf_statement *statement, rdf_node *node)
 {
   /*
   if(statement->subject)
-    free_rdf_node(statement->subject);
-  return (statement->subject=new_rdf_node_from_node(node)) != NULL;
+    rdf_free_node(statement->subject);
+  return (statement->subject=rdf_new_node_from_node(node)) != NULL;
   */
   statement->subject=node;
   return 0;
@@ -97,8 +97,8 @@ rdf_statement_set_predicate(rdf_statement *statement, rdf_node *node)
 {
   /*
   if(statement->predicate)
-    free_rdf_node(statement->predicate);
-  return (statement->predicate=new_rdf_node_from_node(node)) != NULL;
+    rdf_free_node(statement->predicate);
+  return (statement->predicate=rdf_new_node_from_node(node)) != NULL;
   */
   statement->predicate=node;
   return 0;
@@ -117,8 +117,8 @@ rdf_statement_set_object(rdf_statement *statement, rdf_node *node)
 {
   /*
   if(statement->object)
-    free_rdf_node(statement->object);
-  return (statement->object=new_rdf_node_from_node(node)) != NULL;
+    rdf_free_node(statement->object);
+  return (statement->object=rdf_new_node_from_node(node)) != NULL;
   */
   statement->object=node;
   return 0;
@@ -211,18 +211,18 @@ main(int argc, char *argv[])
   init_rdf_statement();
 
   fprintf(stderr, "%s: Creating statement\n", program);
-  statement=new_rdf_statement();
+  statement=rdf_new_statement();
 
-  rdf_statement_set_subject(statement, new_rdf_node_from_uri_string("http://www.ilrt.bris.ac.uk/people/cmdjb/"));
-  rdf_statement_set_predicate(statement, new_rdf_node_from_uri_string("http://purl.org/dc/elements/1.1/#Creator"));
-  rdf_statement_set_object(statement, new_rdf_node_from_literal("Dave Beckett", NULL));
+  rdf_statement_set_subject(statement, rdf_new_node_from_uri_string("http://www.ilrt.bris.ac.uk/people/cmdjb/"));
+  rdf_statement_set_predicate(statement, rdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/#Creator"));
+  rdf_statement_set_object(statement, rdf_new_node_from_literal("Dave Beckett", NULL));
 
   s=rdf_statement_to_string(statement);
   fprintf(stderr, "%s: Resulting statement: %s\n", program, s);
   free(s);
 
   fprintf(stderr, "%s: Freeing statement\n", program);
-  free_rdf_statement(statement);
+  rdf_free_statement(statement);
   
   /* keep gcc -Wall happy */
   return(0);

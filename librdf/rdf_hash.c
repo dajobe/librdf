@@ -126,7 +126,7 @@ get_rdf_hash_factory (const char *name)
  * @param factory object from the factory
  */
 rdf_hash*
-new_rdf_hash (rdf_hash_factory* factory) {
+rdf_new_hash (rdf_hash_factory* factory) {
   rdf_hash* h;
 
   h=(rdf_hash*)RDF_CALLOC(rdf_hash, sizeof(rdf_hash), 1);
@@ -135,7 +135,7 @@ new_rdf_hash (rdf_hash_factory* factory) {
 
   h->context=(char*)RDF_CALLOC(hash_context, factory->context_length, 1);
   if(!h->context) {
-    free_rdf_hash(h);
+    rdf_free_hash(h);
     return NULL;
   }
 
@@ -147,7 +147,7 @@ new_rdf_hash (rdf_hash_factory* factory) {
 
 /** destructor for rdf_hash objects */
 void
-free_rdf_hash (rdf_hash* hash) 
+rdf_free_hash (rdf_hash* hash) 
 {
   RDF_FREE(rdf_hash, hash);
 }
@@ -481,7 +481,7 @@ main(int argc, char *argv[])
       return(0);
     }
     
-    h=new_rdf_hash(factory);
+    h=rdf_new_hash(factory);
     if(!h) {
       fprintf(stderr, "%s: Failed to create new hash type %s\n", program, type);
       return(0);
@@ -493,7 +493,7 @@ main(int argc, char *argv[])
     rdf_hash_print(h, stderr);
     fprintf(stderr, "\n");
     rdf_hash_close(h);
-    free_rdf_hash(h);
+    rdf_free_hash(h);
     return(0);
     
   }
@@ -507,7 +507,7 @@ main(int argc, char *argv[])
       continue;
     }
     
-    h=new_rdf_hash(factory);
+    h=rdf_new_hash(factory);
     if(!h) {
       fprintf(stderr, "%s: Failed to create new hash type %s\n", program, type);
       continue;
@@ -538,7 +538,7 @@ main(int argc, char *argv[])
     rdf_hash_close(h);
 
     fprintf(stderr, "%s: Freeing hash\n", program);
-    free_rdf_hash(h);
+    rdf_free_hash(h);
   }
   
     

@@ -61,10 +61,10 @@ get_rdf_digest_factory(const char *name);
 void init_rdf_digest(void);
                     
 /* constructor */
-rdf_digest* new_rdf_digest(rdf_digest_factory *factory);
+rdf_digest* rdf_new_digest(rdf_digest_factory *factory);
 
 /* destructor */
-void free_rdf_digest(rdf_digest *digest);
+void rdf_free_digest(rdf_digest *digest);
 
 
 /* methods */

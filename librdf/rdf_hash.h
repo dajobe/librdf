@@ -90,10 +90,10 @@ void rdf_hash_register_factory(const char *name,
 rdf_hash_factory* get_rdf_hash_factory(const char *name);
 
 /* constructor */
-rdf_hash* new_rdf_hash(rdf_hash_factory* factory);
+rdf_hash* rdf_new_hash(rdf_hash_factory* factory);
 
 /* destructor */
-void free_rdf_hash(rdf_hash *hash);
+void rdf_free_hash(rdf_hash *hash);
 
 
 /* methods */

@@ -38,7 +38,7 @@ void init_rdf_uri(rdf_digest_factory* factory)
 
 /* constructors */
 INLINE rdf_uri*
-new_rdf_uri (char *uri_string) {
+rdf_new_uri (char *uri_string) {
   char *new_uri=(char*)RDF_MALLOC(rdf_uri, strlen(uri_string)+1);
   if(!new_uri)
     return 0;
@@ -48,7 +48,7 @@ new_rdf_uri (char *uri_string) {
 }
 
 INLINE rdf_uri*
-new_rdf_uri_from_uri (rdf_uri* old_uri) {
+rdf_new_uri_from_uri (rdf_uri* old_uri) {
   char *new_uri=(char*)RDF_MALLOC(rdf_uri, strlen(old_uri)+1);
   if(!new_uri)
     return 0;
@@ -59,7 +59,7 @@ new_rdf_uri_from_uri (rdf_uri* old_uri) {
 
 /* destructor */
 INLINE void
-free_rdf_uri (rdf_uri* uri) 
+rdf_free_uri (rdf_uri* uri) 
 {
   RDF_FREE(rdf_uri, uri);
 }
@@ -78,7 +78,7 @@ rdf_uri_get_digest (rdf_uri* uri)
 {
   rdf_digest* d;
 
-  d=new_rdf_digest(rdf_uri_digest_factory);
+  d=rdf_new_digest(rdf_uri_digest_factory);
   if(!d)
     return NULL;
 

@@ -40,10 +40,10 @@ void init_rdf_statement(void);
 /* initialising functions / constructors */
 
 /* Create a new Statement. */
-rdf_statement* new_rdf_statement(void);
+rdf_statement* rdf_new_statement(void);
 
 /* destructor */
-void free_rdf_statement(rdf_statement* statement);
+void rdf_free_statement(rdf_statement* statement);
 
 
 /* functions / methods */

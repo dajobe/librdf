@@ -53,22 +53,22 @@ void init_rdf_node(rdf_digest_factory* factory);
 /* initialising functions / constructors */
 
 /* Create a new Node. */
-rdf_node* new_rdf_node(void);
+rdf_node* rdf_new_node(void);
 
 /* Create a new resource Node from URI string. */
-rdf_node* new_rdf_node_from_uri_string(char *string);
+rdf_node* rdf_new_node_from_uri_string(char *string);
 
 /* Create a new resource Node from URI object. */
-rdf_node* new_rdf_node_from_uri(rdf_uri *uri);
+rdf_node* rdf_new_node_from_uri(rdf_uri *uri);
 
 /* Create a new Node from literal string / language. */
-rdf_node* new_rdf_node_from_literal(char *string, char *xml_language);
+rdf_node* rdf_new_node_from_literal(char *string, char *xml_language);
 
 /* Create a new Node from an existing Node - CLONE */
-rdf_node* new_rdf_node_from_node(rdf_node *node);
+rdf_node* rdf_new_node_from_node(rdf_node *node);
 
 /* destructor */
-void free_rdf_node(rdf_node *r);
+void rdf_free_node(rdf_node *r);
 
 
 

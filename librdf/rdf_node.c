@@ -43,16 +43,16 @@ void init_rdf_node(rdf_digest_factory* factory)
 
 /* Create a new Node with NULL URI. */
 rdf_node*
-new_rdf_node(void)
+rdf_new_node(void)
 {
-  return new_rdf_node_from_uri_string((char*)NULL);
+  return rdf_new_node_from_uri_string((char*)NULL);
 }
 
     
 
 /* Create a new Node and set the URI (can be NULL). */
 rdf_node*
-new_rdf_node_from_uri_string(char *uri_string) 
+rdf_new_node_from_uri_string(char *uri_string) 
 {
   rdf_node* new_node;
   rdf_uri *new_uri;
@@ -66,13 +66,13 @@ new_rdf_node_from_uri_string(char *uri_string)
   
   new_node->value.resource.uri = NULL;
   if(uri_string != NULL) {
-    new_uri=new_rdf_uri(uri_string);
+    new_uri=rdf_new_uri(uri_string);
     if (!new_uri) {
-      free_rdf_node(new_node);
+      rdf_free_node(new_node);
       return NULL;
     }
     if(!rdf_node_set_uri(new_node, new_uri)) {
-      free_rdf_node(new_node);
+      rdf_free_node(new_node);
       return NULL;
     }
   }
@@ -83,10 +83,10 @@ new_rdf_node_from_uri_string(char *uri_string)
 
 /* Create a new Node and set the URI. */
 rdf_node*
-new_rdf_node_from_uri(rdf_uri *uri) 
+rdf_new_node_from_uri(rdf_uri *uri) 
 {
   char *uri_string=rdf_uri_as_string(uri); /* note: does not allocate string */
-  rdf_node* new_node=new_rdf_node_from_uri_string(uri_string);
+  rdf_node* new_node=rdf_new_node_from_uri_string(uri_string);
   /* thus no need for RDF_FREE(uri_string); */
   return new_node;
 }
@@ -94,7 +94,7 @@ new_rdf_node_from_uri(rdf_uri *uri)
 
 /* Create a new literal Node. */
 rdf_node*
-new_rdf_node_from_literal(char *string, char *xml_language) 
+rdf_new_node_from_literal(char *string, char *xml_language) 
 {
   rdf_node* new_node;
   
@@ -106,7 +106,7 @@ new_rdf_node_from_literal(char *string, char *xml_language)
   new_node->type=RDF_NODE_TYPE_LITERAL;
 
   if (rdf_node_set_literal_value(new_node, string, xml_language)) {
-    free_rdf_node(new_node);
+    rdf_free_node(new_node);
     return NULL;
   }
 
@@ -116,7 +116,7 @@ new_rdf_node_from_literal(char *string, char *xml_language)
 
 /* Create a new Node from an existing Node - CLONE */
 rdf_node*
-new_rdf_node_from_node(rdf_node *node) 
+rdf_new_node_from_node(rdf_node *node) 
 {
   rdf_node* new_node;
   rdf_uri *new_uri;
@@ -126,7 +126,7 @@ new_rdf_node_from_node(rdf_node *node)
     return NULL;
 
   if(node->type == RDF_NODE_TYPE_RESOURCE) {
-    new_uri=new_rdf_uri_from_uri(node->value.resource.uri);
+    new_uri=rdf_new_uri_from_uri(node->value.resource.uri);
     if(!new_uri){
       RDF_FREE(rdf_node, new_node);
       return NULL;
@@ -148,11 +148,11 @@ new_rdf_node_from_node(rdf_node *node)
 
 /* destructor */
 void
-free_rdf_node(rdf_node *r) 
+rdf_free_node(rdf_node *r) 
 {
   if(r->type == RDF_NODE_TYPE_RESOURCE) {
     if(r->value.resource.uri != NULL)
-      free_rdf_uri(r->value.resource.uri);
+      rdf_free_uri(r->value.resource.uri);
   } else {
     if(r->value.literal.string != NULL)
       RDF_FREE(cstring, r->value.literal.string);
@@ -177,13 +177,13 @@ rdf_node_get_uri(rdf_node* node)
 int
 rdf_node_set_uri(rdf_node* node, rdf_uri *uri)
 {
-  rdf_uri* new_uri=new_rdf_uri_from_uri(uri);
+  rdf_uri* new_uri=rdf_new_uri_from_uri(uri);
   if(!new_uri)
     return 0;
 
   /* delete old URI */
   if(node->value.resource.uri)
-    free_rdf_uri(node->value.resource.uri);
+    rdf_free_uri(node->value.resource.uri);
 
   /* set new one */
   node->value.resource.uri=new_uri;
@@ -314,14 +314,14 @@ main(int argc, char *argv[])
   char *program=argv[0];
   
   fprintf(stderr, "%s: Creating home page node from string\n", program);
-  node=new_rdf_node_from_uri_string(hp_string1);
+  node=rdf_new_node_from_uri_string(hp_string1);
 
   fprintf(stderr, "%s: Home page URI is ", program);
   rdf_uri_print(rdf_node_get_uri(node), stderr);
   fputs("\n", stderr);
 
   fprintf(stderr, "%s: Creating URI from string '%s'\n", program, hp_string2);
-  uri=new_rdf_uri(hp_string2);
+  uri=rdf_new_uri(hp_string2);
   fprintf(stderr, "%s: Setting node URI to new URI ", program);
   rdf_uri_print(uri, stderr);
   fputs("\n", stderr);
@@ -336,10 +336,10 @@ main(int argc, char *argv[])
   
 
   fprintf(stderr, "%s: Freeing URI\n", program);
-  free_rdf_uri(uri);
+  rdf_free_uri(uri);
 
   fprintf(stderr, "%s: Freeing node\n", program);
-  free_rdf_node(node);
+  rdf_free_node(node);
 
   /* keep gcc -Wall happy */
   return(0);

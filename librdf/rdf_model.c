@@ -31,20 +31,20 @@ void init_rdf_model(void)
 /* constructors */
 
 /* Create a new Model */
-rdf_model* new_rdf_model(void)
+rdf_model* rdf_new_model(void)
 {
   return NULL;
 }
 
 
 /* Create a new Model from an existing Model - CLONE */
-rdf_model* new_rdf_model_from_model(rdf_model* model)
+rdf_model* rdf_new_model_from_model(rdf_model* model)
 {
   return NULL;
 }
 
 /* destructor */
-void free_rdf_model(rdf_model *model)
+void rdf_free_model(rdf_model *model)
 {
 }
 
@@ -144,10 +144,10 @@ main(int argc, char *argv[])
   init_rdf_model();
 
   fprintf(stderr, "%s: Creating model\n", program);
-  model=new_rdf_model();
+  model=rdf_new_model();
 
   fprintf(stderr, "%s: Freeing model\n", program);
-  free_rdf_model(model);
+  rdf_free_model(model);
   
   /* keep gcc -Wall happy */
   return(0);
