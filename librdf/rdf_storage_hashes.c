@@ -45,11 +45,6 @@ typedef struct
 } librdf_hash_descriptor;
 
 
-/* FIXME: STATIC - FIXME, can be 3 or 4 too. */
-#define NUMBER_OF_HASHES 3
-
-static const char *librdf_storage_default_indexes="sp2o,po2s,so2p,p2so";
-
 static const librdf_hash_descriptor librdf_storage_hashes_descriptions[]= {
   {"sp2o",
    LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_PREDICATE,
@@ -70,6 +65,9 @@ static const librdf_hash_descriptor librdf_storage_hashes_descriptions[]= {
 };
 
 
+#if 0
+/* FIXME not used */
+
 static int
 librdf_storage_get_hash_description_by_name(char *name) 
 {
@@ -85,7 +83,7 @@ librdf_storage_get_hash_description_by_name(char *name)
   }
   return -1;
 }
-
+#endif
 
 
 typedef struct
@@ -185,6 +183,7 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
   librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
   int i;
   int status;
+  int index_predicates=0;
   
   context->hash_type=hash_type;
   context->db_dir=db_dir;
@@ -195,7 +194,13 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
   context->is_new=is_new;
   context->options=options;
   
-  context->hash_count=NUMBER_OF_HASHES;
+  context->hash_count=3; /* first 3 in librdf_storage_hashes_descriptions */
+
+  if((index_predicates=librdf_hash_get_as_boolean(options, "index-predicates"))<0)
+    index_predicates=0; /* default is NO index on properties */
+  
+  if(index_predicates)
+    context->hash_count++; /* 4th p2so in librdf_storage_hashes_descriptions */
 
   context->hashes=(librdf_hash**)LIBRDF_CALLOC(librdf_hash, context->hash_count, sizeof(librdf_hash*));
   if(!context->hashes)
@@ -910,7 +915,7 @@ librdf_stream* librdf_storage_hashes_find_statements(librdf_storage* storage, li
     stream=librdf_storage_hashes_serialise(storage);
     if(stream)
       librdf_stream_set_map(stream, &librdf_storage_hashes_find_map, 
-                            &librdf_free_statement, (void*)statement);
+                            (librdf_stream_map_free_context_handler)&librdf_free_statement, (void*)statement);
   }
   
   return stream;
