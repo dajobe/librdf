@@ -84,8 +84,7 @@ rdf_parser_repat.c
 
 EXTRA_DIST=\
 memcmp.c \
-redland.spec redland.spec.in \
-ex1.rdf ex2.rdf
+redland.spec redland.spec.in
 
 librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@
 
