@@ -97,7 +97,7 @@ librdf_new_node_from_uri_string(char *uri_string)
     return NULL;
   }
   /* ownership of new_uri passes to node object */
-  if(!librdf_node_set_uri(new_node, new_uri)) {
+  if(librdf_node_set_uri(new_node, new_uri)) {
     librdf_free_node(new_node);
     return NULL;
   }
@@ -185,7 +185,11 @@ librdf_new_node_from_node(librdf_node *node)
       LIBRDF_FREE(librdf_node, new_node);
       return NULL;
     }
-    librdf_node_set_uri(new_node, new_uri);
+    if(librdf_node_set_uri(new_node, new_uri)) {
+      librdf_free_uri(new_uri);
+      LIBRDF_FREE(librdf_node, new_node);
+      return NULL;
+    } 
   } else {
     /* must be a LIBRDF_NODE_TYPE_LITERAL */
     if (librdf_node_set_literal_value(new_node,
@@ -255,7 +259,7 @@ int
 librdf_node_set_uri(librdf_node* node, librdf_uri *uri)
 {
   if(!uri)
-    return 0;
+    return 1;
   
   /* delete old URI */
   if(node->value.resource.uri)
@@ -263,7 +267,7 @@ librdf_node_set_uri(librdf_node* node, librdf_uri *uri)
   
   /* set new one */
   node->value.resource.uri=uri;
-  return 1;
+  return 0;
 }
 
 
@@ -560,6 +564,150 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
 
 
 
+/**
+ * librdf_node_encode - Serialise a node into a buffer
+ * @node: the node to serialise
+ * @buffer: the buffer to use
+ * @length: buffer size
+ * 
+ * Encodes the given node in the buffer, which must be of sufficient
+ * size.  If buffer is NULL, no work is done but the size of buffer
+ * required is returned.
+ * 
+ * Return value: the number of bytes written or 0 on failure.
+ **/
+int
+librdf_node_encode(librdf_node* node, char *buffer, size_t length)
+{
+  int total_length=0;
+  char *string;
+  int string_length;
+  
+  switch(node->type) {
+  case LIBRDF_NODE_TYPE_RESOURCE:
+    string=librdf_uri_as_string(node->value.resource.uri);
+    string_length=strlen(string);
+
+    total_length=3 + string_length + 1; /* +1 for \0 at end */
+
+    if(length && total_length > length)
+      return 0;    
+    
+    if(buffer) {
+      buffer[0]='R';
+      buffer[1]=(string_length & 0xff00) >> 8;
+      buffer[2]=(string_length & 0x00ff);
+      strcpy(buffer+3, string);
+    }
+    break;
+
+  case LIBRDF_NODE_TYPE_LITERAL:
+    string=node->value.literal.string;
+    string_length=node->value.literal.string_len;
+
+    total_length=6 + string_length + 1; /* +1 for \0 at end */
+    
+    if(length && total_length > length)
+      return 0;    
+    
+    if(buffer) {
+      buffer[0]='L';
+      buffer[1]=(node->value.literal.is_wf_xml & 0xf) << 8 |
+                (node->value.literal.xml_space & 0xf);
+      buffer[2]=(string_length & 0xff00) >> 8;
+      buffer[3]=(string_length & 0x00ff);
+      buffer[4]=0; /* FIXME - xml:language */
+      buffer[5]=0;
+      strcpy(buffer+6, string);
+    }
+    break;
+
+  default:
+    LIBRDF_FATAL2(librdf_node_encode, 
+                  "Illegal node type %d seen\n", node->type);
+
+  }
+  
+  return total_length;
+}
+
+
+/**
+ * librdf_node_decode - Deserialise a node from a buffer
+ * @node: the node to deserialise into
+ * @buffer: the buffer to use
+ * @length: buffer size
+ * 
+ * Decodes the serialised node (as created by librdf_node_encode() )
+ * from the given buffer.
+ * 
+ * Return value: non 0 on failure (bad encoding, allocation failure)
+ **/
+int
+librdf_node_decode(librdf_node* node, char *buffer, size_t length)
+{
+  int is_wf_xml;
+  int xml_space;
+  int string_length;
+  librdf_uri* new_uri;
+
+  /* absolute minimum - first byte is type */
+  if (length < 1)
+    return 1;
+
+  switch(buffer[0]) {
+    case 'R': /* LIBRDF_NODE_TYPE_RESOURCE */
+      /* min */
+      if(length < 3)
+        return 1;
+      
+      string_length=(buffer[1] << 8) | buffer[2];
+      
+      /* Now initialise fields */
+      node->type = LIBRDF_NODE_TYPE_RESOURCE;
+      new_uri=librdf_new_uri(buffer+3);
+      if (!new_uri)
+        return 1;
+      
+      if(librdf_node_set_uri(node, new_uri)) {
+        librdf_free_uri(new_uri);
+        return 1;
+      }
+      
+      break;
+
+    case 'L': /* LIBRDF_NODE_TYPE_LITERAL */
+      /* min */
+      if(length < 6)
+        return 1;
+      
+      is_wf_xml=(buffer[1] & 0xf0)>>8;
+      xml_space=(buffer[1] & 0x0f)>>8;
+      string_length=(buffer[2] << 8) | buffer[3];
+      
+      /* FIXME - xml:language length in 4, 5 */
+      
+      /* Now initialise fields */
+      node->type = LIBRDF_NODE_TYPE_LITERAL;
+      if (librdf_node_set_literal_value(node, buffer+6,
+                                        NULL, /* xml:language */
+                                        xml_space, is_wf_xml))
+        return 1;
+    
+    break;
+
+  default:
+    LIBRDF_FATAL2(librdf_node_decode, "Illegal node encoding %d seen\n",
+                  buffer[0]);
+
+  }
+  
+  return 0;
+}
+
+
+
+
 #ifdef STANDALONE
 
 /* one more prototype */
@@ -569,10 +717,12 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_node* node;
+  librdf_node *node, *node2;
   char *hp_string1="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
   char *hp_string2="http://purl.org/net/dajobe/";
   librdf_uri *uri, *uri2;
+  int size, size2;
+  char *buffer;
   
   char *program=argv[0];
 	
@@ -580,30 +730,63 @@ main(int argc, char *argv[])
   librdf_init_hash();
   librdf_init_uri(librdf_get_digest_factory(NULL), NULL);
 
-  fprintf(stderr, "%s: Creating home page node from string\n", program);
+  fprintf(stdout, "%s: Creating home page node from string\n", program);
   node=librdf_new_node_from_uri_string(hp_string1);
   
-  fprintf(stderr, "%s: Home page URI is ", program);
-  librdf_uri_print(librdf_node_get_uri(node), stderr);
-  fputs("\n", stderr);
+  fprintf(stdout, "%s: Home page URI is ", program);
+  librdf_uri_print(librdf_node_get_uri(node), stdout);
+  fputs("\n", stdout);
   
-  fprintf(stderr, "%s: Creating URI from string '%s'\n", program, 
+  fprintf(stdout, "%s: Creating URI from string '%s'\n", program, 
           hp_string2);
   uri=librdf_new_uri(hp_string2);
-  fprintf(stderr, "%s: Setting node URI to new URI ", program);
-  librdf_uri_print(uri, stderr);
-  fputs("\n", stderr);
+  fprintf(stdout, "%s: Setting node URI to new URI ", program);
+  librdf_uri_print(uri, stdout);
+  fputs("\n", stdout);
   
   /* now uri is owned by node - do not free */
   librdf_node_set_uri(node, uri);
   
   uri2=librdf_node_get_uri(node);
-  fprintf(stderr, "%s: Node now has URI ", program);
-  librdf_uri_print(uri2, stderr);
-  fputs("\n", stderr);
+  fprintf(stdout, "%s: Node now has URI ", program);
+  librdf_uri_print(uri2, stdout);
+  fputs("\n", stdout);
+
+
+  fprintf(stdout, "%s: Node is: ", program);
+  librdf_node_print(node, stdout);
+  fputs("\n", stdout);
+
+  size=librdf_node_encode(node, NULL, 0);
+  fprintf(stdout, "%s: Encoding node requires %d bytes\n", program, size);
+  buffer=(char*)LIBRDF_MALLOC(cstring, size);
+
+  fprintf(stdout, "%s: Encoding node in buffer\n", program);
+  size2=librdf_node_encode(node, buffer, size);
+  if(size2 != size) {
+    fprintf(stderr, "%s: Encoding node used %d bytes, expected it to use %d\n", program, size2, size);
+    return(1);
+  }
+  
+    
+  fprintf(stdout, "%s: Creating new node\n", program);
+  node2=librdf_new_node();
+
+  fprintf(stdout, "%s: Decoding node from buffer\n", program);
+  if(librdf_node_decode(node2, buffer, size)) {
+    fprintf(stderr, "%s: Decoding node failed\n", program);
+    return(1);
+  }
+  LIBRDF_FREE(cstring, buffer);
+   
+  fprintf(stdout, "%s: New node is: ", program);
+  librdf_node_print(node2, stdout);
+  fputs("\n", stdout);
+ 
   
   
-  fprintf(stderr, "%s: Freeing node\n", program);
+  fprintf(stdout, "%s: Freeing nodes\n", program);
+  librdf_free_node(node2);
   librdf_free_node(node);
   
   librdf_finish_uri();
