@@ -166,12 +166,12 @@ librdf_parser_rapier_new_statement_handler (void *context,
   if(!statement)
     return;
   
-  node=librdf_new_node_from_normalised_uri_string(rstatement->subject,
+  node=librdf_new_node_from_normalised_uri_string(librdf_uri_as_string((librdf_uri*)rstatement->subject),
                                                   scontext->source_uri,
                                                   scontext->base_uri);
   librdf_statement_set_subject(statement, node);
   
-  node=librdf_new_node_from_normalised_uri_string(rstatement->predicate,
+  node=librdf_new_node_from_normalised_uri_string(librdf_uri_as_string((librdf_uri*)rstatement->predicate),
                                                   scontext->source_uri,
                                                   scontext->base_uri);
   librdf_statement_set_predicate(statement, node);
@@ -182,7 +182,7 @@ librdf_parser_rapier_new_statement_handler (void *context,
                                 librdf_new_node_from_literal(rstatement->object,
                                                              NULL, 0, 0));
   else {
-    node=librdf_new_node_from_normalised_uri_string(rstatement->object,
+    node=librdf_new_node_from_normalised_uri_string(librdf_uri_as_string((librdf_uri*)rstatement->object),
                                                     scontext->source_uri,
                                                     scontext->base_uri);
     librdf_statement_set_object(statement, node);
@@ -247,7 +247,7 @@ librdf_parser_rapier_parse_uri_into_model(void *context, librdf_uri *uri,
   status=(void*)librdf_parser_rapier_parse_common(context, 
                                                   uri, base_uri, model);
   
-  return (status == NULL);
+  return (status != NULL);
 }
 
 
@@ -305,11 +305,13 @@ librdf_parser_rapier_parse_common(void *context,
   }
 
   /* Do the work all in one go - should do incrementally - FIXME */
-  rc=rapier_parse_file(rdf_parser, uri, base_uri);
+  rc=rapier_parse_file(rdf_parser,
+                       librdf_uri_as_string(uri),
+                       librdf_uri_as_string(base_uri));
 
   /* Above line does it all for adding to model */
   if(model) {
-    librdf_parser_rapier_serialise_finished((void*)scontext);
+    librdf_free_stream(stream);
     return (librdf_stream*)rc;
   }
   
