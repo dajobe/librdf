@@ -245,6 +245,8 @@ librdf_new_parser_from_factory(librdf_world *world,
 {
   librdf_parser* d;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_parser_factory, NULL);
+
   d=(librdf_parser*)LIBRDF_CALLOC(librdf_parser, 1, sizeof(librdf_parser));
   if(!d)
     return NULL;
@@ -274,6 +276,8 @@ librdf_new_parser_from_factory(librdf_world *world,
 void
 librdf_free_parser(librdf_parser *parser) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(parser, librdf_parser);
+
   if(parser->context) {
     if(parser->factory->terminate)
       parser->factory->terminate(parser->context);
@@ -298,6 +302,9 @@ librdf_stream*
 librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
                               librdf_uri* base_uri) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
+
   if(parser->factory->parse_uri_as_stream)
     return parser->factory->parse_uri_as_stream(parser->context,
                                                 uri, base_uri);
@@ -324,6 +331,10 @@ int
 librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
                                librdf_uri* base_uri, librdf_model* model) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+
   if(parser->factory->parse_uri_into_model)
     return parser->factory->parse_uri_into_model(parser->context,
                                                  uri, base_uri, model);
@@ -341,7 +352,7 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
  * librdf_parser_parse_string_as_stream - Parse a string of content to a librdf_stream of statements
  * @parser: the parser
  * @string: the string to parse
- * @base_uri: the base URI to use (or NULL if the same)
+ * @base_uri: the base URI to use
  * 
  * Return value: &librdf_stream of statements or NULL
  **/
@@ -350,6 +361,10 @@ librdf_parser_parse_string_as_stream(librdf_parser* parser,
                                      const unsigned char *string,
                                      librdf_uri* base_uri) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
+
   if(parser->factory->parse_string_as_stream)
     return parser->factory->parse_string_as_stream(parser->context,
                                                    string, base_uri);
@@ -361,8 +376,8 @@ librdf_parser_parse_string_as_stream(librdf_parser* parser,
 /**
  * librdf_parser_parse_string_into_model - Parse a string of content into an librdf_model
  * @parser: the parser
- * @uri: the URI to read the content
- * @base_uri: the base URI to use (or NULL if the same)
+ * @string: the content to parse
+ * @base_uri: the base URI to use
  * @model: the model to use
  * 
  * Return value: non 0 on failure
@@ -372,6 +387,11 @@ librdf_parser_parse_string_into_model(librdf_parser* parser,
                                       const unsigned char *string,
                                       librdf_uri* base_uri, librdf_model* model) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+
   if(parser->factory->parse_string_into_model)
     return parser->factory->parse_string_into_model(parser->context,
                                                     string, base_uri, model);
@@ -469,6 +489,9 @@ void
 librdf_parser_set_error(librdf_parser* parser, void *user_data,
                         void (*error_fn)(void *user_data, const char *msg, ...))
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(parser, librdf_parser);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(error_fn, error handler);
+
   parser->error_user_data=user_data;
   parser->error_fn=error_fn;
 }
@@ -487,6 +510,9 @@ void
 librdf_parser_set_warning(librdf_parser* parser, void *user_data,
                           void (*warning_fn)(void *user_data, const char *msg, ...))
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(parser, librdf_parser);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(warning_fn, warning handler);
+
   parser->warning_user_data=user_data;
   parser->warning_fn=warning_fn;
 }
@@ -503,6 +529,9 @@ librdf_parser_set_warning(librdf_parser* parser, void *user_data,
 librdf_node*
 librdf_parser_get_feature(librdf_parser* parser, librdf_uri* feature) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(feature, librdf_uri, NULL);
+
   if(parser->factory->get_feature)
     return parser->factory->get_feature(parser->context, feature);
 
@@ -522,6 +551,10 @@ int
 librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature, 
                           librdf_node* value) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, -1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(feature, librdf_uri, -1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(value, librdf_node, -1);
+
   if(parser->factory->set_feature)
     return parser->factory->set_feature(parser->context, feature, value);
 
