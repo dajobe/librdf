@@ -137,6 +137,11 @@ typedef struct {
   int in_literal;           /* non 0 if parseType literal */
   char *literal;            /* literal text being collected */
   int literal_length;
+  librdf_statement *saved_statement; /* partial statement waiting
+                                      * for XML literal content node
+                                      * to be attached 
+                                      * Only valid when in_literal !=0
+                                      */
 } librdf_parser_repat_stream_context;
 
 
@@ -181,6 +186,10 @@ librdf_parser_repat_statement_handler(void* user_data,
     default:
       LIBRDF_FATAL2(librdf_parser_repat_statement_handler, "Unknown subject type %d\n", subject_type);
   }
+  if(!subject) {
+    librdf_free_statement(statement);
+    return;
+  }
   librdf_statement_set_subject(statement,subject);
 
   
@@ -189,8 +198,25 @@ librdf_parser_repat_statement_handler(void* user_data,
                                                          scontext->source_uri,
                                                          scontext->base_uri);
   } else {
-    /* FIXME - an ordinal predicate li:<ordinal> should be generated */
-    predicate=librdf_new_node_from_uri_string(predicate_string);
+    /* Generate an rdf:_<ordinal> predicate */
+    const char *li_prefix="http://www.w3.org/1999/02/22-rdf-syntax-ns#_";
+    char *ordinal_predicate_string;
+    int o=ordinal;
+    int len= 2 + strlen(li_prefix); /* 1-digit + string length + '\0' */
+
+    /* increase len to hold width of integer */
+    while((o /= 10)>0) 
+      len++;
+    ordinal_predicate_string=(char*)LIBRDF_MALLOC(cstring, len);
+    if(predicate_string) {
+      sprintf(ordinal_predicate_string, "%s%d", li_prefix, ordinal);
+      predicate=librdf_new_node_from_uri_string(ordinal_predicate_string);
+      LIBRDF_FREE(cstring, ordinal_predicate_string);
+    }
+  }
+  if(!predicate) {
+    librdf_free_statement(statement);
+    return;
   }
   librdf_statement_set_predicate(statement,predicate);
 
@@ -206,29 +232,34 @@ librdf_parser_repat_statement_handler(void* user_data,
       if(scontext->literal) {
         LIBRDF_DEBUG2(librdf_parser_repat_end_element_handler,
                       "found literal text: '%s'\n", scontext->literal);
-        object=librdf_new_node_from_literal(scontext->literal, 0, 0, 1);
+        object=librdf_new_node_from_literal(scontext->literal, NULL, 0, 0);
         LIBRDF_FREE(cstring, scontext->literal);
         scontext->literal=NULL;
         scontext->literal_length=0;
-      } else
+      } else {
+        if(!object_string)
+          object_string="";
         object=librdf_new_node_from_literal(object_string, xml_lang, 0, 0);
+      }
       break;
     case RDF_OBJECT_TYPE_XML:
-      /* Emitted when a statement has a rdf:BAGID on it */
-      /* FIXME: what do we do here?  Repat does not pass in the bagid */
-      LIBRDF_DEBUG1(librdf_parser_repat_end_element_handler,
-                    "found object type XML - don't know what to do\n");
-      librdf_free_statement(statement);
-      statement=NULL;
+      /* A statement where the object is parseType=Literal and will
+       * turn up later, so save the partial statement to add
+       * in librdf_parser_repat_end_parse_type_literal_handler()
+       */
+      scontext->saved_statement=statement;
+      return;
+
       break;
     default:
       LIBRDF_FATAL2(librdf_parser_repat_statement_handler, "Unknown object type %d\n", object_type);
   }
-
-  if(!statement)
+  if(!object) {
+    librdf_free_statement(statement);
     return;
-  
+  }
   librdf_statement_set_object(statement,object);
+
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   fprintf(stderr, "librdf_parser_repat_statement_handler: Adding statement: ");
@@ -258,7 +289,30 @@ static void
 librdf_parser_repat_end_parse_type_literal_handler( void* user_data )
 {
   librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
+  librdf_statement* statement=scontext->saved_statement;
+
+  if(statement) {
+    librdf_node* object;
+
+    /* create XML content literal string */
+    object=librdf_new_node_from_literal(scontext->literal, NULL, 0, 1);
+    LIBRDF_FREE(cstring, scontext->literal);
+    librdf_statement_set_object(statement,object);
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    fprintf(stderr, "librdf_parser_repat_end_parse_type_literal_handler: Adding statement: ");
+    librdf_statement_print(statement, stderr);
+    fputs("\n", stderr);
+#endif
+
+    librdf_list_add(scontext->statements, statement);
+    
+  } else {
+    LIBRDF_FATAL1(librdf_parser_repat_end_element_handler,
+                  "Found end of literal XML but no saved statement\n");
+  }
   scontext->in_literal=0;
+  scontext->saved_statement=NULL;
 }
 
 
@@ -287,9 +341,10 @@ librdf_parser_repat_start_element_handler(void* user_data,
 
   /* +1 here is for \0 at end */
   buffer=(char*)LIBRDF_MALLOC(cstring, scontext->literal_length + length + 1);
-  /* FIXME - no error return possible */
-  if(!buffer)
+  if(!buffer) {
+    librdf_parser_error(scontext->pcontext->parser, "Out of memory");
     return;
+  }
 
   if(scontext->literal_length) {
     strncpy(buffer, scontext->literal, scontext->literal_length);
@@ -349,9 +404,10 @@ librdf_parser_repat_end_element_handler(void* user_data,
 
   /* +1 here is for \0 at end */
   buffer=(char*)LIBRDF_MALLOC(cstring, scontext->literal_length + length + 1);
-  /* FIXME - no error return possible */
-  if(!buffer)
+  if(!buffer) {
+    librdf_parser_error(scontext->pcontext->parser, "Out of memory");
     return;
+  }
 
   if(scontext->literal_length) {
     strncpy(buffer, scontext->literal, scontext->literal_length);
@@ -389,9 +445,10 @@ librdf_parser_repat_character_data_handler(void* user_data,
   
   /* +1 here is for \0 at end */
   buffer=(char*)LIBRDF_MALLOC(cstring, scontext->literal_length + len + 1);
-  /* FIXME - no error return possible */
-  if(!buffer)
+  if(!buffer) {
+    librdf_parser_error(scontext->pcontext->parser, "Out of memory");
     return;
+  }
 
   if(scontext->literal_length) {
     strncpy(buffer, scontext->literal, scontext->literal_length);
@@ -576,7 +633,7 @@ librdf_parser_repat_get_next_statement(librdf_parser_repat_stream_context *conte
 
     if(!ret) {
       librdf_parser_error(context->pcontext->parser,
-                          "line %d - %s\n",
+                          "line %d - %s",
                           XML_GetCurrentLineNumber( RDF_GetXmlParser(context->repat)),
                           XML_ErrorString(XML_GetErrorCode(RDF_GetXmlParser(context->repat))));
       return -1; /* failed and done */
@@ -619,7 +676,7 @@ librdf_parser_repat_serialise_end_of_stream(void* context)
     return 0;
 
   count=librdf_parser_repat_get_next_statement(scontext);
-  if(!count)
+  if(count <= 0)
     scontext->end_of_stream=1;
 
   return (count == 0);
@@ -648,7 +705,7 @@ librdf_parser_repat_serialise_next_statement(void* context)
   
     /* else get a new one or NULL at end */
     count=librdf_parser_repat_get_next_statement(scontext);
-    if(!count)
+    if(count <= 0)
       scontext->end_of_stream=1;
   }
 
