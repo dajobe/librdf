@@ -219,7 +219,13 @@ LIBRDF_XML_LIBS=
 # XML objects that must be linked into the raptor library (expat usually)
 LIBRDF_XML_OBJS=
 
+# do these first because somehow they get messed up by bdb checks
+AC_CHECK_TYPE([byte u32])
 
+AC_CHECK_SIZEOF(unsigned char, 1)
+AC_CHECK_SIZEOF(unsigned int, 4)
+AC_CHECK_SIZEOF(unsigned long, 4)
+  
 dnl Checks for libraries.
 
 dnl Berkeley DB
@@ -356,12 +362,6 @@ AC_CHECK_HEADERS(expat.h xmlparse.h)
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_BIGENDIAN
-
-AC_CHECK_TYPES([byte u32])
-
-AC_CHECK_SIZEOF(unsigned char, 1)
-AC_CHECK_SIZEOF(unsigned int, 4)
-AC_CHECK_SIZEOF(unsigned long, 4)
 
 dnl Checks for library functions.
 AC_FUNC_MEMCMP
@@ -738,6 +738,27 @@ else
   AC_MSG_RESULT(no)
 fi
 
+
+dnl Check for use of threads
+
+AC_ARG_WITH(threads, [  --with-threads          With POSIX thread support. default=no], with_threads="yes", with_threads="no")
+
+AC_CHECK_HEADERS(pthread.h)
+
+AC_MSG_CHECKING(if POSIX threads should be used)
+if test $with_threads = "yes" ; then
+
+  if test "$ac_cv_header_pthread_h" = yes ; then
+    AC_DEFINE(WITH_THREADS, 1, [Use POSIX threads])
+    LIBRDF_LIBS="-lpthread $LIBRDF_LIBS"
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
+  
 LIBS=$LIBRDF_LIBS
 
 
