@@ -100,7 +100,7 @@ AM_SANITY_CHECK
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 
 # Find a tar command for 'make dist'
 AC_CHECK_PROGS(TAR, gnutar gtar tar)
