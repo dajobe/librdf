@@ -280,6 +280,10 @@ librdf_new_uri_normalised_to_base(const char *uri_string,
   char *new_uri_string;
   librdf_uri *new_uri;
   
+  /* no URI or empty URI - easy, just make from base_uri */
+  if((!uri_string || !*uri_string) && base_uri)
+    return librdf_new_uri_from_uri(base_uri);
+
   /* no match - easy */
   if(strncmp(uri_string, source_uri->string, source_uri->string_length))
     return librdf_new_uri(uri_string);
