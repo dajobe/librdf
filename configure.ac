@@ -372,7 +372,7 @@ LIBS="$LIBRDF_LIBS"
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h getopt.h sqlite.h)
+AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h getopt.h)
 AC_HEADER_TIME
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -715,14 +715,25 @@ if test "X$MYSQL_CONFIG" != X; then
 fi
 
 
-AC_MSG_CHECKING(for sqlite support)
-if test "$ac_cv_header_sqlite_h" = yes; then
-  AC_MSG_RESULT(yes);
-
-  storages_available="$storages_available sqlite"
+AC_MSG_CHECKING(for sqlite library)
+sqlite_version=
+if test "X$PKG_CONFIG" != X ; then
+  sqlite_version=`$PKG_CONFIG sqlite3 --modversion 2>/dev/null`
+  if test "X$sqlite_version" != X; then
+    SQLITE_CONFIG="$PKG_CONFIG sqlite3"
+  else
+    sqlite_version=`$PKG_CONFIG sqlite2 --modversion 2>/dev/null`
+    if test "X$sqlite_version" != X; then
+      SQLITE_CONFIG="$PKG_CONFIG sqlite2"
+    fi
+  fi
+fi
+if test "X$sqlite_version" != X ; then
+  storages_available="$storages_available sqlite($sqlite_version)"
   sqlite_storage_available=yes
+  AC_MSG_RESULT(yes - version $sqlite_version)
 else
-  AC_MSG_RESULT(no);
+  AC_MSG_RESULT(no)
 fi
 
 
@@ -781,7 +792,8 @@ if test $mysql_storage  = yes; then
   LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$MYSQL_CONFIG --cflags|sed -e "s/'//g"`"
 fi
 if test $sqlite_storage  = yes; then
-  LIBRDF_LIBS="$LIBRDF_LIBS -lsqlite"
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$SQLITE_CONFIG --cflags`"
+  LIBRDF_LIBS="$LIBRDF_LIBS `$SQLITE_CONFIG --libs`"
 fi
 if test $tstore_storage  = yes; then
   LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
