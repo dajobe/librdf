@@ -1,3 +1,27 @@
+2005-02-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_rasqal.c
+	(librdf_query_rasqal_query_results_update_statement): Handle empty
+	rstatement right away.
+	(librdf_query_rasqal_results_as_stream): If no statements at all,
+	return NULL.
+
+	* rdf_query_rasqal.c:
+	(librdf_query_rasqal_query_results_next_statement) Remove unused
+	vars.
+
+	* rdf_query_rasqal.c
+	(librdf_query_rasqal_query_results_update_statement): Return 0
+
+	* rdf_query_rasqal.c: Protect all query results from NULL pointers.
+	(librdf_query_rasqal_query_results_end_of_stream,
+	librdf_query_rasqal_query_results_update_statement,
+	librdf_query_rasqal_query_results_next_statement,
+	librdf_query_rasqal_query_results_get_statement
+	librdf_query_rasqal_query_results_finished): Added, implementing
+	RDF graph query results.
+	(librdf_query_rasqal_results_as_stream): Updated to use the above.
+
 2005-01-31  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_query_rasqal.c (librdf_query_rasqal_results_is_bindings,
