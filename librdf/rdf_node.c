@@ -257,10 +257,8 @@ librdf_new_node_from_literal(librdf_world *world,
  * @world: redland world object
  * @string: literal string value
  * @xml_language: literal XML language (or NULL, empty string)
- * @datatype_uri: non 0 if literal is XML
+ * @datatype_uri: URI of typed literal datatype or NULL
  * 
- * 0.9.12: xml_space argument deleted
- *
  * Return value: new &librdf_node object or NULL on failure
  **/
 librdf_node*
