@@ -701,6 +701,9 @@ librdf_model_get_source(librdf_model *model,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(target, librdf_node, NULL);
 
   iterator=librdf_model_get_sources(model, arc, target);
+  if(!iterator)
+    return NULL;
+  
   node=(librdf_node*)librdf_iterator_get_object(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
@@ -732,6 +735,9 @@ librdf_model_get_arc(librdf_model *model,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(target, librdf_node, NULL);
 
   iterator=librdf_model_get_arcs(model, source, target);
+  if(!iterator)
+    return NULL;
+  
   node=(librdf_node*)librdf_iterator_get_object(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
@@ -763,6 +769,9 @@ librdf_model_get_target(librdf_model *model,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(arc, librdf_node, NULL);
 
   iterator=librdf_model_get_targets(model, source, arc);
+  if(!iterator)
+    return NULL;
+  
   node=(librdf_node*)librdf_iterator_get_object(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
