@@ -66,6 +66,7 @@ my(%namespaces)=(
   'Content'      => 'http://purl.org/rss/1.0/modules/content/',
   'Creative Commons' => 'http://web.resource.org/cc/',
   'Admin'        => 'http://webns.net/mvcb/',
+  'Annotate'     => 'http://purl.org/rss/1.0/modules/annotate/',
 # Other modules
   'Dublin Core Terms' => 'http://purl.org/dc/terms/',
   'Slash'        => 'http://slashcode.com/rss/1.0/modules/Slash/', 
