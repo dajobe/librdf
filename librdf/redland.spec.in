@@ -137,7 +137,6 @@ cd ..
 %files perl
 %defattr(-, bin, bin)
 
-%{perlinstallsitearch}/auto/redland/CORE
 %{perlinstallsitearch}/auto/redland/CORE/CORE.*
 %{perlinstallsitearch}/RDF/Redland
 %{perlinstallsitearch}/RDF/Redland.pm
@@ -153,6 +152,7 @@ cd ..
 %changelog
 * Thu Aug 21 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
 - Add redland-db-upgrade.1
+- Removed duplicate perl CORE shared objects
 
 * Sun Aug 17 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
 - Updates for new perl module names.
