@@ -143,11 +143,11 @@ rdf_digest_openssl_constructor(void)
 #ifdef HAVE_OPENSSL_CRYPTO_MD5_DIGEST
   rdf_digest_register_factory("MD5", &rdf_openssl_md5_register_factory);
 #endif
-#ifdef HAVE_OPENSSL_CRYPTO_SHA1_DIGEST
-  rdf_digest_register_factory("SHA1", &rdf_openssl_sha1_register_factory);
-#endif
 #ifdef HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST
   rdf_digest_register_factory("RIPEMD160", &rdf_openssl_ripemd160_register_factory);
+#endif
+#ifdef HAVE_OPENSSL_CRYPTO_SHA1_DIGEST
+  rdf_digest_register_factory("SHA1", &rdf_openssl_sha1_register_factory);
 #endif
 
 }

@@ -90,7 +90,7 @@ get_rdf_digest_factory(const char *name)
   if(!name) {
     factory=digests;
     if(!factory) {
-      RDF_DEBUG1(get_rdf_digest_factory, "No (default) digests registered\n");
+      RDF_DEBUG1(get_rdf_digest_factory, "No digests available\n");
       return NULL;
     }
   } else {
@@ -233,7 +233,6 @@ rdf_digest_to_string(rdf_digest* digest)
 }
 
 
-/* fh is actually a FILE* */
 void
 rdf_digest_print(rdf_digest* digest, FILE* fh)
 {
@@ -254,14 +253,14 @@ rdf_init_digest(void)
 #ifdef HAVE_OPENSSL_DIGESTS
   rdf_digest_openssl_constructor();
 #endif
-#ifdef HAVE_LOCAL_SHA1_DIGEST
-  sha1_constructor();
-#endif
 #ifdef HAVE_LOCAL_MD5_DIGEST
   md5_constructor();
 #endif
 #ifdef HAVE_LOCAL_RIPEMD160_DIGEST
   rmd160_constructor();
+#endif
+#ifdef HAVE_LOCAL_SHA1_DIGEST
+  sha1_constructor();
 #endif
 }
 
