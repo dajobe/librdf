@@ -55,21 +55,25 @@ void librdf_system_free(void *ptr);
 #endif
 
 #define LIBRDF_ASSERT_RETURN(condition, msg, ret) do { \
-  if(!condition) { \
-    fprintf(stderr, "%s:%d:%s: Assertion failed - " __FILE__, __LINE__, __func__, msg); \
+  if(condition) { \
+    fprintf(stderr, "%s:%d:%s: Assertion failed - " msg "\n", __FILE__, __LINE__, __func__); \
+    abort(); \
     return(ret); \
-  }
+  } \
+} while(0)
 
 #define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, type) do { \
   if(!pointer) { \
-     fprintf(stderr, "%s:%d:%s: Assertion failed - object pointer of type " #type " is NULL.", __FILE__, __LINE__, __func__); \
+    fprintf(stderr, "%s:%d:%s: Assertion failed - object pointer of type " #type " is NULL.\n", __FILE__, __LINE__, __func__); \
+    abort(); \
     return; \
   } \
 } while(0)
 
 #define LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(pointer, type, ret) do { \
   if(!pointer) { \
-    fprintf(stderr, "%s:%d:%s: Assertion failed - object pointer of type " #type " is NULL.", __FILE__, __LINE__, __func__); \
+    fprintf(stderr, "%s:%d:%s: Assertion failed - object pointer of type " #type " is NULL.\n", __FILE__, __LINE__, __func__); \
+    abort(); \
     return(ret); \
   } \
 } while(0)
