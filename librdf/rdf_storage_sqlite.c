@@ -939,7 +939,8 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
   int rc;
 
   sb=raptor_new_stringbuffer();
-  raptor_stringbuffer_append_string(sb, "SELECT COUNT(*)", 1);
+  raptor_stringbuffer_append_string(sb, 
+                                    (const unsigned char*)"SELECT COUNT(*)", 1);
   if(librdf_storage_sqlite_statement_operator_helper(storage, statement, 
                                                      NULL, sb))
     return -1;
@@ -1692,7 +1693,7 @@ librdf_storage_sqlite_context_remove_statement(librdf_storage* storage,
   unsigned char *request;
 
   sb=raptor_new_stringbuffer();
-  raptor_stringbuffer_append_string(sb, "DELETE", 1);
+  raptor_stringbuffer_append_string(sb, (const unsigned char*)"DELETE", 1);
   if(librdf_storage_sqlite_statement_operator_helper(storage, statement,
                                                      context_node, sb))
     return -1;
@@ -2253,7 +2254,8 @@ librdf_storage_sqlite_get_feature(librdf_storage* storage, librdf_uri* feature)
   
   if(!strcmp((const char*)uri_string, LIBRDF_MODEL_FEATURE_CONTEXTS)) {
     return librdf_new_node_from_typed_literal(storage->world,
-                                              "1", NULL, NULL);
+                                              (const unsigned char*)"1",
+                                              NULL, NULL);
   }
 
   return NULL;
