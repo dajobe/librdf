@@ -44,9 +44,14 @@ my(%command_labels)=('destroy'  =>'Delete database',
 		     'add',     =>'Add a statement',
 		     'parse',   =>'Parse RDF',
 		     'print',   =>'Print database');
+my(%command_needs_write)=('destroy'  =>1,
+			  'query'    =>0,
+			  'add',     =>1,
+			  'parse',   =>1,
+			  'print',   =>0);
 my(@parsers)=qw(raptor ntriples);
-my(%parser_labels)=('raptor' => 'Raptor RDF/XML (Dave Beckett)',
-		    'ntriples' => 'Raptor N-Triples (Dave Beckett)'
+my(%parser_labels)=('raptor' => 'RDF/XML',
+		    'ntriples' => 'N-Triples'
 		    );
 my(%parser_just_file_uris)=('raptor' => 1,
 			    'ntriples' => 1
@@ -74,6 +79,7 @@ my(%namespaces)=(
   'rss' => 'http://purl.org/rss/1.0/',
   'synd' => 'http://purl.org/rss/1.0/modules/syndication/',
   'dc' => 'http://purl.org/dc/elements/1.1/',
+  'owl' => 'http://www.w3.org/2002/07/owl#',
 );
 
 
@@ -155,11 +161,14 @@ if(defined $val && $val =~ /^([a-z]+)$/) {
   $parser_string=undef;
 }
 
-my $rdf_content='';
+my $rdf_content=undef;
 $val=$q->param('content');
 # WARNING: pass through of all data
-if(defined $val && $val =~ /^(.*)$/s) {
-  $rdf_content=$1;
+if(defined $val) {
+  $val=~ s/^\s*//; $val=~ s/\s*$//;
+  if($val =~ /^(.+)$/s) {
+    $rdf_content=$1;
+  }
 }
 
 my $format_namespaces='';
@@ -319,12 +328,14 @@ if($parser_string && !grep($_ eq $parser_string, @parsers)) {
 }
 
 
+my $model=undef;
+my $storage=undef;
 
 my $db0="$db_dir/".sprintf($db_format, $db, $suffixes[0]);
 if(! -r $db0) {
-  my $storage=new RDF::Redland::Storage("hashes", $db, 
-			       "new='yes',write='yes',hash-type='bdb',dir='$db_dir'");
-  my $model;
+  my $write=$command_needs_write{$command} ? 'yes' : 'no';
+  $storage=new RDF::Redland::Storage("hashes", $db, 
+			       "new='yes',write='$write',hash-type='bdb',dir='$db_dir'");
   if($storage) {
     $model=new RDF::Redland::Model($storage, "");
   }
@@ -349,30 +360,35 @@ if($command eq 'destroy') {
 }
 
 
-# Remaining commands need an open database
-# Write needed?
-my $write=($command eq 'parse' || $command eq 'add') ? 'yes' : 'no';
-my $storage=new RDF::Redland::Storage("hashes", $db, 
-			     "new='no',write='$write',hash-type='bdb',dir='$db_dir'");
-if(!$storage) {
-  log_action($host, $db, "Failed to open storage");
-  print "\n\n<p>Sorry - failed to open RDF Database $db.  This problem has been recorded.</p>\n";
-  end_page($q);
-  exit 0;
+# If model wasn't created/opened above, create and open now
+if(!$model) {
+  # Remaining commands need an open database
+  my $write=$command_needs_write{$command} ? 'yes' : 'no';
+  # Unless exists already and not writable
+  $write='no' if -r $db0 && !-w $db0;
+  $storage=new RDF::Redland::Storage("hashes", $db, 
+				     "new='no',write='$write',hash-type='bdb',dir='$db_dir'");
+  if(!$storage) {
+    log_action($host, $db, "Failed to open storage");
+    print "\n\n<p>Sorry - failed to open RDF Database $db.  This problem has been recorded.</p>\n";
+    end_page($q);
+    exit 0;
+  }
+  
+  $model=new RDF::Redland::Model($storage, "");
+  if(!$model) {
+    log_action($host, $db, "Failed to create model");
+    print "\n\n<p>Sorry - failed to open RDF Model for RDF Database $db.  This problem has been recorded.</p>\n";
+    end_page($q);
+    exit 0;
+  }
 }
 
-my $model=new RDF::Redland::Model($storage, "");
-if(!$model) {
-  log_action($host, $db, "Failed to create model");
-  print "\n\n<p>Sorry - failed to open RDF Model for RDF Database $db.  This problem has been recorded.</p>\n";
-  end_page($q);
-  exit 0;
-}
 
 my $statement=undef;
 my $stream=undef;
 
-if($command ne 'print'  && $command ne 'parse') {
+if($command ne 'print' && $command ne 'parse') {
   if ($statement_string !~ m%^ (?: \? | \[[^]]+\])
                                \s*--\s*
                                (?: \? | \[[^]]+\])
@@ -466,7 +482,7 @@ if($command eq 'print') {
     }
   }
 
-  if($rdf_content) { # have content on web page, maybe with URI
+  if(defined $rdf_content) { # have content on web page, maybe with URI
     $temp_file="$tmp_dir/redland-demo-$$.rdf";
     if(open(OUT, ">$temp_file")) {
       print OUT $rdf_content;
