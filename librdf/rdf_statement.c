@@ -321,6 +321,7 @@ librdf_statement_to_string(librdf_statement *statement)
   char *s;
   int statement_string_len=0;
   char *format;
+#define NULL_STRING_LENGTH 6
   static char *null_string="(null)";
   size_t len;
 
@@ -331,6 +332,7 @@ librdf_statement_to_string(librdf_statement *statement)
     statement_string_len += len;
   } else {
     subject_string=null_string;
+    statement_string_len += NULL_STRING_LENGTH;
   }
 
   
@@ -344,6 +346,7 @@ librdf_statement_to_string(librdf_statement *statement)
     statement_string_len += len;
   } else {
     predicate_string=null_string;
+    statement_string_len += NULL_STRING_LENGTH;
   }
   
 
@@ -359,6 +362,7 @@ librdf_statement_to_string(librdf_statement *statement)
     statement_string_len += len;
   } else {
     object_string=null_string;
+    statement_string_len += NULL_STRING_LENGTH;
   }
   
 
@@ -366,9 +370,9 @@ librdf_statement_to_string(librdf_statement *statement)
 #define LIBRDF_STATEMENT_FORMAT_STRING_LITERAL "{%s, %s, \"%s\"}"
 #define LIBRDF_STATEMENT_FORMAT_RESOURCE_LITERAL "{%s, %s, %s}"
   statement_string_len += + 1 + /* "{" %s */
-                            2 + /* "," %s */
                             2 + /* ", " %s */
-                            1 + 1; /* "}\0" */
+                            2 + /* ", " %s */
+                            1; /* "}" */
   if(LIBRDF_NODE_STATEMENT_OBJECT(statement) &&
      librdf_node_get_type(LIBRDF_NODE_STATEMENT_OBJECT(statement)) == LIBRDF_NODE_TYPE_LITERAL) {
     format=LIBRDF_STATEMENT_FORMAT_STRING_LITERAL;
@@ -377,7 +381,7 @@ librdf_statement_to_string(librdf_statement *statement)
     format=LIBRDF_STATEMENT_FORMAT_RESOURCE_LITERAL;
   }
     
-  s=(char*)LIBRDF_MALLOC(cstring, statement_string_len);
+  s=(char*)LIBRDF_MALLOC(cstring, statement_string_len+1);
   if(s)
     sprintf(s, format, subject_string, predicate_string, object_string);
 
