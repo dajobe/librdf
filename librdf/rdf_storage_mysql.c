@@ -6,11 +6,11 @@
  *
  * Based in part on rdf_storage_list and rdf_storage_parka.
  *
- * Copyright (C) 2003 Morten Frederiksen - http://purl.org/net/morten/
+ * Copyright (C) 2003-2004 Morten Frederiksen - http://purl.org/net/morten/
  *
  * and
  *
- * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  *
@@ -1201,7 +1201,8 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
   librdf_node *subject, *predicate, *object, *node;
 
   /* Get next statement */
-  if(row=mysql_fetch_row(sos->results)) {
+  row=mysql_fetch_row(sos->results);
+  if(row) {
     /* Make sure we have a statement object to return */
     if(!sos->current_statement) {
       if(!(sos->current_statement=librdf_new_statement(sos->storage->world))) {
@@ -1494,7 +1495,8 @@ librdf_storage_mysql_get_contexts_next_context(void* context)
   librdf_node *node;
 
   /* Get next statement */
-  if(row=mysql_fetch_row(gccontext->results)) {
+  row==mysql_fetch_row(gccontext->results);
+  if(row) {
     /* Free old context node, if allocated */
     if(gccontext->current_context)
       librdf_free_node(gccontext->current_context);
