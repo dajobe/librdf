@@ -85,6 +85,9 @@ void librdf_statement_set_predicate(librdf_statement *statement, librdf_node *pr
 librdf_node* librdf_statement_get_object(librdf_statement *statement);
 void librdf_statement_set_object(librdf_statement *statement, librdf_node *object);
 
+/* if statement has all fields */
+int librdf_statement_is_complete(librdf_statement *statement);
+
 /* convert to a string */
 char *librdf_statement_to_string(librdf_statement *statement);
 /* print it prettily */
