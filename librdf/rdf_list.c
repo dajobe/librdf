@@ -208,18 +208,18 @@ librdf_list_unshift(librdf_list* list, void *data)
  * by librdf_list_set_equals() or by straight comparison of pointers
  * if not set.
  * 
- * Return value: non 0 on failure (not found or list empty)
+ * Return value: the data stored or NULL on failure (not found or list empty)
  **/
-int
+void *
 librdf_list_remove(librdf_list* list, void *data) 
 {
   librdf_list_node *node;
   
   node=librdf_list_find_node(list, data);
-  if(!node) {
+  if(!node)
     /* not found */
-    return 1;
-  }
+    return NULL;
+
   if(node == list->first)
     list->first=node->next;
   if(node->prev)
@@ -229,12 +229,15 @@ librdf_list_remove(librdf_list* list, void *data)
     list->last=node->prev;
   if(node->next)
     node->next->prev=node->prev;
-  
+
+  /* retrieve actual stored data */
+  data=node->data;
   
   /* free node */
   LIBRDF_FREE(librdf_list_node, node);
   list->length--;
-  return 0;
+
+  return data;
 }
 
 
