@@ -440,8 +440,7 @@ librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri)
 int
 librdf_uri_is_file_uri(librdf_uri* uri) 
 {
-  /* FIXME: Almost certainly missing something subtle here */
-  return strncmp(uri->string, "file:", 5)==0;
+  return raptor_uri_is_file_uri(uri->string);
 }
 
 
