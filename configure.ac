@@ -1068,10 +1068,13 @@ fi
 
 
 dnl Checks for building sub-packages in sub directories
-SD="docs $raptor_dir $languages"
+dnl before librdf (pre-requisites)
+SD_PRE="$raptor_dir"
+dnl after librdf (use it)
+SD_POST="$languages"
 
-
-AC_SUBST(SD)
+AC_SUBST(SD_PRE)
+AC_SUBST(SD_POST)
 
 
 # Make final changes to cflags
