@@ -156,28 +156,14 @@ work in the source tree.</p>
 
 <h2>3. Using the library</h2>
 
-<p>See <a href="example.c">example.c</a> and
-<a href="example2.c">example2.c</a> which can be built with:</p>
+<p>There are several example programs included in Redland which can
+be compiled with:</p>
 <pre>
-   make example
-</pre>
-<p>or</p>
-<pre>
-   make example2
+   make examples
 </pre>
 <p>once the library has been configured and built.</p>
 
-<p><tt>example</tt> uses a RDF parser, if you have one, to parse a
-URI of RDF/XML content, store it in multple Berkeley DB hashes on the
-disk and run queries against them.  It takes two arguments, the first
-the URI of the RDF/XML content (or <tt>file:</tt><em>filename</em>)
-and the second, optional one, is the name of the RDF parser to use.  At
-present these can be <tt>sirpac</tt> or <tt>libwww</tt></p>
-
-<p><tt>example2</tt> does not use a RDF parser, but reads from a simple
-triple dump format and again stores the data on disk.</p>
-
-<p>If no Berkeley DB was found by configure, the programs will fail
+<p>If no Berkeley DB was found by configure, some of the examples will fail
 since there is no on-disk storage system available.  To change them
 to use the in-memory hashes, edit the lines reading something like</p>
 <pre>
@@ -198,6 +184,40 @@ running the Java parser directly against some RDF URL, eg.:</p>
 <pre>
   java -classpath rdf-api-2000-05-12.jar org.w3c.rdf.examples.ListStatements http://purl.org/dc/index.htm.rdf
 </pre>
+
+
+<h3>3.1. <a href="example1.c">example1.c</a></h3>
+
+<p><tt>example1</tt> uses a RDF parser, if you have one available, to
+parse a URI of RDF/XML content, store it in multple Berkeley DB
+hashes on the disk and run queries against them.  It takes two
+arguments, the first the URI of the RDF/XML content (or
+<tt>file:</tt><em>filename</em>) and the second, optional one, is the
+name of the RDF parser to use.  At present these can be
+<tt>sirpac</tt> or <tt>libwww</tt></p>
+
+<h3>3.2. <a href="example2.c">example2.c</a></h3>
+
+<p><tt>example2</tt> does not use a RDF parser, but reads from a
+simple triple dump format and again stores the data on disk in
+multiple Berkeley DB hashes.</p>
+
+<h3>3.3. <a href="example3.c">example3.c</a></h3>
+
+<p><tt>example3</tt> contains a 10 line main program that creates
+an RDF model, a statement, adds it to the model and stores it on
+disk.</p>
+
+<h3>3.4. <a href="example4.c">example4.c</a></h3>
+
+<p><tt>example4</tt> is a utility that allows the printing and querying
+of an existing on disk Berkeley DB-stored RDF model by statement; source,
+arc or target node and allows the addition and removal of statements.  To
+see a usage message type:</p>
+<pre>
+  example4
+</pre>
+
 
 <hr />
 
