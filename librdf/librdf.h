@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * librdf.h - librdf main header
+ * librdf.h - Redland RDF Application Framework main header
  *
  * $Id$
  *

@@ -1,6 +1,5 @@
 .deps*
 ChangeLog
-Doxyfile
 GPL-ed
 Makefile
 Makefile.in
@@ -15,8 +14,8 @@ configure
 gnupg*
 install-sh
 java-model
-librdf*gz
-librdf-config
+redland-*gz
+redland-config
 missing
 mkinstalldirs
 not-used
@@ -28,3 +27,4 @@ README
 TODO
 LICENSE.txt
 old*
+website
