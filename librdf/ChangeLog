@@ -1,5 +1,15 @@
 2004-10-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_query.c (librdf_query_register_factory):
+	Take a uri_string argument.
+
+	* rdf_query.h:
+	Modify librdf_query_register_factory to take a uri_string
+
+	* rdf_query_rasqal.c (librdf_query_rasqal_constructor): Use
+	rasqal_languages_enumerate to register all languages that rasqal has.
+
+
 	* rdf_query_rasqal.c (librdf_query_rasqal_constructor): Use
 	rasqal_languages_enumerate to register all languages that rasqal
 	has.
