@@ -1805,7 +1805,7 @@ main(int argc, char *argv[])
                                         &string_length);
   if(string_length != EXPECTED_BAD_STRING_LENGTH) {
     fprintf(stderr, "%s: Serialising to RDF/XML returned string size %d, expected %d\n", program,
-            string_length, EXPECTED_BAD_STRING_LENGTH);
+            (int)string_length, EXPECTED_BAD_STRING_LENGTH);
     return 1;
   }
   librdf_free_uri(base_uri);

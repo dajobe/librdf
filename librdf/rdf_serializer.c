@@ -664,7 +664,7 @@ main(int argc, char *argv[])
 #define EXPECTED_BAD_STRING_LENGTH 237
   if(string_length != EXPECTED_BAD_STRING_LENGTH) {
     fprintf(stderr, "%s: Serialising to RDF/XML returned string '%s' size %d, expected %d\n", program, string,
-            string_length, EXPECTED_BAD_STRING_LENGTH);
+            (int)string_length, EXPECTED_BAD_STRING_LENGTH);
     return 1;
   }
 
