@@ -262,6 +262,11 @@ rm -f config.cache
 
 conf_flags=
 
+AUTOMAKE=$automake
+AUTOCONF=$autoconf
+ACLOCAL=$aclocal
+export AUTOMAKE AUTOCONF ACLOCAL
+
 echo "$program: Running ./configure $conf_flags $@"
 if test "X$DRYRUN" = X; then
   $DRYRUN ./configure $conf_flags "$@" \
