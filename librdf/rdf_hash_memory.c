@@ -676,13 +676,16 @@ librdf_hash_memory_register_factory(librdf_hash_factory *factory)
 
 /**
  * librdf_init_hash_memory:
+ * @default_load_factor: Default hash load factor (0-1000)
  * 
- * Initialise the memory hash module.
+ * Initialise the memory hash module and set the default hash load factor.
+ * The recommended and default value is 0.75, i.e. 750/1000.  If you want
+ * to keep the default, use a value less than 0.
  **/
 void
 librdf_init_hash_memory(int default_load_factor)
 {
-  if(default_load_factor >= 0 && default_load_factor < 1000)
+  if(default_load_factor > 0 && default_load_factor < 1000)
     librdf_hash_default_load_factor=default_load_factor;
 
   librdf_hash_register_factory("memory", &librdf_hash_memory_register_factory);
