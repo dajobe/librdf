@@ -289,6 +289,19 @@ memory or with persistant storage.
 </sect1>
 </chapter>
 
+<chapter id="query">
+<?dbhtml filename='query.html'>
+<title>RDF Query</title>
+<para>
+This module provides query language support for RDF models
+either via an adaptor class or direct by persistant storage.
+</para>
+<sect1>
+<title>RDF Query Triples Class</title>
+@INCLUDE query_triples.sgml
+</sect1>
+</chapter>
+
 <chapter id="storage">
 <?dbhtml filename='storage.html'>
 <title>RDF Model Storage</title>
