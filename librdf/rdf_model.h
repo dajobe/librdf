@@ -21,12 +21,12 @@
 #include <rdf_uri.h>
 #include <rdf_node.h>
 #include <rdf_statement.h>
-#include <rdf_model_storage.h>
+#include <rdf_storage.h>
 #include <rdf_iterator.h>
 
 
 struct rdf_model_s {
-  rdf_model_storage*  storage;
+  rdf_storage*  storage;
   struct rdf_model_s* sub_models;
 };
 typedef struct rdf_model_s rdf_model;
@@ -39,7 +39,7 @@ void init_rdf_model(void);
 /* constructors */
 
 /* Create a new Model */
-rdf_model* new_rdf_model();
+rdf_model* new_rdf_model(void);
 
 /* Create a new Model from an existing Model - CLONE */
 rdf_model* new_rdf_model_from_model(rdf_model* model);
