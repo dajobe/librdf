@@ -400,7 +400,7 @@ librdf_query_results_as_stream(librdf_query_results* query_results)
 
 /**
  * librdf_query_get_result_count - Get number of bindings so far
- * @query_resuls: &librdf_query_results query results
+ * @query_results: &librdf_query_results query results
  * 
  * Return value: number of bindings found so far
  **/
