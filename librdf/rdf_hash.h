@@ -67,7 +67,7 @@ struct librdf_hash_factory_s {
   int (*close)(void* context);
 
   /* insert key/value pairs according to flags */
-  int (*put)(void* context, librdf_hash_datum *key, librdf_hash_datum *data, unsigned int flags);
+  int (*put)(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 
   /* returns true if key exists in hash, without returning value */
   int (*exists)(void* context, librdf_hash_datum *key);
@@ -129,7 +129,7 @@ librdf_hash_datum* librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key
 librdf_iterator* librdf_hash_get_all(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
 
 /* insert a key/value pair */
-int librdf_hash_put(librdf_hash* hash, void *key, size_t key_len, void *value, size_t value_len, unsigned int flags);
+int librdf_hash_put(librdf_hash* hash, void *key, size_t key_len, void *value, size_t value_len);
 
   /* returns true if key exists in hash, without returning value */
 int librdf_hash_exists(librdf_hash* hash, void *key, size_t key_len);

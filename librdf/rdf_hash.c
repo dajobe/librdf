@@ -638,7 +638,6 @@ librdf_hash_get_all_iterator_finished(void* iterator)
  * @key_len: length of key in bytes
  * @value: pointer to the value
  * @value_len: length of the value in bytes
- * @flags: 0 at present
  * 
  * The key and values are copied into the hash; the original pointers
  * can be deleted.
@@ -647,7 +646,7 @@ librdf_hash_get_all_iterator_finished(void* iterator)
  **/
 int
 librdf_hash_put(librdf_hash* hash, void *key, size_t key_len,
-                void *value, size_t value_len, unsigned int flags)
+                void *value, size_t value_len)
 {
   librdf_hash_datum hd_key, hd_value;
         
@@ -656,7 +655,7 @@ librdf_hash_put(librdf_hash* hash, void *key, size_t key_len,
   hd_value.data=value; hd_value.size=value_len;
         
   /* call generic routine using librdf_hash_datum structs */
-  return hash->factory->put(hash->context, &hd_key, &hd_value, flags);
+  return hash->factory->put(hash->context, &hd_key, &hd_value);
 }
 
 
@@ -1100,7 +1099,7 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
             *to=value[i];
           }
           
-          librdf_hash_put(hash, key, key_len, new_value, real_value_len, 0);
+          librdf_hash_put(hash, key, key_len, new_value, real_value_len);
           
           LIBRDF_DEBUG1(librdf_hash_from_string,
                         "after decoding ");
@@ -1148,7 +1147,7 @@ librdf_hash_from_array_of_strings (librdf_hash* hash, char **array)
     if(!value)
       LIBRDF_FATAL2(librdf_hash_from_array_of_strings,
                     "Array contains an odd number of strings - %d", i);
-    librdf_hash_put(hash, key, strlen(key), value, strlen(value), 0);
+    librdf_hash_put(hash, key, strlen(key), value, strlen(value));
   }
   return 0;
 }
@@ -1309,7 +1308,7 @@ main(int argc, char *argv[])
       fprintf(stdout, "%s: Adding key/value pair: %s=%s\n", program,
 	      key, value);
       
-      librdf_hash_put(h, key, strlen(key), value, strlen(value), 0);
+      librdf_hash_put(h, key, strlen(key), value, strlen(value));
       
       fprintf(stdout, "%s: resulting ", program);    
       librdf_hash_print(h, stdout);
