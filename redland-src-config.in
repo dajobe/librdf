@@ -25,9 +25,10 @@ fUsage: redland-src-config [OPTION]
 
 known values for OPTION are:
 
-  --libs                print library linking information
   --cflags              print pre-processor and compiler flags
   --help                display this help and exit
+  --libs                print library linking information
+  --libtool-libs        print linking information for use with libtool
   --version             output version information
   --run COMMAND         run the COMMAND with the shared libraries for
                         the source tree
@@ -58,6 +59,9 @@ while test $# -gt 0; do
       ;;
     --libs)
       echo_libs=yes
+      ;;
+    --libtool-libs)
+      echo_libtool_libs=yes
       ;;
     --help|--usage)
       usage 0
@@ -125,6 +129,10 @@ fi
 if test "$echo_cflags" = "yes"; then
   echo -I@abs_top_srcdir@/librdf `$rasqal_config --cflags` `$raptor_config --cflags`
 fi
+if test "$echo_libtool_libs" = "yes"; then
+  echo @abs_top_builddir@/librdf/librdf.la
+fi
+
 if test "$echo_libs" = "yes"; then
   echo -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ `$rasqal_config --libs` `$raptor_config --cflags`
 fi
