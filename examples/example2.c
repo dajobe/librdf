@@ -49,7 +49,7 @@ main(int argc, char *argv[])
   }
 
 
-  librdf_init_world(NULL);
+  librdf_init_world(NULL, NULL);
 
   uri=librdf_new_uri(argv[1]);
   if(!uri) {
