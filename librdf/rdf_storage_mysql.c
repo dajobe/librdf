@@ -1215,6 +1215,7 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
     }
     if(sos->current_context)
       librdf_free_node(sos->current_context);
+    sos->current_context=NULL;
     librdf_statement_clear(sos->current_statement);
     if(sos->query_statement) {
       subject=librdf_statement_get_subject(sos->query_statement);
