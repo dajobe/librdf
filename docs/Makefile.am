@@ -31,7 +31,7 @@ $(man_MANS)
 
 DOC_CLASSES=node statement model \
 storage storage_hashes storage_list storage_mysql storage_tstore \
-stream parser parser_raptor query query_triples serializer \
+stream parser parser_raptor query query_rasqal query_triples serializer \
 serializer_raptor concepts init digest digest_md5 digest_openssl hash \
 hash_bdb hash_cursor hash_memory heuristics iterator list uri utf8
 
