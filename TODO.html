@@ -19,11 +19,7 @@
 <li>RFE: Add node.as_sha1 easy digest methods for literal nodes</li>
 <li>raptor-uri-test may not work in redland when compiled against
 system - fails to find raptor.h.</li>
-<li>PHP may need to include php_config.h not config.h for new
-php version</li>
-<li>Docs: note in language docs that 'make install' of the main
-library is generally needed before any of the language builds will
-work</li>
+<li>PHP may need to include php_config.h not config.h for new php versions</li>
 <li>RFE: return serialized models to syntax as strings</li>
 <li>RFE: model.parseString(format, "string"), model.parseURI(format, URI, baseURI=URI) creating and destroying temporary parser objects for <em>format</em>.
 Means need to care about parser class if you just want simple things.  Similarly
@@ -68,6 +64,8 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Docs: note in language docs that 'make install' of the main
+library is generally needed before any of the language builds will work</li>
 <li>BUG: Blank nodes with illegal nodeIDs (as far as RDF/XML are concerned)
 can be serialized.  Fixed by the change below; all internal nodeIDs are now serializable in RDF/XML or N-Triples (0.9.14)</li>
 <li>Rewrite incoming <code>rdf:nodeID</code> attribute values into same form as generated blank node IDs, ie. <code>r</code><em>redland-start-time</em><code>r</code><em>unique-sequence-counter</em> (0.9.14)</li>
