@@ -101,8 +101,8 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
         fputs(lang, stream);
       }
       if(dt_uri) {
-        fputs("^^<", stream);
-        fputs((const char*)librdf_uri_as_string(dt_uri), stream);
+        fputs("^^<", stream); 
+        raptor_print_ntriples_string(stream, librdf_uri_as_string(dt_uri), '\0');
         fputc('>', stream);
       }
       break;
