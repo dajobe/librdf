@@ -98,7 +98,7 @@ librdf_new_model_from_model(librdf_model* model)
 
 /**
  * librdf_new_model_from_stream - Constructor - create a new librdf_model from a stream
-
+ *
  * @stream: &librdf_stream to create from
  *
  * FIXME: Not implemented yet

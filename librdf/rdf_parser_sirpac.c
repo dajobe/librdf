@@ -72,7 +72,7 @@ typedef struct {
 /**
  * librdf_parser_sirparc_init - Initialise the SiRPAC RDF parser
  * @context: context
-
+ *
  * Return value: non 0 on failure
  **/
 static int
