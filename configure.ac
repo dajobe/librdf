@@ -48,7 +48,7 @@ AC_DEFINE_UNQUOTED(LIBRDF_VERSION_DECIMAL, $version_decimal, [Release version as
 
 # for redland-config.in
 LIBRDF_VERSION_DECIMAL=$version_decimal
-AC_SUBST(REDLAND_VERSION_DECIMAL)
+AC_SUBST(LIBRDF_VERSION_DECIMAL)
 
 
 # Libtool versioning
