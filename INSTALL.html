@@ -11,8 +11,39 @@
 
 <h2>1. Getting the sources</h2>
 
+<p>There are several ways to get the sources.  The most stable and
+tested versions are the sources shipped with each release and these
+are recommended as the first place to start.  If you want to get a
+newer set, then there are nightly snapshots made of the development
+sources, which may not yet be committed to the CVS.  For the latest
+developent sources, anonymous CVS access is available but this may
+require some configuring of developer tools that are not needed for
+the snapshot releases.</p>
 
-<h3>1.1. Getting the sources from CVS</h3>
+<p>The source bundle and package files contain all the HTML files and
+documentation provided on the web site.</p>
+
+
+<h3>1.1. Getting released sources</h3>
+
+<p>Every release comes with full sources and these are available from
+<a href="http://www.redland.opensource.ac.uk/dist/source/">http://www.redland.opensource.ac.uk/dist/source/</a> master site as well as the
+<a href="http://sourceforge.net/projects/librdf/">SourceForge site</a>.
+</p>
+
+
+<h3>1.2. Getting nightly source snapshots</h3>
+
+<p>Each night a snapshot distribution is attempted using the current
+development sources (that may not even be in the CVS), using the
+<code>make dist</code> target of the automake system.  If this target
+completes, these snapshots are then made available from:
+<a href="http://www.redland.opensource.ac.uk/dist/snapshots/source/">http://www.redland.opensource.ac.uk/dist/snapshots/source/</a>
+(binary snapshot releases are also attempted each night from the
+same sources).
+</p>
+
+<h3>1.3. Getting the sources from CVS</h3>
 
 <pre>
   # sh, bash, ...
@@ -31,20 +62,21 @@ CVS password:
   cd redland
 </pre>
 
-<p>At this stage, or after a <tt>cvs update</tt> you will
+<p>At this stage, or after a <code>cvs update</code> you will
 need to create the automake and autoconf derived files, as described
 below in <a href="#sec-create-configure">Create the configure program</a>
-by using the <tt>autogen.sh</tt> script.</p>
+by using the <code>autogen.sh</code> script.</p>
 
+<p>Building Redland in this way requires some particular development
+tools not needed when building from snapshot releases - automake,
+autoconf and swig.  The <code>autogen.sh</code> script checks for the
+appropriate versions.</p>
 
-<h3>1.2. Getting source bundles</h3>
+<p>(Aside: the current automake/conf system is using the "old"
+format configure.in with automake 1.4, autoconf 2.1x.  These will
+be switched to the "new" format configure.ac with automake 1.6+,
+autoconf 2.5+ from the next release.)</p>
 
-<p>The sources are available from
-<a href="http://www.redland.opensource.ac.uk/dist/source/">http://www.redland.opensource.ac.uk/dist/source/</a> (master site) and also from the
-<a href="http://sourceforge.net/projects/librdf/">SourceForge site</a>.
-The source bundle and the distributions contain all the HTML files
-and documentation provided on the web site.
-</p>
 
 
 <h2>2. Configuring and building</h2>
@@ -58,10 +90,10 @@ compile farm and it builds on Debian Linux (x86, Alpha, PPC and
 Sparc), FreeBSD (x86) and Apple OSX.</p>
 
 
-<h3><a id="sec-create-configure" name="sec-create-configure"></a>2.1. Create <tt>configure</tt> program</h3>
+<h3><a id="sec-create-configure" name="sec-create-configure"></a>2.1. Create <code>configure</code> program</h3>
 
-<p>If there is no <tt>configure</tt> program, you can create it 
-by running the <tt>autogen.sh</tt> script, as long as you have the
+<p>If there is no <code>configure</code> program, you can create it 
+by running the <code>autogen.sh</code> script, as long as you have the
 <a href="http://www.gnu.org/software/automake/automake.html">automake</a> and
 <a href="http://www.gnu.org/software/autoconf/autoconf.html">autoconf</a>
 tools.  This is done by:</p>
@@ -79,56 +111,61 @@ hand with:</p>
   aclocal; autoheader; automake --add-missing; autoconf
 </pre>
 <p>(Ignore any warnings from autoconf about AC_TRY_RUN, it is caused
-by an autoconf macro and IMHO is an autoconf bug.)</p>
+by an autoconf macro and seems to be an autoconf bug.)</p>
 
-<h3>2.2. Options for <tt>configure</tt></h3>
+<h3>2.2. Options for <code>configure</code></h3>
 
 <p>See also the generic GNU installation instructions in 
 <a href="INSTALL">INSTALL</a> for information about general options
-such as <tt>--prefix</tt> etc.</p>
+such as <code>--prefix</code> etc.</p>
 
 <dl>
-<dt><tt>--with-bdb=ROOT</tt><br /></dt>
-<dd><p>Enable use of the Berkeley DB library installed at
-<em>ROOT</em>.  That means <em>ROOT</em><tt>/include</tt> must
-contain the BDB header <tt>db.h</tt> and <em>ROOT</em><tt>/lib</tt>
-must contain the library <tt>libdb.a</tt> (or whatever shared library
+<dt><code>--with-bdb=ROOT</code><br /></dt>
+<dd><p>Enable use of the Berkeley / Sleepycat DB library installed at
+<em>ROOT</em>.  That means <em>ROOT</em><code>/include</code> must
+contain the BDB header <code>db.h</code> and <em>ROOT</em><code>/lib</code>
+must contain the library <code>libdb.a</code> (or whatever shared library
 version you have).</p>
 
-<p>Berkeley DB is now known as Sleepycat DB (after version 3) and
+<p>Berkeley DB is now known as Sleepycat DB (after version 2) and
 distributed and supported by
 <a href="http://www.sleepycat.com/">SleepyCat Software</a>.
 Versions 4.1.24, 4.0.14, 3.3.11, 3.2.9, 3.1.17, 3.1.14, 2.7.7 and 2.4.14
 have been tested and work.  Some systems do
 not come installed with a working Berkeley/Sleepycat DB so on those
 systems, Redland will have no persistent storage unless BDB is built
-separately.</p>
+separately and enabled via this option.</p>
 
-<p><b>Note</b>: If you change between using the system installed BDB
-or various versions of BDB (2.x, 3.x etc.) then you will need to
-re-configure the system carefully by tidying up as follows:</p>
+<p><b>Note</b>: If you change installed versions of BDB (from 3.x to
+4.x) then you will need to re-configure Redland carefully to let it
+discover the features of the newer BDB as follows:</p>
 <pre>
   rm -f config.cache
   make clean
   ./configure ... # any configure arguments here
 </pre>
+<p>(plus you might need to use the
+<code>db</code><em>X</em><code>_upgrade</code>
+utility to update the BDB database files to the formats supported by
+the newer version <em>X</em> - see the BDB documentation to find out
+if this is required.)</p>
 
 <p>If the BerkeleyDB is installed in different places from
-<em>ROOT</em><tt>/lib</tt> (library) and
-<em>ROOT</em><tt>/include</tt> (header) or
+<em>ROOT</em><code>/lib</code> (library) and
+<em>ROOT</em><code>/include</code> (header) or
 the library name is something that can't be worked out automatically,
 then you can use the following options to specify them.</p>
 
 </dd>
 
-<dt><tt>--with-bdb-lib=</tt><em>LIBDIR</em><br /></dt>
-<dt><tt>--with-bdb-include=</tt><em>INCDIR</em><br /></dt>
-<dt><tt>--with-bdb-name=</tt><em>NAME</em><br /></dt>
+<dt><code>--with-bdb-lib=</code><em>LIBDIR</em><br /></dt>
+<dt><code>--with-bdb-include=</code><em>INCDIR</em><br /></dt>
+<dt><code>--with-bdb-name=</code><em>NAME</em><br /></dt>
 <dd><p>Use Berkeley DB with the installed library in <em>LIBDIR</em>
-and the <tt>db.h</tt> header in <em>INCDIR</em> and
+and the <code>db.h</code> header in <em>INCDIR</em> and
 the installed library called <em>NAME</em>
-like <tt>-l</tt><em>NAME</em>.  This is relative to <em>LIBDIR</em>.
-All of these options can be omitted and <tt>configure</tt> will
+like <code>-l</code><em>NAME</em>.  This is relative to <em>LIBDIR</em>.
+All of these options can be omitted and <code>configure</code> will
 try to find or guess the values from the system.</p>
 
 <p>For example, to compile redland on OSX with <a href="http://fink.sourceforge.net/">fink</a> required a configure line something like this:</p>
@@ -136,75 +173,56 @@ try to find or guess the values from the system.</p>
   ./configure  --with-bdb-lib=/sw/lib --with-bdb-include=/sw/include/db3
 </pre>
 <p>The name of the BDB library was correctly discovered for this
-configuration, as <tt>db-3.3</tt></p>
+configuration, as <code>db-3.3</code></p>
 </dd>
 
 
-<dt><tt>--with-libwww</tt><br /></dt>
+<dt><code>--with-libwww</code><br /></dt>
 <dd><p>Enable use of the W3C <a href="http://www.w3.org/Library/">libwww</a>,
 if available.  configure will automatically enable this if
-the <tt>libwww-config</tt> program can be found in the path unless
-disabled by setting this option to <em>no</em>.  libwww is presently
-only used for its
-<a href="http://www.w3.org/Library/src/HTRDF.html">RDF parser</a>
+the <code>libwww-config</code> program can be found in the path unless
+disabled by setting this option to <em>no</em>.  libwww is not used
+at present.
 </p>
 </dd>
 
-<dt><tt>--with-java-sirpac-stanford-jar=JAR</tt><br />
-<tt>--with-java-sirpac-w3c-jar=JAR</tt><br /></dt>
-<dd><p>Enable the use of one of the 
-<a href="http://www.w3.org/RDF/Implementations/SiRPAC/">SiRPAC</a>
-RDF Java parsers to generate triples.  Both of arguments these can be
-given if required.</p>
+<dt><code>--enable-parsers=LIST</code><br /></dt>
+<dd><p>Select the list of RDF parsers to be included if the are availble.  The
+valid list of RDF parsers are: <code>raptor repat</code> (the default).
+Even when selected these depend on the available XML parsers.  Raptor
+uses either of libxml2 (prefered) or expat and repat requires expat.
+Redland requires the Raptor parser for other functionality, so this
+cannot be disabled.  If no system-wide libxml2 or expat is available,
+Redland will compile an internal copy of expat and use that.
+</p></dd>
 
-<p>The
-<a href="http://www-db.stanford.edu/~melnik/rdf/api.html"><tt>stanford</tt></a> parser is by Sergey Melnik of Stanford University based on an earlier version
-of the W3C version.  You need to download 
-the distribution or just the <a href="http://www-diglib.stanford.edu/~melnik/rdf/rdf-api-2000-10-30.jar">latest</a> jar file
-from <a href="http://www-db.stanford.edu/~melnik/rdf/api.html">his site</a>
-enable with this option pointing at the jar file.
-This has been tested with the 2000-05-12, 2000-09-03 and
-2000-10-30 releases.</p>
-
-<p>The
-<a href="http://www.w3.org/RDF/Implementations/SiRPAC/"><tt>w3c</tt></a>
-parser is from the W3C.  You need to download the
-<a href="http://www.w3.org/RDF/Implementations/SiRPAC/SiRPAC-1.15.tar.gz">distribution</a>
-and create a jar file of the classes inside, and pass that as the
-value of this option.  You will need the
-<a href="http://www.megginson.com/SAX/">http://www.megginson.com/SAX/</a>
-generic driver and probably others if you want to compile SiRPAC from
-source.  The other requirement is a SAX parser and to configure it
-use the following options:</p>
-
-<blockquote>
-<tt>--with-java-sax-jar=</tt><em>jar file of SAX parser</em><br />
-<tt>--with-java-sax-class=</tt><em>class name of SAXDriver</em>
-</blockquote>
-
-</dd>
-
-<dt><tt>--enable-digests=LIST</tt><br /></dt>
+<dt><code>--enable-digests=LIST</code><br /></dt>
 <dd><p>Select the list of digests to be included if the are availble.  The
-valid list of digests are: <tt>md5 sha1 ripem160</tt> (the default).  The
+valid list of digests are: <code>md5 sha1 ripem160</code> (the default).  The
 digest functions can be provided by external libraries such as
 the <a href="http://www.openssl.org/">OpenSSL</a>
 libcrypto library or by provided portable
 versions (only MD5 supported in this release).</p></dd>
 
-<dt><tt>--with-openssl-digests</tt><br /></dt>
+<dt><code>--with-openssl-digests</code><br /></dt>
 <dd><p>Enable digests provided by the
 <a href="http://www.openssl.org/">OpenSSL</a>
 libcrypto library (MD5, SHA1 and RIPEMD160) if the library is
 available. configure will automatically enable this unless disabled
 by setting this option to <em>no</em>.</p></dd>
 
-<dt><tt>--with-xml-parser=NAME</tt><br /></dt>
-<dd><p>Pick an XML parser to use for Raptor - either <tt>libxml</tt>
-(default) or <tt>expat</tt>.  If this option is not given,
+<dt><code>--with-xml-parser=NAME</code><br /></dt>
+<dd><p>Pick an XML parser to use for Raptor - either <code>libxml</code>
+(default) or <code>expat</code>.  If this option is not given,
 either will be used, with libxml preferred if both are present.
 libxml must be present as a system library but expat is always available
 since it is provided inside Redland.</p>
+
+<p>If the <code>repat</code> RDF parser is also required (by default,
+yes) then since it always requires <code>expat</code>, then even if
+expat is not selected for this option, it will be compiled in.
+To prevent this, remove repat from the list of RDF parsers using
+<code>--enable-parsers=raptor</code>.</p>
 
 <p>Raptor has been tested with various combinations of these libraries
 that are described further in the Raptor
@@ -223,8 +241,8 @@ will need to use a system-specific method of passing this information
 to the run-time loader.  On Linux and Solaris you can set the
 LD_LIBRARY_PATH environment variable to include the directory where
 the libwww libraries are found.  You can also configure it via a
-system wide file - see the <tt>ld</tt>, <tt>ld.so</tt>
-or<tt>ld.so.1</tt> manual pages for details.  The alternative, to
+system wide file - see the <code>ld</code>, <code>ld.so</code>
+or<code>ld.so.1</code> manual pages for details.  The alternative, to
 link libwww statically, works but is difficult to enable.</p>
 
 
@@ -263,8 +281,13 @@ adding or removing options, you may have to tidy up first with either of these:<
 </pre>
 <p>which should emit lots of exciting test messages to the screen but
 conclude with something like:<br />
-  <tt>All </tt><em>n</em><tt> tests passed</tt><br />
+  <code>All </code><em>n</em><code> tests passed</code><br />
 if everything works correctly.</p>
+
+<p>(If you have got all the required subsidiary development tools,
+you can also do <code>make distcheck</code> which does a longer
+check that the distribution installation, configuring and building
+works.  This does not perform any additional core testing).</p>
 
 
 <h3>2.6 Installing the library</h3>
@@ -286,7 +309,7 @@ be compiled with:</p>
    make examples
 </pre>
 <p>once the library has been configured and built.  These are
-compiled in the <tt>examples</tt> sub-directory.</p>
+compiled in the <code>examples</code> sub-directory.</p>
 
 <p>If no Berkeley DB was found by configure, some of the examples will fail
 since there is no on-disk storage system available.  To change them
@@ -313,29 +336,29 @@ running the Java parser directly against some RDF URL, eg.:</p>
 
 <h3>3.1. <a href="example1.c">example1.c</a></h3>
 
-<p><tt>example1</tt> uses a RDF parser, if you have one available, to
+<p><code>example1</code> uses a RDF parser, if you have one available, to
 parse a URI of RDF/XML content, store it in multple Berkeley DB
 hashes on the disk and run queries against them.  It takes two
 arguments, the first the URI of the RDF/XML content (or
-<tt>file:</tt><em>filename</em>) and the second, optional one, is the
+<code>file:</code><em>filename</em>) and the second, optional one, is the
 name of the RDF parser to use.  At present these can be
-<tt>sirpac</tt> or <tt>libwww</tt></p>
+<code>sirpac</code> or <code>libwww</code></p>
 
 <h3>3.2. <a href="example2.c">example2.c</a></h3>
 
-<p><tt>example2</tt> does not use a RDF parser, but reads from a
+<p><code>example2</code> does not use a RDF parser, but reads from a
 simple triple dump format and again stores the data on disk in
 multiple Berkeley DB hashes.</p>
 
 <h3>3.3. <a href="example3.c">example3.c</a></h3>
 
-<p><tt>example3</tt> contains a 10 line main program that creates
+<p><code>example3</code> contains a 10 line main program that creates
 an RDF model, a statement, adds it to the model and stores it on
 disk.</p>
 
 <h3>3.4. <a href="example4.c">example4.c</a></h3>
 
-<p><tt>example4</tt> is a utility that allows the parsing, printing
+<p><code>example4</code> is a utility that allows the parsing, printing
 and querying of an existing on disk Berkeley DB-stored RDF model by
 statement; source, arc or target node and allows the addition and
 removal of statements.  To see a usage message type:</p>
@@ -397,6 +420,11 @@ full information on installing and using Redland from Java.</p>
 
 <p>See the <a href="docs/ruby.html">Redland Ruby Interface</a> document for
 full information on installing and using Redland from Ruby.</p>
+
+<h2>8. Using the PHP interface</h2>
+
+<p>See the <a href="docs/php.html">Redland PHP Interface</a> document for
+full information on installing and using Redland from PHP.</p>
 
 
 
