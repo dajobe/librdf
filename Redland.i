@@ -44,6 +44,27 @@
 void librdf_error(librdf_world* world, const char *message, ...);
 void librdf_warning(librdf_world* world, const char *message, ...);
 
+
+/* 
+ * Thanks to the patch in this Debian bug for the solution
+ * to the crash inside vsnprintf on some architectures.
+ *
+ * "reuse of args inside the while(1) loop is in violation of the
+ * specs and only happens to work by accident on other systems."
+ *
+ * http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=104325 
+ */
+
+#ifndef va_copy
+#ifdef __va_copy
+#define va_copy(dest,src) __va_copy(dest,src)
+#else
+#define va_copy(dest,src) (dest) = (src)
+#endif
+#endif
+
+
+
 #ifdef SWIGPYTHON
 /* swig doesn't declare all prototypes */
 static PyObject *_wrap_redland_copyright_string_get(void);
@@ -100,10 +121,12 @@ static PyMethodDef librdf_python_methods [] = {
 static void
 librdf_call_python_message(int type, const char *message, va_list arguments)
 {
+  char empty_buffer[1];
   PyObject *arglist;
   PyObject *result;
   char *buffer;
   int len;
+  va_list args_copy;
 
   if(!librdf_python_callback) {
     fprintf(stderr, "librdf_call_python_message: No message callback registered\n");
@@ -111,12 +134,16 @@ librdf_call_python_message(int type, const char *message, va_list arguments)
   }
 
   /* ask vsnprintf size of buffer required */
-  len=vsnprintf(NULL, 0, message, arguments)+1;
+  va_copy(args_copy, arguments);
+  len=vsnprintf(empty_buffer, 1, message, args_copy)+1;
+  va_end(args_copy);
   buffer=(char*)malloc(len);
   if(!buffer)
     fprintf(stderr, "librdf_call_python_message: Out of memory\n");
   else {
-    vsnprintf(buffer, len, message, arguments);
+    va_copy(args_copy, arguments);
+    vsnprintf(buffer, len, message, args_copy);
+    va_end(args_copy);
 
     if(type == 0) {
 #ifdef PYTHON_EXCEPTIONS_WORKING
@@ -188,20 +215,26 @@ librdf_python_world_init(librdf_world *world)
 static void
 librdf_call_perl_message(int type, const char *message, va_list arguments)
 {
+  char empty_buffer[1];
   dSP;
   char *buffer;
   int len;
+  va_list args_copy;
   
   ENTER;
   SAVETMPS;
 
   /* ask vsnprintf size of buffer required */
-  len=vsnprintf(NULL, 0, message, arguments)+1;
+  va_copy(args_copy, arguments);
+  len=vsnprintf(empty_buffer, 1, message, args_copy)+1;
+  va_end(args_copy);
   buffer=(char*)malloc(len);
   if(!buffer)
     fprintf(stderr, "librdf_call_perl_message: Out of memory\n");
   else {
-    vsnprintf(buffer, len, message, arguments);
+    va_copy(args_copy, arguments);
+    vsnprintf(buffer, len, message, args_copy);
+    va_end(args_copy);
 
     PUSHMARK(SP) ;
     XPUSHs(sv_2mortal(newSViv(type)));
