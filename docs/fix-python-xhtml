@@ -55,7 +55,7 @@ while(<IN>) {
    }
 
   # Links to other Python modules, exceptions
-  s%<a href="(Redland|string|sys|exceptions).html[^"]*">(.+?)</a>%$2%g; #"
+  s%<a href="(Redland|string|sys|exceptions|__builtin__).html[^"]*">(.+?)</a>%$2%g; #"
   # The horrors of guessing urls in text
   s%<a href="http://example.(org|com|net)[^"]*">([^<]+)</a>%$2%g; # "
   # Never leave these in web pages
