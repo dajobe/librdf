@@ -295,11 +295,7 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
   int status=SQLITE_OK;
   char *errmsg=NULL;
 
-#ifdef HAVE_SQLITE3_H
-#else
-#endif
-
-  fprintf(stderr, "SQLite exec '%s'\n", request);
+  LIBRDF_DEBUG2("SQLite exec '%s'\n", request);
   
   status=sqlite_exec(context->db, request, callback, arg, &errmsg);
   if(fail_ok)
@@ -1045,7 +1041,9 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
 
   if(status == SQLITE_ROW) {
     /* FIXME - turn row data into statement, scontext->context */
+#if LIBRDF_DEBUG > 2
     int i;
+#endif
     librdf_node* node;
     const unsigned char *uri_string, *blank;
     
@@ -1065,6 +1063,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
  9  contextUri
 */
 
+#if LIBRDF_DEBUG > 2
     for(i=0; i<sqlite3_column_count(vm); i++)
       fprintf(stderr, "%s, ", sqlite3_column_name(vm, i));
     fputc('\n', stderr);
@@ -1076,6 +1075,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
         fprintf(stderr, "%s, ", sqlite3_column_text(vm, i));
     }
     fputc('\n', stderr);
+#endif
 
     if(!*statement) {
       if(!(*statement=librdf_new_statement(scontext->storage->world)))
@@ -1358,7 +1358,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   
   request=raptor_stringbuffer_as_string(sb);
   
-  fprintf(stderr, "SQLite prepare '%s'\n", request);
+  LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 
 #ifdef HAVE_SQLITE3_H
   status=sqlite3_prepare(context->db,
