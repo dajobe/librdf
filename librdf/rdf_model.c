@@ -250,8 +250,6 @@ librdf_model_size(librdf_model* model)
  * @model: model object
  * @statement: statement object
  * 
- * After this method, the statement becomes owned by the model
- * 
  * Return value: non 0 on failure
  **/
 int
@@ -302,10 +300,9 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
   librdf_statement_set_object(statement, object);
 
   result=librdf_model_add_statement(model, statement);
-  if(result)
-    librdf_free_statement(statement);
+  librdf_free_statement(statement);
   
-  return 0;
+  return result;
 }
 
 
@@ -411,7 +408,7 @@ librdf_model_find_statements(librdf_model* model,
 
 
 /**
- * librdf_modeeel_get_sources - return the sources (subjects) of arc in an RDF graph given arc (predicate) and target (object)
+ * librdf_model_get_sources - return the sources (subjects) of arc in an RDF graph given arc (predicate) and target (object)
  * @model: &librdf_model object
  * @arc: &librdf_node arc
  * @target: &librdf_node target
@@ -464,6 +461,84 @@ librdf_model_get_targets(librdf_model *model,
                          librdf_node *source, librdf_node *arc) 
 {
   return librdf_storage_get_targets(model->storage, source, arc);
+}
+
+
+/**
+ * librdf_model_get_source - return one source (subject) of arc in an RDF graph given arc (predicate) and target (object)
+ * @model: &librdf_model object
+ * @arc: &librdf_node arc
+ * @target: &librdf_node target
+ * 
+ * Searches the model for arcs matching the given arc and target
+ * and returns one &librdf_node object
+ * 
+ * Return value:  &librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_model_get_source(librdf_model *model,
+                        librdf_node *arc, librdf_node *target) 
+{
+  librdf_iterator *iterator=librdf_storage_get_sources(model->storage, 
+                                                      arc, target);
+  librdf_node *node=librdf_iterator_get_next(iterator);
+  if(node)
+    node=librdf_new_node_from_node(node);
+
+  librdf_free_iterator(iterator);
+  return node;
+}
+
+
+/**
+ * librdf_model_get_arc - return one arc (predicate) of an arc in an RDF graph given source (subject) and target (object)
+ * @model: &librdf_model object
+ * @source: &librdf_node source
+ * @target: &librdf_node target
+ * 
+ * Searches the model for arcs matching the given source and target
+ * and returns one &librdf_node object
+ * 
+ * Return value:  &librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_model_get_arc(librdf_model *model,
+                     librdf_node *source, librdf_node *target) 
+{
+  librdf_iterator *iterator=librdf_storage_get_arcs(model->storage, 
+                                                   source, target);
+  librdf_node *node=librdf_iterator_get_next(iterator);
+  if(node)
+    node=librdf_new_node_from_node(node);
+
+  librdf_free_iterator(iterator);
+  return node;
+}
+
+
+/**
+ * librdf_model_get_target - return one target (object) of an arc in an RDF graph given source (subject) and arc (predicate)
+ * @model: &librdf_model object
+ * @source: &librdf_node source
+ * @arc: &librdf_node arc
+ * 
+ * Searches the model for targets matching the given source and arc
+ * and returns one &librdf_node object
+ * 
+ * Return value:  &librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_model_get_target(librdf_model *model,
+                        librdf_node *source, librdf_node *arc) 
+{
+  librdf_iterator *iterator=librdf_storage_get_targets(model->storage, 
+                                                      source, arc);
+  librdf_node *node=librdf_iterator_get_next(iterator);
+  if(node)
+    node=librdf_new_node_from_node(node);
+  
+  librdf_free_iterator(iterator);
+  return node;
 }
 
 
