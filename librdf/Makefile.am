@@ -45,7 +45,7 @@ rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c rdf_storage_file.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
 rdf_query.c \
-rdf_query_triples.c \
+rdf_query_triples.c rdf_query_rasqal.c \
 rdf_serializer.c \
 rdf_serializer_raptor.c rdf_serializer_rdfxml.c \
 rdf_log.c \
@@ -63,7 +63,6 @@ rdf_stream.h \
 rdf_parser.h \
 rdf_heuristics.h rdf_files.h rdf_utf8.h \
 rdf_query.h \
-rdf_query_triples.h \
 rdf_serializer.h \
 rdf_log.h
 
