@@ -39,7 +39,7 @@ extern "C" {
 #  ifdef REDLAND_STATIC
 #    define REDLAND_API
 #  else
-#    ifdef REDLAND_INTERNAL
+#    ifdef LIBRDF_INTERNAL
 #      define REDLAND_API _declspec(dllexport)
 #    else
 #      define REDLAND_API _declspec(dllimport)
