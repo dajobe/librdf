@@ -906,6 +906,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
   size_t total_length=0;
   unsigned char *string;
   size_t string_length;
+  size_t language_length=0;
   
   switch(node->type) {
     case LIBRDF_NODE_TYPE_RESOURCE:
@@ -928,8 +929,12 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
     case LIBRDF_NODE_TYPE_LITERAL:
       string=(unsigned char*)node->value.literal.string;
       string_length=node->value.literal.string_len;
+      if(node->value.literal.xml_language)
+        language_length=strlen(node->value.literal.xml_language);
       
       total_length= 6 + string_length + 1; /* +1 for \0 at end */
+      if(language_length)
+        total_length += language_length+1;
       
       if(length && total_length > length)
         return 0;    
@@ -940,9 +945,11 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
           (node->value.literal.xml_space & 0xf);
         buffer[2]=(string_length & 0xff00) >> 8;
         buffer[3]=(string_length & 0x00ff);
-        buffer[4]=0; /* FIXME - xml:language */
-        buffer[5]=0;
+        buffer[4]='\0'; /* unused */
+        buffer[5]=(language_length & 0x00ff);
         strcpy((char*)buffer+6, (const char*)string);
+        if(language_length)
+          strcpy((char*)buffer+string_length+7, (const char*)node->value.literal.xml_language);
       }
       break;
       
@@ -991,8 +998,10 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
   int xml_space;
   size_t string_length;
   size_t total_length;
+  size_t language_length;
   librdf_uri* new_uri;
-
+  char *language=NULL;
+  
   /* absolute minimum - first byte is type */
   if (length < 1)
     return 0;
@@ -1029,15 +1038,18 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
       is_wf_xml=(buffer[1] & 0xf0)>>8;
       xml_space=(buffer[1] & 0x0f)>>8;
       string_length=(buffer[2] << 8) | buffer[3];
-
-      /* FIXME - xml:language length in 4, 5 */
+      language_length=buffer[5];
 
       total_length= 6 + string_length + 1; /* +1 for \0 at end */
+      if(language_length) {
+        language = buffer + total_length;
+        total_length += language_length+1;
+      }
       
       /* Now initialise fields */
       node->type = LIBRDF_NODE_TYPE_LITERAL;
       if (librdf_node_set_literal_value(node, (const char*)buffer+6,
-                                        NULL, /* xml:language */
+                                        (const char*)language,
                                         xml_space, is_wf_xml))
         return 0;
     
