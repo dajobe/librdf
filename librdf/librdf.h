@@ -41,13 +41,6 @@ typedef struct librdf_context_s librdf_context;
 typedef struct librdf_parser_s librdf_parser;
 
 
-#ifdef HAVE_INLINE
-#define INLINE inline
-#else
-#define INLINE
-#endif
-
-
 /* error handling */
 #ifdef LIBRDF_DEBUG
 /* DEBUGGING TURNED ON */
@@ -70,6 +63,13 @@ typedef struct librdf_parser_s librdf_parser;
 #endif
 
 
+/* for the memory allocation functions */
+#if defined(HAVE_DMALLOC_H) && defined(LIBRDF_MEMORY_DEBUG_DMALLOC)
+#include <dmalloc.h>
+#undef HAVE_STDLIB_H
+#endif
+
+
 #ifdef LIBRDF_MEMORY_DEBUG
 /* DEBUGGING MEMORY ALLOCATIONS */
 
@@ -86,9 +86,9 @@ void librdf_memory_report(FILE *fh);
 #else
 /* NOT DEBUGGING MEMORY ALLOCATIONS */
 
-/* for the memory allocation functions */
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#undef HAVE_STDLIB_H
 #endif
 
 #define LIBRDF_MALLOC(type, size) malloc(size)
