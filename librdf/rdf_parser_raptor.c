@@ -360,8 +360,7 @@ librdf_parser_raptor_generate_id_handler(void *user_data,
       if(librdf_hash_put_strings(pcontext->bnode_hash, (char*)user_bnodeid, (char*)mapped_id))
         return NULL;
     }
-    /* FIXME if have raptor in sources, otherwise SYSTEM_FREE */
-    LIBRDF_FREE(cstring, (char*)user_bnodeid);
+    SYSTEM_FREE(cstring, (char*)user_bnodeid);
     return mapped_id;
   }
   else
@@ -425,13 +424,11 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   if(!scontext->fh) {
     LIBRDF_DEBUG3(librdf_parser_raptor_parse_uri_as_stream, "Failed to open file '%s' - %s\n",
                   filename, strerror(errno));
-    /* FIXME if have raptor in sources, otherwise SYSTEM_FREE */
-    LIBRDF_FREE(cstring, filename);
+    SYSTEM_FREE(cstring, filename);
     librdf_parser_raptor_serialise_finished((void*)scontext);
     return(NULL);
   }
-  /* FIXME Only if have raptor in sources, otherwise SYSTEM_FREE */
-  LIBRDF_FREE(cstring, filename);
+  SYSTEM_FREE(cstring, filename);
 
   /* Start the parse */
   rc=raptor_start_parse(rdf_parser, (raptor_uri*)base_uri);
