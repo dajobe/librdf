@@ -1,6 +1,22 @@
+2004-10-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_rasqal.c (librdf_query_rasqal_constructor): Use
+	rasqal_languages_enumerate to register all languages that rasqal
+	has.
+
 2004-10-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
-	* rdf_serializer_raptor.c (librdf_serializer_raptor_serialize_statement):
+	* rdf_parser_raptor.c
+	(librdf_parser_raptor_new_statement_handler): Do not copy datatype
+	URIs for new statements.
+
+	* rdf_serializer.c
+	(librdf_serializer_serialize_model_to_counted_string,
+	librdf_serializer_serialize_model_to_string): Do not require a
+	base_uri.
+
+	* rdf_serializer_raptor.c
+	(librdf_serializer_raptor_serialize_statement):
 	Convert statement object URI correctly.
 	(librdf_serializer_raptor_serialize_model_to_counted_string): Zap
 	string, string_length before starting.
