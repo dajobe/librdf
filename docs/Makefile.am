@@ -99,6 +99,10 @@ api/index.html: api.sgml
 @MAINT@$(PYTHON_HTML_PYDOC_FILES): pydoc/%.html: $(srcdir)/../python/RDF.html $(srcdir)/fix-python-xhtml
 @MAINT@	mkdir -p pydoc
 @MAINT@	-tidy -asxml -wrap 1000 $< 2>/dev/null | perl $(srcdir)/fix-python-xhtml $@
+@MAINT@.pod.html: $(srcdir)/fix-pod-xhtml
+@MAINT@	-pod2html --noindex --htmlroot /docs/pod --infile=$< | tidy -asxml -wrap 1000 2>/dev/null | perl $(srcdir)/fix-pod-xhtml $@
+@MAINT@	rm -f pod2htm*
+
 
 if MAINTAINER_MODE
 redland.3: redland.pod
