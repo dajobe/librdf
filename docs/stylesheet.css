@@ -5,12 +5,12 @@ body {
   font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
   background: #ffffff;
   color: black;
+  font-size: 10pt;
 }
 
 /* NS 4 needs this */
 th, td, p, li, dl, dt, blockquote { 
   font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
-  font-size: 80%;
 }
 
 ol,ul { font-size: 100% }
@@ -36,7 +36,6 @@ pre {
 /* NS 4 needs this */
 pre, code, tt {
   font-family: Courier, monospace;
-  font-size: 80%;
 }
 
 @media screen {  /* hide from IE3 */
@@ -80,12 +79,12 @@ a.author:link { text-decoration: none; }
   color: #555;
 
   margin: 1px;
-  font-size: 140%;
+  font-size: 120%;
   padding: 1px;
 }
 
 .catitems {
-  font-size: 80%;
+  font-size: 100%;
   margin-left: 1em;
   padding: 0px;
 }
