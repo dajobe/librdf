@@ -358,7 +358,6 @@ void librdf_world_open(librdf_world *world);
 
 /* rdf_iterator.h */
 void librdf_free_iterator(librdf_iterator*);
-int librdf_iterator_have_elements(librdf_iterator* iterator);
 int librdf_iterator_end(librdf_iterator* iterator);
 librdf_node* librdf_iterator_get_object(librdf_iterator* iterator);
 librdf_node* librdf_iterator_get_context(librdf_iterator* iterator);
