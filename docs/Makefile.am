@@ -74,7 +74,8 @@
 #      under either the MPL or the LGPL License.
 
 
-EXTRA_DIST=api.sgml.in api.sgml README.html README build-docs
+EXTRA_DIST=api.sgml.in api.sgml README.html README build-docs \
+overview.png overview.ps
 
 DOC_CLASSES=digest digest_openssl digest_md5 hash hash_bdb hash_memory iterator list model node parser parser_libwww parser_sirpac statement storage storage_list stream uri
 
