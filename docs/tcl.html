@@ -12,9 +12,17 @@
 
 <p>This is built if <tt>--with-tcl</tt> is given to the configure
 line, or <tt>--with-tcl=tclsh8.4</tt> to use a particular Tcl
-version/program.  The standard 'make' at the top level will build it.</p>
+version/program.</p>
 
-<p>You can also compile the Tcl interface by hand as follows:</p>
+<p.The Tcl shared library locations are discoverable but where the
+matching tcl.h includes live is something that is hard to do entirely
+automatically.  Use configure option
+<tt>--with-tcl-include=/usr/local/include/tcl8.3</tt> to specify it,
+if the default is not correct.
+</p>
+
+<p>The standard 'make' at the top level will then build the Tcl
+API. You can also compile the Tcl interface by hand as follows:</p>
 
 <pre>
   cd tcl
