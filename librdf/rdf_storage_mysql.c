@@ -213,7 +213,7 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   CREATE TABLE IF NOT EXISTS Literals (\
   ID bigint unsigned NOT NULL,\
   Value longtext NOT NULL,\
-  Language varchar(6) NOT NULL default '',\
+  Language text NOT NULL default '',\
   Datatype text NOT NULL,\
   PRIMARY KEY ID (ID),\
   FULLTEXT KEY Value (Value)\
