@@ -274,9 +274,6 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
  * 
  * The language can be set to NULL if not used.
  *
- * The XML space property can be set to three values: 0 - not known,
- * 1 - default or 2 - preserve space.
- * 
  * 0.9.12: xml_space argument deleted
  *
  * Return value: non 0 on failure
