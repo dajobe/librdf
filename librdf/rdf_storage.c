@@ -1004,10 +1004,6 @@ main(int argc, char *argv[])
 
   LIBRDF_FREE(librdf_world, world);
   
-#ifdef LIBRDF_MEMORY_DEBUG 
-  librdf_memory_report(stderr);
-#endif
-  
   /* keep gcc -Wall happy */
   return(0);
 }
