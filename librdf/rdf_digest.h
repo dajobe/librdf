@@ -84,15 +84,17 @@ void rdf_digest_openssl_constructor(void);
 #endif
 
 /* in sha1.c */
-#ifdef HAVE_SHA1_DIGEST
+#ifdef HAVE_LOCAL_SHA1_DIGEST
 void sha1_constructor(void);
 #endif
+
 /* in md5.c */
-#ifdef HAVE_MD5_DIGEST
+#ifdef HAVE_LOCAL_MD5_DIGEST
 void md5_constructor(void);
 #endif
+
 /* in ripemd160.c */
-#ifdef HAVE_RIPEM160_DIGEST
+#ifdef HAVE_LOCAL_RIPEMD160_DIGEST
 void rmd160_constructor(void);
 #endif
 
