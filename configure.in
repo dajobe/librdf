@@ -123,7 +123,7 @@ AC_SUBST(PERLINSTALLSITEARCH)
 AC_SUBST(PERLMAN3DIR)
 
 
-SWIG_MIN_VERSION=1.3.6
+SWIG_MIN_VERSION=1.3.10
 
 AC_MSG_CHECKING(SWIG support)
 if test "X$SWIG" != "X"; then
@@ -132,13 +132,21 @@ if test "X$SWIG" != "X"; then
   SWIG_MIN_VERSION_DEC=`echo $SWIG_MIN_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
 
   if test $SWIG_VERSION_DEC -ge $SWIG_MIN_VERSION_DEC; then
-    AC_MSG_RESULT($SWIG_VERSION - OK for Java)
+    AC_MSG_RESULT($SWIG_VERSION - OK)
   else
-    AC_MSG_RESULT($SWIG_VERSION - no Java support present)
-    AC_MSG_WARN(SWIG is present but this version has no Java support)
-    AC_MSG_WARN(If you want to change the interface you will need at least)
-    AC_MSG_WARN(version $SWIG_MIN_VERSION from http://www.swig.org/)
-    AC_MSG_WARN(Alternatively you can use the pre-generated interface files)
+    AC_MSG_RESULT($SWIG_VERSION - too old to generate language interfaces)
+    if test -r $srcdir/perl/CORE_wrap.c ; then
+      AC_MSG_WARN(Pre-generated language interface files are present)
+      AC_MSG_WARN(If you want to change the interfaces you will need)
+      AC_MSG_WARN(SWIG version $SWIG_MIN_VERSION from http://www.swig.org/)
+    else
+      AC_MSG_WARN(There are no pre-generated language interface files)
+      AC_MSG_WARN(Redland language interfaces will NOT build.)
+      AC_MSG_WARN(If you want to build them you will need)
+      AC_MSG_WARN(SWIG version $SWIG_MIN_VERSION from http://www.swig.org/)
+      AC_MSG_WARN(Alternatively copy the pre-generated interface)
+      AC_MSG_WARN(files from a released version)
+    fi
   fi
 else
   AC_MSG_RESULT(not present - using pre-generated interface files)
