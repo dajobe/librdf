@@ -1,4 +1,123 @@
+2004-08-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/configure.ac: Give nfc_needed a default
+
+	* raptor/configure.ac, raptor/Makefile.am:
+	Added conditional makefile support for XML parsers (expat, libxml),
+	selecting RDF parsers (RDF/XML, Turtle, N-Triples, RSS tag soup),
+	NFC checking.
+	Added new configure argument --enable-parsers to control this.
+
+	* raptor/raptor_utf8.c (raptor_utf8_is_nfc):
+	Protect NFC check with define RAPTOR_NFC_CHECK
+
+	* raptor/raptor_locator.c (raptor_update_document_locator):
+	Protect RDF/XML bits with define RAPTOR_PARSER_RDFXML
+
+	* raptor/raptor_general.c (raptor_stats_print):
+	Protect RDF/XML bits with define RAPTOR_PARSER_RDFXML
+
+	* raptor/raptor.h: Added prototype for raptor_calloc_memory
+
+	* raptor/raptor_set.c, raptor/raptor_nfc.c: Casts for C++
+
+	* rasqal/rasqal_literal.c (rasqal_literal_as_integer,
+	rasqal_literal_as_floating): Edit casts near strtol, strtod to
+	cause less moaning and still work with C++.
+
+	* raptor/LICENSE.html, LICENSE.html, rasqal/LICENSE.html:
+	More LGPL v2.1 fixes
+
+	* librdf/win32_rdf_config.h: 0.9.19
+
+	* raptor/win32_raptor_config.h: 1.3.3
+
+	* rasqal/win32_rasqal_config.h: 0.9.3
+
+	* rasqal/configure.ac: Remove link with expat (!) in posix regex check
+
 2004-08-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/win32/Makefile.am: rasqal not raptor
+
+	* rasqal/win32/Makefile.am, rasqal/win32/rasqal.dsp,
+	rasqal/win32/rasqal.dsw: win32 build configuration
+
+	* rasqal/configure.ac, rasqal/Makefile.am: Add win32 dir
+
+	* rasqal/roqet.c:
+	Use #ifdef HAVE_UNISTD_H ... #endif around include of <unistd.h>
+
+	* rasqal/rasqal_literal.c, rasqal/rasqal_expr.c:
+	Use RASQAL_INLINE instead of inline.
+
+	* rasqal/win32_rasqal_config.h: win32 updates from Chris Pointon
+
+	* rasqal/rasqal_internal.h:
+	Define RASQAL_INLINE here but don't condition it.
+
+	* rasqal/rasqal_internal.h: Add RASQAL_INLINE, empty on WIN32
+
+	* rasqal/rasqal.h: Export rasqal_set_triples_source_factory
+
+	* raptor/turtle_lexer.l, raptor/n3_lexer.l: grammar
+
+	* rasqal/rdql_parser.y: Use win32_rasqal_config.h
+
+	* rasqal/rdql_lexer.l, rasqal/fix-flex, raptor/turtle_lexer.l,
+	raptor/n3_lexer.l, raptor/fix-flex:
+	fix-flex now inserts the raptor and win32 config includes block
+	at the top of the lexer C.
+
+	* raptor/n3_parser.y, raptor/n3_lexer.l: win32
+
+	* rasqal/rdql_parser.y, rasqal/rdql_lexer.l, rasqal/Makefile.am:
+	Do not generate *.tab.[ch] for rdql parser but process and rename
+	to make .c, .h.
+
+	* raptor/win32/raptor.dsw, raptor/win32/raptor.dsp:
+	win32 updates from Chris Pointon
+
+	* raptor/win32_raptor_config.h:
+	No need for #define YY_NO_UNISTD_H here, it's done in the turtle
+	lexer and parser C source.
+
+	* raptor/turtle_parser.y, raptor/turtle_lexer.l: Use turtle_parser.h
+
+	* raptor/raptor_xml_writer.c, raptor/raptor_sax2.c,
+	raptor/raptor_qname.c, raptor/raptor_parse.c,
+	raptor/raptor_namespace.c, raptor/raptor_libxml.c: Calloc fixes.
+
+	* raptor/Makefile.am: Do not generate *.tab.[ch] for turtle parser
+	but process and rename to make .c, .h.
+	Apply fix-flex to the generated flex header file, to catch another
+	unprotected include of unistd.h.
+
+	* raptor/libraptor.3: Document raptor_calloc_memory.
+
+	* raptor/raptor_general.c: Added raptor_calloc_memory
+
+	* raptor/raptor_www_libwww.c:
+	Add #ifdef RAPTOR_WWW_LIBWWW ... #endif block around content
+
+	* raptor/raptor_www_libfetch.c:
+	Add #ifdef RAPTOR_WWW_LIBFETCH ... #endif block around content
+	Use #ifdef HAVE_SYS_PARAM_H for sys/param.h
+
+	* raptor/raptor_www_curl.c:
+	Add #ifdef RAPTOR_WWW_LIBCURL ... #endif block around content
+
+	* raptor/win32_raptor_config.h: win32 updates from Chris Pointon
+
+	* raptor/raptor_www.c: Calloc fix.
+	(raptor_www_get_connection): Return NULL if no WWW library available.
+
+	* raptor/raptor_internal.h: Correct RAPTOR_CALLOC macro param names.
+
+	* raptor/raptor.h: Export raptor_xml_literal_datatype_uri_string
+
+	* raptor/win32/Makefile.am, raptor/win32/README.txt,
+	raptor/win32/README: README renamed to README.txt
 
 	* librdf/rdf_storage_hashes.c, librdf/rdf_storage.c,
 	librdf/rdf_parser.c, librdf/rdf_model_storage.c,
