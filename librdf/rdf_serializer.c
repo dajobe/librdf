@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2002-2003 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2002-2004 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -368,6 +368,34 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
 
 
 /**
+ * librdf_serializer_serialize_model_to_counted_string - Write a serialized librdf_model to a counted string
+ * @serializer: the serializer
+ * @base_uri: the base URI to use
+ * @model: the &librdf_model model to use
+ * @length_p: pointer to store length or NULL
+ * 
+ * Return value: non 0 on failure
+ **/
+unsigned char*
+librdf_serializer_serialize_model_to_counted_string(librdf_serializer* serializer,
+                                                    librdf_uri* base_uri,
+                                                    librdf_model* model,
+                                                    size_t* length_p) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+
+  if(length_p)
+    *length_p=0;
+  
+  return serializer->factory->serialize_model_to_counted_string(serializer->context,
+                                                                base_uri, model,
+                                                                length_p);
+}
+
+
+/**
  * librdf_serializer_serialize_model_to_string - Write a serialized librdf_model to a string
  * @serializer: the serializer
  * @base_uri: the base URI to use
@@ -384,8 +412,9 @@ librdf_serializer_serialize_model_to_string(librdf_serializer* serializer,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
 
-  return serializer->factory->serialize_model_to_string(serializer->context,
-                                                        base_uri, model);
+  return serializer->factory->serialize_model_to_counted_string(serializer->context,
+                                                                base_uri, model,
+                                                                NULL);
 }
 
 
@@ -554,10 +583,11 @@ int
 main(int argc, char *argv[]) 
 {
   char *program=argv[0];
-  char *test_serializer_types[]={"ntriples", NULL};
+  char *test_serializer_types[]={"rdfxml", "ntriples", NULL};
   int i;
   char *type;
-  FILE *fh;
+  unsigned char *string;
+  size_t string_length;
   librdf_world *world;
   librdf_storage *storage;
   librdf_model* model;
@@ -580,19 +610,6 @@ main(int argc, char *argv[])
     
     fprintf(stderr, "%s: Freeing serializer\n", program);
     librdf_free_serializer(serializer);
-  }
-  
-
-#ifdef WIN32
-#define NULL_FILENAME "nul"
-#else
-#define NULL_FILENAME "/dev/null"
-#endif
-
-  fh=fopen(NULL_FILENAME, "w");
-  if(!fh) {
-    fprintf(stderr, "%s: Cannot test serialising errors, cannot write to '%s'\n", program, NULL_FILENAME);
-    goto skip;
   }
   
 
@@ -629,10 +646,20 @@ main(int argc, char *argv[])
   serializer=librdf_new_serializer(world, "rdfxml", NULL, NULL);
   base_uri=librdf_new_uri(world,"http://example.org/base#");
 
-  librdf_serializer_serialize_model_to_file_handle(serializer, fh, 
-                                                   base_uri, model);
+  string=librdf_serializer_serialize_model_to_counted_string(serializer,
+                                                             base_uri, model,
+                                                             &string_length);
+#define EXPECTED_BAD_STRING_LENGTH 237
+  if(string_length != EXPECTED_BAD_STRING_LENGTH) {
+    fprintf(stderr, "%s: Serialising to RDF/XML returned string size %d, expected %d\n", program,
+            string_length, EXPECTED_BAD_STRING_LENGTH);
+    return 1;
+  }
+
+  if(string)
+    free(string);
+
   librdf_free_serializer(serializer);
-  fclose(fh);
 
   librdf_free_uri(base_uri);
   
@@ -650,8 +677,6 @@ main(int argc, char *argv[])
             LogData.warnings, EXPECTED_WARNINGS);
     return 1;
   }
-  
-  skip:
   
   librdf_free_world(world);
   
