@@ -105,7 +105,7 @@ void librdf_finish_node(librdf_world* world);
 const char* librdf_node_get_type_as_string(int type);
 #endif
 
-/* exported public in error but never used */
+/* exported public in error but never usable */
 librdf_digest* librdf_node_get_digest(librdf_node* node);
 
 #endif
