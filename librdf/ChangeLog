@@ -1,3 +1,15 @@
+2004-12-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_sqlite.c: Change context parts pzTail, ppVm to
+	zTail, vm and for sqlite V2 use vm not vm & ppVm.
+
+	* rdf_storage_sqlite.c: Use SQLITE_API with 2 or 3 to distinguish apis
+
+	* rdf_storage_sqlite.c: Casts for c++
+
+	* rdf_serializer_raptor.c (librdf_serializer_raptor_set_namespace):
+	Cast for c++
+
 2004-12-28  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_storage_sqlite.c (librdf_storage_sqlite_exec):

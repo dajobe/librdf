@@ -1,4 +1,187 @@
+2004-12-29  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_sqlite.c: Change context parts pzTail, ppVm
+	to zTail, vm and for sqlite V2 use vm not vm & ppVm.
+
+	* librdf/rdf_storage_sqlite.c: Use SQLITE_API with 2 or 3 to
+	distinguish apis
+
+	* configure.ac: Added --with-sqlite-version to choose V2 or
+	V3. pkg-config gets the details.
+
+	* librdf/rdf_storage_sqlite.c: Casts for c++
+
+	* librdf/rdf_serializer_raptor.c
+	(librdf_serializer_raptor_set_namespace): Cast for c++
+
+2004-12-28  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_sqlite.c (librdf_storage_sqlite_exec):
+	Turn fprintf to debug message.
+	(librdf_storage_sqlite_get_next_common): turn printing all column
+	data into debug messages.
+	(librdf_storage_sqlite_find_statements): Turn fprintf to debug
+	message.
+
+	* configure.ac: Set -g -DLIBRDF_DEBUG in maintainer mode - was
+	lost somehow.
+
+	* librdf/rdf_storage_sqlite.c: code style
+
+	* librdf/rdf_storage_sqlite.c (sqlite_construct_select_helper):
+	Added, to build serialise and find_statements query parts.
+	(librdf_storage_sqlite_serialise): Move most of query building into
+	sqlite_construct_select_helper and now call it.
+	(librdf_storage_sqlite_find_statements): Use
+	sqlite_construct_select_helper to build guts of query, then add
+	the WHERE ...
+
+	* librdf/rdf_storage_sqlite.c (librdf_storage_sqlite_serialise):
+	Use raptor_stringbuffer to construct big request.
+	(librdf_storage_sqlite_get_next_common): Add pointer to statement,
+	context_node args.
+	Fill in statement and context node from column values.
+	Debug print out column names, values.
+	(librdf_storage_sqlite_serialise_end_of_stream,
+	librdf_storage_sqlite_serialise_next_statement,
+	librdf_storage_sqlite_find_statements_next_statement, ): Update
+	call to librdf_storage_sqlite_get_next_common.
+
+2004-12-27  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_sqlite.c (librdf_storage_sqlite_get_helper,
+	librdf_storage_sqlite_add_statements,
+	librdf_storage_sqlite_context_add_statement): Use
+	raptor_stringbuffer to construct requests.
+
+	* librdf/rdf_storage_sqlite.c (librdf_storage_sqlite_set_helper):
+	Use raptor_stringbuffer to construct request.
+
+	* librdf/rdf_storage_sqlite.c: Added TRIPLE_NONE node_type
+	(librdf_storage_sqlite_node_helper): Fail with NULL node.
+	(librdf_storage_sqlite_statement_helper): Handle NULL nodes, set
+	ID to -1, type to TRIPLE_NONE.
+	(librdf_node_to_sqlite_string): Deleted, not used.
+	(librdf_storage_sqlite_find_statements): Use raptor_stringbuffer to
+	construct request.
+
+	* librdf/rdf_storage_sqlite.c (librdf_storage_sqlite_literal_helper):
+	Use IDs for datatype URI.
+	(librdf_storage_sqlite_open): Make uriindex.
+
+	* librdf/rdf_storage_sqlite.c (sqlite_string_escape):
+	Escape ' as '' not \'
+	(librdf_storage_sqlite_uri_helper): Renamed from
+	librdf_storage_sqlite_store_uri_helper
+	(librdf_storage_sqlite_blank_helper): Renamed from
+	librdf_storage_sqlite_store_blank_helper
+	(librdf_storage_sqlite_literal_helper): Added
+	(librdf_storage_sqlite_node_helper): Use
+	librdf_storage_sqlite_literal_helper.
+	(librdf_storage_sqlite_open): If new, unlink the file so no need
+	to do DROP TABLE.
+
+	* librdf/rdf_storage_sqlite.c (librdf_storage_sqlite_init):
+	is_new flag set right, really really.
+	Added data-driven table descriptions - table_info, NTABLES,
+	sqlite_table_numbers, sqlite_tables, triple_part, triple_node_type,
+	triples_fields.
+	Reorder helper functions.
+	(sqlite_string_escape): Now always obeys raw_len and nul-terminates
+	the output.
+	(librdf_storage_sqlite_exec): Debug print all SQL exec
+	(librdf_storage_sqlite_set_helper,
+	librdf_storage_sqlite_get_helper): Added, using table info.
+	(librdf_storage_sqlite_store_uri_helper): Added, returns or makes an
+	ID for the given URI.
+	(librdf_storage_sqlite_store_blank_helper): Added, returns or makes an
+	ID for the given blank node ID.
+	(librdf_storage_sqlite_node_helper): Added, turns a librdf_node into
+	appropriate table IDs, node type and returns to user.
+	(librdf_storage_sqlite_statement_helper): Uses
+	librdf_storage_sqlite_node_helper to get node ids, types and field
+	names for all of a statement.
+	(librdf_storage_sqlite_open): Use data tables for DROP TABLE,
+	CREATE TABLE
+	(librdf_storage_sqlite_size): Use librdf_storage_sqlite_exec only.
+	(librdf_storage_sqlite_add_statements): Updated dummy INSERT for
+	new schema.
+	(librdf_storage_sqlite_contains_statement): Use
+	librdf_storage_sqlite_statement_helper to build query.
+	(librdf_storage_sqlite_context_add_statement): Use
+	librdf_storage_sqlite_statement_helper to build INSERT.  Ignores
+	context fields for now.
+
+2004-12-26  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* utils/rdfproc.c: Added size command calling librdf_model_size.
+
+	* librdf/rdf_storage_sqlite.c: Handle sqlite3 and sqlite2
+	(librdf_storage_sqlite_init): Init is_new correctly.
+	(librdf_storage_sqlite_open): Create tables, indexes when new.
+	(librdf_storage_sqlite_get_1int_callback): Grab count value from
+	argv[0]
+	(librdf_storage_sqlite_size): Works.
+	(librdf_storage_sqlite_add_statements): Dummy INSERT works.
+	(librdf_storage_sqlite_contains_statement): Dummy sql added.
+	librdf_storage_sqlite_serialise_stream_context added sqlite3 fields
+	(librdf_storage_sqlite_serialise,
+	librdf_storage_sqlite_get_next_common,
+	librdf_storage_sqlite_serialise_finished): sqlite3 support
+	librdf_storage_sqlite_find_statements_stream_context added sqlite3
+	fields
+	(librdf_storage_sqlite_find_statements,
+	librdf_storage_sqlite_find_statements_finished): sqlite3 support
+	(librdf_storage_sqlite_context_add_statement): Dummy INSERT added.
+	(librdf_init_storage_sqlite): Storage name now 'sqlite'.
+
+2004-12-25  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* configure.ac: Check for sqlite3.h or sqlite.h after getting
+	sqlite paths.
+
+	* configure.ac: Use pkg-config sqlite3 or pkg-config sqlite2
+
+	* librdf/rdf_serializer.c, librdf/rdf_model.c (main):
+	Cast for size_t to int
+
+	* librdf/rdf_concepts.c: Removed librdf_concept_labels - never used.
+
+	* raptor/raptor_rss.c (raptor_rss_parser_processNode):
+	Turn <guid isPermaLink="true">val</guid>
+	into <guid rdf:resource="val"/>
+	(raptor_rss10_emit_item): Always serialize rss:items at the end of
+	an rss channel.
+
+	* raptor/raptor_xml_writer.c, raptor/raptor_xml.c,
+	raptor/raptor_utf8.c, raptor/raptor_sax2.c, raptor/raptor_rss.c,
+	raptor/raptor_general.c: Casts for c++.  Rename variables
+	namespace to nspace.
+
+2004-12-24  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_www_test.c (main): Cast for size_t
+
 2004-12-23  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c (raptor_rss10_serialize_statement):
+	Fix item URI check to use correct
+	URI.  In debugging unknown typed node, print type URI.
+
+	* raptor/raptor_rss.c (raptor_rss10_serialize_statement):
+	Do not look in items with no URI.
+	(raptor_rss10_build_xml_names): Do not make qnames for types with no
+	namespace.
+
+	* raptor/raptor_rss.c (raptor_rss10_build_items):
+	Do nothing if there is no seq_uri
+
+	* raptor/raptor_rss.c (raptor_init_serializer_rss10):
+	Give rss 1.0 a URI
+
+	* librdf/rdf_serializer.c (librdf_get_serializer_factory):
+	Ensure that if mime_type or type_uri are
+	not NULL, the factory must have a non-NULL item and it must match.
 
 	* librdf/rdf_serializer.c (librdf_get_serializer_factory):
 	Ensure that if mime_type or type_uri are
