@@ -134,7 +134,7 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
 
     case LIBRDF_NODE_TYPE_RESOURCE:
       /* or  RAPTOR_IDENTIFIER_TYPE_ORDINAL ? */
-      rstatement.object=librdf_uri_as_string(librdf_node_get_uri(predicate));
+      rstatement.object=librdf_node_get_uri(object);
       rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
       break;
     default:
@@ -218,8 +218,8 @@ librdf_serializer_raptor_serialize_model_to_counted_string(void *context,
 {
   librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
   raptor_iostream *iostr;
-  unsigned char *string;
-  size_t string_length;
+  unsigned char *string=NULL;
+  size_t string_length=0;
   int rc=0;
   
   librdf_stream *stream=librdf_model_as_stream(model);
