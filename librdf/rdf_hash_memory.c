@@ -399,12 +399,14 @@ librdf_hash_memory_clone(librdf_hash *hash, void* context, char *new_identifer,
 
   iterator=librdf_hash_get_all(old_hcontext->hash, key, value);
   while(!librdf_iterator_end(iterator)) {
-    librdf_iterator_get_next(iterator);
+    librdf_hash_datum* k= librdf_iterator_get_key(iterator);
+    librdf_hash_datum* v= librdf_iterator_get_value(iterator);
 
-    if(librdf_hash_memory_put(hcontext, key, value)) {
+    if(librdf_hash_memory_put(hcontext, k, v)) {
       status=1;
       break;
     }
+    librdf_iterator_next(iterator);
   }
   if(iterator)
     librdf_free_iterator(iterator);
@@ -434,8 +436,6 @@ librdf_hash_memory_values_count(void *context)
 
 typedef struct {
   librdf_hash_memory_context* hash;
-  void *last_key;
-  void *last_value;
   int current_bucket;
   librdf_hash_memory_node* current_node;
   librdf_hash_memory_node_value *current_value;
@@ -479,18 +479,6 @@ librdf_hash_memory_cursor_get(void* context,
   librdf_hash_memory_node_value *vnode=NULL;
   librdf_hash_memory_node *node;
   
-
-  /* Free previous key and values */
-  if(cursor->last_key) {
-    LIBRDF_FREE(cstring, cursor->last_key);
-    cursor->last_key=NULL;
-  }
-    
-  if(cursor->last_value) {
-    LIBRDF_FREE(cstring, cursor->last_value);
-    cursor->last_value=NULL;
-  }
-
 
   /* First step, make sure cursor->current_node points to a valid node,
      if possible */
@@ -574,25 +562,16 @@ librdf_hash_memory_cursor_get(void* context,
     case LIBRDF_HASH_CURSOR_NEXT:
       node=cursor->current_node;
 
-      /* copy key */
-      cursor->last_key = key->data = LIBRDF_MALLOC(cstring, node->key_len);
-      if(!key->data)
-        return 1;
-  
-      memcpy(key->data, node->key, node->key_len);
-      key->size=node->key_len;
+      /* get key */
+      key->data= node->key;
+      key->size= node->key_len;
 
       /* if want values, walk through them */
       if(value) {
         vnode=cursor->current_value;
         
-        /* copy value */
-        cursor->last_value = value->data = LIBRDF_MALLOC(cstring,
-                                                         vnode->value_len);
-        if(!value->data)
-          return 1;
-    
-        memcpy(value->data, vnode->value, vnode->value_len);
+        /* get value */
+        value->data=vnode->value;
         value->size=vnode->value_len;
 
         /* move on */
@@ -638,13 +617,8 @@ librdf_hash_memory_cursor_get(void* context,
 static void
 librdf_hash_memory_cursor_finish(void* context)
 {
-  librdf_hash_memory_cursor_context *cursor=(librdf_hash_memory_cursor_context*)context;
+/* librdf_hash_memory_cursor_context *cursor=(librdf_hash_memory_cursor_context*)context; */
 
-  if(cursor->last_key)
-    LIBRDF_FREE(cstring, cursor->last_key);
-    
-  if(cursor->last_value)
-    LIBRDF_FREE(cstring, cursor->last_value);
 }
 
 
