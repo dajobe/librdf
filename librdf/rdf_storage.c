@@ -246,6 +246,41 @@ librdf_new_storage (librdf_world *world,
 
 
 /**
+ * librdf_new_storage_with_options - Constructor - create a new librdf_storage object
+ * @world: redland world object
+ * @storage_name: the storage factory name
+ * @name: an identifier for the storage
+ * @options: &librdf_hash of options to use
+ *
+ * The options can be NULL if none are required.
+ *
+ * Return value: a new &librdf_storage object or NULL on failure
+ */
+librdf_storage*
+librdf_new_storage_with_options (librdf_world *world, 
+                                 char *storage_name, char *name, 
+                                 librdf_hash *options) {
+  librdf_storage_factory* factory;
+  librdf_hash* options_hash;
+  
+  factory=librdf_get_storage_factory(storage_name);
+  if(!factory)
+    return NULL;
+
+  options_hash=librdf_new_hash_from_hash(options);
+  if(!options_hash)
+    return NULL;
+
+  if(librdf_hash_open(options_hash, NULL, 0, 1, 1, NULL)) {
+    librdf_free_hash(options_hash);
+    return NULL;
+  }
+  
+  return librdf_new_storage_from_factory(world, factory, name, options_hash);
+}
+
+
+/**
  * librdf_new_storage_from_storage - Copy constructor - create a new librdf_storage object from an existing one
  * @old_storage: the existing storage &librdf_storage to use
  *
