@@ -14,14 +14,28 @@
 
 <h3>1.1. Getting the sources from CVS</h3>
 
-<p>Sorry - not yet publically available.  Check back with the
-<a href="http://www.redland.opensource.ac.uk/">Redland home page</a>
-or the
-<a href="http://sourceforge.net/projects/librdf/">SourceForge site</a>.</p>
+<pre>
+  # sh, bash, ...
+  CVSROOT=:pserver:anonymous@cvs.ilrt.org:/cvsroot
+  export CVSROOT
+  # csh, tcsh, ...
+  setenv CVSROOT :pserver:anonymous@cvs.ilrt.org:/cvsroot
 
-<p>After the <tt>cvs checkout</tt> or <tt>cvs update</tt> you will
+  cvs login
+Logging in to :pserver:anonymous@cvs.ilrt.org:2401/cvsroot
+CVS password: 
+  [return]
+
+  cvs checkout redland/librdf
+  cvs checkout redland/raptor
+
+  cd redland/librdf
+</pre>
+
+<p>At this stage, or after a <tt>cvs update</tt> you will
 need to create the automake and autoconf derived files, as described
-below in <em>create the configure program</em>.</p>
+below in <em>create the configure program</em>
+by using the <tt>autogen.sh</tt> script.</p>
 
 
 <h3>1.2. Getting source bundles</h3>
