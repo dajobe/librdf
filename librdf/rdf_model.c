@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -31,6 +31,9 @@
 
 #include <librdf.h>
 
+/* prototypes for helper functions */
+static void librdf_delete_model_factories(void);
+
 
 /**
  * librdf_init_model - Initialise librdf_model class
@@ -39,7 +42,8 @@
 void
 librdf_init_model(librdf_world *world)
 {
-  /* nothing to do here */
+  /* Always have model storage implementation available */
+  librdf_init_model_storage();
 }
 
 
@@ -50,12 +54,127 @@ librdf_init_model(librdf_world *world)
 void
 librdf_finish_model(librdf_world *world)
 {
-  /* nothing to do here */
+  librdf_delete_model_factories();
+}
+
+
+/* statics */
+
+/* list of storage factories */
+static librdf_model_factory* models;
+
+
+/*
+ * librdf_delete_model_factories - helper function to delete all the registered model factories
+ */
+static void
+librdf_delete_model_factories(void)
+{
+  librdf_model_factory *factory, *next;
+  
+  for(factory=models; factory; factory=next) {
+    next=factory->next;
+    LIBRDF_FREE(librdf_model_factory, factory->name);
+    LIBRDF_FREE(librdf_model_factory, factory);
+  }
+  models=NULL;
+}
+
+
+/* class methods */
+
+/**
+ * librdf_model_register_factory - Register a model factory
+ * @name: the model factory name
+ * @factory: pointer to function to call to register the factory
+ * 
+ **/
+void
+librdf_model_register_factory(const char *name,
+                              void (*factory) (librdf_model_factory*)) 
+{
+  librdf_model_factory *model, *h;
+  char *name_copy;
+  
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG2(librdf_model_register_factory,
+                "Received registration for model %s\n", name);
+#endif
+  
+  model=(librdf_model_factory*)LIBRDF_CALLOC(librdf_model_factory, 1,
+                                             sizeof(librdf_model_factory));
+  if(!model)
+    LIBRDF_FATAL1(librdf_model_register_factory, "Out of memory\n");
+
+  name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
+  if(!name_copy) {
+    LIBRDF_FREE(librdf_model, model);
+    LIBRDF_FATAL1(librdf_model_register_factory, "Out of memory\n");
+  }
+  strcpy(name_copy, name);
+  model->name=name_copy;
+        
+  for(h = models; h; h = h->next ) {
+    if(!strcmp(h->name, name_copy)) {
+      LIBRDF_FATAL2(librdf_model_register_factory,
+                    "model %s already registered\n", h->name);
+    }
+  }
+  
+  /* Call the model registration function on the new object */
+  (*factory)(model);
+  
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG3(librdf_model_register_factory, "%s has context size %d\n",
+                name, model->context_length);
+#endif
+  
+  model->next = models;
+  models = model;
 }
 
 
 /**
- * librdf_new_model - Constructor - create a new librdf_storage object
+ * librdf_get_model_factory - Get a model factory by name
+ * @name: the factory name or NULL for the default factory
+ * 
+ * Return value: the factory object or NULL if there is no such factory
+ **/
+librdf_model_factory*
+librdf_get_model_factory (const char *name) 
+{
+  librdf_model_factory *factory;
+
+  /* return 1st model if no particular one wanted - why? */
+  if(!name) {
+    factory=models;
+    if(!factory) {
+      LIBRDF_DEBUG1(librdf_get_model_factory, 
+                    "No (default) models registered\n");
+      return NULL;
+    }
+  } else {
+    for(factory=models; factory; factory=factory->next) {
+      if(!strcmp(factory->name, name)) {
+        break;
+      }
+    }
+    /* else FACTORY name not found */
+    if(!factory) {
+      LIBRDF_DEBUG2(librdf_get_model_factory, "No model with name %s found\n",
+                    name);
+      return NULL;
+    }
+  }
+        
+  return factory;
+}
+
+
+
+
+/**
+ * librdf_new_model - Constructor - create a new storage librdf_model object
  * @world: redland world object
  * @storage: &librdf_storage to use
  * @options_string: options to initialise model
@@ -90,7 +209,7 @@ librdf_new_model (librdf_world *world,
 
 
 /**
- * librdf_new_model - Constructor - Create a new librdf_model with storage
+ * librdf_new_model_with_options - Constructor - Create a new librdf_model with storage
  * @world: redland world object
  * @storage: &librdf_storage storage to use
  * @options: &librdf_hash of options to use
@@ -103,8 +222,8 @@ librdf_model*
 librdf_new_model_with_options(librdf_world *world,
                               librdf_storage *storage, librdf_hash* options)
 {
-  librdf_model* model;
-
+  librdf_model *model;
+  
   if(!storage)
     return NULL;
   
@@ -114,12 +233,18 @@ librdf_new_model_with_options(librdf_world *world,
   
   model->world=world;
 
-  if(storage && librdf_storage_open(storage, model)) {
+  model->factory=librdf_get_model_factory("storage");
+  if(!model->factory) {
     LIBRDF_FREE(librdf_model, model);
     return NULL;
   }
-  
-  model->storage=storage;
+    
+  model->context=LIBRDF_MALLOC(data, model->factory->context_length);
+
+  if(model->context && model->factory->create(model, storage, options)) {
+    LIBRDF_FREE(librdf_model, model);
+    return NULL;
+  }
   
   return model;
 }
@@ -127,7 +252,7 @@ librdf_new_model_with_options(librdf_world *world,
 
 /**
  * librdf_new_model_from_model - Copy constructor - create a new librdf_model from an existing one
- * @old_model: the existing &librdf_model
+ * @model: the existing &librdf_model
  * 
  * Creates a new model as a copy of the existing model in the same
  * storage context.
@@ -135,20 +260,9 @@ librdf_new_model_with_options(librdf_world *world,
  * Return value: a new &librdf_model or NULL on failure
  **/
 librdf_model*
-librdf_new_model_from_model(librdf_model* old_model)
+librdf_new_model_from_model(librdf_model* model)
 {
-  librdf_storage *new_storage;
-  librdf_model *new_model;
-  
-  new_storage=librdf_new_storage_from_storage(old_model->storage);
-  if(!new_storage)
-    return NULL;
-
-  new_model=librdf_new_model_with_options(old_model->world, new_storage, NULL);
-  if(!new_model)
-    librdf_free_storage(new_storage);
-
-  return new_model;
+  return model->factory->clone(model);
 }
 
 
@@ -176,9 +290,10 @@ librdf_free_model(librdf_model *model)
     }
     librdf_free_list(model->sub_models);
   } else {
-    if(model->storage)
-      librdf_storage_close(model->storage);
+    model->factory->destroy(model);
   }
+  LIBRDF_FREE(data, model->context);
+
   LIBRDF_FREE(librdf_model, model);
 }
 
@@ -193,7 +308,7 @@ librdf_free_model(librdf_model *model)
 int
 librdf_model_size(librdf_model* model)
 {
-  return librdf_storage_size(model->storage);
+  return model->factory->size(model);
 }
 
 
@@ -210,7 +325,7 @@ librdf_model_size(librdf_model* model)
 int
 librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 {
-  return librdf_storage_add_statement(model->storage, statement);
+  return model->factory->add_statement(model, statement);
 }
 
 
@@ -224,7 +339,7 @@ librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 int
 librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream)
 {
-  return librdf_storage_add_statements(model->storage, statement_stream);
+  return model->factory->add_statements(model, statement_stream);
 }
 
 
@@ -344,7 +459,7 @@ librdf_model_add_string_literal_statement(librdf_model* model,
 int
 librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
 {
-  return librdf_storage_remove_statement(model->storage, statement);
+  return model->factory->remove_statement(model, statement);
 }
 
 
@@ -358,7 +473,7 @@ librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
 int
 librdf_model_contains_statement(librdf_model* model, librdf_statement* statement)
 {
-  return librdf_storage_contains_statement(model->storage, statement);
+  return model->factory->contains_statement(model, statement);
 }
 
 
@@ -371,7 +486,7 @@ librdf_model_contains_statement(librdf_model* model, librdf_statement* statement
 librdf_stream*
 librdf_model_serialise(librdf_model* model)
 {
-  return librdf_storage_serialise(model->storage);
+  return model->factory->serialise(model);
 }
 
 
@@ -391,7 +506,7 @@ librdf_stream*
 librdf_model_find_statements(librdf_model* model, 
                              librdf_statement* statement)
 {
-  return librdf_storage_find_statements(model->storage, statement);
+  return model->factory->find_statements(model, statement);
 }
 
 
@@ -410,7 +525,7 @@ librdf_iterator*
 librdf_model_get_sources(librdf_model *model,
                          librdf_node *arc, librdf_node *target) 
 {
-  return librdf_storage_get_sources(model->storage, arc, target);
+  return model->factory->get_sources(model, arc, target);
 }
 
 
@@ -429,7 +544,7 @@ librdf_iterator*
 librdf_model_get_arcs(librdf_model *model,
                       librdf_node *source, librdf_node *target) 
 {
-  return librdf_storage_get_arcs(model->storage, source, target);
+  return model->factory->get_arcs(model, source, target);
 }
 
 
@@ -448,7 +563,7 @@ librdf_iterator*
 librdf_model_get_targets(librdf_model *model,
                          librdf_node *source, librdf_node *arc) 
 {
-  return librdf_storage_get_targets(model->storage, source, arc);
+  return model->factory->get_targets(model, source, arc);
 }
 
 
@@ -467,8 +582,7 @@ librdf_node*
 librdf_model_get_source(librdf_model *model,
                         librdf_node *arc, librdf_node *target) 
 {
-  librdf_iterator *iterator=librdf_storage_get_sources(model->storage, 
-                                                       arc, target);
+  librdf_iterator *iterator=librdf_model_get_sources(model, arc, target);
   librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
@@ -492,8 +606,7 @@ librdf_node*
 librdf_model_get_arc(librdf_model *model,
                      librdf_node *source, librdf_node *target) 
 {
-  librdf_iterator *iterator=librdf_storage_get_arcs(model->storage, 
-                                                    source, target);
+  librdf_iterator *iterator=librdf_model_get_arcs(model, source, target);
   librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
@@ -517,8 +630,7 @@ librdf_node*
 librdf_model_get_target(librdf_model *model,
                         librdf_node *source, librdf_node *arc) 
 {
-  librdf_iterator *iterator=librdf_storage_get_targets(model->storage, 
-                                                       source, arc);
+  librdf_iterator *iterator=librdf_model_get_targets(model, source, arc);
   librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
@@ -590,7 +702,7 @@ librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model)
 librdf_iterator*
 librdf_model_get_arcs_in(librdf_model *model, librdf_node *node) 
 {
-  return librdf_storage_get_arcs_in(model->storage, node);
+  return model->factory->get_arcs_in(model, node);
 }
 
 
@@ -604,7 +716,7 @@ librdf_model_get_arcs_in(librdf_model *model, librdf_node *node)
 librdf_iterator*
 librdf_model_get_arcs_out(librdf_model *model, librdf_node *node) 
 {
-  return librdf_storage_get_arcs_out(model->storage, node);
+  return model->factory->get_arcs_out(model, node);
 }
 
 
@@ -620,7 +732,7 @@ int
 librdf_model_has_arc_in(librdf_model *model, librdf_node *node, 
                         librdf_node *property) 
 {
-  return librdf_storage_has_arc_in(model->storage, node, property);
+  return model->factory->has_arc_in(model, node, property);
 }
 
 
@@ -636,7 +748,7 @@ int
 librdf_model_has_arc_out(librdf_model *model, librdf_node *node,
                          librdf_node *property) 
 {
-  return librdf_storage_has_arc_out(model->storage, node, property);
+  return model->factory->has_arc_out(model, node, property);
 }
 
 
@@ -678,8 +790,7 @@ librdf_model_context_add_statement(librdf_model* model,
                                    librdf_node* context,
                                    librdf_statement* statement) 
 {
-  return librdf_storage_context_add_statement(model->storage,
-                                              context, statement);
+  return model->factory->context_add_statement(model, context, statement);
 }
 
 
@@ -706,8 +817,7 @@ librdf_model_context_add_statements(librdf_model* model,
     librdf_statement* statement=librdf_stream_get_object(stream);
     if(!statement)
       break;
-    status=librdf_storage_context_add_statement(model->storage,
-                                                context, statement);
+    status=librdf_model_context_add_statement(model, context, statement);
     if(status)
       break;
     librdf_stream_next(stream);
@@ -731,8 +841,7 @@ librdf_model_context_remove_statement(librdf_model* model,
                                       librdf_node* context,
                                       librdf_statement* statement) 
 {
-  return librdf_storage_context_remove_statement(model->storage,
-                                                 context, statement);
+  return model->factory->context_remove_statement(model, context, statement);
 }
 
 
@@ -747,8 +856,7 @@ int
 librdf_model_context_remove_statements(librdf_model* model,
                                        librdf_node* context) 
 {
-  librdf_stream *stream=librdf_storage_context_serialise(model->storage,
-                                                         context);
+  librdf_stream *stream=librdf_model_context_serialize(model, context);
   if(!stream)
     return 1;
 
@@ -756,8 +864,7 @@ librdf_model_context_remove_statements(librdf_model* model,
     librdf_statement *statement=librdf_stream_get_object(stream);
     if(!statement)
       break;
-    librdf_storage_context_remove_statement(model->storage,
-                                            context, statement);
+    librdf_model_context_remove_statement(model, context, statement);
     librdf_stream_next(stream);
   }
   librdf_free_stream(stream);  
@@ -775,7 +882,7 @@ librdf_model_context_remove_statements(librdf_model* model,
 librdf_stream*
 librdf_model_context_serialize(librdf_model* model, librdf_node* context) 
 {
-  return librdf_storage_context_serialise(model->storage, context);
+  return model->factory->context_serialize(model, context);
 }
 
 
@@ -792,18 +899,7 @@ librdf_model_context_serialize(librdf_model* model, librdf_node* context)
 librdf_stream*
 librdf_model_query(librdf_model* model, librdf_query* query) 
 {
-  librdf_stream *stream;
-  
-  librdf_query_open(query);
-
-  if(librdf_storage_supports_query(model->storage, query))
-    stream=librdf_storage_query(model->storage, query);
-  else
-    stream=librdf_query_run(query,model);
-
-  librdf_query_close(query);
-
-  return stream;
+  return model->factory->query(model, query);
 }
 
 
