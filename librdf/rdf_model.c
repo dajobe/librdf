@@ -1478,7 +1478,7 @@ librdf_model_load(librdf_model* model, librdf_uri *uri,
  *
  * Return value: new string or NULL on failure
  **/
-char*
+unsigned char*
 librdf_model_to_counted_string(librdf_model* model, librdf_uri *uri,
                                const char *name, const char *mime_type, 
                                librdf_uri *type_uri, size_t* string_length_p)
@@ -1499,7 +1499,7 @@ librdf_model_to_counted_string(librdf_model* model, librdf_uri *uri,
                                                              uri, model,
                                                              string_length_p);
   librdf_free_serializer(serializer);
-  return (char*)string;
+  return string;
 }
 
 
@@ -1517,7 +1517,7 @@ librdf_model_to_counted_string(librdf_model* model, librdf_uri *uri,
  *
  * Return value: new string or NULL on failure
  **/
-char*
+unsigned char*
 librdf_model_to_string(librdf_model* model, librdf_uri *uri,
                        const char *name, const char *mime_type, 
                        librdf_uri *type_uri) {
