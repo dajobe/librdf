@@ -332,11 +332,11 @@ AC_MSG_CHECKING(ECMA CLI implementations available)
 result=
 if test "X$MONO" != X -a "X$MCS" != X -a "X$GACUTIL" != X -a "X$SN" != X; then
   result="$result Mono"
-  languages_available="$languages_available C# (Mono)"
+  languages_available="$languages_available C#(Mono)"
 fi
 if test "X$ILRUN" != X -a "X$CSCC" != X -a "X$ILGAC" != X; then
   result="$result dotGNU"
-  languages_available="$languages_available C# (dotGNU)"
+  languages_available="$languages_available C#(dotGNU)"
 fi
 AC_MSG_RESULT($result)
 
@@ -382,7 +382,7 @@ AC_SUBST(CSHARPCFLAGS)
 AC_SUBST(CLI_PREFIX)
 
 if test "$with_ecma_cli" != no; then
-  languages="$languages csharp"
+  languages="$languages C#($ecma_cli)"
 fi
 
 
