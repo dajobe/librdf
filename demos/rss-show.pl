@@ -47,7 +47,7 @@ my $log_file="$::ROOT_DIR/logs/rss.log";
 my $max_error_size=100;
 my $max_warning_size=100;
 
-my(@parameters)=qw(uri box);
+my(@parameters)=qw(uri box soup);
 
 # Used for deleting databases
 my @suffixes=qw(po2s so2p sp2o);
@@ -186,6 +186,12 @@ if(defined $val && $val eq 'yes') {
   $box='yes';
 } else {
   $box='no';
+}
+
+my $soup;
+$val=$q->param('soup');
+if(defined $val) {
+  $soup=1 if $val eq 'yes';
 }
 
 my $empty=(!$uri_string);
@@ -422,9 +428,12 @@ if(1) { # parser_just_file_uris
 
 }
 
-my $parser=new RDF::Redland::Parser("raptor");
+my $parser_name=$soup ? 'rss-tag-soup' : 'raptor';
+my $parser_label=$soup ? 'RSS Tag Soup' : 'RDF/XML';
+my $parser=new RDF::Redland::Parser($parser_name);
 if(!$parser) {
-  print "\n\n<p>Failed to create Raptor RDF/XML parser.</p>\n";
+  log_action($host,"Failed to create $parser_name parser", time);
+  print "\n\n<p>Failed to create Raptor $parser_label parser.</p>\n";
   end_page($q);
   unlink $temp_file if $temp_file;
   exit 0;
@@ -436,7 +445,7 @@ my $redland_source_uri=new RDF::Redland::URI $source_uri;
 log_action($host,"Parsing RSS URI $uri with Raptor", time);
 my $stream=$parser->parse_as_stream($redland_source_uri, $redland_base_uri);
 if(!$stream || $stream->end) {
-  print "\n\n<p>URI \"$uri\" failed to parse RSS 1.0 URI $uri as RDF/XML with Raptor.</p>\n";
+  print "\n\n<p>URI \"$uri\" failed to parse RSS 1.0 URI $uri as $parser_label with Raptor.</p>\n";
 }
 
 my $count=0;
@@ -493,7 +502,7 @@ if(!$count) {
 
 print "<h2>RSS 1.0 Content</h2>\n";
 
-print "\n\n<p>URI \"$uri\" parsed RSS 1.0 as RDF/XML OK (creating $count triples)</p>\n";
+print "\n\n<p>URI \"$uri\" parsed RSS 1.0 as $parser_label OK (creating $count triples)</p>\n";
 
 #unlink $temp_file if $temp_file;
 
