@@ -219,6 +219,8 @@ librdf_hash_list_put(void* context, librdf_hash_data *key,
       LIBRDF_FREE(librdf_hash_list_node, node);
       return 1;
     }
+  } else {
+    new_key=NULL;
   }
   
   /* always allocate new value */
