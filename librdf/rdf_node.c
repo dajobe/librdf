@@ -882,7 +882,7 @@ librdf_node_get_li_ordinal(librdf_node* node) {
   LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_RESOURCE),
                        "node is not type resource", 0);
 
-  if(node->type != LIBRDF_NODE_TYPE_RESOURCE);
+  if(node->type != LIBRDF_NODE_TYPE_RESOURCE)
     return -1;
 
   uri_string=librdf_uri_as_string(node->value.resource.uri); 
