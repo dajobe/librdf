@@ -108,8 +108,8 @@ api/index.html: api.sgml
 if MAINTAINER_MODE
 redland.3: redland.pod
 	pod2man --section=3 --center="Redland RDF Library" \
-	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @LIBRDF_VERSION@" $< | \
-	sed -e "s;REDLAND_VERSION_STRING;@LIBRDF_VERSION@;" > $@
+	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @PACKAGE_VERSION@" $< | \
+	sed -e "s;REDLAND_VERSION_STRING;@PACKAGE_VERSION@;" > $@
 	rm -f pod2htm*
 
 clean-local:
