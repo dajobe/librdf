@@ -298,6 +298,7 @@ librdf_storage_tstore_serialise(librdf_storage* storage)
     return NULL;
   
   scontext->storage=storage;
+  librdf_storage_add_reference(scontext->storage);
 
   scontext->result=rs_find_all_resources(context->rdfsql, 0, context->model);
   if(!scontext->result)
@@ -384,6 +385,9 @@ librdf_storage_tstore_serialise_finished(void* context)
   if(scontext->result)
     rs_free_result(scontext->result);
 
+  if(scontext->storage)
+    librdf_storage_remove_reference(scontext->storage);
+
   LIBRDF_FREE(librdf_storage_tstore_serialise_stream_context, scontext);
 }
 
@@ -408,8 +412,8 @@ typedef struct {
  * 
  * Return value: a &librdf_stream or NULL on failure
  **/
-static
-librdf_stream* librdf_storage_tstore_find_statements(librdf_storage* storage, librdf_statement* statement)
+static librdf_stream*
+librdf_storage_tstore_find_statements(librdf_storage* storage, librdf_statement* statement)
 {
   librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context;
   librdf_storage_tstore_find_stream_context* scontext;
@@ -426,6 +430,7 @@ librdf_stream* librdf_storage_tstore_find_statements(librdf_storage* storage, li
     return NULL;
   
   scontext->storage=storage;
+  librdf_storage_add_reference(scontext->storage);
 
   triple=librdf_storage_tstore_statement_as_rs_triple(statement);
   scontext->search_triple=triple;
@@ -530,6 +535,9 @@ librdf_storage_tstore_find_finished(void* context)
   /* FIXME: as alloced in librdf_storage_tstore_statement_as_rs_triple */
   if(scontext->search_triple)
     LIBRDF_FREE(rs_triple, scontext->search_triple);
+
+  if(scontext->storage)
+    librdf_storage_remove_reference(scontext->storage);
 
   LIBRDF_FREE(librdf_storage_tstore_find_stream_context, scontext);
 }
