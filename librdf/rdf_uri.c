@@ -25,6 +25,7 @@
 #include <librdf.h>
 
 #include <rdf_uri.h>
+#include <rdf_digest.h>
 
 
 /* statics */
@@ -93,6 +94,7 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 
   strcpy(new_string, old_uri->string);
   new_uri->string=new_string;
+  new_uri->string_length=old_uri->string_length;
 
   return new_uri;
 }
@@ -175,13 +177,22 @@ main(int argc, char *argv[])
 {
   char *hp_string="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
   librdf_uri *uri1, *uri2;
-  
+  librdf_digest_factory* digest_factory;
+  librdf_digest *d;
   char *program=argv[0];
-	
-  librdf_init_uri(NULL);
+
+  librdf_init_digest();
+
+  digest_factory=librdf_get_digest_factory(NULL);
+  librdf_init_uri(digest_factory);
 
   fprintf(stderr, "%s: Creating new URI from string\n", program);
   uri1=librdf_new_uri(hp_string);
+  if(!uri1) {
+    fprintf(stderr, "%s: Failed to create URI from string '%s'\n", program, 
+	    hp_string);
+    return(1);
+  }
   
   fprintf(stderr, "%s: Home page URI is ", program);
   librdf_uri_print(uri1, stderr);
@@ -189,16 +200,34 @@ main(int argc, char *argv[])
   
   fprintf(stderr, "%s: Creating URI from URI\n", program);
   uri2=librdf_new_uri_from_uri(uri1);
+  if(!uri2) {
+    fprintf(stderr, "%s: Failed to create new URI from old one\n", program);
+    return(1);
+  }
 
   fprintf(stderr, "%s: New URI is ", program);
   librdf_uri_print(uri2, stderr);
   fputs("\n", stderr);
+
+  
+  fprintf(stderr, "%s: Getting digest for URI\n", program);
+  d=librdf_uri_get_digest(uri2);
+  if(!d) {
+    fprintf(stderr, "%s: Failed to get digest for URI %s\n", program, 
+	    librdf_uri_as_string(uri2));
+    return(1);
+  }
+  fprintf(stderr, "%s: Digest is: ", program);
+  librdf_digest_print(d, stderr);
+  fputs("\n", stderr);
+  librdf_free_digest(d);
 
 
   fprintf(stderr, "%s: Freeing URIs\n", program);
   librdf_free_uri(uri1);
   librdf_free_uri(uri2);
   
+  librdf_finish_digest();
   librdf_finish_uri();
 
 #ifdef LIBRDF_DEBUG 
