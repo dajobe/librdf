@@ -744,7 +744,7 @@ main(int argc, char *argv[])
         }
       }
 
-      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2]);
+      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2], NULL);
       goto printmatching;
       break;
 
@@ -766,7 +766,7 @@ main(int argc, char *argv[])
         }
       }
 
-      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2]);
+      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2], NULL);
       if(!query) {
         fprintf(stderr, "%s: Failed to create new query %s\n", program, argv[2]);
         if(uri)
