@@ -37,12 +37,19 @@ struct librdf_query_s
   int usage;
   void *context;
   struct librdf_query_factory_s* factory;
+
+  /* list of all the results for this query */
+  librdf_query_results* results;
 };
 
 
 struct librdf_query_results_s
 {
+  /* query that this was executed over */
   librdf_query* query;
+
+  /* next query result */
+  librdf_query_results* next;
 };
 
 
