@@ -19,6 +19,9 @@
 #include <sys/types.h>
 
 #include <stdio.h>
+#ifdef HAVE_STRING_H
+#include <string.h> /* for strncmp */
+#endif
 
 #include <rdf_config.h>
 #include <rdf_hash.h>
@@ -68,7 +71,7 @@ rdf_hash_list_find_node(rdf_hash_list_node* list, char *key, size_t key_len,
   if(prev)
     *prev=list;
   for(node=list; node; node=node->next) {
-    if(key_len == node->key_len && !memcmp(key, node->key, key_len))
+    if(key_len == node->key_len && !strncmp(key, node->key, key_len))
       break;
     if(prev)
       *prev=node;
