@@ -101,7 +101,9 @@ sub end_page($) {
   my $q=shift;
 
   print <<'EOT';
-<!-- SOURCE CODE -->
+<p>The source code of this demonstration is available in the Redland
+distribution as <tt>demos/demo.pl</tt> or from the
+<a href="http://www.redland.opensource.ac.uk/">Redland</a> website</p>
 EOT
 
   print qq{<hr />\n\n<p class="copyright"><a href="http://purl.org/net/dajobe/">Dave Beckett</a></p>\n\n</body>\n</html>\n};

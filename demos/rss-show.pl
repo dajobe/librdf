@@ -122,7 +122,9 @@ and the <a href="/docs/pod/RDF/Redland/RSS.html">RDF::Redland::RSS</a>
 <a href="/docs/perl.html">Perl</a> interface,
 interpreting the RSS 1.0 content as RDF using the
 <a href="http://www.redland.opensource.ac.uk/raptor/">Raptor RDF parser</a>.</p>
-<!-- SOURCE CODE -->
+<p>The source code of this demonstration is available in the Redland
+distribution as <tt>demos/rss-show.pl</tt> or from the
+<a href="http://www.redland.opensource.ac.uk/">Redland</a> website</p>
 
 EOT
 

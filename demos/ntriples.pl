@@ -83,7 +83,9 @@ and the <a href="/docs/pod/RDF/Redland/Parser.html">RDF::Redland::Parser</a>
 to the <a href="http://www.redland.opensource.ac.uk/raptor/">Raptor</a>
 N-Triples parser.</p>
 
-<!-- SOURCE CODE -->
+<p>The source code of this demonstration is available in the Redland
+distribution as <tt>demos/ntriples.pl</tt> or from the
+<a href="http://www.redland.opensource.ac.uk/">Redland</a> website</p>
 
 EOT
 
