@@ -1333,6 +1333,35 @@ librdf_storage_set_feature(librdf_storage* storage, librdf_uri* feature,
 }
 
 
+/**
+ * librdf_storage_find_statements_with_options - search the storage for matching statements with match options
+ * @storage: &librdf_storage object
+ * @statement: &librdf_statement partial statement to find
+ * @context_node: &librdf_node context node or NULL.
+ * @options: &librdf_hash of matching options or NULL
+ * 
+ * Searches the storage for a (partial) statement as described in
+ * librdf_statement_match() and returns a &librdf_stream of
+ * matching &librdf_statement objects.
+ * 
+ * If options is given then the match is made according to
+ * the given options.  If options is NULL, this is equivalent
+ * to librdf_storage_find_statements_in_context.
+ * 
+ * Return value:  &librdf_stream of matching statements (may be empty) or NULL on failure
+ **/
+librdf_stream*
+librdf_storage_find_statements_with_options(librdf_storage* storage,
+                                            librdf_statement* statement,
+                                            librdf_node* context_node,
+                                            librdf_hash* options) 
+{
+  if(storage->factory->find_statements_with_options)
+    return storage->factory->find_statements_with_options(storage, statement, context_node, options);
+  else
+    return librdf_storage_find_statements_in_context(storage, statement, context_node);
+}
+
 
 #endif
 
