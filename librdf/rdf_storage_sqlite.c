@@ -347,7 +347,8 @@ librdf_storage_sqlite_get_helper(librdf_storage *storage,
   int id= -1;
   
   sprintf(request, "SELECT id FROM %s WHERE %s;",
-          sqlite_tables[table].name, expression);
+          sqlite_tables[table].name,
+          expression);
 
   if(librdf_storage_sqlite_exec(storage,
                                 request,
@@ -431,7 +432,7 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
   size_t len;
   unsigned char *value_e;
   unsigned char *language_e=NULL;
-  unsigned char *datatype_e=NULL;
+  int datatype_id= -1;
 
   value_e=sqlite_string_escape(value, value_len, NULL);
   if(!value_e)
@@ -447,12 +448,8 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
   }
 
   if(datatype) {
-    unsigned char *datatype_str;
-    datatype_str=librdf_uri_as_counted_string(datatype, &len);
-    datatype_e=sqlite_string_escape((unsigned const char*)datatype, len, NULL);
-    if(!datatype_e)
-      return -1;
-    sprintf(expression+strlen(expression), "AND datatype = '%s'", datatype_e);
+    datatype_id=librdf_storage_sqlite_uri_helper(storage, datatype);
+    sprintf(expression+strlen(expression), "AND datatype = %d", datatype_id);
   }
   
   id=librdf_storage_sqlite_get_helper(storage, TABLE_LITERALS, expression);
@@ -468,9 +465,9 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
     strcat(expression, "'");
   } else
     strcat(expression, ", NULL");
-  if(datatype_e) {
+  if(datatype) {
     strcat(expression, ", '");
-    strcat(expression, datatype_e);
+    sprintf(expression+strlen(expression), "%d", datatype_id);
     strcat(expression, "'");
   } else
     strcat(expression, ", NULL");
@@ -480,8 +477,6 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
   LIBRDF_FREE(cstring, value_e);
   if(language_e)
     LIBRDF_FREE(cstring, language_e);
-  if(datatype_e)
-    LIBRDF_FREE(cstring, datatype_e);
 
   return id;
 }
@@ -641,6 +636,15 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 
     strcpy(request, 
            "CREATE INDEX spindex ON triples (subjectUri, subjectBlank, predicateUri);");
+    if(librdf_storage_sqlite_exec(storage,
+                                  request,
+                                  NULL, /* no callback */
+                                  NULL, /* arg */
+                                  0))
+      return 1;
+    
+    strcpy(request, 
+           "CREATE INDEX uriindex ON uris (uri);");
     if(librdf_storage_sqlite_exec(storage,
                                   request,
                                   NULL, /* no callback */
