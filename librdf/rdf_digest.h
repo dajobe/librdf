@@ -49,7 +49,6 @@ struct librdf_digest_factory_s
   void (*final)( void *c );
   unsigned char *(*get_digest)( void *c );
 };
-typedef struct librdf_digest_factory_s librdf_digest_factory;
 
 
 struct librdf_digest_s {

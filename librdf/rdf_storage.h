@@ -100,8 +100,6 @@ struct librdf_storage_factory_s {
   librdf_iterator* (*find_targets)(librdf_storage* storage, librdf_node *source, librdf_node *target);
 };
 
-typedef struct librdf_storage_factory_s librdf_storage_factory;
-
 #endif
 
 
