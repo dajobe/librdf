@@ -40,7 +40,7 @@ while(<IN>) {
     s%<title>(.*?)</title>%<title>$main_title - $doc_title</title>%;
   }
 
-  next if /^<link|meta/i;
+  next if /^\s*<link|meta/i;
 
   s%<h1>%<h2>%; s%</h1>%</h2>%;
   s%<hr />%%;
@@ -48,7 +48,9 @@ while(<IN>) {
   s%href="/docs/pod/RDF/Redland/([^"]+)"%href="$pod_rdf_redland_rel$1"%g;
   s%href="/docs/pod/RDF/([^"]+)"%href="$pod_rdf_rel$1"%g;
 
-  s%^<body>%<body bgcolor="#ffffff" text="#000085">\n\n<h1 align="center">$main_title - $doc_title</h1>\n\n%;
+  s%^<body[^>]*>%<body bgcolor="#ffffff" text="#000085">\n\n<h1 align="center">$main_title - $doc_title</h1>\n\n%;
+
+  s%^<p><a id="__index__".*</p>%%;
 
   my $year=1900+(localtime)[5];
   print OUT <<"EOT" if m%^</body>%;
