@@ -15,21 +15,14 @@
 
 <ul>
 <li>Add module - rdf parser - internal to librdf written by me</li>
-<li>Add module - xml dom parser - external</li>
-<li>Add module - xml dom parser - libxml</li>
-<li>Add module - xml sax parser - libxml</li>
-<li>Add module - xml parser - sax</li>
-<li>Add module - xml parser - dom</li>
 <li>Add module - uri syntax / representation</li>
 <li>Add module - uri resolving - (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
-<li>module - xml namespaces</li>
 <li>Check out if the library can be built shared</li>
 <li>Modularise the library so some parts can be removed</li>
 <li>Add <tt>#ifdef WIN32</tt> around parts including config file - create a win32 build?</li>
 <li>If LGPL/MPL license, include compatible code OR add separate package?</li>
 <li>Deal with anonymous resources</li>
 <li>Write a C++ interface</li>
-<li>Write a perl interface</li>
 <li>Support RDF schemas</li>
 <li>Add query language interfaces</li>
 <li>Write some better example code</li>
@@ -63,6 +56,7 @@ part of librdf.h automatically to make a 1-header file system.</li>
 <p>(Most recent done at top of list)</p>
 
 <ul>
+<li>perl interface</li>
 <li>module - storage implemented as hashes</li>
 <li>made <tt>get</tt> methods in all hash impls. use iterators (side
 effecting - yuck)</li>
@@ -89,6 +83,26 @@ style, but for C</li>
 <li>iterator interface and module for returning results</li>
 </ul>
 
+<h2>Decided to do differently</h2>
+
+<p>I reserve the right to change my mind again!</p>
+<ul>
+<li>These will not be made into modules at present, the internal RDF
+parser will use expat or libxml as necessary.
+<ul>
+<li>Add module - xml dom parser - external</li>
+<li>Add module - xml dom parser - libxml</li>
+<li>Add module - xml sax parser - libxml</li>
+<li>Add module - xml parser - sax</li>
+<li>Add module - xml parser - dom</li>
+</ul>
+</li>
+<li>This is not needed as a module, the internal RDF parser will do this.
+<ul>
+<li>module - xml namespaces</li>
+</ul>
+</li>
+</ul>
 
 <hr />
 
