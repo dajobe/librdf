@@ -23,7 +23,8 @@ lib_LIBRARIES = librdf.a
 include_HEADERS = librdf.h
 
 librdf_a_SOURCES = rdf_init.c rdf_uri.c rdf_node.c rdf_statement.c \
-rdf_digest.c rdf_hash.c rdf_hash_memory.c rdf_model.c rdf_iterator.c \
+rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
+rdf_model.c rdf_iterator.c \
 rdf_list.c rdf_memory.c rdf_storage.c rdf_storage_list.c rdf_stream.c \
 rdf_parser.c rdf_heuristics.c \
 librdf.h rdf_types.h \
