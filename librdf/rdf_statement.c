@@ -667,20 +667,14 @@ librdf_statement_decode(librdf_statement* statement,
   
     switch(type) {
     case 's': /* subject */
-      if(LIBRDF_NODE_STATEMENT_SUBJECT(statement))
-        librdf_free_node(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
       LIBRDF_NODE_STATEMENT_SUBJECT(statement)=node;
       break;
       
     case 'p': /* predicate */
-      if(LIBRDF_NODE_STATEMENT_PREDICATE(statement))
-        librdf_free_node(LIBRDF_NODE_STATEMENT_PREDICATE(statement));
       LIBRDF_NODE_STATEMENT_PREDICATE(statement)=node;
       break;
       
     case 'o': /* object */
-      if(LIBRDF_NODE_STATEMENT_OBJECT(statement))
-        librdf_free_node(LIBRDF_NODE_STATEMENT_OBJECT(statement));
       LIBRDF_NODE_STATEMENT_OBJECT(statement)=node;
       break;
 
