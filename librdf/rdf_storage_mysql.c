@@ -314,6 +314,7 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
                   context->user, mysql_error(&context->connection));
     status=0-mysql_errno(&context->connection);
     context->connection_open=0;
+    return status;
   }
 
   /* Create tables, if new and not existing */
