@@ -4,13 +4,6 @@
  *
  * $Id$
  *
- *                                       
- * This program is free software distributed under either of these licenses:
- *   1. The GNU Lesser General Public License (LGPL)
- * OR ALTERNATIVELY
- *   2. The modified BSD license
- *
- * See LICENSE.html or LICENSE.txt for the full license terms.
  * Copyright (C) 2000 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology, University of Bristol.
  *
