@@ -176,7 +176,7 @@ librdf_new_model_with_options(librdf_storage *storage, librdf_hash* options)
 
 /**
  * librdf_new_model_from_model - Copy constructor - create a new librdf_model from an existing one
- * @model: the existing &librdf_model
+ * @old_model: the existing &librdf_model
  * 
  * Creates a new model as a copy of the existing model in the same
  * storage context.

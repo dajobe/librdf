@@ -133,7 +133,7 @@ librdf_new_hash_cursor (librdf_hash* hash)
 /**
  * librdf_free_hash_cursor - Destructor - destroy a librdf_hash_cursor object
  *
- * @hash: hash cursor object
+ * @cursor: hash cursor object
  **/
 void
 librdf_free_hash_cursor (librdf_hash_cursor* cursor) 

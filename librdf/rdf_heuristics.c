@@ -94,6 +94,7 @@
 
 /**
  * librdf_heuristic_object_is_literal - try to guess if an object string is a literal or a resource
+ * @object: string object to guess type
  *
  * The guessing is done by assuming the object is a URL if it matches
  *   ^[isalnum()]+:[^isblank()]+$
