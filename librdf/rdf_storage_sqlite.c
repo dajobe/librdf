@@ -612,7 +612,7 @@ librdf_storage_sqlite_statement_helper(librdf_storage* storage,
                                        librdf_node* context_node,
                                        triple_node_type node_types[4],
                                        int node_ids[4],
-                                       const char* fields[4]) 
+                                       const unsigned char* fields[4]) 
 {
   librdf_node* nodes[4];
   int i;
@@ -635,7 +635,7 @@ librdf_storage_sqlite_statement_helper(librdf_storage* storage,
                                          &node_ids[i],
                                          &node_types[i]))
       return 1;
-    fields[i]=triples_fields[i][node_types[i]];
+    fields[i]=(const unsigned char*)triples_fields[i][node_types[i]];
   }
 
   return 0;
@@ -797,7 +797,7 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
     librdf_node* context_node=(librdf_node*)librdf_stream_get_context(statement_stream);
     triple_node_type node_types[4];
     int node_ids[4];
-    const char* fields[4];
+    const unsigned char* fields[4];
     raptor_stringbuffer *sb;
     int i;
     unsigned char* request;
@@ -827,8 +827,7 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
     raptor_stringbuffer_append_counted_string(sb, 
                                               (unsigned char*)" ( ", 3, 1);
     for(i=0; i<3; i++) {
-      raptor_stringbuffer_append_string(sb, 
-                                        (unsigned char*)fields[i], 1);
+      raptor_stringbuffer_append_string(sb, fields[i], 1);
       if(i < 2)
         raptor_stringbuffer_append_counted_string(sb, 
                                                   (unsigned char*)", ", 2, 1);
@@ -878,7 +877,7 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_stateme
   int count=0;
   triple_node_type node_types[4];
   int node_ids[4];
-  const char* fields[4];
+  const unsigned char* fields[4];
   raptor_stringbuffer *sb;
   unsigned char *request;
   int i;
@@ -1374,7 +1373,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   int status;
   triple_node_type node_types[4];
   int node_ids[4];
-  const char* fields[4];
+  const unsigned char* fields[4];
   char *errmsg=NULL;
   raptor_stringbuffer *sb;
   int need_where=1;
@@ -1417,8 +1416,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
                                                 (unsigned char*)"AND ", 5, 1);
     raptor_stringbuffer_append_counted_string(sb, 
                                               (unsigned char*)"T.", 2, 1);
-    raptor_stringbuffer_append_string(sb, 
-                                      (unsigned char*)fields[i], 1);
+    raptor_stringbuffer_append_string(sb, fields[i], 1);
     raptor_stringbuffer_append_counted_string(sb, 
                                               (unsigned char*)"=", 1, 1);
     raptor_stringbuffer_append_decimal(sb, node_ids[i]);
@@ -1601,7 +1599,7 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
   triple_node_type node_types[4];
   int node_ids[4];
-  const char* fields[4];
+  const unsigned char* fields[4];
   raptor_stringbuffer *sb;
   unsigned char* request;
   int i;
@@ -1630,8 +1628,7 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   raptor_stringbuffer_append_counted_string(sb, 
                                             (unsigned char*)" ( ", 3, 1);
   for(i=0; i<3; i++) {
-    raptor_stringbuffer_append_string(sb, 
-                                      (unsigned char*)fields[i], 1);
+    raptor_stringbuffer_append_string(sb, fields[i], 1);
     if(i < 2)
       raptor_stringbuffer_append_counted_string(sb, 
                                                 (unsigned char*)", ", 2, 1);
