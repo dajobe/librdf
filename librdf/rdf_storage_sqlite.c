@@ -43,13 +43,26 @@
 
 #include <redland.h>
 
+#ifdef HAVE_SQLITE3_H
+#include <sqlite3.h>
+#define sqlite_exec sqlite3_exec
+#define sqlite_close sqlite3_close
+#define sqlite_freemem sqlite3_free
+#endif
+
+#ifdef HAVE_SQLITE_H
 #include <sqlite.h>
+#endif
 
 typedef struct
 {
   librdf_storage *storage;
-  
+
+#ifdef HAVE_SQLITE3_H  
+  sqlite3 *db;
+#else
   sqlite *db;
+#endif
 
   int is_new;
   
@@ -139,7 +152,7 @@ librdf_storage_sqlite_init(librdf_storage* storage, char *name,
   context->name=name_copy;
   
   if((is_new=librdf_hash_get_as_boolean(options, "new"))<0)
-    context->is_new=1; /* default is NOT NEW */
+    context->is_new=0; /* default is NOT NEW */
 
   /* no more options, might as well free them now */
   if(options)
@@ -163,15 +176,30 @@ static int
 librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 {
   librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
-  int mode=0;
+  int rc=SQLITE_OK;
   char *errmsg=NULL;
-  
+#ifdef HAVE_SQLITE3_H
+#else
+  int mode=0;
+#endif
+
+#ifdef HAVE_SQLITE3_H
+  context->db=NULL;
+  rc=sqlite3_open(context->name, &context->db);
+  if(rc != SQLITE_OK)
+    errmsg=(char*)sqlite3_errmsg(context->db);
+#else
   context->db=sqlite_open(context->name, mode, &errmsg);
-  if(!context->db) {
+#endif
+  if(rc != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "SQLite database %s exec failed, %s", 
+               "SQLite database %s open failed - %s", 
                context->name, errmsg);
+#ifdef HAVE_SQLITE3_H
+    sqlite3_close(context->db);
+#else
     free(errmsg);
+#endif
     return 1;
   }
   
@@ -192,20 +220,20 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                        &errmsg);
     if(status != SQLITE_OK) {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "SQLite database %s sqlite_compile failed, %s (%d)", 
+                 "SQLite database %s SQL exec failed - %s (%d)", 
                  context->name, errmsg, status);
       sqlite_close(context->db);
       return 1;
     }
 
     status=sqlite_exec(context->db,
-                       "CREATE INDEX sp-index ON triples (subject, subjectType, predicate);",
+                       "CREATE INDEX spindex ON triples (subject, subjectType, predicate);",
                        NULL, /* no callback */
                        NULL, /* arg */
                        &errmsg);
     if(status != SQLITE_OK) {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "SQLite database %s sqlite_compile failed, %s (%d)", 
+                 "SQLite database %s SQL exec failed - %s (%d)", 
                  context->name, errmsg, status);
       sqlite_close(context->db);
       return 1;
@@ -246,7 +274,7 @@ librdf_storage_sqlite_get_1int_callback(void *arg,
   int* count_p=(int*)arg;
   
   if(argc == 1) {
-    *count_p++;
+    *count_p=atoi(argv[0]);
   }
   return 0;
 }
@@ -260,7 +288,6 @@ librdf_storage_sqlite_size(librdf_storage* storage)
   int count=0;
   int status;
   
-  /* FIXME - is this legal */
   status=sqlite_exec(context->db,
                      "SELECT COUNT(*) FROM triples",
                      librdf_storage_sqlite_get_1int_callback,
@@ -268,7 +295,7 @@ librdf_storage_sqlite_size(librdf_storage* storage)
   
   if(status !=SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "SQLite database %s exec failed, %s (%d)", 
+               "SQLite database %s SQL exec failed - %s (%d)", 
                context->name, errmsg, status);
     sqlite_freemem(errmsg);
     return -1;
@@ -291,10 +318,11 @@ librdf_storage_sqlite_add_statement(librdf_storage* storage, librdf_statement* s
 
 static int
 librdf_storage_sqlite_add_statements(librdf_storage* storage,
-                                   librdf_stream* statement_stream)
+                                     librdf_stream* statement_stream)
 {
-  /* librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context; */
+  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
   int status=0;
+  char *errmsg=NULL;
 
   for(; !librdf_stream_end(statement_stream);
       librdf_stream_next(statement_stream)) {
@@ -310,8 +338,24 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
       continue;
 
     /* FIXME - add a statement */
+    char request[1024];
+    sprintf(request, "INSERT INTO triples (subject, subjectType, predicate, object, objectType, context) VALUES('%s', '%s', '%s', '%s', '%s');",
+          "s", "1",
+          "p",
+            "o", "1");
     
-    /* "INSERT INTO triples (subject, subjectType, predicate, object, objectType, context) VALUES ('s', 'st', 'p', 'o', 'ot', 'c');" */
+    status=sqlite_exec(context->db,
+                       request,
+                       NULL,
+                       NULL, &errmsg);
+    if(status != SQLITE_OK) {
+      librdf_log(storage->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "SQLite database %s SQL exec failed - %s (%d)", 
+                 context->name, errmsg, status);
+      sqlite_freemem(errmsg);
+      return 0;
+  }
     
   }
   
@@ -437,18 +481,23 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_stateme
     return status;
   }
 
-  /* FIXME - find a statement */
+  /* FIXME - find a contained statement */
 
-  status=sqlite_exec_printf(context->db,
-                            "SELECT subject, subjectType, predicate, object, objectType, context FROM triples WHERE subject='%s' AND subjectType='%s' AND predicate='%s' AND object='%s' and objectType='%s';",
-                            librdf_storage_sqlite_get_1int_callback,
-                            &count,
-                            &errmsg);
-  /* "SELECT COUNT(*) FROM triples where (s, p, o)" */
+  char request[1024];
+  sprintf(request, "SELECT subject, subjectType, predicate, object, objectType FROM triples WHERE subject='%s' AND subjectType='%s' AND predicate='%s' AND object='%s' and objectType='%s';",
+          "s", "1",
+          "p",
+          "o", "1");
+  
+  status=sqlite_exec(context->db,
+                     request,
+                     NULL,
+                     &count,
+                     &errmsg);
   if(status != SQLITE_OK) {
     librdf_log(storage->world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "SQLite database %s sqlite_finalize failed, %s (%d)", 
+               "SQLite database %s SQL exec failed - %s (%d)", 
                context->name, errmsg, status);
     sqlite_freemem(errmsg);
     return 0;
@@ -469,11 +518,16 @@ typedef struct {
   librdf_statement *statement;
   librdf_node* context;
 
+#ifdef HAVE_SQLITE3_H
+  /* OUT from sqlite3_prepare: */
+  sqlite3_stmt *vm;
+  const char *pzTail;
+#else
   sqlite_vm *vm;
   /* OUT from vm: */
   const char *pzTail;
   sqlite_vm *ppVm;
-  char *pzErrMsg;
+#endif
 } librdf_storage_sqlite_serialise_stream_context;
 
 
@@ -484,6 +538,7 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   librdf_storage_sqlite_serialise_stream_context* scontext;
   librdf_stream* stream;
   int status;
+  char *errmsg=NULL;
   
   scontext=(librdf_storage_sqlite_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_sqlite_serialise_stream_context, 1, sizeof(librdf_storage_sqlite_serialise_stream_context));
   if(!scontext)
@@ -492,14 +547,28 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   scontext->index_contexts=context->index_contexts;
   scontext->sqlite_context=context;
 
+  char request[200];
+  sprintf(request,
+          "SELECT subject, subjectType, predicate, object, objectType, context FROM triples;");
+
+#ifdef HAVE_SQLITE3_H
+  status=sqlite3_prepare(context->db,
+                         request,
+                         strlen(request),
+                         &scontext->vm,
+                         &scontext->pzTail);
+  if(status != SQLITE_OK)
+    errmsg=(char*)sqlite3_errmsg(context->db);
+#else  
   status=sqlite_compile(context->db,
-                        "SELECT subject, subjectType, predicate, object, objectType, context FROM triples;",
+                        request,
                         &scontext->pzTail, &scontext->ppVm,
-                        &scontext->pzErrMsg);
+                        &errmsg);
+#endif
   if(status != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "SQLite database %s sqlite_compile failed, %s (%d)", 
-               context->name, scontext->pzErrMsg, status);
+               "SQLite database %s SQL compile failed - %s (%d)", 
+               context->name, errmsg, status);
 
     librdf_storage_sqlite_serialise_finished((void*)scontext);
     return NULL;
@@ -524,14 +593,22 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 }
 
 
-
+#ifdef HAVE_SQLITE3_H
+static int
+librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
+                                      sqlite3_stmt *vm) {
+#else
 static int
 librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
                                       sqlite_vm *vm) {
+#endif
   int status=SQLITE_BUSY;
+#ifdef HAVE_SQLITE3_H
+#else
   int pN;
   const char **pazValue;   /* Column data */
   const char **pazColName; /* Column names and datatypes */
+#endif
   int result=0;
   
   /*
@@ -541,7 +618,11 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
    * SQLITE_MISUSE.
   */
   do {
+#ifdef HAVE_SQLITE3_H
+    status=sqlite3_step(vm);
+#else
     status=sqlite_step(vm, &pN, &pazValue, &pazColName);
+#endif
     if(status == SQLITE_BUSY) {
       /* FIXME - how to handle busy? */
       status=SQLITE_ERROR;
@@ -559,14 +640,23 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
 
   if(status == SQLITE_ERROR) {
     char *errmsg=NULL;
-    
+
+#ifdef HAVE_SQLITE3_H
+    status=sqlite3_finalize(vm);
+    if(status != SQLITE_OK)
+      errmsg=(char*)sqlite3_errmsg(scontext->db);
+#else
     status=sqlite_finalize(vm, &errmsg);
+#endif
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "SQLite database %s sqlite_finalize failed, %s (%d)", 
+                 "SQLite database %s finalize failed - %s (%d)", 
                  scontext->name, errmsg, status);
+#ifdef HAVE_SQLITE3_H
+#else
       sqlite_freemem(errmsg);
+#endif
     }
     result= -1;
   }
@@ -589,7 +679,7 @@ librdf_storage_sqlite_serialise_end_of_stream(void* context)
                                                scontext->vm);
   if(result) {
     /* error or finished */
-    if(result<0)
+    if(result < 0)
       scontext->vm=NULL;
     scontext->finished=1;
   }
@@ -643,20 +733,25 @@ librdf_storage_sqlite_serialise_finished(void* context)
 
   if(scontext->vm) {
     char *errmsg=NULL;
-
-    int status=sqlite_finalize(scontext->vm, &errmsg);
+    int status;
+    
+#ifdef HAVE_SQLITE3_H
+    status=sqlite3_finalize(scontext->vm);
+    if(status != SQLITE_OK)
+      errmsg=(char*)sqlite3_errmsg(scontext->sqlite_context->db);
+#else
+    status=sqlite_finalize(vm, &errmsg);
+#endif
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "SQLite database %s sqlite_finalize failed, %s (%d)", 
+                 "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
+#ifdef HAVE_SQLITE3_H
+#else
       sqlite_freemem(errmsg);
+#endif
     }
-  }
-
-  if(scontext->pzErrMsg) {
-    sqlite_freemem(scontext->pzErrMsg);
-    scontext->pzErrMsg=NULL;
   }
 
   if(scontext->storage)
@@ -677,11 +772,16 @@ typedef struct {
   librdf_statement *statement;
   librdf_node* context;
 
+#ifdef HAVE_SQLITE3_H
+  /* OUT from sqlite3_prepare: */
+  sqlite3_stmt *vm;
+  const char *pzTail;
+#else
   sqlite_vm *vm;
   /* OUT from vm: */
   const char *pzTail;
   sqlite_vm *ppVm;
-  char *pzErrMsg;
+#endif
 } librdf_storage_sqlite_find_statements_stream_context;
 
 
@@ -707,6 +807,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   int status;
   char *subject_string, *predicate_string, *object_string, *context_string;
   const char *subject_type, *object_type;
+  char *errmsg=NULL;
   
   scontext=(librdf_storage_sqlite_find_statements_stream_context*)LIBRDF_CALLOC(librdf_storage_sqlite_find_statements_stream_context, 1, sizeof(librdf_storage_sqlite_find_statements_stream_context));
   if(!scontext)
@@ -738,14 +839,24 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   LIBRDF_FREE(cstring, predicate_string);
   LIBRDF_FREE(cstring, object_string);
   
+#ifdef HAVE_SQLITE3_H
+  status=sqlite3_prepare(context->db,
+                         query,
+                         strlen(query),
+                         &scontext->vm,
+                         &scontext->pzTail);
+  if(status != SQLITE_OK)
+    errmsg=(char*)sqlite3_errmsg(context->db);
+#else  
   status=sqlite_compile(context->db,
                         query,
                         &scontext->pzTail, &scontext->ppVm,
-                        &scontext->pzErrMsg);
+                        &errmsg);
+#endif
   if(status != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "SQLite database %s sqlite_compile failed, %s (%d)", 
-               context->name, scontext->pzErrMsg, status);
+               "SQLite database %s SQL compile failed - %s (%d)", 
+               context->name, errmsg, status);
 
     librdf_storage_sqlite_serialise_finished((void*)scontext);
     return NULL;
@@ -837,20 +948,25 @@ librdf_storage_sqlite_find_statements_finished(void* context)
 
   if(scontext->vm) {
     char *errmsg=NULL;
-
-    int status=sqlite_finalize(scontext->vm, &errmsg);
+    int status;
+    
+#ifdef HAVE_SQLITE3_H
+    status=sqlite3_finalize(scontext->vm);
+    if(status != SQLITE_OK)
+      errmsg=(char*)sqlite3_errmsg(scontext->sqlite_context->db);
+#else
+    status=sqlite_finalize(vm, &errmsg);
+#endif
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "SQLite database %s sqlite_finalize failed, %s (%d)", 
+                 "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
+#ifdef HAVE_SQLITE3_H
+#else
       sqlite_freemem(errmsg);
+#endif
     }
-  }
-
-  if(scontext->pzErrMsg) {
-    sqlite_freemem(scontext->pzErrMsg);
-    scontext->pzErrMsg=NULL;
   }
 
   if(scontext->storage)
@@ -870,11 +986,12 @@ librdf_storage_sqlite_find_statements_finished(void* context)
  **/
 static int
 librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
-                                          librdf_node* context_node,
-                                          librdf_statement* statement) 
+                                            librdf_node* context_node,
+                                            librdf_statement* statement) 
 {
   librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
   int status=0;
+  char *errmsg=NULL;
 
   if(context_node && !context->index_contexts) {
     librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
@@ -884,10 +1001,25 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   
   /* FIXME Store statement + node in the storage_sqlite */
 
-  if(!context->index_contexts || !context_node)
-    return 0;
+  char request[1024];
+  sprintf(request, "INSERT INTO triples (subject, subjectType, predicate, object, objectType, context) VALUES('%s', '%s', '%s', '%s', '%s', '%s');",
+          "s", "1",
+          "p",
+          "o", "1",
+          (context_node ? "c" : "0"));
   
-  /* Store (context => statement) in the context hash */
+  status=sqlite_exec(context->db,
+                     request,
+                     NULL,
+                     NULL, &errmsg);
+  if(status != SQLITE_OK) {
+    librdf_log(storage->world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "SQLite database %s SQL exec failed - %s (%d)", 
+               context->name, errmsg, status);
+    sqlite_freemem(errmsg);
+    return 0;
+  }
 
   return status;
 }
@@ -938,7 +1070,7 @@ typedef struct {
  **/
 static librdf_stream*
 librdf_storage_sqlite_context_serialise(librdf_storage* storage,
-                                      librdf_node* context_node) 
+                                        librdf_node* context_node) 
 {
   librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
   librdf_storage_sqlite_context_serialise_stream_context* scontext;
@@ -1237,6 +1369,6 @@ librdf_storage_sqlite_register_factory(librdf_storage_factory *factory)
 void
 librdf_init_storage_sqlite(librdf_world *world)
 {
-  librdf_storage_register_factory(world, "sqllite", "SQLite",
+  librdf_storage_register_factory(world, "sqlite", "SQLite",
                                   &librdf_storage_sqlite_register_factory);
 }
