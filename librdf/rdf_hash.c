@@ -1312,7 +1312,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
  * @hash: hash object
  * @array: address of the start of the array of char* pointers
  * 
- * Return value: 
+ * Return value:  non 0 on failure
  **/
 int
 librdf_hash_from_array_of_strings (librdf_hash* hash, char **array) 
@@ -1325,7 +1325,7 @@ librdf_hash_from_array_of_strings (librdf_hash* hash, char **array)
     if(!value.data) {
       LIBRDF_ERROR2(hash->world, librdf_hash_from_array_of_strings,
                     "Array contains an odd number of strings - %d", i);
-      return;
+      return 1;
     }
     key.size=strlen((char*)key.data);
     value.size=strlen((char*)value.data);
