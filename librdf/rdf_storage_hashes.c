@@ -326,21 +326,6 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
     }
   }
 
-
-  if(status) {
-    for(i=0; i<context->hash_count; i++) {
-      if(context->hash_descriptions[i])
-        LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions[i]);
-      if(context->hashes[i]) {
-        librdf_free_hash(context->hashes[i]);
-        context->hashes[i]=NULL;
-      }
-    }
-    LIBRDF_FREE(librdf_hash, context->hashes);
-    LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions);
-    LIBRDF_FREE(cstring, context->names);
-  }
-  
   /* on success or failure - don't need the passed in options */
   if(context->options) {
     librdf_free_hash(context->options);
