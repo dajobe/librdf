@@ -346,7 +346,7 @@ librdf_model* librdf_new_model_from_model(librdf_model* model);
 void librdf_free_model(librdf_model *model);
 int librdf_model_size(librdf_model* model);
 int librdf_model_add(librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
-int librdf_model_add_string_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, char* string, char *xml_language, int is_wf_xml);
+int librdf_model_add_typed_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, char* string, char *xml_language, librdf_uri *datatype_uri);
 int librdf_model_add_statement(librdf_model* model, librdf_statement* statement);
 int librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream);
 int librdf_model_remove_statement(librdf_model* model, librdf_statement* statement);
