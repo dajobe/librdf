@@ -93,36 +93,6 @@ librdf_parser_raptor_init(librdf_parser *parser, void *context)
   
 
 /*
- * librdf_parser_raptor_make_node_from_anon - helper function to convert an id into a node
- * @scontext: parser strream context
- * @anon_string: anonymous ID string
- * 
- * Turns anon_string 'foo' into a resource node with URI baseURI#foo
- * 
- * Return value: librdf_node node for NULL on failure
- **/
-static librdf_node*
-librdf_parser_raptor_make_node_from_anon(librdf_parser_raptor_stream_context* scontext,
-                                         const char *anon_string) 
-{
-  int len;
-  char *buffer;
-  librdf_node *node=NULL;
-
-  len=strlen(anon_string);
-  buffer=LIBRDF_MALLOC(cstring, len+2);
-  if(buffer) {
-    buffer[0]='#';
-    strncpy(buffer+1, anon_string, len+1); /* copy \0 */
-    node=librdf_new_node_from_uri_local_name(scontext->pcontext->parser->world,
-                                             scontext->base_uri, buffer);
-    LIBRDF_FREE(cstring, buffer);
-  }
-  return node;
-}
-
-
-/*
  * librdf_parser_raptor_new_statement_handler - helper callback function for raptor RDF when a new triple is asserted
  * @context: context for callback
  * @statement: raptor_statement
@@ -149,7 +119,7 @@ librdf_parser_raptor_new_statement_handler (void *context,
     return;
 
   if(rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
-    node=librdf_parser_raptor_make_node_from_anon(scontext, rstatement->subject);
+    node=librdf_new_node_from_blank_identifier(world, rstatement->subject);
   } else if (rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
     node=librdf_new_node_from_normalised_uri_string(world,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->subject),
@@ -190,7 +160,7 @@ librdf_parser_raptor_new_statement_handler (void *context,
                                                              rstatement->object,
                                                              NULL, 0, is_xml_literal));
   } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
-    node=librdf_parser_raptor_make_node_from_anon(scontext, rstatement->object);
+    node=librdf_new_node_from_blank_identifier(world, rstatement->object);
     librdf_statement_set_object(statement, node);
   } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
     node=librdf_new_node_from_normalised_uri_string(world,
