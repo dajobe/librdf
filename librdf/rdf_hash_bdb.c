@@ -133,6 +133,8 @@ librdf_hash_bdb_open(void* context, char *identifier,
   int ret;
   int flags;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(identifier, cstring, 1);
+  
 #ifdef HAVE_DB_OPEN
   DB_INFO bdb_info;
 #endif
