@@ -146,8 +146,11 @@ char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_language, int is_wf_xml);
+char *librdf_node_get_blank_identifier(librdf_node* node);
 char *librdf_node_to_string(librdf_node* node);
-int librdf_node_equals(librdf_node* first_node, librdf_node* second_node);
+char *librdf_node_get_blank_identifier(librdf_node* node);
+int librdf_node_set_blank_identifier(librdf_node* node, const char *identifier);
+
 
 /* rdf_statement.h */
 librdf_statement* librdf_new_statement(librdf_world *world);
