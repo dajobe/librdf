@@ -96,6 +96,7 @@ struct librdf_model_factory_s {
   
   /* serialise the results of a query */
   librdf_stream* (*find_statements)(librdf_model* model, librdf_statement* statement);
+  librdf_stream* (*find_statements_with_options)(librdf_model* model, librdf_statement* statement, librdf_node* context_node, librdf_hash* options);
 
   /* return a list of Nodes marching given arc, target */
   librdf_iterator* (*get_sources)(librdf_model* model, librdf_node *arc, librdf_node *target);
@@ -213,6 +214,9 @@ REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_model_serialise(librdf_mode
 
 REDLAND_API librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
 
+#define LIBRDF_MODEL_FIND_OPTION_MATCH_SUBSTRING_LITERAL "http://feature.librdf.org/model-find-match-substring-literal"
+
+REDLAND_API librdf_stream* librdf_model_find_statements_with_options(librdf_model* model, librdf_statement* statement, librdf_node* context_node, librdf_hash* options);
 REDLAND_API librdf_iterator* librdf_model_get_sources(librdf_model *model, librdf_node *arc, librdf_node *target);
 REDLAND_API librdf_iterator* librdf_model_get_arcs(librdf_model *model, librdf_node *source, librdf_node *target);
 REDLAND_API librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *source, librdf_node *arc);
