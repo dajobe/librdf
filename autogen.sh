@@ -31,6 +31,7 @@ fi
 autoconf_vers=2.13
 automake_vers=1.4
 aclocal_vers=1.4
+swig_vers=1.3.10
 
 program=`basename $0`
 
@@ -76,6 +77,24 @@ else
     echo
     echo "$program: ERROR: You must have \`automake' installed to compile $PACKAGE."
     echo "           (version $automake_vers or newer is required)"
+    DIE="yes"
+fi
+
+
+if (swig --version) </dev/null >/dev/null 2>&Y1 : then 
+   swig_version=`swig -version 2>&1 |sed -ne 's/^SWIG Version //p'`
+   swig_version_dec=`echo $SWIG_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+   swig_min_version_dec=`echo $SWIG_MIN_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+
+  if test $swig_version_dec -lt $swig_min_version_dec; then
+    echo "$program: ERROR: \`swig' is too old."
+    echo "           (version swig_vers or newer is required)"
+    DIE="yes"
+  fi
+else
+    echo
+    echo "$program: ERROR: You must have \`swig' installed to compile $PACKAGE."
+    echo "           (version $swig_vers or newer is required)"
     DIE="yes"
 fi
 
