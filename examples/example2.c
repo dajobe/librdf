@@ -33,7 +33,8 @@
 int main(int argc, char *argv[]);
 
 
-static const char *rdfxml_content="<?xml version=\"1.0\"?>\
+static unsigned const char *rdfxml_content=(unsigned const char *)
+"<?xml version=\"1.0\"?>\
 <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\
      xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\
   <rdf:Description rdf:about=\"http://purl.org/net/dajobe/\">\
@@ -60,7 +61,7 @@ main(int argc, char *argv[])
   librdf_world_open(world);
 
 
-  uri=librdf_new_uri(world, "http://example.librdf.org/");
+  uri=librdf_new_uri(world, (const unsigned char*)"http://example.librdf.org/");
   
   if(!uri) {
     fprintf(stderr, "%s: Failed to create URI\n", program);
@@ -109,13 +110,13 @@ main(int argc, char *argv[])
   }
   
   librdf_statement_set_subject(statement, 
-                               librdf_new_node_from_uri_string(world, "http://example.org/subject"));
+                               librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/subject"));
   
   librdf_statement_set_predicate(statement,
-                                   librdf_new_node_from_uri_string(world, "http://example.org/pred1"));
+                                   librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/pred1"));
   
   librdf_statement_set_object(statement,
-                              librdf_new_node_from_literal(world, "object", NULL, 0));
+                              librdf_new_node_from_literal(world, (const unsigned char*)"object", NULL, 0));
   
   librdf_model_add_statement(model, statement);
 

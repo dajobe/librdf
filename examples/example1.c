@@ -58,7 +58,7 @@ main(int argc, char *argv[])
   world=librdf_new_world();
   librdf_world_open(world);
 
-  uri=librdf_new_uri(world, argv[1]);
+  uri=librdf_new_uri(world, (const unsigned char*)argv[1]);
   if(!uri) {
     fprintf(stderr, "%s: Failed to create URI\n", program);
     return(1);
@@ -96,9 +96,9 @@ main(int argc, char *argv[])
   librdf_free_parser(parser);
 
   
-  statement2=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/"),
-                                             librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/title"),
-                                             librdf_new_node_from_literal(world, "My Home Page", NULL, 0)
+  statement2=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/"),
+                                             librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/title"),
+                                             librdf_new_node_from_literal(world, (const unsigned char*)"My Home Page", NULL, 0)
                                              );
   librdf_model_add_statement(model, statement2);
 
@@ -115,8 +115,8 @@ main(int argc, char *argv[])
   /* Construct the query predicate (arc) and object (target) 
    * and partial statement bits
    */
-  subject=librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/");
-  predicate=librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/title");
+  subject=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/");
+  predicate=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/title");
   if(!subject || !predicate) {
     fprintf(stderr, "%s: Failed to create nodes for searching\n", program);
     return(1);

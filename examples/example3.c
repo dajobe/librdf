@@ -46,9 +46,9 @@ main(int argc, char *argv[])
   model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.'"), NULL);
 
   librdf_model_add_statement(model, 
-                             statement=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/"),
-                                                             librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/creator"),
-                                                             librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0)
+                             statement=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/"),
+                                                             librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"),
+                                                             librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0)
                                                              )
                              );
 
