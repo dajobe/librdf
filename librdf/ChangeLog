@@ -1,5 +1,14 @@
 2004-12-28  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_exec):
+	Turn fprintf to debug message.
+	(librdf_storage_sqlite_get_next_common): turn printing all column
+	data into debug messages.
+	(librdf_storage_sqlite_find_statements): Turn fprintf to debug
+	message.
+
+	* rdf_storage_sqlite.c: code style
+
 	* rdf_storage_sqlite.c (sqlite_construct_select_helper):
 	Added, to build serialise and find_statements query parts.
 	(librdf_storage_sqlite_serialise): Move most of query building into
