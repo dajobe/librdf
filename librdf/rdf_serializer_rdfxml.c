@@ -146,24 +146,17 @@ static void
 librdf_serializer_rdfxml_raptor_error_handler(void *data, const char *message, ...) 
 {
   librdf_world* world=(librdf_world*)data;
-  static const char *message_prefix=" - Raptor serializing error - ";
-  int prefix_len=strlen(message_prefix);
-  int message_len=strlen(message);
-  char *buffer;
   va_list arguments;
-
+  char *buffer;
+  
   va_start(arguments, message);
 
-  buffer=(char*)LIBRDF_MALLOC(cstring, prefix_len+message_len+1);
-  if(!buffer) {
-    fprintf(stderr, "librdf_serializer_rdfxml_raptor_error_handler: Out of memory\n");
-    return;
-  }
-  strncpy(buffer, message_prefix, prefix_len);
-  strcpy(buffer+prefix_len, message); /* want extra \0 - using strcpy */
+  buffer=raptor_vsnprintf(message, arguments);
 
-  librdf_error_varargs(world, buffer, arguments);
-  LIBRDF_FREE(cstring, buffer);
+  librdf_log_simple(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER,
+                    NULL, buffer);
+
+  raptor_free_memory(buffer);
 
   va_end(arguments);
 }
