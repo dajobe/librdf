@@ -30,15 +30,16 @@ librdf.h rdf_config.h rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_digest.h rdf_hash.h rdf_hash_gdbm.h \
 rdf_hash_list.h rdf_model.h rdf_storage.h rdf_iterator.h \
 rdf_context.h rdf_list.h rdf_hash_bdb.h rdf_storage.h rdf_storage_list.h \
-rdf_stream.h rdf_parser.h \
-example.c
+rdf_stream.h rdf_parser.h
+
 
 librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ 
 librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@
 
 EXTRA_librdf_a_SOURCES = md5.c rdf_hash_gdbm.c rdf_digest_openssl.c \
 rdf_hash_bdb.c \
-rdf_parser_sirpac.c rdf_parser_libwww.c
+rdf_parser_sirpac.c rdf_parser_libwww.c \
+example.c
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO \
