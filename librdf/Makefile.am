@@ -44,7 +44,7 @@ example.c example2.c
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO \
 README.html NEWS.html TODO.html \
-INSTALL.html LICENSE.html FAQS.html \
+INSTALL.html LICENSE.html FAQS.html BUGS.html \
 librdf-config.in \
 memcmp.c
 
