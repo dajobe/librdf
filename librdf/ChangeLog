@@ -1,4 +1,5 @@
 2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
 	* rdf_log.c: Replace librdf.h, raptor.h with redland.h.
 
 2004-07-09  Edd Dumbill <edd@usefulinc.com>
