@@ -87,7 +87,7 @@ fi
 
 if test -d $RAPTOR_DIR; then
   failed=no
-  for file in $RAPTOR_SRCS $RAPTOR_INCS: do
+  for file in $RAPTOR_SRCS $RAPTOR_INCS; do
     rfile=$RAPTOR_DIR/$file
     if test -r $rfile; then   
       rm -f $file
