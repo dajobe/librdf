@@ -804,9 +804,10 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
 /**
  * librdf_hash_memory_exists - Test the existence of a key in the hash
  * @context: memory hash context
- * @key: pointer to key to store
+ * @key: key
+ * @value: value
  * 
- * Return value: non 0 if the key exists in the hash
+ * Return value: >0 if the key/value exists in the hash, 0 if not, <0 on failure
  **/
 static int
 librdf_hash_memory_exists(void* context, 
