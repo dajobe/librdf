@@ -148,7 +148,8 @@ rdf_serializer_rdfxml_print_as_xml_content(unsigned char *p, FILE *handle)
 
 
 static void
-librdf_serializer_rdfxml_raptor_error_handler(void *data, const char *message, ...) 
+librdf_serializer_rdfxml_raptor_error_handler(void *data, 
+                                              const char *message, ...) 
 {
   librdf_world* world=(librdf_world*)data;
   va_list arguments;
@@ -184,8 +185,9 @@ librdf_serializer_rdfxml_raptor_error_handler(void *data, const char *message, .
  * @value: attribute value
  * @handle: FILE* to print to
  * 
+ * Return value: non-0 on failure
  **/
-static void
+static int
 rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
                                           unsigned char *attr,
                                           unsigned char *value,
@@ -203,10 +205,13 @@ rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
   escaped_len=raptor_xml_escape_string(value, len,
                                        NULL, 0, '"',
                                        librdf_serializer_rdfxml_raptor_error_handler, world);
+  if(!escaped_len)
+    return 1;
 
   buffer=(unsigned char*)LIBRDF_MALLOC(cstring, 1 + attr_len + 2 + escaped_len + 1 +1);
   if(!buffer)
-    return;
+    return 1;
+
   p=buffer;
   *p++=' ';
   strncpy((char*)p, (const char*)attr, attr_len);
@@ -222,6 +227,8 @@ rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
   
   fputs((const char*)buffer, handle);
   LIBRDF_FREE(cstring, buffer);
+
+  return 0;
 }
 
 
@@ -231,8 +238,9 @@ rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
  * @statement: &librdf_statement to print
  * @handle: FILE* to print to
  * 
+ * Return value: non-0 on failure
  **/
-static void
+static int
 librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *context,
                                             librdf_statement * statement,
                                             FILE *handle) 
@@ -248,6 +256,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   int i;
   char* nsprefix="ns0";
   unsigned char *content;
+  int rc;
 
   rdf_ns_uri=librdf_uri_as_counted_string(librdf_concept_ms_namespace_uri, &rdf_ns_uri_len);
   
@@ -286,7 +295,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 
         if(!name) {
           librdf_serializer_warning(context->serializer, "Cannot split predicate URI %s into an XML qname - skipping statement", uris[1]);
-          return;
+          return 1;
         }
 
       }
@@ -296,19 +305,24 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 
   fputs("  <rdf:Description", handle);
 
-
+  rc=0;
   /* subject */
   if(librdf_node_get_type(nodes[0]) == LIBRDF_NODE_TYPE_BLANK)
-    rdf_serializer_rdfxml_print_xml_attribute(world, 
-                                              (unsigned char*)"rdf:nodeID", 
-                                              librdf_node_get_blank_identifier(nodes[0]),
-                                              handle);
+    rc=rdf_serializer_rdfxml_print_xml_attribute(world, 
+                                                 (unsigned char*)"rdf:nodeID", 
+                                                 librdf_node_get_blank_identifier(nodes[0]),
+                                                 handle);
   else
-    rdf_serializer_rdfxml_print_xml_attribute(world,
-                                              (unsigned char*)"rdf:about", 
-                                              uris[0], handle);
+    rc=rdf_serializer_rdfxml_print_xml_attribute(world,
+                                                 (unsigned char*)"rdf:about", 
+                                                 uris[0], handle);
+  if(rc) {
+    fputs("/>\n", handle);
+    return 1;
+  }
 
   fputs(">\n", handle);
+
 
   fputs("    <", handle);
   fputs(nsprefix, handle);
@@ -328,10 +342,13 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
     escaped_len=raptor_xml_escape_string(uris[1], len,
                                          NULL, 0, '"', 
                                          librdf_serializer_rdfxml_raptor_error_handler, world);
+    if(!escaped_len)
+      return 1;
+
     /* " + string + " + \0 */
     buffer=(unsigned char*)LIBRDF_MALLOC(cstring, 1 + escaped_len + 1 + 1);
     if(!buffer)
-      return;
+      return 1;
 
     p=buffer;
     *p++='"';
@@ -348,11 +365,13 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 
   switch(librdf_node_get_type(nodes[2])) {
     case LIBRDF_NODE_TYPE_LITERAL:
-      if(librdf_node_get_literal_value_language(nodes[2]))
-        rdf_serializer_rdfxml_print_xml_attribute(world,
-                                                  (unsigned char*)"xml:lang",
-                                                  (unsigned char*)librdf_node_get_literal_value_language(nodes[2]),
-                                                  handle);
+      if(librdf_node_get_literal_value_language(nodes[2])) {
+        if(rdf_serializer_rdfxml_print_xml_attribute(world,
+                                                     (unsigned char*)"xml:lang",
+                                                     (unsigned char*)librdf_node_get_literal_value_language(nodes[2]),
+                                                     handle))
+          return 1;
+      }
 
       content=librdf_node_get_literal_value(nodes[2]);
       
@@ -362,11 +381,13 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
         fputs((const char*)content, handle);
       } else {
         librdf_uri *duri=librdf_node_get_literal_value_datatype_uri(nodes[2]);
-        if(duri)
-          rdf_serializer_rdfxml_print_xml_attribute(world, 
-                                                    (unsigned char*)"rdf:datatype",
-                                                    librdf_uri_as_string(duri),
-                                                    handle);
+        if(duri) {
+          if(rdf_serializer_rdfxml_print_xml_attribute(world, 
+                                                       (unsigned char*)"rdf:datatype",
+                                                       librdf_uri_as_string(duri),
+                                                       handle))
+            return 1;
+        }
 
         fputc('>', handle);
 
@@ -380,17 +401,19 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
       fputc('>', handle);
       break;
     case LIBRDF_NODE_TYPE_BLANK:
-      rdf_serializer_rdfxml_print_xml_attribute(world, 
-                                                (unsigned char*)"rdf:nodeID",
-                                                librdf_node_get_blank_identifier(nodes[2]), handle);
+      if(rdf_serializer_rdfxml_print_xml_attribute(world, 
+                                                   (unsigned char*)"rdf:nodeID",
+                                                   librdf_node_get_blank_identifier(nodes[2]), handle))
+        return 1;
       fputs("/>", handle);
       break;
 
     case LIBRDF_NODE_TYPE_RESOURCE:
       /* must be URI */
-      rdf_serializer_rdfxml_print_xml_attribute(world,
-                                                (unsigned char*)"rdf:resource",
-                                                uris[2], handle);
+      if(rdf_serializer_rdfxml_print_xml_attribute(world,
+                                                   (unsigned char*)"rdf:resource",
+                                                   uris[2], handle))
+        return 1;
       fputs("/>", handle);
       break;
       
@@ -398,12 +421,14 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
       librdf_log(statement->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
                  "Do not know how to serialize node type %d\n", librdf_node_get_type(nodes[2]));
-      return;
+      return 1;
   }
 
   fputc('\n', handle);
 
   fputs("  </rdf:Description>\n", handle);
+
+  return 0;
 }
 
 
