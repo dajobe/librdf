@@ -1,6 +1,6 @@
 # -*- Mode: Makefile -*-
 #
-# Makefile.am - top level automake file for librdf
+# Makefile.am - top level automake file for Redland
 #
 # $Id$
 #

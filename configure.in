@@ -1,6 +1,6 @@
 dnl -*- Mode: sh -*-
 dnl
-dnl configure.in - top level autoconf file for librdf
+dnl configure.in - top level autoconf file for Redland
 dnl (Process this file with autoconf to produce a configure script.)
 dnl
 dnl $Id$
