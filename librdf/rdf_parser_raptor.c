@@ -325,6 +325,19 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
 }
 
 
+static const unsigned char*
+librdf_parser_raptor_generate_id_handler(void *user_data,
+                                         raptor_genid_type type,
+                                         const unsigned char *user_bnodeid) 
+{
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)user_data;
+  if(user_bnodeid)
+    return user_bnodeid;
+  else
+    return librdf_world_get_genid(pcontext->parser->world);
+}
+
+
 /**
  * librdf_parser_raptor_parse_file_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: parser context
@@ -364,6 +377,10 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
                            librdf_parser_raptor_error_handler);
   raptor_set_warning_handler(rdf_parser, scontext,
                              librdf_parser_raptor_warning_handler);
+
+  raptor_set_generate_id_handler(rdf_parser, pcontext,
+                                 librdf_parser_raptor_generate_id_handler);
+  
   
   scontext->rdf_parser=rdf_parser;
 
@@ -470,6 +487,10 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
                            librdf_parser_raptor_error_handler);
   raptor_set_warning_handler(rdf_parser, scontext,
                              librdf_parser_raptor_warning_handler);
+
+  raptor_set_generate_id_handler(rdf_parser, pcontext,
+                                 librdf_parser_raptor_generate_id_handler);
+  
   
   scontext->rdf_parser=rdf_parser;
 
@@ -612,6 +633,10 @@ librdf_parser_raptor_parse_into_model_common(void *context,
                            librdf_parser_raptor_error_handler);
   raptor_set_warning_handler(rdf_parser, scontext,
                              librdf_parser_raptor_warning_handler);
+
+  raptor_set_generate_id_handler(rdf_parser, pcontext,
+                                 librdf_parser_raptor_generate_id_handler);
+  
   
   scontext->rdf_parser=rdf_parser;
   scontext->pcontext=pcontext;
