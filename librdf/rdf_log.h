@@ -51,6 +51,7 @@ typedef enum {
  */
 typedef enum {
   LIBRDF_FROM_NONE = 0,
+  LIBRDF_FROM_CONCEPTS,
   LIBRDF_FROM_DIGEST,
   LIBRDF_FROM_FILES,
   LIBRDF_FROM_HASH,
@@ -58,6 +59,7 @@ typedef enum {
   LIBRDF_FROM_ITERATOR,
   LIBRDF_FROM_LIST,
   LIBRDF_FROM_MODEL,
+  LIBRDF_FROM_NODE,
   LIBRDF_FROM_PARSER,
   LIBRDF_FROM_QUERY,
   LIBRDF_FROM_SERIALIZER,
@@ -103,7 +105,7 @@ typedef void (*librdf_log_level_func)(void *user_data, const char *message, va_l
  *
  * Return value: non-zero to indicate log message has been handled 
  */
-typedef int (*librdf_log_func)(void *user_data, librdf_log_message *log);
+typedef int (*librdf_log_func)(void *user_data, librdf_log_message *message);
   
 void librdf_log_set_level(librdf_world* world, librdf_log_level level);
 void librdf_log_set_handler(librdf_world* world, void *user_data, librdf_log_func handler);
