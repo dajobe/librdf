@@ -179,12 +179,6 @@ AC_CHECK_SIZEOF(unsigned long long, 8)
 dnl Checks for libraries.
 
 
-STORAGE_OBJS=
-
-store_modules="memory"
-persistent_store=no
-
-
 dnl Berkeley DB
 AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area (default=/usr)], bdb_prefix="$withval", bdb_prefix="none") 
 AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (default=/usr/lib)], bdb_lib_dir="$withval", bdb_lib_dir="none") 
@@ -383,7 +377,7 @@ LIBS="$LIBRDF_LIBS"
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h getopt.h)
+AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h getopt.h sqlite.h)
 AC_HEADER_TIME
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -630,6 +624,47 @@ else
 fi
 
 
+dnl hashes
+HASH_OBJS=
+HASH_SRCS=
+
+AC_MSG_CHECKING(for bdb hash support)
+if test "$have_libdb" = yes; then
+  AC_MSG_RESULT(yes);
+  AC_DEFINE(HAVE_BDB_HASH, 1, [Have BDB hash support])
+  HASH_OBJS="$HASH_OBJS rdf_hash_bdb.lo"
+  HASH_SRCS="$HASH_SRCS rdf_hash_bdb.c"
+else
+  AC_MSG_RESULT(no);
+fi
+
+
+AC_SUBST(HASH_OBJS)
+AC_SUBST(HASH_SRCS)
+
+
+dnl Storages
+persistent_storages="/file/tstore/mysql/sqlite/"
+persistent_store=no
+all_storages="memory file hashes mysql sqlite tstore"
+always_available_storages="memory file hashes"
+
+dnl default availabilities and enablements
+for storage in $all_storages; do
+  eval $storage'_storage_available=no'
+  eval $storage'_storage=no'
+done
+for storage in $always_available_storages; do
+  eval $storage'_storage_available=yes'
+  eval $storage'_storage=yes'
+done
+
+
+storages_available="file hashes(memory)"
+if test "$have_libdb" = yes; then
+  storages_available="$storages_available hashes(bdb $bdb_version)"
+fi
+
 AC_ARG_WITH(threestore, [  --with-threestore(=CONFIG|yes|no)  Location of 3store-config (default=auto)], tstore_config="$withval", tstore_config="")
 if test "X$tstore_config" != "Xno"; then
   if test "X$tstore_config" != "Xyes" ; then
@@ -644,14 +679,10 @@ fi
 AC_MSG_CHECKING(for 3store library)
 if test "X$TSTORE_CONFIG" != X -a "X$PKG_CONFIG" != X ; then
   tstore_version=`$TSTORE_CONFIG --version`
-  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
-  LIBRDF_LIBS="$LIBRDF_LIBS `$TSTORE_CONFIG --libs` `$PKG_CONFIG glib --libs`"
 
-  AC_DEFINE(HAVE_TSTORE, 1, [Have 3store available])
+  storages_available="$storages_available 3store($tstore_version)"
+  tstore_storage_available=yes
 
-  STORAGE_OBJS="$STORAGE_OBJS rdf_storage_tstore.lo"
-  store_modules="$store_modules 3store($tstore_version)"
-  persistent_store=yes
   AC_MSG_RESULT(yes - version $tstore_version)
 else
   AC_MSG_RESULT(no)
@@ -669,7 +700,7 @@ if test $mysql_config = yes -a "X$MYSQL_CONFIG" = "X" ; then
   AC_CHECK_PROGS(MYSQL_CONFIG, mysql_config)
 fi
 
-libmysql_min_version=3.23.58
+libmysql_min_version=3.23.56
 # Also tested on 4.0.14
 
 if test "X$MYSQL_CONFIG" != X; then
@@ -683,19 +714,90 @@ if test "X$MYSQL_CONFIG" != X; then
   if test $libmysql_version_dec -lt $libmysql_min_version_dec; then
     AC_MSG_WARN(Using libmysql $LIBMYSQL_VERSION is unsupported - $libmysql_min_version or newer recommended.)
   else
-    LIBRDF_LIBS="$LIBRDF_LIBS `$MYSQL_CONFIG --libs|sed -e "s/'//g"`"
-    LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$MYSQL_CONFIG --cflags|sed -e "s/'//g"`"
-
-    AC_DEFINE(HAVE_MYSQL,1,[MySQL libraries are present])
-    have_libmysql=yes
-
-    STORAGE_OBJS="$STORAGE_OBJS rdf_storage_mysql.lo"
-    store_modules="$store_modules mysql($LIBMYSQL_VERSION)"
-    persistent_store=yes
+    storages_available="$storages_available mysql($LIBMYSQL_VERSION)"
+    mysql_storage_available=yes
   fi
 fi
 
-AC_SUBST(STORAGE_OBJS)
+
+AC_MSG_CHECKING(for sqlite support)
+if test "$ac_cv_header_sqlite_h" = yes; then
+  AC_MSG_RESULT(yes);
+
+  storages_available="$storages_available sqlite"
+  sqlite_storage_available=yes
+else
+  AC_MSG_RESULT(no);
+fi
+
+
+# This is needed because autoheader can't work out which computed
+# symbols must be pulled from acconfig.h into config.h.in
+if test "x" = "y"; then
+  AC_DEFINE(STORAGE_FILE,   1, [Building file storage])
+  AC_DEFINE(STORAGE_HASHES, 1, [Building hashes storage])
+  AC_DEFINE(STORAGE_MEMORY, 1, [Building memory storage])
+  AC_DEFINE(STORAGE_MYSQL,  1, [Building MySQL storage])
+  AC_DEFINE(STORAGE_SQLITE, 1, [Building SQLite storage])
+  AC_DEFINE(STORAGE_TSTORE, 1, [Building 3store storage])
+fi
+
+
+AC_MSG_CHECKING(storages required)
+AC_ARG_ENABLE(storages, [  --enable-storages=LIST   Use storages (default=all)], storages="$enableval") 
+if test "X$storages" = Xall -o "X$storages" = X; then
+  storages="$all_storages"
+  AC_MSG_RESULT(all)
+else
+  AC_MSG_RESULT($storages)
+fi
+
+dnl absolutely ensuring memory is enabled
+if echo $storages | grep memory >/dev/null; then
+ :
+else
+  storages="memory $storages"
+fi
+
+for storage in $storages; do
+  if eval test \$$storage'_storage_available' = yes; then
+    eval $storage'_storage=yes'
+    NAME=`echo $storage | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
+    n=STORAGE_${NAME}
+    AC_DEFINE_UNQUOTED($n)
+    storages_enabled="$storages_enabled $storage"
+
+    if echo $persistent_storages | grep "/$storage/" >/dev/null; then
+      persistent_store=yes
+    fi
+  fi
+
+done
+
+AM_CONDITIONAL(STORAGE_FILE,   test $file_storage   = yes)
+AM_CONDITIONAL(STORAGE_HASHES, test $hashes_storage = yes)
+AM_CONDITIONAL(STORAGE_MEMORY, test $memory_storage = yes)
+AM_CONDITIONAL(STORAGE_MYSQL,  test $mysql_storage  = yes)
+AM_CONDITIONAL(STORAGE_SQLITE, test $sqlite_storage = yes)
+AM_CONDITIONAL(STORAGE_TSTORE, test $tstore_storage = yes)
+
+if test $mysql_storage  = yes; then
+  LIBRDF_LIBS="$LIBRDF_LIBS `$MYSQL_CONFIG --libs|sed -e "s/'//g"`"
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$MYSQL_CONFIG --cflags|sed -e "s/'//g"`"
+fi
+if test $sqlite_storage  = yes; then
+  LIBRDF_LIBS="$LIBRDF_LIBS -lsqlite"
+fi
+if test $tstore_storage  = yes; then
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
+  LIBRDF_LIBS="$LIBRDF_LIBS `$TSTORE_CONFIG --libs` `$PKG_CONFIG glib --libs`"
+fi
+
+
+if test "$persistent_store" = no; then
+  AC_MSG_WARN(No persistant storage is available or enabled)
+fi
+
 
 
 CPPFLAGS="$LIBRDF_CPPFLAGS"
@@ -754,32 +856,6 @@ if test "x" = "y"; then
   AC_DEFINE(HAVE_LOCAL_MD5_DIGEST, 1, [Have local MD5 digest])
   AC_DEFINE(HAVE_LOCAL_SHA1_DIGEST, 1, [Have local SHA1 digest])
   AC_DEFINE(HAVE_LOCAL_RIPEMD160_DIGEST, 1, [Have local RIPEMD160 digest])
-fi
-
-
-HASH_OBJS=
-HASH_SRCS=
-
-store_modules="$store_modules hashes(memory)"
-AC_MSG_CHECKING(for bdb hash support)
-if test "$have_libdb" = yes; then
-  AC_MSG_RESULT(yes);
-  AC_DEFINE(HAVE_BDB_HASH, 1, [Have BDB hash support])
-  HASH_OBJS="$HASH_OBJS rdf_hash_bdb.lo"
-  HASH_SRCS="$HASH_SRCS rdf_hash_bdb.c"
-  store_modules="$store_modules hashes(bdb $bdb_version)"
-  persistent_store=yes
-else
-  AC_MSG_RESULT(no);
-fi
-
-
-AC_SUBST(HASH_OBJS)
-AC_SUBST(HASH_SRCS)
-
-
-if test "$persistent_store" = no; then
-  AC_MSG_WARN(No persistant storage available)
 fi
 
 
@@ -903,9 +979,10 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 Redland build summary:
-  Berkeley/Sleepycat DB:  $bdb_available
-  Triple stores:          $store_modules
-  RDF parsers:           $rdf_parsers_available
-  RDF query:              $rdf_query
-  Content digests:       $digest_modules_available
+  Berkeley/Sleepycat DB   : $bdb_available
+  Triple stores available : $storages_available
+  Triple stores enabled   :$storages_enabled
+  RDF parsers             :$rdf_parsers_available
+  RDF query               : $rdf_query
+  Content digests         :$digest_modules_available
 ])
