@@ -36,10 +36,11 @@ typedef struct
 
 
 /* prototypes for local functions */
-static int rdf_hash_gdbm_open(void* context, char *identifier, void *mode, void *options);
+static int rdf_hash_gdbm_open(void* context, char *identifier, void *mode, rdf_hash* options);
 static int rdf_hash_gdbm_close(void* context);
 static int rdf_hash_gdbm_get(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigned int flags);
 static int rdf_hash_gdbm_put(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigned int flags);
+static int rdf_hash_gdbm_exists(void* context, rdf_hash_data *key);
 static int rdf_hash_gdbm_delete(void* context, rdf_hash_data *key);
 static int rdf_hash_gdbm_get_seq(void* context, rdf_hash_data *key, unsigned int flags);
 static int rdf_hash_gdbm_sync(void* context);
@@ -51,7 +52,7 @@ static void rdf_hash_gdbm_register_factory(rdf_hash_factory *factory);
 /* functions implementing hash api */
 
 static int
-rdf_hash_gdbm_open(void* context, char *identifier, void *mode, void *options) 
+rdf_hash_gdbm_open(void* context, char *identifier, void *mode, rdf_hash* options) 
 {
   rdf_hash_gdbm_context* gdbm_context=(rdf_hash_gdbm_context*)context;
   GDBM_FILE gdbm;
@@ -123,6 +124,20 @@ rdf_hash_gdbm_put(void* context, rdf_hash_data *key, rdf_hash_data *value, unsig
   /* flags can be GDBM_INSERT or GDBM_REPLACE */
   gdbm_store(gdbm_context->gdbm_file, gdbm_key, gdbm_data, GDBM_REPLACE);
   return 0;
+}
+
+
+static int
+rdf_hash_gdbm_exists(void* context, rdf_hash_data *key) 
+{
+  rdf_hash_gdbm_context* gdbm_context=(rdf_hash_gdbm_context*)context;
+  datum gdbm_key;
+
+  /* Initialise GDBM version of key */
+  gdbm_key.dptr = (char*)key->data;
+  gdbm_key.dsize = key->size;
+  
+  return gdbm_exists(gdbm_context->gdbm_file, gdbm_key);
 }
 
 
@@ -214,6 +229,7 @@ rdf_hash_gdbm_register_factory(rdf_hash_factory *factory)
   factory->close   = rdf_hash_gdbm_close;
   factory->get     = rdf_hash_gdbm_get;
   factory->put     = rdf_hash_gdbm_put;
+  factory->exists  = rdf_hash_gdbm_exists;
   factory->delete_key  = rdf_hash_gdbm_delete;
   factory->get_seq = rdf_hash_gdbm_get_seq;
   factory->sync    = rdf_hash_gdbm_sync;
