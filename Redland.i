@@ -456,8 +456,8 @@ librdf_stream* librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* 
 int librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri, librdf_model* model);
 librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const char *string, librdf_uri* base_uri);
 int librdf_parser_parse_string_into_model(librdf_parser* parser, const char *string, librdf_uri* base_uri, librdf_model* model);
-const char *librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
-int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, const char *value);
+librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
+int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, librdf_node* value);
 
 /* rdf_serializer.h */
 librdf_serializer* librdf_new_serializer(librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri);
