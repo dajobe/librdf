@@ -295,7 +295,7 @@ int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, librdf
 %newobject librdf_new_query;
 %newobject librdf_new_query_from_query;
 
-librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const char *query_string);
+librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const char *query_string, librdf_uri *base_uri);
 librdf_query* librdf_new_query_from_query (librdf_query* old_query);
 void librdf_free_query(librdf_query *query);
 
