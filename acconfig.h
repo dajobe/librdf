@@ -73,6 +73,10 @@
 #undef NEED_EXPAT
 #undef NEED_LIBXML
 
+/* Raptor can use either expat or libxml */
+#undef RAPTOR_XML_EXPAT
+#undef RAPTOR_XML_LIBXML
+
 /* expat compiled with namespaces? */
 #undef HAVE_XML_SetNamespaceDeclHandler
 
