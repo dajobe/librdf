@@ -163,6 +163,7 @@ librdf_query_register_factory(librdf_world *world, const char *name,
 
 /**
  * librdf_get_query_factory - Get a query factory by name
+ * @world: redland world object
  * @name: the factory name or NULL for the default factory
  * @uri: the factory URI or NULL for the default factory
  * 
