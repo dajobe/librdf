@@ -31,6 +31,7 @@
 typedef struct 
 {
   GDBM_FILE gdbm_file;
+  char* file_name;
   datum current_key;
 } rdf_hash_gdbm_context;
 
@@ -56,12 +57,21 @@ rdf_hash_gdbm_open(void* context, char *identifier, void *mode, rdf_hash* option
 {
   rdf_hash_gdbm_context* gdbm_context=(rdf_hash_gdbm_context*)context;
   GDBM_FILE gdbm;
+  char *file;
 
-  gdbm=gdbm_open(identifier, 512, GDBM_WRCREAT, 0644, 0);
-  if(!gdbm)
+  file=(char*)RDF_MALLOC(cstring, strlen(identifier)+6);
+  if(!file)
     return 1;
+  sprintf(file, "%s.gdbm", identifier);
+  
+  gdbm=gdbm_open(file, 512, GDBM_WRCREAT, 0644, 0);
+  if(!gdbm) {
+    RDF_FREE(cstring, file);
+    return 1;
+  }
 
   gdbm_context->gdbm_file=gdbm;
+  gdbm_context->file_name=file;
   return 0;
 }
 
@@ -70,6 +80,7 @@ rdf_hash_gdbm_close(void* context)
 {
   rdf_hash_gdbm_context* gdbm_context=(rdf_hash_gdbm_context*)context;
   gdbm_close(gdbm_context->gdbm_file);
+  RDF_FREE(cstring, gdbm_context->file_name);
   return 0;
 }
 
