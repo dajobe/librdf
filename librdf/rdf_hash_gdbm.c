@@ -57,7 +57,7 @@ static int librdf_hash_gdbm_open(void* context, char *identifier, void *mode,
                                  librdf_hash* options);
 static int librdf_hash_gdbm_close(void* context);
 static int librdf_hash_gdbm_put(void* context, librdf_hash_datum *key,
-                                librdf_hash_datum *data, unsigned int flags);
+                                librdf_hash_datum *data);
 static int librdf_hash_gdbm_exists(void* context, librdf_hash_datum *key);
 static int librdf_hash_gdbm_delete(void* context, librdf_hash_datum *key);
 static int librdf_hash_gdbm_sync(void* context);
@@ -270,7 +270,7 @@ librdf_hash_gdbm_cursor_finish(void* context)
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_gdbm_put(void* context, librdf_hash_datum *key, librdf_hash_datum *value, unsigned int flags) 
+librdf_hash_gdbm_put(void* context, librdf_hash_datum *key, librdf_hash_datum *value) 
 {
   librdf_hash_gdbm_context* gdbm_context=(librdf_hash_gdbm_context*)context;
   datum gdbm_data;

@@ -89,7 +89,7 @@ static void librdf_hash_bdb_cursor_finish(void* context);
 /* prototypes for local functions */
 static int librdf_hash_bdb_open(void* context, char *identifier, void *mode, librdf_hash* options);
 static int librdf_hash_bdb_close(void* context);
-static int librdf_hash_bdb_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data, unsigned int flags);
+static int librdf_hash_bdb_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 static int librdf_hash_bdb_exists(void* context, librdf_hash_datum *key);
 static int librdf_hash_bdb_delete(void* context, librdf_hash_datum *key);
 static int librdf_hash_bdb_sync(void* context);
@@ -467,13 +467,12 @@ librdf_hash_bdb_cursor_finish(void* context)
  * @context: BerkeleyDB hash context
  * @key: pointer to key to store
  * @value: pointer to value to store
- * @flags: flags (not used at present)
  * 
  * Return value: non 0 on failure
  **/
 static int
 librdf_hash_bdb_put(void* context, librdf_hash_datum *key, 
-                    librdf_hash_datum *value, unsigned int flags) 
+                    librdf_hash_datum *value) 
 {
   librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;

@@ -102,7 +102,7 @@ static void librdf_hash_memory_cursor_finish(void* context);
 
 static int librdf_hash_memory_open(void* context, char *identifier, void *mode, librdf_hash* options);
 static int librdf_hash_memory_close(void* context);
-static int librdf_hash_memory_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data, unsigned int flags);
+static int librdf_hash_memory_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 static int librdf_hash_memory_exists(void* context, librdf_hash_datum *key);
 static int librdf_hash_memory_delete(void* context, librdf_hash_datum *key);
 static int librdf_hash_memory_sync(void* context);
@@ -301,7 +301,7 @@ librdf_hash_memory_close(void* context)
 	}
       }
     }
-    LIBRDF_FREE(librdf_hash_memory_node_array, hash->nodes);
+    LIBRDF_FREE(librdf_hash_memory_nodes, hash->nodes);
   }
   return 0;
 }
@@ -498,13 +498,12 @@ librdf_hash_memory_cursor_finish(void* context)
  * @context: memory hash context
  * @key: pointer to key to store
  * @value: pointer to value to store
- * @flags: flags (not used at present)
  * 
  * Return value: non 0 on failure
  **/
 static int
 librdf_hash_memory_put(void* context, librdf_hash_datum *key, 
-		       librdf_hash_datum *value, unsigned int flags) 
+		       librdf_hash_datum *value) 
 {
   librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
   librdf_hash_memory_node *node;
