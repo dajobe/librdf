@@ -126,7 +126,9 @@ TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test
 
-CLEANFILES=$(TESTS) test example1 example2 example3 example4
+EXAMPLES=example1 example2 example3 example4
+
+CLEANFILES=$(TESTS) $(EXAMPLES)
 
 # Memory debugging alternatives
 MEM=@MEM@
@@ -187,6 +189,8 @@ rdf_files_test: rdf_files.c librdf.a
 
 rdf_heuristics_test: rdf_heuristics.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_heuristics.c librdf.a $(LIBS)
+
+examples: $(EXAMPLES)
 
 example1: example1.c librdf.a
 	$(LINK) -I$(srcdir) -I. $(srcdir)/example1.c librdf.a $(LIBS)
