@@ -59,6 +59,7 @@ struct librdf_node_s
 {
   librdf_world *world;
   librdf_node_type type;
+  int usage;
   union 
   {
     struct
@@ -79,12 +80,11 @@ struct librdf_node_s
 
       /* Language of literal (xml:lang) */
       char *xml_language;
+
+      /* Hash key & size */
+      unsigned char *key;
+      size_t size;
     } literal;
-    struct 
-    {
-      /* rdf:li and rdf:_-s have an ordinal */ 
-      int ordinal;
-    } li;
     struct 
     {
       /* blank nodes have an identifier */
