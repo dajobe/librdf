@@ -694,8 +694,8 @@ for parser in $parser_modules; do
     PARSER_SRCS="$PARSER_SRCS rdf_parser_$parser.c"
 
     if test $parser = raptor; then
-      LIBRDF_CPPFLAGS="-I\$(top_srcdir)/raptor $LIBRDF_CPPFLAGS"
-      LIBRDF_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_LIBS"
+      LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor $LIBRDF_INTERNAL_CPPFLAGS"
+      LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_INTERNAL_LIBS"
     fi
 
     n=HAVE_${uname}_RDF_PARSER
@@ -967,7 +967,7 @@ fi
 if test $need_repat = 1; then
   # Always have local copy
   SD="$SD repat"
-  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/repat $LIBRDF_INTERNAL_CFLAGS"
+  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir) $LIBRDF_INTERNAL_CPPFLAGS"
   LIBRDF_INTERNAL_LIBS="\$(top_builddir)/repat/librepat.la $LIBRDF_INTERNAL_LIBS"
 fi
 
