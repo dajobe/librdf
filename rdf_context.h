@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_context.h - RDF Statement Context definition
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -25,7 +25,9 @@
 extern "C" {
 #endif
 
-typedef char  librdf_context;
+struct librdf_context_s {
+  char dummy;
+};
 
 #ifdef __cplusplus
 }
