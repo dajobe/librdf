@@ -34,6 +34,7 @@ struct librdf_stream_s {
   librdf_world *world;
   void *context;
   int is_finished; /* 1 when have no more statements */
+  int is_updated; /* 1 when we know there is a current item */
   
   /* Used when mapping */
   librdf_statement *current;
