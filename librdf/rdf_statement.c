@@ -380,7 +380,7 @@ librdf_statement_print(librdf_statement *statement, FILE *fh)
  * @statement1: first &librdf_statement
  * @statement2: second &librdf_statement
  * 
- * Return value: 0 if statements are different.
+ * Return value: non 0 if statements are equal
  **/
 int
 librdf_statement_equals(librdf_statement* statement1, 
