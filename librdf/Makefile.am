@@ -47,7 +47,8 @@ rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
 rdf_files.h \
 rdf_storage_list.h rdf_storage_hashes.h rdf_utf8.h \
 rdf_query.h \
-rdf_query_triples.h
+rdf_query_triples.h \
+rdf_serializer.h
 
 JAVA_CLASSES=@JAVA_CLASSES@
 pkgdata_DATA = $(JAVA_CLASSES)
@@ -62,6 +63,8 @@ rdf_stream.c \
 rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
 rdf_query.c \
 rdf_query_triples.c \
+rdf_serializer.c \
+rdf_serializer_raptor.c \
 redland.h librdf.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
@@ -74,7 +77,9 @@ rdf_stream.h \
 rdf_parser.h \
 rdf_heuristics.h rdf_files.h rdf_utf8.h \
 rdf_query.h \
-rdf_query_triples.h
+rdf_query_triples.h \
+rdf_serializer.h \
+rdf_serializer_raptor.h
 
 librdf_la_LIBADD = @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @XML_OBJS@
