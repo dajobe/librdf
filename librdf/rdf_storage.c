@@ -110,6 +110,7 @@ librdf_delete_storage_factories(void)
   for(factory=storages; factory; factory=next) {
     next=factory->next;
     LIBRDF_FREE(librdf_storage_factory, factory->name);
+    LIBRDF_FREE(librdf_storage_factory, factory->label);
     LIBRDF_FREE(librdf_storage_factory, factory);
   }
   storages=NULL;
@@ -121,15 +122,17 @@ librdf_delete_storage_factories(void)
 /**
  * librdf_storage_register_factory - Register a storage factory
  * @name: the storage factory name
+ * @label: the storage factory label
  * @factory: pointer to function to call to register the factory
  * 
  **/
 void
-librdf_storage_register_factory(const char *name,
+librdf_storage_register_factory(const char *name, const char *label,
 				void (*factory) (librdf_storage_factory*)) 
 {
   librdf_storage_factory *storage, *h;
   char *name_copy;
+  char *label_copy;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for storage %s\n", name);
@@ -157,6 +160,14 @@ librdf_storage_register_factory(const char *name,
     }
   }
   
+  label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+  if(!label_copy) {
+    LIBRDF_FREE(librdf_storage, storage);
+    LIBRDF_FATAL1(world, "Out of memory");
+  }
+  strcpy(label_copy, label);
+  storage->label=label_copy;
+        
   /* Call the storage registration function on the new object */
   (*factory)(storage);
   
@@ -203,6 +214,37 @@ librdf_get_storage_factory (const char *name)
   return factory;
 }
 
+
+/**
+ * librdf_storage_enumerate - Get information on storages
+ * @counter: index into the list of storages
+ * @name: pointer to store the name of the storage (or NULL)
+ * @label: pointer to store syntax readable label (or NULL)
+ * 
+ * Return value: non 0 on failure of if counter is out of range
+ **/
+int
+librdf_storage_enumerate(const unsigned int counter,
+                         const char **name, const char **label)
+{
+  unsigned int i;
+  librdf_storage_factory *factory=storages;
+
+  if(!factory || counter < 0)
+    return 1;
+
+  for(i=0; factory && i<=counter ; i++, factory=factory->next) {
+    if(i == counter) {
+      if(name)
+        *name=factory->name;
+      if(label)
+        *label=factory->label;
+      return 0;
+    }
+  }
+        
+  return 1;
+}
 
 
 /**
