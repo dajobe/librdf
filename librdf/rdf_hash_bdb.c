@@ -206,6 +206,9 @@ librdf_hash_bdb_open(void* context, char *identifier,
   flags=is_writable ? DB_CREATE : DB_RDONLY;
   if(is_new)
     flags |= DB_TRUNCATE;
+#endif
+
+#if defined(HAVE_BDB_OPEN_6_ARGS) || defined(HAVE_BDB_OPEN_7_ARGS)
 
 #ifdef HAVE_BDB_OPEN_6_ARGS  
 /* 
@@ -219,7 +222,8 @@ librdf_hash_bdb_open(void* context, char *identifier,
     return 1;
   }
 #else
-#ifdef HAVE_BDB_OPEN_7_ARGS  
+/* Must be HAVE_BDB_OPEN_7_ARGS */
+
 /* 
  * int DB->open(DB *db, DB_TXN *txnid, const char *file,
  *              const char *database, DBTYPE type, u_int32_t flags, int mode);
@@ -230,14 +234,6 @@ librdf_hash_bdb_open(void* context, char *identifier,
     LIBRDF_FREE(cstring, file);
     return 1;
   }
-#else
-  if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
-    librdf_error(bdb_context->hash->world, "BDB V3 open of '%s' failed - %s",
-                 file, db_strerror(ret));
-    LIBRDF_FREE(cstring, file);
-    return 1;
-  }
-#endif
 #endif
 
 #else
