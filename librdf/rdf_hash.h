@@ -44,7 +44,7 @@ void librdf_free_hash_datum(librdf_hash_datum *datum) ;
 /** A hash object */
 struct librdf_hash_s
 {
-  char *context;
+  void *context;
   struct librdf_hash_factory_s* factory;
 };
 
@@ -81,10 +81,11 @@ struct librdf_hash_factory_s {
   int (*get_fd)(void* context);
 
   /* create a cursor and operate on it */
-  int (*cursor_init)(void *context, librdf_hash* hash);
-#define LIBRDF_HASH_CURSOR_FIRST 0
-#define LIBRDF_HASH_CURSOR_NEXT 1
-#define LIBRDF_HASH_CURSOR_NEXT_VALUE 2
+  int (*cursor_init)(void *cursor_context, void* hash_context);
+#define LIBRDF_HASH_CURSOR_SET 0
+#define LIBRDF_HASH_CURSOR_NEXT_VALUE 1
+#define LIBRDF_HASH_CURSOR_FIRST 2
+#define LIBRDF_HASH_CURSOR_NEXT 3
   int (*cursor_get)(void *cursor, librdf_hash_datum *key, librdf_hash_datum *value, unsigned int flags);
   void (*cursor_finish)(void *context);
 };
@@ -143,6 +144,7 @@ int librdf_hash_get_fd(librdf_hash* hash);
 /* extra methods */
 void librdf_hash_print(librdf_hash* hash, FILE *fh);
 void librdf_hash_print_keys(librdf_hash* hash, FILE *fh);
+void librdf_hash_print_values(librdf_hash* hash, char *key, FILE *fh);
 
 /* import a hash from a string representation */
 int librdf_hash_from_string (librdf_hash* hash, char *string);
@@ -161,9 +163,10 @@ long librdf_hash_get_as_long (librdf_hash* hash, char *key);
 
 librdf_hash_cursor* librdf_new_hash_cursor (librdf_hash* hash);
 void librdf_free_hash_cursor (librdf_hash_cursor* cursor);
+int librdf_hash_cursor_set(librdf_hash_cursor *cursor, librdf_hash_datum *key,librdf_hash_datum *value);
+int librdf_hash_cursor_get_next_value(librdf_hash_cursor *cursor, librdf_hash_datum *key,librdf_hash_datum *value);
 int librdf_hash_cursor_get_first(librdf_hash_cursor *cursor, librdf_hash_datum *key, librdf_hash_datum *value);
 int librdf_hash_cursor_get_next(librdf_hash_cursor *cursor, librdf_hash_datum *key, librdf_hash_datum *value);
-int librdf_hash_cursor_get_next_value(librdf_hash_cursor *cursor, librdf_hash_datum *key,librdf_hash_datum *value);
 
 
 
