@@ -39,7 +39,7 @@ librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@
 EXTRA_librdf_a_SOURCES = md5.c rdf_hash_gdbm.c rdf_digest_openssl.c \
 rdf_hash_bdb.c \
 rdf_parser_sirpac.c rdf_parser_libwww.c \
-example.c
+example.c example2.c
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO \
@@ -83,6 +83,9 @@ rdf_storage_test: rdf_storage.c librdf.a
 
 example: example.c librdf.a
 	$(LINK) -I$(srcdir) -I. $(srcdir)/example.c librdf.a $(LIBS)
+
+example2: example2.c librdf.a
+	$(LINK) -I$(srcdir) -I. $(srcdir)/example2.c librdf.a $(LIBS)
 
 
 
