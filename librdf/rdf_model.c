@@ -437,7 +437,7 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
  * @predicate: &librdf_node of predicate
  * @literal: string literal content
  * @xml_language: language of literal
- * @datatype: datatype librdf_uri
+ * @datatype_uri: datatype &librdf_uri
  * 
  * After this method, the &librdf_node subject and predicate become
  * owned by the model.

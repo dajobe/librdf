@@ -45,7 +45,7 @@ static librdf_statement* librdf_stream_update_current_statement(librdf_stream* s
  * @is_end_method: pointer to function to test for end of stream
  * @next_method: pointer to function to move to the next statement in stream
  * @get_method: pointer to function to get the current statement
- * @finished: pointer to function to finish the stream.
+ * @finished_method: pointer to function to finish the stream.
  *
  * Creates a new stream with an implementation based on the passed in
  * functions.  The functions next_statement and end_of_stream will be called
@@ -277,7 +277,7 @@ librdf_stream_get_context(librdf_stream* stream)
 /**
  * librdf_stream_add_map - Add a librdf_stream mapping function
  * @stream: the stream
- * @fn: the function to operate
+ * @map_function: the function to perform the mapping
  * @free_context: the function to use to free the context (or NULL)
  * @map_context: the context to pass to the map function
  * 

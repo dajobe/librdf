@@ -155,6 +155,7 @@ static void librdf_storage_mysql_get_contexts_finished(void* context);
 /**
  * librdf_storage_mysql_hash:
  * @storage: the storage
+ * @type: character type of node to hash ("R", "L" or "B")
  * @string: a string to get hash for
  * @length: length of string
  *
@@ -475,7 +476,7 @@ librdf_storage_mysql_add_statement(librdf_storage* storage,
 /**
  * librdf_storage_mysql_add_statements:
  * @storage: the storage
- * @stream: the stream of statements
+ * @statement_stream: the stream of statements
  *
  * Add statements in stream to storage, without context.
  *
@@ -666,7 +667,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
  * librdf_storage_mysql_context_add_statements:
  * @storage: the storage
  * @context_node: &librdf_node object
- * @stream: the stream of statements
+ * @statement_stream: the stream of statements
  *
  * Add statements in stream to storage, with context.
  *
@@ -762,7 +763,7 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
 /**
  * librdf_storage_mysql_contains_statement:
  * @storage: the storage
- * @stream: a complete statement
+ * @statement: a complete statement
  *
  * Test if a given complete statement is present in the model.
  *

@@ -38,7 +38,7 @@
 #ifndef STANDALONE
 /**
  * librdf_heuristic_is_blank_node - try to guess if an node string is a blank node identifier
- * @object: string object to guess type
+ * @node: string object to guess type
  *
  * The guessing is done by assuming the object is a blank node if it matches
  * ^_: like N-Triples, N3 and related.
@@ -55,7 +55,7 @@ librdf_heuristic_is_blank_node(char *node)
 
 /**
  * librdf_heuristic_get_blank_node - get a blank node identifier from a node string
- * @object: string object to guess type
+ * @node: string object to guess type
  *
  * Picks the blank node identifier out of a string.  Looks for things
  * like _:ABC

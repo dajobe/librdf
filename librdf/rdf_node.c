@@ -338,7 +338,7 @@ librdf_new_node_from_literal(librdf_world *world,
 /**
  * librdf_new_node_from_typed_literal -  Constructor - create a new typed literal librdf_node object
  * @world: redland world object
- * @string: literal string value
+ * @value: literal string value
  * @xml_language: literal XML language (or NULL, empty string)
  * @datatype_uri: URI of typed literal datatype or NULL
  * 

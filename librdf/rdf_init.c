@@ -132,6 +132,9 @@ librdf_free_world(librdf_world *world)
 
 
 /**
+ * librdf_world_init_mutex - Create the world mutex
+ * @world: redland world object
+ *
  * Internal
  */
 void

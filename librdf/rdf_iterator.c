@@ -37,9 +37,10 @@ static void* librdf_iterator_update_current_element(librdf_iterator* iterator);
  * librdf_new_iterator - Constructor - create a new librdf_iterator object
  * @world: redland world object
  * @context: context to pass to the iterator functions
- * @is_end: function to call to see if the iteration has ended
- * @get_next: function to get the next element
- * @finished: function to destroy the iterator context (or NULL if not needed)
+ * @is_end_method: function to call to see if the iteration has ended
+ * @next_method: function to get the next element
+ * @get_method: function to get the next element
+ * @finished_method: function to destroy the iterator context (or NULL if not needed)
  * 
  * Return value: a new &librdf_iterator object or NULL on failure
 **/
@@ -325,7 +326,7 @@ librdf_iterator_get_value(librdf_iterator* iterator)
 /**
  * librdf_iterator_add_map - Add a librdf_iterator mapping function
  * @iterator: the iterator
- * @fn: the function to operate
+ * @map_function: the function to operate
  * @free_context: the function to use to free the context (or NULL)
  * @map_context: the context to pass to the map function
  * 
