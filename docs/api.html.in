@@ -16,7 +16,7 @@ Reference Manual</h1>
 <h2>Introduction</h2>
 
 <p>This document describes the APIs provided by
-<a href="http://www.redland.opensource.ac.uk/">Redland</a> to use the RDF
+<a href="http://librdf.org/">Redland</a> to use the RDF
 model; manipulate statements, resources, predicates and objects in the model;
 parse RDF/XML syntax, query and store the models.</p>
 

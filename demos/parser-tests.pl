@@ -4,18 +4,23 @@
 #
 # $Id$
 #
-# Copyright (C) 2001-2003 David Beckett - http://purl.org/net/dajobe/
-# Institute for Learning and Research Technology - http://www.ilrt.org/
-# University of Bristol - http://www.bristol.ac.uk/
+# Copyright (C) 2001-2004, David Beckett http://purl.org/net/dajobe/
+# Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
+# University of Bristol, UK http://www.bristol.ac.uk/
 # 
-# This package is Free Software or Open Source available under the
-# following licenses (these are alternatives):
-#   1. GNU Lesser General Public License (LGPL)
-#   2. GNU General Public License (GPL)
-#   3. Mozilla Public License (MPL)
+# This package is Free Software and part of Redland http://librdf.org/
+# 
+# It is licensed under the following three licenses as alternatives:
+#   1. GNU Lesser General Public License (LGPL) V2.1 or any newer version
+#   2. GNU General Public License (GPL) V2 or any newer version
+#   3. Apache License, V2.0 or any newer version
+# 
+# You may not use this file except in compliance with at least one of
+# the above three licenses.
 # 
 # See LICENSE.html or LICENSE.txt at the top of this package for the
-# full license terms.
+# complete terms and further detail along with the license texts for
+# the licenses in COPYING.LIB, COPYING and LICENSE-2.0.txt respectively.
 # 
 # 
 #
@@ -46,7 +51,7 @@ use Sys::Hostname;
 my $RDF_NAMESPACE="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 my $RDFS_NAMESPACE="http://www.w3.org/2000/01/rdf-schema#";
 my $DC_NAMESPACE="http://purl.org/dc/elements/1.1/";
-my $PT_NAMESPACE="http://ilrt.org/discovery/2001/03/parser-tests/schema#";
+my $PT_NAMESPACE="http://www.ilrt.bristol.ac.uk/discovery/2001/03/parser-tests/schema#";
 
 my $RDF_TESTS_ROOT_URI='http://www.w3.org/2000/10/rdf-tests/';
 
@@ -123,7 +128,7 @@ sub end_page($) {
   print <<'EOT';
 <p>The source code of this demonstration is available in the Redland
 distribution as <tt>demos/parser-tests.pl</tt> or from the
-<a href="http://www.redland.opensource.ac.uk/">Redland</a> website</p>
+<a href="http://librdf.org/">Redland</a> website</p>
 EOT
 
   print qq{<hr />\n\n<p class="copyright"><a href="http://purl.org/net/dajobe/">Dave Beckett</a></p>\n\n</body></html>\n};
@@ -303,20 +308,20 @@ if(!$storage || !$model) {
 
 if($command && $command eq 'init') {
   my(@init_content_uris)=(
-    'http://ilrt.org/discovery/swsw/pt/inputs/expected.rdf',
+    'http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/expected.rdf',
     # Schemas:
     $PT_NAMESPACE,
-    'http://ilrt.org/discovery/swsw/pt/inputs/dces.rdfs',
+    'http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/dces.rdfs',
     $RDFS_NAMESPACE,
     # Parser Data:
-    'http://ilrt.org/discovery/swsw/pt/inputs/parsers/libwww.rdf',
-    'http://ilrt.org/discovery/swsw/pt/inputs/parsers/raptor.rdf',
-    'http://ilrt.org/discovery/swsw/pt/inputs/parsers/sirpac-stanford.rdf',
-    'http://ilrt.org/discovery/swsw/pt/inputs/parsers/sirpac-w3c.rdf',
+    'http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/parsers/libwww.rdf',
+    'http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/parsers/raptor.rdf',
+    'http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/parsers/sirpac-stanford.rdf',
+    'http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/parsers/sirpac-w3c.rdf',
     'http://zoe.mathematik.uni-osnabrueck.de/RDF/cara.rdf',
-    'http://ilrt.org/discovery/swsw/pt/inputs/parsers/arp.rdf',
-    'http://ilrt.org/discovery/swsw/pt/inputs/parsers/cwm.rdf',
-    'http://ilrt.org/discovery/swsw/pt/inputs/parsers/rdfstore.rdf',
+    'http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/parsers/arp.rdf',
+    'http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/parsers/cwm.rdf',
+    'http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/parsers/rdfstore.rdf',
   );
   my $parser=new RDF::Redland::Parser($working_parser);
   if(!$parser) {
@@ -380,7 +385,7 @@ print <<"EOT";
 
 <p>This is a web service allowing you to compare RDF/XML Parsers
 against each other operating on test content and uses a
-<a href="http://ilrt.org/discovery/2001/03/parser-tests/">simple schema for describing the tests and expected output</a>.
+<a href="http://www.ilrt.bristol.ac.uk/discovery/2001/03/parser-tests/">simple schema for describing the tests and expected output</a>.
 </p>
 
 
@@ -392,19 +397,19 @@ all parsers' is a good starting place - i.e. just submit the
 form.</p>
 
 <p>You can browse the individual
-<a href="http://ilrt.org/discovery/swsw/pt/inputs/parsers/">parser results as RDF/XML files</a>
+<a href="http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/parsers/">parser results as RDF/XML files</a>
 or the
-<a href="http://ilrt.org/discovery/swsw/pt/inputs/expected.rdf">expected results</a> (<em>VERY tentative</em>).  The tests
+<a href="http://www.ilrt.bristol.ac.uk/discovery/swsw/pt/inputs/expected.rdf">expected results</a> (<em>VERY tentative</em>).  The tests
 are all from the
 <a href="$RDF_TESTS_ROOT_URI">W3C RDF samples and miscellaneous tests page.</a></p>
 
 
 <p>This is an all RDF system written using 
-<a href="http://www.redland.opensource.ac.uk/">Redland</a>
+<a href="http://librdf.org/">Redland</a>
 and the
-<a href="http://www.redland.opensource.ac.uk/docs/perl.html">Perl</a>
+<a href="http://librdf.org/docs/perl.html">Perl</a>
 interface.  You can even look at the
-<a href="http://www.redland.opensource.ac.uk/demo?db=pt;command=print">raw statements</a> (read only)
+<a href="http://librdf.org/demo?db=pt;command=print">raw statements</a> (read only)
 if you want rather than the slightly cooked statements presented here.</p>
 
 <hr />
