@@ -282,6 +282,10 @@ either via an adaptor class or direct by persistant storage.
 <title>RDF Query Class</title>
 @INCLUDE query.sgml
 </sect1>
+<sect1>
+<title>RDF QueryResults Class</title>
+@INCLUDE query_results.sgml
+</sect1>
 </chapter>
 
 <chapter id="serializer">
