@@ -52,6 +52,41 @@
  *
 */
 
+/*
+ * Unicode 3.0 Corrigendum #1: UTF-8 Shortest Form
+ * http://www.unicode.org/versions/corrigendum1.html
+ *
+ * C12 
+ *
+ * (a) When a process generates data in a Unicode Transformation
+ * Format, it shall not emit ill-formed code unit sequences.
+ *
+ * (b) When a process interprets data in a Unicode Transformation
+ * Format, it shall treat illegal code unit sequences as an error
+ * condition.
+ *
+ * (c) A conformant process shall not interpret illegal UTF code unit
+ * sequences as characters.
+ *
+ * (d) Irregular UTF code unit sequences shall not be used for
+ * encoding any other information.
+ *
+ *
+ * My Summary: never encode non-shortest form UTF-8 sequences - they are
+ * are illegal sequences.  Do not accept them on decoding.
+ *
+ *       Table 3.1B. Legal UTF-8 Byte Sequences
+ *   Code Points         1st Byte  2nd Byte  3rd Byte  4th Byte
+ *   U+0000..U+007F      00..7F
+ *   U+0080..U+07FF      C2..DF    80..BF
+ *   U+0800..U+0FFF      E0        A0..BF    80..BF
+ *   U+1000..U+FFFF      E1..EF    80..BF    80..BF
+ *   U+10000..U+3FFFF    F0        90..BF    80..BF    80..BF
+ *   U+40000..U+FFFFF    F1..F3    80..BF    80..BF    80..BF
+ *   U+100000..U+10FFFF  F4        80..8F    80..BF    80..BF
+ *
+ */
+
 
 /**
  * librdf_unicode_char_to_utf8 - Convert a Unicode character to UTF-8 encoding
@@ -69,6 +104,17 @@ int
 librdf_unicode_char_to_utf8(librdf_unichar c, byte *output, int length)
 {
   int size=0;
+
+  /* check for illegal code positions:
+   * U+D800 to U+DFFF (UTF-16 surrogates)
+   * U+FFFE and U+FFFF
+   */
+  if((c > 0xD7FF && c < 0xE000) || c == 0xFFFE || c == 0xFFFF)
+    return -1;
+
+  /* Unicode 3.2 only defines U+0000 to U+10FFFF and UTF-8 encodings of it */
+  if(c > 0x10ffff)
+    return -1;
   
   if      (c < 0x00000080)
     size=1;
@@ -76,14 +122,8 @@ librdf_unicode_char_to_utf8(librdf_unichar c, byte *output, int length)
     size=2;
   else if (c < 0x00010000)
     size=3;
-  else if (c < 0x00200000)
-    size=4;
-  else if (c < 0x04000000)
-    size=5;
-  else if (c < 0x80000000)
-    size=6;
   else
-    return -1;
+    size=4;
 
   /* when no buffer given, return size */
   if(!output)
@@ -93,18 +133,6 @@ librdf_unicode_char_to_utf8(librdf_unichar c, byte *output, int length)
     return -1;
   
   switch(size) {
-    case 6:
-      output[5]=0x80 | (c & 0x3F);
-      c= c >> 6;
-       /* set bit 2 (bits 7,6,5,4,3,2 less 7,6,5,4,3 set below) on last byte */
-      c |= 0x4000000; /* 0x10000 = 0x04 << 24 */
-      /* FALLTHROUGH */
-    case 5:
-      output[4]=0x80 | (c & 0x3F);
-      c= c >> 6;
-       /* set bit 3 (bits 7,6,5,4,3 less 7,6,5,4 set below) on last byte */
-      c |= 0x200000; /* 0x10000 = 0x08 << 18 */
-      /* FALLTHROUGH */
     case 4:
       output[3]=0x80 | (c & 0x3F);
       c= c >> 6;
@@ -154,25 +182,19 @@ librdf_utf8_to_unicode_char(librdf_unichar *output, const byte *input, int lengt
     return -1;
 
   in=*input++;
-  if((in & 0x80) == 0) {
+  if((in & 0x80) == 0) { /* First byte 00..7F */
     size=1;
     c= in & 0x7f;
-  } else if((in & 0xe0) == 0xc0) {
+  } else if((in & 0xe0) == 0xc0) { /* First byte C0..DF */
     size=2;
     c= in & 0x1f;
-  } else if((in & 0xf0) == 0xe0) {
+  } else if((in & 0xf0) == 0xe0) { /* First byte E0..EF */
     size=3;
     c= in & 0x0f;
-  } else if((in & 0xf8) == 0xf0) {
+  } else if((in & 0xf8) == 0xf0) { /* First byte F0..F7 */
     size=4;
     c = in & 0x07;
-  } else if((in & 0xfc) == 0xf8) {
-    size=5;
-    c = in & 0x03;
-  } else if((in & 0xfe) == 0xfc) {
-    size=6;
-    c = in & 0x01;
-  } else
+  } else /* First byte anything else: 80..BF F8..FF - illegal */
     return -1;
 
 
@@ -183,16 +205,6 @@ librdf_utf8_to_unicode_char(librdf_unichar *output, const byte *input, int lengt
     return -1;
 
   switch(size) {
-    case 6:
-      in=*input++ & 0x3f;
-      c= c << 6;
-      c |= in;
-      /* FALLTHROUGH */
-    case 5:
-      in=*input++ & 0x3f;
-      c= c << 6;
-      c |= in;
-      /* FALLTHROUGH */
     case 4:
       in=*input++ & 0x3f;
       c= c << 6;
@@ -209,8 +221,43 @@ librdf_utf8_to_unicode_char(librdf_unichar *output, const byte *input, int lengt
       c |= in;
       /* FALLTHROUGH */
     default:
-      *output=c;
+      break;
   }
+
+
+  /* check for overlong UTF-8 sequences */
+  switch(size) {
+    case 2:
+      if(c < 0x00000080)
+        return -2;
+      break;
+    case 3:
+      if(c < 0x00000800)
+        return -2;
+      break;
+    case 4:
+      if(c < 0x00010000)
+        return -2;
+      break;
+
+    default: /* 1 */
+      break;
+  }
+
+
+  /* check for illegal code positions:
+   * U+D800 to U+DFFF (UTF-16 surrogates)
+   * U+FFFE and U+FFFF
+   */
+  if((c > 0xD7FF && c < 0xE000) || c == 0xFFFE || c == 0xFFFF)
+    return -1;
+
+  /* Unicode 3.2 only defines U+0000 to U+10FFFF and UTF-8 encodings of it */
+  /* of course this makes some 4 byte forms illegal */
+  if(c > 0x10ffff)
+    return -1;
+
+  *output=c;
 
   return size;
 }
@@ -344,7 +391,7 @@ librdf_utf8_print(const byte *input, int length, FILE *stream)
 {
   int i=0;
   
-  while(*input) {
+  while(*input && i<length) {
     librdf_unichar c;
     int size=librdf_utf8_to_unicode_char(&c, input, length-i);
     if(size <= 0)
@@ -357,7 +404,7 @@ librdf_utf8_print(const byte *input, int length, FILE *stream)
     } else if (c < 0x10000)
       fprintf(stream, "\\u%04X", c);
     else
-      fprintf(stream, "\\u%08X", c);
+      fprintf(stream, "\\U%08X", c);
     input += size;
     i += size;
   }
@@ -368,8 +415,23 @@ librdf_utf8_print(const byte *input, int length, FILE *stream)
 
 #ifdef STANDALONE
 
-/* one more prototype */
+/* static prototypes */
+void librdf_bad_string_print(const byte *input, int length, FILE *stream);
 int main(int argc, char *argv[]);
+
+void
+librdf_bad_string_print(const byte *input, int length, FILE *stream)
+{
+  while(*input && length>0) {
+    char c=*input;
+    if(isprint(c))
+      fputc(c, stream);
+    else
+      fprintf(stream, "\\x%02X", (c & 0xff));
+    input++;
+    length--;
+  }
+}
 
 
 int
@@ -391,13 +453,50 @@ main(int argc, char *argv[])
     /*  euro sign, U+20AC NEW */
     {(const byte*)"\xe2\x82\xac", 3, 0x20AC}, 
     /* unknown char - U+1FFFFF (21 bits) */
-    {(const byte*)"\xf7\xbf\xbf\xbf", 4, 0x1FFFFF},
-    /* unknown char - U+3FFFFFF (26 bits) */
-    {(const byte*)"\xfb\xbf\xbf\xbf\xbf", 5, 0x3FFFFFF},
-    /* unknown char - U+7FFFFFFF (31 bits) */
-    {(const byte*)"\xfd\xbf\xbf\xbf\xbf\xbf", 6, 0x7FFFFFFF},
+
+    /* First possible sequence of a certain length */
+    {(const byte*)"\x00",                     1, 0x00000000},
+    {(const byte*)"\xc2\x80",                 2, 0x00000080},
+    {(const byte*)"\xe0\xa0\x80",             3, 0x00000800}, 
+    {(const byte*)"\xf0\x90\x80\x80",         4, 0x00010000},
+
+    /* Last possible sequence of a certain length */
+    {(const byte*)"\x7f",                     1, 0x0000007F},
+    {(const byte*)"\xdf\xbf",                 2, 0x000007FF},
+    {(const byte*)"\xef\xbf\xbd",             3, 0x0000FFFD}, /*no FFFE-FFFF */
+    {(const byte*)"\xf4\x8f\xbf\xbf",         4, 0x0010FFFF},
+
+    /* Boundary conditions */
+    {(const byte*)"\xed\x9f\xbf",     3, 0x0000D7FF},
+    {(const byte*)"\xee\x80\x80",     3, 0x0000E000},
+    {(const byte*)"\xef\xbf\xbd",     3, 0x0000FFFD}, 
+    {(const byte*)"\xf4\x8f\xbf\xbf", 4, 0x0010FFFF},
+
     {NULL, 0, 0}
   };
+  struct tv bad_test_values[]={
+    /* Sequences that cannot appear in UTF-8 */
+    {(const byte*)"\xfe",                     1, 0x000000FE},
+    {(const byte*)"\xff",                     1, 0x000000FF},
+    {(const byte*)"\xef\xbf\xbe",             3, 0x0000FFFE},
+    {(const byte*)"\xef\xbf\xbf",             3, 0x0000FFFF},
+
+    /* Minumum (ASCII NUL) overlong sequences */
+    {(const byte*)"\xc0\x80",                 2, 0x00000000},
+    {(const byte*)"\xe0\x80\x80",             3, 0x00000000},
+    {(const byte*)"\xf0\x80\x80\x80",         4, 0x00000000},
+
+    /* Maximum overlong sequences */
+    {(const byte*)"\xc1\xbf",                 2, 0x0000007F},
+    {(const byte*)"\xe0\x9f\xbf",             3, 0x000007FF},
+    {(const byte*)"\xf0\x8f\xbf\xbf",         4, 0x0000FFFF},
+
+    /* Beyond U+10FFFF */
+    {(const byte*)"\xf4\x90\x80\x80",         4, 0x00110000},
+
+    {NULL, 0, 0}
+  };
+
   const byte test_utf8_string[]="Lib" "\xc3\xa9" "ration costs " "\xe2\x82\xac" "3.50";
   int test_utf8_string_length=strlen((const char*)test_utf8_string);
   const byte result_latin1_string[]="Lib" "\xe9" "ration costs 3.50";
@@ -410,7 +509,7 @@ main(int argc, char *argv[])
   int latin1_string_length;
   byte *utf8_string;
   int utf8_string_length;
-  
+  int failures=0;
 
   for(i=0; (t=&test_values[i]) && t->string; i++) {
     int size;
@@ -421,17 +520,19 @@ main(int argc, char *argv[])
     
     size=librdf_utf8_to_unicode_char(&c, buffer, length);
     if(size < 0) {
-      fprintf(stderr, "%s: librdf_utf8_to_unicode_char failed to convert UTF-8 string '", program);
-      librdf_utf8_print(buffer, length, stderr);
+      fprintf(stderr, "%s: librdf_utf8_to_unicode_char FAILED to convert UTF-8 string '", program);
+      librdf_bad_string_print(buffer, length, stderr);
       fprintf(stderr, "' (length %d) to Unicode\n", length);
-      return(1);
+      failures++;
+      continue;
     }
     if(c != t->result) {
-      fprintf(stderr, "%s: librdf_utf8_to_unicode_char failed conversion of UTF-8 string '", program);
-      librdf_utf8_print(buffer, size, stderr);
+      fprintf(stderr, "%s: librdf_utf8_to_unicode_char FAILED conversion of UTF-8 string '", program);
+      librdf_bad_string_print(buffer, size, stderr);
       fprintf(stderr, "' to Unicode char U+%04X, expected U+%04X\n",
               (u32)c, (u32)t->result);
-      return(1);
+      failures++;
+      continue;
     }
     
     fprintf(stderr, "%s: librdf_utf8_to_unicode_char converted UTF-8 string '", program);
@@ -440,17 +541,19 @@ main(int argc, char *argv[])
 
     size=librdf_unicode_char_to_utf8(t->result, out_buffer, OUT_BUFFER_SIZE);
     if(size <= 0) {
-      fprintf(stderr, "%s: librdf_unicode_char_to_utf8 failed to convert U+%04X to UTF-8 string\n", program, (u32)t->result);
-      return(1);
+      fprintf(stderr, "%s: librdf_unicode_char_to_utf8 FAILED to convert U+%04X to UTF-8 string\n", program, (u32)t->result);
+      failures++;
+      continue;
     }
 
     if(memcmp(out_buffer, buffer, length)) {
-      fprintf(stderr, "%s: librdf_unicode_char_to_utf8 failed conversion U+%04X to UTF-8 - returned '", program, (u32)t->result);
+      fprintf(stderr, "%s: librdf_unicode_char_to_utf8 FAILED conversion U+%04X to UTF-8 - returned '", program, (u32)t->result);
       librdf_utf8_print(buffer, size, stderr);
       fputs("', expected '", stderr);
       librdf_utf8_print(out_buffer, t->length, stderr);
       fputs("'\n", stderr);
-      return(1);
+      failures++;
+      continue;
     }
     
     fprintf(stderr, "%s: librdf_unicode_char_to_utf8 converted U+%04X to UTF-8 string '", program, (u32)t->result);
@@ -459,23 +562,43 @@ main(int argc, char *argv[])
   }
 
 
+  /* Check for failures */
+  for(i=0; (t=&bad_test_values[i]) && t->string; i++) {
+    int size;
+    const byte *buffer=t->string;
+    int length=t->length;
+    
+    size=librdf_utf8_to_unicode_char(&c, buffer, length);
+    if(size >= 0) {
+      fprintf(stderr, "%s: librdf_utf8_to_unicode_char SUCCEEDED when it should have failed to convert UTF-8 string '", program);
+      librdf_bad_string_print(buffer, length, stderr);
+      fprintf(stderr, "' (length %d) to Unicode\n", length);
+      failures++;
+      continue;
+    }
+    fprintf(stderr, "%s: librdf_utf8_to_unicode_char failed as expected converting bad UTF-8 string '", program);
+    librdf_bad_string_print(buffer, length, stderr);
+    fprintf(stderr, "' (length %d) to Unicode\n", length);
+  }
+  
+
+
   latin1_string=librdf_utf8_to_latin1(test_utf8_string, 
                                       test_utf8_string_length,
                                       &latin1_string_length);
   if(!latin1_string) {
-    fprintf(stderr, "%s: librdf_utf8_to_latin1 failed to convert UTF-8 string '", program);
-    librdf_utf8_print(test_utf8_string, test_utf8_string_length, stderr);
+    fprintf(stderr, "%s: librdf_utf8_to_latin1 FAILED to convert UTF-8 string '", program);
+    librdf_bad_string_print(test_utf8_string, test_utf8_string_length, stderr);
     fputs("' to Latin-1\n", stderr);
-    return(1);
+    failures++;
   }
 
   if(memcmp(latin1_string, result_latin1_string, result_latin1_string_length)) {
-    fprintf(stderr, "%s: librdf_utf8_to_latin1 failed to convert UTF-8 string '", program);
+    fprintf(stderr, "%s: librdf_utf8_to_latin1 FAILED to convert UTF-8 string '", program);
     librdf_utf8_print(test_utf8_string, test_utf8_string_length, stderr);
     fprintf(stderr, "' to Latin-1 - returned '%s' but expected '%s'\n",
             latin1_string, result_latin1_string);
-    LIBRDF_FREE(cstring, latin1_string);
-    return(1);
+    failures++;
   }
 
   fprintf(stderr, "%s: librdf_utf8_to_latin1 converted UTF-8 string '",
@@ -487,20 +610,17 @@ main(int argc, char *argv[])
   utf8_string=librdf_latin1_to_utf8(latin1_string, latin1_string_length,
                                     &utf8_string_length);
   if(!utf8_string) {
-    fprintf(stderr, "%s: librdf_latin1_to_utf8 failed to convert Latin-1 string '%s' to UTF-8\n", program, latin1_string);
-    LIBRDF_FREE(cstring, latin1_string);
-    return(1);
+    fprintf(stderr, "%s: librdf_latin1_to_utf8 FAILED to convert Latin-1 string '%s' to UTF-8\n", program, latin1_string);
+    failures++;
   }
 
   if(memcmp(utf8_string, result_utf8_string, result_utf8_string_length)) {
-    fprintf(stderr, "%s: librdf_latin1_to_utf8 failed to convert Latin-1 string '%s' to UTF-8 - returned '", program, latin1_string);
+    fprintf(stderr, "%s: librdf_latin1_to_utf8 FAILED to convert Latin-1 string '%s' to UTF-8 - returned '", program, latin1_string);
     librdf_utf8_print(utf8_string, utf8_string_length, stderr);
     fputs("' but expected '", stderr);
     librdf_utf8_print(result_utf8_string, result_utf8_string_length, stderr);
     fputs("'\n", stderr);
-    LIBRDF_FREE(cstring, latin1_string);
-    LIBRDF_FREE(cstring, utf8_string);
-    return(1);
+    failures++;
   }
 
   fprintf(stderr, "%s: librdf_latin1_to_utf8 converted Latin-1 string '%s' to UTF-8 string '", program, latin1_string);
@@ -515,8 +635,7 @@ main(int argc, char *argv[])
   librdf_memory_report(stderr);
 #endif
  
-  /* keep gcc -Wall happy */
-  return(0);
+  return failures;
 }
 
 #endif
