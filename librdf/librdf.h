@@ -173,8 +173,7 @@ void librdf_memory_report(FILE *fh);
 #include <rdf_digest.h>
 #include <rdf_files.h>
 
-/* from rdf_heuristics.c */
-int librdf_heuristic_object_is_literal(char *object);
+/* from rdf_heuristics.c - internal */
 char* librdf_heuristic_gen_name(char *name);
 
 #endif
@@ -184,6 +183,9 @@ char* librdf_heuristic_gen_name(char *name);
 /* from rdf_init.c */
 void librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash);
 void librdf_destroy_world(void);
+
+/* From rdf_heuristics.c - useful for user code */
+int librdf_heuristic_object_is_literal(char *object);
 
 #include <rdf_iterator.h>
 #include <rdf_node.h>
