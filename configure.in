@@ -279,20 +279,23 @@ AC_CHECK_LIB(xmltok, main, xmlt=1, xmlt=0)
 # Redland RDF parser only needs XML_ParserCreate but Repat needs
 # XML_ParserCreateNS so check for that
 AC_CHECK_LIB(xmlparse, XML_ParserCreateNS, xmlp=1, xmlp=0, -lxmltok)
+
+REPAT_FLAGS=
+
 LIBS="$oLIBS"
 AC_MSG_CHECKING(for system expat library)
 if test $xmlp = 1 -a $xmlt = 1 -a \( $expat_h = 1 -o $xmlparse_h = 1 \); then
   have_expat_lib=1
   have_expat=1
+
+  if test $xmlparse_h = 1; then
+    AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
+    REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
+  fi
+
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
-fi
-
-REPAT_FLAGS=
-if test $xmlparse_h = 1; then
-  AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
-  REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
 fi
 
 
@@ -536,9 +539,6 @@ done
 AC_MSG_CHECKING(RDF parsers available)
 AC_MSG_RESULT($parsers_available)
 
-dnl FIXME
-REPAT_FLAGS="$REPAT_FLAGS -Dsize_t=int -D_MAX_PATH=1024"
-AC_SUBST(REPAT_FLAGS)
 
 
 dnl Checks for languages
@@ -737,6 +737,11 @@ if test $need_expat = 1; then
     SD="$SD expat"
     CFLAGS="-I\$(top_srcdir)/expat/xmlparse $CFLAGS"
     XML_OBJS="\$(top_builddir)/expat/xmlparse/xmlparse.o \$(top_builddir)/expat/xmlparse/hashtable.o \$(top_builddir)/expat/xmltok/xmlrole.o \$(top_builddir)/expat/xmltok/xmltok.o"
+    REPAT_FLAGS="$REPAT_FLAGS -I\$(top_srcdir)/expat/xmlparse"
+    # FIXME - when expat in source tree is updated to new (sourceforge)
+    # version then need to remove these two lines:
+    AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
+    REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
   else
     LIBS="$LIBS -lxmlparse -lxmltok"
   fi
@@ -748,6 +753,7 @@ if test $need_repat = 1; then
   XML_OBJS="$XML_OBJS \$(top_builddir)/repat/rdfparse.o"
 fi
 
+AC_SUBST(REPAT_FLAGS)
 AC_SUBST(XML_OBJS)
 AC_SUBST(SD)
 
