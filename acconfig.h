@@ -38,3 +38,11 @@
 #undef HAVE_BDB_CURSOR
 /* V1??? */
 #undef HAVE_DBOPEN
+
+/* java program location */
+#undef JAVA_COMMAND
+/* location of RDF java API jar file */
+#undef RDF_JAVA_API_JAR
+
+#undef HAVE_SIRPAC_PARSER
+
