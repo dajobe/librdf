@@ -47,6 +47,7 @@ static void librdf_parser_raptor_serialise_finished(void* context);
 
 typedef struct {
   librdf_parser *parser;        /* librdf parser object */
+  librdf_hash *bnode_hash;      /* bnode id (raptor=>internal) map */
   int is_ntriples;
 } librdf_parser_raptor_context;
 
@@ -93,9 +94,26 @@ librdf_parser_raptor_init(librdf_parser *parser, void *context)
   pcontext->parser = parser;
   pcontext->is_ntriples=(pcontext->parser->factory->name && 
                          !strcmp(pcontext->parser->factory->name, "ntriples"));
+
+  /* New in-memory hash for mapping bnode IDs */
+  pcontext->bnode_hash=librdf_new_hash(parser->world, NULL);
   
   /* always succeeds ? */  
   return 0;
+}
+  
+
+/**
+ * librdf_parser_raptor_terminate - Terminate the raptor RDF parser
+ * @context: context
+ **/
+static void
+librdf_parser_raptor_terminate(void *context) 
+{
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+
+  if(pcontext->bnode_hash)
+    librdf_free_hash(pcontext->bnode_hash);
 }
   
 
@@ -331,8 +349,17 @@ librdf_parser_raptor_generate_id_handler(void *user_data,
                                          const unsigned char *user_bnodeid) 
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)user_data;
-  if(user_bnodeid)
-    return user_bnodeid;
+  if(user_bnodeid) {
+    char *mapped_id=(char*)librdf_hash_get(pcontext->bnode_hash, (char*)user_bnodeid);
+    if(!mapped_id) {
+      mapped_id=(char*)librdf_world_get_genid(pcontext->parser->world);
+      if(librdf_hash_put_strings(pcontext->bnode_hash, user_bnodeid, mapped_id))
+        return NULL;
+    }
+    /* FIXME if have raptor in sources, otherwise SYSTEM_FREE */
+    LIBRDF_FREE(cstring, (char*)user_bnodeid);
+    return mapped_id;
+  }
   else
     return librdf_world_get_genid(pcontext->parser->world);
 }
@@ -915,6 +942,7 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
   factory->context_length = sizeof(librdf_parser_raptor_context);
   
   factory->init  = librdf_parser_raptor_init;
+  factory->terminate  = librdf_parser_raptor_terminate;
   factory->parse_uri_as_stream = librdf_parser_raptor_parse_uri_as_stream;
   factory->parse_uri_into_model = librdf_parser_raptor_parse_uri_into_model;
   factory->parse_string_as_stream = librdf_parser_raptor_parse_string_as_stream;
