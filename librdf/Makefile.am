@@ -82,11 +82,11 @@ librdf_la_SOURCES += rdf_storage_file.c
 endif
 
 if STORAGE_TSTORE
-librdf_la_SOURCES += rdf_storage_tstore.c rdf_storage_tstore.h
+librdf_la_SOURCES += rdf_storage_tstore.c
 endif
 
 if STORAGE_MYSQL
-librdf_la_SOURCES += rdf_storage_mysql.c rdf_storage_mysql.h
+librdf_la_SOURCES += rdf_storage_mysql.c
 endif
 
 if STORAGE_SQLITE
