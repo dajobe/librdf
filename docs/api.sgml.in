@@ -156,8 +156,9 @@ models although multiple worlds are possible.
 <?dbhtml filename='model.html'>
 <title>RDF Model</title>
 <para>
-This module provides the RDF model support which is a bag of statements
-(duplicates are allowed).  Models can have statements added and removed,
+This module provides the RDF model support which is a set of statements
+(duplicates are not allowed, except in separate Redland contexts).
+Models can have statements added and removed,
 be queries and stored which is implemented by the storage classes.
 </para>
 
