@@ -6,7 +6,7 @@
 </head>
 <body bgcolor="#ffffff" text="#000085">
 
-<h1 align="center">Redland RDF Application Framework - To Do list</h1>
+<h1>Redland RDF Application Framework - To Do list</h1>
 
 <p>See the <a href="http://www.redland.opensource.ac.uk/TODO.html">web site version</a> for the up-to-date list.</p>
 
@@ -19,8 +19,6 @@
 system - fails to find raptor.h.</li>
 <li>PHP may need to include php_config.h not config.h for new
 php version</li>
-<li>Rewrite <code>rdf:nodeID</code> from parsing similar to the
-generated internal blank node IDs, maybe like <code>n</code><em>redland-start-time</em><code>n</code><em>unique-sequence-counter</em><code>n</code><em>incoming-node-id</em></li>
 <li>Docs: note in language docs that 'make install' of the main
 library is generally needed before any of the language builds will
 work</li>
@@ -29,8 +27,6 @@ work</li>
 Means need to care about parser class if you just want simple things.  Similarly
 for model.serialize() and Serializer class, however take care with serialise() method.</li>
 <li>Update the RDF/RDFS terms/labels for the latest RDF Schema revision</li>
-<li>BUG: Blank nodes with illegal nodeIDs (as far as RDf/XML are concerned)
-can be serialized - fix in node creation?  statement creation?  serializing?</li>
 <li>in-memory storage uses more memory than needed</li>
 <li>defensive code - check for NULL object parameters, wrong use
 of polymorphic objects such as getting URI of a non-resource node.
@@ -70,6 +66,9 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>BUG: Blank nodes with illegal nodeIDs (as far as RDF/XML are concerned)
+can be serialized.  Fixed by the change below; all internal nodeIDs are now serializable in RDF/XML or N-Triples (0.9.14)</li>
+<li>Rewrite incoming <code>rdf:nodeID</code> attribute values into same form as generated blank node IDs, ie. <code>r</code><em>redland-start-time</em><code>r</code><em>unique-sequence-counter</em> (0.9.14)</li>
 <li>example2.c is rather useless, replaced with a simple string parsing example (0.9.13)</li>
 <li>Replaced *_seriali[sz]e methods with *_to_stream in order to
 reduce confusion versus serializer class (0.9.13)</li>
@@ -172,7 +171,7 @@ parser will use expat or libxml as necessary.
 
 <hr />
 
-<p>Copyright 2000-2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
