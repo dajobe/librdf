@@ -577,7 +577,7 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_raptor_constructor(librdf_world *world)
 {
-  raptor_uri_init();
+  raptor_init();
 
   raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
 
