@@ -24,6 +24,8 @@ noinst_SCRIPTS = redland-src-config
 
 man_MANS = redland-config.1
 
+dist_pkgdata_DATA = Redland.i
+
 # Subdirectories to build/install etc.
 SUBDIRS=@SD_PRE@ librdf examples utils @SD_POST@ demos docs data
 CONFIG_SUBDIRS=raptor rasqal
@@ -38,7 +40,6 @@ README      NEWS      LICENSE.txt  TODO \
 README.html NEWS.html LICENSE.html TODO.html \
 RELEASE.html INSTALL.html FAQS.html \
 MPL.html \
-Redland.i \
 autogen.sh \
 Makefile.PL \
 redland-config.in \
