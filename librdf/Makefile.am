@@ -24,22 +24,14 @@ lib_LTLIBRARIES = librdf.la
 
 include_HEADERS = redland.h librdf.h \
 rdf_init.h \
-rdf_hash.h \
-rdf_digest.h \
-rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
-rdf_model.h rdf_model_storage.h \
+rdf_model.h \
 rdf_iterator.h \
 rdf_storage.h \
 rdf_stream.h \
 rdf_parser.h \
-rdf_heuristics.h \
-rdf_list.h \
-rdf_hash_bdb.h rdf_hash_memory.h \
-rdf_files.h \
-rdf_storage_list.h rdf_storage_hashes.h rdf_utf8.h \
+rdf_utf8.h \
 rdf_query.h \
-rdf_query_triples.h \
 rdf_serializer.h
 
 librdf_la_SOURCES = rdf_init.c \
@@ -56,11 +48,13 @@ rdf_query_triples.c \
 rdf_serializer.c \
 rdf_serializer_raptor.c rdf_serializer_rdfxml.c \
 redland.h librdf.h \
+rdf_internal.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
 rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_memory.h \
 rdf_types.h \
-rdf_model.h rdf_iterator.h \
+rdf_model.h rdf_model_storage.h \
+rdf_iterator.h \
 rdf_list.h \
 rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
 rdf_stream.h \
