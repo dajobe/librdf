@@ -123,6 +123,10 @@ librdf_log_simple(librdf_world* world, int code,
 
   if(level == LIBRDF_LOG_FATAL)
     abort();
+#ifdef LIBRDF_DEBUG
+  if(level >= LIBRDF_LOG_ERROR)
+    abort();
+#endif
 }
 
 
@@ -154,64 +158,6 @@ librdf_log(librdf_world* world, int code,
 
   va_end(arguments);
 }
-
-/*
- * librdf_error - Error - Internal
- * @world: redland world object or NULL
- * @message: message arguments
- *
- * If world is NULL, the error ocurred in redland startup before
- * the world was created.
- **/
-void
-librdf_error(librdf_world* world, const char *message, ...)
-{
-  va_list arguments;
-
-  va_start(arguments, message);
-
-  if(world && world->error_handler) {
-    world->error_handler(world->error_user_data, message, arguments);
-    va_end(arguments);
-    return;
-  }
-  
-  fputs("librdf error - ", stderr);
-  vfprintf(stderr, message, arguments);
-  fputc('\n', stderr);
-
-  va_end(arguments);
-}
-
-
-/*
- * librdf_warning - Warning - Internal
- * @world: redland world object or NULL
- * @message: message arguments
- *
- * If world is NULL, the warning happened in redland startup
- * before the world was created
- **/
-void
-librdf_warning(librdf_world* world, const char *message, ...)
-{
-  va_list arguments;
-
-  va_start(arguments, message);
-
-  if(world && world->warning_handler) {
-    world->warning_handler(world->warning_user_data, message, arguments);
-    va_end(arguments);
-    return;
-  }
-  
-  fputs("librdf warning - ", stderr);
-  vfprintf(stderr, message, arguments);
-  fputc('\n', stderr);
-
-  va_end(arguments);
-}
-
 
 /*
  * librdf_fatal - Fatal error - Internal
