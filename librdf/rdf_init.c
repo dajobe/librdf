@@ -135,7 +135,7 @@ librdf_error(librdf_world* world, const char *message, ...)
   va_start(arguments, message);
 
   if(world->error_fn) {
-    world->error_fn(world->error_user_data, arguments);
+    world->error_fn(world->error_user_data, message, arguments);
     return;
   }
   
@@ -160,7 +160,7 @@ librdf_warning(librdf_world* world, const char *message, ...)
   va_start(arguments, message);
 
   if(world->warning_fn) {
-    world->warning_fn(world->warning_user_data, arguments);
+    world->warning_fn(world->warning_user_data, message, arguments);
     return;
   }
   
@@ -183,7 +183,7 @@ librdf_warning(librdf_world* world, const char *message, ...)
  **/
 void
 librdf_world_set_error(librdf_world* world, void *user_data,
-                       void (*error_fn)(void *user_data, va_list arguments))
+                       void (*error_fn)(void *user_data, const char *message, va_list arguments))
 {
   world->error_user_data=user_data;
   world->error_fn=error_fn;
@@ -201,7 +201,7 @@ librdf_world_set_error(librdf_world* world, void *user_data,
  **/
 void
 librdf_world_set_warning(librdf_world* world, void *user_data,
-                         void (*warning_fn)(void *user_data, va_list arguments))
+                         void (*warning_fn)(void *user_data, const char *message, va_list arguments))
 {
   world->warning_user_data=user_data;
   world->warning_fn=warning_fn;

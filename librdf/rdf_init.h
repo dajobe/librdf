@@ -33,8 +33,8 @@ struct librdf_world_s
 {
   void *error_user_data;
   void *warning_user_data;
-  void (*error_fn)(void *user_data, va_list arguments);
-  void (*warning_fn)(void *user_data, va_list arguments);
+  void (*error_fn)(void *user_data, const char *message, va_list arguments);
+  void (*warning_fn)(void *user_data, const char *message, va_list arguments);
 
   char *digest_factory_name;
   librdf_digest_factory* digest_factory;
@@ -66,8 +66,8 @@ librdf_world* librdf_new_world(void);
 void librdf_free_world(librdf_world *world);
 void librdf_world_open(librdf_world *world);
   
-void librdf_world_set_error(librdf_world* world, void *user_data, void (*error_fn)(void *user_data, va_list arguments));
-void librdf_world_set_warning(librdf_world* world, void *user_data, void (*warning_fn)(void *user_data, va_list arguments));
+void librdf_world_set_error(librdf_world* world, void *user_data, void (*error_fn)(void *user_data, const char *message, va_list arguments));
+void librdf_world_set_warning(librdf_world* world, void *user_data, void (*warning_fn)(void *user_data, const char *message, va_list arguments));
 
 void librdf_world_set_digest(librdf_world*, const char *name);
 void librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash);
