@@ -80,6 +80,7 @@ static command commands[]={
 int
 main(int argc, char *argv[]) 
 {
+  librdf_world* world;
   char *program=argv[0];
   librdf_parser* parser;
   librdf_storage *storage;
@@ -97,7 +98,8 @@ main(int argc, char *argv[])
   int count;
   int type;
 
-  librdf_init_world(NULL, NULL);
+  world=librdf_new_world();
+  librdf_world_open(world);
 
 
   /* Skip program name */
@@ -174,18 +176,18 @@ main(int argc, char *argv[])
 
   if(commands[cmd_index].write)
     if (type == CMD_PARSE_MODEL || type == CMD_PARSE_STREAM)
-      storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='yes',new='yes'");
+      storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='yes',new='yes'");
     else
-      storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='yes'");
+      storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='yes'");
   else
-    storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='no'");
+    storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='no'");
 
   if(!storage) {
     fprintf(stderr, "%s: Failed to open BDB storage\n", program);
     return(1);
   }
 
-  model=librdf_new_model(storage, NULL);
+  model=librdf_new_model(world, storage, NULL);
   if(!model) {
     fprintf(stderr, "%s: Failed to create model\n", program);
     return(1);
@@ -208,13 +210,13 @@ main(int argc, char *argv[])
     break;
   case CMD_PARSE_MODEL:
   case CMD_PARSE_STREAM:
-    uri=librdf_new_uri(argv[0]);
+    uri=librdf_new_uri(world, argv[0]);
     if(!uri) {
       fprintf(stderr, "%s: Failed to create URI from %s\n", program, argv[0]);
       break;
     }
 
-    parser=librdf_new_parser(argv[1], NULL, NULL);
+    parser=librdf_new_parser(world, argv[1], NULL, NULL);
     if(!parser) {
       fprintf(stderr, "%s: Failed to create new parser %s\n", program, argv[1]);
       librdf_free_uri(uri);
@@ -224,7 +226,7 @@ main(int argc, char *argv[])
             librdf_uri_as_string(uri), argv[1]);
     
     if(argv[2]) {
-      base_uri=librdf_new_uri(argv[2]);
+      base_uri=librdf_new_uri(world, argv[2]);
       if(!base_uri) {
         fprintf(stderr, "%s: Failed to create base URI from %s\n", program, argv[2]);
         break;
@@ -289,23 +291,23 @@ main(int argc, char *argv[])
     if(!strcmp(argv[0], "-"))
       source=NULL;
     else
-      source=librdf_new_node_from_uri_string(argv[0]);
+      source=librdf_new_node_from_uri_string(world, argv[0]);
 
     if(!strcmp(argv[1], "-"))
       arc=NULL;
     else
-      arc=librdf_new_node_from_uri_string(argv[1]);
+      arc=librdf_new_node_from_uri_string(world, argv[1]);
 
     if(!strcmp(argv[2], "-"))
       target=NULL;
     else {
       if(librdf_heuristic_object_is_literal(argv[2]))
-        target=librdf_new_node_from_literal(argv[2], NULL, 0, 0);
+        target=librdf_new_node_from_literal(world, argv[2], NULL, 0, 0);
       else
-        target=librdf_new_node_from_uri_string(argv[2]);
+        target=librdf_new_node_from_uri_string(world, argv[2]);
     }
     
-    partial_statement=librdf_new_statement();
+    partial_statement=librdf_new_statement(world);
     librdf_statement_set_subject(partial_statement, source);
     librdf_statement_set_predicate(partial_statement, arc);
     librdf_statement_set_object(partial_statement, target);
@@ -377,11 +379,11 @@ main(int argc, char *argv[])
     break;
 
   case CMD_SOURCES:
-    arc=librdf_new_node_from_uri_string(argv[0]);
+    arc=librdf_new_node_from_uri_string(world, argv[0]);
     if(librdf_heuristic_object_is_literal(argv[1]))
-      target=librdf_new_node_from_literal(argv[1], NULL, 0, 0);
+      target=librdf_new_node_from_literal(world, argv[1], NULL, 0, 0);
     else
-      target=librdf_new_node_from_uri_string(argv[1]);
+      target=librdf_new_node_from_uri_string(world, argv[1]);
 
     iterator=librdf_model_get_sources(model, arc, target);
     if(!iterator) {
@@ -392,11 +394,11 @@ main(int argc, char *argv[])
     /* FALLTHROUGH */
   case CMD_ARCS:
     if(!iterator) {
-      source=librdf_new_node_from_uri_string(argv[0]);
+      source=librdf_new_node_from_uri_string(world, argv[0]);
       if(librdf_heuristic_object_is_literal(argv[1]))
-        target=librdf_new_node_from_literal(argv[1], NULL, 0, 0);
+        target=librdf_new_node_from_literal(world, argv[1], NULL, 0, 0);
       else
-        target=librdf_new_node_from_uri_string(argv[1]);
+        target=librdf_new_node_from_uri_string(world, argv[1]);
       iterator=librdf_model_get_arcs(model, source, target);
       if(!iterator) {
         fprintf(stderr, "Failed to get arcs\n");
@@ -407,8 +409,8 @@ main(int argc, char *argv[])
     /* FALLTHROUGH */
   case CMD_TARGETS:
     if(!iterator) {
-      source=librdf_new_node_from_uri_string(argv[0]);
-      arc=librdf_new_node_from_uri_string(argv[1]);
+      source=librdf_new_node_from_uri_string(world, argv[0]);
+      arc=librdf_new_node_from_uri_string(world, argv[1]);
       iterator=librdf_model_get_targets(model, source, arc);
       if(!iterator) {
         fprintf(stderr, "%s: Failed to get targets\n", program);
@@ -445,11 +447,11 @@ main(int argc, char *argv[])
     break;
 
   case CMD_SOURCE:
-    arc=librdf_new_node_from_uri_string(argv[0]);
+    arc=librdf_new_node_from_uri_string(world, argv[0]);
     if(librdf_heuristic_object_is_literal(argv[1]))
-      target=librdf_new_node_from_literal(argv[1], NULL, 0, 0);
+      target=librdf_new_node_from_literal(world, argv[1], NULL, 0, 0);
     else
-      target=librdf_new_node_from_uri_string(argv[1]);
+      target=librdf_new_node_from_uri_string(world, argv[1]);
 
     node=librdf_model_get_source(model, arc, target);
     if(!node) {
@@ -460,11 +462,11 @@ main(int argc, char *argv[])
     /* FALLTHROUGH */
   case CMD_ARC:
     if(!node) {
-      source=librdf_new_node_from_uri_string(argv[0]);
+      source=librdf_new_node_from_uri_string(world, argv[0]);
       if(librdf_heuristic_object_is_literal(argv[1]))
-        target=librdf_new_node_from_literal(argv[1], NULL, 0, 0);
+        target=librdf_new_node_from_literal(world, argv[1], NULL, 0, 0);
       else
-        target=librdf_new_node_from_uri_string(argv[1]);
+        target=librdf_new_node_from_uri_string(world, argv[1]);
       node=librdf_model_get_arc(model, source, target);
       if(!node) {
         fprintf(stderr, "Failed to get arc\n");
@@ -475,8 +477,8 @@ main(int argc, char *argv[])
     /* FALLTHROUGH */
   case CMD_TARGET:
     if(!node) {
-      source=librdf_new_node_from_uri_string(argv[0]);
-      arc=librdf_new_node_from_uri_string(argv[1]);
+      source=librdf_new_node_from_uri_string(world, argv[0]);
+      arc=librdf_new_node_from_uri_string(world, argv[1]);
       node=librdf_model_get_target(model, source, arc);
       if(!node) {
         fprintf(stderr, "%s: Failed to get target\n", program);
@@ -508,7 +510,7 @@ main(int argc, char *argv[])
   librdf_free_model(model);
   librdf_free_storage(storage);
 
-  librdf_destroy_world();
+  librdf_free_world(world);
 
 #ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);

@@ -35,6 +35,7 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
+  librdf_world* world;
   librdf_storage* storage;
   librdf_parser* parser;
   librdf_model* model;
@@ -53,21 +54,22 @@ main(int argc, char *argv[])
   }
 
 
-  librdf_init_world(NULL, NULL);
+  world=librdf_new_world();
+  librdf_world_open(world);
 
-  uri=librdf_new_uri(argv[1]);
+  uri=librdf_new_uri(world, argv[1]);
   if(!uri) {
     fprintf(stderr, "%s: Failed to create URI\n", program);
     return(1);
   }
 
-  storage=librdf_new_storage("hashes", "test", "hash-type='bdb',dir='.',new='yes'");
+  storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',new='yes'");
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
   }
 
-  model=librdf_new_model(storage, NULL);
+  model=librdf_new_model(world, storage, NULL);
   if(!model) {
     fprintf(stderr, "%s: Failed to create model\n", program);
     return(1);
@@ -77,7 +79,7 @@ main(int argc, char *argv[])
   if(argc==3)
     parser_name=argv[2];
 
-  parser=librdf_new_parser(parser_name, NULL, NULL);
+  parser=librdf_new_parser(world, parser_name, NULL, NULL);
   if(!parser) {
     fprintf(stderr, "%s: Failed to create new parser\n", program);
     return(1);
@@ -103,13 +105,13 @@ main(int argc, char *argv[])
   /* Construct the query predicate (arc) and object (target) 
    * and partial statement bits
    */
-  subject=librdf_new_node_from_uri_string("http://www.ilrt.bristol.ac.uk/people/cmdjb/");
-  predicate=librdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/title");
+  subject=librdf_new_node_from_uri_string(world, "http://www.ilrt.bristol.ac.uk/people/cmdjb/");
+  predicate=librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/title");
   if(!subject || !predicate) {
     fprintf(stderr, "%s: Failed to create nodes for searching\n", program);
     return(1);
   }
-  partial_statement=librdf_new_statement();
+  partial_statement=librdf_new_statement(world);
   librdf_statement_set_subject(partial_statement, subject);
   librdf_statement_set_predicate(partial_statement, predicate);
 
@@ -180,7 +182,7 @@ main(int argc, char *argv[])
 
   librdf_free_uri(uri);
 
-  librdf_destroy_world();
+  librdf_free_world(world);
 
 #ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);

@@ -37,6 +37,7 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
+  librdf_world* world;
   librdf_storage* storage;
   librdf_model* model;
   char *program=argv[0];
@@ -53,21 +54,22 @@ main(int argc, char *argv[])
   }
 
 
-  librdf_init_world(NULL, NULL);
+  world=librdf_new_world();
+  librdf_world_open(world);
 
-  uri=librdf_new_uri(argv[1]);
+  uri=librdf_new_uri(world, argv[1]);
   if(!uri) {
     fprintf(stderr, "%s: Failed to create URI\n", program);
     return(1);
   }
 
-  storage=librdf_new_storage("hashes", "test", "hash-type='bdb',dir='.'");
+  storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.'");
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
   }
 
-  model=librdf_new_model(storage, NULL);
+  model=librdf_new_model(world, storage, NULL);
   if(!model) {
     fprintf(stderr, "%s: Failed to create model\n", program);
     return(1);
@@ -126,22 +128,22 @@ main(int argc, char *argv[])
     
 
     /* got all statement parts now */
-    statement=librdf_new_statement();
+    statement=librdf_new_statement(world);
     if(!statement)
       break;
     
     librdf_statement_set_subject(statement, 
-                                 librdf_new_node_from_uri_string(s));
+                                 librdf_new_node_from_uri_string(world, s));
 
     librdf_statement_set_predicate(statement,
-                                   librdf_new_node_from_uri_string(p));
+                                   librdf_new_node_from_uri_string(world, p));
 
     if(librdf_heuristic_object_is_literal(o))
       librdf_statement_set_object(statement,
-                                  librdf_new_node_from_literal(o, NULL, 0, 0));
+                                  librdf_new_node_from_literal(world, o, NULL, 0, 0));
     else
       librdf_statement_set_object(statement, 
-                                  librdf_new_node_from_uri_string(o));
+                                  librdf_new_node_from_uri_string(world, o));
 
 
     librdf_model_add_statement(model, statement);
@@ -159,7 +161,7 @@ main(int argc, char *argv[])
 
   librdf_free_uri(uri);
 
-  librdf_destroy_world();
+  librdf_free_world(world);
 
 #ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);

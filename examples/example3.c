@@ -34,18 +34,20 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
+  librdf_world* world;
   librdf_storage *storage;
   librdf_model* model;
   librdf_statement* statement;
   
-  librdf_init_world(NULL, NULL);
+  world=librdf_new_world();
+  librdf_world_open(world);
 
-  model=librdf_new_model(storage=librdf_new_storage("hashes", "test", "hash-type='bdb',dir='.'"), NULL);
+  model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.'"), NULL);
 
   librdf_model_add_statement(model, 
-                             statement=librdf_new_statement_from_nodes(librdf_new_node_from_uri_string("http://purl.org/net/dajobe/"),
-                                                             librdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/creator"),
-                                                             librdf_new_node_from_literal("Dave Beckett", NULL, 0, 0)
+                             statement=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/"),
+                                                             librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/creator"),
+                                                             librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0, 0)
                                                              )
                              );
 
@@ -56,7 +58,7 @@ main(int argc, char *argv[])
   librdf_free_model(model);
   librdf_free_storage(storage);
 
-  librdf_destroy_world();
+  librdf_free_world(world);
 
 #ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);
