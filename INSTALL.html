@@ -272,9 +272,23 @@ To install it system wide (this is optional) do this as <em>root</em>:</p>
   root# make install-perl
 </pre>
 
-<p>and then try the perl example program:</p>
+<p>If you did the optional install above, run the perl example
+program with:</p>
 <pre>
   perl ./example.pl  # ./example.pl might work if your perl is in /usr/bin/perl
+</pre>
+
+<p>Otherwise, to run in the source tree do:</p>
+<pre>
+  perl -Iblib/arch -Iblib/lib ./example.pl
+</pre>
+
+<p>and the result should be:</p>
+<pre>
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+  Subject: [http://purl.org/net/dajobe/]
+  Predicate: [http://purl.org/dc/elements/1.1/creator]
+  Object: Dave Beckett
 </pre>
 
 <hr />
