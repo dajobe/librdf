@@ -30,6 +30,9 @@
 #ifdef HAVE_GDBM_HASH
 #include <rdf_hash_gdbm.h>
 #endif
+#ifdef HAVE_BDB_HASH
+#include <rdf_hash_bdb.h>
+#endif
 #include <rdf_hash_list.h>
 
 
@@ -39,6 +42,9 @@ rdf_init_hash(void)
 {
 #ifdef HAVE_GDBM_HASH
   rdf_init_hash_gdbm();
+#endif
+#ifdef HAVE_BDB_HASH
+  rdf_init_hash_bdb();
 #endif
   rdf_init_hash_list();
 }
@@ -553,7 +559,7 @@ main(int argc, char *argv[])
 {
   rdf_hash_factory *factory, *default_factory;
   rdf_hash *h, *h2;
-  char *test_hash_types[]={"GDBM", "FAKE", "LIST", NULL};
+  char *test_hash_types[]={"GDBM", "FAKE", "BDB", "LIST", NULL};
   char *test_hash_values[]={"colour", "yellow",
                             "age", "new",
                             "size", "large",
@@ -587,7 +593,7 @@ main(int argc, char *argv[])
       return(0);
     }
 
-    rdf_hash_open(h, "test.gdbm", "mode", NULL);
+    rdf_hash_open(h, "test", "mode", NULL);
     rdf_hash_from_string(h, argv[1]);
     fprintf(stderr, "%s: resulting ", program);    
     rdf_hash_print(h, stderr);
@@ -613,7 +619,11 @@ main(int argc, char *argv[])
       continue;
     }
 
-    rdf_hash_open(h, "test.gdbm", "mode", NULL);
+    if(rdf_hash_open(h, "test", "mode", NULL)) {
+      fprintf(stderr, "%s: Failed to open new hash type '%s'\n", program, type);
+      continue;
+    }
+      
 
     for(j=0; test_hash_values[j]; j+=2) {
       key=test_hash_values[j];
