@@ -563,7 +563,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
 
     /* ENCODE KEY */
 
-    int fields=context->hash_descriptions[i]->key_fields;
+    librdf_statement_part fields=(librdf_statement_part)context->hash_descriptions[i]->key_fields;
     if(!fields)
       continue;
     
@@ -586,7 +586,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     
     /* ENCODE VALUE */
     
-    fields=context->hash_descriptions[i]->value_fields;
+    fields=(librdf_statement_part)context->hash_descriptions[i]->value_fields;
     if(!fields)
       continue;
     
@@ -678,7 +678,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   unsigned char *key_buffer, *value_buffer;
   int key_len, value_len;
   int hash_index=context->all_statements_hash_index;
-  int fields;
+  librdf_statement_part fields;
   int status;
   
   if(storage->index_contexts) {
@@ -698,7 +698,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   }
 
   /* ENCODE KEY */
-  fields=context->hash_descriptions[hash_index]->key_fields;
+  fields=(librdf_statement_part)context->hash_descriptions[hash_index]->key_fields;
   key_len=librdf_statement_encode_parts(statement, NULL,
                                         NULL, 0, fields);
   if(!key_len)
@@ -713,7 +713,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   }
 
   /* ENCODE VALUE */
-  fields=context->hash_descriptions[hash_index]->value_fields;
+  fields=(librdf_statement_part)context->hash_descriptions[hash_index]->value_fields;
   value_len=librdf_statement_encode_parts(statement, NULL,
                                           NULL, 0, fields);
   if(!value_len) {
@@ -1215,7 +1215,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
   librdf_storage_hashes_node_iterator_context* icontext;
   librdf_iterator *iterator;
   librdf_hash *hash;
-  int fields;
+  librdf_statement_part fields;
   unsigned char *key_buffer;
   
   icontext=(librdf_storage_hashes_node_iterator_context*)LIBRDF_CALLOC(librdf_storage_hashes_node_iterator_context, 1, sizeof(librdf_storage_hashes_node_iterator_context));
@@ -1278,7 +1278,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
 
 
   /* ENCODE KEY */
-  fields=scontext->hash_descriptions[hash_index]->key_fields;
+  fields=(librdf_statement_part)scontext->hash_descriptions[hash_index]->key_fields;
   icontext->key.size=librdf_statement_encode_parts(&icontext->statement, NULL,
                                                    NULL, 0, fields);
   if(!icontext->key.size) {
