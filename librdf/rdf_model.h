@@ -269,6 +269,7 @@ REDLAND_API int librdf_model_context_remove_statement(librdf_model* model, librd
 REDLAND_API int librdf_model_context_remove_statements(librdf_model* model, librdf_node* context);
 REDLAND_API librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* context);
 REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* context);
+REDLAND_API int librdf_model_contains_context(librdf_model* model, librdf_node* context);
 
 /* query language */
 REDLAND_API librdf_query_results* librdf_model_query_execute(librdf_model* model, librdf_query* query);
