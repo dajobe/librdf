@@ -307,8 +307,12 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
 {
   librdf_node* new_node;
   char *new_identifier;
-  int len=strlen(identifier);
-  
+  int len;
+
+  if(!identifier)
+    identifier=librdf_world_get_genid(world);
+
+  len=strlen(identifier);
   
   new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, sizeof(librdf_node));
   if(!new_node)
