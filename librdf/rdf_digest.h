@@ -67,7 +67,8 @@ void librdf_init_digest(void);
 void librdf_finish_digest(void);
                     
 /* constructor */
-librdf_digest* librdf_new_digest(librdf_digest_factory *factory);
+librdf_digest* librdf_new_digest(char *name);
+librdf_digest* librdf_new_digest_from_factory(librdf_digest_factory *factory);
 
 /* destructor */
 void librdf_free_digest(librdf_digest *digest);

@@ -48,7 +48,8 @@ void librdf_finish_model(void);
 /* constructors */
 
 /* Create a new Model */
-librdf_model* librdf_new_model(librdf_storage *storage, librdf_hash* options);
+librdf_model* librdf_new_model(librdf_storage *storage, char* options_string);
+librdf_model* librdf_new_model_with_options(librdf_storage *storage, librdf_hash* options);
 
 /* Create a new Model from an existing Model - CLONE */
 librdf_model* librdf_new_model_from_model(librdf_model* model);

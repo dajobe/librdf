@@ -61,7 +61,8 @@ void librdf_finish_parser(void);
                     
 
 /* constructor */
-librdf_parser* librdf_new_parser(librdf_parser_factory *factory);
+librdf_parser* librdf_new_parser(char *name);
+librdf_parser* librdf_new_parser_from_factory(librdf_parser_factory *factory);
 
 /* destructor */
 void librdf_free_parser(librdf_parser *parser);

@@ -89,7 +89,8 @@ void librdf_storage_register_factory(const char *name, void (*factory) (librdf_s
 librdf_storage_factory* librdf_get_storage_factory(const char *name);
 
 /* constructor */
-librdf_storage* librdf_new_storage(librdf_storage_factory* factory, librdf_hash* options);
+librdf_storage* librdf_new_storage(char* name, char* options_string);
+librdf_storage* librdf_new_storage_from_factory(librdf_storage_factory* factory, librdf_hash* options);
 
 /* destructor */
 void librdf_free_storage(librdf_storage *storage);
