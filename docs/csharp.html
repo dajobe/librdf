@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Redland RDF Application Framework - C# Interface</title>
+</head>
+<body>
+
+<h1>Redland RDF Application Framework - C# Interface</h1>
+
+<p>This interface is for the ECMA Common Language Infrastructure
+(CLI) which is implemented as a set of technologies called ".Net" on
+Microsoft platforms.  It was originally written by
+<a href="http://codeblogs.ximian.com/blogs/cesar/">César Lopez Nataren</a>
+in April 2004 and updated to work with newer Mono releases.
+It is written in C# however it shoulde be usable by any of the CLI
+languages.</p>
+
+
+<h2>Installing the Redland C# interface</h2>
+
+<p>This is built if
+<tt>--with-ecma-cli=mono</tt> (or <tt>dotgnu</tt> - this has not
+been tested recently)
+is given to the configure, selecting a particular ECMA CLI implementation
+from those that may be available.
+The standard 'make' at the top level will build it.</p>
+
+<p>You can also compile the C# interface by hand as follows:</p>
+
+<pre>
+  cd csharp
+  make
+
+  # optional, but it may require a top-level 'make install
+  # first depending on the operating system and how it
+  # handles shared libraries
+  make check
+</pre>
+
+<p>To install it system wide do this as <em>root</em> (or maybe via
+sudo make install):</p>
+
+<pre>
+  root# make install
+</pre>
+
+<p>Which will try to install it in the runtime GAC, registering
+Redland.dll.</p>
+
+<p>The C# interface for Redland is new and requires
+Mono 0.96 (Mono 1.0 beta3) or later.</p>
+
+<blockquote>
+0.95 (1.0 beta2) on Linux<br />
+0.96 (1.0 beta3) on Linux<br />
+0.97 (1.0 RC1) on Linux
+</blockquote>
+
+
+
+<h2>Testing the Redland C# interface</h2>
+
+<p>If you did the install above, you can try the C# examples
+and run the unit tests:</p>
+<pre>
+  cd examples
+  make check
+
+  # Unit tests (requires the NUnit framework)
+  make unittests
+</pre>
+
+<p>The result of the nunittests should be something like:</p>
+<pre>
+  ...
+  Tests run: 13, Failures: 0, Not run: 0, Time: 0.731799 seconds
+
+</pre>
+
+
+
+
+<h2>Redland C# API Introduction</h2>
+
+<p>The C# API is an object-based API reflecting the same structure
+of the Redland objects with simple mappings between them:</p>
+
+<table border="1">
+<tr>
+<th>Concept</th><th>Redland Class</th><th>C# Class</th><th>Purpose</th>
+</tr>
+<tr>
+<td>Resource / Literal</td><td><a href="api/node.html">librdf_node</a></td><td><tt>Redland.Node</tt></td>
+<td>RDF Model &amp; Syntax nodes</td>
+</tr>
+<tr>
+<td>Statement / Triple</td><td><a href="api/statement.html">librdf_statement</a></td><td><tt>Redland.Statement</tt></td>
+<td>RDF Model &amp; Syntax arcs (statements, triples) [isa Resource]</td>
+</tr>
+<tr>
+<td>Model</td><td><a href="api/model.html">librdf_model</a></td><td><tt>Redland.Model</tt></td>
+<td>Set of <em>Statement</em>s usually held in one <em>Storage</em>.</td>
+</tr>
+<tr>
+<td>Storage</td><td><a href="api/storage.html">librdf_storage</a></td><td><tt>Redland.Storage</tt></td>
+<td>Storage for <em>Model</em>s either persistant or in-memory.</td>
+</tr>
+<tr>
+<td>Stream</td><td><a href="api/stream.html">librdf_stream</a></td><td><tt>Redland.Stream</tt></td>
+<td>Providing sequences of <em>Statement</em>s from <em>Parser</em>s, queries.</td>
+</tr>
+<tr>
+<td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><tt>Redland.Parser</tt></td>
+<td>Syntaxes parsers delivering <em>Stream</em> of <em>Statement</em>s or writing to a <em>Model</em></td>
+</tr>
+<tr>
+<td>Serializer</td><td><a href="api/serializer.html">librdf_serializer</a></td><td><tt>Redland.Serializer</tt></td>
+<td>Serializes a <em>Model</em> into a syntax such as RDF/XML</td>
+</tr>
+<tr>
+<td>Iterator</td><td><a href="api/iterator.html">librdf_iterator</a></td><td><tt>Redland.Iterator</tt></td>
+<td>Enumerating lists (of <em>Node</em>) from queries.</td>
+</tr>
+<tr>
+<td>URI</td><td><a href="api/uri.html">librdf_uri</a></td><td><tt>Redland.Uri</tt></td>
+<td>Provides URIs for <em>Resource</em>s, <em>Parser</em>s, ...</td>
+</tr>
+<tr>
+<td>World</td><td>&nbsp;</td><td>Internal</td>
+<td>RDF wrapper class handling Redland startup/shutdown</td>
+</tr>
+<tr>
+<td>Digest</td><td><a href="api/digest.html">librdf_digest</a></td><td>&nbsp;</td>
+<td>Internal content digest class</td>
+</tr>
+<tr>
+<td>Hash</td><td><a href="api/hash.html">librdf_hash</a></td><td>&nbsp;</td>
+<td>Internal key:value maps class</td>
+</tr>
+<tr>
+<td>List</td><td><a href="api/list.html">librdf_list</a></td><td>&nbsp;</td>
+<td>Internal list class</td>
+</tr>
+</table>
+
+<h2>Other RDF C# APIs and applications</h2>
+
+<ul>
+<li><a href="http://www.driverdf.org/">Drive RDF parser for C#</a>.</li>
+</ul>
+
+<hr />
+
+<p>Copyright 2004 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bris.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>
