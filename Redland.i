@@ -292,6 +292,7 @@ int librdf_iterator_next(librdf_iterator* iterator);
 librdf_uri* librdf_new_uri (librdf_world *world, char *string);
 librdf_uri* librdf_new_uri_from_uri (librdf_uri* uri);
 void librdf_free_uri(librdf_uri *uri);
+%newobject librdf_uri_to_string;
 char* librdf_uri_to_string (librdf_uri* uri);
 int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
 
@@ -314,6 +315,7 @@ int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_language, int is_wf_xml);
 int librdf_node_set_typed_literal_value(librdf_node* node, const char* value, const char *xml_language, librdf_uri* datatype_uri);
 
+%newobject librdf_node_to_string;
 char *librdf_node_to_string(librdf_node* node);
 char *librdf_node_get_blank_identifier(librdf_node* node);
 int librdf_node_set_blank_identifier(librdf_node* node, const char *identifier);
@@ -334,6 +336,7 @@ void librdf_statement_set_predicate(librdf_statement *statement, librdf_node *pr
 librdf_node* librdf_statement_get_object(librdf_statement *statement);
 void librdf_statement_set_object(librdf_statement *statement, librdf_node *object);
 
+%newobject librdf_statement_to_string;
 char *librdf_statement_to_string(librdf_statement *statement);
 
 /* rdf_model.h */
