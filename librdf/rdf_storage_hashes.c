@@ -812,6 +812,8 @@ librdf_storage_hashes_serialise_get_statement(void* context, int flags)
       if(scontext->search_node) {
         return (librdf_statement*)librdf_iterator_get_object(scontext->iterator);
       }
+
+      librdf_statement_clear(&scontext->current);
       
       hd=(librdf_hash_datum*)librdf_iterator_get_key(scontext->iterator);
       
@@ -928,6 +930,7 @@ typedef struct {
   librdf_iterator* iterator; /* owned iterator over above hash */
   int want;                  /* part of decoded statement to return */
   librdf_statement statement; /* NOTE: stored here, never allocated */
+  librdf_statement statement2; /* NOTE: stored here, never allocated */
   librdf_hash_datum key;
   librdf_hash_datum value;
   librdf_node *search_node;
@@ -960,11 +963,39 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
 {
   librdf_storage_hashes_node_iterator_context* context=(librdf_storage_hashes_node_iterator_context*)iterator;
   librdf_node* node;
-  librdf_statement* statement;
   librdf_hash_datum* value;
   
   if(librdf_iterator_end(context->iterator))
     return NULL;
+
+  switch(context->want) {
+    case LIBRDF_STATEMENT_SUBJECT: /* SOURCES (subjects) */
+      if((node=librdf_statement_get_subject(&context->statement)))
+         librdf_free_node(node);
+      break;
+      
+    case LIBRDF_STATEMENT_PREDICATE: /* ARCS (predicates) */
+      if((node=librdf_statement_get_predicate(&context->statement)))
+         librdf_free_node(node);
+      break;
+      
+    case LIBRDF_STATEMENT_OBJECT: /* TARGETS (objects) */
+      if((node=librdf_statement_get_object(&context->statement)))
+         librdf_free_node(node);
+      break;
+      
+    case (LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_OBJECT): /* p2so */
+      if((node=librdf_statement_get_subject(&context->statement)))
+         librdf_free_node(node);
+      if((node=librdf_statement_get_object(&context->statement)))
+         librdf_free_node(node);
+      break;
+      
+    default: /* error */
+      LIBRDF_FATAL2(librdf_storage_hashes_node_iterator_get_method,
+                    "Illegal statement part %d seen\n", context->want);
+  }
+
 
   value=(librdf_hash_datum*)librdf_iterator_get_value(context->iterator);
   if(!value)
@@ -978,36 +1009,25 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
   switch(context->want) {
     case LIBRDF_STATEMENT_SUBJECT: /* SOURCES (subjects) */
       node=librdf_statement_get_subject(&context->statement);
-      librdf_statement_set_subject(&context->statement, NULL);
       break;
       
     case LIBRDF_STATEMENT_PREDICATE: /* ARCS (predicates) */
       node=librdf_statement_get_predicate(&context->statement);
-      librdf_statement_set_predicate(&context->statement, NULL);
       break;
       
     case LIBRDF_STATEMENT_OBJECT: /* TARGETS (objects) */
       node=librdf_statement_get_object(&context->statement);
-      librdf_statement_set_object(&context->statement, NULL);
       break;
       
     case (LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_OBJECT): /* p2so */
-      statement=librdf_new_statement(context->storage->world);
-      if(!statement)
-        return NULL;
-      librdf_statement_set_subject(statement, librdf_statement_get_subject(&context->statement));
+      librdf_statement_set_subject(&context->statement2, librdf_statement_get_subject(&context->statement));
       /* fill in the only blank from the node stored in our context */
       node=librdf_new_node_from_node(context->search_node);
-      if(!node) {
-        librdf_free_statement(statement);
+      if(!node)
         return NULL;
-      }
-      librdf_statement_set_predicate(statement, node);
-      librdf_statement_set_object(statement, librdf_statement_get_object(&context->statement));
-      /* now owned by new statement */
-      librdf_statement_set_subject(&context->statement, NULL);
-      librdf_statement_set_object(&context->statement, NULL);
-      return (void*)statement;
+      librdf_statement_set_predicate(&context->statement2, node);
+      librdf_statement_set_object(&context->statement2, librdf_statement_get_object(&context->statement));
+      return (void*)&context->statement2;
       break;
       
     default: /* error */
@@ -1023,12 +1043,17 @@ static void
 librdf_storage_hashes_node_iterator_finished(void* iterator) 
 {
   librdf_storage_hashes_node_iterator_context* icontext=(librdf_storage_hashes_node_iterator_context*)iterator;
-
+  librdf_node* node;
+  
   if(icontext->search_node)
     librdf_free_node(icontext->search_node);
 
   if(icontext->iterator)
     librdf_free_iterator(icontext->iterator);
+
+  librdf_statement_clear(&icontext->statement);
+  if((node=librdf_statement_get_predicate(&icontext->statement2)))
+     librdf_free_node(node);
 
   LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
 }
@@ -1066,7 +1091,21 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
   icontext->hash_index=hash_index;
   icontext->want=want;
 
+  node1=librdf_new_node_from_node(node1);
+  if(!node1) {
+    LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
+    return NULL;
+  }
+  node2=librdf_new_node_from_node(node2);
+  if(!node2) {
+    librdf_free_node(node2);
+    LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
+    return NULL;
+  }
+  
+
   librdf_statement_init(storage->world, &icontext->statement);
+  librdf_statement_init(storage->world, &icontext->statement2);
 
   hash=scontext->hashes[icontext->hash_index];
 
@@ -1336,6 +1375,8 @@ librdf_storage_hashes_group_serialise_get_statement(void* context, int flags)
 
       v=(librdf_hash_datum*)librdf_iterator_get_key(scontext->iterator);
       
+      librdf_statement_clear(&scontext->current);
+
       /* decode value content */
       if(!librdf_statement_decode(&scontext->current,
                                   (unsigned char*)v->data, v->size)) {
