@@ -402,6 +402,217 @@ librdf_statement_match(librdf_statement* statement,
 }
 
 
+/**
+ * librdf_statement_encode - Serialise a statement into a buffer
+ * @statement: the statement to serialise
+ * @buffer: the buffer to use
+ * @length: buffer size
+ * 
+ * Encodes the given statement in the buffer, which must be of sufficient
+ * size.  If buffer is NULL, no work is done but the size of buffer
+ * required is returned.
+ * 
+ * Return value: the number of bytes written or 0 on failure.
+ **/
+size_t
+librdf_statement_encode(librdf_statement* statement, 
+                        unsigned char *buffer, 
+                        size_t length)
+{
+
+  return librdf_statement_encode_parts(statement, buffer, length,
+                                       LIBRDF_STATEMENT_ALL);
+}
+
+
+/**
+ * librdf_statement_encode_parts - Serialise parts of a statement into a buffer
+ * @statement: statement to serialise
+ * @buffer: the buffer to use
+ * @length: buffer size
+ * @fields: fields to encode
+ * 
+ * Encodes the given statement in the buffer, which must be of sufficient
+ * size.  If buffer is NULL, no work is done but the size of buffer
+ * required is returned.
+ *
+ * The fields values are or-ed combinations of:
+ * LIBRDF_STATEMENT_SUBJECT LIBRDF_STATEMENT_PREDICATE
+ * LIBRDF_STATEMENT_OBJECT LIBRDF_STATEMENT_CONTEXT (not used at present)
+ * or LIBRDF_STATEMENT_ALL for all fields
+ * 
+ * Return value: the number of bytes written or 0 on failure.
+ **/
+size_t
+librdf_statement_encode_parts(librdf_statement* statement, 
+                              unsigned char *buffer, size_t length,
+                              int fields)
+{
+  size_t total_length=0;
+  size_t node_len;
+  unsigned char *p;
+
+  /* min size */
+  if(buffer && length < 1)
+    return 0;
+
+  p=buffer;
+  /* magic number 'x' */
+  if(p) {
+    *p++='x';
+    length--;
+  }
+  total_length++;
+
+  if((fields & LIBRDF_STATEMENT_SUBJECT) && statement->subject) {
+    /* 's' + subject */
+    if(p) {
+      *p++='s';
+      length--;
+    }
+    total_length++;
+
+    node_len=librdf_node_encode(statement->subject, p, length);
+    if(!node_len)
+      return 0;
+    if(p) {
+      p += node_len;
+      length -= node_len;
+    }
+    
+    
+    total_length += node_len;
+  }
+  
+  
+  if((fields & LIBRDF_STATEMENT_PREDICATE) && statement->predicate) {
+    /* 'p' + predicate */
+    if(p) {
+      *p++='p';
+      length--;
+    }
+    total_length++;
+
+    node_len=librdf_node_encode(statement->predicate, p, length);
+    if(!node_len)
+      return 0;
+    if(p) {
+      p += node_len;
+      length -= node_len;
+    }
+    
+    total_length += node_len;
+  }
+  
+  if((fields & LIBRDF_STATEMENT_OBJECT) && statement->object) {
+    /* 'o' object */
+    if(p) {
+      *p++='o';
+      length--;
+    }
+    total_length++;
+
+    node_len= librdf_node_encode(statement->object, p, length);
+    if(!node_len)
+      return 0;
+    if(p) {
+      p += node_len;
+      length -= node_len;
+    }
+
+    total_length += node_len;
+  }
+
+  return total_length;
+}
+
+
+/**
+ * librdf_statement_decode - Decodes a statement from a buffer
+ * @statement: the statement to deserialise into
+ * @buffer: the buffer to use
+ * @length: buffer size
+ * 
+ * Decodes the serialised statement (as created by librdf_statement_encode() )
+ * from the given buffer.
+ * 
+ * Return value: number of bytes used or 0 on failure (bad encoding, allocation failure)
+ **/
+size_t
+librdf_statement_decode(librdf_statement* statement, 
+                        unsigned char *buffer, size_t length)
+{
+  unsigned char *p;
+  librdf_node* node;
+  unsigned char type;
+  size_t total_length=0;
+  
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG2(librdf_statement_decode, "Decoding buffer of %d bytes\n", 
+                  length);
+#endif
+
+
+  /* absolute minimum - first byte is type */
+  if(length < 1)
+    return 0;
+
+  p=buffer;
+  if(*p++ != 'x')
+    return 0;
+  length--;
+  total_length++;
+  
+  
+  while(length>0) {
+    size_t node_len;
+    
+    type=*p++;
+    length--;
+    total_length++;
+
+    if(!length)
+      return 0;
+    
+    node=librdf_new_node();
+    if(!node)
+      return 0;
+    
+    if(!(node_len=librdf_node_decode(node, p, length)))
+      return 0;
+
+    p += node_len;
+    length -= node_len;
+    total_length += node_len;
+    
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3(librdf_statement_decode, "Found type %c (%d bytes)\n",
+                  type, node_len);
+#endif
+  
+    switch(type) {
+    case 's': /* subject */
+      statement->subject=node;
+      break;
+      
+    case 'p': /* predicate */
+      statement->predicate=node;
+      break;
+      
+    case 'o': /* object */
+      statement->object=node;
+      break;
+
+    default:
+      LIBRDF_FATAL2(librdf_statement_decode,
+                    "Illegal statement encoding %d seen\n",
+                    p[-1]);
+    }
+  }
+
+  return total_length;
+}
+
 
 
 #ifdef STANDALONE
@@ -413,9 +624,10 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_statement* statement;
+  librdf_statement *statement, *statement2;
+  int size, size2;
   char *program=argv[0];
-  char *s;
+  char *s, *buffer;
   
   /* initialise dependent modules */
   librdf_init_digest();
@@ -438,8 +650,37 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Resulting statement: %s\n", program, s);
   LIBRDF_FREE(cstring, s);
 
-  fprintf(stderr, "%s: Freeing statement\n", program);
+  size=librdf_statement_encode(statement, NULL, 0);
+  fprintf(stdout, "%s: Encoding statement requires %d bytes\n", program, size);
+  buffer=(char*)LIBRDF_MALLOC(cstring, size);
+
+  fprintf(stdout, "%s: Encoding statement in buffer\n", program);
+  size2=librdf_statement_encode(statement, buffer, size);
+  if(size2 != size) {
+    fprintf(stderr, "%s: Encoding statement used %d bytes, expected it to use %d\n", program, size2, size);
+    return(1);
+  }
+  
+    
+  fprintf(stdout, "%s: Creating new statement\n", program);
+  statement2=librdf_new_statement();
+
+  fprintf(stdout, "%s: Decoding statement from buffer\n", program);
+  if(!librdf_statement_decode(statement2, buffer, size)) {
+    fprintf(stderr, "%s: Decoding statement failed\n", program);
+    return(1);
+  }
+  LIBRDF_FREE(cstring, buffer);
+   
+  fprintf(stdout, "%s: New statement is: ", program);
+  librdf_statement_print(statement2, stdout);
+  fputs("\n", stdout);
+ 
+  
+  fprintf(stdout, "%s: Freeing statements\n", program);
+  librdf_free_statement(statement2);
   librdf_free_statement(statement);
+
 
   librdf_finish_statement();
   librdf_finish_uri();
