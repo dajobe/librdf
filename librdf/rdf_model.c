@@ -464,7 +464,7 @@ librdf_model_get_targets(librdf_model *model,
  * Searches the model for arcs matching the given arc and target
  * and returns one &librdf_node object
  * 
- * Return value:  &librdf_node object or NULL on failure
+ * Return value:  a new &librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_model_get_source(librdf_model *model,
@@ -473,6 +473,8 @@ librdf_model_get_source(librdf_model *model,
   librdf_iterator *iterator=librdf_storage_get_sources(model->storage, 
                                                        arc, target);
   librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
+  if(node)
+    node=librdf_new_node_from_node(node);
   librdf_free_iterator(iterator);
   return node;
 }
@@ -487,7 +489,7 @@ librdf_model_get_source(librdf_model *model,
  * Searches the model for arcs matching the given source and target
  * and returns one &librdf_node object
  * 
- * Return value:  &librdf_node object or NULL on failure
+ * Return value:  a new &librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_model_get_arc(librdf_model *model,
@@ -496,6 +498,8 @@ librdf_model_get_arc(librdf_model *model,
   librdf_iterator *iterator=librdf_storage_get_arcs(model->storage, 
                                                     source, target);
   librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
+  if(node)
+    node=librdf_new_node_from_node(node);
   librdf_free_iterator(iterator);
   return node;
 }
@@ -510,7 +514,7 @@ librdf_model_get_arc(librdf_model *model,
  * Searches the model for targets matching the given source and arc
  * and returns one &librdf_node object
  * 
- * Return value:  &librdf_node object or NULL on failure
+ * Return value:  a new &librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_model_get_target(librdf_model *model,
@@ -519,6 +523,8 @@ librdf_model_get_target(librdf_model *model,
   librdf_iterator *iterator=librdf_storage_get_targets(model->storage, 
                                                        source, arc);
   librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
+  if(node)
+    node=librdf_new_node_from_node(node);
   librdf_free_iterator(iterator);
   return node;
 }
