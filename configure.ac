@@ -658,7 +658,7 @@ else
 fi
 
 
-AC_ARG_WITH(mysql, [  --with-mysql(=CONFIG|yes|no) Location of MySQL 4 mysql_config (default=auto)], mysql_config="$withval", mysql_config="")
+AC_ARG_WITH(mysql, [  --with-mysql(=CONFIG|yes|no) Location of MySQL 3/4 mysql_config (default=auto)], mysql_config="$withval", mysql_config="")
 if test "X$mysql_config" != "Xno"; then
   if test "X$mysql_config" != "Xyes" ; then
     MYSQL_CONFIG=$mysql_config
