@@ -41,13 +41,6 @@
 #include <redland.h>
 
 
-/* C world - link to external declarations in rdf_init.h */
-extern const char * const redland_copyright_string;
-extern const char * const redland_version_string;
-extern const int redland_version_major;
-extern const int redland_version_minor;
-extern const int redland_version_release;
-
 #ifdef SWIGPYTHON
 /* swig doesn't declare all prototypes */
 static PyObject *_wrap_redland_copyright_string_get(void);
