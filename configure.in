@@ -81,7 +81,7 @@ AC_PREREQ(2.13)
 AC_INIT(rdf_node.c)
 AM_CONFIG_HEADER(rdf_config.h)
 
-AM_INIT_AUTOMAKE(redland, 0.9.2)
+AM_INIT_AUTOMAKE(redland, 0.9.3)
 
 AM_MAINTAINER_MODE
 
