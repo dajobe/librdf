@@ -46,7 +46,9 @@ enum command_type {
   CMD_PARSE_MODEL,
   CMD_PARSE_STREAM,
   CMD_ARCS_IN,
-  CMD_ARCS_OUT
+  CMD_ARCS_OUT,
+  CMD_HAS_ARC_IN,
+  CMD_HAS_ARC_OUT
 };
 
 typedef struct
@@ -74,6 +76,8 @@ static command commands[]={
   {CMD_PARSE_STREAM, "parse-stream", 2, 3, 1},
   {CMD_ARCS_IN, "arcs-in", 1, 1, 0},
   {CMD_ARCS_OUT, "arcs-out", 1, 1, 0},
+  {CMD_HAS_ARC_IN, "has-arc-in", 2, 2, 0},
+  {CMD_HAS_ARC_OUT, "has-arc-out", 2, 2, 0},
   {(enum command_type)-1, NULL}  
 };
  
@@ -101,6 +105,7 @@ main(int argc, char *argv[])
   int cmd_index;
   int count;
   int type;
+  int result;
 
   world=librdf_new_world();
   librdf_world_open(world);
@@ -173,6 +178,7 @@ main(int argc, char *argv[])
     fprintf(stdout, "  sources | targets | arcs NODE1 NODE2      Query for matching nodes\n");
     fprintf(stdout, "  source | target | arc NODE1 NODE2         Query for 1 matching node\n");
     fprintf(stdout, "  arcs-in | arcs-out NODE                   Show properties in/out of node\n");
+    fprintf(stdout, "  has-arc-in | has-arc-out NODE ARC         Test for property in/out of NODE\n");
     return(1);
   }
 
@@ -540,6 +546,22 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: matching arcs: %d\n", program, count);
 
     librdf_free_node(source);
+    break;
+
+
+  case CMD_HAS_ARC_IN:
+  case CMD_HAS_ARC_OUT:
+    source=librdf_new_node_from_uri_string(world, argv[0]);
+    arc=librdf_new_node_from_uri_string(world, argv[1]);
+    result=(type == CMD_HAS_ARC_IN) ? librdf_model_has_arc_in(model, arc, source) :
+                                      librdf_model_has_arc_out(model, source, arc);
+    if(result)
+      fprintf(stdout, "%s: the model contains the arc\n", program);
+    else
+      fprintf(stdout, "%s: the model does not contain the arc\n", program);
+
+    librdf_free_node(source);
+    librdf_free_node(arc);
     break;
 
 
