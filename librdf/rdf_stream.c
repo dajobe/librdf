@@ -43,8 +43,9 @@ static librdf_statement* librdf_stream_get_next_mapped_statement(librdf_stream* 
  * librdf_new_stream - Constructor - create a new librdf_stream
  * @world: redland world object
  * @context: context to pass to the stream implementing objects
- * @end_of_stream: pointer to function to test for end of stream
- * @next_statement: pointer to function to get the next statement in stream
+ * @is_end_method: pointer to function to test for end of stream
+ * @next_method: pointer to function to move to the next statement in stream
+ * @get_method: pointer to function to get the current statement
  * @finished: pointer to function to finish the stream.
  *
  * Creates a new stream with an implementation based on the passed in
@@ -63,9 +64,10 @@ static librdf_statement* librdf_stream_get_next_mapped_statement(librdf_stream* 
 librdf_stream*
 librdf_new_stream(librdf_world *world, 
                   void* context,
-		  int (*end_of_stream)(void*),
-		  librdf_statement* (*next_statement)(void*),
-		  void (*finished)(void*))
+		  int (*is_end_method)(void*),
+		  int (*next_method)(void*),
+                  void* (*get_method)(void*, int),
+		  void (*finished_method)(void*))
 {
   librdf_stream* new_stream;
   
@@ -77,11 +79,12 @@ librdf_new_stream(librdf_world *world,
 
   new_stream->context=context;
 
-  new_stream->end_of_stream=end_of_stream;
-  new_stream->next_statement=next_statement;
-  new_stream->finished=finished;
+  new_stream->is_end_method=is_end_method;
+  new_stream->next_method=next_method;
+  new_stream->get_method=get_method;
+  new_stream->finished_method=finished_method;
 
-  new_stream->is_end_stream=0;
+  new_stream->is_finished=0;
   
   return new_stream;
 }
@@ -94,9 +97,7 @@ librdf_new_stream(librdf_world *world,
 void
 librdf_free_stream(librdf_stream* stream) 
 {
-  stream->finished(stream->context);
-  if(stream->next)
-    librdf_free_statement(stream->next);
+  stream->finished_method(stream->context);
   
   LIBRDF_FREE(librdf_stream, stream);
 }
@@ -117,56 +118,21 @@ librdf_stream_get_next_mapped_statement(librdf_stream* stream)
   librdf_statement* statement=NULL;
   
   /* find next statement subject to map */
-  while(!stream->end_of_stream(stream->context)) {
-    statement=stream->next_statement(stream->context);
+  while(!stream->is_end_method(stream->context)) {
+    statement=stream->get_method(stream->context,
+                                 LIBRDF_STREAM_GET_METHOD_GET_OBJECT);
     if(!statement)
       break;
     
     /* apply the map to the statement  */
-    statement=stream->map(stream->map_context, statement);
+    if(stream->map)
+      statement=stream->map(stream->map_context, statement);
     /* found something, return it */
     if(statement)
       break;
+
+    stream->next_method(stream->context);
   }
-  return statement;
-}
-
-
-/**
- * librdf_stream_next - Get the next librdf_statement in the stream
- * @stream: &librdf_stream object
- *
- * The returned statement is owned by the caller and must be freed
- * using librdf_free_statement().
- *
- * Return value: a new &librdf_statement object or NULL at end of stream.
- **/
-librdf_statement*
-librdf_stream_next(librdf_stream* stream) 
-{
-  librdf_statement* statement;
-
-  if(stream->is_end_stream)
-    return NULL;
-
-  /* simple case, no mapping so pass on */
-  if(!stream->map)
-    return stream->next_statement(stream->context);
-
-  /* mapping from here */
-
-  /* return stored element if there is one */
-  if(stream->next) {
-    statement=stream->next;
-    stream->next=NULL;
-    return statement;
-  }
-
-  /* else get a new one or NULL at end of list */
-  statement=librdf_stream_get_next_mapped_statement(stream);
-  if(!statement)
-    stream->is_end_stream=1;
-
   return statement;
 }
 
@@ -184,26 +150,86 @@ librdf_stream_end(librdf_stream* stream)
   if(!stream)
     return 1;
   
-  if(stream->is_end_stream)
+  if(stream->is_finished)
     return 1;
 
   /* simple case, no mapping so pass on */
   if(!stream->map)
-    return (stream->is_end_stream=stream->end_of_stream(stream->context));
+    return (stream->is_finished=stream->is_end_method(stream->context));
 
 
   /* mapping from here */
 
   /* already have 1 stored item */
-  if(stream->next)
+  if(stream->current)
     return 0;
 
   /* get next item subject to map or NULL if list ended */
-  stream->next=librdf_stream_get_next_mapped_statement(stream);
-  if(!stream->next)
-    stream->is_end_stream=1;
+  stream->current=librdf_stream_get_next_mapped_statement(stream);
+  if(!stream->current)
+    stream->is_finished=1;
   
-  return stream->is_end_stream;
+  return (stream->current == NULL);
+}
+
+
+/**
+ * librdf_stream_next - Move to the next librdf_statement in the stream
+ * @stream: &librdf_stream object
+ *
+ * Return value: non 0 if the stream has finished
+ **/
+int
+librdf_stream_next(librdf_stream* stream) 
+{
+  if(stream->is_finished)
+    return 1;
+
+  stream->is_finished=stream->next_method(stream->context);
+
+  /* simple case, no mapping so pass on */
+  if(!stream->is_finished) {
+    stream->current=librdf_stream_get_next_mapped_statement(stream);
+
+    if(!stream->current)
+      stream->is_finished=1;
+  }
+
+  return stream->is_finished;
+}
+
+
+/**
+ * librdf_stream_get_object - Get the current librdf_statement in the stream
+ * @stream: &librdf_stream object
+ *
+ * Return value: the current &librdf_statement object or NULL at end of stream.
+ **/
+librdf_statement*
+librdf_stream_get_object(librdf_stream* stream) 
+{
+  if(stream->is_finished)
+    return NULL;
+
+  return stream->get_method(stream->context, 
+                            LIBRDF_STREAM_GET_METHOD_GET_OBJECT);
+}
+
+
+/**
+ * librdf_stream_get_context - Get the context of the current object on the stream
+ * @stream: the &librdf_stream object
+ *
+ * Return value: The context or NULL if the stream has finished.
+ **/
+void*
+librdf_stream_get_context(librdf_stream* stream) 
+{
+  if(stream->is_finished)
+    return NULL;
+
+  return stream->get_method(stream->context, 
+                            LIBRDF_STREAM_GET_METHOD_GET_CONTEXT);
 }
 
 
@@ -230,12 +256,14 @@ librdf_stream_set_map(librdf_stream* stream,
 
 
 static int librdf_stream_from_node_iterator_end_of_stream(void* context);
-static librdf_statement* librdf_stream_from_node_iterator_next_statement(void* context);
+static int librdf_stream_from_node_iterator_next_statement(void* context);
+static void* librdf_stream_from_node_iterator_get_statement(void* context, int flags);
 static void librdf_stream_from_node_iterator_finished(void* context);
 
 typedef struct {
   librdf_iterator *iterator;
   librdf_statement* statement;
+  librdf_statement current; /* static, shared statement */
   unsigned int field;
 } librdf_stream_from_node_iterator_stream_context;
 
@@ -266,6 +294,31 @@ librdf_new_stream_from_node_iterator(librdf_iterator* iterator,
   if(!scontext)
     return NULL;
 
+  librdf_statement_init(iterator->world, &scontext->current);
+
+  /* Initialise static result statement nodes with SHARED copies of nodes .
+   * Since this is a static statement, this is ok, librdf_statement_free
+   * is never called on it, so the shared nodes pointers are never freed.
+   */
+  switch(field) {
+    case LIBRDF_STATEMENT_SUBJECT:
+      librdf_statement_set_predicate(&scontext->current, librdf_statement_get_predicate(statement));
+      librdf_statement_set_object(&scontext->current, librdf_statement_get_object(statement)); 
+      break;
+    case LIBRDF_STATEMENT_PREDICATE:
+      librdf_statement_set_subject(&scontext->current, librdf_statement_get_subject(statement));
+      librdf_statement_set_object(&scontext->current, librdf_statement_get_object(statement)); 
+      break;
+    case LIBRDF_STATEMENT_OBJECT:
+      librdf_statement_set_subject(&scontext->current, librdf_statement_get_subject(statement));
+      librdf_statement_set_predicate(&scontext->current, librdf_statement_get_predicate(statement));
+      break;
+    default:
+      LIBRDF_FATAL2(librdf_stream_from_node_iterator,
+                    "Illegal statement field %d seen\n", scontext->field);
+      
+  }
+  
   scontext->iterator=iterator;
   scontext->statement=statement;
   scontext->field=field;
@@ -274,6 +327,7 @@ librdf_new_stream_from_node_iterator(librdf_iterator* iterator,
                            (void*)scontext,
                            &librdf_stream_from_node_iterator_end_of_stream,
                            &librdf_stream_from_node_iterator_next_statement,
+                           &librdf_stream_from_node_iterator_get_statement,
                            &librdf_stream_from_node_iterator_finished);
   if(!stream) {
     librdf_stream_from_node_iterator_finished((void*)scontext);
@@ -293,41 +347,55 @@ librdf_stream_from_node_iterator_end_of_stream(void* context)
 }
 
 
-static librdf_statement*
+static int
 librdf_stream_from_node_iterator_next_statement(void* context)
 {
   librdf_stream_from_node_iterator_stream_context* scontext=(librdf_stream_from_node_iterator_stream_context*)context;
+
+  return librdf_iterator_next(scontext->iterator);
+}
+
+
+static void*
+librdf_stream_from_node_iterator_get_statement(void* context, int flags)
+{
+  librdf_stream_from_node_iterator_stream_context* scontext=(librdf_stream_from_node_iterator_stream_context*)context;
   librdf_node* node;
-  librdf_statement* statement;
   
-  if(!(node=(librdf_node*)librdf_iterator_get_object(scontext->iterator)))
-    return NULL;
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
 
-  statement=librdf_new_statement_from_statement(scontext->statement);
-  if(!statement) {
-    librdf_free_node(node);
-    return NULL;
-  }
+      if(!(node=(librdf_node*)librdf_iterator_get_object(scontext->iterator)))
+        return NULL;
 
-  switch(scontext->field) {
-    case LIBRDF_STATEMENT_SUBJECT:
-      librdf_statement_set_subject(statement, node);
-      break;
-    case LIBRDF_STATEMENT_PREDICATE:
-      librdf_statement_set_predicate(statement, node);
-      break;
-    case LIBRDF_STATEMENT_OBJECT:
-      librdf_statement_set_object(statement, node);
-      break;
+      /* The node object above is shared, no need to free it before
+       * assigning to the statement, which is also shared, and
+       * return to the user.
+       */
+      switch(scontext->field) {
+        case LIBRDF_STATEMENT_SUBJECT:
+          librdf_statement_set_subject(&scontext->current, node);
+          break;
+        case LIBRDF_STATEMENT_PREDICATE:
+          librdf_statement_set_predicate(&scontext->current, node);
+          break;
+        case LIBRDF_STATEMENT_OBJECT:
+          librdf_statement_set_object(&scontext->current, node);
+          break;
+        default:
+          LIBRDF_FATAL2(librdf_stream_from_node_iterator_next_statement,
+                        "Illegal statement field %d seen\n", scontext->field);
+          
+      }
+      
+      return &scontext->current;
+
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      return (librdf_statement*)librdf_iterator_get_context(scontext->iterator);
     default:
-      LIBRDF_FATAL2(librdf_stream_from_node_iterator_next_statement,
-                    "Illegal statement field %d seen\n", scontext->field);
-
+      abort();
   }
 
-  librdf_iterator_next(scontext->iterator);
-
-  return statement;
 }
 
 
@@ -364,7 +432,7 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
 
   while(!librdf_stream_end(stream)) {
     char *s;
-    librdf_statement* statement=librdf_stream_next(stream);
+    librdf_statement* statement=librdf_stream_get_object(stream);
     if(!statement)
       break;
 
@@ -375,7 +443,7 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
       fputs("\n", fh);
       LIBRDF_FREE(cstring, s);
     }
-    librdf_free_statement(statement);
+    librdf_stream_next(stream);
   }
 }
 
