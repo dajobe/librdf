@@ -96,6 +96,7 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_CHECK_PROGS(JAVA, java jre)
 AC_DEFINE_UNQUOTED(JAVA_COMMAND, "$JAVA")
+AC_CHECK_PROGS(PYTHON, python2.0 python1.5 python)
 
 AC_CHECK_PROG(LIBWWW_CONFIG, libwww-config, libwww-config)
 
@@ -195,7 +196,7 @@ fi
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h unistd.h string.h fcntl.h dmalloc.h)
+AC_CHECK_HEADERS(stdlib.h unistd.h string.h fcntl.h dmalloc.h stdarg.h)
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -319,10 +320,10 @@ AC_CHECK_HEADERS(gnome-xml/parser.h)
 
 
 dnl Checks for RDF parsers
-parser_modules="redland repat sirpac libwww"
+parser_modules="redland repat sirpac-stanford sirpac-w3c libwww"
 
 AC_MSG_CHECKING(RDF parsers required)
-AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [redland repat sirpac libwww]], parser_modules="$enableval") 
+AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [redland repat sirpac-stanford sirpac-w3c libwww]], parser_modules="$enableval") 
 if test "X$parser_modules" = "no" -o "X$parser_modules" = X; then
   parser_modules=
 fi
@@ -330,7 +331,10 @@ AC_MSG_RESULT($parser_modules)
 
 PARSER_OBJS=
 PARSER_SRCS=
-RDF_JAVA_API_JAR=
+JAVA_SIRPACSTANFORD_JAR=
+JAVA_SIRPACW3C_JAR=
+JAVA_SAX_JAR=
+JAVA_SAX_CLASS=
 JAVA_CLASSES=
 
 
@@ -343,26 +347,102 @@ if test "x" = "y"; then
   AC_DEFINE(HAVE_LIBWWW_RDF_PARSER)
 fi
 
+# old:
+# AC_ARG_WITH(rdf-java-api, [  --with-rdf-java-api=JAR Use the Java RDF API in the given jar file [no]], java_rdf_jar="$withval", java_rdf_jar="no") 
+
+AC_ARG_WITH(java-sirpac-stanford-jar, [  --with-java-sirpac-stanford-jar=JAR Use the SiRPAC (Stanford version) jar file [no]], java_sirpac_stanford_jar="$withval", java_sirpac_stanford_jar="no") 
+
+AC_ARG_WITH(java-sirpac-w3c-jar, [  --with-java-sirpac-w3c-jar=JAR Use the SiRPAC (W3C version) jar file [no]], java_sirpac_w3c_jar="$withval", java_sirpac_w3c_jar="no") 
+
+AC_ARG_WITH(java-sax-jar, [  --with-java-sax-jar=JAR Use the Java SAX implementation in the given jar file [no]], java_sax_jar="$withval", java_sax_jar="no") 
+AC_ARG_WITH(java-sax-class, [  --with-java-sax-class=CLASS  Give the Java SAX class name for the SAX jar file [no]], java_sax_class="$withval", java_sax_class="no") 
+
+have_sirpac=0
+
+have_sirpac_stanford=0
+AC_MSG_CHECKING(whether using Java SiRPAC - Stanford version)
+if test "$java_sirpac_stanford_jar" != no ; then
+  AC_DEFINE_UNQUOTED(JAVA_SIRPACSTANFORD_JAR, "$java_sirpac_stanford_jar")
+  if test -r $java_sirpac_stanford_jar; then
+    AC_MSG_RESULT(yes)
+    if test "X$java_sax_class" = no ; then
+      # was: com.microstar.xml.SAXDriver
+      java_sax_class=org.brownell.xml.aelfred2.SAXDriver
+    fi
+    have_sirpac_stanford=1
+    have_sirpac=1
+  else
+    AC_MSG_RESULT(no - JAR file $java_sirpac_stanford_jar does not exist)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
+
+
+have_sirpac_w3c=0
+AC_MSG_CHECKING(whether using Java SiRPAC - W3C version)
+if test "$java_sirpac_w3c_jar" != no ; then
+  AC_DEFINE_UNQUOTED(JAVA_SIRPACW3C_JAR, "$java_sirpac_w3c_jar")
+  if test -r $java_sirpac_w3c_jar; then
+    AC_MSG_RESULT(yes)
+    have_sirpac_w3c=1
+    have_sirpac=1
+  else
+    AC_MSG_RESULT(no - JAR file $java_sirpac_w3c_jar does not exist)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
+
+
+
+have_sax=0
+AC_MSG_CHECKING(whether using Java SAX)
+if test "$java_sax_jar" != no ; then
+  AC_DEFINE_UNQUOTED(JAVA_SAX_JAR, "$java_sax_jar")
+  if test -r $java_sax_jar; then
+    if test "$java_sax_class" != no ; then
+      AC_MSG_RESULT(yes)
+      JAVA_SAX_JAR=$java_sax_jar
+      JAVA_SAX_CLASS=$java_sax_class
+      have_sax=1
+    else
+      AC_MSG_RESULT(no - SAX class must given with --with-java-sax-class)
+    fi
+  else
+    AC_MSG_RESULT(no - JAR file $java_sax_jar does not exist)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
+AC_DEFINE_UNQUOTED(JAVA_SAX_JAR, "$java_sax_jar")
+AC_DEFINE_UNQUOTED(JAVA_SAX_CLASS, "$java_sax_class")
+
+
+seen_sirpac=0
+parsers_available=
 for parser in $parser_modules; do
   uname=`echo $parser | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
   found=0
+  original_parser=$parser
+
   case $parser in
-  sirpac)
-    AC_ARG_WITH(rdf-java-api, [  --with-rdf-java-api=JAR Use the Java RDF API in the given jar file [no]], rdf_java_api_jar="$withval", rdf_java_api_jar="no") 
-    AC_MSG_CHECKING(whether to use Java RDF API)
-    if test "$rdf_java_api_jar" != no ; then
-      AC_DEFINE_UNQUOTED(RDF_JAVA_API_JAR, "$rdf_java_api_jar")
-      if test -r $rdf_java_api_jar; then
-	AC_MSG_RESULT(yes)
-	RDF_JAVA_API_JAR=$rdf_java_api_jar
-	JAVA_CLASSES="PrintConsumer.class PrintParser.class"
-        found=1
-      else
-	AC_MSG_RESULT(no - JAR file $rdf_java_api_jar does not exist)
+    sirpac-stanford)
+      if test $have_sirpac_stanford = 1 ; then
+	found=1
+        parser=sirpac
       fi
-    else
-      AC_MSG_RESULT(no)
-    fi
+    ;;
+
+    sirpac-w3c)
+      if test $have_sirpac_w3c = 1 ; then
+        if test $have_sax = 1 ; then
+  	  found=1
+          parser=sirpac
+        else
+          AC_MSG_WARN(Cannot use SiRPAC W3C version - no SAX jar and class given)
+        fi
+      fi
     ;;
   
     libwww)
@@ -419,6 +499,21 @@ for parser in $parser_modules; do
       AC_MSG_ERROR(No such parser $parser)
   esac
 
+  if test $found = 1; then
+    parsers_available="$parsers_available $original_parser"
+  fi
+
+  # Only add sirpac parser module once even if many sirpac-* parsers are used
+  if test $parser = sirpac; then
+    uname=`echo $parser | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
+    if test $seen_sirpac = 1; then
+      found=0
+    else
+      seen_sirpac=1
+      JAVA_CLASSES="$JAVA_CLASSES PrintConsumer.class PrintParser.class"
+    fi
+  fi
+
   # Add objects, sources only if the parser was found
   if test $found = 1; then
     PARSER_OBJS="$PARSER_OBJS rdf_parser_$parser.o"
@@ -428,10 +523,26 @@ for parser in $parser_modules; do
     AC_DEFINE_UNQUOTED($n)
   fi
 done
+AC_MSG_CHECKING(RDF parsers available)
+AC_MSG_RESULT($parsers_available)
 
-AC_SUBST(RDF_JAVA_API_JAR)
+
+dnl Checks for languages
 AC_SUBST(JAVA_CLASSES)
 AC_DEFINE_UNQUOTED(JAVA_CLASS_DIR, "$prefix/share/$PACKAGE")
+
+if test "X$PYTHON" != X; then
+
+  dnl need to change quotes to allow square brackets
+  changequote(<<, >>)dnl
+  python_version=`$PYTHON -c 'import sys; print sys.version[:3]'`
+  python_prefix=`$PYTHON -c 'import sys; print sys.prefix'`
+  changequote([, ])dnl
+
+  # What a crock
+  PYTHON_INCLUDES="-I$python_prefix/include/python$python_version"
+  AC_SUBST(PYTHON_INCLUDES)
+fi
 
 AC_SUBST(PARSER_OBJS)
 AC_SUBST(PARSER_SRCS)
@@ -585,7 +696,7 @@ AC_SUBST(HASH_SRCS)
 
 
 dnl Checks for building sub-packages in sub directories
-SD="docs perl"
+SD="docs perl python"
 
 
 XML_OBJS=
@@ -650,6 +761,8 @@ expat/xmltok/Makefile
 perl/Makefile
 perl/lib/Makefile
 perl/lib/RDF/Makefile
+python/Makefile
+python/test/Makefile
 repat/Makefile
 redland.spec
 redland-config,
