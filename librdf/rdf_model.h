@@ -226,7 +226,7 @@ librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* 
 
 /* query language */
 librdf_stream* librdf_model_query(librdf_model* model, librdf_query* query);
-librdf_stream* librdf_model_query_string(librdf_model* model, const char *name, librdf_uri* uri, const char *query_string);
+librdf_stream* librdf_model_query_string(librdf_model* model, const char *name, librdf_uri* uri, const unsigned char *query_string);
 
 void librdf_model_sync(librdf_model* model);
 
