@@ -96,6 +96,13 @@ main(int argc, char *argv[])
   librdf_free_parser(parser);
 
 
+  librdf_model_add_statement(model, 
+                             librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/"),
+                                                             librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/title"),
+                                                             librdf_new_node_from_literal(world, "My Home Page", NULL, 0)
+                                                             )
+                             );
+
   /* Print out the model*/
 
 
