@@ -30,7 +30,7 @@ Group: Development/Libraries
 Requires: redland
 
 %description devel
-Header files for development with redland
+Header files for development with Redland
 
 %package perl
 Summary: Perl modules for the Redland RDF system
@@ -77,7 +77,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root)
 
 %{prefix}/bin/*
-%{prefix}/lib/*
+%{prefix}/lib/librdf.a
 %{prefix}/include/redland.h
 %{prefix}/include/librdf.h 
 %{prefix}/include/rdf_hash.h 
@@ -110,7 +110,6 @@ rm -rf $RPM_BUILD_ROOT
 %files perl
 %defattr(-, root, root)
 
-%{prefix}/lib/perl5/site_perl/*/*/auto/redland
 %{prefix}/lib/perl5/site_perl/*/*/auto/redland/*
 %{prefix}/lib/perl5/site_perl/*/*/Redland.pm
 %{prefix}/lib/perl5/site_perl/*/*/RDF
