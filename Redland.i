@@ -147,84 +147,72 @@ static PyMethodDef librdf_python_methods [] = {
  * calls a python function defined as:
  *   RDF.message($$)
  * where first argument is an integer, second is a (scalar) string
+ * with an integer return value indicating if the message was handled.
  */
-static void
+static int
 librdf_call_python_message(int type, const char *message, va_list arguments)
 {
   char empty_buffer[1];
-#ifdef PYTHON_EXCEPTIONS_WORKING
   PyObject *arglist;
   PyObject *result;
-#endif
   char *buffer;
   int len;
   va_list args_copy;
+  int rc=0;
 
-  if(!librdf_python_callback) {
-    fprintf(stderr, "librdf_call_python_message: No message callback registered\n");
-    return;
-  }
+  if(!librdf_python_callback)
+    return 0;
 
   /* ask vsnprintf size of buffer required */
   va_copy(args_copy, arguments);
   len=vsnprintf(empty_buffer, 1, message, args_copy)+1;
   va_end(args_copy);
   buffer=(char*)malloc(len);
-  if(!buffer)
+  if(!buffer) {
     fprintf(stderr, "librdf_call_python_message: Out of memory\n");
-  else {
-    va_copy(args_copy, arguments);
-    vsnprintf(buffer, len, message, args_copy);
-    va_end(args_copy);
-
-    if(type == 0) {
-#ifdef PYTHON_EXCEPTIONS_WORKING
-      PyObject *error = PyErr_NewException("Redland.error", NULL, NULL);
-      /* error */
-      PyErr_SetString(error, buffer);
-#else
-      PyErr_Warn(NULL, buffer);
-#endif
-    } else {
-      /* warning */
-       PyErr_Warn(NULL, buffer);
-    }
-
-#ifdef PYTHON_EXCEPTIONS_WORKING
-    /* call the callback */
-    arglist = Py_BuildValue("(is)", type, buffer);
-    if(!arglist) {
-      fprintf(stderr, "librdf_call_python_message: Out of memory\n");
-      free(buffer);
-      return;
-    }
-    result = PyEval_CallObject(librdf_python_callback, arglist);
-    Py_DECREF(arglist);
-    if (result == NULL) {
-      free(buffer);
-      return;
-    }
-    
-    /* no result */
-    Py_DECREF(result);
-#endif
-    free(buffer);
+    return 0;
   }
+  
+  va_copy(args_copy, arguments);
+  vsnprintf(buffer, len, message, args_copy);
+  va_end(args_copy);
+
+  /* call the callback */
+  arglist = Py_BuildValue("(is)", type, buffer);
+  if(!arglist) {
+    fprintf(stderr, "librdf_call_python_message: Out of memory\n");
+    free(buffer);
+    return 0;
+  }
+  result = PyEval_CallObject(librdf_python_callback, arglist);
+  Py_DECREF(arglist);
+  if(result) {
+    if(PyInt_Check(result))
+      rc=(int)PyInt_AS_LONG(result);
+    
+    Py_DECREF(result);
+  }
+
+  free(buffer);
+
+  rc=1;
+  
+  return rc;
 }
 
-static void
+static int
 librdf_python_error_handler(void *user_data, 
                             const char *message, va_list arguments)
 {
-  librdf_call_python_message(0, message, arguments);
+  return librdf_call_python_message(0, message, arguments);
 }
 
 
-static void
+static int
 librdf_python_warning_handler(void *user_data,
                               const char *message, va_list arguments)
 {
-  librdf_call_python_message(1, message, arguments);
+  return librdf_call_python_message(1, message, arguments);
 }
 
 void
