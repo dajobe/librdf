@@ -17,16 +17,19 @@ dnl Checks for programs.
 AC_CANONICAL_HOST
 AC_ARG_PROGRAM
 AM_SANITY_CHECK
-AC_PROG_CC
+AM_PROG_CC_STDC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+dnl AM_PROG_LIBTOOL
 
 AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
 AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
 AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
 AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
+
+
 
 
 dnl Checks for libraries.
@@ -90,10 +93,10 @@ fi
 
 
 dnl Checks for library functions.
-
+AC_FUNC_MEMCMP
 
 dnl Checks for URI resolvers
-AC_ARG_WITH(libwww, [  --with-libww  Use libwww [yes]], enable_libwww="$withval", enable_libwww="yes") 
+AC_ARG_WITH(libwww, [  --with-libww  Use libwww [yes]], enable_libwww="$withval", enable_libwww="no") 
 
 AC_MSG_CHECKING(whether to use libwww)
 if test "$enable_libwww" = yes ; then
@@ -121,6 +124,14 @@ DIGEST_SRCS=
 
 AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests [yes]], enable_openssl_digests="$withval", enable_openssl_digests="yes") 
 
+# This is needed because autoheader can't work out which computed
+# symbols must be pulled from acconfig.h into config.h.in
+if test "x" = "y"; then
+  AC_DEFINE(HAVE_OPENSSL_CRYPTO_MD5_DIGEST)
+  AC_DEFINE(HAVE_OPENSSL_CRYPTO_SHA1_DIGEST)
+  AC_DEFINE(HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST)
+fi
+
 AC_MSG_CHECKING(whether to use openssl digests)
 if test "$enable_openssl_digests" = yes ; then
   AC_MSG_RESULT(yes)
@@ -129,45 +140,28 @@ if test "$enable_openssl_digests" = yes ; then
     AC_DEFINE(HAVE_OPENSSL_DIGESTS)
     new_digest_modules=
     oLIBS="$LIBS"
-    have_libcrypto=
+    LIBS="-lcrypto $LIBS"
+    have_libcrypto=no
 
     for module in $digest_modules; do
-      func=`echo $module | tr 'a-z' 'A-Z'`
-      # This is needed because autoheader can't work out which computed
-      # symbols must be pulled from acconfig.h into config.h.in
+      func=`echo $module | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
       found=
-      case "$func" in
-        MD5)
-	  AC_CHECK_LIB(crypto, MD5)
-          if test "$ac_cv_lib_crypto_MD5"; then
-            AC_DEFINE(HAVE_OPENSSL_CRYPTO_MD5_DIGEST)
-	    found=yes
-          fi
-	  ;;
-        SHA1)
-	  AC_CHECK_LIB(crypto, SHA1)
-          if test "$ac_cv_lib_crypto_SHA1"; then
-            AC_DEFINE(HAVE_OPENSSL_CRYPTO_SHA1_DIGEST)
-	    found=yes
-          fi
-	  ;;
-        RIPEMD160)
-	  AC_CHECK_LIB(crypto, RIPEMD160)
-          if test "$ac_cv_lib_crypto_RIPEMD160"; then
-            AC_DEFINE(HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST)
-	    found=yes
-          fi
-	  ;;
-        esac
-      if test "$found" = yes; then
+      AC_MSG_CHECKING(for openssl $func digest module)
+      AC_CACHE_VAL(ac_cv_lib_crypto_$func,
+                   [AC_TRY_LINK(, $func(),
+                   [eval "ac_cv_lib_crypto_$func=yes"],
+                   [eval "ac_cv_lib_crypto_$func=no"])])
+      if eval "test \"`echo '$ac_cv_lib_crypto_'$func`\" = yes"; then
+	AC_MSG_RESULT(yes)
+	n=HAVE_$func
+	AC_DEFINE_UNQUOTED($n)
         have_libcrypto=yes
       else
+	AC_MSG_RESULT(no)
 	new_digest_modules="${new_digest_modules} $module"
       fi
     done
-    if test "$have_libcrypto" = yes; then
-      LIBS="-lcrypto $oLIBS"
-    else
+    if test "$have_libcrypto" = no; then
       LIBS="$oLIBS"
     fi
     DIGEST_OBJS="$DIGEST_OBJS rdf_digest_openssl.o"
@@ -179,18 +173,24 @@ else
 fi
 
 
+# This is needed because autoheader can't work out which computed
+# symbols must be pulled from acconfig.h into config.h.in
+if test "x" = "y"; then
+  AC_DEFINE(HAVE_LOCAL_MD5_DIGEST)
+  AC_DEFINE(HAVE_LOCAL_SHA1_DIGEST)
+  AC_DEFINE(HAVE_LOCAL_RIPEMD160_DIGEST)
+fi
+
 # Maybe add some local digest modules
 for module in $digest_modules; do
-  module_u=`echo $module | tr 'a-z' 'A-Z'`
+  module_u=`echo $module | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
   AC_MSG_CHECKING(for local $module digest module)
   if test -r $srcdir/$module.c; then
     AC_MSG_RESULT(yes);
-    # This is needed because autoheader can't work out which computed
-    # symbols must be pulled from acconfig.h into config.h.in
-    case "$module_u" in
-      MD5) AC_DEFINE(HAVE_LOCAL_MD5_DIGEST) ;;
-      SHA1) AC_DEFINE(HAVE_LOCAL_SHA1_DIGEST) ;;
-    esac
+
+    n=HAVE_$module_u
+    AC_DEFINE_UNQUOTED($n)
+
     DIGEST_OBJS="$DIGEST_OBJS $module.o"
     DIGEST_SRCS="$DIGEST_SRCS $module.c"
   else
@@ -228,6 +228,16 @@ fi
 AC_SUBST(HASH_OBJS)
 AC_SUBST(HASH_SRCS)
 
+
+dnl Checks for packages
+SD=docs
+
+#if test -d libxml2-2.1.1; then 
+#  SD="$SD libxml2-2.1.1"
+#  (cd libxml2-2.1.1 && ./configure --cache=../config.cache --enable-shared=no)
+#fi
+
+AC_SUBST(SD)
 
 AC_OUTPUT(Makefile
 docs/Makefile
