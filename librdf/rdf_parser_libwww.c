@@ -453,7 +453,7 @@ librdf_parser_libwww_parse_common(void *context,
   if(!scontext)
     return NULL;
 
-  scontext->pcontext=context;
+  scontext->pcontext=pcontext;
   
   librdf_parser_libwww_client_profile("librdf_parser_libwwww", "1.0");
 
@@ -548,7 +548,7 @@ librdf_parser_libwww_get_next_statement(librdf_parser_libwww_stream_context *con
     context->request_done=1;
   }
   
-  context->next=librdf_list_pop(context->statements);
+  context->next=(librdf_statement*)librdf_list_pop(context->statements);
 
   if(!context->next)
     context->end_of_stream=1;
