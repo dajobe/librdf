@@ -468,50 +468,50 @@ int getoptions(int argc,char *argv[],librdf_world *world)
 
 int usage(char *argv0,int version)
 {
-	printf("\
-%s  Version %s\
-Retrieve statements from persistent Redland storage.\
-* Copyright (C) 2003 Morten Frederiksen - http://purl.org/net/morten/\
-* Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/\
+	printf("\n\
+%s  Version %s\n\
+Retrieve statements from persistent Redland storage.\n\
+* Copyright (C) 2003 Morten Frederiksen - http://purl.org/net/morten/\n\
+* Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/\n\
 ",argv0,VERSION);
 	if (version)
 		exit(0);
-	printf("\
-usage: %s [options] [ <URI> ]\
-\
-  -?, --help         Display this help message and exit.\
-  -c<uri>, --context=<uri>\
-                     Extract only statements with given context URI.\
-  -D<database>, --database=<database>\
-                     Name of MySQL database to use, default is 'redland'.\
-  -d<directory>, --directory=<directory>\
-                     Directory to use for BDB files. When provided implies use\
-                     of 'hashes' storage type instead of 'mysql'.\
-  -h<host name>, --host=<host name>\
-                     Host to contact for MySQL connections, default is 'mysql'.\
-  -i<storage id>, --id=<storage id>\
-                     Identifier for (name of) storage (model name for storage\
-                     type 'mysql', base file name for storage type 'hashes'),\
-                     default is 'redland'.\
-  -l<number>, --level=<number>\
-                     The number of levels of statements to extract. Default is\
-                     1, also returning statements about objects.\
-  -o<syntax id>, --output=<syntax id>\
-                     Syntax identifier for serialization, 'ntriples' or\
-                     'rdfxml' (default).\
-  -p<password>, --password=<password>\
-                     Password to use when connecting to MySQL server.\
-                     If password is not given it's asked from the tty.\
-  -P<port number>, --port=<port number>\
-                     The port number to use when connecting to MySQL server.\
-                     Default port number is 3306.\
-  -q<query language>, --query=<query language>\
-                     Name of query language for query read from stdin. This\
-                     overrides any subject URI given.\
-  -u<user name>, --user=<user name>\
-                     User name for MySQL server.\
-  -v, --version      Output version information and exit.\
-\
+	printf("\n\
+usage: %s [options] [ <URI> ]\n\
+\n\
+  -?, --help         Display this help message and exit.\n\
+  -c<uri>, --context=<uri>\n\
+                     Extract only statements with given context URI.\n\
+  -D<database>, --database=<database>\n\
+                     Name of MySQL database to use, default is 'redland'.\n\
+  -d<directory>, --directory=<directory>\n\
+                     Directory to use for BDB files. When provided implies use\n\
+                     of 'hashes' storage type instead of 'mysql'.\n\
+  -h<host name>, --host=<host name>\n\
+                     Host to contact for MySQL connections, default is 'mysql'.\n\
+  -i<storage id>, --id=<storage id>\n\
+                     Identifier for (name of) storage (model name for storage\n\
+                     type 'mysql', base file name for storage type 'hashes'),\n\
+                     default is 'redland'.\n\
+  -l<number>, --level=<number>\n\
+                     The number of levels of statements to extract. Default is\n\
+                     1, also returning statements about objects.\n\
+  -o<syntax id>, --output=<syntax id>\n\
+                     Syntax identifier for serialization, 'ntriples' or\n\
+                     'rdfxml' (default).\n\
+  -p<password>, --password=<password>\n\
+                     Password to use when connecting to MySQL server.\n\
+                     If password is not given it's asked from the tty.\n\
+  -P<port number>, --port=<port number>\n\
+                     The port number to use when connecting to MySQL server.\n\
+                     Default port number is 3306.\n\
+  -q<query language>, --query=<query language>\n\
+                     Name of query language for query read from stdin. This\n\
+                     overrides any subject URI given.\n\
+  -u<user name>, --user=<user name>\n\
+                     User name for MySQL server.\n\
+  -v, --version      Output version information and exit.\n\
+\n\
 ",argv0);
 	exit(1);
 }

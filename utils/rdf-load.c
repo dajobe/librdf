@@ -360,51 +360,51 @@ int getoptions(int argc,char *argv[],librdf_world *world)
 
 int usage(char *argv0,int version)
 {
-	printf("\
-%s  Version %s\
-Load statements from URI and store in persistent Redland storage.\
-* Copyright (C) 2003 Morten Frederiksen - http://purl.org/net/morten/\
-* Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/\
+	printf("\n\
+%s  Version %s\n\
+Load statements from URI and store in persistent Redland storage.\n\
+* Copyright (C) 2003 Morten Frederiksen - http://purl.org/net/morten/\n\
+* Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/\n\
 ",argv0,VERSION);
 	if (version)
 		exit(0);
-	printf("\
-usage: %s [options] <URI>\
-\
-  -?, --help         Display this help message and exit.\
-  -b<uri>, --base=<uri>\
-                     Base URI for parsing input statements.\
-  -c<uri>, --context=<uri>\
-                     URI to store with triples as context, default is base URI\
-                     if present, otherwise source URI.\
-  -D<database>, --database=<database>\
-                     Name of MySQL database to use, default is 'redland'.\
-  -d<directory>, --directory=<directory>\
-                     Directory to use for BDB files. When provided implies use\
-                     of 'hashes' storage type instead of 'mysql'.\
-  -h<host name>, --host=<host name>\
-                     Host to contact for MySQL connections, default is 'mysql'.\
-  -i<storage id>, --id=<storage id>\
-                     Identifier for (name of) storage (model name for storage\
-                     type 'mysql', base file name for storage type 'hashes'),\
-                     default is 'redland'.\
-  -k, --keep         By default, existing statements in the given context will\
-                     be removed prior to insertion of new statements, this\
-                     option will skip the removal.\
-  -n, --new          Truncate model before adding new statements.\
-  -p<password>, --password=<password>\
-                     Password to use when connecting to MySQL server.\
-                     If password is not given it's asked from the tty.\
-  -P<port number>, --port=<port number>\
-                     The port number to use when connecting to MySQL server.\
-                     Default port number is 3306.\
-  -r<parser name>, --rdf-parser=<parser name>\
-                     Name of parser to use ('raptor' for RDF/XML, or 'ntriples'\
-                     for NTriples), default is 'raptor'.\
-  -u<user name>, --user=<user name>\
-                     User name for MySQL server.\
-  -v, --version      Output version information and exit.\
-\
+	printf("\n\
+usage: %s [options] <URI>\n\
+\n\
+  -?, --help         Display this help message and exit.\n\
+  -b<uri>, --base=<uri>\n\
+                     Base URI for parsing input statements.\n\
+  -c<uri>, --context=<uri>\n\
+                     URI to store with triples as context, default is base URI\n\
+                     if present, otherwise source URI.\n\
+  -D<database>, --database=<database>\n\
+                     Name of MySQL database to use, default is 'redland'.\n\
+  -d<directory>, --directory=<directory>\n\
+                     Directory to use for BDB files. When provided implies use\n\
+                     of 'hashes' storage type instead of 'mysql'.\n\
+  -h<host name>, --host=<host name>\n\
+                     Host to contact for MySQL connections, default is 'mysql'.\n\
+  -i<storage id>, --id=<storage id>\n\
+                     Identifier for (name of) storage (model name for storage\n\
+                     type 'mysql', base file name for storage type 'hashes'),\n\
+                     default is 'redland'.\n\
+  -k, --keep         By default, existing statements in the given context will\n\
+                     be removed prior to insertion of new statements, this\n\
+                     option will skip the removal.\n\
+  -n, --new          Truncate model before adding new statements.\n\
+  -p<password>, --password=<password>\n\
+                     Password to use when connecting to MySQL server.\n\
+                     If password is not given it's asked from the tty.\n\
+  -P<port number>, --port=<port number>\n\
+                     The port number to use when connecting to MySQL server.\n\
+                     Default port number is 3306.\n\
+  -r<parser name>, --rdf-parser=<parser name>\n\
+                     Name of parser to use ('raptor' for RDF/XML, or 'ntriples'\n\
+                     for NTriples), default is 'raptor'.\n\
+  -u<user name>, --user=<user name>\n\
+                     User name for MySQL server.\n\
+  -v, --version      Output version information and exit.\n\
+\n\
 ",argv0);
 	exit(1);
 }
