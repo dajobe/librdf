@@ -1596,6 +1596,136 @@ librdf_storage_hashes_sync(librdf_storage *storage)
 }
 
 
+typedef struct {
+  librdf_world *world;
+  librdf_iterator *iterator;
+  librdf_hash_datum *key;
+  librdf_node *current;
+} librdf_storage_hashes_get_contexts_iterator_context;
+
+
+
+static int
+librdf_storage_hashes_get_contexts_is_end(void* iterator)
+{
+  librdf_storage_hashes_get_contexts_iterator_context* icontext=(librdf_storage_hashes_get_contexts_iterator_context*)iterator;
+
+  return librdf_iterator_end(icontext->iterator);
+}
+
+
+static int
+librdf_storage_hashes_get_contexts_next_method(void* iterator) 
+{
+  librdf_storage_hashes_get_contexts_iterator_context* icontext=(librdf_storage_hashes_get_contexts_iterator_context*)iterator;
+
+  return librdf_iterator_next(icontext->iterator);
+}
+
+
+static void*
+librdf_storage_hashes_get_contexts_get_method(void* iterator, int flags) 
+{
+  librdf_storage_hashes_get_contexts_iterator_context* icontext=(librdf_storage_hashes_get_contexts_iterator_context*)iterator;
+  void *result=NULL;
+  librdf_hash_datum* k;
+  
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      if(!(k=(librdf_hash_datum*)librdf_iterator_get_key(icontext->iterator)))
+        return NULL;
+
+      if(icontext->current)
+        librdf_free_node(icontext->current);
+
+      /* decode value content */
+      icontext->current=librdf_node_decode(icontext->world, NULL,
+                                           (unsigned char*)k->data, k->size);
+      result=icontext->current;
+      break;
+
+    case LIBRDF_ITERATOR_GET_METHOD_GET_KEY:
+    case LIBRDF_ITERATOR_GET_METHOD_GET_VALUE:
+      result=NULL;
+      break;
+      
+    default:
+      LIBRDF_ERROR2(icontext->world, "Unknown iterator method flag %d\n", flags);
+      result=NULL;
+      break;
+  }
+
+  return result;
+}
+
+
+static void
+librdf_storage_hashes_get_contexts_finished(void* iterator) 
+{
+  librdf_storage_hashes_get_contexts_iterator_context* icontext=(librdf_storage_hashes_get_contexts_iterator_context*)iterator;
+
+  if(icontext->iterator)
+    librdf_free_iterator(icontext->iterator);
+
+  librdf_free_hash_datum(icontext->key);
+  
+  if(icontext->current)
+    librdf_free_node(icontext->current);
+
+  LIBRDF_FREE(librdf_storage_hashes_get_contexts_iterator_context, icontext);
+}
+
+
+/**
+ * librdf_storage_hashes_context_get_contexts - List all context nodes in a storage
+ * @storage: &librdf_storage object
+ * 
+ * Return value: &librdf_iterator of context_nodes or NULL on failure or no contexts
+ **/
+static librdf_iterator*
+librdf_storage_hashes_get_contexts(librdf_storage* storage) 
+{
+  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_get_contexts_iterator_context* icontext;
+  librdf_iterator* iterator;
+
+  if(context->index_contexts <0)
+    return NULL;
+  
+  icontext=(librdf_storage_hashes_get_contexts_iterator_context*)LIBRDF_CALLOC(librdf_storage_hashes_get_contexts_iterator_context, 1, sizeof(librdf_storage_hashes_get_contexts_iterator_context));
+  if(!icontext)
+    return NULL;
+
+  icontext->world=storage->world;
+  
+  icontext->key=librdf_new_hash_datum(storage->world, NULL, 0);
+  if(!icontext->key)
+    return NULL;
+  
+  icontext->iterator=librdf_hash_keys(context->hashes[context->contexts_index],
+                                      icontext->key);
+  if(!icontext->iterator) {
+    librdf_storage_hashes_get_contexts_finished(icontext);
+    return NULL;
+  }
+
+
+  iterator=librdf_new_iterator(storage->world,
+                               (void*)icontext,
+                               &librdf_storage_hashes_get_contexts_is_end,
+                               &librdf_storage_hashes_get_contexts_next_method,
+                               &librdf_storage_hashes_get_contexts_get_method,
+                               &librdf_storage_hashes_get_contexts_finished);
+  if(!iterator) {
+    librdf_storage_hashes_get_contexts_finished((void*)icontext);
+    return NULL;
+  }
+  
+  return iterator;  
+}
+
+
+
 /**
  * librdf_storage_hashes_get_feature - get the value of a storage feature
  * @storage: &librdf_storage object
@@ -1657,6 +1787,7 @@ librdf_storage_hashes_register_factory(librdf_storage_factory *factory)
   factory->context_remove_statement = librdf_storage_hashes_context_remove_statement;
   factory->context_serialise        = librdf_storage_hashes_context_serialise;
   factory->sync                     = librdf_storage_hashes_sync;
+  factory->get_contexts             = librdf_storage_hashes_get_contexts;
   factory->get_feature              = librdf_storage_hashes_get_feature;
 }
 
