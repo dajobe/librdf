@@ -100,6 +100,7 @@ librdf_delete_storage_factories(void)
     LIBRDF_FREE(librdf_storage_factory, factory->name);
     LIBRDF_FREE(librdf_storage_factory, factory);
   }
+  storages=NULL;
 }
 
 
