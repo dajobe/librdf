@@ -39,8 +39,8 @@ while(<IN>) {
 
   next if /^<link|meta/i;
 
-  # Links to other modules
-  s%<a href="(Redland|string|sys).html">([^<]+)</a>%$2%g;
+  # Links to other Python modules, exceptions
+  s%<a href="(Redland|string|sys|exceptions).html[^"]*">(.+?)</a>%$2%g; #"
   # The horrors of guessing urls in text
   s%<a href="http://example.(org|com|net)[^"]*">([^<]+)</a>%$2%g; # "
   # Never leave these in web pages
