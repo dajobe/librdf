@@ -138,7 +138,7 @@ struct librdf_storage_factory_s {
   librdf_stream* (*context_serialise)(librdf_storage* storage, librdf_node* context);
 
   /* synchronise to underlying storage - OPTIONAL */
-  void (*sync)(librdf_storage* storage);
+  int (*sync)(librdf_storage* storage);
 
   /* add statements to the context - OPTIONAL (rdf_storage will do it
    * using context_add_statement if missing)
@@ -252,7 +252,7 @@ REDLAND_API int librdf_storage_supports_query(librdf_storage* storage, librdf_qu
 REDLAND_API librdf_query_results* librdf_storage_query_execute(librdf_storage* storage, librdf_query *query);
 
 /* synchronise a storage to the backing store */
-REDLAND_API void librdf_storage_sync(librdf_storage *storage);
+REDLAND_API int librdf_storage_sync(librdf_storage *storage);
 
 /* find statements in a given context */
 REDLAND_API librdf_stream* librdf_storage_find_statements_in_context(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node);
