@@ -714,7 +714,7 @@ AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
 AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default auto)], with_raptor="$withval", with_raptor="auto")
 
 RAPTOR_VERSION=`$RAPTOR_CONFIG --version 2>/dev/null`
-RAPTOR_MIN_VERSION=1.0.0
+RAPTOR_MIN_VERSION=1.1.0
 
 # FIXME - could use raptor-config --decimal-version at some point
 RAPTOR_VERSION_DEC=`echo $RAPTOR_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
@@ -925,6 +925,23 @@ if test "$enable_openssl_digests" = yes ; then
 else
   AC_MSG_RESULT(no)
 fi
+
+
+AC_ARG_WITH(threestore, [  --with-threestore=DIR          3store installation location], tstore="$withval", tstore="")
+AC_MSG_CHECKING(for tstore)
+if test "X$tstore" != "X" -a -r $tstore/include/rdfsql/rdfsql.h -a -r $tstore/lib/librdfsql.la ; then
+  # FIXME - this assumes glib-config exists
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS -I$tstore/include `glib-config --cflags`"
+  LIBRDF_LIBS="$LIBRDF_LIBS $tstore/lib/librdfsql.la"
+
+  PARSER_OBJS="$PARSER_OBJS rdf_storage_tstore.lo"
+  PARSER_SRCS="$PARSER_SRCS rdf_storage_tstore.c"
+
+  AC_DEFINE(HAVE_TSTORE, 1, [Have 3store available])
+else
+  tstore=
+fi
+AC_MSG_RESULT($tstore)
 
 
 dnl Check for use of threads
