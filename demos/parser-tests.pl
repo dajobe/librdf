@@ -184,7 +184,7 @@ sub upload_rdf($$$$$$) {
   my $count=0;
   my $new_tests_count=0;
   while(!$stream->end) {
-    my $statement=$stream->next;
+    my $statement=$stream->current;
     $model->add_statement($statement);
     # Found ?--[pt:test]->[uri]
     if($statement->predicate->equals($PT_TEST_RESOURCE)) {
@@ -197,6 +197,7 @@ sub upload_rdf($$$$$$) {
       }
     }
     $count++;
+    $stream->next;
   }
   $stream=undef;
   
@@ -595,7 +596,7 @@ EOT
   my $stream=$model->find_statements($statement);
   my $property_count=0;
   while(!$stream->end) {
-    my $statement2=$stream->next;
+    my $statement2=$stream->current;
 
     my $predicate_uri_string=$statement2->predicate->uri->as_string;
     my $value=$statement2->object;
@@ -612,6 +613,7 @@ EOT
     }
     print "</td></tr>\n";
     $property_count++;
+    $stream->next;
   }
   $stream=undef;
 
@@ -760,8 +762,8 @@ EOT
   my $property_count=0;
   my $test_results_count=0;
   my(@testresult_nodes);
-  while(!$stream->end) {
-    my $statement2=$stream->next;
+  for(;!$stream->end; $stream->next) {
+    my $statement2=$stream->current;
 
     if ($statement2->predicate->equals($PT_TESTRESULT_PREDICATE)) {
       $test_results_count++;

@@ -316,10 +316,8 @@ if($stream && !$stream->end) {
 EOT
 
 
-  while($stream && !$stream->end) {
-    my $statement;
-
-    $statement=$stream->next;
+  for(; $stream && !$stream->end; $stream->next) {
+    my $statement=$stream->current;
 
     my $subject=format_node($statement->subject);
     my $predicate=format_node($statement->predicate);
@@ -340,8 +338,8 @@ EOT
     if ($count >= $max_stream_size) {
       my $cur=$count+1;
       while($stream && !$stream->end) {
-	$statement=$stream->next;
 	$count++;
+	$stream->next;
       }
       print << "EOT";
 <tr>
@@ -350,7 +348,6 @@ EOT
 EOT
       last;
     }
-
   }
 
   print <<"EOT";

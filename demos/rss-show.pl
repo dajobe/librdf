@@ -439,10 +439,11 @@ if(!$stream || $stream->end) {
 my $count=0;
 if($stream && !$stream->end) {
   while(!$stream->end) {
-    my $statement=$stream->next;
+    my $statement=$stream->current;
     $model->add_statement($statement);
     $statement=undef;
     $count++;
+    $statement=$stream->next;
   }
 }
 $stream=undef;

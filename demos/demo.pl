@@ -554,10 +554,10 @@ EOT
 
 #$RDF::Debug=1;
 my $count=0;
-while(!$stream->end) {
+for(;!$stream->end ;  $stream->next) {
   # Must use a new statement object here since $statement may be 
   # used/shared by the model's find_statements method
-  my $statement2=$stream->next;
+  my $statement2=$stream->current;
 
   last if !$statement2;
 
@@ -626,7 +626,8 @@ EOT
       $model->add_statement($statement2);
     }
   }
-}
+
+} # while
 
 if($use_parse_stream) {
   if($command eq 'parse') {
