@@ -267,33 +267,58 @@ librdf_free_parser(librdf_parser *parser)
  * librdf_parser_parse_as_stream - Parse a URI to a librdf_stream of statements
  * @parser: the parser
  * @uri: the URI to read
+ * @base_uri: the base URI to use (or NULL if the same)
  * 
  * Return value: &librdf_stream of statements or NULL
  **/
 librdf_stream*
-librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri) 
+librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
+                              librdf_uri* base_uri) 
 {
-  return parser->factory->parse_as_stream(parser->context, uri);
+  const char *filename;
+  
+  if(parser->factory->parse_uri_as_stream)
+    return parser->factory->parse_uri_as_stream(parser->context, uri, base_uri);
+
+  filename=librdf_uri_as_filename(uri);
+  if(!filename) {
+    LIBRDF_DEBUG2(librdf_parser_parse_as_stream, "%s parser can only handle file: URIs\n", parser->factory->name);
+    return NULL;
+  }
+  return parser->factory->parse_file_as_stream(parser->context, uri,
+                                               base_uri);
 }
 
 
 /**
  * librdf_parser_parse_into_model - Parse a URI of RDF/XML content into an librdf_model
  * @parser: the parser
- * @uri: the URI to read
+ * @uri: the URI to read the content
+ * @base_uri: the base URI to use (or NULL if the same)
  * @model: the model to use
  * 
  * Return value: non 0 on failure
  **/
 int
 librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
-                               librdf_model* model) 
+                               librdf_uri* base_uri, librdf_model* model) 
 {
-  if(!parser->factory->parse_into_model)
-    return 1;
+  const char *filename;
   
-  return parser->factory->parse_into_model(parser->context, uri, model);
+  if(parser->factory->parse_uri_into_model)
+    return parser->factory->parse_uri_into_model(parser->context, uri,
+                                                 base_uri, model);
+  
+  filename=librdf_uri_as_filename(uri);
+  if(!filename) {
+    LIBRDF_DEBUG2(librdf_parser_parse_into_stream, "%s parser can only handle file: URIs\n", parser->factory->name);
+    return 1;
+  }
+  return parser->factory->parse_file_into_model(parser->context, uri,
+                                                base_uri, model);
 }
+
+
 
 
 /**
