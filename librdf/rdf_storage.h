@@ -136,6 +136,9 @@ struct librdf_storage_factory_s {
 
 #include <rdf_storage_list.h>
 #include <rdf_storage_hashes.h>
+#ifdef HAVE_MYSQL
+#include <rdf_storage_mysql.h>
+#endif
 
 #endif
 

@@ -33,7 +33,12 @@
 
 #include <librdf.h>
 #include <rdf_storage.h>
+#ifdef HAVE_MYSQL
+#include <rdf_storage_mysql.h>
+#endif
+#ifdef HAVE_TSTORE
 #include <rdf_storage_tstore.h>
+#endif
 #include <rdf_storage_hashes.h>
 #include <rdf_storage_list.h>
 
@@ -65,8 +70,11 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
  * factory functions such as librdf_get_storage_factory()
  **/
 void
-librdf_init_storage(librdf_world *world) 
+librdf_init_storage(librdf_world *world)
 {
+#ifdef HAVE_MYSQL
+  librdf_init_storage_mysql();
+#endif
 #ifdef HAVE_TSTORE
   librdf_init_storage_tstore();
 #endif
