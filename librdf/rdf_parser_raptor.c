@@ -489,7 +489,7 @@ librdf_parser_raptor_serialise_finished(void* context)
     librdf_statement* statement;
 
     if(scontext->rdf_parser)
-      raptor_free(scontext->rdf_parser);
+      raptor_free_parser(scontext->rdf_parser);
 
     if(scontext->current)
       librdf_free_statement(scontext->current);
@@ -568,6 +568,13 @@ librdf_raptor_uri_as_string(void *context, raptor_uri *uri)
 }
 
 
+static char*
+librdf_raptor_uri_as_counted_string(void *context, raptor_uri *uri, size_t *len_p)
+{
+  return librdf_uri_as_counted_string((librdf_uri*)uri, len_p);
+}
+
+
 static raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_new_uri,
   librdf_raptor_new_uri_from_uri_local_name,
@@ -577,6 +584,7 @@ static raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_uri_equals,
   librdf_raptor_uri_copy,
   librdf_raptor_uri_as_string,
+  librdf_raptor_uri_as_counted_string,
   1
 };
 
