@@ -20,7 +20,7 @@
 object needn't be kept around when dealing with model.</li>
 <li>Consider an AVL-tree in-memory store (libavl)</li>
 <li>Listing the statements in a model ends 1 statement early. Related to
-iterator changes?</li>
+iterator changes?  May be fixed now - recheck.</li>
 <li>swig 1.3.14 may fail to work for some languages (perl,python ok)</li>
 <li>make librdf_statement_set_subject* free any existing node before setting</li>
 <li>Docs: note that compiling redland also builds raptor, if both are wanted</li>
@@ -28,12 +28,9 @@ iterator changes?</li>
 <li>Allow base URIs in Perl parser methods to be undef</li>
 <li>Ensure non-file: URIs do not cause crashes (seen in Perl)</li>
 <li>Document the storage constructor hash options under the main class</li>
-<li>RFE: make Node and URI be the same class, change all methods using
-Nodes to take URI OR URI or Literal as appropriate.</li>
 <li>RFE: make add_statement method on model take URIs</li>
 <li>Add arcs_in/arcs_out model methods</li>
 <li>Add container class for manipulating RDF containers - Seq, Bag, Alt, ...</li>
-<li>Pass RDF parser error messages to user code, scripting languages</li>
 <li>Add module - URI retrieval via (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
 <li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build</li>
 <li>If LGPL/MPL license, include compatible code OR add separate package?</li>
@@ -73,16 +70,17 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
-<li>Add a swig test in autogen.sh, abort if it is too old</li>
+<li>Pass RDF parser error messages to user code, scripting languages (0.9.12)</li>
+<li>Add a swig test in autogen.sh, abort if it is too old (0.9.12)</li>
 <li>swig 1.3.14 changed its default to shadow and failed to work out
-of the box.  Add -noproxy to the swig line for 1.3.14+</li>
-<li>Hacked around repat parser failing to pass bnode ids when as statement objects</li>
-<li>Added relative URI parsing code from Repat (via raptor)</li>
-<li>Handle xml:lang when the rdf parsers provide it</li>
-<li>Add query language interfaces</li>
-<li>Add support for blank nodes (were anonymous resources)</li>
-<li>Removed all node types except for resource, literal, blank, li (statement)</li>
-<li>Use <a href="http://xmlsoft.org/">libxml</a> rather than expat as default xml parser (at least for raptor) Reasons: uses iconv to handle more content encodings and provides better error reporting</li>
+of the box.  Add -noproxy to the swig line for 1.3.14+ (0.9.12)</li>
+<li>Hacked around repat parser failing to pass bnode ids when as statement objects (0.9.12)</li>
+<li>Added relative URI parsing code from Repat (via raptor) (0.9.12)</li>
+<li>Handle xml:lang when the rdf parsers provide it (0.9.12)</li>
+<li>Add query language interfaces (0.9.12)</li>
+<li>Add support for blank nodes (were anonymous resources) (0.9.12)</li>
+<li>Removed all node types except for resource, literal, blank, li (statement (0.9.12))</li>
+<li>Use <a href="http://xmlsoft.org/">libxml</a> rather than expat as default xml parser (at least for raptor) Reasons: uses iconv to handle more content encodings and provides better error reporting (0.9.12)</li>
 <li>Link XML Libraries (-lexpat etc.) before libwww libraries to
 ensure correct XML library is used (0.9.11)</li>
 <li>Python interface to parsers now works (0.9.11)</li>
@@ -128,6 +126,10 @@ style, but for C</li>
 
 <p>I reserve the right to change my mind again!</p>
 <ul>
+<li>RFE: make Node and URI be the same class, change all methods using
+Nodes to take URI OR URI or Literal as appropriate.  The RDF abstract
+syntax has nodes that are (URI-refs or Literals or ...) so this design
+matches it well.</li>
 <li>These will not be made into modules at present, the internal RDF
 parser will use expat or libxml as necessary.
 <ul>
