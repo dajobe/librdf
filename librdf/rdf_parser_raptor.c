@@ -48,7 +48,7 @@ static void librdf_parser_raptor_serialise_finished(void* context);
 typedef struct {
   librdf_parser *parser;        /* librdf parser object */
   librdf_hash *bnode_hash;      /* bnode id (raptor=>internal) map */
-  int is_ntriples;
+  char *parser_name;            /* raptor parser name to use */
 } librdf_parser_raptor_context;
 
 
@@ -92,8 +92,12 @@ librdf_parser_raptor_init(librdf_parser *parser, void *context)
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
 
   pcontext->parser = parser;
-  pcontext->is_ntriples=(pcontext->parser->factory->name && 
-                         !strcmp(pcontext->parser->factory->name, "ntriples"));
+  pcontext->parser_name=pcontext->parser->factory->name;
+  /* legacy name - see librdf_parser_raptor_constructor
+   * from when there was just one parser
+   */
+  if(!strcmp(pcontext->parser_name, "raptor"))
+    pcontext->parser_name="rdfxml";
 
   /* New in-memory hash for mapping bnode IDs */
   pcontext->bnode_hash=librdf_new_hash(parser->world, NULL);
@@ -389,11 +393,7 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   if(!scontext)
     return NULL;
 
-  if(pcontext->is_ntriples)
-    rdf_parser=raptor_new_parser("ntriples");
-  else
-    rdf_parser=raptor_new_parser("rdfxml");
-
+  rdf_parser=raptor_new_parser(pcontext->parser->factory->name);
   if(!rdf_parser)
     return NULL;
 
@@ -497,11 +497,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   if(!scontext)
     return NULL;
 
-  if(pcontext->is_ntriples)
-    rdf_parser=raptor_new_parser("ntriples");
-  else
-    rdf_parser=raptor_new_parser("rdfxml");
-
+  rdf_parser=raptor_new_parser(pcontext->parser_name);
   if(!rdf_parser) {
     LIBRDF_FREE(librdf_parser_raptor_stream_context, scontext);
     return NULL;
@@ -644,11 +640,7 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   if(!scontext)
     return 1;
 
-  if(pcontext->is_ntriples)
-    rdf_parser=raptor_new_parser("ntriples");
-  else
-    rdf_parser=raptor_new_parser("rdfxml");
-
+  rdf_parser=raptor_new_parser(pcontext->parser_name);
   if(!rdf_parser) {
     LIBRDF_FREE(librdf_parser_raptor_stream_context, scontext);
     return 1;
@@ -958,18 +950,44 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_raptor_constructor(librdf_world *world)
 {
+  unsigned int i;
   raptor_init();
 
   raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
 
-  librdf_parser_register_factory(world, "rdfxml", "application/rdf+xml", 
-                                 (const unsigned char*)"http://www.w3.org/TR/rdf-syntax-grammar",
-                                 &librdf_parser_raptor_register_factory);
-  librdf_parser_register_factory(world, "raptor", NULL, NULL,
-                                 &librdf_parser_raptor_register_factory);
-  librdf_parser_register_factory(world, "ntriples", "text/plain",
-                                 (const unsigned char*)"http://www.w3.org/TR/rdf-testcases/#ntriples",
-                                 &librdf_parser_raptor_register_factory);
+  for(i=0; 1; i++) {
+    const char *syntax_name=NULL;
+    const char *mime_type=NULL;
+    const unsigned char *uri_string=NULL;
+
+    /* FIXME - after redland 0.9.15, depend on raptor 1.2.0 with
+     * function raptor_syntaxes_enumerate available
+     */
+#if 0
+    if(raptor_syntaxes_enumerate(i, &syntax_name, NULL, 
+                                 &mime_type, &uri_string))
+      break;
+#else
+    if(raptor_parsers_enumerate(i, &syntax_name, NULL))
+      break;
+
+    if(!strcmp(syntax_name, "rdfxml")) {
+      mime_type="application/rdf+xml";
+      uri_string=(const unsigned char*)"http://www.w3.org/TR/rdf-syntax-grammar";
+      /* legacy name - see librdf_parser_raptor_init */
+      librdf_parser_register_factory(world, "raptor", NULL, NULL,
+                                     &librdf_parser_raptor_register_factory);
+    } else if (!strcmp(syntax_name, "ntriples")) {
+      mime_type="text/plain";
+      uri_string=(const unsigned char*)"http://www.w3.org/TR/rdf-testcases/#ntriples";
+    } else if (!strcmp(syntax_name, "ntriples-plus")) {
+      uri_string=(const unsigned char*)"http://www.ilrt.bristol.ac.uk/discovery/2003/11/ntriplesplus/";
+    }
+#endif
+
+    librdf_parser_register_factory(world, syntax_name, mime_type, uri_string,
+                                   &librdf_parser_raptor_register_factory);
+  }
 }
 
 
