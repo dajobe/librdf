@@ -36,16 +36,12 @@ extern "C" {
 struct librdf_statement_s
 {
   librdf_world* world;
+  int usage;
   librdf_node* subject;
   librdf_node* predicate;
   librdf_node* object;
 };
 
-
-/* convienience macros - internal */
-#define LIBRDF_NODE_STATEMENT_SUBJECT(s)   ((s)->subject)
-#define LIBRDF_NODE_STATEMENT_PREDICATE(s) ((s)->predicate)
-#define LIBRDF_NODE_STATEMENT_OBJECT(s)    ((s)->object)
 
 /* class methods */
 void librdf_init_statement(librdf_world *world);
