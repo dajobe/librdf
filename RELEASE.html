@@ -112,6 +112,29 @@ They provide RDF query support using
 query classes.</p>
 
 
+<h3>New Logging API</h3>
+
+<p>An enhanced logging API was added to provide enhanced information
+from log messages, error and warnings such as from parsing.  The new
+world method <code>librdf_world_set_logger</code> allows setting of
+the log handler callback which gives a
+<code>librdf_log_message</code>.  Parts of this the structure can be
+read by using the following new accessors methods:
+</p>
+
+<ul>
+<li><code>librdf_log_message_code</code></li>
+<li><code>librdf_log_message_level</code></li>
+<li><code>librdf_log_message_facility</code></li>
+<li><code>librdf_log_message_message</code></li>
+<li><code>librdf_log_message_locator</code></li>
+</ul>
+
+<p>The locator returns an <code>raptor_locator</code> that gives the
+line, column, byte offset, URI and/or filename of the message.
+Raptor 1.3.2+ provides accessor methods for that structure.</p>
+
+
 <h3>Model Class changes</h3>
 
 <p>Added <code>librdf_model_query_execute</code> method to execute a
@@ -175,16 +198,6 @@ inside <code>librdf_storage_find_statements_in_context</code>.
 second node parameter to be NULL, so that methods
 <code>librdf_storage_get_arcs_out</code> and
 <code>librdf_storage_get_arcs_in</code> that can use it to work.</p>
-
-
-
-<h3>General changes</h3>
-
-<p>Update the logging API to provide structured information
-returned including message level, facility, line, column, byte offset
-filename and/or URI of the activity.  Returns a
-<code>librdf_log_message</code>.</p>
-
 
 
 
