@@ -192,6 +192,9 @@ librdf_node* librdf_new_node_from_uri(librdf_uri *uri);
 /* Create a new resource Node from URI object with a qname */
 librdf_node* librdf_new_node_from_uri_qname(librdf_uri *uri, const char *qname);
 
+/* Create a new resource Node from URI string renormalised to a new base */
+librdf_node* librdf_new_node_from_normalised_uri_string(const char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
+
 /* Create a new Node from literal string / language. */
 librdf_node* librdf_new_node_from_literal(const char *string, const char *xml_language, int xml_space, int is_wf_xml);
 
