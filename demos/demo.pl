@@ -40,8 +40,8 @@ use URI::URL;
 
 my(@commands)=qw(destroy query parse add print),
 my(%command_labels)=('destroy'  =>'Delete database',
-		     'query'    =>'Find statements',
-		     'add',     =>'Add a statement',
+		     'query'    =>'Find triples',
+		     'add',     =>'Add a triple',
 		     'parse',   =>'Parse RDF',
 		     'print',   =>'Print database');
 my(%command_needs_write)=('destroy'  =>1,
@@ -80,6 +80,7 @@ my(%namespaces)=(
   'synd' => 'http://purl.org/rss/1.0/modules/syndication/',
   'dc' => 'http://purl.org/dc/elements/1.1/',
   'owl' => 'http://www.w3.org/2002/07/owl#',
+  'xsd' => 'http://www.w3.org/2001/XMLSchema#',
 );
 
 
@@ -138,7 +139,7 @@ if(defined $val && $val =~ /^([a-z]+)$/) {
 }
 
 my $statement_string;
-$val=$q->param('statement');
+$val=($q->param('triple') || $q->param('statement'));
 if(defined $val && $val =~ /^([ -~]+)$/) {
   $statement_string=$1;
 } else {
@@ -208,31 +209,31 @@ print <<"EOT";
 
 <ol>
 <li>Pick a database name</li>
-<li><p>Add some RDF statements to the database in one of these ways:</p>
+<li><p>Add some RDF triples to the database in one of these ways:</p>
 <ol>
-  <li>Enter a statement by hand in the <em>Statement</em> field and
-  use the <em>Add a statement</em> command.</li>
+  <li>Enter a triple by hand in the <em>Triple</em> field and
+  use the <em>Add a triple</em> command.</li>
   <li>Enter some RDF/XML or N-Triples in the <em>Content</em> area and
   use the <em>Parse RDF</em> command.</li>
   <li>Give the URI of the RDF/XML or N-Triples on the web to parse in the <em>URI</em> field and
   use the <em>Parse RDF</em> command.</li>
 </ol>
 <li>Print the database - select the <em>Print database</em> command.</li>
-<li>Query the database - either click on the statements from the result of the
-previous command</li> <strong>or</strong> enter a statement in the <em>statement</em> field and use the <em>Find statements</em> command to return matching statements</li>
+<li>Query the database - either click on the triples from the result of the
+previous command</li> <strong>or</strong> enter a triple in the <em>triple</em> field and use the <em>Find triples</em> command to return matching triples</li>
 <li>Delete the database when you are done - thanks!</li>
 </ol>
 
 
-<p>The syntax of statements is as follows. A statement about a resource is written as:</p>
+<p>The syntax of triples is as follows. A triple about a resource is written as:</p>
 <pre>  [subject]--[predicate]-->[object]</pre>
 
-<p>and a statement with a string value is written as:</p>
+<p>and a triple with a string value is written as:</p>
 <pre>  [subject]--[predicate]-->"object"</pre>
 
 <p>When used as a query, replace any of the parts with <tt>?</tt>
 to match anything e.g.: <tt>?--?-->"foo"</tt> to
-return all statements which have the object string <em>foo</em>.</p>
+return all triples which have the object string <em>foo</em>.</p>
 
 <!-- DB PRIVACY BLURB HERE -->
 
@@ -258,12 +259,12 @@ print $q->popup_menu(-name=>'command',
 		     -default=>$default_command, 
 		     -labels=>\%command_labels);
 
-print "\n\n<p><em>Statement</em> (for <em>Find</em> and <em>Add Statements</em> commands):\n";
-print $q->textfield(-name=>'statement',
+print "\n\n<p><em>Triple</em> (for <em>Find</em> and <em>Add Triples</em> commands):\n";
+print $q->textfield(-name=>'triple',
 		    -default=>'',
 		    -size=>80);
 
-print "\n\n<p>RDF Parser for <em>Parse RDF</em> command\n";
+print "\n\n<p>RDF content syntax the <em>Parse RDF</em> command\n";
 print $q->popup_menu(-name=>'parser', 
 		     -values=>\@parsers,
 		     -default=>$parsers[0], 
@@ -395,7 +396,7 @@ if($command ne 'print' && $command ne 'parse') {
                                \s*--\>\s*
                                (?: \? | [\["] [^]"]+ [\]"]) $%x) { # "
     print <<"EOT";
-\n\n<p>Sorry, I do not understand the statement syntax; it should match that
+\n\n<p>Sorry, I do not understand the triple syntax; it should match that
 described above.</p>
 EOT
     end_page($q);
@@ -594,24 +595,25 @@ for(;!$stream->end ;  $stream->next) {
 
   $q->delete('content');  # HACK - makes generated URIs just too large
 
-  $q->param('statement', "$subject--?-->?");
+  $q->param('triple', "$subject--?-->?");
   my $subject_query=$q->self_url;
 
-  $q->param('statement', "?--$predicate-->?");
+  $q->param('triple', "?--$predicate-->?");
   my $predicate_query=$q->self_url;
 
   if($object =~ /^\[(.+)\]$/) {
-    $q->param('statement', "?--?-->[$1]");
+    $q->param('triple', "?--?-->[$1]");
   } else {
     $object=qq{"$object"};
-    $q->param('statement', "?--?-->$object");
+    $q->param('triple', "?--?-->$object");
   }
 
-  my $object_query=$q->self_url;
-
+  my $object_string=$object_label;
   my $from_object='';
   if($object =~ /^\[(.+)\]$/) {
-    $q->param('statement', "[$1]--?-->?");
+    my $object_query=$q->self_url;
+    $q->param('triple', "[$1]--?-->?");
+    $object_string=qq{<a href="$object_query">$object_label</a>};
     $from_object=qq{<a href="}.$q->self_url.qq{">Follow</a>};
   } else {
     $from_object='&nbsp;';
@@ -621,7 +623,7 @@ for(;!$stream->end ;  $stream->next) {
 <tr>
 <td><a href="$subject_query">$subject_label</a></td>
 <td><a href="$predicate_query">$predicate_label</a></td>
-<td><a href="$object_query">$object_label</a></td>
+<td>$object_string</td>
 <td>$from_object</td>
 </tr>
 EOT
@@ -655,14 +657,15 @@ print <<"EOT";
 EOT
 
 my $pl=($count != 1) ? 's' : '';
-print "\n\n<p>Found $count statement$pl</p>\n";
+print "\n\n<p>Found $count triple$pl</p>\n";
 
 if($format_namespaces) {
- print "<p>Where the following namespace prefixes were used:";
- while(my($ns_prefix,$ns_uri)=each %namespaces) {
-   print qq{<br />\n${ns_prefix}: is namespace <a href="${ns_uri}">${ns_uri}</a>};
+ print "<p>Where the following namespace prefixes were used:</p>\n<dl>";
+ for my $ns_prefix (sort keys %namespaces) {
+   my $ns_uri=$namespaces{$ns_prefix};
+   print qq{<dt>${ns_prefix}<br /></dt>\n<dd>namespace <a href="${ns_uri}">${ns_uri}</a></dd>\n};
  }
- print "\n</p>\n\n";
+ print "\n</dl>\n\n";
 }
 
 end_page($q);
