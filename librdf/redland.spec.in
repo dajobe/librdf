@@ -1,7 +1,7 @@
 # Note that this is NOT a relocatable package
 %define name    @PACKAGE@
 %define version @VERSION@
-%define release 1
+%define release SNAP
 %define prefix  /usr
 
 Summary:   Redland RDF Application Framework
@@ -52,9 +52,9 @@ PYTHON=python
 export PYTHON
 
 if [ ! -f configure ]; then
-  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --sysconfdir=/etc
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --enable-release --sysconfdir=/etc
 else
-  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --sysconfdir=/etc
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --enable-release --sysconfdir=/etc
 fi
 
 if [ "$SMP" != "" ]; then
