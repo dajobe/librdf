@@ -1050,6 +1050,14 @@ done
 AC_SUBST(DIGEST_OBJS)
 AC_SUBST(DIGEST_SRCS)
 
+# This is needed because autoheader can't work out which computed
+# symbols must be pulled from acconfig.h into config.h.in
+if test "x" = "y"; then
+  AC_DEFINE(HAVE_LOCAL_MD5_DIGEST, 1, [Have local MD5 digest])
+  AC_DEFINE(HAVE_LOCAL_SHA1_DIGEST, 1, [Have local SHA1 digest])
+  AC_DEFINE(HAVE_LOCAL_RIPEMD160_DIGEST, 1, [Have local RIPEMD160 digest])
+fi
+
 
 HASH_OBJS=
 HASH_SRCS=
