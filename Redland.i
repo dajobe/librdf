@@ -244,7 +244,7 @@ librdf_python_world_init(librdf_world *world)
  *   RDF::Redland::World::message($$)
  * where first argument is an integer, second is a (scalar) string
  */
-static void
+static int
 librdf_call_perl_message(int type, const char *message, va_list arguments)
 {
   char empty_buffer[1];
@@ -252,6 +252,7 @@ librdf_call_perl_message(int type, const char *message, va_list arguments)
   char *buffer;
   int len;
   va_list args_copy;
+  int rc=0;
   
   SAVETMPS;
 
@@ -263,6 +264,8 @@ librdf_call_perl_message(int type, const char *message, va_list arguments)
   if(!buffer)
     fprintf(stderr, "librdf_call_perl_message: Out of memory\n");
   else {
+    int count;
+    
     va_copy(args_copy, arguments);
     vsnprintf(buffer, len, message, args_copy);
     va_end(args_copy);
@@ -272,27 +275,34 @@ librdf_call_perl_message(int type, const char *message, va_list arguments)
     XPUSHs(sv_2mortal(newSVpv(buffer, 0)));
     PUTBACK;
   
-    call_pv("RDF::Redland::World::message", G_DISCARD);
+    count=call_pv("RDF::Redland::World::message", G_SCALAR);
 
+    SPAGAIN;
+    if(count == 1)
+      rc=POPi;
+    PUTBACK;
+    
     free(buffer);
   }
   
   FREETMPS;
+  
+  return rc;
 }
 
-static void
+static int
 librdf_perl_error_handler(void *user_data, 
                           const char *message, va_list arguments)
 {
-  librdf_call_perl_message(0, message, arguments);
+  return librdf_call_perl_message(0, message, arguments);
 }
 
 
-static void
+static int
 librdf_perl_warning_handler(void *user_data,
                             const char *message, va_list arguments)
 {
-  librdf_call_perl_message(1, message, arguments);
+  return librdf_call_perl_message(1, message, arguments);
 }
 
 static librdf_world* librdf_perl_world=NULL;
