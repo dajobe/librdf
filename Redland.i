@@ -37,13 +37,24 @@
 #define SWIG_prefix
 #endif
 
+#ifdef SWIGRUBY
+/* Ruby pollutes the #define space with these names */
+#undef PACKAGE_NAME
+#undef PACKAGE_STRING
+#undef PACKAGE_TARNAME
+#undef PACKAGE_VERSION
+#undef PACKAGE_BUGREPORT
+#endif
+
 #include <rdf_config.h>
 #include <redland.h>
 
 /* internal routines used to invoking errors/warnings upwards to user */
-void librdf_error(librdf_world* world, const char *message, ...);
-void librdf_warning(librdf_world* world, const char *message, ...);
+void librdf_internal_test_error(librdf_world* world);
+void librdf_internal_test_warning(librdf_world* world);
 
+/* SWIG fails to declare this */
+SWIGEXPORT(void) Init_Redland(void);
 
 /* 
  * Thanks to the patch in this Debian bug for the solution
