@@ -21,6 +21,20 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<h2 id="rel0_9_16"><a name="rel0_9_16">Redland 0.9.16 Changes</a></h2>
+
+<p>A small but important fix to make the installed C headers work
+correctly again.  The rdf_uri.h file had <code>#include
+rdf_digest.h</code> which is an internal header and not installed.
+This required removing two functions from the public API that
+returned <code>librdf_digest*</code>, but neither of them could be
+used since rdf_digest.h was not shipped.</p>
+
+<p>Patched librdf.h and raptor.h to <code>#include stdio.h</code> so
+that the empty program <code>#include &lt;redland.h&gt;</code>
+<code>main() {}</code> now works (ditto for raptor). </p>
+
+
 <h2 id="rel0_9_15"><a name="rel0_9_15">Redland 0.9.15 Changes</a></h2>
 
 <p>This version of Redland updates to use
