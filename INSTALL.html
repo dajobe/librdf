@@ -291,7 +291,7 @@ works.  This does not perform any additional core testing).</p>
 
 <p>Each of the language APIs has it's own test and example
 code that can be run.  See the language-specific page for further
-details, however most of them can be run with:</p>
+details, however they can be build and tested with:</p>
 <pre>
    cd language
    make test-language
@@ -299,15 +299,23 @@ details, however most of them can be run with:</p>
 
 
 
-<h3>2.6 Installing the library</h3>
+<h3 id="sec-install">2.6 Installing the library</h3>
 
-<p>Although this works, the user interface/internal interface header
-file split hasn't been completed yet, so I currently recommend compiling
-against the source tree.  However, if you choose to install, do:</p>
+<p>To install the C library (static and shared typically) plus the
+interface header (.h) files do:</p>
 
 <pre>
    make install
 </pre>
+
+<p>The language-specific interfaces are not installed in this
+step.  See the language-specific page for further details,
+however they can be be installed with:</p>
+<pre>
+   cd language
+   make install-language
+</pre>
+
 
 
 <h2>3. Using the library</h2>
