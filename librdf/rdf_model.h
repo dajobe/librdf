@@ -137,6 +137,17 @@ struct librdf_model_factory_s {
 
   /* get the single storage for this model if there is one - OPTIONAL */
   librdf_storage* (*get_storage)(librdf_model* model);
+
+  /* search for statement in a context - OPTIONAL (rdf_model will do
+   * it using find_statements if missing)
+   */
+  librdf_stream* (*find_statements_in_context)(librdf_model* model, librdf_statement* statement, librdf_node* context_node);
+
+  /* return an iterator of context nodes in the store - OPTIONAL
+   * (returning NULL)
+   */
+  librdf_iterator* (*get_contexts)(librdf_model* model);
+
 };
 
 #include <rdf_model_storage.h>
@@ -233,6 +244,11 @@ REDLAND_API librdf_stream* librdf_model_query_string(librdf_model* model, const 
 REDLAND_API void librdf_model_sync(librdf_model* model);
 
 REDLAND_API librdf_storage* librdf_model_get_storage(librdf_model *model);
+
+/* find statements in a given context */
+REDLAND_API librdf_stream* librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* statement, librdf_node* context_node);
+
+REDLAND_API librdf_iterator* librdf_model_get_contexts(librdf_model* model);
 
 #ifdef __cplusplus
 }
