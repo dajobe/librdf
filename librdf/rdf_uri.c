@@ -78,6 +78,7 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
+#include <string.h> /* for strcat */
 
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
@@ -152,7 +153,7 @@ librdf_finish_uri(void)
  * Return value: a new &librdf_uri object or NULL on failure
  **/
 librdf_uri*
-librdf_new_uri (char *uri_string)
+librdf_new_uri (const char *uri_string)
 {
   librdf_uri* new_uri;
   char *new_string;
@@ -162,7 +163,7 @@ librdf_new_uri (char *uri_string)
   
   length=strlen(uri_string);
 
-  key.data=uri_string;
+  key.data=(char*)uri_string;
   key.size=length;
   
   /* if existing URI found in hash, return it */
@@ -231,6 +232,33 @@ librdf_new_uri (char *uri_string)
 librdf_uri*
 librdf_new_uri_from_uri (librdf_uri* old_uri) {
   return librdf_new_uri (old_uri->string);
+}
+
+
+/**
+ * librdf_new_uri_from_uri_qname - Copy constructor - create a new librdf_uri object from an existing librdf_uri object and a qname
+ * @old_uri: &librdf_uri object
+ * @qname: qualfiied name to append to URI
+ * 
+ * Return value: a new &librdf_uri object or NULL on failure
+ **/
+librdf_uri*
+librdf_new_uri_from_uri_qname (librdf_uri* old_uri, const char *qname) {
+  int len=old_uri->string_length + strlen(qname) +1 ; /* +1 for \0 */
+  char *new_string;
+  librdf_uri* new_uri;
+  
+  new_string=(char*)LIBRDF_CALLOC(cstring, 1, len);
+  if(!new_string)
+    return NULL;
+
+  strcpy(new_string, old_uri->string);
+  strcat(new_string, qname);
+
+  new_uri=librdf_new_uri (new_string);
+  LIBRDF_FREE(cstring, new_string);
+
+  return new_uri;
 }
 
 
