@@ -932,7 +932,7 @@ AC_MSG_CHECKING(for tstore)
 if test "X$tstore" != "X" -a -r $tstore/include/rdfsql/rdfsql.h -a -r $tstore/lib/librdfsql.la ; then
   # FIXME - this assumes glib-config exists
   LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS -I$tstore/include `glib-config --cflags`"
-  LIBRDF_LIBS="$LIBRDF_LIBS $tstore/lib/librdfsql.la"
+  LIBRDF_LIBS="$LIBRDF_LIBS -L$tstore/lib -lrdfsql"
 
   PARSER_OBJS="$PARSER_OBJS rdf_storage_tstore.lo"
   PARSER_SRCS="$PARSER_SRCS rdf_storage_tstore.c"
