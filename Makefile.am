@@ -125,7 +125,8 @@ INSTALL.html LICENSE.html FAQS.html MPL.html \
 redland-config.in \
 memcmp.c \
 PrintConsumer.java PrintParser.java \
-$(JAVA_CLASSES)
+$(JAVA_CLASSES) \
+autogen.sh
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
