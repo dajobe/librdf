@@ -1,5 +1,9 @@
 2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* redland.h: Include rasqal.h, reorder so raptor.h is first.
+
+2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
 	* rdf_query_results.c, rdf_utf8.c, rdf_uri.c, rdf_stream.c,
 	rdf_storage_tstore.c, rdf_storage_mysql.c, rdf_storage_list.c,
 	rdf_storage_hashes.c, rdf_storage_file.c, rdf_storage.c,
