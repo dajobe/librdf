@@ -1080,8 +1080,8 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
     if(!*statement) {
       if(!(*statement=librdf_new_statement(scontext->storage->world)))
         return 1;
-
     }
+
     librdf_statement_clear(*statement);
 
     /* subject */
@@ -1107,10 +1107,10 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
     if(uri_string)
       node=librdf_new_node_from_uri_string(scontext->storage->world,
                                            uri_string);
-    else if(blank) {
+    else if(blank)
       node=librdf_new_node_from_blank_identifier(scontext->storage->world,
                                                  blank);
-    } else {
+    else {
       const unsigned char *literal=sqlite3_column_text(vm, 5);
       const unsigned char *language=sqlite3_column_text(vm, 6);
       librdf_uri *datatype=NULL;
