@@ -117,8 +117,6 @@ void librdf_memory_report(FILE *fh);
 /* internal interfaces  */
 #ifdef LIBRDF_INTERNAL
 
-extern librdf_world *RDF_World;
-
 #include <rdf_list.h>
 #include <rdf_hash.h>
 #include <rdf_digest.h>
