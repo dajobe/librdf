@@ -98,7 +98,6 @@ AM_SANITY_CHECK
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 AM_PROG_LIBTOOL
 
 # Find a tar command for 'make dist'
@@ -294,7 +293,7 @@ if test "$bdb_prefix" != no; then
   if test "$have_libdb" = yes; then
     LIBRDF_LIBS="-l$DBname $LIBRDF_LIBS"
     LIBRDF_LDFLAGS="$nLDFLAGS $LIBRDF_LDFLAGS"
-    LIBRDF_CPPFLAGS="$nCPPFLAGS $LIBRDF_CFLAGS"
+    LIBRDF_CPPFLAGS="$nCPPFLAGS $LIBRDF_CPPFLAGS"
   fi
 
 fi
@@ -339,7 +338,7 @@ if test "$enable_libwww" = yes ; then
   if test -n "$LIBWWW_CONFIG"; then
     AC_MSG_RESULT(yes)
     LIBRDF_LIBS="`$LIBWWW_CONFIG --libs` $LIBRDF_LIBS"
-    LIBRDF_CPPFLAGS="`$LIBWWW_CONFIG --cflags` $LIBRDF_CFLAGS"
+    LIBRDF_CPPFLAGS="`$LIBWWW_CONFIG --cflags` $LIBRDF_CPPFLAGS"
     AC_DEFINE(HAVE_LIBWWW)
     have_libwww=yes
   else
