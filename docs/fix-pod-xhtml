@@ -50,10 +50,11 @@ while(<IN>) {
 
   s%^<body>%<body bgcolor="#ffffff" text="#000085">\n\n<h1 align="center">$main_title - $doc_title</h1>\n\n%;
 
+  my $year=1900+(localtime)[5];
   print OUT <<"EOT" if m%^</body>%;
 <hr />
 
-<p>Copyright 2000-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-$year <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 EOT
   print OUT;
