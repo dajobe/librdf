@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -59,12 +59,19 @@ struct librdf_world_s
 
    /* hash load_factor out of 1000 */
   int hash_load_factor;
+
+#ifdef WITH_THREADS
+  /* mutex so we can lock around this when we need to */
+  pthread_mutex_t* mutex;
+#endif
 };
 #endif
 
 librdf_world* librdf_new_world(void);
 void librdf_free_world(librdf_world *world);
 void librdf_world_open(librdf_world *world);
+
+void librdf_world_init_mutex(librdf_world *world);
   
 void librdf_world_set_error(librdf_world* world, void *user_data, void (*error_fn)(void *user_data, const char *message, va_list arguments));
 void librdf_world_set_warning(librdf_world* world, void *user_data, void (*warning_fn)(void *user_data, const char *message, va_list arguments));
