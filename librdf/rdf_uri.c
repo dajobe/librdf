@@ -79,6 +79,7 @@
 
 #include <stdio.h>
 #include <string.h> /* for strcat */
+#include <ctype.h> /* for isalnum */
 
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
@@ -320,6 +321,93 @@ librdf_new_uri_normalised_to_base(const char *uri_string,
 
 
 /**
+ * librdf_new_uri_relative_to_base - Constructor - create a new librdf_uri object from a URI string relative to a base URI
+ * @base_uri: absolute base URI
+ * @uri_string: relative URI string
+ * 
+ * NOTE: This method is not a full relative URI implementation but handles
+ * common cases where uri_string is empty, "#id", "id" where id has
+ * no "/" or "../" inside.  FIXME.
+ *
+ * Return value: a new &librdf_uri object or NULL on failure
+ **/
+librdf_uri*
+librdf_new_uri_relative_to_base(librdf_uri* base_uri,
+                                const char *uri_string) {
+  const char *p;
+  int uri_string_length;
+  char *new_uri_string;
+  librdf_uri* new_uri;
+  
+  /* If URI string is empty, just copy base URI */
+  if(!*uri_string)
+    return librdf_new_uri_from_uri(base_uri);
+
+  uri_string_length=strlen(uri_string);
+
+  /* If URI string is a fragment #foo ... */
+  if(*uri_string == '#') {
+
+    /* Check if base URI has a fragment - # somewhere */
+    for(p=base_uri->string;*p; p++)
+      if(*p == '#')
+        break;
+
+    /* just append to base URI if it has no fragment */
+    if(!*p)
+      return librdf_new_uri_from_uri_qname(base_uri, uri_string);
+
+    /* otherwise, take the prefix of base URI and add the fragment part */
+    new_uri_string=LIBRDF_MALLOC(cstring, (p-base_uri->string) + uri_string_length + 1);
+    if(!new_uri_string)
+      return NULL;
+    strncpy(new_uri_string, base_uri->string, (p-base_uri->string));
+    strcpy(new_uri_string + (p-base_uri->string), uri_string);
+    new_uri=librdf_new_uri(new_uri_string);
+    LIBRDF_FREE(cstring, new_uri_string);
+    return new_uri;
+  }
+  
+
+  /* If URI string is an absolute URI, just copy it 
+   * FIXME - need to check what is allowed before a :
+   */
+  for(p=uri_string;*p; p++)
+    if(!isalnum(*p))
+       break;
+
+  /* If first non-alphanumeric char is a ':' then probably a absolute URI
+   * FIXME - wrong, but good enough for a short while...
+   */
+  if(*p && *p == ':')
+    return librdf_new_uri(uri_string);
+
+
+  /* Otherwise is a general URI relative to base URI */
+
+  /* FIXME do this properly */
+
+  /* Move p to the last / or : char in the base URI */
+  for(p= base_uri->string + base_uri->string_length - 1;
+      p > base_uri->string && *p != '/' && *p != ':';
+      p--)
+    ;
+
+  new_uri_string=LIBRDF_MALLOC(cstring, (p-base_uri->string)+1+uri_string_length+1);
+  if(!new_uri_string)
+    return NULL;
+
+  strncpy(new_uri_string, base_uri->string, p-base_uri->string+1);
+  strcpy(new_uri_string + (p-base_uri->string) + 1, uri_string);
+  new_uri=librdf_new_uri(new_uri_string);
+  LIBRDF_FREE(cstring, new_uri_string);
+  
+  return new_uri;
+}
+
+
+
+/**
  * librdf_free_uri - Destructor - destroy a librdf_uri object
  * @uri: &librdf_uri object
  * 
@@ -495,12 +583,13 @@ int
 main(int argc, char *argv[]) 
 {
   char *hp_string="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
-  librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5;
+  librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5, *uri6, *uri7;
   librdf_digest_factory* digest_factory;
   librdf_digest *d;
   char *program=argv[0];
-  const char *uri_string=  "file:/big/long/directory/blah#1.rdf";
-  
+  const char *uri_string=  "file:/big/long/directory/blah#frag";
+  const char *relative_uri_string1="#foo";
+  const char *relative_uri_string2="bar";
 
   librdf_init_digest();
   librdf_init_hash();
@@ -559,12 +648,27 @@ main(int argc, char *argv[])
   fputs("\n", stderr);
 
 
+  uri6=librdf_new_uri_relative_to_base(uri5, relative_uri_string1);
+  fprintf(stderr, "%s: URI + Relative URI %s gives ", program, 
+          relative_uri_string1);
+  librdf_uri_print(uri6, stderr);
+  fputs("\n", stderr);
+
+  uri7=librdf_new_uri_relative_to_base(uri5, relative_uri_string2);
+  fprintf(stderr, "%s: URI + Relative URI %s gives ", program, 
+          relative_uri_string2);
+  librdf_uri_print(uri7, stderr);
+  fputs("\n", stderr);
+
+
   fprintf(stderr, "%s: Freeing URIs\n", program);
   librdf_free_uri(uri1);
   librdf_free_uri(uri2);
   librdf_free_uri(uri3);
   librdf_free_uri(uri4);
   librdf_free_uri(uri5);
+  librdf_free_uri(uri6);
+  librdf_free_uri(uri7);
   
   librdf_finish_uri();
   librdf_finish_hash();
