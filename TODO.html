@@ -10,17 +10,16 @@
 
 <p>See the <a href="http://www.redland.opensource.ac.uk/TODO.html">web site version</a> for the up-to-date list.</p>
 
-<h2>Features</h2>
+<h2>Bugs, Features, Requests For Enhancement</h2>
 
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>perl - if you didn't clone a node before trying to re-use it the whole thing would segfault</li>
 <li>example2.c is rather useless, consider replacing or removing</li>
-<li>Consider adding a librdf_model_get_storage() method so storage
+<li>RFE: Consider adding a librdf_model_get_storage() method so storage
 object needn't be kept around when dealing with model.</li>
-<li>Consider an AVL-tree in-memory store (libavl)</li>
-<li>Listing the statements in a model ends 1 statement early. Related to
-iterator changes?  May be fixed now - recheck.</li>
+<li>Consider an AVL-tree in-memory store (<a href="http://www.msu.edu/user/pfaffben/avl/">libavl</a>)</li>
 <li>swig 1.3.14 may fail to work for some languages (perl,python ok)</li>
 <li>make librdf_statement_set_subject* free any existing node before setting</li>
 <li>Docs: note that compiling redland also builds raptor, if both are wanted</li>
@@ -49,19 +48,11 @@ part of librdf.h automatically to make a 1-header file system.</li>
 <li>Add proper error/warning reporting in general</li>
 <li>Write stringbuffer for easy creation of growing in-memory strings</li>
 <li>For IRIX (and others?), try also linking with -lpthreads when testing for working Berkeley DB</li>
-</ul>
-
-
-<h2>Known Bugs</h2>
-
-<p>(Excluding all the <tt>FIXME</tt>s in the source)</p>
-
-<ul>
 <li>String encoding - needs iconv posix function and/or Unicode library.
 Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
-
-<li>BerkeleyDB V1 code has been tested and does not work - probably not worth fixing.</li>
 </ul>
+
+<p>(Excluding issues near <tt>FIXME</tt>s in the source)</p>
 
 
 <h2>Done</h2>
@@ -70,6 +61,7 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Listing the statements in a model ends 1 statement early. (broken and fixed in 0.9.12 CVS)</li>
 <li>Pass RDF parser error messages to user code, scripting languages (0.9.12)</li>
 <li>Add a swig test in autogen.sh, abort if it is too old (0.9.12)</li>
 <li>swig 1.3.14 changed its default to shadow and failed to work out
@@ -122,10 +114,11 @@ style, but for C</li>
 <li>iterator interface and module for returning results</li>
 </ul>
 
-<h2>Decided to do differently</h2>
+<h2>Decided to do differently, not to address</h2>
 
 <p>I reserve the right to change my mind again!</p>
 <ul>
+<li>Redland does not work with BerkeleyDB V1.  Not fixing since it works with V2,V3 and V4.</li>
 <li>RFE: make Node and URI be the same class, change all methods using
 Nodes to take URI OR URI or Literal as appropriate.  The RDF abstract
 syntax has nodes that are (URI-refs or Literals or ...) so this design
