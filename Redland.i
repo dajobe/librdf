@@ -256,6 +256,8 @@ int librdf_model_set_feature(librdf_model* model, librdf_uri* feature, librdf_no
 int librdf_model_load(librdf_model* model, librdf_uri *uri, const char *inStrOrNull=NULL, const char *inStrOrNull=NULL, librdf_uri *type_uri=NULL);
 %newobject librdf_model_query_execute;
 librdf_query_results* librdf_model_query_execute(librdf_model* model, librdf_query* query);
+%newobject librdf_model_to_string;
+char* librdf_model_to_string(librdf_model* model, librdf_uri *uri, const char *name, const char *mime_type, librdf_uri *type_uri);
 
 /* rdf_storage.h */
 %newobject librdf_new_storage;
