@@ -33,6 +33,7 @@
 #endif
 
 #include <librdf.h>
+#include <rdf_hash_memory.h>
 
 
 /* private structures */
