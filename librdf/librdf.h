@@ -173,6 +173,8 @@ void librdf_system_free(void *ptr);
 #include <rdf_files.h>
 #include <rdf_heuristics.h>
 
+#endif
+
 /* public interfaces */
 #include <rdf_init.h>
 #include <rdf_iterator.h>
