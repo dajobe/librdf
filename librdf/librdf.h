@@ -28,7 +28,7 @@ extern "C" {
 /* forward references to private structures */
 typedef struct librdf_hash_s librdf_hash;
 typedef struct librdf_digest_s librdf_digest;
-/* typedef struct librdf_uri_s librdf_uri; */
+typedef struct librdf_uri_s librdf_uri;
 typedef struct librdf_list_s librdf_list;
 typedef struct librdf_iterator_s librdf_iterator;
 typedef struct librdf_node_s librdf_node;
@@ -44,10 +44,6 @@ typedef struct librdf_parser_s librdf_parser;
 #define INLINE inline
 #else
 #define INLINE
-#endif
-
-#ifdef HAVE_INLINE
-#define LIBRDF_URI_INLINE yes
 #endif
 
 

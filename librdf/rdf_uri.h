@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_uri.h - RDF URI Definition / Implementation (if inline)
+ * rdf_uri.h - RDF URI Definition
  *
  * $Id$
  *
@@ -28,7 +28,13 @@ extern "C" {
 #endif
 
 
-typedef char librdf_uri;
+struct librdf_uri_s
+{
+  char *string;
+  int string_length; /* useful for fast comparisons (that fail) */
+  int usage_count;
+};
+
 
 /* class methods */
 void librdf_init_uri(librdf_digest_factory *factory);
@@ -47,14 +53,6 @@ librdf_digest* librdf_uri_get_digest (librdf_uri *uri);
 void librdf_uri_print (librdf_uri* uri, FILE *fh);
 char* librdf_uri_to_string (librdf_uri* uri);
 int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
-
-
-#if defined(LIBRDF_URI_INLINE) && !defined(LIBRDF_INSIDE_LIBRDF_URI_C)
-/* Please inline the functions */
-#undef LIBRDF_URI_INLINE
-#include <librdf_uri.c>
-#define LIBRDF_URI_INLINE yes
-#endif
 
 
 #ifdef __cplusplus
