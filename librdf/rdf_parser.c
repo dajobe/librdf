@@ -587,6 +587,8 @@ main(int argc, char *argv[])
   librdf_init_digest(world);
   librdf_init_hash(world);
   librdf_init_uri(world);
+  librdf_init_node(world);
+  librdf_init_concepts(world);
 
   /* initialise parser module */
   librdf_init_parser(world);
@@ -607,6 +609,8 @@ main(int argc, char *argv[])
   /* finish parser module */
   librdf_finish_parser(world);
 
+  librdf_finish_concepts(world);
+  librdf_finish_node(world);
   librdf_finish_uri(world);
   librdf_finish_hash(world);
   librdf_finish_digest(world);
