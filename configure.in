@@ -440,7 +440,7 @@ AC_DEFINE_UNQUOTED(JAVA_SAX_JAR, "$java_sax_jar")
 AC_DEFINE_UNQUOTED(JAVA_SAX_CLASS, "$java_sax_class")
 
 
-have_rapier=
+have_rapier=0
 if test -r $srcdir/rapier.h -a -r $srcdir/rapier_parse.c; then
   have_rapier=1;
 fi
