@@ -15,6 +15,7 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>RFE: consider how to allow raptor parser guessing in redland parser API</li>
 <li>RFE: Python api, add __nonzero__ (check this) so you can do things
 like <code>if redland-stream: do things...</code> to check for
 empty streams before iterating. 
@@ -24,8 +25,6 @@ empty streams before iterating.
 <li>BUG: The parser error/warning callbacks are not called - broken. They
 are also rather useless in not passing through the varargs argument.  Maybe
 change the API and the world error/warning api to be more general.</li>
-<li>RFE: allow the raptor parser features (raptor_set_feature) to be
-set via librdf_parser_set_feature</li>
 <li>RFE: The parser should be able to adjust error and warning
 actions, stopping immediately or ignoring them by features. Document
 the defaults.</li>
@@ -70,6 +69,8 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Allow raptor parser features (<code>raptor_set_feature</code>) to be
+set via <code>librdf_parser_set_feature</code> (0.9.17)</li>
 <li>rdf_uri.h and rdf_node.h exported functions returning rdf_digest* which is a private structure, now made internal (0.9.16)</li>
 <li>Added some defensive code checks for NULL object parameters and
 abort when debugging (0.9.15)</li>
