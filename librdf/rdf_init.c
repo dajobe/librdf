@@ -183,7 +183,24 @@ librdf_error(librdf_world* world, const char *message, ...)
   va_list arguments;
 
   va_start(arguments, message);
+  librdf_error_varargs(world, message, arguments);
+  va_end(arguments);
+}
 
+
+/*
+ * librdf_error_varargs - Error - Internal
+ * @world: redland world object or NULL
+ * @message: error message or format string
+ * @arguments: va_alist arguments
+ *
+ * If world is NULL, the error ocurred in redland startup before
+ * the world was created.
+ **/
+void
+librdf_error_varargs(librdf_world* world, const char *message,
+                     va_list arguments)
+{
   if(world && world->error_fn) {
     world->error_fn(world->error_user_data, message, arguments);
     return;
@@ -192,8 +209,6 @@ librdf_error(librdf_world* world, const char *message, ...)
   fputs("librdf error - ", stderr);
   vfprintf(stderr, message, arguments);
   fputc('\n', stderr);
-
-  va_end(arguments);
 }
 
 
@@ -214,6 +229,7 @@ librdf_warning(librdf_world* world, const char *message, ...)
 
   if(world && world->warning_fn) {
     world->warning_fn(world->warning_user_data, message, arguments);
+    va_end(arguments);
     return;
   }
   
