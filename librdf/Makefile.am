@@ -139,7 +139,8 @@ redland-config.in \
 memcmp.c Redland.i \
 PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \
-autogen.sh
+autogen.sh \
+redland.spec.in
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
