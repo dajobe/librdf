@@ -26,7 +26,7 @@ AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR(librdf/rdf_node.c)
 AC_REVISION($Revision$)dnl
 
-AM_INIT_AUTOMAKE([1.7 check-news std-options -Wall])
+AM_INIT_AUTOMAKE([1.7 check-news std-options -Wobsolete -Wportability -Wsyntax -Wunsupported])
 AM_CONFIG_HEADER(librdf/rdf_config.h)
 AM_MAINTAINER_MODE
 
