@@ -111,7 +111,21 @@ while [ $# -ne 0 ] ; do
         aclocal_vers=$vers
       fi
     done
-  fi progs=`ls autoheader* 2>/dev/null`
+  fi
+  progs=`ls libtoolize* 2>/dev/null`
+  if [ "X$progs" != "X" ]; then
+    for prog in $progs; do
+      vers=`$prog --version | sed -ne '1s/^.* //p'`
+      if [ "X$vers" = "X" ]; then
+        continue
+      fi
+      if expr $vers '>' $libtoolize_vers >/dev/null; then
+        libtoolize=$prog
+        libtoolize_vers=$vers
+      fi
+    done
+  fi
+  progs=`ls autoheader* 2>/dev/null`
   if [ "X$progs" != "X" ]; then
     for prog in $progs; do
       vers=`$prog --version | sed -ne '1s/^.* //p'`
@@ -121,45 +135,6 @@ while [ $# -ne 0 ] ; do
       if expr $vers '>' $autoheader_vers >/dev/null; then
         autoheader=$prog
         autoheader_vers=$vers
-      fi
-    done
-  fi
-  progs=`ls libtoolize* 2>/dev/null`
-  if [ "X$progs" != "X" ]; then
-    for prog in $progs; do
-      vers=`$prog --version | sed -ne '1s/^.* //p'`
-      if [ "X$vers" = "X" ]; then
-        continue
-      fi
-      if expr $vers '>' $libtoolize_vers >/dev/null; then
-        libtoolize=$prog
-        libtoolize_vers=$vers
-      fi
-    done
-  fi
-  progs=`ls libtoolize* 2>/dev/null`
-  if [ "X$progs" != "X" ]; then
-    for prog in $progs; do
-      vers=`$prog --version | sed -ne '1s/^.* //p'`
-      if [ "X$vers" = "X" ]; then
-        continue
-      fi
-      if expr $vers '>' $libtoolize_vers >/dev/null; then
-        libtoolize=$prog
-        libtoolize_vers=$vers
-      fi
-    done
-  fi
-  progs=`ls libtoolize* 2>/dev/null`
-  if [ "X$progs" != "X" ]; then
-    for prog in $progs; do
-      vers=`$prog --version | sed -ne '1s/^.* //p'`
-      if [ "X$vers" = "X" ]; then
-        continue
-      fi
-      if expr $vers '>' $libtoolize_vers >/dev/null; then
-        libtoolize=$prog
-        libtoolize_vers=$vers
       fi
     done
   fi
