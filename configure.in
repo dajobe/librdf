@@ -13,13 +13,14 @@ AM_INIT_AUTOMAKE(librdf, 1.0)
 
 
 dnl Checks for programs.
-
 AC_CANONICAL_HOST
 AC_ARG_PROGRAM
 AM_SANITY_CHECK
 AC_PROG_CC
-AC_PROG_RANLIB
 AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
 AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
 AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
@@ -28,7 +29,6 @@ AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
 
 
 dnl Checks for libraries.
-
 AC_CHECK_HEADERS(gdbm.h)
 if test "$ac_cv_header_gdbm_h" = yes ; then
   AC_CHECK_LIB(gdbm,gdbm_firstkey)
@@ -39,7 +39,7 @@ fi
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h stdlib.h)
+AC_CHECK_HEADERS(stdlib.h unistd.h)
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -65,41 +65,91 @@ fi
 
 
 dnl Checks for library functions.
+AC_FUNC_MEMCMP
 
 
 dnl Checks for modules
 digest_modules="md5 sha1 ripemd160"
 
+AC_MSG_CHECKING(digests wanted)
+AC_ARG_ENABLE(digests, [  --enable-digests=LIST   Use digests [md5 sha1 ripemd160]], digest_modules="$enableval") 
+AC_MSG_RESULT($digest_modules)
+
 DIGEST_OBJS=
 DIGEST_SRCS=
 
-AC_CHECK_HEADERS(openssl/crypto.h)
-if test "$ac_cv_header_openssl_crypto_h" = yes ; then
-  AC_DEFINE(HAVE_OPENSSL_DIGESTS)
-  new_digest_modules=
-  have_libcrypto=
-  for module in $digest_modules; do
-    func=`echo $module | tr 'a-z' 'A-Z'`
-    AC_CHECK_LIB(crypto, $func,[
-      # Have to do this since macro version doesn't expand variables
-      echo "#define HAVE_OPENSSL_CRYPTO_${func}_DIGEST 1" >> confdefs.h
-    ], [
-      new_digest_modules="${new_digest_modules} $module"
-    ])
-  done
-  LIBS="-lcrypto $LIBS"
-  DIGEST_OBJS="$DIGEST_OBJS rdf_digest_openssl.o"
-  DIGEST_SRCS="$DIGEST_SRCS rdf_digest_openssl.c"
-  digest_modules=$new_digest_modules
+AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests [yes]], enable_openssl_digests="$withval", enable_openssl_digests="yes") 
+
+AC_MSG_CHECKING(whether to use openssl digests)
+if test "$enable_openssl_digests" = yes ; then
+  AC_MSG_RESULT(yes)
+  AC_CHECK_HEADERS(openssl/crypto.h)
+  if test "$ac_cv_header_openssl_crypto_h" = yes ; then
+    AC_DEFINE(HAVE_OPENSSL_DIGESTS)
+    new_digest_modules=
+    oLIBS="$LIBS"
+    have_libcrypto=
+
+    for module in $digest_modules; do
+      func=`echo $module | tr 'a-z' 'A-Z'`
+      # This is needed because autoheader can't work out which computed
+      # symbols must be pulled from acconfig.h into config.h.in
+      found=
+      case "$func" in
+        MD5)
+	  AC_CHECK_LIB(crypto, MD5)
+          if test "$ac_cv_func_MD5"; then
+            AC_DEFINE(HAVE_OPENSSL_CRYPTO_MD5_DIGEST)
+	    found=yes
+          fi
+	  ;;
+        SHA1)
+	  AC_CHECK_LIB(crypto, SHA1)
+          if test "$ac_cv_func_SHA1"; then
+            AC_DEFINE(HAVE_OPENSSL_CRYPTO_SHA1_DIGEST)
+	    found=yes
+          fi
+	  ;;
+        RIPEMD160)
+	  AC_CHECK_LIB(crypto, RIPEMD160)
+          if test "$ac_cv_func_RIPEMD160"; then
+            AC_DEFINE(HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST)
+	    found=yes
+          fi
+	  ;;
+        esac
+      if test "$found" = yes; then
+        have_libcrypto=yes
+      else
+	new_digest_modules="${new_digest_modules} $module"
+      fi
+    done
+    if test "$have_libcrypto" = yes; then
+      LIBS="-lcrypto $oLIBS"
+    else
+      LIBS="$oLIBS"
+    fi
+    DIGEST_OBJS="$DIGEST_OBJS rdf_digest_openssl.o"
+    DIGEST_SRCS="$DIGEST_SRCS rdf_digest_openssl.c"
+    digest_modules=$new_digest_modules
+  fi
+else
+  AC_MSG_RESULT(no)
 fi
 
+# Maybe add some local digest modules
 for module in $digest_modules; do
   module_u=`echo $module | tr 'a-z' 'A-Z'`
-  AC_MSG_CHECKING(for $module digest module)
+  AC_MSG_CHECKING(for local $module digest module)
   if test -r $srcdir/$module.c; then
     AC_MSG_RESULT(yes);
-    # Have to do this since macro version doesn't expand variables
-    echo "#define HAVE_${module_u}_DIGEST 1" >> confdefs.h
+    # This is needed because autoheader can't work out which computed
+    # symbols must be pulled from acconfig.h into config.h.in
+    case "$module_u" in
+      MD5) AC_DEFINE(HAVE_LOCAL_MD5_DIGEST) ;;
+      SHA1) AC_DEFINE(HAVE_LOCAL_SHA1_DIGEST) ;;
+      RIPEMD160) AC_DEFINE(HAVE_LOCAL_RIPEMD160_DIGEST) ;;
+    esac
     DIGEST_OBJS="$DIGEST_OBJS $module.o"
     DIGEST_SRCS="$DIGEST_SRCS $module.c"
   else
@@ -119,7 +169,6 @@ if test "$ac_cv_lib_gdbm_gdbm_firstkey" = yes ; then
   AC_DEFINE(HAVE_GDBM_HASH)
   HASH_OBJS="$HASH_OBJS rdf_hash_gdbm.o"
   HASH_SRCS="$HASH_SRCS rdf_hash_gdbm.o"
-  LIBS="$LIBS -lgdbm"
 else
   AC_MSG_RESULT(no);
 fi
