@@ -1,5 +1,5 @@
 /*
- * rdf_hash.c - RDF HASH Implementation
+ * rdf_hash.c - RDF Hash Implementation
  *
  * $Source$
  * $Id$
@@ -101,9 +101,9 @@ librdf_delete_hash_factories(void)
  * 
  * Register a hash factory
  **/
-void librdf_hash_register_factory(const char *name,
-                               void (*factory) (librdf_hash_factory*)
-                               ) 
+void
+librdf_hash_register_factory(const char *name,
+			     void (*factory) (librdf_hash_factory*)) 
 {
         librdf_hash_factory *hash, *h;
         char *name_copy;
@@ -274,7 +274,7 @@ librdf_hash_close(librdf_hash* hash)
  * @flags: 0 at present
  * 
  * Retrieve data from hash given a key according to flags
- * The key and values returned are from newly allocated memory which the
+ * The value returned is from newly allocated memory which the
  * caller must free.
  * 
  * Return value: non 0 on failure
@@ -376,7 +376,7 @@ librdf_hash_delete(librdf_hash* hash, void *key, size_t key_len)
  * @type: LIBRDF_HASH_SEQUENCE_FIRST to return first key, LIBRDF_HASH_SEQUENCE_NEXT to return next key, LIBRDF_HASH_SEQUENCE_CURRENT to return current key in sequence
  * 
  * retrieve keys via sequential access
- * Note; the key pointer will return newly allocate memory each time
+ * Note; the key pointer will return newly allocated memory each time
  * 
  * Return value: 
  **/
@@ -499,7 +499,7 @@ librdf_hash_print (librdf_hash* hash, FILE *fh)
                 fwrite(value, value_len, 1, fh);
                 fputs("'\n", fh);
                 
-                /* key and value point to new memory each time */
+                /* key and value points to new memory each time */
                 LIBRDF_FREE(cstring, key);
                 LIBRDF_FREE(cstring, value);
         }
