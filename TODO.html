@@ -56,8 +56,9 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>rdf_uri.h and rdf_node.h exported functions returning rdf_digest* which is a private structure, now made internal (0.9.16)</li>
 <li>Added some defensive code checks for NULL object parameters and
-abort when debugging.</li>
+abort when debugging (0.9.15)</li>
 <li>The serializer code crashed in PHP (0.9.15)</li>
 <li>raptor-uri-test in redland when compiled against
 system raptor failed to find raptor.h; fixed in raptor 1.1.0.</li>
