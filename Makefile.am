@@ -60,22 +60,3 @@ TODO: TODO.html
 	$(HTML_TO_TEXT) $< > $@
 
 @SET_MAKE@
-
-$(top_builddir)/repat/librepat.la:
-	cd $(top_builddir)/repat && $(MAKE) $(AM_MAKEFLAGS)
-
-$(top_builddir)/raptor/libraptor.la:
-	cd raptor && $(MAKE) $(AM_MAKEFLAGS)
-
-$(top_builddir)/raptor/lib/libraptor.la: $(top_builddir)/raptor/libraptor.la
-	cd raptor && $(MAKE) $(AM_MAKEFLAGS) finish LOCAL_LIB_DIR=../lib
-
-$(top_builddir)/librdf/libraptor.la:
-	cd librdf && $(MAKE) $(AM_MAKEFLAGS)
-
-$(top_builddir)/librdf/lib/librdf.la: $(top_builddir)/librdf/librdf.la
-	cd librdf && $(MAKE) $(AM_MAKEFLAGS) finish LOCAL_LIB_DIR=../lib
-
-finish: $(top_builddir)/raptor/lib/libraptor.la $(top_builddir)/librdf/lib/librdf.la
-	rm -rf $(top_builddir)/lib
-	mkdir $(top_builddir)/lib
