@@ -84,7 +84,8 @@ rdf_uri_get_digest (rdf_uri* uri)
 
   rdf_digest_init(d);
   rdf_digest_update(d, (unsigned char*)uri, strlen(uri));
-
+  rdf_digest_final(d);
+  
   return d;
 }
 
