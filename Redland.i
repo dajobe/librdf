@@ -320,6 +320,12 @@ unsigned char* librdf_query_results_to_string(librdf_query_results *query_result
 
 void librdf_free_query_results(librdf_query_results* query_results);
 
+int librdf_query_results_is_bindings(librdf_query_results *query_results);
+int librdf_query_results_is_boolean(librdf_query_results *query_results);
+int librdf_query_results_is_graph(librdf_query_results *query_results);
+
+int librdf_query_results_get_boolean(librdf_query_results *query_results);
+
 
 /* rdf_serializer.h */
 %newobject librdf_new_serializer;
