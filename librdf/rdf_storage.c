@@ -397,7 +397,7 @@ librdf_storage_close(librdf_storage* storage)
  * librdf_storage_size - Get the number of statements stored
  * @storage: &librdf_storage object
  * 
- * Return value: The number of statements
+ * Return value: The number of statements or < 0 if cannot be determined
  **/
 int
 librdf_storage_size(librdf_storage* storage) 
