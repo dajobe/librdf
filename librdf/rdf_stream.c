@@ -184,13 +184,16 @@ librdf_stream_get_next_mapped_statement(librdf_stream* stream)
  * librdf_stream_next - Get the next librdf_statement in the stream
  * @stream: &librdf_stream object
  *
+ * The returned statement is owned by the caller and must be freed
+ * using librdf_free_statement().
+ *
  * Return value: a new &librdf_statement object or NULL at end of stream.
  **/
 librdf_statement*
 librdf_stream_next(librdf_stream* stream) 
 {
   librdf_statement* statement;
-  
+
   if(stream->is_end_stream)
     return NULL;
 
@@ -208,11 +211,11 @@ librdf_stream_next(librdf_stream* stream)
   }
 
   /* else get a new one or NULL at end of list */
-  stream->next=librdf_stream_get_next_mapped_statement(stream);
-  if(!stream->next)
+  statement=librdf_stream_get_next_mapped_statement(stream);
+  if(!statement)
     stream->is_end_stream=1;
-  
-  return stream->next;
+
+  return statement;
 }
 
 
@@ -241,7 +244,7 @@ librdf_stream_end(librdf_stream* stream)
 
   /* already have 1 stored item */
   if(stream->next)
-    return 1;
+    return 0;
 
   /* get next item subject to map or NULL if list ended */
   stream->next=librdf_stream_get_next_mapped_statement(stream);
