@@ -113,6 +113,8 @@ extern const unsigned int librdf_version_decimal;
 /* FIXME: Should be replaced with automatically pulled
  * definitions from the listed rdf_*.h header files.
  */
+ 
+#ifndef LIBRDF_OBJC_FRAMEWORK
 #include <rdf_log.h>
 #include <rdf_init.h>
 #include <rdf_iterator.h>
@@ -126,7 +128,21 @@ extern const unsigned int librdf_version_decimal;
 #include <rdf_serializer.h>
 #include <rdf_stream.h>
 #include <rdf_query.h>
-
+#else
+#include <Redland/rdf_log.h>
+#include <Redland/rdf_init.h>
+#include <Redland/rdf_iterator.h>
+#include <Redland/rdf_uri.h>
+#include <Redland/rdf_node.h>
+#include <Redland/rdf_concepts.h>
+#include <Redland/rdf_statement.h>
+#include <Redland/rdf_model.h>
+#include <Redland/rdf_storage.h>
+#include <Redland/rdf_parser.h>
+#include <Redland/rdf_serializer.h>
+#include <Redland/rdf_stream.h>
+#include <Redland/rdf_query.h>
+#endif
 
 #ifdef __cplusplus
 }

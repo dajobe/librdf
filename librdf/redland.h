@@ -33,6 +33,7 @@
 extern "C" {
 #endif
 
+#ifndef LIBRDF_OBJC_FRAMEWORK
 /* Redland consists of */
 /* raptor */
 #include <raptor.h>
@@ -40,6 +41,11 @@ extern "C" {
 #include <rasqal.h>
 /* librdf */
 #include <librdf.h>
+#else
+#include <Redland/raptor.h>
+#include <Redland/rasqal.h>
+#include <Redland/librdf.h>
+#endif
 
 #ifdef __cplusplus
 }

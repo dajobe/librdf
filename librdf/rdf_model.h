@@ -30,7 +30,11 @@
 #ifndef LIBRDF_MODEL_H
 #define LIBRDF_MODEL_H
 
+#ifndef LIBRDF_OBJC_FRAMEWORK
 #include <rdf_uri.h>
+#else
+#include <Redland/rdf_uri.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

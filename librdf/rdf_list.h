@@ -30,7 +30,11 @@
 #ifndef LIBRDF_LIST_H
 #define LIBRDF_LIST_H
 
+#ifndef LIBRDF_OBJC_FRAMEWORK
 #include <rdf_iterator.h>
+#else
+#include <Redland/rdf_iterator.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

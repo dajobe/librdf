@@ -34,8 +34,11 @@
 extern "C" {
 #endif
 
+#ifndef LIBRDF_OBJC_FRAMEWORK
 #include <rdf_types.h>
-
+#else
+#include <Redland/rdf_types.h>
+#endif
 
 typedef u32 librdf_unichar;
 
