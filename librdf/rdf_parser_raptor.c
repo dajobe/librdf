@@ -426,16 +426,19 @@ librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler(raptor_www *www,
 
 
 /**
- * librdf_parser_raptor_parse_uri_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
+ * librdf_parser_raptor_parse_as_stream_common - Retrieve the content at URI/string and parse it into a librdf_stream
  * @context: parser context
- * @uri: &librdf_uri URI of RDF/XML content source
+ * @uri: &librdf_uri URI of ontent source
+ * @string: or content string
  * @base_uri: &librdf_uri URI of the content location or NULL if the same
  *
+ * Only one of uri or string may be given
  *
  **/
 static librdf_stream*
-librdf_parser_raptor_parse_uri_as_stream(void *context, librdf_uri *uri,
-                                         librdf_uri *base_uri)
+librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
+                                            const char *string,
+                                            librdf_uri *base_uri)
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
@@ -519,6 +522,40 @@ librdf_parser_raptor_parse_uri_as_stream(void *context, librdf_uri *uri,
 
 
 /**
+ * librdf_parser_raptor_parse_uri_as_stream - Retrieve the content at URI and parse it into a librdf_stream
+ * @context: parser context
+ * @uri: &librdf_uri URI of content source
+ * @base_uri: &librdf_uri URI of the content location or NULL if the same
+ *
+ *
+ **/
+static librdf_stream*
+librdf_parser_raptor_parse_uri_as_stream(void *context, librdf_uri *uri,
+                                         librdf_uri *base_uri)
+{
+  return librdf_parser_raptor_parse_as_stream_common(context, 
+                                                     uri, NULL, base_uri);
+}
+
+
+/**
+ * librdf_parser_raptor_parse_string_as_stream - Parse the content in a string and return a librdf_stream
+ * @context: parser context
+ * @string: string content to parse
+ * @base_uri: &librdf_uri URI of the content location or NULL if the same
+ *
+ *
+ **/
+static librdf_stream*
+librdf_parser_raptor_parse_string_as_stream(void *context, const char *string,
+                                            librdf_uri *base_uri)
+{
+  return librdf_parser_raptor_parse_as_stream_common(context, 
+                                                     NULL, string, base_uri);
+}
+
+
+/**
  * librdf_parser_raptor_parse_uri_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
  * @context: parser context
  * @uri: &librdf_uri URI of RDF/XML content source
@@ -530,9 +567,11 @@ librdf_parser_raptor_parse_uri_as_stream(void *context, librdf_uri *uri,
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri, 
-                                          librdf_uri *base_uri,
-                                          librdf_model* model)
+librdf_parser_raptor_parse_into_model_common(void *context,
+                                             librdf_uri *uri, 
+                                             const char *string,
+                                             librdf_uri *base_uri,
+                                             librdf_model* model)
 {
   int status=0;
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
@@ -571,11 +610,62 @@ librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri,
   /* direct into model */
   scontext->model = model;
 
-  status=raptor_parse_uri(rdf_parser, (raptor_uri*)uri, (raptor_uri*)base_uri);
+  if(uri) {
+    status=raptor_parse_uri(rdf_parser, (raptor_uri*)uri, (raptor_uri*)base_uri);
+  } else {
+    status=raptor_start_parse(rdf_parser, (raptor_uri*)base_uri);
+    if(!status)
+      status=raptor_parse_chunk(rdf_parser, string, strlen(string), 1);
+  }
+  
 
   librdf_parser_raptor_serialise_finished((void*)scontext);
 
   return status;
+}
+
+
+/**
+ * librdf_parser_raptor_parse_uri_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
+ * @context: parser context
+ * @uri: &librdf_uri URI of RDF/XML content source
+ * @base_uri: &librdf_uri URI of the content location
+ * @model: &librdf_model of model
+ *
+ * Retrieves all statements and stores them in the given model.
+ *
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri, 
+                                          librdf_uri *base_uri,
+                                          librdf_model* model)
+{
+  return librdf_parser_raptor_parse_into_model_common(context,
+                                                      uri, NULL,
+                                                      base_uri, model);}
+
+
+/**
+ * librdf_parser_raptor_parse_string_into_model - Parse the RDF/XML content in a string and store it into a librdf_model
+ * @context: parser context
+ * @string: RDF/XML source
+ * @base_uri: &librdf_uri URI of the content location
+ * @model: &librdf_model of model
+ *
+ * Stores the statements found parsing string and stores in the given model.
+ *
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_parser_raptor_parse_string_into_model(void *context, 
+                                             const char *string,
+                                             librdf_uri *base_uri,
+                                             librdf_model* model)
+{
+  return librdf_parser_raptor_parse_into_model_common(context,
+                                                      NULL, string,
+                                                      base_uri, model);
 }
 
 
@@ -779,6 +869,8 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
   factory->init  = librdf_parser_raptor_init;
   factory->parse_uri_as_stream = librdf_parser_raptor_parse_uri_as_stream;
   factory->parse_uri_into_model = librdf_parser_raptor_parse_uri_into_model;
+  factory->parse_string_as_stream = librdf_parser_raptor_parse_string_as_stream;
+  factory->parse_string_into_model = librdf_parser_raptor_parse_string_into_model;
 }
 
 
