@@ -131,7 +131,7 @@ main(int argc, char *argv[])
   if(argc==3)
     parser_name=argv[2];
 
-  parser=librdf_new_parser(parser_name);
+  parser=librdf_new_parser(parser_name, NULL, NULL);
   if(!parser) {
     fprintf(stderr, "%s: Failed to create new parser\n", program);
     return(1);
