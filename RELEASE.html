@@ -3,8 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
   <title>Redland RDF Application Framework - Release Notes</title>
-</head>
-<style type="text/css">
+  <style type="text/css">
 <!--
 pre
 {
@@ -16,13 +15,14 @@ pre
 	border-style: dotted;
 }
 -->
-</style>
+  </style>
+</head>
 <body bgcolor="#ffffff" text="#000085">
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
 
-<h2 id="rel0_9_12" name="rel0_9_12">Redland 0.9.12 Changes</h2>
+<h2 id="rel0_9_12"><a name="rel0_9_12">Redland 0.9.12 Changes</a></h2>
 
 <p>This version of Redland is a major update to 0.9.11 incorporating
 a much more improved, complete and stable version 0.9.7 of the 
@@ -39,7 +39,7 @@ interface about object ownership.</p>
 
 <p>A Perl script <a href="aux/update-api-0912.pl">aux/update-api-0912.pl</a>
 can help automate the API changes as far as possible or warn about those
-that cannot be automatically updated.<br />
+that cannot be automatically updated.</p>
 
 
 <h3>New Feature - Contexts</h3>
@@ -77,7 +77,7 @@ other statements about the statement that is returned.</li>
 <code>get_next</code> method was split into <code>get_object</code>
 always returning a pointer to a shared object and the
 <code>next</code> method to advance the iterator.
-<code>get_object</code> method is generally called
+The <code>get_object</code> method is generally called
 <code>current</code> in the higher level language APIs.</p>
 
 <p>(Iterator and Stream now have consistent method names; they
@@ -122,7 +122,7 @@ Node.</p>
 <code>add_statement</code> method no longer takes ownership of the
 passed in statement object.  The caller now retains ownership and can
 reuse the statement several times and has responsibility for freeing it
-if need be (when it isn't shared).<br />
+if need be (when it isn't shared).</p>
 
 <p>C example for Redland 0.9.11 and earlier:</p>
 <pre>
@@ -203,9 +203,10 @@ in the API as a wrapper around the above.</p>
   librdf_node* librdf_new_node_from_typed_literal(librdf_world *world,
     const char *string, const char *xml_language, librdf_uri* datatype_uri);
 </pre>
-that should be used in preference to <code>librdf_new_node_from_literal</code> 
-which remains in the API as a wrapper around the above.
-</p>
+
+<p>that should be used in preference to
+<code>librdf_new_node_from_literal</code> which remains in the API as
+a wrapper around the above.  </p>
 
 <p><code>librdf_node_new_nodefrom_literal</code> lost the
 xml_space argument.</p>
@@ -276,7 +277,7 @@ on-disk Berkeley/Sleepycat DB:</p>
 <code>next</code> method was split into <code>get_object</code>
 always returning a pointer to a shared Statement and the
 <code>next</code> method to advance the iterator.
-<code>get_object</code> method is generally called
+The <code>get_object</code> method is generally called
 <code>current</code> in the higher level language APIs.</p>
 
 <p>(Iterator and Stream now have consistent method names; they
@@ -438,12 +439,12 @@ changes described above.</p>
 <p>The <a href="docs/java.html">Java</a> classes were updated to have
 a <code>finished()</code> method that the user can call to cleanup
 objects replacing the rather useless Java <code>finalize()</code>
-method that gives no guarantees to when it is called.<br />
+method that gives no guarantees to when it is called.</p>
 
 <p>The Java API is still experimental and may change further.</p>
 
 
-<h2 id="rel_older" name="rel_older">Redland 0.9.1 - Redland 0.9.11 Changes</h2>
+<h2 id="rel_older"><a name="rel_older">Redland 0.9.1 - Redland 0.9.11 Changes</a></h2>
 
 <p>Release notes for 0.9.11 and earlier are in the
 <a href="NEWS.html">NEWS page</a> or
