@@ -1,7 +1,21 @@
+dnl -*- Mode: sh -*-
 dnl
-dnl Configure for librdf
-dnl
+dnl configure.in - top level autoconf file for librdf
 dnl (Process this file with autoconf to produce a configure script.)
+dnl
+dnl $Id$
+dnl
+dnl (C) Dave Beckett 2000 ILRT, University of Bristol
+dnl http://www.ilrt.bristol.ac.uk/people/cmdjb/
+dnl
+dnl
+dnl This program is free software distributed under either of these licenses:
+dnl   1. The GNU Lesser General Public License (LGPL)
+dnl OR ALTERNATIVELY
+dnl   2. The modified BSD license
+dnl
+dnl See LICENSE.html or LICENSE.txt for the full license terms.
+dnl
 
 AC_REVISION($Revision$)dnl
 
@@ -25,11 +39,25 @@ AC_PROG_RANLIB
 AC_CHECK_PROGS(JAVA, java jre)
 AC_DEFINE_UNQUOTED(JAVA_COMMAND, "$JAVA")
 
+AC_CHECK_PROG(LIBWWW_CONFIG, libwww-config, libwww-config)
+
 AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
 AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
 AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
 AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
 
+
+
+dnl compiler checks
+# if using gcc...
+if test "$ac_cv_prog_gcc" = yes; then
+  STANDARD_CFLAGS=
+  MAINTAINER_CFLAGS="-Wall -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls"
+else
+  STANDARD_CFLAGS=
+  MAINTAINER_CFLAGS=
+fi
+MAINTAINER_CFLAGS="-DLIBRDF_DEBUG=1 $MAINTAINER_CFLAGS"
 
 
 
@@ -108,16 +136,19 @@ dnl Checks for library functions.
 AC_FUNC_MEMCMP
 
 dnl Checks for URI resolvers
-AC_ARG_WITH(libwww, [  --with-libww            Use libwww [yes]], enable_libwww="$withval", enable_libwww="no") 
+AC_ARG_WITH(libwww, [  --with-libww            Use libwww [yes]], enable_libwww="$withval", enable_libwww="yes") 
 
-AC_MSG_CHECKING(whether to use libwww)
+have_libwww=
+AC_MSG_CHECKING(whether have working libwww)
 if test "$enable_libwww" = yes ; then
-  AC_MSG_RESULT(yes)
-  AC_CHECK_PROG(LIBWWW_CONFIG, libwww-config, yes, no)
-  if test "$LIBWWW_CONFIG" = yes; then
-    LIBS="`libwww-config --libs` $LIBS"
-    CFLAGS="`libwww-config --cflags` $CFLAGS"
+  if test -n "$LIBWWW_CONFIG"; then
+    AC_MSG_RESULT(yes)
+    LIBS="$LIBS `$LIBWWW_CONFIG --libs`"
+    CFLAGS="$CFLAGS `$LIBWWW_CONFIG --cflags`"
     AC_DEFINE(HAVE_LIBWWW)
+    have_libwww=yes
+  else
+    AC_MSG_RESULT(no)
   fi
 else
   AC_MSG_RESULT(no)
@@ -134,12 +165,26 @@ if test "$rdf_java_api_jar" != no ; then
   AC_DEFINE_UNQUOTED(RDF_JAVA_API_JAR, "$rdf_java_api_jar")
   if test -r $rdf_java_api_jar; then
     AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_SIRPAC_PARSER)
+    AC_DEFINE(HAVE_SIRPAC_RDF_PARSER)
     PARSER_OBJS="$PARSER_OBJS rdf_parser_sirpac.o"
     PARSER_SRCS="$PARSER_SRCS rdf_parser_sirpac.c"
   else
     AC_MSG_RESULT(no - JAR file $rdf_java_api_jar does not exist)
   fi
+else
+  AC_MSG_RESULT(no)
+fi
+AC_MSG_CHECKING(whether libwww has RDF support)
+if test "$have_libwww" = yes ; then
+  AC_TRY_LINK([#undef PACKAGE
+               #undef VERSION
+               #include <WWWXML.h>], [HTRDF* rdfp=HTRDF_new();],
+              AC_DEFINE(HAVE_LIBWWW_RDF)
+	      AC_DEFINE(HAVE_LIBWWW_RDF_PARSER)
+	      PARSER_OBJS="$PARSER_OBJS rdf_parser_libwww.o"
+	      PARSER_SRCS="$PARSER_SRCS rdf_parser_libwww.c"
+	      AC_MSG_RESULT(yes),
+	      AC_MSG_RESULT(no))
 else
   AC_MSG_RESULT(no)
 fi
@@ -274,9 +319,21 @@ SD=docs
 #  (cd libxml2-2.1.1 && ./configure --cache=../config.cache --enable-shared=no)
 #fi
 
+if test -d expat; then
+  SD="$SD expat"
+fi
+
 AC_SUBST(SD)
+
+
+# Make final changes to cflags
+STANDARD_CFLAGS="$STANDARD_CFLAGS $CFLAGS"
+CFLAGS="$MAINTAINER_CFLAGS $CFLAGS"
+AC_SUBST(STANDARD_CFLAGS)
+
 
 AC_OUTPUT(Makefile
 docs/Makefile
+expat/Makefile expat/xmlparse/Makefile expat/xmltok/Makefile
 librdf-config,
 [chmod +x librdf-config])
