@@ -31,7 +31,7 @@ fi
 autoconf_vers=2.13
 automake_vers=1.4
 aclocal_vers=1.4
-swig_vers=1.3.10
+swig_vers=1.3.14
 
 program=`basename $0`
 
