@@ -1,3 +1,7 @@
+2005-02-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Snapshotted redland_1_0_0 for 1.0.0 release
+
 2005-02-04  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* Redland.i: librdf_query_results_to_string returns a char*
