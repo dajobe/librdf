@@ -46,10 +46,10 @@ struct librdf_iterator_s {
   void *current;            /* stores current element */
   librdf_list *map_list; /* non-empty means there is a list of maps */
   
-  int (*is_end)(void*);
+  int (*is_end_method)(void*);
   int (*next_method)(void*);
   void* (*get_method)(void*, int); /* flags: type of get */
-  void (*finished)(void*);
+  void (*finished_method)(void*);
 };
 
 /* FIXME - should all short lists be enums */
@@ -60,7 +60,7 @@ struct librdf_iterator_s {
 
 #endif
 
-librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*is_end)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished)(void*));
+librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
 
 void librdf_free_iterator(librdf_iterator*);
 
