@@ -1269,9 +1269,15 @@ librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* s
   if(model->factory->find_statements_in_context)
     return model->factory->find_statements_in_context(model, statement, context_node);
 
-  stream=librdf_model_context_as_stream(model, context_node);
-  if(!stream)
+  statement=librdf_new_statement_from_statement(statement);
+  if(!statement)
     return NULL;
+
+  stream=librdf_model_context_as_stream(model, context_node);
+  if(!stream) {
+    librdf_free_statement(statement);
+    return NULL;
+  }
 
   librdf_stream_add_map(stream,
                         &librdf_stream_statement_find_map,
