@@ -209,25 +209,15 @@ librdf_hash_bdb_open(void* context, char *identifier,
 
 #ifdef HAVE_BDB_OPEN_7_ARGS  
   if((ret=bdb->open(bdb, NULL, file, NULL, DB_BTREE, flags, mode))) {
-#ifdef LIBRDF_DEBUG
-    LIBRDF_DEBUG3(librdf_hash_bdb_open, "BDB V4.1+ open of '%s' failed - %s", 
-                  file, db_strerror(ret));
-#else
     librdf_error(bdb_context->hash->world, "BDB V4.1+ open of '%s' failed - %s",
                  file, db_strerror(ret));
-#endif
     LIBRDF_FREE(cstring, file);
     return 1;
   }
 #else
   if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
-#ifdef LIBRDF_DEBUG
-    LIBRDF_DEBUG3(librdf_hash_bdb_open, "BDB V3 open of '%s' failed - %s", 
-                  file, db_strerror(ret));
-#else
     librdf_error(bdb_context->hash->world, "BDB V3 open of '%s' failed - %s",
                  file, db_strerror(ret));
-#endif
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -248,7 +238,8 @@ librdf_hash_bdb_open(void* context, char *identifier,
     flags |= DB_TRUNCATE;
 
   if((ret=db_open(file, DB_BTREE, flags, mode, NULL, &bdb_info, &bdb))) {
-    LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB V2 db_open failed - %d\n", ret);
+    librdf_error(bdb_context->hash->world, "BDB V2 open of '%s' failed - %d", 
+                 file, ret);
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -266,7 +257,8 @@ librdf_hash_bdb_open(void* context, char *identifier,
     remove(file);
 
   if((bdb=dbopen(file, flags, mode, DB_BTREE, NULL)) == 0) {
-    LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB dbopen failed - %d\n", ret);
+    librdf_error(bdb_context->hash->world, "BDB V1 open of '%s' failed - %d",
+                 file, ret);
     LIBRDF_FREE(cstring, file);
     return 1;
   }
