@@ -684,14 +684,10 @@ AC_C_CONST
 AC_C_BIGENDIAN
 
 dnl Checks for library functions.
-AC_FUNC_MEMCMP
-AC_CHECK_FUNCS(getopt getopt_long mkstemp mktemp tmpnam gettimeofday getenv)
+AC_CHECK_FUNCS(getopt getopt_long memcmp mkstemp mktemp tmpnam gettimeofday getenv)
 
-RDFPROC_EXTRA_OBJS=
-if test $ac_cv_func_getopt = no -a $ac_cv_func_getopt_long = no; then
-  RDFPROC_EXTRA_OBJS='getopt.$(OBJEXT)'
-  AC_SUBST([RDFPROC_EXTRA_OBJS])
-fi
+AM_CONDITIONAL(MEMCMP, test $ac_cv_func_memcmp = no)
+AM_CONDITIONAL(GETOPT, test $ac_cv_func_getopt = no -a $ac_cv_func_getopt_long = no)
 
 dnl Checks for URI resolvers
 AC_ARG_WITH(libwww, [  --with-libwww           Use libwww (default=auto)], enable_libwww="$withval", enable_libwww="no") 
