@@ -137,11 +137,12 @@ using the standard configure and make system.
 <li>Does it run on Apple OSX?<br />
 <p>Yes.  The most recent version of this operating system has most of
 the basic requirements for using Redland and Raptor - an XML parser
-(in 10.3).  The <a href="http://fink.sourceforge.net/">Fink</a> environment
-provides the GNU toolchain, GNU make, autotools and others needed
-if building from CVS.  It also provides Berkeley/Sleepcat DB
-needed for a persistent store.  Redland and Raptor can probably
-be used without Fink but with much reduced functionality.
+(in 10.3). You may need to install the Apple Developer Tools/XCode
+to get all the standard GNU toolchain, make, autotools and other
+things needed to build from CVS.  Another alternative is to
+install the <a href="http://fink.sourceforge.net/">Fink</a> environment
+which also provides the developent tools.  Particular things needed
+include Berkeley/Sleepcat DB, libxml2 and would benefit from libcurl.
 </p>
 </li>
 
