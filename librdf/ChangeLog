@@ -1,3 +1,15 @@
+2005-01-05  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_sqlite.c: Implement get_contexts.
+	(librdf_storage_sqlite_get_next_context_common,
+	librdf_storage_sqlite_get_contexts_is_end,
+	librdf_storage_sqlite_get_contexts_next_method,
+	librdf_storage_sqlite_get_contexts_get_method,
+	librdf_storage_sqlite_get_contexts_finished,
+	librdf_storage_sqlite_get_contexts): Implement, based on
+	find_statements technique.  No special database schema support for
+	contexts at present.
+
 2004-12-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_storage_sqlite.c:
