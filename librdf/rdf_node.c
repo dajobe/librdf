@@ -517,7 +517,7 @@ librdf_node_set_type(librdf_node* node, librdf_node_type type)
 #ifdef LIBRDF_DEBUG
 /* FIXME: For debugging purposes only */
 static const char* const librdf_node_type_names[] =
-{"Unknown", "Resource", "Literal", "LI", "Blank"};
+{"Unknown", "Resource", "Literal", "<Reserved1>", "Blank"};
 
 
 /*

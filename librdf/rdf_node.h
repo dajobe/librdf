@@ -41,7 +41,7 @@ typedef enum {
   LIBRDF_NODE_TYPE_UNKNOWN   = 0,  /* To catch uninitialised nodes */
   LIBRDF_NODE_TYPE_RESOURCE  = 1,  /* rdf:Resource (& rdf:Property) - has a URI */
   LIBRDF_NODE_TYPE_LITERAL   = 2,  /* rdf:Literal - has an XML string, language, XML space */
-  LIBRDF_NODE_TYPE_LI        = 3,  /* rdf:li (a rdf:Property) - has an integer */
+  LIBRDF_NODE_TYPE_RESERVED1 = 3,  /* Do not use */
   LIBRDF_NODE_TYPE_BLANK     = 4,  /* blank node has an identifier string */
   LIBRDF_NODE_TYPE_LAST      = LIBRDF_NODE_TYPE_BLANK
 } librdf_node_type;
