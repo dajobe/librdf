@@ -1742,8 +1742,11 @@ librdf_storage_hashes_get_contexts(librdf_storage* storage)
   librdf_storage_hashes_get_contexts_iterator_context* icontext;
   librdf_iterator* iterator;
 
-  if(context->index_contexts <0)
+  if(context->index_contexts <0) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
+               "Storage was created without context support");
     return NULL;
+  }
   
   icontext=(librdf_storage_hashes_get_contexts_iterator_context*)LIBRDF_CALLOC(librdf_storage_hashes_get_contexts_iterator_context, 1, sizeof(librdf_storage_hashes_get_contexts_iterator_context));
   if(!icontext)
