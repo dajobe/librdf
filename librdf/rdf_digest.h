@@ -66,6 +66,8 @@ librdf_get_digest_factory(const char *name);
 
 /* module init */
 void librdf_init_digest(void);
+/* module finish */
+void librdf_finish_digest(void);
                     
 /* constructor */
 librdf_digest* librdf_new_digest(librdf_digest_factory *factory);
