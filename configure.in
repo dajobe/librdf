@@ -270,14 +270,14 @@ if test $xmlp = 1 -a $xmlt = 1 -a  $ac_cv_header_xmlparse_h = yes; then
   AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
   REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
 
-  AC_MSG_RESULT(yes)
+  AC_MSG_RESULT(yes - libxmlparse and libxmltok)
 elif test $libexpat = 1 -a $ac_cv_header_expat_h = yes ; then
   # New expat - expat-1.95.0 or later
   have_expat_lib=1
   have_expat=1
   expat_libs="-lexpat"
 
-  AC_MSG_RESULT(yes)
+  AC_MSG_RESULT(yes - libexpat)
 else
   AC_MSG_RESULT(no)
 fi
@@ -733,7 +733,7 @@ if test $need_expat = 1; then
     AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
     REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
   else
-    LIBS="$LIBS -lxmlparse -lxmltok"
+    LIBS="$LIBS $expat_libs"
   fi
 fi
 
@@ -780,6 +780,8 @@ python/Makefile
 python/test/Makefile
 tcl/Makefile
 repat/Makefile
+debian/Makefile
+debian/rules
 redland.spec
 redland-config,
-[chmod +x redland-config])
+[chmod +x redland-config debian/rules])
