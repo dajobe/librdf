@@ -39,8 +39,8 @@
 /* these three are alternatives: */
 /* BDB V3 */
 #ifdef HAVE_DB_CREATE
-#define BDB_CLOSE_2_ARGS ?
-#define BDB_FD_2_ARGS ?
+#define BDB_CLOSE_2_ARGS 1
+#define BDB_FD_2_ARGS 1
 
 #else
 
@@ -117,6 +117,9 @@ librdf_hash_bdb_open(void* context, char *identifier, void *mode,
   DB* bdb;
   char *file;
   int ret;
+#ifdef HAVE_DB_OPEN
+  DB_INFO bdb_info;
+#endif
   
   file=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+1);
   if(!file)
@@ -151,7 +154,11 @@ librdf_hash_bdb_open(void* context, char *identifier, void *mode,
    * int db_open(const char *file, DBTYPE type, u_int32_t flags,
    *             int mode, DB_ENV *dbenv, DB_INFO *dbinfo, DB **dbpp);
    */
-  if((ret=db_open(file, DB_BTREE, DB_CREATE | DB_DUP, 0644, NULL, NULL, &bdb))) {
+
+  memset(&bdb_info, 0, sizeof(DB_INFO));
+  bdb_info.flags=DB_DUP;
+  
+  if((ret=db_open(file, DB_BTREE, DB_CREATE, 0644, NULL, &bdb_info, &bdb))) {
     LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB db_open failed - %d\n", ret);
     LIBRDF_FREE(cstring, file);
     return 1;
@@ -235,11 +242,18 @@ librdf_hash_bdb_cursor_init(void *cursor_context, void *hash_context)
   cursor->hash=(librdf_hash_bdb_context*)hash_context;
 
 #ifdef HAVE_BDB_CURSOR
-  /* V2/V3 prototype:
+  db=cursor->hash->db;
+#ifdef HAVE_BDB_CURSOR_4_ARGS
+  /* V3 prototype:
    * int DB->cursor(DB *db, DB_TXN *txnid, DBC **cursorp, u_int32_t flags);
    */
-  db=cursor->hash->db;
   if(db->cursor(db, NULL, &cursor->cursor, 0))
+#else
+  /* V2 prototype:
+   * int DB->cursor(DB *db, DB_TXN *txnid, DBC **cursorp);
+   */
+  if(db->cursor(db, NULL, &cursor->cursor))
+#endif
     return 0;
 #endif
   return 0;
@@ -267,18 +281,6 @@ librdf_hash_bdb_cursor_get(void* context,
   DBT bdb_key;
   DBT bdb_value;
   int ret;
-
-  /* Free old data */
-  /* Don't free last key when moving by value, need to check it later */
-  if(cursor->last_key && flags != LIBRDF_HASH_CURSOR_NEXT_VALUE) {
-    LIBRDF_FREE(cstring, cursor->last_key);
-    cursor->last_key=NULL;
-  }
-    
-  if(cursor->last_value) {
-    LIBRDF_FREE(cstring, cursor->last_value);
-    cursor->last_value=NULL;
-  }
 
   /* docs say you must zero DBT's before use */
   memset(&bdb_key, 0, sizeof(DBT));
@@ -340,20 +342,37 @@ librdf_hash_bdb_cursor_get(void* context,
         ret=DB_NOTFOUND;
       }
       
-
-      /* always tidy up this */
-      if(cursor->last_key) {
-        LIBRDF_FREE(cstring, cursor->last_key);
-        cursor->last_key=NULL;
-      }
-
       break;
       
     case LIBRDF_HASH_CURSOR_NEXT:
 #ifdef HAVE_BDB_CURSOR
-      /* V2/V3 */
+#ifdef DB_NEXT_NODUP
+      /* V3 */
+
+      /* Get next key, or next key/value (when value defined) */
       ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_value,
                             (value) ? DB_NEXT : DB_NEXT_NODUP);
+#else
+      /* V2 */
+
+      /* Must mess about finding next key - note this relies on
+       * the bdb btree having the keys in sorted order
+       */
+      while(1) {
+        ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_value, DB_NEXT);
+        /* finished on error or want all values */
+        if(ret || value)
+          break;
+        /* else want unique keys, so check key changed */
+        if(cursor->last_key &&
+           memcmp(cursor->last_key, bdb_key.data, bdb_key.size))
+          break;
+        
+        /* always allocated by BDB using system malloc */
+        free(bdb_key.data);
+        free(bdb_value.data);
+      }
+#endif
 #else
       /* V1 */
       ret=db->seq(db, &bdb_key, &bdb_value, R_NEXT);
@@ -363,6 +382,19 @@ librdf_hash_bdb_cursor_get(void* context,
     default:
       abort();
   }
+
+
+  /* Free previous key and values */
+  if(cursor->last_key) {
+    LIBRDF_FREE(cstring, cursor->last_key);
+    cursor->last_key=NULL;
+  }
+    
+  if(cursor->last_value) {
+    LIBRDF_FREE(cstring, cursor->last_value);
+    cursor->last_value=NULL;
+  }
+
   
 
   if(ret) {
@@ -547,8 +579,7 @@ librdf_hash_bdb_delete(void* context, librdf_hash_datum *key)
   ret=bdb->del(bdb, &bdb_key, 0);
 #endif
   if(ret)
-    LIBRDF_DEBUG3(librdf_hash_bdb_delete, "BDB del failed - %d - %s\n", ret,
-                  db_strerror(ret));
+    LIBRDF_DEBUG2(librdf_hash_bdb_delete, "BDB del failed - %d\n", ret);
 
   return (ret != 0);
 }
