@@ -18,13 +18,13 @@ ol,ul { font-size: 100% }
 h1, h2, h3, h4 { text-align: left; }
 
 h1 { font-weight: normal; font-size: 200%; font-family: Arial, Helvetica, Geneva, SunSans-Regular, sans-serif; }
-h2 { font-weight: bold; text-transform: capitalize; font-size: 130%; font-family: Arial, Helvetica, Geneva, SunSans-Regular, sans-serif; margin-top: 0em; }
+h2 { font-weight: bold; font-size: 130%; font-family: Arial, Helvetica, Geneva, SunSans-Regular, sans-serif; margin-top: 0em; }
 h3 { font-weight: bold; font-size: 110%; font-family: Arial, Helvetica, Geneva, SunSans-Regular, sans-serif; }
 h4 { font-weight: bold; font-size: 100%; font-family: Arial, Helvetica, Geneva, SunSans-Regular, sans-serif; }
 
 
 pre {
-  margin: 1em 4em 1em 4em;
+  margin: 1em;
   color: black;
   background-color: #eee;
   padding: 0.5em;
