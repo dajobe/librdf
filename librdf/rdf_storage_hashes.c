@@ -681,6 +681,22 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   int fields;
   int status;
   
+  if(storage->index_contexts) {
+    /* When we have contexts, we have to use find_statements for contains
+     * since a statement is encoded in KEY/VALUE and the VALUE may
+     * contain some context node.
+     */
+    librdf_stream *stream=librdf_storage_hashes_find_statements(storage, statement);
+    
+    if(!stream)
+      return 0;
+    /* librdf_stream_end returns 0 if have more, non-0 at end */
+    status=!librdf_stream_end(stream);
+    /* convert to 0 if at end (not found) and non-zero otherwise (found) */
+    librdf_free_stream(stream);
+    return status;
+  }
+
   /* ENCODE KEY */
   fields=context->hash_descriptions[hash_index]->key_fields;
   key_len=librdf_statement_encode_parts(statement, NULL,
