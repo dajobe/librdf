@@ -58,12 +58,14 @@ static void librdf_free_hash_datums(librdf_world *world);
 
 /* prototypes for iterator for getting all keys and values */
 static int librdf_hash_get_all_iterator_is_end(void* iterator);
-static void* librdf_hash_get_all_iterator_get_next(void* iterator);
+static int librdf_hash_get_all_iterator_next_method(void* iterator);
+static void* librdf_hash_get_all_iterator_get_method(void* iterator, int);
 static void librdf_hash_get_all_iterator_finished(void* iterator);
 
 /* prototypes for iterator for getting all keys */
 static int librdf_hash_keys_iterator_is_end(void* iterator);
-static void* librdf_hash_keys_iterator_get_next(void* iterator);
+static int librdf_hash_keys_iterator_next_method(void* iterator);
+static void* librdf_hash_keys_iterator_get_method(void* iterator, int);
 static void librdf_hash_keys_iterator_finished(void* iterator);
 
 
@@ -570,8 +572,8 @@ typedef struct {
   librdf_hash_datum *key;
   librdf_hash_datum *value;
 
-  librdf_hash_datum *next_key; /* not used if one_key set */
-  librdf_hash_datum *next_value;
+  librdf_hash_datum next_key; /* not used if one_key set */
+  librdf_hash_datum next_value;
   int is_end;
   int one_key;
 } librdf_hash_get_all_iterator_context;
@@ -608,35 +610,24 @@ librdf_hash_get_all(librdf_hash* hash,
   if(key->data)
     context->one_key=1;
 
-  if(!context->one_key)
-    if(!(context->next_key=librdf_new_hash_datum(hash->world, NULL, 0))) {
-      librdf_hash_get_all_iterator_finished(context);
-      return NULL;
-    }
-
-  if(value)
-    if(!(context->next_value=librdf_new_hash_datum(hash->world, NULL, 0))) {
-      librdf_hash_get_all_iterator_finished(context);
-      return NULL;
-    }
-
   context->hash=hash;
   context->key=key;
   context->value=value;
 
   if(context->one_key)
     status=librdf_hash_cursor_set(context->cursor, context->key, 
-                                  context->next_value);
+                                  &context->next_value);
   else
-    status=librdf_hash_cursor_get_first(context->cursor, context->next_key, 
-                                        context->next_value);
+    status=librdf_hash_cursor_get_first(context->cursor, &context->next_key, 
+                                        &context->next_value);
 
   context->is_end=(status != 0);
   
   return librdf_new_iterator(hash->world,
                              (void*)context,
                              librdf_hash_get_all_iterator_is_end,
-                             librdf_hash_get_all_iterator_get_next,
+                             librdf_hash_get_all_iterator_next_method,
+                             librdf_hash_get_all_iterator_get_method,
                              librdf_hash_get_all_iterator_finished);
 }
 
@@ -645,78 +636,65 @@ static int
 librdf_hash_get_all_iterator_is_end(void* iterator)
 {
   librdf_hash_get_all_iterator_context* context=(librdf_hash_get_all_iterator_context*)iterator;
+
+  return context->is_end;
+}
+
+
+static int
+librdf_hash_get_all_iterator_next_method(void* iterator) 
+{
+  librdf_hash_get_all_iterator_context* context=(librdf_hash_get_all_iterator_context*)iterator;
   int status;
-  
+    
   if(context->is_end)
     return 1;
-
-  /* have key (if not one_key) or value */
-  if((!context->one_key && context->next_key->data) ||
-     context->next_value->data)
-    return 0;
   
-  /* no stored data, so check for it */
+  /* move on */
+  
   if(context->one_key)
-    status=librdf_hash_cursor_get_next_value(context->cursor,
-                                             context->key,
-                                             context->next_value);
-  else
+    status=librdf_hash_cursor_get_next_value(context->cursor, 
+                                             &context->next_key,
+                                             &context->next_value);
+  else {
+    /* want the next key/value pair, so mark last data as used */
+    context->next_key.data=NULL;
     status=librdf_hash_cursor_get_next(context->cursor, 
-                                       context->next_key, 
-                                       context->next_value);
-
+                                       &context->next_key, 
+                                       &context->next_value);
+  }
+  
   if(status)
     context->is_end=1;
-  
+
   return context->is_end;
 }
 
 
 static void*
-librdf_hash_get_all_iterator_get_next(void* iterator) 
+librdf_hash_get_all_iterator_get_method(void* iterator, int flags) 
 {
   librdf_hash_get_all_iterator_context* context=(librdf_hash_get_all_iterator_context*)iterator;
-
+  void *result=NULL;
+  
   if(context->is_end)
     return NULL;
-  
-  /* check stored data - have key (if not one_key) or value? */
-  if((!context->one_key && context->next_key->data) ||
-     context->next_value->data) {
 
-    if(!context->one_key) {
-      context->key->data=context->next_key->data;
-      context->key->size=context->next_key->size;
-    }
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_KEY:
+      result=&context->next_key;
+      break;
+      
+    case LIBRDF_ITERATOR_GET_METHOD_GET_VALUE:
+      result=&context->next_value;
+      break;
 
-    if(context->value) {
-      context->value->data=context->next_value->data;
-      context->value->size=context->next_value->size;
-    }
-
-    if(!context->one_key)
-      context->next_key->data=NULL;
-    
-    context->next_value->data=NULL;
-
-  } else {
-    int status;
-    
-    /* no stored data, so check for it */
-    if(context->one_key)
-      status=librdf_hash_cursor_get_next_value(context->cursor, 
-                                               context->next_key,
-                                               context->next_value);
-    else
-      status=librdf_hash_cursor_get_next(context->cursor, context->next_key, 
-                                         context->next_value);
-    
-    if(status)
-      context->is_end=1;
+    default:
+      result=NULL;
+      break;
   }
-  
 
-  return (void*)(context->is_end == 0);
+  return result;
 }
 
 
@@ -727,18 +705,6 @@ librdf_hash_get_all_iterator_finished(void* iterator)
 
   if(context->cursor)
     librdf_free_hash_cursor(context->cursor);
-
-  if(context->next_key) {
-    context->next_key->data=NULL;
-    if(context->next_key)
-      librdf_free_hash_datum(context->next_key);
-  }
-  
-  if(context->next_value) {
-    context->next_value->data=NULL;
-    if(context->next_value)
-      librdf_free_hash_datum(context->next_value);
-  }
 
   context->key->data=NULL;
 
@@ -849,7 +815,7 @@ typedef struct {
   librdf_hash_cursor* cursor;
   librdf_hash_datum *key;
 
-  librdf_hash_datum *next_key;
+  librdf_hash_datum next_key;
   int is_end;
 } librdf_hash_keys_iterator_context;
 
@@ -881,22 +847,18 @@ librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key)
     return NULL;
   }
 
-  if(!(context->next_key=librdf_new_hash_datum(hash->world, NULL, 0))) {
-    librdf_hash_keys_iterator_finished(context);
-    return NULL;
-  }
-
   context->hash=hash;
   context->key=key;
  
-  status=librdf_hash_cursor_get_first(context->cursor, context->next_key, 
+  status=librdf_hash_cursor_get_first(context->cursor, &context->next_key, 
                                       NULL);
   context->is_end=(status != 0);
   
   return librdf_new_iterator(hash->world, 
                              (void*)context,
                              librdf_hash_keys_iterator_is_end,
-                             librdf_hash_keys_iterator_get_next,
+                             librdf_hash_keys_iterator_next_method,
+                             librdf_hash_keys_iterator_get_method,
                              librdf_hash_keys_iterator_finished);
 }
 
@@ -910,39 +872,51 @@ librdf_hash_keys_iterator_is_end(void* iterator)
     return 1;
 
   /* have key */
-  if(context->next_key->data)
+  if(context->next_key.data)
     return 0;
   
   /* no stored data, so check for it */
-  if(librdf_hash_cursor_get_next(context->cursor, context->next_key, NULL))
+  if(librdf_hash_cursor_get_next(context->cursor, &context->next_key, NULL))
     context->is_end=1;
   
   return context->is_end;
 }
 
 
-static void*
-librdf_hash_keys_iterator_get_next(void* iterator) 
+static int
+librdf_hash_keys_iterator_next_method(void* iterator) 
 {
   librdf_hash_keys_iterator_context* context=(librdf_hash_keys_iterator_context*)iterator;
 
   if(context->is_end)
+    return 1;
+  
+  /* move on */
+
+  /* want the next key, so mark last key data as used */
+  context->next_key.data=NULL;
+  if(librdf_hash_cursor_get_next(context->cursor, &context->next_key, NULL))
+    context->is_end=1;
+
+  return context->is_end;
+}
+
+
+static void*
+librdf_hash_keys_iterator_get_method(void* iterator, int flags) 
+{
+  librdf_hash_keys_iterator_context* context=(librdf_hash_keys_iterator_context*)iterator;
+  void *result=NULL;
+  
+  if(context->is_end)
     return NULL;
   
-  /* check stored data */
-  if(context->next_key->data) {
-    context->key->data=context->next_key->data;
-    context->key->size=context->next_key->size;
+  if(flags == LIBRDF_ITERATOR_GET_METHOD_GET_KEY)
+    result=&context->next_key;
+  else
+    result=NULL;
 
-    context->next_key->data=NULL;
-  } else {
-    /* no stored data, so check for it */
-    if(librdf_hash_cursor_get_next(context->cursor, context->next_key, 
-                                   NULL))
-      context->is_end=1;
-  }
-
-  return (void*)(context->is_end == 0);
+  return result;
 }
 
 
@@ -953,10 +927,6 @@ librdf_hash_keys_iterator_finished(void* iterator)
 
   if(context->cursor)
     librdf_free_hash_cursor(context->cursor);
-
-  context->next_key->data=NULL;
-  if(context->next_key)
-    librdf_free_hash_datum(context->next_key);
 
   context->key->data=NULL;
 
@@ -1011,15 +981,19 @@ librdf_hash_print(librdf_hash* hash, FILE *fh)
 
   iterator=librdf_hash_get_all(hash, key, value);
   while(!librdf_iterator_end(iterator)) {
-    librdf_iterator_get_next(iterator);
+    librdf_hash_datum *k, *v;
+
+    k=librdf_iterator_get_key(iterator);
+    v=librdf_iterator_get_value(iterator);
     
     fputs("  '", fh);
-    fwrite(key->data, key->size, 1, fh);
+    fwrite(k->data, k->size, 1, fh);
     fputs("'=>'", fh);
-    fwrite(value->data, value->size, 1, fh);
+    fwrite(v->data, v->size, 1, fh);
     fputs("'\n", fh);
-      
-  }
+
+    librdf_iterator_next(iterator);
+}
   if(iterator)
     librdf_free_iterator(iterator);
 
@@ -1047,11 +1021,13 @@ librdf_hash_print_keys(librdf_hash* hash, FILE *fh)
 
   iterator=librdf_hash_keys(hash, key);
   while(!librdf_iterator_end(iterator)) {
-    librdf_iterator_get_next(iterator);
-    
+    librdf_hash_datum *k=librdf_iterator_get_key(iterator);
+
     fputs("  '", fh);
-    fwrite(key->data, key->size, 1, fh);
+    fwrite(k->data, k->size, 1, fh);
     fputs("'\n", fh);
+
+    librdf_iterator_next(iterator);
   }
   if(iterator)
     librdf_free_iterator(iterator);
@@ -1089,14 +1065,15 @@ librdf_hash_print_values(librdf_hash* hash, char *key_string, FILE *fh)
   iterator=librdf_hash_get_all(hash, key, value);
   fputc('(', fh);
   while(!librdf_iterator_end(iterator)) {
-    librdf_iterator_get_next(iterator);
+    librdf_hash_datum *v=librdf_iterator_get_value(iterator);
     if(!first)
       fputs(", ", fh);
       
     fputc('\'', fh);
-    fwrite(value->data, value->size, 1, fh);
+    fwrite(v->data, v->size, 1, fh);
     fputc('\'', fh);
     first=0;
+    librdf_iterator_next(iterator);
   }
   fputc(')', fh);
   librdf_free_iterator(iterator);
@@ -1578,15 +1555,14 @@ main(int argc, char *argv[])
     
     iterator=librdf_hash_keys(h2, key_hd);
     while(!librdf_iterator_end(iterator)) {
+      librdf_hash_datum *k=librdf_iterator_get_key(iterator);
       char *key_string;
       
-      librdf_iterator_get_next(iterator);
-      
-      key_string=(char*)LIBRDF_MALLOC(cstring, key_hd->size+1);
+      key_string=(char*)LIBRDF_MALLOC(cstring, k->size+1);
       if(!key_string)
         break;
-      strncpy(key_string, (char*)key_hd->data, key_hd->size);
-      key_string[key_hd->size]='\0';
+      strncpy(key_string, (char*)k->data, k->size);
+      key_string[k->size]='\0';
       
       fprintf(stdout, "%s: boolean value of key '%s' is ", program,
               key_string);
@@ -1599,6 +1575,7 @@ main(int argc, char *argv[])
       fprintf(stdout, "%ld (decimal, -1 Bad)\n", l);
       
       LIBRDF_FREE(cstring, key_string);
+      librdf_iterator_next(iterator);
     }
     if(iterator)
       librdf_free_iterator(iterator);
