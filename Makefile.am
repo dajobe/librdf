@@ -33,7 +33,7 @@ perl php python tcl java ruby csharp \
 raptor \
 utils demos
 
-EXTRA_DIST=ChangeLog \
+EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 \
 README      NEWS      LICENSE.txt  TODO \
 README.html NEWS.html LICENSE.html TODO.html \
 RELEASE.html INSTALL.html FAQS.html \
