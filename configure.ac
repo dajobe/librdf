@@ -734,7 +734,7 @@ AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
 AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default=auto)], with_raptor="$withval", with_raptor="auto")
 
 RAPTOR_VERSION=`$RAPTOR_CONFIG --version 2>/dev/null`
-RAPTOR_MIN_VERSION=1.2.0
+RAPTOR_MIN_VERSION=1.3.0
 
 # FIXME - could use raptor-config --decimal-version at some point
 RAPTOR_VERSION_DEC=`echo $RAPTOR_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
