@@ -7,7 +7,7 @@ Makefile.in
 aclocal.m4
 config.cache
 config.guess
-config.h*
+rdf_config.h*
 config.log
 config.status
 config.sub
@@ -23,3 +23,7 @@ not-used
 rdf*_test
 stamp-h*
 test*
+NEWS
+README
+TODO
+BUGS
