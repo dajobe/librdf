@@ -45,6 +45,8 @@ enum command_type {
   CMD_REMOVE,
   CMD_PARSE_MODEL,
   CMD_PARSE_STREAM,
+  CMD_ARCS_IN,
+  CMD_ARCS_OUT
 };
 
 typedef struct
@@ -70,6 +72,8 @@ static command commands[]={
   {CMD_REMOVE, "remove", 3, 3, 1},
   {CMD_PARSE_MODEL, "parse", 2, 3, 1},
   {CMD_PARSE_STREAM, "parse-stream", 2, 3, 1},
+  {CMD_ARCS_IN, "arcs-in", 1, 1, 0},
+  {CMD_ARCS_OUT, "arcs-out", 1, 1, 0},
   {(enum command_type)-1, NULL}  
 };
  
@@ -168,6 +172,7 @@ main(int argc, char *argv[])
     fprintf(stdout, "  add | remove SUBJECT PREDICATE OBJECT     Add/remove statement to/from model.\n");
     fprintf(stdout, "  sources | targets | arcs NODE1 NODE2      Query for matching nodes\n");
     fprintf(stdout, "  source | target | arc NODE1 NODE2         Query for 1 matching node\n");
+    fprintf(stdout, "  arcs-in | arcs-out NODE                   Show properties in/out of node\n");
     return(1);
   }
 
@@ -501,6 +506,43 @@ main(int argc, char *argv[])
     if(target)
       librdf_free_node(target);
     break;
+
+
+
+  case CMD_ARCS_IN:
+  case CMD_ARCS_OUT:
+    source=librdf_new_node_from_uri_string(world, argv[0]);
+    iterator=(type == CMD_ARCS_IN) ? librdf_model_get_arcs_in(model, source) :
+                                     librdf_model_get_arcs_out(model, source);
+    if(!iterator) {
+      fprintf(stderr, "%s: Failed to get arcs in/out\n", program);
+      librdf_free_node(source);
+      break;
+    }
+
+    count=0;
+    while(librdf_iterator_have_elements(iterator)) {
+      node=(librdf_node*)librdf_iterator_get_next(iterator);
+      if(!node) {
+        fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
+                program);
+        break;
+      }
+      
+      fputs("Matched arc: ", stdout);
+      librdf_node_print(node, stdout);
+      fputc('\n', stdout);
+      
+      librdf_free_node(node);
+      count++;
+    }
+    librdf_free_iterator(iterator);
+    fprintf(stderr, "%s: matching arcs: %d\n", program, count);
+
+    librdf_free_node(source);
+    break;
+
+
   default:
     fprintf(stderr, "%s: Unknown command %d\n", program, type);
     return(1);
