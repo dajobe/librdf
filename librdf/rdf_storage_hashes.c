@@ -119,7 +119,12 @@ static const librdf_hash_descriptor librdf_storage_hashes_descriptions[3]= {
 
 typedef struct
 {
+  /* from init() argument */
   char         *name;
+  /* from options */
+  char         *hash_type;
+  char         *db_dir;
+  /* internals */
   int           hash_count;   /* how many hashes are present? STATIC 3 - FIXME */
   const librdf_hash_descriptor *hash_descriptions; /* points to STATIC hash_descriptions above - FIXME */
   char* names[3];                 /* names for hash open method */
@@ -157,20 +162,18 @@ librdf_storage_hashes_init(librdf_storage* storage, char *name,
                            librdf_hash* options)
 {
   librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
-  char *hash_type=NULL;
-  char *db_dir=NULL;
   const librdf_hash_descriptor *desc;
   int i;
   int status;
 
-  hash_type=librdf_hash_get(options, "hash_type");
-  if(!hash_type)
+  context->hash_type=librdf_hash_get(options, "hash-type");
+  if(!context->hash_type)
     return 1;
 
-  librdf_hash_delete(options, "hash_type", 9); /* FIXME strlen("hash_type") */
+  librdf_hash_delete(options, "hash-type", 9); /* FIXME strlen("hash-type") */
   
-  db_dir=librdf_hash_get(options, "dir");
-  if(db_dir)
+  context->db_dir=librdf_hash_get(options, "dir");
+  if(context->db_dir)
     librdf_hash_delete(options, "dir", 3); /* FIXME strlen("dir") */
   
   
@@ -186,8 +189,8 @@ librdf_storage_hashes_init(librdf_storage* storage, char *name,
     char *full_name;
     
     len=strlen(desc[i].name) + 1 + strlen(name) + 1; /* "%s-%s\0" */
-    if(db_dir)
-      len+=strlen(db_dir) +1;
+    if(context->db_dir)
+      len+=strlen(context->db_dir) +1;
       
     full_name=(char*)LIBRDF_MALLOC(cstring, len);
     if(!full_name) {
@@ -196,12 +199,12 @@ librdf_storage_hashes_init(librdf_storage* storage, char *name,
     }
 
     /* FIXME: Implies Unix filenames */
-    if(db_dir)
-      sprintf(full_name, "%s/%s-%s", db_dir, name, desc[i].name);
+    if(context->db_dir)
+      sprintf(full_name, "%s/%s-%s", context->db_dir, name, desc[i].name);
     else
       sprintf(full_name, "%s-%s", name, desc[i].name);
 
-    context->hashes[i]=librdf_new_hash(hash_type);
+    context->hashes[i]=librdf_new_hash(context->hash_type);
 
     context->names[i]=full_name;
   }
@@ -221,11 +224,6 @@ librdf_storage_hashes_init(librdf_storage* storage, char *name,
     context->options=NULL;
   }
   
-  if(hash_type)
-    LIBRDF_FREE(cstring, hash_type);
-  if(db_dir)
-    LIBRDF_FREE(cstring, db_dir);
-
   return status;
 }
 
@@ -245,6 +243,13 @@ librdf_storage_hashes_terminate(librdf_storage* storage)
 
   if(context->options)
     librdf_free_hash(context->options);
+
+  if(context->hash_type)
+    LIBRDF_FREE(cstring, context->hash_type);
+
+  if(context->db_dir)
+    LIBRDF_FREE(cstring, context->db_dir);
+
 }
 
 
