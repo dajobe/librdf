@@ -992,8 +992,9 @@ librdf_node_to_string(librdf_node* node)
 unsigned char*
 librdf_node_to_counted_string(librdf_node* node, size_t* len_p) 
 {
-  unsigned char *uri_string, *datatype_uri_string;
-  size_t len, datatype_len, language_len;
+  unsigned char *uri_string;
+  unsigned char *datatype_uri_string=NULL;
+  size_t len, datatype_len, language_len=0;
   unsigned char *s, *d;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
@@ -1024,8 +1025,7 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
     if(node->value.literal.datatype_uri) {
       datatype_uri_string=librdf_uri_to_counted_string(node->value.literal.datatype_uri, &datatype_len);
       len+=4+datatype_len;
-    } else
-      datatype_uri_string=NULL;
+    }
     if(len_p)
       *len_p=len;
     s=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
