@@ -96,6 +96,8 @@ struct librdf_storage_factory_s {
   
   /* serialise the results of a query */
   librdf_stream* (*find_statements)(librdf_storage* storage, librdf_statement* statement);
+  /* OPTIONAL */
+  librdf_stream* (*find_statements_with_options)(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node, librdf_hash* options);
 
   /* return a list of Nodes marching given arc, target */
   librdf_iterator* (*find_sources)(librdf_storage* storage, librdf_node *arc, librdf_node *target);
@@ -206,6 +208,7 @@ REDLAND_API int librdf_storage_remove_statement(librdf_storage* storage, librdf_
 REDLAND_API int librdf_storage_contains_statement(librdf_storage* storage, librdf_statement* statement);
 REDLAND_API librdf_stream* librdf_storage_serialise(librdf_storage* storage);
 REDLAND_API librdf_stream* librdf_storage_find_statements(librdf_storage* storage, librdf_statement* statement);
+REDLAND_API librdf_stream* librdf_storage_find_statements_with_options(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node, librdf_hash* options);
 REDLAND_API librdf_iterator* librdf_storage_get_sources(librdf_storage *storage, librdf_node *arc, librdf_node *target);
 REDLAND_API librdf_iterator* librdf_storage_get_arcs(librdf_storage *storage, librdf_node *source, librdf_node *target);
 REDLAND_API librdf_iterator* librdf_storage_get_targets(librdf_storage *storage, librdf_node *source, librdf_node *arc);
