@@ -36,6 +36,7 @@ typedef struct {
 
   int depth;
   raptor_namespace_stack *nstack;
+  raptor_namespace *rdf_ns;
 } librdf_serializer_rdfxml_context;
 
 
@@ -61,12 +62,18 @@ librdf_serializer_rdfxml_init(librdf_serializer *serializer, void *context)
   pcontext->serializer = serializer;
 
   raptor_uri_get_handler(&uri_handler, &uri_context);
-  pcontext->nstack=raptor_namespaces_new(uri_handler, uri_context,
+  pcontext->nstack=raptor_new_namespaces(uri_handler, uri_context,
                                          librdf_serializer_rdfxml_raptor_error_handler, world,
                                          1);
 
   pcontext->depth=0;
   
+  pcontext->rdf_ns=raptor_new_namespace(pcontext->nstack,
+                                        "rdf",
+                                        librdf_uri_as_string(librdf_concept_ms_namespace_uri),
+                                        pcontext->depth);
+
+
   return 0;
 }
 
@@ -82,8 +89,12 @@ static void
 librdf_serializer_rdfxml_terminate(void *context) 
 {
   librdf_serializer_rdfxml_context* pcontext=(librdf_serializer_rdfxml_context*)context;
+  
+  if(pcontext->nstack)
+    raptor_free_namespaces(pcontext->nstack);
+  if(pcontext->rdf_ns)
+    raptor_free_namespace(pcontext->rdf_ns);
 
-  raptor_namespaces_free(pcontext->nstack);
 }
 
 
@@ -398,7 +409,7 @@ librdf_serializer_rdfxml_serialize_model(void *context,
                                          librdf_model *model) 
 {
   librdf_serializer_rdfxml_context* pcontext=(librdf_serializer_rdfxml_context*)context;
-  raptor_namespace *ns;
+  raptor_qname *rdf_RDF;
   unsigned char *buffer;
   librdf_stream *stream=librdf_model_as_stream(model);
 
@@ -408,13 +419,12 @@ librdf_serializer_rdfxml_serialize_model(void *context,
   fputs("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n", handle);
 
   pcontext->depth++;
-  ns=raptor_namespace_new(pcontext->nstack,
-                          "rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                          pcontext->depth);
+  raptor_namespaces_start_namespace(pcontext->nstack, pcontext->rdf_ns);
 
-  raptor_namespaces_start_namespace(pcontext->nstack, ns);
+  buffer=raptor_namespaces_format(pcontext->rdf_ns, NULL);
 
-  buffer=raptor_namespaces_format(ns, NULL);
+  rdf_RDF=raptor_new_qname_from_namespace_local_name(pcontext->rdf_ns,
+                                                     "RDF", NULL);
 
   fputs("<rdf:RDF ", handle);
   fputs(buffer, handle);
