@@ -382,6 +382,40 @@ librdf_new_hash_from_factory (librdf_hash_factory* factory) {
 
 
 /**
+ * librdf_new_hash_from_hash -  Copy Constructor - create a new librdf_hash object from an existing one
+ * @old_hash: the hash to use to construct the hash
+ *
+ * Return value: a new &librdf_hash object or NULL on failure
+ */
+librdf_hash*
+librdf_new_hash_from_hash (librdf_hash* old_hash) {
+  librdf_hash* hash;
+  
+  hash=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
+  if(!hash)
+    return NULL;
+  
+  hash->factory=old_hash->factory;
+
+  hash->context=(char*)LIBRDF_CALLOC(librdf_hash_context, 1,
+                                     hash->factory->context_length);
+  if(!hash->context) {
+    librdf_free_hash(hash);
+    return NULL;
+  }
+
+  /* FIXME: fail if clone operation not supported */
+  if(!hash->factory->clone ||
+     (hash->factory->clone(hash->context, old_hash->context))) {
+    librdf_free_hash(hash);
+    hash=NULL;
+  }
+  
+  return hash;
+}
+
+
+/**
  * librdf_free_hash - Destructor - destroy a librdf_hash object
  *
  * @hash: hash object
