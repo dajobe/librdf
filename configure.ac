@@ -447,6 +447,14 @@ LIBRDF_INTERNAL_CPPFLAGS=
 # -Ldir -llib
 LIBRDF_INTERNAL_LIBS=
 
+# Libraries linked externally also may be internal - presently just
+# raptor but in future will include rasqal.
+# Currently only substituted into redland-src-config.
+# -Dfoo -Idir
+LIBRDF_EXTERNAL_CPPFLAGS=
+# -Ldir -llib
+LIBRDF_EXTERNAL_LIBS=
+
 # do these first because somehow they get messed up by bdb checks
 AC_CHECK_TYPE([byte u32])
 
@@ -803,8 +811,8 @@ for parser in $parser_modules; do
         LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor $LIBRDF_INTERNAL_CPPFLAGS"
         LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_INTERNAL_LIBS"
       else
-        LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$RAPTOR_CONFIG --cflags`"
-        LIBRDF_LIBS="$LIBRDF_LIBS `$RAPTOR_CONFIG --libs`"
+        LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+        LIBRDF_EXTERNAL_LIBS="`$RAPTOR_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
         raptor_dir=
       fi
     fi
@@ -1113,6 +1121,9 @@ CPPFLAGS=
 LDFLAGS=
 
 LIBRDF_LIBTOOLLIBS=librdf.la
+
+AC_SUBST(LIBRDF_EXTERNAL_CPPFLAGS)
+AC_SUBST(LIBRDF_EXTERNAL_LIBS)
 
 AC_SUBST(LIBRDF_INTERNAL_CPPFLAGS)
 AC_SUBST(LIBRDF_INTERNAL_LIBS)
