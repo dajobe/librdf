@@ -5,6 +5,10 @@ body {
   font-family: sans-serif
 }
 
+h1 {
+  align: center
+}
+
 pre {
   font-family: monospace
 }
