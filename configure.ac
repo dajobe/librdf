@@ -751,7 +751,6 @@ fi
 AC_MSG_RESULT($parser_modules)
 
 PARSER_OBJS=
-PARSER_SRCS=
 
 
 # This is needed because autoheader can't work out which computed
@@ -792,7 +791,6 @@ for parser in $parser_modules; do
   # Add objects, sources only if the parser was found
   if test $found = 1; then
     PARSER_OBJS="$PARSER_OBJS rdf_parser_$parser.lo"
-    PARSER_SRCS="$PARSER_SRCS rdf_parser_$parser.c"
 
     if test $parser = raptor; then
       if test $with_raptor = internal; then
@@ -857,7 +855,6 @@ else
 fi
 
 AC_SUBST(PARSER_OBJS)
-AC_SUBST(PARSER_SRCS)
 
 if test "X$PARSER_OBJS" = X; then
   AC_MSG_WARN(No RDF parser configured)
@@ -927,6 +924,8 @@ else
 fi
 
 
+STORAGE_OBJS=
+
 AC_ARG_WITH(threestore, [  --with-threestore=DIR          3store installation location], tstore="$withval", tstore="")
 AC_MSG_CHECKING(for 3store)
 if test "X$tstore" != "X" -a -r $tstore/include/rdfsql/rdfsql.h -a -r $tstore/lib/librdfsql.la ; then
@@ -934,14 +933,56 @@ if test "X$tstore" != "X" -a -r $tstore/include/rdfsql/rdfsql.h -a -r $tstore/li
   LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS -I$tstore/include `glib-config --cflags`"
   LIBRDF_LIBS="$LIBRDF_LIBS -L$tstore/lib -lrdfsql"
 
-  PARSER_OBJS="$PARSER_OBJS rdf_storage_tstore.lo"
-  PARSER_SRCS="$PARSER_SRCS rdf_storage_tstore.c"
+  STORAGE_OBJS="$STORAGE_OBJS rdf_storage_tstore.lo"
 
   AC_DEFINE(HAVE_TSTORE, 1, [Have 3store available])
 else
-  tstore=
+  tstore=no
 fi
 AC_MSG_RESULT($tstore)
+
+
+AC_ARG_WITH(mysql-config, [  --with-mysql-config=PATH        Location of MySQL 4 mysql_config], mysql_config="$withval", mysql_config="")
+if test "X$mysql_config" != "X" ; then
+  AC_MSG_CHECKING(for $mysql_config)
+  if test -f $mysql_config ; then
+    MYSQL_CONFIG=$mysql_config
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no - searching PATH)
+  fi
+fi
+if test "X$MYSQL_CONFIG" = "X"; then
+  AC_CHECK_PROGS(MYSQL_CONFIG, mysql_config)
+fi
+
+libmysql_min_version=4.0.14
+
+if test "X$MYSQL_CONFIG" != X; then
+  LIBS="`$MYSQL_CONFIG --libs|sed -e "s/'//g"` $LIBRDF_LIBS"
+  CPPFLAGS="`$MYSQL_CONFIG --cflags|sed -e "s/'//g"` $LIBRDF_CPPFLAGS"
+  AC_MSG_CHECKING(for mysql library)
+  LIBMYSQL_VERSION=`$MYSQL_CONFIG --version`
+  libmysql_version_dec=`echo $LIBMYSQL_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  libmysql_min_version_dec=`echo $libmysql_min_version | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  AC_MSG_RESULT(yes - version $LIBMYSQL_VERSION)
+  if test $libmysql_version_dec -lt $libmysql_min_version_dec; then
+    AC_MSG_WARN(Using libmysql $LIBMYSQL_VERSION is unsupported - $libmysql_min_version or newer recommended.)
+  else
+    LIBRDF_LIBS="`$MYSQL_CONFIG --libs|sed -e "s/'//g"` $LIBRDF_LIBS"
+    LIBRDF_CPPFLAGS="`$MYSQL_CONFIG --cflags|sed -e "s/'//g"` $LIBRDF_CPPFLAGS"
+    STORAGE_OBJS="$STORAGE_OBJS rdf_storage_mysql.lo"
+    AC_DEFINE(HAVE_MYSQL,1,[MySQL libraries are present])
+    have_libmysql=yes
+  fi
+fi
+
+AC_SUBST(STORAGE_OBJS)
+
+
+CPPFLAGS="$LIBRDF_CPPFLAGS"
+LDFLAGS="$LIBRDF_LDFLAGS"
+LIBS="$LIBRDF_LIBS"
 
 
 dnl Check for use of threads
