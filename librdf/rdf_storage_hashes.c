@@ -1372,8 +1372,11 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
   int size;
   int status;
   
-  if(context->contexts_index <0)
+  if(context->contexts_index <0) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
+               "Storage was created without context support");
     return 1;
+  }
   
   if(librdf_storage_hashes_add_remove_statement(storage, 
                                                 statement, context_node, 1))
@@ -1413,6 +1416,11 @@ librdf_storage_hashes_context_remove_statement(librdf_storage* storage,
   librdf_hash_datum key, value; /* on stack - not allocated */
   int size;
   int status;
+  
+  if(context_node && context->contexts_index <0) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
+               "Storage was created without context support");
+  }
   
   if(librdf_storage_hashes_add_remove_statement(storage, 
                                                 statement, context_node, 0))
@@ -1464,8 +1472,11 @@ librdf_storage_hashes_context_serialise(librdf_storage* storage,
   librdf_stream* stream;
   size_t size;
 
-  if(context->contexts_index <0)
+  if(context->contexts_index <0) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
+               "Storage was created without context support");
     return NULL;
+  }
   
   scontext=(librdf_storage_hashes_context_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_hashes_context_serialise_stream_context, 1, sizeof(librdf_storage_hashes_context_serialise_stream_context));
   if(!scontext)
