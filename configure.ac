@@ -712,6 +712,8 @@ if test "X$MYSQL_CONFIG" != X; then
     storages_available="$storages_available mysql($LIBMYSQL_VERSION)"
     mysql_storage_available=yes
   fi
+  LIBS="$LIBRDF_LIBS"
+  CPPFLAGS="$LIBRDF_CPPFLAGS"
 fi
 
 
@@ -732,6 +734,10 @@ if test "X$sqlite_version" != X ; then
   storages_available="$storages_available sqlite($sqlite_version)"
   sqlite_storage_available=yes
   AC_MSG_RESULT(yes - version $sqlite_version)
+
+  CPPFLAGS="$LIBRDF_CPPFLAGS `$SQLITE_CONFIG --cflags`"
+  AC_CHECK_HEADERS(sqlite3.h sqlite.h)
+  CPPFLAGS="$LIBRDF_CPPFLAGS"
 else
   AC_MSG_RESULT(no)
 fi
