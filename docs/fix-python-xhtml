@@ -15,7 +15,7 @@ use File::Basename;
 
 my $progname=basename $0;
 
-my $main_title="Redland RDF Application Framework";
+my $main_title="Redland RDF Library";
 
 my $doc_title="Python API Reference";
 
@@ -32,10 +32,6 @@ open(OUT, ">$file") or die "$progname: Cannot create $file - $!\n";
 print OUT qq{<?xml version="1.0" encoding="iso-8859-1"?>\n};
 open(IN, "-");
 while(<IN>) {
-  # Sorry, I'm transitional
-  s%<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"%<?xml version="1.0" encoding="iso-8859-1"?>%;
-  s%^.*"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">%<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">%;
-
   if(m%<title>(.*?)</title>%) {
     s%<title>(.*?)</title>%<title>$main_title - $doc_title</title>%;
   }
@@ -65,7 +61,8 @@ while(<IN>) {
   s%RDF.html\#%#%;
 
   # Bad IDs, who writes this stuff?
-  s%<a id="([^"]+)" name="[^"]+">%my $a=$1; $a =~ s/^-//; $a=~ s/ /-/g; qq{<a id="$a" name="$a">}%ge;
+  s%<a name="([^"]+)">%my $a=$1; $a =~ s/\&lt;.*?\&gt;//g; qq{<a id="$a" name="$a">}%ge;
+  s%<a id="([^"]+)" name="[^"]+">%my $a=$1; $a =~ s/\&lt;.*?\&gt;//g; $a =~ s/^-//; $a=~ s/ /-/g; qq{<a id="$a" name="$a">}%ge;
   s%<a href="#-[^"+]">%<a href="#$1">%g;
 
   # All the __new__ links are broken
@@ -74,7 +71,7 @@ while(<IN>) {
   s%<a href="\#\-debug">debug</a>%debug%;
 
   if(m%^<body.*>%) {
-    print OUT qq{<body bgcolor="#ffffff" text="#000085">\n\n<h1 align="center">$main_title - $doc_title</h1>\n\n};
+    print OUT qq{<body>\n\n<h1 style="text-align:center">$main_title - $doc_title</h1>\n\n};
     next;
   } 
 

@@ -2,8 +2,8 @@
 <book id="redlandAPI">
   <?dbhtml filename='index.html'>
   <bookinfo>
-    <date>2003-01-29</date>
-    <title>Redland RDF Application Framework API Reference Manual</title>
+    <date>2004-01-03</date>
+    <title>Redland RDF Library API Reference Manual</title>
     <authorgroup>
       <author>
 	<firstname>Dave</firstname>

@@ -15,7 +15,7 @@ use File::Basename;
 
 my $progname=basename $0;
 
-my $main_title="Redland RDF Application Framework";
+my $main_title="Redland RDF Library";
 
 die "USAGE: $progname OUTPUT-FILE\n" if @ARGV < 1;
 
@@ -30,11 +30,6 @@ open(OUT, ">$file") or die "$progname: Cannot create $file - $!\n";
 print OUT qq{<?xml version="1.0" encoding="iso-8859-1"?>\n};
 open(IN, "-");
 while(<IN>) {
-  # Sorry, I'm transitional
-  s%<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"%<?xml version="1.0" encoding="iso-8859-1"?>%;
-  s%^.*"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">%<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">%;
-
-
   if(m%<title>(.*?)</title>%) {
     $doc_title=$1;
     $doc_title =~ s/^(.*) - Redland (.*) Class$/Perl $1 Class/;
@@ -51,7 +46,7 @@ while(<IN>) {
   s%href="/docs/pod/RDF/Redland/([^"]+)"%href="$pod_rdf_redland_rel$1"%g;
   s%href="/docs/pod/RDF/([^"]+)"%href="$pod_rdf_rel$1"%g;
 
-  s%^<body[^>]*>%<body bgcolor="#ffffff" text="#000085">\n\n<h1 align="center">$main_title - $doc_title</h1>\n\n%;
+  s%^<body[^>]*>%<body>\n\n<h1 style="text-align:center">$main_title - $doc_title</h1>\n\n%;
 
   s%^<p><a id="__index__".*</p>%%;
 
