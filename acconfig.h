@@ -4,12 +4,11 @@
 /* package version */
 #define VERSION
 
-/* defined if specific types are already defined as typedefs */
-#undef HAVE_BYTE_TYPEDEF
-#undef HAVE_USHORT_TYPEDEF
-#undef HAVE_ULONG_TYPEDEF
-#undef HAVE_U16_TYPEDEF
-#undef HAVE_U32_TYPEDEF
+/* type is defined by typedef or MISSING if not present */
+#undef byte
+#undef u16
+#undef u32
+#undef u64
 
 /* defined if have local version of message digests */
 #undef HAVE_LOCAL_SHA1_DIGEST
