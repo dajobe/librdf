@@ -10,13 +10,17 @@
 <h2>To Do Pre-0.1</h2>
 
 <ul>
-<li>make get operation in all hash impls. return a list of values</li>
+<li>make BDB hash use btree and handle duplicates</li>
+<li>remove GDBM from default code until handles duplicates</li>
+<li>remove references factories from simple user code</li>
+<li>make <tt>get</tt> method in all hash impls. return a list of
+values via an iterator</li>
 <li>module - storage implemented as hashes</li>
 </ul>
 
 <h2>To Do Post First Release</h2>
 
-<p>In no real order</p>
+<p>In no real order.  Help wanted.</p>
 
 <ul>
 <li>module - rdf parser - internal to librdf written by me</li>
@@ -39,6 +43,11 @@
 <li>perl interface</li>
 <li>RDF schemas</li>
 <li>query language interface</li>
+<li>write better example code</li>
+<li>write a quickstart / howto document</li>
+<li>split header files into internal / user ones.  Maybe generate
+part of librdf.h automatically to make a 1-header file system.</li>
+<li>make GDBM hash handle duplicates</li>
 </ul>
 
 
