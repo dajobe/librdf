@@ -95,7 +95,7 @@ rdf_parser.h rdf_heuristics.h \
 rdf_list.h \
 rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
 rdf_files.h \
-rdf_storage_list.h rdf_storage_hashes.h
+rdf_storage_list.h rdf_storage_hashes.h rdf_utf8.h
 
 JAVA_CLASSES=@JAVA_CLASSES@
 pkgdata_DATA = $(JAVA_CLASSES)
