@@ -77,12 +77,12 @@
 EXTRA_DIST=api.sgml.in api.sgml README.html README build-docs \
 overview.png overview.ps overview.pdf api
 
-DOC_CLASSES=digest digest_openssl digest_md5 hash hash_bdb hash_memory iterator list model node parser parser_libwww parser_sirpac statement storage storage_list stream uri
+DOC_CLASSES=digest digest_md5 digest_openssl hash hash_bdb hash_cursor hash_memory heuristics init iterator list model node parser parser_libwww parser_sirpac statement storage storage_hashes storage_list stream uri
 
 DOC_C_FILES=$(DOC_CLASSES:%=$(srcdir)/rdf_%.c)
 API_DOCBOOK_FILES=$(DOC_CLASSES:%=%.sgml)
 
-CLEANFILES=$(API_DOCBOOK_FILES) api.html README
+CLEANFILES=$(API_DOCBOOK_FILES) README
 MAINTAINERCLEANFILES=api.sgml api
 
 PERL=perl
@@ -93,20 +93,21 @@ LYNXARGS=-dump -nolist
 
 SUFFIXES = .html .txt .sgml .ps .pdf
 
+api: api/index.html
+
+# Generates a tree of HTML files, not 1 file
+api/index.html: api.sgml
+	db2html $<
+
 .html.txt:
 	$(LYNX) $(LYNXARGS) $< > $@
 
-.sgml.html:
-	db2html $<
-	touch $@
-
+# These don't work for me
 .sgml.ps:
 	db2ps $<
-	touch $@
 
 .sgml.pdf:
 	db2pdf $<
-	touch $@
 
 @MAINT@$(API_DOCBOOK_FILES): %.sgml: $(srcdir)/../rdf_%.c
 @MAINT@	kernel-doc -docbook $< > $@
@@ -122,7 +123,7 @@ SUFFIXES = .html .txt .sgml .ps .pdf
 @MAINT@	ps2pdf overview.ps overview.pdf
 
 clean-local:
-	rm -rf $(API_DOCBOOK_FILES) api.html api.junk DBTOHTML*
+	rm -rf $(API_DOCBOOK_FILES) api.junk DBTOHTML*
 
 README: README.html
 	$(LYNX) $(LYNXARGS) $< > $@
