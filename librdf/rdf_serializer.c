@@ -242,6 +242,8 @@ librdf_new_serializer_from_factory(librdf_world *world,
 {
   librdf_serializer* d;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_serializer_factory, NULL);
+
   d=(librdf_serializer*)LIBRDF_CALLOC(librdf_serializer, 1, sizeof(librdf_serializer));
   if(!d)
     return NULL;
@@ -271,6 +273,8 @@ librdf_new_serializer_from_factory(librdf_world *world,
 void
 librdf_free_serializer(librdf_serializer *serializer) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(serializer, librdf_serializer);
+
   if(serializer->context) {
     if(serializer->factory->terminate)
       serializer->factory->terminate(serializer->context);
@@ -287,7 +291,7 @@ librdf_free_serializer(librdf_serializer *serializer)
  * librdf_serializer_serialize_model - Turn a librdf_model into a serialized form
  * @serializer: the serializer
  * @handle: file handle to serialize to
- * @base_uri: the base URI to use
+ * @base_uri: the base URI to use or NULL
  * @model: the &librdf_model model to use
  * 
  * Return value: non 0 on failure
@@ -297,6 +301,9 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
                                   FILE *handle, librdf_uri* base_uri,
                                   librdf_model* model) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+
   return serializer->factory->serialize_model(serializer->context,
                                               handle, base_uri, model);
 }
@@ -306,7 +313,7 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
  * librdf_serializer_serialize_model - Write a librdf_model into a serialized form to a file
  * @serializer: the serializer
  * @name: filename to serialize to
- * @base_uri: the base URI to use
+ * @base_uri: the base URI to use or NULL
  * @model: the &librdf_model model to use
  * 
  * Return value: non 0 on failure
@@ -317,9 +324,14 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
                                           librdf_uri* base_uri,
                                           librdf_model* model) 
 {
-  FILE* fh=fopen(name, "w+");
-  int status=0;
+  FILE* fh;
+  int status;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, string, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+
+  fh=fopen(name, "w+");
   if(!fh)
     return 1;
   status=librdf_serializer_serialize_model(serializer, fh, base_uri, model);
@@ -410,6 +422,9 @@ void
 librdf_serializer_set_error(librdf_serializer* serializer, void *user_data,
                             void (*error_fn)(void *user_data, const char *msg, ...))
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(serializer, librdf_serializer);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(error_fn, error handler);
+
   serializer->error_user_data=user_data;
   serializer->error_fn=error_fn;
 }
@@ -428,6 +443,9 @@ void
 librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data,
                               void (*warning_fn)(void *user_data, const char *msg, ...))
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(serializer, librdf_serializer);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(warning_fn, warning handler);
+
   serializer->warning_user_data=user_data;
   serializer->warning_fn=warning_fn;
 }
@@ -444,6 +462,9 @@ librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data,
 librdf_node*
 librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(feature, librdf_uri, NULL);
+
   if(serializer->factory->get_feature)
     return serializer->factory->get_feature(serializer->context, feature);
 
@@ -463,6 +484,10 @@ int
 librdf_serializer_set_feature(librdf_serializer* serializer,
                               librdf_uri *feature, librdf_node* value) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, -1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(feature, librdf_uri, -1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(value, librdf_node, -1);
+
   if(serializer->factory->set_feature)
     return serializer->factory->set_feature(serializer->context, feature, value);
 
@@ -482,6 +507,10 @@ int
 librdf_serializer_set_namespace(librdf_serializer* serializer,
                                 librdf_uri *uri, const char *prefix) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(prefix, string, 1);
+
   if(serializer->factory->set_namespace)
     return serializer->factory->set_namespace(serializer->context, uri, prefix);
   return 1;
