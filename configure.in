@@ -542,6 +542,10 @@ if test "X$PYTHON" != X; then
   # What a crock
   PYTHON_INCLUDES="-I$python_prefix/include/python$python_version"
   AC_SUBST(PYTHON_INCLUDES)
+else
+  # This allows 'make clean' in the python directory to work when
+  # python isn't available
+  PYTHON=:
 fi
 
 AC_SUBST(PARSER_OBJS)
