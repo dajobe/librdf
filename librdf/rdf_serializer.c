@@ -291,7 +291,29 @@ librdf_free_serializer(librdf_serializer *serializer)
 /* methods */
 
 /**
- * librdf_serializer_serialize_model - Turn a librdf_model into a serialized form
+ * librdf_serializer_serialize_model - Write a serialized librdf_mode to a FILE*
+ * @serializer: the serializer
+ * @handle: file handle to serialize to
+ * @base_uri: the base URI to use or NULL
+ * @model: the &librdf_model model to use
+ * 
+ * DEPRECATED: Use librdf_serializer_serialize_model_to_file_handle
+ *
+ * Return value: non 0 on failure
+ **/
+int
+librdf_serializer_serialize_model(librdf_serializer* serializer,
+                                  FILE *handle, librdf_uri* base_uri,
+                                  librdf_model* model) 
+{
+  return librdf_serializer_serialize_model_to_file_handle(serializer,
+                                                          handle, base_uri,
+                                                          model);
+}
+
+
+/**
+ * librdf_serializer_serialize_model_to_file_handle - Write a serialized librdf_model to a FILE*
  * @serializer: the serializer
  * @handle: file handle to serialize to
  * @base_uri: the base URI to use or NULL
@@ -300,20 +322,21 @@ librdf_free_serializer(librdf_serializer *serializer)
  * Return value: non 0 on failure
  **/
 int
-librdf_serializer_serialize_model(librdf_serializer* serializer,
-                                  FILE *handle, librdf_uri* base_uri,
-                                  librdf_model* model) 
+librdf_serializer_serialize_model_to_file_handle(librdf_serializer* serializer,
+                                                 FILE *handle, 
+                                                 librdf_uri* base_uri,
+                                                 librdf_model* model) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
 
-  return serializer->factory->serialize_model(serializer->context,
-                                              handle, base_uri, model);
+  return serializer->factory->serialize_model_to_file_handle(serializer->context,
+                                                             handle, base_uri, model);
 }
 
 
 /**
- * librdf_serializer_serialize_model - Write a librdf_model into a serialized form to a file
+ * librdf_serializer_serialize_model_to_file - Write a serialized librdf_model to a file
  * @serializer: the serializer
  * @name: filename to serialize to
  * @base_uri: the base URI to use or NULL
@@ -337,9 +360,32 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
   fh=fopen(name, "w+");
   if(!fh)
     return 1;
-  status=librdf_serializer_serialize_model(serializer, fh, base_uri, model);
+  status=librdf_serializer_serialize_model_to_file_handle(serializer, fh, 
+                                                          base_uri, model);
   fclose(fh);
   return status;
+}
+
+
+/**
+ * librdf_serializer_serialize_model_to_string - Write a serialized librdf_model to a string
+ * @serializer: the serializer
+ * @base_uri: the base URI to use
+ * @model: the &librdf_model model to use
+ * 
+ * Return value: non 0 on failure
+ **/
+unsigned char*
+librdf_serializer_serialize_model_to_string(librdf_serializer* serializer,
+                                            librdf_uri* base_uri,
+                                            librdf_model* model) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+
+  return serializer->factory->serialize_model_to_string(serializer->context,
+                                                        base_uri, model);
 }
 
 
@@ -351,7 +397,6 @@ void
 librdf_init_serializer(librdf_world *world) 
 {
   librdf_serializer_raptor_constructor(world);
-  librdf_serializer_rdfxml_constructor(world);
 }
 
 
