@@ -75,8 +75,8 @@
  */
 
 
-#ifndef LIBRDF_H
-#define LIBRDF_H
+#ifndef REDLAND_H
+#define REDLAND_H
 
 #ifdef __cplusplus
 extern "C" {
