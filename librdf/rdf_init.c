@@ -24,9 +24,8 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
-#ifdef HAVE_STDARG_H
 #include <stdarg.h>
-#endif
+
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
@@ -133,13 +132,13 @@ librdf_error(librdf_world* world, const char *message, ...)
 {
   va_list arguments;
 
+  va_start(arguments, message);
+
   if(world->error_fn) {
-    world->error_fn(world->error_user_data, message);
+    world->error_fn(world->error_user_data, arguments);
     return;
   }
   
-  va_start(arguments, message);
-
   fputs("librdf error - ", stderr);
   vfprintf(stderr, message, arguments);
   fputc('\n', stderr);
@@ -158,13 +157,13 @@ librdf_warning(librdf_world* world, const char *message, ...)
 {
   va_list arguments;
 
+  va_start(arguments, message);
+
   if(world->warning_fn) {
-    world->warning_fn(world->warning_user_data, message);
+    world->warning_fn(world->warning_user_data, arguments);
     return;
   }
   
-  va_start(arguments, message);
-
   fputs("librdf warning - ", stderr);
   vfprintf(stderr, message, arguments);
   fputc('\n', stderr);
@@ -184,7 +183,7 @@ librdf_warning(librdf_world* world, const char *message, ...)
  **/
 void
 librdf_world_set_error(librdf_world* world, void *user_data,
-                       void (*error_fn)(void *user_data, const char *msg, ...))
+                       void (*error_fn)(void *user_data, va_list arguments))
 {
   world->error_user_data=user_data;
   world->error_fn=error_fn;
@@ -202,7 +201,7 @@ librdf_world_set_error(librdf_world* world, void *user_data,
  **/
 void
 librdf_world_set_warning(librdf_world* world, void *user_data,
-                         void (*warning_fn)(void *user_data, const char *msg, ...))
+                         void (*warning_fn)(void *user_data, va_list arguments))
 {
   world->warning_user_data=user_data;
   world->warning_fn=warning_fn;
