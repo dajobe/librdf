@@ -76,24 +76,6 @@ static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
 };
 
 
-/* These are the ENGLISH labels from RDF Schema CR
- * FIXME - language issues 
- */
-static const char* const librdf_concept_labels[LIBRDF_CONCEPT_LAST+1]={
-  /* RDF M&S */
-  "Alt", "Bag", "Property", "Sequence", "Statement", "object", "predicate", "subject", "type", "object", "li",
-  "RDF", "Description",
-  "aboutEach", "aboutEachPrefix",
-  /* all new in RDF/XML revised */
-  "nodeID",
-  "List", "first", "rest", "nil",
-  "XMLLiteral",
-
-  /* RDF S */
-  "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"
-};
-
-
 
 static const unsigned char * librdf_concept_ms_namespace=(const unsigned char *)"http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 static const unsigned char * librdf_concept_schema_namespace=(const unsigned char *)"http://www.w3.org/2000/01/rdf-schema#";
