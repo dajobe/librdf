@@ -28,6 +28,9 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
+#ifdef HAVE_STDARG_H
+#include <stdarg.h> /* for raptor.h use of va_list */
+#endif
 
 #include <librdf.h>
 
@@ -37,6 +40,7 @@
 #include <rdf_statement.h>
 #include <rdf_list.h>
 
+#define RAPTOR_IN_REDLAND
 #include <raptor.h>
 #include <ntriples.h>
 

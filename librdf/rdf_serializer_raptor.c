@@ -25,6 +25,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifdef HAVE_STDARG_H
+#include <stdarg.h> /* for raptor.h use of va_list */
+#endif
 
 #include <librdf.h>
 
@@ -32,6 +35,7 @@
 #include <rdf_stream.h>
 #include <rdf_statement.h>
 
+#define RAPTOR_IN_REDLAND
 #include <raptor.h>
 #include <ntriples.h>
 
