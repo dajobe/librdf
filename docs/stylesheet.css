@@ -3,8 +3,8 @@
 body {
   margin: 0em 1em 1em 1em;
   font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
-  color: black;
   background: #ffffff;
+  color: black;
   font-size: 12px;
 }
 
@@ -32,29 +32,31 @@ pre, code, tt {
 }
 
 @media screen {  /* hide from IE3 */
-  a:hover { color: red } 
+  a:hover { color: red; background: #ffffff; } 
+  h2.catheader a:hover { color: red; background: #0b479d; } 
 }
 
 .category {
-  border: solid #993300 2px;
   margin: 0em 0.5em 0.5em 0em;
 }
 
 .catheader {
-  padding: 2px;
-  margin-top: 0px;
-  border-bottom: solid #993300 1px;
+  background: #0b479d;
+  color: #ffffff;
 
-  background: #eeeeee;
-
+  margin: 1px;
   font-size: 80%;
+  padding: 1px;
 }
+
+h2.catheader { color: white; background: #0b479d; }
+h2.catheader a { color: white; background: #0b479d; }
+
 
 .catitems {
   font-size: 75%;
   margin-left: 6pt;
-  margin: 0.3em;
-  padding: 0em;
+  padding: 0px;
 }
 
 .logo {
@@ -62,21 +64,22 @@ pre, code, tt {
 }
 
 .heading {
-  margin: 0pt;
+  margin: 0px;
 }
 
 h1.heading {
-  margin: 0em;
+  margin: 0px;
 }
 
 .author {
-  margin: 0pt;
+  margin: 0px;
 }
 
-a.author:link { text-decoration: none };
+a.author:link { text-decoration: none; }
 
 .footer {
   font-size: 75%;
+  background: #ffffff;
   color : #808080;
 }
 
