@@ -117,7 +117,7 @@ librdf_serializer_raptor_serialize_model(void *context,
 {
   /* librdf_serializer_raptor_context* pcontext=(librdf_serializer_raptor_context*)context; */
 
-  librdf_stream *stream=librdf_model_serialise(model);
+  librdf_stream *stream=librdf_model_as_stream(model);
   if(!stream)
     return 1;
   while(!librdf_stream_end(stream)) {

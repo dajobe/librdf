@@ -316,7 +316,7 @@ librdf_serializer_rdfxml_serialize_model(void *context,
 {
   librdf_serializer_rdfxml_context* scontext=(librdf_serializer_rdfxml_context*)context;
 
-  librdf_stream *stream=librdf_model_serialise(model);
+  librdf_stream *stream=librdf_model_as_stream(model);
   if(!stream)
     return 1;
   fputs("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n", handle);

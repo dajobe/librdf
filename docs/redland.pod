@@ -302,7 +302,7 @@ C<librdf_> prefix
 
 =item int B<librdf_model_has_arc_out>(librdf_model *I<model>, librdf_node *I<node>, librdf_node *I<property>);
 
-=item librdf_stream* B<librdf_model_serialise>(librdf_model* I<model>);
+=item librdf_stream* B<librdf_model_as_stream>(librdf_model* I<model>);
 
 =item librdf_stream* B<librdf_model_find_statements>(librdf_model* I<model>, librdf_statement* I<statement>);
 
