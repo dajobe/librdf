@@ -853,7 +853,7 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
   if(!first_node || !second_node)
     return 0;
   
-  if(first_node->type != first_node->type)
+  if(first_node->type != second_node->type)
     return 0;
   
   switch(first_node->type) {
