@@ -225,8 +225,7 @@ librdf_parser_raptor_error_handler(void *data, raptor_locator *locator,
                                    const char *message) 
 {
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)data;
-  librdf_parser* rdf_parser=scontext->pcontext->parser;
-  raptor_parser *raptor_parser=scontext->rdf_parser;
+  librdf_parser* parser=scontext->pcontext->parser;
   static const char *message_prefix=" - Raptor error - ";
   int prefix_len=strlen(message_prefix);
   int message_len=strlen(message);
@@ -245,7 +244,7 @@ librdf_parser_raptor_error_handler(void *data, raptor_locator *locator,
   strncpy(buffer+locator_len, message_prefix, prefix_len);
   strcpy(buffer+prefix_len+locator_len, message); /* want extra \0 - using strcpy */
 
-  librdf_error(rdf_parser->world, buffer);
+  librdf_error(parser->world, buffer);
   LIBRDF_FREE(cstring, buffer);
 }
 
@@ -255,8 +254,7 @@ librdf_parser_raptor_warning_handler(void *data, raptor_locator *locator,
                                      const char *message) 
 {
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)data;
-  librdf_parser* rdf_parser=scontext->pcontext->parser;
-  raptor_parser *raptor_parser=scontext->rdf_parser;
+  librdf_parser* parser=scontext->pcontext->parser;
   static const char *message_prefix=" - Raptor warning - ";
   int prefix_len=strlen(message_prefix);
   int message_len=strlen(message);
@@ -274,7 +272,7 @@ librdf_parser_raptor_warning_handler(void *data, raptor_locator *locator,
   strncpy(buffer+locator_len, message_prefix, prefix_len);
   strcpy(buffer+prefix_len+locator_len, message); /* want extra \0 - using strcpy */
 
-  librdf_warning(rdf_parser->world, message);
+  librdf_warning(parser->world, message);
   LIBRDF_FREE(cstring, buffer);
 }
 
@@ -538,7 +536,6 @@ librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri,
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
   raptor_parser *rdf_parser;
-  librdf_world *world=uri->world;
   
   scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
   if(!scontext)
