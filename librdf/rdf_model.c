@@ -1043,6 +1043,29 @@ librdf_model_sync(librdf_model* model)
     model->factory->sync(model);
 }
 
+
+/**
+ * librdf_model_get_storage - return the storage of this model
+ * @model: &librdf_model object
+ * 
+ * Note: this can only return one storage, so model implementations
+ * that have multiple &librdf_storage internally may chose not to
+ * implement this.
+ *
+ * Return value:  &librdf_storage or NULL if this has no store
+ **/
+librdf_storage*
+librdf_model_get_storage(librdf_model *model)
+{
+  if(model->factory->get_storage)
+    return model->factory->get_storage(model);
+  else
+    return NULL;
+}
+
+
+
+
 #endif
 
 

@@ -493,6 +493,19 @@ librdf_model_storage_sync(librdf_model* model)
 }
 
 
+/**
+ * librdf_model_storage_get_Storage - Get the storage for the model
+ * @model: &librdf_model object
+ * 
+ **/
+static librdf_storage*
+librdf_model_storage_get_storage(librdf_model* model) 
+{
+  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
+  return context->storage;
+}
+
+
 
 
 /* local function to register model_storage functions */
@@ -533,6 +546,7 @@ librdf_model_storage_register_factory(librdf_model_factory *factory)
 
   factory->query              = librdf_model_storage_query;
   factory->sync               = librdf_model_storage_sync;
+  factory->get_storage        = librdf_model_storage_get_storage;
 }
 
 

@@ -135,6 +135,8 @@ struct librdf_model_factory_s {
    */
   int (*context_remove_statements)(librdf_model* model, librdf_node* context);
 
+  /* get the single storage for this model if there is one - OPTIONAL */
+  librdf_storage* (*get_storage)(librdf_model* model);
 };
 
 #include <rdf_model_storage.h>
