@@ -126,6 +126,9 @@ void librdf_query_rasqal_constructor(librdf_world *world);
 
 void librdf_query_rasqal_destructor(void);
 
+void librdf_query_add_query_result(librdf_query *query, librdf_query_results* query_results);
+void librdf_query_remove_query_result(librdf_query *query, librdf_query_results* query_results);
+
 #endif
 
 /* class methods */
