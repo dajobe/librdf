@@ -1,3 +1,694 @@
+2004-10-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Redland.i: Export librdf_world_get_feature and
+	librdf_world_set_feature
+
+	* librdf/rdf_init.h: Update librdf_world_get_feature and
+	librdf_world_set_feature to use librdf_node*
+
+	* librdf/rdf_init.c (librdf_world_get_feature): Document and
+	change to return librdf_node*
+	(librdf_world_set_feature): Document and change to use
+	librdf_node* value.
+
+2004-10-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/.cvsignore: Ignore more
+
+2004-09-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/check-sparql: -warnings, new perl only
+
+	* rasqal/roqet.c: On query failure (prepare or execute) tidy and
+	exit
+
+	* rasqal/tests/rdql/testsuite/Makefile.am: count expected failures
+	the old way
+
+	* rasqal/tests/rdql/testsuite/check-rdql,
+	rasqal/tests/sparql/check-sparql: Handle query parsing, execution
+	errors
+
+	* rasqal/tests/rdql/testsuite/Makefile.am: Handle test failures
+	with/without a regex library
+
+	* rasqal/tests/sparql/simple/Makefile.am,
+	rasqal/tests/sparql/part1/Makefile.am: echo messages for correct,
+	works targets
+
+	* rasqal/tests/sparql/check-sparql: A few more fixes predicting
+	optional results working.  Unique test works
+
+	* rasqal/tests/rdql/testsuite/check-rdql,
+	rasqal/tests/sparql/check-sparql: Handle missing vars or with
+	undef value
+
+	* rasqal/tests/sparql/part1/Makefile.am,
+	rasqal/tests/sparql/simple/Makefile.am: Use check-sparql to run
+	queries driven by manifests and check results are correct.  Enable
+	this in check-local
+
+	* rasqal/tests/sparql/check-sparql: Read manifest
+
+	* rasqal/tests/sparql/simple/Makefile.am:
+	Remove expected test failures code.
+
+	* rasqal/tests/sparql/Makefile.am: Added check-sparql
+
+	* rasqal/tests/sparql/check-sparql: run sparql tests
+
+	* rasqal/tests/rdql/testsuite/check-rdql: Relative to root is ../../..
+	use -d on roqet to dump query
+	Added -d flag here to run in debug mode
+
+	* rasqal/roqet.c: Added -d/--dump-query to print query to stdout
+
+	* rasqal/tests/sparql/Makefile.am: sparql tests
+
+	* rasqal/Makefile.am: sparql parser/lexer tests
+
+	* rasqal/brql_parser.y: sparql label
+
+	* rasqal/Makefile.am: BRQL to SPARQL
+
+	* rasqal/rasqal_general.c: brql to sparql
+
+	* rasqal/tests/sparql/part1/Makefile.am,
+	rasqal/tests/sparql/simple/Makefile.am: list files
+
+	* rasqal/configure.ac: Added sparql subdirs
+
+	* rasqal/tests/sparql/part1/.cvsignore,
+	rasqal/tests/sparql/part1/Makefile.am,
+	rasqal/tests/sparql/part1/dawg-data-01.n3,
+	rasqal/tests/sparql/part1/dawg-query-001,
+	rasqal/tests/sparql/part1/dawg-query-002,
+	rasqal/tests/sparql/part1/dawg-query-003,
+	rasqal/tests/sparql/part1/dawg-result-001.n3,
+	rasqal/tests/sparql/part1/dawg-result-002.n3,
+	rasqal/tests/sparql/part1/dawg-result-003.n3,
+	rasqal/tests/sparql/part1/manifest.n3: sparql part1 tests
+
+	* rasqal/tests/sparql/simple/Makefile.am,
+	rasqal/tests/sparql/simple/data-01.n3,
+	rasqal/tests/sparql/simple/data-02.n3,
+	rasqal/tests/sparql/simple/dawg-data-01.n3,
+	rasqal/tests/sparql/simple/dawg-tp-01.rq,
+	rasqal/tests/sparql/simple/dawg-tp-02.rq,
+	rasqal/tests/sparql/simple/dawg-tp-03.rq,
+	rasqal/tests/sparql/simple/dawg-tp-04.rq,
+	rasqal/tests/sparql/simple/manifest.n3,
+	rasqal/tests/sparql/simple/result-tp-01.n3,
+	rasqal/tests/sparql/simple/result-tp-02.n3,
+	rasqal/tests/sparql/simple/result-tp-03.n3,
+	rasqal/tests/sparql/simple/result-tp-04.n3: Added sparql simple tests
+
+	* rasqal/configure.ac: brql to sparql
+
+	* rasqal/tests/Makefile.am: brql to sparql
+
+	* rasqal/tests/brql/D.n3, rasqal/tests/brql/E.n3,
+	rasqal/tests/brql/Makefile.am, rasqal/tests/brql/Q-C-1,
+	rasqal/tests/brql/Q-C-2, rasqal/tests/brql/Q-D-1,
+	rasqal/tests/brql/Q-D-2, rasqal/tests/brql/Q-D-3,
+	rasqal/tests/brql/Q-F2F3-1, rasqal/tests/brql/Q-F2F3-2,
+	rasqal/tests/brql/Q-OPT-1, rasqal/tests/brql/Q-OPT-2,
+	rasqal/tests/brql/Q-S-1, rasqal/tests/brql/Q-S-2,
+	rasqal/tests/brql/Q-SOURCE-1, rasqal/tests/brql/Q-SOURCE-2:
+	Deleted
+
+	* rasqal/Makefile.am: Add rasqal_xml.c
+
+	* rasqal/roqet.c: Use rasqal_query_results_print_as_xml
+
+	* rasqal/rasqal.h: Added rasqal_query_results_print_as_xml
+
+	* rasqal/rasqal_xml.c: Rasqal XML
+
+	* rasqal/roqet.c (roqet_print_results_as_xml):
+	If xml, don't print datatype attribute.
+
+	* rasqal/roqet.c: indent
+
+	* rasqal/roqet.c (roqet_print_results_as_xml): no need to
+	malloc/free when escaped string is same len as original.
+
+	* rasqal/roqet.c: debug
+
+	* rasqal/roqet.c (roqet_print_results_as_xml): Print XML Literals
+	raw.
+
+	* rasqal/roqet.c: Added OUTPUT_FORMAT_XML experiment
+	(roqet_print_xml_attribute): Added, based on
+	librdf_serialize_rdfxml code.
+	(roqet_print_results_as_xml): Added, printing an entire result
+	stream to the given handle in XML.
+	(main): Added the xml output format.
+
+	* rasqal/rasqal_literal.c, rasqal/rasqal.h: Export
+	rasqal_literal_print_type
+
+	* rasqal/roqet.c: source_uri check
+
+	* rasqal/brql_parser.y: brql to sparqal (keeping alias)
+
+	* rasqal/roqet.c: terminology s/data/source/ -d/-s --data/--source
+
+	* rasqal/ChangeLog: changes
+
+	* rasqal/rasqal_query.c (rasqal_query_add_source,
+	 rasqal_query_get_source): Handle NULL query->sources and
+	 initialise it first time when adding.
+	(rasqal_query_add_variable, rasqal_query_get_variable,
+	rasqal_query_has_variable, rasqal_query_set_variable): Handle NULL
+	query->selects and initialise it first time when adding.
+	(rasqal_query_add_triple, rasqal_query_get_triple):Handle NULL
+	query->triples and initialise it first time when adding.
+	(rasqal_query_add_constraint, rasqal_query_get_constraint): Handle
+	NULL query->constraints and initialise it first time when adding.
+	(rasqal_query_add_prefix, rasqal_query_get_prefix): Handle NULL
+	query->prefixes and initialise it first time when adding.
+
+	* rasqal/roqet.c: Added -d URI to specify a data URI to load
+	before running the query.
+
+2004-09-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Redland.i:
+	Added REDLAND_TYPEMAP_I protecting redland-typemap.i early on
+
+2004-09-26  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/brql_parser.y:
+	(TriplePatternList) Append constraint to right sequence.
+
+	* rasqal/brql_parser.y: Merged CommaAndConstraintClause into
+	TriplePatternList to remove another shift/reduce conflict with
+	AND.
+
+	* rasqal/brql_parser.y: CommaAndConstraintClause tidy
+
+	* rasqal/brql_parser.y: Removed SOURCE alias for FROM, reducing a
+	shift/reduce cnflict
+
+	* rasqal/brql_parser.y: URIList tidy
+
+	* rasqal/fix-bison: Delete yyerrlab1 label only if used in a goto
+
+	* rasqal/tests/brql/Q-F2F3-1, rasqal/tests/brql/Q-F2F3-2: F2F3
+	bits
+
+	* rasqal/rasqal_general.c: debug messages
+
+	* rasqal/tests/brql/Q-SOURCE-1, rasqal/tests/brql/Q-SOURCE-2:
+	PREFIX syntax
+
+	* rasqal/rasqal.h: rasqal_triples_source_s: remove source_index.
+	rasqal_triples_source_factory: remove UI from new_triples_source
+	method.
+
+	* rasqal/rasqal_redland.c:
+	rasqal_redland_triples_source_user_data: Add source_uris array of
+	size source_uris_count and source_index to use it when loading
+	data.
+	(rasqal_redland_new_triples_source): Walk through each source URI
+	in turn and load data.
+	(rasqal_redland_free_triples_source): Tidy up new array of uris.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_new_triples_source,
+	rasqal_raptor_free_triples_source): Allocate and free source_uris
+	and source_literals array.
+
+	* rasqal/rasqal_redland.c (rasqal_redland_new_triples_source):
+	Handle 0 sources
+
+	* rasqal/rasqal_raptor.c:
+	rasqal_raptor_triples_source_user_data: Add source_uris and
+	source_literals array of size source_uris_count and source_index to
+	use it when loading data.
+	(rasqal_raptor_statement_handler): set origin URI as pointer into
+	URI literals array.
+	(rasqal_raptor_new_triples_source): Remove URI arg.  Walk through
+	each source URI in turn and load data.
+	(rasqal_raptor_triple_match): Remove URi arg, use origin_uri from
+	triple.
+	(rasqal_raptor_free_triples_source): Tidy up new arrays of data.
+	(rasqal_raptor_bind_match): Update call to triple_match with no URI
+	argument.
+
+	* rasqal/rasqal_engine.c (rasqal_new_triples_source):
+	Do not assume there is just one URI
+	source.
+	(rasqal_triples_source_next_source): Deleted.
+	(rasqal_engine_get_next_result): Remove call to
+	rasqal_triples_source_next_source - sources are not applied in order.
+
+	* rasqal/brql_parser.y: expect 4
+	(TriplePatternList): Rewrite and add SOURCE, OPTIONAL
+	(ConstraintClause): Removed, now in TriplePatternList
+	(URIList): No commas
+
+	* rasqal/Makefile.am:
+	Added fix-bison.  Use it for rdql and brql parsers.
+
+	* rasqal/fix-bison: fix-bison
+
+2004-09-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor-config.1: Restore deleted content
+
+2004-09-22  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage.c (librdf_storage_context_add_statement,
+	librdf_storage_context_add_statements): With a NULL context, call
+	the non-context method as documented.  Fix NULL statement pointer
+	checks.
+
+2004-09-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/win32_raptor_config.h,
+	raptor/configure.ac: Bumped version to 1.3.4
+
+	* raptor/examples/Makefile.am, raptor/examples/grapper.c,
+	raptor/examples/raptor_abort.c, raptor/raptor_locator.c,
+	raptor/raptor_namespace.c, raptor/raptor_nfc.c,
+	raptor/raptor_nfc.h, raptor/raptor_nfc_test.c,
+	raptor/raptor_parse.c, raptor/raptor_qname.c,
+	raptor/raptor_rdfxml.c, raptor/raptor_rfc2396.c,
+	raptor/raptor_rss.c, raptor/raptor_sax2.c,
+	raptor/raptor_sequence.c, raptor/raptor_set.c,
+	raptor/raptor_stringbuffer.c, raptor/raptor_uri.c,
+	raptor/raptor_utf8.c, raptor/raptor_win32.c, raptor/raptor_www.c,
+	raptor/raptor_www_curl.c, raptor/raptor_www_libfetch.c,
+	raptor/raptor_www_libwww.c, raptor/raptor_www_libxml.c,
+	raptor/raptor_www_test.c, raptor/raptor_xml.c,
+	raptor/raptor_xml_writer.c, raptor/rdfdump.c,
+	raptor/tests/Makefile.am, raptor/tests/empty.c,
+	raptor/tests/ex-14.out, raptor/tests/ex-20.out,
+	raptor/tests/ex-22.out, raptor/tests/ex-52.out,
+	raptor/tests/turtle/Makefile.am, raptor/tests/turtle/README.txt,
+	raptor/tests/turtle/rdfq-results.out,
+	raptor/tests/turtle/test-00.out, raptor/turtle_common.h,
+	raptor/turtle_lexer.l, raptor/turtle_parser.y,
+	raptor/win32_raptor_config.h, raptor/Makefile.am,
+	raptor/configure.ac, raptor/manifest.pl, raptor/n3_common.h,
+	raptor/n3_lexer.l, raptor/n3_parser.y, raptor/ntriples_parse.c,
+	raptor/raptor-config.1, raptor/raptor-config.in,
+	raptor/raptor-src-config.in, raptor/raptor.h,
+	raptor/raptor.rdf.in, raptor/raptor.spec.in,
+	raptor/raptor_expat.c, raptor/raptor_general.c,
+	raptor/raptor_identifier.c, raptor/raptor_internal.h,
+	raptor/raptor_libxml.c: LGPL / Apache 2.0 license
+
+	* raptor/configure.ac: Check for libxml 2.5.10+ for RSS tag soup
+	parser requirements, not features.
+
+2004-09-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_internal.h:
+	Added prototype for rasqal_engine_declare_prefix
+
+	* rasqal/rasqal_engine.c (rasqal_engine_declare_prefix):
+	Added to declare a namespace
+	prefix/uri once only in a query.
+	(rasqal_engine_declare_prefixes): Use above.
+
+	* rasqal/rasqal.h: Added declared field to rasqal_prefix
+
+	* rasqal/brql_parser.y: Initial BRQL updates post DAWG F2F3
+	Deleted OPTIONAL, replaced with []s around set of triples
+	using new terms LSQUARE and RSQUARE
+	Removed USING work and replaced with PREFIX earlier.  Declare
+	prefixes as soon as they appear.
+
+	* rasqal/brql_lexer.l: Added PREF state for post-PREFIX word handling
+	Define PREFIX, NAME, QNAME more precisely (not checked vs spec)
+	Deleted OPTIONAL
+	Made "PREFIX"/"prefix" set state PREF
+	Added [/LSQUARE and ]/RSQUARE
+	Made <PREF> state handle foo: and : names for namespace prefixes
+
+2004-09-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_internal.h:
+	Added prototype for rasqal_triples_source_next_source
+
+	* rasqal/rasqal.h: Added origin field to rasqal_triple
+	Added rasqal_triple_set_origin and rasqal_triple_get_origin
+	Made bindings be [4]array
+	Added raptor_uri param to rasqal_triples_soruce_factory method
+	new_triples_source
+
+	* rasqal/rasqal_redland.c (rasqal_redland_new_triples_match):
+	Added origin, not checked
+
+	* rasqal/rasqal_raptor.c (rasqal_new_triples_source):
+	Set uri from first in list, call
+	updated factory with that uri.
+	(rasqal_free_triples_source): Tidy triples source and user data
+	only if not alreayd done.
+	(rasqal_triples_source_next_source): Added for switching to next
+	data source.
+	(rasqal_triples_match_bind_match): Handle 4 bindings
+	(rasqal_engine_get_next_result): Handle origin queries and switching
+	to next data source when current one exhausted (goto restart)
+
+	* rasqal/rasqal_expr.c (rasqal_triple_print): Handle origin.
+	(rasqal_triple_set_origin, rasqal_triple_get_origin): Added
+
+	* rasqal/rasqal_engine.c (rasqal_new_triples_source):
+	Set uri from first in list, call
+	updated factory with that uri.
+	(rasqal_free_triples_source): Tidy triples source and user data
+	only if not alreayd done.
+	(rasqal_triples_source_next_source): Added for switching to next
+	data source.
+	(rasqal_triples_match_bind_match): Handle 4 bindings
+	(rasqal_engine_get_next_result): Handle origin queries and switching
+	to next data source when current one exhausted (goto restart)
+
+	* rasqal/brql_parser.y: Added SOURCE ?foo before triple
+
+	* rasqal/tests/brql/Makefile.am, rasqal/tests/brql/E.n3,
+	rasqal/tests/brql/Q-SOURCE-1, rasqal/tests/brql/Q-SOURCE-2: tests
+
+2004-09-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_literal.c (rasqal_literal_as_string): Handle BLANK
+
+2004-09-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal.h: docs
+
+	* rasqal/brql_parser.y (OptionalClause):
+	Make print handler for seq of seq.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_assign_variables):
+	Handle no selects
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_new_triples_source):
+	Handle no sources
+
+	* rasqal/roqet.c: Use raptor_free_memory on uri_string
+
+	* rasqal/Makefile.am: clean up local_tests
+
+	* rasqal/tests/brql/Makefile.am: fix tool building paths
+
+	* rasqal/rasqal_query_test.c: Use data/dc.rdf
+
+	* rasqal/Makefile.am, rasqal/configure.ac: Added data
+
+	* rasqal/data/Makefile.am, rasqal/data/dc.rdf: data
+
+2004-09-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_namespace.c: foo
+
+	* raptor/raptor_namespace.c (raptor_new_namespace):
+	Debug message only when level >1
+
+	* rasqal/brql_lexer.l, rasqal/rdql_lexer.l (main):
+	Use raptor_free_memory
+
+	* rasqal/tests/brql/Makefile.am: BRQL Makefile
+
+	* rasqal/tests/rdql/Makefile.am: RDQL Makefile
+
+	* rasqal/rasqal_query.c (rasqal_free_query):
+	Added describes, optional_triples and constructs.
+	(rasqal_query_print): Print describes, optional_triples and
+	constructs when present.  Make most things printing only if present.
+
+	* rasqal/Makefile.am: fix line directives in bison generated files
+
+	* rasqal/tests/rdql/testsuite/check-rdql,
+	rasqal/tests/rdql/testsuite/tests2turtle.patch: Adjustments for
+	dir renaming
+
+	* rasqal/rasqal_internal.h:
+	Added constructs, optional_triples, describes sequences
+	Added select_is_describe, construct_all flags.
+	Declare rasqal_init_query_engine_brql prototype
+
+	* rasqal/rasqal_general.c (rasqal_init):
+	Use conditionals for query language inits.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_expand_triple_qnames):
+	Don't fail if there are no
+	triples.  BRQL doesn't need them.
+
+	* rasqal/tests/brql/D.n3, rasqal/tests/brql/Q-C-1,
+	rasqal/tests/brql/Q-C-2, rasqal/tests/brql/Q-D-1,
+	rasqal/tests/brql/Q-D-2, rasqal/tests/brql/Q-D-3,
+	rasqal/tests/brql/Q-OPT-1, rasqal/tests/brql/Q-OPT-2,
+	rasqal/tests/brql/Q-S-1, rasqal/tests/brql/Q-S-2: BRQL tests
+
+	* rasqal/tests/Makefile.am: Switch to just subdirs here
+
+	* rasqal/Makefile.am:
+	Split tests into BRQL and RDQL ones enabled separately.
+	Use makefile conditionals for sources
+
+	* rasqal/configure.ac:
+	Added --enable-query-languages and automake conditionals
+	to avoid building them.
+
+	* rasqal/Makefile.am: Remove rdql-testsuite dir.
+	Add BRQL sources and tests
+
+	* rasqal/brql_common.h, rasqal/brql_lexer.l, rasqal/brql_parser.y: BRQL
+
+	* rasqal/tests/rdql/dc.rdf, rasqal/tests/rdql/example1.rdql,
+	rasqal/tests/rdql/example2.rdql, rasqal/tests/rdql/example3.rdql,
+	rasqal/tests/rdql/example4.rdql, rasqal/tests/rdql/example5.rdql,
+	rasqal/tests/rdql/example_at_1.rdql,
+	rasqal/tests/rdql/example_at_2.rdql,
+	rasqal/tests/rdql/example_at_3.rdql,
+	rasqal/tests/rdql/example_at_4.rdql,
+	rasqal/tests/rdql/example_at_5.rdql,
+	rasqal/tests/rdql/example_at_6.rdql,
+	rasqal/tests/rdql/example_at_7.rdql,
+	rasqal/tests/rdql/example_at_8.rdql,
+	rasqal/tests/rdql/note-ex1.rdql, rasqal/tests/rdql/note-ex2.rdql,
+	rasqal/tests/rdql/note-ex3.rdql, rasqal/tests/rdql/note-ex4.rdql,
+	rasqal/tests/dc.rdf, rasqal/tests/example1.rdql,
+	rasqal/tests/example2.rdql, rasqal/tests/example3.rdql,
+	rasqal/tests/example4.rdql, rasqal/tests/example5.rdql,
+	rasqal/tests/example_at_1.rdql, rasqal/tests/example_at_2.rdql,
+	rasqal/tests/example_at_3.rdql, rasqal/tests/example_at_4.rdql,
+	rasqal/tests/example_at_5.rdql, rasqal/tests/example_at_6.rdql,
+	rasqal/tests/example_at_7.rdql, rasqal/tests/example_at_8.rdql,
+	rasqal/tests/note-ex1.rdql, rasqal/tests/note-ex2.rdql,
+	rasqal/tests/note-ex3.rdql, rasqal/tests/note-ex4.rdql: Moved to
+	rdql subdir
+
+2004-09-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/Makefile.am:
+	Just link raptor_uri_test, raptor_uri_win32_test with raptor_rfc2396.lo
+
+	* raptor/raptor_uri.c: (main) Don't use raptor_basename
+
+	* raptor/raptor_uri.c:
+	Revert wrapping so that -DWIN32 raptor_uri_win32_test can be
+	compiled.  OSX 'make check' will have to live with the moans.
+
+	* raptor/raptor_uri.c:
+	Wrap functions with #ifndef STANDALONE ... #endif to
+	prevent multiple link warnings on OSX with tests.
+
+	* raptor/raptor_uri.c (main):
+	Use program and raptor_basename in messages
+
+	* raptor/raptor_sequence.c, raptor/raptor_stringbuffer.c,
+	raptor/raptor_xml.c, raptor/raptor_rfc2396.c:
+	Wrap functions with #ifndef STANDALONE ... #endif to
+	prevent multiple link warnings on OSX with tests.
+
+	* raptor/raptor_rss.c, raptor/raptor_rfc2396.c: Fixes for C++
+
+	* raptor/NOTICE: NOTICE
+
+	* raptor/raptor.spec.in, raptor/Makefile.am: Added NOTICE
+
+	* raptor/raptor.spec.in: Mention atom 0.3
+
+	* raptor/raptor.spec.in: Update for LGPL/Apache 2
+
+	* raptor/raptor_rfc2396.c: Header
+
+2004-09-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rfc2396.c (raptor_new_uri_detail):
+	Handle NULL string - failure.
+	Increase alloced size to compensate for possibly 5 extra \0s
+	for each URI component.
+	(main): Check "" URI parses and NULL doesn't crash it.
+
+	* raptor/raptor_internal.h: Added raptor_uri_detail.
+	Added internal raptor_basename.
+
+	* raptor/raptor.h: docs
+
+	* raptor/Makefile.am: Added raptor_rfc2396.c and raptor_rfc2396_test
+	Link all tests with librdf.la $(LIBS)
+
+	* raptor/raptor_rfc2396.c: RFC2396 URI detail
+
+	* raptor/raptor_uri.c: Remove old URI resolving code.
+
+	* raptor/raptor_xml.c, raptor/raptor_parse.c,
+	raptor/raptor_sequence.c, raptor/raptor_set.c,
+	raptor/raptor_stringbuffer.c, raptor/raptor_nfc_test.c: Use
+	raptor_basename in test code main()
+
+	* raptor/raptor_general.c (raptor_basename): Added
+
+	* raptor/raptor_rdfxml.c: correct comment
+
+	* raptor/Makefile.am:
+	Enable raptor_set_test raptor_xml_test tests only when rdf/xml enabled.
+
+	* raptor/raptor_parse.c (raptor_stats_print):
+	Only print rdfxml stats if compiled in.
+
+	* raptor/Makefile.am: Change test to be raptor_parse_test
+	Use raptor_rdfxml.c only if rdf/xml enabled.
+
+	* raptor/raptor.h: Export raptor_xml_literal_datatype_uri_string_len
+
+	* raptor/raptor_internal.h: Declare raptor_delete_parser_factories.
+
+	* raptor/raptor_parse.c, raptor/raptor_general.c:
+	Moved the following parser related functions and methods to
+	raptor_parse.c:
+	raptor_default_generate_id_handler,
+	raptor_delete_parser_factories, raptor_feature_from_uri,
+	raptor_features_enumerate, raptor_free_parser, raptor_generate_id,
+	raptor_get_feature, raptor_get_label, raptor_get_locator,
+	raptor_get_mime_type, raptor_get_name, raptor_get_parser_factory ,
+	raptor_guess_parser_name, raptor_new_parser,
+	raptor_new_parser_for_content, raptor_parse_abort,
+	raptor_parse_chunk, raptor_parse_file, raptor_parse_file_stream,
+	raptor_parse_uri, raptor_parse_uri_with_connection,
+	raptor_parse_uri_write_bytes, raptor_parser_error,
+	raptor_parser_error_varargs, raptor_parser_fatal_error,
+	raptor_parser_fatal_error_varargs, raptor_parser_register_factory,
+	raptor_parser_simple_error, raptor_parser_warning,
+	raptor_parser_warning_varargs, raptor_parsers_enumerate,
+	raptor_set_default_generate_id_parameters, raptor_set_error_handler,
+	raptor_set_fatal_error_handler, raptor_set_feature,
+	raptor_set_generate_id_handler, raptor_set_parser_strict,
+	raptor_set_statement_handler, raptor_set_warning_handler,
+	raptor_start_parse, raptor_stats_print, raptor_syntax_name_check,
+	raptor_syntaxes_enumerate
+
+	* raptor/Makefile.am: -MPL1.1 +Apache2.0
+
+	* raptor/LICENSE-2.0.txt: +Apache2
+
+2004-09-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/tests/turtle/test-16.ttl, raptor/tests/turtle/test-16.out:
+	10000 triples exactly now
+
+	* raptor/raptor_sequence.c: docs
+
+	* raptor/turtle_parser.y (blank):
+	Revert mis-edited triple sequence change.
+
+	* raptor/turtle_parser.y (propertyList):
+	Switch to left-recursion to prevent stack problems
+	with bison.
+	(raptor_turtle_parse_terminate): Call turtle_lexer_lex_destroy properly.
+
+	* rasqal/rdql_parser.y (rasqal_rdql_query_engine_terminate):
+	Call rdql_lexer_lex_destroy properly.
+
+	* raptor/tests/turtle/test-14.ttl, raptor/tests/turtle/test-14.out:
+	Use exactly 10000 all different triples.
+
+	* raptor/tests/turtle/test-15.out, raptor/tests/turtle/test-15.ttl:
+	Use different objects and no collections so there are exactly 10000
+	triples, all different.
+
+	* raptor/tests/turtle/test-16.out, raptor/tests/turtle/test-16.ttl:
+	Use different objects so all 10000 triples are different
+
+	* raptor/turtle_lexer.l (turtle_token_print):
+	Add INTEGER_LITERAL for debugging.
+
+	* raptor/Makefile.am: Make turtle_parser.c appear as C source name
+
+	* raptor/turtle_parser.y (statementList, objectList):
+	Switch to using left recursion to
+	prevent stack overflow in bison with 10000 statements (possible) or
+	objects (rarer).
+
+	* raptor/tests/turtle/Makefile.am,
+	raptor/tests/turtle/test-14.out, raptor/tests/turtle/test-14.ttl,
+	raptor/tests/turtle/test-15.out, raptor/tests/turtle/test-15.ttl,
+	raptor/tests/turtle/test-16.out, raptor/tests/turtle/test-16.ttl:
+	Added large turtle tests test-14,15,16
+
+	* raptor/turtle_parser.y (raptor_turtle_parse_chunk):
+	Use RAPTOR_REALLOC for massive speed
+	improvements on some systems.
+
+	* raptor/raptor_internal.h: Added RAPTOR_REALLOC
+
+2004-09-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c (rasqal_engine_execute_finish):
+	Don't free triple_meta before
+	checking the columns
+
+	* rasqal/Makefile.am: Added rasqal_query_test to TESTS
+
+	* rasqal/rasqal_engine.c (rasqal_engine_execute_init):
+	Init triples_source, triple_meta only
+	if not already done.
+	(rasqal_engine_execute_finish): Free triple_meta and any variables
+	still set if not cleared.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_free_triples_source):
+	Free the rasqal_triple in the loop.
+
+	* rasqal/rasqal_query.c (rasqal_query_execute): Re-execute if wanted.
+
+	* rasqal/tests/Makefile.am, rasqal/tests/dc.rdf: Added dc.rdf
+
+	* rasqal/Makefile.am, rasqal/rasqal_query_test.c:
+	Added rasqal_query_test.c
+
+	* rasqal/rasqal_literal.c (rasqal_literal_expand_qname):
+	Zap old string pointer.
+
+	* raptor/raptor_set.c (raptor_free_id_set):
+	Free the set after freeing the list.
+
+	* rasqal/rasqal_query.c (rasqal_query_prepare):
+	Allow re-prepare when finished or executed.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_execute_init):
+	Do not overwrite query->variables on
+	a re-execute init.
+
+	* librdf/rdf_log.c (librdf_fatal): Off by 1 in snprintf on OSX
+
+2004-09-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/tests/turtle/test-13.out, raptor/tests/turtle/test-13.ttl:
+	Make serializable as rdf/xml
+
+2004-09-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* utils/rdfproc.c: Init results to NULL
+
+	* raptor/tests/turtle/Makefile.am, raptor/tests/turtle/README.txt:
+	Turtle tests readme
+
 2004-08-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_storage_mysql.c (librdf_storage_mysql_get_contexts):
@@ -88,9 +779,6 @@
 	* rasqal/rasqal_literal.c (rasqal_literal_as_integer,
 	rasqal_literal_as_floating): Edit casts near strtol, strtod to
 	cause less moaning and still work with C++.
-
-	* raptor/LICENSE.html, LICENSE.html, rasqal/LICENSE.html:
-	More LGPL v2.1 fixes
 
 	* librdf/win32_rdf_config.h: 0.9.19
 
