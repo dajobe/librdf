@@ -170,8 +170,8 @@ librdf_query_register_factory(librdf_world *world, const char *name,
  * Return value: the factory object or NULL if there is no such factory
  **/
 librdf_query_factory*
-librdf_get_query_factory (librdf_world *world, 
-                          const char *name, librdf_uri *uri) 
+librdf_get_query_factory(librdf_world *world, 
+                         const char *name, librdf_uri *uri) 
 {
   librdf_query_factory *factory;
 
@@ -193,7 +193,8 @@ librdf_get_query_factory (librdf_world *world,
     }
     /* else FACTORY name not found */
     if(!factory) {
-      LIBRDF_DEBUG3("No query factory with name %s uri %s found\n", name, librdf_uri_as_string(uri));
+      LIBRDF_DEBUG3("No query language with name '%s' uri %s found\n", 
+                    name, (uri ? (char*)librdf_uri_as_string(uri) : "NULL"));
       return NULL;
     }
   }
@@ -529,7 +530,26 @@ librdf_query_next_result(librdf_query *query)
     return 1;
 }
 
+
+/**
+ * librdf_query_get_bindings_count - Get the number of bound variables in the result
+ * @query: &librdf_query query
+ * 
+ * Return value: <0 if failed or results exhausted
+ **/
+int
+librdf_query_get_bindings_count(librdf_query *query)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+
+  if(query->factory->get_bindings_count)
+    return query->factory->get_bindings_count);
+  else
+    return -1;
+}
+
 #endif
+
 
 
 /* TEST CODE */
