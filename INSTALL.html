@@ -90,8 +90,8 @@ Sparc, IA64), FreeBSD (x86) and Apple OSX.</p>
 
 
 <p>Configure tries very hard to find several programs and libraries
-that Redland might need.  These include the language APIs (perl,
-python, etc.), the storage modules (Berkeley/Sleepycat DB, MySQL,
+that Redland might need.  These include
+the storage modules (Berkeley/Sleepycat DB, MySQL,
 3store), the XML parsers -- via Raptor's configure -- and various
 others.  A summary of the modular parts found is given at the end of
 the configure run.  Several options to configure given below can be
@@ -235,43 +235,6 @@ installation directory and will look there for BDB installs)</p>
 
 </dd>
 
-<dt><code>--with-java</code>(=<em>JAVA-COMMAND</em>)<br /></dt>
-<dt><code>--with-perl</code>(=<em>PERL-COMMAND</em>)<br /></dt>
-<dt><code>--with-php</code>(=<em>PHP-COMMAND</em>)<br /></dt>
-<dt><code>--with-python</code>(=<em>PYTHON-COMMAND</em>)<br /></dt>
-<dt><code>--with-ruby</code>(=<em>RUBY-COMMAND</em>)<br /></dt>
-<dt><code>--with-tcl</code>(=<em>TCL-COMMAND</em>)<br /></dt>
-<dd><p>Enable the given language APIs - the default is to build
-no language APIs automatically.  If the option value is omitted or
-<em>yes</em>, configure will guess the location of the language
-command.  If the option value is <em>no</em> or no option is given,
-the language API will be disabled - this is the default, not
-to build any language API.</p>
-
-<p>If the option is given a value, that is used as the appropriate
-language command to use.  For example <code>--with-ruby=ruby1.8</code>
-will use the 'ruby1.8' binary, whereas <code>--with-ruby</code> will use
-'ruby' as the binary, both of these will be searched for in the PATH.
-An absolute path could alternatively be given such as
-<code>--with-python=/opt/mypython/bin/python</code> 
-to use a python installation in a different location.</p></dd>
-
-<dt><code>--with-jdk=</code><em>DIR</em><br /></dt>
-<dd><p>Choose the location of the Java JDK to use for building
-the Java API with Java JNI.  If omitted, Redland will guess likely
-locations but this is not guaranteed to work.
-</p></dd>
-
-
-<dt><code>--with-libwww</code><br /></dt>
-<dd><p>Enable use of the W3C <a href="http://www.w3.org/Library/">libwww</a>,
-if available.  configure will automatically enable this if
-the <code>libwww-config</code> program can be found in the path unless
-disabled by setting this option to <em>no</em>.  libwww is not used
-at present.
-</p>
-</dd>
-
 <dt><code>--with-mysql</code>(<code>=</code><em>CONFIG</em>|<code>yes</code>|<code>no</code>)<br /></dt>
 
 <dd><p>Enable use of the Redland MySQL 3.x, 4.x triple store backend
@@ -390,23 +353,6 @@ conclude with something like:<br />
   <code>All </code><em>n</em><code> tests passed</code><br />
 if everything works correctly.</p>
 
-<p>If the language-specific <code>--with-perl</code> etc. arguments
-have been given to <code>configure</code>, the top-level
-<code>make check</code> will run these tests for the enabled languages
-in addition to the core tests.  These <em>may fail</em> if
-the main redland libraries (librdf and libraptor) are not
-installed. So in this case you should do:</p>
-<pre>
-   make install
-</pre>
-<p>before trying to run the language-specific tests.
-</p>
-
-<p>The language-specific tests can also be built and run with:</p>
-<pre>
-   cd language
-   make check
-</pre>
 
 <p>(If you have got all the required subsidiary development tools,
 you can also do <code>make distcheck</code> which does a longer
@@ -424,15 +370,6 @@ interface header (.h) files do:</p>
    make install
 </pre>
 
-<p>The language-specific interfaces are installed in this step when
-they are enabled with the <code>--with-perl</code> etc. arguments of
-<code>configure</code></p>
-
-<p>Otherwise, the language-specific installations can be made with:</p>
-<pre>
-  cd language
-  make install
-</pre>
 
 
 
@@ -447,9 +384,6 @@ in the <code>examples</code> sub-directory and can be built with:</p>
 </pre>
 <p>(This may be done by the initial 'make' automatically).</p>
 
-<p>There are many examples for all of the language interfaces in the
-corresponding sub-directories such as <code>perl/example.pl</code>
-which may be easier to modify.</p>
 
 <p>If no Berkeley DB was found by configure, some of the examples will fail
 since there is no on-disk storage system available.  To change them
@@ -501,39 +435,6 @@ disk.</p>
 
 <p><code>example4</code> contains an example of how to
 serialize an RDF model to a syntax.</p>
-
-
-
-<h2>3. Using the Perl interface</h2>
-
-<p>See the <a href="docs/perl.html">Redland Perl Interface</a> document for
-full information on installing and using Redland from Perl.</p>
-
-<h2>4. Using the Python interface</h2>
-
-<p>See the <a href="docs/python.html">Redland Python Interface</a> document for
-full information on installing and using Redland from Python.</p>
-
-<h2>5. Using the Tcl interface</h2>
-
-<p>See the <a href="docs/tcl.html">Redland Tcl Interface</a> document for
-full information on installing and using Redland from Tcl, and/or Tcl/Tk.</p>
-
-<h2>6. Using the Java interface</h2>
-
-<p>See the <a href="docs/java.html">Redland Java Interface</a> document for
-full information on installing and using Redland from Java.</p>
-
-<h2>7. Using the Ruby interface</h2>
-
-<p>See the <a href="docs/ruby.html">Redland Ruby Interface</a> document for
-full information on installing and using Redland from Ruby.</p>
-
-<h2>8. Using the PHP interface</h2>
-
-<p>See the <a href="docs/php.html">Redland PHP Interface</a> document for
-full information on installing and using Redland from PHP.</p>
-
 
 
 <hr />
