@@ -89,7 +89,7 @@ rdf_parser_repat.c
 EXTRA_DIST=\
 memcmp.c \
 PrintConsumer.java PrintParser.java \
-$(JAVA_CLASSES) \
+PrintConsumer.class PrintParser.class \
 redland.spec redland.spec.in \
 ex1.rdf ex2.rdf
 
