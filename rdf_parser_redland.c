@@ -107,6 +107,16 @@
 #endif
 
 
+/* namespace stack node */
+struct ns_map_s {
+  struct ns_map_s* next; /* next down the stack, NULL at bottom */
+  char *prefix;
+  char *uri;
+  int depth;             /* parse depth that this was added, delete when parser leaves this */
+};
+typedef struct ns_map_s ns_map;
+  
+
 /*
  * Redland parser context
  */
@@ -120,6 +130,10 @@ typedef struct {
   /* parser context */
   /* xmlParserCtxtPtr xc; */
 #endif  
+  /* stack depth */
+  int depth;
+  /* stack of namespaces, most recently added at top */
+  ns_map *namespaces;
 } librdf_parser_redland_context;
 
 
@@ -151,6 +165,10 @@ static void librdf_parser_redland_fatal_error(void *ctx, const char *msg, ...);
 #endif
 
 
+static void librdf_parser_redland_free(void *ctx);
+  
+
+
 /**
  * librdf_parser_redland_init - Initialise the Redland RDF parser
  * @context: context
@@ -163,8 +181,9 @@ librdf_parser_redland_init(void *context)
   librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)context;
 #ifdef NEED_EXPAT
   XML_Parser xp;
-  xp=XML_ParserCreateNS(NULL, '\0');
+  xp=XML_ParserCreate(NULL);
 
+  /* create a new parser in the specified encoding */
   XML_SetUserData(xp, context);
 
   /* XML_SetEncoding(xp, "..."); */
@@ -193,6 +212,8 @@ librdf_parser_redland_init(void *context)
   /* xmlInitParserCtxt(&scontext->xc); */
 #endif
 
+  scontext->depth=0;
+
   return 0;
 }
 
@@ -204,18 +225,66 @@ static void librdf_parser_redland_start_element_handler(void *userData,
   librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)userData;
 /*  XML_Parser xp=scontext->xp;*/
 
+  scontext->depth++;
+  
   fprintf(stderr, "redland: saw start element '%s'", name);
   if (atts != NULL) {
     int i;
+
     fputs(" attrs: ", stderr);
-    for (i = 0;(atts[i] != NULL);i++) {
+
+    for (i = 0;(atts[i] != NULL);i+=2) {
+      /* synthesise the XML NS events */
+      if(!strncmp(atts[i], "xmlns", 5)) {
+        const char *prefix;
+        int prefix_length;
+        int uri_length;
+        int len;
+        ns_map *map;
+        
+        if(atts[i][5]) { /* there is more i.e. xmlns:foo */
+          prefix=&atts[i][6];
+          prefix_length=strlen(prefix);
+        }
+        else
+          prefix=NULL;
+
+#if 0
+        librdf_parser_redland_start_namespace(userData, prefix, atts[i+1]);
+#endif
+        fprintf(stderr, "redland: synthesised start namespace prefix %s uri %s\n", prefix, atts[i+1]);
+
+        uri_length=strlen(atts[i+1]);
+        len=sizeof(ns_map) + uri_length+1;
+        if(prefix_length)
+          len+=prefix_length+1;
+
+        /* Just one malloc */
+        map=(ns_map*)LIBRDF_CALLOC(ns_map, len, 1);
+        if(!map) {
+          fprintf(stderr, "OUT OF MEMORY\n"); /* FIXME */
+          abort();
+        }
+        
+        map->uri=strcpy((char*)map+sizeof(ns_map), atts[i+1]);
+        if(prefix)
+          map->prefix=strcpy((char*)map+sizeof(ns_map)+uri_length+1, prefix);
+        map->depth=scontext->depth;
+
+        if(scontext->namespaces)
+          map->next=scontext->namespaces;
+        scontext->namespaces=map;
+
+      }
+
       if(i)
         fputc(' ', stderr);
-      fprintf(stderr, "%s='", atts[i++]);
-      fprintf(stderr, "%s'", atts[i]);
+      fprintf(stderr, "%s='", atts[i]);
+      fprintf(stderr, "%s'", atts[i+1]);
     }
   }
   fputc('\n', stderr);
+
 }
 
 
@@ -227,6 +296,22 @@ librdf_parser_redland_end_element_handler(void *userData,
 /*  XML_Parser xp=scontext->xp;*/
 
   fprintf(stderr, "redland: saw end element '%s'\n", name);
+
+  while(scontext->namespaces && scontext->namespaces->depth == scontext->depth) {
+    ns_map* ns=scontext->namespaces;
+    ns_map* next=ns->next;
+
+#if 0
+    librdf_parser_redland_end_namespace(userData, ns->prefix, ns->uri);
+#endif
+    fprintf(stderr, "redland: synthesised end namespace prefix %s uri \"%s\"\n", 
+            ns->prefix ? ns->prefix : "(None)", ns->uri);
+
+    LIBRDF_FREE(ns_map, ns);
+    scontext->namespaces=next;
+  }
+
+  scontext->depth--;
 }
 
 
@@ -391,6 +476,7 @@ librdf_parser_redland_parse_into_model(void *context, librdf_uri *uri,
   if(strncmp(librdf_uri_as_string(uri), "file:", 5)) {
     fprintf(stderr, "librdf_parser_redland_parse_into_model: parser cannot handle non file: URI %s\n",
             librdf_uri_as_string(uri));
+    librdf_parser_redland_free(context);
     return 1;
   }
   
@@ -402,6 +488,7 @@ librdf_parser_redland_parse_into_model(void *context, librdf_uri *uri,
     fprintf(stderr, "librdf_parser_redland_parse_into_model: failed to open file %s (URI %s) - ", 
             filename, librdf_uri_as_string(uri));
     perror(NULL);
+    librdf_parser_redland_free(context);
     return 1;
   }
   
@@ -460,8 +547,27 @@ librdf_parser_redland_parse_into_model(void *context, librdf_uri *uri,
   XML_ParserFree(xp);
 #endif /* EXPAT */
 
+  librdf_parser_redland_free(context);
+
   return (rc != 0);
 }
+
+
+static void
+librdf_parser_redland_free(void *context) 
+{
+  librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)context;
+
+  fprintf(stderr, "Entering librdf_parser_redland_free\n");
+  
+  while(scontext->namespaces) {
+    ns_map* next_map=scontext->namespaces->next;
+
+    LIBRDF_FREE(ns_map, scontext->namespaces);
+    scontext->namespaces=next_map;
+  }
+}
+
 
 
 /**
