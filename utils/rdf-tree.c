@@ -1,5 +1,5 @@
 /*
- * rdf-tree.c - Retrieve statements from persistent Redland storage as RDF/XML.
+ * rdf-tree.c - Retrieve statements from persistent Redland storage.
  *
  * Copyright (C) 2003 Morten Frederiksen - http://purl.org/net/morten/
  *
@@ -25,9 +25,9 @@
 #include <string.h>
 #include <getopt.h>
 #include <redland.h>
-#include <mysql.h>
+#include <openssl/lhash.h>
 
-const char *VERSION="0.0.1";
+const char *VERSION="0.3";
 
 struct options
 {
@@ -38,13 +38,15 @@ struct options
 	char *id;
 	int level;
 	int port;
+	char *output;
 	char *password;
 	char *query;
 	char *user;
 } opts;
 
 int main(int argc,char *argv[]);
-int tree(librdf_world *world,librdf_node *node,librdf_model *model,librdf_model *outputmodel,int level);
+int tree(librdf_world *world,librdf_node *node,librdf_model *model,librdf_model *outputmodel,LHASH *table,int level);
+void hash_free(void *data);
 int getoptions(int argc,char *argv[],librdf_world *world);
 int usage(char *argv0,int version);
 
@@ -80,7 +82,7 @@ int main(int argc,char *argv[])
 	/* Check for URI argument. */
 	if (argnum<argc)
 	{
-		uri=librdf_new_uri(world,(const unsigned char *)argv[argnum]);
+		uri=librdf_new_uri(world,argv[argnum]);
 		if(!uri)
 		{
 			fprintf(stderr, "%s: Failed to create input uri\n",argv[0]);
@@ -92,7 +94,7 @@ int main(int argc,char *argv[])
 	if (opts.database)
 	{
 		storage_type=strdup("mysql");
-		storage_options=(char*)malloc(strlen(opts.host)+strlen(opts.database)+strlen(opts.user)+strlen(opts.password)+120);
+		storage_options=malloc(strlen(opts.host)+strlen(opts.database)+strlen(opts.user)+strlen(opts.password)+120);
 		if (!storage_type || !storage_options)
 		{
 			fprintf(stderr, "%s: Failed to create 'mysql' storage options\n",argv[0]);
@@ -104,7 +106,7 @@ int main(int argc,char *argv[])
 	else
 	{
 		storage_type=strdup("hashes");
-		storage_options=(char*)malloc(strlen(opts.directory)+120);
+		storage_options=malloc(strlen(opts.directory)+120);
 		if (!storage_type || !storage_options)
 		{
 			fprintf(stderr, "%s: Failed to create 'hashes' storage options\n",argv[0]);
@@ -147,7 +149,7 @@ int main(int argc,char *argv[])
 	}
 
 	/* Create serializer. */
-	serializer=librdf_new_serializer(world,"rdfxml",NULL,NULL);
+	serializer=librdf_new_serializer(world,opts.output,NULL,NULL);
 	if(!serializer)
 	{
 		fprintf(stderr, "%s: Failed to create serializer\n",argv[0]);
@@ -192,7 +194,7 @@ librdf_free_stream(stream);
 			return(1);
 		};
 		/* Extract statements with given context. */
-		if (!(stream=librdf_model_context_serialize(model,opts.context)))
+		if (!(stream=librdf_model_context_as_stream(model,opts.context)))
 		{
 			fprintf(stderr, "%s: Failed to serialize context model\n",argv[0]);
 			return(1);
@@ -211,11 +213,21 @@ librdf_free_stream(stream);
 	/* Populate output model... */
 	if (uri)
 	{
+		int rc=0;
+		LHASH *table=lh_new((LHASH_HASH_FN_TYPE)lh_strhash, (LHASH_COMP_FN_TYPE)strcmp);
+		if (!table)
+		{
+			fprintf(stderr, "%s: Failed to create hash table\n",argv[0]);
+			return(1);
+		};
 		fprintf(stderr, "%s: Populating output model from uri...\n",argv[0]);
 		/* Recursively extract statements about subject... */
-		if (tree(world,librdf_new_node_from_uri(world,uri),model,outputmodel,opts.level))
+		rc=tree(world,librdf_new_node_from_uri(world,uri),model,outputmodel,table,opts.level);
+		lh_doall(table,(LHASH_DOALL_FN_TYPE)hash_free);
+		lh_free(table);
+		if (rc)
 		{
-			fprintf(stderr, "%s: Failed to extract statements from model\n",argv[0]);
+			fprintf(stderr, "%s: Failed to extract statements from model (%d)\n",argv[0],rc);
 			return(1);
 		};
 		librdf_free_model(model);
@@ -246,6 +258,7 @@ librdf_free_stream(stream);
 	};
 
 	/* Clean up. */
+	librdf_free_serializer(serializer);
 	librdf_free_model(outputmodel);
 	librdf_free_storage(outputstorage);
 	librdf_free_world(world);
@@ -254,56 +267,59 @@ librdf_free_stream(stream);
 	return(0);
 }
 
-int tree(librdf_world *world,librdf_node *node,librdf_model *model,librdf_model *outputmodel,int level)
+int tree(librdf_world *world,librdf_node *node,librdf_model *model,librdf_model *outputmodel,LHASH *table,int level)
 {
 	librdf_stream *instream;
-	librdf_stream *outstream;
 	librdf_node *object;
 	librdf_statement *statement;
+	int rc;
+	librdf_node_type ont;
 
+	/* Add node to hash, to prevent cycles. */
+	lh_insert(table,strdup(librdf_node_to_string(node)));
+	if (lh_error(table))
+		return 1;
 	/* Find all statements about node. */
 	if (!(statement=librdf_new_statement_from_nodes(
 			world,librdf_new_node_from_node(node),NULL,NULL)))
-		return 1;
+		return 2;
 	if (!(instream=librdf_model_find_statements(model,statement)))
-		return 1;
+		return 3;
 	while (!librdf_stream_end(instream))
 	{
-		/* Check for duplicates. */
-		if (!(outstream=librdf_model_find_statements(outputmodel,
-				librdf_new_statement_from_statement(
-				librdf_stream_get_object(instream)))))
-			return 1;
-		if (librdf_stream_end(outstream))
+		/* Add statement to output model. */
+		statement=librdf_stream_get_object(instream);
+		if (librdf_model_add_statement(outputmodel,
+				librdf_new_statement_from_statement(statement)))
+			return 4;
+		/* Recurse? */
+		if (level)
 		{
-			/* Add statement to output model */
-			if (librdf_model_add_statement(outputmodel,librdf_new_statement_from_statement(
-					librdf_stream_get_object(instream))))
-				return 1;
-			/* Check for recursive adds... */
-			object=librdf_statement_get_object(librdf_stream_get_object(instream));
-			if (level &&
-					(librdf_node_get_type(object)==LIBRDF_NODE_TYPE_RESOURCE ||
-					librdf_node_get_type(object)==LIBRDF_NODE_TYPE_BLANK))
+			object=librdf_statement_get_object(statement);
+			ont=librdf_node_get_type(object);
+			if (ont==LIBRDF_NODE_TYPE_RESOURCE ||
+					ont==LIBRDF_NODE_TYPE_BLANK)
 			{
-/*librdf_statement_print(librdf_stream_get_object(instream),stderr);
+/*librdf_statement_print(statement,stderr);
 fprintf(stderr,"%s","\n");*/
-				/* Don't recurse if there are already statements about object. */
-				librdf_free_stream(outstream);
-				if (!(outstream=librdf_model_find_statements(outputmodel,
-						librdf_new_statement_from_nodes(
-						world,librdf_new_node_from_node(object),NULL,NULL))))
-					return 1;
-				if (librdf_stream_end(outstream)
-						&& tree(world,object,model,outputmodel,level-1))
-					return 1;
+				/* Don't recurse if object is known... */
+				if (!lh_retrieve(table,librdf_node_to_string(object)))
+				{
+					rc=tree(world,object,model,outputmodel,table,level-1);
+					if (rc)
+						return rc;
+				}
 			};
 		};
-		librdf_free_stream(outstream);
 		librdf_stream_next(instream);
 	};
 	librdf_free_stream(instream);
 	return 0;
+};
+
+void hash_free(void *data)
+{
+	free(data);
 };
 
 int getoptions(int argc,char *argv[],librdf_world *world)
@@ -317,13 +333,14 @@ int getoptions(int argc,char *argv[],librdf_world *world)
 		{"host",required_argument,NULL,'h'},
 		{"id",required_argument,NULL,'i'},
 		{"level",required_argument,NULL,'l'},
+		{"output",required_argument,NULL,'o'},
 		{"port",required_argument,NULL,'P'},
 		{"password",optional_argument,NULL,'p'},
 		{"query",required_argument,NULL,'q'},
 		{"user",required_argument,NULL,'u'},
 		{"version",no_argument,NULL,'v'},
 		{0,0,0,0}};
-	const char *opts_short="?c:D:d:h:i:l:P:p:q:u:v";
+	const char *opts_short="?c:D:d:h:i:l:o:P:p:q:u:v";
 	int i=1;
 	char c;
 	char *buffer;
@@ -339,6 +356,7 @@ int getoptions(int argc,char *argv[],librdf_world *world)
 	if (!(opts.directory=strdup("./"))
 			|| !(opts.host=strdup("mysql"))
 			|| !(opts.id=strdup("redland"))
+			|| !(opts.output=strdup("rdfxml"))
 			|| !(opts.database=strdup("redland")))
 	{
 		fprintf(stderr,"%s: Failed to allocate default options\n",argv[0]);
@@ -349,7 +367,7 @@ int getoptions(int argc,char *argv[],librdf_world *world)
 	{
 		if (optarg)
 		{
-			buffer=(char*)malloc(strlen(optarg)+1);
+			buffer=malloc(strlen(optarg)+1);
 			if (!buffer)
 			{
 				fprintf(stderr,"%s: Failed to allocate buffer for command line argument (%s)\n",argv[0],optarg);
@@ -363,7 +381,7 @@ int getoptions(int argc,char *argv[],librdf_world *world)
 				usage(argv[0],0);
 			case 'c':
 				free(buffer);
-				opts.context=librdf_new_node_from_uri_string(world,(const unsigned char *)optarg);
+				opts.context=librdf_new_node_from_uri_string(world,optarg);
 				if (!opts.context)
 				{
 					fprintf(stderr,"%s: Failed to create context node (%s)\n",argv[0],optarg);
@@ -389,6 +407,10 @@ int getoptions(int argc,char *argv[],librdf_world *world)
 			case 'l':
 				free(buffer);
 				opts.level=atoi(optarg);
+				break;
+			case 'o':
+				free(opts.output);
+				opts.output=buffer;
 				break;
 			case 'P':
 				free(buffer);
@@ -423,10 +445,22 @@ int getoptions(int argc,char *argv[],librdf_world *world)
 	/* Read password from tty if not specified. */
 	if (opts.database && ttypasswd)
 	{
-		buffer=(char*)malloc(strlen(opts.host)+strlen(opts.database)+strlen(opts.user)+42);
-		snprintf(buffer,40+strlen(opts.host)+strlen(opts.database)+strlen(opts.user),"Enter password for %s@%s/%s: ",opts.user,opts.host,opts.database);
-		opts.password=get_tty_password(buffer);
-		free(buffer);
+		char c2;
+		int i2=0;
+		opts.password=malloc(128);
+		if (!opts.password)
+		{
+			fprintf(stderr,"%s: Failed to allocate buffer for password\n",argv[0]);
+			exit(1);
+		};
+		fprintf(stderr,"%s: Enter password for %s@%s/%s: ",argv[0],opts.user,opts.host,opts.database);
+		while ((c2=getchar())!='\n')
+		{
+			opts.password[i2++]=c2;
+			if (i2==127)
+				break;
+		};
+		opts.password[i2++]=0;
 	};
 
 	return optind;
@@ -436,7 +470,7 @@ int usage(char *argv0,int version)
 {
 	printf("\
 %s  Version %s\
-Retrieve statements from persistent Redland storage as RDF/XML.\
+Retrieve statements from persistent Redland storage.\
 * Copyright (C) 2003 Morten Frederiksen - http://purl.org/net/morten/\
 * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/\
 ",argv0,VERSION);
@@ -462,6 +496,9 @@ usage: %s [options] [ <URI> ]\
   -l<number>, --level=<number>\
                      The number of levels of statements to extract. Default is\
                      1, also returning statements about objects.\
+  -o<syntax id>, --output=<syntax id>\
+                     Syntax identifier for serialization, 'ntriples' or\
+                     'rdfxml' (default).\
   -p<password>, --password=<password>\
                      Password to use when connecting to MySQL server.\
                      If password is not given it's asked from the tty.\
