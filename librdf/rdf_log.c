@@ -187,8 +187,9 @@ librdf_fatal(librdf_world* world, int facility,
   /* Not passing NULL to snprintf since that seems to not be portable  */
   size_t length=snprintf(empty_buffer, 1, "%s:%d:%s: fatal error: %s", 
                          file, line, function, message);
-
-  buffer=(char*)LIBRDF_MALLOC(cstring, length+1);
+  
+  length++; /* add the length 1 passed in */
+  buffer=(char*)LIBRDF_MALLOC(cstring, length+1); /* for \0 */
   if(!buffer)
     return;
   
