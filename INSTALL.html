@@ -49,7 +49,18 @@ files, as described below in <em>configuring the package</em>.</p>
 <dd>Enable use of the W3C <a href="http://www.w3.org/Library/">libwww</a>,
 if available.  configure will automatically enable this if
 the <tt>libwww-config</tt> program can be found in the path unless
-disabled by setting this option to <em>no</em>.</dd>
+disabled by setting this option to <em>no</em>.
+
+<p><b>WARNING</b> If the libwww libraries are installed in a
+non-default directory, when the final linking occurs, the libraries
+may not be found at run time.  To fix this you will need to use a
+system-specific method of passing this information to the run-time
+loader.  On Linux and Solaris you can set the LD_LIBRARY_PATH
+variable to include the directory where the libwww libraries are
+found.  You can also configure it via a system wide file - see the
+ld.so manual page for details.  The alternative, to link libwww
+statically, works but is difficult to enable.</p>
+</dd>
 
 <dt><tt>--with-rdf-java-api=JAR</tt><br />
 <dd>Enable the use of Sergey Melnik's Java API RDF parser (based on
