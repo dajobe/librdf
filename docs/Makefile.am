@@ -93,15 +93,21 @@ redland.3: redland.pod
 	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @LIBRDF_VERSION@" $? | \
 	sed -e "s;REDLAND_VERSION_STRING;@LIBRDF_VERSION@;" > $@
 	rm -f pod2htm*
+
+clean-local:
+	rm -rf api.junk DBTOHTML* pod2htm*
+
+distclean-local:
+	rm -rf $(API_DOCBOOK_FILES)
+
 else
 redland.3: redland.pod
 	# This is the best that can be done without pod2man
 	cp $? $@
-endif
-
 
 clean-local:
 	rm -rf $(API_DOCBOOK_FILES) api.junk DBTOHTML* pod2htm*
+endif
 
 README: README.html
 	$(LYNX) $(LYNXARGS) $< > $@
