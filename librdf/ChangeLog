@@ -1,3 +1,15 @@
+2004-12-21  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_mysql.c (librdf_storage_mysql_init): Applied patch
+	from Morten to only use mysql_real_escape_string if a connection
+	was made.
+	(librdf_storage_mysql_find_statements_in_context_next_statement):
+	Do not call librdf_storage_mysql_find_statements_in_context_finished
+	when errors happen, the iterator class will do that on destruction.
+	(librdf_storage_mysql_get_contexts_next_context): Do not call
+	librdf_storage_mysql_get_contexts_finished when errors happen, the
+	iterator class will do that on destruction.
+
 2004-12-08  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_uri.c (librdf_new_uri_relative_to_base): Ask for 1 more char for
