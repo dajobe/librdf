@@ -1,5 +1,9 @@
 2005-01-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_query.c: docs
+
+	* rdf_query.c (main): C99
+
 	* rdf_storage_sqlite.c: Casts for C++
 
 	* rdf_query_rasqal.c (rasqal_redland_bind_match): Casts for C++
