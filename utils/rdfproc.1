@@ -1,0 +1,146 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\"
+.\" rdfproc.1 - Redland RDF processor utility manual page
+.\"
+.\" $Id$
+.\"
+.\" Copyright (C) 2003 David Beckett - http://purl.org/net/dajobe/
+.\" Institute for Learning and Research Technology - http://www.ilrt.org/
+.\" University of Bristol - http://www.bristol.ac.uk/
+.\"
+.TH rdfproc 1 "2003-09-04"
+.\" Please adjust this date whenever revising the manpage.
+.SH NAME
+rdfproc \- Redland RDF processor utility
+.SH SYNOPSIS
+.B rdfproc
+.RB [ OPTIONS ]
+.IR "<store>"
+.IR "command"
+.IR "arg..."
+.SH EXAMPLE
+.nf
+.B rdfproc test parse http://ilrt.org/discovery/rdf/resources/rss.rdf
+.br
+.B rdfproc test print
+.br
+.B rdfproc test serialize ntriples
+.br
+.SH DESCRIPTION
+The
+.B rdfproc
+utility allows parsing, querying, manipulating and  serializing of
+RDF content using the
+.B Redland
+RDF library.   The \fIstore\fR is a Redland store name, typically
+a short identifier.  The arguments to \fIcommand\fR vary
+and are explained in section COMMAND below.
+.SH OPTIONS
+rdfproc uses the usual GNU command line syntax, with long
+options starting with two dashes (`-') if supported by the
+getopt_long function.  Otherwise the short options are only available.
+.TP
+.B \-h, \-\-help
+Show a summary of the options.
+.TP
+.B \-c, \-\-contexts
+Use a store with Redland contexts.
+.TP
+.B \-v, \-\-version
+Print the Redland version and exit.
+.SH COMMANDS
+Where a node is allowed, such as \fINODE\fP, \fISUBJECT\fP,
+\fIPREDICATE\fP or \fIOBJECT\fP below, simple heuristics are used to
+guess which are URIs or literals (to add a statement with a literal,
+use add-typed).  No Blank Node identifiers are supported.
+.IP "\fBadd \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP \fI[CONTEXT]\fP\fR"
+Add the given triple to graph, in the optional Redland context
+if the \fICONTEXT\fR node is given.
+
+.IP "\fBadd-typed \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP \fIOBJECT-LANG\fP \fIOBJECT-URI\fP \fI[CONTEXT]\fP\fR"
+Add the triple with the datatyped literal object to the graph, in the
+optional Redland context if \fICONTEXT\fR is given.
+
+.IP "\fBarc \fISUBJECT\fP \fIOBJECT\fP\fR"
+.IP "\fBarcs \fISUBJECT\fP \fIOBJECT\fP\fR"
+Show one node/all nodes that match triples (\fISUBJECT\fP, ?, \fIOBJECT\fP)
+
+.IP "\fBarcs-in \fINODE\fP\fR"
+Show all properties of triples with \fINODE\fP as a subject.
+
+.IP "\fBarcs-out \fINODE\fP\fR"
+Show all properties of triples with \fINODE\fP as an object.
+
+.IP "\fBcontains \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP\fR"
+Check if the given triple is in the graph.
+
+.IP "\fBfind \fISUBJECT\fP|- \fIPREDICATE\fP|- \fIOBJECT\fP|-\fR"
+Find matching triples to the given statement
+where - stands for a blank that matches any node.
+
+.IP "\fBhas-arc-in \fINODE\fP \fIARC\fP\fR"
+Check that there is a triple with \fINODE\fP as a subject
+and \fIARC\fP as a predicate.
+
+.IP "\fBhas-arc-out \fPNODE\fP \fIARC\fP\fR"
+Check that there is a triple with \fINODE\fP as a object
+and \fIARC\fP as a predicate.
+
+.IP "\fBparse \fIURI\fP \fIPARSER\fP \fI[BASE URI]\fP\fR"
+Parse syntax at \fIURI\fP intothe graph using PARSER
+
+.IP "\fBparse-stream \fIURI\fP \fIPARSER\fP \fI[BASE URI]\fP\fR"
+Streaming parse syntax at URI into the graph using PARSER
+
+.IP "\fBprint\fR"
+Print the graph triples.
+
+.IP "\fBremove \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP \fI[CONTEXT]\fP\fR"
+Remove the given triple graph, in the optional Redland context
+if \fICONTEXT\fR is given.
+
+.IP "\fBserialize [\fINAME\fP [\fIURI\fP [\fIMIME-TYPE\fP]]]\fR"
+Serializes the graph to a syntax with a particular \INAME\fI
+\fIURI\fR or Internet Media Type/MIME Type.  The default is
+RDF/XML (\fINAME\fR "rdfxml", MIME Type "application/rdf/xml")
+if none of the above are given.  Other alternatives
+are "ntriples" (no MIME Type).
+
+.IP "\fBsource \fIPREDICATE\fP \fIOBJECT\fP\fR"
+.IP "\fBsources \fIPREDICATE\fP \fIOBJECT\fP\fR"
+Show one node/all nodes that match triples (?, \fIPREDICATE\fP, \fIOBJECT\fP)
+
+.IP "\fBtarget \fISUBJECT\fP \fIPREDICATE\fP\fR"
+.IP "\fBtargets \fISUBJECT\fP \fIPREDICATE\fP\fR"
+Show one node/all nodes that match triples (\fISUBJECT\fP, \fIPREDICATE\fP, ?)
+
+.SH "CONFORMING TO"
+\fIRDF/XML Syntax (Revised)\fR,
+W3C Working Draft (work in progress),
+.UR http://www.w3.org/TR/rdf-syntax-grammar/
+http://www.w3.org/TR/rdf-syntax-grammar/
+.UE
+
+\fIN-Triples\fR,
+W3C Working Draft (work in progress),
+.UR http://www.w3.org/TR/rdf-testcases/#ntriples
+http://www.w3.org/TR/rdf-testcases/#ntriples
+.UE
+.SH SEE ALSO
+.BR redland (3)
+.SH AUTHOR
+Dave Beckett - 
+.UR http://purl.org/net/dajobe/
+http://purl.org/net/dajobe/
+.UE
+.br
+.UR
+Institute for Learning and Research Technology (ILRT)
+http://www.ilrt.bristol.ac.uk/
+.UE
+.br
+.UR
+University of Bristol
+http://www.bristol.ac.uk/
+.UE
+
