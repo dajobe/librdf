@@ -36,6 +36,13 @@ extern "C" {
 struct librdf_model_s {
   librdf_world *world;
 
+  /* usage count of this instance
+   * Used by other redland classes such as iterator, stream
+   * via  librdf_model_add_reference librdf_model_remove_reference
+   * The usage count of model after construction is 1.
+   */
+  int usage;
+  
   librdf_list*     sub_models;
 
   void *context;
@@ -166,6 +173,9 @@ void librdf_finish_model(librdf_world *world);
 /* class methods */
 void librdf_model_register_factory(const char *name, void (*factory) (librdf_model_factory*));
 librdf_model_factory* librdf_get_model_factory(const char *name);
+
+void librdf_model_add_reference(librdf_model *model);
+void librdf_model_remove_reference(librdf_model *model);
 
 #endif
 
