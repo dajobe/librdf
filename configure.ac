@@ -901,7 +901,7 @@ AC_SUBST(LOCAL_SUBDIRS)
 CFLAGS="-DLIBRDF_INTERNAL=1 $CFLAGS"
 MEM=
 MEM_LIBS=
-AC_ARG_WITH(dmalloc, [  --with-dmalloc          Use dmalloc debugging library (default=auto)], use_dmalloc="$withval", use_dmalloc="auto") 
+AC_ARG_WITH(dmalloc, [  --with-dmalloc          Use dmalloc debugging library (default=no)], use_dmalloc="$withval", use_dmalloc="no") 
 AC_MSG_CHECKING(using dmalloc library)
 if test "$USE_MAINTAINER_MODE" = yes; then
   if test "$ac_cv_header_dmalloc_h" = yes; then
