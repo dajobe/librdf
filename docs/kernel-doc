@@ -646,6 +646,7 @@ sub output_struct_sgml(%) {
     print "  <programlisting>\n";
     print $args{'type'}." ".$args{'struct'}." {\n";
     foreach $parameter (@{$args{'parameterlist'}}) {
+	defined($args{'parameterdescs'}{$parameter}) || next;
         ($args{'parameterdescs'}{$parameter} ne $undescribed) || next;
 	$type = $args{'parametertypes'}{$parameter};
 	if ($type =~ m/([^\(]*\(\*)\s*\)\s*\(([^\)]*)\)/) {
@@ -666,6 +667,7 @@ sub output_struct_sgml(%) {
 
     print "  <variablelist>\n";
     foreach $parameter (@{$args{'parameterlist'}}) {
+      defined($args{'parameterdescs'}{$parameter}) || next;
       ($args{'parameterdescs'}{$parameter} ne $undescribed) || next;
       print "    <varlistentry>";
       print "      <term>$parameter</term>\n";
@@ -878,7 +880,7 @@ sub output_function_man(%) {
     my ($parameter, $section);
     my $count;
 
-    print ".TH \"$args{'function'}\" 9 \"$args{'function'}\" \"25 May 1998\" \"Kernel Hacker's Manual\" LINUX\n";
+    print ".TH \"$args{'function'}\" 9 \"$args{'function'}\" \"$man_date\" \"Kernel Hacker's Manual\" LINUX\n";
 
     print ".SH NAME\n";
     print $args{'function'}." \\- ".$args{'purpose'}."\n";
@@ -1349,8 +1351,8 @@ sub create_parameterlist($$$) {
 	        print STDERR "Warning(${file}:$.): Function parameter ".
 		    "or member '$param' not " .
 		    "described in '$declaration_name'\n";
+	        ++$errors;
 	    }
-	    ++$errors;
         }
 
 	push @parameterlist, $param;
