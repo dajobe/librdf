@@ -166,11 +166,16 @@ librdf_heuristic_gen_name(char *name)
     l=0;
   l++;
 
-  /* +1 to length if an extra digit was added (number now ends in 0) */
+  /* +1 to required length if no digit was found */
+  if(offset == len-1) 
+    len++;
+
+  /* +1 to required length if an extra digit is needed -
+   * number now ends in 0.  Note l is never 0. */
   if((l % 10) ==0) 
     len++;
 
-  new_name=(char*)LIBRDF_MALLOC(cstring, len+1);
+  new_name=(char*)LIBRDF_MALLOC(cstring, len+1); /* +1 for \0 */
   strncpy(new_name, name, offset+2);
   sprintf(new_name+offset+1, "%ld", l);
   return new_name;
