@@ -374,24 +374,24 @@ int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
 
 /* rdf_node.h */
 librdf_node* librdf_new_node(librdf_world *world);
-librdf_node* librdf_new_node_from_uri_string(librdf_world *world, const unsigned char *string);
+librdf_node* librdf_new_node_from_uri_string(librdf_world *world, const char *string);
 librdf_node* librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri);
-librdf_node* librdf_new_node_from_literal(librdf_world *world, const unsigned char *string, const char *xml_language, int is_wf_xml);
+librdf_node* librdf_new_node_from_literal(librdf_world *world, const char *string, const char *xml_language, int is_wf_xml);
 librdf_node* librdf_new_node_from_typed_literal(librdf_world *world, const char *string, const char *xml_language, librdf_uri* datatype_uri);
 librdf_node* librdf_new_node_from_node(librdf_node *node);
-librdf_node* librdf_new_node_from_blank_identifier(librdf_world *world, const unsigned char *identifier);
+librdf_node* librdf_new_node_from_blank_identifier(librdf_world *world, const char *identifier);
 void librdf_free_node(librdf_node *r);
 librdf_uri* librdf_node_get_uri(librdf_node* node);
 int librdf_node_get_type(librdf_node* node);
-unsigned char* librdf_node_get_literal_value(librdf_node* node);
+char* librdf_node_get_literal_value(librdf_node* node);
 char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 librdf_uri* librdf_node_get_literal_value_datatype_uri(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 
 %newobject librdf_node_to_string;
-unsigned char *librdf_node_to_string(librdf_node* node);
-unsigned char *librdf_node_get_blank_identifier(librdf_node* node);
+char *librdf_node_to_string(librdf_node* node);
+char *librdf_node_get_blank_identifier(librdf_node* node);
 
 int librdf_node_is_resource(librdf_node* node);
 int librdf_node_is_literal(librdf_node* node);
