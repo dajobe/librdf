@@ -207,12 +207,12 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
   hash=(librdf_hash_factory*)LIBRDF_CALLOC(librdf_hash_factory, 1,
                                            sizeof(librdf_hash_factory));
   if(!hash)
-    LIBRDF_FATAL1(world, librdf_hash_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_hash, hash);
-    LIBRDF_FATAL1(world, librdf_hash_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
   }
   strcpy(name_copy, name);
   hash->name=name_copy;
@@ -221,8 +221,7 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
     if(!strcmp(h->name, name_copy)) {
       LIBRDF_FREE(cstring, name_copy); 
       LIBRDF_FREE(librdf_hash_factory, hash);
-      LIBRDF_ERROR2(world, librdf_hash_register_factory,
-		    "hash %s already registered", h->name);
+      LIBRDF_ERROR2(world, "hash %s already registered", h->name);
       return;
     }
   }
@@ -692,9 +691,7 @@ librdf_hash_get_all_iterator_get_method(void* iterator, int flags)
       break;
 
     default:
-      LIBRDF_ERROR2(context->hash->world, 
-                    librdf_hash_get_all_iterator_get_method,
-                    "Unknown iterator method flag %d\n", flags);
+      LIBRDF_ERROR2(context->hash->world, "Unknown iterator method flag %d\n", flags);
       result=NULL;
       break;
   }
@@ -1303,8 +1300,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
         break;
         
       default:
-        LIBRDF_ERROR2(hash->world, librdf_hash_from_string,
-                      "No such state %d", state);
+        LIBRDF_ERROR2(hash->world, "No such state %d", state);
         return 1;
     }
   }
@@ -1328,8 +1324,7 @@ librdf_hash_from_array_of_strings (librdf_hash* hash, char **array)
   for(i=0; (key.data=array[i]); i+=2) {
     value.data=array[i+1];
     if(!value.data) {
-      LIBRDF_ERROR2(hash->world, librdf_hash_from_array_of_strings,
-                    "Array contains an odd number of strings - %d", i);
+      LIBRDF_ERROR2(hash->world, "Array contains an odd number of strings - %d", i);
       return 1;
     }
     key.size=strlen((char*)key.data);

@@ -124,14 +124,14 @@ librdf_query_register_factory(const char *name,
   query=(librdf_query_factory*)LIBRDF_CALLOC(librdf_query_factory, 1,
                                              sizeof(librdf_query_factory));
   if(!query)
-    LIBRDF_FATAL1(world, librdf_query_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
 
   name_length=strlen(name);
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, name_length+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_query, query);
-    LIBRDF_FATAL1(world, librdf_query_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
   }
   query->name=strcpy(name_copy, name);
   if(uri) {
@@ -139,7 +139,7 @@ librdf_query_register_factory(const char *name,
     if(!query->uri) {
       LIBRDF_FREE(cstring, name_copy); 
       LIBRDF_FREE(librdf_query, query);
-      LIBRDF_FATAL1(world, librdf_query_register_factory, "Out of memory");
+      LIBRDF_FATAL1(world, "Out of memory");
     }
   }
         
@@ -147,8 +147,7 @@ librdf_query_register_factory(const char *name,
     if(!strcmp(h->name, name_copy)) {
       LIBRDF_FREE(cstring, name_copy); 
       LIBRDF_FREE(librdf_query, query);
-      LIBRDF_ERROR2(NULL, librdf_query_register_factory,
-                    "query language %s already registered\n", h->name);
+      LIBRDF_ERROR2(NULL, "query language %s already registered\n", h->name);
       return;
     }
   }
@@ -248,7 +247,7 @@ librdf_new_query_from_query(librdf_query* old_query)
 
   /* FIXME: fail if clone is not supported by this query (factory) */
   if(!old_query->factory->clone) {
-    LIBRDF_FATAL2(world, librdf_new_query_from_query, "clone not implemented for query factory type %s", old_query->factory->name);
+    LIBRDF_FATAL2(world, "clone not implemented for query factory type %s", old_query->factory->name);
     return NULL;
   }
 

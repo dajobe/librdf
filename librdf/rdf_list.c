@@ -434,9 +434,7 @@ librdf_list_iterator_get_method(void* iterator, int flags)
   if(flags == LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT)
     return node->data;
 
-  LIBRDF_ERROR2(context->list->world, 
-                librdf_list_iterator_get_method,
-                "Unsupported iterator method flag %d\n", flags);
+  LIBRDF_ERROR2(context->list->world, "Unsupported iterator method flag %d\n", flags);
   return NULL;
 }
 

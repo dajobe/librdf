@@ -58,11 +58,10 @@ librdf_init_uri(librdf_world *world)
   if(!world->uris_hash) {
     world->uris_hash=librdf_new_hash(world, NULL);
     if(!world->uris_hash)
-      LIBRDF_FATAL1(world, librdf_init_uri,
-                    "Failed to create URI hash from factory");
+      LIBRDF_FATAL1(world, "Failed to create URI hash from factory");
     
     if(librdf_hash_open(world->uris_hash, NULL, 0, 1, 1, NULL))
-      LIBRDF_FATAL1(world, librdf_init_uri, "Failed to open URI hash");
+      LIBRDF_FATAL1(world, "Failed to open URI hash");
 
     /* remember to free it later */
     world->uris_hash_allocated_here=1;
@@ -405,7 +404,7 @@ librdf_free_uri (librdf_uri* uri)
   key.data=uri->string;
   key.size=uri->string_length;
   if(librdf_hash_delete_all(uri->world->uris_hash, &key) )
-    LIBRDF_FATAL1(world, librdf_free_uri, "Hash deletion failed");
+    LIBRDF_FATAL1(world, "Hash deletion failed");
 
 
   if(uri->string)

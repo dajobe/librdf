@@ -62,11 +62,10 @@ librdf_init_node(librdf_world* world)
   for(i=0; i<H_COUNT; i++) {
     world->nodes_hash[i]=librdf_new_hash(world, NULL);
     if(!world->nodes_hash[i])
-      LIBRDF_FATAL1(world, librdf_init_node,
-                    "Failed to create Nodes hash from factory");
+      LIBRDF_FATAL1(world, "Failed to create Nodes hash from factory");
     
     if(librdf_hash_open(world->nodes_hash[i], NULL, 0, 1, 1, NULL))
-      LIBRDF_FATAL1(world, librdf_init_node, "Failed to open Nodes hash");
+      LIBRDF_FATAL1(world, "Failed to open Nodes hash");
   }
 }
 
@@ -625,7 +624,7 @@ librdf_free_node(librdf_node *node)
       key.data=&node->value.resource.uri;
       key.size=sizeof(librdf_uri*);
       if(librdf_hash_delete_all(node->world->nodes_hash[H_RESOURCE], &key) )
-        LIBRDF_FATAL1(world, librdf_free_node, "Hash deletion failed");
+        LIBRDF_FATAL1(world, "Hash deletion failed");
 
       librdf_free_uri(node->value.resource.uri);
       break;
@@ -635,7 +634,7 @@ librdf_free_node(librdf_node *node)
         key.data=node->value.literal.key;
         key.size=node->value.literal.size;
         if(librdf_hash_delete_all(node->world->nodes_hash[H_LITERAL], &key) )
-          LIBRDF_FATAL1(world, librdf_free_node, "Hash deletion failed");
+          LIBRDF_FATAL1(world, "Hash deletion failed");
         LIBRDF_FREE(cstring, node->value.literal.key);
       }
       
@@ -651,7 +650,7 @@ librdf_free_node(librdf_node *node)
       key.data=node->value.blank.identifier;
       key.size=node->value.blank.identifier_len;
       if(librdf_hash_delete_all(node->world->nodes_hash[H_BLANK], &key) )
-        LIBRDF_FATAL1(world, librdf_free_node, "Hash deletion failed");
+        LIBRDF_FATAL1(world, "Hash deletion failed");
 
       if(node->value.blank.identifier != NULL)
         LIBRDF_FREE(cstring, node->value.blank.identifier);
@@ -1024,8 +1023,7 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
     sprintf((char*)s, "(%s)", node->value.blank.identifier);
     break;
   default:
-    LIBRDF_ERROR2(node->world, librdf_node_string, 
-                  "Do not know how to print node type %d\n", node->type);
+    LIBRDF_ERROR2(node->world, "Do not know how to print node type %d\n", node->type);
     return NULL;
   }
   return s;
@@ -1094,9 +1092,7 @@ librdf_node_get_digest(librdf_node* node)
       librdf_digest_final(d);
       break;
     default:
-      LIBRDF_ERROR2(world, librdf_node_get_digest,
-                    "Do not know how to make digest for node type %d\n", 
-                    node->type);
+      LIBRDF_ERROR2(world, "Do not know how to make digest for node type %d\n", node->type);
       return NULL;
   }
   
@@ -1252,8 +1248,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       break;
       
     default:
-      LIBRDF_ERROR2(node->world, librdf_node_encode,
-                    "Do not know how to encode node type %d\n", node->type);
+      LIBRDF_ERROR2(node->world, "Do not know how to encode node type %d\n", node->type);
       return 0;
   }
   
@@ -1376,8 +1371,7 @@ librdf_node_decode(librdf_world *world,
     break;
 
   default:
-    LIBRDF_ERROR2(world, librdf_node_decode,
-                  "Illegal node encoding '%c' seen\n", buffer[0]);
+    LIBRDF_ERROR2(world, "Illegal node encoding '%c' seen\n", buffer[0]);
     return NULL;
   }
   
@@ -1441,8 +1435,7 @@ librdf_node_static_iterator_get_method(void* iterator, int flags)
       return NULL;
 
     default:
-      LIBRDF_ERROR2(context->world, librdf_node_static_iterator_get_method,
-                    "Unknown iterator method flag %d\n", flags);
+      LIBRDF_ERROR2(context->world, "Unknown iterator method flag %d\n", flags);
       return NULL;
   }
 }

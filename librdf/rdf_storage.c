@@ -138,12 +138,12 @@ librdf_storage_register_factory(const char *name,
   storage=(librdf_storage_factory*)LIBRDF_CALLOC(librdf_storage_factory, 1,
                                                  sizeof(librdf_storage_factory));
   if(!storage)
-    LIBRDF_FATAL1(world, librdf_storage_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
 
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_storage, storage);
-    LIBRDF_FATAL1(world, librdf_storage_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
   }
   strcpy(name_copy, name);
   storage->name=name_copy;
@@ -152,8 +152,7 @@ librdf_storage_register_factory(const char *name,
     if(!strcmp(h->name, name_copy)) {
       LIBRDF_FREE(cstring, name_copy); 
       LIBRDF_FREE(librdf_storage, storage);
-      LIBRDF_ERROR2(NULL, librdf_storage_register_factory,
-                    "storage %s already registered\n", h->name);
+      LIBRDF_ERROR2(NULL, "storage %s already registered\n", h->name);
       return;
     }
   }
@@ -307,9 +306,7 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(old_storage, librdf_storage, NULL);
 
   if(!old_storage->factory->clone) {
-    LIBRDF_ERROR2(old_storage->world, librdf_new_storage_from_storage,
-                  "clone method not implemented for storage factory %s",
-                  old_storage->factory->name);
+    LIBRDF_ERROR2(old_storage->world, "clone method not implemented for storage factory %s", old_storage->factory->name);
     return NULL;
   }
 
@@ -693,9 +690,7 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
           break;
 
         default: /* error */
-          LIBRDF_ERROR2(statement->world,
-                        librdf_storage_stream_to_node_iterator_get_method,
-                        "Unknown statement part %d\n", context->want);
+          LIBRDF_ERROR2(statement->world, "Unknown statement part %d\n", context->want);
           node=NULL;
       }
       break;
@@ -705,9 +700,7 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
       break;
       
     default:
-      LIBRDF_ERROR2(statement->world, 
-                    librdf_storage_stream_to_node_iterator_get_method,
-                    "Unknown iterator method flag %d\n", flags);
+      LIBRDF_ERROR2(statement->world, "Unknown iterator method flag %d\n", flags);
       node=NULL;
   }
   
@@ -786,8 +779,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
       break;
     default:
       librdf_free_statement(partial_statement);
-      LIBRDF_ERROR2(storage->world, librdf_storage_node_stream_to_node_create,
-                    "Illegal statement part %d seen\n", want);
+      LIBRDF_ERROR2(storage->world, "Illegal statement part %d seen\n", want);
       return NULL;
   }
   

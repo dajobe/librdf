@@ -91,12 +91,12 @@ librdf_parser_register_factory(librdf_world *world,
   parser_factory=(librdf_parser_factory*)LIBRDF_CALLOC(librdf_parser_factory, 1,
 					       sizeof(librdf_parser_factory));
   if(!parser_factory)
-    LIBRDF_FATAL1(world, librdf_parser_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
   if(!name_copy) {
     librdf_free_parser_factory(parser_factory);
-    LIBRDF_FATAL1(world, librdf_parser_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
   }
   strcpy(name_copy, name);
   parser_factory->name=name_copy;
@@ -107,7 +107,7 @@ librdf_parser_register_factory(librdf_world *world,
     mime_type_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
     if(!mime_type_copy) {
       librdf_free_parser_factory(parser_factory);
-      LIBRDF_FATAL1(world, librdf_parser_register_factory, "Out of memory");
+      LIBRDF_FATAL1(world, "Out of memory");
     }
     strcpy(mime_type_copy, mime_type);
     parser_factory->mime_type=mime_type_copy;
@@ -120,7 +120,7 @@ librdf_parser_register_factory(librdf_world *world,
     uri=librdf_new_uri(world, uri_string);
     if(!uri) {
       librdf_free_parser_factory(parser_factory);
-      LIBRDF_FATAL1(world, librdf_parser_register_factory, "Out of memory");
+      LIBRDF_FATAL1(world, "Out of memory");
     }
     parser_factory->type_uri=uri;
   }

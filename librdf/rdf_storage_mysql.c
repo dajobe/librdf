@@ -286,9 +286,7 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
                        strlen(create_table_bnodes)) ||
       mysql_real_query(&context->connection,create_table_models,
                        strlen(create_table_models)))) {
-    LIBRDF_ERROR2(storage->world, librdf_storage_mysql_init,
-                  "MySQL table creation failed with error %s",
-                  mysql_error(&context->connection));
+    LIBRDF_ERROR2(storage->world, "MySQL table creation failed with error %s", mysql_error(&context->connection));
     status=0-mysql_errno(&context->connection);
   }
 
@@ -304,9 +302,7 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
     sprintf(query, create_model, context->model, name);
     if(!status && mysql_real_query(&context->connection,query,strlen(query)) &&
        mysql_errno(&context->connection) != ER_DUP_ENTRY) {
-      LIBRDF_ERROR2(storage->world, librdf_storage_mysql_init,
-                    "MySQL insert into Models table failed with error %s",
-                    mysql_error(&context->connection));
+      LIBRDF_ERROR2(storage->world, "MySQL insert into Models table failed with error %s", mysql_error(&context->connection));
       status=0-mysql_errno(&context->connection);
     }
   } else if(!status) {
@@ -317,14 +313,11 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
     res=NULL;
     if(!status && (mysql_real_query(&context->connection,query,strlen(query)) ||
                    !(res=mysql_store_result(&context->connection)))) {
-      LIBRDF_ERROR2(storage->world, librdf_storage_mysql_init,
-                    "MySQL select from Models table failed with error %s",
-                    mysql_error(&context->connection));
+      LIBRDF_ERROR2(storage->world, "MySQL select from Models table failed with error %s", mysql_error(&context->connection));
       status=0-mysql_errno(&context->connection);
     }
     if(!status && !(mysql_fetch_row(res))) {
-      LIBRDF_ERROR2(storage->world, librdf_storage_mysql_init,
-                    "Unknown model: %s",name);
+      LIBRDF_ERROR2(storage->world, "Unknown model: %s",name);
       status=1;
     }
     if(res)
@@ -452,9 +445,7 @@ librdf_storage_mysql_size(librdf_storage* storage)
   if(mysql_real_query(&context->connection, query, strlen(query)) ||
      !(res=mysql_store_result(&context->connection)) ||
      !(row=mysql_fetch_row(res))) {
-    LIBRDF_ERROR2(storage->world, librdf_storage_mysql_size,
-                  "MySQL query for model size failed with error %s",
-                  mysql_error(&context->connection));
+    LIBRDF_ERROR2(storage->world, "MySQL query for model size failed with error %s", mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0-mysql_errno(&context->connection);
   };
@@ -548,9 +539,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       LIBRDF_FREE(cstring,escaped_uri);
       if(mysql_real_query(&context->connection, query, strlen(query)) &&
          mysql_errno(&context->connection) != ER_DUP_ENTRY) {
-        LIBRDF_ERROR2(storage->world, librdf_storage_mysql_node_hash,
-                      "MySQL insert into Resources failed with error %s",
-                      mysql_error(&context->connection));
+        LIBRDF_ERROR2(storage->world, "MySQL insert into Resources failed with error %s", mysql_error(&context->connection));
         LIBRDF_FREE(cstring,query);
         return 0;
       }
@@ -619,9 +608,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       LIBRDF_FREE(cstring,escaped_datatype);
       if(mysql_real_query(&context->connection, query, strlen(query)) &&
          mysql_errno(&context->connection) != ER_DUP_ENTRY) {
-        LIBRDF_ERROR2(storage->world, librdf_storage_mysql_node_hash,
-                      "MySQL insert into Literals failed with error %s",
-                      mysql_error(&context->connection));
+        LIBRDF_ERROR2(storage->world, "MySQL insert into Literals failed with error %s", mysql_error(&context->connection));
         LIBRDF_FREE(cstring,query);
         return 0;
       }
@@ -653,9 +640,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       LIBRDF_FREE(cstring,escaped_name);
       if(mysql_real_query(&context->connection, query, strlen(query)) &&
          mysql_errno(&context->connection) != ER_DUP_ENTRY) {
-        LIBRDF_ERROR2(storage->world, librdf_storage_mysql_node_hash,
-                      "MySQL insert into Bnodes failed with error %s",
-                      mysql_error(&context->connection));
+        LIBRDF_ERROR2(storage->world, "MySQL insert into Bnodes failed with error %s", mysql_error(&context->connection));
         LIBRDF_FREE(cstring,query);
         return 0;
       }
@@ -756,10 +741,7 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
     return 1;
   sprintf(query, insert_statement, subject, predicate, object, ctxt, context->model);
   if(mysql_real_query(&context->connection, query, strlen(query))) {
-    LIBRDF_ERROR2(storage->world,
-                  librdf_storage_mysql_context_add_statement_helper,
-                  "MySQL insert into Statements failed with error %s",
-                  mysql_error(&context->connection));
+    LIBRDF_ERROR2(storage->world, "MySQL insert into Statements failed with error %s", mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0-mysql_errno(&context->connection);
   };
@@ -805,9 +787,7 @@ librdf_storage_mysql_contains_statement(librdf_storage* storage,
   if(mysql_real_query(&context->connection, query, strlen(query)) ||
      !(res=mysql_store_result(&context->connection)) ||
      !(mysql_fetch_row(res))) {
-    LIBRDF_ERROR2(storage->world, librdf_storage_mysql_contains_statement,
-                  "MySQL query for statement failed with error %s",
-                  mysql_error(&context->connection));
+    LIBRDF_ERROR2(storage->world, "MySQL query for statement failed with error %s", mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0;
   };
@@ -872,10 +852,7 @@ librdf_storage_mysql_context_remove_statement(librdf_storage* storage,
             context->model);
   }
   if(mysql_real_query(&context->connection, query, strlen(query))) {
-    LIBRDF_ERROR2(storage->world,
-                  librdf_storage_mysql_context_remove_statement,
-                  "MySQL delete from Statements failed with error %s",
-                  mysql_error(&context->connection));
+    LIBRDF_ERROR2(storage->world, "MySQL delete from Statements failed with error %s", mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0-mysql_errno(&context->connection);
   };
@@ -920,10 +897,7 @@ librdf_storage_mysql_context_remove_statements(librdf_storage* storage,
     sprintf(query, delete_model, context->model);
   }
   if(mysql_real_query(&context->connection,query,strlen(query))) {
-    LIBRDF_ERROR2(storage->world,
-                  librdf_storage_mysql_context_remove_statements,
-                  "MySQL delete of context from Statements failed with error %s",
-                  mysql_error(&context->connection));
+    LIBRDF_ERROR2(storage->world, "MySQL delete of context from Statements failed with error %s", mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0-mysql_errno(&context->connection);
   }
@@ -1144,9 +1118,7 @@ librdf_storage_mysql_find_statements_in_context(librdf_storage* storage, librdf_
   /* Start query... */
   if(mysql_real_query(&sos->connection, query, strlen(query)) ||
      !(sos->results=mysql_use_result(&sos->connection))) {
-    LIBRDF_ERROR2(sos->storage->world, librdf_storage_mysql_find_statements_in_context,
-                  "MySQL query failed with error %s",
-                  mysql_error(&sos->connection));
+    LIBRDF_ERROR2(sos->storage->world, "MySQL query failed with error %s", mysql_error(&sos->connection));
     librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
     return NULL;
   };
@@ -1461,9 +1433,7 @@ WHERE Model=%llu";
   /* Start query... */
   if(mysql_real_query(&gccontext->connection, query, strlen(query)) ||
      !(gccontext->results=mysql_use_result(&gccontext->connection))) {
-    LIBRDF_ERROR2(gccontext->storage->world, librdf_storage_mysql_get_contexts,
-                  "MySQL query failed with error %s",
-                  mysql_error(&gccontext->connection));
+    LIBRDF_ERROR2(gccontext->storage->world, "MySQL query failed with error %s", mysql_error(&gccontext->connection));
     librdf_storage_mysql_get_contexts_finished((void*)gccontext);
     return NULL;
   };

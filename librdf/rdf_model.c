@@ -105,12 +105,12 @@ librdf_model_register_factory(const char *name,
   model=(librdf_model_factory*)LIBRDF_CALLOC(librdf_model_factory, 1,
                                              sizeof(librdf_model_factory));
   if(!model)
-    LIBRDF_FATAL1(world, librdf_model_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
 
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_model, model);
-    LIBRDF_FATAL1(world, librdf_model_register_factory, "Out of memory");
+    LIBRDF_FATAL1(world, "Out of memory");
   }
   strcpy(name_copy, name);
   model->name=name_copy;
@@ -118,8 +118,7 @@ librdf_model_register_factory(const char *name,
   for(h = models; h; h = h->next ) {
     if(!strcmp(h->name, name_copy)) {
       LIBRDF_FREE(cstring, name_copy);
-      LIBRDF_ERROR2(model->world, librdf_model_register_factory,
-                    "model %s already registered", h->name);
+      LIBRDF_ERROR2(model->world, "model %s already registered", h->name);
       return;
     }
   }

@@ -40,9 +40,9 @@
 #define LIBRDF_DEBUG3(function, msg, arg1, arg2) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2);} while(0)
 #define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2, arg3);} while(0)
 
-#define LIBRDF_ERROR1(world, function, msg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function); abort();} while(0)
-#define LIBRDF_ERROR2(world, function, msg,arg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg); abort();} while(0)
-#define LIBRDF_ERROR3(world, function, msg,arg1,arg2) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg1, arg2); abort();} while(0)
+#define LIBRDF_ERROR1(world, msg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__); abort();} while(0)
+#define LIBRDF_ERROR2(world, msg,arg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__, arg); abort();} while(0)
+#define LIBRDF_ERROR3(world, msg,arg1,arg2) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__, arg1, arg2); abort();} while(0)
 
 #if defined(HAVE_DMALLOC_H) && defined(LIBRDF_MEMORY_DEBUG_DMALLOC)
 void* librdf_system_malloc(size_t size);
@@ -88,9 +88,9 @@ void librdf_system_free(void *ptr);
 #define LIBRDF_DEBUG3(function, msg, arg1, arg2)
 #define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3)
 
-#define LIBRDF_ERROR1(world, notused, msg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__)
-#define LIBRDF_ERROR2(world, notused, msg, arg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__, arg)
-#define LIBRDF_ERROR3(world, notused, msg, arg1, arg2) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__x, arg1, arg2)
+#define LIBRDF_ERROR1(world, msg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__)
+#define LIBRDF_ERROR2(world, msg, arg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__, arg)
+#define LIBRDF_ERROR3(world, msg, arg1, arg2) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__x, arg1, arg2)
 
 #define SYSTEM_MALLOC(size)   malloc(size)
 #define SYSTEM_FREE(ptr)   free(ptr)
@@ -123,8 +123,8 @@ void librdf_system_free(void *ptr);
 
 
 /* Fatal errors - always happen */
-#define LIBRDF_FATAL1(world, notused, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , __func__); abort();} while(0)
-#define LIBRDF_FATAL2(world, notused, msg, arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , __func__, arg); abort();} while(0)
+#define LIBRDF_FATAL1(world, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , __func__); abort();} while(0)
+#define LIBRDF_FATAL2(world, msg, arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , __func__, arg); abort();} while(0)
 #include <rdf_list.h>
 #include <rdf_hash.h>
 #include <rdf_digest.h>

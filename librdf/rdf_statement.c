@@ -176,7 +176,7 @@ librdf_new_statement_from_nodes(librdf_world *world,
 void
 librdf_statement_init(librdf_world *world, librdf_statement *statement)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
   statement->world=world;
   statement->subject=NULL;
@@ -193,7 +193,7 @@ librdf_statement_init(librdf_world *world, librdf_statement *statement)
 void
 librdf_statement_clear(librdf_statement *statement)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
   if(LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
     librdf_free_node(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
@@ -218,7 +218,7 @@ librdf_statement_clear(librdf_statement *statement)
 void
 librdf_free_statement(librdf_statement* statement)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
   librdf_statement_clear(statement);
   LIBRDF_FREE(librdf_statement, statement);
@@ -255,7 +255,7 @@ librdf_statement_get_subject(librdf_statement *statement)
 void
 librdf_statement_set_subject(librdf_statement *statement, librdf_node *node)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
   LIBRDF_NODE_STATEMENT_SUBJECT(statement)=node;
 }
@@ -288,7 +288,7 @@ librdf_statement_get_predicate(librdf_statement *statement)
 void
 librdf_statement_set_predicate(librdf_statement *statement, librdf_node *node)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
   LIBRDF_NODE_STATEMENT_PREDICATE(statement)=node;
 }
@@ -321,7 +321,7 @@ librdf_statement_get_object(librdf_statement *statement)
 void
 librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
   LIBRDF_NODE_STATEMENT_OBJECT(statement)=node;
 }
@@ -336,7 +336,7 @@ librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 int
 librdf_statement_is_complete(librdf_statement *statement)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
   return (LIBRDF_NODE_STATEMENT_SUBJECT(statement) &&
           LIBRDF_NODE_STATEMENT_PREDICATE(statement) &&
@@ -451,7 +451,7 @@ librdf_statement_print(librdf_statement *statement, FILE *fh)
 {
   unsigned char *s;
 
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
   if(!statement)
     return;
@@ -476,8 +476,8 @@ int
 librdf_statement_equals(librdf_statement* statement1, 
                         librdf_statement* statement2)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement1, librdf_statement, NULL);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement2, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement1, librdf_statement, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement2, librdf_statement, 0);
 
   if(!statement1 || !statement2)
     return 0;
@@ -514,8 +514,8 @@ int
 librdf_statement_match(librdf_statement* statement, 
                        librdf_statement* partial_statement)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(partial_statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(partial_statement, librdf_statement, 0);
 
   if(LIBRDF_NODE_STATEMENT_SUBJECT(partial_statement) &&
      !librdf_node_equals(LIBRDF_NODE_STATEMENT_SUBJECT(statement), 
@@ -553,7 +553,7 @@ librdf_statement_encode(librdf_statement* statement,
                         unsigned char *buffer, 
                         size_t length)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
   return librdf_statement_encode_parts(statement, NULL,
                                        buffer, length,
@@ -592,7 +592,7 @@ librdf_statement_encode_parts(librdf_statement* statement,
   size_t node_len;
   unsigned char *p;
 
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
   /* min size */
   if(buffer && length < 1)
@@ -703,7 +703,7 @@ size_t
 librdf_statement_decode(librdf_statement* statement, 
                         unsigned char *buffer, size_t length)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
   return librdf_statement_decode_parts(statement, NULL, buffer, length);
 }
@@ -732,7 +732,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
   unsigned char type;
   size_t total_length=0;
   
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG2(librdf_statement_decode_parts,
@@ -794,8 +794,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
       break;
 
     default:
-      LIBRDF_ERROR2(statement->world, librdf_statement_decode_parts,
-                    "Illegal statement encoding '%c' seen\n", p[-1]);
+      LIBRDF_ERROR2(statement->world, "Illegal statement encoding '%c' seen\n", p[-1]);
       return 0;
     }
   }

@@ -873,9 +873,7 @@ librdf_storage_hashes_serialise_get_statement(void* context, int flags)
       case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
         return librdf_iterator_get_context(scontext->iterator);
       default:
-        LIBRDF_ERROR2(scontext->iterator->world,
-                      librdf_storage_hashes_serialise_get_statement,
-                      "Unimplemented flags %d seen\n", flags);
+        LIBRDF_ERROR2(scontext->iterator->world, "Unimplemented flags %d seen\n", flags);
         return NULL;
     }
   }
@@ -925,9 +923,7 @@ librdf_storage_hashes_serialise_get_statement(void* context, int flags)
         return scontext->context_node;
         
     default:
-      LIBRDF_ERROR2(scontext->iterator->world,
-                    librdf_storage_hashes_serialise_get_statement,
-                    "Unimplemented flags %d seen\n", flags);
+      LIBRDF_ERROR2(scontext->iterator->world, "Unimplemented flags %d seen\n", flags);
       return NULL;
   }
 }
@@ -1071,9 +1067,7 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
   
   
   if(flags != LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT) {
-    LIBRDF_ERROR2(context->iterator->world,
-                  librdf_storage_hashes_node_iterator_get_method,
-                  "Unimplemented iterator method %d\n", flags);
+    LIBRDF_ERROR2(context->iterator->world, "Unimplemented iterator method %d\n", flags);
     return NULL;
   }
 
@@ -1103,9 +1097,7 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
       break;
       
     default: /* error */
-      LIBRDF_ERROR2(context->iterator->world, 
-                    librdf_storage_hashes_node_iterator_get_method,
-                    "Illegal statement part %d seen\n", context->want);
+      LIBRDF_ERROR2(context->iterator->world, "Illegal statement part %d seen\n", context->want);
       return NULL;
   }
 
@@ -1144,9 +1136,7 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
       break;
       
     default: /* error */
-      LIBRDF_ERROR2(context->iterator->world, 
-                    librdf_storage_hashes_node_iterator_get_method,
-                    "Illegal statement part %d seen\n", context->want);
+      LIBRDF_ERROR2(context->iterator->world, "Illegal statement part %d seen\n", context->want);
       return NULL;
   }
   
@@ -1254,8 +1244,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
       
     default: /* error */
       LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
-      LIBRDF_ERROR2(storage->world, librdf_storage_hashes_node_iterator_create,
-                    "Illegal statement part %d seen\n", want);
+      LIBRDF_ERROR2(storage->world, "Illegal statement part %d seen\n", want);
       return NULL;
   }
 
@@ -1561,9 +1550,7 @@ librdf_storage_hashes_context_serialise_get_statement(void* context, int flags)
         return scontext->context_node;
 
     default:
-      LIBRDF_ERROR2(scontext->iterator->world,
-                    librdf_storage_hashes_context_serialise_get_statement,
-                    "Unimplemented flags %d seen\n", flags);
+      LIBRDF_ERROR2(scontext->iterator->world, "Unimplemented flags %d seen\n", flags);
       return NULL;
   }
 
