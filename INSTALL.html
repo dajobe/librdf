@@ -34,7 +34,7 @@ CVS password:
 
 <p>At this stage, or after a <tt>cvs update</tt> you will
 need to create the automake and autoconf derived files, as described
-below in <em>create the configure program</em>
+below in <a href="#sec-create-configure">Create the configure program</a>
 by using the <tt>autogen.sh</tt> script.</p>
 
 
@@ -51,21 +51,31 @@ and documentation provided on the web site.
 <h2>2. Configuring and building</h2>
 
 <p>Redland uses the GNU automake and autoconf to handle system
-dependency checking.  It is developed and built on x86 Linux (Redhat
-6.2), but is also used extensively locally on various versions of
+dependency checking.  It is developed and built on x86 Linux (Redhat),
+but is also used extensively locally on various versions of
 sparc Sun Solaris 2.x.  I also test it via
 <a href="http://sourceforge.net/">SourceForge</a>s'
 compile farm and it builds on Debian Linux (x86, Alpha, PPC and
 Sparc), FreeBSD (x86) and Apple OSX.</p>
 
 
-<h3>2.1. Create <tt>configure</tt> program</h3>
+<h3><a id="sec-create-configure" name="sec-create-configure"></a>2.1. Create <tt>configure</tt> program</h3>
 
 <p>If there is no <tt>configure</tt> program, you can create it 
-using the <tt>autogen.sh</tt> script, as long as you have the
+by running the <tt>autogen.sh</tt> script, as long as you have the
 <a href="http://www.gnu.org/software/automake/automake.html">automake</a> and
 <a href="http://www.gnu.org/software/autoconf/autoconf.html">autoconf</a>
-tools.  Alternatively you can run them by hand with:</p>
+tools.  This is done by:</p>
+<pre>
+  ./autogen.sh
+</pre>
+<p>and you can also pass along arguments intended for configure (see
+below for what these are):</p>
+<pre>
+  ./autogen.sh --prefix=/usr/local/somewhere
+</pre>
+<p>Alternatively you can run the automake and autoconf programs by
+hand with:</p>
 <pre>
   aclocal; autoheader; automake --add-missing; autoconf
 </pre>
@@ -83,14 +93,14 @@ such as <tt>--prefix</tt> etc.</p>
 <dd><p>Enable use of the Berkeley DB library installed at
 <em>ROOT</em>.  That means <em>ROOT</em><tt>/include</tt> must
 contain the BDB header <tt>db.h</tt> and <em>ROOT</em><tt>/lib</tt>
-must contain the library <tt>libdb.a</tt> (or whatever shared version
-you have).</p>
+must contain the library <tt>libdb.a</tt> (or whatever shared library
+version you have).</p>
 
 <p>Berkeley DB is now known as Sleepcat DB (after version 3) and
 distributed and supported by
 <a href="http://www.sleepycat.com/">SleepyCat Software</a>.
-Versions 3.3.11, 3.2.9, 3.1.17, 3.1.14, 2.7.7 and 2.4.14 (the version that
-comes with RedHat 6.2) have been tested and work.  Some systems do
+Versions 3.3.11, 3.2.9, 3.1.17, 3.1.14, 2.7.7 and 2.4.14
+have been tested and work.  Some systems do
 not come installed with a working Berkeley/Sleepcat DB so on those
 systems, Redland will have no persistent storage unless BDB is built
 separately.</p>
@@ -348,6 +358,11 @@ full information on installing and using Redland from Tcl, and/or Tcl/Tk.</p>
 
 <p>See the <a href="docs/java.html">Redland Java Interface</a> document for
 full information on installing and using Redland from Java.</p>
+
+<h2>7. Using the Ruby interface</h2>
+
+<p>See the <a href="docs/ruby.html">Redland Ruby Interface</a> document for
+full information on installing and using Redland from Ruby.</p>
 
 
 
