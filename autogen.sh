@@ -238,10 +238,10 @@ do
   else
     echo $program: Processing directory $dir
     ( cd $dir
-      aclocalinclude="$ACLOCAL_FLAGS"
       echo "$program: Running libtoolize --copy --automake"
       $DRYRUN libtoolize --copy --automake
 
+      aclocalinclude="$ACLOCAL_FLAGS"
       echo "$program: Running aclocal $aclocalinclude"
       $DRYRUN $aclocal $aclocal_args
       if grep "^AM_CONFIG_HEADER" configure.ac >/dev/null; then
