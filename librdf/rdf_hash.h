@@ -158,6 +158,7 @@ librdf_iterator* librdf_hash_get_all(librdf_hash* hash, librdf_hash_datum *key, 
 
 /* insert a key/value pair */
 int librdf_hash_put(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
+int librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value);
 
   /* returns true if key exists in hash, without returning value */
 int librdf_hash_exists(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
