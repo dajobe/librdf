@@ -43,8 +43,12 @@ typedef struct
 } librdf_hash_descriptor;
 
 
+#ifdef LIBRDF_STORAGE_HASH_GROUPS
 /* FIXME: STATIC */
 #define NUMBER_OF_HASHES 4
+#else
+#define NUMBER_OF_HASHES 3
+#endif
 
 static const librdf_hash_descriptor librdf_storage_hashes_descriptions[NUMBER_OF_HASHES]= {
   {"sp2o",
@@ -55,10 +59,12 @@ static const librdf_hash_descriptor librdf_storage_hashes_descriptions[NUMBER_OF
    LIBRDF_STATEMENT_SUBJECT},  /* For 'get sources' */
   {"so2p", 
    LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_OBJECT,
-   LIBRDF_STATEMENT_PREDICATE},  /* For 'get arcs' */
-  {"groups",
+   LIBRDF_STATEMENT_PREDICATE}  /* For 'get arcs' */
+#ifdef LIBRDF_STORAGE_HASH_GROUPS
+  ,{"groups",
    0L, /* for groups - do not touch when storing statements! */
    0L}
+#endif
 };
 
 
@@ -91,8 +97,9 @@ typedef struct
   int arcs_index;
   int targets_index;
 
+#ifdef LIBRDF_STORAGE_HASH_GROUPS
   int groups_index;
-  
+#endif
 } librdf_storage_hashes_context;
 
 
@@ -205,8 +212,10 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
   context->sources_index= -1;
   context->arcs_index= -1;
   context->targets_index= -1;
+#ifdef LIBRDF_STORAGE_HASH_GROUPS
   /* and index for groups (no key or value fields) */
   context->groups_index= -1;
+#endif
   for(i=0; i<context->hash_count; i++) {
     int key_fields=context->hash_descriptions[i].key_fields;
     int value_fields=context->hash_descriptions[i].value_fields;
@@ -221,7 +230,9 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
               value_fields == LIBRDF_STATEMENT_PREDICATE) {
       context->arcs_index=i;
     } else if(!key_fields || !value_fields) {
-      context->groups_index=i;
+#ifdef LIBRDF_STORAGE_HASH_GROUPS
+       context->groups_index=i;
+#endif
     }
   }
 
@@ -984,7 +995,7 @@ librdf_storage_hashes_find_targets(librdf_storage* storage,
                                                     LIBRDF_STATEMENT_OBJECT);
 }
 
-
+#ifdef LIBRDF_STORAGE_HASH_GROUPS
 /**
  * librdf_storage_hashes_group_add_statement - Add a statement to a storage group
  * @storage: &librdf_storage object
@@ -1165,6 +1176,34 @@ librdf_storage_hashes_group_serialise_finished(void* context)
 
   LIBRDF_FREE(librdf_storage_hashes_group_serialise_stream_context, scontext);
 }
+
+
+#else
+/* !LIBRDF_STORAGE_HASH_GROUPS */
+static int
+librdf_storage_hashes_group_add_statement(librdf_storage* storage,
+                                          librdf_uri* group_uri,
+                                          librdf_statement* statement) 
+{
+ return 0;
+}
+static int
+librdf_storage_hashes_group_remove_statement(librdf_storage* storage, 
+                                             librdf_uri* group_uri,
+                                             librdf_statement* statement) 
+{
+ return 0;
+}
+
+static librdf_stream*
+librdf_storage_hashes_group_serialise(librdf_storage* storage,
+                                      librdf_uri* group_uri) 
+{
+ return NULL;
+}
+
+#endif
+/* end !LIBRDF_STORAGE_HASH_GROUPS */
 
 
 /* local function to register hashes storage functions */
