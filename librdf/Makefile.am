@@ -113,7 +113,7 @@ librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
-rdf_query_test
+rdf_query_test rdf_serializer_test
 
 EXAMPLES=example1 example2 example3 example4
 
