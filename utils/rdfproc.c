@@ -93,7 +93,7 @@ typedef struct
 static command commands[]={
   {CMD_PRINT, "print", 0, 0, 0,},
   {CMD_CONTAINS, "contains", 3, 3, 0},
-  {CMD_FIND, "find", 3, 3, 0},
+  {CMD_FIND, "find", 3, 4, 0},
   {CMD_SOURCES, "sources", 2, 2, 0},
   {CMD_ARCS, "arcs", 2, 2, 0},
   {CMD_TARGETS, "targets", 2, 2, 0},
@@ -402,8 +402,7 @@ main(int argc, char *argv[])
     /* FIXME Not a query -> results table query, so leave out for now */
     puts("  query NAME URI|- QUERY-STRING             Query for matching triples");
 #endif
-    puts("  find SUBJECT|- PREDICATE|- OBJECT|-       Find matching triples");
-    puts("                                            where - matches any node.");
+    puts("  find SUBJECT|- PREDICATE|- OBJECT|- [CONTEXT] Find matching triples");
     puts("  contains SUBJECT PREDICATE OBJECT         Check if triple is in the graph.");
     puts("  add SUBJECT PREDICATE OBJECT [CONTEXT]    Add triple to graph.");
     puts("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]");
@@ -417,6 +416,7 @@ main(int argc, char *argv[])
     puts("\nNotation:");
     puts("  nodes are either blank node identifiers like _:ABC,");
     puts("    URIs like http://example.org otherwise are literal strings.");
+    puts("    - matches any node when allowed.");
     puts("  triples are three nodes (subject, predicate, object)");
     puts("    predicates cannot be blank node identifiers, only objects can be literals");
     puts("  source means subject of triples matching (?,  NODE1, NODE2)");
@@ -696,13 +696,24 @@ main(int argc, char *argv[])
         case CMD_FIND:
         case CMD_QUERY:
           /* Print out matching statements */
-          if(type==CMD_FIND)
-            stream=librdf_model_find_statements(model, partial_statement);
-          else
+          if(type==CMD_FIND) {
+            if(argc == 4) {
+              librdf_node *context_node;
+              
+              if (librdf_heuristic_is_blank_node(argv[3]))
+                context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
+              else
+                context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
+              stream=librdf_model_find_statements_in_context(model, partial_statement, context_node);
+              librdf_free_node(context_node);
+            } else
+              stream=librdf_model_find_statements(model, partial_statement);
+          } else
             stream=librdf_model_query(model, query);
+
           if(!stream) {
             fprintf(stderr, "%s: %s returned NULL stream\n", program,
-                    ((type==CMD_FIND) ? "librdf_model_find_statements" : "librdf_model_query"));
+                    ((type==CMD_FIND) ? (argc ==4 ? "librdf_model_find_statements_in_context" : "librdf_model_find_statements") : "librdf_model_query"));
           } else {
             count=0;
             while(!librdf_stream_end(stream)) {
