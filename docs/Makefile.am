@@ -25,7 +25,7 @@ EXTRA_DIST=api.sgml.in api.sgml README.html README \
 csharp.html perl.html python.html tcl.html java.html ruby.html php.html \
 storage.html \
 build-docs fix-pod-xhtml fix-python-xhtml \
-overview.png overview.ps overview.pdf api pod pydoc \
+api pod pydoc \
 redland.pod kernel-doc \
 $(man_MANS)
 
