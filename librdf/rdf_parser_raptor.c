@@ -35,6 +35,7 @@
 #include <rdf_list.h>
 
 #include <raptor.h>
+#include <ntriples.h>
 
 
 /* serialising implementing functions */
@@ -47,16 +48,16 @@ static void librdf_parser_raptor_serialise_finished(void* context);
 static librdf_stream* librdf_parser_raptor_parse_common(void *context, librdf_uri *uri, librdf_uri* base_uri, librdf_model *model);
 
 
-/* not used at present */
 typedef struct {
   librdf_parser *parser;        /* librdf parser object */
-  raptor_parser *rdf_parser;    /* Raptor parser object */
+  int is_ntriples;
 } librdf_parser_raptor_context;
 
 
 typedef struct {
   librdf_parser_raptor_context* pcontext; /* parser context */
   raptor_parser *rdf_parser;      /* source URI string (for raptor) */
+  raptor_ntriples_parser *ntriples_parser; /* source URI string (for raptor) */
   librdf_statement* next;   /* next statement */
   librdf_model *model;      /* model to store in */
   librdf_list statements;  /* OR list to store statements (STATIC) */
@@ -80,6 +81,8 @@ librdf_parser_raptor_init(librdf_parser *parser, void *context)
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
 
   pcontext->parser = parser;
+  pcontext->is_ntriples=(pcontext->parser->factory->name && 
+                         !strcmp(pcontext->parser->factory->name, "ntriples"));
   
   /* always succeeds ? */  
   return 0;
@@ -118,10 +121,16 @@ librdf_parser_raptor_new_statement_handler (void *context,
   if(!statement)
     return;
   
-  node=librdf_new_node_from_normalised_uri_string(world,
-                                                  librdf_uri_as_string((librdf_uri*)rstatement->subject),
-                                                  scontext->source_uri,
-                                                  scontext->base_uri);
+  if(rstatement->subject_type == RAPTOR_SUBJECT_TYPE_ANONYMOUS) {
+    node=librdf_new_node_from_uri_string(world,
+                                         librdf_uri_as_string((librdf_uri*)rstatement->subject));
+  } else {
+    node=librdf_new_node_from_normalised_uri_string(world,
+                                                    librdf_uri_as_string((librdf_uri*)rstatement->subject),
+                                                    scontext->source_uri,
+                                                    scontext->base_uri);
+  }
+  
   librdf_statement_set_subject(statement, node);
   
   if(rstatement->predicate_type == RAPTOR_PREDICATE_TYPE_ORDINAL) {
@@ -130,11 +139,12 @@ librdf_parser_raptor_new_statement_handler (void *context,
     sprintf(ordinal_buffer, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_%d", ordinal);
     
     node=librdf_new_node_from_uri_string(world, ordinal_buffer);
-  } else
+  } else {
     node=librdf_new_node_from_normalised_uri_string(world,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->predicate),
                                                     scontext->source_uri,
                                                     scontext->base_uri);
+  }
   librdf_statement_set_predicate(statement, node);
 
 
@@ -146,6 +156,9 @@ librdf_parser_raptor_new_statement_handler (void *context,
                                 librdf_new_node_from_literal(world,
                                                              rstatement->object,
                                                              NULL, 0, is_xml_literal));
+  } else if(rstatement->object_type == RAPTOR_OBJECT_TYPE_ANONYMOUS) {
+    node=librdf_new_node_from_uri_string(world,
+                                         librdf_uri_as_string((librdf_uri*)rstatement->object));
   } else if(rstatement->object_type == RAPTOR_OBJECT_TYPE_RESOURCE) {
     node=librdf_new_node_from_normalised_uri_string(world,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->object),
@@ -240,6 +253,7 @@ librdf_parser_raptor_parse_common(void *context,
   librdf_parser_raptor_stream_context* scontext;
   librdf_stream *stream;
   raptor_parser *rdf_parser;
+  raptor_ntriples_parser *ntriples_parser;
   int rc;
   librdf_world *world=uri->world;
   
@@ -247,16 +261,28 @@ librdf_parser_raptor_parse_common(void *context,
   if(!scontext)
     return NULL;
 
-  rdf_parser=raptor_new(world);
-  if(!rdf_parser)
-    return NULL;
+  if(pcontext->is_ntriples) {
+    ntriples_parser=raptor_ntriples_new(world);
+    if(!ntriples_parser)
+      return NULL;
   
-  raptor_set_statement_handler(rdf_parser, scontext, 
-                               librdf_parser_raptor_new_statement_handler);
+    raptor_ntriples_set_statement_handler(ntriples_parser, scontext, 
+                                          librdf_parser_raptor_new_statement_handler);
+    
+    scontext->ntriples_parser=ntriples_parser;
+  } else {
+    rdf_parser=raptor_new(world);
+    if(!rdf_parser)
+      return NULL;
+  
+    raptor_set_statement_handler(rdf_parser, scontext, 
+                                 librdf_parser_raptor_new_statement_handler);
+    
+    raptor_set_feature(rdf_parser, RAPTOR_FEATURE_SCANNING, 1);
 
-  raptor_set_feature(rdf_parser, RAPTOR_FEATURE_SCANNING, 1);
-
-  scontext->rdf_parser=rdf_parser;
+    scontext->rdf_parser=rdf_parser;
+  }
+  
 
   scontext->pcontext=pcontext;
   scontext->source_uri = uri;
@@ -275,7 +301,10 @@ librdf_parser_raptor_parse_common(void *context,
   }
 
   /* Do the work all in one go - should do incrementally - FIXME */
-  rc=raptor_parse_file(rdf_parser, uri, base_uri);
+  if(pcontext->is_ntriples)
+    rc=raptor_ntriples_parse_file(ntriples_parser, uri, base_uri);
+  else
+    rc=raptor_parse_file(rdf_parser, uri, base_uri);
 
   /* Above line does it all for adding to model */
   if(model) {
@@ -390,6 +419,9 @@ librdf_parser_raptor_serialise_finished(void* context)
     if(scontext->rdf_parser)
       raptor_free(scontext->rdf_parser);
 
+    if(scontext->ntriples_parser)
+      raptor_ntriples_free(scontext->ntriples_parser);
+
     /* Empty static list of any remaining things */
     while((statement=(librdf_statement*)librdf_list_pop(&scontext->statements)))
       librdf_free_statement(statement);
@@ -427,5 +459,8 @@ void
 librdf_parser_raptor_constructor(librdf_world *world)
 {
   librdf_parser_register_factory(world, "raptor", NULL, NULL,
+                                 &librdf_parser_raptor_register_factory);
+  librdf_parser_register_factory(world, "ntriples", "text/plain",
+                                 "http://purl.org/net/dajobe/2001/06/ntriples/",
                                  &librdf_parser_raptor_register_factory);
 }
