@@ -717,20 +717,42 @@ if test "X$MYSQL_CONFIG" != X; then
 fi
 
 
-AC_MSG_CHECKING(for sqlite library)
-sqlite_version=
+AC_ARG_WITH(sqlite-version, [  --with-sqlite-version(=2|3) SQLite version to use (default=auto)], sqlite_api_version="$withval", sqlite_api_version="auto")
+
+AC_MSG_CHECKING(for sqlite library versions available)
+sqlite_versions=
 if test "X$PKG_CONFIG" != X ; then
   sqlite_version=`$PKG_CONFIG sqlite3 --modversion 2>/dev/null`
   if test "X$sqlite_version" != X; then
-    SQLITE_CONFIG="$PKG_CONFIG sqlite3"
-  else
-    sqlite_version=`$PKG_CONFIG sqlite2 --modversion 2>/dev/null`
-    if test "X$sqlite_version" != X; then
-      SQLITE_CONFIG="$PKG_CONFIG sqlite2"
+    if test "X$sqlite_api_version" = Xauto; then
+      sqlite_api_version=3
     fi
+    sqlite_versions=$sqlite_version
+  fi
+  sqlite_version=`$PKG_CONFIG sqlite --modversion 2>/dev/null`
+  if test "X$sqlite_version" != X; then
+    if test "X$sqlite_api_version" = Xauto; then
+      sqlite_api_version=2
+    fi
+    sqlite_versions="$sqlite_version $sqlite_versions"
   fi
 fi
-if test "X$sqlite_version" != X ; then
+AC_MSG_RESULT($sqlite_versions)
+
+if test "X$sqlite_api_version" = Xauto; then
+  sqlite_api_version=none
+fi
+
+AC_MSG_CHECKING(using sqlite library)
+if test "X$sqlite_api_version" != Xnone ; then
+  if test "$sqlite_api_version" = 3; then
+    SQLITE_CONFIG="$PKG_CONFIG sqlite3"
+  else
+    SQLITE_CONFIG="$PKG_CONFIG sqlite"
+  fi
+  sqlite_version=`$SQLITE_CONFIG --modversion 2>/dev/null`
+  AC_DEFINE_UNQUOTED(SQLITE_API, $sqlite_api_version, [SQLite API version])
+
   storages_available="$storages_available sqlite($sqlite_version)"
   sqlite_storage_available=yes
   AC_MSG_RESULT(yes - version $sqlite_version)
