@@ -264,11 +264,11 @@ main(int argc, char *argv[])
     if(librdf_parser_parse_into_model(parser, uri, model)) {
       fprintf(stderr, "%s: Failed to parse RDF into model\n", program);
       librdf_free_parser(parser);
-      librdf_new_uri(uri);
+      librdf_free_uri(uri);
       break;
     }
     librdf_free_parser(parser);
-    librdf_new_uri(uri);
+    librdf_free_uri(uri);
     break;
   case CMD_CONTAINS:
   case CMD_STATEMENTS:
