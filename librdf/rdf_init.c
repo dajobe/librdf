@@ -38,7 +38,7 @@ void rdf_init_world(char *digest_factory_name)
 {
   rdf_digest_factory* digest_factory;
 
-  digest_factory=get_rdf_digest_factory(digest_factory_name);
+  digest_factory=rdf_get_digest_factory(digest_factory_name);
 
   rdf_init_digest();
   rdf_init_hash();

@@ -82,7 +82,7 @@ rdf_digest_register_factory(const char *name,
  * @returns the factory or NULL if not found
  */
 rdf_digest_factory*
-get_rdf_digest_factory(const char *name) 
+rdf_get_digest_factory(const char *name) 
 {
   rdf_digest_factory *factory;
 
@@ -90,7 +90,7 @@ get_rdf_digest_factory(const char *name)
   if(!name) {
     factory=digests;
     if(!factory) {
-      RDF_DEBUG1(get_rdf_digest_factory, "No digests available\n");
+      RDF_DEBUG1(rdf_get_digest_factory, "No digests available\n");
       return NULL;
     }
   } else {
@@ -101,7 +101,7 @@ get_rdf_digest_factory(const char *name)
     }
     /* else FACTORY with name digest_name not found */
     if(!factory) {
-      RDF_DEBUG2(get_rdf_digest_factory, "No digest with name %s found\n",
+      RDF_DEBUG2(rdf_get_digest_factory, "No digest with name %s found\n",
               name);
       return NULL;
     }
@@ -289,7 +289,7 @@ main(int argc, char *argv[])
 
   for(i=0; (type=test_digest_types[i]); i++) {
     fprintf(stderr, "%s: Trying to create new %s digest\n", program, type);
-    factory=get_rdf_digest_factory(type);
+    factory=rdf_get_digest_factory(type);
     if(!factory) {
       fprintf(stderr, "%s: No digest factory called %s\n", program, type);
       continue;

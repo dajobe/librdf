@@ -54,7 +54,7 @@ rdf_digest_register_factory(const char *name,
                             );
 
 rdf_digest_factory*
-get_rdf_digest_factory(const char *name);
+rdf_get_digest_factory(const char *name);
 
 
 /* module init */

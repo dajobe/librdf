@@ -91,7 +91,7 @@ void rdf_init_hash(void);
 void rdf_hash_register_factory(const char *name,
                                void (*factory) (rdf_hash_factory*)
                                );
-rdf_hash_factory* get_rdf_hash_factory(const char *name);
+rdf_hash_factory* rdf_get_hash_factory(const char *name);
 
 /* constructor */
 rdf_hash* rdf_new_hash(rdf_hash_factory* factory);

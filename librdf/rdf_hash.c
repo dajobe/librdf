@@ -102,7 +102,7 @@ void rdf_hash_register_factory(const char *name,
  * @returns the factory object or NULL if there is no such factory
  */
 rdf_hash_factory*
-get_rdf_hash_factory (const char *name) 
+rdf_get_hash_factory (const char *name) 
 {
   rdf_hash_factory *factory;
 
@@ -110,7 +110,7 @@ get_rdf_hash_factory (const char *name)
   if(!name) {
     factory=hashes;
     if(!factory) {
-      RDF_DEBUG1(get_rdf_hash_factory, "No (default) hashes registered\n");
+      RDF_DEBUG1(rdf_get_hash_factory, "No (default) hashes registered\n");
       return NULL;
     }
   } else {
@@ -121,7 +121,7 @@ get_rdf_hash_factory (const char *name)
     }
     /* else FACTORY name not found */
     if(!factory) {
-      RDF_DEBUG2(get_rdf_hash_factory, "No hash with name %s found\n",
+      RDF_DEBUG2(rdf_get_hash_factory, "No hash with name %s found\n",
               name);
       return NULL;
     }
@@ -581,7 +581,7 @@ main(int argc, char *argv[])
   rdf_init_hash();
 
   if(argc ==2) {
-    factory=get_rdf_hash_factory(NULL);
+    factory=rdf_get_hash_factory(NULL);
     if(!factory) {
       fprintf(stderr, "%s: No hash factory called '%s'\n", program, type);
       return(0);
@@ -607,7 +607,7 @@ main(int argc, char *argv[])
 
   for(i=0; (type=test_hash_types[i]); i++) {
     fprintf(stderr, "%s: Trying to create new %s hash\n", program, type);
-    factory=get_rdf_hash_factory(type);
+    factory=rdf_get_hash_factory(type);
     if(!factory) {
       fprintf(stderr, "%s: No hash factory called '%s'\n", program, type);
       continue;
@@ -653,7 +653,7 @@ main(int argc, char *argv[])
 
   
   fprintf(stderr, "%s: Getting default hash factory\n", program);
-  default_factory=get_rdf_hash_factory(NULL);
+  default_factory=rdf_get_hash_factory(NULL);
   if(!default_factory) {
     fprintf(stderr, "%s: No default hash factory found\n", program);
     return(0);
