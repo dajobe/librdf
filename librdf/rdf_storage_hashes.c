@@ -587,6 +587,8 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
       break;
   }
 
+  librdf_free_statement(statement);
+
   return status;
 }
 
