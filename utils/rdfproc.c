@@ -405,10 +405,20 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(h, "help            ", "Print this help, then exit"));
     puts(HELP_TEXT(n, "new             ", "Create a new store (default no)"));
     puts(HELP_TEXT(o, "output FORMAT   ", "Set the triple output format to one of:"));
-    puts("    'simple'                A simple format (default)\n    'ntriples'              N-Triples\n    'rdfxml'                RDF/XML");
+    puts("    simple                  A simple format (default)\n    ntriples                N-Triples\n    rdfxml                  RDF/XML");
     puts(HELP_TEXT(p, "password        ", "Read storage option 'password' from standard input"));
     puts(HELP_TEXT(s, "storage TYPE    ", "Set the graph storage type"));
-    puts("    'memory'                In memory\n    'hashes'                Indexed hashes (default)\n    'mysql'                 MySQL - when available\n    '3store'                AKT triplestore - when available");
+    for(i=0; 1; i++) {
+      const char *help_name;
+      const char *help_label;
+      if(librdf_storage_enumerate(i, &help_name, &help_label))
+        break;
+      printf("    %-10s              %s", help_name, help_label);
+      if(!i)
+        puts(" (default)");
+      else
+        putchar('\n');
+    }
     printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Storage options (default \"%s\")\n"), default_storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
