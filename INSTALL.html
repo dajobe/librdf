@@ -115,6 +115,23 @@ by an autoconf macro and seems to be an autoconf bug.)</p>
 such as <code>--prefix</code> etc.</p>
 
 <dl>
+<dt><code>--enable-digests=LIST</code><br /></dt>
+<dd><p>Select the list of content digests to be included if the are
+availble.  The valid list of digests are: <code>md5 sha1
+ripem160</code> (the default).  The digest functions can be provided
+by external libraries such as the
+<a href="http://www.openssl.org/">OpenSSL</a> libcrypto library or by
+provided portable versions (only MD5 supported in this
+release).</p></dd>
+
+<dt><code>--enable-parsers=LIST</code><br /></dt>
+<dd><p>Select the list of RDF parsers to be included if the are availble.  The
+valid list of RDF parsers is currently only <code>raptor</code> (the default)
+since the older repat parser has been removed.  Raptor uses either of
+libxml2 (prefered) or expat.  Redland requires the Raptor parser for
+other functionality, so it cannot be disabled.
+</p></dd>
+
 <dt><code>--with-bdb=ROOT</code><br /></dt>
 <dd><p>Enable use of the Berkeley / Sleepycat DB library installed at
 <em>ROOT</em>.  That means <em>ROOT</em><code>/include</code> must
@@ -208,16 +225,15 @@ at present.
 </p>
 </dd>
 
-<dt><code>--enable-parsers=LIST</code><br /></dt>
-<dd><p>Select the list of RDF parsers to be included if the are availble.  The
-valid list of RDF parsers is currently only <code>raptor</code> (the default)
-since the older repat parser has been removed.  Raptor uses either of
-libxml2 (prefered) or expat.  Redland requires the Raptor parser for
-other functionality, so it cannot be disabled.
-</p></dd>
+<dt><code>--with-mysql</code>(<code>=</code><em>CONFIG</em>|<code>=yes</code>|<code>=no</code><br /></dt>
+<dd><p>Enable use of the Redland MySQL 4.x triple store backend using
+<em>CONFIG</em> for the <em>mysql_config</em> program. The default
+when either no argument is given, or <code>--with-mysql</code> alone,
+is to search for <em>mysql_config</em> on the search PATH.  With
+<code>--with-mysql=no</code>, this store is disabled.</p></dd>
 
 <dt><code>--with-openssl-digests</code><br /></dt>
-<dd><p>Enable digests provided by the
+<dd><p>Enable the content digests provided by the
 <a href="http://www.openssl.org/">OpenSSL</a>
 libcrypto library (MD5, SHA1 and RIPEMD160) if the library is
 available. configure will automatically enable this unless disabled
@@ -233,6 +249,14 @@ is used and redland discovers that the system raptor is too old,
 a warning will be given but the configuration will continue.
 </p></dd>
 
+<dt><code>--with-threestore</code>(<code>=</code><em>CONFIG</em>|<code>=yes</code>|<code>=no</code><br /></dt>
+<dd><p>Enable use of the AKT project
+<a href="http://www.aktors.org/technologies/3store/">3store triple store</a>
+backend using <em>CONFIG</em>
+for the <em>3store-config</em> program. The default when either
+no argument is given, or <code>--with-threestore</code> alone, is to search for
+the 3store-config on the search PATH.  With
+<code>--with-threestore=no</code>, this store is disabled.</p></dd>
 
 <dt><code>--with-xml-parser=NAME</code><br /></dt>
 <dd><p>Pick an XML parser to use for Raptor - either <code>libxml</code>
@@ -247,14 +271,6 @@ that are described further in the Raptor
 documentation.
 </p>
 </dd>
-
-<dt><code>--enable-digests=LIST</code><br /></dt>
-<dd><p>Select the list of digests to be included if the are availble.  The
-valid list of digests are: <code>md5 sha1 ripem160</code> (the default).  The
-digest functions can be provided by external libraries such as
-the <a href="http://www.openssl.org/">OpenSSL</a>
-libcrypto library or by provided portable
-versions (only MD5 supported in this release).</p></dd>
 
 </dl>
 
