@@ -259,14 +259,14 @@ librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash)
 const char *
 librdf_world_get_feature(librdf_world* world, librdf_uri *feature) 
 {
-  abort();
+  return NULL; /* none retrievable */
 }
 
 int
 librdf_world_set_feature(librdf_world* world, librdf_uri *feature,
                          const char *value) 
 {
-  abort();
+  return 1; /* none available */
 }
 
 
