@@ -270,7 +270,7 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
  * @predicate: &librdf_node of predicate
  * @string: string literal conten
  * @xml_language: language of literal
- * @xml_space: XML space properties
+ * @unused1: Not used
  * @is_wf_xml: literal is XML
  * 
  * The language can be set to NULL if not used.
@@ -284,14 +284,14 @@ int
 librdf_model_add_string_literal_statement(librdf_model* model, 
 					  librdf_node* subject, 
 					  librdf_node* predicate, char* string,
-					  char *xml_language, int xml_space,
+					  char *xml_language, int unused1,
                                           int is_wf_xml)
 {
   librdf_node* object;
   int result;
   
   object=librdf_new_node_from_literal(model->world,
-                                      string, xml_language, xml_space, 
+                                      string, xml_language, 0, 
                                       is_wf_xml);
   if(!object)
     return 1;
