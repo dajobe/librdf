@@ -558,6 +558,16 @@ librdf_model_storage_set_feature(librdf_model* model, librdf_uri* feature,
 }
 
 
+static librdf_stream*
+librdf_model_storage_find_statements_with_options(librdf_model* model,
+                                                  librdf_statement* statement,
+                                                  librdf_node* context_node,
+                                                  librdf_hash* options) 
+{
+  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
+  return librdf_storage_find_statements_with_options(context->storage, statement, context_node, options);
+}
+
 /* local function to register model_storage functions */
 
 static void
@@ -600,6 +610,7 @@ librdf_model_storage_register_factory(librdf_model_factory *factory)
   factory->get_contexts       = librdf_model_storage_get_contexts;
   factory->get_feature        = librdf_model_storage_get_feature;
   factory->set_feature        = librdf_model_storage_set_feature;
+  factory->find_statements_with_options = librdf_model_storage_find_statements_with_options;
 }
 
 
