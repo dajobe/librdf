@@ -127,6 +127,14 @@ librdf_free_world(librdf_world *world)
 #ifdef WITH_THREADS
    if (world->mutex)
    {
+     pthread_mutex_destroy(world->statements_mutex);
+     SYSTEM_FREE(world->statements_mutex);
+     world->statements_mutex = NULL;
+
+     pthread_mutex_destroy(world->nodes_mutex);
+     SYSTEM_FREE(world->nodes_mutex);
+     world->nodes_mutex = NULL;
+
      pthread_mutex_destroy(world->mutex);
      SYSTEM_FREE(world->mutex);
      world->mutex = NULL;
@@ -149,6 +157,12 @@ librdf_world_init_mutex(librdf_world* world)
 #ifdef WITH_THREADS
   world->mutex = (pthread_mutex_t *) SYSTEM_MALLOC(sizeof(pthread_mutex_t));
   pthread_mutex_init(world->mutex, NULL);
+
+  world->nodes_mutex = (pthread_mutex_t *) SYSTEM_MALLOC(sizeof(pthread_mutex_t));
+  pthread_mutex_init(world->nodes_mutex, NULL);
+
+  world->statements_mutex = (pthread_mutex_t *) SYSTEM_MALLOC(sizeof(pthread_mutex_t));
+  pthread_mutex_init(world->statements_mutex, NULL);
 #else
 #endif
 }
