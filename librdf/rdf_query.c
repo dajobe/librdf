@@ -40,8 +40,8 @@
 /* prototypes for helper functions */
 static void librdf_delete_query_factories(librdf_world *world);
 
-static void librdf_query_add_query_result(librdf_query *query);
-static void librdf_query_remove_query_result(librdf_query *query);
+static void librdf_query_add_query_result(librdf_query *query, librdf_query_results* query_results);
+static void librdf_query_remove_query_result(librdf_query *query, librdf_query_results* query_results);
 
 
 /**
@@ -353,6 +353,7 @@ librdf_free_query(librdf_query* query)
 
   if(query->context)
     LIBRDF_FREE(librdf_query_context, query->context);
+
   LIBRDF_FREE(librdf_query, query);
 }
 
@@ -361,16 +362,31 @@ librdf_free_query(librdf_query* query)
 
 
 static void
-librdf_query_add_query_result(librdf_query *query)
+librdf_query_add_query_result(librdf_query *query,
+                              librdf_query_results* query_results)
 {
+  query_results->next=query->results;
+  query->results=query_results;
   /* add reference to ensure query lives as long as this runs */
   query->usage++;
 }
 
 
 static void
-librdf_query_remove_query_result(librdf_query *query)
+librdf_query_remove_query_result(librdf_query *query,
+                                 librdf_query_results* query_results)
 {
+  librdf_query_results *cur, *prev=NULL;
+  for(cur=query->results; cur && cur != query_results; cur=cur->next)
+    prev=cur;
+  
+  if(cur == query_results) {
+    if(prev)
+      prev->next=cur->next;
+  }
+  if(cur == query->results && cur != NULL)
+    query->results=cur->next;
+
   /* remove reference and free if we are the last */
   librdf_free_query(query);
 }
@@ -396,7 +412,7 @@ librdf_query_execute(librdf_query* query, librdf_model* model)
 
   if(query->factory->execute) {
     if((results=query->factory->execute(query, model)))
-      librdf_query_add_query_result(query);
+      librdf_query_add_query_result(query, results);
   }
   
   return results;
@@ -598,7 +614,7 @@ librdf_free_query_results(librdf_query_results* query_results)
   if(query_results->query->factory->free_results)
     query_results->query->factory->free_results(query_results);
 
-  librdf_query_remove_query_result(query_results->query);
+  librdf_query_remove_query_result(query_results->query, query_results);
 
   LIBRDF_FREE(librdf_query_results, query_results);
 }
