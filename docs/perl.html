@@ -44,10 +44,36 @@ program with:</p>
 
 <p>and the result should be:</p>
 <pre>
+  Creating storage
+
+  Creating model
+
+  Creating statement
+
+  Adding statement to model
+
+  Parsing URI (file) dc.rdf
+  Parsing added 3 statements
+
+  Printing all statements
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
   Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
-  Subject: [http://purl.org/net/dajobe/]
-  Predicate: [http://purl.org/dc/elements/1.1/creator]
-  Object: Dave Beckett
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page of Dave Beckett."}
+
+  Searching model for statements matching predicate http://purl.org/dc/elements/1.1/creator
+  Matching Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+    Subject: [http://purl.org/net/dajobe/]
+    Predicate: [http://purl.org/dc/elements/1.1/creator]
+    Object: Dave Beckett
+  Matching Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+    Subject: [http://purl.org/net/dajobe/]
+    Predicate: [http://purl.org/dc/elements/1.1/creator]
+    Object: Dave Beckett
+
+  Writing model to test-out.rdf as rdf/xml
+
+Done
 </pre>
 
 
