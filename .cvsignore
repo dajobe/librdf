@@ -5,7 +5,6 @@
 *.rdfs
 *.rss
 *.xml
-*.triples
 *.log
 *test
 *results
@@ -17,11 +16,13 @@ LICENSE.txt
 Makefile
 Makefile.in
 MANIFEST
+MANIFEST.SKIP
 NEWS
 README
 TODO
 aclocal.m4
 admin
+autom4te.cache
 config.cache
 config.guess
 config.log
@@ -31,10 +32,14 @@ configure
 dmalloc*
 install-sh
 libtool
+ltmain.sh
 missing
 mkinstalldirs
 not-used
 notes
+patches
+redland-config
+redland-src-config
 releases
 saved
 stamp-h*
