@@ -353,10 +353,6 @@ librdf_world* librdf_new_world(void);
 void librdf_free_world(librdf_world *world);
 void librdf_world_open(librdf_world *world);
 
-/* OLD: */
-void librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash);
-void librdf_destroy_world(void);
-
 /* rdf_iterator.h */
 void librdf_free_iterator(librdf_iterator*);
 int librdf_iterator_have_elements(librdf_iterator* iterator);
@@ -432,7 +428,6 @@ int librdf_model_add_statements(librdf_model* model, librdf_stream* statement_st
 int librdf_model_remove_statement(librdf_model* model, librdf_statement* statement);
 int librdf_model_contains_statement(librdf_model* model, librdf_statement* statement);
 librdf_stream* librdf_model_as_stream(librdf_model* model);
-librdf_stream* librdf_model_serialise(librdf_model* model);
 librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
 librdf_iterator* librdf_model_get_sources(librdf_model *model, librdf_node *arc, librdf_node *target);
 librdf_iterator* librdf_model_get_arcs(librdf_model *model, librdf_node *source, librdf_node *target);
@@ -445,7 +440,6 @@ int librdf_model_context_add_statements(librdf_model* model, librdf_node* contex
 int librdf_model_context_remove_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
 int librdf_model_context_remove_statements(librdf_model* model, librdf_node* context);
 librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* context);
-librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* context);
 void librdf_model_sync(librdf_model* model);
 
 /* rdf_storage.h */
