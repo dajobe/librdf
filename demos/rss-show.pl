@@ -328,12 +328,15 @@ EOT
 
 print <<"EOT";
 
-<p>You can find other feeds at the
-<a href="http://groups.yahoo.com/group/rss-dev/links/Feeds_000966335046/">RSS-Dev listing</a>,
-<a href="http://www.blogspace.com/rss/">RSS Info</a> and you
-can construct them from the
-<a href="http://www1.chi.netlojix.com/cgi-bin/xmlnews2rss.cgi">Netlojix XMLNews to RSS</a>
-and <a href="http://www.tnl.net/how/asp/rss">RSSup</a>.
+<p>You can find other feeds in various places
+such as the
+<a href="http://www.oreillynet.com/meerkat/">Meerkat</a>,
+<a href="http://www.newsisfree.com/">News Is Free</a> and
+<a href="http://www.syndic8.com/">Syndic8</a>
+RSS aggregrators.  You can make them yourself with
+online tools such as <a href="http://rssxpress.ukoln.ac.uk/">RSS-xpress</a>
+(which also has a list of RSS 1.0 feeds)
+or <a href="http://www.tnl.net/how/asp/rss">RSSup</a>.
 </p>
 
 EOT
