@@ -63,15 +63,26 @@ typedef struct
   /* hash of model name in the database (table Models, column ID) */
   u64 model;
 
+  /* if inserts should be optimized by locking and index optimizations */
+  int bulk;
+
+  /* if a table with merged models should be maintained */
+  int merge;
+
+  /* digest object for node hashes */
+  librdf_digest *digest;
+
 } librdf_storage_mysql_context;
 
 /* prototypes for local functions */
 static int librdf_storage_mysql_init(librdf_storage* storage, char *name,
                                      librdf_hash* options);
+static int librdf_storage_mysql_merge(librdf_storage* storage);
 static void librdf_storage_mysql_terminate(librdf_storage* storage);
 static int librdf_storage_mysql_open(librdf_storage* storage,
                                      librdf_model* model);
 static int librdf_storage_mysql_close(librdf_storage* storage);
+static void librdf_storage_mysql_sync(librdf_storage* storage);
 static int librdf_storage_mysql_size(librdf_storage* storage);
 static int librdf_storage_mysql_add_statement(librdf_storage* storage,
                                               librdf_statement* statement);
@@ -139,6 +150,8 @@ static u64 librdf_storage_mysql_hash(librdf_storage* storage, char *type,
                                      char *string, int length);
 static u64 librdf_storage_mysql_node_hash(librdf_storage* storage,
                                           librdf_node* node,int add);
+static int librdf_storage_mysql_start_bulk(librdf_storage* storage);
+static int librdf_storage_mysql_stop_bulk(librdf_storage* storage);
 static int librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
                                                              u64 ctxt,
                                                              librdf_statement* statement);
@@ -150,7 +163,7 @@ static int librdf_storage_mysql_find_statements_in_context_next_statement(void* 
 static void* librdf_storage_mysql_find_statements_in_context_get_statement(void* context, int flags);
 static void librdf_storage_mysql_find_statements_in_context_finished(void* context);
 
-/* methods for stream of contexts */
+/* methods for iterator for contexts */
 static int librdf_storage_mysql_get_contexts_end_of_iterator(void* context);
 static int librdf_storage_mysql_get_contexts_next_context(void* context);
 static void* librdf_storage_mysql_get_contexts_get_context(void* context, int flags);
@@ -159,8 +172,8 @@ static void librdf_storage_mysql_get_contexts_finished(void* context);
 
 /* functions implementing storage api */
 
-/**
- * librdf_storage_mysql_hash:
+/*
+ * librdf_storage_mysql_hash - Find hash value of string.
  * @storage: the storage
  * @type: character type of node to hash ("R", "L" or "B")
  * @string: a string to get hash for
@@ -174,19 +187,16 @@ static u64
 librdf_storage_mysql_hash(librdf_storage* storage, char *type,
                           char *string, int length)
 {
-  librdf_digest* digest;
+  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
   u64 hash;
 
-  /* Create digest */
-  if(!(digest=librdf_new_digest(storage->world,"MD5")))
-    return 0;
-  librdf_digest_init(digest);
+  /* (Re)initialize digest object */
+  librdf_digest_init(context->digest);
   if(type)
-    librdf_digest_update(digest, (unsigned char*)type, 1);
-  librdf_digest_update(digest, (unsigned char*)string, length);
-  librdf_digest_final(digest);
-  memcpy(&hash, librdf_digest_get_digest(digest), sizeof(hash));
-  librdf_free_digest(digest);
+    librdf_digest_update(context->digest, (unsigned char*)type, 1);
+  librdf_digest_update(context->digest, (unsigned char*)string, length);
+  librdf_digest_final(context->digest);
+  memcpy(&hash, librdf_digest_get_digest(context->digest), sizeof(hash));
   return hash;
 }
 
@@ -194,9 +204,16 @@ librdf_storage_mysql_hash(librdf_storage* storage, char *type,
  * librdf_storage_mysql_init:
  * @storage: the storage
  * @name: model name
- * @options: host, port, database, user, password.
+ * @options: host, port, database, user, password [, new] [, bulk] [, merge].
  *
  * Create connection to database.  Defaults to port 3306 if not given.
+ *
+ * The boolean bulk option can be set to true if optimized inserts (table
+ * locks and temporary key disabling) is wanted. Note that this will block
+ * all other access, and requires table locking and alter table privileges.
+ *
+ * The boolean merge option can be set to true if a merged "view" of all
+ * models should be maintained. This "view" will be a table with TYPE=MERGE.
  *
  * Return value: Non-zero on failure (negative values are MySQL errors).
  **/
@@ -206,17 +223,16 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
 {
   librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
   const char create_table_statements[]="\
-  CREATE TABLE IF NOT EXISTS Statements (\
-  Model bigint unsigned NOT NULL,\
+  CREATE TABLE IF NOT EXISTS Statements%llu (\
   Subject bigint unsigned NOT NULL,\
   Predicate bigint unsigned NOT NULL,\
   Object bigint unsigned NOT NULL,\
   Context bigint unsigned NOT NULL,\
-  KEY Context (Model,Context),\
+  KEY Context (Context),\
   KEY SubjectPredicate (Subject,Predicate),\
   KEY PredicateObject (Predicate,Object),\
   KEY ObjectSubject (Object,Subject)\
-) TYPE=MyISAM";
+) TYPE=MyISAM DELAY_KEY_WRITE=1 MAX_ROWS=100000000 AVG_ROW_LENGTH=33";
   const char create_table_literals[]="\
   CREATE TABLE IF NOT EXISTS Literals (\
   ID bigint unsigned NOT NULL,\
@@ -225,25 +241,25 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   Datatype text NOT NULL,\
   PRIMARY KEY ID (ID),\
   FULLTEXT KEY Value (Value)\
-) TYPE=MyISAM";
+) TYPE=MyISAM DELAY_KEY_WRITE=1 MAX_ROWS=100000000 AVG_ROW_LENGTH=44";
   const char create_table_resources[]="\
   CREATE TABLE IF NOT EXISTS Resources (\
   ID bigint unsigned NOT NULL,\
   URI text NOT NULL,\
   PRIMARY KEY ID (ID)\
-) TYPE=MyISAM";
+) TYPE=MyISAM DELAY_KEY_WRITE=1 MAX_ROWS=100000000 AVG_ROW_LENGTH=63";
   const char create_table_bnodes[]="\
   CREATE TABLE IF NOT EXISTS Bnodes (\
   ID bigint unsigned NOT NULL,\
   Name text NOT NULL,\
   PRIMARY KEY ID (ID)\
-) TYPE=MyISAM";
+) TYPE=MyISAM DELAY_KEY_WRITE=1 MAX_ROWS=100000000 AVG_ROW_LENGTH=33";
   const char create_table_models[]="\
   CREATE TABLE IF NOT EXISTS Models (\
   ID bigint unsigned NOT NULL,\
   Name text NOT NULL,\
   PRIMARY KEY ID (ID)\
-) TYPE=MyISAM";
+) TYPE=MyISAM DELAY_KEY_WRITE=1";
   const char create_model[]="INSERT INTO Models (ID,Name) VALUES (%llu,'%s')";
   const char check_model[]="SELECT HIGH_PRIORITY 1 FROM Models WHERE ID=%llu AND Name='%s'";
   int status=0;
@@ -253,6 +269,10 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
 
   /* Must have connection parameters passed as options */
   if(!options)
+    return 1;
+
+  /* Create digest */
+  if(!(context->digest=librdf_new_digest(storage->world,"MD5")))
     return 1;
 
   /* Save hash of model name */
@@ -275,13 +295,16 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   /* Initialize MySQL connection */
   mysql_init(&context->connection);
 
+  /* Maintain merge table? */
+  context->merge=(librdf_hash_get_as_boolean(options, "merge")>0);
+
   /* Create connection to database */
   context->connection_open=1;
   if(!mysql_real_connect(&context->connection,
                          context->host, context->user, context->password,
                          context->database, context->port, NULL, 0)) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                  "Connection to MySQL database %s:%d name %s as user %s failed with error %s",
+                  "Connection to MySQL database %s:%d name %s as user %s failed: %s",
                   context->host, context->port, context->database,
                   context->user, mysql_error(&context->connection));
     status=0-mysql_errno(&context->connection);
@@ -289,20 +312,29 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   }
 
   /* Create tables, if new and not existing */
-  if(!status && (librdf_hash_get_as_boolean(options, "new")>0) &&
-     (mysql_real_query(&context->connection,create_table_statements,
-                       strlen(create_table_statements)) ||
-      mysql_real_query(&context->connection,create_table_literals,
-                       strlen(create_table_literals)) ||
-      mysql_real_query(&context->connection,create_table_resources,
-                       strlen(create_table_resources)) ||
-      mysql_real_query(&context->connection,create_table_bnodes,
-                       strlen(create_table_bnodes)) ||
-      mysql_real_query(&context->connection,create_table_models,
-                       strlen(create_table_models)))) {
-    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "MySQL table creation failed with error %s", mysql_error(&context->connection));
-    status=0-mysql_errno(&context->connection);
+  if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) {
+    if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(create_table_statements)+
+                                    20))) {
+      status=1;
+    } else {
+      sprintf(query, create_table_statements, context->model);
+      if(mysql_real_query(&context->connection, query,
+                          strlen(query)) ||
+         mysql_real_query(&context->connection, create_table_literals,
+                          strlen(create_table_literals)) ||
+         mysql_real_query(&context->connection, create_table_resources,
+                          strlen(create_table_resources)) ||
+         mysql_real_query(&context->connection, create_table_bnodes,
+                          strlen(create_table_bnodes)) ||
+         mysql_real_query(&context->connection, create_table_models,
+                          strlen(create_table_models))) {
+        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                   "MySQL table creation failed: %s",
+                   mysql_error(&context->connection));
+        status=0-mysql_errno(&context->connection);
+      }
+      LIBRDF_FREE(cstring, query);
+    }
   }
 
   /* Create model if new and not existing, or check for existence */
@@ -311,6 +343,7 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   mysql_real_escape_string(&context->connection, escaped_name,
                            (const char*)name, strlen(name));
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) {
+    /* Create new model */
     if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(create_model)+20+
                                     strlen(escaped_name)+1)))
       status=1;
@@ -318,10 +351,15 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
     if(!status && mysql_real_query(&context->connection,query,strlen(query)) &&
        mysql_errno(&context->connection) != ER_DUP_ENTRY) {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "MySQL insert into Models table failed with error %s", mysql_error(&context->connection));
+                 "MySQL insert into Models table failed: %s",
+                 mysql_error(&context->connection));
       status=0-mysql_errno(&context->connection);
     }
+    /* Maintain merge table? */
+    if(!status && context->merge)
+      status=librdf_storage_mysql_merge(storage);
   } else if(!status) {
+    /* Check for model existence */
     if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(check_model)+20+
                                     strlen(escaped_name)+1)))
       status=1;
@@ -330,7 +368,8 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
     if(!status && (mysql_real_query(&context->connection,query,strlen(query)) ||
                    !(res=mysql_store_result(&context->connection)))) {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "MySQL select from Models table failed with error %s", mysql_error(&context->connection));
+                 "MySQL select from Models table failed: %s",
+                 mysql_error(&context->connection));
       status=0-mysql_errno(&context->connection);
     }
     if(!status && !(mysql_fetch_row(res))) {
@@ -345,6 +384,9 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
     LIBRDF_FREE(cstring, query);
   LIBRDF_FREE(cstring, escaped_name);
 
+  /* Optimize loads? */
+  context->bulk=(librdf_hash_get_as_boolean(options, "bulk")>0);
+
   /* Truncate model? */
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0))
     status=librdf_storage_mysql_context_remove_statements(storage, NULL);
@@ -352,31 +394,74 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   /* Unused options: write (always...) */
   librdf_free_hash(options);
 
-/* Test of get_contexts */
-/*
-if(!status) {
-	librdf_iterator *c=librdf_storage_mysql_get_contexts(storage);
-	fprintf(stderr,"%s: finding contexts...\n",name);
-	if(c) {
-		while(!librdf_iterator_end(c)) {
-			librdf_node *cn=librdf_iterator_get_object(c);
-			if(cn) {
-				char *s=librdf_node_to_string(cn);
-				fprintf(stderr,"%s: - %s\n",name,s);
-				free(s);
-			}
-			librdf_iterator_next(c);
-		}
-		librdf_free_iterator(c);
-	}
-	fprintf(stderr,"%s: done finding contexts.\n",name);
-}
-*/
-
   if(status)
     librdf_storage_mysql_terminate(storage);
 
   return status;
+}
+
+/*
+ * librdf_storage_mysql_merge - (re)create merged "view" of all models
+ * @storage: the storage
+ *
+ * Return value: Non-zero on failure (negative values are MySQL errors).
+ */
+static int
+librdf_storage_mysql_merge(librdf_storage* storage)
+{
+  librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
+  const char get_models[]="SELECT ID FROM Models";
+  const char drop_table_statements[]="DROP TABLE IF EXISTS Statements";
+  const char create_table_statements[]="\
+  CREATE TABLE Statements (\
+  Subject bigint unsigned NOT NULL,\
+  Predicate bigint unsigned NOT NULL,\
+  Object bigint unsigned NOT NULL,\
+  Context bigint unsigned NOT NULL,\
+  KEY Context (Context),\
+  KEY SubjectPredicate (Subject,Predicate),\
+  KEY PredicateObject (Predicate,Object),\
+  KEY ObjectSubject (Object,Subject)\
+) TYPE=MERGE INSERT_METHOD=NO UNION=(";
+  char *query=NULL;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+
+  /* Query for list of models. */
+  if(mysql_real_query(&context->connection, get_models, strlen(get_models)) ||
+     !(res=mysql_store_result(&context->connection))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL query for model list failed: %s",
+               mysql_error(&context->connection));
+    return 0-mysql_errno(&context->connection);
+  }
+  /* Allocate space for merge table generation query. */
+  if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(create_table_statements)+
+                                  mysql_num_rows(res)*31+2)))
+    return 1;
+  /* Generate CSV list of models. */
+  strcpy(query,create_table_statements);
+  while((row=mysql_fetch_row(res))) {
+    strcat(query,"Statements");
+    strcat(query,row[0]);
+    strcat(query,",");
+  }
+  mysql_free_result(res);
+  query[strlen(query)-1]=')';
+
+  /* Drop and create merge table. */
+  if(mysql_real_query(&context->connection, drop_table_statements,
+                      strlen(drop_table_statements)) ||
+     mysql_real_query(&context->connection, query, strlen(query))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL merge table creation failed: %s",
+               mysql_error(&context->connection));
+    LIBRDF_FREE(cstring, query);
+    return 0-mysql_errno(&context->connection);
+  }
+  LIBRDF_FREE(cstring, query);
+
+  return 0;
 }
 
 /**
@@ -407,6 +492,8 @@ librdf_storage_mysql_terminate(librdf_storage* storage)
   if(context->host)
     LIBRDF_FREE(cstring,(char *)context->host);
 
+  if(context->digest)
+    librdf_free_digest(context->digest);
 }
 
 /**
@@ -435,7 +522,26 @@ librdf_storage_mysql_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_mysql_close(librdf_storage* storage)
 {
+  librdf_storage_mysql_sync(storage);
   return 0;
+}
+
+/**
+ * librdf_storage_mysql_sync - Flush all tables, making sure they are saved on disk.
+ * @storage: the storage
+ *
+ * Return value: N/A
+ **/
+static void
+librdf_storage_mysql_sync(librdf_storage* storage)
+{
+  librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
+
+  /* Make sure optimizing for bulk operations is stopped? */
+  if(context->bulk)
+    librdf_storage_mysql_stop_bulk(storage);
+
+  return;
 }
 
 /**
@@ -450,7 +556,7 @@ static int
 librdf_storage_mysql_size(librdf_storage* storage)
 {
   librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
-  char model_size[]="SELECT HIGH_PRIORITY COUNT(*) FROM Statements WHERE Model=%llu";
+  char model_size[]="SELECT HIGH_PRIORITY COUNT(*) FROM Statements%llu";
   char *query;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -464,10 +570,11 @@ librdf_storage_mysql_size(librdf_storage* storage)
      !(res=mysql_store_result(&context->connection)) ||
      !(row=mysql_fetch_row(res))) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "MySQL query for model size failed with error %s", mysql_error(&context->connection));
+               "MySQL query for model size failed: %s",
+               mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0-mysql_errno(&context->connection);
-  };
+  }
   count=atol(row[0]);
   mysql_free_result(res);
   LIBRDF_FREE(cstring,query);
@@ -510,13 +617,11 @@ librdf_storage_mysql_add_statements(librdf_storage* storage,
   return helper;
 }
 
-/**
- * librdf_storage_mysql_node_hash:
+/*
+ * librdf_storage_mysql_node_hash - Create hash value for node
  * @storage: the storage
  * @node: a node to get hash for (and possibly create in database)
  * @add: whether to add the node to the database
- *
- * Find hash value for node.
  *
  * Return value: Non-zero on succes.
  **/
@@ -526,9 +631,6 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
                                int add)
 {
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
-  char create_resource[]="INSERT INTO Resources (ID,URI) VALUES (%llu,'%s')";
-  char create_literal[]="INSERT INTO Literals (ID,Value,Language,Datatype) VALUES (%llu,'%s','%s','%s')";
-  char create_bnode[]="INSERT INTO Bnodes (ID,Name) VALUES (%llu,'%s')";
   librdf_node_type type=librdf_node_get_type(node);
   u64 hash;
   size_t nodelen;
@@ -540,13 +642,13 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
     hash=librdf_storage_mysql_hash(storage, "R", (char*)uri, nodelen);
 
     if(add) {
+      char create_resource[]="INSERT INTO Resources (ID,URI) VALUES (%llu,'%s')";
       /* Escape URI for db query */
       char *escaped_uri;
       if(!(escaped_uri=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1)))
         return 0;
       mysql_real_escape_string(&context->connection, escaped_uri,
                                (const char*)uri, nodelen);
-      nodelen=strlen(escaped_uri);
 
       /* Create new resource, ignore if existing */
       if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(create_resource)+
@@ -568,32 +670,37 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
 
   } else if(type==LIBRDF_NODE_TYPE_LITERAL) {
     /* Get hash */
-    unsigned char *value, *datatype=0, *nodestring;
-    char *lang;
+    unsigned char *value, *datatype=0;
+    char *lang, *nodestring;
+    librdf_uri *dt;
     size_t valuelen, langlen=0, datatypelen=0;
 
     value=librdf_node_get_literal_value_as_counted_string(node,&valuelen);
     lang=librdf_node_get_literal_value_language(node);
     if(lang)
       langlen=strlen(lang);
-    if(librdf_node_get_literal_value_datatype_uri(node))
-      datatype=librdf_uri_as_counted_string(librdf_node_get_literal_value_datatype_uri(node),&datatypelen);
+    dt=librdf_node_get_literal_value_datatype_uri(node);
+    if(dt)
+      datatype=librdf_uri_as_counted_string(dt,&datatypelen);
+    if(datatype)
+      datatypelen=strlen(datatype);
 
     /* Create composite node string for hash generation */
-    if(!(nodestring=(unsigned char*)LIBRDF_MALLOC(cstring, valuelen+langlen+datatypelen+3)))
+    if(!(nodestring=(char*)LIBRDF_MALLOC(cstring, valuelen+langlen+datatypelen+3)))
       return 0;
-    strcpy((char*)nodestring, (const char*)value);
-    strcat((char*)nodestring, "<");
+    strcpy(nodestring, (const char*)value);
+    strcat(nodestring, "<");
     if(lang)
-      strcat((char*)nodestring, lang);
-    strcat((char*)nodestring, ">");
+      strcat(nodestring, lang);
+    strcat(nodestring, ">");
     if(datatype)
-      strcat((char*)nodestring, (const char*)datatype);
-    nodelen=strlen((const char*)nodestring);
-    hash=librdf_storage_mysql_hash(storage, "L", (char*)nodestring, nodelen);
+      strcat(nodestring, (const char*)datatype);
+    nodelen=valuelen+langlen+datatypelen+2;
+    hash=librdf_storage_mysql_hash(storage, "L", nodestring, nodelen);
     LIBRDF_FREE(cstring,nodestring);
 
     if(add) {
+      char create_literal[]="INSERT INTO Literals (ID,Value,Language,Datatype) VALUES (%llu,'%s','%s','%s')";
       /* Escape value, lang and datatype for db query */
       char *escaped_value, *escaped_lang, *escaped_datatype;
       if(!(escaped_value=(char*)LIBRDF_MALLOC(cstring, valuelen*2+1)) ||
@@ -602,7 +709,6 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
         return 0;
       mysql_real_escape_string(&context->connection, escaped_value,
                                (const char*)value, valuelen);
-      valuelen=strlen(escaped_value);
       if(lang)
         mysql_real_escape_string(&context->connection, escaped_lang,
                                  (const char*)lang, langlen);
@@ -616,9 +722,9 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
 
       /* Create new literal, ignore if existing */
       if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(create_literal)+
-                                      20+strlen(escaped_value)+
+                                      strlen(escaped_value)+
                                       strlen(escaped_lang)+
-                                      strlen(escaped_datatype)+1))) {
+                                      strlen(escaped_datatype)+21))) {
         LIBRDF_FREE(cstring,escaped_value);
         LIBRDF_FREE(cstring,escaped_lang);
         LIBRDF_FREE(cstring,escaped_datatype);
@@ -631,7 +737,8 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       if(mysql_real_query(&context->connection, query, strlen(query)) &&
          mysql_errno(&context->connection) != ER_DUP_ENTRY) {
         librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "MySQL insert into Literals failed with error %s", mysql_error(&context->connection));
+                   "MySQL insert into Literals failed: %s",
+                   mysql_error(&context->connection));
         LIBRDF_FREE(cstring,query);
         return 0;
       }
@@ -645,17 +752,17 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
     hash=librdf_storage_mysql_hash(storage, "B", (char*)name, nodelen);
 
     if(add) {
+      char create_bnode[]="INSERT INTO Bnodes (ID,Name) VALUES (%llu,'%s')";
       /* Escape name for db query */
       char *escaped_name;
       if(!(escaped_name=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1)))
         return 0;
       mysql_real_escape_string(&context->connection, escaped_name,
                                (const char*)name, nodelen);
-      nodelen=strlen(escaped_name);
 
       /* Create new bnode, ignore if existing */
       if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(create_bnode)+
-                                      20+nodelen+1))) {
+                                      strlen(escaped_name)+21))) {
         LIBRDF_FREE(cstring,escaped_name);
         return 0;
       }
@@ -664,7 +771,8 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       if(mysql_real_query(&context->connection, query, strlen(query)) &&
          mysql_errno(&context->connection) != ER_DUP_ENTRY) {
         librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "MySQL insert into Bnodes failed with error %s", mysql_error(&context->connection));
+                   "MySQL insert into Bnodes failed: %s",
+                   mysql_error(&context->connection));
         LIBRDF_FREE(cstring,query);
         return 0;
       }
@@ -675,6 +783,113 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
     return 0;
 
   return hash;
+}
+
+
+/*
+ * librdf_storage_mysql_start_bulk - Prepare for bulk insert operation
+ * @storage: the storage
+ *
+ * Return value: Non-zero on failure.
+ */
+static int
+librdf_storage_mysql_start_bulk(librdf_storage* storage)
+{
+  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  char disable_statement_keys[]="ALTER TABLE Statements%llu DISABLE KEYS";
+  char disable_literal_keys[]="ALTER TABLE Literals DISABLE KEYS";
+  char lock_tables[]="LOCK TABLES Statements%llu WRITE, Resources WRITE, Bnodes WRITE, Literals WRITE";
+  char lock_tables_extra[]=", Statements WRITE";
+  char *query=NULL;
+
+  if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(disable_statement_keys)+21)))
+    return 1;
+  sprintf(query, disable_statement_keys, context->model);
+  if(mysql_real_query(&context->connection, query, strlen(query))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL statement key disabling failed: %s",
+               mysql_error(&context->connection));
+    return 0-mysql_errno(&context->connection);
+  }
+  LIBRDF_FREE(cstring,query);
+  if(mysql_real_query(&context->connection, disable_literal_keys,
+                      strlen(disable_literal_keys))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL literal key disabling failed: %s",
+               mysql_error(&context->connection));
+    return 0-mysql_errno(&context->connection);
+  }
+
+  if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(lock_tables)+
+                                  strlen(lock_tables_extra)+21)))
+    return 1;
+  sprintf(query, lock_tables, context->model);
+  if(context->merge)
+    strcat(query, lock_tables_extra);
+  if(mysql_real_query(&context->connection, query, strlen(query))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL table locking failed: %s",
+               mysql_error(&context->connection));
+    LIBRDF_FREE(cstring,query);
+    return 0-mysql_errno(&context->connection);
+  }
+  LIBRDF_FREE(cstring,query);
+
+  return 0;
+}
+
+
+/*
+ * librdf_storage_mysql_stop_bulk - End bulk insert operation
+ * @storage: the storage
+ *
+ * Return value: Non-zero on failure.
+ */
+static int
+librdf_storage_mysql_stop_bulk(librdf_storage* storage)
+{
+  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  char enable_statement_keys[]="ALTER TABLE Statements%llu ENABLE KEYS";
+  char enable_literal_keys[]="ALTER TABLE Literals ENABLE KEYS";
+  char unlock_tables[]="UNLOCK TABLES";
+  char flush_statements[]="FLUSH TABLE Statements";
+  char *query=NULL;
+
+  if(mysql_real_query(&context->connection, unlock_tables,
+                      strlen(unlock_tables))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL table unlocking failed: %s",
+               mysql_error(&context->connection));
+    return 1;
+  }
+
+  if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(enable_statement_keys)+21)))
+    return 1;
+  sprintf(query, enable_statement_keys, context->model);
+  if(mysql_real_query(&context->connection, query, strlen(query))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL statement key re-enabling failed: %s",
+               mysql_error(&context->connection));
+    return 0-mysql_errno(&context->connection);
+  }
+  LIBRDF_FREE(cstring,query);
+  if(mysql_real_query(&context->connection, enable_literal_keys,
+                      strlen(enable_literal_keys))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL literal key re-enabling failed: %s",
+               mysql_error(&context->connection));
+    return 0-mysql_errno(&context->connection);
+  }
+
+  if(context->merge && mysql_real_query(&context->connection, flush_statements,
+                      strlen(flush_statements))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL table flush failed: %s",
+               mysql_error(&context->connection));
+    return 0-mysql_errno(&context->connection);
+  }
+
+  return 0;
 }
 
 
@@ -693,15 +908,22 @@ librdf_storage_mysql_context_add_statements(librdf_storage* storage,
                                             librdf_node* context_node,
                                             librdf_stream* statement_stream)
 {
+  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
   u64 ctxt=0;
   int helper=0;
 
+  /* Optimize for bulk loads? */
+  if(context->bulk) {
+    if(librdf_storage_mysql_start_bulk(storage))
+      return 1;
+  }
+  
   /* Find hash for context, creating if necessary */
   if(context_node) {
     ctxt=librdf_storage_mysql_node_hash(storage,context_node,1);
     if(!ctxt)
       return 1;
-  };
+  }
 
   while(!helper && !librdf_stream_end(statement_stream)) {
     librdf_statement* statement=librdf_stream_get_object(statement_stream);
@@ -741,12 +963,20 @@ librdf_storage_mysql_context_add_statement(librdf_storage* storage,
 }
 
 
+/*
+ * librdf_storage_mysql_context_add_statement_helper - Perform actual addition of a statement to a storage context
+ * @storage: &librdf_storage object
+ * @ctxt: u64 context hash
+ * @statement: &librdf_statement statement to add
+ *
+ * Return value: non 0 on failure
+ **/
 static int
 librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
                                           u64 ctxt, librdf_statement* statement)
 {
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
-  char insert_statement[]="INSERT INTO Statements (Subject,Predicate,Object,Context,Model) VALUES (%llu,%llu,%llu,%llu,%llu)";
+  char insert_statement[]="INSERT INTO Statements%llu (Subject,Predicate,Object,Context) VALUES (%llu,%llu,%llu,%llu)";
   u64 subject, predicate, object;
   char *query;
 
@@ -763,13 +993,14 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
   /* Add statement to storage */
   if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(insert_statement)+101)))
     return 1;
-  sprintf(query, insert_statement, subject, predicate, object, ctxt, context->model);
+  sprintf(query, insert_statement, context->model, subject, predicate, object, ctxt);
   if(mysql_real_query(&context->connection, query, strlen(query))) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "MySQL insert into Statements failed with error %s", mysql_error(&context->connection));
+               "MySQL insert into Statements failed: %s",
+               mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0-mysql_errno(&context->connection);
-  };
+  }
   LIBRDF_FREE(cstring,query);
 
   return 0;
@@ -777,11 +1008,9 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
 
 
 /**
- * librdf_storage_mysql_contains_statement:
++ * librdf_storage_mysql_contains_statement - Test if a given complete statement is present in the model
  * @storage: the storage
  * @statement: a complete statement
- *
- * Test if a given complete statement is present in the model.
  *
  * Return value: Non-zero if the model contains the statement.
  **/
@@ -790,7 +1019,7 @@ librdf_storage_mysql_contains_statement(librdf_storage* storage,
                                         librdf_statement* statement)
 {
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
-  char find_statement[]="SELECT HIGH_PRIORITY 1 FROM Statements WHERE Subject=%llu AND Predicate=%llu AND Object=%llu AND Model=%llu limit 1";
+  char find_statement[]="SELECT HIGH_PRIORITY 1 FROM Statements%llu WHERE Subject=%llu AND Predicate=%llu AND Object=%llu limit 1";
   u64 subject, predicate, object;
   char *query;
   MYSQL_RES *res;
@@ -806,24 +1035,37 @@ librdf_storage_mysql_contains_statement(librdf_storage* storage,
     return 0;
 
   /* Check for statement */
-  if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(find_statement)+81)))
+  if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(find_statement)+81)))
     return 0;
-  sprintf(query, find_statement, subject, predicate, object, context->model);
-  if(mysql_real_query(&context->connection, query, strlen(query)) ||
-     !(res=mysql_store_result(&context->connection)) ||
-     !(mysql_fetch_row(res))) {
+  sprintf(query, find_statement, context->model, subject, predicate, object);
+  if(mysql_real_query(&context->connection, query, strlen(query))) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "MySQL query for statement failed with error %s", mysql_error(&context->connection));
+               "MySQL query for statement failed: %s",
+               mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0;
-  };
-  mysql_free_result(res);
-  LIBRDF_FREE(cstring,query);
+  }
+  LIBRDF_FREE(cstring, query);
+  if(!(res=mysql_store_result(&context->connection)) ||
+     !(mysql_fetch_row(res))) {
+    if(res)
+      mysql_free_result(res);
+    return 0;
+  }
+  if(res)
+    mysql_free_result(res);
 
   return 1;
 }
 
 
+/**
+ * librdf_storage_mysql_remove_statement - Remove a statement from storage
+ * @storage: &librdf_storage object
+ * @statement: &librdf_statement statement to remove
+ *
+ * Return value: non-zero on failure
+ **/
 static int
 librdf_storage_mysql_remove_statement(librdf_storage* storage, librdf_statement* statement)
 {
@@ -845,8 +1087,8 @@ librdf_storage_mysql_context_remove_statement(librdf_storage* storage,
                                              librdf_statement* statement)
 {
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
-  char delete_statement[]="DELETE FROM Statements WHERE Subject=%llu AND Predicate=%llu AND Object=%llu AND Model=%llu";
-  char delete_statement_with_context[]="DELETE FROM Statements WHERE Subject=%llu AND Predicate=%llu AND Object=%llu AND Context=%llu AND Model=%llu";
+  char delete_statement[]="DELETE FROM Statements%llu WHERE Subject=%llu AND Predicate=%llu AND Object=%llu";
+  char delete_statement_with_context[]="DELETE FROM Statements%llu WHERE Subject=%llu AND Predicate=%llu AND Object=%llu AND Context=%llu";
   u64 subject, predicate, object, ctxt=0;
   char *query;
 
@@ -861,7 +1103,7 @@ librdf_storage_mysql_context_remove_statement(librdf_storage* storage,
     ctxt=librdf_storage_mysql_node_hash(storage,context_node,0);
     if(!ctxt)
       return 1;
-  };
+  }
   if(!subject || !predicate || !object || (context_node && !ctxt))
     return 1;
 
@@ -869,20 +1111,21 @@ librdf_storage_mysql_context_remove_statement(librdf_storage* storage,
   if(context_node) {
     if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement_with_context)+101)))
       return 1;
-    sprintf(query, delete_statement_with_context, subject, predicate,
-            object, ctxt, context->model);
+    sprintf(query, delete_statement_with_context, context->model, subject,
+            predicate, object, ctxt);
   } else {
     if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement)+81)))
       return 1;
-    sprintf(query, delete_statement, subject, predicate, object,
-            context->model);
+    sprintf(query, delete_statement, context->model, subject, predicate,
+            object);
   }
   if(mysql_real_query(&context->connection, query, strlen(query))) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "MySQL delete from Statements failed with error %s", mysql_error(&context->connection));
+               "MySQL delete from Statements failed: %s",
+               mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0-mysql_errno(&context->connection);
-  };
+  }
   LIBRDF_FREE(cstring,query);
 
   return 0;
@@ -901,8 +1144,9 @@ librdf_storage_mysql_context_remove_statements(librdf_storage* storage,
                                                librdf_node* context_node)
 {
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
-  char delete_context[]="DELETE FROM Statements WHERE Context=%llu AND Model=%llu";
-  char delete_model[]="DELETE FROM Statements WHERE Model=%llu";
+  char delete_context[]="DELETE FROM Statements%llu WHERE Context=%llu";
+  char delete_model[]="DELETE FROM Statements%llu";
+  char flush_statements[]="FLUSH TABLE Statements";
   u64 ctxt=0;
   char *query;
 
@@ -917,7 +1161,7 @@ librdf_storage_mysql_context_remove_statements(librdf_storage* storage,
   if(context_node) {
     if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_context)+61)))
       return 1;
-    sprintf(query, delete_context, ctxt, context->model);
+    sprintf(query, delete_context, context->model, ctxt);
   } else {
     if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_model)+21)))
       return 1;
@@ -925,18 +1169,29 @@ librdf_storage_mysql_context_remove_statements(librdf_storage* storage,
   }
   if(mysql_real_query(&context->connection,query,strlen(query))) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "MySQL delete of context from Statements failed with error %s", mysql_error(&context->connection));
+               "MySQL delete of context from Statements failed: %s",
+               mysql_error(&context->connection));
     LIBRDF_FREE(cstring,query);
     return 0-mysql_errno(&context->connection);
   }
   LIBRDF_FREE(cstring,query);
 
- return 0;
+  /* Flush merge table when using delete without where... */
+  if(context->merge && !context_node
+      && mysql_real_query(&context->connection, flush_statements,
+                                   strlen(flush_statements))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL table flush failed: %s",
+               mysql_error(&context->connection));
+    return 0-mysql_errno(&context->connection);
+  }
+
+  return 0;
 }
 
 
 /**
- * librdf_storage_mysql_serialise:
+ * librdf_storage_mysql_serialise - Return a stream of all statements in a storage
  * @storage: the storage
  *
  * Return a stream of all statements in a storage.
@@ -951,7 +1206,7 @@ librdf_storage_mysql_serialise(librdf_storage* storage)
 
 
 /**
- * librdf_storage_mysql_find_statements:
+ * librdf_storage_mysql_find_statements - Find a graph of statements in storage.
  * @storage: the storage
  * @statement: the statement to match
  *
@@ -985,7 +1240,7 @@ librdf_storage_mysql_context_serialise(librdf_storage* storage,
 
 
 /**
- * librdf_storage_mysql_find_statements_in_context:
+ * librdf_storage_mysql_find_statements_in_context - Find a graph of statements in a storage context.
  * @storage: the storage
  * @statement: the statement to match
  * @context_node: the context to search
@@ -1005,7 +1260,7 @@ librdf_storage_mysql_find_statements_in_context(librdf_storage* storage, librdf_
 
 
 /**
- * librdf_storage_mysql_find_statements_with_options:
+ * librdf_storage_mysql_find_statements_with_options - Find a graph of statements in a storage context with options.
  * @storage: the storage
  * @statement: the statement to match
  * @context_node: the context to search
@@ -1047,11 +1302,11 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
   sos->current_statement=NULL;
   sos->current_context=NULL;
   sos->results=NULL;
-  
+
   if(options) {
     sos->is_literal_match=librdf_hash_get_as_boolean(options, "match-substring");
   }
-  
+
   /* Initialize temporary MySQL connection */
   mysql_init(&sos->connection);
   sos->connection_open=1;
@@ -1059,26 +1314,26 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
                          context->host, context->user, context->password,
                          context->database, context->port, NULL, 0)) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Connection to MySQL database %s:%d name %s as user %s failed with error %s",
+               "Connection to MySQL database %s:%d name %s as user %s failed: %s",
                context->host, context->port, context->database,
                context->user, mysql_error(&sos->connection));
     sos->connection_open=0;
     librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
     return NULL;
-  };
+  }
 
   /* Construct query */
   if(!(query=(char*)LIBRDF_MALLOC(cstring, 21))) {
     librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
     return NULL;
   }
-  strcpy(query,"SELECT HIGH_PRIORITY");
-  sprintf(where," WHERE Model=%llu", context->model);
+  strcpy(query, "SELECT HIGH_PRIORITY");
+  *where='\0';
   if(sos->is_literal_match)
-    strcpy(joins," FROM Literals AS L LEFT JOIN Statements as S ON L.ID=S.Object");
+    sprintf(joins, " FROM Literals AS L LEFT JOIN Statements%llu as S ON L.ID=S.Object",
+            context->model);
   else
-    strcpy(joins," FROM Statements AS S");
-
+    sprintf(joins, " FROM Statements%llu AS S", context->model);
 
   if(statement) {
     subject=librdf_statement_get_subject(statement);
@@ -1088,9 +1343,13 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
 
   /* Subject */
   if(statement && subject) {
-    sprintf(tmp," AND S.Subject=%llu",
+    sprintf(tmp, "S.Subject=%llu",
             librdf_storage_mysql_node_hash(storage,subject,0));
-    strcat(where,tmp);
+    if(!strlen(where))
+      strcat(where, " WHERE ");
+    else
+      strcat(where, " AND ");
+    strcat(where, tmp);
   } else {
     if(librdf_storage_mysql_find_statements_in_context_augment_query(&query, " SubjectR.URI AS SuR, SubjectB.Name AS SuB")) {
       librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
@@ -1102,9 +1361,13 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
 
   /* Predicate */
   if(statement && predicate) {
-    sprintf(tmp," AND S.Predicate=%llu",
+    sprintf(tmp, "S.Predicate=%llu",
             librdf_storage_mysql_node_hash(storage, predicate, 0));
-    strcat(where,tmp);
+    if(!strlen(where))
+      strcat(where, " WHERE ");
+    else
+      strcat(where, " AND ");
+    strcat(where, tmp);
   } else {
     if(!statement || !subject) {
       if(librdf_storage_mysql_find_statements_in_context_augment_query(&query, ",")) {
@@ -1122,11 +1385,15 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
   /* Object */
   if(statement && object) {
     if(!sos->is_literal_match) {
-      sprintf(tmp," AND S.Object=%llu",
+      sprintf(tmp,"S.Object=%llu",
               librdf_storage_mysql_node_hash(storage, object, 0));
-      strcat(where,tmp);
+      if(!strlen(where))
+        strcat(where, " WHERE ");
+      else
+        strcat(where, " AND ");
+      strcat(where, tmp);
     } else {
-      /* MATCH literal, not =hash_id */
+      /* MATCH literal, not hash_id */
       if(!statement || !subject || !predicate) {
         if(librdf_storage_mysql_find_statements_in_context_augment_query(&query, ",")) {
           librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
@@ -1141,15 +1408,19 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
       strcat(joins," LEFT JOIN Bnodes AS ObjectB ON S.Object=ObjectB.ID");
       strcat(joins," LEFT JOIN Literals AS ObjectL ON S.Object=ObjectL.ID");
 
-      sprintf(tmp, " AND MATCH(L.Value) AGAINST ('%s')", 
+      sprintf(tmp, "MATCH(L.Value) AGAINST ('%s')",
               librdf_node_get_literal_value(object));
 
       /* NOTE:  This is NOT USED but could be if FULLTEXT wasn't enabled */
       /*
-        sprintf(tmp, " AND L.Value LIKE '%%%s%%'", 
+        sprintf(tmp, " L.Value LIKE '%%%s%%'",
                 librdf_node_get_literal_value(object));
        */
-      strcat(where,tmp);
+      if(!strlen(where))
+        strcat(where, " WHERE ");
+      else
+        strcat(where, " AND ");
+      strcat(where, tmp);
     }
   } else {
     if(!statement || !subject || !predicate) {
@@ -1169,9 +1440,13 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
 
   /* Context */
   if(context_node) {
-    sprintf(tmp," AND S.Context=%llu",
+    sprintf(tmp,"S.Context=%llu",
             librdf_storage_mysql_node_hash(storage,context_node,0));
-    strcat(where,tmp);
+    if(!strlen(where))
+      strcat(where, " WHERE ");
+    else
+      strcat(where, " AND ");
+    strcat(where, tmp);
   } else {
     if(!statement || !subject || !predicate || !object) {
       if(librdf_storage_mysql_find_statements_in_context_augment_query(&query, ",")) {
@@ -1207,7 +1482,8 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
   if(mysql_real_query(&sos->connection, query, strlen(query)) ||
      !(sos->results=mysql_use_result(&sos->connection))) {
     librdf_log(sos->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "MySQL query failed with error %s", mysql_error(&sos->connection));
+               "MySQL query failed: %s",
+               mysql_error(&sos->connection));
     librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
     return NULL;
   };
@@ -1265,22 +1541,17 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
 {
   librdf_storage_mysql_sos_context* sos=(librdf_storage_mysql_sos_context*)context;
   MYSQL_ROW row;
-  librdf_node *subject, *predicate, *object, *node;
+  librdf_node *subject=NULL, *predicate=NULL, *object=NULL;
+  librdf_node *node;
 
   /* Get next statement */
   row=mysql_fetch_row(sos->results);
   if(row) {
-    /* Make sure we have a statement object to return */
-    if(!sos->current_statement) {
-      if(!(sos->current_statement=librdf_new_statement(sos->storage->world))) {
-        librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
-        return 1;
-      }
-    }
+    /* Get ready for context */
     if(sos->current_context)
       librdf_free_node(sos->current_context);
     sos->current_context=NULL;
-    librdf_statement_clear(sos->current_statement);
+    /* Is this a query with statement parts? */
     if(sos->query_statement) {
       subject=librdf_statement_get_subject(sos->query_statement);
       predicate=librdf_statement_get_predicate(sos->query_statement);
@@ -1289,8 +1560,16 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
       else
         object=librdf_statement_get_object(sos->query_statement);
     }
+    /* Make sure we have a statement object to return */
+    if(!sos->current_statement) {
+      if(!(sos->current_statement=librdf_new_statement(sos->storage->world))) {
+        librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+        return 1;
+      }
+    }
+    librdf_statement_clear(sos->current_statement);
     /* Query without variables? */
-    if(sos->query_statement && subject && predicate && object && sos->query_context) {
+    if(subject && predicate && object && sos->query_context) {
       librdf_statement_set_subject(sos->current_statement,librdf_new_node_from_node(subject));
       librdf_statement_set_predicate(sos->current_statement,librdf_new_node_from_node(predicate));
       librdf_statement_set_object(sos->current_statement,librdf_new_node_from_node(object));
@@ -1299,7 +1578,7 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
       /* Turn row parts into statement and context */
       int part=0;
       /* Subject - constant or from row? */
-      if(sos->query_statement && subject) {
+      if(subject) {
         librdf_statement_set_subject(sos->current_statement,librdf_new_node_from_node(subject));
       } else {
         /* Resource or Bnode? */
@@ -1323,7 +1602,7 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
         part+=2;
       }
       /* Predicate - constant or from row? */
-      if(sos->query_statement && predicate) {
+      if(predicate) {
         librdf_statement_set_predicate(sos->current_statement,librdf_new_node_from_node(predicate));
       } else {
         /* Resource? */
@@ -1341,7 +1620,7 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
         part+=1;
       }
       /* Object - constant or from row? */
-      if(sos->query_statement && object) {
+      if(object) {
         librdf_statement_set_object(sos->current_statement,librdf_new_node_from_node(object));
       } else {
         /* Resource, Bnode or Literal? */
@@ -1488,11 +1767,10 @@ librdf_storage_mysql_get_contexts(librdf_storage* storage)
   const char select_contexts[]="\
 SELECT HIGH_PRIORITY DISTINCT R.URI AS CoR, B.Name AS CoB, \
 L.Value AS CoV, L.Language AS CoL, L.Datatype AS CoD \
-FROM Statements as S \
+FROM Statements%llu as S \
 LEFT JOIN Resources AS R ON S.Context=R.ID \
 LEFT JOIN Bnodes AS B ON S.Context=B.ID \
-LEFT JOIN Literals AS L ON S.Context=L.ID \
-WHERE Model=%llu";
++LEFT JOIN Literals AS L ON S.Context=L.ID";
   char *query;
   librdf_iterator *iterator;
 
@@ -1514,13 +1792,13 @@ WHERE Model=%llu";
                          context->host, context->user, context->password,
                          context->database, context->port, NULL, 0)) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Connection to MySQL database %s:%d name %s as user %s failed with error %s",
+               "Connection to MySQL database %s:%d name %s as user %s failed: %s",
                context->host, context->port, context->database,
                context->user, mysql_error(&gccontext->connection));
     gccontext->connection_open=0;
     librdf_storage_mysql_get_contexts_finished((void*)gccontext);
     return NULL;
-  };
+  }
 
   /* Construct query */
   if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(select_contexts)+21))) {
@@ -1533,10 +1811,11 @@ WHERE Model=%llu";
   if(mysql_real_query(&gccontext->connection, query, strlen(query)) ||
      !(gccontext->results=mysql_use_result(&gccontext->connection))) {
     librdf_log(gccontext->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "MySQL query failed with error %s", mysql_error(&gccontext->connection));
+               "MySQL query failed: %s",
+               mysql_error(&gccontext->connection));
     librdf_storage_mysql_get_contexts_finished((void*)gccontext);
     return NULL;
-  };
+  }
   LIBRDF_FREE(cstring, query);
 
   /* Get first context, if any, and initialize iterator */
@@ -1554,7 +1833,7 @@ WHERE Model=%llu";
   if(!iterator) {
     librdf_storage_mysql_get_contexts_finished((void*)gccontext);
     return NULL;
-  };
+  }
 
   return iterator;
 }
@@ -1698,6 +1977,7 @@ librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
   factory->terminate          = librdf_storage_mysql_terminate;
   factory->open               = librdf_storage_mysql_open;
   factory->close              = librdf_storage_mysql_close;
+  factory->sync               = librdf_storage_mysql_sync;
   factory->size               = librdf_storage_mysql_size;
   factory->add_statement      = librdf_storage_mysql_add_statement;
   factory->add_statements     = librdf_storage_mysql_add_statements;
