@@ -110,6 +110,8 @@ librdf_hash_gdbm_close(void* context)
 {
         librdf_hash_gdbm_context* gdbm_context=(librdf_hash_gdbm_context*)context;
         gdbm_close(gdbm_context->gdbm_file);
+	if(gdbm_context->current_key.dsize)
+		LIBRDF_FREE(gdbm_data, gdbm_context->current_key.dptr);
         LIBRDF_FREE(cstring, gdbm_context->file_name);
         return 0;
 }
