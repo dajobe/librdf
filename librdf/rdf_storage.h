@@ -169,14 +169,19 @@ struct librdf_storage_factory_s {
 
 #include <rdf_storage_list.h>
 #include <rdf_storage_hashes.h>
+
 void librdf_init_storage_file(librdf_world *world);
 
-#ifdef HAVE_MYSQL
-#include <rdf_storage_mysql.h>
+#ifdef STORAGE_MYSQL
+void librdf_init_storage_mysql(librdf_world *world);
 #endif
 
-#ifdef HAVE_TSTORE
-#include <rdf_storage_tstore.h>
+#ifdef STORAGE_TSTORE
+void librdf_init_storage_tstore(librdf_world *world);
+#endif
+
+#ifdef STORAGE_SQLITE
+void librdf_init_storage_sqlite(librdf_world *world);
 #endif
 
 
