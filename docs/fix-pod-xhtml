@@ -27,6 +27,7 @@ my($pod_rdf_rel)=($file =~ m%^pod/RDF/%) ? '../' : '';
 my($pod_rdf_redland_rel)=($file =~ m%^pod/RDF/Redland/%) ? '' : 'Redland/';
 
 open(OUT, ">$file") or die "$progname: Cannot create $file - $!\n";
+print OUT qq{<?xml version="1.0" encoding="iso-8859-1"?>};
 open(IN, "-");
 while(<IN>) {
   # Sorry, I'm transitional
