@@ -38,6 +38,11 @@ librdf_init_statement(void)
 {
 }
 
+void
+librdf_finish_statement(void) 
+{
+}
+
 
 /* constructor */
 /* Create a new empty Statement */
@@ -50,6 +55,29 @@ librdf_new_statement(void)
   if(!new_statement)
     return NULL;
 
+  return new_statement;
+}
+
+
+/* Create a new Statement from an existing Statement - CLONE */
+librdf_statement*
+librdf_new_statement_from_statement(librdf_statement* statement)
+{
+  librdf_statement* new_statement;
+  
+  new_statement = librdf_new_statement();
+  if(!new_statement)
+	  return NULL;
+
+  new_statement->subject=librdf_new_node_from_node(statement->subject);
+  new_statement->predicate=librdf_new_node_from_node(statement->predicate);
+  new_statement->object=librdf_new_node_from_node(statement->object);
+
+  if(!new_statement->subject || !new_statement->predicate || 
+     !new_statement->object) {
+	  librdf_free_statement(new_statement);
+	  return NULL;
+  }
   return new_statement;
 }
 
