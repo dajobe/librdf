@@ -497,8 +497,6 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
 
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(identifier, string, NULL);
-
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->nodes_mutex);
 #endif
