@@ -1187,16 +1187,17 @@ if test $use_dmalloc = yes; then
   MEM_LIBS=-ldmalloc
 fi
 
-AC_ARG_ENABLE(assert, [  --disable-assert        Turn off run time assertion checks.  ], \
-if test "$enableval" = "yes"; then \
-  AC_DEFINE(LIBRDF_DISABLE_ASSERT, 1, [Disable run time assertion checks.])
-fi;)	
+assert=yes
+AC_ARG_ENABLE(assertions, [  --enable-assertions    Perform run time assertion checks (default yes).  ], assert=$enableval)
+if test "$assert" = "yes"; then
+  AC_DEFINE(LIBRDF_ASSERT, 1, [Run time assertion checks.])
+fi
 
-AC_ARG_ENABLE(assert-messages, [  --disable-assert-messages  Turn off run time assertion check messages.  ], \
-if test "$enableval" = "yes"; then \
-  AC_DEFINE(LIBRDF_DISABLE_ASSERT_MESSAGES, 1, [Disable run time assertion check messages.])
-fi;)	
-
+assert_messages=yes
+AC_ARG_ENABLE(assert-messages, [  --enable-assert-messages  Print run time assertion check failure messages (default yes).  ], assert_messages=$enableval)	
+if test "$assert_messages" = "yes"; then
+  AC_DEFINE(LIBRDF_ASSERT_MESSAGES, 1, [Print run time assertion check failure messages.])
+fi
 
 STANDARD_CFLAGS="$STANDARD_CFLAGS $CFLAGS"
 if test "$USE_MAINTAINER_MODE" = yes; then
