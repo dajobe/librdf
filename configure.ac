@@ -460,7 +460,15 @@ AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (defau
 AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory (default=/usr/include)], bdb_include_dir="$withval", bdb_include_dir="none") 
 AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Berkeley DB library name (auto)], bdb_dbname="$withval", bdb_dbname="none")
 
-bdb_version=none
+bdb_version=unknown
+
+# Only prefix given - set lib and include
+if test "X$bdb_prefix" != "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_dir" = "Xnone" ; then
+  bdb_lib_dir="$bdb_prefix/lib"
+  bdb_include_dir="$bdb_prefix/include"
+fi
+
+# Nothing given - search
 if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_dir" = "Xnone" -a "X$bdb_dbname" = "Xnone" ; then
   bdb_prefix="/usr"
   bdb_lib_dir="/usr/lib"
