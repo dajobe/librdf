@@ -399,6 +399,13 @@ blank node identifier
 
 <h3>Parser Class changes</h3>
 
+<p>Added methods
+<code>librdf_parser_parse_counted_string_as_stream</code> and
+<code>librdf_parser_parse_counted_string_into_model</code>
+for parsing a string with a given length rather than
+a C NUL-terminated string.</p>
+
+
 <p>Methods
 <code>librdf_parser_parse_string_as_stream</code> and
 <code>librdf_parser_parse_string_into_model</code>
@@ -432,10 +439,13 @@ parser classes.
 
 <h3>Statement Class changes</h3>
 
+<p>The statement objects are now usage counted like most other
+objects so they are cheap to copy.  No user-API level changes
+are needed.</p>
+
 <p>(Debugging method <code>librdf_statement_to_string</code> now
 returns a <code>const unsigned char* string</code>)
 </p>
-
 
 <h3>URI Class changes</h3>
 
