@@ -31,7 +31,6 @@
 #include <sys/types.h>
 
 #include <librdf.h>
-#include <rdf_storage_tstore.h>
 
 #include <rdfsql/rdfsql.h>
 
