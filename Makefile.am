@@ -76,4 +76,4 @@ endif
 @SET_MAKE@
 
 install-data-hook:
-	touch -r Redland.i $(DESTDIR)$(pkgdatadir)/Redland.i
+	touch -r $(srcdir)/Redland.i $(DESTDIR)$(pkgdatadir)/Redland.i
