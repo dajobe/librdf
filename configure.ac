@@ -601,6 +601,13 @@ if test "$bdb_prefix" != no; then
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
+    AC_MSG_CHECKING(for BDB DB->set_flags)
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [DB *bdb; bdb->set_flags(bdb, 0);],
+		AC_DEFINE(HAVE_BDB_SET_FLAGS, 1, [BDB has set_flags method])
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
     AC_MSG_CHECKING(for BDB V4.1+ DB->open with 7 arguments)
     AC_TRY_LINK([#include <stdio.h>
                  #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);],
