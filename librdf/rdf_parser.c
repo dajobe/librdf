@@ -60,8 +60,10 @@ librdf_parser_register_factory(const char *name,
   librdf_parser_factory *d, *parser;
   char *name_copy;
 
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2(librdf_parser_register_factory,
 		"Received registration for parser %s\n", name);
+#endif
   
   parser=(librdf_parser_factory*)LIBRDF_CALLOC(librdf_parser_factory, 1,
 					       sizeof(librdf_parser_factory));
@@ -90,9 +92,11 @@ librdf_parser_register_factory(const char *name,
   (*factory)(parser);
 
 
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3(librdf_parser_register_factory,
 		"%s has context size %d\n", name,
 		parser->context_length);
+#endif
   
   parser->next = parsers;
   parsers = parser;
@@ -138,12 +142,31 @@ librdf_get_parser_factory(const char *name)
 
 /**
  * librdf_new_parser - Constructor - create a new librdf_parser object
+ * @name: the parser factory name
+ * 
+ * Return value: new &librdf_parser object or NULL
+ **/
+librdf_parser*
+librdf_new_parser(char *name)
+{
+  librdf_parser_factory* factory;
+
+  factory=librdf_get_parser_factory(name);
+  if(!factory)
+    return NULL;
+
+  return librdf_new_parser_from_factory(factory);
+}
+
+
+/**
+ * librdf_new_parser_from_factory - Constructor - create a new librdf_parser object
  * @factory: the parser factory to use to create this parser
  * 
  * Return value: new &librdf_parser object or NULL
  **/
 librdf_parser*
-librdf_new_parser(librdf_parser_factory *factory)
+librdf_new_parser_from_factory(librdf_parser_factory *factory)
 {
   librdf_parser* d;
 
@@ -230,9 +253,8 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_parser_factory* factory;
   librdf_parser* d;
-  char *test_parser_types[]={"SIRPAC", "LIBWWW", NULL};
+  char *test_parser_types[]={"sirpac", "libwww", NULL};
   int i;
   char *type;
   char *program=argv[0];
@@ -243,13 +265,7 @@ main(int argc, char *argv[])
   
   for(i=0; (type=test_parser_types[i]); i++) {
     fprintf(stderr, "%s: Trying to create new %s parser\n", program, type);
-    factory=librdf_get_parser_factory(type);
-    if(!factory) {
-      fprintf(stderr, "%s: No parser factory called %s\n", program, type);
-      continue;
-    }
-    
-    d=librdf_new_parser(factory);
+    d=librdf_new_parser(type);
     if(!d) {
       fprintf(stderr, "%s: Failed to create new parser type %s\n", program, type);
       continue;
@@ -263,7 +279,7 @@ main(int argc, char *argv[])
   /* finish parser module */
   librdf_finish_parser();
   
-#ifdef LIBRDF_DEBUG 
+#ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);
 #endif
   

@@ -99,8 +99,10 @@ librdf_storage_register_factory(const char *name,
   librdf_storage_factory *storage, *h;
   char *name_copy;
   
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2(librdf_storage_register_factory,
                 "Received registration for storage %s\n", name);
+#endif
   
   storage=(librdf_storage_factory*)LIBRDF_CALLOC(librdf_storage_factory, 1,
                                                  sizeof(librdf_storage_factory));
@@ -125,8 +127,10 @@ librdf_storage_register_factory(const char *name,
   /* Call the storage registration function on the new object */
   (*factory)(storage);
   
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3(librdf_storage_register_factory, "%s has context size %d\n",
                 name, storage->context_length);
+#endif
   
   storage->next = storages;
   storages = storage;
@@ -174,14 +178,49 @@ librdf_get_storage_factory (const char *name)
 
 /**
  * librdf_new_storage - Constructor - create a new librdf_storage object
+ * @name: the factory name
+ * @options_string: options to initialise storage
+ *
+ * The options are encoded as described in librdf_hash_from_string()
+ * and can be NULL if none are required.
+ *
+ * Return value: a new &librdf_storage object or NULL on failure
+ */
+librdf_storage*
+librdf_new_storage (char *name, char *options_string) {
+  librdf_storage_factory* factory;
+  librdf_hash* options_hash;
+  librdf_storage *storage;
+  
+  factory=librdf_get_storage_factory(name);
+  if(!factory)
+    return NULL;
+
+  options_hash=librdf_new_hash(NULL);
+  if(!options_hash)
+    return NULL;
+  
+  if(librdf_hash_from_string(options_hash, options_string)) {
+    librdf_free_hash(options_hash);
+    return NULL;
+  }
+
+  storage=librdf_new_storage_from_factory(factory, options_hash);
+  librdf_free_hash(options_hash);
+  return storage;
+}
+
+
+/**
+ * librdf_new_storage_from_factory - Constructor - create a new librdf_storage object
  * @factory: the factory to use to construct the storage
  * @options: &librdf_hash of options to initialise storage
  *
  * Return value: a new &librdf_storage object or NULL on failure
  */
 librdf_storage*
-librdf_new_storage (librdf_storage_factory* factory,
-		    librdf_hash* options) {
+librdf_new_storage_from_factory (librdf_storage_factory* factory,
+                                 librdf_hash* options) {
   librdf_storage* storage;
 
   if(!factory) {
@@ -371,19 +410,16 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_storage_factory* factory;
   librdf_storage* storage;
   char *program=argv[0];
   
-  /* initialise model and storage modules */
+  /* initialise hash, model and storage modules */
+  librdf_init_hash();
   librdf_init_storage();
   librdf_init_model();
   
-  fprintf(stderr, "%s: Getting factory\n", program);
-  factory=librdf_get_storage_factory(NULL);
-
   fprintf(stderr, "%s: Creating storage\n", program);
-  storage=librdf_new_storage(factory, NULL);
+  storage=librdf_new_storage(NULL, NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
@@ -409,9 +445,10 @@ main(int argc, char *argv[])
   /* finish model and storage modules */
   librdf_finish_model();
   librdf_finish_storage();
+  librdf_finish_hash();
   
   
-#ifdef LIBRDF_DEBUG 
+#ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);
 #endif
   

@@ -52,6 +52,39 @@ librdf_finish_model(void)
 
 
 /**
+ * librdf_new_model - Constructor - create a new librdf_storage object
+ * @storage: &librdf_storage to use
+ * @options_string: options to initialise model
+ *
+ * The options are encoded as described in librdf_hash_from_string()
+ * and can be NULL if none are required.
+ *
+ * Return value: a new &librdf_model object or NULL on failure
+ */
+librdf_model*
+librdf_new_model (librdf_storage *storage, char *options_string) {
+  librdf_hash* options_hash;
+  librdf_model *model;
+
+  if(!storage)
+    return NULL;
+  
+  options_hash=librdf_new_hash(NULL);
+  if(!options_hash)
+    return NULL;
+  
+  if(librdf_hash_from_string(options_hash, options_string)) {
+    librdf_free_hash(options_hash);
+    return NULL;
+  }
+
+  model=librdf_new_model_with_options(storage, options_hash);
+  librdf_free_hash(options_hash);
+  return model;
+}
+
+
+/**
  * librdf_new_model - Constructor - Create a new librdf_model with storage
  * @storage: &librdf_storage storage to use
  * @options: &librdf_hash of options to use
@@ -61,9 +94,12 @@ librdf_finish_model(void)
  * Return value: a new &librdf_model object or NULL on failure
  **/
 librdf_model*
-librdf_new_model(librdf_storage *storage, librdf_hash* options)
+librdf_new_model_with_options(librdf_storage *storage, librdf_hash* options)
 {
   librdf_model* model;
+
+  if(!storage)
+    return NULL;
   
   model=(librdf_model*)LIBRDF_CALLOC(librdf_model, 1, sizeof(librdf_model));
   if(!model)
@@ -424,22 +460,19 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_storage_factory* factory;
   librdf_storage* storage;
   librdf_model* model;
   librdf_statement *statement;
   char *program=argv[0];
   
-  /* initialise statement and model modules */
+  /* initialise dependent modules */
+  librdf_init_hash();
   librdf_init_statement();
   librdf_init_storage();
   librdf_init_model();
   
-  fprintf(stderr, "%s: Getting factory\n", program);
-  factory=librdf_get_storage_factory(NULL);
-
   fprintf(stderr, "%s: Creating storage\n", program);
-  storage=librdf_new_storage(factory, NULL);
+  storage=librdf_new_storage(NULL, NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
@@ -467,8 +500,9 @@ main(int argc, char *argv[])
   librdf_finish_model();
   librdf_finish_storage();
   librdf_finish_statement();
+  librdf_finish_hash();
   
-#ifdef LIBRDF_DEBUG
+#ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);
 #endif
 	
