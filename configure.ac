@@ -323,7 +323,7 @@ AC_SUBST(RUBY_VERSION)
 
 with_ecma_cla=
 dnl Pick an ECMA CLI implementation
-AC_ARG_WITH(ecma-cli, [  --with-ecma-cli=SYSTEM  Enable ECMA CLI interface - mono, dotgnu (default=no)], ecma_cli_name="$withval", ecma_cli_name="no")
+AC_ARG_WITH(ecma-cli, [  --with-ecma-cli=SYSTEM  Enable ECMA CLI interface - mono, dotgnu (default no)], ecma_cli_name="$withval", ecma_cli_name="no")
 
 
 AC_MSG_CHECKING(ECMA CLI implementations available)
@@ -473,9 +473,9 @@ persistent_store=no
 
 
 dnl Berkeley DB
-AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area (default=/usr)], bdb_prefix="$withval", bdb_prefix="none") 
-AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (default=/usr/lib)], bdb_lib_dir="$withval", bdb_lib_dir="none") 
-AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory (default=/usr/include)], bdb_include_dir="$withval", bdb_include_dir="none") 
+AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area (default /usr)], bdb_prefix="$withval", bdb_prefix="none") 
+AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (default /usr/lib)], bdb_lib_dir="$withval", bdb_lib_dir="none") 
+AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory (default /usr/include)], bdb_include_dir="$withval", bdb_include_dir="none") 
 AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Berkeley DB library name (auto)], bdb_dbname="$withval", bdb_dbname="none")
 
 bdb_version=unknown
@@ -688,7 +688,7 @@ if test $ac_cv_func_getopt = no -a $ac_cv_func_getopt_long = no; then
 fi
 
 dnl Checks for URI resolvers
-AC_ARG_WITH(libwww, [  --with-libwww           Use libwww [yes]], enable_libwww="$withval", enable_libwww="no") 
+AC_ARG_WITH(libwww, [  --with-libwww           Use libwww (default auto)], enable_libwww="$withval", enable_libwww="no") 
 
 have_libwww=
 AC_MSG_CHECKING(whether have working libwww)
@@ -761,7 +761,7 @@ fi
 AC_SUBST(with_raptor)
 
 AC_MSG_CHECKING(RDF parsers required)
-AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [raptor]], parser_modules="$enableval") 
+AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers (default raptor)], parser_modules="$enableval") 
 if test "X$parser_modules" = Xno -o "X$parser_modules" = X; then
   parser_modules=
   AC_MSG_RESULT($parser_modules)
@@ -876,7 +876,7 @@ dnl Checks for modules
 digest_modules="md5 sha1 ripemd160"
 
 AC_MSG_CHECKING(digests wanted)
-AC_ARG_ENABLE(digests, [  --enable-digests=LIST   Use digests [md5 sha1 ripemd160]], digest_modules="$enableval") 
+AC_ARG_ENABLE(digests, [  --enable-digests=LIST   Use digests (default=md5 sha1 ripemd160)], digest_modules="$enableval") 
 AC_MSG_RESULT($digest_modules)
 
 DIGEST_OBJS=
@@ -1009,7 +1009,7 @@ LIBS="$LIBRDF_LIBS"
 
 dnl Check for use of threads
 
-AC_ARG_WITH(threads, [  --with-threads          With POSIX thread support (default=no)], with_threads="yes", with_threads="no")
+AC_ARG_WITH(threads, [  --with-threads          With POSIX thread support (default no)], with_threads="yes", with_threads="no")
 
 AC_CHECK_HEADERS(pthread.h)
 
@@ -1101,7 +1101,7 @@ AC_SUBST(SD_POST)
 CFLAGS="-DLIBRDF_INTERNAL=1 $CFLAGS"
 MEM=
 MEM_LIBS=
-AC_ARG_WITH(dmalloc, [  --with-dmalloc          Use dmalloc debugging library (default=auto)], use_dmalloc="$withval", use_dmalloc="auto") 
+AC_ARG_WITH(dmalloc, [  --with-dmalloc          Use dmalloc debugging library (default auto)], use_dmalloc="$withval", use_dmalloc="auto") 
 AC_MSG_CHECKING(using dmalloc library)
 if test "$USE_MAINTAINER_MODE" = yes; then
   if test "$ac_cv_header_dmalloc_h" = yes; then
