@@ -62,32 +62,6 @@ static PyObject *_wrap_redland_version_release_get(void);
 %}
 
 
-/* Turning a native file handle to a C/stdio FILE* */
-
-#ifdef SWIGPERL_NOT_USED
-%typemap(in) FILE * {
-  /* http://archive.develooper.com/perl5-porters@perl.org/msg78879.html */
-  // $1 = stderr;
-  //char buf[8];
-  // $1 = fdopen(PerlIO_fileno($input), PerlIO_modestr($input,buf));
-
-  /* see perldoc perlapio */
-  fprintf(stderr, "input is %d\n", $input);
-  $1 = PerlIO_exportFILE($input, 0);
-}
-#endif
-
-#ifdef SWIGPYTHON_NOT_USED
-%typemap(in) FILE * {
-  if (!PyFile_Check($source)) {
-    PyErr_SetString(PyExc_TypeError, "Need a file!");
-    return NULL;
-  }
-  $1 = PyFile_AsFile($input);
-}
-#endif
-
-
 %init %{
 #ifdef TCL_MAJOR_VERSION
 Tcl_PkgProvide(interp, PACKAGE, (char*)redland_version_string);
