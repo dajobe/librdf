@@ -462,7 +462,7 @@ librdf_uri_to_string (librdf_uri* uri)
  * @first_uri: &librdf_uri object 1
  * @second_uri: &librdf_uri object 2
  * 
- * Return value: 0 if the objects are equal
+ * Return value: non 0 if the objects are equal
  **/
 int
 librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri) 
