@@ -153,7 +153,7 @@ if test "$enable_openssl_digests" = yes ; then
                    [eval "ac_cv_lib_crypto_$func=no"])])
       if eval "test \"`echo '$ac_cv_lib_crypto_'$func`\" = yes"; then
 	AC_MSG_RESULT(yes)
-	n=HAVE_$func
+	n=HAVE_OPENSSL_CRYPTO_${func}_DIGEST
 	AC_DEFINE_UNQUOTED($n)
         have_libcrypto=yes
       else
