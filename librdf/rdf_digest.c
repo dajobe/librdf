@@ -55,14 +55,13 @@ librdf_delete_digest_factories(void)
 /**
  * librdf_digest_register_factory:
  * @name: the name of the hash
- * @factory: function to be called to register the factor parameters
+ * @factory: function to be called to register the factory parameters
  * 
  * Register a hash factory
  **/
 void
 librdf_digest_register_factory(const char *name,
-                           void (*factory) (librdf_digest_factory*)
-                           )
+			       void (*factory) (librdf_digest_factory*))
 {
   librdf_digest_factory *d, *digest;
   char *name_copy;
