@@ -20,7 +20,7 @@ URL:       http://www.redland.opensource.ac.uk/
 BuildRoot: /tmp/%{name}-%{version}
 BuildRequires: libxml2-devel >= 2.5.0
 BuildRequires: curl-devel
-BuildRequires: raptor-devel >= 0.9.12
+BuildRequires: raptor-devel >= 1.0.0
 Packager:  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 Docdir: %{prefix}/doc
 Requires:  libxml2
@@ -40,7 +40,7 @@ for RDF developers to experiment with the technology.
 Summary: Libraries and header files for programs that use Redland.
 Group: Development/Libraries
 Requires: redland
-Requires: raptor >= 0.9.12
+Requires: raptor >= 1.0.0
 
 %description devel
 Header files for development with Redland
@@ -73,7 +73,7 @@ fi
 cd perl
 
 %{__perl} Makefile.PL PREFIX=$RPM_BUILD_ROOT/%{_prefix} SYSCONFDIR=$RPM_BUILD_ROOT/%{_sysconfdir} INST_PREFIX=%{_prefix} INST_SYSCONFDIR=%{_sysconfdir}
-make build-perl
+make
 
 cd ..
 
@@ -83,9 +83,7 @@ cd ..
 
 %makeinstall prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc libdir=$RPM_BUILD_ROOT%{_libdir} mandir=$RPM_BUILD_ROOT%{_mandir}
 
-# Ewww!
-find $RPM_BUILD_ROOT \( -name \*raptor\* -o -name \*ntriples\* -o -name \*rapper\*  \) -exec rm -v {}  \;
-find $RPM_BUILD_ROOT -exec chmod u+w {} \;
+find $RPM_BUILD_ROOT -print | xargs chmod u+w
 
 
 # FIXME
@@ -95,7 +93,7 @@ find $RPM_BUILD_ROOT -exec chmod u+w {} \;
 
 cd perl
 
-make prefix=$RPM_BUILD_ROOT%{prefix} exec_prefix=$RPM_BUILD_ROOT%{prefix} bindir=$RPM_BUILD_ROOT%{prefix}/bin sbindir=$RPM_BUILD_ROOT%{prefix}/sbin sysconfdir=$RPM_BUILD_ROOT/etc datadir=$RPM_BUILD_ROOT%{prefix}/share includedir=$RPM_BUILD_ROOT%{prefix}/include libdir=$RPM_BUILD_ROOT%{prefix}/lib libexecdir=$RPM_BUILD_ROOT%{prefix}/libexec localstatedir=$RPM_BUILD_ROOT/var sharedstatedir=$RPM_BUILD_ROOT%{prefix}/com mandir=$RPM_BUILD_ROOT%{prefix}/share/man infodir=$RPM_BUILD_ROOT%{prefix}/share/info install PREFIX=$RPM_BUILD_ROOT%{prefix} INSTALLMAN1DIR=$RPM_BUILD_ROOT%{prefix}/share/man/man1 INSTALLMAN3DIR=$RPM_BUILD_ROOT%{prefix}/share/man/man3 install-perl
+make prefix=$RPM_BUILD_ROOT%{prefix} exec_prefix=$RPM_BUILD_ROOT%{prefix} bindir=$RPM_BUILD_ROOT%{prefix}/bin sbindir=$RPM_BUILD_ROOT%{prefix}/sbin sysconfdir=$RPM_BUILD_ROOT/etc datadir=$RPM_BUILD_ROOT%{prefix}/share includedir=$RPM_BUILD_ROOT%{prefix}/include libdir=$RPM_BUILD_ROOT%{prefix}/lib libexecdir=$RPM_BUILD_ROOT%{prefix}/libexec localstatedir=$RPM_BUILD_ROOT/var sharedstatedir=$RPM_BUILD_ROOT%{prefix}/com mandir=$RPM_BUILD_ROOT%{prefix}/share/man infodir=$RPM_BUILD_ROOT%{prefix}/share/info install PREFIX=$RPM_BUILD_ROOT%{prefix} INSTALLMAN1DIR=$RPM_BUILD_ROOT%{prefix}/share/man/man1 INSTALLMAN3DIR=$RPM_BUILD_ROOT%{prefix}/share/man/man3 install
 
 find $RPM_BUILD_ROOT -name perllocal.pod -exec rm -v {}  \;
 
@@ -152,6 +150,9 @@ cd ..
 /sbin/ldconfig
 
 %changelog
+* Mon Sep 8 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
+- require raptor 1.0.0
+ 
 * Thu Sep 4 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
 - added rdfproc
  
