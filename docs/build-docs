@@ -1,0 +1,38 @@
+#!/usr/local/bin/perl
+#
+# build-docs - construct the SGML docbook files from the parts
+#
+# $Id$
+#
+# (C) Dave Beckett 2000 ILRT, University of Bristol
+# http://www.ilrt.bristol.ac.uk/people/cmdjb/
+#
+#                                       
+# This program is free software distributed under either of these licenses:
+#   1. The GNU Lesser General Public License (LGPL)
+# OR ALTERNATIVELY
+#   2. The modified BSD license
+#
+# See LICENSE.html or LICENSE.txt for the full license terms.
+
+
+$::verbose=0;
+
+my($prototype)=@ARGV;
+
+
+open(PROTO, $prototype) or die "Cannot open $prototype - $!\n";
+while(<PROTO>) {
+  if(/^\@INCLUDE\s+(.+)$/) {
+    my $file=$1;
+    my $content='';
+    open(IN, $file) or die "$prototype:$.: Cannot open $file - $!\n";
+    while(<IN>) {
+      $content.=$_;
+    }
+    close(IN);
+    print $content;
+    next;
+  }
+  print;
+}
