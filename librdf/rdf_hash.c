@@ -1500,7 +1500,7 @@ main(int argc, char *argv[])
     librdf_hash_from_string(h, argv[1]);
     fprintf(stdout, "%s: resulting ", program);
     librdf_hash_print(h, stdout);
-    fprintf(stdout, "\n");
+    fputc('\n', stdout);
     fprintf(stdout, "%s: values count %d\n", program, librdf_hash_values_count(h));
     librdf_hash_close(h);
     librdf_free_hash(h);
@@ -1534,7 +1534,7 @@ main(int argc, char *argv[])
       
       fprintf(stdout, "%s: resulting ", program);
       librdf_hash_print(h, stdout);
-      fprintf(stdout, "\n");
+      fputc('\n', stdout);
       fprintf(stdout, "%s: values count %d\n", program, librdf_hash_values_count(h));
     }
     
@@ -1545,23 +1545,23 @@ main(int argc, char *argv[])
     
     fprintf(stdout, "%s: resulting ", program);
     librdf_hash_print(h, stdout);
-    fprintf(stdout, "\n");
+    fputc('\n', stdout);
     fprintf(stdout, "%s: values count %d\n", program, librdf_hash_values_count(h));
     
     fprintf(stdout, "%s: resulting %s hash keys: ", program, type);
     librdf_hash_print_keys(h, stdout);
-    fprintf(stdout, "\n");
+    fputc('\n', stdout);
 
     fprintf(stdout, "%s: all values of key '%s'=", program, test_duplicate_key);
     librdf_hash_print_values(h, test_duplicate_key, stdout);
-    fprintf(stdout, "\n");
+    fputc('\n', stdout);
 
     fprintf(stdout, "%s: cloning %s hash\n", program, type);
     ch=librdf_new_hash_from_hash(h);
     if(ch) {
       fprintf(stdout, "%s: resulting cloned ", program);
       librdf_hash_print(ch, stdout);
-      fprintf(stdout, "\n");
+      fputc('\n', stdout);
       fprintf(stdout, "%s: values count %d\n", program, librdf_hash_values_count(ch));
       
       librdf_hash_close(ch);
@@ -1590,12 +1590,12 @@ main(int argc, char *argv[])
   
   fprintf(stdout, "%s: resulting hash ", program);
   librdf_hash_print(h2, stdout);
-  fprintf(stdout, "\n");
+  fputc('\n', stdout);
   fprintf(stdout, "%s: values count %d\n", program, librdf_hash_values_count(h2));
 
   fprintf(stdout, "%s: resulting hash keys: ", program);
   librdf_hash_print_keys(h2, stdout);
-  fprintf(stdout, "\n");
+  fputc('\n', stdout);
 
   
   /* test get as boolean and long functions */
@@ -1648,7 +1648,7 @@ main(int argc, char *argv[])
   librdf_hash_from_string (h2, test_hash_string);
   fprintf(stdout, "%s: resulting ", program);
   librdf_hash_print(h2, stdout);
-  fprintf(stdout, "\n");
+  fputc('\n', stdout);
   fprintf(stdout, "%s: values count %d\n", program, librdf_hash_values_count(h2));
 
   librdf_free_hash(h2);

@@ -417,7 +417,7 @@ main(int argc, char *argv[])
     
     fprintf(stdout, "%s: %s digest of data is: ", program, answer->type);
     librdf_digest_print(d, stdout);
-    fprintf(stdout, "\n");
+    fputc('\n', stdout);
 
     s=librdf_digest_to_string(d);
     if(strcmp(s, answer->result))
