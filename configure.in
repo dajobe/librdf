@@ -457,10 +457,10 @@ fi
 
 if test "X$XML_CONFIG" != X; then
   LIBS="`$XML_CONFIG --libs` $LIBS"
-  AC_CHECK_LIB(xml, xmlCreatePushParserCtxt)
+  AC_CHECK_FUNC(xmlCreatePushParserCtxt, have_xmlCreatePushParserCtxt=yes, have_xmlCreatePushParserCtxt=no)
   LIBS="$LIBRDF_LIBS"
   AC_MSG_CHECKING(for system (GNOME) libxml library)
-  if test $ac_cv_lib_xml_xmlCreatePushParserCtxt = yes; then
+  if test $have_xmlCreatePushParserCtxt = yes; then
     have_libxml_lib=1
     have_libxml=1
     AC_MSG_RESULT(yes)
