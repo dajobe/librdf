@@ -320,6 +320,33 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
 }
 
 
+/**
+ * librdf_new_uri_from_filename - Constructor - create a new librdf_uri object from a filename
+ * @world: Redland &librdf_world object
+ * @filename: filename
+ *
+ * Return value: a new &librdf_uri object or NULL on failure
+ **/
+librdf_uri*
+librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
+  char *buffer;
+  int buffer_length;
+  librdf_uri* new_uri;
+  char *uri_string;
+
+  if(!filename)
+    return NULL;
+  
+  uri_string=raptor_uri_filename_to_uri_string(filename);
+  if(!uri_string)
+    return NULL;
+  
+  new_uri=librdf_new_uri(world, uri_string);
+  LIBRDF_FREE(cstring, uri_string);
+  return new_uri;
+}
+
+
 
 /**
  * librdf_free_uri - Destructor - destroy a librdf_uri object
@@ -551,10 +578,12 @@ int
 main(int argc, char *argv[]) 
 {
   char *hp_string="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
-  librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5, *uri6, *uri7;
+  librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5, *uri6, *uri7, *uri8, *uri9;
   librdf_digest *d;
   char *program=argv[0];
-  const char *uri_string=  "file:/big/long/directory/blah#frag";
+  const char *file_string="/big/long/directory/file";
+  const char *file_uri_string=  "file:///big/long/directory/file";
+  const char *uri_string=  "http://example.com/big/long/directory/blah#frag";
   const char *relative_uri_string1="#foo";
   const char *relative_uri_string2="bar";
   librdf_world *world;
@@ -630,6 +659,12 @@ main(int argc, char *argv[])
   librdf_uri_print(uri7, stderr);
   fputs("\n", stderr);
 
+  uri8=librdf_new_uri_from_filename(world, file_string);
+  uri9=librdf_new_uri(world, file_uri_string);
+  if(!librdf_uri_equals(uri8, uri9)) {
+    fprintf(stderr, "%s: URI string from filename %s returned %s, expected %s\n", program, file_string, librdf_uri_as_string(uri8), file_uri_string);
+    return(1);
+  }
 
   fprintf(stderr, "%s: Freeing URIs\n", program);
   librdf_free_uri(uri1);
@@ -639,6 +674,8 @@ main(int argc, char *argv[])
   librdf_free_uri(uri5);
   librdf_free_uri(uri6);
   librdf_free_uri(uri7);
+  librdf_free_uri(uri8);
+  librdf_free_uri(uri9);
   
   librdf_finish_uri(world);
   librdf_finish_hash(world);
