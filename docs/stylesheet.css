@@ -1,46 +1,82 @@
-/* Smush of CSS from ILRT, Rudolf, W3C REC, Gnumeric home page */
+/* CSS from many places, styled after 2002 ILRT style */
 
 body {
-  margin: 2em 1em 2em 1em;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  color: #000085;
-  background: white;
+  margin: 0em 1em 1em 1em;
+  font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
+  color: black;
+  background: #ffffff;
+  font-size: 12px;
 }
 
 /* NS 4 needs this */
-th, td, p, ol, ul, li, dl, dt, blockquote { font-family: Verdana, Arial, Helvetica, sans-serif; }
+th, td, p, ol, ul, li, dl, dt, blockquote { 
+  font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
+}
 
-h1, h2, h3, h4 { text-align: left; color: #880000; }
+h1, h2, h3, h4 { text-align: left; }
 
-h1 { font-weight: normal; font-size: 200%; font-family: Verdana, Arial, Helvetica, sans-serif; }
-h2 { font-weight: 600; text-transform: capitalize; font-size: 120%; font-family: Verdana, Arial, Helvetica, sans-serif; }
-h3 { font-weight: normal; font-size: 110%; font-family: Verdana, Arial, Helvetica, sans-serif; }
-h4 { font-weight: bold; font-size: 100%; font-family: Verdana, Arial, Helvetica, sans-serif; }
+h1 { font-weight: normal; font-size: 200%; font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif; }
+h2 { font-weight: bold; text-transform: capitalize; font-size: 130%; font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif; }
+h3 { font-weight: bold; font-size: 110%; font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif; }
+h4 { font-weight: bold; font-size: 100%; font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif; }
 
 
-pre { margin-left: 2em }
+pre {
+  margin-left: 2em
+}
 
 /* NS 4 needs this */
-pre, code { font-size: 100%; font-family: Courier, monospace; }
-
-tt { font-size: 100%; font-family: Courier, monospace; }
-
+pre, code, tt {
+  font-family: Courier, monospace;
+  font-size: 80%;
+}
 
 @media screen {  /* hide from IE3 */
-  a:hover { background: #ffa } 
+  a:hover { color: red } 
 }
-
 
 .category {
-  padding: 0;
-  border-bottom: solid #008000 1px;
-  border-bottom-width: 1px;
-  border-top: solid #FFFFFF 0px;
-  border-top-width: 0px;
-  border-left: solid #FFFFFF 0px;
-  border-left-width: 0px;
-  border-right: solid #FFFFFF 0px;
-  border-right-width: 0px;
-  border-color: #008000;
-  border-style: solid;
+  border: solid #993300 2px;
+  margin: 0em 0.5em 0.5em 0em;
 }
+
+.catheader {
+  padding: 2px;
+  margin-top: 0px;
+  border-bottom: solid #993300 1px;
+
+  background: #eeeeee;
+
+  font-size: 80%;
+}
+
+.catitems {
+  font-size: 70%;
+  margin-left: 6pt;
+  margin: 0.3em;
+  padding: 0em;
+}
+
+.logo {
+  font-size: 60%;
+}
+
+.heading {
+  margin: 0pt;
+}
+
+h1.heading {
+  margin: 0em;
+}
+
+.author {
+  margin: 0pt;
+}
+
+a.author:link { text-decoration: none };
+
+.footer {
+  font-size: 75%;
+  color : #808080;
+}
+
