@@ -1127,37 +1127,37 @@ librdf_storage_mysql_context_serialise_next_statement(void* context)
 
   if(scontext->one_context)
     sprintf(scontext->query,
-"select\
+"select \
 SuR.URI as SUR,SuB.Name as SUB,\
 PrR.URI as PRR,ObR.URI as OBR,ObB.Name as OBB,\
-ObL.Value as OBV,ObL.Language as OBL,ObL.Datatype as OBD\
-from Statements as T\
-left join Resources as SuR on T.Subject1=SuR.ID1 and T.Subject2=SuR.ID2\
-left join Bnodes as SuB on T.Subject1=SuB.ID1 and T.Subject2=SuB.ID2\
-left join Resources as PrR on T.Predicate1=PrR.ID1 and T.Predicate2=PrR.ID2\
-left join Resources as ObR on T.Object1=ObR.ID1 and T.Object2=ObR.ID2\
-left join Bnodes as ObB on T.Object1=ObB.ID1 and T.Object2=ObB.ID2\
-left join Literals as ObL on T.Object1=ObL.ID1 and T.Object2=ObL.ID2\
+ObL.Value as OBV,ObL.Language as OBL,ObL.Datatype as OBD \
+from Statements as T \
+left join Resources as SuR on T.Subject1=SuR.ID1 and T.Subject2=SuR.ID2 \
+left join Bnodes as SuB on T.Subject1=SuB.ID1 and T.Subject2=SuB.ID2 \
+left join Resources as PrR on T.Predicate1=PrR.ID1 and T.Predicate2=PrR.ID2 \
+left join Resources as ObR on T.Object1=ObR.ID1 and T.Object2=ObR.ID2 \
+left join Bnodes as ObB on T.Object1=ObB.ID1 and T.Object2=ObB.ID2 \
+left join Literals as ObL on T.Object1=ObL.ID1 and T.Object2=ObL.ID2 \
 where T.ID=%u",
             scontext->stmts[scontext->count]);
   else
     sprintf(scontext->query,
-"select\
+"select \
 SuR.URI as SUR,SuB.Name as SUB,\
 PrR.URI as PRR,ObR.URI as OBR,ObB.Name as OBB,\
 ObL.Value as OBV,ObL.Language as OBL,ObL.Datatype as OBD,\
 CoR.URI as COR,CoB.Name as COB,\
-CoL.Value as COV,CoL.Language as COL,CoL.Datatype as CoD\
-from Statements as T\
-left join Resources as SuR on T.Subject1=SuR.ID1 and T.Subject2=SuR.ID2\
-left join Bnodes as SuB on T.Subject1=SuB.ID1 and T.Subject2=SuB.ID2\
-left join Resources as PrR on T.Predicate1=PrR.ID1 and T.Predicate2=PrR.ID2\
-left join Resources as ObR on T.Object1=ObR.ID1 and T.Object2=ObR.ID2\
-left join Bnodes as ObB on T.Object1=ObB.ID1 and T.Object2=ObB.ID2\
-left join Literals as ObL on T.Object1=ObL.ID1 and T.Object2=ObL.ID2\
-left join Resources as CoR on T.Context1=CoR.ID1 and T.Context2=CoR.ID2\
-left join Bnodes as CoB on T.Context1=CoB.ID1 and T.Context2=CoB.ID2\
-left join Literals as CoL on T.Context1=CoL.ID1 and T.Context2=CoL.ID2\
+CoL.Value as COV,CoL.Language as COL,CoL.Datatype as CoD \
+from Statements as T \
+left join Resources as SuR on T.Subject1=SuR.ID1 and T.Subject2=SuR.ID2 \
+left join Bnodes as SuB on T.Subject1=SuB.ID1 and T.Subject2=SuB.ID2 \
+left join Resources as PrR on T.Predicate1=PrR.ID1 and T.Predicate2=PrR.ID2 \
+left join Resources as ObR on T.Object1=ObR.ID1 and T.Object2=ObR.ID2 \
+left join Bnodes as ObB on T.Object1=ObB.ID1 and T.Object2=ObB.ID2 \
+left join Literals as ObL on T.Object1=ObL.ID1 and T.Object2=ObL.ID2 \
+left join Resources as CoR on T.Context1=CoR.ID1 and T.Context2=CoR.ID2 \
+left join Bnodes as CoB on T.Context1=CoB.ID1 and T.Context2=CoB.ID2 \
+left join Literals as CoL on T.Context1=CoL.ID1 and T.Context2=CoL.ID2 \
 where T.ID=%u",
             scontext->stmts[scontext->count]);
 
@@ -1185,11 +1185,10 @@ where T.ID=%u",
   librdf_statement_clear(scontext->current);
   
   /* Subject. */
-  if(!row[0] && 
-     (!row[1] || 
-      !(s=row[0] ? librdf_new_node_from_uri_string(scontext->storage->world,(const unsigned char*)row[0]): librdf_new_node_from_blank_identifier(scontext->storage->world, (const unsigned char*)row[1]))
-      )
-     )
+  if((!row[0] && !row[1]) ||
+     !(s=row[0] ? librdf_new_node_from_uri_string(scontext->storage->world,(const unsigned char*)row[0])
+                : librdf_new_node_from_blank_identifier(scontext->storage->world, (const unsigned char*)row[1]))
+    )
     return 0;
   librdf_statement_set_subject(scontext->current,s);
 
@@ -1201,8 +1200,11 @@ where T.ID=%u",
   
   /* Object. */
   if((!row[3] && !row[4] && !row[5]) ||
-     !(o=row[3]? librdf_new_node_from_uri_string(scontext->storage->world,(const unsigned char*)row[3]): row[4]? librdf_new_node_from_blank_identifier(scontext->storage->world,(const unsigned char*)row[4]): librdf_new_node_from_typed_literal(scontext->storage->world,(const unsigned char*)row[5],row[6], row[7] && strlen(row[7])?librdf_new_uri(scontext->storage->world,(const unsigned char*)row[7]):NULL))
+     !(o=row[3] ? librdf_new_node_from_uri_string(scontext->storage->world,(const unsigned char*)row[3])
+                : row[4] ? librdf_new_node_from_blank_identifier(scontext->storage->world,(const unsigned char*)row[4])
+                         : librdf_new_node_from_typed_literal(scontext->storage->world,(const unsigned char*)row[5],row[6], row[7] && strlen(row[7])?librdf_new_uri(scontext->storage->world,(const unsigned char*)row[7]):NULL)
       )
+    )
     return 0;
   librdf_statement_set_object(scontext->current,o);
   
