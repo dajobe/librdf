@@ -805,7 +805,7 @@ librdf_node_get_digest(librdf_node* node)
  * Note - for literal nodes, XML language, XML space and well-formness are 
  * presently ignored in the comparison.
  * 
- * Return value: non 0 if nodes are equal.  0 if equal or failure
+ * Return value: non 0 if nodes are equal.  0 if not-equal or failure
  **/
 int
 librdf_node_equals(librdf_node* first_node, librdf_node* second_node) 
