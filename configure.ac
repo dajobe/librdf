@@ -508,7 +508,8 @@ fi
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h)
+AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h)
+AC_HEADER_TIME
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -516,7 +517,7 @@ AC_C_BIGENDIAN
 
 dnl Checks for library functions.
 AC_FUNC_MEMCMP
-AC_CHECK_FUNCS(mkstemp mktemp tmpnam)
+AC_CHECK_FUNCS(mkstemp mktemp tmpnam gettimeofday)
 
 dnl Checks for URI resolvers
 AC_ARG_WITH(libwww, [  --with-libwww           Use libwww [yes]], enable_libwww="$withval", enable_libwww="no") 
