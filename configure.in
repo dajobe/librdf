@@ -44,11 +44,15 @@ AC_CHECK_HEADERS(db.h)
 if test "$ac_cv_header_db_h" = yes ; then
   AC_CHECK_LIB(db, db_create)
   AC_CHECK_LIB(db, db_open)
+  AC_CHECK_LIB(db, dbopen)
   if test "$ac_cv_lib_db_db_create" = yes; then
     AC_DEFINE(HAVE_DB_CREATE)
   fi
   if test "$ac_cv_lib_db_db_open" = yes; then
     AC_DEFINE(HAVE_DB_OPEN)
+  fi
+  if test "$ac_cv_lib_db_dbopen" = yes; then
+    AC_DEFINE(HAVE_DBOPEN)
   fi
   AC_MSG_CHECKING(whether DB_TXN defined in db.h)
   dnl In BDB, DB_TXN is a pointer to a structure never defined
@@ -215,7 +219,7 @@ else
 fi
 
 AC_MSG_CHECKING(for libdb support)
-if test "$ac_cv_lib_db_db_open" = yes ; then
+if test "$ac_cv_lib_db_db_open" = yes -o "$ac_cv_lib_db_dbopen" = yes; then
   AC_MSG_RESULT(yes);
   AC_DEFINE(HAVE_BDB_HASH)
   HASH_OBJS="$HASH_OBJS rdf_hash_bdb.o"
