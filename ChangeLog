@@ -1,4 +1,248 @@
+2004-12-08  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/rdql/testsuite/Makefile.am (check-rdql-correct):
+	Set PATH then use -s $(srcdir) rather than
+	lots of envariable passing.
+
+	* rasqal/tests/rdql/testsuite/check-rdql:
+	Merged in changes from check-sparql - use -s . argument now.
+
+	* configure.ac:
+	Delete changing PATH here for OSX. A bad idea as it makes the
+	configure environment different from the user's.
+	Added /opt/local to BDB search path for darwinports.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_execute_init):
+	Init current_graph_pattern only if there
+	are graph patterns.
+	(rasqal_engine_get_next_result): Handle 0 graph patterns.
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Added manifest.n3
+	Invoke check-sparql-correct test
+
+	* rasqal/tests/sparql/syntax/manifest.n3: Test manifest
+
+	* rasqal/tests/sparql/syntax/result-0triples.n3:
+	select with 0 triples result
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Added 0triples.rq
+
+	* rasqal/tests/sparql/syntax/0triples.rq: Zero graph pattern triples
+
+	* rasqal/tests/sparql/syntax/data.n3: typo
+
+	* raptor/raptor_sequence.c (raptor_sequence_set_at,
+	raptor_sequence_get_at): Check for non-negative idx
+
+	* raptor/raptor_sequence.c (raptor_sequence_get_at):
+	Fix index offset check
+
+2004-12-07  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y (PatternElementForms): Handle empty
+	GraphPattern1 (NULL sequences)
+
+	* rasqal/tests/sparql/part1/dawg-data-01.n3,
+	rasqal/tests/sparql/part1/dawg-query-002,
+	rasqal/tests/sparql/simple/dawg-tp-04.rq,
+	rasqal/tests/sparql/simple/dawg-data-01.n3: foaf:knowns to
+	foaf:knows
+
+2004-12-02  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/rdfdump.c: Make a raptor_sequence of namespace
+	declarations declared by '-f xmlns:foo="bar"' and then add them to
+	the serializer when initialised.
+	(rdfdump_free_namespace_decl): Added, to provide a helper to
+	cleanup.
+
+	* raptor/raptor_serialize.c (raptor_serialize_set_namespace): Call
+	factory method declare_namespace.
+	(raptor_rdfxml_serialize_declare_namespace): Copy the passed in
+	namespace prefix, URI before storing the namespace.
+	(raptor_rdfxml_serialize_start): Delete the namespace sequence
+	contents as the namespaces are declared on the namespace stack,
+	which is the new owner of the namespaces.
+
+	* raptor/raptor_namespace.c
+	(raptor_new_namespace_parts_from_string): Added, to decode things
+	like "xmlns:foo='bar'" into prefix, uri strings.
+
+	* raptor/raptor.h: Added prototype for
+	raptor_new_namespace_parts_from_string.
+	raptor_sequence_free_handler prototype changed to return void
+
+2004-11-30  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/examples/ex2-1a-result.n3,
+	rasqal/tests/sparql/examples/ex2-2a-result.n3,
+	rasqal/tests/sparql/examples/ex2-3a-result.n3,
+	rasqal/tests/sparql/examples/ex2-4a-result.n3,
+	rasqal/tests/sparql/examples/ex3-result.n3: .
+
+	* raptor/raptor_serialize.c (raptor_rdfxml_serialize_init): Add a
+	sequence of user-declared namespaces.
+	(raptor_rdfxml_serialize_terminate): Tidy sequence.
+	(raptor_rdfxml_serialize_declare_namespace): Use sequence to store
+	declared namespaces.
+	(raptor_rdfxml_serialize_start): Declare used-defined namespaces
+	and start them in the namespace stack.
+
+	* raptor/raptor_namespace.c (raptor_new_namespace_from_uri): Added
+	with raptor_new_namespace code.
+	(raptor_new_namespace): Now a wrapper around
+	raptor_new_namespace_from_uri.
+	(raptor_namespace_copy): Use raptor_new_namespace_from_uri.
+
+	* raptor/raptor_qname.c (raptor_iostream_write_qname):
+	Added to write a qname to an iostream.
+
+	* raptor/raptor.h: Add prototypes for raptor_iostream_write_qname,
+	raptor_new_namespace_from_uri
+
+	* raptor/raptor_rdfxml.c (raptor_xml_start_element_handler,
+	raptor_xml_end_element_handler, raptor_xml_comment_handler,
+	raptor_start_element_grammar, raptor_end_element_grammar,
+	raptor_cdata_grammar): Update the use of xml_writer for building
+	parseType="Literal" content to use an iostream. Use more sax2
+	methods rather than direct access to internals - still some left.
+	(raptor_xml_parse_init, raptor_xml_parse_start,
+	raptor_xml_parse_terminate, raptor_inscope_xml_language,
+	raptor_inscope_base_uri): Move expat/libxml details to
+	raptor_new_sax2, raptor_sax2_parse_start, raptor_free_sax2,
+	raptor_sax2_inscope_xml_language, raptor_sax2_inscope_base_uri
+	respectively.
+	(raptor_xml_parse_chunk_): Deleted, moved to
+	raptor_sax2_parse_chunk
+
+	* raptor/raptor_xml_writer.c: Change to output to an iostream not
+	build up a stringbuffer.
+	(raptor_new_xml_writer): Add iostream arg, delete never-used
+	canonicalize.
+	(raptor_free_xml_writer): Remvoe stringbuffer.
+	(raptor_xml_writer_start_element, raptor_xml_writer_end_element):
+	Delete stringbuffer and use raptor_iostream_write_sax2_element.
+	(raptor_xml_writer_cdata): Delete stringbuffer and use
+	raptor_iostream_write_xml_escaped_string.
+	(raptor_xml_writer_raw): Added to write just the bytes.
+	(raptor_xml_writer_comment): Fixed to emit <!-- and -->
+	(raptor_xml_writer_as_string): Deleted.
+	(main): Added with test case.
+
+	* raptor/raptor_sax2.c (raptor_new_sax2, raptor_free_sax2,
+	raptor_sax2_inscope_xml_language, raptor_sax2_inscope_base_uri,
+	raptor_sax2_get_depth, raptor_sax2_inc_depth,
+	raptor_sax2_dec_depth, raptor_sax2_parse_start,
+	raptor_sax2_parse_chunk, raptor_sax2_element_get_element): Added.
+	(raptor_iostream_write_sax2_element): Renamed from
+	raptor_format_sax2_element and now writing to a raptor_iostream
+	with no allocing/freeing buffers.
+
+	* raptor/raptor_xml.c (raptor_iostream_write_xml_escaped_string):
+	Added, to write an
+	XML-escaped version of a string to an iostream
+
+2004-11-29  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_namespace.c (raptor_iostream_write_namespace):
+	Added to write a namespace to a raptor_iostream
+
+	* raptor/raptor.h: Added raptor_iostream_write_namespace
+
+	* raptor/Makefile.am: Added raptor_xml_writer_test
+
+	* raptor/raptor_expat.c (raptor_expat_init): Take void* user data
+
+	* raptor/raptor_internal.h: raptor_exp_init takes void*
+	Add user_data to raptor_sax2
+	Added prototypes or raptor_new_sax2, raptor_free_sax2,
+	raptor_sax2_parse_start, raptor_sax2_parse_chunk,
+	raptor_sax2_parse_handle_errors, raptor_sax2_get_depth,
+	raptor_sax2_inc_depth, raptor_sax2_dec_depth,
+	raptor_sax2_inscope_xml_language, raptor_sax2_inscope_base_uri,
+	raptor_sax2_element_get_element, raptor_iostream_write_sax2_element
+	Deleted raptor_format_sax2_element, raptor_xml_writer_as_string and
+	raptor_xml_writer_write_to_iostream
+	Changed raptor_new_xml_writer to write to a raptor_iostream
+
+	* raptor/raptor.h: Added raptor_iostream_write_xml_escaped_string
+	and raptor_namespace_write
+
+	* rasqal/rasqal_expr.c (rasqal_expression_evaluate):
+	UMINUS, PLUS, MINUX, STAR, SLASH are
+	now done with floating literals.
+
+	* rasqal/rasqal_internal.h: Export rasqal_literal_as_floating
+
+	* rasqal/rasqal_literal.c (rasqal_new_floating_literal):
+	Changed to take a double arg
+	(rasqal_literal_as_floating): Export.
+	(rasqal_literal_compare): Improve promotion. Promote to float where
+	needed, especially assuming strings could be a float.
+
+	* rasqal/sparql_lexer.l, rasqal/rdql_lexer.l:
+	Do sscanf here and call rasqal_new_floating_literal with the double.
+
+	* rasqal/rasqal.h: rasqal_new_floating_literal takes a double arg
+
+	* rasqal/tests/sparql/check-sparql,
+	rasqal/tests/rdql/testsuite/check-rdql: diff backwards
+
+	* rasqal/tests/sparql/part1/dawg-result-002.n3,
+	rasqal/tests/sparql/part1/dawg-result-003.n3,
+	rasqal/tests/sparql/simple/result-tp-01.n3,
+	rasqal/tests/sparql/simple/result-tp-02.n3,
+	rasqal/tests/sparql/simple/result-tp-03.n3,
+	rasqal/tests/sparql/simple/result-tp-04.n3,
+	rasqal/tests/sparql/part1/dawg-result-001.n3: Update to DAWG
+	latest results removing rs:size triples.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_as_integer): For
+	RASQAL_LITERAL_STRING, also try to evaluate it as a double with
+	strtod, then return that cast to int if it worked.
+
+	* rasqal/sparql_parser.y, rasqal/rdql_parser.y (UnaryExpression):
+	Make unary plus and minus work; removes 2
+	shift/reduce conflicts.
+
+	* rasqal/rasqal_expr.c:
+	(rasqal_free_expression, rasqal_expression_foreach,
+	rasqal_expression_evaluate, rasqal_expression_print):
+	Added RASQAL_EXPR_UMINUS support.
+	rasqal_op_labels: added uminus
+
+	* rasqal/rasqal.h: Added RASQAL_EXPR_UMINUS
+
+2004-11-26  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_internal.h: Added prototype for
+	raptor_xml_writer_write_to_iostream
+
+	* raptor/raptor_xml_writer.c
+	(raptor_xml_writer_write_to_iostream): Added
+
+	* raptor/raptor.h: Added prototype for
+	raptor_iostream_write_stringbuffer
+
+	* raptor/raptor_iostream.c: (raptor_iostream_write_stringbuffer) Added
+
+	* configure.ac, rasqal/configure.ac, raptor/configure.ac:
+	--with-dmalloc default is now no
+
+	* librdf/Makefile.am: Remove rdf_storage_tstore.h rdf_storage_mysql.h
+
+2004-11-25  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/configure.ac: If expat_source is empty, set it to auto so
+	no path-to-source is added to libs, includes
+
 2004-11-23  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/tests/ex-55.out, raptor/tests/ex-55.rdf: ex-55
+
+	* raptor/tests/Makefile.am: Added ex-55
+
+	* librdf/rdf_storage_mysql.h, librdf/rdf_storage_tstore.h: Deleted
 
 	* configure.ac:
 	Rip out STORAGE_OBJS code and make all storage modules have

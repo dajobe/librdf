@@ -1,3 +1,11 @@
+2004-11-26  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* Makefile.am: Remove rdf_storage_tstore.h rdf_storage_mysql.h
+
+2004-11-23  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_mysql.h, rdf_storage_tstore.h: Deleted
+
 2004-11-22  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* Makefile.am: Use STORAGE_ conditionals instead of @STORAGE_OBJS@
