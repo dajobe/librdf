@@ -1,3 +1,23 @@
+2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_rasqal.c, rdf_parser_raptor.c, rdf_node.c, rdf_log.c:
+	Casts for C++
+
+2004-07-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_parser.c, rdf_model.c: Replace parser name "raptor" with "rdfxml"
+
+2004-07-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* redland.spec.in: remove redland-perl, redland-python
+
+2004-07-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* redland.spec.in:
+	Use MAKE_PL_OPTS along with "make Makefile.perl" to ensure that the
+	right flags get passed in, rather than invoking perl Makefile.PL
+	directly
+
 2004-07-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* redland.spec.in: Ship /usr/share/redland/Redland.i in redland-devel

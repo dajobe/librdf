@@ -1,6 +1,9 @@
 2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
-	* configre.ac.: Added DIST_SUBDIRS for maintainer mode
+	* librdf/rdf_query_rasqal.c, librdf/rdf_parser_raptor.c,
+	librdf/rdf_node.c, librdf/rdf_log.c: Casts for C++
+
+	* configure.ac: Added DIST_SUBDIRS for maintainer mode
 
 	* configure.ac, Makefile.am:
 	Replace SD_PRE with LOCAL_SUBDIRS to enable make distcheck to work.
