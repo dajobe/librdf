@@ -56,11 +56,10 @@ such as <tt>--prefix</tt> etc.</p>
 <dt><tt>--with-bdb=ROOT</tt><br /></dt>
 <dd><p>Enable use of the Berkeley DB library installed at <em>ROOT</em>.  That means <em>ROOT</em><tt>/include</tt> must contain the BDB header <tt>db.h</tt> and <em>ROOT</em><tt>/lib</tt> must contain the library <tt>libdb.a</tt> (or whatever shared version you have).</p>
 
-<P>Berkeley DB is now distributed and supported by
+<p>Berkeley DB is now distributed and supported by
 <a href="http://www.sleepycat.com/">SleepyCat Software</a> and you can
 download the library from there.  Versions 3.1.14, 2.7.7 and 2.4.14 (comes
 with RedHat 6.2) have been tested and work.</p>
-
 </dd>
 
 <dt><tt>--with-libwww</tt><br /></dt>
@@ -85,28 +84,28 @@ but is difficult to enable.</p>
 </dd>
 
 <dt><tt>--with-rdf-java-api=JAR</tt><br /></dt>
-<dd>Enable the use of Sergey Melnik's
+<dd><p>Enable the use of Sergey Melnik's
 <a href="http://www-db.stanford.edu/~melnik/rdf/api.html">Java API</a>
 RDF parser (based on 
 <a href="http://www.w3.org/RDF/Implementations/SiRPAC/">SiRPAC</a>)
 to generate triples.  You need to download 
 the distribution from
 <a href="http://www-db.stanford.edu/~melnik/rdf/api.html">his site</a>
-and enable with this option pointing at the Jar file.</dd>
+and enable with this option pointing at the Jar file.</p></dd>
 
 <dt><tt>--enable-digests=LIST</tt><br /></dt>
-<dd>Select the list of digests to be included if the are availble.  The
+<dd><p>Select the list of digests to be included if the are availble.  The
 valid list of digests are: <tt>md5 sha1 ripem160</tt> (the default).  The
 digest functions can be provided by external libraries such as
 the <a href="http://www.openssl.org/">OpenSSL</a>
 libcrypto library or by provided portable
-versions (only MD5 supported in this release).</dd>
+versions (only MD5 supported in this release).</p></dd>
 
 <dt><tt>--with-openssl-digests</tt><br /></dt>
-<dd>Enable digests provided by the <a href="http://www.openssl.org/">OpenSSL</a> libcrypto library (MD5,
+<dd><p>Enable digests provided by the <a href="http://www.openssl.org/">OpenSSL</a> libcrypto library (MD5,
 SHA1 and RIPEMD160) if the library is available. configure will
 automatically enable this unless disabled by setting this option to
-<em>no</em>.</dd>
+<em>no</em>.</p></dd>
 
 </dl>
 
