@@ -51,6 +51,7 @@ README      NEWS      LICENSE.txt  TODO \
 README.html NEWS.html LICENSE.html TODO.html \
 RELEASE.html INSTALL.html FAQS.html \
 LICENSE-2.0.txt NOTICE \
+redland.rdf.in \
 autogen.sh \
 Makefile.PL \
 redland-config.in \

@@ -1003,6 +1003,8 @@ abs_top_builddir=`pwd`
 AC_SUBST(abs_top_builddir)
 
 AC_CONFIG_FILES([Makefile
+redland.rdf
+librdf/redland.spec
 docs/Makefile
 librdf/Makefile
 examples/Makefile
@@ -1010,7 +1012,6 @@ utils/Makefile
 demos/Makefile
 data/Makefile
 librdf/redland.pc])
-AC_CONFIG_FILES([librdf/redland.spec])
 AC_CONFIG_FILES([redland-config], [chmod +x redland-config])
 AC_CONFIG_FILES([redland-src-config], [chmod +x redland-src-config])
 
