@@ -218,8 +218,11 @@ static librdf_statement*
 librdf_storage_list_serialise_next_statement(void* context)
 {
   librdf_iterator* iterator=(librdf_iterator*)context;
-
-  return (librdf_statement*)librdf_iterator_get_next(iterator);
+  librdf_statement* statement=(librdf_statement*)librdf_iterator_get_next(iterator);
+  if(!statement)
+    return NULL;
+  
+  return librdf_new_statement_from_statement(statement);
 }
 
 
@@ -245,6 +248,8 @@ librdf_storage_list_find_map(void* context, librdf_statement* statement)
     return statement;
   }
 
+  /* discard */
+  librdf_free_statement(statement);
   return NULL;
 }
 
@@ -269,7 +274,8 @@ librdf_stream* librdf_storage_list_find_statements(librdf_storage* storage, libr
 
   stream=librdf_storage_list_serialise(storage);
   if(stream)
-    librdf_stream_set_map(stream, &librdf_storage_list_find_map, (void*)statement);
+    librdf_stream_set_map(stream, &librdf_storage_list_find_map,
+                          (void*)statement);
   return stream;
 }
 
