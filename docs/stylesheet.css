@@ -139,3 +139,57 @@ div.logo a {
 img {
   border: 0
 }
+
+.headerback { background-color: #286097 }
+
+.mainnavback {
+  color: #ffffff; 
+  background-color: #113558; 
+  padding: 3px 6px 3px 6px;
+}
+
+a.mainnavlink { 
+  color: #ffffff; background-color: #113558; 
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a.mainnavlink:hover { 
+  color: #ffffff; background-color: #113558; 
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+a.mainnavlinkselected { 
+  color: #ccff66; background-color: #113558; 
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+a.mainnavlinkselected:hover { 
+  color: #ccff66; background-color: #113558; 
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.navdisplay {
+  padding: 0.5em;
+}
+
+.home {
+  color: white;
+  background-color: #286097;
+}
+
+a.home {
+  color: white;
+  background-color: #286097;
+  text-decoration: none; 
+}
+
+a.home:hover {
+  color: #ccff66;
+  background-color: #286097;
+  text-decoration: none; 
+}
+
