@@ -88,7 +88,7 @@ my(%demo_rss_feeds)=(
   # Put your favourite RSS 1.0 feeds here
    'W3C Semantic Web News' => 'http://www.w3.org/2001/sw/Overview.rss',
 );
-my(@demo_rss_feeds_order)=sort keys %demo_rss_feeds;
+my(@demo_rss_feeds_order)=sort {lc $a cmp lc $b} keys %demo_rss_feeds;
 
 # Redland perl modules
 
