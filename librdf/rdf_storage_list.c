@@ -357,7 +357,7 @@ librdf_stream* librdf_storage_list_find_statements(librdf_storage* storage, libr
   stream=librdf_storage_list_serialise(storage);
   if(stream)
     librdf_stream_set_map(stream, &librdf_storage_list_find_map,
-                          &librdf_free_statement, (void*)statement);
+                          (librdf_stream_map_free_context_handler)&librdf_free_statement, (void*)statement);
   return stream;
 }
 
