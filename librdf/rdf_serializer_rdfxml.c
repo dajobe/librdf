@@ -59,7 +59,7 @@ librdf_serializer_rdfxml_init(librdf_serializer *serializer, void *context)
  * rdf_serializer_rdfxml_ok_xml_name - check name is OK XML Name
  * @name: XML name to check
  * 
- * An XML name starts with alpha or _, continues with alnum or _ - . */
+ * An XML name starts with alpha or _, continues with alnum or _ - .
  * 
  * Return value: non-zero if is a legal XML name
  **/
