@@ -301,6 +301,14 @@ librdf_new_node_from_node(librdf_node *node)
       }
       break;
 
+    case LIBRDF_NODE_TYPE_BLANK:
+      if (!librdf_node_set_blank_identifier(new_node,
+                                            node->value.blank.identifier)) {
+        LIBRDF_FREE(librdf_node, new_node);
+        return NULL;
+      }
+      break;
+
     default:
       LIBRDF_FATAL2(librdf_node_from_node, 
                     "Do not know how to copy node type %d\n", node->type);
@@ -346,6 +354,11 @@ librdf_free_node(librdf_node *node)
         LIBRDF_FREE(cstring, node->value.literal.xml_language);
       break;
 
+    case LIBRDF_NODE_TYPE_BLANK:
+      if(node->value.blank.identifier != NULL)
+        LIBRDF_FREE(cstring, node->value.blank.identifier);
+      break;
+      
     default:
       break;
   }
@@ -444,7 +457,7 @@ librdf_node_set_type(librdf_node* node, librdf_node_type type)
 #ifdef LIBRDF_DEBUG
 /* FIXME: For debugging purposes only */
 static const char* const librdf_node_type_names[] =
-{"Unknown", "Resource", "Literal", "Statement", "Bag", "Seq", "Alt", "Li", "Model"};
+{"Unknown", "Resource", "Literal", "Statement", "LI", "Blank"};
 
 
 /*
@@ -643,6 +656,44 @@ librdf_node_set_li_ordinal(librdf_node* node, int ordinal)
 }
 
 
+/**
+ * librdf_node_get_blank_identifier - Get the blank node identifier
+ * @node: the node object
+ *
+ * Return value: the identifier value
+ **/
+char *
+librdf_node_get_blank_identifier(librdf_node* node) {
+  return node->value.blank.identifier;
+}
+
+
+/**
+ * librdf_node_set_blank_identifier - Set the blank node identifier
+ * @node: the node object
+ * @identifier: the identifier
+ *
+ * Return value: the old identifier or NULL on failure
+ **/
+char *
+librdf_node_set_blank_identifier(librdf_node* node, char *identifier) 
+{
+  char *old_identifier;
+  char *new_identifier;
+  int len=strlen(identifier);
+  
+  new_identifier=(char*)LIBRDF_MALLOC(cstring, len+1);
+  if(!new_identifier)
+    return NULL;
+  strcpy(new_identifier, identifier);
+  old_identifier=node->value.blank.identifier;
+  node->value.blank.identifier=new_identifier;
+  node->value.blank.identifier_len=len;
+
+  return old_identifier;
+}
+
+
 
 
 /**
@@ -678,6 +729,13 @@ librdf_node_to_string(librdf_node* node)
       return NULL;
     /* use strcpy here to add \0 to end of literal string */
     strcpy(s, node->value.literal.string);
+    break;
+  case LIBRDF_NODE_TYPE_BLANK:
+    s=(char*)LIBRDF_MALLOC(cstring, node->value.blank.identifier_len + 3);
+    if(!s)
+      return NULL;
+    /* use strcpy here to add \0 to end of literal string */
+    sprintf(s, "(%s)", node->value.blank.identifier);
     break;
   case LIBRDF_NODE_TYPE_STATEMENT:
     s=librdf_statement_to_string(node);
