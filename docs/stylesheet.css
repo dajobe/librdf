@@ -1,17 +1,23 @@
 /* Placeholder for better style sheet */
-body {
-  background-color: #FFFFFF;
+
+BODY {
+  background-color: #ffffff;
   color: #000085;
-  font-family: sans-serif
+  font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
+
 }
 
-h1 {
-  align: center
+H1, H2, H3, H4, H5 {
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
+  font-weight: normal;
+  color: #880000; 
 }
 
-pre {
+PRE {
   font-family: monospace
 }
-tt {
+
+TT {
   font-family: monospace
 }
