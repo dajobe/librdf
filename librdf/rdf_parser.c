@@ -213,8 +213,11 @@ librdf_parser_parse_from_uri(librdf_parser* parser, librdf_uri* uri)
 void
 librdf_init_parser(void) 
 {
-#ifdef HAVE_SIRPAC_PARSER
+#ifdef HAVE_SIRPAC_RDF_PARSER
   librdf_parser_sirpac_constructor();
+#endif
+#ifdef HAVE_LIBWWW_RDF_PARSER
+  librdf_parser_libwww_constructor();
 #endif
 }
 
@@ -237,7 +240,7 @@ main(int argc, char *argv[])
 {
   librdf_parser_factory* factory;
   librdf_parser* d;
-  char *test_parser_types[]={"SIRPAC", NULL};
+  char *test_parser_types[]={"SIRPAC", "LIBWWW", NULL};
   int i;
   char *type;
   char *program=argv[0];

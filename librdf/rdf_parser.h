@@ -72,8 +72,11 @@ librdf_stream* librdf_parser_parse_from_uri(librdf_parser* parser, librdf_uri* u
 
 
 /* in librdf_parser_sirpac.c */
-#ifdef HAVE_SIRPAC_PARSER
+#ifdef HAVE_SIRPAC_RDF_PARSER
 void librdf_parser_sirpac_constructor(void);
+#endif
+#ifdef HAVE_LIBWWW_RDF_PARSER
+void librdf_parser_libwww_constructor(void);
 #endif
 
 
