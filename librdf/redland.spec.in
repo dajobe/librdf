@@ -90,6 +90,7 @@ cd ..
 %files
 %defattr(0555, bin, bin)
 %{prefix}/bin/redland-config
+%{prefix}/bin/redland-db-upgrade
 %{prefix}/lib/librdf.a
 %{prefix}/lib/librdf.so.*
 
