@@ -178,7 +178,7 @@ log_handler(void *user_data, librdf_log_message *message)
  }
   fputs(message->message, stderr);
   fputc('\n', stderr);
-  if(message->facility >= LIBRDF_LOG_FATAL)
+  if(message->level >= LIBRDF_LOG_FATAL)
     exit(1);
 
   /* Handled */
