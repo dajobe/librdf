@@ -33,7 +33,7 @@
 #ifdef HAVE_BDB_HASH
 #include <rdf_hash_bdb.h>
 #endif
-#include <rdf_hash_list.h>
+#include <rdf_hash_memory.h>
 
 
 /* prototypes for helper functions */
@@ -57,8 +57,8 @@ librdf_init_hash(void)
 #ifdef HAVE_BDB_HASH
   librdf_init_hash_bdb();
 #endif
-  /* Always have hash list implementation available */
-  librdf_init_hash_list();
+  /* Always have hash in memory implementation available */
+  librdf_init_hash_memory(7000);
 }
 
 /**
@@ -711,7 +711,7 @@ main(int argc, char *argv[])
 {
   librdf_hash_factory *factory, *default_factory;
   librdf_hash *h, *h2;
-  char *test_hash_types[]={"GDBM", "FAKE", "BDB", "LIST", NULL};
+  char *test_hash_types[]={"GDBM", "FAKE", "BDB", "memory", NULL};
   char *test_hash_values[]={"colour", "yellow",
 			    "age", "new",
 			    "size", "large",
