@@ -76,21 +76,22 @@ ERROR - no idea how to use Berkeley DB
 typedef struct 
 {
   DB* db;
-#ifdef HAVE_BDB_CURSOR
-  DBC* cursor;
-#endif
-	char* file_name;
+  char* file_name;
 } librdf_hash_bdb_context;
+
+
+/* Implementing the hash cursor */
+static int librdf_hash_bdb_cursor_init(void *cursor_context, void *hash_context);
+static int librdf_hash_bdb_cursor_get(void *context, librdf_hash_datum* key, librdf_hash_datum* value, unsigned int flags);
+static void librdf_hash_bdb_cursor_finish(void* context);
 
 
 /* prototypes for local functions */
 static int librdf_hash_bdb_open(void* context, char *identifier, void *mode, librdf_hash* options);
 static int librdf_hash_bdb_close(void* context);
-static int librdf_hash_bdb_get(void* context, librdf_hash_data *key, librdf_hash_data *data, unsigned int flags);
-static int librdf_hash_bdb_put(void* context, librdf_hash_data *key, librdf_hash_data *data, unsigned int flags);
-static int librdf_hash_bdb_exists(void* context, librdf_hash_data *key);
-static int librdf_hash_bdb_delete(void* context, librdf_hash_data *key);
-static int librdf_hash_bdb_get_seq(void* context, librdf_hash_data *key, librdf_hash_sequence_type type);
+static int librdf_hash_bdb_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data, unsigned int flags);
+static int librdf_hash_bdb_exists(void* context, librdf_hash_datum *key);
+static int librdf_hash_bdb_delete(void* context, librdf_hash_datum *key);
 static int librdf_hash_bdb_sync(void* context);
 static int librdf_hash_bdb_get_fd(void* context);
 
@@ -123,26 +124,45 @@ librdf_hash_bdb_open(void* context, char *identifier, void *mode,
   strcpy(file, identifier);
 	
 #ifdef HAVE_DB_CREATE
-  if((ret=db_create(&bdb, NULL, 0)) != 0)
+  /* V3 prototype:
+   * int db_create(DB **dbp, DB_ENV *dbenv, u_int32_t flags);
+   */
+  if((ret=db_create(&bdb, NULL, 0))) {
+    LIBRDF_DEBUG2(librdf_hash_bdb_open, "Failed to create BDB context - %d\n", ret);
     return 1;
-  if((ret=bdb->open(bdb, file, NULL, DB_HASH, DB_CREATE, 0644)) != 0) {
+  }
+  
+  if((ret=bdb->set_flags(bdb, DB_DUP))) {
+    LIBRDF_DEBUG2(librdf_hash_bdb_open, "Failed to set BDB duplicate flag - %d\n", ret);
+    return 1;
+  }
+  
+  /* V3 prototype:
+   * int DB->open(DB *db, const char *file, const char *database,
+   *              DBTYPE type, u_int32_t flags, int mode);
+   */
+  if((ret=bdb->open(bdb, file, NULL, DB_BTREE, DB_CREATE, 0644))) {
     LIBRDF_FREE(cstring, file);
     return 1;
   }
 #else
 #ifdef HAVE_DB_OPEN
-  /* db_open() on my system is prototyped as:
-     const char *name, DBTYPE, u_int32_t flags, int mode, DB_ENV*, DB_INFO*, DB** */
-  if((ret=db_open(file, DB_HASH, DB_CREATE, 0644, NULL, NULL, &bdb)) != 0) {
+  /* V2 prototype:
+   * int db_open(const char *file, DBTYPE type, u_int32_t flags,
+   *             int mode, DB_ENV *dbenv, DB_INFO *dbinfo, DB **dbpp);
+   */
+  if((ret=db_open(file, DB_BTREE, DB_CREATE | DB_DUP, 0644, NULL, NULL, &bdb))) {
+    LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB db_open failed - %d\n", ret);
     LIBRDF_FREE(cstring, file);
     return 1;
   }
 #else
 #ifdef HAVE_DBOPEN
-  /* dbopen() on my system is prototyped as:
+  /* V1 prototype:
     const char *file, int flags, int mode, DBTYPE, const void *openinfo
   */
-  if((bdb=dbopen(file, O_RDWR, 0644, DB_HASH, NULL)) != 0) {
+  if((bdb=dbopen(file, O_CREAT | O_RDWR | R_DUP, 0644, DB_BTREE, NULL)) == 0) {
+    LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB dbopen failed - %d\n", ret);
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -154,8 +174,8 @@ ERROR - no idea how to use Berkeley DB
 #endif
 
   bdb_context->db=bdb;
- bdb_context->file_name=file;
- return 0;
+  bdb_context->file_name=file;
+  return 0;
 }
 
 
@@ -176,8 +196,10 @@ librdf_hash_bdb_close(void* context)
   int ret;
   
 #ifdef BDB_CLOSE_2_ARGS
+  /* V2/V3 */
   ret=db->close(db, 0);
 #else
+  /* V1 */
   ret=db->close(db);
 #endif
   LIBRDF_FREE(cstring, bdb_context->file_name);
@@ -185,62 +207,227 @@ librdf_hash_bdb_close(void* context)
 }
 
 
+typedef struct {
+  librdf_hash_bdb_context* hash;
+  void *last_key;
+  void *last_value;
+#ifdef HAVE_BDB_CURSOR
+  DBC* cursor;
+#endif
+} librdf_hash_bdb_cursor_context;
+
+
 /**
- * librdf_hash_bdb_get - Retrieve a hash value for the given key
- * @context: BerkeleyDB hash context
- * @key: pointer to key to use
- * @data: pointer to data to return value
- * @flags: flags (not used at present)
+ * librdf_hash_bdb_cursor_init - Initialise a new bdb cursor
+ * @cursor_context: hash cursor context
+ * @hash_context: hash to operate over
  * 
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_bdb_get(void* context, librdf_hash_data *key,
-                    librdf_hash_data *data, unsigned int flags) 
+librdf_hash_bdb_cursor_init(void *cursor_context, void *hash_context)
 {
-  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
-  DB* db=bdb_context->db;
-  DBT bdb_data;
+  librdf_hash_bdb_cursor_context *cursor=(librdf_hash_bdb_cursor_context*)cursor_context;
+#ifdef HAVE_BDB_CURSOR
+  DB* db;
+#endif
+
+  cursor->hash=(librdf_hash_bdb_context*)hash_context;
+
+#ifdef HAVE_BDB_CURSOR
+  /* V2/V3 prototype:
+   * int DB->cursor(DB *db, DB_TXN *txnid, DBC **cursorp, u_int32_t flags);
+   */
+  db=cursor->hash->db;
+  if(db->cursor(db, NULL, &cursor->cursor, 0))
+    return 0;
+#endif
+  return 0;
+}
+
+
+/**
+ * librdf_hash_bdb_cursor_get - Retrieve a hash value for the given key
+ * @context: BerkeleyDB hash cursor context
+ * @key: pointer to key to use
+ * @value: pointer to value to use
+ * @flags: flags
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_hash_bdb_cursor_get(void* context, 
+                           librdf_hash_datum *key, librdf_hash_datum *value,
+                           unsigned int flags)
+{
+  librdf_hash_bdb_cursor_context *cursor=(librdf_hash_bdb_cursor_context*)context;
+#ifdef HAVE_BDB_CURSOR
+  DBC *bdb_cursor=cursor->cursor;
+#endif
   DBT bdb_key;
+  DBT bdb_value;
   int ret;
-  
+
+  /* Free old data */
+  /* Don't free last key when moving by value, need to check it later */
+  if(cursor->last_key && flags != LIBRDF_HASH_CURSOR_NEXT_VALUE) {
+    LIBRDF_FREE(cstring, cursor->last_key);
+    cursor->last_key=NULL;
+  }
+    
+  if(cursor->last_value) {
+    LIBRDF_FREE(cstring, cursor->last_value);
+    cursor->last_value=NULL;
+  }
+
   /* docs say you must zero DBT's before use */
-  memset(&bdb_data, 0, sizeof(DBT));
   memset(&bdb_key, 0, sizeof(DBT));
-  
-  /* Initialise BDB version of key */
+  memset(&bdb_value, 0, sizeof(DBT));
+
+  /* Always initialise BDB version of key */
   bdb_key.data = (char*)key->data;
   bdb_key.size = key->size;
   
 #ifdef DB_DBT_MALLOC
   /* BDB V2 or later? */
-  bdb_data.flags=DB_DBT_MALLOC;
+  bdb_key.flags=DB_DBT_MALLOC;   /* Return in malloc() allocated memory */
+  bdb_value.flags=DB_DBT_MALLOC;
 #endif
   
-  
-#ifdef HAVE_BDB_DB_TXN
-  if((ret=db->get(db, NULL, &bdb_key, &bdb_data, 0)) == DB_NOTFOUND) {
+  switch(flags) {
+    case LIBRDF_HASH_CURSOR_SET:
+
+#ifdef HAVE_BDB_CURSOR
+      /* V2/V3 prototype:
+       * int DBcursor->c_get(DBC *cursor, DBT *key, DBT *data, u_int32_t flags);
+       */
+      ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_value, DB_SET);
 #else
-  if((ret=db->get(db, &bdb_key, &bdb_data, 0))) {
+      /* V1 */
+      ret=db->seq(db, &bdb_key, &bdb_value, 0);
 #endif
-    /* not found */
-    data->data = NULL;
+      break;
+      
+    case LIBRDF_HASH_CURSOR_FIRST:
+#ifdef HAVE_BDB_CURSOR
+      /* V2/V3 prototype:
+       * int DBcursor->c_get(DBC *cursor, DBT *key, DBT *data, u_int32_t flags);
+       */
+      ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_value, DB_FIRST);
+#else
+      /* V1 */
+      ret=db->seq(db, &bdb_key, &bdb_value, R_FIRST);
+#endif
+      break;
+      
+    case LIBRDF_HASH_CURSOR_NEXT_VALUE:
+#ifdef HAVE_BDB_CURSOR
+      /* V2/V3 */
+      ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_value, DB_NEXT);
+#else
+      /* V1 */
+      ret=db->seq(db, &bdb_key, &bdb_value, R_NEXT);
+#endif
+      
+      /* If succeeded and key has changed, end */
+      if(!ret && cursor->last_key &&
+         memcmp(cursor->last_key, bdb_key.data, bdb_key.size)) {
+        
+        /* always allocated by BDB using system malloc */
+        free(bdb_key.data);
+        free(bdb_value.data);
+
+        ret=DB_NOTFOUND;
+      }
+      
+
+      /* always tidy up this */
+      if(cursor->last_key) {
+        LIBRDF_FREE(cstring, cursor->last_key);
+        cursor->last_key=NULL;
+      }
+
+      break;
+      
+    case LIBRDF_HASH_CURSOR_NEXT:
+#ifdef HAVE_BDB_CURSOR
+      /* V2/V3 */
+      ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_value,
+                            (value) ? DB_NEXT : DB_NEXT_NODUP);
+#else
+      /* V1 */
+      ret=db->seq(db, &bdb_key, &bdb_value, R_NEXT);
+#endif
+      break;
+      
+    default:
+      abort();
+  }
+  
+
+  if(ret) {
+    if(ret != DB_NOTFOUND)
+      LIBRDF_DEBUG2(librdf_hash_bdb_cursor_get, "BDB cursor error - %d\n", ret);
+    key->data=NULL;
     return ret;
   }
   
-  data->data = LIBRDF_MALLOC(bdb_data, bdb_data.size);
-  if(!data->data) {
-    free(bdb_data.data);
+  cursor->last_key = key->data = LIBRDF_MALLOC(cstring, bdb_key.size);
+  if(!key->data) {
+    /* always allocated by BDB using system malloc */
+    if(flags != LIBRDF_HASH_CURSOR_SET)
+      free(bdb_key.data);
+    free(bdb_value.data);
     return 1;
   }
-  memcpy(data->data, bdb_data.data, bdb_data.size);
-  data->size = bdb_data.size;
   
+  memcpy(key->data, bdb_key.data, bdb_key.size);
+  key->size = bdb_key.size;
+
+  if(value) {
+    cursor->last_value = value->data = LIBRDF_MALLOC(cstring, bdb_value.size);
+    if(!value->data) {
+      /* always allocated by BDB using system malloc */
+      if(flags != LIBRDF_HASH_CURSOR_SET)
+        free(bdb_key.data);
+      free(bdb_value.data);
+      return 1;
+    }
+    
+    memcpy(value->data, bdb_value.data, bdb_value.size);
+    value->size = bdb_value.size;
+  }
+
   /* always allocated by BDB using system malloc */
-  free(bdb_data.data);
+  if(flags != LIBRDF_HASH_CURSOR_SET)
+    free(bdb_key.data);
+  free(bdb_value.data);
+
   return 0;
 }
-	
+
+
+/**
+ * librdf_hash_bdb_cursor_finished - Finish the serialisation of the hash bdb get
+ * @context: BerkeleyDB hash cursor context
+ **/
+static void
+librdf_hash_bdb_cursor_finish(void* context)
+{
+  librdf_hash_bdb_cursor_context* cursor=(librdf_hash_bdb_cursor_context*)context;
+
+#ifdef HAVE_BDB_CURSOR
+  /* BDB V2/V3 */
+  if(cursor->cursor)
+    cursor->cursor->c_close(cursor->cursor);
+#endif
+  if(cursor->last_key)
+    LIBRDF_FREE(cstring, cursor->last_key);
+    
+  if(cursor->last_value)
+    LIBRDF_FREE(cstring, cursor->last_value);
+}
+
 
 /**
  * librdf_hash_bdb_put - Store a key/value pair in the hash
@@ -252,17 +439,17 @@ librdf_hash_bdb_get(void* context, librdf_hash_data *key,
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_bdb_put(void* context, librdf_hash_data *key, 
-                    librdf_hash_data *value, unsigned int flags) 
+librdf_hash_bdb_put(void* context, librdf_hash_datum *key, 
+                    librdf_hash_datum *value, unsigned int flags) 
 {
   librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
-  DBT bdb_data;
+  DBT bdb_value;
   DBT bdb_key;
   int ret;
 
   /* docs say you must zero DBT's before use */
-  memset(&bdb_data, 0, sizeof(DBT));
+  memset(&bdb_value, 0, sizeof(DBT));
   memset(&bdb_key, 0, sizeof(DBT));
   
   /* Initialise BDB version of key */
@@ -270,15 +457,22 @@ librdf_hash_bdb_put(void* context, librdf_hash_data *key,
   bdb_key.size = key->size;
   
   /* Initialise BDB version of data */
-  bdb_data.data = (char*)value->data;
-  bdb_data.size = value->size;
+  bdb_value.data = (char*)value->data;
+  bdb_value.size = value->size;
   
-  /* flags can be R_CURSOR, R_IAFTER, R_IBEFORE, R_NOOVERWRITE, R_SETCURSOR */
 #ifdef HAVE_BDB_DB_TXN
-  return (ret=db->put(db, NULL, &bdb_key, &bdb_data, 0));
+  /* V2/V3 prototype:
+   * int DB->put(DB *db, DB_TXN *txnid, DBT *key, DBT *data, u_int32_t flags); 
+   */
+  ret=db->put(db, NULL, &bdb_key, &bdb_value, 0);
 #else
-  return (ret=db->put(db, &bdb_key, &bdb_data, 0));
+  /* V1 */
+  ret=db->put(db, &bdb_key, &bdb_value, 0);
 #endif
+  if(ret)
+    LIBRDF_DEBUG2(librdf_hash_bdb_put, "BDB put failed - %d\n", ret);
+
+  return (ret != 0);
 }
 
 
@@ -290,33 +484,36 @@ librdf_hash_bdb_put(void* context, librdf_hash_data *key,
  * Return value: non 0 if the key exists in the hash
  **/
 static int
-librdf_hash_bdb_exists(void* context, librdf_hash_data *key) 
+librdf_hash_bdb_exists(void* context, librdf_hash_datum *key) 
 {
   librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   DBT bdb_key;
-  DBT bdb_data;
+  DBT bdb_value;
   int ret;
 
   /* docs say you must zero DBT's before use */
   memset(&bdb_key, 0, sizeof(DBT));
-  memset(&bdb_data, 0, sizeof(DBT));
+  memset(&bdb_value, 0, sizeof(DBT));
   
   /* Initialise BDB version of key */
   bdb_key.data = (char*)key->data;
   bdb_key.size = key->size;
 	
 #ifdef HAVE_BDB_DB_TXN
-  if((ret=db->get(db, NULL, &bdb_key, &bdb_data, 0)) == DB_NOTFOUND) {
+  /* V2/V3 */
+  if((ret=db->get(db, NULL, &bdb_key, &bdb_value, 0)) == DB_NOTFOUND) {
 #else
-  if((ret=db->get(db, &bdb_key, &bdb_data, 0)) != 0) {
+  /* V1 */
+  if((ret=db->get(db, &bdb_key, &bdb_value, 0)) != 0) {
 #endif
     /* not found */
     return 0;
   }
   
   /* always allocated by BDB using system malloc */
-  free(bdb_data.data);
+  free(bdb_value.data);
+
   return 1;
 }
 
@@ -329,114 +526,31 @@ librdf_hash_bdb_exists(void* context, librdf_hash_data *key)
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_bdb_delete(void* context, librdf_hash_data *key) 
+librdf_hash_bdb_delete(void* context, librdf_hash_datum *key) 
 {
   librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
-  DB* db=bdb_context->db;
+  DB* bdb=bdb_context->db;
   DBT bdb_key;
   int ret;
-  
+
+  memset(&bdb_key, 0, sizeof(DBT));
+
   /* Initialise BDB version of key */
   bdb_key.data = (char*)key->data;
   bdb_key.size = key->size;
   
 #ifdef HAVE_BDB_DB_TXN
-  return (ret=db->del(db, NULL, &bdb_key, 0));
+  /* V2/V3 */
+  ret=bdb->del(bdb, NULL, &bdb_key, 0);
 #else
-  return (ret=db->del(db, &bdb_key, 0));
+  /* V1 */
+  ret=bdb->del(bdb, &bdb_key, 0);
 #endif
-}
+  if(ret)
+    LIBRDF_DEBUG3(librdf_hash_bdb_delete, "BDB del failed - %d - %s\n", ret,
+                  db_strerror(ret));
 
-
-/**
- * librdf_hash_bdb_get_seq - Provide sequential access to the hash
- * @context: BerkeleyDB hash context
- * @key: pointer to the key
- * @type: type of operation
- * 
- * Valid operations are
- * LIBRDF_HASH_SEQUENCE_FIRST to get the first key in the sequence
- * LIBRDF_HASH_SEQUENCE_NEXT to get the next in sequence and
- * LIBRDF_HASH_SEQUENCE_CURRENT to get the current key (again).
- * 
- * Return value: non 0 on failure
- **/
-static int
-librdf_hash_bdb_get_seq(void* context, librdf_hash_data *key, 
-                        librdf_hash_sequence_type type) 
-{
-  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
-  DB* db=bdb_context->db;
-  DBT bdb_key;
-  DBT bdb_data;
-#ifdef HAVE_BDB_CURSOR
-  DBC* bdb_cursor;
-#endif
-  int ret;
-
-  /* docs say you must zero DBT's before use */
-  memset(&bdb_key, 0, sizeof(DBT));
-  memset(&bdb_data, 0, sizeof(DBT));
-#ifdef DB_DBT_MALLOC
-  /* BDB V2 or later? */
-  bdb_key.flags=DB_DBT_MALLOC;
-  bdb_data.flags=DB_DBT_MALLOC;
-#endif
-  
-  
-  if(type == LIBRDF_HASH_SEQUENCE_FIRST) {
-#ifdef HAVE_BDB_CURSOR
-    ret=db->cursor(db, NULL, &bdb_context->cursor);
-    if(!ret) {
-      bdb_cursor=bdb_context->cursor;
-      ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_data, DB_FIRST);
-    }
-
-#else
-    ret=db->seq(db, &bdb_key, &bdb_data, R_FIRST);
-#endif
-  } else if (type == LIBRDF_HASH_SEQUENCE_NEXT) {
-#ifdef HAVE_BDB_CURSOR
-    bdb_cursor=bdb_context->cursor;
-    ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_data, DB_NEXT);
-#else
-    ret=db->seq(db, &bdb_key, &bdb_data, R_NEXT);
-#endif
-  } else { /* LIBRDF_HASH_SEQUENCE_CURRENT */
-#ifdef HAVE_BDB_CURSOR
-    bdb_cursor=bdb_context->cursor;
-    ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_data, DB_CURRENT);
-#else
-#ifdef R_CURRENT
-    ret=db->seq(db, &bdb_key, &bdb_data, R_CURRENT);
-#else
-    /* BDB V1 does not define R_CURRENT - just use fail - FIXME */
-    return 1;
-#endif
-#endif
-  }
-  
-
-  if(ret) {
-    key->data=NULL;
-    return ret;
-  }
-  
-  key->data = LIBRDF_MALLOC(bdb_data, bdb_key.size);
-  if(!key->data) {
-    /* always allocated by BDB using system malloc */
-    free(bdb_key.data);
-    free(bdb_data.data);
-    return 1;
-  }
-  memcpy(key->data, bdb_key.data, bdb_key.size);
-  key->size = bdb_key.size;
-  
-  /* always allocated by BDB using system malloc */
-  free(bdb_key.data);
-  free(bdb_data.data);
-  
-  return 0;
+  return (ret != 0);
 }
 
 
@@ -492,16 +606,19 @@ static void
 librdf_hash_bdb_register_factory(librdf_hash_factory *factory) 
 {
   factory->context_length = sizeof(librdf_hash_bdb_context);
+  factory->cursor_context_length = sizeof(librdf_hash_bdb_cursor_context);
   
   factory->open    = librdf_hash_bdb_open;
   factory->close   = librdf_hash_bdb_close;
-  factory->get     = librdf_hash_bdb_get;
   factory->put     = librdf_hash_bdb_put;
   factory->exists  = librdf_hash_bdb_exists;
   factory->delete_key  = librdf_hash_bdb_delete;
-  factory->get_seq = librdf_hash_bdb_get_seq;
   factory->sync    = librdf_hash_bdb_sync;
   factory->get_fd  = librdf_hash_bdb_get_fd;
+
+  factory->cursor_init   = librdf_hash_bdb_cursor_init;
+  factory->cursor_get    = librdf_hash_bdb_cursor_get;
+  factory->cursor_finish = librdf_hash_bdb_cursor_finish;
 }
 
 
@@ -511,5 +628,5 @@ librdf_hash_bdb_register_factory(librdf_hash_factory *factory)
 void
 librdf_init_hash_bdb(void)
 {
-  librdf_hash_register_factory("BDB", &librdf_hash_bdb_register_factory);
+  librdf_hash_register_factory("bdb", &librdf_hash_bdb_register_factory);
 }
