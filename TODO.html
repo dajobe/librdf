@@ -7,6 +7,8 @@
 
 <h1 align="center">librdf todo list</h1>
 
+<p>See the <a href="http://www.ilrt.bristol.ac.uk/people/cmdjb/software/librdf/TODO.html">web site version</a> for the up-to-date list.</p>
+
 <h2>To Do Pre-0.1</h2>
 
 <ul>
@@ -18,7 +20,7 @@ values via an iterator</li>
 <li>module - storage implemented as hashes</li>
 </ul>
 
-<h2>To Do Post First Release</h2>
+<h2>Features</h2>
 
 <p>In no real order.  Help wanted.</p>
 
@@ -48,7 +50,18 @@ values via an iterator</li>
 <li>split header files into internal / user ones.  Maybe generate
 part of librdf.h automatically to make a 1-header file system.</li>
 <li>make GDBM hash handle duplicates</li>
+<li>make API docbook sgml generate 1 big HTML file</li>
+<li>make API docbook sgml generate decent PostScript / PDF output</li>
 </ul>
+
+
+<h2>Known Bugs</h2>
+
+<p>1. string encoding - needs iconv posix function and/or Unicode library.</p>
+
+<p>2. rdf_hash.c <tt>librdf_hash_from_string()</tt> - \ escaping doesn't work properly</p>
+
+<p>3. BerkeleyDB V1 code does not work, V3 (SleepyCat) not tested</p>
 
 
 <h2>Done</h2>
