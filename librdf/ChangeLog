@@ -1,3 +1,21 @@
+2005-02-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_rasqal.c (librdf_query_rasqal_execute): Free any
+	existing stored rasqal result before executing.
+	(librdf_query_rasqal_free_results): Zap results pointer after
+	freeing rasqal results.
+
+2005-02-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_node.c (librdf_node_encode): init datatype_uri_string to
+	prevent a gcc warning.
+
+2005-02-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* win32_rdf_config.h: Bumped version to 1.0.1
+
+	* win32_rdf_config.h: 1.0.0
+
 2005-02-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_query_rasqal.c
