@@ -113,7 +113,7 @@ librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@
 EXTRA_librdf_a_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
 rdf_parser_sirpac.c rdf_parser_libwww.c \
-example1.c example2.c example3.c
+example1.c example2.c example3.c example4.c
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO \
@@ -126,7 +126,7 @@ TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test
 
-CLEANFILES=$(TESTS) test example1 example2 example3
+CLEANFILES=$(TESTS) test example1 example2 example3 example4
 
 # Memory debugging alternatives
 MEM=@MEM@
@@ -196,6 +196,9 @@ example2: example2.c librdf.a
 
 example3: example3.c librdf.a
 	$(LINK) -I$(srcdir) -I. $(srcdir)/example3.c librdf.a $(LIBS)
+
+example4: example4.c librdf.a
+	$(LINK) -I$(srcdir) -I. $(srcdir)/example4.c librdf.a $(LIBS)
 
 
 
