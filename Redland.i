@@ -302,6 +302,7 @@ librdf_node* librdf_new_node(librdf_world *world);
 librdf_node* librdf_new_node_from_uri_string(librdf_world *world, char *string);
 librdf_node* librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri);
 librdf_node* librdf_new_node_from_literal(librdf_world *world, char *string, char *xml_language, int is_wf_xml);
+librdf_node* librdf_new_node_from_typed_literal(librdf_world *world, const char *string, const char *xml_language, librdf_uri* datatype_uri);
 librdf_node* librdf_new_node_from_node(librdf_node *node);
 librdf_node* librdf_new_node_from_blank_identifier(librdf_world *world, const char *identifier);
 void librdf_free_node(librdf_node *r);
