@@ -403,7 +403,66 @@ librdf_parser_parse_string_into_model(librdf_parser* parser,
 }
 
 
+/**
+ * librdf_parser_parse_counted_string_as_stream - Parse a counted string of content to a librdf_stream of statements
+ * @parser: the parser
+ * @string: the string to parse
+ * @length: length of the string content (must be >0)
+ * @base_uri: the base URI to use
+ * 
+ * Return value: &librdf_stream of statements or NULL
+ **/
+librdf_stream*
+librdf_parser_parse_counted_string_as_stream(librdf_parser* parser, 
+                                             const unsigned char *string,
+                                             size_t length,
+                                             librdf_uri* base_uri)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
+  LIBRDF_ASSERT_RETURN(length < 1, "string length is not greater than zero", 
+                       NULL);
 
+  if(parser->factory->parse_counted_string_as_stream)
+    return parser->factory->parse_counted_string_as_stream(parser->context,
+                                                           string, length,
+                                                           base_uri);
+
+  return NULL;
+}
+
+
+/**
+ * librdf_parser_parse_counted_string_into_model - Parse a counted string of content into an librdf_model
+ * @parser: the parser
+ * @string: the content to parse
+ * @length: length of content (must be >0)
+ * @base_uri: the base URI to use
+ * @model: the model to use
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_parser_parse_counted_string_into_model(librdf_parser* parser, 
+                                              const unsigned char *string,
+                                              size_t length,
+                                              librdf_uri* base_uri, 
+                                              librdf_model* model)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_RETURN(length < 1, "string length is not greater than zero", 1);
+
+  if(parser->factory->parse_counted_string_into_model)
+    return parser->factory->parse_counted_string_into_model(parser->context,
+                                                            string, length,
+                                                            base_uri, model);
+  
+  return 1;
+}
 
 
 /**
@@ -520,52 +579,180 @@ librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature,
 int main(int argc, char *argv[]);
 
 
+#define RDFXML_CONTENT \
+"<?xml version=\"1.0\"?>\n" \
+"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n" \
+"         xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n" \
+"  <rdf:Description rdf:about=\"http://purl.org/net/dajobe/\">\n" \
+"    <dc:title>Dave Beckett's Home Page</dc:title>\n" \
+"    <dc:creator>Dave Beckett</dc:creator>\n" \
+"    <dc:description>The generic home page of Dave Beckett.</dc:description>\n" \
+"  </rdf:Description>\n" \
+"</rdf:RDF>"
+
+#define NTRIPLES_CONTENT \
+"<http://purl.org/net/dajobe/> <http://purl.org/dc/elements/1.1/creator> \"Dave Beckett\" .\n" \
+"<http://purl.org/net/dajobe/> <http://purl.org/dc/elements/1.1/description> \"The generic home page of Dave Beckett.\" .\n" \
+"<http://purl.org/net/dajobe/> <http://purl.org/dc/elements/1.1/title> \"Dave Beckett's Home Page\" . \n"
+
+
+#define TURTLE_CONTENT \
+"@prefix dc: <http://purl.org/dc/elements/1.1/> .\n" \
+"\n" \
+"<http://purl.org/net/dajobe/>\n" \
+"      dc:creator \"Dave Beckett\" ;\n" \
+"      dc:description \"The generic home page of Dave Beckett.\" ; \n" \
+"      dc:title \"Dave Beckett's Home Page\" . \n"
+
+/* All the examples above give the same three triples */
+#define EXPECTED_TRIPLES_COUNT 3
+
+
 int
 main(int argc, char *argv[]) 
 {
-  librdf_parser* d;
-  char *test_parser_types[]={"ntriples", "rdfxml", NULL};
+  char *test_parser_types[]={"rdfxml", "ntriples", "turtle", NULL};
+  #define URI_STRING_COUNT 3
+  const unsigned char *file_uri_strings[URI_STRING_COUNT]={(const unsigned char*)"http://example.org/test1.rdf", (const unsigned char*)"http://example.org/test2.nt", (const unsigned char*)"http://example.org/test3.ttl"};
+  const unsigned char *file_content[URI_STRING_COUNT]={(const unsigned char*)RDFXML_CONTENT, (const unsigned char*)NTRIPLES_CONTENT, (const unsigned char*)TURTLE_CONTENT};
+  librdf_uri* uris[URI_STRING_COUNT];
   int i;
   char *type;
   char *program=argv[0];
   librdf_world *world;
 
   world=librdf_new_world();
-  librdf_world_init_mutex(world);
+  librdf_world_open(world);
 
-  /* Needed for URI use when registering factories */
-  librdf_init_digest(world);
-  librdf_init_hash(world);
-  librdf_init_uri(world);
-  librdf_init_node(world);
-  librdf_init_concepts(world);
-
-  /* initialise parser module */
-  librdf_init_parser(world);
+  while(*program++)
+    ;
+  for(; 1; program--)
+    if(*program == '/' || *program == '\\') {
+      program++;
+      break;
+    }
   
+  for (i=0; i<URI_STRING_COUNT; i++) {
+    uris[i]=librdf_new_uri(world, file_uri_strings[i]);
+  }
+
   for(i=0; (type=test_parser_types[i]); i++) {
-    fprintf(stderr, "%s: Trying to create new %s parser\n", program, type);
-    d=librdf_new_parser(world, type, NULL, NULL);
-    if(!d) {
+    librdf_storage* storage;
+    librdf_model *model;
+    librdf_parser* parser;
+    librdf_stream *stream=NULL;
+    size_t length=strlen(file_content[i]);
+    int size;
+
+    fprintf(stderr, "%s: Testing parsing syntax '%s'\n", program, type);
+
+    fprintf(stderr, "%s: Creating storage and model\n", program);
+    storage=librdf_new_storage(world, NULL, NULL, NULL);
+    if(!storage) {
+      fprintf(stderr, "%s: Failed to create new storage\n", program);
+      return(1);
+    }
+    model=librdf_new_model(world, storage, NULL);
+    if(!model) {
+      fprintf(stderr, "%s: Failed to create new model\n", program);
+      return(1);
+    }
+
+    fprintf(stderr, "%s: Creating %s parser\n", program, type);
+    parser=librdf_new_parser(world, type, NULL, NULL);
+    if(!parser) {
       fprintf(stderr, "%s: Failed to create new parser type %s\n", program, type);
       continue;
     }
     
-    fprintf(stderr, "%s: Freeing parser\n", program);
-    librdf_free_parser(d);
+
+    fprintf(stderr, "%s: Adding %s counted string content as stream\n", 
+            program, type);
+    if(!(stream=librdf_parser_parse_counted_string_as_stream(parser, 
+                                                             file_content[i],
+                                                             length,
+                                                             uris[i]))) {
+      fprintf(stderr, "%s: Failed to parse RDF from counted string %d as stream\n", program, i);
+      exit(1);
+    }
+    librdf_model_add_statements(model, stream);
+    librdf_free_stream(stream);
+
+    size=librdf_model_size(model);
+    fprintf(stderr, "%s: Model size is %d triples\n", program, size);
+    if(size != EXPECTED_TRIPLES_COUNT) {
+      fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
+              program, size, EXPECTED_TRIPLES_COUNT);
+      exit(1);
+    }
+
+    fprintf(stderr, "%s: Adding %s string content as stream\n", program, type);
+    if(!(stream=librdf_parser_parse_string_as_stream(parser, 
+                                                     file_content[i],
+                                                     uris[i]))) {
+      fprintf(stderr, "%s: Failed to parse RDF from string %d as stream\n", program, i);
+      exit(1);
+    }
+    librdf_model_add_statements(model, stream);
+    librdf_free_stream(stream);
+    
+    size=librdf_model_size(model);
+    fprintf(stderr, "%s: Model size is %d triples\n", program, size);
+    if(size != EXPECTED_TRIPLES_COUNT) {
+      fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
+              program, size, EXPECTED_TRIPLES_COUNT);
+      exit(1);
+    }
+    
+
+    fprintf(stderr, "%s: Adding %s counted string content\n", program, type);
+    if(librdf_parser_parse_counted_string_into_model(parser, 
+                                                     file_content[i],
+                                                     length,
+                                                     uris[i], model)) {
+      fprintf(stderr, "%s: Failed to parse RDF from counted string %d into model\n", program, i);
+      exit(1);
+    }
+    
+    size=librdf_model_size(model);
+    fprintf(stderr, "%s: Model size is %d triples\n", program, size);
+    if(size != EXPECTED_TRIPLES_COUNT) {
+      fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
+              program, size, EXPECTED_TRIPLES_COUNT);
+      exit(1);
+    }
+
+    
+    fprintf(stderr, "%s: Adding %s string content\n", program, type);
+    if(librdf_parser_parse_string_into_model(parser, 
+                                             file_content[i],
+                                             uris[i], model)) {
+      fprintf(stderr, "%s: Failed to parse RDF from string %d into model\n", program, i);
+      exit(1);
+    }
+
+    size=librdf_model_size(model);
+    fprintf(stderr, "%s: Model size is %d triples\n", program, size);
+    if(size != EXPECTED_TRIPLES_COUNT) {
+      fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
+              program, size, EXPECTED_TRIPLES_COUNT);
+      exit(1);
+    }
+
+    
+    fprintf(stderr, "%s: Freeing parser, model and storage\n", program);
+    librdf_free_parser(parser);
+    librdf_free_model(model);
+    librdf_free_storage(storage);
   }
   
+
+  fprintf(stderr, "%s: Freeing URIs\n", program);
+  for (i=0; i<URI_STRING_COUNT; i++) {
+    librdf_free_uri(uris[i]);
+  }
   
-  /* finish parser module */
-  librdf_finish_parser(world);
-
-  librdf_finish_concepts(world);
-  librdf_finish_node(world);
-  librdf_finish_uri(world);
-  librdf_finish_hash(world);
-  librdf_finish_digest(world);
-
-  LIBRDF_FREE(librdf_world, world);
+  librdf_free_world(world);
   
   /* keep gcc -Wall happy */
   return(0);
