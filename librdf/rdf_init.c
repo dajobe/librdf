@@ -34,10 +34,6 @@
 #include <rdf_model.h>
 
 
-/* prototype that should really be elsewhere */
-void librdf_init_world(char *digest_factory_name);
-
-
 void librdf_init_world(char *digest_factory_name) 
 {
   librdf_digest_factory* digest_factory;
@@ -50,4 +46,15 @@ void librdf_init_world(char *digest_factory_name)
   librdf_init_node(digest_factory);
   librdf_init_statement();
   librdf_init_model();
+}
+
+
+void librdf_destroy_world(void)
+{
+	librdf_finish_digest();
+	librdf_finish_hash();
+	/* librdf_finish_uri(); */
+	/* librdf_finish_node(); */
+	/* librdf_finish_statement(); */
+	/* librdf_finish_model(); */
 }
