@@ -49,12 +49,19 @@
 #include <rdf_config.h>
 #include <redland.h>
 
-/* internal routines used to invoking errors/warnings upwards to user */
-void librdf_internal_test_error(librdf_world* world);
-void librdf_internal_test_warning(librdf_world* world);
+/* Internal prototypes */
+/* FOR TESTING ERRORS ONLY - NOT PART OF API */
+void librdf_internal_test_error(librdf_world *world);
+void librdf_internal_test_warning(librdf_world *world);
 
-/* SWIG fails to declare this */
-SWIGEXPORT(void) Init_Redland(void);
+#ifdef SWIGPYTHON
+void librdf_python_world_init(librdf_world *world);
+#endif
+#ifdef SWIGPERL
+void librdf_perl_world_init(librdf_world *world);
+void librdf_perl_world_finish(void);
+#endif
+
 
 /* 
  * Thanks to the patch in this Debian bug for the solution
@@ -133,8 +140,10 @@ static void
 librdf_call_python_message(int type, const char *message, va_list arguments)
 {
   char empty_buffer[1];
+#ifdef PYTHON_EXCEPTIONS_WORKING
   PyObject *arglist;
   PyObject *result;
+#endif
   char *buffer;
   int len;
   va_list args_copy;
