@@ -493,14 +493,19 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_parser* d;
-  char *test_parser_types[]={"sirpac-stanford", "sirpac-w3c", "libwww", "repat", NULL};
+  char *test_parser_types[]={"sirpac-stanford", "sirpac-w3c", "libwww", "repat", "raptor", NULL};
   int i;
   char *type;
   char *program=argv[0];
   librdf_world *world;
 
   world=librdf_new_world();
-  
+
+  /* Needed for URI use when registering factories */
+  librdf_init_digest(world);
+  librdf_init_hash(world);
+  librdf_init_uri(world);
+
   /* initialise parser module */
   librdf_init_parser(world);
   
@@ -519,6 +524,10 @@ main(int argc, char *argv[])
   
   /* finish parser module */
   librdf_finish_parser(world);
+
+  librdf_finish_uri(world);
+  librdf_finish_hash(world);
+  librdf_finish_digest(world);
 
   LIBRDF_FREE(librdf_world, world);
   
