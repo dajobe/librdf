@@ -124,7 +124,7 @@ librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 
 EXTRA_librdf_a_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
-rdf_parser_sirpac.c rdf_parser_libwww.c \
+rdf_parser_sirpac.c rdf_parser_libwww.c rdf_parser_redland.c \
 example1.c example2.c example3.c example4.c
 
 EXTRA_DIST=ChangeLog \
