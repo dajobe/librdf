@@ -108,13 +108,13 @@ else
 fi
 
 if test @with_rasqal@ = internal; then
-  raptor_config=@abs_top_builddir@/rasqal/rasqal-src-config
+  rasqal_config=@abs_top_builddir@/rasqal/rasqal-src-config
   if test ! -r $raptor_config; then
     echo "redland-src-config: Source tree not configured - no rasqal-src-config, exiting" 1>&2
     exit 0
   fi
 else
-  raptor_config=rasqal-config
+  rasqal_config=rasqal-config
 fi
 
 if test "$echo_cflags" = "yes"; then
