@@ -1,3 +1,15 @@
+2004-08-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_hashes.c, librdf/rdf_storage.c,
+	librdf/rdf_parser.c, librdf/rdf_model_storage.c,
+	librdf/rdf_model.c: Documentation - Note that the model, storage
+	and parser get_feature methods return new librdf_node objects
+
+	* Redland.i: librdf_model_has_arc_in/out return int not an
+	librdf_iterator.
+	Use %newobject to record that librdf_model_get_feature and
+	librdf_parser_get_feature return new librdf_node objects.
+
 2004-08-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_model.c (librdf_model_context_add_statement,
