@@ -26,7 +26,7 @@ follows</p>
   root# make install-perl
 </pre>
 
-<p>The Redland interface has been tested with Perl 5.005 and 5.6.0.</p>
+<p>The Redland interface has been tested with Perl 5.005, 5.6.0 and 5.6.1.</p>
 
 
 <h2>Testing the Redland Perl interface</h2>
@@ -62,39 +62,39 @@ of the Redland objects with simple mappings between them:</p>
 <th>Concept</th><th>Redland Class</th><th>Perl Class</th><th>Purpose</th>
 </tr>
 <tr>
-<td>Resource / Literal</td><td><a href="api/node.html">librdf_node</a></td><td><tt><a href="pod/RDF/Node.html">RDF::Node</a></tt></td>
+<td>Resource / Literal</td><td><a href="api/node.html">librdf_node</a></td><td><tt><a href="pod/RDF/Redland/Node.html">RDF::Redland::Node</a></tt></td>
 <td>RDF Model &amp; Syntax nodes</td>
 </tr>
 <tr>
-<td>Statement / Triple</td><td><a href="api/statement.html">librdf_statement</a></td><td><tt><a href="pod/RDF/Statement.html">RDF::Statement</a></tt></td>
+<td>Statement / Triple</td><td><a href="api/statement.html">librdf_statement</a></td><td><tt><a href="pod/RDF/Redland/Statement.html">RDF::Redland::Statement</a></tt></td>
 <td>RDF Model &amp; Syntax arcs (statements, triples) [isa Resource]</td>
 </tr>
 <tr>
-<td>Model</td><td><a href="api/model.html">librdf_model</a></td><td><tt><a href="pod/RDF/Model.html">RDF::Model</a></tt></td>
+<td>Model</td><td><a href="api/model.html">librdf_model</a></td><td><tt><a href="pod/RDF/Redland/Model.html">RDF::Redland::Model</a></tt></td>
 <td>Set of <em>Statement</em>s usually held in one <em>Storage</em>.</td>
 </tr>
 <tr>
-<td>Storage</td><td><a href="api/storage.html">librdf_storage</a></td><td><tt><a href="pod/RDF/Storage.html">RDF::Storage</a></tt></td>
+<td>Storage</td><td><a href="api/storage.html">librdf_storage</a></td><td><tt><a href="pod/RDF/Redland/Storage.html">RDF::Redland::Storage</a></tt></td>
 <td>Storage for <em>Model</em>s either persistant or in-memory.</td>
 </tr>
 <tr>
-<td>Stream</td><td><a href="api/stream.html">librdf_stream</a></td><td><tt><a href="pod/RDF/Stream.html">RDF::Stream</a></tt></td>
+<td>Stream</td><td><a href="api/stream.html">librdf_stream</a></td><td><tt><a href="pod/RDF/Redland/Stream.html">RDF::Redland::Stream</a></tt></td>
 <td>Providing sequences of <em>Statement</em>s from <em>Parser</em>s, queries.</td>
 </tr>
 <tr>
-<td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><tt><a href="pod/RDF/Parser.html">RDF::Parser</a></tt></td>
+<td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><tt><a href="pod/RDF/Redland/Parser.html">RDF::Redland::Parser</a></tt></td>
 <td>Syntaxes parsers delivering <em>Stream</em> of <em>Statement</em>s or writing to a <em>Model</em></td>
 </tr>
 <tr>
-<td>Iterator</td><td><a href="api/iterator.html">librdf_iterator</a></td><td><tt><a href="pod/RDF/Iterator.html">RDF::Iterator</a></tt></td>
+<td>Iterator</td><td><a href="api/iterator.html">librdf_iterator</a></td><td><tt><a href="pod/RDF/Redland/Iterator.html">RDF::Redland::Iterator</a></tt></td>
 <td>Enumerating lists (of <em>Node</em>) from queries.</td>
 </tr>
 <tr>
-<td>URI</td><td><a href="api/uri.html">librdf_uri</a></td><td><tt><a href="pod/RDF/URI.html">RDF::URI</a></tt></td>
+<td>URI</td><td><a href="api/uri.html">librdf_uri</a></td><td><tt><a href="pod/RDF/Redland/URI.html">RDF::Redland::URI</a></tt></td>
 <td>Provides URIs for <em>Resource</em>s, <em>Parser</em>s, ...</td>
 </tr>
 <tr>
-<td>World</td><td>&nbsp;</td><td><tt><a href="pod/RDF.html">RDF</a></tt></td>
+<td>World</td><td>&nbsp;</td><td><tt><a href="pod/Redland/RDF.html">RDF::Redland</a></tt></td>
 <td>RDF wrapper class handling Redland startup/shutdown</td>
 </tr>
 <tr>
@@ -110,7 +110,7 @@ of the Redland objects with simple mappings between them:</p>
 <td>Internal list class</td>
 </tr>
 <tr>
-<td>&nbsp;</td><td>&nbsp;</td><td><tt><a href="pod/RDF/RSS.html">RDF::RSS</a></tt></td>
+<td>&nbsp;</td><td>&nbsp;</td><td><tt><a href="pod/RDF/Redland/RSS.html">RDF::Redland::RSS</a></tt></td>
 <td>Perl Module providing <a href="http://purl.org/rss/1.0/">RSS 1.0</a> support.</td>
 </tr>
 </table>
@@ -118,9 +118,9 @@ of the Redland objects with simple mappings between them:</p>
 
 <h2>Perl API Reference Documentation</h2>
 
-<p>Either use any of the <tt>RDF::</tt> module links above or start
-at the <a href="pod/RDF.html">main RDF module</a> and follow the
-references from there.</p>
+<p>Either use any of the <tt>RDF::Redland::</tt> module links above or start
+at the <a href="pod/RDF/Redland.html">main RDF::Redland module</a>
+and follow the references from there.</p>
 
 <h2>Other RDF Perl APIs and applications</h2>
 
@@ -139,9 +139,7 @@ references from there.</p>
 
 <hr />
 
-<p>Copyright 2000 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
-
-<p><a href="http://www.mirror.ac.uk/services/validator/check/referer">Validate me</a></p>
+<p>Copyright 2000-2002 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
