@@ -329,8 +329,6 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
  **/
 librdf_uri*
 librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
-  char *buffer;
-  int buffer_length;
   librdf_uri* new_uri;
   char *uri_string;
 
