@@ -191,7 +191,7 @@ librdf_get_serializer_factory(librdf_world *world,
       
       /* URI may need to match */
       if(type_uri && factory->type_uri &&
-         librdf_uri_equals(factory->type_uri, type_uri))
+         ! librdf_uri_equals(factory->type_uri, type_uri))
         continue;
 
       /* found it */
