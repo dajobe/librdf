@@ -245,3 +245,16 @@ librdf_fatal(librdf_world* world, int facility,
 }
 
 
+/* prototypes for testing errors only - NOT PART OF API */
+void
+librdf_test_error(librdf_world* world, const char *message) 
+{
+  librdf_log_simple(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NONE, NULL, message);
+}
+
+void
+librdf_test_warning(librdf_world* world, const char *message)
+{
+  librdf_log_simple(world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_NONE, NULL, message);
+}
+

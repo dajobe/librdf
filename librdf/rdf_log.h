@@ -117,6 +117,9 @@ void librdf_log(librdf_world* world, int code, librdf_log_level level, librdf_lo
 
 void librdf_fatal(librdf_world* world, int facility, const char *file, int line, const char *function, const char *message);
 
+void librdf_test_error(librdf_world* world, const char *message);
+void librdf_test_warning(librdf_world* world, const char *message);
+
 #endif
 
 #ifdef __cplusplus
