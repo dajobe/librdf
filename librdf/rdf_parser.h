@@ -47,21 +47,21 @@ struct librdf_parser_factory_s
   size_t  context_length;
 
   /* create a new parser */
-  int (*init)(librdf_parser* parser, void *c);
+  int (*init)(librdf_parser* parser, void *_context);
 
   /* destroy a parser */
-  void (*terminate)(void *c);
+  void (*terminate)(void *_context);
 
   /* get/set features of parser (think of Java properties) */
-  const char * (*get_feature)(void *c, librdf_uri *feature);
-  int (*set_feature)(void *c, librdf_uri *feature, const char *value);
+  const char * (*get_feature)(void *_context, librdf_uri *feature);
+  int (*set_feature)(void *_context, librdf_uri *feature, const char *value);
   
-  librdf_stream* (*parse_uri_as_stream)(void *c, librdf_uri *uri, librdf_uri* base_uri);
-  int (*parse_uri_into_model)(void *c, librdf_uri *uri, librdf_uri* base_uri, librdf_model *model);
-  librdf_stream* (*parse_file_as_stream)(void *c, librdf_uri *uri, librdf_uri *base_uri);
-  int (*parse_file_into_model)(void *c, librdf_uri *uri, librdf_uri *base_uri, librdf_model *model);
-  int (*parse_string_into_model)(void *c, const unsigned char *string, librdf_uri* base_uri, librdf_model *model);
-  librdf_stream* (*parse_string_as_stream)(void *c, const unsigned char *string, librdf_uri *base_uri);
+  librdf_stream* (*parse_uri_as_stream)(void *_context, librdf_uri *uri, librdf_uri* base_uri);
+  int (*parse_uri_into_model)(void *_context, librdf_uri *uri, librdf_uri* base_uri, librdf_model *model);
+  librdf_stream* (*parse_file_as_stream)(void *_context, librdf_uri *uri, librdf_uri *base_uri);
+  int (*parse_file_into_model)(void *_context, librdf_uri *uri, librdf_uri *base_uri, librdf_model *model);
+  int (*parse_string_into_model)(void *_context, const unsigned char *string, librdf_uri* base_uri, librdf_model *model);
+  librdf_stream* (*parse_string_as_stream)(void *_context, const unsigned char *string, librdf_uri *base_uri);
 };
 
 

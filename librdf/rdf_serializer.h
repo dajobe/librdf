@@ -50,18 +50,18 @@ struct librdf_serializer_factory_s
   size_t  context_length;
 
   /* create a new serializer */
-  int (*init)(librdf_serializer* serializer, void *c);
+  int (*init)(librdf_serializer* serializer, void *_context);
 
   /* destroy a serializer */
-  void (*terminate)(void *c);
+  void (*terminate)(void *_context);
 
   /* get/set features of serializer (think of Java properties) */
-  const char * (*get_feature)(void *c, librdf_uri *feature);
-  int (*set_feature)(void *c, librdf_uri *feature, const char *value);
+  const char * (*get_feature)(void *_context, librdf_uri *feature);
+  int (*set_feature)(void *_context, librdf_uri *feature, const char *value);
 
-  int (*set_namespace)(void *c, librdf_uri *uri, const char *prefix);
+  int (*set_namespace)(void *_context, librdf_uri *uri, const char *prefix);
   
-  int (*serialize_model)(void *c, FILE *handle, librdf_uri* base_uri, librdf_model *model);
+  int (*serialize_model)(void *_context, FILE *handle, librdf_uri* base_uri, librdf_model *model);
 };
 
 

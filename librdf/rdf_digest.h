@@ -44,10 +44,10 @@ struct librdf_digest_factory_s
   size_t  digest_length;
 
   /* functions (over context) */
-  void (*init)( void *c );
-  void (*update)( void *c, unsigned char *buf, size_t nbytes );
-  void (*final)( void *c );
-  unsigned char *(*get_digest)( void *c );
+  void (*init)( void *_context );
+  void (*update)( void *_context, unsigned char *buf, size_t nbytes );
+  void (*final)( void *_context );
+  unsigned char *(*get_digest)( void *_context );
 };
 
 
