@@ -20,11 +20,6 @@ PACKAGE=redland
 # Where the GNU config.sub, config.guess might be found
 CONFIG_DIR=../config
 
-# Where raptor may be found, in an adjacent directory
-RAPTOR_DIR=../raptor
-RAPTOR_INCS="raptor.h ntriples.h"
-RAPTOR_SRCS="raptor_parse.c ntriples_parse.c raptor_uri.c"
-
 DIE=
 
 if test "X$DRYRUN" != X; then
@@ -101,26 +96,6 @@ if test -d $CONFIG_DIR; then
     fi
   done
 fi
-
-if test -d $RAPTOR_DIR; then
-  failed=no
-  for file in $RAPTOR_SRCS $RAPTOR_INCS; do
-    rfile=$RAPTOR_DIR/$file
-    if test -r $rfile; then   
-      rm -f $file
-      ln -s $rfile
-    else
-      failed=yes
-    fi
-  done
-  # Need all raptor files present
-  if test "$failed" = yes; then
-    rm -f $RAPTOR_SRCS $RAPTOR_INCS
-  else
-    echo "$program: Found and enabled Raptor sources in $RAPTOR_DIR"
-  fi
-fi
-
 
 
 if test -z "$*"; then
