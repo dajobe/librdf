@@ -121,7 +121,7 @@ librdf_query_results_finished(librdf_query_results *query_results)
 
 
 /**
- * librdf_query_get_result_bindings - Get all binding names, values for current result
+ * librdf_query_results_get_bindings - Get all binding names, values for current result
  * @query_results: &librdf_query_results query results
  * @names: pointer to an array of binding names (or NULL)
  * @values: pointer to an array of binding value &librdf_node (or NULL)
