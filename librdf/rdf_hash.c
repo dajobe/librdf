@@ -394,7 +394,7 @@ librdf_free_hash(librdf_hash* hash)
 {
   if(hash->context) {
     if(hash->is_open)
-      hash->factory->close(hash->context);
+      librdf_hash_close(hash);
     hash->factory->destroy(hash->context);
     LIBRDF_FREE(librdf_hash_context, hash->context);
   }
