@@ -438,17 +438,34 @@ librdf_query_get_result_bindings(librdf_query *query,
 
 
 /**
- * librdf_query_get_result_binding: Get one binding value for the current result
+ * librdf_query_get_result_binding_value: Get one binding value for the current result
  * @query: &librdf_query query
  * @offset: offset of binding name into array of known names
  * 
  * Return value: a new &librdf_node binding value or NULL on failure
  **/
 librdf_node*
-librdf_query_get_result_binding(librdf_query *query, int offset)
+librdf_query_get_result_binding_value(librdf_query *query, int offset)
 {
-  if(query->factory->get_result_binding)
-    return query->factory->get_result_binding(query, offset);
+  if(query->factory->get_result_binding_value)
+    return query->factory->get_result_binding_value(query, offset);
+  else
+    return NULL;
+}
+
+
+/**
+ * librdf_query_get_result_binding_name: Get binding name for the current result
+ * @query: &librdf_query query
+ * @offset: offset of binding name into array of known names
+ * 
+ * Return value: a pointer to a shared copy of the binding name or NULL on failure
+ **/
+const char*
+librdf_query_get_result_binding_name(librdf_query *query, int offset)
+{
+  if(query->factory->get_result_binding_name)
+    return query->factory->get_result_binding_name(query, offset);
   else
     return NULL;
 }
