@@ -417,7 +417,7 @@ librdf_node_set_literal_value(librdf_node* node, char* value,
      xml_space > LIBRDF_NODE_LITERAL_XML_SPACE_PRESERVE )
     xml_space=LIBRDF_NODE_LITERAL_XML_SPACE_UNKNOWN;
   
-  node->value.literal.xml_space=xml_space;
+  node->value.literal.xml_space=(librdf_node_literal_xml_space)xml_space;
   node->value.literal.is_wf_xml=is_wf_xml;
   
   return 0;
@@ -485,7 +485,7 @@ librdf_node_get_digest(librdf_node* node)
   } else {
     /* LIBRDF_NODE_TYPE_LITERAL */
     s=node->value.literal.string;
-    d=librdf_new_digest(librdf_node_digest_factory);
+    d=librdf_new_digest_from_factory(librdf_node_digest_factory);
     if(!d)
       return NULL;
 
@@ -577,7 +577,7 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Freeing node\n", program);
   librdf_free_node(node);
   
-#ifdef LIBRDF_DEBUG 
+#ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);
 #endif
  
