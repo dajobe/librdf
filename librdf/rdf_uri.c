@@ -157,25 +157,23 @@ librdf_new_uri (char *uri_string)
   librdf_uri* new_uri;
   char *new_string;
   int length;
-  librdf_hash_datum *key, *value;
+  librdf_hash_datum key, value; /* on stack - not allocated */
+  librdf_hash_datum *old_value;
   
   length=strlen(uri_string);
 
-  key=librdf_new_hash_datum(uri_string, length);
-  if(!key)
-    return NULL;
+  key.data=uri_string;
+  key.size=length;
   
   /* if existing URI found in hash, return it */
-  if((value=librdf_hash_get_one(uris_hash, key))) {
-    new_uri=*(librdf_uri**)value->data;
+  if((old_value=librdf_hash_get_one(uris_hash, &key))) {
+    new_uri=*(librdf_uri**)old_value->data;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG3(librdf_new_uri, "Found existing URI %s in hash with current usage %d\n", uri_string, new_uri->usage);
 #endif
 
-    key->data=NULL;
-    librdf_free_hash_datum(key);
-    librdf_free_hash_datum(value);
+    librdf_free_hash_datum(old_value);
     new_uri->usage++;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
@@ -212,17 +210,13 @@ librdf_new_uri (char *uri_string)
   new_uri->max_usage=1;
 #endif
 
+  value.data=&new_uri; value.size=sizeof(librdf_uri*);
+  
   /* store in hash: URI-string => (librdf_uri*) */
-  if(librdf_hash_put(uris_hash, 
-                     uri_string, length,
-                     &new_uri, sizeof(librdf_uri*))) {
+  if(librdf_hash_put(uris_hash, &key, &value)) {
     LIBRDF_FREE(librdf_uri, new_uri);
     new_uri=NULL;
-  } 
-
-  /* Don't free data */
-  key->data=NULL;
-  librdf_free_hash_datum(key);
+  }
 
   return new_uri;
 }
@@ -248,6 +242,8 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 void
 librdf_free_uri (librdf_uri* uri) 
 {
+  librdf_hash_datum key; /* on stack */
+
   uri->usage--;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
@@ -262,7 +258,9 @@ librdf_free_uri (librdf_uri* uri)
   LIBRDF_DEBUG3(librdf_free_uri, "Deleting URI %s from hash, max usage was %d\n", uri->string, uri->max_usage);
 #endif
   
-  if(librdf_hash_delete(uris_hash, uri->string, uri->string_length) )
+  key.data=uri->string;
+  key.size=uri->string_length;
+  if(librdf_hash_delete_all(uris_hash, &key) )
     LIBRDF_FATAL1(librdf_free_uri, "Hash deletion failed");
 
 
