@@ -1,5 +1,5 @@
 /*
- * rdf_assertion_context.h - RDF Assertion Context definition
+ * rdf_context.h - RDF Statement Context definition
  *
  * $Source$
  * $Id$
@@ -18,14 +18,14 @@
 
 
 
-#ifndef LIBRDF_ASSERTION_CONTEXT_H
-#define LIBRDF_ASSERTION_CONTEXT_H
+#ifndef LIBRDF_CONTEXT_H
+#define LIBRDF_CONTEXT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef char  librdf_assertion_context;
+typedef char  librdf_context;
 
 #ifdef __cplusplus
 }
