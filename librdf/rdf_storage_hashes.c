@@ -231,9 +231,12 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
       sprintf(full_name, "%s-%s", name, desc[i].name);
 
     context->hashes[i]=librdf_new_hash(context->hash_type);
+    if(!context->hashes[i]) {
+      status=1;
+      break;
+    }
 
     context->names[i]=full_name;
-
   }
 
   /* find indexes for get targets, sources and arcs */
@@ -265,7 +268,8 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
       }
     }
   }
-
+  
+  /* on success or failure - don't need the passed in options */
   if(context->options) {
     librdf_free_hash(context->options);
     context->options=NULL;
@@ -378,14 +382,17 @@ librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
   for(i=0; i<context->hash_count; i++) {
     librdf_hash *hash=context->hashes[i];
 
-    if(librdf_hash_open(hash, context->names[i], 
+    if(!hash ||
+       librdf_hash_open(hash, context->names[i], 
                         context->mode, context->is_writable, context->is_new,
                         context->options)) {
       /* I still have my "Structured Fortran" book */
       int j;
-      for (j=0; j<i; j++)
+      for (j=0; j<i; j++) {
         librdf_hash_close(context->hashes[j]);
-    
+        context->hashes[j]=NULL;
+      }
+      
       return 1;
     }
   }
