@@ -4,6 +4,9 @@
 %define release SNAP
 %define prefix  /usr
 
+%define perlinstallsitearch @PERLINSTALLSITEARCH@
+%define perlman3dir @PERLMAN3DIR@
+
 Summary:   Redland RDF Application Framework
 Name:      %{name}
 Version:   %{version}
@@ -68,6 +71,10 @@ fi
 
 make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc install
 
+# Fix it so -L.. -llibrdf works from perl, python, ... subdirs
+# Must find a way to do this better
+ln -s .libs/librdf.a librdf.a
+
 cd perl
 
 make prefix=$RPM_BUILD_ROOT%{prefix} install-perl
@@ -122,12 +129,12 @@ cd ..
 %files perl
 %defattr(-, bin, bin)
 
-%{prefix}/lib/perl5/site_perl/*/*/auto/Redland
-%{prefix}/lib/perl5/site_perl/*/*/Redland.pm
-%{prefix}/lib/perl5/site_perl/*/*/RDF
-%{prefix}/lib/perl5/site_perl/*/*/RDF.pm
+%{perlinstallsitearch}/auto/Redland
+%{perlinstallsitearch}/Redland.pm
+%{perlinstallsitearch}/RDF
+%{perlinstallsitearch}/RDF.pm
 
-%doc %{prefix}/lib/perl5/man/man3/*
+%doc %{perlman3dir}/*
 
 %post
 /sbin/ldconfig
