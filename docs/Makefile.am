@@ -124,7 +124,7 @@ api/index.html: api.sgml
 @MAINT@	ps2pdf overview.ps overview.pdf
 @MAINT@
 @MAINT@api-big.html: api.sgml
-@MAINT@	jade -t sgml -ihtml -d /usr/lib/sgml/stylesheets/cygnus-both.dsl -V nochunks $? > a$@
+@MAINT@	jade -t sgml -ihtml -d /usr/lib/sgml/stylesheets/cygnus-both.dsl -V nochunks $? > $@
 
 clean-local:
 	rm -rf $(API_DOCBOOK_FILES) api.junk DBTOHTML*
