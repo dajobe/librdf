@@ -131,6 +131,8 @@ librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash)
   librdf_init_uri(digest_factory, uris_hash);
   librdf_init_node(digest_factory);
 
+  librdf_init_concepts();
+
   librdf_init_statement();
   librdf_init_model();
   librdf_init_storage();
@@ -146,12 +148,17 @@ librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash)
 void
 librdf_destroy_world(void)
 {
-  librdf_finish_digest();
-  librdf_finish_uri();
-  librdf_finish_hash();
-  /* librdf_finish_node(); */
-  librdf_finish_statement();
-  librdf_finish_model();
-  librdf_finish_storage();
   librdf_finish_parser();
+  librdf_finish_storage();
+  librdf_finish_model();
+  librdf_finish_statement();
+
+  librdf_finish_concepts();
+
+  librdf_finish_node();
+  librdf_finish_uri();
+
+  librdf_finish_hash();
+
+  librdf_finish_digest();
 }
