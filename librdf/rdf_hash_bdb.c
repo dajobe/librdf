@@ -905,7 +905,7 @@ librdf_hash_bdb_delete_key_value(void* context,
   /* V2/V3 prototype:
    * int DBcursor->c_get(DBC *cursor, DBT *key, DBT *data, u_int32_t flags);
    */
-  ret=dbc->c_get(dbc, &bdb_key, &bdb_value, DB_SET);
+  ret=dbc->c_get(dbc, &bdb_key, &bdb_value, DB_GET_BOTH);
   if(ret) {
     dbc->c_close(dbc);
     return 1;
