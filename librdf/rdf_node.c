@@ -783,6 +783,7 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
                     "Do not know how to compare node type %d\n", first_node->type);
   }
 
+  /* NOTREACHED */
   return 0;
 }
 
