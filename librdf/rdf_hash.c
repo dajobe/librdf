@@ -1413,6 +1413,33 @@ librdf_hash_get_as_long (librdf_hash* hash, char *key)
   return lvalue;
 }
 
+/**
+ * librdf_hash_put_strings - Insert key/value pairs into the hash as strings
+ * @hash: hash object
+ * @key: key 
+ * @value: value
+ * 
+ * The key and values are copied into the hash, no sharing i s done.
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value) {
+  librdf_hash_datum key_hd; /* static */
+  librdf_hash_datum value_hd;
+
+  /* Note: We do not have to init the world field of
+   * these librdf_hash_datum since they are never put on the
+   * hash datums free list
+   */
+
+  key_hd.data=(void*)key;
+  key_hd.size=strlen(key);
+  value_hd.data=(void*)value;
+  value_hd.size=strlen(value);
+  return librdf_hash_put(hash, &key_hd, &value_hd);
+}
+
 #endif
 
 
