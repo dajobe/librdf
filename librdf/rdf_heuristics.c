@@ -90,6 +90,7 @@
 
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
+#include <rdf_heuristics.h>
 
 
 /**

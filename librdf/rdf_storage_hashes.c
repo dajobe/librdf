@@ -88,6 +88,7 @@
 #include <rdf_hash.h>
 #include <rdf_statement.h>
 #include <rdf_stream.h>
+#include <rdf_heuristics.h>
 
 typedef struct 
 {

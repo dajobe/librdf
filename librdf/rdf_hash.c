@@ -101,6 +101,7 @@
 #include <rdf_hash_bdb.h>
 #endif
 #include <rdf_hash_memory.h>
+#include <rdf_heuristics.h>
 
 
 /* prototypes for helper functions */
