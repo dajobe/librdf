@@ -2,18 +2,24 @@
 <book id="redlandAPI">
   <?dbhtml filename='index.html'>
   <bookinfo>
-    <date>2001-07-17</date>
-    <title>Redland - RDF Application Framework - APIs</title>
-    <author>
-      <firstname>Dave</firstname>
-      <surname>Beckett</surname>
-    </author>
-    <affiliation>
-      <orgname>University of Bristol</orgname>
-      <orgdiv>Institute for Learning and Research Technology (ILRT)</orgdiv>
-    </affiliation>
+    <date>2002-04-29</date>
+    <title>Redland RDF Application Framework API Reference Manual</title>
+    <authorgroup>
+      <author>
+	<firstname>Dave</firstname>
+	<surname>Beckett</surname>
+	<affiliation>
+          <orgname>University of Bristol</orgname>
+	  <orgdiv>Institute for Learning and Research Technology (ILRT)</orgdiv>
+	  <address>
+	    <email>Dave.Beckett@bristol.ac.uk</email>
+	  </address>
+	</affiliation>
+      </author>
+    </authorgroup>
     <copyright>
-      <holder role="mailto:Dave.Beckett@bristol.ac.uk">Dave Beckett</holder>
+      <year>2000-2002</year>
+      <holder>Dave Beckett, University of Bristol, UK</holder>
       <indexterm>
 	<primary>
           <author>
@@ -26,7 +32,6 @@
 	  </author>
          </primary>
       </indexterm>
-      <year>2000-2001</year>
     </copyright>
     <legalnotice>
       <para>
