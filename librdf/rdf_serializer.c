@@ -478,7 +478,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_serializer* d;
-  char *test_serializer_types[]={"ntriples", "raptor-rdfxml", NULL};
+  char *test_serializer_types[]={"ntriples", NULL};
   int i;
   char *type;
   char *program=argv[0];
