@@ -114,7 +114,7 @@ static command commands[]={
   {CMD_HAS_ARC_OUT, "has-arc-out", 2, 2, 0},
   /* FIXME triples-match-query is deliberately not documented */
   {CMD_QUERY, "triples-match-query", 3, 3, 0},
-  {CMD_QUERY_AS_BINDINGS, "query", 1, 1, 0},
+  {CMD_QUERY_AS_BINDINGS, "query", 3, 3, 0},
   {CMD_SERIALIZE, "serialize", 0, 3, 0},
   {CMD_REMOVE_CONTEXT, "remove-context", 1, 1, 0},
   {CMD_CONTEXTS, "contexts", 0, 0, 0},
@@ -432,7 +432,7 @@ main(int argc, char *argv[])
     puts("      with optional BASEURI, into the optional CONTEXT.");
     puts("  print                                     Print the graph triples.");
     puts("  serialize [SYNTAX [URI [MIME-TYPE]]]      Serializes to a syntax (RDF/XML).");
-    puts("  query NAME QUERY-STRING                   Query in syntax NAME for bindings");
+    puts("  query NAME|- URI|- QUERY-STRING           Run QUERY-STRING query in language NAME for bindings");
 #if 0
     puts("  triples-match-query NAME URI|- QUERY-STRING  Query for matching triples");
 #endif
@@ -693,9 +693,32 @@ main(int argc, char *argv[])
       break;
 
     case CMD_QUERY_AS_BINDINGS:
-      /* args are name and query_string */
+      /* args are name (optional), uri (may be NULL), query_string */
+      uri=NULL;
+      name=NULL;
+      
+      if(strcmp(argv[0], "-"))
+        name=argv[0];
 
-      query=librdf_new_query(world, argv[0], NULL, (const unsigned char *)argv[1]);
+      if(!strcmp(argv[1], "-"))
+        uri=NULL;
+      else {
+        uri=librdf_new_uri(world, (const unsigned char *)argv[1]);
+        if(!uri) {
+          fprintf(stderr, "%s: Failed to create URI from %s\n", program, argv[1]);
+          break;
+        }
+      }
+
+      query=librdf_new_query(world, argv[0], uri,
+                             (const unsigned char *)argv[2]);
+      if(!query) {
+        fprintf(stderr, "%s: Failed to create new query %s\n", program, argv[2]);
+        if(uri)
+          librdf_free_uri(uri);
+        break;
+      }
+
       while(!librdf_query_results_finished(query)) {
         const char **names;
         librdf_node **values;
@@ -725,6 +748,8 @@ main(int argc, char *argv[])
 
       fprintf(stdout, "%s: Query returned %d results\n", program, 
               librdf_query_get_result_count(query));
+      if(uri)
+        librdf_free_uri(uri);
       break;
       
     case CMD_CONTAINS:
