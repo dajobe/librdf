@@ -34,6 +34,7 @@
 
 #include <librdf.h>
 #include <rdf_hash_memory.h>
+#include <rdf_types.h>
 
 
 /* private structures */
@@ -51,7 +52,7 @@ struct librdf_hash_memory_node_s
   struct librdf_hash_memory_node_s* next;
   char *key;
   size_t key_len;
-  unsigned long hash_key;
+  u32 hash_key;
   librdf_hash_memory_node_value *values;
   int values_count;
 };
@@ -90,7 +91,6 @@ static const int librdf_hash_initial_capacity=8;
 
 
 /* prototypes for local functions */
-static unsigned long librdf_hash_memory_crc32 (const unsigned char *s, unsigned int len);
 static librdf_hash_memory_node* librdf_hash_memory_find_node(librdf_hash_memory_context* hash, char *key, size_t key_len, int *bucket, librdf_hash_memory_node** prev);
 static void librdf_free_hash_memory_node(librdf_hash_memory_node* node);
 static int librdf_hash_memory_expand_size(librdf_hash_memory_context* hash);
@@ -121,23 +121,38 @@ static int librdf_hash_memory_get_fd(void* context);
 static void librdf_hash_memory_register_factory(librdf_hash_factory *factory);
 
 
+
+
+/*
+ * perldelta 5.8.0 says under *Performance Enhancements*
+ *
+ *   Hashes now use Bob Jenkins "One-at-a-Time" hashing key algorithm
+ *   http://burtleburtle.net/bob/hash/doobs.html  This algorithm is
+ *   reasonably fast while producing a much better spread of values
+ *   than the old hashing algorithm ...
+ *
+ * Changed here to hash the string backwards to help do URIs better
+ *
+ */
+
+#define ONE_AT_A_TIME_HASH(hash,str,len) \
+     do { \
+        register const unsigned char *c_oneat = str+len-1; \
+        register int i_oneat = len; \
+        register u32 hash_oneat = 0; \
+        while (i_oneat--) { \
+            hash_oneat += *c_oneat--; \
+            hash_oneat += (hash_oneat << 10); \
+            hash_oneat ^= (hash_oneat >> 6); \
+        } \
+        hash_oneat += (hash_oneat << 3); \
+        hash_oneat ^= (hash_oneat >> 11); \
+        (hash) = (hash_oneat + (hash_oneat << 15)); \
+    } while(0)
+
+
+
 /* helper functions */
-
-/* Return a CRC of the contents of the buffer. */
-unsigned long
-librdf_hash_memory_crc32 (const unsigned char *s, unsigned int len)
-{
-  unsigned int i;
-  unsigned long crc32val;
-  
-  crc32val = 0;
-  for (i=0;  i< len;  i++) {
-    crc32val = (crc32val << 3) ^ s[i];
-  }
-  return crc32val;
-}
-
-
 
 
 /**
@@ -164,13 +179,13 @@ librdf_hash_memory_find_node(librdf_hash_memory_context* hash,
 {
   librdf_hash_memory_node* node;
   int bucket;
-  int hash_key;
+  u32 hash_key;
 
   /* empty hash */
   if(!hash->capacity)
     return NULL;
   
-  hash_key=librdf_hash_memory_crc32((unsigned char*)key, key_len);
+  ONE_AT_A_TIME_HASH(hash_key, key, key_len);
 
   if(prev)
     *prev=NULL;
@@ -249,24 +264,28 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
     hash->nodes=new_nodes;
     return 0;
   }
+  
+  /* Copy all old bucket pointers into first half */
+  memcpy(new_nodes, hash->nodes, hash->capacity * sizeof(librdf_hash_memory_node*));
+  /* second half is empty from calloc above - correctly */
 
 
   for(i=0; i<hash->capacity; i++) {
     librdf_hash_memory_node *node=hash->nodes[i];
+    librdf_hash_memory_node **next_ptr=&hash->nodes[i];
       
-    /* walk all attached nodes */
-    while(node) {
-      librdf_hash_memory_node *next;
-      int bucket;
-
-      next=node->next;
-      /* find slot in new table */
-      bucket=node->hash_key & (required_capacity - 1);
-      node->next=new_nodes[bucket];
-      new_nodes[bucket]=node;
-
-      node=next;
+    /* walk all attached nodes, see if they need to move bucket */
+    for(;node; node = *next_ptr) {
+      int bucket=node->hash_key & (required_capacity - 1);
+      if(bucket != i) {
+        /* needs to move */
+        *next_ptr=node->next;
+        node->next=new_nodes[bucket];
+        new_nodes[bucket]=node;
+      } else
+        next_ptr=&node->next;
     }
+
   }
 
   /* now free old table */
@@ -635,7 +654,7 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
   librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
   librdf_hash_memory_node *node;
   librdf_hash_memory_node_value *vnode;
-  int hash_key;
+  u32 hash_key;
   char *new_key=NULL;
   char *new_value;
   int bucket= (-1);
@@ -654,7 +673,7 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
   
   /* not found - new key */
   if(is_new_node) {
-    hash_key=librdf_hash_memory_crc32((unsigned char*)key->data, key->size);
+    ONE_AT_A_TIME_HASH(hash_key, key->data, key->size);
 
     bucket=hash_key & (hash->capacity - 1);
 
