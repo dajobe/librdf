@@ -123,10 +123,6 @@ distclean-local:
 	rm -rf $(API_DOCBOOK_FILES)
 
 else
-# This is the best that can be done without pod2man
-redland.3: redland.pod
-	cp $< $@
-
 clean-local:
 	rm -rf $(API_DOCBOOK_FILES) api.junk DBTOHTML* pod2htm*
 endif
