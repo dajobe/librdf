@@ -47,8 +47,8 @@ $s=new RDF::Redland::Statement($n, $n, $n);
 $model->add($s);
 
 # python
-n=RDF.Node(uri_string="http://example.org/foo")
-s=RDF.Statement(n, n, n)
+n=RDF.Uri("http://example.org/foo")
+s=RDF.Statement(n, n, n) # n is used as a resource RDF.Node here
 model.add_statement(s)
 </pre>
 
@@ -123,13 +123,16 @@ directly)</p>
 Redland URI objects and native perl URIs to be used in place of
 Redland Nodes where convienent (such as in making Statements).  All
 existing code should work but can be shortened.
+A new <tt>--with-perl</tt> configure argument to enable the perl
+interface.
 </p>
 
 
 <h3>Python API changes</h3>
 
 <p>A major update to use Python 2.2+ idioms and features by Edd
-Dumbill.  Edd wrote the following change log.</p>
+Dumbill.  A new <tt>--with-python</tt> configure argument to enable the
+python interface.  Edd wrote the following change log.</p>
 
 <p>General changes</p>
 <ul>
@@ -213,24 +216,46 @@ Dumbill.  Edd wrote the following change log.</p>
 </ul>
 
 
-<h3>Internal changes</h3>
+<h3>Java Interface Changes</h3>
 
-<p>Added Sleepycat/BDB 4.0 and 4.1 support - the open API changed again</p>
+<p>Additions for the new API calls as outlined above (such
+as model/storage sync, parsing from strings etc.). New configure
+argument <tt>--with-jdk</tt> to pick the JDK in order to
+find the JNI headers.  See the <a href="docs/java">java API</a>
+page for details.</p>
 
-<p>Split the librdf_model class into model interface (librdf_model)
-and implementation class (librdf_model_storage).</p>
 
-<p>Removed the old and outdated repat RDF parser.</p>
+<h3>PHP, Ruby and Tcl Interfaces Changes</h3>
 
-<p>Removed the very old expat XML parser from the sources;
-much newer or expat or libxml2 are very widespread.</p>
+<p>Updates in configuring and building these interfaces
+and new <tt>--with-php</tt>, <tt>--with-ruby</tt> and <tt>--with-tcl</tt>
+configure arguments.  See the corresponding API pages for details.</p>
 
-<p>Added simple thread support with configuration option
+
+<h3>Internal changes and fixes</h3>
+
+<ul>
+<li>Added Sleepycat/BDB 4.0 and 4.1 support - the open API changed again</li>
+
+<li>Split the librdf_model class into model interface (librdf_model)
+and implementation class (librdf_model_storage).</li>
+
+<li>Removed the old and outdated repat RDF parser.</li>
+
+<li>Removed the very old expat XML parser from the sources;
+much newer or expat or libxml2 are very widespread.</li>
+
+<li>Added simple thread support with configuration option
 <tt>--with-threads</tt> that locks key shared classes to
 allow separate threads to work in the same memory space. The
-current locked classes are URI and World.
-</p>
+current locked classes are URI and World.</li>
 
+<li>Deleting statements in the in-memory store now works.</li>
+
+<li>Getting the context of iterators returned from in-memory
+sources, targets, arcs now works.</li>
+
+</ul>
 
 
 <h2 id="rel0_9_12"><a name="rel0_9_12">Redland 0.9.12 Changes</a></h2>
