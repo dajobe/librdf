@@ -15,10 +15,12 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>Link with -lexpat before libwww libraries to ensure correct
+XML library is used.</li>
 <li>Deprecate node types beyond simple resource, literal</li>
 <li>Allow base URIs in Perl parser methods to be undef</li>
 <li>Ensure non-file: URIs do not cause crashes (seen in Perl)</li>
-<li>Add URI resolving code from Repat</li>
+<li>Add URI parsing code from Repat</li>
 <li>Document the storage constructor hash options under the main class</li>
 <li>RFE: make Node and URI be the same class, change all methods using
 Nodes to take URI OR URI or Literal as appropriate.</li>
@@ -34,9 +36,9 @@ Nodes to take URI OR URI or Literal as appropriate.</li>
 <li>Add module - URI retrieval via (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
 <li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build</li>
 <li>If LGPL/MPL license, include compatible code OR add separate package?</li>
-<li>Deal with anonymous resources</li>
+<li>Deal with anonymous resources / blank graph nodes</li>
 <li>Write a C++ interface</li>
-<li>Provide any necessary support for RDF Schema</li>
+<li>Provide any necessary support for RDF Schema (fast rdf:type lookups)</li>
 <li>Add query language interfaces</li>
 <li>Write some better example code</li>
 <li>Write a quickstart / howto document</li>
@@ -47,7 +49,7 @@ part of librdf.h automatically to make a 1-header file system.</li>
 <li>Fix the URI hash mechanism - currently stores URI/pointer pairs in hash - wrong</li>
 <li>Make the library thread safe</li>
 <li>The library does not do file locking on e.g. DB files</li>
-<li>Provide a way to represent reified statements with instantiated statements - related to anonymous resources</li>
+<li>Provide a way to represent reified statements with instantiated statements</li>
 <li>Add proper error/warning reporting in general</li>
 <li>Write stringbuffer for easy creation of growing in-memory strings</li>
 <li>For IRIX (and others?), try also linking with -lpthreads when testing for working Berkeley DB</li>
