@@ -213,8 +213,8 @@ librdf_free_hash_memory_node(librdf_hash_memory_node* node)
         LIBRDF_FREE(cstring, vnode->value);
       LIBRDF_FREE(librdf_hash_memory_node_value, vnode);
     }
-    LIBRDF_FREE(librdf_hash_memory_node, node);
   }
+  LIBRDF_FREE(librdf_hash_memory_node, node);
 }
 
 
@@ -846,7 +846,9 @@ librdf_hash_memory_delete_key_value(void* context, librdf_hash_datum *key,
   } else
     vprev->next=vnode->next;
 
-  /* free value node */
+  /* free value and value node */
+  if(vnode->value)
+    LIBRDF_FREE(librdf_hash_memory_node_value, vnode->value);
   LIBRDF_FREE(librdf_hash_memory_node_value, vnode);
 
   /* update hash counts */
