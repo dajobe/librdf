@@ -59,7 +59,7 @@ static  char *program=NULL;
 enum command_type {
   CMD_PRINT,
   CMD_CONTAINS,
-  CMD_STATEMENTS,
+  CMD_FIND,
   CMD_SOURCES,
   CMD_ARCS,
   CMD_TARGETS,
@@ -91,16 +91,16 @@ typedef struct
 static command commands[]={
   {CMD_PRINT, "print", 0, 0, 0,},
   {CMD_CONTAINS, "contains", 3, 3, 0},
-  {CMD_STATEMENTS, "statements", 3, 3, 0},
+  {CMD_FIND, "find", 3, 3, 0},
   {CMD_SOURCES, "sources", 2, 2, 0},
   {CMD_ARCS, "arcs", 2, 2, 0},
   {CMD_TARGETS, "targets", 2, 2, 0},
   {CMD_SOURCE, "source", 2, 2, 0},
   {CMD_ARC, "arc", 2, 2, 0},
   {CMD_TARGET, "target", 2, 2, 0},
-  {CMD_ADD, "add", 3, 3, 1},
-  {CMD_REMOVE, "remove", 3, 3, 1},
-  {CMD_ADD_TYPED, "add-typed", 5, 5, 1},
+  {CMD_ADD, "add", 3, 4, 1},
+  {CMD_REMOVE, "remove", 3, 4, 1},
+  {CMD_ADD_TYPED, "add-typed", 5, 6, 1},
   {CMD_PARSE_MODEL, "parse", 2, 3, 1},
   {CMD_PARSE_STREAM, "parse-stream", 2, 3, 1},
   {CMD_ARCS_IN, "arcs-in", 1, 1, 0},
@@ -169,7 +169,7 @@ main(int argc, char *argv[])
   int result;
   char *p;
   int i;
-  
+  int rc;
 
   program=argv[0];
   if((p=strrchr(program, '/')))
@@ -291,11 +291,11 @@ main(int argc, char *argv[])
     /* Not a query -> results table query, so leave out for now */
     printf("  query NAME URI|- QUERY-STRING             Query for matching statements\n");
 #endif
-    printf("  statements SUBJECT|- PREDICATE|- OBJECT|- Find matching statements\n");
+    printf("  find SUBJECT|- PREDICATE|- OBJECT|-       Find matching statements\n");
     printf("                                            where - matches any node.\n");
     printf("  contains SUBJECT PREDICATE OBJECT         Check if statement is in the model.\n");
-    printf("  add | remove SUBJECT PREDICATE OBJECT     Add/remove statement to/from model.\n");
-    printf("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI  Add datatyped statement to model.\n");
+    printf("  add | remove SUBJECT PREDICATE OBJECT [CONTEXT] Add/remove statement to/from model.\n");
+    printf("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]  Add datatyped statement to model.\n");
     printf("  sources | targets | arcs NODE1 NODE2      Query for matching nodes\n");
     printf("  source | target | arc NODE1 NODE2         Query for 1 matching node\n");
     printf("  arcs-in | arcs-out NODE                   Show properties in/out of NODE\n");
@@ -492,7 +492,7 @@ main(int argc, char *argv[])
       break;
 
     case CMD_CONTAINS:
-    case CMD_STATEMENTS:
+    case CMD_FIND:
     case CMD_ADD:
     case CMD_REMOVE:
     case CMD_ADD_TYPED:
@@ -528,7 +528,7 @@ main(int argc, char *argv[])
       librdf_statement_set_predicate(partial_statement, arc);
       librdf_statement_set_object(partial_statement, target);
       
-      if(type != CMD_STATEMENTS) {
+      if(type != CMD_FIND) {
         if(!source || !arc || !target) {
           fprintf(stderr, "%s: cannot have missing statement parts for %s\n", program, cmd);
           librdf_free_statement(partial_statement);
@@ -545,16 +545,16 @@ main(int argc, char *argv[])
           fprintf(stdout, "%s: the model does not contain the statement\n", program);
           break;
           
-        case CMD_STATEMENTS:
+        case CMD_FIND:
         case CMD_QUERY:
           /* Print out matching statements */
-          if(type==CMD_STATEMENTS)
+          if(type==CMD_FIND)
             stream=librdf_model_find_statements(model, partial_statement);
           else
             stream=librdf_model_query(model, query);
           if(!stream) {
             fprintf(stderr, "%s: %s returned NULL stream\n", program,
-                    ((type==CMD_STATEMENTS) ? "librdf_model_find_statements" : "librdf_model_query"));
+                    ((type==CMD_FIND) ? "librdf_model_find_statements" : "librdf_model_query"));
           } else {
             count=0;
             while(!librdf_stream_end(stream)) {
@@ -583,14 +583,34 @@ main(int argc, char *argv[])
           
         case CMD_ADD:
         case CMD_ADD_TYPED:
-          if(librdf_model_add_statement(model, partial_statement))
+          if(argv[3] && contexts) {
+            librdf_node* context_node=librdf_new_node_from_uri_string(world, argv[3]);
+            rc=librdf_model_context_add_statement(model, context_node,
+                                                  partial_statement);
+            librdf_free_node(context_node);
+          } else {
+            if(argv[3])
+              fprintf(stderr, "%s: WARNING: Cannot add in context with contexts not enabled (-c)\n", program);
+            rc=librdf_model_add_statement(model, partial_statement);
+          }
+          if(rc)
             fprintf(stdout, "%s: failed to add statement to model\n", program);
           else
-          fprintf(stdout, "%s: added statement to model\n", program);
+            fprintf(stdout, "%s: added statement to model\n", program);
           break;
           
         case CMD_REMOVE:
-          if(librdf_model_remove_statement(model, partial_statement))
+          if(argv[3] && contexts) {
+            librdf_node* context_node=librdf_new_node_from_uri_string(world, argv[3]);
+            rc=librdf_model_context_remove_statement(model, context_node,
+                                                     partial_statement);
+            librdf_free_node(context_node);
+          } else {
+            if(argv[3])
+              fprintf(stderr, "%s: WARNING: Cannot remove in context with contexts not enabled (-c)\n", program);
+            rc=librdf_model_remove_statement(model, partial_statement);
+          }
+          if(rc)
             fprintf(stdout, "%s: failed to remove statement from model\n", program);
           else
             fprintf(stdout, "%s: removed statement from model\n", program);
