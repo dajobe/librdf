@@ -396,7 +396,7 @@ librdf_query_run_as_bindings(librdf_query* query, librdf_model* model)
 
 
 /**
- * librdf_query_get_result_count: Get number of bindings so far
+ * librdf_query_get_result_count - Get number of bindings so far
  * @query: &librdf_query query
  * 
  * Return value: number of bindings found so far
@@ -414,7 +414,7 @@ librdf_query_get_result_count(librdf_query *query)
 
 
 /**
- * librdf_query_results_finished: Find out if binding results are exhausted
+ * librdf_query_results_finished - Find out if binding results are exhausted
  * @query: &librdf_query query
  * 
  * Return value: non-0 if results are finished or query failed
@@ -432,7 +432,7 @@ librdf_query_results_finished(librdf_query *query)
 
 
 /**
- * librdf_query_get_result_bindings: Get all binding names, values for current result
+ * librdf_query_get_result_bindings - Get all binding names, values for current result
  * @query: &librdf_query query
  * @names: pointer to an array of binding names (or NULL)
  * @values: pointer to an array of binding value &librdf_node (or NULL)
@@ -456,7 +456,7 @@ librdf_query_get_result_bindings(librdf_query *query,
 
 
 /**
- * librdf_query_get_result_binding_value: Get one binding value for the current result
+ * librdf_query_get_result_binding_value - Get one binding value for the current result
  * @query: &librdf_query query
  * @offset: offset of binding name into array of known names
  * 
@@ -475,7 +475,7 @@ librdf_query_get_result_binding_value(librdf_query *query, int offset)
 
 
 /**
- * librdf_query_get_result_binding_name: Get binding name for the current result
+ * librdf_query_get_result_binding_name - Get binding name for the current result
  * @query: &librdf_query query
  * @offset: offset of binding name into array of known names
  * 
@@ -494,7 +494,7 @@ librdf_query_get_result_binding_name(librdf_query *query, int offset)
 
 
 /**
- * librdf_query_get_result_binding_by_name: Get one binding value for a given name in the current result
+ * librdf_query_get_result_binding_by_name - Get one binding value for a given name in the current result
  * @query: &librdf_query query
  * @name: variable name
  * 
@@ -513,7 +513,7 @@ librdf_query_get_result_binding_by_name(librdf_query *query, const char *name)
 
 
 /**
- * librdf_query_next_result: Move to the next result
+ * librdf_query_next_result - Move to the next result
  * @query: &librdf_query query
  * 
  * Return value: non-0 if failed or results exhausted
