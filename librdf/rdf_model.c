@@ -465,11 +465,8 @@ main(int argc, char *argv[])
   librdf_statement *statement;
   char *program=argv[0];
   
-  /* initialise dependent modules */
-  librdf_init_hash();
-  librdf_init_statement();
-  librdf_init_storage();
-  librdf_init_model();
+  /* initialise dependent modules - all of them! */
+  librdf_init_world(NULL, NULL);
   
   fprintf(stderr, "%s: Creating storage\n", program);
   storage=librdf_new_storage(NULL, NULL);
@@ -497,10 +494,7 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Freeing storage\n", program);
   librdf_free_storage(storage);
 
-  librdf_finish_model();
-  librdf_finish_storage();
-  librdf_finish_statement();
-  librdf_finish_hash();
+  librdf_destroy_world();
   
 #ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);
