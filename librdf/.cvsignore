@@ -1,0 +1,16 @@
+Doxyfile
+Makefile
+Makefile.in
+RCS
+config.cache
+config.h*
+config.log
+config.status
+configure
+gnupg*
+java-model
+librdf*gz
+not-used
+stamp-h*
+test*
+.deps*

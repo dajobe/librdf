@@ -1,0 +1,11 @@
+M&S[x] refers to RDF Model and Syntax serialisation syntax production [x]
+- see http://www.w3.org/TR/REC-rdf-syntax/
+
+In RDF/XML
+  A description contains propertyElts and describes an identified resource - M&S [2]
+  A propertyElt is either a property+value or property+resource reference
+  A property has a namespace prefix + name - M&S [6],[7],[10
+  A resource has a URI reference or an ID - M&S [4],[9]
+  A value is either a description or a string - M&S [8]
+
+=> FOR NOW, IGNORING URI / namespace prefix+ name distinction

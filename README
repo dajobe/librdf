@@ -1,0 +1,38 @@
+Bits taken from GNUPG 1.0.1 (GPL license)
+bithelp.h types.h md5.c rmd.h rmd160.c sha1.c
+
+
+
+Interface Design for 'Classes'
+
+Prototypes and structures (aka Interface) in rdf_foo.h
+
+Implementation and static variables in rdf_foo.c
+
+simple constructor
+  new_rdf_foo(void)
+returns
+  rdf_foo*
+
+complex constructor(s)
+  new_rdf_foo_from_X(X* x)
+returns
+  rdf_foo*
+
+destructor
+  free_rdf_foo(void)
+returns
+  rdf_foo*
+
+class initialiser
+   void init_rdf_foo(void)
+
+methods
+  ... rdf_foo_method1(...)
+returns
+  ...
+
+
+methods called
+   ..._as_string do not allocate a new string
+   ..._to_string use RDF_MALLOC to create a new string that must be freed

@@ -1,0 +1,132 @@
+dnl
+dnl Configure for librdf
+dnl
+dnl (Process this file with autoconf to produce a configure script.)
+
+AC_REVISION($Revision$)dnl
+
+AC_PREREQ(2.13)
+AC_INIT(rdf_node.c)
+AM_CONFIG_HEADER(config.h)
+
+AM_INIT_AUTOMAKE(librdf, 1.0)
+
+
+dnl Checks for programs.
+
+AC_CANONICAL_HOST
+AC_ARG_PROGRAM
+AM_SANITY_CHECK
+AC_PROG_CC
+AC_PROG_RANLIB
+AC_PROG_INSTALL
+
+AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
+AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
+AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
+AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
+
+
+dnl Checks for libraries.
+
+AC_CHECK_HEADERS(gdbm.h)
+if test "$ac_cv_header_gdbm_h" = yes ; then
+  AC_CHECK_LIB(gdbm,gdbm_firstkey)
+fi
+
+AC_CHECK_HEADERS(openssl/crypto.h)
+if test "$ac_cv_header_openssl_crypto_h" = yes ; then
+  AC_CHECK_LIB(crypto,MD5)
+  if test "$ac_cv_lib_crypto_MD5" = yes ; then
+    AC_DEFINE(HAVE_OPENSSL_CRYPTO_MD5_DIGEST)
+  fi
+  AC_CHECK_LIB(crypto,SHA)
+  if test "$ac_cv_lib_crypto_SHA" = yes ; then
+    AC_DEFINE(HAVE_OPENSSL_CRYPTO_SHA1_DIGEST)
+  fi
+fi
+
+
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h stdlib.h)
+
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_C_BIGENDIAN
+
+GNUPG_CHECK_TYPEDEF(byte, HAVE_BYTE_TYPEDEF)
+GNUPG_CHECK_TYPEDEF(ushort, HAVE_USHORT_TYPEDEF)
+GNUPG_CHECK_TYPEDEF(ulong, HAVE_ULONG_TYPEDEF)
+GNUPG_CHECK_TYPEDEF(u16, HAVE_U16_TYPEDEF)
+GNUPG_CHECK_TYPEDEF(u32, HAVE_U32_TYPEDEF)
+
+AC_CHECK_SIZEOF(unsigned short, 2)
+AC_CHECK_SIZEOF(unsigned int, 4)
+AC_CHECK_SIZEOF(unsigned long, 4)
+
+if test "$ac_cv_sizeof_unsigned_short" = "0" \
+   || test "$ac_cv_sizeof_unsigned_int" = "0" \
+   || test "$ac_cv_sizeof_unsigned_long" = "0"; then
+    AC_MSG_WARN([Hmmm, something is wrong with the sizes - using defaults]);
+fi
+
+
+dnl Checks for library functions.
+
+
+dnl Checks for modules
+DIGEST_OBJS=
+DIGEST_SRCS=
+AC_MSG_CHECKING(for sha1 digest module)
+if test -r $srcdir/sha1.c; then
+  AC_MSG_RESULT(yes);
+  AC_DEFINE(HAVE_SHA1_DIGEST)
+  DIGEST_OBJS="$DIGEST_OBJS sha1.o"
+  DIGEST_SRCS="$DIGEST_SRCS sha1.c"
+else
+  AC_MSG_RESULT(no);
+
+fi
+AC_MSG_CHECKING(for md5 digest module)
+if test -r $srcdir/md5.c; then
+  AC_MSG_RESULT(yes);
+  AC_DEFINE(HAVE_MD5_DIGEST)
+  DIGEST_OBJS="$DIGEST_OBJS md5.o"
+  DIGEST_SRCS="$DIGEST_SRCS md5.c"
+else
+  AC_MSG_RESULT(no);
+fi
+AC_MSG_CHECKING(for ripem160 digest module)
+if test -r $srcdir/rmd160.c; then
+  AC_MSG_RESULT(yes);
+  AC_DEFINE(HAVE_RIPEM160_DIGEST)
+  DIGEST_OBJS="$DIGEST_OBJS rmd160.o"
+  DIGEST_SRCS="$DIGEST_SRCS rmd160.c"
+else
+  AC_MSG_RESULT(no);
+fi
+AC_SUBST(DIGEST_OBJS)
+AC_SUBST(DIGEST_SRCS)
+
+
+HASH_OBJS=
+HASH_SRCS=
+AC_MSG_CHECKING(for libgdbm support)
+if test "$ac_cv_lib_gdbm_gdbm_firstkey" = yes ; then
+  AC_MSG_RESULT(yes);
+  AC_DEFINE(HAVE_GDBM_HASH)
+  HASH_OBJS="$HASH_OBJS rdf_hash_gdbm.o"
+  HASH_SRCS="$HASH_SRCS rdf_hash_gdbm.o"
+  LIBS="$LIBS -lgdbm"
+else
+  AC_MSG_RESULT(no);
+fi
+AC_SUBST(HASH_OBJS)
+AC_SUBST(HASH_SRCS)
+
+
+AC_OUTPUT([Makefile])
