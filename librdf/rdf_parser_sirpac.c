@@ -96,7 +96,7 @@ librdf_parser_sirparc_parse_from_uri(void *context, librdf_uri *uri) {
   char *command;
   FILE *fh;
   static const char *command_format_string="%s -classpath %s org.w3c.rdf.examples.ListStatements %s 2>&1";
-  
+  char *uri_string;
 
   scontext=(librdf_parser_sirpac_stream_context*)LIBRDF_CALLOC(librdf_parser_sirpac_stream_context, 1, sizeof(librdf_parser_sirpac_stream_context));
   if(!scontext)
@@ -104,20 +104,23 @@ librdf_parser_sirparc_parse_from_uri(void *context, librdf_uri *uri) {
 
   scontext->uri=uri;
   
+  uri_string=librdf_uri_as_string(uri);
+
   /* strlen(format_string) is 3 chars too long (%s * 3) and 1 char
    * too short (\0 at end of new string), so take 2 chars off length 
    */
   command_len=strlen(command_format_string) + 
               strlen(JAVA_COMMAND) +
               strlen(RDF_JAVA_API_JAR) +
-              strlen(uri) -2;
+              strlen(uri_string) -2;
 
   command=(char*)LIBRDF_MALLOC(cstring, command_len);
   if(!command) {
     librdf_parser_sirpac_serialise_finished((void*)context);
     return NULL;
   }
-  sprintf(command, command_format_string, JAVA_COMMAND, RDF_JAVA_API_JAR, uri);
+  sprintf(command, command_format_string, JAVA_COMMAND, RDF_JAVA_API_JAR, 
+	  uri_string);
   scontext->command=command;
 
   LIBRDF_DEBUG2(librdf_parser_sirparc_parse_from_uri, "Running command '%s'\n", command);
