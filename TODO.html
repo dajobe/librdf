@@ -15,11 +15,11 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>make librdf_statement_set_subject* free any existing node before setting</li>
 <li>Docs: note that compiling redland also builds raptor, if both are wanted</li>
 <li>RFE: Add is_literal etc. methods to perl etc. Node class</li>
 <li>Allow base URIs in Perl parser methods to be undef</li>
 <li>Ensure non-file: URIs do not cause crashes (seen in Perl)</li>
-<li>Add URI parsing code from Repat</li>
 <li>Document the storage constructor hash options under the main class</li>
 <li>RFE: make Node and URI be the same class, change all methods using
 Nodes to take URI OR URI or Literal as appropriate.</li>
@@ -28,16 +28,12 @@ Nodes to take URI OR URI or Literal as appropriate.</li>
 <li>Add container class for manipulating RDF containers - Seq, Bag, Alt, ...</li>
 <li>Add a N3 parser</li>
 <li>Add an XSLT 'parser' based on <a href="http://xmlsoft.org/XSLT/">libxslt</a></li>
-<li>Handle xml:lang when the rdf parsers provide it</li>
-<li>Use <a href="http://xmlsoft.org/">libxml</a> rather than expat as default xml parser? Reasons: uses iconv to handle more content encodings and provides better error reporting</li>
 <li>Pass RDF parser error messages to user code, scripting languages</li>
-<li>Add module - URI syntax, representation, relative URI resolving</li>
 <li>Add module - URI retrieval via (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
 <li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build</li>
 <li>If LGPL/MPL license, include compatible code OR add separate package?</li>
 <li>Write a C++ interface</li>
 <li>Provide any necessary support for RDF Schema (fast rdf:type lookups)</li>
-<li>Add query language interfaces</li>
 <li>Write some better example code</li>
 <li>Write a quickstart / howto document</li>
 <li>Split the header files into internal / user ones.  Maybe generate
@@ -72,8 +68,12 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Added relative URI parsing code from Repat (via raptor)</li>
+<li>Handle xml:lang when the rdf parsers provide it</li>
+<li>Add query language interfaces</li>
 <li>Add support for blank nodes (were anonymous resources)</li>
 <li>Removed all node types except for resource, literal, blank, li (statement)</li>
+<li>Use <a href="http://xmlsoft.org/">libxml</a> rather than expat as default xml parser (at least for raptor) Reasons: uses iconv to handle more content encodings and provides better error reporting</li>
 <li>Link XML Libraries (-lexpat etc.) before libwww libraries to
 ensure correct XML library is used (0.9.11)</li>
 <li>Python interface to parsers now works (0.9.11)</li>
