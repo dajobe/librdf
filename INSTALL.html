@@ -111,10 +111,23 @@ automatically enable this unless disabled by setting this option to
 
 <h3>2.3 Configuring</h3>
 
+<p>If everything is in the default place, do:</p>
 <pre>
    ./configure
 </pre>
 
+<p>More commonly you will be doing something like this, when compiling
+with the Java parser:</p>
+<pre>
+   ./configure --with-rdf-java-api=rdf-api-2000-05-12.jar
+</pre>
+
+<p>If you are having problems with configuring several times when
+adding or removing options, you may have to tidy up first with either of these:</p>
+<pre>
+   make clean
+   rm -f config.cache
+</pre>
 
 <h3>2.4 Compiling</h3>
 
@@ -125,7 +138,7 @@ automatically enable this unless disabled by setting this option to
 
 <h2>2.5. Testing</h2>
 
-<p>You can build and run the built in tests with:</p>
+<p>You can build and run the built-in tests with:</p>
 <pre>
     make check
 </pre>
@@ -141,7 +154,7 @@ work in the source tree.</p>
 </pre>
 
 
-<h2>3. Using librdf</h2>
+<h2>3. Using the library</h2>
 
 <p>See <a href="example.c">example.c</a> and
 <a href="example2.c">example2.c</a> which can be built with:</p>
@@ -153,6 +166,27 @@ work in the source tree.</p>
    make example2
 </pre>
 <p>once the library has been configured and built.</p>
+
+<p><tt>example</tt> uses a RDF parser, if you have one, to parse a
+URI of RDF/XML content, store it in multple Berkeley DB hashes on the
+disk and run queries against them.  It takes two arguments, the first
+the URI of the RDF/XML content (or <tt>file:</tt><em>filename</tt>)
+and the second, optional one, is the name of the RDF parser to use.  At
+present these can be <tt>sirpac</tt> or <tt>libwww</tt></p>
+
+<p><tt>example2</tt> does not use a RDF parser, but reads from a simple
+triple dump format and again stores the data on disk.</p>
+
+<p>Note: there is very poor error reporting support at present from
+the RDF parsers.  Generally if the results are just an empty model
+when something was expected, an error ocurred.  If the URI works (check
+it in a browser) then probably it was a parsing problem.</p>
+
+<p>You can check that you have a functioning Java/SiRPAC installation by
+running the Java parser directly against some RDF URL, eg.:</p>
+<pre>
+  java -classpath rdf-api-2000-05-12.jar org.w3c.rdf.examples.ListStatements http://purl.org/dc/index.htm.rdf
+</pre>
 
 <hr />
 
