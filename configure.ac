@@ -109,17 +109,6 @@ AC_CHECK_PROGS(PERL, perl)
 # Gnome
 AC_CHECK_PROGS(PKG_CONFIG, pkg-config)
 
-if test "X$PERL" != "X"; then
-  PERLINSTALLSITEARCH=`$PERL -MConfig -e 'print $Config{installsitearch};'`
-  PERLMAN3DIR=`$PERL -MConfig -e 'print $Config{man3dir};'`
-else
-  PERLINSTALLSITEARCH=none
-  PERLMAN3DIR=none
-fi
-AC_SUBST(PERLINSTALLSITEARCH)
-AC_SUBST(PERLMAN3DIR)
-
-
 
 AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
 AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
