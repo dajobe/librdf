@@ -386,7 +386,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
     unsigned char *uri=librdf_uri_as_counted_string(librdf_node_get_uri(node), &nodelen);
     
     /* Create digest */
-    librdf_digest_update(digest, "R", 1);
+    librdf_digest_update(digest, (unsigned char*)"R", 1);
     librdf_digest_update(digest, uri, nodelen);
     librdf_digest_final(digest);
     memcpy(id,librdf_digest_get_digest(digest),16);
@@ -427,7 +427,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
     nodelen=valuelen+langlen+datatypelen;
     
     /* Create digest */
-    librdf_digest_update(digest, "L", 1);
+    librdf_digest_update(digest, (unsigned char*)"L", 1);
     librdf_digest_update(digest,value,valuelen);
     if(lang)
       librdf_digest_update(digest,(unsigned char*)lang,langlen);
@@ -475,7 +475,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
     nodelen=strlen((const char*)name);
     
     /* Create digest */
-    librdf_digest_update(digest, "B", 1);
+    librdf_digest_update(digest, (unsigned char*)"B", 1);
     librdf_digest_update(digest, (unsigned char*)name, nodelen);
     librdf_digest_final(digest);
     memcpy(id,librdf_digest_get_digest(digest),16);
