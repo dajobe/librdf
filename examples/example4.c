@@ -132,10 +132,10 @@ main(int argc, char *argv[])
   librdf_iterator* iterator;
   int usage;
   char *identifier;
-  int cmd;
-  char *query;
+  char *cmd;
+  int cmd_index;
   int count;
-  
+  int type;
 
   librdf_init_world(NULL, NULL);
 
@@ -146,8 +146,7 @@ main(int argc, char *argv[])
 
 
   usage=0;
-  cmd= -1;
-  query=NULL; /* will be set except for PRINT */
+  cmd_index= -1;
   identifier=NULL;
   
   if(!argc) {
@@ -164,26 +163,28 @@ main(int argc, char *argv[])
       usage=1;
     } else {
       int i;
+
+      cmd=argv[0];
       
       for(i=0; commands[i].name; i++)
-        if(!strcmp(argv[0], commands[i].name)) {
-          cmd=i;
+        if(!strcmp(cmd, commands[i].name)) {
+          cmd_index=i;
           break;
         }
-      if(cmd<0) {
+      if(cmd_index<0) {
         fprintf(stderr, "%s: No such command %s\n", program, argv[0]);
         usage=1;
       } else {
         argv++;
         argc--;
 
-        if(argc < commands[cmd].nargs) {
+        if(argc < commands[cmd_index].nargs) {
           fprintf(stderr, "%s: command %s needs %d arguments\n", program, 
-                  commands[cmd].name, commands[cmd].nargs);
+                  cmd, commands[cmd_index].nargs);
           usage=1;
-        } else if(argc > commands[cmd].nargs) {
+        } else if(argc > commands[cmd_index].nargs) {
           fprintf(stderr, "%s: command %s given extra arguments\n", program,
-                  commands[cmd].name);
+                  cmd);
           usage=1;
         } /* otherwise is just fine and argv points to remaining args */
       }
@@ -194,14 +195,17 @@ main(int argc, char *argv[])
   
   if(usage) {
     fprintf(stdout, "USAGE: %s: <BDB name> COMMANDS\n", program);
-    fprintf(stdout, "  print\n    Prints all the statements\n");
-    fprintf(stdout, "  statements SUBJECT|- PREDICATE|- OBJECT|-\n    Query for matching statements\n    where - is used to match anything.\n");
-    fprintf(stdout, "  sources | targets | arcs NODE1 NODE2\n    Query for matching nodes\n");
+    fprintf(stdout, "  print                                     Prints all the statements\n");
+    fprintf(stdout, "  statements SUBJECT|- PREDICATE|- OBJECT|- Query for matching statements\n");
+    fprintf(stdout, "                                            where - matches any node.\n");
+    fprintf(stdout, "  contains SUBJECT PREDICATE OBJECT         Check if statement is in the model.\n");
+    fprintf(stdout, "  add | remove SUBJECT PREDICATE OBJECT     Add/remove statement to/from model.\n");
+    fprintf(stdout, "  sources | targets | arcs NODE1 NODE2      Query for matching nodes\n");
     return(1);
   }
 
 
-  if(commands[cmd].write)
+  if(commands[cmd_index].write)
     storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='yes'");
   else
     storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='no'");
@@ -224,8 +228,10 @@ main(int argc, char *argv[])
   source=NULL;
   arc=NULL;
   target=NULL;
+
+  type=commands[cmd_index].type;
   
-  switch(commands[cmd].type) {
+  switch(type) {
   case CMD_PRINT:
     librdf_model_print(model, stdout);
     break;
@@ -257,20 +263,20 @@ main(int argc, char *argv[])
     librdf_statement_set_predicate(partial_statement, arc);
     librdf_statement_set_object(partial_statement, target);
 
-    if(commands[cmd].type != CMD_STATEMENTS) {
+    if(type != CMD_STATEMENTS) {
       if(!source || !arc || !target) {
-        fprintf(stderr, "%s: cannot have missing statement parts for %s\n", program, commands[cmd].name);
+        fprintf(stderr, "%s: cannot have missing statement parts for %s\n", program, cmd);
         librdf_free_statement(partial_statement);
         break;
       }
     }
 
-    switch(commands[cmd].type) {
+    switch(type) {
       case CMD_CONTAINS:
         if(librdf_model_contains_statement(model, partial_statement))
           fprintf(stdout, "%s: the model contains the statement\n", program);
         else
-          fprintf(stdout, "%s: the model does not contains the statement\n", program);
+          fprintf(stdout, "%s: the model does not contain the statement\n", program);
         break;
 
     case CMD_STATEMENTS:
@@ -314,12 +320,12 @@ main(int argc, char *argv[])
       break;
 
     default:
-      fprintf(stderr, "Unexpected command %d\n", commands[cmd].type);
+      fprintf(stderr, "Unexpected command %d\n", type);
 
     } /* end inner switch */
 
     /* also frees the nodes */
-    if(commands[cmd].type != CMD_ADD)
+    if(type != CMD_ADD)
       librdf_free_statement(partial_statement);
     break;
 
@@ -393,7 +399,7 @@ main(int argc, char *argv[])
       librdf_free_node(target);
     break;
   default:
-    fprintf(stderr, "%s: Unknown command %d\n", program, commands[cmd].type);
+    fprintf(stderr, "%s: Unknown command %d\n", program, type);
     return(1);
   }
 
