@@ -119,6 +119,7 @@ typedef struct {
  */
 typedef struct {
   librdf_uri* uri;          /* source */
+  librdf_uri* base_uri;     /* base URI */
   char *command;            /* command invoked ... */
   FILE *fh;                 /* file handle to pipe to above command */
   librdf_statement* next;   /* next statement */
@@ -141,16 +142,18 @@ librdf_parser_sirpac_init(void *context)
   
 
 /**
- * librdf_parser_sirpac_parse_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
+ * librdf_parser_sirpac_parse_uri_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: serialisation context
  * @uri: URI of RDF content
+ * @base_uri: the base URI to use (or NULL if the same)
  * 
  * FIXME: No error reporting provided 
  *
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
 static librdf_stream*
-librdf_parser_sirpac_parse_as_stream(void *context, librdf_uri *uri) {
+librdf_parser_sirpac_parse_uri_as_stream(void *context, librdf_uri *uri,
+                                         librdf_uri *base_uri) {
   /* Note: not yet used */
 /*  librdf_parser_sirpac_context* pcontext=(librdf_parser_sirpac_context*)context; */
   librdf_parser_sirpac_stream_context* scontext;
@@ -158,10 +161,7 @@ librdf_parser_sirpac_parse_as_stream(void *context, librdf_uri *uri) {
   int command_len;
   char *command;
   FILE *fh;
-  static const char *command_format_string="%s -classpath .:%s -Dorg.xml.sax.parser=com.microstar.xml.SAXDriver PrintParser %s";
-#if 0
-  static const char *command_format_string="%s -classpath %s -Dorg.xml.sax.parser=com.microstar.xml.SAXDriver org.w3c.rdf.examples.ListStatements %s";
-#endif
+  static const char *command_format_string="%s -classpath " JAVA_CLASS_DIR ":%s -Dorg.xml.sax.parser=com.microstar.xml.SAXDriver PrintParser %s";
   char *uri_string;
 
   scontext=(librdf_parser_sirpac_stream_context*)LIBRDF_CALLOC(librdf_parser_sirpac_stream_context, 1, sizeof(librdf_parser_sirpac_stream_context));
@@ -169,6 +169,7 @@ librdf_parser_sirpac_parse_as_stream(void *context, librdf_uri *uri) {
     return NULL;
 
   scontext->uri=uri;
+  scontext->base_uri=base_uri;
   
   uri_string=librdf_uri_as_string(uri);
 
@@ -190,12 +191,12 @@ librdf_parser_sirpac_parse_as_stream(void *context, librdf_uri *uri) {
   scontext->command=command;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_parser_sirpac_parse_as_stream, "Running command '%s'\n", command);
+  LIBRDF_DEBUG2(librdf_parser_sirpac_parse_uri_as_stream, "Running command '%s'\n", command);
 #endif
 
   fh=popen(command, "r");
   if(!fh) {
-    LIBRDF_DEBUG2(librdf_new_parser_sirpac, "Failed to create pipe to '%s'", command);
+    LIBRDF_DEBUG2(librdf_parser_sirpac_parse_uri_as_stream, "Failed to create pipe to '%s'", command);
     librdf_parser_sirpac_serialise_finished((void*)context);
     return(NULL);
   }
@@ -216,9 +217,10 @@ librdf_parser_sirpac_parse_as_stream(void *context, librdf_uri *uri) {
 
 
 /**
- * librdf_parser_sirpac_parse_into_model - Retrieve the RDF/XML content at URI and store in a librdf_model
+ * librdf_parser_sirpac_parse_uri_into_model - Retrieve the RDF/XML content at URI and store in a librdf_model
  * @context: serialisation context
  * @uri: URI of RDF content
+ * @base_uri: the base URI to use (or NULL if the same)
  * @model: &librdf_model
  * 
  * FIXME: No error reporting provided 
@@ -227,11 +229,12 @@ librdf_parser_sirpac_parse_as_stream(void *context, librdf_uri *uri) {
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_sirpac_parse_into_model(void *context, librdf_uri *uri,
-                                       librdf_model *model) {
+librdf_parser_sirpac_parse_uri_into_model(void *context, librdf_uri *uri,
+                                          librdf_uri *base_uri, 
+                                          librdf_model *model) {
   librdf_stream* stream;
   
-  stream=librdf_parser_sirpac_parse_as_stream(context, uri);
+  stream=librdf_parser_sirpac_parse_uri_as_stream(context, uri, base_uri);
   if(!stream)
     return 1;
 
@@ -451,8 +454,8 @@ librdf_parser_sirpac_register_factory(librdf_parser_factory *factory)
   factory->context_length = sizeof(librdf_parser_sirpac_context);
   
   factory->init  = librdf_parser_sirpac_init;
-  factory->parse_as_stream = librdf_parser_sirpac_parse_as_stream;
-  factory->parse_into_model = librdf_parser_sirpac_parse_into_model;
+  factory->parse_uri_as_stream = librdf_parser_sirpac_parse_uri_as_stream;
+  factory->parse_uri_into_model = librdf_parser_sirpac_parse_uri_into_model;
 }
 
 

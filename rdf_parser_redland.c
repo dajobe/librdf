@@ -214,6 +214,12 @@ librdf_parser_redland_init(void *context)
 
   scontext->depth=0;
 
+
+/* FIXME
+ * XMLNS http://www.w3.org/TR/1999/REC-xml-names-19990114/ says in 4.
+ * "The prefix xml is by definition bound to the namespace name http://www.w3.org/XML/1998/namespace"
+ */
+
   return 0;
 }
 
@@ -226,7 +232,34 @@ static void librdf_parser_redland_start_element_handler(void *userData,
 /*  XML_Parser xp=scontext->xp;*/
 
   scontext->depth++;
-  
+
+/* XMLNS says:
+  5.2 Namespace Defaulting
+
+  A default namespace is considered to apply to the element where it
+  is declared (if that element has no namespace prefix), and to all
+  elements with no prefix within the content of that element. 
+
+  If the URI reference in a default namespace declaration is empty,
+  then unprefixed elements in the scope of the declaration are not
+  considered to be in any namespace.
+
+  Note that default namespaces do not apply directly to attributes.
+
+[...]
+  5.3 Uniqueness of Attributes
+
+  In XML documents conforming to this specification, no tag may
+  contain two attributes which:
+
+    1. have identical names, or 
+
+    2. have qualified names with the same local part and with
+    prefixes which have been bound to namespace names that are
+    identical.
+
+*/
+
   fprintf(stderr, "redland: saw start element '%s'", name);
   if (atts != NULL) {
     int i;
@@ -399,14 +432,15 @@ librdf_parser_redland_fatal_error(void *ctx, const char *msg, ...)
 
 
 /**
- * librdf_parser_redland_parse_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
+ * librdf_parser_redland_parse_file_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: serialisation context
  * @uri: URI of RDF content
  * 
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
 static librdf_stream*
-librdf_parser_redland_parse_as_stream(void *context, librdf_uri *uri) {
+librdf_parser_redland_parse_file_as_stream(void *context, librdf_uri* uri,
+                                           librdf_uri *base_uri) {
   librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)context;
 
   return NULL; /* FIXME: NOT IMPLEMENTED */
@@ -444,7 +478,7 @@ myXmlSAXParseFile(xmlSAXHandlerPtr sax, void *user_data, const char *filename) {
 
 
 /**
- * librdf_parser_redland_parse_into_model - Retrieve the RDF/XML content at URI and store in a librdf_model
+ * librdf_parser_redland_parse_file_into_model - Retrieve the RDF/XML content at URI and store in a librdf_model
  * @context: serialisation context
  * @uri: URI of RDF content
  * @model: &librdf_model
@@ -452,10 +486,11 @@ myXmlSAXParseFile(xmlSAXHandlerPtr sax, void *user_data, const char *filename) {
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_redland_parse_into_model(void *context, librdf_uri *uri,
-                                       librdf_model *model) {
+librdf_parser_redland_parse_file_into_model(void *context, 
+                                            librdf_uri *uri,
+                                            librdf_uri *base_uri,
+                                            librdf_model *model) {
   librdf_parser_redland_context* scontext=(librdf_parser_redland_context*)context;
-  char *filename;
 #ifdef NEED_EXPAT
   XML_Parser xp;
 #endif
@@ -468,25 +503,21 @@ librdf_parser_redland_parse_into_model(void *context, librdf_uri *uri,
   char buffer[RBS];
   int rc=1;
   int len;
+  const char *filename;
+  
   
 #ifdef NEED_EXPAT
   xp=scontext->xp;
 #endif
 
-  if(strncmp(librdf_uri_as_string(uri), "file:", 5)) {
-    fprintf(stderr, "librdf_parser_redland_parse_into_model: parser cannot handle non file: URI %s\n",
-            librdf_uri_as_string(uri));
-    librdf_parser_redland_free(context);
+  filename=librdf_uri_as_filename(uri);
+  if(!filename)
     return 1;
-  }
-  
-
-  filename=librdf_uri_as_string(uri)+5; /* FIXME - copy this */
 
   fh=fopen(filename, "r");
   if(!fh) {
     fprintf(stderr, "librdf_parser_redland_parse_into_model: failed to open file %s (URI %s) - ", 
-            filename, librdf_uri_as_string(uri));
+            filename, librdf_uri_as_string(base_uri));
     perror(NULL);
     librdf_parser_redland_free(context);
     return 1;
@@ -580,8 +611,8 @@ librdf_parser_redland_register_factory(librdf_parser_factory *factory)
   factory->context_length = sizeof(librdf_parser_redland_context);
   
   factory->init  = librdf_parser_redland_init;
-  factory->parse_as_stream = librdf_parser_redland_parse_as_stream;
-  factory->parse_into_model = librdf_parser_redland_parse_into_model;
+  factory->parse_file_as_stream = librdf_parser_redland_parse_file_as_stream;
+  factory->parse_file_into_model = librdf_parser_redland_parse_file_into_model;
 }
 
 
