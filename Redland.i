@@ -286,6 +286,7 @@ void librdf_free_iterator(librdf_iterator*);
 int librdf_iterator_have_elements(librdf_iterator* iterator);
 int librdf_iterator_end(librdf_iterator* iterator);
 librdf_node* librdf_iterator_get_object(librdf_iterator* iterator);
+librdf_node* librdf_iterator_get_context(librdf_iterator* iterator);
 int librdf_iterator_next(librdf_iterator* iterator);
 
 /* rdf_uri.h */
@@ -385,6 +386,7 @@ void librdf_free_stream(librdf_stream* stream);
 int librdf_stream_end(librdf_stream* stream);
 int librdf_stream_next(librdf_stream* stream);
 librdf_statement* librdf_stream_get_object(librdf_stream* stream);
+librdf_node* librdf_stream_get_context(librdf_stream* stream);
 
 /* here */
 #ifdef SWIGPYTHON
