@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -72,7 +72,8 @@ librdf_init_storage(librdf_world *world)
 #ifdef HAVE_TSTORE
   librdf_init_storage_tstore();
 #endif
-  /* Always have storage list, hashes implementations available */
+  /* Always have storage list, hashes, file implementations available */
+  librdf_init_storage_file();
   librdf_init_storage_hashes();
   librdf_init_storage_list();
 }
