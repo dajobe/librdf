@@ -107,6 +107,17 @@ struct librdf_storage_factory_s {
   /* return list of properties to/from a node */
   librdf_iterator* (*get_arcs_in)(librdf_storage *storage, librdf_node *node);
   librdf_iterator* (*get_arcs_out)(librdf_storage *storage, librdf_node *node);
+
+
+  /* add a statement to the storage from the group */
+  int (*group_add_statement)(librdf_storage* storage, librdf_uri* group, librdf_statement *statement);
+  
+  /* remove a statement from the group  */
+  int (*group_remove_statement)(librdf_storage* storage, librdf_uri* group, librdf_statement *statement);
+
+  /* list statements in the group  */
+  librdf_stream* (*group_serialise)(librdf_storage* storage, librdf_uri* group);
+
 };
 
 #endif
@@ -156,6 +167,11 @@ librdf_iterator* librdf_storage_get_arcs_out(librdf_storage *storage, librdf_nod
 int librdf_storage_has_arc_in(librdf_storage *storage, librdf_node *node, librdf_node *property);
 /* check for [?, property, node] */
 int librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node, librdf_node *property);
+
+/* group methods */
+int librdf_storage_group_add_statement(librdf_storage* storage, librdf_uri* group_uri, librdf_statement* statement);
+int librdf_storage_group_remove_statement(librdf_storage* storage, librdf_uri* group_uri, librdf_statement* statement);
+librdf_stream* librdf_storage_group_serialise(librdf_storage* storage, librdf_uri* group_uri);
 
 
 #ifdef __cplusplus
