@@ -343,10 +343,10 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
 }
 
 
-static const unsigned char*
+static unsigned char*
 librdf_parser_raptor_generate_id_handler(void *user_data,
                                          raptor_genid_type type,
-                                         const unsigned char *user_bnodeid) 
+                                         unsigned char *user_bnodeid) 
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)user_data;
   if(user_bnodeid) {
