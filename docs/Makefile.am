@@ -97,6 +97,7 @@ api: api/index.html
 
 # Generates a tree of HTML files, not 1 file
 api/index.html: api.sgml
+	rm -rf api.junk DBTOHTML*
 	db2html $<
 
 .html.txt:
@@ -113,7 +114,6 @@ api/index.html: api.sgml
 @MAINT@	kernel-doc -docbook $< > $@
 @MAINT@
 @MAINT@api.sgml: $(srcdir)/build-docs api.sgml.in $(API_DOCBOOK_FILES)
-@MAINT@	-rm -rf api.junk DBTOHTML*
 @MAINT@	$(PERL) $(srcdir)/build-docs api.sgml.in > api.sgml
 @MAINT@
 @MAINT@overview.ps: overview.xfig
