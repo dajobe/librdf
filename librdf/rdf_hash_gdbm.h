@@ -18,6 +18,6 @@
 #ifndef RDF_HASH_GDBM_H
 #define RDF_HASH_GDBM_H
 
-void init_rdf_hash_gdbm(void);
+void rdf_init_hash_gdbm(void);
 
 #endif

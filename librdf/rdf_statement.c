@@ -26,7 +26,7 @@
 /* class methods */
 
 void
-init_rdf_statement(void) 
+rdf_init_statement(void) 
 {
 }
 
@@ -208,7 +208,7 @@ main(int argc, char *argv[])
   char *s;
   
   /* initialise statement module */
-  init_rdf_statement();
+  rdf_init_statement();
 
   fprintf(stderr, "%s: Creating statement\n", program);
   statement=rdf_new_statement();

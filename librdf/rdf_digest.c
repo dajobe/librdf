@@ -245,7 +245,7 @@ rdf_digest_print(rdf_digest* digest, FILE* fh)
 /* class initialisation */
 
 void
-init_rdf_digest(void) 
+rdf_init_digest(void) 
 {
 #ifdef HAVE_OPENSSL_DIGESTS
   rdf_digest_openssl_constructor();
@@ -282,7 +282,7 @@ main(int argc, char *argv[])
   
   
   /* initialise digest module */
-  init_rdf_digest();
+  rdf_init_digest();
 
   for(i=0; (type=test_digest_types[i]); i++) {
     fprintf(stderr, "%s: Trying to create new %s digest\n", program, type);

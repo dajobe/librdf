@@ -35,7 +35,7 @@ rdf_statement;
 
 
 /* class methods */
-void init_rdf_statement(void);
+void rdf_init_statement(void);
 
 /* initialising functions / constructors */
 

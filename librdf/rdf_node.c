@@ -30,7 +30,7 @@
 /* statics */
 static rdf_digest_factory *rdf_node_digest_factory=NULL;
 
-void init_rdf_node(rdf_digest_factory* factory) 
+void rdf_init_node(rdf_digest_factory* factory) 
 {
   rdf_node_digest_factory=factory;
 }

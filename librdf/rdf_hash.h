@@ -80,7 +80,7 @@ typedef struct
 
 
 /* module init */
-void init_rdf_hash(void);
+void rdf_init_hash(void);
 
 
 /* class methods */

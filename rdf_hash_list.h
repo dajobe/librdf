@@ -18,6 +18,6 @@
 #ifndef RDF_HASH_LIST_H
 #define RDF_HASH_LIST_H
 
-void init_rdf_hash_list(void);
+void rdf_init_hash_list(void);
 
 #endif

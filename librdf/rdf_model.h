@@ -33,7 +33,7 @@ typedef struct rdf_model_s rdf_model;
 
 
 /* class methods */
-void init_rdf_model(void);
+void rdf_init_model(void);
 
 
 /* constructors */

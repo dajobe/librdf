@@ -40,10 +40,10 @@ void rdf_init_world(char *digest_factory_name)
 
   digest_factory=get_rdf_digest_factory(digest_factory_name);
 
-  init_rdf_digest();
-  init_rdf_hash();
-  init_rdf_uri(digest_factory);
-  init_rdf_node(digest_factory);
-  init_rdf_statement();
-  init_rdf_model();
+  rdf_init_digest();
+  rdf_init_hash();
+  rdf_init_uri(digest_factory);
+  rdf_init_node(digest_factory);
+  rdf_init_statement();
+  rdf_init_model();
 }

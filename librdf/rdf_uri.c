@@ -28,7 +28,7 @@
 static rdf_digest_factory* rdf_uri_digest_factory;
 
 /* class methods */
-void init_rdf_uri(rdf_digest_factory* factory) 
+void rdf_init_uri(rdf_digest_factory* factory) 
 {
   rdf_uri_digest_factory=factory;
 }

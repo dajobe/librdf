@@ -47,7 +47,7 @@ rdf_node;
 
 
 /* class methods */
-void init_rdf_node(rdf_digest_factory* factory);
+void rdf_init_node(rdf_digest_factory* factory);
 
 
 /* initialising functions / constructors */

@@ -23,7 +23,7 @@
 
 
 /* class methods */
-void init_rdf_model(void)
+void rdf_init_model(void)
 {
 }
 
@@ -141,7 +141,7 @@ main(int argc, char *argv[])
   char *program=argv[0];
   
   /* initialise model module */
-  init_rdf_model();
+  rdf_init_model();
 
   fprintf(stderr, "%s: Creating model\n", program);
   model=rdf_new_model();

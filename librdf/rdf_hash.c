@@ -31,12 +31,12 @@
 
 /** initialise module */
 void
-init_rdf_hash(void) 
+rdf_init_hash(void) 
 {
 #ifdef HAVE_GDBM_HASH
-  init_rdf_hash_gdbm();
+  rdf_init_hash_gdbm();
 #endif
-  init_rdf_hash_list();
+  rdf_init_hash_list();
 }
 
 /** list of hash factories */
@@ -472,7 +472,7 @@ main(int argc, char *argv[])
   
   
   /* initialise hash module */
-  init_rdf_hash();
+  rdf_init_hash();
 
   if(argc ==2) {
     factory=get_rdf_hash_factory(NULL);

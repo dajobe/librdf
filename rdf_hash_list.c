@@ -281,7 +281,7 @@ rdf_hash_list_register_factory(rdf_hash_factory *factory)
 }
 
 void
-init_rdf_hash_list(void)
+rdf_init_hash_list(void)
 {
   rdf_hash_register_factory("LIST", &rdf_hash_list_register_factory);
 }

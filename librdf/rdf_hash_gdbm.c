@@ -221,7 +221,7 @@ rdf_hash_gdbm_register_factory(rdf_hash_factory *factory)
 }
 
 void
-init_rdf_hash_gdbm(void)
+rdf_init_hash_gdbm(void)
 {
   rdf_hash_register_factory("GDBM", &rdf_hash_gdbm_register_factory);
 }

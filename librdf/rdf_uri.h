@@ -25,7 +25,7 @@
 typedef char rdf_uri;
 
 /* class methods */
-void init_rdf_uri(rdf_digest_factory *factory);
+void rdf_init_uri(rdf_digest_factory *factory);
 
 /* constructors */
 rdf_uri* rdf_new_uri (char *string);
