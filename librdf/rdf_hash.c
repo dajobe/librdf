@@ -1608,7 +1608,7 @@ main(int argc, char *argv[])
     
     iterator=librdf_hash_keys(h2, key_hd);
     while(!librdf_iterator_end(iterator)) {
-      librdf_hash_datum *k=librdf_iterator_get_key(iterator);
+      librdf_hash_datum *k=(librdf_hash_datum*)librdf_iterator_get_key(iterator);
       char *key_string;
       
       key_string=(char*)LIBRDF_MALLOC(cstring, k->size+1);

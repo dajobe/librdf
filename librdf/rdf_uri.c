@@ -585,15 +585,15 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  char *hp_string="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
+  const unsigned char *hp_string=(const unsigned char*)"http://www.ilrt.bristol.ac.uk/people/cmdjb/";
   librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5, *uri6, *uri7, *uri8, *uri9;
   librdf_digest *d;
   char *program=argv[0];
   const char *file_string="/big/long/directory/file";
-  const char *file_uri_string=  "file:///big/long/directory/file";
-  const char *uri_string=  "http://example.com/big/long/directory/blah#frag";
-  const char *relative_uri_string1="#foo";
-  const char *relative_uri_string2="bar";
+  const unsigned char *file_uri_string=(const unsigned char*)"file:///big/long/directory/file";
+  const unsigned char *uri_string=(const unsigned char*)"http://example.com/big/long/directory/blah#frag";
+  const unsigned char *relative_uri_string1=(const unsigned char*)"#foo";
+  const unsigned char *relative_uri_string2=(const unsigned char*)"bar";
   librdf_world *world;
   
   world=librdf_new_world();
@@ -639,8 +639,8 @@ main(int argc, char *argv[])
   fputs("\n", stderr);
   librdf_free_digest(d);
 
-  uri3=librdf_new_uri(world, "file:/big/long/directory/");
-  uri4=librdf_new_uri(world, "http://somewhere/dir/");
+  uri3=librdf_new_uri(world, (const unsigned char*)"file:/big/long/directory/");
+  uri4=librdf_new_uri(world, (const unsigned char*)"http://somewhere/dir/");
   fprintf(stderr, "%s: Source URI is ", program);
   librdf_uri_print(uri3, stderr);
   fputs("\n", stderr);

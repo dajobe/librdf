@@ -496,14 +496,14 @@ main(int argc, char *argv[])
   librdf_init_uri(world);
   librdf_init_node(world);
 
-  prefix_uri=librdf_new_uri(world, NODE_URI_PREFIX);
+  prefix_uri=librdf_new_uri(world, (const unsigned char*)NODE_URI_PREFIX);
   if(!prefix_uri) {
     fprintf(stderr, "%s: Failed to create prefix URI\n", program);
     return(1);
   }
 
   for(i=0; i < STREAM_NODES_COUNT; i++) {
-    char buf[2];
+    unsigned char buf[2];
     buf[0]='a'+i;
     buf[1]='\0';
     nodes[i]=librdf_new_node_from_uri_local_name(world, prefix_uri, buf);
@@ -521,8 +521,8 @@ main(int argc, char *argv[])
   }
 
   statement=librdf_new_statement_from_nodes(world,
-                                            librdf_new_node_from_uri_string(world, "http://example.org/resource"),
-                                            librdf_new_node_from_uri_string(world, "http://example.org/property"),
+                                            librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/resource"),
+                                            librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/property"),
                                             NULL);
   if(!statement) {
     fprintf(stderr, "%s: Failed to create statement\n", program);

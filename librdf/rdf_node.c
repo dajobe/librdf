@@ -1434,7 +1434,7 @@ main(int argc, char *argv[])
   char *genid="genid42";
   librdf_uri *uri, *uri2;
   int size, size2;
-  char *buffer;
+  unsigned char *buffer;
   librdf_world *world;
   
   char *program=argv[0];
@@ -1448,7 +1448,7 @@ main(int argc, char *argv[])
   librdf_init_node(world);
 
   fprintf(stdout, "%s: Creating home page node from string\n", program);
-  node=librdf_new_node_from_uri_string(world, hp_string1);
+  node=librdf_new_node_from_uri_string(world, (const unsigned char*)hp_string1);
   if(!node) {
     fprintf(stderr, "%s: librdf_new_node_from_uri_string failed\n", program);
     return(1);
@@ -1460,7 +1460,7 @@ main(int argc, char *argv[])
   
   fprintf(stdout, "%s: Creating URI from string '%s'\n", program, 
           hp_string2);
-  uri=librdf_new_uri(world, hp_string2);
+  uri=librdf_new_uri(world, (const unsigned char*)hp_string2);
   fprintf(stdout, "%s: Setting node URI to new URI ", program);
   librdf_uri_print(uri, stdout);
   fputc('\n', stdout);
@@ -1472,10 +1472,10 @@ main(int argc, char *argv[])
 
   size=librdf_node_encode(node, NULL, 0);
   fprintf(stdout, "%s: Encoding node requires %d bytes\n", program, size);
-  buffer=(char*)LIBRDF_MALLOC(cstring, size);
+  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, size);
 
   fprintf(stdout, "%s: Encoding node in buffer\n", program);
-  size2=librdf_node_encode(node, (unsigned char*)buffer, size);
+  size2=librdf_node_encode(node, buffer, size);
   if(size2 != size) {
     fprintf(stderr, "%s: Encoding node used %d bytes, expected it to use %d\n", program, size2, size);
     return(1);
@@ -1485,7 +1485,7 @@ main(int argc, char *argv[])
   fprintf(stdout, "%s: Creating new node\n", program);
 
   fprintf(stdout, "%s: Decoding node from buffer\n", program);
-  if(!(node2=librdf_node_decode(world, NULL, (unsigned char*)buffer, size))) {
+  if(!(node2=librdf_node_decode(world, NULL, buffer, size))) {
     fprintf(stderr, "%s: Decoding node failed\n", program);
     return(1);
   }
@@ -1497,13 +1497,13 @@ main(int argc, char *argv[])
  
   
   fprintf(stdout, "%s: Creating new literal string node\n", program);
-  node3=librdf_new_node_from_literal(world, lit_string, NULL, 0);
+  node3=librdf_new_node_from_literal(world, (const unsigned char*)lit_string, NULL, 0);
   if(!node3) {
     fprintf(stderr, "%s: librdf_new_node_from_literal failed\n", program);
     return(1);
   }
 
-  buffer=librdf_node_get_literal_value_as_latin1(node3);
+  buffer=(unsigned char*)librdf_node_get_literal_value_as_latin1(node3);
   if(!buffer) {
     fprintf(stderr, "%s: Failed to get literal string value as Latin-1\n", program);
     return(1);
@@ -1514,7 +1514,7 @@ main(int argc, char *argv[])
 
   
   fprintf(stdout, "%s: Creating new blank node with identifier %s\n", program, genid);
-  node4=librdf_new_node_from_blank_identifier(world, genid);
+  node4=librdf_new_node_from_blank_identifier(world, (const unsigned char*)genid);
   if(!node4) {
     fprintf(stderr, "%s: librdf_new_node_from_blank_identifier failed\n", program);
     return(1);
@@ -1541,14 +1541,15 @@ main(int argc, char *argv[])
   fprintf(stdout, "%s: Copied node identifier is: '%s'\n", program, buffer);
 
 
-  uri2=librdf_new_uri(world, "http://example.org/datatypeURI");
-  node6=librdf_new_node_from_typed_literal(world, "Datatyped literal value",
+  uri2=librdf_new_uri(world, (const unsigned char*)"http://example.org/datatypeURI");
+  node6=librdf_new_node_from_typed_literal(world, 
+                                           (const unsigned char*)"Datatyped literal value",
                                            "en-GB", uri2);
   librdf_free_uri(uri2);
 
   size=librdf_node_encode(node6, NULL, 0);
   fprintf(stdout, "%s: Encoding typed node requires %d bytes\n", program, size);
-  buffer=(char*)LIBRDF_MALLOC(cstring, size);
+  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, size);
 
   fprintf(stdout, "%s: Encoding typed node in buffer\n", program);
   size2=librdf_node_encode(node6, (unsigned char*)buffer, size);

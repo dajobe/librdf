@@ -799,15 +799,15 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Creating statement\n", program);
   statement=librdf_new_statement(world);
 
-  s=librdf_statement_to_string(statement);
+  s=(char*)librdf_statement_to_string(statement);
   fprintf(stderr, "%s: Empty statement: %s\n", program, s);
   LIBRDF_FREE(cstring, s);
 
-  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, "http://www.ilrt.bris.ac.uk/people/cmdjb/"));
-  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/#Creator"));
-  librdf_statement_set_object(statement, librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0));
+  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://www.ilrt.bris.ac.uk/people/cmdjb/"));
+  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/#Creator"));
+  librdf_statement_set_object(statement, librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0));
 
-  s=librdf_statement_to_string(statement);
+  s=(char*)librdf_statement_to_string(statement);
   fprintf(stderr, "%s: Resulting statement: %s\n", program, s);
   LIBRDF_FREE(cstring, s);
 

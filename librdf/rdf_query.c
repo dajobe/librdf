@@ -423,7 +423,7 @@ main(int argc, char *argv[])
   librdf_init_model(world);
   
   fprintf(stdout, "%s: Creating query\n", program);
-  query=librdf_new_query(world, "triples", NULL, "[http://example.org] \"literal\" -");
+  query=librdf_new_query(world, "triples", NULL, (const unsigned char*)"[http://example.org] \"literal\" -");
   if(!query) {
     fprintf(stderr, "%s: Failed to create new query\n", program);
     return(1);

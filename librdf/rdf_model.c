@@ -1088,8 +1088,8 @@ main(int argc, char *argv[])
   librdf_stream* stream;
   const char *parser_name="raptor";
   #define URI_STRING_COUNT 2
-  const char *file_uri_strings[URI_STRING_COUNT]={"http://example.org/test1.rdf", "http://example.org/test2.rdf"};
-  const char *file_content[URI_STRING_COUNT]={EX1_CONTENT, EX2_CONTENT};
+  const unsigned char *file_uri_strings[URI_STRING_COUNT]={(const unsigned char*)"http://example.org/test1.rdf", (const unsigned char*)"http://example.org/test2.rdf"};
+  const unsigned char *file_content[URI_STRING_COUNT]={(const unsigned char*)EX1_CONTENT, (const unsigned char*)EX2_CONTENT};
   librdf_uri* uris[URI_STRING_COUNT];
   librdf_node* nodes[URI_STRING_COUNT];
   int i;
@@ -1124,15 +1124,15 @@ main(int argc, char *argv[])
 
   statement=librdf_new_statement(world);
   /* after this, nodes become owned by model */
-  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, "http://www.ilrt.bris.ac.uk/people/cmdjb/"));
-  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/creator"));
+  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://www.ilrt.bris.ac.uk/people/cmdjb/"));
+  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"));
 
   if(!librdf_model_add_statement(model, statement)) {
     fprintf(stderr, "%s: librdf_model_add_statement unexpectedly succeeded adding a partial statement\n", program);
     return(1);
   }
 
-  librdf_statement_set_object(statement, librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0));
+  librdf_statement_set_object(statement, librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0));
 
   librdf_model_add_statement(model, statement);
   librdf_free_statement(statement);
@@ -1176,8 +1176,8 @@ main(int argc, char *argv[])
 
 
   /* sources */
-  n1=librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/creator");
-  n2=librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0);
+  n1=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator");
+  n2=librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0);
 
   fprintf(stderr, "%s: Looking for sources of arc=", program);
   librdf_node_print(n1, stderr);
@@ -1208,8 +1208,8 @@ main(int argc, char *argv[])
   
 
   /* targets */
-  n1=librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/");
-  n2=librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/description");
+  n1=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/");
+  n2=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/description");
 
   fprintf(stderr, "%s: Looking for targets of source=", program);
   librdf_node_print(n1, stderr);
@@ -1240,8 +1240,8 @@ main(int argc, char *argv[])
   
 
   /* arcs */
-  n1=librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/");
-  n2=librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0);
+  n1=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/");
+  n2=librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0);
 
   fprintf(stderr, "%s: Looking for arcs of source=", program);
   librdf_node_print(n1, stderr);
