@@ -370,6 +370,9 @@ void
 librdf_finish_parser(librdf_world *world) 
 {
   librdf_delete_parser_factories(world);
+#ifdef HAVE_RAPTOR_RDF_PARSER
+  librdf_parser_raptor_destructor();
+#endif
 }
 
 
