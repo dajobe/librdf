@@ -117,7 +117,7 @@ librdf_malloc(char *file, int line, char *type, size_t size)
   if(!addr)
     return NULL;
   node=librdf_add_memory(file, line, type, size, addr);
-#ifdef LIBRDF_MEMORY_DEBUG
+#if defined(LIBRDF_MEMORY_DEBUG) && LIBRDF_MEMORY_DEBUG > 1
   fprintf(stderr, "%s:%d: malloced %d bytes for type %s at %p\n",
           node->file, node->line, node->size, node->type, node->addr);
 #endif
@@ -134,7 +134,7 @@ librdf_calloc(char *file, int line, char *type, size_t nmemb, size_t size)
   if(!addr)
     return NULL;
   node=librdf_add_memory(file, line, type, nmemb*size, addr);
-#ifdef LIBRDF_MEMORY_DEBUG
+#if defined(LIBRDF_MEMORY_DEBUG) && LIBRDF_MEMORY_DEBUG > 1
   fprintf(stderr, "%s:%d: calloced %d bytes for type %s at %p\n",
           node->file, node->line, node->size, node->type, node->addr);
 #endif
@@ -154,7 +154,7 @@ librdf_free(char *file, int line, char *type, void *addr)
     return;
   }
   
-#ifdef LIBRDF_MEMORY_DEBUG
+#if defined(LIBRDF_MEMORY_DEBUG) && LIBRDF_MEMORY_DEBUG > 1
   fprintf(stderr,
 	  "%s:%d: freeing %d bytes for type %s at %p allocated at %s:%d\n",
 	  file,line, node->size, node->type, node->addr,
