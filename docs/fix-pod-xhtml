@@ -42,6 +42,8 @@ while(<IN>) {
 
   next if /^\s*<link|meta/i;
 
+  s'(id|name)="([^"]+)"'my($a,$v)=($1,$2); $v=~ s/%/_/g; qq{$a="$v"}'eg;
+
   s%<h1>%<h2>%; s%</h1>%</h2>%;
   s%<hr />%%;
 
