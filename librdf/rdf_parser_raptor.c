@@ -262,7 +262,7 @@ librdf_parser_raptor_error_handler(void *data, raptor_locator *locator,
   strncpy(buffer+locator_len, message_prefix, prefix_len);
   strcpy(buffer+prefix_len+locator_len, message); /* want extra \0 - using strcpy */
 
-  librdf_error(parser->world, buffer);
+  librdf_error(parser->world, "%s", buffer);
   LIBRDF_FREE(cstring, buffer);
 }
 
@@ -290,7 +290,7 @@ librdf_parser_raptor_warning_handler(void *data, raptor_locator *locator,
   strncpy(buffer+locator_len, message_prefix, prefix_len);
   strcpy(buffer+prefix_len+locator_len, message); /* want extra \0 - using strcpy */
 
-  librdf_warning(parser->world, message);
+  librdf_warning(parser->world, "%s", message);
   LIBRDF_FREE(cstring, buffer);
 }
 
