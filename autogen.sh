@@ -85,7 +85,7 @@ fi
 
 # Ensure that these are created by the versions on this system
 # (indirectly via automake)
-rm -f libtool ltmain.sh
+rm -f libtool ltmain.sh ltconfig
 
 if test -d $CONFIG_DIR; then
   for file in config.guess config.sub; do
