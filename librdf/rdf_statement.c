@@ -368,7 +368,7 @@ librdf_statement_to_string(librdf_statement *statement)
 }
 
 /**
- * librdf_hash_print - pretty print the statement to a file descriptor
+ * librdf_statement_print - pretty print the statement to a file descriptor
  * @statement: the statement
  * @fh: file handle
  **/
