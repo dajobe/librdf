@@ -544,7 +544,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
     status=sqlite_step(vm, &pN, &pazValue, &pazColName);
     if(status == SQLITE_BUSY) {
       /* FIXME - how to handle busy? */
-      sleep(1);
+      status=SQLITE_ERROR;
       continue;
     }
     break;
