@@ -284,6 +284,57 @@ librdf_new_storage (char *storage_name, char *name,
 
 
 /**
+ * librdf_new_storage_from_storage - Copy constructor - create a new librdf_storage object from an existing one
+ * @storage: the existing storage &librdf_storage to use
+ *
+ * Should create a new storage in the same context as the existing one
+ * as appropriate for the storage.  For example, in a RDBMS storage
+ * it would be a new database, or in on disk it would be a new
+ * set of files.  This will mean automatically generating
+ * a new identifier for the storage, maybe based on the existing
+ * storage identifier.
+ *
+ * Return value: a new &librdf_storage object or NULL on failure
+ */
+librdf_storage*
+librdf_new_storage_from_storage(librdf_storage* old_storage) 
+{
+  librdf_storage* new_storage;
+
+  /* FIXME: fail if clone is not supported by this storage (factory) */
+  if(!old_storage->factory->clone) {
+    LIBRDF_FATAL2(librdf_new_storage_from_storage, "clone not implemented for factory type %s", old_storage->factory->name);
+    return NULL;
+  }
+
+  new_storage=(librdf_storage*)LIBRDF_CALLOC(librdf_storage, 1,
+                                             sizeof(librdf_storage));
+  if(!new_storage)
+    return NULL;
+  
+  new_storage->context=(char*)LIBRDF_CALLOC(librdf_storage_context, 1,
+                                            old_storage->factory->context_length);
+  if(!new_storage->context) {
+    librdf_free_storage(new_storage);
+    return NULL;
+  }
+  
+  if(old_storage->factory->clone(new_storage, old_storage)) {
+    librdf_free_storage(new_storage);
+    return NULL;
+
+  }
+
+  /* do this now so librdf_free_storage won't call new factory on
+   * partially copied storage 
+   */
+  new_storage->factory=old_storage->factory;
+  
+  return new_storage;
+}
+
+
+/**
  * librdf_new_storage_from_factory - Constructor - create a new librdf_storage object
  * @factory: the factory to use to construct the storage
  * @name: name to use for storage
