@@ -148,6 +148,10 @@ struct librdf_model_factory_s {
    */
   librdf_iterator* (*get_contexts)(librdf_model* model);
 
+  /* features - OPTIONAL */
+  librdf_node* (*get_feature)(librdf_model* model, librdf_uri* feature);
+  int (*set_feature)(librdf_model* model, librdf_uri* feature, librdf_node* value);
+
 };
 
 #include <rdf_model_storage.h>
@@ -245,10 +249,17 @@ REDLAND_API void librdf_model_sync(librdf_model* model);
 
 REDLAND_API librdf_storage* librdf_model_get_storage(librdf_model *model);
 
+
 /* find statements in a given context */
 REDLAND_API librdf_stream* librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* statement, librdf_node* context_node);
 
 REDLAND_API librdf_iterator* librdf_model_get_contexts(librdf_model* model);
+
+
+#define LIBRDF_MODEL_FEATURE_CONTEXTS "http://feature.librdf.org/model-contexts"
+/* features */
+REDLAND_API librdf_node* librdf_model_get_feature(librdf_model* model, librdf_uri* feature);
+REDLAND_API int librdf_model_set_feature(librdf_model* model, librdf_uri* feature, librdf_node* value);
 
 #ifdef __cplusplus
 }
