@@ -120,7 +120,11 @@ int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_lang
 
 librdf_digest* librdf_node_get_digest(librdf_node* node);
 
+/* convert to a string */
 char *librdf_node_to_string(librdf_node* node);
+
+/* pretty print it */
+void librdf_node_print(librdf_node* node, FILE *fh);
 
 
 /* utility functions */
