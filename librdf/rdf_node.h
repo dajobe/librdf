@@ -174,7 +174,7 @@ librdf_digest* librdf_node_get_digest(librdf_node* node);
 
 /* serialise / deserialise */
 size_t librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length);
-size_t librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length);
+librdf_node* librdf_node_decode(librdf_world *world, size_t* len_p, unsigned char *buffer, size_t length);
 
 
 /* convert to a string */
