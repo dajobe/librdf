@@ -543,7 +543,7 @@ librdf_query_get_bindings_count(librdf_query *query)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
 
   if(query->factory->get_bindings_count)
-    return query->factory->get_bindings_count);
+    return query->factory->get_bindings_count(query);
   else
     return -1;
 }
