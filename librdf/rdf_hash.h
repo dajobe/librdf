@@ -87,6 +87,8 @@ typedef struct librdf_hash_factory_s librdf_hash_factory;
 /* module init */
 void librdf_init_hash(void);
 
+/* module terminate */
+void librdf_finish_hash(void);
 
 /* class methods */
 void librdf_hash_register_factory(const char *name,
