@@ -333,20 +333,20 @@ librdf_php_world_finish(void)
 
 
 /* prototypes for internal routines called below - NOT PART OF API */
-void librdf_error(librdf_world* world, const char *message, ...);
-void librdf_warning(librdf_world* world, const char *message, ...);
+void librdf_test_error(librdf_world* world, const char *message);
+void librdf_test_warning(librdf_world* world, const char *message);
 
 /* FOR TESTING ERRORS ONLY - NOT PART OF API */
 void
 librdf_internal_test_error(librdf_world *world) 
 {
-  librdf_error(world, "test error message number %d.", 1);
+  librdf_test_error(world, "test error message number 1.");
 }
 
 void
 librdf_internal_test_warning(librdf_world *world) 
 {
-  librdf_warning(world, "test warning message number %d.", 2);
+  librdf_test_warning(world, "test warning message number 2.");
 }
 
 %}
