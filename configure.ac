@@ -515,7 +515,7 @@ done
 AC_CHECK_PROG(RASQAL_CONFIG, rasqal-config, rasqal-config)
 AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/internal (default=auto)], with_rasqal="$withval", with_rasqal="auto")
 
-RASQAL_MIN_VERSION=0.9.5
+RASQAL_MIN_VERSION=0.9.6
 AC_SUBST(RASQAL_MIN_VERSION)
 if test "X$RASQAL_CONFIG" = "X"; then
   with_rasqal=internal
