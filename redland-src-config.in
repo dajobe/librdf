@@ -78,8 +78,8 @@ else
 fi
 
 if test "$echo_cflags" = "yes"; then
-  echo `$config --cflags` -I@abs_top_srcdir@/librdf
+  echo -I@abs_top_srcdir@/librdf `$config --cflags`
 fi
 if test "$echo_libs" = "yes"; then
-  echo `$config --libs` -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@
+  echo -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ `$config --libs`
 fi
