@@ -27,6 +27,7 @@ extern "C" {
 
 /* forward references to private structures */
 typedef struct librdf_hash_s librdf_hash;
+typedef struct librdf_hash_cursor_s librdf_hash_cursor;
 typedef struct librdf_digest_s librdf_digest;
 typedef struct librdf_uri_s librdf_uri;
 typedef struct librdf_list_s librdf_list;
