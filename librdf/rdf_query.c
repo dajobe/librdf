@@ -635,7 +635,9 @@ main(int argc, char *argv[])
 
   fprintf(stdout, "%s: Freeing query\n", program);
   librdf_free_query(query);
-  
+
+  librdf_free_model(model);
+  librdf_free_storage(storage);
 
   librdf_free_world(world);
   
