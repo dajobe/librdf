@@ -302,6 +302,32 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
 
 
 /**
+ * librdf_serializer_serialize_model - Write a librdf_model into a serialized form to a file
+ * @serializer: the serializer
+ * @name: filename to serialize to
+ * @base_uri: the base URI to use
+ * @model: the &librdf_model model to use
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
+                                          const char *name, 
+                                          librdf_uri* base_uri,
+                                          librdf_model* model) 
+{
+  FILE* fh=fopen(name, "w+");
+  int status=0;
+  
+  if(!fh)
+    return 1;
+  status=librdf_serializer_serialize_model(serializer, fh, base_uri, model);
+  fclose(fh);
+  return status;
+}
+
+
+/**
  * librdf_init_serializer - Initialise the librdf_serializer class
  * @world: redland world object
  **/
