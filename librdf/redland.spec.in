@@ -23,11 +23,13 @@ BuildRequires: curl-devel
 BuildRequires: raptor-devel >= 1.2.0
 BuildRequires: perl >= 5.8.0
 BuildRequires: python >= 2.2.0 python-devel
+BuildRequires: mysql-devel
 Packager:  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 Docdir: %{prefix}/doc
 Requires:  libxml2
 Requires:  curl
 Requires:  raptor
+Requires:  mysql
 
 %description
 
@@ -74,9 +76,9 @@ PYTHON=python
 export PYTHON
 
 if [ ! -f configure ]; then
-  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --enable-release --sysconfdir=/etc --mandir=%{_mandir} --libdir=%{_libdir} --with-raptor=system
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --enable-release --sysconfdir=/etc --mandir=%{_mandir} --libdir=%{_libdir} --with-raptor=system --with-threestore=no
 else
-  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --enable-release --sysconfdir=/etc --mandir=%{_mandir} --libdir=%{_libdir} --with-raptor=system
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --enable-release --sysconfdir=/etc --mandir=%{_mandir} --libdir=%{_libdir} --with-raptor=system --with-threestore=no
 fi
 
 %{__make} OPTIMIZE="$RPM_OPT_FLAGS"
@@ -195,6 +197,8 @@ cd ..
 - update for removal of python distutils
 - require python 2.2.0+
 - require perl 5.8.0+
+- build and require mysql
+- do not build and require threestore
 
 * Sun Jan 4 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
 - added redland-python package
