@@ -30,7 +30,7 @@ CONFIG_SUBDIRS=raptor
 # Subdirectories to use for distribution
 DIST_SUBDIRS=librdf docs examples \
 perl php python tcl java ruby \
-expat repat raptor \
+repat raptor \
 debian utils
 
 EXTRA_DIST=ChangeLog \
