@@ -97,8 +97,9 @@ int librdf_statement_match(librdf_statement* statement, librdf_statement* partia
 
 /* serialising/deserialising */
 size_t librdf_statement_encode(librdf_statement* statement, unsigned char *buffer, size_t length);
-size_t librdf_statement_encode_parts(librdf_statement* statement, unsigned char *buffer, size_t length, int fields);
+size_t librdf_statement_encode_parts(librdf_statement* statement, librdf_node* context_node, unsigned char *buffer, size_t length, int fields);
 size_t librdf_statement_decode(librdf_statement* statement, unsigned char *buffer, size_t length);
+size_t librdf_statement_decode_parts(librdf_statement* statement, librdf_node** context_node, unsigned char *buffer, size_t length);
 
 
 #ifdef LIBRDF_INTERNAL
@@ -111,11 +112,8 @@ typedef enum {
   LIBRDF_STATEMENT_SUBJECT   = 1 << 0,
   LIBRDF_STATEMENT_PREDICATE = 1 << 1,
   LIBRDF_STATEMENT_OBJECT    = 1 << 2,
-  LIBRDF_STATEMENT_ID        = 1 << 3,
-  LIBRDF_STATEMENT_FLAGS     = 1 << 4,
 
-  /* must be or of all of the above */
-  /* FIXME: Not encoding ID or FLAGS */
+  /* must be a combination of all of the above */
   LIBRDF_STATEMENT_ALL       = (LIBRDF_STATEMENT_SUBJECT|
                                 LIBRDF_STATEMENT_PREDICATE|
                                 LIBRDF_STATEMENT_OBJECT)
