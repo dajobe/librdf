@@ -941,13 +941,26 @@ AC_SUBST(SD)
 CFLAGS="-DLIBRDF_INTERNAL=1 $CFLAGS"
 MEM=
 MEM_LIBS=
+AC_ARG_WITH(dmalloc, [  --with-dmalloc          Use dmalloc debugging library (default=auto)], use_dmalloc="$withval", use_dmalloc="auto") 
+AC_MSG_CHECKING(using dmalloc library)
 if test "$USE_MAINTAINER_MODE" = yes; then
-  if test "$ac_cv_header_dmalloc_h" = yes; then
-    MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
-    MEM_LIBS=-ldmalloc
+  if test "$ac_cv_header_dmalloc_h"; then
+    if test "X$use_dmalloc" = Xauto; then
+      use_dmalloc=yes
+    fi
+  else
+    use_dmalloc=no
   fi
   CFLAGS="-DLIBRDF_DEBUG=1 $CFLAGS"
+else
+  use_dmalloc=no
 fi
+AC_MSG_RESULT($use_dmalloc);
+if test $use_dmalloc = yes; then
+  MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
+  MEM_LIBS=-ldmalloc
+fi
+
 STANDARD_CFLAGS="$STANDARD_CFLAGS $CFLAGS"
 if test "$USE_MAINTAINER_MODE" = yes; then
   CFLAGS="$MAINTAINER_CFLAGS $CFLAGS"
