@@ -175,9 +175,9 @@ static void librdf_storage_hashes_register_factory(librdf_storage_factory *facto
 
 
 /* node iterator implementing functions for get sources, targets, arcs methods */
-static int librdf_storage_storage_hashes_node_iterator_have_elements(void* iterator);
-static void* librdf_storage_storage_hashes_node_iterator_get_next(void* iterator);
-static void librdf_storage_storage_hashes_node_iterator_finished(void* iterator);
+static int librdf_storage_hashes_node_iterator_have_elements(void* iterator);
+static void* librdf_storage_hashes_node_iterator_get_next(void* iterator);
+static void librdf_storage_hashes_node_iterator_finished(void* iterator);
 /* common initialisation code for creating get sources, targets, arcs iterators */
 static librdf_iterator* librdf_storage_hashes_node_iterator_create(librdf_storage* storage, librdf_node* node1, librdf_node *node2, int hash_index, int want);
 
@@ -524,16 +524,6 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
       break;
   }
 
-  /* FIXME: if one of the above hash things fails, the add statement
-   * operation is only partially complete (but reported as a failure)
-   */
-
-  /* Free statement if this is an addition and the statement is now
-   * stored - statement ownership was passed in
-   */
-  if(is_addition)
-    librdf_free_statement(statement);
-
   return status;
 }
 
@@ -815,22 +805,22 @@ typedef struct {
   librdf_statement statement; /* NOTE: stored here, never allocated */
   librdf_hash_datum key;
   librdf_hash_datum value;
-} librdf_storage_storage_hashes_node_iterator_context;
+} librdf_storage_hashes_node_iterator_context;
 
 
 static int
-librdf_storage_storage_hashes_node_iterator_have_elements(void* iterator)
+librdf_storage_hashes_node_iterator_have_elements(void* iterator)
 {
-  librdf_storage_storage_hashes_node_iterator_context* context=(librdf_storage_storage_hashes_node_iterator_context*)iterator;
+  librdf_storage_hashes_node_iterator_context* context=(librdf_storage_hashes_node_iterator_context*)iterator;
 
   return librdf_iterator_have_elements(context->iterator);
 }
 
 
 static void*
-librdf_storage_storage_hashes_node_iterator_get_next(void* iterator) 
+librdf_storage_hashes_node_iterator_get_next(void* iterator) 
 {
-  librdf_storage_storage_hashes_node_iterator_context* context=(librdf_storage_storage_hashes_node_iterator_context*)iterator;
+  librdf_storage_hashes_node_iterator_context* context=(librdf_storage_hashes_node_iterator_context*)iterator;
   librdf_node* node;
 
   if(!librdf_iterator_have_elements(context->iterator))
@@ -864,7 +854,7 @@ librdf_storage_storage_hashes_node_iterator_get_next(void* iterator)
       break;
       
     default: /* error */
-      LIBRDF_FATAL2(librdf_storage_storage_hashes_node_iterator_get_next,
+      LIBRDF_FATAL2(librdf_storage_hashes_node_iterator_get_next,
                     "Illegal statement part %d seen\n", context->want);
   }
   
@@ -873,14 +863,14 @@ librdf_storage_storage_hashes_node_iterator_get_next(void* iterator)
 
 
 static void
-librdf_storage_storage_hashes_node_iterator_finished(void* iterator) 
+librdf_storage_hashes_node_iterator_finished(void* iterator) 
 {
-  librdf_storage_storage_hashes_node_iterator_context* context=(librdf_storage_storage_hashes_node_iterator_context*)iterator;
+  librdf_storage_hashes_node_iterator_context* icontext=(librdf_storage_hashes_node_iterator_context*)iterator;
 
-  if(context->iterator)
-    librdf_free_iterator(context->iterator);
+  if(icontext->iterator)
+    librdf_free_iterator(icontext->iterator);
 
-  LIBRDF_FREE(librdf_storage_storage_hashes_node_iterator_context, context);
+  LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
 }
 
 
@@ -902,13 +892,13 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
                                            int want) 
 {
   librdf_storage_hashes_context *scontext=(librdf_storage_hashes_context*)storage->context;
-  librdf_storage_storage_hashes_node_iterator_context* icontext;
+  librdf_storage_hashes_node_iterator_context* icontext;
   librdf_iterator *iterator;
   librdf_hash *hash;
   int fields;
   unsigned char *key_buffer;
   
-  icontext=(librdf_storage_storage_hashes_node_iterator_context*)LIBRDF_CALLOC(librdf_storage_storage_hashes_node_iterator_context, 1, sizeof(librdf_storage_storage_hashes_node_iterator_context));
+  icontext=(librdf_storage_hashes_node_iterator_context*)LIBRDF_CALLOC(librdf_storage_hashes_node_iterator_context, 1, sizeof(librdf_storage_hashes_node_iterator_context));
   if(!icontext)
     return NULL;
 
@@ -946,11 +936,11 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
   icontext->key.size=librdf_statement_encode_parts(&icontext->statement, 
                                                    NULL, 0, fields);
   if(!icontext->key.size) {
-    LIBRDF_FREE(librdf_storage_storage_hashes_node_iterator_context, icontext);
+    LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
     return NULL;
   }
   if(!(key_buffer=(unsigned char*)LIBRDF_MALLOC(data, icontext->key.size))) {
-    LIBRDF_FREE(librdf_storage_storage_hashes_node_iterator_context, icontext);
+    LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
     return NULL;
   }
        
@@ -958,7 +948,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
                                     key_buffer, icontext->key.size,
                                     fields)) {
     LIBRDF_FREE(data, key_buffer);
-    librdf_storage_storage_hashes_node_iterator_finished(icontext);
+    librdf_storage_hashes_node_iterator_finished(icontext);
     return NULL;
   }
 
@@ -968,7 +958,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
   icontext->iterator=librdf_hash_get_all(hash, &icontext->key, &icontext->value);
   if(!icontext->iterator) {
     LIBRDF_FREE(data, key_buffer);
-    librdf_storage_storage_hashes_node_iterator_finished(icontext);
+    librdf_storage_hashes_node_iterator_finished(icontext);
     return NULL;
   }
 
@@ -976,11 +966,11 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
 
 
   iterator=librdf_new_iterator((void*)icontext,
-                               librdf_storage_storage_hashes_node_iterator_have_elements,
-                               librdf_storage_storage_hashes_node_iterator_get_next,
-                               librdf_storage_storage_hashes_node_iterator_finished);
+                               librdf_storage_hashes_node_iterator_have_elements,
+                               librdf_storage_hashes_node_iterator_get_next,
+                               librdf_storage_hashes_node_iterator_finished);
   if(!iterator)
-    librdf_storage_storage_hashes_node_iterator_finished(icontext);
+    librdf_storage_hashes_node_iterator_finished(icontext);
 
   return iterator;
 }
