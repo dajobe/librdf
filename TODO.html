@@ -15,8 +15,6 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>Link with -lexpat before libwww libraries to ensure correct
-XML library is used.</li>
 <li>Deprecate node types beyond simple resource, literal</li>
 <li>Allow base URIs in Perl parser methods to be undef</li>
 <li>Ensure non-file: URIs do not cause crashes (seen in Perl)</li>
@@ -74,6 +72,9 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Link XML Libraries (-lexpat etc.) before libwww libraries to
+ensure correct XML library is used (0.9.11)</li>
+<li>Python interface to parsers now works (0.9.11)</li>
 <li>Multiple startup/shutdowns of entire library now works (0.9.11)</li>
 <li>Make the library work as a shared library (0.9.11)</li>
 <li>Model size method implemented (0.9.11)</li>
