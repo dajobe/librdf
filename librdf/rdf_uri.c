@@ -358,7 +358,7 @@ librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
     return NULL;
   
   new_uri=librdf_new_uri(world, uri_string);
-  LIBRDF_FREE(cstring, uri_string);
+  raptor_free_memory(uri_string);
   return new_uri;
 }
 
