@@ -1,4 +1,83 @@
+2004-10-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c (main):
+	Use raptor_www_fetch_to_string from raptor 1.4.0
+
+	* raptor/win32_raptor_config.h, raptor/configure.ac: Bumped
+	version to 1.4.1
+
+	* raptor/libraptor.3: typo
+
+	* raptor/raptor_rss.c: Added generation of triples for RSS
+	enclosures based on a patch from Suzan Foster.  Changes made
+	include correcting the enclosures namespace, tidying some memory
+	leaks and printing some debug information.
+
+	* raptor/raptor_serialize.c (raptor_rdfxml_serialize_statement):
+	Make rdf:_<n> 'ordinal' properties serialize correctly.
+
+	* raptor/raptor_www_test.c (main):
+	Use raptor_www_fetch_to_string for testing.
+
+	* raptor/raptor_iostream.c (raptor_string_iostream_finish): Code tidy.
+
+	* raptor/libraptor.3, raptor/raptor.h: Added
+	raptor_www_fetch_to_string
+
+	* raptor/raptor_www.c (raptor_www_fetch_to_string_write_bytes):
+	Added handler for following function:
+	(raptor_www_fetch_to_string): Added, to get content back as a string.
+
+	* rasqal/roqet.c:
+	(roqet_get_www_content); Use raptor_stringbuffer_copy_to_string.
+
+	* rasqal/configure.ac: enable sparql for regular users
+
+2004-10-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/libraptor.3: Updates for 1.4.0
+
+	* raptor/raptor.h, raptor/raptor_iostream.c: s/fh/handle/ for clarity.
+
+	* rasqal/configure.ac, rasqal/Makefile.am: Added rasqal.rdf.in
+
+	* rasqal/rasqal.rdf.in: Rasqal DOAP description
+
+	* raptor/raptor.spec.in:
+	Update descriptions to include serializers
+
 2004-10-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/Makefile.am, rasqal/rasqal.spec.in,
+	rasqal/LICENSE-2.0.txt, NOTICE: LGPL / Apache 2.0 license
+
+	* rasqal/tests/sparql/simple/Makefile.am, rasqal/docs/README.html,
+	rasqal/docs/build-docs, rasqal/tests/Makefile.am,
+	rasqal/tests/rdql/Makefile.am,
+	rasqal/tests/rdql/testsuite/Makefile.am,
+	rasqal/tests/rdql/testsuite/check-rdql,
+	rasqal/tests/sparql/Makefile.am, rasqal/tests/sparql/check-sparql,
+	rasqal/tests/sparql/examples/Makefile.am,
+	rasqal/tests/sparql/part1/Makefile.am, rasqal/docs/Makefile.am,
+	rasqal/sparql_parser.y, rasqal/win32_rasqal_config.h,
+	rasqal/rdql_parser.y, rasqal/roqet.c, rasqal/sparql_common.h,
+	rasqal/sparql_lexer.l, rasqal/Makefile.am, rasqal/README.html,
+	rasqal/configure.ac, rasqal/rasqal-config.in,
+	rasqal/rasqal-src-config.in, rasqal/rasqal.h,
+	rasqal/rasqal.spec.in, rasqal/rasqal_engine.c,
+	rasqal/rasqal_expr.c, rasqal/rasqal_general.c,
+	rasqal/rasqal_internal.h, rasqal/rasqal_literal.c,
+	rasqal/rasqal_query.c, rasqal/rasqal_query_test.c,
+	rasqal/rasqal_raptor.c, rasqal/rasqal_redland.c,
+	rasqal/rasqal_xml.c, rasqal/rdql_common.h, rasqal/rdql_lexer.l,
+	rasqal/INSTALL.html: LGPL / Apache 2.0 license
+
+	* rasqal/win32/rasqal.dsp, rasqal/win32/rasqal.dsw:
+	win32 updates including sparql (not tested)
+
+	* librdf/rdf_parser_raptor.c
+	(librdf_parser_raptor_new_statement_handler): Do not copy datatype
+	URIs for new statements.
 
 	* raptor/raptor_namespace.c: less namespace debugs
 
