@@ -144,24 +144,35 @@ main(int argc, char *argv[])
   char *test_names[]={"test", "abc123", "99997", NULL};
   char *name;
   int n;
+  int rc=0;
   
+#define NAMES_COUNT 11
+
   char *program=argv[0];
 
   for(n=0; (name=test_names[n]); n++) {
     int i;
     
-    fprintf(stdout, "%s: Generating 11 new names from '%s'\n", program, name);
+#if LIBRDF_DEBUG > 1
+    fprintf(stdout, "%s: Generating %d new names from '%s'\n", program, 
+            NAMES_COUNT, name);
+#endif
   
-    for(i=0; i<11; i++) {
+    for(i=0; i< NAMES_COUNT; i++) {
       char *new_name;
       
-      fprintf(stdout, "%s: Generated name from '%s' is ", program, name);
+#if LIBRDF_DEBUG > 1
+      fprintf(stdout, "Generating name from '%s'\n", name);
+#endif
       new_name=librdf_heuristic_gen_name(name);
       if(!new_name) {
-        fputs("failed\n", stderr);
+        fprintf(stdout, "%s: Failed to generate name from '%s'\n", program, name);
+        rc=1;
         break;
       }
-      fprintf(stdout, "'%s'\n", new_name);
+#if LIBRDF_DEBUG > 1
+      fprintf(stdout, "  result was '%s'\n", new_name);
+#endif
       
       if(name != test_names[n])
         LIBRDF_FREE(cstring, name);
@@ -173,8 +184,7 @@ main(int argc, char *argv[])
       LIBRDF_FREE(cstring, name);
   }
 
-  /* keep gcc -Wall happy */
-  return(0);
+  return rc;
 }
 
 #endif
