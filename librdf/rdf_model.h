@@ -122,6 +122,9 @@ struct librdf_model_factory_s {
   /* query the model */
   librdf_stream* (*query)(librdf_model* model, librdf_query* query);
 
+  /* sync the model to the storage */
+  void (*sync)(librdf_model* model);
+
 };
 
 #include <rdf_model_storage.h>
@@ -211,6 +214,8 @@ librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* 
 /* query language */
 librdf_stream* librdf_model_query(librdf_model* model, librdf_query* query);
 librdf_stream* librdf_model_query_string(librdf_model* model, const char *name, librdf_uri* uri, const char *query_string);
+
+void librdf_model_sync(librdf_model* model);
 
 
 #ifdef __cplusplus
