@@ -120,5 +120,8 @@ void rdf_hash_print(rdf_hash* hash, FILE *fh);
 int rdf_hash_first(rdf_hash* hash, void** key, size_t* key_len);
 int rdf_hash_next(rdf_hash* hash, void** key, size_t* key_len);
 
+/* import a hash from a string representation */
+void rdf_hash_from_string (rdf_hash* hash, char *string);
+
 #endif
 
