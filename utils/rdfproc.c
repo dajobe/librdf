@@ -729,26 +729,21 @@ main(int argc, char *argv[])
       }
 
       while(!librdf_query_results_finished(query)) {
-        const char **names=NULL;
-        librdf_node **values=NULL;
-        
-        if(librdf_query_get_result_bindings(query, &names, values))
-          break;
-        
         fputs("result: [", stdout);
-        if(names) {
-          for(i=0; names[i]; i++) {
-            fprintf(stdout, "%s=", names[i]);
-            if(values && values[i]) {
-              librdf_node_print(values[i], stdout);
-              librdf_free_node(values[i]);
-            } else
-              fputs("NULL", stdout);
-            if(names[i+1])
-              fputs(", ", stdout);
-          }
-          fputs("]\n", stdout);
+        for(i=0; i<librdf_query_get_bindings_count(query); i++) {
+          librdf_node *value=librdf_query_get_result_binding_value(query, i);
+          name=(char*)librdf_query_get_result_binding_name(query, i);
+
+          if(i>0)
+            fputs(", ", stdout);
+          fprintf(stdout, "%s=", name);
+          if(value) {
+            librdf_node_print(value, stdout);
+            librdf_free_node(value);
+          } else
+            fputs("NULL", stdout);
         }
+        fputs("]\n", stdout);
         
         librdf_query_next_result(query);
       }
