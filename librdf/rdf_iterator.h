@@ -18,6 +18,16 @@
 #ifndef RDF_ITERATOR_H
 #define RDF_ITERATOR_H
 
-typedef char rdf_iterator;
+typedef struct {
+  void *datum;
+  int (*have_elements)(void*);
+  void* (*get_next)(void*);
+} rdf_iterator;
+
+
+rdf_iterator* rdf_new_iterator(void *datum,
+                               int (*have_elements)(void*),
+                               void* (*get_next)(void*));
+void rdf_free_iterator(rdf_iterator*);
 
 #endif
