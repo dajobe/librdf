@@ -419,7 +419,7 @@ if test "$bdb_prefix" != no; then
     nLDFLAGS="-L$bdb_lib_dir";
   fi
 
-  if test "$bdb_dbname" != none; then
+  if test "$bdb_dbname" = none; then
     # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
     bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb*.a 2>/dev/null |sed -e 's/^lib//' -e 's/\.a$//' | head -1`
     if test "X$bdb_dbname" = X; then
