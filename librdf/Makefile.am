@@ -4,8 +4,8 @@
 #
 # $Id$
 #
-# Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
-# Institute for Learning and Research Technology - http://www.ilrt.org/
+# Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+# Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
 # University of Bristol - http://www.bristol.ac.uk/
 # 
 # This package is Free Software or Open Source available under the
@@ -32,7 +32,8 @@ rdf_stream.h \
 rdf_parser.h \
 rdf_utf8.h \
 rdf_query.h \
-rdf_serializer.h
+rdf_serializer.h \
+rdf_log.h
 
 librdf_la_SOURCES = rdf_init.c \
 rdf_uri.c rdf_node.c rdf_statement.c \
@@ -47,6 +48,7 @@ rdf_query.c \
 rdf_query_triples.c \
 rdf_serializer.c \
 rdf_serializer_raptor.c rdf_serializer_rdfxml.c \
+rdf_log.c \
 redland.h librdf.h \
 rdf_internal.h \
 rdf_init.h \
@@ -62,7 +64,8 @@ rdf_parser.h \
 rdf_heuristics.h rdf_files.h rdf_utf8.h \
 rdf_query.h \
 rdf_query_triples.h \
-rdf_serializer.h
+rdf_serializer.h \
+rdf_log.h
 
 librdf_la_LIBADD = \
 @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ @STORAGE_OBJS@ \
