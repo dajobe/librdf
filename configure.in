@@ -282,7 +282,7 @@ else
   AC_MSG_RESULT(no)
 fi
 
-AC_CHECK_PROG(LIBXML_CONFIG, libxml-config, libxml-config)
+AC_CHECK_PROG(XML_CONFIG, xml-config, xml-config)
 
 
 have_libxml=0
@@ -304,16 +304,19 @@ else
   AC_MSG_RESULT(no)
 fi
 
-oLIBS="$LIBS"
-AC_CHECK_LIB(xml, xmlParseFile)
-LIBS="$oLIBS"
-AC_MSG_CHECKING(for system (GNOME) libxml library)
-if test $ac_cv_lib_xml_xmlParseFile = yes; then
-  have_libxml_lib=1
-  have_libxml=1
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
+if test "X$XML_CONFIG" != X; then
+  oLIBS="$LIBS"
+  LIBS="$LIBS `$XML_CONFIG --libs`"
+  AC_CHECK_LIB(xml, xmlParseFile)
+  LIBS="$oLIBS"
+  AC_MSG_CHECKING(for system (GNOME) libxml library)
+  if test $ac_cv_lib_xml_xmlParseFile = yes; then
+    have_libxml_lib=1
+    have_libxml=1
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi
 fi
 AC_CHECK_HEADERS(gnome-xml/parser.h)
 
@@ -371,9 +374,9 @@ for parser in $parser_modules; do
 		     #undef VERSION
 		     #include <WWWXML.h>], [HTRDF* rdfp=HTRDF_new();],
 		    AC_DEFINE(HAVE_LIBWWW_RDF)
+                    found=1
 		    AC_MSG_RESULT(yes),
 		    AC_MSG_RESULT(no))
-        found=1
       else
 	AC_MSG_RESULT(no)
       fi
@@ -561,7 +564,8 @@ if test $have_libxml = 1 -a $need_libxml = 1; then
     CFLAGS="$CFLAGS -I$srcdir/$libxml_dir"
     XML_OBS="$libxml_dir/libxml.a"
   else
-    LIBS="$LIBS -L$srcdir/$libxml_dir -lxml"
+    LIBS="$LIBS `$XML_CONFIG --libs`"
+    CFLAGS="$CFLAGS `$XML_CONFIG --cflags`"
   fi
 fi
 
