@@ -498,6 +498,7 @@ for parser in $parser_modules; do
       if test $with_raptor = internal; then
         LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor $LIBRDF_INTERNAL_CPPFLAGS"
         LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_INTERNAL_LIBS"
+        AC_CONFIG_SUBDIRS(raptor)
       else
         LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
         LIBRDF_EXTERNAL_LIBS="`$RAPTOR_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
@@ -778,6 +779,7 @@ if test $with_rasqal = internal; then
   LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/rasqal $LIBRDF_INTERNAL_CPPFLAGS"
   LIBRDF_INTERNAL_LIBS="\$(top_builddir)/rasqal/librasqal.la $LIBRDF_INTERNAL_LIBS"
   rasqal_dir=rasqal
+  AC_CONFIG_SUBDIRS(rasqal)
 else
   LIBRDF_EXTERNAL_CPPFLAGS="`$RASQAL_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
   LIBRDF_EXTERNAL_LIBS="`$RASQAL_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
@@ -867,8 +869,6 @@ abs_top_srcdir=`cd $srcdir; pwd`
 AC_SUBST(abs_top_srcdir)
 abs_top_builddir=`pwd`
 AC_SUBST(abs_top_builddir)
-
-AC_CONFIG_SUBDIRS([raptor rasqal])
 
 AC_CONFIG_FILES([Makefile
 docs/Makefile
