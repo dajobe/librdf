@@ -30,31 +30,36 @@
 #include <rdf_uri.h>
 #include <rdf_node.h>
 #include <rdf_digest.h>
+#include <rdf_stream.h>
 #include <rdf_statement.h>
+#include <rdf_storage.h>
 #include <rdf_model.h>
 
 
-void librdf_init_world(char *digest_factory_name) 
+void
+librdf_init_world(char *digest_factory_name) 
 {
-  librdf_digest_factory* digest_factory;
-
-  digest_factory=librdf_get_digest_factory(digest_factory_name);
-
-  librdf_init_digest();
-  librdf_init_hash();
-  librdf_init_uri(digest_factory);
-  librdf_init_node(digest_factory);
-  librdf_init_statement();
-  librdf_init_model();
+	librdf_digest_factory* digest_factory;
+	
+	digest_factory=librdf_get_digest_factory(digest_factory_name);
+	
+	librdf_init_digest();
+	librdf_init_hash();
+	librdf_init_uri(digest_factory);
+	librdf_init_node(digest_factory);
+	librdf_init_statement();
+	librdf_init_model();
+	librdf_init_storage();
 }
 
 
-void librdf_destroy_world(void)
+void
+librdf_destroy_world(void)
 {
 	librdf_finish_digest();
 	librdf_finish_hash();
 	/* librdf_finish_uri(); */
 	/* librdf_finish_node(); */
-	/* librdf_finish_statement(); */
+	librdf_finish_statement();
 	/* librdf_finish_model(); */
 }
