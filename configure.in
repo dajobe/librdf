@@ -24,8 +24,8 @@ dnl
 AC_REVISION($Revision$)dnl
 
 AC_PREREQ(2.13)
-AC_INIT(rdf_node.c)
-AM_CONFIG_HEADER(rdf_config.h)
+AC_INIT(librdf/rdf_node.c)
+AM_CONFIG_HEADER(librdf/rdf_config.h)
 AC_CANONICAL_HOST
 
 
@@ -550,16 +550,8 @@ AC_DEFINE_UNQUOTED(JAVA_SAX_JAR, "$java_sax_jar")
 AC_DEFINE_UNQUOTED(JAVA_SAX_CLASS, "$java_sax_class")
 
 
-have_raptor=0
-if test -r $srcdir/raptor.h -a -r $srcdir/raptor_parse.c -a -r $srcdir/ntriples.h -a -r $srcdir/ntriples_parse.c ; then
-  have_raptor=1;
-  RAPTOR_INCS="raptor.h ntriples.h"
-  AC_SUBST(RAPTOR_INCS)
-  RAPTOR_SRCS="raptor_parse.c ntriples_parse.c raptor_uri.c"
-  AC_SUBST(RAPTOR_SRCS)
-fi
-
-# Always have it
+# Always have these
+have_raptor=1
 have_repat=1
 
 
@@ -675,8 +667,8 @@ for parser in $parser_modules; do
     PARSER_SRCS="$PARSER_SRCS rdf_parser_$parser.c"
 
     if test $parser = raptor; then
-      PARSER_OBJS="$PARSER_OBJS raptor_parse.lo ntriples_parse.lo raptor_uri.lo"
-      PARSER_SRCS="$PARSER_SRCS raptor_parse.c ntriples_parse.c raptor_uri.c"
+      CFLAGS="$CFLAGS -I\$(top_srcdir)/raptor"
+      LIBS="\$(top_builddir)/raptor/libraptor.la $LIBS"
     fi
 
     n=HAVE_${uname}_RDF_PARSER
@@ -936,7 +928,8 @@ fi
 if test $need_repat = 1; then
   # Always have local copy
   SD="$SD repat"
-  XML_OBJS="$XML_OBJS \$(top_builddir)/repat/rdfparse.lo"
+  CFLAGS="$CFLAGS -I\$(top_srcdir)"
+  LIBS="\$(top_builddir)/repat/librepat.la $LIBS"
 fi
 
 AC_SUBST(REPAT_FLAGS)
@@ -963,9 +956,12 @@ AC_SUBST(MEM)
 AC_SUBST(MEM_LIBS)
 AC_SUBST(STANDARD_CFLAGS)
 
+AC_CONFIG_SUBDIRS(raptor)
 
 AC_OUTPUT(Makefile
 docs/Makefile
+librdf/Makefile
+examples/Makefile
 expat/Makefile
 expat/xmlparse/Makefile
 expat/xmltok/Makefile
@@ -984,9 +980,9 @@ ruby/Makefile
 repat/Makefile
 debian/Makefile
 debian/rules
-redland.spec
-redland-config,
-[chmod +x redland-config debian/rules])
+librdf/redland.spec
+librdf/redland-config,
+[chmod +x librdf/redland-config debian/rules])
 
 AC_MSG_RESULT([
 Redland build summary:
