@@ -1,3 +1,34 @@
+2004-10-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_serializer_rdfxml.c: Deleted. raptor does all this now
+
+	* Makefile.am: Remove rdf_serializer_rdfxml.c
+
+	* rdf_serializer.h:
+	Renamed factory method serialize_model to
+	serialize_model_to_file_handle.
+	Added factory method serialize_model_to_string.
+	Deprecated librdf_serializer_serialize_model
+	Added librdf_serializer_serialize_model_to_file_handle as new name
+	Added librdf_serializer_serialize_model_to_string
+
+	* rdf_serializer.c (librdf_serializer_serialize_model): Deprecate name.
+	(librdf_serializer_serialize_model_to_file_handle): Added, new name
+	for above.
+	(librdf_serializer_serialize_model_to_string): Added.
+	(librdf_init_serializer): Let raptor make all
+
+	* rdf_storage_file.c (librdf_storage_file_sync): Use
+	librdf_serializer_serialize_model_to_file_handle not deprecated
+	librdf_serializer_serialize_model
+
+	* rdf_serializer_raptor.c: Converted to use raptor_serializer.
+	(librdf_serializer_raptor_serialize_model_to_file_handle): Renamed
+	from librdf_serializer_raptor_serialize_model.
+	(librdf_serializer_raptor_serialize_model_to_string): Added.
+	(librdf_serializer_raptor_constructor): Register from raptor's
+	enumeration of serializers.
+
 2004-10-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_serializer.c (main):
