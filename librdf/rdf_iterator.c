@@ -78,7 +78,10 @@ librdf_new_iterator(librdf_world *world,
 static void
 librdf_iterator_free_iterator_map(void *list_data, void *user_data) 
 {
-  LIBRDF_FREE(librdf_iterator_map, (librdf_iterator_map*)list_data);
+  librdf_iterator_map* map=(librdf_iterator_map*)list_data;
+  if(map->free_context)
+    map->free_context(map->context);
+  LIBRDF_FREE(librdf_iterator_map, map);
 }
 
   
@@ -114,7 +117,7 @@ librdf_free_iterator(librdf_iterator* iterator)
  * 
  * Helper function to set the iterator->current to the current
  * element as filtered optionally by a user defined 
- * map function as set by librdf_iterator_set_map()
+ * map function as set by librdf_iterator_add_map()
  * 
  * Return value: the next element or NULL if the iterator has ended
  */
@@ -147,7 +150,7 @@ librdf_iterator_update_current_element(librdf_iterator* iterator)
         break;
       
       /* apply the map to the element  */
-      element=map->fn(element, map->context);
+      element=map->fn(iterator, element, map->context);
       if(!element)
         break;
 
@@ -313,7 +316,8 @@ librdf_iterator_get_value(librdf_iterator* iterator)
  * librdf_iterator_add_map - Add a librdf_iterator mapping function
  * @iterator: the iterator
  * @fn: the function to operate
- * @context: the context to pass to the map function
+ * @free_context: the function to use to free the context (or NULL)
+ * @map_context: the context to pass to the map function
  * 
  * Adds an iterator mapping function which operates over the iterator to
  * select which elements are returned; it will be applied as soon as
@@ -329,8 +333,9 @@ librdf_iterator_get_value(librdf_iterator* iterator)
  **/
 int
 librdf_iterator_add_map(librdf_iterator* iterator, 
-                        void* (*fn)(void *context, void *element),
-                        void *context)
+                        librdf_iterator_map_handler map_function,
+                        librdf_iterator_map_free_context_handler free_context,
+                        void *map_context)
 {
   librdf_iterator_map *map;
   
@@ -344,8 +349,9 @@ librdf_iterator_add_map(librdf_iterator* iterator,
   if(!map)
     return 1;
 
-  map->fn=fn;
-  map->context=context;
+  map->fn=map_function;
+  map->free_context=free_context;
+  map->context=map_context;
 
   if(librdf_list_add(iterator->map_list, map)) {
     LIBRDF_FREE(librdf_iterator_map, map);
