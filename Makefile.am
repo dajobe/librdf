@@ -84,7 +84,7 @@ rdf_init.h \
 rdf_hash.h \
 rdf_digest.h \
 rdf_types.h \
-rdf_uri.h rdf_node.h rdf_statement.h rdf_context.h \
+rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
 rdf_model.h rdf_iterator.h \
 rdf_storage.h \
 rdf_stream.h \
@@ -100,14 +100,14 @@ pkgdata_DATA = $(JAVA_CLASSES)
 librdf_a_SOURCES = rdf_init.c \
 rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
-rdf_model.c rdf_iterator.c \
+rdf_model.c rdf_iterator.c rdf_concepts.c \
 rdf_list.c rdf_memory.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c rdf_files.c \
 redland.h librdf.h \
 rdf_init.h \
-rdf_uri.h rdf_node.h rdf_statement.h rdf_context.h \
+rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
 rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
 rdf_types.h \
 rdf_model.h rdf_iterator.h \
