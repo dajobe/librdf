@@ -26,7 +26,7 @@ automake and autoconf derived files, as described below in
 <a href="http://www.ilrt.bristol.ac.uk/people/cmdjb/software/librdf/source/">http://www.ilrt.bristol.ac.uk/people/cmdjb/software/librdf/source/</a></p>
 
 
-<H2>2. Configuring and building</H2>
+<h2>2. Configuring and building</h2>
 
 <h3>2.1. Create <tt>configure</tt> program</h3>
 
@@ -48,8 +48,8 @@ tools with:</p>
 such as <tt>--prefix</tt> etc.</p>
 
 <dl>
-<dt><tt>--with-libwww</tt><br />
-<dd>Enable use of the W3C <a href="http://www.w3.org/Library/">libwww</a>,
+<dt><tt>--with-libwww</tt><br /></dt>
+<dd><p>Enable use of the W3C <a href="http://www.w3.org/Library/">libwww</a>,
 if available.  configure will automatically enable this if
 the <tt>libwww-config</tt> program can be found in the path unless
 disabled by setting this option to <em>no</em>.  libwww is presently
@@ -69,7 +69,7 @@ pages for details.  The alternative, to link libwww statically, works
 but is difficult to enable.</p>
 </dd>
 
-<dt><tt>--with-rdf-java-api=JAR</tt><br />
+<dt><tt>--with-rdf-java-api=JAR</tt><br /></dt>
 <dd>Enable the use of Sergey Melnik's
 <a href="http://www-db.stanford.edu/~melnik/rdf/api.html">Java API</a>
 RDF parser (based on 
@@ -79,7 +79,7 @@ the distribution from
 <a href="http://www-db.stanford.edu/~melnik/rdf/api.html">his site</a>
 and enable with this option pointing at the Jar file.</dd>
 
-<dt><tt>--enable-digests=LIST</tt><br />
+<dt><tt>--enable-digests=LIST</tt><br /></dt>
 <dd>Select the list of digests to be included if the are availble.  The
 valid list of digests are: <tt>md5 sha1 ripem160</tt> (the default).  The
 digest functions can be provided by external libraries such as
@@ -87,7 +87,7 @@ the <a href="http://www.openssl.org/">OpenSSL</a>
 libcrypto library or by provided portable
 versions (only MD5 supported in this release).</dd>
 
-<dt><tt>--with-openssl-digests</tt><br />
+<dt><tt>--with-openssl-digests</tt><br /></dt>
 <dd>Enable digests provided by the <a href="http://www.openssl.org/">OpenSSL</a> libcrypto library (MD5,
 SHA1 and RIPEMD160) if the library is available. configure will
 automatically enable this unless disabled by setting this option to
@@ -125,11 +125,15 @@ automatically enable this unless disabled by setting this option to
 
 <h2>3. Using librdf</h2>
 
-<p>See <a href="example.c">example.c</a> for the only example at present.  It can be built with
+<p>See <a href="example.c">example.c</a> for the only example at present.  It can be built with</p>
 <pre>
    make example
 </pre>
 
+
+<hr />
+
+<p>Copyright 2000 <a href="http://www.ilrt.bristol.ac.uk/people/cmdjb/software/librdf/">Dave Beckett</a></p>
 
 </body>
 </html>
