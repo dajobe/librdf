@@ -923,17 +923,14 @@ else
 fi
 
 
-AC_ARG_WITH(threestore, [  --with-threestore=PATH  Location of AKT triplestore/3store 3store-config (default auto)], tstore_config="$withval", tstore_config="")
-if test "X$tstore_config" != "X" ; then
-  AC_MSG_CHECKING(for $tstore_config)
-  if test -f $tstore_config ; then
+AC_ARG_WITH(threestore, [  --with-threestore(=CONFIG|yes|no)  Location of 3store-config (default auto)], tstore_config="$withval", tstore_config="")
+if test "X$tstore_config" != "Xno"; then
+  if test "X$tstore_config" != "Xyes" ; then
     TSTORE_CONFIG=$tstore_config
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no - searching PATH)
   fi
+  tstore_config=yes
 fi
-if test "X$TSTORE_CONFIG" = "X"; then
+if test $tstore_config = yes -a "X$TSTORE_CONFIG" = "X" ; then
   AC_CHECK_PROGS(TSTORE_CONFIG, 3store-config)
 fi
 
@@ -948,23 +945,20 @@ if test "X$TSTORE_CONFIG" != X -a "X$PKG_CONFIG" != X ; then
   STORAGE_OBJS="$STORAGE_OBJS rdf_storage_tstore.lo"
   store_modules="$store_modules 3store($tstore_version)"
   persistent_store=yes
+  AC_MSG_RESULT(yes - version $tstore_version)
 else
-  with_tstore=no
+  AC_MSG_RESULT(no)
 fi
-AC_MSG_RESULT($with_tstore)
 
 
-AC_ARG_WITH(mysql, [  --with-mysql=PATH  Location of MySQL 4 mysql_config (default auto)], mysql_config="$withval", mysql_config="")
-if test "X$mysql_config" != "X" ; then
-  AC_MSG_CHECKING(for $mysql_config)
-  if test -f $mysql_config ; then
+AC_ARG_WITH(mysql, [  --with-mysql(=CONFIG|yes|no) Location of MySQL 4 mysql_config (default auto)], mysql_config="$withval", mysql_config="")
+if test "X$mysql_config" != "Xno"; then
+  if test "X$mysql_config" != "Xyes" ; then
     MYSQL_CONFIG=$mysql_config
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no - searching PATH)
   fi
+  mysql_config=yes
 fi
-if test "X$MYSQL_CONFIG" = "X"; then
+if test $mysql_config = yes -a "X$MYSQL_CONFIG" = "X" ; then
   AC_CHECK_PROGS(MYSQL_CONFIG, mysql_config)
 fi
 
