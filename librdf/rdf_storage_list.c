@@ -232,16 +232,20 @@ librdf_storage_list_serialise_finished(void* context)
 }
 
 
-static int
+static librdf_statement*
 librdf_storage_list_find_map(void* context, librdf_statement* statement) 
 {
   librdf_statement* partial_statement=(librdf_statement*)context;
 
   /* any statement matches when no partial statement is given */
   if(!partial_statement)
-    return 1;
+    return statement;
   
-  return librdf_statement_match(statement, partial_statement);
+  if (librdf_statement_match(statement, partial_statement)) {
+    return statement;
+  }
+
+  return NULL;
 }
 
 
