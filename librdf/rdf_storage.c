@@ -583,21 +583,18 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
   switch(context->want) {
     case LIBRDF_STATEMENT_SUBJECT: /* SOURCES (subjects) */
       node=librdf_statement_get_subject(statement);
-      librdf_statement_set_subject(statement, NULL);
       break;
       
     case LIBRDF_STATEMENT_PREDICATE: /* ARCS (predicates) */
       node=librdf_statement_get_predicate(statement);
-      librdf_statement_set_predicate(statement, NULL);
       break;
       
     case LIBRDF_STATEMENT_OBJECT: /* TARGETS (objects) */
       node=librdf_statement_get_object(statement);
-      librdf_statement_set_object(statement, NULL);
       break;
       
     default: /* error */
-    abort();
+      abort();
   }
   
   return (void*)node;
