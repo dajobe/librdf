@@ -443,6 +443,8 @@ AC_DEFINE_UNQUOTED(JAVA_SAX_CLASS, "$java_sax_class")
 have_rapier=0
 if test -r $srcdir/rapier.h -a -r $srcdir/rapier_parse.c; then
   have_rapier=1;
+  RAPIER_SOURCES="rapier.h rapier_parse.c"
+  AC_SUBST(RAPIER_SOURCES)
 fi
 
 # Always have it

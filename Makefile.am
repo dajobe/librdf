@@ -37,7 +37,7 @@ rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
 rdf_model.h rdf_iterator.h \
 rdf_storage.h \
 rdf_stream.h \
-rdf_parser.h rapier.h \
+rdf_parser.h \
 rdf_heuristics.h \
 rdf_list.h \
 rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
@@ -64,7 +64,7 @@ rdf_model.h rdf_iterator.h \
 rdf_list.h \
 rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
 rdf_stream.h \
-rdf_parser.h rapier.h \
+rdf_parser.h \
 rdf_heuristics.h rdf_files.h rdf_utf8.h
 
 
@@ -89,7 +89,8 @@ memcmp.c Redland.i \
 PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \
 autogen.sh \
-redland.spec redland.spec.in
+redland.spec redland.spec.in \
+@RAPIER_SOURCES@
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
