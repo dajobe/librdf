@@ -406,20 +406,15 @@ librdf_free_node(librdf_node *node)
  * Returns a pointer to the URI object held by the node, it must be
  * copied if it is wanted to be used by the caller.
  * 
- * Return value: URI object
+ * Return value: URI object or NULL if node has no URI.
  **/
 librdf_uri*
 librdf_node_get_uri(librdf_node* node) 
 {
-  switch(node->type) {
-    case LIBRDF_NODE_TYPE_RESOURCE:
-      return node->value.resource.uri;
-
-    default:
-      /* FIXME */
-      LIBRDF_FATAL2(librdf_node_get_uri, 
-                    "Do not know how to get uri for node type %d\n", node->type);
-  }
+  if(node->type != LIBRDF_NODE_TYPE_RESOURCE)
+    return NULL;
+  
+  return node->value.resource.uri;
 }
 
 
@@ -436,23 +431,19 @@ librdf_node_get_uri(librdf_node* node)
 int
 librdf_node_set_uri(librdf_node* node, librdf_uri *uri)
 {
-  switch(node->type) {
-    case LIBRDF_NODE_TYPE_RESOURCE:
-      if(!uri)
-        return 1;
-      
-      /* delete old URI */
-      if(node->value.resource.uri)
-        librdf_free_uri(node->value.resource.uri);
-      
-      /* set new one */
-      node->value.resource.uri=uri;
-      return 0;
-    default:
-      /* FIXME */
-      LIBRDF_FATAL2(librdf_node_set_uri, 
-                    "Do not know how to set uri for node type %d\n", node->type);
-  }
+  if(node->type != LIBRDF_NODE_TYPE_RESOURCE)
+    return 1;
+  
+  if(!uri)
+    return 1;
+    
+  /* delete old URI */
+  if(node->value.resource.uri)
+    librdf_free_uri(node->value.resource.uri);
+  
+  /* set new one */
+  node->value.resource.uri=uri;
+  return 0;
 }
 
 
@@ -475,8 +466,8 @@ librdf_node_get_type(librdf_node* node)
  * @type: the node type
  *
  * Presently the nodes can be of type
- * LIBRDF_NODE_TYPE_RESOURCE, PROPERTY (same as RESOURCE), LITERAL, STATEMENT
- * BAG, SEQ, ALT, LI, MODEL
+ * LIBRDF_NODE_TYPE_RESOURCE, PROPERTY (same as RESOURCE), LITERAL, 
+ * STATEMENT, LI, BLANK
  **/
 void
 librdf_node_set_type(librdf_node* node, librdf_node_type type)
@@ -955,6 +946,23 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       }
       break;
       
+    case LIBRDF_NODE_TYPE_BLANK:
+      string=(unsigned char*)node->value.blank.identifier;
+      string_length=node->value.blank.identifier_len;
+      
+      total_length= 3 + string_length + 1; /* +1 for \0 at end */
+      
+      if(length && total_length > length)
+        return 0;    
+      
+      if(buffer) {
+        buffer[0]='B';
+        buffer[1]=(string_length & 0xff00) >> 8;
+        buffer[2]=(string_length & 0x00ff);
+        strcpy((char*)buffer+3, (const char*)string);
+      }
+      break;
+      
     default:
       /* FIXME */
       LIBRDF_FATAL2(librdf_node_encode,
@@ -1031,6 +1039,22 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
       if (librdf_node_set_literal_value(node, (const char*)buffer+6,
                                         NULL, /* xml:language */
                                         xml_space, is_wf_xml))
+        return 0;
+    
+    break;
+
+    case 'B': /* LIBRDF_NODE_TYPE_BLANK */
+      /* min */
+      if(length < 3)
+        return 1;
+      
+      string_length=(buffer[1] << 8) | buffer[2];
+
+      total_length= 3 + string_length + 1; /* +1 for \0 at end */
+      
+      /* Now initialise fields */
+      node->type = LIBRDF_NODE_TYPE_BLANK;
+      if (librdf_node_set_blank_identifier(node, (const char*)buffer+3))
         return 0;
     
     break;
