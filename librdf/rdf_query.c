@@ -105,13 +105,13 @@ librdf_delete_query_factories(librdf_world *world)
  * librdf_query_register_factory - Register a query factory
  * @world: redland world object
  * @name: the query language name
- * @uri: the query language URI (or NULL if none)
+ * @uri_string: the query language URI string (or NULL if none)
  * @factory: pointer to function to call to register the factory
  * 
  **/
 void
 librdf_query_register_factory(librdf_world *world, const char *name,
-                              librdf_uri *uri,
+                              const unsigned char *uri_string,
                               void (*factory) (librdf_query_factory*)) 
 {
   librdf_query_factory *query, *h;
@@ -119,7 +119,7 @@ librdf_query_register_factory(librdf_world *world, const char *name,
   int name_length;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3("Received registration for query name %s URI %s\n", name, librdf_uri_as_string(uri));
+  LIBRDF_DEBUG3("Received registration for query name %s\n", name);
 #endif
   
   query=(librdf_query_factory*)LIBRDF_CALLOC(librdf_query_factory, 1,
@@ -135,13 +135,16 @@ librdf_query_register_factory(librdf_world *world, const char *name,
     LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
   }
   query->name=strcpy(name_copy, name);
-  if(uri) {
-    query->uri=librdf_new_uri_from_uri(uri);
-    if(!query->uri) {
+  if(uri_string) {
+    librdf_uri *uri;
+
+    uri=librdf_new_uri(world, uri_string);
+    if(!uri) {
       LIBRDF_FREE(cstring, name_copy); 
       LIBRDF_FREE(librdf_query, query);
       LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
     }
+    query->uri=uri;
   }
         
   for(h = world->query_factories; h; h = h->next ) {
