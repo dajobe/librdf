@@ -1,3 +1,107 @@
+2004-08-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_parser_raptor.c
+	(librdf_parser_raptor_parse_as_stream_common,
+	librdf_parser_raptor_parse_into_model_common): Add a length parameter,
+	calculate it if it is 0.
+	(librdf_parser_raptor_parse_uri_as_stream,
+	librdf_parser_raptor_parse_string_as_stream): Updates for change above.
+	(librdf_parser_raptor_parse_counted_string_as_stream,
+	librdf_parser_raptor_parse_counted_string_into_model): Added, taking
+	a counted string with length>0, calling one of the common functions
+	above.
+	(librdf_parser_raptor_register_factory): Register new methods.
+
+	* rdf_parser.c (librdf_parser_parse_counted_string_as_stream,
+	librdf_parser_parse_counted_string_into_model): Added, taking a
+	counted string with length>0, calling the new parser factory
+	methods.
+	(main): Test code updated to test rdfxml, ntriples and turtle
+	with four different parsing methods for one parser.  This
+	tests - a) memory model checks for same triples
+	b) parsing works with four methods
+	c) parsing with same parser multiple times works
+
+	* rdf_parser.h: Added factory methods parse_counted_string_into_model,
+	parse_counted_string_as_stream as variants of the uncounted versions.
+	Added prototypes for librdf_parser_parse_counted_string_as_stream,
+	librdf_parser_parse_counted_string_into_model
+
+2004-07-28  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_tstore.c (librdf_storage_list_add_statement):
+	Note FIXME - cannot enforce not adding duplicate statements.
+
+	* rdf_storage_mysql.c (librdf_storage_mysql_add_statement,
+	librdf_storage_mysql_add_statements): Enforce not adding duplicate
+	statements.
+
+	* rdf_storage_list.c (librdf_storage_list_add_statement):
+	Enforce not adding duplicate statements.
+	(librdf_storage_list_add_statements): Enforce not adding duplicate
+	statements. Tidy the code.
+
+	* rdf_storage_hashes.c (librdf_storage_hashes_add_statement):
+	Enforce not adding duplicate statements.
+	This is not needed for librdf_storage_hashes_add_statements since
+	it calls the above method.
+
+	* rdf_storage.c:
+	(librdf_storage_add_statement,librdf_storage_add_statements):
+	Document that duplicate statements are ignored on addition.
+
+	* rdf_model.c (librdf_model_add_statement):
+	Document that duplicate statements are
+	ignored and use librdf_model_contains_statement to enforce it.
+	(librdf_model_add_statements): Document that duplicate statements are
+	ignored.
+
+2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_mysql.c: cast for c++
+
+2004-07-27  Morten Frederiksen
+
+	* Updated to latest version of the MySQL storage written
+	by Morten Frederiksen
+
+	* rdf_storage_mysql.c: Add new storage options:
+	  bulk - if inserts should be optimized by locking and index
+	         optimizations 
+	  merge - if a table with merged models should be maintained
+	Added a digest object to the storage context for use and re-use
+	of MD5 digesting.
+	(librdf_storage_mysql_hash): Changed to use context digest option.
+	(librdf_storage_mysql_init): Added and documented the bulk and merge
+	options.  Document the new option, already implemented, to create
+	tables.  Update the MySQL schemas.
+	(librdf_storage_mysql_merge): Added, to re/create merged view of all
+	models.
+	(librdf_storage_mysql_terminate): Tidy up digest from context.
+	(librdf_storage_mysql_sync): Added to flush tables.  Now used
+	by librdf_storage_mysql_close.
+	(librdf_storage_mysql_size, librdf_storage_mysql_node_hash): Updated
+	for new schema.
+	(librdf_storage_mysql_start_bulk, librdf_storage_mysql_stop_bulk):
+	Added, to start and stop bulk op.
+	(librdf_storage_mysql_context_add_statements): Add bulk start
+	operations when enabled.
+	(librdf_storage_mysql_context_add_statement_helper,
+	librdf_storage_mysql_contains_statement,
+	librdf_storage_mysql_remove_statement): Docucomments.
+	Updated for new schema.
+	(librdf_storage_mysql_context_remove_statements):
+	Updated for new schema.
+	(librdf_storage_mysql_serialise,
+	librdf_storage_mysql_find_statements,
+	librdf_storage_mysql_find_statements_in_context): Docucomments
+	(librdf_storage_mysql_find_statements_with_options): Docucomments.
+	Updated for new schema.
+	(librdf_storage_mysql_find_statements_in_context_next_statement):
+	Add checking there is a statement to return.
+	(librdf_storage_mysql_get_contexts):
+	Updated for new schema.
+
 2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_query_rasqal.c, rdf_parser_raptor.c, rdf_node.c, rdf_log.c:

@@ -1,3 +1,36 @@
+2004-08-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_parser_raptor.c
+	(librdf_parser_raptor_parse_as_stream_common,
+	librdf_parser_raptor_parse_into_model_common): Add a length parameter,
+	calculate it if it is 0.
+	(librdf_parser_raptor_parse_uri_as_stream,
+	librdf_parser_raptor_parse_string_as_stream): Updates for change above.
+	(librdf_parser_raptor_parse_counted_string_as_stream,
+	librdf_parser_raptor_parse_counted_string_into_model): Added, taking
+	a counted string with length>0, calling one of the common functions
+	above.
+	(librdf_parser_raptor_register_factory): Register new methods.
+
+	* librdf/rdf_parser.c (librdf_parser_parse_counted_string_as_stream,
+	librdf_parser_parse_counted_string_into_model): Added, taking a
+	counted string with length>0, calling the new parser factory
+	methods.
+	(main): Test code updated to test rdfxml, ntriples and turtle
+	with four different parsing methods for one parser.  This
+	tests - a) memory model checks for same triples
+	b) parsing works with four methods
+	c) parsing with same parser multiple times works
+
+	* Redland.i: Added librdf_parser_parse_counted_string_as_stream and
+	librdf_parser_parse_counted_string_into_model
+
+	* librdf/rdf_parser.h: Added factory methods
+	parse_counted_string_into_model, parse_counted_string_as_stream as
+	variants of the uncounted versions.  Added prototypes for
+	librdf_parser_parse_counted_string_as_stream,
+	librdf_parser_parse_counted_string_into_model
+
 2004-07-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* raptor/raptor_internal.h:
