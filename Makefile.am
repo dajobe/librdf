@@ -50,7 +50,7 @@ EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
 README      NEWS      LICENSE.txt  TODO \
 README.html NEWS.html LICENSE.html TODO.html \
 RELEASE.html INSTALL.html FAQS.html \
-MPL.html \
+LICENSE-2.0.txt NOTICE \
 autogen.sh \
 Makefile.PL \
 redland-config.in \
