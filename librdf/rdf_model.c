@@ -1070,6 +1070,56 @@ librdf_model_get_storage(librdf_model *model)
 }
 
 
+/**
+ * librdf_model_find_statements_in_context - search the model for matching statements in a given context
+ * @model: &librdf_model object
+ * @statement: &librdf_statement partial statement to find
+ * @context_node: context &librdf_node (or NULL)
+ * 
+ * Searches the model for a (partial) statement as described in
+ * librdf_statement_match() in the given context and returns a
+ * &librdf_stream of matching &librdf_statement objects.  If
+ * context is NULL, this is equivalent to librdf_model_find_statements.
+ * 
+ * Return value: &librdf_stream of matching statements (may be empty) or NULL on failure
+ **/
+librdf_stream*
+librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* statement, librdf_node* context_node) 
+{
+  librdf_stream *stream;
+
+  if(model->factory->find_statements_in_context)
+    return model->factory->find_statements_in_context(model, statement, context_node);
+
+  stream=librdf_model_context_as_stream(model, context_node);
+  if(!stream)
+    return NULL;
+
+  librdf_stream_add_map(stream,
+                        &librdf_stream_statement_find_map,
+                        (librdf_stream_map_free_context_handler)&librdf_free_statement, (void*)statement);
+
+  return stream;
+}
+
+
+/**
+ * librdf_model_get_contexts - return the list of contexts in the graph
+ * @model: &librdf_model object
+ * 
+ * Returns an iterator of &librdf_node context nodes for each
+ * context in the graph.
+ *
+ * Return value: &librdf_iterator of context nodes or NULL on failure or if contexts are not supported
+ **/
+librdf_iterator*
+librdf_model_get_contexts(librdf_model* model) 
+{
+  if(model->factory->get_contexts)
+    return model->factory->get_contexts(model);
+  else
+    return NULL;
+}
 
 
 #endif
@@ -1298,6 +1348,27 @@ main(int argc, char *argv[])
   }
   librdf_free_node(n1);
   librdf_free_node(n2);
+
+
+  fprintf(stderr, "%s: Listing contexts\n", program);
+  iterator=librdf_model_get_contexts(model);
+  if(!iterator) {
+    fprintf(stderr, "%s: librdf_model_get_contexts failed (optional method)\n", program);
+  } else {
+    expected_count=2;
+    for(count=0; !librdf_iterator_end(iterator); librdf_iterator_next(iterator), count++) {
+      librdf_node* n=(librdf_node*)librdf_iterator_get_object(iterator);
+      fputs("  ", stderr);
+      librdf_node_print(n, stderr);
+      fputs("\n", stderr);
+    }
+    librdf_free_iterator(iterator);
+    if(count != expected_count) {
+      fprintf(stderr, "%s: librdf_model_get_contexts returned %d context nodes, expected %d\n", program, count, expected_count);
+      exit(1);
+    }
+  }
+
   
 
   for (i=0; i<URI_STRING_COUNT; i++) {
