@@ -973,7 +973,8 @@ if test $mysql_config = yes -a "X$MYSQL_CONFIG" = "X" ; then
   AC_CHECK_PROGS(MYSQL_CONFIG, mysql_config)
 fi
 
-libmysql_min_version=4.0.14
+libmysql_min_version=3.23.58
+# Also tested on 4.0.14
 
 if test "X$MYSQL_CONFIG" != X; then
   LIBS="$LIBRDF_LIBS `$MYSQL_CONFIG --libs|sed -e "s/'//g"`"
