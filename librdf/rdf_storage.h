@@ -103,6 +103,9 @@ struct librdf_storage_factory_s {
   
   /* create a new storage */
   int (*init)(librdf_storage* storage, char *name, librdf_hash* options);
+  
+  /* copy a storage */
+  int (*clone)(librdf_storage* new_storage, librdf_storage* old_storage);
 
   /* destroy a storage */
   void (*terminate)(librdf_storage* storage);
@@ -160,6 +163,7 @@ librdf_storage_factory* librdf_get_storage_factory(const char *name);
 
 /* constructor */
 librdf_storage* librdf_new_storage(char *storage_name, char *name, char *options_string);
+librdf_storage* librdf_new_storage_from_storage (librdf_storage* old_storage);
 librdf_storage* librdf_new_storage_from_factory(librdf_storage_factory* factory, char *name, librdf_hash* options);
 
 /* destructor */
