@@ -1,7 +1,12 @@
+*.sgml
 .cvsignore
 Makefile
 Makefile.in
-*.sgml
+README
+api
+api.junk
+gnome-doc
+kernel-doc
+overview.pdf
 overview.png
 overview.ps
-overview.pdf
