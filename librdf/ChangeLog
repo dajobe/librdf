@@ -1,4 +1,27 @@
-2004-11-10  cmdjb  <cmdjb@hedwig.dajobe.org>
+2004-11-22  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Makefile.am: Use STORAGE_ conditionals instead of @STORAGE_OBJS@
+
+	* rdf_storage.c: Delete rdf_storage_hashes.h and
+	rdf_storage_list.h includes, they are called from rdf_storage.h
+	already.
+	(librdf_init_storage) Use STORAGE_ defines.
+
+	* rdf_storage_sqlite.c: don't sleep now, this should be fixed later
+
+	* rdf_storage.h: Use STORAGE_ defines.
+	Delete rdf_storage_tstore.h and rdf_storage_mysql.h includes
+
+	* rdf_storage.c (librdf_init_storage):
+	Added call to librdf_init_storage_sqlite
+
+	* Makefile.am: Added rdf_storage_sqlite.c
+
+	* rdf_storage.h: added librdf_init_storage_sqlite prototype
+
+	* rdf_storage_sqlite.c: sqlite storage
+
+2004-11-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_serializer_raptor.c (librdf_serializer_raptor_set_namespace):
 	raptor_serialize_set_namespace, typo
