@@ -69,4 +69,8 @@ rdf_iterator* rdf_model_find_(rdf_model* model, rdf_node* subject, rdf_node* pro
 rdf_uri* rdf_model_get_source_uri(rdf_model* model);
 int rdf_model_set_source_uri(rdf_model* model, rdf_uri *uri);
 
+int rdf_model_add_submodel(rdf_model* model, rdf_model* sub_model);
+int rdf_model_remove_submodel(rdf_model* model, rdf_model* sub_model);
+
+
 #endif
