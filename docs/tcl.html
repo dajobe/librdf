@@ -11,7 +11,7 @@
 <h2>Installing the Redland Tcl interface</h2>
 
 <p>This is built if <tt>--with-tcl</tt> is given to the configure
-line, or <tt>--with-tcl=tclsh8.4</tt> to use a particular Tcl
+line, or <tt>--with-tcl=tclsh8.3</tt> to use a particular Tcl
 version/program.</p>
 
 <p.The Tcl shared library locations are discoverable but where the
@@ -36,8 +36,9 @@ API. You can also compile the Tcl interface by hand as follows:</p>
   root# make install
 </pre>
 
-<p>The Tcl interface has been tested with Tcl 8.4, 8.3 and 8.0.5.  It
-isalpha quality - the test and examples work.</p>
+<p>The Tcl interface has been tested with Tcl 8.3 and 8.0.5.  (8.4
+does not seem to work with the interface made from SWIG 1.3.19).  The
+TCL interface is isalpha quality - the test and examples work.</p>
 
 
 <h2>Redland Tcl API Introduction</h2>
