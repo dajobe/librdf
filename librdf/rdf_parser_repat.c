@@ -27,6 +27,10 @@
 #include <string.h>
 #include <stdarg.h>
 
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
 #ifdef STANDALONE
 #define LIBRDF_DEBUG 1
 #endif
