@@ -25,252 +25,239 @@ pre
 
 <p>This section is <b>draft</b> until 0.9.15 is released</p>
 
-<p>This version of Redland updates to use Raptor 1.1.0
-and ...
+<p>This version of Redland updates to use
+<a href="http://www.redland.opensource.ac.uk/raptor/">Raptor</a>
+1.2.0 (<a href="http://www.redland.opensource.ac.uk/raptor/NEWS.html">raptor news</a>)
+along with the new syntax
+<a href="http://www.ilrt.bristol.ac.uk/discovery/2004/01/turtle/">Turtle Terse RDF Triple Language</a>.
 </p>
+
+<p>Three new storage modules were added:</p>
+<ol>
+<li>MySQL written by Morten Frederiksen</li>
+<li> <a href="http://triplestore.aktors.org/">AKT Triplestore</a></li>
+<li>File and URI-backed store</li>
+</ol>
+
+<p>The runtime is now compiled with assertions to check for illegal
+use of NULL pointers in arguments, these will give warning messages
+(which can be disabled with <code>--disable-assert-messages</code>).
+The storage and model classes now track when open iterator and
+streams are operating on them and will not release resources until
+all the open iterators and streams are finished.
+</p>
+
 
 <h3>URI and Literal string type changes</h3>
 
-<p>Most of these changes are to properly use and return UTF-8 strings
-as <code>unsigned char*</code> for URIs (looking forward to
+<p>There are many changes are to properly use and return UTF-8
+strings as <code>unsigned char*</code> for URIs (looking forward to
 Internationalized Resource Identifiers, IRIs emerging) and for RDF
 literal strings, plus other fixes to work better with C++ correcting
 the use of <code>const</code>.  Redland and Raptor now both compile
-cleanly with g++.</p>
+cleanly with g++ 3.2, 3.3 and all warnings enabled.</p>
+
+
+<h3><code>rdfproc</code> RDF processor utility program changes</h3>
+
+<p><code>rdfproc</code> was extensively updated and it can now more
+easily work with any type of Redland store and has better
+support for working with contexts. The detailed changes are
+as follows:</p>
+
+<ul>
+<li>Added an -s TYPE option to specify a storage type</li>
+<li>Added an -t option for giving storage options</li>
+<li>Added an -p option to read the value of
+storage option <code>password</code> from standard input, to prevent
+exposing it as a parameter.</li>
+<li>The default of creating a new store was
+replaced; -n enables truncation or overwriting (the
+<code>write=yes</code> storage option).</li>
+<li> Now recognises <code>_:</code><em>abc</em> as blank node arguments.</li>
+<li>Parsing now return counts of errors and warnings if possible.</li>
+<li>The parse-stream command can take an optional context node</li>
+<li>Added a contexts command, to list the contexts in a model.</li>
+<li>Added support for environment variables RDFPROC_STORAGE_OPTIONS and
+RDFPROC_STORAGE_TYPE to provide default storage options (-t) and type (-s)</li>
+<li>Help message updated and correctly lists supported parsers</li>
+</ul>
+
+
+<h3>Configuration changes</h3>
+
+<p>Redland 0.9.15 requires Raptor 1.2.0 either installed otherwise
+the copy in the source tree will be installed.</p>
+
+<p><code>--with-mysql=</code><em>CONFIG</em> added to point to the
+mysql_config program for the MySQL backing store
+</p>
+
+<p><code>--with-threestore</code> added to enable the
+AKT Triplestore
+</p>
+
+<p><code>--disable-assert</code> added to disable
+compiling run-time assertions.
+</p>
+
+<p><code>--disable-assert-messages</code> added to disable
+compiling run-time assertion messages.
+</p>
+
 
 
 <h3>Model Class changes</h3>
 
 <p>Methods
-<code>add_string_literal_statement</code> and
-<code>add_typed_literal_statement</code>
+<code>librdf_model_add_string_literal_statement</code> and
+<code>librdf_model_add_typed_literal_statement</code>
 now take a <code>const unsigned char* string</code>.
 Method
-<code>query_string</code> now takes
+<code>librdf_model_query_string</code> now takes
 a <code>const unsigned char* string</code> query.
 </p>
 
-<!--<pre>
-Methods
--int librdf_model_add_string_literal_statement(librdf_model* model,
-   librdf_node* subject, librdf_node* predicate, char* string, char *xml_language, int is_wf_xml);
-+int librdf_model_add_string_literal_statement(librdf_model* model,
-   librdf_node* subject, librdf_node* predicate, const unsigned char* string, char *xml_language, int is_wf_xml);
+<p>New methods were added
+<code>librdf_model_find_statements_in_context</code>
+to search for a statement matching only in a particular context,
+<code>librdf_model_find_statements_with_options</code> to
+allow options with searching (none used at present),
+and <code>librdf_model_get_contexts</code> to
+list the context nodes in a graph.
+</p>
 
--int librdf_model_add_typed_literal_statement(librdf_model* model,
-   librdf_node* subject, librdf_node* predicate, char* string, char *xml_language, librdf_uri *datatype_uri);
-+int librdf_model_add_typed_literal_statement(librdf_model* model, 
-   librdf_node* subject, librdf_node* predicate, const unsigned char* string, char *xml_language, librdf_uri *datatype_uri);
-
--librdf_stream* librdf_model_query_string(librdf_model* model,
-   const char *name, librdf_uri* uri, const char *query_string);
-+librdf_stream* librdf_model_query_string(librdf_model* model,
-   const char *name, librdf_uri* uri, const unsigned char *query_string);
-</pre>-->
+<p>Methods <code>librdf_model_get_feature</code>,
+<code>librdf_model_set_feature</code> were modified to take and return
+<code>librdf_node*</code> values.
+</p>
 
 
 <h3>Node Class changes</h3>
 
 <p>Constructors
-<code>from_uri_string</code>,
-<code>from_uri_local_name</code> and
-<code>from_normalised_uri_string</code>
+<code>librdf_new_node_from_uri_string</code>,
+<code>librdf_new_node_from_uri_local_name</code> and
+<code>librdf_new_node_from_normalised_uri_string</code>
 now take a <code>const unsigned char*
 string</code> URI string.
 Constructors
-<code>from_literal</code> and
-<code>from_typed_literal</code>
+<code>librdf_new_node_from_literal</code> and
+<code>librdf_new_node_from_typed_literal</code>
 now take a <code>const unsigned char* string</code> RDF literal.
-Constructor <code>from_blank_identifier</code>
+Constructor <code>librdf_new_node_from_blank_identifier</code>
 now takes a <code>const unsigned char* string</code> blank node identifier.
 </p>
 
 <p>Methods
-<code>get_literal_value</code>,
-<code>get_literal_value_as_counted_string</code> and
-<code>get_blank_identifier</code>
+<code>librdf_node_get_literal_value</code>,
+<code>librdf_node_get_literal_value_as_counted_string</code> and
+<code>librdf_node_get_blank_identifier</code>
 now return a <code>const unsigned char* string</code> RDF literal,
 blank node identifier
 
 </p>
 
-<p>(Debugging methods
-<code>to_string</code> and <code>to_counted_string</code> now return a
+<p>(Debugging methods <code>librdf_node_to_string</code> and
+<code>librdf_node_to_counted_string</code>where changed to return a
 <code>const unsigned char* string</code>)
 </p>
-
-<!--<pre>
-Constructors
--librdf_node* librdf_new_node_from_uri_string(librdf_world* world,
-   const char *string);
-+librdf_node* librdf_new_node_from_uri_string(librdf_world* world,
-   const unsigned char *string);
-
--librdf_node* librdf_new_node_from_uri_local_name(librdf_world* world,
-   librdf_uri *uri, const char *local_name);
-+librdf_node* librdf_new_node_from_uri_local_name(librdf_world* world,
-   librdf_uri *uri, const unsigned char *local_name);
- 
--librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world,
-   const char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
-+librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world,
-   const unsigned char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
- 
--librdf_node* librdf_new_node_from_literal(librdf_world* world,
-   const char *string, const char *xml_language, int is_wf_xml);
-+librdf_node* librdf_new_node_from_literal(librdf_world* world,
-   const unsigned char *string, const char *xml_language, int is_wf_xml);
- 
--librdf_node* librdf_new_node_from_typed_literal(librdf_world *world,
-   const char *string, const char *xml_language,
-   librdf_uri* datatype_uri);
-+librdf_node* librdf_new_node_from_typed_literal(librdf_world *world,
-   const unsigned char *string, const char *xml_language,
-   librdf_uri* datatype_uri);
- 
--librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world,
-   const char *identifier);
-+librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world,
-   const unsigned char *identifier);
-
-
-Methods
--char* librdf_node_get_literal_value(librdf_node* node);
-+unsigned char* librdf_node_get_literal_value(librdf_node* node);
-
--char* librdf_node_get_literal_value_as_counted_string(librdf_node* node, 
-   size_t* len_p);
-+unsigned char* librdf_node_get_literal_value_as_counted_string(librdf_node* node,
-   size_t* len_p);
-
--char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
-+unsigned char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
-
--char *librdf_node_get_blank_identifier(librdf_node* node);
-+unsigned char *librdf_node_get_blank_identifier(librdf_node* node);
- 
--char *librdf_node_to_string(librdf_node* node);
-+unsigned char *librdf_node_to_string(librdf_node* node);
-
--char* librdf_node_to_counted_string(librdf_node* node, size_t* len_p);
-+unsigned char* librdf_node_to_counted_string(librdf_node* node, size_t* len_p);
-</pre>-->
 
 
 <h3>Parser Class changes</h3>
 
 <p>Methods
-<code>parse_string_as_stream</code> and
-<code>parse_string_into_model</code>
+<code>librdf_parser_parse_string_as_stream</code> and
+<code>librdf_parser_parse_string_into_model</code>
 now take a <code>const unsigned char* string</code> syntax buffer.
 </p>
 
-<!--<pre>
-Methods 
--librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser,
-   const char* string, librdf_uri* base_uri);
-+librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser,
-   const unsigned char* string, librdf_uri* base_uri);
-
--int librdf_parser_parse_string_into_model(librdf_parser* parser,
-   const char *string, librdf_uri* base_uri, librdf_model* model);
-+int librdf_parser_parse_string_into_model(librdf_parser* parser,
-   const unsigned char *string, librdf_uri* base_uri, librdf_model* model);
-</pre>-->
-
+<p>Methods
+<code>librdf_parser_get_feature</code>
+and <code>librdf_parser_set_feature</code>
+were modified to take and return <code>librdf_node*</code> values.
+</p>
 
 
 <h3>Query Class changes</h3>
 
-<p>Constructor
-<code>query</code> 
-now takes a <code>const unsigned char* string</code> query.
+<p>Constructor <code>librdf_new_query</code> now takes a <code>const
+unsigned char* string</code> query.
 </p>
 
-<!--<pre>
-Constructor
--librdf_query* librdf_new_query(librdf_world* world,
-   const char *name, librdf_uri* uri, const char *query_string);
-+librdf_query* librdf_new_query(librdf_world* world,
-   const char *name, librdf_uri* uri, const unsigned char *query_string);
-</pre>-->
+
+
+
+<h3>Serializer Class changes</h3>
+
+<p>Added methods <code>librdf_serializer_get_feature</code> and
+<code>librdf_serializer_set_feature</code> taking and returning
+<code>librdf_node*</code> values like the methods for the model and
+parser classes.
+</p>
 
 
 <h3>Statement Class changes</h3>
 
-<p>(Debugging method
-<code>to_string</code>
-now returns a <code>const unsigned char* string</code>)
+<p>(Debugging method <code>librdf_statement_to_string</code> now
+returns a <code>const unsigned char* string</code>)
 </p>
-
-<!--<pre>
-Methods
--char *librdf_statement_to_string(librdf_statement *statement);
-+unsigned char *librdf_statement_to_string(librdf_statement *statement);
-</pre>-->
 
 
 <h3>URI Class changes</h3>
 
 <p>Constructors
 <code>librdf_new_uri</code>, 
-...<code>from_uri_local_name</code>,
-... <code>normalised_to_base</code> and
-... <code>relative_to_base</code>.
+<code>librdf_new_uri_from_uri_local_name</code>,
+<code>librdf_new_uri_normalised_to_base</code> and
+<code>librdf_new_uri_relative_to_base</code>.
 now take a <code>const unsigned char* string</code> URI string.
 </p>
 
 <p>Methods
-<code>as_string</code>,
-<code>as_counted_string</code>,
-<code>to_string</code> and
-<code>to_counted_string</code>
+<code>librdf_uri_as_string</code>,
+<code>librdf_uri_as_counted_string</code>,
+<code>librdf_uri_to_string</code> and
+<code>librdf_uri_to_counted_string</code>
 now return a <code>const unsigned char* string</code> URI string.
 </p>
 
 
+<h3>Java API Changes</h3>
 
-<!--<pre>
-Constructors
--librdf_uri* librdf_new_uri (librdf_world *world,
-   const char *string);
-+librdf_uri* librdf_new_uri (librdf_world *world,
-   const unsigned char *string);
+<p>Updated to match API changes above.  Fixes for OSX 10.3</p>
 
--librdf_uri* librdf_new_uri_from_uri_local_name (librdf_uri* uri,
-   const char *local_name);
-+librdf_uri* librdf_new_uri_from_uri_local_name (librdf_uri* uri,
-   const unsigned char *local_name);
+<h3>Perl API changes</h3>
 
--librdf_uri* librdf_new_uri_normalised_to_base(const char *uri_string,
-   librdf_uri* source_uri, librdf_uri* base_uri);
-+librdf_uri* librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
-   librdf_uri* source_uri, librdf_uri* base_uri);
-
--librdf_uri* librdf_new_uri_relative_to_base(librdf_uri* base_uri,
-   const char *uri_string);
-+librdf_uri* librdf_new_uri_relative_to_base(librdf_uri* base_uri,
-   const unsigned char *uri_string);
+<p>Updated to match API changes above.  Fixes for perl 5.8.1 and
+later which changed how <code>MakeMaker</code> installed.  Let perl
+install the files rather than try to force it based on the prefix
+argument to configure.  Make Parser method parse_string_into_model
+call the correct Redland function.  Added OSX Java directories
+to JDK search path.</p>
 
 
-Methods
--char* librdf_uri_as_string (librdf_uri *uri);
-+unsigned char* librdf_uri_as_string (librdf_uri *uri);
+<h3>Python API changes</h3>
 
--char* librdf_uri_as_counted_string (librdf_uri *uri,
-   size_t *len_p);
-+unsigned char* librdf_uri_as_counted_string (librdf_uri *uri,
-   size_t *len_p);
+<p>Updated to match API changes above.  Fix Node literal_values
+to work with datatype URIs.  Export the NS class.  Added
+a FileStorage class for the storage type <code>file</code>.
+</p>
 
--char* librdf_uri_to_string (librdf_uri* uri);
-+unsigned char* librdf_uri_to_string (librdf_uri* uri);
+<h3>Ruby API changes</h3>
 
--char* librdf_uri_to_counted_string (librdf_uri* uri,
-   size_t* len_p);
-+unsigned char* librdf_uri_to_counted_string (librdf_uri* uri,
-   size_t* len_p);
-</pre>-->
+<p>Updated to match API changes above.</p>
 
+<h3>Tcl API changes</h3>
+
+<p>Updated to match API changes above.</p>
+
+
+<h3>Other changes</h3>
+
+<p>Redland now ships with both portable MD5 as well as (new in
+0.9.15) SHA1 digest implementations used if neither is available via
+an optimised library.</p>
 
 
 <h2 id="rel0_9_14"><a name="rel0_9_14">Redland 0.9.14 Changes</a></h2>
@@ -296,7 +283,7 @@ one (always present).</p>
 
 <h3>Hash Class changes</h3>
 
-<p>Added a librdf_hash_put_strings helper method to put a pair of
+<p>Added a <code>librdf_hash_put_strings</code> helper method to put a pair of
 string values into a hash.  Useful for making model or storage
 options.</p>
 
@@ -304,21 +291,23 @@ options.</p>
 
 <p>Resource (URI) / literal / blank nodes are now interned on
 construction so there is only one object for each distinct
-librdf_node object. This reduces memory and makes copying cheaper at
-the cost of an increase in construction cost.  Copying nodes is very
-common, since not only is it done for nodes but any time a statement
-is used or returned.  This interning was already done for the URI
-class but the change required librdf_node to be made immutable, which
-was done in 0.9.13.</p>
+<code>librdf_node</code> object. This reduces memory and makes
+copying cheaper at the cost of an increase in construction cost.
+Copying nodes is very common, since not only is it done for nodes but
+any time a statement is used or returned.  This interning was already
+done for the URI class but the change required
+<code>librdf_node</code> to be made immutable, which was done in
+0.9.13.</p>
 
 <h3>Storage Class changes</h3>
 
-<p>Added librdf_storage_context_as_stream deprecating
-librdf_storage_context_serialise to be consistent with the
+<p>Added <code>librdf_storage_context_as_stream</code> deprecating
+<code>librdf_storage_context_serialise</code> to be consistent with the
 *as_stream method name changes to model.</p>
 
-<p>Added librdf_new_storage_with_options taking an librdf_hash
-of options rather than the string of librdf_new_storage.</p>
+<p>Added <code>librdf_new_storage_with_options</code> taking an
+<code>librdf_hash*</code>
+of options rather than the string of <code>librdf_new_storage</code>.</p>
 
 <p>Added new optional storage factory methods context_add_statements
 and context_remove_statements.  If omitted, the storage class
@@ -348,7 +337,7 @@ librdf_short_copyright_string.</p>
 <h2 id="rel0_9_13"><a name="rel0_9_13">Redland 0.9.13 Changes</a></h2>
 
 <p>This version of Redland is a major update to 0.9.12 changing the
-node class.  librdf_node objects are now immutable once created,
+node class.  <code>librdf_node</code> objects are now immutable once created,
 higher-level language APIs no longer have deal with sharing or
 copying internals, some additional API support for parsing content
 from strings.</p>
@@ -392,32 +381,32 @@ the main C library.</p>
 
 <h3>Node Class changes</h3>
 
-<p>The librdf_node class was modifed to make objects immutable once
-constructed, they cannot be modified.  The following set methods were
-consequently removed.</p>
+<p>The <code>librdf_node</code> class was modifed to make objects
+immutable once constructed, they cannot be modified.  The following
+set methods were consequently removed.</p>
 
 <ul>
-<li>librdf_node_set_blank_identifier</li>
-<li>librdf_node_set_li_ordinal</li>
-<li>librdf_node_set_literal_value</li>
-<li>librdf_node_set_type</li>
-<li>librdf_node_set_typed_literal_value</li>
-<li>librdf_node_set_uri</li>
+<li><code>librdf_node_set_blank_identifier</code></li>
+<li><code>librdf_node_set_li_ordinal</code></li>
+<li><code>librdf_node_set_literal_value</code></li>
+<li><code>librdf_node_set_type</code></li>
+<li><code>librdf_node_set_typed_literal_value</code></li>
+<li><code>librdf_node_set_uri</code></li>
 </ul>
 
 <p>The following utility methods were added (covering
-all the librdf_node_get_type values):</p>
+all the <code>librdf_node_get_type</code> values):</p>
 
 <ul>
-<li>librdf_node_is_blank - return non-0 if the node is a blank node</li>
-<li>librdf_node_is_literal - return non-0 if the node is a literal</li>
-<li>librdf_node_is_resource - return non-0 if the node is a URI</li>
+<li><code>librdf_node_is_blank</code> - return non-0 if the node is a blank node</li>
+<li><code>librdf_node_is_literal</code> - return non-0 if the node is a literal</li>
+<li><code>librdf_node_is_resource</code> - return non-0 if the node is a URI</li>
 </ul>
 
 <p>(These are reflected into the same methods on
 the Perl, Python and Java node classes)</p>
 
-<p><code>LIBRDF_NODE_TYPE_LI</code> as returned by librdf_node_get_type
+<p><code>LIBRDF_NODE_TYPE_LI</code> as returned by <code>librdf_node_get_type</code>
 was deleted, it was never used.</p>
 
 <p>To support datatyped literals, the following method was added:</p>
@@ -429,36 +418,39 @@ was deleted, it was never used.</p>
 
 <h3>Model Class changes</h3>
 
-<p>Added librdf_model_sync to sync the model to the backing store.</p>
+<p>Added <code>ibrdf_model_sync</code> to sync the model to the backing store.</p>
 
-<p>Added librdf_model_as_stream and librdf_model_context_as_stream to
-replace librdf_model_context_serialise and
-librdf_model_context_serialize respectively.  This was done both to
-reduce the confusion with the librdf_serializer class and the mixture
-of US/UK spelling of that word.  The old functions will remain for now.
+<p>Added <code>librdf_model_as_stream</code> and
+<code>librdf_model_context_as_stream</code> to replace
+<code>librdf_model_context_serialise</code> and
+<code>librdf_model_context_serialize</code> respectively.  This was
+done both to reduce the confusion with the
+<code>librdf_serializer</code> class and the mixture of US/UK
+spelling of that word.  The old functions will remain for now.
 </p>
 
 
 
 <h3>Parser Class changes</h3>
 
-<p>Added librdf_parser_parse_string_as_stream and
-librdf_parser_parse_string_into_model to allow parsing content from
-strings.</p>
+<p>Added <code>librdf_parser_parse_string_as_stream</code> and
+<code>librdf_parser_parse_string_into_model</code> to allow parsing
+content from strings.</p>
 
 
 <h3>Statement Class changes</h3>
 
-<p>Added librdf_statement_is_complete to test if a statement has
-all the subject, predicate and object fields assigned.  Partial
-statements cannot be added to a model but can be used in
-matching statement queries with librdf_model_find_statements.</p>
+<p>Added <code>librdf_statement_is_complete</code> to test if a
+statement has all the subject, predicate and object fields assigned.
+Partial statements cannot be added to a model but can be used in
+matching statement queries with
+<code>librdf_model_find_statements</code>.</p>
 
 
 <h3>Storage Class changes</h3>
 
-<p>Added librdf_storage_sync to sync the backing store.  (This is
-slightly internal to Redland, you should not be calling this
+<p>Added <code>librdf_storage_sync</code> to sync the backing store.
+(This is slightly internal to Redland, you should not be calling this
 directly)</p>
 
 
@@ -585,8 +577,9 @@ includes directories.</p>
 <ul>
 <li>Added Sleepycat/BDB 4.0 and 4.1 support - the open API changed again</li>
 
-<li>Split the librdf_model class into model interface (librdf_model)
-and implementation class (librdf_model_storage).</li>
+<li>Split the <code>librdf_model</code> class into model interface
+(<code>librdf_model</code>) and implementation class
+(<code>librdf_model_storage</code>).</li>
 
 <li>Removed the old and outdated repat RDF parser.</li>
 
