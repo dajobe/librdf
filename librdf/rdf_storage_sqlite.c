@@ -293,7 +293,7 @@ sqlite_string_escape(const unsigned char *raw, size_t raw_len, size_t *len_p)
 
 
 static int
-librdf_storage_sqlite_EXEC(librdf_storage* storage, 
+librdf_storage_sqlite_exec(librdf_storage* storage, 
                            unsigned char *request,
                            sqlite_callback callback, void *arg,
                            int fail_ok)
@@ -346,7 +346,7 @@ librdf_storage_sqlite_set_helper(librdf_storage *storage,
                                             (const unsigned char*)");", 2, 1);
   request=raptor_stringbuffer_as_string(sb);
 
-  rc=librdf_storage_sqlite_EXEC(storage,
+  rc=librdf_storage_sqlite_exec(storage,
                                 request,
                                 NULL, /* no callback */
                                 NULL, /* arg */
@@ -383,7 +383,7 @@ librdf_storage_sqlite_get_helper(librdf_storage *storage,
                                             (const unsigned char*)";", 1, 1);
   request=raptor_stringbuffer_as_string(sb);
 
-  rc=librdf_storage_sqlite_EXEC(storage,
+  rc=librdf_storage_sqlite_exec(storage,
                                 request,
                                 librdf_storage_sqlite_get_1int_callback,
                                 &id,
@@ -661,7 +661,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 
 #if 0
       sprintf((char*)request, "DROP TABLE %s;", sqlite_tables[i].name);
-      librdf_storage_sqlite_EXEC(storage,
+      librdf_storage_sqlite_exec(storage,
                                  request,
                                  NULL, /* no callback */
                                  NULL, /* arg */
@@ -671,7 +671,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
       sprintf((char*)request, "CREATE TABLE %s (%s);",
               sqlite_tables[i].name, sqlite_tables[i].schema);
       
-      if(librdf_storage_sqlite_EXEC(storage,
+      if(librdf_storage_sqlite_exec(storage,
                                     request,
                                     NULL, /* no callback */
                                     NULL, /* arg */
@@ -683,7 +683,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 
     strcpy((char*)request, 
            "CREATE INDEX spindex ON triples (subjectUri, subjectBlank, predicateUri);");
-    if(librdf_storage_sqlite_EXEC(storage,
+    if(librdf_storage_sqlite_exec(storage,
                                   request,
                                   NULL, /* no callback */
                                   NULL, /* arg */
@@ -692,7 +692,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
     
     strcpy((char*)request, 
            "CREATE INDEX uriindex ON uris (uri);");
-    if(librdf_storage_sqlite_EXEC(storage,
+    if(librdf_storage_sqlite_exec(storage,
                                   request,
                                   NULL, /* no callback */
                                   NULL, /* arg */
@@ -732,7 +732,7 @@ librdf_storage_sqlite_size(librdf_storage* storage)
 {
   int count=0;
   
-  if(librdf_storage_sqlite_EXEC(storage,
+  if(librdf_storage_sqlite_exec(storage,
                                 (unsigned char*)"SELECT COUNT(*) FROM triples;",
                                 librdf_storage_sqlite_get_1int_callback,
                                 &count,
@@ -817,7 +817,7 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
     
     request=raptor_stringbuffer_as_string(sb);
 
-    rc=librdf_storage_sqlite_EXEC(storage,
+    rc=librdf_storage_sqlite_exec(storage,
                                   request,
                                   NULL, /* no callback */
                                   NULL, /* arg */
@@ -883,7 +883,7 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_stateme
           fields[TRIPLE_PREDICATE], node_ids[TRIPLE_PREDICATE],
           fields[TRIPLE_OBJECT], node_ids[TRIPLE_OBJECT]);
   
-  if(librdf_storage_sqlite_EXEC(storage,
+  if(librdf_storage_sqlite_exec(storage,
                                 request,
                                 librdf_storage_sqlite_get_1int_callback,
                                 &count,
@@ -1614,7 +1614,7 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   
   request=raptor_stringbuffer_as_string(sb);
   
-  rc=librdf_storage_sqlite_EXEC(storage,
+  rc=librdf_storage_sqlite_exec(storage,
                                 request,
                                 NULL, /* no callback */
                                 NULL, /* arg */
