@@ -28,7 +28,7 @@ man_MANS = redland-config.1
 SUBDIRS=@SD_PRE@ librdf examples utils @SD_POST@ demos docs data
 CONFIG_SUBDIRS=raptor rasqal
 # Subdirectories to use for distribution
-DIST_SUBDIRS=librdf docs examples \
+DIST_SUBDIRS=librdf docs data examples \
 perl php python tcl java ruby csharp \
 raptor rasqal \
 utils demos
