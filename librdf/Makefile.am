@@ -85,7 +85,7 @@ rdf_parser_sirpac.c rdf_parser_libwww.c \
 rdf_parser_raptor.c \
 rdf_parser_repat.c
 
-EXTRA_DIST=ChangeLog \
+EXTRA_DIST=\
 README      NEWS      TODO      LICENSE.txt \
 README.html NEWS.html TODO.html LICENSE.html \
 INSTALL.html FAQS.html MPL.html \
