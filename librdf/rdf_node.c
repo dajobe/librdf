@@ -791,15 +791,35 @@ librdf_node_set_blank_identifier(librdf_node* node, const char *identifier)
 char*
 librdf_node_to_string(librdf_node* node) 
 {
+  return librdf_node_to_counted_string(node, NULL);
+}
+
+
+/**
+ * librdf_node_to_counted_string - Format the node as a counted string
+ * @node: the node object
+ * @len_p: pointer to location to store length
+ * 
+ * Note a new string is allocated which must be freed by the caller.
+ * 
+ * Return value: a string value representing the node or NULL on failure
+ **/
+char*
+librdf_node_to_counted_string(librdf_node* node, size_t* len_p) 
+{
   char *uri_string;
+  size_t len;
   char *s;
 
   switch(node->type) {
   case LIBRDF_NODE_TYPE_RESOURCE:
-    uri_string=librdf_uri_to_string(node->value.resource.uri);
+    uri_string=librdf_uri_to_counted_string(node->value.resource.uri, &len);
     if(!uri_string)
       return NULL;
-    s=(char*)LIBRDF_MALLOC(cstring, strlen(uri_string)+3);
+    len +=2;
+    if(len_p)
+      *len_p=len;
+    s=(char*)LIBRDF_MALLOC(cstring, len+1);
     if(!s) {
       LIBRDF_FREE(cstring, uri_string);
       return NULL;
@@ -808,14 +828,20 @@ librdf_node_to_string(librdf_node* node)
     LIBRDF_FREE(cstring, uri_string);
     break;
   case LIBRDF_NODE_TYPE_LITERAL:
-    s=(char*)LIBRDF_MALLOC(cstring, node->value.literal.string_len + 1);
+    len=node->value.literal.string_len;
+    if(len_p)
+      *len_p=len;
+    s=(char*)LIBRDF_MALLOC(cstring, len+1);
     if(!s)
       return NULL;
     /* use strcpy here to add \0 to end of literal string */
     strcpy(s, node->value.literal.string);
     break;
   case LIBRDF_NODE_TYPE_BLANK:
-    s=(char*)LIBRDF_MALLOC(cstring, node->value.blank.identifier_len + 3);
+    len=node->value.blank.identifier_len + 2;
+    if(len_p)
+      *len_p=len;
+    s=(char*)LIBRDF_MALLOC(cstring, len+1);
     if(!s)
       return NULL;
     sprintf(s, "(%s)", node->value.blank.identifier);
@@ -983,8 +1009,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
   
   switch(node->type) {
     case LIBRDF_NODE_TYPE_RESOURCE:
-      string=(unsigned char*)librdf_uri_as_string(node->value.resource.uri);
-      string_length=strlen((char*)string);
+      string=(unsigned char*)librdf_uri_as_counted_string(node->value.resource.uri, &string_length);
       
       total_length= 3 + string_length + 1; /* +1 for \0 at end */
       
@@ -1033,8 +1058,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       if(node->value.literal.xml_language)
         language_length=strlen(node->value.literal.xml_language);
       if(node->value.literal.datatype_uri) {
-        datatype_uri_string=librdf_uri_as_string(node->value.literal.datatype_uri);
-        datatype_uri_length=strlen(datatype_uri_string);
+        datatype_uri_string=librdf_uri_as_counted_string(node->value.literal.datatype_uri, &datatype_uri_length);
       }
       
       total_length= 6 + string_length + 1; /* +1 for \0 at end */
