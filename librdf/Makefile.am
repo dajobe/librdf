@@ -98,7 +98,7 @@ librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
-rdf_query_test rdf_serializer_test
+rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test
 
 CLEANFILES=$(TESTS) test.db test1.db
 MAINTAINERCLEANFILES=$(JAVA_CLASSES)
@@ -180,6 +180,12 @@ rdf_query_test: rdf_query.c librdf.la
 
 rdf_serializer_test: rdf_serializer.c librdf.la
 	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_serializer.c librdf.la $(LIBS)
+
+rdf_stream_test: rdf_stream.c librdf.la
+	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_stream.c librdf.la $(LIBS)
+
+rdf_iterator_test: rdf_iterator.c librdf.la
+	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_iterator.c librdf.la $(LIBS)
 
 # The action is the COMPILE definition but always using least warning CFLAGS
 @MAINT@rdf_parser_libwww.o: rdf_parser_libwww.c
