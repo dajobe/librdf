@@ -543,6 +543,30 @@ main(int argc, char *argv[])
 
   librdf_free_query_results(results);
 
+
+  fprintf(stdout, "%s: Executing a second time\n", program);
+  if(!(results=librdf_model_query_execute(model, query))) {
+    fprintf(stderr, "%s: Second query of model with '%s' failed\n", 
+            program, query_string);
+    return 1;
+  }
+
+  librdf_uri* format_uri=librdf_new_uri(world, (unsigned const char*)"http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/");
+  size_t string_length=0;
+  unsigned char *string;
+
+  string=librdf_query_results_to_counted_string(results, 
+                                                format_uri, NULL,
+                                                &string_length);
+  fprintf(stdout, "%s: Got query results string of length %d\n", program,
+          string_length);
+
+  librdf_free_uri(format_uri);
+  free(string);
+  
+  librdf_free_query_results(results);
+
+
   fprintf(stdout, "%s: Freeing query\n", program);
   librdf_free_query(query);
 
