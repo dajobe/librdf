@@ -188,13 +188,13 @@ if (swig -help) </dev/null >/dev/null 2>&1; then
 
   if test $swig_version_dec -lt $swig_min_version_dec; then
     echo "$program: ERROR: \`swig' is too old."
-    echo "           (version swig_vers or newer is required)"
+    echo "           (version $swig_min_vers or newer is required)"
     DIE="yes"
   fi
 else
     echo
     echo "$program: ERROR: You must have \`swig' installed to compile $PACKAGE."
-    echo "           (version $swig_vers or newer is required)"
+    echo "           (version $swig_min_vers or newer is required)"
     DIE="yes"
 fi
 
