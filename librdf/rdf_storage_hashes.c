@@ -96,10 +96,11 @@ typedef struct
   librdf_hash  *options;     /* remaining options for hash open method */
 
   /* internals */
-  int           hash_count; /* how many hashes are present? STATIC */
-  librdf_hash* hashes[NUMBER_OF_HASHES]; /* here they are in a STATIC array */
-  const librdf_hash_descriptor *hash_descriptions; /* points to STATIC hash_descriptions above - FIXME */
-  char* names[NUMBER_OF_HASHES];       /* hash names for hash open method */
+  int                      hash_count; /* how many hashes are present? */
+  /* The following are allocated arrays of size hash_count */
+  librdf_hash**            hashes;
+  librdf_hash_descriptor** hash_descriptions;
+  char**                   names;       /* hash names for hash open method */
 
   int sources_index;
   int arcs_index;
@@ -173,7 +174,6 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
                                   librdf_hash* options)
 {
   librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
-  const librdf_hash_descriptor *desc;
   int i;
   int status;
   
@@ -183,18 +183,45 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
   context->mode=mode;
   context->is_writable=is_writable;
   context->is_new=is_new;
-
-  context->hash_count=NUMBER_OF_HASHES;
-  desc=context->hash_descriptions=librdf_storage_hashes_descriptions;
-
   context->options=options;
+  
+  context->hash_count=NUMBER_OF_HASHES;
+
+  context->hashes=(librdf_hash**)LIBRDF_CALLOC(librdf_hash, context->hash_count, sizeof(librdf_hash*));
+  if(!context->hashes)
+    return 1;
+
+  context->hash_descriptions=(librdf_hash_descriptor**)LIBRDF_CALLOC(librdf_hash_descriptor, context->hash_count, sizeof(librdf_hash_descriptor*));
+  if(!context->hash_descriptions) {
+    LIBRDF_FREE(librdf_hash, context->hashes);
+    return 1;
+  }
+  
+  context->names=(char**)LIBRDF_CALLOC(cstring, context->hash_count, sizeof(char*));
+  if(!context->names) {
+    LIBRDF_FREE(librdf_hash, context->hashes);
+    LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions);
+    return 1;
+  }
   
   status=0;
   for(i=0; i<context->hash_count; i++) {
     int len;
     char *full_name;
+
+    librdf_hash_descriptor *desc=(librdf_hash_descriptor*)LIBRDF_MALLOC(librdf_hash_descriptor, sizeof(librdf_hash_descriptor));
+
+    if(!desc) {
+      status=1;
+      break;
+    }
+
+
+    memcpy(desc, &librdf_storage_hashes_descriptions[i], sizeof(librdf_hash_descriptor));
     
-    len=strlen(desc[i].name) + 1 + strlen(name) + 1; /* "%s-%s\0" */
+    context->hash_descriptions[i]=desc;
+    
+    len=strlen(desc->name) + 1 + strlen(name) + 1; /* "%s-%s\0" */
     if(context->db_dir)
       len+=strlen(context->db_dir) +1;
       
@@ -206,9 +233,9 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
 
     /* FIXME: Implies Unix filenames */
     if(context->db_dir)
-      sprintf(full_name, "%s/%s-%s", context->db_dir, name, desc[i].name);
+      sprintf(full_name, "%s/%s-%s", context->db_dir, name, desc->name);
     else
-      sprintf(full_name, "%s-%s", name, desc[i].name);
+      sprintf(full_name, "%s-%s", name, desc->name);
 
     context->hashes[i]=librdf_new_hash(storage->world, context->hash_type);
     if(!context->hashes[i]) {
@@ -229,8 +256,8 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
   context->groups_index= -1;
 #endif
   for(i=0; i<context->hash_count; i++) {
-    int key_fields=context->hash_descriptions[i].key_fields;
-    int value_fields=context->hash_descriptions[i].value_fields;
+    int key_fields=context->hash_descriptions[i]->key_fields;
+    int value_fields=context->hash_descriptions[i]->value_fields;
     
     if(key_fields == (LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_PREDICATE) &&
        value_fields == LIBRDF_STATEMENT_OBJECT) {
@@ -254,11 +281,16 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
 
   if(status) {
     for(i=0; i<context->hash_count; i++) {
+      if(context->hash_descriptions[i])
+        LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions[i]);
       if(context->hashes[i]) {
         librdf_free_hash(context->hashes[i]);
         context->hashes[i]=NULL;
       }
     }
+    LIBRDF_FREE(librdf_hash, context->hashes);
+    LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions);
+    LIBRDF_FREE(cstring, context->names);
   }
   
   /* on success or failure - don't need the passed in options */
@@ -313,11 +345,22 @@ librdf_storage_hashes_terminate(librdf_storage* storage)
   int i;
   
   for(i=0; i<context->hash_count; i++) {
+    if(context->hash_descriptions[i])
+      LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions[i]);
     if(context->hashes[i])
       librdf_free_hash(context->hashes[i]);
     if(context->names[i])
       LIBRDF_FREE(cstring,context->names[i]);
   }
+
+  if(context->hash_descriptions)
+    LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions);
+
+  if(context->hashes)
+    LIBRDF_FREE(librdf_hash_descriptor, context->hashes);
+
+  if(context->names)
+    LIBRDF_FREE(cstring, context->names);
 
   if(context->options)
     librdf_free_hash(context->options);
@@ -455,7 +498,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
 
     /* ENCODE KEY */
 
-    int fields=context->hash_descriptions[i].key_fields;
+    int fields=context->hash_descriptions[i]->key_fields;
     if(!fields)
       continue;
     
@@ -477,7 +520,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     
     /* ENCODE VALUE */
     
-    fields=context->hash_descriptions[i].value_fields;
+    fields=context->hash_descriptions[i]->value_fields;
     if(!fields)
       continue;
     
@@ -579,7 +622,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   int status;
   
   /* ENCODE KEY */
-  fields=context->hash_descriptions[hash_index].key_fields;
+  fields=context->hash_descriptions[hash_index]->key_fields;
   key_len=librdf_statement_encode_parts(statement, NULL, 0, fields);
   if(!key_len)
     return 1;
@@ -593,7 +636,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   }
 
   /* ENCODE VALUE */
-  fields=context->hash_descriptions[hash_index].value_fields;
+  fields=context->hash_descriptions[hash_index]->value_fields;
   value_len=librdf_statement_encode_parts(statement, NULL, 0, fields);
   if(!value_len) {
     LIBRDF_FREE(data, key_buffer);
@@ -997,7 +1040,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
 
 
   /* ENCODE KEY */
-  fields=scontext->hash_descriptions[hash_index].key_fields;
+  fields=scontext->hash_descriptions[hash_index]->key_fields;
   icontext->key.size=librdf_statement_encode_parts(&icontext->statement, 
                                                    NULL, 0, fields);
   if(!icontext->key.size) {
