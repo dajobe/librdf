@@ -261,7 +261,7 @@ done
 
 rm -f config.cache
 
-conf_flags=
+conf_flags="--enable-maintainer-mode"
 
 AUTOMAKE=$automake
 AUTOCONF=$autoconf
