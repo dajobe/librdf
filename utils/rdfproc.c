@@ -722,6 +722,7 @@ main(int argc, char *argv[])
               fprintf(stdout, "%s=", names[i]);
               if(values[i]) {
                 librdf_node_print(values[i], stdout);
+                librdf_free_node(values[i]);
               } else
                 fputs("NULL", stdout);
               if(names[i+1])

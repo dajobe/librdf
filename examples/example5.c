@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * example5.c - Redland example code using quering
+ * example5.c - Redland example code using querying
  *
  * $Id$
  *
@@ -89,6 +89,7 @@ main(int argc, char *argv[])
         fprintf(stdout, "%s=", names[i]);
         if(values[i]) {
           librdf_node_print(values[i], stdout);
+          librdf_free_node(values[i]);
         } else
           fputs("NULL", stdout);
         if(names[i+1])
