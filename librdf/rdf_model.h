@@ -113,6 +113,12 @@ int librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model);
 
 void librdf_model_print(librdf_model *model, FILE *fh);
 
+/* statement groups */
+int librdf_model_add_statements_group(librdf_model* model, librdf_uri* group_uri, librdf_stream* stream);
+int librdf_model_remove_statements_group(librdf_model* model, librdf_uri* group_uri);
+
+
+
 #ifdef __cplusplus
 }
 #endif
