@@ -72,6 +72,15 @@ struct librdf_storage_factory_s {
   
   /* serialise the results of a query */
   librdf_stream* (*find_statements)(librdf_storage* storage, librdf_statement* statement);
+
+  /* return a list of Nodes marching given arc, target */
+  librdf_iterator* (*find_sources)(librdf_storage* storage, librdf_node *arc, librdf_node *target);
+
+  /* return a list of Nodes marching given source, target */
+  librdf_iterator* (*find_arcs)(librdf_storage* storage, librdf_node *source, librdf_node *target);
+
+  /* return a list of Nodes marching given source, target */
+  librdf_iterator* (*find_targets)(librdf_storage* storage, librdf_node *source, librdf_node *target);
 };
 
 typedef struct librdf_storage_factory_s librdf_storage_factory;
@@ -108,7 +117,9 @@ int librdf_storage_remove_statement(librdf_storage* storage, librdf_statement* s
 int librdf_storage_contains_statement(librdf_storage* storage, librdf_statement* statement);
 librdf_stream* librdf_storage_serialise(librdf_storage* storage);
 librdf_stream* librdf_storage_find_statements(librdf_storage* storage, librdf_statement* statement);
-
+librdf_iterator* librdf_storage_get_sources(librdf_storage *storage, librdf_node *arc, librdf_node *target);
+librdf_iterator* librdf_storage_get_arcs(librdf_storage *storage, librdf_node *source, librdf_node *target);
+librdf_iterator* librdf_storage_get_targets(librdf_storage *storage, librdf_node *source, librdf_node *arc);
 
 
 #ifdef __cplusplus
