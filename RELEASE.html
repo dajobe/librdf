@@ -34,10 +34,15 @@ along with the new syntax
 
 <p>Three new storage modules were added:</p>
 <ol>
-<li>MySQL store written by <a href="http://purl.org/net/morten/">Morten Frederiksen</a> supporting the entire storage API include full contexts support.</li>
+<li><a href="http://www.mysql.com/">MySQL</a> store written by <a href="http://purl.org/net/morten/">Morten Frederiksen</a> supporting the entire storage API include full contexts support.</li>
 <li><a href="http://triplestore.aktors.org/">AKT Triplestore</a> using MySQL inside 3store</li>
 <li>File and URI-backed in-memory store - read/write file, read only URI.</li>
 </ol>
+
+<p>The details of these modules are explained in much greater detail
+in the <a href="docs/storage.html">storage modules</a> overview
+including the features that they support.
+</p>
 
 <p>The runtime is now compiled with assertions to check for illegal
 use of NULL pointers in arguments, these will give warning messages
