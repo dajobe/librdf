@@ -200,6 +200,8 @@ LIBRDF_INTERNAL_LIBS=
 LIBRDF_XML_CPPFLAGS=
 # -lexpatname
 LIBRDF_XML_LIBS=
+# XML objects that must be linked into the raptor library (expat usually)
+LIBRDF_XML_OBJS=
 
 
 dnl Checks for libraries.
@@ -936,11 +938,9 @@ if test $need_expat = 1; then
   if test $need_expat_source = 1; then
     SD="$SD expat"
     c="-I\$(top_srcdir)/expat/xmlparse"
-    l="\$(top_builddir)/expat/xmlparse/libxmlparse.la \$(top_builddir)/expat/xmltok/libxmltok.la"
     LIBRDF_CPPFLAGS="$c $LIBRDF_CPPFLAGS"
-    LIBRDF_LIBS="$l $LIBRDF_LIBS"
     LIBRDF_XML_CPPFLAGS="$c $LIBRDF_XML_CPPFLAGS"
-    LIBRDF_XML_LIBS="$l $LIBRDF_XML_LIBS"
+    LIBRDF_XML_OBJS="\$(top_builddir)/expat/xmlparse/xmlparse.lo \$(top_builddir)/expat/xmlparse/hashtable.lo \$(top_builddir)/expat/xmltok/xmlrole.lo \$(top_builddir)/expat/xmltok/xmltok.lo"
     REPAT_FLAGS="$REPAT_FLAGS -I\$(top_srcdir)/expat/xmlparse"
 
     AC_DEFINE(NEED_EXPAT_SOURCE)
@@ -952,10 +952,12 @@ if test $need_expat = 1; then
     # We know local expat sources has XML_SetNamespaceDeclHandler already
     found=yes
   else
-    LIBS="$expat_libs $LIBS"
+    LIBRDF_LIBS="$expat_libs $LIBRDF_LIBS"
     LIBRDF_XML_LIBS="$expat_libs $LIBRDF_XML_LIBS"
     found=no
   fi
+
+  LIBS=$LIBRDF_LIBS
 
   AC_MSG_CHECKING(for XML_SetNamespaceDeclHandler in expat)
   if test $found = yes; then
@@ -1010,6 +1012,7 @@ LDFLAGS=
 
 AC_SUBST(LIBRDF_XML_CPPFLAGS)
 AC_SUBST(LIBRDF_XML_LIBS)
+AC_SUBST(LIBRDF_XML_OBJS)
 
 AC_SUBST(LIBRDF_INTERNAL_CPPFLAGS)
 AC_SUBST(LIBRDF_INTERNAL_LIBS)
