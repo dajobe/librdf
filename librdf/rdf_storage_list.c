@@ -123,6 +123,9 @@ librdf_storage_list_node_equals(librdf_storage_list_node *first,
 {
   if(!librdf_statement_equals(first->statement, second->statement))
     return 0;
+
+  if(!first->context && !second->context)
+    return 1;
   
   if(!librdf_node_equals(first->context, second->context))
     return 0;
