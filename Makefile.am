@@ -22,6 +22,8 @@
 bin_SCRIPTS = redland-config
 noinst_SCRIPTS = redland-src-config
 
+man_MANS = redland-config.1
+
 # Subdirectories to build/install etc.
 SUBDIRS=@SD@ repat raptor librdf examples utils
 CONFIG_SUBDIRS=raptor
