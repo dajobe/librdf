@@ -5,7 +5,7 @@
 # $Id$
 #
 
-EXAMPLES=example1 example2 example3
+EXAMPLES=example1 example2 example3 example4
 DBUS_EXAMPLES=redland_dbus
 
 EXTRA_PROGRAMS = $(EXAMPLES) $(DBUS_EXAMPLES)
@@ -22,6 +22,8 @@ example1_SOURCES = example1.c
 example2_SOURCES = example2.c
 
 example3_SOURCES = example3.c
+
+example4_SOURCES = example4.c
 
 
 redland_dbus_SOURCES = redland_dbus.c
