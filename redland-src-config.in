@@ -121,5 +121,5 @@ if test "$echo_cflags" = "yes"; then
   echo -I@abs_top_srcdir@/librdf `$rasqal_config --cflags` `$raptor_config --cflags`
 fi
 if test "$echo_libs" = "yes"; then
-  echo -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ `$rasqal_config --libs` `$raptor_config --cflags`
+  echo -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ `$rasqal_config --libs` `$raptor_config --cflags`
 fi
