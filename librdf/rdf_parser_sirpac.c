@@ -91,6 +91,7 @@
 #include <rdf_node.h>
 #include <rdf_stream.h>
 #include <rdf_statement.h>
+#include <rdf_concepts.h>
 
 
 
@@ -106,10 +107,14 @@ static void librdf_parser_sirpac_serialise_finished(void* context);
 
 
 /*
- * SiRPAC parser context- not used at present
+ * SiRPAC parser context
  */
 typedef struct {
-  char dummy;
+  librdf_parser *parser;
+  int sirpac_flavour;                /* 0 = W3C 1 = Stanford */
+  const char *command_format_string; /* command to run with 2-%s for arg, URI */
+  int feature_aboutEach;             /* non 0 if rdf:aboutEach supported */
+  int feature_aboutEachPrefix;       /* non 0 if rdf:aboutEachPrefix supported */
 } librdf_parser_sirpac_context;
 
 
@@ -118,6 +123,7 @@ typedef struct {
  * of statements from parsing the output of the java command
  */
 typedef struct {
+  librdf_parser_sirpac_context *pcontext;
   librdf_uri* uri;          /* source */
   librdf_uri* base_uri;     /* base URI */
   char *command;            /* command invoked ... */
@@ -128,17 +134,53 @@ typedef struct {
 
 
 
+#ifdef JAVA_SIRPACSTANFORD_JAR
+#ifdef JAVA_SAX_JAR
+static const char *librdf_parser_sirpac_stanford_command_format_string= JAVA_COMMAND " -classpath " JAVA_CLASS_DIR ":" JAVA_SIRPACSTANFORD_JAR ":" JAVA_SAX_JAR" -Dorg.xml.sax.parser=" JAVA_SAX_CLASS " PrintParser %s %s";
+#else
+static const char *librdf_parser_sirpac_stanford_command_format_string= JAVA_COMMAND " -classpath " JAVA_CLASS_DIR ":" JAVA_SIRPACSTANFORD_JAR " -Dorg.xml.sax.parser=" JAVA_SAX_CLASS " PrintParser %s %s";
+#endif
+
 /**
- * librdf_parser_sirpac_init - Initialise the SiRPAC RDF parser
+ * librdf_parser_sirpac_stanford_init - Initialise the SiRPAC (Stanford) RDF parser
+ * @parser: the parser
  * @context: context
  *
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_sirpac_init(void *context) 
+librdf_parser_sirpac_stanford_init(librdf_parser* parser, void *context) 
 {
+  librdf_parser_sirpac_context* pcontext=(librdf_parser_sirpac_context*)context;
+  pcontext->parser = parser;
+  pcontext->sirpac_flavour=1;
+  pcontext->command_format_string=librdf_parser_sirpac_stanford_command_format_string;
   return 0;
 }
+
+#endif
+
+
+#ifdef JAVA_SIRPACW3C_JAR
+static const char *librdf_parser_sirpac_w3c_command_format_string=JAVA_COMMAND " -classpath " JAVA_CLASS_DIR ":" JAVA_SIRPACW3C_JAR ":" JAVA_SAX_JAR " -Dorg.xml.sax.parser=" JAVA_SAX_CLASS " PrintParser %s %s";
+
+/**
+ * librdf_parser_sirpac_w3c_init - Initialise the SiRPAC (W3C) RDF parser
+ * @parser: the parser
+ * @context: context
+ *
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_parser_sirpac_w3c_init(librdf_parser* parser, void *context) 
+{
+  librdf_parser_sirpac_context* pcontext=(librdf_parser_sirpac_context*)context;
+  pcontext->parser = parser;
+  pcontext->sirpac_flavour=0;
+  pcontext->command_format_string=librdf_parser_sirpac_w3c_command_format_string;
+  return 0;
+}
+#endif
   
 
 /**
@@ -147,47 +189,52 @@ librdf_parser_sirpac_init(void *context)
  * @uri: URI of RDF content
  * @base_uri: the base URI to use (or NULL if the same)
  * 
- * FIXME: No error reporting provided 
- *
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
 static librdf_stream*
 librdf_parser_sirpac_parse_uri_as_stream(void *context, librdf_uri *uri,
                                          librdf_uri *base_uri) {
-  /* Note: not yet used */
-/*  librdf_parser_sirpac_context* pcontext=(librdf_parser_sirpac_context*)context; */
+  librdf_parser_sirpac_context* pcontext=(librdf_parser_sirpac_context*)context;
   librdf_parser_sirpac_stream_context* scontext;
   librdf_stream* stream;
   int command_len;
   char *command;
   FILE *fh;
-  static const char *command_format_string="%s -classpath " JAVA_CLASS_DIR ":%s -Dorg.xml.sax.parser=com.microstar.xml.SAXDriver PrintParser %s";
   char *uri_string;
+  char *streaming_arg;
 
   scontext=(librdf_parser_sirpac_stream_context*)LIBRDF_CALLOC(librdf_parser_sirpac_stream_context, 1, sizeof(librdf_parser_sirpac_stream_context));
   if(!scontext)
     return NULL;
+  
+  scontext->pcontext=pcontext;
 
   scontext->uri=uri;
   scontext->base_uri=base_uri;
   
   uri_string=librdf_uri_as_string(uri);
 
-  /* strlen(format_string) is 3 chars too long (%s * 3) and 1 char
-   * too short (\0 at end of new string), so take 2 chars off length 
+  streaming_arg=(!scontext->pcontext->feature_aboutEach &&
+                 !scontext->pcontext->feature_aboutEachPrefix) ?
+                 "--streaming" : "--static";
+
+  /* strlen(format_string) is 2 chars too long because 2x %s and 1 char
+   * too short because of the \0 at the end of the new string, so take
+   * 1 char off the length.
    */
-  command_len=strlen(command_format_string) + 
-              strlen(JAVA_COMMAND) +
-              strlen(RDF_JAVA_API_JAR) +
-              strlen(uri_string) -2;
+  command_len=strlen(scontext->pcontext->command_format_string) +
+              strlen(streaming_arg) + strlen(uri_string) -1;
 
   command=(char*)LIBRDF_MALLOC(cstring, command_len);
   if(!command) {
     librdf_parser_sirpac_serialise_finished((void*)context);
     return NULL;
   }
-  sprintf(command, command_format_string, JAVA_COMMAND, RDF_JAVA_API_JAR, 
-	  uri_string);
+  
+  /* can use streaming if aboutEach and aboutEachPrefix are not wanted */
+
+  sprintf(command, scontext->pcontext->command_format_string, 
+          streaming_arg, uri_string);
   scontext->command=command;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
@@ -196,8 +243,9 @@ librdf_parser_sirpac_parse_uri_as_stream(void *context, librdf_uri *uri,
 
   fh=popen(command, "r");
   if(!fh) {
-    LIBRDF_DEBUG2(librdf_parser_sirpac_parse_uri_as_stream, "Failed to create pipe to '%s'", command);
-    librdf_parser_sirpac_serialise_finished((void*)context);
+    librdf_parser_error(pcontext->parser,
+                        "Failed to create pipe to SiRPAC command '%s'\n", command);
+    librdf_parser_sirpac_serialise_finished((void*)scontext);
     return(NULL);
   }
   scontext->fh=fh;
@@ -224,7 +272,6 @@ librdf_parser_sirpac_parse_uri_as_stream(void *context, librdf_uri *uri,
  * @model: &librdf_model
  * 
  * FIXME: No error reporting provided 
- * FIXME: Maybe should use lower level code directly.
  *
  * Return value: non 0 on failure
  **/
@@ -234,7 +281,8 @@ librdf_parser_sirpac_parse_uri_into_model(void *context, librdf_uri *uri,
                                           librdf_model *model) {
   librdf_stream* stream;
   
-  stream=librdf_parser_sirpac_parse_uri_as_stream(context, uri, base_uri);
+  stream=librdf_parser_sirpac_parse_uri_as_stream(context,
+                                                  uri, base_uri);
   if(!stream)
     return 1;
 
@@ -242,7 +290,7 @@ librdf_parser_sirpac_parse_uri_into_model(void *context, librdf_uri *uri,
 }
 
 
-/*
+/**
  * librdf_parser_sirpac_get_next_statement - helper function to decode the output of the Java command to get the next statement
  * @context: serialisation context
  * 
@@ -333,14 +381,12 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
 
 
   if(feof(context->fh)) {
-    int status=pclose(context->fh);
+    int status=(pclose(context->fh)& 0xff00)>>8;
 
-    if(status) {
-      /* FIXME: something failed e.g. fork, exec or SiRPAC exited
-       * with an error */
-      fprintf(stderr, "SiRPAC command '%s' exited with status %d\n",
-              context->command, status);
-    }
+    if(status)
+      librdf_parser_error(context->pcontext->parser,
+                          "SiRPAC command '%s' exited with status %d\n",
+                          context->command, status);
     context->fh=NULL;
   }
   
@@ -423,13 +469,11 @@ librdf_parser_sirpac_serialise_finished(void* context)
       while(!feof(scontext->fh)) {
 	fgets(buffer, LINE_BUFFER_LEN, scontext->fh);
       }
-      status=pclose(scontext->fh);
-      if(status) {
-        /* FIXME: something failed e.g. fork, exec or SiRPAC exited
-         * with an error */
-        fprintf(stderr, "SiRPAC command '%s' exited with status %d\n",
-                scontext->command, status);
-      }
+      status=(pclose(scontext->fh) & 0xff00)>>8;
+      if(status)
+        librdf_parser_error(scontext->pcontext->parser,
+                            "SiRPAC command '%s' exited with status %d\n",
+                            scontext->command, status);
       scontext->fh=NULL;
     }
 
@@ -445,19 +489,104 @@ librdf_parser_sirpac_serialise_finished(void* context)
 
 
 /**
- * librdf_parser_sirpac_register_factory - Register the SiRPAC RDF parser with the RDF parser factory
+ * librdf_parser_sirpac_get_feature - Get SiRPAC parser features
+ * @context: parser context
+ * @feature: feature URI string
+ * 
+ * Allows the querying of the rdf:aboutEach and rdf:aboutEachPrefix
+ * features
+ * 
+ * Return values: "yes", "no" or NULL on unknown or illegal feature
+ **/
+static const char *
+librdf_parser_sirpac_get_feature(void *context, librdf_uri *feature)
+{
+  librdf_parser_sirpac_context* pcontext=(librdf_parser_sirpac_context*)context;
+  if(!feature)
+    return NULL;
+
+  if(!librdf_uri_equals(feature, LIBRDF_SYNTAX_aboutEach_URI))
+    return pcontext->feature_aboutEach ? "yes" : "no";
+
+  if(!librdf_uri_equals(feature, LIBRDF_SYNTAX_aboutEachPrefix_URI))
+    return pcontext->feature_aboutEachPrefix ? "yes" : "no";
+  
+  return NULL;
+}
+
+
+/**
+ * librdf_parser_sirpac_set_feature - Set SiRPAC parser features
+ * @context: parser context
+ * @feature: feature URI string
+ * @value: feature value string
+ * 
+ * Allows the setting of the rdf:aboutEach and rdf:aboutEachPrefix
+ * features.
+ * 
+ * Return value: Non 0 on failure, negative on illegal feature or value.
+ **/
+static int
+librdf_parser_sirpac_set_feature(void *context, librdf_uri *feature, 
+                                 const char *value) 
+{
+  librdf_parser_sirpac_context* pcontext=(librdf_parser_sirpac_context*)context;
+
+  if(!value)
+    return -1;
+  
+  if(!librdf_uri_equals(feature, LIBRDF_SYNTAX_aboutEach_URI)) {
+    pcontext->feature_aboutEach=(strcmp(value, "yes") == 0);
+    pcontext->feature_aboutEachPrefix = pcontext->feature_aboutEach;
+    return 0;
+  }
+
+  if(!librdf_uri_equals(feature, LIBRDF_SYNTAX_aboutEachPrefix_URI)) {
+    pcontext->feature_aboutEachPrefix=(strcmp(value, "yes") == 0);
+    pcontext->feature_aboutEach = pcontext->feature_aboutEachPrefix;
+    return 0;
+  }
+
+  return -1;
+}
+
+
+
+#ifdef JAVA_SIRPACSTANFORD_JAR
+/**
+ * librdf_parser_sirpac_stanford_register_factory - Register the SiRPAC RDF parser with the RDF parser factory
  * @factory: prototype rdf parser factory
  **/
 static void
-librdf_parser_sirpac_register_factory(librdf_parser_factory *factory) 
+librdf_parser_sirpac_stanford_register_factory(librdf_parser_factory *factory) 
 {
   factory->context_length = sizeof(librdf_parser_sirpac_context);
   
-  factory->init  = librdf_parser_sirpac_init;
+  factory->init  = librdf_parser_sirpac_stanford_init;
   factory->parse_uri_as_stream = librdf_parser_sirpac_parse_uri_as_stream;
   factory->parse_uri_into_model = librdf_parser_sirpac_parse_uri_into_model;
+  factory->get_feature = librdf_parser_sirpac_get_feature;
+  factory->set_feature = librdf_parser_sirpac_set_feature;
 }
+#endif
 
+#ifdef JAVA_SIRPACW3C_JAR
+/**
+ * librdf_parser_sirpac_w3c_register_factory - Register the SiRPAC RDF parser with the RDF parser factory
+ * @factory: prototype rdf parser factory
+ **/
+static void
+librdf_parser_sirpac_w3c_register_factory(librdf_parser_factory *factory) 
+{
+  factory->context_length = sizeof(librdf_parser_sirpac_context);
+  
+  factory->init  = librdf_parser_sirpac_w3c_init;
+  factory->parse_uri_as_stream = librdf_parser_sirpac_parse_uri_as_stream;
+  factory->parse_uri_into_model = librdf_parser_sirpac_parse_uri_into_model;
+  factory->get_feature = librdf_parser_sirpac_get_feature;
+  factory->set_feature = librdf_parser_sirpac_set_feature;
+}
+#endif
 
 /**
  * librdf_parser_sirpac_constructor - Initialise the SiRPAC RDF parser module
@@ -465,5 +594,13 @@ librdf_parser_sirpac_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_sirpac_constructor(void)
 {
-  librdf_parser_register_factory("sirpac", &librdf_parser_sirpac_register_factory);
+#ifdef JAVA_SIRPACSTANFORD_JAR
+  librdf_parser_register_factory("sirpac-stanford", NULL, NULL,
+                                 &librdf_parser_sirpac_stanford_register_factory);
+#endif
+
+#ifdef JAVA_SIRPACW3C_JAR
+  librdf_parser_register_factory("sirpac-w3c", NULL, NULL,
+                                 &librdf_parser_sirpac_w3c_register_factory);
+#endif
 }
