@@ -171,7 +171,7 @@ AC_SUBST(SWIG_PYTHON_ARGS)
 languages=
 
 
-AC_ARG_WITH(perl, [  --with-perl(=PERL)      Enable the Perl interface (default=auto)], with_perl="$withval", with_perl="auto")
+AC_ARG_WITH(perl, [  --with-perl(=PERL)      Enable the Perl interface], with_perl="$withval", with_perl="no")
 AC_MSG_CHECKING(Enable Perl API)
 if test "X$with_perl" != "Xno"; then
   if test "X$with_perl" != "Xyes" -a "X$with_perl" != "Xauto"; then
@@ -185,7 +185,7 @@ fi
 AC_MSG_RESULT($with_perl)
 
 
-AC_ARG_WITH(python, [  --with-python(=PYTHON)  Enable the Python interface (default=auto)], with_python="$withval", with_python="auto")
+AC_ARG_WITH(python, [  --with-python(=PYTHON)  Enable the Python interface], with_python="$withval", with_python="no")
 AC_MSG_CHECKING(Enable Python API)
 if test "X$with_python" != "Xno"; then
   if test "X$with_python" != "Xyes" -a "X$with_python" != "Xauto"; then
