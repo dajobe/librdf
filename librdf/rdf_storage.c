@@ -44,8 +44,6 @@
 
 #include <redland.h>
 #include <rdf_storage.h>
-#include <rdf_storage_hashes.h>
-#include <rdf_storage_list.h>
 
 
 #ifndef STANDALONE
@@ -77,18 +75,21 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
 void
 librdf_init_storage(librdf_world *world)
 {
-#ifdef HAVE_MYSQL
+#ifdef STORAGE_MYSQL
   librdf_init_storage_mysql(world);
 #endif
-#ifdef HAVE_TSTORE
+#ifdef STORAGE_TSTORE
   librdf_init_storage_tstore(world);
 #endif
-#ifdef HAVE_SQLITE
+#ifdef STORAGE_SQLITE
   librdf_init_storage_sqlite(world);
 #endif
-  /* Always have storage list, hashes, file implementations available */
+#ifdef STORAGE_FILE
   librdf_init_storage_file(world);
+#endif
+  /* Always have storage list, hashes, file implementations available */
   librdf_init_storage_hashes(world);
+  /* Always have storage memory must always be available */
   librdf_init_storage_list(world);
 }
 
