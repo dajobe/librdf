@@ -138,7 +138,7 @@ cd ..
 %{perlinstallsitearch}/RDF/Redland
 %{perlinstallsitearch}/RDF/Redland.pm
 
-%doc %{perlman3dir}/*
+%doc %{perlman3dir}/redland.3*
 
 %post
 /sbin/ldconfig
