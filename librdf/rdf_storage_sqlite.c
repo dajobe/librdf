@@ -53,7 +53,7 @@
 #define sqlite_STATEMENT sqlite3_stmt
 #define sqlite_EXEC sqlite3_exec
 #define sqlite_CLOSE sqlite3_close
-#define sqlite_freemem sqlite3_free
+#define sqlite_FREE sqlite3_free
 #define sqlite_callback sqlite3_callback
 #define sqlite_last_insert_rowid sqlite3_last_insert_rowid
 #endif
@@ -1118,8 +1118,8 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
 */
 
 #if SQLITE_API == 3
-  #define GET_COLUMN_VALUE_TEXT(col) sqlite3_column_text(col)
-  #define GET_COLUMN_VALUE_INT(col) sqlite3_column_int(col)
+  #define GET_COLUMN_VALUE_TEXT(col) sqlite3_column_text(vm, col)
+  #define GET_COLUMN_VALUE_INT(col) sqlite3_column_int(vm, col)
 #endif
 #if SQLITE_API == 2
   #define GET_COLUMN_VALUE_TEXT(col) (unsigned char*)pazValue[col]
