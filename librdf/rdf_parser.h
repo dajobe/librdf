@@ -143,6 +143,9 @@ void librdf_parser_libwww_constructor(void);
 #ifdef HAVE_REDLAND_RDF_PARSER
 void librdf_parser_redland_constructor(void);
 #endif
+#ifdef HAVE_REPAT_RDF_PARSER
+void librdf_parser_repat_constructor(void);
+#endif
 
 
 #ifdef __cplusplus
