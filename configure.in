@@ -64,7 +64,9 @@ dnl Checks for libraries.
 dnl GNU GDBM
 AC_CHECK_HEADERS(gdbm.h)
 if test "$ac_cv_header_gdbm_h" = yes ; then
+  oLIBS="$LIBS"
   AC_CHECK_LIB(gdbm,gdbm_firstkey)
+  LIBS="$oLIBS"
 fi
 
 dnl Berkeley DB
@@ -106,12 +108,11 @@ fi
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h unistd.h string.h fcntl.h)
+AC_CHECK_HEADERS(stdlib.h unistd.h string.h fcntl.h dmalloc.h)
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
-AC_C_INLINE
 AC_C_BIGENDIAN
 
 AC_CHECK_TYPE(byte, MISSING)
@@ -331,13 +332,21 @@ AC_SUBST(SD)
 
 
 # Make final changes to cflags
+MEM=
+MEM_LIBS=
 if test "$USE_MAINTAINER_MODE" = yes; then
-  CFLAGS="-DLIBRDF_DEBUG=1 -DLIBRDF_MEMORY_DEBUG=1 $CFLAGS"
+  #MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
+  #MEM_LIBS=-ldmalloc
+  MEM=-DLIBRDF_MEMORY_DEBUG=1
+  MEM_LIBS=
+  CFLAGS="-DLIBRDF_DEBUG=1 $CFLAGS"
 fi
 STANDARD_CFLAGS="$STANDARD_CFLAGS $CFLAGS"
 if test "$USE_MAINTAINER_MODE" = yes; then
   CFLAGS="$MAINTAINER_CFLAGS $CFLAGS"
 fi
+AC_SUBST(MEM)
+AC_SUBST(MEM_LIBS)
 AC_SUBST(STANDARD_CFLAGS)
 
 
