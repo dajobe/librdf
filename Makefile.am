@@ -26,11 +26,11 @@ man_MANS = redland-config.1
 
 # Subdirectories to build/install etc.
 SUBDIRS=@SD_PRE@ librdf examples utils @SD_POST@ demos docs
-CONFIG_SUBDIRS=raptor
+CONFIG_SUBDIRS=raptor rasqal
 # Subdirectories to use for distribution
 DIST_SUBDIRS=librdf docs examples \
 perl php python tcl java ruby csharp \
-raptor \
+raptor rasqal \
 utils demos
 
 EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 \
