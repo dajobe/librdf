@@ -49,7 +49,7 @@ while(<IN>) {
    } elsif ($skip_heading == 1) {
      if(m%\#</tt></p>%) {
        $skip_heading=2;
-       print "<!-- LICENSE HEADING -->\n";
+       print OUT "<!-- LICENSE HEADING -->\n";
      }
      next;
    }
