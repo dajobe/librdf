@@ -74,6 +74,9 @@ struct librdf_query_factory_s {
   
 };
 
+
+#include <rdf_query_triples.h>
+
 #endif
 
 
