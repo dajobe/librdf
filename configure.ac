@@ -830,7 +830,7 @@ done
 AC_CHECK_PROG(RASQAL_CONFIG, rasqal-config, rasqal-config)
 AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/internal (default=auto)], with_rasqal="$withval", with_rasqal="auto")
 
-RASQAL_MIN_VERSION=0.2.0
+RASQAL_MIN_VERSION=0.9.0
 AC_SUBST(RASQAL_MIN_VERSION)
 if test "X$RASQAL_CONFIG" = "X"; then
   with_rasqal=internal
@@ -1151,6 +1151,9 @@ fi
 LIBRDF_EXTERNAL_CPPFLAGS="$LIBRDF_EXTERNAL_CPPFLAGS $LIBRDF_CPPFLAGS"
 LIBRDF_EXTERNAL_LIBS="$LIBRDF_EXTERNAL_LIBS $LIBRDF_LIBS"
 
+# Everything except things with .pc files (raptor and rasqal)
+# 3store uses it but is optional and thus tricky to specify this way
+LIBRDF_PKGCONFIG_LIBS=$LIBRDF_LIBS
 
 dnl Checks for building sub-packages in sub directories
 dnl before librdf (pre-requisites). rasqal may need raptor
@@ -1218,6 +1221,7 @@ AC_SUBST(LIBRDF_INTERNAL_LIBS)
 AC_SUBST(LIBRDF_CPPFLAGS)
 AC_SUBST(LIBRDF_LDFLAGS)
 AC_SUBST(LIBRDF_LIBTOOLLIBS)
+AC_SUBST(LIBRDF_PKGCONFIG_LIBS)
 
 AC_SUBST(MEM)
 AC_SUBST(MEM_LIBS)
