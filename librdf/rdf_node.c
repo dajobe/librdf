@@ -128,6 +128,9 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
 
+  LIBRDF_ASSERT_RETURN((uri_string == NULL && uri == NULL), 
+                       "both uri_string and uri are NULL", NULL);
+
   if(!uri_string && !uri)
     return NULL;
 
@@ -217,6 +220,8 @@ librdf_node*
 librdf_new_node_from_uri_string(librdf_world *world, 
                                 const unsigned char *uri_string) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri_string, string, NULL);
+
   return librdf_new_node_from_uri_string_or_uri(world, uri_string, NULL);
 }
 
@@ -234,6 +239,8 @@ librdf_new_node_from_uri_string(librdf_world *world,
 librdf_node*
 librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
+
   return librdf_new_node_from_uri_string_or_uri(world, NULL, uri);
 }
 
@@ -253,6 +260,9 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
 {
   librdf_uri *new_uri;
   librdf_node* new_node;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(local_name, string, NULL);
 
   new_uri=librdf_new_uri_from_uri_local_name(uri, local_name);
   if(!new_uri)
@@ -284,6 +294,10 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
   librdf_uri* new_uri;
   librdf_node* new_node;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri_string, string, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(source_uri, librdf_uri, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
+
   new_uri=librdf_new_uri_normalised_to_base(uri_string, source_uri, base_uri);
   if(!new_uri)
     return NULL;
@@ -312,6 +326,8 @@ librdf_new_node_from_literal(librdf_world *world,
                              const char *xml_language, 
                              int is_wf_xml) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL);
+
   return librdf_new_node_from_typed_literal(world,
                                             string, xml_language,
                                             (is_wf_xml ? 
@@ -344,6 +360,8 @@ librdf_new_node_from_typed_literal(librdf_world *world,
   size_t size;
   unsigned char *buffer;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(value, string, NULL);
+
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->nodes_mutex);
 #endif
@@ -479,6 +497,8 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(identifier, string, NULL);
+
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->nodes_mutex);
 #endif
@@ -557,6 +577,8 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
 librdf_node*
 librdf_new_node_from_node(librdf_node *node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+
   node->usage++;
   return node;
 }
@@ -572,10 +594,13 @@ librdf_free_node(librdf_node *node)
 {
   librdf_hash_datum key; /* on stack */
 #ifdef WITH_THREADS
-  librdf_world *world = node->world;
+  librdf_world *world;
 #endif
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(node, librdf_node);
+
 #ifdef WITH_THREADS
+  world = node->world;
   pthread_mutex_lock(world->nodes_mutex);
 #endif
 
@@ -660,6 +685,8 @@ librdf_free_node(librdf_node *node)
 librdf_uri*
 librdf_node_get_uri(librdf_node* node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+
   if(node->type != LIBRDF_NODE_TYPE_RESOURCE)
     return NULL;
   
@@ -676,6 +703,8 @@ librdf_node_get_uri(librdf_node* node)
 librdf_node_type
 librdf_node_get_type(librdf_node* node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, LIBRDF_NODE_TYPE_UNKNOWN);
+
   return node->type;
 }
 
@@ -719,6 +748,8 @@ librdf_node_get_type_as_string(int type)
 unsigned char*
 librdf_node_get_literal_value(librdf_node* node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return NULL;
   return node->value.literal.string;
@@ -739,6 +770,10 @@ unsigned char*
 librdf_node_get_literal_value_as_counted_string(librdf_node* node, 
                                                 size_t *len_p) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+  LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_LITERAL),
+                       "node is not type literal", NULL);
+
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return NULL;
   if(len_p)
@@ -759,6 +794,10 @@ librdf_node_get_literal_value_as_counted_string(librdf_node* node,
 char*
 librdf_node_get_literal_value_as_latin1(librdf_node* node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+  LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_LITERAL),
+                       "node is not type literal", NULL);
+
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return NULL;
   return (char*)librdf_utf8_to_latin1((const byte*)node->value.literal.string,
@@ -779,6 +818,10 @@ librdf_node_get_literal_value_as_latin1(librdf_node* node)
 char*
 librdf_node_get_literal_value_language(librdf_node* node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+  LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_LITERAL),
+                       "node is not type literal", NULL);
+
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return NULL;
   return node->value.literal.xml_language;
@@ -794,6 +837,10 @@ librdf_node_get_literal_value_language(librdf_node* node)
 int
 librdf_node_get_literal_value_is_wf_xml(librdf_node* node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+  LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_LITERAL),
+                       "node is not type literal", 0);
+
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return 0;
   return librdf_uri_equals(node->value.literal.datatype_uri,
@@ -810,6 +857,10 @@ librdf_node_get_literal_value_is_wf_xml(librdf_node* node)
 librdf_uri*
 librdf_node_get_literal_value_datatype_uri(librdf_node* node)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+  LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_LITERAL),
+                       "node is not type literal", 0);
+
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return 0;
   return node->value.literal.datatype_uri;
@@ -826,6 +877,10 @@ int
 librdf_node_get_li_ordinal(librdf_node* node) {
   unsigned char *uri_string;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+  LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_RESOURCE),
+                       "node is not type resource", 0);
+
   if(node->type != LIBRDF_NODE_TYPE_RESOURCE);
     return -1;
 
@@ -846,6 +901,10 @@ librdf_node_get_li_ordinal(librdf_node* node) {
  **/
 unsigned char *
 librdf_node_get_blank_identifier(librdf_node* node) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+  LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_BLANK),
+                       "node is not type resource", NULL);
+
   return node->value.blank.identifier;
 }
 
@@ -858,6 +917,8 @@ librdf_node_get_blank_identifier(librdf_node* node) {
  **/
 int
 librdf_node_is_resource(librdf_node* node) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+
   return (node->type == LIBRDF_NODE_TYPE_RESOURCE);
 }
 
@@ -870,6 +931,8 @@ librdf_node_is_resource(librdf_node* node) {
  **/
 int
 librdf_node_is_literal(librdf_node* node) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+
   return (node->type == LIBRDF_NODE_TYPE_LITERAL);
 }
 
@@ -882,6 +945,8 @@ librdf_node_is_literal(librdf_node* node) {
  **/
 int
 librdf_node_is_blank(librdf_node* node) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+
   return (node->type == LIBRDF_NODE_TYPE_BLANK);
 }
 
@@ -897,6 +962,8 @@ librdf_node_is_blank(librdf_node* node) {
 unsigned char*
 librdf_node_to_string(librdf_node* node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+
   return librdf_node_to_counted_string(node, NULL);
 }
 
@@ -916,6 +983,8 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
   unsigned char *uri_string;
   size_t len;
   unsigned char *s;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
   switch(node->type) {
   case LIBRDF_NODE_TYPE_RESOURCE:
@@ -975,6 +1044,9 @@ librdf_node_print(librdf_node* node, FILE *fh)
 {
   unsigned char* s;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(node, librdf_node);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(fh, FILE*);
+
   if(!node)
     return;
   
@@ -1002,6 +1074,8 @@ librdf_node_get_digest(librdf_node* node)
   unsigned char *s;
   librdf_world* world=node->world;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+
   switch(node->type) {
     case LIBRDF_NODE_TYPE_RESOURCE:
       d=librdf_uri_get_digest(node->value.resource.uri);
@@ -1041,6 +1115,9 @@ librdf_node_get_digest(librdf_node* node)
 int
 librdf_node_equals(librdf_node* first_node, librdf_node* second_node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(first_node, librdf_node, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(second_node, librdf_node, 0);
+
   if(!first_node || !second_node)
     return 0;
   
@@ -1071,6 +1148,8 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
   unsigned char *datatype_uri_string;
   size_t datatype_uri_length=0;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+
   switch(node->type) {
     case LIBRDF_NODE_TYPE_RESOURCE:
       string=(unsigned char*)librdf_uri_as_counted_string(node->value.resource.uri, &string_length);
@@ -1392,6 +1471,8 @@ librdf_node_static_iterator_create(librdf_node** nodes,
   librdf_node_static_iterator_context* context;
   librdf_iterator *iterator;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(nodes, librdf_node**, NULL);
+
   context=(librdf_node_static_iterator_context*)LIBRDF_CALLOC(librdf_node_static_iterator_context, 1, sizeof(librdf_node_static_iterator_context));
   if(!context)
     return NULL;
