@@ -100,7 +100,7 @@ librdf_node* librdf_concept_resources[LIBRDF_CONCEPT_LAST+1];
 /* Tokens used by the RDF world */
 static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
   /* RDF M&S */
-  "Alt", "Bag", "Property", "Seq", "Statement", "object", "predicate", "subject", "type", "value",
+  "Alt", "Bag", "Property", "Seq", "Statement", "object", "predicate", "subject", "type", "value", "li",
   "RDF", "Description",
   "aboutEach", "aboutEachPrefix",
 
@@ -115,7 +115,7 @@ static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
  */
 static const char* const librdf_concept_labels[LIBRDF_CONCEPT_LAST+1]={
   /* RDF M&S */
-  "Alt", "Bag", "Property", "Sequence", "Statement", "object", "predicate", "subject", "type", "object",
+  "Alt", "Bag", "Property", "Sequence", "Statement", "object", "predicate", "subject", "type", "object", "li",
   "RDF", "Description",
   "aboutEach", "aboutEachPrefix",
 

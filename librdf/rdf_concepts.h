@@ -101,6 +101,7 @@ enum {
   LIBRDF_CONCEPT_MS_subject,
   LIBRDF_CONCEPT_MS_type,
   LIBRDF_CONCEPT_MS_value,
+  LIBRDF_CONCEPT_MS_li,
 
   LIBRDF_CONCEPT_MS_RDF,
   LIBRDF_CONCEPT_MS_Description,
@@ -155,6 +156,7 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_MS_subject librdf_concept_resources[LIBRDF_CONCEPT_MS_subject]
 #define LIBRDF_MS_type librdf_concept_resources[LIBRDF_CONCEPT_MS_type]
 #define LIBRDF_MS_value librdf_concept_resources[LIBRDF_CONCEPT_MS_value]
+#define LIBRDF_MS_li librdf_concept_resources[LIBRDF_CONCEPT_MS_li]
 
 #define LIBRDF_MS_RDF librdf_concept_resources[LIBRDF_CONCEPT_MS_RDF]
 #define LIBRDF_MS_Description librdf_concept_resources[LIBRDF_CONCEPT_MS_Description]
@@ -193,6 +195,7 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_MS_subject_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_subject]
 #define LIBRDF_MS_type_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_type]
 #define LIBRDF_MS_value_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_value]
+#define LIBRDF_MS_li_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_li]
 
 #define LIBRDF_MS_RDF_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_RDF]
 #define LIBRDF_MS_Description_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_Description]
