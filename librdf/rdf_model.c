@@ -178,15 +178,26 @@ librdf_new_model_with_options(librdf_storage *storage, librdf_hash* options)
  * librdf_new_model_from_model - Copy constructor - create a new librdf_model from an existing one
  * @model: the existing &librdf_model
  * 
- * FIXME: Not implemented yet
+ * Creates a new model as a copy of the existing model in the same
+ * storage context.
  * 
  * Return value: a new &librdf_model or NULL on failure
  **/
 librdf_model*
-librdf_new_model_from_model(librdf_model* model)
+librdf_new_model_from_model(librdf_model* old_model)
 {
-  abort();
-  return NULL;
+  librdf_storage *new_storage;
+  librdf_model *new_model;
+  
+  new_storage=librdf_new_storage_from_storage(old_model->storage);
+  if(!new_storage)
+    return NULL;
+
+  new_model=librdf_new_model_with_options(new_storage, NULL);
+  if(!new_model)
+    librdf_free_storage(new_storage);
+
+  return new_model;
 }
 
 
