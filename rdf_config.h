@@ -50,7 +50,6 @@
 
 /* DEBUGGING TURNED OFF */
 
-/* Not RDF_DEBUG */
 #define RDF_MALLOC(type, size) malloc(size)
 #define RDF_CALLOC(type, size, count) calloc(size, count)
 #define RDF_FREE(type, ptr)   free(ptr)
@@ -64,9 +63,9 @@
 #endif
 
 
-/* Fatal errors - always printed */
-#define RDF_FATAL1(function, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function); exit(1);} while(0)
-#define RDF_FATAL2(function, msg,arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function, arg); exit(1);} while(0)
+/* Fatal errors - always happen */
+#define RDF_FATAL1(function, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function); abort();} while(0)
+#define RDF_FATAL2(function, msg,arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function, arg); abort();} while(0)
 
 #endif
 
