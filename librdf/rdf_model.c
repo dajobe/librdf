@@ -1463,6 +1463,70 @@ librdf_model_load(librdf_model* model, librdf_uri *uri,
 }
 
 
+/**
+ * librdf_model_to_counted_string - Write serialized model to a string
+ * @model: &librdf_model object
+ * @uri: base URI to use in serializing (or NULL if not used)
+ * @name: the name of the serializer (or NULL for default)
+ * @mime_type: the MIME type of the syntax (NULL if not used)
+ * @type_uri: URI identifying the syntax (NULL if not used)
+ * @string_length_p: pointer to location to store string length (or NULL)
+ *
+ * If the name field is NULL, the default serializer will be used.
+ *
+ * Note: the returned string must be freed by the caller.
+ *
+ * Return value: new string or NULL on failure
+ **/
+char*
+librdf_model_to_counted_string(librdf_model* model, librdf_uri *uri,
+                               const char *name, const char *mime_type, 
+                               librdf_uri *type_uri, size_t* string_length_p)
+{
+  unsigned char *string=NULL;
+  librdf_serializer* serializer;
+  
+  if(name && !*name)
+    name=NULL;
+  if(mime_type && !*mime_type)
+    mime_type=NULL;
+
+  serializer=librdf_new_serializer(model->world, name, mime_type, type_uri);
+  if(!serializer)
+    return NULL;
+
+  string=librdf_serializer_serialize_model_to_counted_string(serializer,
+                                                             uri, model,
+                                                             string_length_p);
+  librdf_free_serializer(serializer);
+  return (char*)string;
+}
+
+
+/**
+ * librdf_model_to_string - Write serialized model to a string
+ * @model: &librdf_model object
+ * @uri: base URI to use in serializing (or NULL if not used)
+ * @name: the name of the serializer (or NULL for default)
+ * @mime_type: the MIME type of the syntax (NULL if not used)
+ * @type_uri: URI identifying the syntax (NULL if not used)
+ *
+ * If the name field is NULL, the default serializer will be used.
+ *
+ * Note: the returned string must be freed by the caller.
+ *
+ * Return value: new string or NULL on failure
+ **/
+char*
+librdf_model_to_string(librdf_model* model, librdf_uri *uri,
+                       const char *name, const char *mime_type, 
+                       librdf_uri *type_uri) {
+  return librdf_model_to_counted_string(model, uri, 
+                                        name, mime_type, type_uri,
+                                        NULL);
+}
+
+
 #endif
 
 
@@ -1520,6 +1584,10 @@ main(int argc, char *argv[])
   librdf_node *n1, *n2;
   int count;
   int expected_count;
+#define EXPECTED_BAD_STRING_LENGTH 299
+  librdf_uri* base_uri;
+  char *string;
+  size_t string_length=0;
 
   librdf_world_open(world);
   
@@ -1721,6 +1789,19 @@ main(int argc, char *argv[])
     librdf_model_print(model, stderr);
   }
 
+  fprintf(stderr, "%s: Serializing model\n", program);
+  base_uri=librdf_new_uri(world, "http://example.org/base#");
+  string=librdf_model_to_counted_string(model, base_uri,
+                                        "rdfxml", NULL, NULL,
+                                        &string_length);
+  if(string_length != EXPECTED_BAD_STRING_LENGTH) {
+    fprintf(stderr, "%s: Serialising to RDF/XML returned string size %d, expected %d\n", program,
+            string_length, EXPECTED_BAD_STRING_LENGTH);
+    return 1;
+  }
+  librdf_free_uri(base_uri);
+  free(string);
+  fprintf(stderr, "%s: Serialized OK\n", program);
 
   fprintf(stderr, "%s: Freeing URIs and Nodes\n", program);
   for (i=0; i<URI_STRING_COUNT; i++) {
