@@ -4,11 +4,11 @@
 .\"
 .\" $Id$
 .\"
-.\" Copyright (C) 2003 David Beckett - http://purl.org/net/dajobe/
-.\" Institute for Learning and Research Technology - http://www.ilrt.org/
+.\" Copyright (C) 2003-2004 David Beckett - http://purl.org/net/dajobe/
+.\" Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
 .\" University of Bristol - http://www.bristol.ac.uk/
 .\"
-.TH rdfproc 1 "2004-01-13"
+.TH rdfproc 1 "2004-01-30"
 .\" Please adjust this date whenever revising the manpage.
 .SH NAME
 rdfproc \- Redland RDF processor utility
@@ -72,7 +72,7 @@ type given here will override it.
 Set options for the the Redland storage, default is "hash-type='bdb',dir='.'"
 to match the default storage "hashes".  For storages types such as 'mysql'
 that need extra options this would typically be something
-like "host='hostname',db='databasename',user='abc',password='pass'".
+like "host='hostname',database='dbname',user='abc',password='pass'".
 If environment variable RDFPROC_STORAGE_OPTIONS is set, the storage
 options given here will be applied afterwards.
 .TP
@@ -173,13 +173,13 @@ instead of using the option \-s, \-\-storage \fITYPE\fR.
 When both are given, the storage type from the command is used.
 .SH "CONFORMING TO"
 \fIRDF/XML Syntax (Revised)\fR,
-W3C Working Draft (work in progress),
+W3C Proposed Recommendation,
 .UR http://www.w3.org/TR/rdf-syntax-grammar/
 http://www.w3.org/TR/rdf-syntax-grammar/
 .UE
 
-\fIN-Triples\fR,
-W3C Working Draft (work in progress),
+\fIN-Triples\fR, in \fIRDF Test Cases\fR, Jan Grant and Dave Beckett (eds.)
+W3C Proposed Recommendation,
 .UR http://www.w3.org/TR/rdf-testcases/#ntriples
 http://www.w3.org/TR/rdf-testcases/#ntriples
 .UE
