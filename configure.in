@@ -235,7 +235,7 @@ AC_FUNC_MEMCMP
 AC_CHECK_FUNCS(mkstemp mktemp tmpnam)
 
 dnl Checks for URI resolvers
-AC_ARG_WITH(libwww, [  --with-libww            Use libwww [yes]], enable_libwww="$withval", enable_libwww="yes") 
+AC_ARG_WITH(libwww, [  --with-libwww           Use libwww [yes]], enable_libwww="$withval", enable_libwww="yes") 
 
 have_libwww=
 AC_MSG_CHECKING(whether have working libwww)
@@ -258,6 +258,8 @@ dnl Checks for RDF parsers
 
 PARSER_OBJS=
 PARSER_SRCS=
+RDF_JAVA_API_JAR=
+JAVA_CLASSES=
 AC_ARG_WITH(rdf-java-api, [  --with-rdf-java-api=JAR  Use the Java RDF API in the given jar file [no]], rdf_java_api_jar="$withval", rdf_java_api_jar="no") 
 AC_MSG_CHECKING(whether to use Java RDF API)
 if test "$rdf_java_api_jar" != no ; then
@@ -267,12 +269,17 @@ if test "$rdf_java_api_jar" != no ; then
     AC_DEFINE(HAVE_SIRPAC_RDF_PARSER)
     PARSER_OBJS="$PARSER_OBJS rdf_parser_sirpac.o"
     PARSER_SRCS="$PARSER_SRCS rdf_parser_sirpac.c"
+    RDF_JAVA_API_JAR=$rdf_java_api_jar
+    JAVA_CLASSES="PrintConsumer.class PrintParser.class"
   else
     AC_MSG_RESULT(no - JAR file $rdf_java_api_jar does not exist)
   fi
 else
   AC_MSG_RESULT(no)
 fi
+AC_SUBST(RDF_JAVA_API_JAR)
+AC_SUBST(JAVA_CLASSES)
+
 AC_MSG_CHECKING(whether libwww has RDF support)
 if test "$have_libwww" = yes ; then
   AC_TRY_LINK([#undef PACKAGE
