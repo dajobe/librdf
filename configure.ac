@@ -205,9 +205,6 @@ fi
 dnl need to change quotes to allow square brackets
 changequote(<<, >>)dnl
 PYTHON_VERSION=`$PYTHON -c 'import sys; print sys.version[:3]' 2>/dev/null`
-python_prefix=`$PYTHON -c 'import sys; print sys.prefix' 2>/dev/null`
-python_include=`$PYTHON -c 'import sys, os; print os.path.join(sys.prefix, "include", "python"+sys.version[:3])'`
-python_lib=`$PYTHON -c 'import sys, os; print os.path.join(sys.prefix, "lib", "python"+sys.version[:3], "site-packages")'`
 changequote([, ])dnl
 if test "X$PYTHON_VERSION" != X; then
   languages_available="$languages_available python($PYTHON_VERSION)"
@@ -848,12 +845,20 @@ else
 fi
 
 if test "X$PYTHON" != X; then
+  AC_MSG_CHECKING(Python includes)
+  python_prefix=`$PYTHON -c 'import sys; print sys.prefix' 2>/dev/null`
+  python_exec_prefix=`$PYTHON -c "import sys; print sys.exec_prefix"`
+  PYTHON_INCLUDES="-I${python_prefix}/include/python${PYTHON_VERSION}"
+  if test "$python_prefix" != "$python_exec_prefix"; then
+    PYTHON_INCLUDES="$PYTHON_INCLUDES -I${python_exec_prefix}/include/python${PYTHON_VERSION}"
+  fi
+  AC_SUBST(PYTHON_INCLUDES)
+  AC_MSG_RESULT($PYTHON_INCLUDES)
 
-  # What a crock
-  PYTHON_INCLUDE=$python_include
-  AC_SUBST(PYTHON_INCLUDE)
-  PYTHON_LIB=$python_lib
+  AC_MSG_CHECKING(Python libs)
+  PYTHON_LIB="${python_prefix}/lib/python${PYTHON_VERSION}/site-packages"
   AC_SUBST(PYTHON_LIB)
+  AC_MSG_RESULT($PYTHON_LIB)
 else
   # This allows 'make clean' in the python directory to work when
   # python isn't available
