@@ -443,7 +443,6 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
   raptor_parser *rdf_parser;
-  librdf_world *world;
   librdf_stream *stream;
   
   if(uri && librdf_uri_is_file_uri(uri))
