@@ -1010,6 +1010,11 @@ AC_SUBST(MEM)
 AC_SUBST(MEM_LIBS)
 AC_SUBST(STANDARD_CFLAGS)
 
+abs_top_srcdir=`cd $srcdir; pwd`
+AC_SUBST(abs_top_srcdir)
+abs_top_builddir=`pwd`
+AC_SUBST(abs_top_builddir)
+
 AC_CONFIG_SUBDIRS(raptor)
 
 AC_OUTPUT(Makefile
@@ -1035,8 +1040,9 @@ repat/Makefile
 debian/Makefile
 debian/rules
 librdf/redland.spec
+librdf/redland-src-config
 librdf/redland-config,
-[chmod +x librdf/redland-config debian/rules])
+[chmod +x redland-src-config librdf/redland-config debian/rules])
 
 AC_MSG_RESULT([
 Redland build summary:
