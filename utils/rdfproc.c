@@ -519,19 +519,13 @@ main(int argc, char *argv[])
       if (type == CMD_PARSE_MODEL) {
         if(librdf_parser_parse_into_model(parser, uri, base_uri, model)) {
           fprintf(stderr, "%s: Failed to parse into the graph\n", program);
-          librdf_free_parser(parser);
-          librdf_free_uri(uri);
-          librdf_free_uri(base_uri);
-          break;
+          rc=1;
         }
       } else {
         /* must be CMD_PARSE_STREAM */
         if(!(stream=librdf_parser_parse_as_stream(parser, uri, base_uri))) {
           fprintf(stderr, "%s: Failed to parse RDF as stream\n", program);
-          librdf_free_parser(parser);
-          librdf_free_uri(uri);
-          librdf_free_uri(base_uri);
-          break;
+          rc=1;
         }
         
         count=0;
@@ -547,12 +541,30 @@ main(int argc, char *argv[])
           librdf_stream_next(stream);
         }
         librdf_free_stream(stream);  
-        librdf_free_parser(parser);
-        librdf_free_uri(uri);
-        librdf_free_uri(base_uri);
+
         fprintf(stderr, "%s: Added %d triples\n", program, count);
-        break;
+        rc=1;
+      }
+
+      if(rc) {
+        librdf_uri* error_count_uri=librdf_new_uri(world, LIBRDF_PARSER_FEATURE_ERROR_COUNT);
+        librdf_uri* warning_count_uri=librdf_new_uri(world, LIBRDF_PARSER_FEATURE_WARNING_COUNT);
+        const char *error_count_string, *warning_count_string;
+        int error_count, warning_count;
         
+        error_count_string =librdf_parser_get_feature(parser, error_count_uri);
+        error_count=atoi(error_count_string);
+        
+        warning_count_string=librdf_parser_get_feature(parser, warning_count_uri);
+        warning_count=atoi(warning_count_string);
+
+        if(error_count+warning_count >0)
+          fprintf(stderr,
+                  "%s: The parsing returned %d errors and %d warnings\n", 
+                  program, error_count, warning_count);
+        
+        librdf_free_uri(error_count_uri);
+        librdf_free_uri(warning_count_uri);
       }
       
       librdf_free_parser(parser);
@@ -1029,7 +1041,7 @@ main(int argc, char *argv[])
     librdf_free_query(query);
 
   if(free_uri_string)
-    free(uri_string);
+    SYSTEM_FREE(uri_string);
 
   if(output_model) {
     if(librdf_serializer_serialize_model(output_serializer, stdout, NULL,
