@@ -247,6 +247,9 @@ rdf_digest_print(rdf_digest* digest, FILE* fh)
 void
 init_rdf_digest(void) 
 {
+#ifdef HAVE_OPENSSL_DIGESTS
+  rdf_digest_openssl_constructor();
+#endif
 #ifdef HAVE_SHA1_DIGEST
   sha1_constructor();
 #endif
@@ -272,7 +275,7 @@ main(int argc, char *argv[])
   rdf_digest_factory* factory;
   rdf_digest* d;
   char *test_data="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
-  char *test_digest_types[]={"MD5", "SHA1", "FAKE", "RIPEM160", NULL};
+  char *test_digest_types[]={"MD5", "MD5-OPENSSL", "SHA1", "SHA1-OPENSSL", "FAKE", "RIPEMD160", "RIPEMD160-OPENSSL", NULL};
   int i;
   char *type;
   char *program=argv[0];
