@@ -180,7 +180,7 @@ my $host=$q->remote_host;
 ######################################################################
 # Emit content
 
-print $q->header(-type  =>  'text/html');
+print $q->header(-type  =>  'text/html', -charset=>'utf-8');
 
 # Always print header
 print <<"EOT";
