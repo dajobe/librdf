@@ -42,17 +42,22 @@
 #include <sys/types.h>
 
 #include <redland.h>
+#include <rdf_storage.h>
+
 
 #ifdef HAVE_SQLITE3_H
 #include <sqlite3.h>
 #define sqlite_exec sqlite3_exec
 #define sqlite_close sqlite3_close
 #define sqlite_freemem sqlite3_free
+#define sqlite_callback sqlite3_callback
+#define sqlite_last_insert_rowid sqlite3_last_insert_rowid
 #endif
 
 #ifdef HAVE_SQLITE_H
 #include <sqlite.h>
 #endif
+
 
 typedef struct
 {
@@ -151,8 +156,8 @@ librdf_storage_sqlite_init(librdf_storage* storage, char *name,
   strncpy(name_copy, name, context->name_len+1);
   context->name=name_copy;
   
-  if((is_new=librdf_hash_get_as_boolean(options, "new"))<0)
-    context->is_new=0; /* default is NOT NEW */
+  if((is_new=librdf_hash_get_as_boolean(options, "new"))>0)
+    context->is_new=1; /* default is NOT NEW */
 
   /* no more options, might as well free them now */
   if(options)
@@ -169,6 +174,322 @@ librdf_storage_sqlite_terminate(librdf_storage* storage)
 
   if(context->name)
     LIBRDF_FREE(cstring, context->name);
+}
+
+
+typedef struct 
+{
+  const char *name;
+  const char *schema;
+  const char *columns; /* Excluding key column, always called id */
+} table_info;
+
+
+#define NTABLES 4
+
+/*
+ * INTEGER PRIMARY KEY columns can be used to implement the
+ * equivalent of AUTOINCREMENT. If you try to insert a NULL into an
+ * INTEGER PRIMARY KEY column, the column will actually be filled
+ * with a integer that is one greater than the largest key already in
+ * the table. Or if the largest key is 2147483647, then the column
+ * will be filled with a random integer. Either way, the INTEGER
+ * PRIMARY KEY column will be assigned a unique integer. You can
+ * retrieve this integer using the sqlite_last_insert_rowid() API
+ * function or using the last_insert_rowid() SQL function in a
+ * subsequent SELECT statement.
+ */
+
+typedef enum {
+  TABLE_URIS,
+  TABLE_BLANKS,
+  TABLE_LITERALS,
+  TABLE_TRIPLES
+}  sqlite_table_numbers;
+
+static const table_info sqlite_tables[NTABLES]={
+  { "uris",     "id INTEGER PRIMARY KEY, uri TEXT", "uri" },
+  { "blanks",   "id INTEGER PRIMARY KEY, blank TEXT", "blank" },
+  { "literals", "id INTEGER PRIMARY KEY, text TEXT, language TEXT, datatype INTEGER", "text, language, datatype" },
+  { "triples",  "subjectUri INTEGER, subjectBlank INTEGER, predicateUri INTEGER, objectUri INTEGER, objectBlank INTEGER, objectLiteral INTEGER, contextUri INTEGER", "subjectUri, subjectBlank, predicateUri, objectUri, objectBlank, objectLiteral, contextUri"  },
+};
+
+
+typedef enum {
+  TRIPLE_SUBJECT  =0,
+  TRIPLE_PREDICATE=1,
+  TRIPLE_OBJECT   =2,
+  TRIPLE_CONTEXT  =3,
+} triple_part;
+
+typedef enum {
+  TRIPLE_URI    =0,
+  TRIPLE_BLANK  =1,
+  TRIPLE_LITERAL=2,
+} triple_node_type;
+
+static const char * triples_fields[4][3] = {
+  { "subjectUri",   "subjectBlank", NULL },
+  { "predicateUri", NULL,           NULL },
+  { "objectUri",    "objectBlank",  "objectLiteral" },
+  { "contextUri",   NULL,           NULL }
+};
+
+
+static int
+librdf_storage_sqlite_get_1int_callback(void *arg,
+                                        int argc, char **argv,
+                                        char **columnNames) {
+  int* count_p=(int*)arg;
+  
+  if(argc == 1) {
+    *count_p=atoi(argv[0]);
+  }
+  return 0;
+}
+
+
+static unsigned char *
+sqlite_string_escape(const unsigned char *raw, size_t raw_len, size_t *len_p) 
+{
+  int escapes=0;
+  unsigned char *p;
+  unsigned char *escaped;
+  int len;
+
+  for(p=(unsigned char*)raw, len=(int)raw_len; len>0; p++, len--) {
+    if(*p == '\'')
+      escapes++;
+  }
+
+  len= raw_len+escapes;
+  escaped=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
+
+  p=escaped;
+  while(raw_len > 0) {
+    if(*raw == '\'') {
+      *p++='\\';
+    }
+    *p++=*raw++;
+    raw_len--;
+  }
+  *p='\0';
+
+  if(len_p)
+    *len_p=len;
+  
+  return escaped;
+}
+
+
+static int
+librdf_storage_sqlite_exec(librdf_storage* storage, 
+                           char *request, sqlite_callback callback, void *arg,
+                           int fail_ok)
+{
+  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
+  int status=SQLITE_OK;
+  char *errmsg=NULL;
+
+#ifdef HAVE_SQLITE3_H
+#else
+#endif
+
+  fprintf(stderr, "SQLite exec '%s'\n", request);
+  
+  status=sqlite_exec(context->db, request, callback, arg, &errmsg);
+  if(fail_ok)
+    status=SQLITE_OK;
+  
+  if(status != SQLITE_OK) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "SQLite database %s SQL exec '%s' failed - %s (%d)", 
+               context->name, request, errmsg, status);
+    sqlite_close(context->db);
+    context->db=NULL;
+  }
+
+  return (status != SQLITE_OK);
+}
+
+
+static int
+librdf_storage_sqlite_set_helper(librdf_storage *storage,
+                                 int table, const char *values) 
+{
+  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
+  char request[1024];
+
+  sprintf(request, "INSERT INTO %s (id, %s) VALUES(NULL, %s);",
+          sqlite_tables[table].name, 
+          sqlite_tables[table].columns,
+          values);
+
+  if(librdf_storage_sqlite_exec(storage,
+                                request,
+                                NULL, /* no callback */
+                                NULL, /* arg */
+                                0))
+    return -1;
+
+  return sqlite_last_insert_rowid(context->db);
+}
+
+
+static int
+librdf_storage_sqlite_get_helper(librdf_storage *storage,
+                                 int table, const char *expression) 
+{
+  char request[1024];
+  int id= -1;
+  
+  sprintf(request, "SELECT id FROM %s WHERE %s;",
+          sqlite_tables[table].name, expression);
+
+  if(librdf_storage_sqlite_exec(storage,
+                                request,
+                                librdf_storage_sqlite_get_1int_callback,
+                                &id,
+                                0))
+    return -1;
+
+  return id;
+}
+
+
+static int
+librdf_storage_sqlite_store_uri_helper(librdf_storage* storage,
+                                       librdf_uri* uri) 
+{
+  const unsigned char *uri_string;
+  size_t uri_len;
+  char expression[2048];
+  char *uri_e;
+  int id;
+
+  uri_string=librdf_uri_as_counted_string(uri, &uri_len);
+  uri_e=sqlite_string_escape(uri_string, uri_len, NULL);
+  if(!uri_e)
+    return -1;
+  
+  sprintf(expression, "uri = '%s'", uri_e);
+  id=librdf_storage_sqlite_get_helper(storage, TABLE_URIS, expression);
+  if(id >=0)
+    goto tidy;
+  
+  sprintf(expression, "'%s'", uri_e);
+  id=librdf_storage_sqlite_set_helper(storage, TABLE_URIS, expression);
+
+  tidy:
+  LIBRDF_FREE(cstring, uri_e);
+
+  return id;
+}
+
+
+static int
+librdf_storage_sqlite_store_blank_helper(librdf_storage* storage,
+                                         const unsigned char *blank) 
+{
+  size_t blank_len;
+  char expression[2048];
+  char *blank_e;
+  int id;
+
+  blank_len=strlen((const char*)blank);
+  blank_e=sqlite_string_escape(blank, blank_len, NULL);
+  if(!blank_e)
+    return -1;
+  
+  sprintf(expression, "blank = '%s'", blank_e);
+  id=librdf_storage_sqlite_get_helper(storage, TABLE_BLANKS, expression);
+  if(id >=0)
+    goto tidy;
+  
+  sprintf(expression, "'%s'", blank_e);
+  id=librdf_storage_sqlite_set_helper(storage, TABLE_BLANKS, expression);
+
+  tidy:
+  LIBRDF_FREE(cstring, blank_e);
+
+  return id;
+}
+
+
+static int
+librdf_storage_sqlite_node_helper(librdf_storage* storage,
+                                  librdf_node* node,
+                                  int* id_p,
+                                  triple_node_type *node_type_p) 
+{
+  int id;
+  triple_node_type node_type;
+
+  switch(librdf_node_get_type(node)) {
+    case LIBRDF_NODE_TYPE_RESOURCE:
+      id=librdf_storage_sqlite_store_uri_helper(storage,
+                                                librdf_node_get_uri(node));
+      if(id <0)
+        return 1;
+      node_type=TRIPLE_URI;
+      break;
+
+    case LIBRDF_NODE_TYPE_LITERAL:
+      id=9999;
+      node_type=TRIPLE_LITERAL;
+      break;
+
+    case LIBRDF_NODE_TYPE_BLANK:
+      id=librdf_storage_sqlite_store_blank_helper(storage,
+                                                  librdf_node_get_blank_identifier(node));
+      if(id <0)
+        return 1;
+      node_type=TRIPLE_BLANK;
+      break;
+
+    default:
+      librdf_log(node->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "Do not know how to store node type %d\n", node->type);
+    return 1;
+  }
+
+  if(id_p)
+    *id_p=id;
+  if(node_type_p)
+    *node_type_p=node_type;
+  
+  return 0;
+}
+
+                                        
+
+static int
+librdf_storage_sqlite_statement_helper(librdf_storage* storage,
+                                       librdf_statement* statement,
+                                       librdf_node* context_node,
+                                       triple_node_type node_types[4],
+                                       int node_ids[4],
+                                       const char* fields[4]) 
+{
+  librdf_node* nodes[4];
+  int i;
+  
+  nodes[0]=librdf_statement_get_subject(statement);
+  nodes[1]=librdf_statement_get_predicate(statement);
+  nodes[2]=librdf_statement_get_object(statement);
+  nodes[3]=context_node;
+    
+  for(i=0; i<3; i++) {
+    if(librdf_storage_sqlite_node_helper(storage,
+                                         nodes[i],
+                                         &node_ids[i],
+                                         &node_types[i]))
+      return 1;
+    fields[i]=triples_fields[i][node_types[i]];
+  }
+
+  return 0;
 }
 
 
@@ -196,6 +517,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                "SQLite database %s open failed - %s", 
                context->name, errmsg);
 #ifdef HAVE_SQLITE3_H
+    sqlite_freemem(errmsg);
     sqlite3_close(context->db);
 #else
     free(errmsg);
@@ -204,43 +526,42 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
   }
   
   if(context->is_new) {
-    int status;
+    int i;
+    char request[200];
 
-    status=sqlite_exec(context->db,
-                       "DROP TABLE triples;",
-                       NULL, /* no callback */
-                       NULL, /* arg */
-                       &errmsg);
-    /* don't care if this fails */
+    for(i=0; i < NTABLES; i++) {
 
-    status=sqlite_exec(context->db,
-                       "CREATE TABLE triples (subject, subjectType, predicate, object, objectType, context);",
-                       NULL, /* no callback */
-                       NULL, /* arg */
-                       &errmsg);
-    if(status != SQLITE_OK) {
-      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "SQLite database %s SQL exec failed - %s (%d)", 
-                 context->name, errmsg, status);
-      sqlite_close(context->db);
+      sprintf(request, "DROP TABLE %s;", sqlite_tables[i].name);
+      librdf_storage_sqlite_exec(storage,
+                                 request,
+                                 NULL, /* no callback */
+                                 NULL, /* arg */
+                                 1); /* don't care if this fails */
+    
+      sprintf(request, "CREATE TABLE %s (%s);",
+              sqlite_tables[i].name, sqlite_tables[i].schema);
+      
+      if(librdf_storage_sqlite_exec(storage,
+                                    request,
+                                    NULL, /* no callback */
+                                    NULL, /* arg */
+                                    0))
+        return 1;
+
+    } /* end drop/create table loop */
+
+
+    strcpy(request, 
+           "CREATE INDEX spindex ON triples (subjectUri, subjectBlank, predicateUri);");
+    if(librdf_storage_sqlite_exec(storage,
+                                  request,
+                                  NULL, /* no callback */
+                                  NULL, /* arg */
+                                  0))
       return 1;
-    }
+    
+  } /* end if is new */
 
-    status=sqlite_exec(context->db,
-                       "CREATE INDEX spindex ON triples (subject, subjectType, predicate);",
-                       NULL, /* no callback */
-                       NULL, /* arg */
-                       &errmsg);
-    if(status != SQLITE_OK) {
-      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "SQLite database %s SQL exec failed - %s (%d)", 
-                 context->name, errmsg, status);
-      sqlite_close(context->db);
-      return 1;
-    }
-
-
-  }
   
   return 0;
 }
@@ -268,38 +589,16 @@ librdf_storage_sqlite_close(librdf_storage* storage)
 
 
 static int
-librdf_storage_sqlite_get_1int_callback(void *arg,
-                                        int argc, char **argv,
-                                        char **columnNames) {
-  int* count_p=(int*)arg;
-  
-  if(argc == 1) {
-    *count_p=atoi(argv[0]);
-  }
-  return 0;
-}
-
-
-static int
 librdf_storage_sqlite_size(librdf_storage* storage)
 {
-  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
-  char *errmsg;
   int count=0;
-  int status;
   
-  status=sqlite_exec(context->db,
-                     "SELECT COUNT(*) FROM triples",
-                     librdf_storage_sqlite_get_1int_callback,
-                     &count, &errmsg);
-  
-  if(status !=SQLITE_OK) {
-    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "SQLite database %s SQL exec failed - %s (%d)", 
-               context->name, errmsg, status);
-    sqlite_freemem(errmsg);
+  if(librdf_storage_sqlite_exec(storage,
+                                "SELECT COUNT(*) FROM triples;",
+                                librdf_storage_sqlite_get_1int_callback,
+                                &count,
+                                0))
     return -1;
-  }
 
   return count;
 }
@@ -339,10 +638,11 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
 
     /* FIXME - add a statement */
     char request[1024];
-    sprintf(request, "INSERT INTO triples (subject, subjectType, predicate, object, objectType, context) VALUES('%s', '%s', '%s', '%s', '%s');",
-          "s", "1",
-          "p",
-            "o", "1");
+    sprintf(request, "INSERT INTO triples (subjectUri, subjectBlank, predicateUri, objectUri, objectBlank, objectLiteral, contextUri) VALUES(%s, %s, %s, %s, %s, %s, %s);",
+            "1", "2",
+            "3",
+            "4", "5", "6", 
+            "7");
     
     status=sqlite_exec(context->db,
                        request,
@@ -367,37 +667,6 @@ static int
 librdf_storage_sqlite_remove_statement(librdf_storage* storage, librdf_statement* statement)
 {
   return librdf_storage_sqlite_context_remove_statement(storage, NULL, statement);
-}
-
-
-static char *
-sqlite_string_escape(char *raw, size_t raw_len, size_t *len_p) 
-{
-  int escapes=0;
-  char *p;
-  char *escaped;
-  int len;
-
-  for(p=raw; *p; p++) {
-    if(*p == '\'')
-      escapes++;
-  }
-
-  len+= raw_len+1;
-  escaped=(char*)LIBRDF_MALLOC(cstring, len);
-
-  p=escaped;
-  while(*raw) {
-    if(*raw == '\'') {
-      *p++='\\';
-    }
-    *p++=*raw++;
-  }
-
-  if(len_p)
-    *len_p=len;
-  
-  return escaped;
 }
 
 
@@ -462,8 +731,11 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_stateme
 {
   librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
   int status;
-  char *errmsg=NULL;
   int count=0;
+  char request[2048];
+  triple_node_type node_types[4];
+  int node_ids[4];
+  const char* fields[4];
   
   if(context->index_contexts) {
 
@@ -483,25 +755,25 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_stateme
 
   /* FIXME - find a contained statement */
 
-  char request[1024];
-  sprintf(request, "SELECT subject, subjectType, predicate, object, objectType FROM triples WHERE subject='%s' AND subjectType='%s' AND predicate='%s' AND object='%s' and objectType='%s';",
-          "s", "1",
-          "p",
-          "o", "1");
+  if(librdf_storage_sqlite_statement_helper(storage,
+                                            statement,
+                                            NULL,
+                                            node_types, node_ids, fields))
+    return -1;
   
-  status=sqlite_exec(context->db,
-                     request,
-                     NULL,
-                     &count,
-                     &errmsg);
-  if(status != SQLITE_OK) {
-    librdf_log(storage->world,
-               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "SQLite database %s SQL exec failed - %s (%d)", 
-               context->name, errmsg, status);
-    sqlite_freemem(errmsg);
-    return 0;
-  }
+  sprintf(request,
+          "SELECT COUNT(*) FROM %s WHERE %s='%d' and %s='%d' and %s='%d';",
+          sqlite_tables[TABLE_TRIPLES].name, 
+          fields[TRIPLE_SUBJECT], node_ids[TRIPLE_SUBJECT],
+          fields[TRIPLE_PREDICATE], node_ids[TRIPLE_PREDICATE],
+          fields[TRIPLE_OBJECT], node_ids[TRIPLE_OBJECT]);
+  
+  if(librdf_storage_sqlite_exec(storage,
+                                request,
+                                librdf_storage_sqlite_get_1int_callback,
+                                &count,
+                                0))
+    return -1;
 
   return (count > 0);
 }
@@ -990,8 +1262,10 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
                                             librdf_statement* statement) 
 {
   librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
-  int status=0;
-  char *errmsg=NULL;
+  triple_node_type node_types[4];
+  int node_ids[4];
+  const char* fields[4];
+  char request[1024];
 
   if(context_node && !context->index_contexts) {
     librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
@@ -1001,27 +1275,27 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   
   /* FIXME Store statement + node in the storage_sqlite */
 
-  char request[1024];
-  sprintf(request, "INSERT INTO triples (subject, subjectType, predicate, object, objectType, context) VALUES('%s', '%s', '%s', '%s', '%s', '%s');",
-          "s", "1",
-          "p",
-          "o", "1",
-          (context_node ? "c" : "0"));
-  
-  status=sqlite_exec(context->db,
-                     request,
-                     NULL,
-                     NULL, &errmsg);
-  if(status != SQLITE_OK) {
-    librdf_log(storage->world,
-               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "SQLite database %s SQL exec failed - %s (%d)", 
-               context->name, errmsg, status);
-    sqlite_freemem(errmsg);
-    return 0;
-  }
+  if(librdf_storage_sqlite_statement_helper(storage,
+                                            statement,
+                                            context_node,
+                                            node_types, node_ids, fields))
+    return -1;
 
-  return status;
+  /* FIXME no context field used */
+  sprintf(request,
+          "INSERT INTO %s (%s, %s, %s) VALUES(%d, %d, %d);",
+          sqlite_tables[TABLE_TRIPLES].name, 
+          fields[TRIPLE_SUBJECT],  fields[TRIPLE_PREDICATE],  fields[TRIPLE_OBJECT], 
+          node_ids[TRIPLE_SUBJECT], node_ids[TRIPLE_PREDICATE], node_ids[TRIPLE_OBJECT]);
+  
+  if(librdf_storage_sqlite_exec(storage,
+                                request,
+                                NULL, /* no callback */
+                                NULL, /* arg */
+                                0))
+    return 1;
+
+  return 0;
 }
 
 
