@@ -769,7 +769,7 @@ librdf_storage_list_get_contexts_get_method(void* iterator, int flags)
       break;
       
     default:
-      LIBRDF_ERROR2(icontext->world, "Unknown iterator method flag %d\n", flags);
+      LIBRDF_ERROR2(icontext->storage->world, "Unknown iterator method flag %d\n", flags);
       result=NULL;
       break;
   }
