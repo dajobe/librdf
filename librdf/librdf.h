@@ -103,6 +103,7 @@ extern const unsigned int librdf_version_decimal;
 /* FIXME: Should be replaced with automatically pulled
  * definitions from the listed rdf_*.h header files.
  */
+#include <rdf_log.h>
 #include <rdf_init.h>
 #include <rdf_iterator.h>
 #include <rdf_uri.h>
