@@ -75,3 +75,6 @@
 
 /* for Repat */
 #undef RDFPARSE_INCLUDE_XMLPARSE
+
+/* When need expat compiled in the sources */
+#undef NEED_EXPAT_SOURCE
