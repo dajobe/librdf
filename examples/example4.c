@@ -48,7 +48,7 @@ main(int argc, char *argv[])
   model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.'"), NULL);
 
   parser=librdf_new_parser(world,"raptor","application/rdf+xml",NULL);
-  uri=librdf_new_uri(world,"file:../perl/dc.rdf");
+  uri=librdf_new_uri(world,"file:../data/dc.rdf");
   librdf_parser_parse_into_model(parser,uri,uri,model);
   librdf_free_uri(uri);
   librdf_free_parser(parser);
