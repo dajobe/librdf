@@ -36,7 +36,7 @@
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>
 #else
-#include <raptor_getopt.h>
+#include <rdfproc_getopt.h>
 #endif
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
