@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -66,7 +66,7 @@ REDLAND_API librdf_iterator* librdf_new_iterator(librdf_world *world, void *cont
 REDLAND_API void librdf_free_iterator(librdf_iterator*);
 
 REDLAND_API int librdf_iterator_end(librdf_iterator* iterator);
-REDLAND_API int librdf_iterator_have_elements(librdf_iterator* iterator);
+REDLAND_API REDLAND_DEPRECATED int librdf_iterator_have_elements(librdf_iterator* iterator);
 
 REDLAND_API int librdf_iterator_finished(librdf_iterator* iterator);
 
