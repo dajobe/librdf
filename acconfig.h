@@ -73,6 +73,9 @@
 #undef NEED_EXPAT
 #undef NEED_LIBXML
 
+/* expat compiled with namespaces? */
+#undef HAVE_XML_SetNamespaceDeclHandler
+
 /* for Repat */
 #undef RDFPARSE_INCLUDE_XMLPARSE
 
