@@ -241,7 +241,7 @@ librdf_new_query_from_query(librdf_query* old_query)
 
   /* FIXME: fail if clone is not supported by this query (factory) */
   if(!old_query->factory->clone) {
-    LIBRDF_FATAL2(world, "clone not implemented for query factory type %s", old_query->factory->name);
+    LIBRDF_FATAL1(world, "clone not implemented for query factory");
     return NULL;
   }
 
