@@ -245,6 +245,8 @@ static librdf_statement*
 librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *context) {
   librdf_statement* statement=NULL;
   char buffer[LINE_BUFFER_LEN];
+  char *literal_buffer=NULL;
+  int literal_buffer_length=0;
   
   /* SiRPAC format:
   triple("URL-of-predicate","URL-of-subject","URI-of-object/literal-string").
@@ -289,17 +291,70 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
     if(*o == '"')
       o++;
 
-
-    if(!(e=strstr(o, "\")")))
-      continue;
-    /* zap end */
-    *e='\0';
-
     if(!strncmp(o, "literal(\"", 9)) {
       o+=9;
       object_is_literal=1;
     }
 
+    if(e=strstr(o, "\")")) {
+      /* found end of object - terminate it */
+      *e='\0';
+    } else {
+      /* Ignore statements with URI objects that dont live on one line */
+      if(!object_is_literal)
+        continue;
+
+      /* otherwise build a multi-line literal */
+      e=NULL;
+      
+      literal_buffer_length=strlen(o);
+      literal_buffer=(char*)LIBRDF_MALLOC(cstring, literal_buffer_length+1);
+      if(!literal_buffer) {
+        o=NULL;
+        break;
+      }
+      strcpy(literal_buffer, o);
+
+      /* Read more lines for rest of literal */
+      while(!feof(context->fh)) {
+        char *p, *literal_buffer2;
+        char literal_line_buffer[LINE_BUFFER_LEN];
+        int len;
+        
+        if(!fgets(literal_line_buffer, LINE_BUFFER_LEN, context->fh))
+          break;
+        
+        if(p=strstr(literal_line_buffer, "\")")) {
+          len=(p-literal_line_buffer);
+        } else {
+          len=strlen(literal_line_buffer);
+        }
+
+        literal_buffer2=(char*)LIBRDF_MALLOC(cstring, 
+                                             literal_buffer_length+len+1);
+        if(!literal_buffer2) {
+          LIBRDF_FREE(cstring, literal_buffer);
+          literal_buffer=NULL;
+          break;
+        }
+        strncpy(literal_buffer2,
+                literal_buffer, literal_buffer_length);
+        strncpy(literal_buffer2+literal_buffer_length, 
+                literal_line_buffer, len);
+        literal_buffer_length+=len;
+        literal_buffer2[literal_buffer_length]='\0';
+        LIBRDF_FREE(cstring, literal_buffer);
+
+        literal_buffer=literal_buffer2;
+
+        /* found end so stop */
+        if(p)
+          break;
+      }
+    }
+
+    if(!o && !literal_buffer)
+      break;
 
     /* got all statement parts now */
     statement=librdf_new_statement();
@@ -313,8 +368,12 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
                                    librdf_new_node_from_uri_string(p));
 
     if(object_is_literal) {
+      if(literal_buffer)
+        o=literal_buffer;
       librdf_statement_set_object(statement,
                                   librdf_new_node_from_literal(o, NULL, 0, 0));
+      if(literal_buffer)
+        LIBRDF_FREE(cstring, literal_buffer);
     } else {
       librdf_statement_set_object(statement, 
                                   librdf_new_node_from_uri_string(o));
