@@ -113,8 +113,8 @@ REDLAND_API void librdf_world_set_uris_hash(librdf_world* world, librdf_hash* ur
 #define LIBRDF_WORLD_FEATURE_GENID_BASE "http://feature.librdf.org/genid-base"
 #define LIBRDF_WORLD_FEATURE_GENID_COUNTER "http://feature.librdf.org/genid-counter"
 
-REDLAND_API const char *librdf_world_get_feature(librdf_world* world, librdf_uri *feature);
-REDLAND_API int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, const char *value);
+REDLAND_API librdf_node* librdf_world_get_feature(librdf_world* world, librdf_uri *feature);
+REDLAND_API int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, librdf_node* value);
 
 /* OLD INTERFACES */
 REDLAND_API REDLAND_DEPRECATED void librdf_init_world(char *digest_factory_name, void* not_used2);
