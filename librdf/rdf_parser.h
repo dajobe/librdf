@@ -60,7 +60,6 @@ struct librdf_parser_factory_s
   librdf_stream* (*parse_file_as_stream)(void *c, librdf_uri *uri, librdf_uri *base_uri);
   int (*parse_file_into_model)(void *c, librdf_uri *uri, librdf_uri *base_uri, librdf_model *model);
 };
-typedef struct librdf_parser_factory_s librdf_parser_factory;
 
 
 struct librdf_parser_s {
@@ -76,15 +75,15 @@ struct librdf_parser_s {
 
 
 /* factory static methods */
-void librdf_parser_register_factory(const char *name, const char *mime_type, const char *uri_string, void (*factory) (librdf_parser_factory*));
+void librdf_parser_register_factory(librdf_world *world, const char *name, const char *mime_type, const char *uri_string, void (*factory) (librdf_parser_factory*));
 
-librdf_parser_factory* librdf_get_parser_factory(const char *name, const char *mime_type, librdf_uri *type_uri);
+librdf_parser_factory* librdf_get_parser_factory(librdf_world *world, const char *name, const char *mime_type, librdf_uri *type_uri);
 
 
 /* module init */
-void librdf_init_parser(void);
+void librdf_init_parser(librdf_world *world);
 /* module finish */
-void librdf_finish_parser(void);
+void librdf_finish_parser(librdf_world *world);
                     
 
 /* constructor */
@@ -110,16 +109,16 @@ void librdf_parser_warning(librdf_parser* parser, const char *message, ...);
 
 /* in librdf_parser_sirpac.c */
 #ifdef HAVE_SIRPAC_RDF_PARSER
-void librdf_parser_sirpac_constructor(void);
+void librdf_parser_sirpac_constructor(librdf_world* world);
 #endif
 #ifdef HAVE_LIBWWW_RDF_PARSER
-void librdf_parser_libwww_constructor(void);
+void librdf_parser_libwww_constructor(librdf_world* world);
 #endif
 #ifdef HAVE_RAPIER_RDF_PARSER
-void librdf_parser_rapier_constructor(void);
+void librdf_parser_rapier_constructor(librdf_world* world);
 #endif
 #ifdef HAVE_REPAT_RDF_PARSER
-void librdf_parser_repat_constructor(void);
+void librdf_parser_repat_constructor(librdf_world* world);
 #endif
 
 

@@ -84,7 +84,7 @@ librdf_uri* librdf_concept_schema_namespace_uri = NULL;
  * 
  **/
 void
-librdf_init_concepts(void)
+librdf_init_concepts(librdf_world *world)
 {
   int i;
 
@@ -113,7 +113,7 @@ librdf_init_concepts(void)
  * librdf_finish_concepts - Terminate the librdf_concepts module
  **/
 void
-librdf_finish_concepts(void)
+librdf_finish_concepts(librdf_world *world)
 {
   int i;
 
@@ -140,16 +140,21 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_init_digest();
-  librdf_init_hash();
-  librdf_init_uri(librdf_get_digest_factory(NULL), NULL);
-  librdf_init_concepts();
+  librdf_world *world;
   
-  librdf_finish_concepts();
-  librdf_finish_uri();
-  librdf_finish_hash();
-  librdf_finish_digest();
+  RDF_World=world=librdf_new_world();
+  
+  librdf_init_digest(world);
+  librdf_init_hash(world);
+  librdf_init_uri(world);
+  librdf_init_concepts(world);
+  
+  librdf_finish_concepts(world);
+  librdf_finish_uri(world);
+  librdf_finish_hash(world);
+  librdf_finish_digest(world);
 
+  LIBRDF_FREE(librdf_world, world);
 
 #ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);

@@ -32,8 +32,7 @@
 #include <rdf_utf8.h>
 
 
-/* statics */
-static librdf_digest_factory *librdf_node_digest_factory=NULL;
+/* class functions */
 
 /**
  * librdf_init_node - Initialise the node module.
@@ -41,9 +40,8 @@ static librdf_digest_factory *librdf_node_digest_factory=NULL;
  * 
  **/
 void
-librdf_init_node(librdf_digest_factory* factory) 
+librdf_init_node(librdf_world* world) 
 {
-  librdf_node_digest_factory=factory;
 }
 
 
@@ -51,13 +49,11 @@ librdf_init_node(librdf_digest_factory* factory)
  * librdf_finish_node - Terminate the librdf_node module
  **/
 void
-librdf_finish_node(void)
+librdf_finish_node(librdf_world *world)
 {
 }
 
 
-
-/* class functions */
 
 /* constructors */
 
@@ -690,6 +686,7 @@ librdf_node_print(librdf_node* node, FILE *fh)
 librdf_digest*
 librdf_node_get_digest(librdf_node* node) 
 {
+  librdf_world* world=RDF_World;
   librdf_digest* d=NULL;
   char *s;
   
@@ -700,7 +697,7 @@ librdf_node_get_digest(librdf_node* node)
       
     case LIBRDF_NODE_TYPE_LITERAL:
       s=node->value.literal.string;
-      d=librdf_new_digest_from_factory(librdf_node_digest_factory);
+      d=librdf_new_digest_from_factory(world->digest_factory);
       if(!d)
         return NULL;
       
@@ -933,12 +930,16 @@ main(int argc, char *argv[])
   librdf_uri *uri, *uri2;
   int size, size2;
   char *buffer;
+  librdf_world *world;
   
   char *program=argv[0];
 	
-  librdf_init_digest();
-  librdf_init_hash();
-  librdf_init_uri(librdf_get_digest_factory(NULL), NULL);
+  RDF_World=world=librdf_new_world();
+
+  librdf_init_digest(world);
+  librdf_init_hash(world);
+  librdf_init_uri(world);
+  librdf_init_node(world);
 
   fprintf(stdout, "%s: Creating home page node from string\n", program);
   node=librdf_new_node_from_uri_string(hp_string1);
@@ -1011,9 +1012,12 @@ main(int argc, char *argv[])
   librdf_free_node(node2);
   librdf_free_node(node);
   
-  librdf_finish_uri();
-  librdf_finish_hash();
-  librdf_finish_digest();
+  librdf_finish_node(world);
+  librdf_finish_uri(world);
+  librdf_finish_hash(world);
+  librdf_finish_digest(world);
+
+  LIBRDF_FREE(librdf_world, world);
 
 #ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);

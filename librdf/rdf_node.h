@@ -119,12 +119,12 @@ struct librdf_node_s
 #endif
 
 
-/* class methods */
-void librdf_init_node(librdf_digest_factory* factory);
-void librdf_finish_node(void);
-
-
 /* initialising functions / constructors */
+
+/* class methods */
+void librdf_init_node(librdf_world* world);
+void librdf_finish_node(librdf_world* world);
+
 
 /* Create a new Node. */
 librdf_node* librdf_new_node(void);

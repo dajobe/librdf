@@ -102,10 +102,10 @@ typedef struct librdf_storage_factory_s librdf_storage_factory;
 
 
 /* module init */
-void librdf_init_storage(void);
+void librdf_init_storage(librdf_world *world);
 
 /* module terminate */
-void librdf_finish_storage(void);
+void librdf_finish_storage(librdf_world *world);
 
 /* class methods */
 void librdf_storage_register_factory(const char *name, void (*factory) (librdf_storage_factory*));

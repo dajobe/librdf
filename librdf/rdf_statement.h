@@ -35,8 +35,8 @@ extern "C" {
 
 
 /* class methods */
-void librdf_init_statement(void);
-void librdf_finish_statement(void);
+void librdf_init_statement(librdf_world *world);
+void librdf_finish_statement(librdf_world *world);
 
 
 /* initialising functions / constructors */

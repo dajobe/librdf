@@ -719,8 +719,8 @@ librdf_parser_repat_register_factory(librdf_parser_factory *factory)
  * librdf_parser_repat_constructor - Initialise the Repat RDF parser module
  **/
 void
-librdf_parser_repat_constructor(void)
+librdf_parser_repat_constructor(librdf_world *world)
 {
-  librdf_parser_register_factory("repat", NULL, NULL,
+  librdf_parser_register_factory(world, "repat", NULL, NULL,
                                  &librdf_parser_repat_register_factory);
 }

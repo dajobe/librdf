@@ -24,9 +24,11 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
+#ifdef HAVE_STDARG_H
+#include <stdarg.h>
+#endif
 
 #include <librdf.h>
-#include <rdf_init.h>
 #include <rdf_hash.h>
 #include <rdf_uri.h>
 #include <rdf_node.h>
@@ -35,9 +37,11 @@
 #include <rdf_statement.h>
 #include <rdf_storage.h>
 #include <rdf_model.h>
+#include <rdf_parser.h>
+#include <rdf_init.h>
 
 
-const char * const redland_copyright_string = "Copyright (C) 2000 David Beckett - http://purl.org/net/dajobe/ - Institute for Learning and Research Technology, University of Bristol.";
+const char * const redland_copyright_string = "Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/ - Institute for Learning and Research Technology, University of Bristol.";
 
 const char * const redland_version_string = VERSION;
 
@@ -46,64 +50,234 @@ const int redland_version_minor = LIBRDF_VERSION_MINOR;
 const int redland_version_release = LIBRDF_VERSION_RELEASE;
 
 
+
+
 /**
- * librdf_init_world - Initialise the library
- * @digest_factory_name: &librdf_digest_factory
- * @uris_hash: &librdf_hash for URIs
- * 
- * Initialises various classes and uses the digest factory
- * for various modules that need to make digests of their objects.
- * See librdf_init_node() for details.
- *
- * If a uris_hash is given, that is passed to the URIs class
- * initialisation and used to store hashes rather than the default
- * one, currently an in memory hash.  See librdf_init_uri() for details.
- *
- **/
-void
-librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash)
-{
-  librdf_digest_factory* digest_factory;
-
-  /* Digests first, lots of things use these */
-  librdf_init_digest();
-  digest_factory=librdf_get_digest_factory(digest_factory_name);
- 
-  /* Hash next, needed for URIs */
-  librdf_init_hash();
-
-  /* URIs */
-  librdf_init_uri(digest_factory, uris_hash);
-  librdf_init_node(digest_factory);
-
-  librdf_init_concepts();
-
-  librdf_init_statement();
-  librdf_init_model();
-  librdf_init_storage();
-  librdf_init_parser();
+ * librdf_new_world - Creates a new Redland execution environment
+ */
+librdf_world*
+librdf_new_world(void) {
+  librdf_world *world=(librdf_world*)LIBRDF_CALLOC(librdf_world, sizeof(librdf_world), 1);
+  
+  return world;
+  
 }
 
 
 /**
- * librdf_destroy_world - Terminate the library
+ * librdf_free_world - Terminate the library
+ * 
+ * Terminates and frees the resources.
+ **/
+void
+librdf_free_world(librdf_world *world)
+{
+  librdf_finish_parser(world);
+  librdf_finish_storage(world);
+  librdf_finish_model(world);
+  librdf_finish_statement(world);
+
+  librdf_finish_concepts(world);
+
+  librdf_finish_node(world);
+  librdf_finish_uri(world);
+
+  librdf_finish_hash(world);
+
+  librdf_finish_digest(world);
+
+  LIBRDF_FREE(librdf_world, world);
+}
+
+
+/**
+ * librdf_world_open - Open an environment
+ * 
+ **/
+void
+librdf_world_open(librdf_world *world)
+{
+  /* Digests first, lots of things use these */
+  librdf_init_digest(world);
+
+  /* Hash next, needed for URIs */
+  librdf_init_hash(world);
+
+  librdf_init_uri(world);
+
+  librdf_init_concepts(world);
+
+  librdf_init_statement(world);
+  librdf_init_model(world);
+  librdf_init_storage(world);
+  librdf_init_parser(world);
+}
+
+
+/*
+ * librdf_error - Error - Internal
+ **/
+void
+librdf_error(librdf_world* world, const char *message, ...)
+{
+  va_list arguments;
+
+  if(world->error_fn) {
+    world->error_fn(world->error_user_data, message);
+    return;
+  }
+  
+  va_start(arguments, message);
+
+  fputs("librdf error - ", stderr);
+  vfprintf(stderr, message, arguments);
+  fputc('\n', stderr);
+
+  va_end(arguments);
+}
+
+
+/*
+ * librdf_warning - Warning - Internal
+ **/
+void
+librdf_warning(librdf_world* world, const char *message, ...)
+{
+  va_list arguments;
+
+  if(world->warning_fn) {
+    world->warning_fn(world->warning_user_data, message);
+    return;
+  }
+  
+  va_start(arguments, message);
+
+  fputs("librdf warning - ", stderr);
+  vfprintf(stderr, message, arguments);
+  fputc('\n', stderr);
+
+  va_end(arguments);
+}
+
+
+/**
+ * librdf_world_set_error - Set the world error handling function
+ * @world: the world
+ * @user_data: user data to pass to function
+ * @error_fn: pointer to the function
+ * 
+ * The function will receive callbacks when the world fails.
+ * 
+ **/
+void
+librdf_world_set_error(librdf_world* world, void *user_data,
+                       void (*error_fn)(void *user_data, const char *msg, ...))
+{
+  world->error_user_data=user_data;
+  world->error_fn=error_fn;
+}
+
+
+/**
+ * librdf_world_set_warning - Set the world warning handling function
+ * @world: the world
+ * @user_data: user data to pass to function
+ * @warning_fn: pointer to the function
+ * 
+ * The function will receive callbacks when the world gives a warning.
+ * 
+ **/
+void
+librdf_world_set_warning(librdf_world* world, void *user_data,
+                         void (*warning_fn)(void *user_data, const char *msg, ...))
+{
+  world->warning_user_data=user_data;
+  world->warning_fn=warning_fn;
+}
+
+
+
+/**
+ * librdf_world_set_digest - Set the default digest name
+ * @world: the world
+ * @name: Digest factory name
+ *
+ * Sets the digest factory for various modules that need to make
+ * digests of their objects.
+ * 
+ */
+void
+librdf_world_set_digest(librdf_world* world, const char *name) {
+  world->digest_factory_name=(char*)name;
+}
+
+
+/**
+ * librdf_world_set_uris_hash - Set the hash object to use for URI class
+ * @world: the world
+ * @uris_hash: librdf_hash* hash
+ *
+ * If a uris_hash is given, that is passed to the URIs class
+ * initialisation and used to store hashes rather than the default
+ * one, currently an in memory hash.  See librdf_init_uri() for details.
+ */
+void 
+librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash)
+{
+  world->uris_hash=uris_hash;
+}
+
+
+const char *
+librdf_world_get_feature(librdf_world* world, librdf_uri *feature) 
+{
+  abort();
+}
+
+int
+librdf_world_set_feature(librdf_world* world, librdf_uri *feature,
+                         const char *value) 
+{
+  abort();
+}
+
+
+
+/* OLD INTERFACES BELOW HERE */
+
+/* GLOBAL - for old interfaces below */
+librdf_world* RDF_World;
+
+/**
+ * librdf_init_world - Initialise the library (DEPRECATED)
+ *
+ * Use librdf_new_world and librdf_world_open on librdf_world object
+ * 
+ * See librdf_world_set_digest_factory_name and
+ * librdf_world_set_uris_hash for documentation on arguments.
+ **/
+void
+librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash)
+{
+  RDF_World=librdf_new_world();
+  if(!RDF_World)
+    return;
+  if(digest_factory_name)
+    librdf_world_set_digest(RDF_World, digest_factory_name);
+  librdf_world_set_uris_hash(RDF_World, uris_hash);
+  librdf_world_open(RDF_World);
+}
+
+
+/**
+ * librdf_destroy_world - Terminate the library (DEPRECATED)
+ *
+ * Use librdf_free_world on librdf_world object
  * 
  * Terminates and frees the resources.
  **/
 void
 librdf_destroy_world(void)
 {
-  librdf_finish_parser();
-  librdf_finish_storage();
-  librdf_finish_model();
-  librdf_finish_statement();
-
-  librdf_finish_concepts();
-
-  librdf_finish_node();
-  librdf_finish_uri();
-
-  librdf_finish_hash();
-
-  librdf_finish_digest();
+  librdf_free_world(RDF_World);
 }

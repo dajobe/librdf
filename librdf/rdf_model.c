@@ -38,7 +38,7 @@
  * librdf_init_model - Initialise librdf_model class
  **/
 void
-librdf_init_model(void)
+librdf_init_model(librdf_world *world)
 {
   /* nothing to do here */
 }
@@ -48,7 +48,7 @@ librdf_init_model(void)
  * librdf_finish_model - Terminate librdf_model class
  **/
 void
-librdf_finish_model(void)
+librdf_finish_model(librdf_world *world)
 {
   /* nothing to do here */
 }

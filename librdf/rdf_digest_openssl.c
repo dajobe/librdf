@@ -154,16 +154,19 @@ librdf_openssl_ripemd160_register_factory(librdf_digest_factory *factory)
  * 
  **/
 void
-librdf_digest_openssl_constructor(void)
+librdf_digest_openssl_constructor(librdf_world *world)
 {
 #ifdef HAVE_OPENSSL_CRYPTO_MD5_DIGEST
-  librdf_digest_register_factory("MD5", &librdf_openssl_md5_register_factory);
+  librdf_digest_register_factory(world,
+                                 "MD5", &librdf_openssl_md5_register_factory);
 #endif
 #ifdef HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST
-  librdf_digest_register_factory("RIPEMD160", &librdf_openssl_ripemd160_register_factory);
+  librdf_digest_register_factory(world,
+                                 "RIPEMD160", &librdf_openssl_ripemd160_register_factory);
 #endif
 #ifdef HAVE_OPENSSL_CRYPTO_SHA1_DIGEST
-  librdf_digest_register_factory("SHA1", &librdf_openssl_sha1_register_factory);
+  librdf_digest_register_factory(world,
+                                 "SHA1", &librdf_openssl_sha1_register_factory);
 #endif
 
 }

@@ -36,7 +36,7 @@
  * librdf_init_statement - Initialise the librdf_statement module
  **/
 void
-librdf_init_statement(void) 
+librdf_init_statement(librdf_world *world) 
 {
 }
 
@@ -45,7 +45,7 @@ librdf_init_statement(void)
  * librdf_finish_statement - Terminate the librdf_statement module
  **/
 void
-librdf_finish_statement(void) 
+librdf_finish_statement(librdf_world *world) 
 {
 }
 
@@ -651,12 +651,15 @@ main(int argc, char *argv[])
   int size, size2;
   char *program=argv[0];
   char *s, *buffer;
+  librdf_world *world;
+  
+  RDF_World=world=librdf_new_world();
   
   /* initialise dependent modules */
-  librdf_init_digest();
-  librdf_init_hash();
-  librdf_init_uri(librdf_get_digest_factory(NULL), NULL);
-  librdf_init_statement();
+  librdf_init_digest(world);
+  librdf_init_hash(world);
+  librdf_init_uri(world);
+  librdf_init_statement(world);
 
   fprintf(stderr, "%s: Creating statement\n", program);
   statement=librdf_new_statement();
@@ -705,10 +708,12 @@ main(int argc, char *argv[])
   librdf_free_statement(statement);
 
 
-  librdf_finish_statement();
-  librdf_finish_uri();
-  librdf_finish_hash();
-  librdf_finish_digest();
+  librdf_finish_statement(world);
+  librdf_finish_uri(world);
+  librdf_finish_hash(world);
+  librdf_finish_digest(world);
+
+  LIBRDF_FREE(librdf_world, world);
   
 #ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);

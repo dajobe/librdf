@@ -332,7 +332,8 @@ librdf_digest_md5_register_factory(librdf_digest_factory *factory)
  * librdf_digest_md5_constructor - Initialise the MD5 digest factory
  **/
 void
-librdf_digest_md5_constructor(void)
+librdf_digest_md5_constructor(librdf_world *world)
 {
-  librdf_digest_register_factory("MD5", &librdf_digest_md5_register_factory);
+  librdf_digest_register_factory(world, 
+                                 "MD5", &librdf_digest_md5_register_factory);
 }

@@ -33,45 +33,29 @@
 #include <rdf_digest.h>
 
 
-/* statics */
-static librdf_digest_factory* librdf_uri_digest_factory;
-
-
-static librdf_hash* uris_hash=NULL;
-static int uris_hash_allocated_here=0;
-
-
 /* class methods */
 
 
 /**
  * librdf_init_uri - Initialise the librdf_uri class
- * @digest_factory: &librdf_digest_factory
- * @hash: &librdf_hash
- * 
- * Initialises the librdf_uri class using the given
- * digest factory when calculating URI digests in librdf_uri_get_digest()
- * and using the given hash to store uris.
+ * @world: &librdf_world
+ *
  **/
 void
-librdf_init_uri(librdf_digest_factory* digest_factory, librdf_hash* hash) 
+librdf_init_uri(librdf_world *world)
 {
-  librdf_uri_digest_factory=digest_factory;
-
   /* If no default given, create an in memory hash */
-  if(!hash) {
-    hash=librdf_new_hash(NULL);
-    if(!hash)
+  if(!world->uris_hash) {
+    world->uris_hash=librdf_new_hash(NULL);
+    if(!world->uris_hash)
       LIBRDF_FATAL1(librdf_init_uri, "Failed to create URI hash from factory");
     
-    if(librdf_hash_open(hash, NULL, 0, 1, 1, NULL))
+    if(librdf_hash_open(world->uris_hash, NULL, 0, 1, 1, NULL))
       LIBRDF_FATAL1(librdf_init_uri, "Failed to open URI hash");
 
     /* remember to free it later */
-    uris_hash_allocated_here=1;
+    world->uris_hash_allocated_here=1;
   }
-
-  uris_hash=hash;  
 }
 
 
@@ -80,12 +64,12 @@ librdf_init_uri(librdf_digest_factory* digest_factory, librdf_hash* hash)
  * librdf_finish_uri - Terminate the librdf_uri class
  **/
 void
-librdf_finish_uri(void)
+librdf_finish_uri(librdf_world *world)
 {
-  librdf_hash_close(uris_hash);
+  librdf_hash_close(world->uris_hash);
 
-  if(uris_hash_allocated_here)
-    librdf_free_hash(uris_hash);
+  if(world->uris_hash_allocated_here)
+    librdf_free_hash(world->uris_hash);
 }
 
 
@@ -101,6 +85,7 @@ librdf_finish_uri(void)
 librdf_uri*
 librdf_new_uri (const char *uri_string)
 {
+  librdf_world *world=RDF_World;
   librdf_uri* new_uri;
   char *new_string;
   int length;
@@ -113,7 +98,7 @@ librdf_new_uri (const char *uri_string)
   key.size=length;
   
   /* if existing URI found in hash, return it */
-  if((old_value=librdf_hash_get_one(uris_hash, &key))) {
+  if((old_value=librdf_hash_get_one(world->uris_hash, &key))) {
     new_uri=*(librdf_uri**)old_value->data;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
@@ -141,6 +126,7 @@ librdf_new_uri (const char *uri_string)
   if(!new_uri)
     return NULL;
 
+  new_uri->world=world;
   new_uri->string_length=length;
 
   new_string=(char*)LIBRDF_MALLOC(librdf_uri, length+1);
@@ -160,7 +146,7 @@ librdf_new_uri (const char *uri_string)
   value.data=&new_uri; value.size=sizeof(librdf_uri*);
   
   /* store in hash: URI-string => (librdf_uri*) */
-  if(librdf_hash_put(uris_hash, &key, &value)) {
+  if(librdf_hash_put(world->uris_hash, &key, &value)) {
     LIBRDF_FREE(librdf_uri, new_uri);
     new_uri=NULL;
   }
@@ -378,7 +364,7 @@ librdf_free_uri (librdf_uri* uri)
   
   key.data=uri->string;
   key.size=uri->string_length;
-  if(librdf_hash_delete_all(uris_hash, &key) )
+  if(librdf_hash_delete_all(uri->world->uris_hash, &key) )
     LIBRDF_FATAL1(librdf_free_uri, "Hash deletion failed");
 
 
@@ -416,9 +402,10 @@ librdf_uri_as_string (librdf_uri *uri)
 librdf_digest*
 librdf_uri_get_digest (librdf_uri* uri) 
 {
+  librdf_world *world=RDF_World;
   librdf_digest* d;
   
-  d=librdf_new_digest_from_factory(librdf_uri_digest_factory);
+  d=librdf_new_digest_from_factory(world->digest_factory);
   if(!d)
     return NULL;
   
@@ -529,17 +516,18 @@ main(int argc, char *argv[])
 {
   char *hp_string="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
   librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5, *uri6, *uri7;
-  librdf_digest_factory* digest_factory;
   librdf_digest *d;
   char *program=argv[0];
   const char *uri_string=  "file:/big/long/directory/blah#frag";
   const char *relative_uri_string1="#foo";
   const char *relative_uri_string2="bar";
-
-  librdf_init_digest();
-  librdf_init_hash();
-  digest_factory=librdf_get_digest_factory(NULL);
-  librdf_init_uri(digest_factory, NULL);
+  librdf_world *world;
+  
+  RDF_World=world=librdf_new_world();
+  
+  librdf_init_digest(world);
+  librdf_init_hash(world);
+  librdf_init_uri(world);
 
   fprintf(stderr, "%s: Creating new URI from string\n", program);
   uri1=librdf_new_uri(hp_string);
@@ -615,9 +603,11 @@ main(int argc, char *argv[])
   librdf_free_uri(uri6);
   librdf_free_uri(uri7);
   
-  librdf_finish_uri();
-  librdf_finish_hash();
-  librdf_finish_digest();
+  librdf_finish_uri(world);
+  librdf_finish_hash(world);
+  librdf_finish_digest(world);
+
+  LIBRDF_FREE(librdf_world, world);
 
 #ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);

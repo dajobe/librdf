@@ -520,7 +520,8 @@ librdf_hash_gdbm_register_factory(librdf_hash_factory *factory)
  * 
  **/
 void
-librdf_init_hash_gdbm(void)
+librdf_init_hash_gdbm(librdf_world *world)
 {
-  librdf_hash_register_factory("gdbm", &librdf_hash_gdbm_register_factory);
+  librdf_hash_register_factory(world,
+                               "gdbm", &librdf_hash_gdbm_register_factory);
 }

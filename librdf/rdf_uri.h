@@ -34,6 +34,7 @@ extern "C" {
 
 struct librdf_uri_s
 {
+  librdf_world *world;
   char *string;
   int string_length; /* useful for fast comparisons (that fail) */
   int usage;
@@ -44,8 +45,8 @@ struct librdf_uri_s
 
 
 /* class methods */
-void librdf_init_uri(librdf_digest_factory *factory, librdf_hash *hash);
-void librdf_finish_uri(void);
+void librdf_init_uri(librdf_world *world);
+void librdf_finish_uri(librdf_world *world);
 
 /* constructors */
 librdf_uri* librdf_new_uri (const char *string);

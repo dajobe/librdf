@@ -30,9 +30,11 @@ extern "C" {
 
 
 /* forward references to private structures */
+typedef struct librdf_world_s librdf_world;
 typedef struct librdf_hash_s librdf_hash;
 typedef struct librdf_hash_cursor_s librdf_hash_cursor;
 typedef struct librdf_digest_s librdf_digest;
+typedef struct librdf_digest_factory_s librdf_digest_factory;
 typedef struct librdf_uri_s librdf_uri;
 typedef struct librdf_list_s librdf_list;
 typedef struct librdf_iterator_s librdf_iterator;
@@ -42,6 +44,7 @@ typedef struct librdf_model_s librdf_model;
 typedef struct librdf_storage_s librdf_storage;
 typedef struct librdf_stream_s librdf_stream;
 typedef struct librdf_parser_s librdf_parser;
+typedef struct librdf_parser_factory_s librdf_parser_factory;
 
 
 /* error handling */
@@ -112,6 +115,9 @@ void librdf_memory_report(FILE *fh);
 
 /* internal interfaces  */
 #ifdef LIBRDF_INTERNAL
+
+extern librdf_world *RDF_World;
+
 #include <rdf_list.h>
 #include <rdf_hash.h>
 #include <rdf_digest.h>

@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 
-void librdf_init_hash_gdbm(void);
+void librdf_init_hash_gdbm(librdf_world *world);
 
 
 #ifdef __cplusplus

@@ -177,8 +177,8 @@ extern librdf_uri* librdf_concept_schema_namespace_uri;
 
 
 /* class methods */
-void librdf_init_concepts(void);
-void librdf_finish_concepts(void);
+void librdf_init_concepts(librdf_world *world);
+void librdf_finish_concepts(librdf_world *world);
 
 
 

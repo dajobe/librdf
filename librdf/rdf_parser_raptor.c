@@ -405,8 +405,8 @@ librdf_parser_rapier_register_factory(librdf_parser_factory *factory)
  * librdf_parser_rapier_constructor - Initialise the rapier RDF parser module
  **/
 void
-librdf_parser_rapier_constructor(void)
+librdf_parser_rapier_constructor(librdf_world *world)
 {
-  librdf_parser_register_factory("rapier", NULL, NULL,
+  librdf_parser_register_factory(world, "rapier", NULL, NULL,
                                  &librdf_parser_rapier_register_factory);
 }

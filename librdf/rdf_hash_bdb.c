@@ -994,7 +994,8 @@ librdf_hash_bdb_register_factory(librdf_hash_factory *factory)
  * librdf_init_hash_bdb - Initialise the BerkeleyDB hash module
  **/
 void
-librdf_init_hash_bdb(void)
+librdf_init_hash_bdb(librdf_world *world)
 {
-  librdf_hash_register_factory("bdb", &librdf_hash_bdb_register_factory);
+  librdf_hash_register_factory(world,
+                               "bdb", &librdf_hash_bdb_register_factory);
 }

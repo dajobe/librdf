@@ -49,7 +49,6 @@ struct librdf_digest_factory_s
   void (*final)( void *c );
   unsigned char *(*get_digest)( void *c );
 };
-typedef struct librdf_digest_factory_s librdf_digest_factory;
 
 
 struct librdf_digest_s {
@@ -60,15 +59,15 @@ struct librdf_digest_s {
 
 
 /* factory static methods */
-void librdf_digest_register_factory(const char *name, void (*factory) (librdf_digest_factory*));
+void librdf_digest_register_factory(librdf_world *world, const char *name, void (*factory) (librdf_digest_factory*));
 
-librdf_digest_factory* librdf_get_digest_factory(const char *name);
+librdf_digest_factory* librdf_get_digest_factory(librdf_world *world, const char *name);
 
 
 /* module init */
-void librdf_init_digest(void);
+void librdf_init_digest(librdf_world *world);
 /* module finish */
-void librdf_finish_digest(void);
+void librdf_finish_digest(librdf_world *world);
                     
 /* constructor */
 librdf_digest* librdf_new_digest(char *name);
@@ -90,22 +89,22 @@ void librdf_digest_print(librdf_digest* digest, FILE* fh);
 
 /* in librdf_digest_openssl.c */
 #ifdef HAVE_OPENSSL_DIGESTS
-void librdf_digest_openssl_constructor(void);
+void librdf_digest_openssl_constructor(librdf_world *world);
 #endif
 
 /* in librdf_digest_md5.c */
 #ifdef HAVE_LOCAL_MD5_DIGEST
-void librdf_digest_md5_constructor(void);
+void librdf_digest_md5_constructor(librdf_world *world);
 #endif
 
 /* in librdf_digest_sha1.c */
 #ifdef HAVE_LOCAL_SHA1_DIGEST
-void librdf_digest_sha1_constructor(void);
+void librdf_digest_sha1_constructor(librdf_world *world);
 #endif
 
 /* in librdf_digest_ripemd160.c */
 #ifdef HAVE_LOCAL_RIPEMD160_DIGEST
-void librdf_digest_rmd160_constructor(void);
+void librdf_digest_rmd160_constructor(librdf_world *world);
 #endif
 
 

@@ -296,7 +296,7 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
       object_is_literal=1;
     }
 
-    if(e=strstr(o, "\")")) {
+    if((e=strstr(o, "\")"))) {
       /* found end of object - terminate it */
       *e='\0';
     } else {
@@ -317,14 +317,14 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
 
       /* Read more lines for rest of literal */
       while(!feof(context->fh)) {
-        char *p, *literal_buffer2;
+        char *literal_buffer2;
         char literal_line_buffer[LINE_BUFFER_LEN];
         int len;
         
         if(!fgets(literal_line_buffer, LINE_BUFFER_LEN, context->fh))
           break;
         
-        if(p=strstr(literal_line_buffer, "\")")) {
+        if((p=strstr(literal_line_buffer, "\")"))) {
           len=(p-literal_line_buffer);
         } else {
           len=strlen(literal_line_buffer);
@@ -596,15 +596,15 @@ librdf_parser_sirpac_w3c_register_factory(librdf_parser_factory *factory)
  * librdf_parser_sirpac_constructor - Initialise the SiRPAC RDF parser module
  **/
 void
-librdf_parser_sirpac_constructor(void)
+librdf_parser_sirpac_constructor(librdf_world *world)
 {
 #ifdef JAVA_SIRPACSTANFORD_JAR
-  librdf_parser_register_factory("sirpac-stanford", NULL, NULL,
+  librdf_parser_register_factory(world, "sirpac-stanford", NULL, NULL,
                                  &librdf_parser_sirpac_stanford_register_factory);
 #endif
 
 #ifdef JAVA_SIRPACW3C_JAR
-  librdf_parser_register_factory("sirpac-w3c", NULL, NULL,
+  librdf_parser_register_factory(world, "sirpac-w3c", NULL, NULL,
                                  &librdf_parser_sirpac_w3c_register_factory);
 #endif
 }

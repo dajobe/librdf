@@ -80,13 +80,12 @@ typedef struct
 } librdf_hash_memory_context;
 
 
-/* statics */
 
 /* default load_factor out of 1000 */
-static int librdf_hash_default_load_factor=750;
+static const int librdf_hash_default_load_factor=750;
 
 /* starting capacity - MUST BE POWER OF 2 */
-static int librdf_hash_initial_capacity=8;
+static const int librdf_hash_initial_capacity=8;
 
 
 /* prototypes for local functions */
@@ -996,10 +995,12 @@ librdf_hash_memory_register_factory(librdf_hash_factory *factory)
  * To use the default value (whatever it is) use a value less than 0.
  **/
 void
-librdf_init_hash_memory(int default_load_factor)
+librdf_init_hash_memory(librdf_world *world) 
 {
-  if(default_load_factor > 0 && default_load_factor < 1000)
-    librdf_hash_default_load_factor=default_load_factor;
+  /* use default load factor */
+  if(world->hash_load_factor <= 0 || world->hash_load_factor > 999)
+    world->hash_load_factor=librdf_hash_default_load_factor;
 
-  librdf_hash_register_factory("memory", &librdf_hash_memory_register_factory);
+  librdf_hash_register_factory(world,
+                               "memory", &librdf_hash_memory_register_factory);
 }

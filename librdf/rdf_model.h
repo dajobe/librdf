@@ -45,8 +45,8 @@ struct librdf_model_s {
 
 
 /* class methods */
-void librdf_init_model(void);
-void librdf_finish_model(void);
+void librdf_init_model(librdf_world *world);
+void librdf_finish_model(librdf_world *world);
 
 
 /* constructors */

@@ -621,8 +621,8 @@ librdf_parser_libwww_register_factory(librdf_parser_factory *factory)
  * librdf_parser_libwww_constructor - Initialise the libwww RDF parser module
  **/
 void
-librdf_parser_libwww_constructor(void)
+librdf_parser_libwww_constructor(librdf_world *world)
 {
-  librdf_parser_register_factory("libwww", NULL, NULL,
+  librdf_parser_register_factory(world, "libwww", NULL, NULL,
                                  &librdf_parser_libwww_register_factory);
 }

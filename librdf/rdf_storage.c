@@ -57,7 +57,7 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
  * factory functions such as librdf_get_storage_factory()
  **/
 void
-librdf_init_storage(void) 
+librdf_init_storage(librdf_world *world) 
 {
   /* Always have storage list, hashes implementations available */
   librdf_init_storage_hashes();
@@ -69,7 +69,7 @@ librdf_init_storage(void)
  * librdf_finish_storage - Terminate the librdf_storage module
  **/
 void
-librdf_finish_storage(void) 
+librdf_finish_storage(librdf_world *world) 
 {
   librdf_delete_storage_factories();
 }
@@ -754,11 +754,14 @@ main(int argc, char *argv[])
 {
   librdf_storage* storage;
   char *program=argv[0];
+  librdf_world *world;
+  
+  RDF_World=world=librdf_new_world();
   
   /* initialise hash, model and storage modules */
-  librdf_init_hash();
-  librdf_init_storage();
-  librdf_init_model();
+  librdf_init_hash(world);
+  librdf_init_storage(world);
+  librdf_init_model(world);
   
   fprintf(stdout, "%s: Creating storage\n", program);
   storage=librdf_new_storage(NULL, "test", NULL);
@@ -785,10 +788,11 @@ main(int argc, char *argv[])
   
 
   /* finish model and storage modules */
-  librdf_finish_model();
-  librdf_finish_storage();
-  librdf_finish_hash();
-  
+  librdf_finish_model(world);
+  librdf_finish_storage(world);
+  librdf_finish_hash(world);
+
+  LIBRDF_FREE(librdf_world, world);
   
 #ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);

@@ -33,10 +33,7 @@
 
 
 /* prototypes for helper functions */
-static void librdf_delete_parser_factories(void);
-
-/** List of parser factories */
-static librdf_parser_factory *parsers=NULL;
+static void librdf_delete_parser_factories(librdf_world *world);
 
 
 /* helper functions */
@@ -54,14 +51,15 @@ librdf_free_parser_factory(librdf_parser_factory *factory)
 
 
 static void
-librdf_delete_parser_factories(void)
+librdf_delete_parser_factories(librdf_world *world)
 {
   librdf_parser_factory *factory, *next;
   
-  for(factory=parsers; factory; factory=next) {
+  for(factory=world->parsers; factory; factory=next) {
     next=factory->next;
     librdf_free_parser_factory(factory);
   }
+  world->parsers=NULL;
 }
 
 
@@ -74,7 +72,8 @@ librdf_delete_parser_factories(void)
  * 
  **/
 void
-librdf_parser_register_factory(const char *name, const char *mime_type,
+librdf_parser_register_factory(librdf_world *world,
+                               const char *name, const char *mime_type,
                                const char *uri_string,
 			       void (*factory) (librdf_parser_factory*))
 {
@@ -135,8 +134,8 @@ librdf_parser_register_factory(const char *name, const char *mime_type,
 		parser_factory->context_length);
 #endif
   
-  parser_factory->next = parsers;
-  parsers = parser_factory;
+  parser_factory->next = world->parsers;
+  world->parsers = parser_factory;
   
 }
 
@@ -150,20 +149,21 @@ librdf_parser_register_factory(const char *name, const char *mime_type,
  * Return value: the factory or NULL if not found
  **/
 librdf_parser_factory*
-librdf_get_parser_factory(const char *name, const char *mime_type,
+librdf_get_parser_factory(librdf_world *world,
+                          const char *name, const char *mime_type,
                           librdf_uri *type_uri) 
 {
   librdf_parser_factory *factory;
 
   /* return 1st parser if no particular one wanted - why? */
   if(!name) {
-    factory=parsers;
+    factory=world->parsers;
     if(!factory) {
       LIBRDF_DEBUG1(librdf_get_parser_factory, "No parsers available\n");
       return NULL;
     }
   } else {
-    for(factory=parsers; factory; factory=factory->next) {
+    for(factory=world->parsers; factory; factory=factory->next) {
       /* next if name does not match */
       if(name && strcmp(factory->name, name))
 	continue;
@@ -202,9 +202,10 @@ librdf_parser*
 librdf_new_parser(const char *name, const char *mime_type,
                   librdf_uri *type_uri)
 {
+  librdf_world *world=RDF_World;
   librdf_parser_factory* factory;
 
-  factory=librdf_get_parser_factory(name, mime_type, type_uri);
+  factory=librdf_get_parser_factory(world, name, mime_type, type_uri);
   if(!factory)
     return NULL;
 
@@ -325,19 +326,19 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
  * librdf_init_parser - Initialise the librdf_parser class
  **/
 void
-librdf_init_parser(void) 
+librdf_init_parser(librdf_world *world) 
 {
 #ifdef HAVE_RAPIER_RDF_PARSER
-  librdf_parser_rapier_constructor();
+  librdf_parser_rapier_constructor(world);
 #endif
 #ifdef HAVE_SIRPAC_RDF_PARSER
-  librdf_parser_sirpac_constructor();
+  librdf_parser_sirpac_constructor(world);
 #endif
 #ifdef HAVE_LIBWWW_RDF_PARSER
-  librdf_parser_libwww_constructor();
+  librdf_parser_libwww_constructor(world);
 #endif
 #ifdef HAVE_REPAT_RDF_PARSER
-  librdf_parser_repat_constructor();
+  librdf_parser_repat_constructor(world);
 #endif
 }
 
@@ -346,9 +347,9 @@ librdf_init_parser(void)
  * librdf_finish_parser - Terminate the librdf_parser class
  **/
 void
-librdf_finish_parser(void) 
+librdf_finish_parser(librdf_world *world) 
 {
-  librdf_delete_parser_factories();
+  librdf_delete_parser_factories(world);
 }
 
 
@@ -487,10 +488,12 @@ main(int argc, char *argv[])
   int i;
   char *type;
   char *program=argv[0];
-        
+  librdf_world *world;
+
+  RDF_World=world=librdf_new_world();
   
   /* initialise parser module */
-  librdf_init_parser();
+  librdf_init_parser(world);
   
   for(i=0; (type=test_parser_types[i]); i++) {
     fprintf(stderr, "%s: Trying to create new %s parser\n", program, type);
@@ -506,7 +509,9 @@ main(int argc, char *argv[])
   
   
   /* finish parser module */
-  librdf_finish_parser();
+  librdf_finish_parser(world);
+
+  LIBRDF_FREE(librdf_world, world);
   
 #ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);
