@@ -89,7 +89,8 @@ EXTRA_librdf_la_SOURCES = rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_sha1.c rdf_digest_openssl.c \
 rdf_parser_raptor.c \
 rdf_storage_tstore.c rdf_storage_tstore.h \
-rdf_storage_mysql.c rdf_storage_mysql.h
+rdf_storage_mysql.c rdf_storage_mysql.h \
+rdf_storage_sqlite.c
 
 EXTRA_DIST=\
 redland.spec redland.spec.in \
