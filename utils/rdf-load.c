@@ -2,7 +2,7 @@
  * rdf-load.c - Load statements from URI and store in persistent
  * Redland storage.
  *
- * Copyright (C) 2003 Morten Frederiksen - http://purl.org/net/morten/
+ * Copyright (C) 2003-2004 Morten Frederiksen - http://purl.org/net/morten/
  *
  * and
  *
@@ -26,9 +26,9 @@
 #include <string.h>
 #include <getopt.h>
 #include <redland.h>
-#include <mysql.h>
+#include <unistd.h>
 
-const char *VERSION = "0.0.1";
+const char *VERSION = "0.4";
 
 struct options {
   librdf_uri *base;
@@ -36,12 +36,13 @@ struct options {
   char *database;
   char *directory;
   char *host;
-  char *id;
+  char *input;
+  char *model;
   int keep;
   char *is_new;
   int port;
   char *password;
-  char *rdfparser;
+  int quiet;
   char *user;
 } opts;
 
@@ -142,10 +143,11 @@ main(int argc, char *argv[])
   }
 
   /* Create storage. */
-  storage = librdf_new_storage(world, storage_type, opts.id, storage_options);
+  storage =
+    librdf_new_storage(world, storage_type, opts.model, storage_options);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage (%s/%s/%s)\n", argv[0],
-	    storage_type, opts.id, storage_options);
+	    storage_type, opts.model, storage_options);
     return (1);
   }
 
@@ -155,12 +157,12 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Failed to create model\n", argv[0]);
     return (1);
   }
-  if(librdf_model_size(model) != -1)
+  if(librdf_model_size(model) != -1 && !opts.quiet)
     fprintf(stderr, "%s: Model '%s' initially contained %d statements\n",
-	    argv[0], opts.id, librdf_model_size(model));
+	    argv[0], opts.model, librdf_model_size(model));
 
   /* Create parser. */
-  parser = librdf_new_parser(world, opts.rdfparser, NULL, NULL);
+  parser = librdf_new_parser(world, opts.input, NULL, NULL);
   if(!parser) {
     fprintf(stderr, "%s: Failed to create parser\n", argv[0]);
     return (1);
@@ -180,7 +182,7 @@ main(int argc, char *argv[])
 	      argv[0]);
       return (1);
     }
-    if(librdf_model_size(model) != -1)
+    if(librdf_model_size(model) != -1 && !opts.quiet)
       fprintf(stderr, "%s: After context truncation: %d statements\n",
 	      argv[0], librdf_model_size(model));
   }
@@ -190,10 +192,12 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Failed to add statements to model\n", argv[0]);
     return (1);
   }
-  if(librdf_model_size(model) != -1)
+  if(librdf_model_size(model) != -1 && !opts.quiet)
     fprintf(stderr, "%s: After insertion: %d statements\n", argv[0],
 	    librdf_model_size(model));
 
+  /* Sleep to make sure that generated bnode ID's don't clash... */
+  sleep(1);
   /* Clean up. */
   librdf_free_parser(parser);
   librdf_free_model(model);
@@ -215,17 +219,18 @@ getoptions(int argc, char *argv[], librdf_world * world)
     {"database", required_argument, NULL, 's'},
     {"directory", required_argument, NULL, 'd'},
     {"host", required_argument, NULL, 'h'},
-    {"id", required_argument, NULL, 'i'},
+    {"input", required_argument, NULL, 'i'},
     {"keep", no_argument, NULL, 'k'},
+    {"model", required_argument, NULL, 'm'},
     {"new", no_argument, NULL, 'n'},
     {"port", required_argument, NULL, 'P'},
     {"password", required_argument, NULL, 'p'},
-    {"rdf-parser", required_argument, NULL, 'r'},
+    {"quiet", no_argument, NULL, 'q'},
     {"user", required_argument, NULL, 'u'},
     {"version", no_argument, NULL, 'v'},
     {0, 0, 0, 0}
   };
-  const char *opts_short = "?b:c:D:d:h:i:knP:p:r:u:v";
+  const char *opts_short = "?b:c:D:d:h:i:m:knP:p:qu:v";
   int i = 1;
   char c;
   char *buffer;
@@ -236,13 +241,14 @@ getoptions(int argc, char *argv[], librdf_world * world)
   opts.context = 0;
   opts.password = 0;
   opts.port = 3306;
+  opts.quiet = 0;
   opts.user = 0;
   opts.keep = 0;
   if(!(opts.directory = strdup("./"))
      || !(opts.host = strdup("mysql"))
-     || !(opts.id = strdup("redland"))
+     || !(opts.model = strdup("redland"))
      || !(opts.is_new = strdup("no"))
-     || !(opts.rdfparser = strdup("raptor"))
+     || !(opts.input = strdup("raptor"))
      || !(opts.database = strdup("redland"))) {
     fprintf(stderr, "%s: Failed to allocate default options\n", argv[0]);
     exit(1);
@@ -296,10 +302,13 @@ getoptions(int argc, char *argv[], librdf_world * world)
 	opts.host = buffer;
 	break;
       case 'i':
-	opts.id = buffer;
+	opts.input = buffer;
 	break;
       case 'k':
 	opts.keep = 1;
+	break;
+      case 'm':
+	opts.model = buffer;
 	break;
       case 'n':
 	opts.is_new = (char *) malloc(4);
@@ -318,8 +327,8 @@ getoptions(int argc, char *argv[], librdf_world * world)
 	opts.password = buffer;
 	ttypasswd = 0;
 	break;
-      case 'r':
-	opts.rdfparser = buffer;
+      case 'q':
+	opts.quiet = 1;
 	break;
       case 'u':
 	opts.user = buffer;
@@ -340,16 +349,24 @@ getoptions(int argc, char *argv[], librdf_world * world)
   }
 
   /* Read password from tty if not specified. */
+  /* Read password from tty if not specified. */
   if(opts.database && ttypasswd) {
-    buffer =
-      (char *) malloc(strlen(opts.host) + strlen(opts.database) +
-		      strlen(opts.user) + 42);
-    snprintf(buffer,
-	     40 + strlen(opts.host) + strlen(opts.database) +
-	     strlen(opts.user), "Enter password for %s@%s/%s: ", opts.user,
-	     opts.host, opts.database);
-    opts.password = get_tty_password(buffer);
-    free(buffer);
+    char c2;
+    int i2 = 0;
+    opts.password = malloc(128);
+    if(!opts.password) {
+      fprintf(stderr, "%s: Failed to allocate buffer for password\n",
+	      argv[0]);
+      exit(1);
+    }
+    fprintf(stderr, "%s: Enter password for %s@%s/%s: ", argv[0], opts.user,
+	    opts.host, opts.database);
+    while((c2 = getchar()) != '\n') {
+      opts.password[i2++] = c2;
+      if(i2 == 127)
+	break;
+    }
+    opts.password[i2++] = 0;
   }
 
   return optind;
@@ -382,13 +399,16 @@ usage: %s [options] <URI>\n\
                      of 'hashes' storage type instead of 'mysql'.\n\
   -h<host name>, --host=<host name>\n\
                      Host to contact for MySQL connections, default is 'mysql'.\n\
-  -i<storage id>, --id=<storage id>\n\
-                     Identifier for (name of) storage (model name for storage\n\
-                     type 'mysql', base file name for storage type 'hashes'),\n\
-                     default is 'redland'.\n\
+  -i<parser name>, --input=<parser name>\n\
+                     Name of parser to use ('raptor' for RDF/XML, or 'ntriples'\n\
+                     for NTriples), default is 'raptor'.\n\
   -k, --keep         By default, existing statements in the given context will\n\
                      be removed prior to insertion of new statements, this\n\
                      option will skip the removal.\n\
+  -m<model id>, --model=<model id>\n\
+                     Identifier for (name of) storage (model name for storage\n\
+                     type 'mysql', base file name for storage type 'hashes'),\n\
+                     default is 'redland'.\n\
   -n, --new          Truncate model before adding new statements.\n\
   -p<password>, --password=<password>\n\
                      Password to use when connecting to MySQL server.\n\
@@ -396,9 +416,6 @@ usage: %s [options] <URI>\n\
   -P<port number>, --port=<port number>\n\
                      The port number to use when connecting to MySQL server.\n\
                      Default port number is 3306.\n\
-  -r<parser name>, --rdf-parser=<parser name>\n\
-                     Name of parser to use ('raptor' for RDF/XML, or 'ntriples'\n\
-                     for NTriples), default is 'raptor'.\n\
   -u<user name>, --user=<user name>\n\
                      User name for MySQL server.\n\
   -v, --version      Output version information and exit.\n\
