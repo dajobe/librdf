@@ -186,7 +186,17 @@ new logging API works correctly with this code.</p>
 
 <h3>Storage Class changes</h3>
 
-<p>Context methods will give a run time warning if called and
+<p>The "mysql" storage was updated by
+<a href="http://purl.org/net/morten/">Morten Frederiksen</a>
+to revise the schema and to add two new features,
+controlled by new boolean storage options:</p>
+<ol>
+<li><code>bulk</code>: whether model/storage method add_statements
+should be optimized, until a model/storage sync operation</li>
+<li><code>merge</code>: whether to maintain a table with merged models</li>
+</ol>
+
+<p>Context methods will now give a run time warning if called and
 contexts are not supported or enabled.  The methods affected are:</p>
 <ul>
 <li><code>librdf_storage_context_add_statement</code></li>
