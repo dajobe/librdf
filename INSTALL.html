@@ -1,11 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "blah">
 <html>
 <head>
-  <title>Redland - An RDF Application Framework - Installation instructions</title>
+  <title>Redland - RDF Application Framework - Installation instructions</title>
+  <link rel="stylesheet" title="Default" href="docs/stylesheet.css" />
 </head>
 <body bgcolor="#ffffff" text="#000085">
 
-<h1 align="center">Redland - An RDF Application Framework - Installation instructions</h1>
+<h1 align="center">Redland - RDF Application Framework - Installation instructions</h1>
 
 
 <h2>1. Getting the sources</h2>
@@ -54,12 +55,26 @@ such as <tt>--prefix</tt> etc.</p>
 
 <dl>
 <dt><tt>--with-bdb=ROOT</tt><br /></dt>
-<dd><p>Enable use of the Berkeley DB library installed at <em>ROOT</em>.  That means <em>ROOT</em><tt>/include</tt> must contain the BDB header <tt>db.h</tt> and <em>ROOT</em><tt>/lib</tt> must contain the library <tt>libdb.a</tt> (or whatever shared version you have).</p>
+<dd><p>Enable use of the Berkeley DB library installed at
+<em>ROOT</em>.  That means <em>ROOT</em><tt>/include</tt> must
+contain the BDB header <tt>db.h</tt> and <em>ROOT</em><tt>/lib</tt>
+must contain the library <tt>libdb.a</tt> (or whatever shared version
+you have).</p>
 
 <p>Berkeley DB is now distributed and supported by
-<a href="http://www.sleepycat.com/">SleepyCat Software</a> and you can
-download the library from there.  Versions 3.1.14, 2.7.7 and 2.4.14 (comes
-with RedHat 6.2) have been tested and work.</p>
+<a href="http://www.sleepycat.com/">SleepyCat Software</a> and you
+can download the library from there.  Versions 3.1.17, 3.1.14, 2.7.7
+and 2.4.14 (the version that comes with RedHat 6.2) have been tested
+and work.</p>
+
+<p><b>Note</b>: If you change between using the system installed BDB
+or various versions of BDB (2.x, 3.x etc.) then you will need to re-configure the system carefully by tidying up as follows:</p>
+<pre>
+  rm -f config.cache
+  make clean
+  ./configure ... # any configure arguments here
+</pre>
+
 </dd>
 
 <dt><tt>--with-libwww</tt><br /></dt>
@@ -83,15 +98,38 @@ pages for details.  The alternative, to link libwww statically, works
 but is difficult to enable.</p>
 </dd>
 
-<dt><tt>--with-rdf-java-api=JAR</tt><br /></dt>
-<dd><p>Enable the use of Sergey Melnik's
-<a href="http://www-db.stanford.edu/~melnik/rdf/api.html">Java API</a>
-RDF parser (based on 
-<a href="http://www.w3.org/RDF/Implementations/SiRPAC/">SiRPAC</a>)
-to generate triples.  You need to download 
-the distribution or just the <a href="http://www-diglib.stanford.edu/~melnik/rdf/rdf-api-2000-05-12.jar">rdf-api-2000-05-12.jar</a> file
+<dt><tt>--with-sirpac-stanford-jar=JAR</tt><br />
+<tt>--with-sirpac-w3c-jar=JAR</tt><br /></dt>
+<dd><p>Enable the use of one of the 
+<a href="http://www.w3.org/RDF/Implementations/SiRPAC/">SiRPAC</a>
+RDF Java parsers to generate triples.  Both of arguments these can be
+given if required.</p>
+
+<p>The
+<a href="http://www-db.stanford.edu/~melnik/rdf/api.html"><tt>stanford</tt></a> parser is by Sergey Melnik of Stanford University based on an earlier version
+of the W3C version.  You need to download 
+the distribution or just the <a href="latest">latest</a> jar file
 from <a href="http://www-db.stanford.edu/~melnik/rdf/api.html">his site</a>
-enable with this option pointing at the jar file.</p></dd>
+enable with this option pointing at the jar file.
+This has been tested with the 2000-05-12, 2000-09-03 and
+2000-10-30 releases.</p>
+</dd>
+
+<p>The
+<a href="http://www.w3.org/RDF/Implementations/SiRPAC/"><tt>w3c</tt></a>
+parser is from the W3C.  You need to download the
+<a href="http://www.w3.org/RDF/Implementations/SiRPAC/SiRPAC-1.15.tar.gz">distribution</a>
+and create a jar file of the classes inside, and pass that as the
+value of this option.  You will need the
+<a href="http://www.megginson.com/SAX/">http://www.megginson.com/SAX/</a>
+generic driver and probably others if you want to compile SiRPAC from
+source.  The other requirement is a SAX parser and to configure it
+specify use the following options:</p>
+
+<blockquote>
+<tt>--with-java-sax-jar=</tt><em>jar file of SAX parser</em><br />
+<tt>--with-java-sax-class=</tt><em>class name of SAXDriver </em>
+</blockquote>
 
 <dt><tt>--enable-digests=LIST</tt><br /></dt>
 <dd><p>Select the list of digests to be included if the are availble.  The
@@ -102,10 +140,11 @@ libcrypto library or by provided portable
 versions (only MD5 supported in this release).</p></dd>
 
 <dt><tt>--with-openssl-digests</tt><br /></dt>
-<dd><p>Enable digests provided by the <a href="http://www.openssl.org/">OpenSSL</a> libcrypto library (MD5,
-SHA1 and RIPEMD160) if the library is available. configure will
-automatically enable this unless disabled by setting this option to
-<em>no</em>.</p></dd>
+<dd><p>Enable digests provided by the
+<a href="http://www.openssl.org/">OpenSSL</a>
+libcrypto library (MD5, SHA1 and RIPEMD160) if the library is
+available. configure will automatically enable this unless disabled
+by setting this option to <em>no</em>.</p></dd>
 
 </dl>
 
@@ -117,9 +156,9 @@ automatically enable this unless disabled by setting this option to
 </pre>
 
 <p>More commonly you will be doing something like this, when compiling
-with the Java parser:</p>
+with the Stanford version of the SiRPAC Java parser:</p>
 <pre>
-   ./configure --with-rdf-java-api=rdf-api-2000-05-12.jar
+   ./configure --with-sirpac-stanford-jar=rdf-api-2000-10-30.jar
 </pre>
 
 <p>If you are having problems with configuring several times when
@@ -182,7 +221,7 @@ it in a browser) then probably it was a parsing problem.</p>
 <p>You can check that you have a functioning Java/SiRPAC installation by
 running the Java parser directly against some RDF URL, eg.:</p>
 <pre>
-  java -classpath rdf-api-2000-05-12.jar org.w3c.rdf.examples.ListStatements http://purl.org/dc/index.htm.rdf
+  java -classpath .../rdf-api-2000-10-30.jar org.w3c.rdf.examples.ListStatements http://purl.org/dc/index.htm.rdf
 </pre>
 
 
@@ -222,7 +261,7 @@ removal of statements.  To see a usage message type:</p>
 parser) into a BerkeleyDB store, print it, do some queries, you could
 do the following:</p>
 <pre>
-  linux$ example4 test parse http://www.ilrt.bristol.ac.uk/people/cmdjb/webwho.xrdf sirpac
+  linux$ example4 test parse http://www.ilrt.bristol.ac.uk/people/cmdjb/webwho.xrdf sirpac-w3c
   example4: Parsing URI http://www.ilrt.bristol.ac.uk/people/cmdjb/webwho.xrdf
   linux$ example4 test print
   [[
@@ -255,41 +294,15 @@ do the following:</p>
 
 <h2>3. Using the Perl interface</h2>
 
-<p>This is not automatically built or installed at present, since the
-installation system isn't quite finished.  You can easily build it by
-hand as follows</p>
+<p>See the <a href="docs/perl.html">Redland Perl Interface</a> document for
+full information on installing and using Redland from Perl.</p>
 
-<pre>
-  cd perl
-  make build-perl
-  make test-perl   # optional
-</pre>
+<h2>4. Using the Python interface</h2>
 
-<p>You can ignore any compiling warnings about discarding 'const'.
-To install it system wide (this is optional) do this as <em>root</em>:</p>
+<p>See the <a href="docs/python.html">Redland Python Interface</a> document for
+full information on installing and using Redland from Python.</p>
 
-<pre>
-  root# make install-perl
-</pre>
 
-<p>If you did the optional install above, run the perl example
-program with:</p>
-<pre>
-  perl ./example.pl  # ./example.pl might work if your perl is in /usr/bin/perl
-</pre>
-
-<p>Otherwise, to run in the source tree do:</p>
-<pre>
-  perl -Iblib/arch -Iblib/lib ./example.pl
-</pre>
-
-<p>and the result should be:</p>
-<pre>
-  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
-  Subject: [http://purl.org/net/dajobe/]
-  Predicate: [http://purl.org/dc/elements/1.1/creator]
-  Object: Dave Beckett
-</pre>
 
 <hr />
 
