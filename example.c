@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * example.c - Example code using RDF parser
+ * example.c - Redland example parsing RDF from a URI, storing on disk as BDB hashes and querying the results
  *
  * $Id$
  *

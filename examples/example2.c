@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * example2.c - Example code importing triples from a text file
+ * example2.c - Redland example code importing RDF as triples from a text file and storing them on disk as BDB hashes
  *
  * $Id$
  *
