@@ -6,3 +6,4 @@ dmalloc*
 rdfproc
 rdfproc.html
 redland-db-upgrade
+*.db
