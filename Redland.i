@@ -59,7 +59,83 @@ static PyObject *_wrap_redland_version_release_get(void);
 
 #endif
 
+#ifdef SWIGPERL
+/*
+ * calls a perl subroutine defined as:
+ *   RDF::Redland::World::message($$)
+ * where first argument is an integer, second is a (scalar) string
+ */
+static void
+librdf_call_perl_message(int type, const char *message, va_list arguments)
+{
+  dSP;
+  char *buffer;
+  int len;
+  
+  ENTER;
+  SAVETMPS;
+
+  /* ask vsnprintf size of buffer required */
+  len=vsnprintf(NULL, 0, message, arguments)+1;
+  buffer=(char*)malloc(len);
+  if(!buffer)
+    fprintf(stderr, "librdf_call_perl_message: Out of memory\n");
+  else {
+    vsnprintf(buffer, len, message, arguments);
+
+    PUSHMARK(SP) ;
+    XPUSHs(sv_2mortal(newSViv(type)));
+    XPUSHs(sv_2mortal(newSVpv(buffer, 0)));
+    PUTBACK;
+  
+    call_pv("RDF::Redland::World::message", G_DISCARD);
+
+    free(message);
+  }
+  
+  FREETMPS;
+  LEAVE;
+}
+
+static void
+librdf_perl_error_handler(void *user_data, 
+                          const char *message, va_list arguments)
+{
+  librdf_call_perl_message(0, message, arguments);
+}
+
+
+static void
+librdf_perl_warning_handler(void *user_data,
+                            const char *message, va_list arguments)
+{
+  librdf_call_perl_message(1, message, arguments);
+}
+
+void
+librdf_perl_world_init(librdf_world *world)
+{
+  librdf_world_set_error(world, NULL, librdf_perl_error_handler);
+  librdf_world_set_warning(world,  NULL, librdf_perl_warning_handler);
+}
+#endif
+
+
+/* FOR TESTING ERRORS ONLY - NOT PART OF API */
+void
+librdf_internal_test_error(librdf_world *world) 
+{
+  librdf_error(world, "test error message number %d.", 1);
+}
+
+void
+librdf_internal_test_warning(librdf_world *world) 
+{
+  librdf_warning(world, "test warning message number %d.", 2);
+}
+
 %}
+
 
 
 %init %{
@@ -120,7 +196,6 @@ char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_language, int is_wf_xml);
-char *librdf_node_get_blank_identifier(librdf_node* node);
 char *librdf_node_to_string(librdf_node* node);
 char *librdf_node_get_blank_identifier(librdf_node* node);
 int librdf_node_set_blank_identifier(librdf_node* node, const char *identifier);
@@ -188,13 +263,24 @@ void librdf_free_stream(librdf_stream* stream);
 int librdf_stream_end(librdf_stream* stream);
 librdf_statement* librdf_stream_next(librdf_stream* stream);
 
+/* here */
+#ifdef SWIGPERL
+void librdf_perl_world_init(librdf_world *world);
+#endif
+
+/* FOR TESTING ERRORS ONLY - NOT PART OF API */
+void librdf_internal_test_error(librdf_world *world);
+void librdf_internal_test_warning(librdf_world *world);
+
+
 /* SWIG world - declare variables wanted from rdf_init.h */
 
-%readonly
+%immutable;
 /* Note: most consts lost for SWIG to remain happy */
 extern const char * redland_copyright_string;
 extern const char * redland_version_string;
 extern int redland_version_major;
 extern int redland_version_minor;
 extern int redland_version_release;
-%readwrite
+%mutable;
+
