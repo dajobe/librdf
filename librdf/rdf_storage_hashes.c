@@ -960,9 +960,10 @@ librdf_storage_hashes_serialise_finished(void* context)
 
 
 static librdf_statement*
-librdf_storage_hashes_find_map(void* context, librdf_statement* statement) 
+librdf_storage_hashes_find_map(librdf_stream *stream,
+                               void* map_context, librdf_statement* statement) 
 {
-  librdf_statement* partial_statement=(librdf_statement*)context;
+  librdf_statement* partial_statement=(librdf_statement*)map_context;
 
   /* any statement matches when no partial statement is given */
   if(!partial_statement)
@@ -989,8 +990,8 @@ librdf_storage_hashes_find_map(void* context, librdf_statement* statement)
  * 
  * Return value: a &librdf_stream or NULL on failure
  **/
-static
-librdf_stream* librdf_storage_hashes_find_statements(librdf_storage* storage, librdf_statement* statement)
+static librdf_stream*
+librdf_storage_hashes_find_statements(librdf_storage* storage, librdf_statement* statement)
 {
   librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
   librdf_stream* stream;
@@ -1011,7 +1012,7 @@ librdf_stream* librdf_storage_hashes_find_statements(librdf_storage* storage, li
 
     stream=librdf_storage_hashes_serialise(storage);
     if(stream)
-      librdf_stream_set_map(stream, &librdf_storage_hashes_find_map, 
+      librdf_stream_add_map(stream, &librdf_storage_hashes_find_map, 
                             (librdf_stream_map_free_context_handler)&librdf_free_statement, (void*)statement);
   }
   
