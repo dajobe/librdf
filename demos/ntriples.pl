@@ -94,10 +94,25 @@ EOT
   print qq{<hr />\n\n<p class="copyright"><a href="http://purl.org/net/dajobe/">Dave Beckett</a></p>\n\n</body></html>};
 }
 
+
+sub format_body($) {
+  my $string=shift;
+  # No need for HTML::Entities here for three things
+  $string =~ s/\&/\&amp;/g;
+  $string =~ s/</\&lt;/g;
+  $string =~ s/>/\&gt;/g;
+  $string;
+}
+
+sub format_attr($) {
+  my $string=format_body(shift);
+  $string =~ s/"/\&quot;/g; #"
+  $string;
+}
+
 sub format_literal ($) {
   my($string)=@_;
   return 'UNDEFINED' if !defined $string;
-  # No need for HTML::Entities here for four things
 
   my $new_string='';
   for my $c (split(//, $string)) {
@@ -107,13 +122,14 @@ sub format_literal ($) {
       $new_string.=$c;
     }
   }
-  $string=$new_string;
+  return format_body($new_string);
+}
 
-  $string =~ s/\&/\&amp;/g;
-  $string =~ s/</\&lt;/g;
-  $string =~ s/>/\&gt;/g;
-  $string =~ s/"/\&quot;/g; #"
-  $string;
+sub format_url($) {
+  my $url=shift;
+  my $a_url= format_attr($url);
+  my $q_url= format_body($url);
+  qq{<a href="$a_url">$q_url</a>};
 }
 
 sub format_node ($) {
@@ -306,8 +322,8 @@ if($stream && !$stream->end) {
 
   print <<"EOT";
 <center>
-<table align="center" border="1">
-<tr>
+<table style="text-align:center" border="1">
+<tr align="left">
 <th>Count</th>
 <th>Subject</th>
 <th>Predicate</th>
@@ -325,7 +341,7 @@ EOT
 
     my $id=$count+1;
     print << "EOT";
-<tr>
+<tr align="left">
 <td>$id</td>
 <td>$subject</td>
 <td>$predicate</td>
@@ -335,14 +351,15 @@ EOT
 
     $count++;
 
-    if ($count >= $max_stream_size) {
+    if ($count == $max_stream_size) {
       my $cur=$count+1;
-      while($stream && !$stream->end) {
-	$count++;
+      while(1) {
 	$stream->next;
+	last if $stream->end;
+	$count++;
       }
       print << "EOT";
-<tr>
+<tr align="left">
 <td>$cur...$count</td><td colspan="3">Truncated at $max_stream_size to limit table / page size</td>
 </tr>
 EOT
@@ -369,7 +386,7 @@ if(@errors) {
   for my $error (@errors) {
     $error =~ s/URI $uri_string:/line /;
     $error =~ s/- Raptor error//;
-    print $error,"<br/>\n";
+    print $error,"<br />\n";
     $error_count++;
     if ($error_count > $max_error_size) {
       print "</p>\n\n<p>Remaining errors $error_count..",scalar(@errors)," truncated to limit page size";
@@ -392,11 +409,6 @@ my $errorpl=($error_count != 1) ? 's' : '';
 print "\n\n<p>URI \"$uri\" parsed as N-Triples giving $count triple$pl and $error_count error$errorpl</p>\n";
 
 #unlink $temp_file if $temp_file;
-
-sub format_url($) {
-  my $url=shift;
-  qq{<a href="$url">$url</a>};
-}
 
 end_page($q);
 exit 0;
