@@ -341,7 +341,7 @@ librdf_parser_raptor_generate_id_handler(void *user_data,
       if(librdf_hash_put_strings(pcontext->bnode_hash, (char*)user_bnodeid, (char*)mapped_id))
         return NULL;
     }
-    SYSTEM_FREE((char*)user_bnodeid);
+    raptor_free_memory(user_bnodeid);
     return mapped_id;
   }
   else
