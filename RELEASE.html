@@ -83,6 +83,11 @@ The <code>get_object</code> method is generally called
 <p>(Iterator and Stream now have consistent method names; they
 may be merged in future.)</p>
 
+<p>The <code>get_object</code> method now always returns a pointer to
+a shared object.  If this object is needed outside the scope of an
+iteration, it must be copied, which for Nodes is the copy constructor
+<code>librdf_new_node_from_node</code>.</p>
+
 <p>C example for Redland 0.9.11 and earlier:</p>
 <pre>
   while(!librdf_iterator_end(iterator)) {
