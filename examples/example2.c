@@ -115,7 +115,7 @@ main(int argc, char *argv[])
     return(1);
   }
 
-  storage=librdf_new_storage("hashes", "test", "hash_type='bdb',dir='.'");
+  storage=librdf_new_storage("hashes", "test", "hash-type='bdb',dir='.'");
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
