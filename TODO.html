@@ -38,7 +38,6 @@ object needn't be kept around when dealing with model.</li>
 <li>Write a quickstart / howto document</li>
 <li>Split the header files into internal / user ones.  Maybe generate
 part of librdf.h automatically to make a 1-header file system.</li>
-<li>Make GDBM hash handle duplicates (code is present but never used)</li>
 <li>Make API docbook sgml generate decent PostScript / PDF output</li>
 <li>Fix the URI hash mechanism - currently stores URI/pointer pairs in hash - wrong</li>
 <li>Make the library thread safe</li>
@@ -117,6 +116,7 @@ style, but for C</li>
 
 <p>I reserve the right to change my mind again!</p>
 <ul>
+<li>Redland does not work with GDBM hashes.  BDB is much better.</li>
 <li>Redland does not work with BerkeleyDB V1.  Not fixing since it works with V2,V3 and V4.</li>
 <li>RFE: make Node and URI be the same class, change all methods using
 Nodes to take URI OR URI or Literal as appropriate.  The RDF abstract
