@@ -18,6 +18,14 @@
 #ifndef RDF_STORAGE_H
 #define RDF_STORAGE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef char rdf_storage;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

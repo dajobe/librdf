@@ -18,6 +18,14 @@
 #ifndef RDF_ASSERTION_CONTEXT_H
 #define RDF_ASSERTION_CONTEXT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef char  rdf_assertion_context;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

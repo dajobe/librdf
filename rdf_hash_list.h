@@ -18,6 +18,14 @@
 #ifndef RDF_HASH_LIST_H
 #define RDF_HASH_LIST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void rdf_init_hash_list(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

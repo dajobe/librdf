@@ -20,6 +20,10 @@
 
 #include <rdf_iterator.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct rdf_list_node_s
 {
   struct rdf_list_node_s* next;
@@ -43,5 +47,9 @@ int rdf_list_add(rdf_list* list, void *data);
 int rdf_list_remove(rdf_list* list, void *data);
 rdf_iterator* rdf_list_get_iterator(rdf_list* list);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -18,6 +18,10 @@
 #ifndef RDF_DIGEST_H
 #define RDF_DIGEST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void* RDF_DIGEST;
 
 /* based on the GNUPG cipher/digest registration stuff */
@@ -97,5 +101,9 @@ void md5_constructor(void);
 void rmd160_constructor(void);
 #endif
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -24,6 +24,10 @@
 #include <rdf_storage.h>
 #include <rdf_iterator.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 struct rdf_model_s {
   rdf_storage*  storage;
@@ -72,5 +76,9 @@ int rdf_model_set_source_uri(rdf_model* model, rdf_uri *uri);
 int rdf_model_add_submodel(rdf_model* model, rdf_model* sub_model);
 int rdf_model_remove_submodel(rdf_model* model, rdf_model* sub_model);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

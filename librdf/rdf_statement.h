@@ -22,6 +22,11 @@
 #include <rdf_uri.h>
 #include <rdf_assertion_context.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 typedef struct 
 {
   rdf_node* subject;
@@ -62,5 +67,10 @@ rdf_assertion_context* rdf_statement_remove_assertion_context(rdf_statement *sta
 
 /* convert to a string */
 char *rdf_statement_to_string(rdf_statement *statement);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

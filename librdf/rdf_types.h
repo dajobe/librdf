@@ -18,8 +18,11 @@
 #ifndef RDF_TYPES_H
 #define RDF_TYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <sys/types.h>
-#include <config.h>
 
 #if u16 == MISSING
   #undef u16
@@ -67,5 +70,9 @@
   #endif
 #endif
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

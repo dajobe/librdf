@@ -17,6 +17,9 @@
 #ifndef RDF_HASH_H
 #define RDF_HASH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** data type used to describe hash key and data */
 typedef struct 
@@ -133,5 +136,9 @@ int rdf_hash_from_string (rdf_hash* hash, char *string);
 /* import a hash from an array of strings */
 int rdf_hash_from_array_of_strings (rdf_hash* hash, char *array[]);
 
+
+#ifdef __cplusplus
+}
 #endif
 
+#endif

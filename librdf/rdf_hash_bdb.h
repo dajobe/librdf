@@ -18,6 +18,14 @@
 #ifndef RDF_HASH_BDB_H
 #define RDF_HASH_BDB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void rdf_init_hash_bdb(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

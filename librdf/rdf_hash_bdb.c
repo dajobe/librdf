@@ -19,9 +19,9 @@
 #include <sys/types.h>
 
 #include <stdio.h>
-#ifdef HAVE_FCNTL_H
-/* for O_* macros */
-#include <fcntl.h>
+#ifdef HAVE_STRING_H
+/* for memset */
+#include <string.h>
 #endif
 
 #ifdef HAVE_DB_H

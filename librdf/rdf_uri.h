@@ -18,9 +18,11 @@
 #ifndef RDF_URI_H
 #define RDF_URI_H
 
-#include <rdf_config.h>
-
 #include <rdf_digest.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef char rdf_uri;
 
@@ -47,6 +49,11 @@ char* rdf_uri_to_string (rdf_uri* uri);
 #undef RDF_URI_INLINE
 #include <rdf_uri.c>
 #define RDF_URI_INLINE yes
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

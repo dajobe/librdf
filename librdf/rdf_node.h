@@ -20,6 +20,11 @@
 
 #include <rdf_uri.h>
 #include <rdf_digest.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* A resource (also a property) - has a URI */
 #define RDF_NODE_TYPE_RESOURCE 0
 /* A literal - an XML string + language */
@@ -92,5 +97,9 @@ char *rdf_node_to_string(rdf_node* node);
 /* utility functions */
 int rdf_node_equals(rdf_node* first_node, rdf_node* second_node);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
