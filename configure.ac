@@ -797,10 +797,8 @@ dnl Checks for building sub-packages in sub directories
 dnl before librdf (pre-requisites). rasqal may need raptor
 SD_PRE="$raptor_dir $rasqal_dir"
 dnl after librdf (use it)
-SD_POST=""
 
 AC_SUBST(SD_PRE)
-AC_SUBST(SD_POST)
 
 
 # Make final changes to cflags
