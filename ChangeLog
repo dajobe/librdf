@@ -1,5 +1,13 @@
 2004-11-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* LICENSE-2.0.txt, LICENSE.html, MPL.html, Makefile.am,
+	README.html, TODO.html, librdf/redland.spec.in: LGPL / Apache 2.0
+	license - remove MPL MPL.html add Apache2 LICENSE-2.0.txt
+
+	* Switched to LGPL / Apache 2.0 license in the sources
+	CVS tags before: redland_license_lgpl_mpl,
+	and after: redland_license_lgpl_apache2
+
 	* rasqal/configure.ac, configure.ac: Need raptor 1.4.2
 
 	* raptor/win32_raptor_config.h, raptor/configure.ac: Bumped
