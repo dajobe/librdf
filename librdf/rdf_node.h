@@ -54,13 +54,6 @@ typedef enum {
  * http://www.w3.org/TR/REC-xml section 2.10 White Space Handling
  */
 
-/* FIXME This should be defined publically */
-typedef enum {
-  LIBRDF_NODE_LITERAL_XML_SPACE_UNKNOWN = 0,  /* neither of the next two */
-  LIBRDF_NODE_LITERAL_XML_SPACE_DEFAULT = 1,  /* xml:space="default" */
-  LIBRDF_NODE_LITERAL_XML_SPACE_PRESERVE = 2, /* xml:space="preserve" */
-} librdf_node_literal_xml_space;
-
 
 #ifdef LIBRDF_INTERNAL
 
@@ -89,8 +82,6 @@ struct librdf_node_s
 
       /* Language of literal (xml:lang) */
       char *xml_language;
-      /* XML space preserving properties (xml:space) */
-      librdf_node_literal_xml_space xml_space;
     } literal;
     struct 
     {
@@ -145,7 +136,7 @@ librdf_node* librdf_new_node_from_uri_local_name(librdf_world* world, librdf_uri
 librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world, const char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
 
 /* Create a new Node from literal string / language. */
-librdf_node* librdf_new_node_from_literal(librdf_world* world, const char *string, const char *xml_language, int xml_space, int is_wf_xml);
+librdf_node* librdf_new_node_from_literal(librdf_world* world, const char *string, const char *xml_language, int unused1, int is_wf_xml);
 
 /* Create a new Node from blank node identifier. */
 librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world, const char *identifier);
@@ -176,9 +167,8 @@ const char* librdf_node_get_type_as_string(int type);
 char* librdf_node_get_literal_value(librdf_node* node);
 char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
-int librdf_node_get_literal_value_xml_space(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
-int librdf_node_set_literal_value(librdf_node* node, const char* value, const char *xml_language, int xml_space, int is_wf_xml);
+int librdf_node_set_literal_value(librdf_node* node, const char* value, const char *xml_language, int unused1, int is_wf_xml);
 
 int librdf_node_get_li_ordinal(librdf_node* node);
 void librdf_node_set_li_ordinal(librdf_node* node, int ordinal);
