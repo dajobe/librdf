@@ -69,20 +69,14 @@ void librdf_system_free(void *ptr);
 #endif
 
 
-#ifdef LIBRDF_DISABLE_ASSERT_MESSAGES
-#define LIBRDF_ASSERT_REPORT(line)
-#else
+#ifdef LIBRDF_ASSERT_MESSAGES
 #define LIBRDF_ASSERT_REPORT(msg) fprintf(stderr, "%s:%d: (%s) assertion failed: " msg "\n", __FILE__, __LINE__, __func__);
+#else
+#define LIBRDF_ASSERT_REPORT(line)
 #endif
 
 
-#ifdef LIBRDF_DISABLE_ASSERT
-
-#define LIBRDF_ASSERT_RETURN(condition, msg, ret) 
-#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, type)
-#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(pointer, type, ret)
-
-#else
+#ifdef LIBRDF_ASSERT
 
 #define LIBRDF_ASSERT_RETURN(condition, msg, ret) do { \
   if(condition) { \
@@ -107,6 +101,12 @@ void librdf_system_free(void *ptr);
     return(ret); \
   } \
 } while(0)
+
+#else
+
+#define LIBRDF_ASSERT_RETURN(condition, msg, ret) 
+#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, type)
+#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(pointer, type, ret)
 
 #endif
 
