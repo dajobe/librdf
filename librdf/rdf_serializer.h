@@ -63,7 +63,7 @@ struct librdf_serializer_factory_s
   
   int (*serialize_model_to_file_handle)(void *_context, FILE *handle, librdf_uri* base_uri, librdf_model *model);
 
-  unsigned char* (*serialize_model_to_string)(void *_context, librdf_uri* base_uri, librdf_model *model);
+  unsigned char* (*serialize_model_to_counted_string)(void *_context, librdf_uri* base_uri, librdf_model *model, size_t *length_p);
 };
 
 
@@ -111,6 +111,7 @@ REDLAND_API REDLAND_DEPRECATED int librdf_serializer_serialize_model(librdf_seri
 REDLAND_API int librdf_serializer_serialize_model_to_file_handle(librdf_serializer* serializer, FILE *handle, librdf_uri* base_uri, librdf_model* model);
 REDLAND_API int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer, const char *name, librdf_uri* base_uri, librdf_model* model);
 REDLAND_API unsigned char* librdf_serializer_serialize_model_to_string(librdf_serializer* serializer, librdf_uri* base_uri, librdf_model* model);
+REDLAND_API unsigned char* librdf_serializer_serialize_model_to_counted_string(librdf_serializer* serializer, librdf_uri* base_uri, librdf_model* model, size_t *length_p);
 REDLAND_API void librdf_serializer_set_error(librdf_serializer* serializer, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
 REDLAND_API void librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
 
