@@ -114,7 +114,7 @@ cd ..
 
 cd python
 
-make install DESTDIR=$RPM_BUILD_ROOT%{prefix}
+make install DESTDIR=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT%{prefix} -name "*.py[co]" -exec rm -f {} \;
 
 cd ..
@@ -190,6 +190,9 @@ cd ..
 /sbin/ldconfig
 
 %changelog
+* Fri Jan 30 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
+- update for removal of python distutils
+
 * Sun Jan 4 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
 - added redland-python package
 - export some more docs
