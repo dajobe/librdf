@@ -58,8 +58,8 @@ while test $# -gt 0; do
     --libs)
       echo_libs=yes
       ;;
-    --usage)
-      usage 0 1>&2
+    --help|--usage)
+      usage 0
       ;;
     --run)
       lpath=@abs_top_builddir@/librdf/.libs
