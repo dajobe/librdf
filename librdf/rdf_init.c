@@ -34,7 +34,7 @@
 #include <librdf.h>
 
 
-const char * const redland_copyright_string = "Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/ - Institute for Learning and Research Technology, University of Bristol.";
+const char * const redland_copyright_string = "Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/ - Institute for Learning and Research Technology, University of Bristol.";
 
 const char * const redland_version_string = VERSION;
 
