@@ -7,6 +7,6 @@ Name: Redland
 Description: Redland RDF Application Framework
 Requires: raptor
 Version: @VERSION@
-Libs: -L${libdir} -llibrdf @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@
+Libs: -L${libdir} -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@
 Cflags: -I${includedir}
 
