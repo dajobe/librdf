@@ -348,6 +348,25 @@ librdf_uri_as_string (librdf_uri *uri)
 
 
 /**
+ * librdf_uri_as_string - Get a pointer to the string representation of the URI
+ * @uri: &librdf_uri object
+ * @len_p: pointer to location to store length
+ * 
+ * Returns a shared pointer to the URI string representation. 
+ * Note: does not allocate a new string so the caller must not free it.
+ * 
+ * Return value: string representation of URI
+ **/
+char*
+librdf_uri_as_counted_string(librdf_uri *uri, size_t* len_p) 
+{
+  if(len_p)
+    *len_p=uri->string_length;
+  return uri->string;
+}
+
+
+/**
  * librdf_uri_get_digest - Get a digest for the URI
  * @uri: &librdf_uri object
  * 
@@ -398,11 +417,31 @@ librdf_uri_print (librdf_uri* uri, FILE *fh)
 char*
 librdf_uri_to_string (librdf_uri* uri)
 {
+  return librdf_uri_to_counted_string(uri, NULL);
+}
+
+
+/**
+ * librdf_uri_to_counted_string - Format the URI as a counted string
+ * @uri: &librdf_uri object
+ * @len_p: pointer to location to store length
+ * 
+ * Note: this method allocates a new string since this is a _to_ method
+ * and the caller must free the resulting memory.
+ *
+ * Return value: string representation of the URI or NULL on failure
+ **/
+char*
+librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p)
+{
   char *s;
 
   if(!uri)
     return NULL;
   
+  if(len_p)
+    *len_p=uri->string_length;
+
   s=(char*)LIBRDF_MALLOC(cstring, uri->string_length+1);
   if(!s)
     return NULL;
