@@ -793,12 +793,11 @@ LIBRDF_EXTERNAL_LIBS="$LIBRDF_EXTERNAL_LIBS $LIBRDF_LIBS"
 # 3store uses it but is optional and thus tricky to specify this way
 LIBRDF_PKGCONFIG_LIBS=$LIBRDF_LIBS
 
-dnl Checks for building sub-packages in sub directories
-dnl before librdf (pre-requisites). rasqal may need raptor
-SD_PRE="$raptor_dir $rasqal_dir"
-dnl after librdf (use it)
+dnl Local sub-packages in sub directories needed to build librdf
+dnl Ordering constraints: rasqal needs raptor
+LOCAL_SUBDIRS="$raptor_dir $rasqal_dir"
 
-AC_SUBST(SD_PRE)
+AC_SUBST(LOCAL_SUBDIRS)
 
 
 # Make final changes to cflags

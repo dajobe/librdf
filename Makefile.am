@@ -26,11 +26,14 @@ man_MANS = redland-config.1
 
 dist_pkgdata_DATA = Redland.i
 
-# Subdirectories to build/install etc.
-SUBDIRS=@SD_PRE@ librdf examples utils demos docs data
-
-# Subdirectories to use for distribution
-DIST_SUBDIRS=raptor rasqal librdf examples utils demos docs data
+# Subdirectories to build/install/distribute etc.
+#
+# NOTE: A full distribution tarball cannot be made inside a 'make distcheck'
+# when raptor and rasqal are installed system wide, since then the
+# subdirs are not configured or included in the build tree, when it
+# is separate from the source tree.
+# Summary: always make the tarball from the top level
+SUBDIRS=@LOCAL_SUBDIRS@ librdf examples utils demos docs data
 
 EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
 README      NEWS      LICENSE.txt  TODO \
