@@ -31,17 +31,6 @@ extern "C" {
 
 #include <sys/types.h>
 
-#if u16 == MISSING
-  #undef u16
-  #if SIZEOF_UNSIGNED_SHORT == 2
-    typedef unsigned short u16;
-  #elif SIZEOF_UNSIGNED_INT == 2
-    typedef unsigned int u16;
-  #else
-    #error u16 type not defined
-  #endif
-#endif
-
 #if u32 == MISSING
   #undef u32
   #if SIZEOF_UNSIGNED_INT == 4
@@ -50,20 +39,6 @@ extern "C" {
     typedef unsigned long u32;
   #else
     #error u32 type not defined
-  #endif
-#endif
-
-
-#if u64 == MISSING
-  #undef u64
-  #if SIZEOF_UNSIGNED_INT == 8
-    typedef unsigned int u64;
-  #elif SIZEOF_UNSIGNED_LONG == 8
-    typedef unsigned long u64;
-  #elif SIZEOF_UNSIGNED_LONG_LONG == 8
-    typedef unsigned long long u64;
-  #else
-    #error u64 type not defined
   #endif
 #endif
 
