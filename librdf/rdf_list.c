@@ -40,6 +40,7 @@ static librdf_list_node* librdf_list_find_node(librdf_list* list, void *data);
 
 static int librdf_list_iterator_is_end(void* iterator);
 static void* librdf_list_iterator_get_next(void* iterator);
+static void librdf_list_iterator_finished(void* iterator);
 
 
 
@@ -366,6 +367,12 @@ librdf_list_set_equals(librdf_list* list,
 
 
 
+typedef struct {
+  librdf_list *list;
+  librdf_list_node *current;
+} librdf_list_iterator_context;
+
+
 /**
  * librdf_list_get_iterator - get an iterator for the list
  * @list: &librdf_list object
@@ -375,14 +382,20 @@ librdf_list_set_equals(librdf_list* list,
 librdf_iterator*
 librdf_list_get_iterator(librdf_list* list)
 {
-  /* Initialise walk */
-  list->current=list->first;
+  librdf_list_iterator_context* context;
+
+  context=(librdf_list_iterator_context*)LIBRDF_CALLOC(librdf_list_iterator_context, 1, sizeof(librdf_list_iterator_context));
+  if(!context)
+    return NULL;
+
+  context->list=list;
+  context->current=list->first;
   
   return librdf_new_iterator(list->world, 
-                             (void*)list,
+                             (void*)context,
                              librdf_list_iterator_is_end,
                              librdf_list_iterator_get_next,
-                             NULL);
+                             librdf_list_iterator_finished);
   
 }
 
@@ -390,12 +403,8 @@ librdf_list_get_iterator(librdf_list* list)
 static int
 librdf_list_iterator_is_end(void* iterator) 
 {
-  librdf_list *list=(librdf_list*)iterator;
-  librdf_list_node *node;
-  
-  if(!list)
-    return 1;
-  node=list->current;
+  librdf_list_iterator_context* context=(librdf_list_iterator_context*)iterator;
+  librdf_list_node *node=context->current;
   
   return (node == NULL);
 }
@@ -404,16 +413,23 @@ librdf_list_iterator_is_end(void* iterator)
 static void*
 librdf_list_iterator_get_next(void* iterator) 
 {
-  librdf_list *list=(librdf_list*)iterator;
-  librdf_list_node *node;
+  librdf_list_iterator_context* context=(librdf_list_iterator_context*)iterator;
+  librdf_list_node *node=context->current;
   
-  if(!list || !list->current)
+  if(!node)
     return NULL;
   
-  node= list->current;
-  list->current = list->current->next;
+  context->current = node->next;
   return node->data;
 }
+
+static void
+librdf_list_iterator_finished(void* iterator)
+{
+  librdf_list_iterator_context* context=(librdf_list_iterator_context*)iterator;
+  LIBRDF_FREE(librdf_list_iterator_context, context);
+}
+
 
 
 /**
