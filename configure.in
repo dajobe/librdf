@@ -129,6 +129,11 @@ AC_MSG_CHECKING(SWIG support)
 if test "X$SWIG" != "X"; then
   SWIG_VERSION=`$SWIG -version 2>&1 |sed -ne 's/^SWIG Version //p'`
   SWIG_VERSION_DEC=`echo $SWIG_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+
+ if test $SWIG_VERSION_DEC -ge 010314; then
+   SWIG_PYTHON_ARGS=-noproxy
+ fi
+
   SWIG_MIN_VERSION_DEC=`echo $SWIG_MIN_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
 
   if test $SWIG_VERSION_DEC -ge $SWIG_MIN_VERSION_DEC; then
@@ -151,6 +156,8 @@ if test "X$SWIG" != "X"; then
 else
   AC_MSG_RESULT(not present - using pre-generated interface files)
 fi
+
+AC_SUBST(SWIG_PYTHON_ARGS)
 
 
 AC_CHECK_PROG(LIBWWW_CONFIG, libwww-config, libwww-config)
