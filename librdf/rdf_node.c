@@ -220,15 +220,16 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
  * @world: redland world object
  * @string: literal string value
  * @xml_language: literal XML language (or NULL, empty string)
- * @unused1: Ignored
  * @is_wf_xml: non 0 if literal is XML
  * 
+ * 0.9.12: xml_space argument deleted
+ *
  * Return value: new &librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_literal(librdf_world *world, 
                              const char *string, const char *xml_language, 
-                             int unused1, int is_wf_xml) 
+                             int is_wf_xml) 
 {
   librdf_node* new_node;
   
@@ -579,7 +580,6 @@ librdf_node_get_literal_value_is_wf_xml(librdf_node* node)
  * @node: the node object
  * @value: pointer to the literal string value
  * @xml_language: pointer to the literal language (or NULL, empty string if not defined)
- * @unused1: Not used
  * @is_wf_xml: non 0 if the value is Well Formed XML
  * 
  * Sets the node literal value, optional language, XML space
@@ -587,12 +587,14 @@ librdf_node_get_literal_value_is_wf_xml(librdf_node* node)
  *
  * The space property can take three values: 0 - unknown, 1 - use default
  * method (xml:space="default") or 2 - preserve space (xml:space="preserve").
+ *
+ * 0.9.12: xml_space argument deleted
  * 
  * Return value: non 0 on failure
  **/
 int
 librdf_node_set_literal_value(librdf_node* node, const char* value,
-			      const char *xml_language, int unused1,
+			      const char *xml_language,
                               int is_wf_xml) 
 {
   int value_len;
