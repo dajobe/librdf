@@ -369,7 +369,7 @@ librdf_hash_bdb_delete(void* context, librdf_hash_data *key)
  * LIBRDF_HASH_SEQUENCE_NEXT to get the next in sequence and
  * LIBRDF_HASH_SEQUENCE_CURRENT to get the current key (again).
  * 
- * Return value: 
+ * Return value: non 0 on failure
  **/
 static int
 librdf_hash_bdb_get_seq(void* context, librdf_hash_data *key, 
