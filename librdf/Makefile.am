@@ -142,7 +142,7 @@ rdf_hash_test: rdf_hash.c librdf.la
 
 # This needs raptor.h
 rdf_uri_test: rdf_uri.c librdf.la
-	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE @LIBRDF_INTERNAL_CPPFLAGS@ $(srcdir)/rdf_uri.c librdf.la
+	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE @LIBRDF_INTERNAL_CPPFLAGS@ @LIBRDF_EXTERNAL_CPPFLAGS@ $(srcdir)/rdf_uri.c librdf.la
 
 rdf_statement_test: rdf_statement.c librdf.la
 	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la
