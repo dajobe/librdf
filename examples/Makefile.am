@@ -5,7 +5,7 @@
 # $Id$
 #
 
-EXAMPLES=example1 example2 example3 example4
+EXAMPLES=example1 example2 example3 example4 example5
 DBUS_EXAMPLES=redland_dbus
 
 EXTRA_PROGRAMS = $(EXAMPLES) $(DBUS_EXAMPLES)
@@ -25,6 +25,8 @@ example3_SOURCES = example3.c
 
 example4_SOURCES = example4.c
 
+example5_SOURCES = example5.c
+
 
 redland_dbus_SOURCES = redland_dbus.c
 redland_dbus_LDADD=$(top_builddir)/librdf/librdf.la @LIBRDF_EXTERNAL_LIBS@
@@ -35,3 +37,6 @@ redland_dbus_DEPENDENCIES = $(top_builddir)/librdf/librdf.la
 
 $(top_builddir)/raptor/libraptor.la:
 	cd $(top_builddir)/raptor && $(MAKE) $(AM_MAKEFLAGS) libraptor.la
+
+$(top_builddir)/rasqal/librasqal.la:
+	cd $(top_builddir)/rasqal && $(MAKE) $(AM_MAKEFLAGS) librasqal.la
