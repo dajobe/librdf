@@ -1,6 +1,8 @@
 *.class
 *.db
 *.gz
+*.lo
+*.la
 *.out
 *.rdf
 *.rdfs
@@ -9,7 +11,8 @@
 *.log
 *test
 *results
-.deps*
+.deps
+.libs
 ANNOUNCE*
 ChangeLog
 GPL-ed
