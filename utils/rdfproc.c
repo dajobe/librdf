@@ -115,10 +115,10 @@ static command commands[]={
  
 
 #ifdef HAVE_GETOPT_LONG
-#define HELP_TEXT(short, long, description) "  -" #short ", --" long "  " description "\n"
+#define HELP_TEXT(short, long, description) "  -" #short ", --" long "  " description
 #define HELP_ARG(short, long) "--" #long
 #else
-#define HELP_TEXT(short, long, description) "  -" #short "  " description "\n"
+#define HELP_TEXT(short, long, description) "  -" #short "  " description
 #define HELP_ARG(short, long) "-" #short
 #endif
 
@@ -269,7 +269,8 @@ main(int argc, char *argv[])
   if(usage) {
     if(usage>1) {
       fprintf(stderr, title_format_string, librdf_version_string);
-      fprintf(stderr, "%s\n", librdf_short_copyright_string);
+      fputs(librdf_short_copyright_string, stderr);
+      fputc('\n', stderr);
     }
     fprintf(stderr, "Try `%s " HELP_ARG(h, help) "' for more information.\n",
                     program);
@@ -279,40 +280,40 @@ main(int argc, char *argv[])
   if(help) {
     printf("Usage: %s [options] store command arg...\n", program);
     printf(title_format_string, librdf_version_string);
-    printf("%s\n", librdf_short_copyright_string);
-    printf("Utility for processing RDF using the Redland library.\n");
-    printf("\nMain options:\n");
-    printf(HELP_TEXT(c, "contexts        ", "Use Redland contexts"));
-    printf(HELP_TEXT(h, "help            ", "Print this help, then exit"));
-    printf(HELP_TEXT(v, "version         ", "Print the Redland version"));
-    printf("\nCommands:\n");
-    printf("  parse URI [SYNTAX [BASE URI]]             Parse syntax at URI into\n");
-    printf("                                            the graph (RDF/XML)\n");
-    printf("  parse-stream URI [SYNTAX [BASE URI]       Streaming parse syntax at URI\n");
-    printf("                                            into the graph (RDF/XML)\n");
-    printf("  print                                     Print the graph triples.\n");
-    printf("  serialize [SYNTAX [URI [MIME-TYPE]]]      Serializes to a syntax (RDF/XML)\n");
+    puts(librdf_short_copyright_string);
+    puts("Utility for processing RDF using the Redland library.");
+    puts("\nMain options:");
+    puts(HELP_TEXT(c, "contexts        ", "Use Redland contexts"));
+    puts(HELP_TEXT(h, "help            ", "Print this help, then exit"));
+    puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
+    puts("\nCommands:");
+    puts("  parse URI [SYNTAX [BASE URI]]             Parse syntax at URI into");
+    puts("                                            the graph (RDF/XML)");
+    puts("  parse-stream URI [SYNTAX [BASE URI]       Streaming parse syntax at URI");
+    puts("                                            into the graph (RDF/XML)");
+    puts("  print                                     Print the graph triples.");
+    puts("  serialize [SYNTAX [URI [MIME-TYPE]]]      Serializes to a syntax (RDF/XML)");
 #if 0
     /* FIXME Not a query -> results table query, so leave out for now */
-    printf("  query NAME URI|- QUERY-STRING             Query for matching triples\n");
+    puts("  query NAME URI|- QUERY-STRING             Query for matching triples");
 #endif
-    printf("  find SUBJECT|- PREDICATE|- OBJECT|-       Find matching triples\n");
-    printf("                                            where - matches any node.\n");
-    printf("  contains SUBJECT PREDICATE OBJECT         Check if triple is in the graph.\n");
-    printf("  add SUBJECT PREDICATE OBJECT [CONTEXT]    Add triple to graph.\n");
-    printf("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]\n");
-    printf("                                            Add datatyped triple to graph.\n");
-    printf("  remove SUBJECT PREDICATE OBJECT [CONTEXT] Remove triple from graph.\n");
-    printf("  sources | targets | arcs NODE1 NODE2      Show matching nodes.\n");
-    printf("  source | target | arc NODE1 NODE2         Show 1 matching node.\n");
-    printf("  arcs-in | arcs-out NODE                   Show properties in/out of NODE\n");
-    printf("  has-arc-in | has-arc-out NODE ARC         Check for property in/out of NODE\n");
-    printf("\nNotation:\n");
-    printf("    source means subject of triples matching (?,  NODE1, NODE2)\n");
-    printf("    target means object of triples matching (NODE1, NODE2, ?)\n");
-    printf("    arc means predicate of triples matching (NODE1, ?, NODE2)\n");
-    printf("\nReport bugs to <redland-dev@lists.librdf.org>.\n");
-    printf("Redland home page: http://www.redland.opensource.ac.uk/\n");
+    puts("  find SUBJECT|- PREDICATE|- OBJECT|-       Find matching triples");
+    puts("                                            where - matches any node.");
+    puts("  contains SUBJECT PREDICATE OBJECT         Check if triple is in the graph.");
+    puts("  add SUBJECT PREDICATE OBJECT [CONTEXT]    Add triple to graph.");
+    puts("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]");
+    puts("                                            Add datatyped triple to graph.");
+    puts("  remove SUBJECT PREDICATE OBJECT [CONTEXT] Remove triple from graph.");
+    puts("  sources | targets | arcs NODE1 NODE2      Show matching nodes.");
+    puts("  source | target | arc NODE1 NODE2         Show 1 matching node.");
+    puts("  arcs-in | arcs-out NODE                   Show properties in/out of NODE");
+    puts("  has-arc-in | has-arc-out NODE ARC         Check for property in/out of NODE");
+    puts("\nNotation:");
+    puts("    source means subject of triples matching (?,  NODE1, NODE2)");
+    puts("    target means object of triples matching (NODE1, NODE2, ?)");
+    puts("    arc means predicate of triples matching (NODE1, ?, NODE2)");
+    puts("\nReport bugs to <redland-dev@lists.librdf.org>.");
+    puts("Redland home page: http://www.redland.opensource.ac.uk/");
     exit(0);
   }
   
