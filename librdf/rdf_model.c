@@ -30,6 +30,7 @@
 #endif
 
 #include <librdf.h>
+#include <raptor.h>
 
 #ifndef STANDALONE
 /* prototypes for helper functions */
@@ -1353,6 +1354,46 @@ librdf_model_find_statements_with_options(librdf_model* model,
     return model->factory->find_statements_with_options(model, statement, context_node, options);
   else
     return librdf_model_find_statements_in_context(model, statement, context_node);
+}
+
+
+/**
+ * librdf_model_load - Load content from a URI into the model
+ * @model: &librdf_model object
+ * @uri: the URI to read the content
+ * @name: the name of the parser (or NULL)
+ * @mime_type: the MIME type of the syntax (NULL if not used)
+ * @type_uri: URI identifying the syntax (NULL if not used)
+ *
+ * If the name field is NULL, the library will try to guess
+ * the parser to use from the uri, mime_type and type_uri fields.
+ * This is done via the raptor_guess_parser_name function.
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_model_load(librdf_model* model, librdf_uri *uri,
+                  const char *name, const char *mime_type, 
+                  librdf_uri *type_uri)
+{
+  int rc=0;
+  librdf_parser* parser;
+
+  if(name && !*name)
+    name=NULL;
+  if(mime_type && !*mime_type)
+    mime_type=NULL;
+
+  if(!name)
+    name=raptor_guess_parser_name((raptor_uri*)type_uri, mime_type,
+                                  NULL, 0, librdf_uri_as_string(uri));
+  parser=librdf_new_parser(model->world, name, NULL, NULL);
+  if(!parser)
+    return 1;
+
+  rc=librdf_parser_parse_into_model(parser, uri, NULL, model);
+  librdf_free_parser(parser);
+  return rc;
 }
 
 
