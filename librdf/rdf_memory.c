@@ -23,6 +23,8 @@
 
 #define LIBRDF_DEBUG 1
 
+#undef LIBRDF_MEMORY_DEBUG
+
 #define LIBRDF_INTERNAL
 #include <rdf_config.h>
 
@@ -42,8 +44,10 @@ typedef struct librdf_memory_s librdf_memory;
 /* statics */
 librdf_memory* Rdf_Memory_List=NULL;
 
-
+/* prototypes for helper functions */
 static librdf_memory* librdf_memory_find_node(librdf_memory* list, void *addr, librdf_memory** prev);
+static void librdf_free_memory(librdf_memory* node);
+static librdf_memory* librdf_add_memory(char *file, int line, char *type, size_t size, void *addr);
 
 
 /* helper functions */
@@ -71,7 +75,7 @@ librdf_free_memory(librdf_memory* node)
 }
 
 
-static int
+static librdf_memory*
 librdf_add_memory(char *file, int line, char *type,
                size_t size, void *addr) 
 {
@@ -83,13 +87,14 @@ librdf_add_memory(char *file, int line, char *type,
     /* duplicated node added! */
     fprintf(stderr, "librdf_add_memory: Duplicate memory address %p added\n", addr);
     abort();
+    /* never returns actually */
   }
-  
+
     
   /* need new node */
   node=(librdf_memory*)calloc(sizeof(librdf_memory), 1);
   if(!node)
-    return 1;
+    return NULL;
 
 
   node->file=file; /* pointer to static string, no need to free */
@@ -103,33 +108,48 @@ librdf_add_memory(char *file, int line, char *type,
   node->next=Rdf_Memory_List;
   Rdf_Memory_List=node;
 
-  return 0;
+  return node;
 }
 
 
-/* memory allocation with tracking */
-
-void* librdf_malloc(char *file, int line, char *type, size_t size) 
+void*
+librdf_malloc(char *file, int line, char *type, size_t size) 
 {
-  void *addr=malloc(size);
-  if(!addr)
-    return NULL;
-  librdf_add_memory(file, line, type, size, addr);
+	void *addr=malloc(size);
+	librdf_memory* node;
+	
+	if(!addr)
+		return NULL;
+	node=librdf_add_memory(file, line, type, size, addr);
+#ifdef LIBRDF_MEMORY_DEBUG
+	fprintf(stderr, 
+		"%s:%d: malloced %d bytes for type %s at %p\n",
+		node->file, node->line, node->size, node->type, node->addr);
+#endif
   return addr;
 }
 
 
-void* librdf_calloc(char *file, int line, char *type, size_t nmemb, size_t size) 
+void*
+librdf_calloc(char *file, int line, char *type, size_t nmemb, size_t size) 
 {
-  void *addr=calloc(nmemb, size);
-  if(!addr)
-    return NULL;
-  librdf_add_memory(file, line, type, nmemb*size, addr);
-  return addr;
+	void *addr=calloc(nmemb, size);
+	librdf_memory* node;
+
+	if(!addr)
+		return NULL;
+	node=librdf_add_memory(file, line, type, nmemb*size, addr);
+#ifdef LIBRDF_MEMORY_DEBUG
+	fprintf(stderr,
+		"%s:%d: calloced %d bytes for type %s at %p\n",
+		node->file, node->line, node->size, node->type, node->addr);
+#endif
+	return addr;
 }
 
 
-void librdf_free(char *file, int line, char *type, void *addr) 
+void
+librdf_free(char *file, int line, char *type, void *addr) 
 {
   librdf_memory *node, *prev;
 
@@ -140,6 +160,13 @@ void librdf_free(char *file, int line, char *type, void *addr)
     return;
   }
   
+#ifdef LIBRDF_MEMORY_DEBUG
+  fprintf(stderr,
+	  "%s:%d: freeing %d bytes for type %s at %p allocated at %s:%d\n",
+	  file,line, node->size, node->type, node->addr,
+	  node->file, node->line);
+#endif
+
   if(node == Rdf_Memory_List)
     Rdf_Memory_List=node->next;
   else
@@ -155,18 +182,19 @@ void librdf_free(char *file, int line, char *type, void *addr)
 void
 librdf_memory_report(FILE *fh)
 {
-  librdf_memory *node, *next;
-
-  if(!Rdf_Memory_List)
-    return;
-
-  fprintf(stderr, "ALLOCATED MEMORY REPORT\n");
-  fprintf(stderr, "-----------------------\n");
-  for(node=Rdf_Memory_List; node; node=next) {
-    next=node->next;
-    fprintf(fh, "%s:%d: %d bytes allocated for type %s\n",
-            node->file, node->line, node->size, node->type);
-    librdf_free_memory(node);
-  }
-  fprintf(stderr, "-----------------------\n");
+	librdf_memory *node, *next;
+	
+	if(!Rdf_Memory_List)
+		return;
+	
+	fprintf(stderr, "ALLOCATED MEMORY REPORT\n");
+	fprintf(stderr, "-----------------------\n");
+	for(node=Rdf_Memory_List; node; node=next) {
+		next=node->next;
+		fprintf(fh, "%s:%d: %d bytes allocated for type %s at %p\n",
+			node->file, node->line, node->size, node->type,
+			node->addr);
+		librdf_free_memory(node);
+	}
+	fprintf(stderr, "-----------------------\n");
 }
