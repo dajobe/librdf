@@ -145,6 +145,10 @@ struct librdf_storage_factory_s {
    */
   librdf_iterator* (*get_contexts)(librdf_storage* storage);
 
+  /* features - OPTIONAL */
+  librdf_node* (*get_feature)(librdf_storage* storaage, librdf_uri* feature);
+  int (*set_feature)(librdf_storage* storage, librdf_uri* feature, librdf_node* value);
+
 };
 
 #include <rdf_storage_list.h>
@@ -230,6 +234,10 @@ REDLAND_API void librdf_storage_sync(librdf_storage *storage);
 REDLAND_API librdf_stream* librdf_storage_find_statements_in_context(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node);
 
 REDLAND_API librdf_iterator* librdf_storage_get_contexts(librdf_storage* storage);
+
+/* features */
+REDLAND_API librdf_node* librdf_storage_get_feature(librdf_storage* storage, librdf_uri* feature);
+REDLAND_API int librdf_storage_set_feature(librdf_storage* storage, librdf_uri* feature, librdf_node* value);
 
 #ifdef __cplusplus
 }
