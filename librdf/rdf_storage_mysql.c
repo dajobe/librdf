@@ -117,6 +117,7 @@ typedef struct {
   int connection_open;
   MYSQL connection;
   MYSQL_RES *results;
+  int is_literal_match;
 } librdf_storage_mysql_sos_context;
 
 typedef struct {
@@ -1024,7 +1025,11 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
   sos->current_statement=NULL;
   sos->current_context=NULL;
   sos->results=NULL;
-
+  
+  if(options) {
+    sos->is_literal_match=librdf_hash_get_as_boolean(options, "match-substring");
+  }
+  
   /* Initialize temporary MySQL connection */
   mysql_init(&sos->connection);
   sos->connection_open=1;
@@ -1090,9 +1095,29 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
 
   /* Object */
   if(statement && object) {
-    sprintf(tmp," AND S.Object=%llu",
-            librdf_storage_mysql_node_hash(storage, object, 0));
-    strcat(where,tmp);
+    if(!sos->is_literal_match) {
+      sprintf(tmp," AND S.Object=%llu",
+              librdf_storage_mysql_node_hash(storage, object, 0));
+      strcat(where,tmp);
+    } else {
+      /* MATCH literal, not =hash_id */
+      if(!statement || !subject || !predicate) {
+        if(librdf_storage_mysql_find_statements_in_context_augment_query(&query, ",")) {
+          librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+          return NULL;
+        }
+      }
+      if(librdf_storage_mysql_find_statements_in_context_augment_query(&query, " ObjectL.Value AS ObV, ObjectL.Language AS ObL, ObjectL.Datatype AS ObD")) {
+        librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+        return NULL;
+      }
+      strcat(joins," LEFT JOIN Resources AS ObjectR ON S.Object=ObjectR.ID");
+      strcat(joins," LEFT JOIN Bnodes AS ObjectB ON S.Object=ObjectB.ID");
+      strcat(joins," LEFT JOIN Literals AS ObjectL ON S.Object=ObjectL.ID");
+      sprintf(tmp, " AND ObjectL.Value LIKE '%%%s%%'", 
+              librdf_node_get_literal_value(object));
+      strcat(where,tmp);
+    }
   } else {
     if(!statement || !subject || !predicate) {
       if(librdf_storage_mysql_find_statements_in_context_augment_query(&query, ",")) {
