@@ -108,9 +108,8 @@ AC_CHECK_PROGS(TAR, gnutar gtar tar)
 
 AC_CHECK_PROGS(JAVA, java jre)
 AC_CHECK_PROGS(JAVAC, javac)
-AC_DEFINE_UNQUOTED(JAVA_COMMAND, "$JAVA", [Java command])
-AC_CHECK_PROGS(PYTHON, python2.2 python2.1 python2.0 python2 python)
-AC_CHECK_PROGS(PERL, perl5.6.1 perl5.6.0 perl5 perl)
+AC_CHECK_PROGS(PYTHON, python)
+AC_CHECK_PROGS(PERL, perl)
 AC_CHECK_PROGS(PHP, php)
 AC_CHECK_PROGS(TCL, tcl)
 AC_CHECK_PROGS(RUBY, ruby)
@@ -167,6 +166,153 @@ else
 fi
 
 AC_SUBST(SWIG_PYTHON_ARGS)
+
+
+languages=
+
+
+AC_ARG_WITH(perl, [  --with-perl(=PERL)      Enable the Perl interface (default=auto)], with_perl="$withval", with_perl="auto")
+AC_MSG_CHECKING(Enable Perl API)
+if test "X$with_perl" != "Xno"; then
+  if test "X$with_perl" != "Xyes" -a "X$with_perl" != "Xauto"; then
+    PERL=$with_perl
+  fi
+  with_perl=yes
+  languages="$languages perl"
+else
+  with_perl=no
+fi
+AC_MSG_RESULT($with_perl)
+
+
+AC_ARG_WITH(python, [  --with-python(=PYTHON)  Enable the Python interface (default=auto)], with_python="$withval", with_python="auto")
+AC_MSG_CHECKING(Enable Python API)
+if test "X$with_python" != "Xno"; then
+  if test "X$with_python" != "Xyes" -a "X$with_python" != "Xauto"; then
+    PYTHON=$with_python
+  fi
+  with_python=yes
+  languages="$languages python"
+else
+  with_python=no
+fi
+AC_MSG_RESULT($with_python)
+
+
+AC_ARG_WITH(java, [  --with-java(=JAVA)      Enable the java interface], with_java="$withval", with_java="no")
+AC_MSG_CHECKING(Enable Java API)
+if test  "X$with_java" != "Xyes" -a "X$with_java" != "Xno"; then
+  JAVA=$with_java
+  with_java=yes
+  languages="$languages java"
+else
+  with_java=no
+fi
+AC_MSG_RESULT($with_java)
+
+
+AC_ARG_WITH(tcl, [  --with-tcl(=TCL)        Enable the Tcl interface], with_tcl="$withval", with_tcl="no")
+AC_MSG_CHECKING(Enable Tcl API)
+if test "X$with_tcl" != "Xyes" -a "X$with_tcl" != "Xno"; then
+  TCL=$with_tcl
+  with_tcl=yes
+  languages="$languages tcl"
+else
+  with_tcl=no
+fi
+AC_MSG_RESULT($with_tcl)
+
+
+AC_ARG_WITH(php, [  --with-php(=PHP)        Enable the PHP interface], with_php="$withval", with_php="no")
+AC_MSG_CHECKING(Enable PHP API)
+if test "X$with_php" != "Xyes" -a "X$with_php" != "Xno"; then
+  PHP=$with_php
+  with_php=yes
+  languages="$languages php"
+else
+  with_php=no
+fi
+AC_MSG_RESULT($with_php)
+
+
+AC_ARG_WITH(ruby, [  --with-ruby(=RUBY)      Enable the Ruby interface], with_ruby="$withval", with_ruby="no")
+AC_MSG_CHECKING(Enable Ruby API)
+if test "X$with_ruby" != "Xyes" -a "X$with_ruby" != "Xno"; then
+  RUBY=$with_ruby
+  with_ruby=yes
+  languages="$languages ruby"
+else
+  with_ruby=no
+fi
+AC_MSG_RESULT($with_ruby)
+
+with_ecma_cla=
+dnl Pick an ECMA CLI implementation
+AC_ARG_WITH(ecma-cli, [  --with-ecma-cli=SYSTEM  Enable ECMA CLI interface - mono, dotgnu (default=no)], ecma_cli_name="$withval", ecma_cli_name="no")
+
+
+AC_MSG_CHECKING(ECMA CLI implementations available)
+result=
+if test "X$MONO" != X -a "X$MCS" != X; then
+  result="$result Mono"
+fi
+if test "X$ILRUN" != X -a "X$CSCC" != X; then
+  result="$result dotGNU"
+fi
+AC_MSG_RESULT($result)
+
+AC_MSG_CHECKING(ECMA CLI implementations to use)
+with_ecma_cli=no
+CLIRUN=
+CSHARPC=
+for name in $ecma_cli_name mono dotgnu no; do
+  case $name in
+    mono)
+      if test "X$MONO" != X -a "X$MCS" != X; then
+        CLIRUN=$MONO
+        CSHARPC=$MCS
+        ecma_cli=Mono
+      fi
+      ;;
+
+    dotgnu)
+      if test "X$ILRUN" != X -a "X$CSCC" != X; then
+        CLIRUN=$ILRUN
+        CSHARPC=$CSCC
+        ecma_cli=dotGNU
+      fi
+      ;;
+
+    no)
+      ;;
+    *)
+      AC_MSG_ERROR(No such ECMA CLI implementation $name)
+      ;;
+esac
+done
+AC_MSG_RESULT($ecma_cli)
+AC_SUBST(CLIRUN)
+AC_SUBST(CSHARPC)
+
+if test "$with_ecma_cli" != no; then
+  languages="$languages csharp"
+fi
+
+
+
+AC_ARG_WITH(jdk, [  --with-jdk=DIR          Java JDK location []], jdk="$withval", jdk="")
+AC_MSG_CHECKING(Java JDK includes)
+JDK_INCLUDES=
+if test "X$jdk" != X -a -r $jdk/include/jni.h; then
+  inc1="$jdk/include"
+  inc2=`find $inc1 -type d | grep -v "$inc1\$" | head -1`
+  JDK_INCLUDES="-I$inc1"
+  if test -r $inc2/jni_md.h; then
+    JDK_INCLUDES="$JDK_INCLUDES -I$inc2"
+  fi
+fi
+AC_SUBST(JDK_INCLUDES)
+AC_MSG_RESULT($JDK_INCLUDES)
 
 
 AC_CHECK_PROG(LIBWWW_CONFIG, libwww-config, libwww-config)
@@ -470,21 +616,6 @@ done
 
 
 dnl Checks for languages
-AC_ARG_WITH(jdk, [  --with-jdk=DIR          Java JDK location []], jdk="$withval", jdk="")
-AC_MSG_CHECKING(Java JDK includes)
-JDK_INCLUDES=
-if test "X$jdk" != X -a -r $jdk/include/jni.h; then
-  inc1="$jdk/include"
-  inc2=`find $inc1 -type d | grep -v "$inc1\$" | head -1`
-  JDK_INCLUDES="-I$inc1"
-  if test -r $inc2/jni_md.h; then
-    JDK_INCLUDES="$JDK_INCLUDES -I$inc2"
-  fi
-fi
-AC_SUBST(JDK_INCLUDES)
-AC_MSG_RESULT($JDK_INCLUDES)
-
-
 AC_CHECK_PROG(PHP_CONFIG, php-config, php-config)
 if test "X$PHP" != X -a "X$PHP_CONFIG" != X ; then
 
@@ -622,51 +753,6 @@ fi
   
 LIBS=$LIBRDF_LIBS
 
-dnl Pick an ECMA CLI implementation
-AC_ARG_WITH(ecma-cli, [  --with-ecma-cli          Choose an ECMA CLI implenentation - mono, dotgnu []], ecma_cli_name="$withval", ecma_cli_name="")
-
-
-AC_MSG_CHECKING(ECMA CLI implementations available)
-result=
-if test "X$MONO" != X -a "X$MCS" != X; then
-  result="$result Mono"
-fi
-if test "X$ILRUN" != X -a "X$CSCC" != X; then
-  result="$result dotGNU"
-fi
-AC_MSG_RESULT($result)
-
-AC_MSG_CHECKING(ECMA CLI implementations to use)
-ecma_cli=none
-CLIRUN=
-CSHARPC=
-for name in $ecma_cli_name mono dotgnu; do
-  case $name in
-    mono)
-      if test "X$MONO" != X -a "X$MCS" != X; then
-        CLIRUN=$MONO
-        CSHARPC=$MCS
-        ecma_cli=Mono
-      fi
-      ;;
-
-    dotgnu)
-      if test "X$ILRUN" != X -a "X$CSCC" != X; then
-        CLIRUN=$ILRUN
-        CSHARPC=$CSCC
-        ecma_cli=dotGNU
-      fi
-      ;;
-
-    *)
-      AC_MSG_ERROR(No such ECMA CLI implementation $name)
-      ;;
-esac
-done
-AC_MSG_RESULT($ecma_cli)
-AC_SUBST(CLIRUN)
-AC_SUBST(CSHARPC)
-
 
 # Maybe add some local digest modules
 for module in $digest_modules; do
@@ -710,7 +796,7 @@ AC_SUBST(HASH_SRCS)
 
 
 dnl Checks for building sub-packages in sub directories
-SD="docs perl python tcl java"
+SD="docs $languages"
 
 
 AC_SUBST(SD)
@@ -783,6 +869,7 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 Redland build summary:
+  Language interfaces:   $languages
   RDF parsers:           $rdf_parsers_available
   Hash digests:          $digest_modules_available
   Berkeley/Sleepycat DB:  $bdb_available
