@@ -86,7 +86,7 @@ librdf_free_world(librdf_world *world)
    if (world->mutex)
    {
      pthread_mutex_destroy(world->mutex);
-     free(world->mutex);
+     SYSTEM_FREE(world->mutex);
      world->mutex = NULL;
    }
 #endif
@@ -102,7 +102,7 @@ void
 librdf_world_init_mutex(librdf_world* world)
 {
 #ifdef WITH_THREADS
-  world->mutex = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+  world->mutex = (pthread_mutex_t *) SYSTEM_MALLOC(sizeof(pthread_mutex_t));
   pthread_mutex_init(world->mutex, NULL);
 #else
 #endif
@@ -317,3 +317,23 @@ librdf_destroy_world(void)
 {
   librdf_free_world(RDF_World);
 }
+
+#if defined (LIBRDF_DEBUG) && defined(HAVE_DMALLOC_H) && defined(LIBRDF_MEMORY_DEBUG_DMALLOC)
+
+#undef malloc
+void*
+librdf_system_malloc(size_t size)
+{
+  return malloc(size);
+}
+
+#undef free
+void
+librdf_system_free(void *ptr)
+{
+  return free(ptr);
+  
+}
+
+#endif
+
