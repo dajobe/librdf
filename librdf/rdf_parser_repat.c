@@ -424,6 +424,7 @@ librdf_parser_repat_warning_handler(void* user_data, const XML_Char* msg)
 
 /**
  * librdf_parser_repat_init - Initialise the Repat RDF parser
+ * @parser: the parser
  * @context: context
  *
  * Return value: non 0 on failure
@@ -441,10 +442,9 @@ librdf_parser_repat_init(librdf_parser *parser, void *context)
 /**
  * librdf_parser_repat_parse_as_stream - Retrieve the RDF/XML content at file and parse it into a librdf_stream
  * @context: serialisation context
- * @uri: URI of RDF content
+ * @uri: URI of RDF content source
+ * @base_uri: the base URI to use (or NULL if the same)
  * 
- * FIXME: No error reporting provided 
- *
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
 static librdf_stream*
@@ -525,10 +525,9 @@ librdf_parser_repat_parse_file_as_stream(void *context,
  * librdf_parser_repat_parse_into_model - Retrieve the RDF/XML content at URI and store in a librdf_model
  * @context: serialisation context
  * @uri: URI of RDF content
+ * @base_uri: the base URI to use (or NULL if the same)
  * @model: &librdf_model
  * 
- * FIXME: No error reporting provided 
- *
  * Return value: non 0 on failure
  **/
 static int

@@ -173,6 +173,7 @@ static void librdf_parser_redland_free(void *context);
 
 /**
  * librdf_parser_redland_init - Initialise the Redland RDF parser
+ * @parser: the parser
  * @context: context
  *
  * Return value: non 0 on failure
@@ -399,6 +400,7 @@ librdf_parser_redland_fatal_error(void *ctx, const char *msg, ...)
  * librdf_parser_redland_parse_file_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: serialisation context
  * @uri: URI of RDF content
+ * @base_uri: the base URI to use (or NULL if the same)
  * 
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
@@ -446,6 +448,7 @@ myXmlSAXParseFile(xmlSAXHandlerPtr sax, void *user_data, const char *filename) {
  * librdf_parser_redland_parse_file_into_model - Retrieve the RDF/XML content at URI and store in a librdf_model
  * @context: serialisation context
  * @uri: URI of RDF content
+ * @base_uri: the base URI to use (or NULL if the same)
  * @model: &librdf_model
  * 
  * Return value: non 0 on failure
