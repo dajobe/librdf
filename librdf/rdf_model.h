@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -35,21 +35,108 @@ extern "C" {
 
 struct librdf_model_s {
   librdf_world *world;
-  
-  /* these two are alternatives (probably should be a union) */
 
-  /* 1. model is stored here */
-  librdf_storage*  storage;
-  
-  /* 2. model is built from a list of sub models */
   librdf_list*     sub_models;
+
+  void *context;
+  struct librdf_model_factory_s* factory;
 };
+
+/** A Model Factory */
+struct librdf_model_factory_s {
+  librdf_world *world;
+  struct librdf_model_factory_s* next;
+  char* name;
+  
+  /* the rest of this structure is populated by the
+     model-specific register function */
+  size_t context_length;
+  
+  /* init the factory */
+  void (*init)(void);
+
+  /* terminate the factory */
+  void (*terminate)(void);
+  
+  /* create a new model */
+  int (*create)(librdf_model* model, librdf_storage* storage, librdf_hash* options);
+  
+  /* copy a model */
+  /* clone is assumed to do leave the new model in the same state
+   * after an init() method on an existing model - i.e ready to
+   * use but closed.
+   */
+  librdf_model* (*clone)(librdf_model* new_model);
+
+  /* destroy model */
+  void (*destroy)(librdf_model* model);
+  
+  /* return the number of statements in the model for model */
+  int (*size)(librdf_model* model);
+  
+  /* add a statement to the model from the given model */
+  int (*add_statement)(librdf_model* model, librdf_statement* statement);
+  
+  /* add a statement to the model from the given model */
+  int (*add_statements)(librdf_model* model, librdf_stream* statement_stream);
+  
+  /* remove a statement from the model  */
+  int (*remove_statement)(librdf_model* model, librdf_statement* statement);
+  
+  /* check if statement in model  */
+  int (*contains_statement)(librdf_model* model, librdf_statement* statement);
+  /* check for [node, property, ?] */
+  int (*has_arc_in)(librdf_model *model, librdf_node *node, librdf_node *property);
+  /* check for [?, property, node] */
+  int (*has_arc_out)(librdf_model *model, librdf_node *node, librdf_node *property);
+
+  
+  /* serialise the model in model  */
+  librdf_stream* (*serialise)(librdf_model* model);
+  
+  /* serialise the results of a query */
+  librdf_stream* (*find_statements)(librdf_model* model, librdf_statement* statement);
+
+  /* return a list of Nodes marching given arc, target */
+  librdf_iterator* (*get_sources)(librdf_model* model, librdf_node *arc, librdf_node *target);
+
+  /* return a list of Nodes marching given source, target */
+  librdf_iterator* (*get_arcs)(librdf_model* model, librdf_node *source, librdf_node *target);
+
+  /* return a list of Nodes marching given source, target */
+  librdf_iterator* (*get_targets)(librdf_model* model, librdf_node *source, librdf_node *target);
+
+  /* return list of properties to/from a node */
+  librdf_iterator* (*get_arcs_in)(librdf_model *model, librdf_node *node);
+  librdf_iterator* (*get_arcs_out)(librdf_model *model, librdf_node *node);
+
+  /* add a statement to the model from the context */
+  int (*context_add_statement)(librdf_model* model, librdf_node* context, librdf_statement *statement);
+  
+  /* remove a statement from the context  */
+  int (*context_remove_statement)(librdf_model* model, librdf_node* context, librdf_statement *statement);
+
+  /* list statements in a context  */
+  librdf_stream* (*context_serialize)(librdf_model* model, librdf_node* context);
+
+  /* query the model */
+  librdf_stream* (*query)(librdf_model* model, librdf_query* query);
+
+};
+
+#include <rdf_model_storage.h>
 
 #endif
 
-/* class methods */
+/* module init */
 void librdf_init_model(librdf_world *world);
+
+  /* module terminate */
 void librdf_finish_model(librdf_world *world);
+
+/* class methods */
+void librdf_model_register_factory(const char *name, void (*factory) (librdf_model_factory*));
+librdf_model_factory* librdf_get_model_factory(const char *name);
 
 
 /* constructors */
