@@ -163,7 +163,7 @@ static int
 librdf_storage_file_size(librdf_storage* storage)
 {
   librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
-  return librdf_storage_size(context->storage);
+  return librdf_model_size(context->model);
 }
 
 
