@@ -1,8 +1,10 @@
 2004-11-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
-	* LICENSE-2.0.txt, LICENSE.html, MPL.html, Makefile.am,
+	* Snapshotted redland_0_9_19 for 0.9.19 release
+
+	* LICENSE-2.0.txt, LICENSE.html, MPL.html, Makefile.am, NOTICE,
 	README.html, TODO.html, librdf/redland.spec.in: LGPL / Apache 2.0
-	license - remove MPL MPL.html add Apache2 LICENSE-2.0.txt
+	license - remove MPL MPL.html add Apache2 LICENSE-2.0.txt NOTICE
 
 	* Switched to LGPL / Apache 2.0 license in the sources
 	CVS tags before: redland_license_lgpl_mpl,
@@ -21,12 +23,8 @@
 
 	* raptor/raptor_xml.c: docs
 
-	* librdf/rdf_serializer.c (main): Undo update expected result length.
-
 	* utils/rdfproc.c (log_handler):
 	Check level against fatal, not facility.
-
-	* librdf/rdf_serializer.c (main): Update expected result length.
 
 	* librdf/rdf_serializer_raptor.c, librdf/rdf_serializer.c,
 	librdf/rdf_query_rasqal.c, librdf/rdf_query.c,
