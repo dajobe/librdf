@@ -30,7 +30,7 @@ redland.pod kernel-doc \
 $(man_MANS)
 
 DOC_CLASSES=init node statement model \
-storage stream parser query query_results serializer concepts uri \
+storage stream parser query serializer concepts uri \
 digest hash heuristics iterator utf8
 
 POD_MODULES=RDF/Redland RDF/Redland/Iterator RDF/Redland/Model RDF/Redland/Node RDF/Redland/Parser RDF/Redland/RSS RDF/Redland/Serializer RDF/Redland/Statement RDF/Redland/Storage RDF/Redland/Stream RDF/Redland/URI
