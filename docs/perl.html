@@ -8,11 +8,11 @@
 
 <h1 align="center">Redland - An RDF Application Framework - Perl Interface</h1>
 
-<h2>Installing the Perl interface</h2>
+<h2>Installing the Redland Perl interface</h2>
 
-<p>This is not automatically built or installed at present, since the
-installation system isn't quite finished.  You can easily build it by
-hand as follows</p>
+<p>This is not automatically built or installed at present since this
+interface may not be required.  You can easily build it by hand as
+follows</p>
 
 <pre>
   cd perl
@@ -20,8 +20,7 @@ hand as follows</p>
   make test-perl   # optional
 </pre>
 
-<p>You can ignore any compiling warnings about discarding 'const'.
-To install it system wide (this is optional) do this as <em>root</em>:</p>
+<p>To install it system wide (this is optional) do this as <em>root</em>:</p>
 
 <pre>
   root# make install-perl
@@ -30,7 +29,7 @@ To install it system wide (this is optional) do this as <em>root</em>:</p>
 <p>The Redland interface has been tested with Perl 5.005.</p>
 
 
-<h2>Testing the Perl interface</h2>
+<h2>Testing the Redland Perl interface</h2>
 
 <p>If you did the optional install above, run the perl example
 program with:</p>
@@ -52,7 +51,7 @@ program with:</p>
 </pre>
 
 
-<h2>Perl API Introduction</h2>
+<h2>Redland Perl API Introduction</h2>
 
 <p>The Perl API is an object-based API reflecting the same structure
 of the Redland objects with simple mappings between them:
@@ -108,6 +107,13 @@ of the Redland objects with simple mappings between them:
 </tr>
 </table>
 </center>
+
+<h2>Other RDF Perl APIs and applications</h2>
+
+<ul>
+<li><a href="http://www.uxn.nu/wraf/">eb Resource Application Framework (WRAF)</a> (and at <a href="http://sourceforge.net/projects/wraf/">SourceForge</a>) -  RDF API that hopes to realize the Semantic Web. The framework uses RDF for data, user interface, modules and object methods. It uses interfaces to other sources in order to integrate all data in one enviroment, regardless of storage form.  Includes the <tt>RDF::Service</tt> perl modules (also in CPAN).</li>
+<li><a href="http://www.w3.org/1999/02/26-modules/">W3C perl modules</a> by Eric Prud'hommeaux.</li>
+</ul>
 
 
 <hr />
