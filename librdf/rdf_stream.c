@@ -421,6 +421,9 @@ librdf_stream_from_node_iterator_finished(void* context)
  * useful operation is to dispose of the stream with the
  * librdf_free_stream() destructor.
  * 
+ * This method is for debugging and the format of the output should
+ * not be relied on.
+ * 
  **/
 void
 librdf_stream_print(librdf_stream *stream, FILE *fh)
@@ -431,6 +434,7 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
   while(!librdf_stream_end(stream)) {
     char *s;
     librdf_statement* statement=librdf_stream_get_object(stream);
+    librdf_node* context_node=librdf_stream_get_context(stream);
     if(!statement)
       break;
 
@@ -438,6 +442,10 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
     if(s) {
       fputs("  ", fh);
       fputs(s, fh);
+      if(context_node) {
+        fputs(" with context ", fh);
+        librdf_node_print(context_node, fh);
+      }
       fputs("\n", fh);
       LIBRDF_FREE(cstring, s);
     }
