@@ -142,7 +142,7 @@ librdf_iterator_update_current_element(librdf_iterator* iterator)
       break;
     
     while(!librdf_iterator_end(map_iterator)) {
-      librdf_iterator_map *map=(librdf_iterator_map*)librdf_iterator_next(map_iterator);
+      librdf_iterator_map *map=(librdf_iterator_map*)librdf_iterator_get_object(map_iterator);
       if(!map)
         break;
       
@@ -150,6 +150,8 @@ librdf_iterator_update_current_element(librdf_iterator* iterator)
       element=map->fn(element, map->context);
       if(!element)
         break;
+
+      librdf_iterator_next(map_iterator);
     }
     librdf_free_iterator(map_iterator);
     
@@ -353,20 +355,6 @@ librdf_iterator_add_map(librdf_iterator* iterator,
   return 0;
 }
 
-
-void*
-librdf_iterator_map_remove_duplicate_nodes(void *item, void *user_data) 
-{
-  librdf_node *node=(librdf_node *)item;
-  static const unsigned char *null_string=(const unsigned char*)"NULL";
-  unsigned char *s;
-
-  s=node ? librdf_node_to_string(node) : (unsigned char*)null_string;
-  fprintf(stderr, "librdf_iterator_remove_duplicate_nodes: node %s and user_data %p\n", s, user_data);
-  if(s != null_string)
-    LIBRDF_FREE(cstring, s);
-  return item;
-}
 
 #endif
 
