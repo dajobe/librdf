@@ -48,8 +48,8 @@ INSTALL.html LICENSE.html FAQS.html \
 librdf-config.in \
 memcmp.c
 
-TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_statement_test \
-rdf_model_test rdf_storage_test
+TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
+rdf_statement_test rdf_model_test rdf_storage_test
 
 CLEANFILES=$(TESTS) test example
 
@@ -71,6 +71,9 @@ rdf_digest_test: rdf_digest.c librdf.a
 
 rdf_hash_test: rdf_hash.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_hash.c librdf.a $(LIBS)
+
+rdf_uri_test: rdf_uri.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_uri.c librdf.a $(LIBS)
 
 rdf_statement_test: rdf_statement.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c librdf.a $(LIBS)
