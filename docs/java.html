@@ -10,48 +10,60 @@
 
 <h2>Redland Java interface</h2>
 
-<p>The Java interface is still rather experimental and is still
-likely to change somewhat.</p>
+<p>This is built if <tt>--with-java</tt> is given to the configure
+line, or <tt>--with-java=java</tt> to use a particular Java
+version/program.</p>
 
-<p>This is not automatically built or installed at present since this
-interface may not be required.  You can easily build it by hand as
-follows</p>
+<p>The <tt>--with-jdk</tt> configure argument MUST be given give the
+location of the root of the full JDK installation so that the
+interface can be properly compiled against the correct Java Native
+Interface (JNI) headers for the JDK that provides the <tt>java</tt>
+program.</p>
 
+
+<p>The standard 'make' at the top level will build it once enabled as
+above.  You can also compile the Java interface by hand as
+follows:</p>
 
 <pre>
   cd java
-  make build-java
-  make test-java   # optional
-  # might need to run the test code like this:
-  LD_LIBRARY_PATH=. java -classpath . test
+  make
+  make check  # optional
 </pre>
 
+<p>(the <tt>make check</tt> may fail without the files being installed)</p>
 
-<p>To install it system wide, you will have to copy the
-<code>redland-java.jar<code> file to somewhere in your java CLASSPATH
-and the shared library <code>libredland-java.so</code> to somewhere
-in your dynamic library load path such as /usr/lib or /usr/local/lib.
-This varies between systems.
+<p>To install it system wide (this is optional) do this as <em>root</em>:</p>
+
+<pre>
+  root# make install
+</pre>
+
+<p>which will copy the <code>librdf-java.jar<code> to
+PREFIX/share/java and the shared library <code>librdf-java.so</code>
+to PREFIX/lib.  This is not a standard location between systems so
+might have to be done by hand.
 </p>
 
-<p>The Redland Java interface has been tested with J2SDK 1.3.1 and
-J2SDK 1.4.1_01 on Linux/x86 only.  It will need customising for
-different operating systems since the shared library creation has
-been hard-coded for Linux.  (This in particular will be hard to make
-portable).</p>
+<p>The Redland Java interface has been tested with JD2SDK 1.4.2,
+ J2SDK 1.4.1_01 and J2SDK 1.3.1 on Linux/x86 only.  The JNI header
+ and library files are in different places on all systems so the
+ <tt>--with-jdk</tt> MUST be used to give the location of the root
+ of the full JDK installation.  This should then find the header
+ files in the <tt>include</tt> and <tt>include/</tt><em>system</em>
+ sub-directories (such as "solaris" or "linux").</p>
 
 
 <h2>Testing the Redland Java interface</h2>
 
 <p>There is the beginnings of an example program in
 <a href="../java/example.java">example.java</a>
-which is mostly for reading (along with the tes1.java)
+which is mostly for reading (along with the test1.java)
 but can be compiled and run with:</p>
 <pre>
   make example
-  # the following asssumes you have done 'make install' for Redland
-  java -classpath .:redland-java.jar example
 </pre>
+<p>which tries to set the shared library path for librdf-java.so</p>
 
 
 <h2>Redland Java API Introduction</h2>
@@ -138,7 +150,7 @@ of the Redland objects with simple mappings between them:</p>
 
 <hr />
 
-<p>Copyright 2001-2002 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2001-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
