@@ -2,5 +2,6 @@
 .libs
 Makefile
 Makefile.in
-redland-db-upgrade
+dmalloc*
 rdfproc
+redland-db-upgrade
