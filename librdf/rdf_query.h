@@ -100,7 +100,7 @@ struct librdf_query_factory_s {
   int (*results_get_bindings_count)(librdf_query_results* query_results);
 
   /* tidy up query results - OPTIONAL */
-  int (*free_results)(librdf_query_results* query_results);
+  void (*free_results)(librdf_query_results* query_results);
 };
 
 
