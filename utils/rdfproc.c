@@ -260,6 +260,7 @@ main(int argc, char *argv[])
                   librdf_free_serializer(output_serializer);
                   output_serializer=NULL;
                 }
+              }
             }
             
           }
