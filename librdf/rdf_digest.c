@@ -70,7 +70,7 @@ librdf_digest_register_factory(const char *name,
         LIBRDF_DEBUG2(librdf_digest_register_factory,
                       "Received registration for digest %s\n", name);
 
-        digest=(librdf_digest_factory*)LIBRDF_CALLOC(librdf_digest_factory, 1
+        digest=(librdf_digest_factory*)LIBRDF_CALLOC(librdf_digest_factory, 1,
                                                      sizeof(librdf_digest_factory));
         if(!digest)
                 LIBRDF_FATAL1(librdf_digest_register_factory,
