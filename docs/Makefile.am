@@ -75,7 +75,7 @@
 
 
 EXTRA_DIST=api.sgml.in api.sgml README.html README build-docs \
-overview.png overview.ps overview.pdf
+overview.png overview.ps overview.pdf api
 
 DOC_CLASSES=digest digest_openssl digest_md5 hash hash_bdb hash_memory iterator list model node parser parser_libwww parser_sirpac statement storage storage_list stream uri
 
@@ -83,7 +83,7 @@ DOC_C_FILES=$(DOC_CLASSES:%=$(srcdir)/rdf_%.c)
 API_DOCBOOK_FILES=$(DOC_CLASSES:%=%.sgml)
 
 CLEANFILES=$(API_DOCBOOK_FILES) api.html README
-MAINTAINERCLEANFILES=api.sgml
+MAINTAINERCLEANFILES=api.sgml api
 
 PERL=perl
 
@@ -112,7 +112,7 @@ SUFFIXES = .html .txt .sgml .ps .pdf
 @MAINT@	kernel-doc -docbook $< > $@
 @MAINT@
 @MAINT@api.sgml: $(srcdir)/build-docs api.sgml.in $(API_DOCBOOK_FILES)
-@MAINT@	rm -rf DBTOHTML*
+@MAINT@	-rm -rf api.junk DBTOHTML*
 @MAINT@	$(PERL) $(srcdir)/build-docs api.sgml.in > api.sgml
 @MAINT@
 @MAINT@overview.ps: overview.xfig
