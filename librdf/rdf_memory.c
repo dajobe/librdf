@@ -23,9 +23,8 @@
 #include <rdf_config.h>
 
 #ifdef LIBRDF_MEMORY_DEBUG
-#include <stdio.h>
-#include <stdarg.h>
 
+#include <stdio.h>
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif

@@ -23,11 +23,9 @@
 
 #include <rdf_config.h>
 
-#include <sys/types.h>
-
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
+#include <sys/types.h>
 
 #include <librdf.h>
 

@@ -24,7 +24,6 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
-#include <stdarg.h>
 
 #include <librdf.h>
 

@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
 
 #ifdef STANDALONE
 #define LIBRDF_DEBUG 1

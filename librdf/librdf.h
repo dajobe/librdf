@@ -117,6 +117,12 @@ void librdf_memory_report(FILE *fh);
 #define LIBRDF_FATAL2(function, msg,arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function, arg); abort();} while(0)
 
 
+/* Required for va_list in error handler function registrations
+ * which are in the public API
+ */
+#include <stdarg.h>
+
+
 /* these includes should be replaced with automatically pulled
  * definitions from rdf_*.h headers 
  */

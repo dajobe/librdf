@@ -25,8 +25,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
-
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif

@@ -355,7 +355,7 @@ fi
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h unistd.h string.h fcntl.h dmalloc.h stdarg.h)
+AC_CHECK_HEADERS(stdlib.h unistd.h string.h fcntl.h dmalloc.h)
 AC_CHECK_HEADERS(expat.h xmlparse.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.

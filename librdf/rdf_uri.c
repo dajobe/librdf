@@ -25,10 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
-
 #include <ctype.h> /* for isalnum */
-
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
