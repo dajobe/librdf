@@ -39,7 +39,8 @@
 
 /* serialising implementing functions */
 static int librdf_parser_libwww_serialise_end_of_stream(void* context);
-static librdf_statement* librdf_parser_libwww_serialise_next_statement(void* context);
+static int librdf_parser_libwww_serialise_next_statement(void* context);
+static void* librdf_parser_libwww_serialise_get_statement(void* context, int flags);
 static void librdf_parser_libwww_serialise_finished(void* context);
 
 
@@ -58,7 +59,7 @@ typedef struct {
   char* uri;                /* source URI string (for libwww) */
   HTRDF* parser;            /* libwww RDF parser */
   HTRequest* request;       /* request for URI */
-  librdf_statement* next;   /* next statement */
+  librdf_statement* current; /* current statement */
   librdf_model *model;      /* model to store in */
   librdf_list *statements;  /* OR list to store statements */
   librdf_uri *source_uri;   /* source URI */
@@ -217,6 +218,8 @@ librdf_parser_libwww_terminate_handler (HTRequest * request,
 
   /* finish event loop */
   HTEventList_stopLoop();
+
+  return 0;
 }
 
 
@@ -463,6 +466,7 @@ librdf_parser_libwww_parse_common(void *context,
                            (void*)scontext,
                            &librdf_parser_libwww_serialise_end_of_stream,
                            &librdf_parser_libwww_serialise_next_statement,
+                           &librdf_parser_libwww_serialise_get_statement,
                            &librdf_parser_libwww_serialise_finished);
   if(!stream) {
     librdf_parser_libwww_serialise_finished((void*)scontext);
@@ -499,12 +503,12 @@ librdf_parser_libwww_get_next_statement(librdf_parser_libwww_stream_context *con
     context->request_done=1;
   }
   
-  context->next=(librdf_statement*)librdf_list_pop(context->statements);
+  context->current=(librdf_statement*)librdf_list_pop(context->statements);
 
-  if(!context->next)
+  if(!context->current)
     context->end_of_stream=1;
 
-  return context->next;
+  return context->current;
 }
 
 
@@ -526,48 +530,79 @@ librdf_parser_libwww_serialise_end_of_stream(void* context)
     return 1;
 
   /* already have 1 stored item - not end yet */
-  if(scontext->next)
+  if(scontext->current)
     return 0;
 
-  scontext->next=librdf_parser_libwww_get_next_statement(scontext);
-  if(!scontext->next)
+  scontext->current=librdf_parser_libwww_get_next_statement(scontext);
+  if(!scontext->current)
     scontext->end_of_stream=1;
 
-  return (scontext->next == NULL);
+  return (scontext->current == NULL);
 }
 
 
 /**
- * librdf_parser_libwww_serialise_next_statement - Get the next librdf_statement from the stream of statements from the libwww RDF parse
+ * librdf_parser_libwww_serialise_next_statement - Move to the next librdf_statement int the stream of statements from the libwww RDF parse
  * @context: the context passed in by &librdf_stream
  * 
  * Uses helper function librdf_parser_libwww_get_next_statement() to do the
  * work.
  *
- * Return value: a new &librdf_statement or NULL on error or if no statements found.
+ * Return value: non 0 at end of stream
  **/
-static librdf_statement*
+static int
 librdf_parser_libwww_serialise_next_statement(void* context)
 {
   librdf_parser_libwww_stream_context* scontext=(librdf_parser_libwww_stream_context*)context;
   librdf_statement* statement;
 
   if(scontext->end_of_stream)
-    return NULL;
+    return 1;
 
   /* return stored statement if there is one */
-  if(scontext->next) {
-    statement=scontext->next;
-    scontext->next=NULL;
-    return statement;
+  if(scontext->current) {
+    statement=scontext->current;
+    scontext->current=NULL;
   }
   
   /* else get a new one or NULL at end */
-  scontext->next=librdf_parser_libwww_get_next_statement(scontext);
-  if(!scontext->next)
+  scontext->current=librdf_parser_libwww_get_next_statement(scontext);
+  if(!scontext->current)
     scontext->end_of_stream=1;
 
-  return scontext->next;
+  return scontext->end_of_stream;
+}
+
+
+/**
+ * librdf_parser_libwww_serialise_get_statement - Get the current librdf_statement from the stream of statements from the libwww RDF parse
+ * @context: the context passed in by &librdf_stream
+ * @flags: type of stream get method
+ * 
+ * Uses helper function librdf_parser_libwww_get_next_statement() to do the
+ * work.
+ *
+ * Return value: a pointer to the shared object or NULL on error
+ **/
+static void*
+librdf_parser_libwww_serialise_get_statement(void* context, int flags)
+{
+  librdf_parser_libwww_stream_context* scontext=(librdf_parser_libwww_stream_context*)context;
+
+  if(scontext->end_of_stream)
+    return NULL;
+
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      return scontext->current;
+
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      return NULL;
+      
+    default:
+      abort();
+  }
+
 }
 
 
@@ -579,7 +614,6 @@ static void
 librdf_parser_libwww_serialise_finished(void* context)
 {
   librdf_parser_libwww_stream_context* scontext=(librdf_parser_libwww_stream_context*)context;
-  librdf_parser_libwww_context* pcontext=scontext->pcontext;
 
   if(scontext) {
     if(scontext->request)
@@ -595,8 +629,8 @@ librdf_parser_libwww_serialise_finished(void* context)
       librdf_free_list(scontext->statements);
     }
 
-    if(scontext->next)
-      librdf_free_statement(scontext->next);
+    if(scontext->current)
+      librdf_free_statement(scontext->current);
     
     /* terminate libwww */
     HTProfile_delete();
