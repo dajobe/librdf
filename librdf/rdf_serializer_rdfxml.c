@@ -28,6 +28,7 @@
 #include <ctype.h>
 
 #include <librdf.h>
+#include <raptor.h>
 
 
 typedef struct {
@@ -132,23 +133,78 @@ rdf_serializer_rdfxml_print_as_xml_attribute(char *p, char quote,
 }
 
 
+static void
+librdf_serializer_rdfxml_raptor_error_handler(void *data, const char *message, ...) 
+{
+  librdf_world* world=(librdf_world*)data;
+  static const char *message_prefix=" - Raptor serializing error - ";
+  int prefix_len=strlen(message_prefix);
+  int message_len=strlen(message);
+  char *buffer;
+  va_list arguments;
+
+  va_start(arguments, message);
+
+  buffer=(char*)LIBRDF_MALLOC(cstring, prefix_len+message_len+1);
+  if(!buffer) {
+    fprintf(stderr, "librdf_serializer_rdfxml_raptor_error_handler: Out of memory\n");
+    return;
+  }
+  strncpy(buffer, message_prefix, prefix_len);
+  strcpy(buffer+prefix_len, message); /* want extra \0 - using strcpy */
+
+  librdf_error_varargs(world, buffer, arguments);
+  LIBRDF_FREE(cstring, buffer);
+
+  va_end(arguments);
+}
+
+
+
 /**
  * rdf_serializer_rdfxml_print_xml_attribute - Print the attribute/value as an XML attribute, XML escaped
+ * @world: &librdf_world world
  * @attr: attribute name
  * @value: attribute value
  * @handle: FILE* to print to
  * 
  **/
 static void
-rdf_serializer_rdfxml_print_xml_attribute(char *attr, char *value,
+rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
+                                          char *attr, char *value,
                                           FILE *handle) 
 {
-  fputc(' ', handle);
-  fputs(attr, handle);
-  fputc('=', handle);
-  fputc('"', handle);
-  rdf_serializer_rdfxml_print_as_xml_attribute(value, '"', handle);
-  fputc('"', handle);
+  size_t attr_len;
+  size_t len;
+  size_t escaped_len;
+  unsigned char *buffer;
+  unsigned char *p;
+  
+  attr_len=strlen(attr);
+  len=strlen(value);
+
+  escaped_len=raptor_xml_escape_string(value, len,
+                                       NULL, 0, '"',
+                                       librdf_serializer_rdfxml_raptor_error_handler, world);
+
+  buffer=(char*)LIBRDF_MALLOC(cstring, 1 + attr_len + 2 + escaped_len + 1 +1);
+  if(!buffer)
+    return;
+  p=buffer;
+  *p++=' ';
+  strncpy(p, attr, attr_len);
+  p+= attr_len;
+  *p++='=';
+  *p++='"';
+  raptor_xml_escape_string(value, len,
+                           p, escaped_len, '"',
+                           librdf_serializer_rdfxml_raptor_error_handler, world);
+  p+= escaped_len;
+  *p++='"';
+  *p++='\0';
+  
+  fputs(buffer, handle);
+  LIBRDF_FREE(cstring, buffer);
 }
 
 
@@ -164,6 +220,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
                                             librdf_statement * statement,
                                             FILE *handle) 
 {
+  librdf_world* world=statement->world;
   librdf_node* nodes[3];
   char* uris[3];
   char *name=NULL;  /* where to split predicate name */
@@ -216,11 +273,11 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 
   /* subject */
   if(librdf_node_get_type(nodes[0]) == LIBRDF_NODE_TYPE_BLANK)
-    rdf_serializer_rdfxml_print_xml_attribute("rdf:nodeID", 
+    rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:nodeID", 
                                               librdf_node_get_blank_identifier(nodes[0]),
                                               handle);
   else
-    rdf_serializer_rdfxml_print_xml_attribute("rdf:about", uris[0], handle);
+    rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:about", uris[0], handle);
 
   fputs(">\n", handle);
 
@@ -243,7 +300,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   switch(librdf_node_get_type(nodes[2])) {
     case LIBRDF_NODE_TYPE_LITERAL:
       if(librdf_node_get_literal_value_language(nodes[2]))
-        rdf_serializer_rdfxml_print_xml_attribute("xml:lang",
+        rdf_serializer_rdfxml_print_xml_attribute(world, "xml:lang",
                                                   librdf_node_get_literal_value_language(nodes[2]),
                                                   handle);
 
@@ -256,7 +313,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
       } else {
         librdf_uri *duri=librdf_node_get_literal_value_datatype_uri(nodes[2]);
         if(duri)
-          rdf_serializer_rdfxml_print_xml_attribute("rdf:datatype",
+          rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:datatype",
                                                     librdf_uri_as_string(duri),
                                                     handle);
 
@@ -272,14 +329,14 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
       fputc('>', handle);
       break;
     case LIBRDF_NODE_TYPE_BLANK:
-      rdf_serializer_rdfxml_print_xml_attribute("rdf:nodeID",
+      rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:nodeID",
                                                 librdf_node_get_blank_identifier(nodes[2]), handle);
       fputs("/>", handle);
       break;
 
     case LIBRDF_NODE_TYPE_RESOURCE:
       /* must be URI */
-      rdf_serializer_rdfxml_print_xml_attribute("rdf:resource",
+      rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:resource",
                                                 uris[2], handle);
       fputs("/>", handle);
       break;
