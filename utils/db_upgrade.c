@@ -95,7 +95,7 @@ main(int argc, char *argv[])
     return(1);
   }
   
-  stream=librdf_model_serialise(model);
+  stream=librdf_model_as_stream(model);
   if(!stream) {
     fprintf(stderr, "%s: librdf_model_serialize returned NULL stream\n", 
             program);
