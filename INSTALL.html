@@ -53,6 +53,16 @@ tools with:</p>
 such as <tt>--prefix</tt> etc.</p>
 
 <dl>
+<dt><tt>--with-bdb=ROOT</tt><br /></dt>
+<dd><p>Enable use of the Berkeley DB library installed at <em>ROOT</em>.  That means <em>ROOT</em><tt>/include</tt> must contain the BDB header <tt>db.h</tt> and <em>ROOT</em><tt>/lib</tt> must contain the library <tt>libdb.a</tt> (or whatever shared version you have).</p>
+
+<P>Berkeley DB is now distributed and supported by
+<a href="http://www.sleepycat.com/">SleepyCat Software</a> and you can
+download the library from there.  Versions 3.1.14, 2.7.7 and 2.4.14 (comes
+with RedHat 6.2) have been tested and work.</p>
+
+</dd>
+
 <dt><tt>--with-libwww</tt><br /></dt>
 <dd><p>Enable use of the W3C <a href="http://www.w3.org/Library/">libwww</a>,
 if available.  configure will automatically enable this if
