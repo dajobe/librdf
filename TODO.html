@@ -32,7 +32,6 @@ Nodes to take URI OR URI or Literal as appropriate.</li>
 <li>Pass RDF parser error messages to user code, scripting languages</li>
 <li>Add module - URI syntax, representation, relative URI resolving</li>
 <li>Add module - URI retrieval via (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
-<li>Make the library work as a shared library/DLL</li>
 <li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build</li>
 <li>If LGPL/MPL license, include compatible code OR add separate package?</li>
 <li>Deal with anonymous resources</li>
@@ -73,6 +72,8 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Multiple startup/shutdowns of entire library now works (0.9.11)</li>
+<li>Make the library work as a shared library (0.9.11)</li>
 <li>Model size method implemented (0.9.11)</li>
 <li>Added a <a href="docs/java.html">Java interface</a> (0.9.10)</li>
 <li><tt>librdf_hash_from_string()</tt> - \ escaping doesn't work properly (0.9.9)</li>
@@ -133,9 +134,7 @@ parser will use expat or libxml as necessary.
 
 <hr />
 
-<p>Copyright 2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
-
-<p><a href="http://www.mirror.ac.uk/services/validator/check/referer">Validate me</a></p>
+<p>Copyright 2000-2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
