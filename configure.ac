@@ -733,11 +733,12 @@ rdf_parsers_available=
 AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
 AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default=auto)], with_raptor="$withval", with_raptor="auto")
 
+RAPTOR_MIN_VERSION=1.3.0
+AC_SUBST(RAPTOR_MIN_VERSION)
 if test "X$RAPTOR_CONFIG" == "X"; then
   with_raptor=internal
 else
   RAPTOR_VERSION=`$RAPTOR_CONFIG --version 2>/dev/null`
-  RAPTOR_MIN_VERSION=1.3.0
 
   # FIXME - could use raptor-config --decimal-version at some point
   RAPTOR_VERSION_DEC=`echo $RAPTOR_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
@@ -833,11 +834,12 @@ done
 AC_CHECK_PROG(RASQAL_CONFIG, rasqal-config, rasqal-config)
 AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/internal (default=auto)], with_rasqal="$withval", with_rasqal="auto")
 
+RASQAL_MIN_VERSION=0.2.0
+AC_SUBST(RASQAL_MIN_VERSION)
 if test "X$RAPTOR_CONFIG" == "X"; then
   with_rasqal=internal
 else
   RASQAL_VERSION=`$RASQAL_CONFIG --version 2>/dev/null`
-  RASQAL_MIN_VERSION=0.2.0
 
   RASQAL_VERSION_DEC=`$RASQAL_CONFIG --version-decimal`
   RASQAL_MIN_VERSION_DEC=`echo $RASQAL_MIN_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`

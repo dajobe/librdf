@@ -20,8 +20,8 @@ URL:       http://www.redland.opensource.ac.uk/
 BuildRoot: /tmp/%{name}-%{version}
 BuildRequires: libxml2-devel >= 2.4.0
 BuildRequires: curl-devel
-BuildRequires: raptor-devel >= 1.3.0
-BuildRequires: rasqal-devel >= 0.2.0
+BuildRequires: raptor-devel >= @RAPTOR_MIN_VERSION@
+BuildRequires: rasqal-devel >= @RASQAL_MIN_VERSION@
 BuildRequires: perl >= 5.8.0
 BuildRequires: python >= 2.2.0 python-devel
 BuildRequires: mysql-devel
@@ -46,8 +46,8 @@ for RDF developers to experiment with the technology.
 Summary: Libraries and header files for programs that use Redland.
 Group: Development/Libraries
 Requires: redland
-Requires: raptor >= 1.3.0
-Requires: rasqal >= 0.2.0
+Requires: raptor >= @RAPTOR_MIN_VERSION@
+Requires: rasqal >= @RASQAL_MIN_VERSION@
 
 %description devel
 Header files for development with Redland
