@@ -15,8 +15,13 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>Python: factories for parsers</li>
-<li>Python: remove "raptor" in examples, replace with syntax names "rdfxml"</li>
+<li>python. reported the code needs to be:
+<pre>
+[foo = RDF.Parser("turtle", "application/x-turtle")]
+</pre> "Leaving out the mime_type argument does not work."
+</li>
+<li>Python: add factories for all parsers</li>
+<li>remove "raptor" parser name in any examples, replace with syntax names such as "rdfxml"</li>
 <li>In RDF.py, parse_into_model, allow promotion of base_uri arg.
 <pre>
 if type(base_uri) is str:
