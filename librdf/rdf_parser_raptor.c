@@ -49,6 +49,9 @@ typedef struct {
   librdf_parser *parser;        /* librdf parser object */
   librdf_hash *bnode_hash;      /* bnode id (raptor=>internal) map */
   char *parser_name;            /* raptor parser name to use */
+
+  int errors;
+  int warnings;
 } librdf_parser_raptor_context;
 
 
@@ -72,9 +75,6 @@ typedef struct {
    */
   librdf_statement* current; /* current statement */
   librdf_list statements;   /* STATIC following statements after current */
-
-  int errors;
-  int warnings;
 } librdf_parser_raptor_stream_context;
 
 
@@ -101,7 +101,7 @@ librdf_parser_raptor_init(librdf_parser *parser, void *context)
 
   /* New in-memory hash for mapping bnode IDs */
   pcontext->bnode_hash=librdf_new_hash(parser->world, NULL);
-  
+
   /* always succeeds ? */  
   return 0;
 }
@@ -247,14 +247,18 @@ librdf_parser_raptor_error_handler(void *data, raptor_locator *locator,
                                    const char *message) 
 {
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)data;
-  librdf_parser* parser=scontext->pcontext->parser;
+  librdf_parser_raptor_context* pcontext;
+  librdf_parser* parser;
   static const char *message_prefix=" - Raptor error - ";
   int prefix_len=strlen(message_prefix);
   int message_len=strlen(message);
   int locator_len=raptor_format_locator(NULL, 0, locator);
   char *buffer;
 
-  scontext->errors++;
+  pcontext=scontext->pcontext;
+  parser=pcontext->parser;
+
+  pcontext->errors++;
   raptor_parse_abort(scontext->rdf_parser);
 
   buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+prefix_len+message_len+1);
@@ -276,14 +280,18 @@ librdf_parser_raptor_warning_handler(void *data, raptor_locator *locator,
                                      const char *message) 
 {
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)data;
-  librdf_parser* parser=scontext->pcontext->parser;
+  librdf_parser_raptor_context* pcontext;
+  librdf_parser* parser;
   static const char *message_prefix=" - Raptor warning - ";
   int prefix_len=strlen(message_prefix);
   int message_len=strlen(message);
   int locator_len=raptor_format_locator(NULL, 0, locator);
   char *buffer;
 
-  scontext->warnings++;
+  pcontext=scontext->pcontext;
+  parser=pcontext->parser;
+
+  pcontext->warnings++;
 
   buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+prefix_len+message_len+1);
   if(!buffer) {
@@ -387,6 +395,9 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   raptor_parser *rdf_parser;
   int rc;
   librdf_world *world=uri->world;
+
+  pcontext->errors=0;
+  pcontext->warnings=0;
   
   scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
   if(!scontext)
@@ -485,6 +496,9 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   librdf_parser_raptor_stream_context* scontext;
   raptor_parser *rdf_parser;
   librdf_stream *stream;
+  
+  pcontext->errors=0;
+  pcontext->warnings=0;
   
   if(uri && librdf_uri_is_file_uri(uri))
     return librdf_parser_raptor_parse_file_as_stream(context, uri, base_uri);
@@ -632,6 +646,9 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
   raptor_parser *rdf_parser;
+  
+  pcontext->errors=0;
+  pcontext->warnings=0;
   
   scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
   if(!scontext)
@@ -841,6 +858,36 @@ librdf_parser_raptor_serialise_finished(void* context)
 }
 
 
+static const char *
+librdf_parser_raptor_get_feature(void* context, librdf_uri *feature) 
+{
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+  unsigned char *uri_string;
+
+  if(!feature)
+    return NULL;
+
+  uri_string=librdf_uri_as_string(feature);
+  if(!uri_string)
+    return NULL;
+  
+  if(!strcmp(uri_string, LIBRDF_PARSER_FEATURE_ERROR_COUNT)) {
+    static unsigned char count[20]; /* FIXME */
+
+    sprintf((char*)count, "%d", pcontext->errors);
+    return (const char*)count;
+  } else if(!strcmp(uri_string, LIBRDF_PARSER_FEATURE_WARNING_COUNT)) {
+    static unsigned char count[20]; /* FIXME */
+
+    sprintf((char*)count, "%d", pcontext->warnings);
+    return (const char*)count;
+  }
+
+  return NULL;
+}
+
+
+
 static raptor_uri*
 librdf_raptor_new_uri(void *context, const unsigned char *uri_string) 
 {
@@ -937,6 +984,7 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
   factory->parse_uri_into_model = librdf_parser_raptor_parse_uri_into_model;
   factory->parse_string_as_stream = librdf_parser_raptor_parse_string_as_stream;
   factory->parse_string_into_model = librdf_parser_raptor_parse_string_into_model;
+  factory->get_feature = librdf_parser_raptor_get_feature;
 }
 
 
