@@ -1041,49 +1041,7 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
   if(!first_node || !second_node)
     return 0;
   
-  if(first_node->type != second_node->type)
-    return 0;
-  
-  switch(first_node->type) {
-    case LIBRDF_NODE_TYPE_RESOURCE:
-      return librdf_uri_equals(first_node->value.resource.uri,
-                               second_node->value.resource.uri);
-
-    case LIBRDF_NODE_TYPE_LITERAL:
-      if(first_node->value.literal.string_len != second_node->value.literal.string_len)
-        return 0;
-
-      status=strcmp(first_node->value.literal.string,
-                    second_node->value.literal.string);
-      if(status)
-        return 0;
-      
-      /* No datatypes, must be equal */
-      if(!first_node->value.literal.datatype_uri && !second_node->value.literal.datatype_uri)
-        return 1;
-
-      /* Only one URI - must be different */
-      if(!first_node->value.literal.datatype_uri || !second_node->value.literal.datatype_uri)
-        return 0;
-
-      return librdf_uri_equals(first_node->value.literal.datatype_uri,
-                               second_node->value.literal.datatype_uri);
-      
-
-    case LIBRDF_NODE_TYPE_BLANK:
-
-      return !strcmp(first_node->value.blank.identifier,
-                     second_node->value.blank.identifier);
-
-    default:
-      LIBRDF_ERROR2(first_node->world, librdf_node_equals,
-                    "Do not know how to compare node type %d\n",
-                    first_node->type);
-      return 0;
-  }
-
-  /* NOTREACHED */
-  return 0;
+  return (first_node == second_node);
 }
 
 
