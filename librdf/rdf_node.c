@@ -230,6 +230,33 @@ librdf_new_node_from_uri_qname(librdf_uri *uri, const char *qname)
 
 
 /**
+ * librdf_new_node_from_normalised_uri_string - Constructor - create a new librdf_node object from a URI string normalised to a new base URI
+ * @uri_string: string representing a URI
+ * @source_uri: source URI
+ * @base_uri: base URI
+ * 
+ * Return value: a new &librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_new_node_from_normalised_uri_string(const char *uri_string,
+                                           librdf_uri *source_uri,
+                                           librdf_uri *base_uri)
+{
+  librdf_uri* new_uri;
+  librdf_node* new_node;
+  
+  new_uri=librdf_new_uri_normalised_to_base(uri_string, source_uri, base_uri);
+  if(!new_uri)
+    return NULL;
+
+  new_node=librdf_new_node_from_uri_string(librdf_uri_as_string(new_uri));
+  librdf_free_uri(new_uri);
+  
+  return new_node;
+}
+
+
+/**
  * librdf_new_node_from_literal -  Constructor - create a new literal librdf_node object
  * @string: literal string value
  * @xml_language: literal XML language (or NULL)
