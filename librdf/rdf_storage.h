@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -136,8 +136,15 @@ struct librdf_storage_factory_s {
 
 #include <rdf_storage_list.h>
 #include <rdf_storage_hashes.h>
+
+/* in librdf_storage_mysql.c */
 #ifdef HAVE_MYSQL
-#include <rdf_storage_mysql.h>
+void librdf_init_storage_mysql(void);
+#endif
+
+/* in librdf_storage_tstore.c */
+#ifdef HAVE_TSTORE
+void librdf_init_storage_tstore(void);
 #endif
 
 #endif
