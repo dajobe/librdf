@@ -36,3 +36,5 @@
 #undef HAVE_DB_OPEN
 #undef HAVE_BDB_DB_TXN
 #undef HAVE_BDB_CURSOR
+/* V1??? */
+#undef HAVE_DBOPEN
