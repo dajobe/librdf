@@ -46,16 +46,20 @@ typedef struct
 } librdf_hash_gdbm_context;
 
 
+/* Implementing the hash cursor */
+static int librdf_hash_gdbm_cursor_init(void *cursor_context, void *hash_context);
+static int librdf_hash_gdbm_cursor_get(void *context, librdf_hash_datum* key, librdf_hash_datum* value, unsigned int flags);
+static void librdf_hash_gdbm_cursor_finish(void* context);
+
+
 /* prototypes for local functions */
 static int librdf_hash_gdbm_open(void* context, char *identifier, void *mode,
                                  librdf_hash* options);
 static int librdf_hash_gdbm_close(void* context);
-static librdf_iterator* librdf_hash_gdbm_get(void* context, librdf_hash_datum *key, unsigned int flags);
 static int librdf_hash_gdbm_put(void* context, librdf_hash_datum *key,
                                 librdf_hash_datum *data, unsigned int flags);
 static int librdf_hash_gdbm_exists(void* context, librdf_hash_datum *key);
 static int librdf_hash_gdbm_delete(void* context, librdf_hash_datum *key);
-static librdf_iterator* librdf_hash_gdbm_keys(void* context);
 static int librdf_hash_gdbm_sync(void* context);
 static int librdf_hash_gdbm_get_fd(void* context);
 
@@ -123,43 +127,138 @@ librdf_hash_gdbm_close(void* context)
 }
 
 
+
+typedef struct {
+  librdf_hash_gdbm_context* hash;
+  datum current_key;
+} librdf_hash_gdbm_cursor_context;
+
+
+
 /**
- * librdf_hash_gdbm_get - 
+ * librdf_hash_gdbm_cursor_init - 
  **/
-static librdf_iterator*
-librdf_hash_gdbm_get(void* context, librdf_hash_datum *key, unsigned int flags) 
+static int
+librdf_hash_gdbm_cursor_init(void *cursor_context, void *hash_context)
 {
-#if 0
-  librdf_hash_gdbm_context* gdbm_context=(librdf_hash_gdbm_context*)context;
-  datum gdbm_data;
-  datum gdbm_key;
-  
-  /* Initialise GDBM version of key */
-  gdbm_key.dptr = (char*)key->data;
-  gdbm_key.dsize = key->size;
-  
-  gdbm_data = gdbm_fetch(gdbm_context->gdbm_file, gdbm_key);
-  if(!gdbm_data.dptr) {
-    /* not found */
-    data->data = NULL;
-    return 0;
-  }
-  
-  data->data = LIBRDF_MALLOC(gdbm_data, gdbm_data.dsize);
-  if(!data->data) {
-    free(gdbm_data.dptr);
-    return 1;
-  }
-  memcpy(data->data, gdbm_data.dptr, gdbm_data.dsize);
-  data->size = gdbm_data.dsize;
-  
-  /* always allocated by GDBM using system malloc */
-  free(gdbm_data.dptr);
-#endif
-  abort();
+  librdf_hash_gdbm_cursor_context *cursor=(librdf_hash_gdbm_cursor_context*)cursor_context;
+
+  cursor->hash=(librdf_hash_gdbm_context*)hash_context;
+
   return 0;
 }
 
+
+/**
+ * librdf_hash_gdbm_cursor_get - Retrieve a hash value for the given key
+ * @context: GDBM hash cursor context
+ * @key: pointer to key to use
+ * @value: pointer to value to use
+ * @flags: flags
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_hash_gdbm_cursor_get(void* context, 
+                           librdf_hash_datum *key, librdf_hash_datum *value,
+                           unsigned int flags)
+{
+  librdf_hash_gdbm_cursor_context *cursor=(librdf_hash_gdbm_cursor_context*)context;
+  datum gdbm_key;
+  datum gdbm_value;
+
+
+  /* Always initialise key */
+  if (flags != LIBRDF_HASH_CURSOR_FIRST) {
+    cursor->current_key.dptr = (char*)key->data;
+    cursor->current_key.dsize = key->size;
+  }
+  
+  switch(flags) {
+  case LIBRDF_HASH_CURSOR_FIRST:
+    gdbm_key=cursor->current_key=gdbm_firstkey(cursor->hash->gdbm_file);
+    break;
+
+  case LIBRDF_HASH_CURSOR_NEXT:
+  case LIBRDF_HASH_CURSOR_NEXT_VALUE:
+    /* FIXME - GDBM cannot distinguish these */
+    gdbm_key=gdbm_nextkey(cursor->hash->gdbm_file, cursor->current_key);
+
+  default:
+    abort();
+  }
+    
+  if(!gdbm_key.dptr) {
+    key->data=NULL;
+    return 1;
+  }
+
+  /* want value? */
+  if(value) {
+    gdbm_value = gdbm_fetch(cursor->hash->gdbm_file, gdbm_key);
+    if(!gdbm_value.dptr) {
+      /* not found */
+      free(gdbm_key.dptr);
+      key->data = NULL;
+      return 0;
+    }
+  
+    value->data = LIBRDF_MALLOC(gdbm_data, gdbm_value.dsize);
+    if(!value->data) {
+      free(gdbm_key.dptr);
+      free(gdbm_value.dptr);
+      return 1;
+    }
+    memcpy(value->data, gdbm_value.dptr, gdbm_value.dsize);
+    value->size = gdbm_value.dsize;
+  
+  /* always allocated by GDBM using system malloc */
+    free(gdbm_value.dptr);
+  }
+  
+
+  key->data = LIBRDF_MALLOC(gdbm_data, gdbm_key.dsize);
+  if(!key->data) {
+    free(gdbm_key.dptr);
+    if(value) {
+      LIBRDF_FREE(gdbm_data, value->data);
+      value->data=NULL;
+    }
+    return 1;
+  }
+
+  memcpy(key->data, gdbm_key.dptr, gdbm_key.dsize);
+  key->size = gdbm_key.dsize;
+  
+  
+  /* save new current key */
+  if(cursor->current_key.dsize)
+    LIBRDF_FREE(gdbm_data, cursor->current_key.dptr);
+  cursor->current_key.dsize=gdbm_key.dsize;
+  cursor->current_key.dptr=(char*)LIBRDF_MALLOC(gdbm_data, gdbm_key.dsize);
+  if(!cursor->current_key.dptr)
+    return 1;
+
+  memcpy(cursor->current_key.dptr, gdbm_key.dptr, gdbm_key.dsize);
+  
+  /* always allocated by GDBM using system malloc */
+  free(gdbm_key.dptr);
+
+  return 0;
+}
+
+
+/**
+ * librdf_hash_gdbm_cursor_finished - Finish the serialisation of the hash gdbm get
+ * @context: GDBM hash cursor context
+ **/
+static void
+librdf_hash_gdbm_cursor_finish(void* context)
+{
+#if 0
+  librdf_hash_gdbm_cursor_context* cursor=(librdf_hash_gdbm_cursor_context*)context;
+#endif
+}
 
 /**
  * librdf_hash_gdbm_put - Store a key/value pair in the hash
@@ -235,67 +334,6 @@ librdf_hash_gdbm_delete(void* context, librdf_hash_datum *key)
 
 
 /**
- * librdf_hash_gdbm_keys - 
- **/
-static librdf_iterator*
-librdf_hash_gdbm_keys(void* context) 
-{
-#if 0
-  librdf_hash_gdbm_context* gdbm_context=(librdf_hash_gdbm_context*)context;
-  datum gdbm_key;
-  
-  if(type == LIBRDF_HASH_SEQUENCE_FIRST) {
-    gdbm_key=gdbm_firstkey(gdbm_context->gdbm_file);
-
-  } else if (type == LIBRDF_HASH_SEQUENCE_NEXT) {
-    gdbm_key=gdbm_nextkey(gdbm_context->gdbm_file, gdbm_context->current_key);
-
-  } else if (type == LIBRDF_HASH_SEQUENCE_CURRENT) {
-    gdbm_key.dsize=gdbm_context->current_key.dsize;
-    gdbm_key.dptr=gdbm_context->current_key.dptr;
-
-  } else
-    LIBRDF_FATAL2(librdf_hash_gdbm_get_seq, "Unknown type %d", type);
-  
-  if(!gdbm_key.dptr) {
-    key->data=NULL;
-    return 1;
-  }
-
-  key->data = LIBRDF_MALLOC(gdbm_data, gdbm_key.dsize);
-  if(!key->data) {
-    /* always allocated by GDBM using system malloc */
-    if(type != LIBRDF_HASH_SEQUENCE_CURRENT)
-      free(gdbm_key.dptr);
-    return 1;
-  }
-  memcpy(key->data, gdbm_key.dptr, gdbm_key.dsize);
-  key->size = gdbm_key.dsize;
-  
-  if(type != LIBRDF_HASH_SEQUENCE_CURRENT) {
-    /* save new current key */
-    if(gdbm_context->current_key.dsize)
-      LIBRDF_FREE(gdbm_data, gdbm_context->current_key.dptr);
-    gdbm_context->current_key.dsize=gdbm_key.dsize;
-    gdbm_context->current_key.dptr=(char*)LIBRDF_MALLOC(gdbm_data,
-                                                        gdbm_key.dsize);
-    if(!gdbm_context->current_key.dptr)
-      return 1;
-    memcpy(gdbm_context->current_key.dptr, gdbm_key.dptr,
-           gdbm_key.dsize);
-    
-    /* always allocated by GDBM using system malloc */
-    free(gdbm_key.dptr);
-  }
-  
-  return 0;
-#endif
-  abort();
-  return NULL;
-}
-
-
-/**
  * librdf_hash_gdbm_sync - Flush the hash to disk
  * @context: GDBM hash context
  * 
@@ -339,16 +377,19 @@ static void
 librdf_hash_gdbm_register_factory(librdf_hash_factory *factory) 
 {
   factory->context_length = sizeof(librdf_hash_gdbm_context);
+  factory->cursor_context_length = sizeof(librdf_hash_gdbm_cursor_context);
   
   factory->open    = librdf_hash_gdbm_open;
   factory->close   = librdf_hash_gdbm_close;
-  factory->get     = librdf_hash_gdbm_get;
   factory->put     = librdf_hash_gdbm_put;
   factory->exists  = librdf_hash_gdbm_exists;
   factory->delete_key  = librdf_hash_gdbm_delete;
-  factory->keys    = librdf_hash_gdbm_keys;
   factory->sync    = librdf_hash_gdbm_sync;
   factory->get_fd  = librdf_hash_gdbm_get_fd;
+
+  factory->cursor_init   = librdf_hash_gdbm_cursor_init;
+  factory->cursor_get    = librdf_hash_gdbm_cursor_get;
+  factory->cursor_finish = librdf_hash_gdbm_cursor_finish;
 }
 
 /**
