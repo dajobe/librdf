@@ -386,24 +386,40 @@ if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_
   bdb_lib_dir="/usr/lib"
   bdb_include_dir="/usr/include"
 
-  dbincdir=/usr/include
+  extraprefix=
   # OSX fink
   if test -d /sw/include -a -d /sw/lib ; then
-    dbincdir=/sw/include
-    bdb_lib_dir=/sw/lib
+    extraprefix=/sw
   fi
 
-  for version in 4 3 2; do
-    if test -f $dbincdir/db$version/db.h ; then
-      bdb_include_dir=$dbincdir/db$version
-      bdb_dbname=db-$version
-      break
-    fi
-  done
+  # Sigh!  And this still might not be good enough.
+  for version in 4.1 4.0 4 3.3 3.2 3.1 3 2; do
+    for prefix in $extraprefix /usr/local /usr; do
+      major=`echo $version | sed -e 's/^\(.\).*$/\1/'`;
+      version2=`echo $version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
+
+      libdir=$prefix/lib
+      for incdir in $prefix/include/db$version $prefix/include/db$version2 $prefix/include/db$major $prefix/include ; do
+        if test -r $incdir/db.h ; then
+          header_version=`sed -ne 's/^.*DB_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $incdir/db.h`
+          if test "X$header_version" = "X$version" ; then 
+            for name in db-$version db$version db-$version2 db$version2; do
+              if test -r $libdir/lib$name.a -o -r $libdir/lib$name.so -o -r $libdir/lib$name.dylib; then
+  	        bdb_prefix=$prefix
+  	        bdb_include_dir=$incdir
+	        bdb_lib_dir=$libdir
+	        bdb_dbname=$name
+                break 4
+              fi
+            done
+          fi
+
+        fi
+      done
+     done
+   done
+
 fi
-
-
-
 
 AC_MSG_CHECKING(location of BDB libs)
 AC_MSG_RESULT($bdb_lib_dir)
