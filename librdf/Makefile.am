@@ -265,3 +265,15 @@ $(top_builddir)/expat/xmlparse/xmlparse.o $(top_builddir)/expat/xmlparse/hashtab
 
 $(top_builddir)/repat/rdfparse.o: $(top_builddir)/expat/xmlparse/xmlparse.o $(top_builddir)/expat/xmlparse/hashtable.o $(top_builddir)/expat/xmltok/xmlrole.o $(top_builddir)/expat/xmltok/xmltok.o
 	cd repat && $(MAKE) $(AM_MAKEFLAGS) all
+
+# Copy these by hand since they are symlinks to the latest versions
+# in the hom erapier source tree and the default rule just copies the
+# (broken) links into the distribution which then fails to work.
+#
+# Note: this can't be protected with @MAINT@ since automake only
+# activates this rule if it is normally in the Makefile.am
+dist-hook:
+	@for file in rapier_parse.c rapier.h; do \
+	  rm -f $(distdir)/$$file; \
+	  cp -p $(srcdir)/$$file $(distdir)/$$file; \
+	done
