@@ -253,6 +253,37 @@ librdf_new_node_from_literal(librdf_world *world,
 
 
 /**
+ * librdf_new_node_from_blank_identifier -  Constructor - create a new literal librdf_node object from a blank node identifier
+ * @world: redland world object
+ * @identifier: blank node identifier
+ * 
+ * Return value: new &librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_new_node_from_blank_identifier(librdf_world *world,
+                                      const char *identifier)
+{
+  librdf_node* new_node;
+  
+  new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, sizeof(librdf_node));
+  if(!new_node)
+    return NULL;
+
+  new_node->world=world;
+  
+  /* set type */
+  new_node->type=LIBRDF_NODE_TYPE_BLANK;
+
+  if (librdf_node_set_blank_identifier(new_node, identifier)) {
+    librdf_free_node(new_node);
+    return NULL;
+  }
+  
+  return new_node;
+}
+
+
+/**
  * librdf_new_node_from_node - Copy constructor - create a new librdf_node object from an existing librdf_node object
  * @node: &librdf_node object to copy
  * 
@@ -676,7 +707,7 @@ librdf_node_get_blank_identifier(librdf_node* node) {
  * Return value: non 0 on failure
  **/
 int
-librdf_node_set_blank_identifier(librdf_node* node, char *identifier) 
+librdf_node_set_blank_identifier(librdf_node* node, const char *identifier) 
 {
   char *new_identifier;
   int len=strlen(identifier);
@@ -686,7 +717,9 @@ librdf_node_set_blank_identifier(librdf_node* node, char *identifier)
     return 1;
   strcpy(new_identifier, identifier);
 
-  LIBRDF_FREE(cstring, node->value.blank.identifier);
+  if(node->value.blank.identifier)
+    LIBRDF_FREE(cstring, node->value.blank.identifier);
+
   node->value.blank.identifier=new_identifier;
   node->value.blank.identifier_len=len;
 
@@ -1023,10 +1056,11 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_node *node, *node2, *node3;
+  librdf_node *node, *node2, *node3, *node4;
   char *hp_string1="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
   char *hp_string2="http://purl.org/net/dajobe/";
   char *lit_string="Dave Beckett";
+  char *genid="genid42";
   librdf_uri *uri, *uri2;
   int size, size2;
   char *buffer;
@@ -1043,6 +1077,10 @@ main(int argc, char *argv[])
 
   fprintf(stdout, "%s: Creating home page node from string\n", program);
   node=librdf_new_node_from_uri_string(world, hp_string1);
+  if(!node) {
+    fprintf(stderr, "%s: librdf_new_node_from_uri_string failed\n", program);
+    return(1);
+  }
   
   fprintf(stdout, "%s: Home page URI is ", program);
   librdf_uri_print(librdf_node_get_uri(node), stdout);
@@ -1082,6 +1120,10 @@ main(int argc, char *argv[])
     
   fprintf(stdout, "%s: Creating new node\n", program);
   node2=librdf_new_node(world);
+  if(!node2) {
+    fprintf(stderr, "%s: librdf_new_node failed\n", program);
+    return(1);
+  }
 
   fprintf(stdout, "%s: Decoding node from buffer\n", program);
   if(!librdf_node_decode(node2, (unsigned char*)buffer, size)) {
@@ -1097,6 +1139,11 @@ main(int argc, char *argv[])
   
   fprintf(stdout, "%s: Creating new literal string node\n", program);
   node3=librdf_new_node_from_literal(world, lit_string, NULL, 0, 0);
+  if(!node3) {
+    fprintf(stderr, "%s: librdf_new_node_from_literal failed\n", program);
+    return(1);
+  }
+
   buffer=librdf_node_get_literal_value_as_latin1(node3);
   if(!buffer) {
     fprintf(stderr, "%s: Failed to get literal string value as Latin-1\n", program);
@@ -1105,9 +1152,25 @@ main(int argc, char *argv[])
   fprintf(stdout, "%s: Node literal string value (Latin-1) is: '%s'\n",
           program, buffer);
   LIBRDF_FREE(cstring, buffer);
+
+  
+  fprintf(stdout, "%s: Creating new blank node with identifier %s\n", program, genid);
+  node4=librdf_new_node_from_blank_identifier(world, genid);
+  if(!node4) {
+    fprintf(stderr, "%s: librdf_new_node_from_blank_identifier failed\n", program);
+    return(1);
+  }
+
+  buffer=librdf_node_get_blank_identifier(node4);
+  if(!buffer) {
+    fprintf(stderr, "%s: Failed to get blank node identifier\n", program);
+    return(1);
+  }
+  fprintf(stdout, "%s: Node identifier is: '%s'\n", program, buffer);
   
 
   fprintf(stdout, "%s: Freeing nodes\n", program);
+  librdf_free_node(node4);
   librdf_free_node(node3);
   librdf_free_node(node2);
   librdf_free_node(node);
