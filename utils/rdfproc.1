@@ -46,6 +46,20 @@ Show a summary of the options.
 .B \-c, \-\-contexts
 Use a store with Redland contexts.
 .TP
+.B \-n, \-\-new
+Make a new store, overwriting any existing one.
+.TP
+.B \-s, \-\-storage \fITYPE\fR
+Set the Redland storage type (default 'hashes').  Alternatives
+are 'memory' which is always present and '3store', 'mysql' when
+support for those is compiled in
+.TP
+.B \-t, \-\-storage-options \fIOPTIONS\fR
+Set options for the the Redland storage, default is "hash-type='bdb',dir='.'"
+to match the default storage "hashes".  For storages types such as 'mysql'
+that need extra options this would typically be something
+like "host='hostname',db='databasename',user='abc',password='pass'"
+.TP
 .B \-v, \-\-version
 Print the Redland version and exit.
 .SH COMMANDS
@@ -86,13 +100,17 @@ and \fIARC\fP as a predicate.
 Check that there is a triple with \fINODE\fP as a object
 and \fIARC\fP as a predicate.
 
-.IP "\fBparse \fIURI\fP [\fISYNTAX|\fP \fI[BASE URI]\fP]\fR"
+.IP "\fBparse \fIURI|FILENAME\fP [\fISYNTAX|\fP \fI[BASE URI]\fP]\fR"
 Parse syntax at \fIURI\fP intothe graph using \fISYNTAX\fP which
 can be one of \fIrdfxml\fP (RDF/XML, default) or \fIntriples\fP.
+If \fIFILENAME\fP is a existing file, the appropriate URI will be
+generated for it.
 
-.IP "\fBparse-stream \fIURI\fP [\fISYNTAX\fP \fI[BASE URI]\fP]\fR"
+.IP "\fBparse-stream \fIURI|FILENAME\fP [\fISYNTAX\fP \fI[BASE URI]\fP]\fR"
 Streaming parse syntax at URI into the graph using \fISYNTAX\fP which
 can be one of \fIrdfxml\fP (RDF/XML, default) or \fIntriples\fP.
+If \fIFILENAME\fP is an existing file, the appropriate URI will be
+generated for it.
 
 .IP "\fBprint\fR"
 Print the graph triples in a simple format showing context nodes
