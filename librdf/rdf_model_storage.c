@@ -506,6 +506,22 @@ librdf_model_storage_get_storage(librdf_model* model)
 }
 
 
+/**
+ * librdf_model_storage_get_contexts - return the list of contexts in the store
+ * @storage: &librdf_storage object
+ * 
+ * Returns an iterator of &librdf_node context nodes for each
+ * context in the store.
+ *
+ * Return value: &librdf_iterator of context nodes or NULL on failure or if contexts are not supported
+ **/
+static librdf_iterator*
+librdf_model_storage_get_contexts(librdf_model* model) 
+{
+  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
+  return librdf_storage_get_contexts(context->storage);
+}
+
 
 
 /* local function to register model_storage functions */
@@ -547,6 +563,7 @@ librdf_model_storage_register_factory(librdf_model_factory *factory)
   factory->query              = librdf_model_storage_query;
   factory->sync               = librdf_model_storage_sync;
   factory->get_storage        = librdf_model_storage_get_storage;
+  factory->get_contexts        = librdf_model_storage_get_contexts;
 }
 
 
