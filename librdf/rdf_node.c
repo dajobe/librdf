@@ -1,9 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_node.c - RDF Node implementation
- *   RDF:Resource
- *   RDF:Property
- *   (object) - RDF:Literal / RDF:Resource
+ * rdf_node.c - RDF Node (Resource / Literal) Implementation
  *
  * $Id$
  *
