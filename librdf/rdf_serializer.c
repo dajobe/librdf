@@ -475,48 +475,139 @@ librdf_serializer_set_namespace(librdf_serializer* serializer,
 int main(int argc, char *argv[]);
 
 
+struct log_data {
+  int errors;
+  int warnings;
+} LogData;
+
+
+static int
+log_handler(void *user_data, librdf_log_message *message) 
+{
+  struct log_data* ld=(struct log_data*)user_data;
+
+  switch(message->level) {
+    case LIBRDF_LOG_ERROR:
+      ld->errors++;
+      break;
+    case LIBRDF_LOG_WARN:
+      ld->warnings++;
+      break;
+    default:
+      break;
+  }
+
+  return 1;
+}
+
+
+#define EXPECTED_ERRORS 2
+#define EXPECTED_WARNINGS 1 
+
+
 int
 main(int argc, char *argv[]) 
 {
-  librdf_serializer* d;
+  char *program=argv[0];
   char *test_serializer_types[]={"ntriples", NULL};
   int i;
   char *type;
-  char *program=argv[0];
+  FILE *fh;
   librdf_world *world;
+  librdf_storage *storage;
+  librdf_model* model;
+  librdf_uri* base_uri;
+  librdf_statement* statement;
+  librdf_serializer* serializer;
 
   world=librdf_new_world();
-  librdf_world_init_mutex(world);
+  librdf_world_open(world);
 
-  /* Needed for URI use when registering factories */
-  librdf_init_digest(world);
-  librdf_init_hash(world);
-  librdf_init_uri(world);
+  librdf_world_set_logger(world, &LogData, log_handler);
 
-  /* initialise serializer module */
-  librdf_init_serializer(world);
-  
   for(i=0; (type=test_serializer_types[i]); i++) {
     fprintf(stderr, "%s: Trying to create new %s serializer\n", program, type);
-    d=librdf_new_serializer(world, type, NULL, NULL);
-    if(!d) {
+    serializer=librdf_new_serializer(world, type, NULL, NULL);
+    if(!serializer) {
       fprintf(stderr, "%s: Failed to create new serializer type %s\n", program, type);
       continue;
     }
     
     fprintf(stderr, "%s: Freeing serializer\n", program);
-    librdf_free_serializer(d);
+    librdf_free_serializer(serializer);
   }
   
+
+#ifdef WIN32
+#define NULL_FILENAME "nul"
+#else
+#define NULL_FILENAME "/dev/null"
+#endif
+
+  fh=fopen(NULL_FILENAME, "w");
+  if(!fh) {
+    fprintf(stderr, "%s: Cannot test serialising errors, cannot write to '%s'\n", program, NULL_FILENAME);
+    goto skip;
+  }
   
-  /* finish serializer module */
-  librdf_finish_serializer(world);
 
-  librdf_finish_uri(world);
-  librdf_finish_hash(world);
-  librdf_finish_digest(world);
+  storage=librdf_new_storage(world, NULL, NULL, NULL);
+  model=librdf_new_model(world, storage, NULL);
 
-  LIBRDF_FREE(librdf_world, world);
+  /* ERROR: Subject URI is bad UTF-8 */
+  statement=librdf_new_statement_from_nodes(world,
+    librdf_new_node_from_uri_string(world, "http://example.org/foo\xfc"),
+    librdf_new_node_from_uri_string(world, "http://example.org/bar"),
+    librdf_new_node_from_literal(world, "blah", NULL, 0));
+
+  librdf_model_add_statement(model, statement);
+  librdf_free_statement(statement);
+
+  /* WARNINGS: Predicate URI is not serializable */
+  statement=librdf_new_statement_from_nodes(world,
+    librdf_new_node_from_uri_string(world, "http://example.org/foo"),
+    librdf_new_node_from_uri_string(world, "http://bad.example.org/"),
+    librdf_new_node_from_literal(world, "blah", NULL, 0));
+
+  librdf_model_add_statement(model, statement);
+  librdf_free_statement(statement);
+
+  /* ERROR: Object literal is bad UTF-8 */
+  statement=librdf_new_statement_from_nodes(world,
+    librdf_new_node_from_uri_string(world, "http://example.org/foo"),
+    librdf_new_node_from_uri_string(world, "http://example.org/abc"),
+    librdf_new_node_from_literal(world, "\xfc", NULL, 0));
+
+  librdf_model_add_statement(model, statement);
+  librdf_free_statement(statement);
+
+  serializer=librdf_new_serializer(world, "rdfxml", NULL, NULL);
+  base_uri=librdf_new_uri(world,"http://example.org/base#");
+
+  librdf_serializer_serialize_model(serializer, fh, base_uri, model);
+  librdf_free_serializer(serializer);
+  fclose(fh);
+
+  librdf_free_uri(base_uri);
+  
+  librdf_free_model(model);
+  librdf_free_storage(storage);
+
+  if(LogData.errors != EXPECTED_ERRORS) {
+    fprintf(stderr, "%s: Serialising to RDF/XML returned %d errors, expected %d\n", program,
+            LogData.errors, EXPECTED_ERRORS);
+    return 1;
+  }
+
+  if(LogData.warnings != EXPECTED_WARNINGS) {
+    fprintf(stderr, "%s: Serialising to RDF/XML returned %d warnings, expected %d\n", program,
+            LogData.warnings, EXPECTED_WARNINGS);
+    return 1;
+  }
+  
+  skip:
+  
+  librdf_free_world(world);
   
   /* keep gcc -Wall happy */
   return(0);
