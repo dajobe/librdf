@@ -2,7 +2,7 @@
 <book id="redlandAPI">
   <?dbhtml filename='index.html'>
   <bookinfo>
-    <date>2002-04-29</date>
+    <date>2003-01-29</date>
     <title>Redland RDF Application Framework API Reference Manual</title>
     <authorgroup>
       <author>
@@ -18,7 +18,7 @@
       </author>
     </authorgroup>
     <copyright>
-      <year>2000-2002</year>
+      <year>2000-2003</year>
       <holder>Dave Beckett, University of Bristol, UK</holder>
       <indexterm>
 	<primary>
@@ -61,7 +61,7 @@ model; manipulate statements, resources, predicates and objects in the model;
 parse RDF/XML syntax, query and store the models.
       </para>
 <para>
-See also the <ulink url="http://purl.org/net/redland/">Home Page</ulink>
+See also the <ulink url="http://www.librdf.org/">Redland Home Page</ulink>
 and the <ulink url="../README.html">main document overview</ulink>.
 </para>
 
