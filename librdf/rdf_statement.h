@@ -107,6 +107,8 @@ librdf_statement* librdf_new_statement(void);
 
 /* Create a new Statement from an existing Statement - CLONE */
 librdf_statement* librdf_new_statement_from_statement(librdf_statement* statement);
+/* Create a new Statement from existing Nodes */
+librdf_statement* librdf_new_statement_from_nodes(librdf_node* subject, librdf_node* predicate, librdf_node* object);
 
 /* destructor */
 void librdf_free_statement(librdf_statement* statement);
