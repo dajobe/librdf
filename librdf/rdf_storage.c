@@ -33,6 +33,7 @@
 
 #include <librdf.h>
 #include <rdf_storage.h>
+#include <rdf_storage_tstore.h>
 #include <rdf_storage_hashes.h>
 #include <rdf_storage_list.h>
 
@@ -66,6 +67,9 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
 void
 librdf_init_storage(librdf_world *world) 
 {
+#ifdef HAVE_TSTORE
+  librdf_init_storage_tstore();
+#endif
   /* Always have storage list, hashes implementations available */
   librdf_init_storage_hashes();
   librdf_init_storage_list();
@@ -483,9 +487,26 @@ int
 librdf_storage_add_statements(librdf_storage* storage,
                               librdf_stream* statement_stream) 
 {
+  int status=0;
+  
   if(storage->factory->add_statements)
     return storage->factory->add_statements(storage, statement_stream);
-  return 1;
+
+  while(!librdf_stream_end(statement_stream)) {
+    librdf_statement* statement=librdf_stream_get_object(statement_stream);
+
+    if(statement)
+      status=librdf_storage_add_statement(storage, statement);
+    else
+      status=1;
+
+    if(status)
+      break;
+
+    librdf_stream_next(statement_stream);
+  }
+  
+  return status;
 }
 
 
