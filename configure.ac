@@ -1141,19 +1141,19 @@ fi
 
 
 dnl RDF query
+rasqal_dir=rasqal
 if test $with_rasqal = internal; then
   LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/rasqal $LIBRDF_INTERNAL_CPPFLAGS"
   LIBRDF_INTERNAL_LIBS="\$(top_builddir)/rasqal/librasqal.la $LIBRDF_INTERNAL_LIBS"
 else
   LIBRDF_EXTERNAL_CPPFLAGS="`$RASQAL_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
   LIBRDF_EXTERNAL_LIBS="`$RASQAL_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
-  rasqal_dir=
 fi
 
 
 
 dnl Checks for building sub-packages in sub directories
-dnl before librdf (pre-requisites)
+dnl before librdf (pre-requisites). rasqal may need raptor
 SD_PRE="$raptor_dir $rasqal_dir"
 dnl after librdf (use it)
 SD_POST="$languages"
