@@ -46,7 +46,7 @@ rdf_list.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c rdf_storage_file.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
-rdf_query.c \
+rdf_query.c rdf_query_results.c \
 rdf_query_triples.c rdf_query_rasqal.c \
 rdf_serializer.c \
 rdf_serializer_raptor.c rdf_serializer_rdfxml.c \
@@ -175,8 +175,8 @@ rdf_utf8_test: rdf_utf8.c librdf.la
 rdf_concepts_test: rdf_concepts.c librdf.la
 	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_concepts.c librdf.la
 
-rdf_query_test: rdf_query.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_query.c librdf.la
+rdf_query_test: rdf_query.c rdf_query_results.c librdf.la
+	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_query.c $(srcdir)/rdf_query_results.c librdf.la
 
 rdf_serializer_test: rdf_serializer.c librdf.la
 	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_serializer.c librdf.la
