@@ -45,7 +45,9 @@ rdf_heuristics.h \
 rdf_list.h \
 rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
 rdf_files.h \
-rdf_storage_list.h rdf_storage_hashes.h rdf_utf8.h
+rdf_storage_list.h rdf_storage_hashes.h rdf_utf8.h \
+rdf_query.h \
+rdf_query_triples.h
 
 JAVA_CLASSES=@JAVA_CLASSES@
 pkgdata_DATA = $(JAVA_CLASSES)
@@ -58,6 +60,8 @@ rdf_list.c rdf_memory.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
+rdf_query.c \
+rdf_query_triples.c \
 redland.h librdf.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
@@ -68,7 +72,9 @@ rdf_list.h \
 rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
 rdf_stream.h \
 rdf_parser.h \
-rdf_heuristics.h rdf_files.h rdf_utf8.h
+rdf_heuristics.h rdf_files.h rdf_utf8.h \
+rdf_query.h \
+rdf_query_triples.h
 
 librdf_la_LIBADD = @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @XML_OBJS@
@@ -101,7 +107,8 @@ librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
-rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test
+rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
+rdf_query_test
 
 EXAMPLES=example1 example2 example3 example4
 
@@ -176,6 +183,9 @@ rdf_utf8_test: rdf_utf8.c librdf.la
 
 rdf_concepts_test: rdf_concepts.c librdf.la
 	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_concepts.c librdf.la $(LIBS)
+
+rdf_query_test: rdf_query.c librdf.la
+	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_query.c librdf.la $(LIBS)
 
 examples: $(EXAMPLES)
 
