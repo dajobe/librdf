@@ -20,7 +20,6 @@
 # 
 
 
-bin_SCRIPTS = redland-config
 lib_LTLIBRARIES = librdf.la
 
 include_HEADERS = redland.h librdf.h \
@@ -86,7 +85,6 @@ rdf_parser_raptor.c \
 rdf_parser_repat.c
 
 EXTRA_DIST=\
-redland-config.in \
 memcmp.c \
 PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \

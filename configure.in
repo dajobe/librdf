@@ -1018,6 +1018,7 @@ AC_SUBST(abs_top_builddir)
 AC_CONFIG_SUBDIRS(raptor)
 
 AC_OUTPUT(Makefile
+redland-config
 redland-src-config
 docs/Makefile
 librdf/Makefile
@@ -1040,9 +1041,8 @@ ruby/Makefile
 repat/Makefile
 debian/Makefile
 debian/rules
-librdf/redland.spec
-librdf/redland-config,
-[chmod +x redland-src-config librdf/redland-config debian/rules])
+librdf/redland.spec,
+[chmod +x redland-config redland-src-config debian/rules])
 
 AC_MSG_RESULT([
 Redland build summary:

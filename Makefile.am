@@ -19,6 +19,7 @@
 # 
 # 
 
+bin_SCRIPTS = redland-config
 noinst_SCRIPTS = redland-src-config
 
 # Subdirectories to build/install etc.
@@ -37,6 +38,7 @@ INSTALL.html FAQS.html MPL.html \
 Redland.i \
 autogen.sh \
 Makefile.PL \
+redland-config.in \
 redland-src-config.in
 
 # Create some text files from HTML sources
