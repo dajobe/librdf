@@ -132,12 +132,15 @@ librdf_parser_rapier_new_statement_handler (void *context,
   librdf_statement_set_predicate(statement, node);
 
 
-  if(rstatement->object_type == RAPIER_OBJECT_TYPE_LITERAL)
+  if(rstatement->object_type == RAPIER_OBJECT_TYPE_LITERAL ||
+     rstatement->object_type == RAPIER_OBJECT_TYPE_XML_LITERAL) {
+    int is_xml_literal = (rstatement->object_type == RAPIER_OBJECT_TYPE_XML_LITERAL);
+    
     librdf_statement_set_object(statement,
                                 librdf_new_node_from_literal(world,
                                                              rstatement->object,
-                                                             NULL, 0, 0));
-  else {
+                                                             NULL, 0, is_xml_literal));
+  } else if(rstatement->object_type == RAPIER_OBJECT_TYPE_RESOURCE) {
     node=librdf_new_node_from_normalised_uri_string(world,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->object),
                                                     scontext->source_uri,
