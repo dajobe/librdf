@@ -227,7 +227,7 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
 
   if (hash->capacity) {
     /* big enough */
-    if((1000 * hash->size) < (hash->load_factor * hash->capacity))
+    if((1000 * hash->keys) < (hash->load_factor * hash->capacity))
       return 0;
     /* grow hash (keeping it a power of two) */
     required_capacity=hash->capacity << 1;
