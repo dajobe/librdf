@@ -703,141 +703,139 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-        librdf_hash_factory *factory, *default_factory;
-        librdf_hash *h, *h2;
-        char *test_hash_types[]={"GDBM", "FAKE", "BDB", "LIST", NULL};
-        char *test_hash_values[]={"colour", "yellow",
-                                  "age", "new",
-                                  "size", "large",
-                                  "fruit", "banana",
-                                  NULL, NULL};
-        char *test_hash_array[]={"shape", "cube",
-                                 "sides", "six",
-                                 "colours", "six",
-                                 "creator", "rubik",
-                                 NULL};
-        char *test_hash_delete_key="size";
-        int i,j;
-        char *type;
-        char *key, *value;
-        char *program=argv[0];
-        
+  librdf_hash_factory *factory, *default_factory;
+  librdf_hash *h, *h2;
+  char *test_hash_types[]={"GDBM", "FAKE", "BDB", "LIST", NULL};
+  char *test_hash_values[]={"colour", "yellow",
+			    "age", "new",
+			    "size", "large",
+			    "fruit", "banana",
+			    NULL, NULL};
+  char *test_hash_array[]={"shape", "cube",
+			   "sides", "six",
+			   "colours", "six",
+			   "creator", "rubik",
+			   NULL};
+  char *test_hash_delete_key="size";
+  int i,j;
+  char *type;
+  char *key, *value;
+  char *program=argv[0];
   
-        /* initialise hash module */
-        librdf_init_hash();
-        
-        if(argc ==2) {
-                factory=librdf_get_hash_factory(NULL);
-                if(!factory) {
-                        fprintf(stderr, "%s: No hash factory called '%s'\n",
-                                program, type);
-                        return(0);
-                }
-                
-                h=librdf_new_hash(factory);
-                if(!h) {
-                        fprintf(stderr,
-                                "%s: Failed to create new hash type '%s'\n",
-                                program, type);
-                        return(0);
-                }
-                
-                librdf_hash_open(h, "test", "mode", NULL);
-                librdf_hash_from_string(h, argv[1]);
-                fprintf(stderr, "%s: resulting ", program);    
-                librdf_hash_print(h, stderr);
-                fprintf(stderr, "\n");
-                librdf_hash_close(h);
-                librdf_free_hash(h);
-                return(0);
-                
-        }
+  
+  /* initialise hash module */
+  librdf_init_hash();
+  
+  if(argc ==2) {
+    type=argv[1];
+    factory=librdf_get_hash_factory(NULL);
+    if(!factory) {
+      fprintf(stderr, "%s: No hash factory called '%s'\n", program, type);
+      return(0);
+    }
     
-
-        for(i=0; (type=test_hash_types[i]); i++) {
-                fprintf(stderr, "%s: Trying to create new %s hash\n", program, type);
-                factory=librdf_get_hash_factory(type);
-                if(!factory) {
-                        fprintf(stderr, "%s: No hash factory called '%s'\n", program, type);
-                        continue;
-                }
-                
-                h=librdf_new_hash(factory);
-                if(!h) {
-                        fprintf(stderr, "%s: Failed to create new hash type '%s'\n", program, type);
-                        continue;
-                }
-                
-                if(librdf_hash_open(h, "test", "mode", NULL)) {
-                        fprintf(stderr, "%s: Failed to open new hash type '%s'\n", program, type);
-                        continue;
-                }
+    h=librdf_new_hash(factory);
+    if(!h) {
+      fprintf(stderr, "%s: Failed to create new hash type '%s'\n",
+	      program, type);
+      return(0);
+    }
+    
+    librdf_hash_open(h, "test", "mode", NULL);
+    librdf_hash_from_string(h, argv[1]);
+    fprintf(stderr, "%s: resulting ", program);    
+    librdf_hash_print(h, stderr);
+    fprintf(stderr, "\n");
+    librdf_hash_close(h);
+    librdf_free_hash(h);
+    return(0);
+  }
+  
+  
+  for(i=0; (type=test_hash_types[i]); i++) {
+    fprintf(stderr, "%s: Trying to create new %s hash\n", program, type);
+    factory=librdf_get_hash_factory(type);
+    if(!factory) {
+      fprintf(stderr, "%s: No hash factory called '%s'\n", program, type);
+      continue;
+    }
+    
+    h=librdf_new_hash(factory);
+    if(!h) {
+      fprintf(stderr, "%s: Failed to create new hash type '%s'\n", program, type);
+      continue;
+    }
+    
+    if(librdf_hash_open(h, "test", "mode", NULL)) {
+      fprintf(stderr, "%s: Failed to open new hash type '%s'\n", program, type);
+      continue;
+    }
+    
+    
+    for(j=0; test_hash_values[j]; j+=2) {
+      key=test_hash_values[j];
+      value=test_hash_values[j+1];
+      fprintf(stderr, "%s: Adding key/value pair: %s=%s\n", program,
+	      key, value);
       
-                
-                for(j=0; test_hash_values[j]; j+=2) {
-                        key=test_hash_values[j];
-                        value=test_hash_values[j+1];
-                        fprintf(stderr, "%s: Adding key/value pair: %s=%s\n", program, key, value);
-                        
-                        librdf_hash_put(h, key, strlen(key), value, strlen(value),
-                                        0);
-                        
-                        fprintf(stderr, "%s: resulting ", program);    
-                        librdf_hash_print(h, stderr);
-                        fprintf(stderr, "\n");
-                }
-
-                fprintf(stderr, "%s: Deleting key '%s'\n", program, test_hash_delete_key);
-                librdf_hash_delete(h, test_hash_delete_key, strlen(test_hash_delete_key));
-                
-                fprintf(stderr, "%s: resulting ", program);    
-                librdf_hash_print(h, stderr);
-                fprintf(stderr, "\n");
+      librdf_hash_put(h, key, strlen(key), value, strlen(value), 0);
+      
+      fprintf(stderr, "%s: resulting ", program);    
+      librdf_hash_print(h, stderr);
+      fprintf(stderr, "\n");
+    }
     
-                librdf_hash_close(h);
-                
-                fprintf(stderr, "%s: Freeing hash\n", program);
-                librdf_free_hash(h);
-        }
-
+    fprintf(stderr, "%s: Deleting key '%s'\n", program, test_hash_delete_key);
+    librdf_hash_delete(h, test_hash_delete_key, strlen(test_hash_delete_key));
+    
+    fprintf(stderr, "%s: resulting ", program);    
+    librdf_hash_print(h, stderr);
+    fprintf(stderr, "\n");
+    
+    librdf_hash_close(h);
+    
+    fprintf(stderr, "%s: Freeing hash\n", program);
+    librdf_free_hash(h);
+  }
   
-        fprintf(stderr, "%s: Getting default hash factory\n", program);
-        default_factory=librdf_get_hash_factory(NULL);
-        if(!default_factory) {
-                fprintf(stderr, "%s: No default hash factory found\n", program);
-                return(0);
-        }
-
-        fprintf(stderr, "%s: Creating new hash from default factory\n", program);
-        h2=librdf_new_hash(default_factory);
-        if(!h2) {
-                fprintf(stderr, "%s: Failed to create new hash from default factory\n", program);
-                return(0);
-        }
-
-        fprintf(stderr, "%s: Initialising hash from array of strings\n", program);
-        if(librdf_hash_from_array_of_strings(h2, test_hash_array)) {
-                fprintf(stderr, "%s: Failed to init hash from array of strings\n", program);
-                return(0);
-        }
-
-        fprintf(stderr, "%s: resulting hash ", program);    
-        librdf_hash_print(h2, stderr);
-        fprintf(stderr, "\n");
-        
-        librdf_hash_close(h2);
   
-        fprintf(stderr, "%s: Freeing hash\n", program);
-        librdf_free_hash(h2);
-        
-        /* finish hash module */
-        librdf_finish_hash();
-        
+  fprintf(stderr, "%s: Getting default hash factory\n", program);
+  default_factory=librdf_get_hash_factory(NULL);
+  if(!default_factory) {
+    fprintf(stderr, "%s: No default hash factory found\n", program);
+    return(0);
+  }
+
+  fprintf(stderr, "%s: Creating new hash from default factory\n", program);
+  h2=librdf_new_hash(default_factory);
+  if(!h2) {
+    fprintf(stderr, "%s: Failed to create new hash from default factory\n", program);
+    return(0);
+  }
+
+  fprintf(stderr, "%s: Initialising hash from array of strings\n", program);
+  if(librdf_hash_from_array_of_strings(h2, test_hash_array)) {
+    fprintf(stderr, "%s: Failed to init hash from array of strings\n", program);
+    return(0);
+  }
   
-	librdf_memory_report(stderr);
-	
-        /* keep gcc -Wall happy */
-        return(0);
+  fprintf(stderr, "%s: resulting hash ", program);    
+  librdf_hash_print(h2, stderr);
+  fprintf(stderr, "\n");
+  
+  librdf_hash_close(h2);
+  
+  fprintf(stderr, "%s: Freeing hash\n", program);
+  librdf_free_hash(h2);
+  
+  /* finish hash module */
+  librdf_finish_hash();
+  
+  
+  librdf_memory_report(stderr);
+  
+  /* keep gcc -Wall happy */
+  return(0);
 }
 
 #endif
