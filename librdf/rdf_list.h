@@ -52,6 +52,7 @@ void librdf_free_list(librdf_list* list);
 
 int librdf_list_add(librdf_list* list, void *data);
 int librdf_list_remove(librdf_list* list, void *data);
+void* librdf_list_pop(librdf_list* list);
 int librdf_list_contains(librdf_list* list, void *data);
 int librdf_list_size(librdf_list* list);
 
