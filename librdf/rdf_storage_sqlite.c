@@ -1934,8 +1934,7 @@ librdf_storage_sqlite_context_serialise_finished(void* context)
 
 typedef struct {
   librdf_storage *storage;
-  librdf_iterator *iterator;
-  librdf_hash_datum *key;
+
   librdf_node *current;
 } librdf_storage_sqlite_get_contexts_iterator_context;
 
@@ -1944,18 +1943,18 @@ typedef struct {
 static int
 librdf_storage_sqlite_get_contexts_is_end(void* iterator)
 {
-  librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator;
+  /* librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator; */
 
-  return librdf_iterator_end(icontext->iterator);
+  return 1;
 }
 
 
 static int
 librdf_storage_sqlite_get_contexts_next_method(void* iterator) 
 {
-  librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator;
+  /* librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator; */
 
-  return librdf_iterator_next(icontext->iterator);
+  return 1;
 }
 
 
@@ -1964,20 +1963,10 @@ librdf_storage_sqlite_get_contexts_get_method(void* iterator, int flags)
 {
   librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator;
   void *result=NULL;
-  librdf_hash_datum* k;
   
   switch(flags) {
     case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
-      if(!(k=(librdf_hash_datum*)librdf_iterator_get_key(icontext->iterator)))
-        return NULL;
-
-      if(icontext->current)
-        librdf_free_node(icontext->current);
-
-      /* decode value content */
-      icontext->current=librdf_node_decode(icontext->storage->world, NULL,
-                                           (unsigned char*)k->data, k->size);
-      result=icontext->current;
+      return NULL;
       break;
 
     case LIBRDF_ITERATOR_GET_METHOD_GET_KEY:
@@ -1986,7 +1975,7 @@ librdf_storage_sqlite_get_contexts_get_method(void* iterator, int flags)
       break;
       
     default:
-      librdf_log(icontext->iterator->world,
+      librdf_log(icontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "Unknown iterator method flag %d\n", flags);
       result=NULL;
@@ -2002,11 +1991,6 @@ librdf_storage_sqlite_get_contexts_finished(void* iterator)
 {
   librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator;
 
-  if(icontext->iterator)
-    librdf_free_iterator(icontext->iterator);
-
-  librdf_free_hash_datum(icontext->key);
-  
   if(icontext->current)
     librdf_free_node(icontext->current);
 
@@ -2034,10 +2018,6 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
   if(!icontext)
     return NULL;
 
-  icontext->key=librdf_new_hash_datum(storage->world, NULL, 0);
-  if(!icontext->key)
-    return NULL;
-  
   icontext->storage=storage;
   librdf_storage_add_reference(icontext->storage);
   
