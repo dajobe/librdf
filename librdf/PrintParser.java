@@ -93,7 +93,7 @@ import java.net.*;
 public class PrintParser {
 
   static void bailOut() {
-    System.err.println("Usage: java -Dorg.xml.sax.parser=<classname> PrintParser " +
+    System.err.println("Usage: java -Dorg.xml.sax.parser=<classname> PrintParser [--streaming|--static] " +
                        "<URI | filename>");
     System.exit(1);
   }
@@ -115,8 +115,22 @@ public class PrintParser {
 
 
   public static void main(String[] args) throws Exception {
-    
-    if(args.length != 1)
+    if(args.length <1)
+      bailOut();
+
+    boolean streaming = true;
+    int offset = 0;
+    while(offset < args.length && args[offset].startsWith("--")) {
+      if(args[offset].equals("--streaming"))
+        streaming = true;
+      else if(args[offset].equals("--static"))
+        streaming = false;
+      else
+        bailOut();
+      offset++;
+    }
+
+    if(offset != args.length - 1)
       bailOut();
     
     //    NodeFactory node_factory = new NodeFactoryImpl();
@@ -124,13 +138,14 @@ public class PrintParser {
 
     SiRPAC parser=new SiRPAC();
     parser.setRobustMode(true);
-    parser.setStreamMode(true);
+    parser.setStreamMode(streaming);
     
     URL url=null;
     try {
-      url=new URL (normalizeURI(args[0]));
+      url=new URL (normalizeURI(args[offset]));
     } catch (Exception e) {
-      System.err.println("PrintParser: failked to create URL " + url + " - " + e);
+      System.err.println("PrintParser: Failed to create URL '" + url + "' - " + e);
+      System.exit(1);
     }
     
     // Prepare input source
@@ -139,26 +154,45 @@ public class PrintParser {
     try {
       source = new InputSource(url.openStream());
     } catch (Exception e) {
-      System.err.println("PrintParser: failed to open url " + url + " - " + e);
+      System.err.println("PrintParser: Failed to open URL '" + url + "' - " + e);
+      System.exit(1);
     }
-    
+
     source.setSystemId( url.toString() );
     model.setSourceURI( url.toString() );
-    
-    PrintConsumer p=null;
-    try {
-      p = new PrintConsumer(model, System.out);
-    } catch  (Exception e) {
-      System.err.println("PrintParser: failed to create PrintConsumer - " + e);
-   }
 
+    // Create a consumer for the RDF triples    
+    RDFConsumer consumer=null;
+    if(streaming) {
+      try {
+        consumer = new PrintConsumer(model, System.out);
+      } catch  (Exception e) {
+        System.err.println("PrintParser: Failed to create PrintConsumer - " + e);
+        System.exit(1);
+      }
+    } else {
+      try {
+        consumer = new org.w3c.rdf.util.ModelConsumer(model);
+      } catch (Exception e) {
+        System.err.println("PrintParser: Failed to create ModelConsumer - " + e);
+        System.exit(1);
+      }
+      
+    }
+    
+    // Parse the RDF/XML
     try {
-      parser.parse(source,  p);
-    } catch (SAXException e) {
-      System.err.println("PrintParser: failed to parse - SAX Exception - " + (SAXException)e);
+      parser.parse(source,  consumer);
     } catch (Exception e) {
-      System.err.println("PrintParser: failed to parse - " + e);
-      e.printStackTrace(System.err);
-   }
+      System.err.println("PrintParser: RDF parsing failed - " + e);
+      System.exit(1);
+    }
+
+    if(!streaming) {
+      for(Enumeration en = model.elements(); en.hasMoreElements();) {
+        Statement s = (Statement)en.nextElement();
+        System.out.println("Statement " + s);
+      }
+    }
   }
 }
