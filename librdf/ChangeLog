@@ -1,3 +1,30 @@
+2004-12-26  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_sqlite.c: Handle sqlite3 and sqlite2
+	(librdf_storage_sqlite_init): Init is_new correctly.
+	(librdf_storage_sqlite_open): Create tables, indexes when new.
+	(librdf_storage_sqlite_get_1int_callback): Grab count value from
+	argv[0]
+	(librdf_storage_sqlite_size): Works.
+	(librdf_storage_sqlite_add_statements): Dummy INSERT works.
+	(librdf_storage_sqlite_contains_statement): Dummy sql added.
+	librdf_storage_sqlite_serialise_stream_context added sqlite3 fields
+	(librdf_storage_sqlite_serialise,
+	librdf_storage_sqlite_get_next_common,
+	librdf_storage_sqlite_serialise_finished): sqlite3 support
+	librdf_storage_sqlite_find_statements_stream_context added sqlite3
+	fields
+	(librdf_storage_sqlite_find_statements,
+	librdf_storage_sqlite_find_statements_finished): sqlite3 support
+	(librdf_storage_sqlite_context_add_statement): Dummy INSERT added.
+	(librdf_init_storage_sqlite): Storage name now 'sqlite'.
+
+2004-12-25  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_serializer.c, rdf_model.c (main): Cast for size_t to int
+
+	* rdf_concepts.c: Removed librdf_concept_labels - never used.
+
 2004-12-23  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_serializer.c (librdf_get_serializer_factory):
