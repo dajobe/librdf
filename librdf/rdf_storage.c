@@ -529,7 +529,9 @@ librdf_storage_serialise(librdf_storage* storage)
  * @storage: &librdf_storage object
  * @statement: &librdf_statement partial statement to find
  * 
- * Searches the storage for a (partial) statement - see librdf_statement_match() - and return a stream matching &librdf_statement.
+ * Searches the storage for a (partial) statement as described in
+ * librdf_statement_match() and returns a &librdf_stream of
+ * matching &librdf_statement objects.
  * 
  * Return value:  &librdf_stream of matching statements (may be empty) or NULL on failure
  **/
