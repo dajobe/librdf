@@ -794,6 +794,29 @@ librdf_model_query_string(librdf_model* model,
 /* one more prototype */
 int main(int argc, char *argv[]);
 
+#define EX1_CONTENT \
+"<?xml version=\"1.0\"?>\n" \
+"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n" \
+"         xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n" \
+"  <rdf:Description rdf:about=\"http://purl.org/net/dajobe/\">\n" \
+"    <dc:title>Dave Beckett's Home Page</dc:title>\n" \
+"    <dc:creator>Dave Beckett</dc:creator>\n" \
+"    <dc:description>The generic home page of Dave Beckett.</dc:description>\n" \
+"  </rdf:Description>\n" \
+"</rdf:RDF>"
+
+#define EX2_CONTENT \
+"<?xml version=\"1.0\"?>\n" \
+"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n" \
+"         xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n" \
+"  <rdf:Description rdf:about=\"http://purl.org/net/dajobe/\">\n" \
+"    <dc:title>Dave Beckett's Home Page</dc:title>\n" \
+"    <dc:creator>Dave Beckett</dc:creator>\n" \
+"    <dc:description>I do development-based research on RDF, metadata and web searching.</dc:description>\n" \
+"    <dc:rights>Copyright &#169; 2002 Dave Beckett</dc:rights>\n" \
+"  </rdf:Description>\n" \
+"</rdf:RDF>"
+
 
 int
 main(int argc, char *argv[]) 
@@ -805,11 +828,12 @@ main(int argc, char *argv[])
   librdf_stream* stream;
   const char *parser_name="raptor";
   #define URI_STRING_COUNT 2
-  const char *file_uri_strings[URI_STRING_COUNT]={"file:ex1.rdf", "file:ex2.rdf"};
+  const char *file_name_strings[URI_STRING_COUNT]={"model_test1.rdf", "model_test2.rdf"};
+  const char *file_uri_strings[URI_STRING_COUNT]={"file:model_test1.rdf", "file:model_test2.rdf"};
+  const char *file_content[URI_STRING_COUNT]={EX1_CONTENT, EX2_CONTENT};
   librdf_uri* uris[URI_STRING_COUNT];
   int i;
   char *program=argv[0];
-  
   /* initialise dependent modules - all of them! */
   librdf_world *world=librdf_new_world();
   librdf_world_open(world);
@@ -843,6 +867,20 @@ main(int argc, char *argv[])
   }
 
   for (i=0; i<URI_STRING_COUNT; i++) {
+    FILE *fh=fopen(file_name_strings[i], "w");
+    int len=strlen(file_content[i]);
+    if(!fh) {
+      fprintf(stderr, "%s: Failed to create example file %s - ", program,
+        file_name_strings[i]);
+      perror(NULL);
+      fputc('\n', stderr);
+      return(1);
+    }
+    fprintf(stderr, "%s: Creating file %s (%d bytes)\n", program, 
+            file_name_strings[i], len);
+    fwrite(file_content[i], len, 1, fh);
+    fclose(fh);
+
     uris[i]=librdf_new_uri(world, file_uri_strings[i]);
 
     fprintf(stderr, "%s: Adding content from %s into statement group\n", program,
@@ -856,6 +894,8 @@ main(int argc, char *argv[])
 
     fprintf(stderr, "%s: Printing model\n", program);
     librdf_model_print(model, stderr);
+
+    remove(file_name_strings[i]);
   }
 
 
@@ -889,7 +929,7 @@ main(int argc, char *argv[])
 #ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);
 #endif
-	
+
   /* keep gcc -Wall happy */
   return(0);
 }
