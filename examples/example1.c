@@ -64,8 +64,6 @@ main(int argc, char *argv[])
     return(1);
   }
 
-//  storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',new='yes'");
-//  storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',new='yes'");
   storage=librdf_new_storage(world, "memory", "test", NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
@@ -113,7 +111,6 @@ main(int argc, char *argv[])
 
   fprintf(stdout, "%s: Resulting model is:\n", program);
   librdf_model_print(model, stdout);
-
 
   /* Construct the query predicate (arc) and object (target) 
    * and partial statement bits
