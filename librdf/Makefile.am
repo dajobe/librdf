@@ -73,9 +73,11 @@ rdf_serializer.h
 
 librdf_la_LIBADD = \
 @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+@LIBRDF_XML_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 librdf_la_DEPENDENCIES = \
 @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+@LIBRDF_XML_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 
 EXTRA_librdf_la_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
