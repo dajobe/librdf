@@ -289,11 +289,15 @@ AC_CHECK_LIB(xmltok, main, xmlt=1, xmlt=0)
 # XML_ParserCreateNS so check for that
 AC_CHECK_LIB(xmlparse, XML_ParserCreateNS, xmlp=1, xmlp=0, -lxmltok)
 
+LIBS="$oLIBS"
+
+AC_CHECK_LIB(expat, XML_SetNamespaceDeclHandler, libexpat=1, libexpat=0)
+
 REPAT_FLAGS=
 
 LIBS="$oLIBS"
 AC_MSG_CHECKING(for system expat library)
-if test $xmlp = 1 -a $xmlt = 1 -a  "X$ac_cv_header_xmlparse_h" = Xyes; then
+if test $xmlp = 1 -a $xmlt = 1 -a  $ac_cv_header_xmlparse_h = yes; then
   # Old expat
   have_expat_lib=1
   have_expat=1
@@ -303,7 +307,7 @@ if test $xmlp = 1 -a $xmlt = 1 -a  "X$ac_cv_header_xmlparse_h" = Xyes; then
   REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
 
   AC_MSG_RESULT(yes)
-elif test $libexpat = 1 -a "X$ac_cv_header_expat_h" = Xyes ; then
+elif test $libexpat = 1 -a $ac_cv_header_expat_h = yes ; then
   # New expat - expat-1.95.0 or later
   have_expat_lib=1
   have_expat=1
