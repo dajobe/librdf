@@ -863,6 +863,7 @@ if test "X$with_rasqal" = Xinternal; then
 else
   rdf_query="rasqal(system $RASQAL_VERSION)"
 fi
+AC_SUBST(with_rasqal)
 
 
 dnl Checks for languages
