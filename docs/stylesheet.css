@@ -1,4 +1,4 @@
-/* Smush of CSS from ILRT, Rudolf, W3C REC */
+/* Smush of CSS from ILRT, Rudolf, W3C REC, Gnumeric home page */
 
 body {
   margin: 2em 1em 2em 1em;
@@ -8,25 +8,39 @@ body {
 }
 
 /* NS 4 needs this */
-th, td, p, ol, ul, li, dl, dt, dt, blockquote { font-family: Verdana, Arial, Helvetica, sans-serif; }
+th, td, p, ol, ul, li, dl, dt, blockquote { font-family: Verdana, Arial, Helvetica, sans-serif; }
 
-h1, h2, h3, h4, h5 { text-align: left; color: #880000; }
+h1, h2, h3, h4 { text-align: left; color: #880000; }
 
-h1 { font-weight: normal; font-size: 170%; font-family: Verdana, Arial, Helvetica, sans-serif; }
-h2 { font-weight: normal; font-size: 140%; font-family: Verdana, Arial, Helvetica, sans-serif; }
-h3 { font-weight: normal; font-size: 120%; font-family: Verdana, Arial, Helvetica, sans-serif; }
+h1 { font-weight: normal; font-size: 200%; font-family: Verdana, Arial, Helvetica, sans-serif; }
+h2 { font-weight: 600; text-transform: capitalize; font-size: 120%; font-family: Verdana, Arial, Helvetica, sans-serif; }
+h3 { font-weight: normal; font-size: 110%; font-family: Verdana, Arial, Helvetica, sans-serif; }
 h4 { font-weight: bold; font-size: 100%; font-family: Verdana, Arial, Helvetica, sans-serif; }
-h5 { font-weight: italic; font-size: 100%; font-family: Verdana, Arial, Helvetica, sans-serif; }
 
 
 pre { margin-left: 2em }
 
 /* NS 4 needs this */
-pre, code { font-size: 100%; font-family: monospace; }
+pre, code { font-size: 100%; font-family: Courier, monospace; }
 
-tt { font-size: 100%; font-family: monospace; }
+tt { font-size: 100%; font-family: Courier, monospace; }
 
 
-a:link  { color : #000099; }
+@media screen {  /* hide from IE3 */
+  a:hover { background: #ffa } 
+}
 
-a:hover  { color : red; }
+
+.category {
+  padding: 0;
+  border-bottom: solid #008000 1px;
+  border-bottom-width: 1px;
+  border-top: solid #FFFFFF 0px;
+  border-top-width: 0px;
+  border-left: solid #FFFFFF 0px;
+  border-left-width: 0px;
+  border-right: solid #FFFFFF 0px;
+  border-right-width: 0px;
+  border-color: #008000;
+  border-style: solid;
+}
