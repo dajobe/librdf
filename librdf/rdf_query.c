@@ -409,11 +409,12 @@ main(int argc, char *argv[])
   
   /* initialise hash, model and query modules */
   librdf_init_hash(world);
+  librdf_init_uri(world);
   librdf_init_query(world);
   librdf_init_model(world);
   
   fprintf(stdout, "%s: Creating query\n", program);
-  query=librdf_new_query(world, "triples", NULL, "test query");
+  query=librdf_new_query(world, "triples", NULL, "[http://example.org] \"literal\" -");
   if(!query) {
     fprintf(stderr, "%s: Failed to create new query\n", program);
     return(1);
@@ -439,6 +440,7 @@ main(int argc, char *argv[])
   /* finish model and query modules */
   librdf_finish_model(world);
   librdf_finish_query(world);
+  librdf_finish_uri(world);
   librdf_finish_hash(world);
 
   LIBRDF_FREE(librdf_world, world);
