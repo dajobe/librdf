@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * example4.c - Redland example code
+ * example4.c - Redland example code using the serializing
  *
  * $Id$
  *
@@ -35,8 +35,39 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
+  librdf_world* world;
+  librdf_storage *storage;
+  librdf_model* model;
+  librdf_uri* uri, *base_uri;
+  librdf_parser* parser;
+  librdf_serializer* serializer;
+  
+  world=librdf_new_world();
+  librdf_world_open(world);
 
-  fprintf(stderr, "This example has been turned into the utility rdfproc\n");
+  model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.'"), NULL);
+
+  parser=librdf_new_parser(world,"raptor","application/rdf+xml",NULL);
+  uri=librdf_new_uri(world,"file:../perl/dc.rdf");
+  librdf_parser_parse_into_model(parser,uri,uri,model);
+  librdf_free_uri(uri);
+  librdf_free_parser(parser);
+
+  serializer=librdf_new_serializer(world, "rdfxml", NULL, NULL);
+  base_uri=librdf_new_uri(world,"http://exampe.org/base.rdf");
+  librdf_serializer_serialize_model(serializer, stdout, base_uri, model);
+  librdf_free_serializer(serializer);
+  librdf_free_uri(base_uri);
+  
+  librdf_free_model(model);
+  librdf_free_storage(storage);
+
+  librdf_free_world(world);
+
+#ifdef LIBRDF_MEMORY_DEBUG
+  librdf_memory_report(stderr);
+#endif
+	
   /* keep gcc -Wall happy */
   return(0);
 }
