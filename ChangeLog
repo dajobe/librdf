@@ -1,5 +1,17 @@
 2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* configure.ac, Makefile.am:
+	Replace SD_PRE with LOCAL_SUBDIRS to enable make distcheck to work.
+	Note that this will create a smaller tarball while doing the 'make
+	dist' in the build tree, which should not be used to make the
+	release tarball.
+
+	* Makefile.am:
+	No need for SD_POST, CONFIG_SUBDIRS (not used here anyway)
+	Tidy DIST_SUBDIRS
+
+	* configure.ac: No need for SD_POST
+
 	* configure.ac:
 	Do not configure raptor, rasqal directories unless compiling and
 	using them.
