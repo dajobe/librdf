@@ -1,3 +1,61 @@
+2005-02-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_query_rasqal.c (librdf_query_rasqal_execute): Free
+	any existing stored rasqal result before executing.
+	(librdf_query_rasqal_free_results): Zap results pointer after
+	freeing rasqal results.
+
+	* rasqal/rasqal_engine.c (rasqal_reset_triple_meta): End any
+	triples match when resetting rasqal_triple_meta; this frees any
+	resources that were providing a source of triples.
+
+2005-02-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_xml.c (raptor_valid_xml_ID): Just return an error
+	status, don't error out here.
+
+	* rasqal/rasqal_query_test.c (main): Execute a query/free twice
+	with no checking of results in between.
+
+2005-02-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/bound/Makefile.am,
+	rasqal/tests/sparql/examples/Makefile.am,
+	rasqal/tests/sparql/part1/Makefile.am,
+	rasqal/tests/sparql/simple/Makefile.am,
+	rasqal/tests/sparql/syntax/Makefile.am, rasqal/configure.ac,
+	rasqal/tests/rdql/testsuite/Makefile.am: Add @RAPPER_PATH@ to the
+	PATH before check-rdql/sparql calls so that if both raptor and
+	rasqal are being built, rapper can be found before installation.
+
+	* raptor/Makefile.am: Add n3_lexer.l n3_parser.y to EXTRA_DIST
+	otherwise building with --enable-maintainer-mode from tarball will
+	fail.
+
+	* raptor/raptor_rss.c: Add RSS enclosures serializing into RSS 1.0
+	raptor_rss10_serializer_context gains enclosures sequence
+	(raptor_rss10_serialize_init, raptor_rss10_serialize_terminate):
+	Init, free enclosures sequence.
+	(raptor_rss10_store_statement): If subject isn't an RSS item, see
+	if it is an enclosure and if so, set the type.
+	(raptor_rss10_serialize_statement): If type is enclosure, walk the
+	list of enclosures and add a new one if not seen already.
+	(raptor_rss10_emit_item): Add indent arg as this is called
+	recursively.  Use it to print spaces from teh raptor_rss10_spaces
+	constant.  Only serialize an rdf:about if the item has a URI.  If
+	field is enc:enclosure, find the enclosure item and write it
+	indented further recursively calling raptor_rss10_emit_item.
+
+	* raptor/raptor_rss.c: re-comment back item enclosure thing
+
+2005-02-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c (raptor_rss_parser_processNode): Do not
+	assign 'alternate' attribute values when there's no field to use.
+
+	* librdf/rdf_node.c (librdf_node_encode): init datatype_uri_string
+	to prevent a gcc warning.
+
 2005-02-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* configure.ac, librdf/win32_rdf_config.h:
