@@ -23,10 +23,6 @@
 #include <ctype.h>
 #include <sys/types.h>
 
-#ifdef STANDALONE
-#define LIBRDF_DEBUG 1
-#endif
-
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
 
@@ -440,7 +436,9 @@ main(int argc, char *argv[])
   librdf_finish_storage();
   
   
+#ifdef LIBRDF_DEBUG 
   librdf_memory_report(stderr);
+#endif
   
   /* keep gcc -Wall happy */
   return(0);

@@ -21,10 +21,6 @@
 
 #include <stdio.h>
 
-#ifdef STANDALONE
-#define LIBRDF_DEBUG 1
-#endif
-
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
 #include <rdf_node.h>
@@ -435,7 +431,9 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Freeing statement\n", program);
   librdf_free_statement(statement);
   
+#ifdef LIBRDF_DEBUG 
   librdf_memory_report(stderr);
+#endif
 	
   /* keep gcc -Wall happy */
   return(0);

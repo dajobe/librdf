@@ -28,10 +28,6 @@
 #include <string.h> /* for memcpy */
 #endif
 
-#ifdef STANDALONE
-#define LIBRDF_DEBUG 1
-#endif
-
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
 #include <rdf_uri.h>
@@ -553,8 +549,10 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Freeing node\n", program);
   librdf_free_node(node);
   
+#ifdef LIBRDF_DEBUG 
   librdf_memory_report(stderr);
-  
+#endif
+ 
   /* keep gcc -Wall happy */
   return(0);
 }
