@@ -269,10 +269,10 @@ and implementation class (librdf_model_storage).</li>
 <li>Removed the very old expat XML parser from the sources;
 much newer or expat or libxml2 are very widespread.</li>
 
-<li>Added simple thread support with configuration option
-<tt>--with-threads</tt> that locks key shared classes to
-allow separate threads to work in the same memory space. The
-current locked classes are URI and World.</li>
+<li>Added simple thread support from patches by Seth Ladd with
+configuration option <tt>--with-threads</tt> that locks key shared
+classes to allow separate threads to work in the same memory
+space. The current locked classes are URI and World.</li>
 
 <li>Deleting statements in the in-memory store now works.</li>
 
