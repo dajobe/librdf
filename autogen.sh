@@ -17,6 +17,9 @@
 
 PACKAGE=redland
 
+# Where the GNU config.sub, config.guess might be found
+CONFIG_DIR=../config
+
 # Where raptor may be found, in an adjacent directory
 RAPTOR_DIR=../raptor
 RAPTOR_INCS="raptor.h ntriples.h"
@@ -84,6 +87,20 @@ if test "X$DIE" != X; then
   exit 1
 fi
 
+
+# Ensure that these are created by the versions on this system
+# (indirectly via automake)
+rm -f libtool ltmain.sh
+
+if test -d $CONFIG_DIR; then
+  for file in config.guess config.sub; do
+    cfile=$CONFIG_DIR/$file
+    if test -f $cfile; then
+      rm -f $file
+      cp -p $cfile $file
+    fi
+  done
+fi
 
 if test -d $RAPTOR_DIR; then
   failed=no
