@@ -10,9 +10,11 @@
 
 <h2>Installing the Redland Perl interface</h2>
 
-<p>This is not automatically built or installed at present since this
-interface may not be required.  You can easily build it by hand as
-follows</p>
+<p>This is built if <tt>--with-perl</tt> is given to the configure
+line, or <tt>--with-perl=perl5.8</tt> to use a particular perl
+version/program.  The standard 'make' at the top level will build it.</p>
+
+<p>You can also compile the perl interface by hand as follows:</p>
 
 <pre>
   cd perl
@@ -23,10 +25,12 @@ follows</p>
 <p>To install it system wide (this is optional) do this as <em>root</em>:</p>
 
 <pre>
-  root# make install-perl
+  root# make install
 </pre>
 
-<p>The Redland interface has been tested with Perl 5.005, 5.6.0 and 5.6.1.</p>
+<p>The Redland interface has been tested with Perl 5.8.0, 5.6.1,
+5.6.0 and (in the past) 5.005 however it probably requires 5.6.0
+minimum.</p>
 
 
 <h2>Testing the Redland Perl interface</h2>
@@ -34,7 +38,7 @@ follows</p>
 <p>If you did the optional install above, run the perl example
 program with:</p>
 <pre>
-  perl ./example.pl  # ./example.pl might work if your perl is in /usr/bin/perl
+  perl ./example.pl
 </pre>
 
 <p>Otherwise, to run in the source tree do:</p>
@@ -52,10 +56,16 @@ program with:</p>
 
   Adding statement to model
 
+  Adding statement (new Statement(n, n, n)) to model
+
+  Adding statement (n,n,n) to model
+
   Parsing URI (file) dc.rdf
   Parsing added 3 statements
 
   Printing all statements
+  Statement: {[http://example.org/foo], [http://example.org/foo], [http://example.org/foo]}
+  Statement: {[http://example.org/foo], [http://example.org/foo], [http://example.org/foo]}
   Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
   Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
   Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
@@ -70,6 +80,10 @@ program with:</p>
     Subject: [http://purl.org/net/dajobe/]
     Predicate: [http://purl.org/dc/elements/1.1/creator]
     Object: Dave Beckett
+
+  Searching model for targets of subject http://purl.org/net/dajobe/ predicate http://purl.org/dc/elements/1.1/creator
+  Matching Node: Dave Beckett
+  Matching Node: Dave Beckett
 
   Writing model to test-out.rdf as rdf/xml
 
@@ -169,7 +183,7 @@ and follow the references from there.</p>
 
 <hr />
 
-<p>Copyright 2000-2002 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>

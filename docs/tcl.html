@@ -10,24 +10,26 @@
 
 <h2>Installing the Redland Tcl interface</h2>
 
-<p>This is not automatically built or installed at present since this
-interface may not be required.  You can easily build it by hand as
-follows</p>
+<p>This is built if <tt>--with-tcl</tt> is given to the configure
+line, or <tt>--with-tcl=tclsh8.4</tt> to use a particular Tcl
+version/program.  The standard 'make' at the top level will build it.</p>
+
+<p>You can also compile the Tcl interface by hand as follows:</p>
 
 <pre>
   cd tcl
-  make build-tcl
-  make test-tcl   # optional
+  make
+  make check # optional
 </pre>
 
 <p>To install it system wide (this is optional) do this as <em>root</em>:</p>
 
 <pre>
-  root# make install-tcl
+  root# make install
 </pre>
 
-<p>The Tcl interface has been tested with Tcl 8.0.5, 8.3 and is alpha
-quality - the test and examples work.</p>
+<p>The Tcl interface has been tested with Tcl 8.4, 8.3 and 8.0.5.  It
+isalpha quality - the test and examples work.</p>
 
 
 <h2>Redland Tcl API Introduction</h2>
@@ -77,7 +79,7 @@ model.  It should be run with two arguments - the URI of the content
 
 <hr />
 
-<p>Copyright 2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2001-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
