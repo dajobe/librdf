@@ -37,6 +37,7 @@ typedef struct librdf_model_s librdf_model;
 typedef struct librdf_storage_s librdf_storage;
 typedef struct librdf_stream_s librdf_stream;
 typedef struct librdf_context_s librdf_context;
+typedef struct librdf_parser_s librdf_parser;
 
 
 #ifdef HAVE_INLINE
@@ -117,6 +118,7 @@ void librdf_destroy_world(void);
 #include <rdf_storage.h>
 #include <rdf_stream.h>
 #include <rdf_context.h>
+#include <rdf_parser.h>
 
 
 #ifdef __cplusplus
