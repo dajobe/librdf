@@ -166,7 +166,7 @@ if this is required.)</p>
 <em>ROOT</em><code>/lib</code> (library) and
 <em>ROOT</em><code>/include</code> (header) or
 the library name is something that can't be worked out automatically,
-then you can use the next ste of options to specify them.</p>
+then you can use the next set of options to specify them.</p>
 
 <p>If all of the BDB options are omitted, Redland will do
 a best efforts guess to find the newest BDB installation but
@@ -190,11 +190,15 @@ might require a configure line something like this:</p>
   ./configure --with-bdb-lib=/sw/lib --with-bdb-include=/sw/include/db3
 </pre>
 <p>The name of the BDB library was correctly discovered for this
-configuration, as <code>db-3.3</code></p>
+configuration, as <code>db-3.3</code>.</p>
 
 <p>If all of the BDB options are omitted, Redland will do
 a best efforts guess to find the newest BDB installation but
 this may not work for all configurations.</p>
+
+<p>(At present, Redland knows of the default <code>/sw</code> Fink
+installation directory and will look there for BDB installs)</p>
+
 </dd>
 
 <dt><code>--with-java</code>(=<em>JAVA</em>)<br /></dt>
@@ -204,10 +208,13 @@ this may not work for all configurations.</p>
 <dt><code>--with-ruby</code>(=<em>RUBY</em>)<br /></dt>
 <dt><code>--with-tcl</code>(=<em>TCL</em>)<br /></dt>
 <dd><p>Enable the given language APIs - the default is to build
-none automatically.  If the optional argument is given, choose
-the command to use.  For example <code>--with-ruby=ruby1.8</code>
-will pick the ruby1.8 binary.
-</p></dd>
+no language APIs automatically.  If the option value is omitted or
+<em>yes</em>, configure will guess the location of the language
+command.  If the argument value is <em>no</em> or no option is given,
+the language API will be disabled (the default).  Otherwise, the
+argument is used as the appropriate language command to use.  For
+example <code>--with-ruby=ruby1.8</code> will use the 'ruby1.8'
+binary, whereas <code>--with-ruby</code> will use 'ruby'.</p></dd>
 
 <dt><code>--with-jdk=</code><em>DIR</em><br /></dt>
 <dd><p>Choose the location of the Java JDK to use for building
