@@ -140,7 +140,7 @@ main(int argc, char *argv[])
 
   /* PARSE the URI as RDF/XML*/
   fprintf(stdout, "%s: Parsing URI %s\n", program, librdf_uri_as_string(uri));
-  if(librdf_parser_parse_into_model(parser, uri, model)) {
+  if(librdf_parser_parse_into_model(parser, uri, uri, model)) {
     fprintf(stderr, "%s: Failed to parse RDF into model\n", program);
     return(1);
   }
