@@ -102,9 +102,11 @@ void librdf_init_uri(librdf_digest_factory *factory, librdf_hash *hash);
 void librdf_finish_uri(void);
 
 /* constructors */
-librdf_uri* librdf_new_uri (char *string);
+librdf_uri* librdf_new_uri (const char *string);
 /* Create a new URI from an existing URI - CLONE */
 librdf_uri* librdf_new_uri_from_uri (librdf_uri* uri);
+/* Create a new URI from an existing URI and qname */
+librdf_uri* librdf_new_uri_from_uri_qname (librdf_uri* uri, const char *qname);
 
 /* destructor */
 void librdf_free_uri(librdf_uri *uri);
