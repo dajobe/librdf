@@ -1,3 +1,19 @@
+2004-11-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_mysql.c
+	(librdf_storage_mysql_find_statements_with_options): Ensure
+	subject, predicate and object are initialised.
+
+	* rdf_query_triples.c (librdf_query_triples_init): Ensure subject,
+	predicate are initialised.  Free them only if they are set.
+
+	* rdf_node.c (librdf_node_to_counted_string): Init
+	datatype_uri_string, language_len.
+
+2004-11-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* win32_rdf_config.h: Bumped version to 0.9.20
+
 2004-11-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_serializer.c (main): Update expected result length.
