@@ -293,11 +293,7 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
   if(!object)
     return 1;
   
-  result=librdf_model_add(model, subject, predicate, object);
-  if(result)
-    librdf_free_node(object);
-  
-  return result;
+  return librdf_model_add(model, subject, predicate, object);
 }
 
 
