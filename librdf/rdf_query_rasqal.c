@@ -651,12 +651,30 @@ librdf_query_rasqal_register_factory(librdf_query_factory *factory)
 void
 librdf_query_rasqal_constructor(librdf_world *world)
 {
-  librdf_query_register_factory(world, "rdql", NULL,
-                                &librdf_query_rasqal_register_factory);
+  unsigned int i;
 
   rasqal_init();
   
   rasqal_set_triples_source_factory(rasqal_redland_register_triples_source_factory, world);
+
+  /* enumerate from query language 1, so the default parser 0 is done last */
+  for(i=1; 1; i++) {
+    const char *language_name=NULL;
+    const unsigned char *uri_string=NULL;
+
+    if(rasqal_languages_enumerate(i, &language_name, NULL, &uri_string)) {
+      /* reached the end of the parsers, now register the default one */
+      i=0;
+      rasqal_languages_enumerate(i, &language_name, NULL, &uri_string);
+    }
+
+  librdf_query_register_factory(world, language_name, uri_string,
+                                &librdf_query_rasqal_register_factory);
+  
+  if(!i) /* registered default query, end */
+    break;
+  }
+
 }
 
 
