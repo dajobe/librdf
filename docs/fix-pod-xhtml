@@ -42,13 +42,13 @@ while(<IN>) {
     s%<title>(.*?)</title>%<title>$main_title - $doc_title</title>%;
   }
 
-  next if /^<link|meta/;
+  next if /^<link|meta/i;
 
   s%<h1>%<h2>%; s%</h1>%</h2>%;
   s%<hr />%%;
 
-  s%href="/docs/pod/RDF/([^"]+)"%href="$pod_rdf_rel$1"%g;
-  s%href="/docs/pod/([^"]+)"%href="$pod_rel$1"%g;
+  s%href="/docs/pod/RDF/Redland/([^"]+)"%href="$pod_rdf_rel$1"%g;
+  s%href="/docs/pod/RDF/([^"]+)"%href="$pod_rel$1"%g;
 
   s%^<body>%<body bgcolor="#ffffff" text="#000085">\n\n<h1 align="center">$main_title - $doc_title</h1>\n\n%;
 
@@ -57,7 +57,6 @@ while(<IN>) {
 
 <p>Copyright 2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
-<p><a href="http://www.mirror.ac.uk/services/validator/check/referer">Validate me</a></p>
 EOT
   print OUT;
 }
