@@ -179,8 +179,9 @@ main(int argc, char *argv[])
   
   if(usage) {
     fprintf(stdout, "USAGE: %s: <storage name> COMMANDS\n", program);
-    fprintf(stdout, "  parse URI PARSER [BASE URI]               Parse the RDF/XML at URI into\n");
+    fprintf(stdout, "  parse URI PARSER [BASE URI]               Parse syntax at URI into\n");
     fprintf(stdout, "                                            the model using PARSER\n");
+    fprintf(stdout, "  parse-stream URI PARSER [BASE URI]        Parse as a stream.\n");
     fprintf(stdout, "  print                                     Prints all the statements\n");
     fprintf(stdout, "  serialize SYN-NAME SYN-URI SYN-MIME-TYPE  Serializes model to a syntax\n");
     fprintf(stdout, "  query QL-NAME QL-URI|- QUERY-STRING       Query (language) search\n");
