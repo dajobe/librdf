@@ -108,9 +108,9 @@ librdf_query_rasqal_init(librdf_query* query,
 
   rasqal_query_set_user_data(context->rq, query);
 
-  rasqal_set_error_handler(context->rq, query,
+  rasqal_query_set_error_handler(context->rq, query,
                            librdf_query_rasqal_error_handler);
-  rasqal_set_warning_handler(context->rq, query,
+  rasqal_query_set_warning_handler(context->rq, query,
                              librdf_query_rasqal_warning_handler);
 
 
