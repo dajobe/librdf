@@ -44,7 +44,8 @@ rdf_serializer.h
 librdf_la_SOURCES = rdf_init.c \
 rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
-rdf_model.c rdf_iterator.c rdf_concepts.c \
+rdf_model.c rdf_model_storage.c \
+rdf_iterator.c rdf_concepts.c \
 rdf_list.c rdf_memory.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_stream.c \
