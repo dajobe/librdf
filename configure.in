@@ -113,10 +113,8 @@ AC_CHECK_PROGS(RUBY, ruby)
 AC_CHECK_PROGS(SWIG, swig)
 
 if test "X$PERL" != "X"; then
-  tmp=conftest-pl$$
-  $PERL -V:installsitearch -V:man3dir > $tmp && . $tmp && rm -f $tmp
-  PERLINSTALLSITEARCH=$installsitearch
-  PERLMAN3DIR=$man3dir
+  PERLINSTALLSITEARCH=`$PERL -MConfig -e 'print $Config{installsitearch};'`
+  PERLMAN3DIR=`$PERL -MConfig -e 'print $Config{man3dir};'`
 else
   PERLINSTALLSITEARCH=none
   PERLMAN3DIR=none
@@ -213,28 +211,41 @@ if test "$ac_cv_header_gdbm_h" = yes ; then
 fi
 
 dnl Berkeley DB
-AC_ARG_WITH(bdb, [  --with-bdb=ROOT            Berkeley DB install area [/usr]], bdb_prefix="$withval", bdb_prefix="/usr") 
+AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area [/usr]], bdb_prefix="$withval", bdb_prefix="/usr") 
+AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory [/usr/lib]], bdb_lib_dir="$withval", bdb_lib_dir="$bdb_prefix/lib") 
+AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory [/usr/include]], bdb_include_dir="$withval", bdb_include_dir="$bdb_prefix/include") 
+AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Berkeley DB library name []], bdb_dbname="$withval", bdb_dbname="none")
 
 
-AC_MSG_CHECKING(location of BDB)
-AC_MSG_RESULT($bdb_prefix)
+AC_MSG_CHECKING(location of BDB libs)
+AC_MSG_RESULT($bdb_lib_dir)
+AC_MSG_CHECKING(location of BDB includes)
+AC_MSG_RESULT($bdb_include_dir)
 
 bdb_available=
 if test "$bdb_prefix" != no; then
-  if test "$bdb_prefix" != /usr; then
-    nLDFLAGS="-L$bdb_prefix/lib";
-    nCPPFLAGS="-I$bdb_prefix/include";
+  nLDFLAGS=
+  nCPPFLAGS=
+
+  if test "$bdb_lib_dir" != /usr/lib; then
+    nLDFLAGS="-L$bdb_lib_dir";
+  fi
+
+  if test "$bdb_name" != none; then
     # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
-    DBname=`cd $bdb_prefix/lib; ls -1 libdb*.a|sed -e 's/^lib//' -e 's/\.a$//' | head -1`
-  else
-    nLDFLAGS=
-    nCPPFLAGS=
-    DBname="db"
+    bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb*.a|sed -e 's/^lib//' -e 's/\.a$//' | head -1`
+  fi
+
+  AC_MSG_CHECKING(name of BDB library)
+  AC_MSG_RESULT($bdb_dbname)
+
+  if test "$bdb_include_dir" != /usr/include; then
+    nCPPFLAGS="-I$bdb_include_dir";
   fi
 
   LDFLAGS="$nLDFLAGS $LDFLAGS"
   CPPFLAGS="$nCPPFLAGS $CPPFLAGS"
-  LIBS="-l$DBname $LIBS"
+  LIBS="-l$bdb_dbname $LIBS"
 
   AC_CHECK_HEADERS(db.h)
   if test "$ac_cv_header_db_h" = yes ; then
@@ -291,7 +302,7 @@ if test "$bdb_prefix" != no; then
   fi
 
   if test "$have_libdb" = yes; then
-    LIBRDF_LIBS="-l$DBname $LIBRDF_LIBS"
+    LIBRDF_LIBS="-l$bdb_dbname $LIBRDF_LIBS"
     LIBRDF_LDFLAGS="$nLDFLAGS $LIBRDF_LDFLAGS"
     LIBRDF_CPPFLAGS="$nCPPFLAGS $LIBRDF_CPPFLAGS"
   fi
