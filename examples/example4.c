@@ -94,27 +94,30 @@ enum command_type {
   CMD_TARGETS,
   CMD_ADD,
   CMD_REMOVE,
-  CMD_PARSE,
+  CMD_PARSE_MODEL,
+  CMD_PARSE_STREAM,
 };
 
 typedef struct
 {
   enum command_type type;
   char *name;
-  int nargs; /* how many args needed? */
+  int min_args; /* min args needed? */
+  int max_args; /* max args needed? */
   int write; /* write to db? */
 } command;
 
 static command commands[]={
-  {CMD_PRINT, "print", 0, 0},
-  {CMD_CONTAINS, "contains", 3, 0},
-  {CMD_STATEMENTS, "statements", 3, 0},
-  {CMD_SOURCES, "sources", 2, 0},
-  {CMD_ARCS, "arcs", 2, 0},
-  {CMD_TARGETS, "targets", 2, 0},
-  {CMD_ADD, "add", 3, 1},
-  {CMD_REMOVE, "remove", 3, 1},
-  {CMD_PARSE, "parse", 2, 1},
+  {CMD_PRINT, "print", 0, 0, 0,},
+  {CMD_CONTAINS, "contains", 3, 3, 0},
+  {CMD_STATEMENTS, "statements", 3, 3, 0},
+  {CMD_SOURCES, "sources", 2, 2, 0},
+  {CMD_ARCS, "arcs", 2, 2, 0},
+  {CMD_TARGETS, "targets", 2, 2, 0},
+  {CMD_ADD, "add", 3, 3, 1},
+  {CMD_REMOVE, "remove", 3, 3, 1},
+  {CMD_PARSE_MODEL, "parse", 2, 3, 1},
+  {CMD_PARSE_STREAM, "parse-stream", 2, 3, 1},
   {-1, NULL}  
 };
  
@@ -134,6 +137,7 @@ main(int argc, char *argv[])
   librdf_stream* stream;
   librdf_iterator* iterator;
   librdf_uri *uri;
+  librdf_uri *base_uri;
   int usage;
   char *identifier;
   char *cmd;
@@ -184,13 +188,13 @@ main(int argc, char *argv[])
         argv++;
         argc--;
 
-        if(argc < commands[cmd_index].nargs) {
+        if(argc < commands[cmd_index].min_args) {
           fprintf(stderr, "%s: command %s needs %d arguments\n", program, 
-                  cmd, commands[cmd_index].nargs);
+                  cmd, commands[cmd_index].min_args);
           usage=1;
-        } else if(argc > commands[cmd_index].nargs) {
-          fprintf(stderr, "%s: command %s given extra arguments\n", program,
-                  cmd);
+        } else if(argc > commands[cmd_index].max_args) {
+          fprintf(stderr, "%s: command %s given more than %d arguments\n",
+                  program, cmd, commands[cmd_index].max_args);
           usage=1;
         } /* otherwise is just fine and argv points to remaining args */
       }
@@ -201,7 +205,7 @@ main(int argc, char *argv[])
   
   if(usage) {
     fprintf(stdout, "USAGE: %s: <BDB name> COMMANDS\n", program);
-    fprintf(stdout, "  parse URI PARSER                          Parse the RDF/XML at URI into\n");
+    fprintf(stdout, "  parse URI PARSER [BASE URI]               Parse the RDF/XML at URI into\n");
     fprintf(stdout, "                                            the model using PARSER\n");
     fprintf(stdout, "  print                                     Prints all the statements\n");
     fprintf(stdout, "  statements SUBJECT|- PREDICATE|- OBJECT|- Query for matching statements\n");
@@ -216,7 +220,7 @@ main(int argc, char *argv[])
   
 
   if(commands[cmd_index].write)
-    if (type == CMD_PARSE)
+    if (type == CMD_PARSE_MODEL || type == CMD_PARSE_STREAM)
       storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='yes',new='yes'");
     else
       storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='yes'");
@@ -248,7 +252,8 @@ main(int argc, char *argv[])
   case CMD_PRINT:
     librdf_model_print(model, stdout);
     break;
-  case CMD_PARSE:
+  case CMD_PARSE_MODEL:
+  case CMD_PARSE_STREAM:
     uri=librdf_new_uri(argv[0]);
     if(!uri) {
       fprintf(stderr, "%s: Failed to create URI from %s\n", program, argv[0]);
@@ -260,15 +265,59 @@ main(int argc, char *argv[])
       fprintf(stderr, "%s: Failed to create new parser %s\n", program, argv[1]);
       break;
     }
-    fprintf(stdout, "%s: Parsing URI %s\n", program, librdf_uri_as_string(uri));
-    if(librdf_parser_parse_into_model(parser, uri, model)) {
-      fprintf(stderr, "%s: Failed to parse RDF into model\n", program);
-      librdf_free_parser(parser);
-      librdf_free_uri(uri);
+    fprintf(stdout, "%s: Parsing URI %s with %s parser\n", program,
+            librdf_uri_as_string(uri), argv[1]);
+    
+    if(argv[2]) {
+      base_uri=librdf_new_uri(argv[2]);
+      if(!base_uri) {
+        fprintf(stderr, "%s: Failed to create base URI from %s\n", program, argv[2]);
+        break;
+      }
+      fprintf(stderr, "%s: Using base URI %s\n", program,
+              librdf_uri_as_string(base_uri));
+    } else
+      base_uri=librdf_new_uri_from_uri(uri);
+
+
+    if (type == CMD_PARSE_MODEL) {
+      if(librdf_parser_parse_into_model(parser, uri, base_uri, model)) {
+        fprintf(stderr, "%s: Failed to parse RDF into model\n", program);
+        librdf_free_parser(parser);
+        librdf_free_uri(uri);
+        librdf_free_uri(base_uri);
+        break;
+      }
+    } else {
+      /* must be CMD_PARSE_STREAM */
+      if(!(stream=librdf_parser_parse_as_stream(parser, uri, base_uri))) {
+        fprintf(stderr, "%s: Failed to parse RDF as stream\n", program);
+        librdf_free_parser(parser);
+        librdf_free_uri(uri);
+        librdf_free_uri(base_uri);
+        break;
+      }
+
+      count=0;
+      while(!librdf_stream_end(stream)) {
+        librdf_statement *statement=librdf_stream_next(stream);
+        if(!statement) {
+          fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
+          break;
+        }
+          
+        librdf_model_add_statement(model, statement);
+        count++;
+      }
+      librdf_free_stream(stream);  
+      fprintf(stderr, "%s: Added %d statements\n", program, count);
       break;
+         
     }
+    
     librdf_free_parser(parser);
     librdf_free_uri(uri);
+    librdf_free_uri(base_uri);
     break;
   case CMD_CONTAINS:
   case CMD_STATEMENTS:
