@@ -227,20 +227,26 @@ installation directory and will look there for BDB installs)</p>
 
 </dd>
 
-<dt><code>--with-java</code>(=<em>JAVA</em>)<br /></dt>
-<dt><code>--with-perl</code>(=<em>PERL</em>)<br /></dt>
-<dt><code>--with-php</code>(=<em>PHP</em>)<br /></dt>
-<dt><code>--with-python</code>(=<em>PYTHON</em>)<br /></dt>
-<dt><code>--with-ruby</code>(=<em>RUBY</em>)<br /></dt>
-<dt><code>--with-tcl</code>(=<em>TCL</em>)<br /></dt>
+<dt><code>--with-java</code>(=<em>JAVA-COMMAND</em>)<br /></dt>
+<dt><code>--with-perl</code>(=<em>PERL-COMMAND</em>)<br /></dt>
+<dt><code>--with-php</code>(=<em>PHP-COMMAND</em>)<br /></dt>
+<dt><code>--with-python</code>(=<em>PYTHON-COMMAND</em>)<br /></dt>
+<dt><code>--with-ruby</code>(=<em>RUBY-COMMAND</em>)<br /></dt>
+<dt><code>--with-tcl</code>(=<em>TCL-COMMAND</em>)<br /></dt>
 <dd><p>Enable the given language APIs - the default is to build
 no language APIs automatically.  If the option value is omitted or
 <em>yes</em>, configure will guess the location of the language
-command.  If the argument value is <em>no</em> or no option is given,
-the language API will be disabled (the default).  Otherwise, the
-argument is used as the appropriate language command to use.  For
-example <code>--with-ruby=ruby1.8</code> will use the 'ruby1.8'
-binary, whereas <code>--with-ruby</code> will use 'ruby'.</p></dd>
+command.  If the option value is <em>no</em> or no option is given,
+the language API will be disabled - this is the default, not
+to build any language API.</p>
+
+<p>If the option is given a value, that is used as the appropriate
+language command to use.  For example <code>--with-ruby=ruby1.8</code>
+will use the 'ruby1.8' binary, whereas <code>--with-ruby</code> will use
+'ruby' as the binary, both of these will be searched for in the PATH.
+An absolute path could alternatively be given such as
+<code>--with-python=/opt/mypython/bin/python</code> 
+to use a python installation in a different location.</p></dd>
 
 <dt><code>--with-jdk=</code><em>DIR</em><br /></dt>
 <dd><p>Choose the location of the Java JDK to use for building
