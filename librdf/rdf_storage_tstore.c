@@ -100,7 +100,7 @@ librdf_storage_tstore_init(librdf_storage* storage, char *name,
   librdf_storage_tstore_context *context=(librdf_storage_tstore_context*)storage->context;
   
   context->host=librdf_hash_get_del(options, "host");
-  context->db=librdf_hash_get_del(options, "db");
+  context->db=librdf_hash_get_del(options, "database");
   context->user=librdf_hash_get_del(options, "user");
   context->password=librdf_hash_get_del(options, "password");
   context->model=librdf_hash_get_del(options, "model");
