@@ -18,8 +18,7 @@ CLEANFILES=$(TESTS) $(EXAMPLES) $(DBUS_EXAMPLES) $(GUI_EXAMPLES) test*db
 examples: $(EXAMPLES)
 
 AM_CPPFLAGS=-I$(top_srcdir)/librdf
-AM_LDFLAGS=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la $(top_builddir)/raptor/libraptor.la
-LIBS=@LIBS@ @LIBRDF_LIBS@
+AM_LDFLAGS=@LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ $(top_builddir)/librdf/librdf.la @LIBRDF_INTERNAL_LIBS@
 
 example1_SOURCES = example1.c
 
