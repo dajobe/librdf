@@ -81,9 +81,9 @@ typedef struct {
 
 #ifdef JAVA_SIRPACSTANFORD_JAR
 #ifdef JAVA_SAX_JAR
-static const char *librdf_parser_sirpac_stanford_command_format_string= JAVA_COMMAND " -classpath " JAVA_CLASS_DIR ":" JAVA_SIRPACSTANFORD_JAR ":" JAVA_SAX_JAR" -Dorg.xml.sax.parser=" JAVA_SAX_CLASS " PrintParser %s %s";
+static const char *librdf_parser_sirpac_stanford_command_format_string= JAVA_COMMAND " -classpath " JAVA_CLASS_DIR ":" JAVA_SIRPACSTANFORD_JAR ":" JAVA_SAX_JAR" -Dorg.xml.sax.parser=" JAVA_SAX_CLASS " PrintParser %s '%s'";
 #else
-static const char *librdf_parser_sirpac_stanford_command_format_string= JAVA_COMMAND " -classpath " JAVA_CLASS_DIR ":" JAVA_SIRPACSTANFORD_JAR " -Dorg.xml.sax.parser=" JAVA_SAX_CLASS " PrintParser %s %s";
+static const char *librdf_parser_sirpac_stanford_command_format_string= JAVA_COMMAND " -classpath " JAVA_CLASS_DIR ":" JAVA_SIRPACSTANFORD_JAR " -Dorg.xml.sax.parser=" JAVA_SAX_CLASS " PrintParser %s '%s'";
 #endif
 
 /**
@@ -107,7 +107,7 @@ librdf_parser_sirpac_stanford_init(librdf_parser* parser, void *context)
 
 
 #ifdef JAVA_SIRPACW3C_JAR
-static const char *librdf_parser_sirpac_w3c_command_format_string=JAVA_COMMAND " -classpath " JAVA_CLASS_DIR ":" JAVA_SIRPACW3C_JAR ":" JAVA_SAX_JAR " -Dorg.xml.sax.parser=" JAVA_SAX_CLASS " PrintParser %s %s";
+static const char *librdf_parser_sirpac_w3c_command_format_string=JAVA_COMMAND " -classpath " JAVA_CLASS_DIR ":" JAVA_SIRPACW3C_JAR ":" JAVA_SAX_JAR " -Dorg.xml.sax.parser=" JAVA_SAX_CLASS " PrintParser %s '%s'";
 
 /**
  * librdf_parser_sirpac_w3c_init - Initialise the SiRPAC (W3C) RDF parser
