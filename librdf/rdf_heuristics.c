@@ -84,6 +84,10 @@
 #include <stdlib.h> /* for strtol */
 #endif
 
+#ifdef HAVE_STRING_H
+#include <string.h> /* for strncpy */
+#endif
+
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
 
