@@ -1,5 +1,24 @@
 2004-12-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_storage_sqlite.c:
+	Make get_contexts fail rather than do useless things.
+
+	* rdf_storage_sqlite.c: Moved GET_COLUMN* defines to top.
+	Deleted all index_contexts - always supported.
+	(librdf_storage_sqlite_statement_helper): Work when statement=NULL.
+	(librdf_storage_sqlite_add_statements): Handle when max=4 for
+	contexts.
+	(librdf_storage_sqlite_serialise): Debug prepared query.
+	(librdf_storage_sqlite_context_add_statement): Handle when max=4 for
+	contexts.
+	librdf_storage_sqlite_context_serialise_stream_context updated to add
+	sqlite fields.
+	(librdf_storage_sqlite_context_serialise): Implemented, based on
+	librdf_storage_sqlite_serialise and related functions.
+
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_context_add_statement):
+	Kill fixme, done.
+
 	* rdf_storage_sqlite.c (librdf_storage_sqlite_set_helper):
 	Add length arg.
 	(librdf_storage_sqlite_uri_helper,
