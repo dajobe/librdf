@@ -724,7 +724,7 @@ librdf_hash_bdb_put(void* context, librdf_hash_datum *key,
  * The value can be NULL in which case the check will just be
  * for the key.
  *
- * Return value: non 0 if the key/value exists in the hash
+ * Return value: >0 if the key/value exists in the hash, 0 if not, <0 on failure
  **/
 static int
 librdf_hash_bdb_exists(void* context, librdf_hash_datum *key,
@@ -735,7 +735,6 @@ librdf_hash_bdb_exists(void* context, librdf_hash_datum *key,
   DBT bdb_key;
   DBT bdb_value;
   int ret;
-  int flags;
   
   /* docs say you must zero DBT's before use */
   memset(&bdb_key, 0, sizeof(DBT));
@@ -745,27 +744,116 @@ librdf_hash_bdb_exists(void* context, librdf_hash_datum *key,
   bdb_key.data = (char*)key->data;
   bdb_key.size = key->size;
 
-  flags=0;
-  
   if(value) {
     bdb_value.data = (char*)value->data;
     bdb_value.size = value->size;
-
-    flags=DB_GET_BOTH;
   }
 	
 #ifdef HAVE_BDB_DB_TXN
-  /* V2/V3 */
-  if((ret=db->get(db, NULL, &bdb_key, &bdb_value, flags)) == DB_NOTFOUND) {
+#ifdef DB_GET_BOTH
+  /* later V2 (sigh)/V3 */
+  ret=db->get(db, NULL, &bdb_key, &bdb_value, (value ? DB_GET_BOTH : 0));
+  if(ret == DB_NOTFOUND)
+    ret= 0;
+  else if(ret) /* failed */
+    ret= -1;
+  else
+    ret= 1;
+#else
+  /* earlier V2 */
+  if(!value) {
+    /* don't care about value, can use standard get */
+    ret=db->get(db, NULL, &bdb_key, &bdb_value, 0);
+    if(ret == DB_NOTFOUND)
+      ret= 0;
+    else if(ret) /* failed */
+      ret= -1;
+    else
+      ret= 1;
+  } else {
+    /* Want exact key/value - have to use a cursor, darn */
+    DBC* dbc=NULL;
+    
+    ret=1;
+    
+    if(db->cursor(db, NULL, &dbc))
+      ret= -1;
+
+    if(ret >= 0) {
+      ret=dbc->c_get(dbc, &bdb_key, &bdb_value, DB_SET);
+      if(ret == DB_NOTFOUND)
+        ret= 0;
+      else if(ret) /* failed */
+        ret= -1;
+      else
+        ret= 1;
+    }
+
+    while(ret > 0) {
+      /* key different - match failed */
+      if(memcmp(key->data, bdb_key.data, key->size)) {
+        ret=0;
+        break;
+      }
+      /* value equal - match found */
+      if(!memcmp(value->data, bdb_value.data, value->size)) {
+        ret=1;
+        break;
+      }
+      ret=dbc->c_get(dbc, &bdb_key, &bdb_value, DB_NEXT);
+      if(ret == DB_NOTFOUND)
+        ret= 0;
+      else if(ret) /* failed */
+        ret= -1;
+      else
+        ret= 1;
+    }
+    if(dbc)
+      dbc->c_close(dbc);
+  }
+#endif
 #else
   /* V1 */
-  if((ret=db->get(db, &bdb_key, &bdb_value, flags)) != 0) {
-#endif
-    /* not found */
-    return 0;
+  if(!value) {
+    /* don't care about value, can use standard get */
+    ret=db->get(db, &bdb_key, &bdb_value, 0);
+    if(ret >0) /* not found */
+      ret= 0;
+    else if(ret <0) /* failed */
+      ret= -1;
+    else /* 0 = found */
+      ret= 1;
+  } else {
+    /* Want exact key/value - have to use sequence */
+
+    ret=db->seq(bdb, &bdb_key, &bdb_value, 0);
+    if(ret) /* failed */
+      ret= -1;
+    else
+      ret= 1;
+
+    while(ret > 0) {
+      /* key different - match failed */
+      if(memcmp(key->data, bdb_key.data, key->size)) {
+        ret=0;
+        break;
+      }
+      /* value equal - match found */
+      if(!memcmp(value->data, bdb_value.data, value->size)) {
+        ret=1;
+        break;
+      }
+      ret=db->seq(dbc, &bdb_key, &bdb_value, R_NEXT);
+      if(ret) /* not found */
+        ret= 0;
+      else
+        ret= 1;
+    }
   }
   
-  return 1;
+#endif
+
+  return ret;
 }
 
 
