@@ -535,6 +535,7 @@ main(int argc, char *argv[])
   uri=NULL;
   node=NULL;
   query=NULL;
+  results=NULL;
 
   switch(type) {
     case CMD_PRINT:
