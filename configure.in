@@ -193,4 +193,4 @@ AC_SUBST(HASH_OBJS)
 AC_SUBST(HASH_SRCS)
 
 
-AC_OUTPUT([Makefile])
+AC_OUTPUT([Makefile docs/Makefile])

@@ -6,6 +6,8 @@
 #
 #
 
+SUBDIRS=docs
+
 lib_LIBRARIES = librdf.a
 
 librdf_a_SOURCES = rdf_init.c rdf_uri.c rdf_node.c rdf_statement.c \
