@@ -445,22 +445,20 @@ librdf_uri_is_file_uri(librdf_uri* uri)
 
 
 /**
- * librdf_uri_as_filename - Return pointer to filename part of URI
+ * librdf_uri_to_filename - Return pointer to filename of URI
  * @uri: &librdf_uri object
  * 
- * Note - returns a pointer to a shared copy; this assumes that
- * the URI encodes the filename without changing any characters -
- * a simple but in general wrong assumption (e.g. files with spaces
- * or slashes).
+ * Returns a pointer to a newly allocated buffer that
+ * the caller must free.  This will fail if the URI
+ * is not a file: URI.  This can be checked with &librdf_uri_is_file_uri
  *
- * Return value: pointer to shared copy of name or NULL if the URI does not point to a file
+ * Return value: pointer to filename or NULL on failure
  **/
 const char*
-librdf_uri_as_filename(librdf_uri* uri) 
+librdf_uri_to_filename(librdf_uri* uri) 
 {
-  if(!librdf_uri_is_file_uri(uri))
-    return NULL;
-  return uri->string + 5;
+  return raptor_uri_uri_string_to_filename(uri->string);
+  
 }
 
 
