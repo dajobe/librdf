@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+#ifdef LIBRDF_INTERNAL
 
 struct librdf_parser_factory_s 
 {
@@ -63,6 +64,8 @@ struct librdf_parser_factory_s
 
 
 struct librdf_parser_s {
+  librdf_world *world;
+  
   void *context;
 
   void *error_user_data;
@@ -73,6 +76,7 @@ struct librdf_parser_s {
   librdf_parser_factory* factory;
 };
 
+#endif
 
 /* factory static methods */
 void librdf_parser_register_factory(librdf_world *world, const char *name, const char *mime_type, const char *uri_string, void (*factory) (librdf_parser_factory*));
@@ -87,8 +91,8 @@ void librdf_finish_parser(librdf_world *world);
                     
 
 /* constructor */
-librdf_parser* librdf_new_parser(const char *name, const char *mime_type, librdf_uri *type_uri);
-librdf_parser* librdf_new_parser_from_factory(librdf_parser_factory *factory);
+librdf_parser* librdf_new_parser(librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri);
+librdf_parser* librdf_new_parser_from_factory(librdf_world* world, librdf_parser_factory *factory);
 
 /* destructor */
 void librdf_free_parser(librdf_parser *parser);

@@ -147,7 +147,8 @@ librdf_parser_sirpac_parse_uri_as_stream(void *context, librdf_uri *uri,
   FILE *fh;
   char *uri_string;
   char *streaming_arg;
-
+  librdf_world *world=uri->world;
+  
   scontext=(librdf_parser_sirpac_stream_context*)LIBRDF_CALLOC(librdf_parser_sirpac_stream_context, 1, sizeof(librdf_parser_sirpac_stream_context));
   if(!scontext)
     return NULL;
@@ -196,7 +197,8 @@ librdf_parser_sirpac_parse_uri_as_stream(void *context, librdf_uri *uri,
   scontext->fh=fh;
   
 
-  stream=librdf_new_stream((void*)scontext,
+  stream=librdf_new_stream(world, 
+                           (void*)scontext,
                            &librdf_parser_sirpac_serialise_end_of_stream,
                            &librdf_parser_sirpac_serialise_next_statement,
                            &librdf_parser_sirpac_serialise_finished);
@@ -247,6 +249,7 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
   char buffer[LINE_BUFFER_LEN];
   char *literal_buffer=NULL;
   int literal_buffer_length=0;
+  librdf_world *world=context->pcontext->parser->world;
   
   /* SiRPAC format:
   triple("URL-of-predicate","URL-of-subject","URI-of-object/literal-string").
@@ -357,26 +360,26 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
       break;
 
     /* got all statement parts now */
-    statement=librdf_new_statement();
+    statement=librdf_new_statement(world);
     if(!statement)
       break;
     
     librdf_statement_set_subject(statement, 
-                                 librdf_new_node_from_uri_string(s));
+                                 librdf_new_node_from_uri_string(world, s));
 
     librdf_statement_set_predicate(statement,
-                                   librdf_new_node_from_uri_string(p));
+                                   librdf_new_node_from_uri_string(world, p));
 
     if(object_is_literal) {
       if(literal_buffer)
         o=literal_buffer;
       librdf_statement_set_object(statement,
-                                  librdf_new_node_from_literal(o, NULL, 0, 0));
+                                  librdf_new_node_from_literal(world, o, NULL, 0, 0));
       if(literal_buffer)
         LIBRDF_FREE(cstring, literal_buffer);
     } else {
       librdf_statement_set_object(statement, 
-                                  librdf_new_node_from_uri_string(o));
+                                  librdf_new_node_from_uri_string(world, o));
     }
 
     /* found a statement, return it */

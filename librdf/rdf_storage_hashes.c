@@ -175,7 +175,7 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
     else
       sprintf(full_name, "%s-%s", name, desc[i].name);
 
-    context->hashes[i]=librdf_new_hash(context->hash_type);
+    context->hashes[i]=librdf_new_hash(storage->world, context->hash_type);
     if(!context->hashes[i]) {
       status=1;
       break;
@@ -602,11 +602,11 @@ librdf_storage_hashes_serialise(librdf_storage* storage)
 
   hash=context->hashes[scontext->index];
 
-  scontext->key=librdf_new_hash_datum(NULL, 0);
+  scontext->key=librdf_new_hash_datum(storage->world, NULL, 0);
   if(!scontext->key)
     return NULL;
   
-  scontext->value=librdf_new_hash_datum(NULL, 0);
+  scontext->value=librdf_new_hash_datum(storage->world, NULL, 0);
   if(!scontext->value) {
     librdf_free_hash_datum(scontext->key);
     return NULL;
@@ -620,7 +620,8 @@ librdf_storage_hashes_serialise(librdf_storage* storage)
   }
 
 
-  stream=librdf_new_stream((void*)scontext,
+  stream=librdf_new_stream(storage->world,
+                           (void*)scontext,
                            &librdf_storage_hashes_serialise_end_of_stream,
                            &librdf_storage_hashes_serialise_next_statement,
                            &librdf_storage_hashes_serialise_finished);
@@ -649,7 +650,7 @@ librdf_storage_hashes_serialise_next_statement(void* context)
   librdf_storage_hashes_serialise_stream_context* scontext=(librdf_storage_hashes_serialise_stream_context*)context;
   librdf_statement* statement;
   
-  statement=librdf_new_statement();
+  statement=librdf_new_statement(scontext->iterator->world);
   if(!statement)
     return NULL;
 
@@ -909,7 +910,8 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
   LIBRDF_FREE(data, key_buffer);
 
 
-  iterator=librdf_new_iterator((void*)icontext,
+  iterator=librdf_new_iterator(storage->world,
+                               (void*)icontext,
                                librdf_storage_hashes_node_iterator_have_elements,
                                librdf_storage_hashes_node_iterator_get_next,
                                librdf_storage_hashes_node_iterator_finished);

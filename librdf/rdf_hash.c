@@ -153,16 +153,18 @@ librdf_free_hash_datums(librdf_world *world)
  * Return value: New &librdf_hash_datum object or NULL on failure
  **/
 librdf_hash_datum*
-librdf_new_hash_datum(void *data, size_t size)
+librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
 {
-  librdf_world *world=RDF_World;
   librdf_hash_datum *datum;
 
   /* get one from free list, or allocate new one */ 
   if((datum=world->hash_datums_list)) {
     world->hash_datums_list=datum->next;
-  } else 
+  } else {
     datum=(librdf_hash_datum*)LIBRDF_CALLOC(librdf_hash_datum, 1, sizeof(librdf_hash_datum));
+    datum->world=world;
+  }
+  
 
   if(datum) {
     datum->data=data;
@@ -179,11 +181,10 @@ librdf_new_hash_datum(void *data, size_t size)
 void
 librdf_free_hash_datum(librdf_hash_datum *datum) 
 {
-  librdf_world *world=RDF_World;
   if(datum->data)
     LIBRDF_FREE(cstring, datum->data);
-  datum->next=world->hash_datums_list;
-  world->hash_datums_list=datum;
+  datum->next=datum->world->hash_datums_list;
+  datum->world->hash_datums_list=datum;
 }
 
 
@@ -285,15 +286,14 @@ librdf_get_hash_factory(librdf_world *world, const char *name)
  * Return value: a new &librdf_hash object or NULL on failure
  */
 librdf_hash*
-librdf_new_hash(char* name) {
-  librdf_world *world=RDF_World;
+librdf_new_hash(librdf_world *world, char* name) {
   librdf_hash_factory *factory;
 
   factory=librdf_get_hash_factory(world, name);
   if(!factory)
     return NULL;
 
-  return librdf_new_hash_from_factory(factory);
+  return librdf_new_hash_from_factory(world, factory);
 }
 
 
@@ -304,7 +304,8 @@ librdf_new_hash(char* name) {
  * Return value: a new &librdf_hash object or NULL on failure
  */
 librdf_hash*
-librdf_new_hash_from_factory (librdf_hash_factory* factory) {
+librdf_new_hash_from_factory (librdf_world *world,
+                              librdf_hash_factory* factory) {
   librdf_hash* h;
 
   h=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
@@ -317,6 +318,8 @@ librdf_new_hash_from_factory (librdf_hash_factory* factory) {
     librdf_free_hash(h);
     return NULL;
   }
+
+  h->world=world;
   
   h->factory=factory;
 
@@ -340,7 +343,8 @@ librdf_new_hash_from_hash(librdf_hash* old_hash) {
   hash=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
   if(!hash)
     return NULL;
-  
+
+  hash->world=old_hash->world;
   hash->factory=old_hash->factory;
 
   hash->context=(char*)LIBRDF_CALLOC(librdf_hash_context, 1,
@@ -461,7 +465,7 @@ librdf_hash_get(librdf_hash* hash, char *key)
   librdf_hash_datum *hd_key, *hd_value;
   char *value=NULL;
 
-  hd_key=librdf_new_hash_datum(key, strlen(key));
+  hd_key=librdf_new_hash_datum(hash->world, key, strlen(key));
   if(!hd_key)
     return NULL;
 
@@ -505,7 +509,7 @@ librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key)
   int status;
   char *new_value;
   
-  value=librdf_new_hash_datum(NULL, 0);
+  value=librdf_new_hash_datum(hash->world, NULL, 0);
   if(!value)
     return NULL;
 
@@ -585,13 +589,13 @@ librdf_hash_get_all(librdf_hash* hash,
     context->one_key=1;
 
   if(!context->one_key)
-    if(!(context->next_key=librdf_new_hash_datum(NULL, 0))) {
+    if(!(context->next_key=librdf_new_hash_datum(hash->world, NULL, 0))) {
       librdf_hash_get_all_iterator_finished(context);
       return NULL;
     }
 
   if(value)
-    if(!(context->next_value=librdf_new_hash_datum(NULL, 0))) {
+    if(!(context->next_value=librdf_new_hash_datum(hash->world, NULL, 0))) {
       librdf_hash_get_all_iterator_finished(context);
       return NULL;
     }
@@ -609,7 +613,8 @@ librdf_hash_get_all(librdf_hash* hash,
 
   context->have_elements=(status == 0);
   
-  return librdf_new_iterator((void*)context,
+  return librdf_new_iterator(hash->world,
+                             (void*)context,
                              librdf_hash_get_all_iterator_have_elements,
                              librdf_hash_get_all_iterator_get_next,
                              librdf_hash_get_all_iterator_finished);
@@ -856,7 +861,7 @@ librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key)
     return NULL;
   }
 
-  if(!(context->next_key=librdf_new_hash_datum(NULL, 0))) {
+  if(!(context->next_key=librdf_new_hash_datum(hash->world, NULL, 0))) {
     librdf_hash_keys_iterator_finished(context);
     return NULL;
   }
@@ -868,7 +873,8 @@ librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key)
                                       NULL);
   context->have_elements=(status == 0);
   
-  return librdf_new_iterator((void*)context,
+  return librdf_new_iterator(hash->world, 
+                             (void*)context,
                              librdf_hash_keys_iterator_have_elements,
                              librdf_hash_keys_iterator_get_next,
                              librdf_hash_keys_iterator_finished);
@@ -980,8 +986,8 @@ librdf_hash_print(librdf_hash* hash, FILE *fh)
   
   fprintf(fh, "%s hash: {\n", hash->factory->name);
 
-  key=librdf_new_hash_datum(NULL, 0);
-  value=librdf_new_hash_datum(NULL, 0);
+  key=librdf_new_hash_datum(hash->world, NULL, 0);
+  value=librdf_new_hash_datum(hash->world, NULL, 0);
 
   iterator=librdf_hash_get_all(hash, key, value);
   while(librdf_iterator_have_elements(iterator)) {
@@ -1017,7 +1023,7 @@ librdf_hash_print_keys(librdf_hash* hash, FILE *fh)
   
   fputs("{\n", fh);
 
-  key=librdf_new_hash_datum(NULL, 0);
+  key=librdf_new_hash_datum(hash->world, NULL, 0);
 
   iterator=librdf_hash_keys(hash, key);
   while(librdf_iterator_have_elements(iterator)) {
@@ -1049,11 +1055,11 @@ librdf_hash_print_values(librdf_hash* hash, char *key_string, FILE *fh)
   librdf_iterator* iterator;
   int first=1;
   
-  key=librdf_new_hash_datum(key_string, strlen(key_string));
+  key=librdf_new_hash_datum(hash->world, key_string, strlen(key_string));
   if(!key)
     return;
   
-  value=librdf_new_hash_datum(NULL, 0);
+  value=librdf_new_hash_datum(hash->world, NULL, 0);
   if(!value) {
     key->data=NULL;
     librdf_free_hash_datum(key);
@@ -1421,14 +1427,14 @@ main(int argc, char *argv[])
   long l;
   librdf_world *world;
   
-  RDF_World=world=librdf_new_world();
+  world=librdf_new_world();
   
   /* initialise hash module */
   librdf_init_hash(world);
   
   if(argc ==2) {
     type=argv[1];
-    h=librdf_new_hash(NULL);
+    h=librdf_new_hash(world, NULL);
     if(!h) {
       fprintf(stderr, "%s: Failed to create new hash type '%s'\n",
 	      program, type);
@@ -1448,7 +1454,7 @@ main(int argc, char *argv[])
   
   for(i=0; (type=test_hash_types[i]); i++) {
     fprintf(stdout, "%s: Trying to create new %s hash\n", program, type);
-    h=librdf_new_hash(type);
+    h=librdf_new_hash(world, type);
     if(!h) {
       fprintf(stderr, "%s: Failed to create new hash type '%s'\n", program, type);
       continue;
@@ -1511,7 +1517,7 @@ main(int argc, char *argv[])
     librdf_free_hash(h);
   }
   fprintf(stdout, "%s: Getting default hash factory\n", program);
-  h2=librdf_new_hash(NULL);
+  h2=librdf_new_hash(world, NULL);
   if(!h2) {
     fprintf(stderr, "%s: Failed to create new hash from default factory\n", program);
     return(1);
@@ -1537,7 +1543,7 @@ main(int argc, char *argv[])
     librdf_iterator* iterator;
     librdf_hash_datum *key_hd;
     
-    key_hd=librdf_new_hash_datum(NULL, 0);
+    key_hd=librdf_new_hash_datum(world, NULL, 0);
     
     iterator=librdf_hash_keys(h2, key_hd);
     while(librdf_iterator_have_elements(iterator)) {

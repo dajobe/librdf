@@ -34,7 +34,6 @@ typedef struct librdf_world_s librdf_world;
 typedef struct librdf_hash_s librdf_hash;
 typedef struct librdf_hash_cursor_s librdf_hash_cursor;
 typedef struct librdf_digest_s librdf_digest;
-typedef struct librdf_digest_factory_s librdf_digest_factory;
 typedef struct librdf_uri_s librdf_uri;
 typedef struct librdf_list_s librdf_list;
 typedef struct librdf_iterator_s librdf_iterator;

@@ -65,14 +65,15 @@ librdf_finish_model(librdf_world *world)
  * Return value: a new &librdf_model object or NULL on failure
  */
 librdf_model*
-librdf_new_model (librdf_storage *storage, char *options_string) {
+librdf_new_model (librdf_world *world,
+                  librdf_storage *storage, char *options_string) {
   librdf_hash* options_hash;
   librdf_model *model;
 
   if(!storage)
     return NULL;
   
-  options_hash=librdf_new_hash(NULL);
+  options_hash=librdf_new_hash(world, NULL);
   if(!options_hash)
     return NULL;
   
@@ -81,7 +82,7 @@ librdf_new_model (librdf_storage *storage, char *options_string) {
     return NULL;
   }
 
-  model=librdf_new_model_with_options(storage, options_hash);
+  model=librdf_new_model_with_options(world, storage, options_hash);
   librdf_free_hash(options_hash);
   return model;
 }
@@ -97,7 +98,8 @@ librdf_new_model (librdf_storage *storage, char *options_string) {
  * Return value: a new &librdf_model object or NULL on failure
  **/
 librdf_model*
-librdf_new_model_with_options(librdf_storage *storage, librdf_hash* options)
+librdf_new_model_with_options(librdf_world *world,
+                              librdf_storage *storage, librdf_hash* options)
 {
   librdf_model* model;
 
@@ -108,6 +110,8 @@ librdf_new_model_with_options(librdf_storage *storage, librdf_hash* options)
   if(!model)
     return NULL;
   
+  model->world=world;
+
   if(storage && librdf_storage_open(storage, model)) {
     LIBRDF_FREE(librdf_model, model);
     return NULL;
@@ -138,7 +142,7 @@ librdf_new_model_from_model(librdf_model* old_model)
   if(!new_storage)
     return NULL;
 
-  new_model=librdf_new_model_with_options(new_storage, NULL);
+  new_model=librdf_new_model_with_options(old_model->world, new_storage, NULL);
   if(!new_model)
     librdf_free_storage(new_storage);
 
@@ -236,7 +240,7 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
   librdf_statement *statement;
   int result;
   
-  statement=librdf_new_statement();
+  statement=librdf_new_statement(model->world);
   if(!statement)
     return 1;
 
@@ -278,7 +282,8 @@ librdf_model_add_string_literal_statement(librdf_model* model,
   librdf_node* object;
   int result;
   
-  object=librdf_new_node_from_literal(string, xml_language, xml_space, 
+  object=librdf_new_node_from_literal(model->world,
+                                      string, xml_language, xml_space, 
                                       is_wf_xml);
   if(!object)
     return 1;
@@ -493,7 +498,7 @@ librdf_model_add_submodel(librdf_model* model, librdf_model* sub_model)
   librdf_list *l=model->sub_models;
   
   if(!l) {
-    l=librdf_new_list();
+    l=librdf_new_list(model->world);
     if(!l)
       return 1;
     model->sub_models=l;
@@ -585,22 +590,23 @@ main(int argc, char *argv[])
   char *program=argv[0];
   
   /* initialise dependent modules - all of them! */
-  librdf_init_world(NULL, NULL);
+  librdf_world *world=librdf_new_world();
+  librdf_world_open(world);
   
   fprintf(stderr, "%s: Creating storage\n", program);
-  storage=librdf_new_storage(NULL, NULL, NULL);
+  storage=librdf_new_storage(world, NULL, NULL, NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
   }
   fprintf(stderr, "%s: Creating model\n", program);
-  model=librdf_new_model(storage, NULL);
+  model=librdf_new_model(world, storage, NULL);
 
-  statement=librdf_new_statement();
+  statement=librdf_new_statement(world);
   /* after this, nodes become owned by model */
-  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string("http://www.ilrt.bris.ac.uk/people/cmdjb/"));
-  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/#Creator"));
-  librdf_statement_set_object(statement, librdf_new_node_from_literal("Dave Beckett", NULL, 0, 0));
+  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, "http://www.ilrt.bris.ac.uk/people/cmdjb/"));
+  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/#Creator"));
+  librdf_statement_set_object(statement, librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0, 0));
 
   librdf_model_add_statement(model, statement);
   librdf_free_statement(statement);
@@ -614,7 +620,7 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Freeing storage\n", program);
   librdf_free_storage(storage);
 
-  librdf_destroy_world();
+  librdf_free_world(world);
   
 #ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);

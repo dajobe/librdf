@@ -115,7 +115,7 @@ librdf_parser_register_factory(librdf_world *world,
   if(uri_string) {
     librdf_uri *uri;
 
-    uri=librdf_new_uri(uri_string);
+    uri=librdf_new_uri(world, uri_string);
     if(!uri) {
       librdf_free_parser_factory(parser_factory);
       LIBRDF_FATAL1(librdf_parser_register_factory, "Out of memory\n");
@@ -199,17 +199,17 @@ librdf_get_parser_factory(librdf_world *world,
  * Return value: new &librdf_parser object or NULL
  **/
 librdf_parser*
-librdf_new_parser(const char *name, const char *mime_type,
+librdf_new_parser(librdf_world *world, 
+                  const char *name, const char *mime_type,
                   librdf_uri *type_uri)
 {
-  librdf_world *world=RDF_World;
   librdf_parser_factory* factory;
 
   factory=librdf_get_parser_factory(world, name, mime_type, type_uri);
   if(!factory)
     return NULL;
 
-  return librdf_new_parser_from_factory(factory);
+  return librdf_new_parser_from_factory(world, factory);
 }
 
 
@@ -220,7 +220,8 @@ librdf_new_parser(const char *name, const char *mime_type,
  * Return value: new &librdf_parser object or NULL
  **/
 librdf_parser*
-librdf_new_parser_from_factory(librdf_parser_factory *factory)
+librdf_new_parser_from_factory(librdf_world *world, 
+                               librdf_parser_factory *factory)
 {
   librdf_parser* d;
 
@@ -233,7 +234,9 @@ librdf_new_parser_from_factory(librdf_parser_factory *factory)
     librdf_free_parser(d);
     return NULL;
   }
-        
+
+  d->world=world;
+  
   d->factory=factory;
 
   if(factory->init)
@@ -490,14 +493,14 @@ main(int argc, char *argv[])
   char *program=argv[0];
   librdf_world *world;
 
-  RDF_World=world=librdf_new_world();
+  world=librdf_new_world();
   
   /* initialise parser module */
   librdf_init_parser(world);
   
   for(i=0; (type=test_parser_types[i]); i++) {
     fprintf(stderr, "%s: Trying to create new %s parser\n", program, type);
-    d=librdf_new_parser(type, NULL, NULL);
+    d=librdf_new_parser(world, type, NULL, NULL);
     if(!d) {
       fprintf(stderr, "%s: Failed to create new parser type %s\n", program, type);
       continue;

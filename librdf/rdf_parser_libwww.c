@@ -117,17 +117,20 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
   char *s;
 #endif
 #endif
-
-  statement=librdf_new_statement();
+  librdf_world *world=scontext->pcontext->parser->world;
+  
+  statement=librdf_new_statement(world);
   if(!statement)
     return;
   
-  node=librdf_new_node_from_normalised_uri_string(HTTriple_subject(t),
+  node=librdf_new_node_from_normalised_uri_string(world,
+                                                  HTTriple_subject(t),
                                                   scontext->source_uri,
                                                   scontext->base_uri);
   librdf_statement_set_subject(statement, node);
   
-  node=librdf_new_node_from_normalised_uri_string(HTTriple_predicate(t),
+  node=librdf_new_node_from_normalised_uri_string(world,
+                                                  HTTriple_predicate(t),
                                                   scontext->source_uri,
                                                   scontext->base_uri);
   librdf_statement_set_predicate(statement, node);
@@ -136,9 +139,10 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
   object=HTTriple_object(t);
   if(librdf_heuristic_object_is_literal(object))
     librdf_statement_set_object(statement,
-                                librdf_new_node_from_literal(object, NULL, 0, 0));
+                                librdf_new_node_from_literal(world, object, NULL, 0, 0));
   else {
-    node=librdf_new_node_from_normalised_uri_string(object,
+    node=librdf_new_node_from_normalised_uri_string(world,
+                                                    object,
                                                     scontext->source_uri,
                                                     scontext->base_uri);
     librdf_statement_set_object(statement, node);
@@ -394,6 +398,7 @@ librdf_parser_libwww_parse_common(void *context,
   HTAnchor *anchor;
   BOOL status = NO;
   librdf_stream *stream;
+  librdf_world *world=uri->world;
   
   scontext=(librdf_parser_libwww_stream_context*)LIBRDF_CALLOC(librdf_parser_libwww_stream_context, 1, sizeof(librdf_parser_libwww_stream_context));
   if(!scontext)
@@ -457,7 +462,8 @@ librdf_parser_libwww_parse_common(void *context,
     return (librdf_stream*)1;
   }
   
-  stream=librdf_new_stream((void*)scontext,
+  stream=librdf_new_stream(world,
+                           (void*)scontext,
                            &librdf_parser_libwww_serialise_end_of_stream,
                            &librdf_parser_libwww_serialise_next_statement,
                            &librdf_parser_libwww_serialise_finished);
@@ -486,8 +492,10 @@ librdf_parser_libwww_parse_common(void *context,
 static librdf_statement*
 librdf_parser_libwww_get_next_statement(librdf_parser_libwww_stream_context *context)
 {
+  librdf_world *world=context->pcontext->parser->world;
+
   if(!context->request_done) {
-    context->statements=librdf_new_list();
+    context->statements=librdf_new_list(world);
     if(!context->statements)
       return NULL;
     HTEventList_loop(context->request);

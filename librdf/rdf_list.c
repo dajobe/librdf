@@ -68,13 +68,15 @@ librdf_list_find_node(librdf_list* list, void *data)
  * Return value: a new &librdf_list or NULL on failure
  **/
 librdf_list*
-librdf_new_list(void)
+librdf_new_list(librdf_world *world)
 {
   librdf_list* new_list;
   
   new_list=(librdf_list*)LIBRDF_CALLOC(librdf_list, 1, sizeof(librdf_list));
   if(!new_list)
     return NULL;
+  
+  new_list->world=world;
   
   return new_list;
 }
@@ -372,7 +374,8 @@ librdf_list_get_iterator(librdf_list* list)
   /* Initialise walk */
   list->current=list->first;
   
-  return librdf_new_iterator((void*)list,
+  return librdf_new_iterator(list->world, 
+                             (void*)list,
                              librdf_list_iterator_have_elements,
                              librdf_list_iterator_get_next,
                              NULL);

@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+#ifdef LIBRDF_INTERNAL
 struct librdf_world_s
 {
   void *error_user_data;
@@ -56,6 +57,7 @@ struct librdf_world_s
    /* hash load_factor out of 1000 */
   int hash_load_factor;
 };
+#endif
 
 librdf_world* librdf_new_world(void);
 void librdf_free_world(librdf_world *world);

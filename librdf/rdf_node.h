@@ -66,8 +66,11 @@ typedef enum {
 } librdf_node_literal_xml_space;
 
 
+#ifdef LIBRDF_INTERNAL
+
 struct librdf_node_s
 {
+  librdf_world *world;
   librdf_node_type type;
   union 
   {
@@ -109,8 +112,6 @@ struct librdf_node_s
 };
 
 
-#ifdef LIBRDF_INTERNAL
-
 /* convienience macros - internal */
 #define LIBRDF_NODE_STATEMENT_SUBJECT(s)   ((s)->value.statement.subject)
 #define LIBRDF_NODE_STATEMENT_PREDICATE(s) ((s)->value.statement.predicate)
@@ -127,22 +128,22 @@ void librdf_finish_node(librdf_world* world);
 
 
 /* Create a new Node. */
-librdf_node* librdf_new_node(void);
+librdf_node* librdf_new_node(librdf_world* world);
 
 /* Create a new resource Node from URI string. */
-librdf_node* librdf_new_node_from_uri_string(const char *string);
+librdf_node* librdf_new_node_from_uri_string(librdf_world* world, const char *string);
 
 /* Create a new resource Node from URI object. */
-librdf_node* librdf_new_node_from_uri(librdf_uri *uri);
+librdf_node* librdf_new_node_from_uri(librdf_world* world, librdf_uri *uri);
 
 /* Create a new resource Node from URI object with a qname */
-librdf_node* librdf_new_node_from_uri_qname(librdf_uri *uri, const char *qname);
+librdf_node* librdf_new_node_from_uri_qname(librdf_world* world, librdf_uri *uri, const char *qname);
 
 /* Create a new resource Node from URI string renormalised to a new base */
-librdf_node* librdf_new_node_from_normalised_uri_string(const char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
+librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world, const char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
 
 /* Create a new Node from literal string / language. */
-librdf_node* librdf_new_node_from_literal(const char *string, const char *xml_language, int xml_space, int is_wf_xml);
+librdf_node* librdf_new_node_from_literal(librdf_world* world, const char *string, const char *xml_language, int xml_space, int is_wf_xml);
 
 /* Create a new Node from an existing Node - CLONE */
 librdf_node* librdf_new_node_from_node(librdf_node *node);

@@ -46,7 +46,7 @@ librdf_init_uri(librdf_world *world)
 {
   /* If no default given, create an in memory hash */
   if(!world->uris_hash) {
-    world->uris_hash=librdf_new_hash(NULL);
+    world->uris_hash=librdf_new_hash(world, NULL);
     if(!world->uris_hash)
       LIBRDF_FATAL1(librdf_init_uri, "Failed to create URI hash from factory");
     
@@ -83,9 +83,9 @@ librdf_finish_uri(librdf_world *world)
  * Return value: a new &librdf_uri object or NULL on failure
  **/
 librdf_uri*
-librdf_new_uri (const char *uri_string)
+librdf_new_uri (librdf_world *world, 
+                const char *uri_string)
 {
-  librdf_world *world=RDF_World;
   librdf_uri* new_uri;
   char *new_string;
   int length;
@@ -96,7 +96,7 @@ librdf_new_uri (const char *uri_string)
 
   key.data=(char*)uri_string;
   key.size=length;
-  
+
   /* if existing URI found in hash, return it */
   if((old_value=librdf_hash_get_one(world->uris_hash, &key))) {
     new_uri=*(librdf_uri**)old_value->data;
@@ -163,7 +163,7 @@ librdf_new_uri (const char *uri_string)
  **/
 librdf_uri*
 librdf_new_uri_from_uri (librdf_uri* old_uri) {
-  return librdf_new_uri (old_uri->string);
+  return librdf_new_uri (old_uri->world, old_uri->string);
 }
 
 
@@ -187,7 +187,7 @@ librdf_new_uri_from_uri_qname (librdf_uri* old_uri, const char *qname) {
   strcpy(new_string, old_uri->string);
   strcat(new_string, qname);
 
-  new_uri=librdf_new_uri (new_string);
+  new_uri=librdf_new_uri (old_uri->world, new_string);
   LIBRDF_FREE(cstring, new_string);
 
   return new_uri;
@@ -211,7 +211,8 @@ librdf_new_uri_normalised_to_base(const char *uri_string,
   int len;
   char *new_uri_string;
   librdf_uri *new_uri;
-  
+  librdf_world *world=source_uri->world;
+                                    
   /* no URI or empty URI - easy, just make from base_uri */
   if((!uri_string || !*uri_string) && base_uri)
     return librdf_new_uri_from_uri(base_uri);
@@ -219,7 +220,7 @@ librdf_new_uri_normalised_to_base(const char *uri_string,
   /* not a fragment, and no match - easy */
   if(*uri_string != '#' &&
      strncmp(uri_string, source_uri->string, source_uri->string_length))
-    return librdf_new_uri(uri_string);
+    return librdf_new_uri(world, uri_string);
 
   /* darn - is a fragment or matches, is a prefix of the source URI */
 
@@ -243,7 +244,7 @@ librdf_new_uri_normalised_to_base(const char *uri_string,
   /* strcpy not strncpy since I want a \0 on the end */
   strcpy(new_uri_string + base_uri->string_length, uri_string);
   
-  new_uri=librdf_new_uri(new_uri_string);
+  new_uri=librdf_new_uri(world, new_uri_string);
   LIBRDF_FREE(cstring, new_uri_string); /* always free this even on failure */
 
   return new_uri; /* new URI or NULL from librdf_new_uri failure */
@@ -269,7 +270,8 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
   int uri_string_length;
   char *new_uri_string;
   librdf_uri* new_uri;
-  
+  librdf_world *world=base_uri->world;
+                                  
   /* If URI string is empty, just copy base URI */
   if(!*uri_string)
     return librdf_new_uri_from_uri(base_uri);
@@ -294,7 +296,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
       return NULL;
     strncpy(new_uri_string, base_uri->string, (p-base_uri->string));
     strcpy(new_uri_string + (p-base_uri->string), uri_string);
-    new_uri=librdf_new_uri(new_uri_string);
+    new_uri=librdf_new_uri(world, new_uri_string);
     LIBRDF_FREE(cstring, new_uri_string);
     return new_uri;
   }
@@ -311,7 +313,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
    * FIXME - wrong, but good enough for a short while...
    */
   if(*p && *p == ':')
-    return librdf_new_uri(uri_string);
+    return librdf_new_uri(world, uri_string);
 
 
   /* Otherwise is a general URI relative to base URI */
@@ -330,7 +332,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
 
   strncpy(new_uri_string, base_uri->string, p-base_uri->string+1);
   strcpy(new_uri_string + (p-base_uri->string) + 1, uri_string);
-  new_uri=librdf_new_uri(new_uri_string);
+  new_uri=librdf_new_uri(world, new_uri_string);
   LIBRDF_FREE(cstring, new_uri_string);
   
   return new_uri;
@@ -402,10 +404,10 @@ librdf_uri_as_string (librdf_uri *uri)
 librdf_digest*
 librdf_uri_get_digest (librdf_uri* uri) 
 {
-  librdf_world *world=RDF_World;
+  librdf_world *world=uri->world;
   librdf_digest* d;
   
-  d=librdf_new_digest_from_factory(world->digest_factory);
+  d=librdf_new_digest_from_factory(world, world->digest_factory);
   if(!d)
     return NULL;
   
@@ -523,14 +525,14 @@ main(int argc, char *argv[])
   const char *relative_uri_string2="bar";
   librdf_world *world;
   
-  RDF_World=world=librdf_new_world();
+  world=librdf_new_world();
   
   librdf_init_digest(world);
   librdf_init_hash(world);
   librdf_init_uri(world);
 
   fprintf(stderr, "%s: Creating new URI from string\n", program);
-  uri1=librdf_new_uri(hp_string);
+  uri1=librdf_new_uri(world, hp_string);
   if(!uri1) {
     fprintf(stderr, "%s: Failed to create URI from string '%s'\n", program, 
 	    hp_string);
@@ -565,8 +567,8 @@ main(int argc, char *argv[])
   fputs("\n", stderr);
   librdf_free_digest(d);
 
-  uri3=librdf_new_uri("file:/big/long/directory/");
-  uri4=librdf_new_uri("http://somewhere/dir/");
+  uri3=librdf_new_uri(world, "file:/big/long/directory/");
+  uri4=librdf_new_uri(world, "http://somewhere/dir/");
   fprintf(stderr, "%s: Source URI is ", program);
   librdf_uri_print(uri3, stderr);
   fputs("\n", stderr);

@@ -106,27 +106,29 @@ librdf_parser_repat_statement_handler(void* user_data,
   librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
   librdf_statement* statement=NULL;
   librdf_node *subject=NULL, *predicate=NULL, *object=NULL;
-  
+  librdf_world *world=scontext->pcontext->parser->world;
+
   /* got all statement parts now */
-  statement=librdf_new_statement();
+  statement=librdf_new_statement(world);
   if(!statement)
     return;
 
   switch(subject_type)
   {
     case RDF_SUBJECT_TYPE_URI:
-      subject=librdf_new_node_from_normalised_uri_string(subject_string,
+      subject=librdf_new_node_from_normalised_uri_string(world,
+                                                         subject_string,
                                                          scontext->source_uri,
                                                          scontext->base_uri);
       break;
     case RDF_SUBJECT_TYPE_DISTRIBUTED:
-      subject=librdf_new_node_from_uri_string(subject_string);
+      subject=librdf_new_node_from_uri_string(world, subject_string);
       break;
     case RDF_SUBJECT_TYPE_PREFIX:
-      subject=librdf_new_node_from_uri_string(subject_string);
+      subject=librdf_new_node_from_uri_string(world, subject_string);
       break;
     case RDF_SUBJECT_TYPE_ANONYMOUS:
-      subject=librdf_new_node_from_uri_string(subject_string);
+      subject=librdf_new_node_from_uri_string(world, subject_string);
       break;
     default:
       LIBRDF_FATAL2(librdf_parser_repat_statement_handler, "Unknown subject type %d\n", subject_type);
@@ -139,7 +141,8 @@ librdf_parser_repat_statement_handler(void* user_data,
 
   
   if(!ordinal) {
-    predicate=librdf_new_node_from_normalised_uri_string(predicate_string,
+    predicate=librdf_new_node_from_normalised_uri_string(world, 
+                                                         predicate_string,
                                                          scontext->source_uri,
                                                          scontext->base_uri);
   } else {
@@ -155,7 +158,8 @@ librdf_parser_repat_statement_handler(void* user_data,
     ordinal_predicate_string=(char*)LIBRDF_MALLOC(cstring, len);
     if(predicate_string) {
       sprintf(ordinal_predicate_string, "%s%d", li_prefix, ordinal);
-      predicate=librdf_new_node_from_uri_string(ordinal_predicate_string);
+      predicate=librdf_new_node_from_uri_string(world, 
+                                                ordinal_predicate_string);
       LIBRDF_FREE(cstring, ordinal_predicate_string);
     }
   }
@@ -169,7 +173,8 @@ librdf_parser_repat_statement_handler(void* user_data,
   switch( object_type )
   {
     case RDF_OBJECT_TYPE_RESOURCE:
-      object=librdf_new_node_from_normalised_uri_string(object_string,
+      object=librdf_new_node_from_normalised_uri_string(world, 
+                                                        object_string,
                                                         scontext->source_uri,
                                                         scontext->base_uri);
       break;
@@ -177,14 +182,16 @@ librdf_parser_repat_statement_handler(void* user_data,
       if(scontext->literal) {
         LIBRDF_DEBUG2(librdf_parser_repat_end_element_handler,
                       "found literal text: '%s'\n", scontext->literal);
-        object=librdf_new_node_from_literal(scontext->literal, NULL, 0, 0);
+        object=librdf_new_node_from_literal(world, 
+                                            scontext->literal, NULL, 0, 0);
         LIBRDF_FREE(cstring, scontext->literal);
         scontext->literal=NULL;
         scontext->literal_length=0;
       } else {
         if(!object_string)
           object_string="";
-        object=librdf_new_node_from_literal(object_string, xml_lang, 0, 0);
+        object=librdf_new_node_from_literal(world, 
+                                            object_string, xml_lang, 0, 0);
       }
       break;
     case RDF_OBJECT_TYPE_XML:
@@ -235,6 +242,7 @@ librdf_parser_repat_end_parse_type_literal_handler( void* user_data )
 {
   librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
   librdf_statement* statement=scontext->saved_statement;
+  librdf_world *world=scontext->pcontext->parser->world;
 
   if(statement) {
     librdf_node* object;
@@ -246,7 +254,8 @@ librdf_parser_repat_end_parse_type_literal_handler( void* user_data )
      *   'URI-of-element-namespace '^' qname
      * i.e. the literal is NOT legal an XML document or XML fragment.
      */
-    object=librdf_new_node_from_literal(scontext->literal, NULL, 0, 1);
+    object=librdf_new_node_from_literal(world, 
+                                        scontext->literal, NULL, 0, 1);
     LIBRDF_FREE(cstring, scontext->literal);
     scontext->literal=NULL;
     scontext->literal_length=0;
@@ -465,6 +474,7 @@ librdf_parser_repat_parse_file_as_stream(void *context,
   librdf_parser_repat_stream_context* scontext;
   librdf_stream* stream;
   const char* filename;
+  librdf_world *world=pcontext->parser->world;
 
   scontext=(librdf_parser_repat_stream_context*)LIBRDF_CALLOC(librdf_parser_repat_stream_context, 1, sizeof(librdf_parser_repat_stream_context));
   if(!scontext)
@@ -472,7 +482,7 @@ librdf_parser_repat_parse_file_as_stream(void *context,
 
   scontext->pcontext=pcontext;
   
-  scontext->statements=librdf_new_list();
+  scontext->statements=librdf_new_list(world);
   if(!scontext->statements) {
     librdf_parser_repat_serialise_finished((void*)scontext);
     return NULL;
@@ -519,7 +529,8 @@ librdf_parser_repat_parse_file_as_stream(void *context,
   RDF_SetBase(scontext->repat, librdf_uri_as_string(base_uri));
 
 
-  stream=librdf_new_stream((void*)scontext,
+  stream=librdf_new_stream(world,
+                           (void*)scontext,
                            &librdf_parser_repat_serialise_end_of_stream,
                            &librdf_parser_repat_serialise_next_statement,
                            &librdf_parser_repat_serialise_finished);

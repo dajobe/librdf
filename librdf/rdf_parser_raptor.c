@@ -106,12 +106,14 @@ librdf_parser_rapier_new_statement_handler (void *context,
   char *s;
 #endif
 #endif
+  librdf_world* world=scontext->pcontext->parser->world;
 
-  statement=librdf_new_statement();
+  statement=librdf_new_statement(world);
   if(!statement)
     return;
   
-  node=librdf_new_node_from_normalised_uri_string(librdf_uri_as_string((librdf_uri*)rstatement->subject),
+  node=librdf_new_node_from_normalised_uri_string(world,
+                                                  librdf_uri_as_string((librdf_uri*)rstatement->subject),
                                                   scontext->source_uri,
                                                   scontext->base_uri);
   librdf_statement_set_subject(statement, node);
@@ -121,20 +123,23 @@ librdf_parser_rapier_new_statement_handler (void *context,
     int ordinal=*(int*)rstatement->predicate;
     sprintf(ordinal_buffer, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_%d", ordinal);
     
-    node=librdf_new_node_from_uri_string(ordinal_buffer);
+    node=librdf_new_node_from_uri_string(world, ordinal_buffer);
   } else
-    node=librdf_new_node_from_normalised_uri_string(librdf_uri_as_string((librdf_uri*)rstatement->predicate),
-                                                  scontext->source_uri,
-                                                  scontext->base_uri);
+    node=librdf_new_node_from_normalised_uri_string(world,
+                                                    librdf_uri_as_string((librdf_uri*)rstatement->predicate),
+                                                    scontext->source_uri,
+                                                    scontext->base_uri);
   librdf_statement_set_predicate(statement, node);
 
 
   if(rstatement->object_type == RAPIER_OBJECT_TYPE_LITERAL)
     librdf_statement_set_object(statement,
-                                librdf_new_node_from_literal(rstatement->object,
+                                librdf_new_node_from_literal(world,
+                                                             rstatement->object,
                                                              NULL, 0, 0));
   else {
-    node=librdf_new_node_from_normalised_uri_string(librdf_uri_as_string((librdf_uri*)rstatement->object),
+    node=librdf_new_node_from_normalised_uri_string(world,
+                                                    librdf_uri_as_string((librdf_uri*)rstatement->object),
                                                     scontext->source_uri,
                                                     scontext->base_uri);
     librdf_statement_set_object(statement, node);
@@ -227,12 +232,13 @@ librdf_parser_rapier_parse_common(void *context,
   librdf_stream *stream;
   rapier_parser *rdf_parser;
   int rc;
+  librdf_world *world=uri->world;
   
   scontext=(librdf_parser_rapier_stream_context*)LIBRDF_CALLOC(librdf_parser_rapier_stream_context, 1, sizeof(librdf_parser_rapier_stream_context));
   if(!scontext)
     return NULL;
 
-  rdf_parser=rapier_new();
+  rdf_parser=rapier_new(world);
   if(!rdf_parser)
     return NULL;
   
@@ -247,7 +253,8 @@ librdf_parser_rapier_parse_common(void *context,
 
   scontext->model=model;
 
-  stream=librdf_new_stream((void*)scontext,
+  stream=librdf_new_stream(world,
+                           (void*)scontext,
                            &librdf_parser_rapier_serialise_end_of_stream,
                            &librdf_parser_rapier_serialise_next_statement,
                            &librdf_parser_rapier_serialise_finished);

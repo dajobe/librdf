@@ -29,7 +29,10 @@
 extern "C" {
 #endif
 
+#ifdef LIBRDF_INTERNAL
+
 struct librdf_iterator_s {
+  librdf_world *world;
   void *context;
   int have_more_elements; /* 0 when have no more elements */
 
@@ -43,8 +46,9 @@ struct librdf_iterator_s {
   void* (*map)(void *context, void *element);
 };
 
+#endif
 
-librdf_iterator* librdf_new_iterator(void *context, int (*have_elements)(void*), void* (*get_next)(void*), void (*finished)(void*));
+librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*have_elements)(void*), void* (*get_next)(void*), void (*finished)(void*));
 
 void librdf_free_iterator(librdf_iterator*);
 

@@ -124,7 +124,7 @@ librdf_storage_register_factory(const char *name,
                                                  sizeof(librdf_storage_factory));
   if(!storage)
     LIBRDF_FATAL1(librdf_storage_register_factory, "Out of memory\n");
-  
+
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_storage, storage);
@@ -204,7 +204,8 @@ librdf_get_storage_factory (const char *name)
  * Return value: a new &librdf_storage object or NULL on failure
  */
 librdf_storage*
-librdf_new_storage (char *storage_name, char *name, 
+librdf_new_storage (librdf_world *world, 
+                    char *storage_name, char *name, 
                     char *options_string) {
   librdf_storage_factory* factory;
   librdf_hash* options_hash;
@@ -213,7 +214,7 @@ librdf_new_storage (char *storage_name, char *name,
   if(!factory)
     return NULL;
 
-  options_hash=librdf_new_hash(NULL);
+  options_hash=librdf_new_hash(world, NULL);
   if(!options_hash)
     return NULL;
 
@@ -227,7 +228,7 @@ librdf_new_storage (char *storage_name, char *name,
     return NULL;
   }
 
-  return librdf_new_storage_from_factory(factory, name, options_hash);
+  return librdf_new_storage_from_factory(world, factory, name, options_hash);
 }
 
 
@@ -267,6 +268,8 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
     return NULL;
   }
 
+  new_storage->world=old_storage->world;
+
   /* do this now so librdf_free_storage won't call new factory on
    * partially copied storage 
    */
@@ -297,7 +300,8 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
  * Return value: a new &librdf_storage object or NULL on failure
  */
 librdf_storage*
-librdf_new_storage_from_factory (librdf_storage_factory* factory,
+librdf_new_storage_from_factory (librdf_world *world,
+                                 librdf_storage_factory* factory,
                                  char *name,
                                  librdf_hash* options) {
   librdf_storage* storage;
@@ -315,6 +319,8 @@ librdf_new_storage_from_factory (librdf_storage_factory* factory,
     return NULL;
   }
   
+
+  storage->world=world;
   
   storage->context=(char*)LIBRDF_CALLOC(librdf_storage_context, 1,
                                         factory->context_length);
@@ -622,7 +628,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   librdf_storage_stream_to_node_iterator_context* context;
   librdf_iterator *iterator;
   
-  partial_statement=librdf_new_statement();
+  partial_statement=librdf_new_statement(storage->world);
   if(!partial_statement)
     return NULL;
   
@@ -661,7 +667,8 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   context->stream=stream;
   context->want=want;
   
-  iterator=librdf_new_iterator((void*)context,
+  iterator=librdf_new_iterator(storage->world,
+                               (void*)context,
                                librdf_storage_stream_to_node_iterator_have_elements,
                                librdf_storage_stream_to_node_iterator_get_next,
                                librdf_storage_stream_to_node_iterator_finished);
@@ -756,7 +763,7 @@ main(int argc, char *argv[])
   char *program=argv[0];
   librdf_world *world;
   
-  RDF_World=world=librdf_new_world();
+  world=librdf_new_world();
   
   /* initialise hash, model and storage modules */
   librdf_init_hash(world);
@@ -764,7 +771,7 @@ main(int argc, char *argv[])
   librdf_init_model(world);
   
   fprintf(stdout, "%s: Creating storage\n", program);
-  storage=librdf_new_storage(NULL, "test", NULL);
+  storage=librdf_new_storage(world, NULL, "test", NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);

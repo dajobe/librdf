@@ -28,10 +28,12 @@
 extern "C" {
 #endif
 
+#ifdef LIBRDF_INTERNAL
 
 /** data type used to describe hash key and data */
 struct librdf_hash_datum_s
 {
+  librdf_world *world;
   void *data;
   size_t size;
   /* used internally to build lists of these  */
@@ -40,7 +42,7 @@ struct librdf_hash_datum_s
 typedef struct librdf_hash_datum_s librdf_hash_datum;
 
 /* constructor / destructor for above */
-librdf_hash_datum* librdf_new_hash_datum(void *data, size_t size);
+librdf_hash_datum* librdf_new_hash_datum(librdf_world *world, void *data, size_t size);
 void librdf_free_hash_datum(librdf_hash_datum *ptr);
   
 
@@ -48,6 +50,7 @@ void librdf_free_hash_datum(librdf_hash_datum *ptr);
 /** A hash object */
 struct librdf_hash_s
 {
+  librdf_world* world;
   char* identifier; /* as passed in during open(), used by clone() */
   void* context;
   int   is_open;
@@ -96,16 +99,18 @@ struct librdf_hash_factory_s {
 
   /* create a cursor and operate on it */
   int (*cursor_init)(void *cursor_context, void* hash_context);
+  int (*cursor_get)(void *cursor, librdf_hash_datum *key, librdf_hash_datum *value, unsigned int flags);
+  void (*cursor_finish)(void *context);
+};
+typedef struct librdf_hash_factory_s librdf_hash_factory;
+
+#endif
+
+/* hash cursor_get method flags */
 #define LIBRDF_HASH_CURSOR_SET 0
 #define LIBRDF_HASH_CURSOR_NEXT_VALUE 1
 #define LIBRDF_HASH_CURSOR_FIRST 2
 #define LIBRDF_HASH_CURSOR_NEXT 3
-  int (*cursor_get)(void *cursor, librdf_hash_datum *key, librdf_hash_datum *value, unsigned int flags);
-  void (*cursor_finish)(void *context);
-};
-
-typedef struct librdf_hash_factory_s librdf_hash_factory;
-
 
 
 /* factory class methods */
@@ -120,8 +125,8 @@ void librdf_init_hash(librdf_world *world);
 void librdf_finish_hash(librdf_world *world);
 
 /* constructors */
-librdf_hash* librdf_new_hash(char *name);
-librdf_hash* librdf_new_hash_from_factory(librdf_hash_factory* factory);
+librdf_hash* librdf_new_hash(librdf_world *world, char *name);
+librdf_hash* librdf_new_hash_from_factory(librdf_world *world, librdf_hash_factory* factory);
 librdf_hash* librdf_new_hash_from_hash (librdf_hash* old_hash);
 
 /* destructor */

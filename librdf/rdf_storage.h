@@ -28,10 +28,12 @@
 extern "C" {
 #endif
 
+#ifdef LIBRDF_INTERNAL
 
 /** A storage object */
 struct librdf_storage_s
 {
+  librdf_world *world;
   librdf_model *model;
   void *context;
   struct librdf_storage_factory_s* factory;
@@ -40,6 +42,7 @@ struct librdf_storage_s
 
 /** A Storage Factory */
 struct librdf_storage_factory_s {
+  librdf_world *world;
   struct librdf_storage_factory_s* next;
   char* name;
   
@@ -99,6 +102,7 @@ struct librdf_storage_factory_s {
 
 typedef struct librdf_storage_factory_s librdf_storage_factory;
 
+#endif
 
 
 /* module init */
@@ -112,9 +116,9 @@ void librdf_storage_register_factory(const char *name, void (*factory) (librdf_s
 librdf_storage_factory* librdf_get_storage_factory(const char *name);
 
 /* constructor */
-librdf_storage* librdf_new_storage(char *storage_name, char *name, char *options_string);
+librdf_storage* librdf_new_storage(librdf_world *world, char *storage_name, char *name, char *options_string);
 librdf_storage* librdf_new_storage_from_storage (librdf_storage* old_storage);
-librdf_storage* librdf_new_storage_from_factory(librdf_storage_factory* factory, char *name, librdf_hash* options);
+librdf_storage* librdf_new_storage_from_factory(librdf_world *world, librdf_storage_factory* factory, char *name, librdf_hash* options);
 
 /* destructor */
 void librdf_free_storage(librdf_storage *storage);

@@ -145,16 +145,15 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
  * Return value: new &librdf_digest object or NULL
  **/
 librdf_digest*
-librdf_new_digest(char *name)
+librdf_new_digest(librdf_world *world, char *name)
 {
-  librdf_world *world=RDF_World;
   librdf_digest_factory* factory;
   
   factory=librdf_get_digest_factory(world, name);
   if(!factory)
     return NULL;
   
-  return librdf_new_digest_from_factory(factory);
+  return librdf_new_digest_from_factory(world, factory);
 }
 
 
@@ -165,7 +164,8 @@ librdf_new_digest(char *name)
  * Return value: new &librdf_digest object or NULL
  **/
 librdf_digest*
-librdf_new_digest_from_factory(librdf_digest_factory *factory)
+librdf_new_digest_from_factory(librdf_world *world,
+                               librdf_digest_factory *factory)
 {
   librdf_digest* d;
 
@@ -381,7 +381,7 @@ main(int argc, char *argv[])
   char *program=argv[0];
   librdf_world *world;
   
-  RDF_World=world=librdf_new_world();
+  world=librdf_new_world();
   
   /* initialise digest module */
   librdf_init_digest(world);
@@ -391,7 +391,7 @@ main(int argc, char *argv[])
     
     fprintf(stdout, "%s: Trying to create new %s digest\n", program, 
             answer->type);
-    d=librdf_new_digest(answer->type);
+    d=librdf_new_digest(world, answer->type);
     if(!d) {
       fprintf(stderr, "%s: Failed to create new digest type %s\n", program, 
               answer->type);

@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+#ifdef LIBRDF_INTERNAL
 
 struct librdf_stream_s {
   void *context;
@@ -44,11 +45,11 @@ struct librdf_stream_s {
   librdf_statement* (*map)(void *context, librdf_statement* statement);
 };
 
-
+#endif
 
 /* constructor */
 
-librdf_stream* librdf_new_stream(void* context, int (*end_of_stream)(void*), librdf_statement* (*next_statement)(void*), void (*finished)(void*));
+librdf_stream* librdf_new_stream(librdf_world *world, void* context, int (*end_of_stream)(void*), librdf_statement* (*next_statement)(void*), void (*finished)(void*));
 
 /* destructor */
 

@@ -63,9 +63,9 @@ librdf_finish_node(librdf_world *world)
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node(void)
+librdf_new_node(librdf_world *world)
 {
-  return librdf_new_node_from_uri_string((char*)NULL);
+  return librdf_new_node_from_uri_string(world, (char*)NULL);
 }
 
     
@@ -79,7 +79,7 @@ librdf_new_node(void)
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_uri_string(const char *uri_string) 
+librdf_new_node_from_uri_string(librdf_world *world, const char *uri_string) 
 {
   librdf_node* new_node;
   librdf_uri *new_uri;
@@ -89,6 +89,8 @@ librdf_new_node_from_uri_string(const char *uri_string)
   if(!new_node)
     return NULL;
   
+  new_node->world=world;
+
   new_node->type = LIBRDF_NODE_TYPE_RESOURCE;
   /* not needed thanks to calloc */
   /* new_node->value.resource.uri = NULL; */
@@ -97,7 +99,7 @@ librdf_new_node_from_uri_string(const char *uri_string)
   if(!uri_string)
     return new_node;
   
-  new_uri=librdf_new_uri(uri_string);
+  new_uri=librdf_new_uri(world, uri_string);
   if (!new_uri) {
     librdf_free_node(new_node);
     return NULL;
@@ -122,12 +124,12 @@ librdf_new_node_from_uri_string(const char *uri_string)
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_uri(librdf_uri *uri) 
+librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri) 
 {
   /* note: librdf_uri_as_string does not allocate string ... */
   char *uri_string=librdf_uri_as_string(uri); 
   
-  librdf_node* new_node=librdf_new_node_from_uri_string(uri_string);
+  librdf_node* new_node=librdf_new_node_from_uri_string(world, uri_string);
   
   /* ... thus no need for LIBRDF_FREE(uri_string); */
   return new_node;
@@ -142,7 +144,8 @@ librdf_new_node_from_uri(librdf_uri *uri)
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_uri_qname(librdf_uri *uri, const char *qname) 
+librdf_new_node_from_uri_qname(librdf_world *world, 
+                               librdf_uri *uri, const char *qname) 
 {
   librdf_node* new_node;
   librdf_uri *new_uri;
@@ -151,6 +154,8 @@ librdf_new_node_from_uri_qname(librdf_uri *uri, const char *qname)
                                          sizeof(librdf_node));
   if(!new_node)
     return NULL;
+
+  new_node->world=world;
   
   new_node->type = LIBRDF_NODE_TYPE_RESOURCE;
   /* not needed thanks to calloc */
@@ -180,7 +185,8 @@ librdf_new_node_from_uri_qname(librdf_uri *uri, const char *qname)
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_normalised_uri_string(const char *uri_string,
+librdf_new_node_from_normalised_uri_string(librdf_world *world, 
+                                           const char *uri_string,
                                            librdf_uri *source_uri,
                                            librdf_uri *base_uri)
 {
@@ -191,7 +197,7 @@ librdf_new_node_from_normalised_uri_string(const char *uri_string,
   if(!new_uri)
     return NULL;
 
-  new_node=librdf_new_node_from_uri_string(librdf_uri_as_string(new_uri));
+  new_node=librdf_new_node_from_uri_string(world, librdf_uri_as_string(new_uri));
   librdf_free_uri(new_uri);
   
   return new_node;
@@ -208,7 +214,8 @@ librdf_new_node_from_normalised_uri_string(const char *uri_string,
  * Return value: new &librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_literal(const char *string, const char *xml_language, 
+librdf_new_node_from_literal(librdf_world *world, 
+                             const char *string, const char *xml_language, 
                              int xml_space, int is_wf_xml) 
 {
   librdf_node* new_node;
@@ -217,6 +224,8 @@ librdf_new_node_from_literal(const char *string, const char *xml_language,
                                          sizeof(librdf_node));
   if(!new_node)
     return NULL;
+
+  new_node->world=world;
   
   /* set type */
   new_node->type=LIBRDF_NODE_TYPE_LITERAL;
@@ -250,6 +259,8 @@ librdf_new_node_from_node(librdf_node *node)
                                          sizeof(librdf_node));
   if(!new_node)
     return NULL;
+
+  new_node->world=node->world;
   
   new_node->type=node->type;
 
@@ -686,9 +697,9 @@ librdf_node_print(librdf_node* node, FILE *fh)
 librdf_digest*
 librdf_node_get_digest(librdf_node* node) 
 {
-  librdf_world* world=RDF_World;
   librdf_digest* d=NULL;
   char *s;
+  librdf_world* world=node->world;
   
   switch(node->type) {
     case LIBRDF_NODE_TYPE_RESOURCE:
@@ -697,7 +708,7 @@ librdf_node_get_digest(librdf_node* node)
       
     case LIBRDF_NODE_TYPE_LITERAL:
       s=node->value.literal.string;
-      d=librdf_new_digest_from_factory(world->digest_factory);
+      d=librdf_new_digest_from_factory(world, world->digest_factory);
       if(!d)
         return NULL;
       
@@ -869,7 +880,7 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
       
       /* Now initialise fields */
       node->type = LIBRDF_NODE_TYPE_RESOURCE;
-      new_uri=librdf_new_uri(buffer+3);
+      new_uri=librdf_new_uri(node->world, buffer+3);
       if (!new_uri)
         return 0;
       
@@ -934,7 +945,7 @@ main(int argc, char *argv[])
   
   char *program=argv[0];
 	
-  RDF_World=world=librdf_new_world();
+  world=librdf_new_world();
 
   librdf_init_digest(world);
   librdf_init_hash(world);
@@ -942,7 +953,7 @@ main(int argc, char *argv[])
   librdf_init_node(world);
 
   fprintf(stdout, "%s: Creating home page node from string\n", program);
-  node=librdf_new_node_from_uri_string(hp_string1);
+  node=librdf_new_node_from_uri_string(world, hp_string1);
   
   fprintf(stdout, "%s: Home page URI is ", program);
   librdf_uri_print(librdf_node_get_uri(node), stdout);
@@ -950,7 +961,7 @@ main(int argc, char *argv[])
   
   fprintf(stdout, "%s: Creating URI from string '%s'\n", program, 
           hp_string2);
-  uri=librdf_new_uri(hp_string2);
+  uri=librdf_new_uri(world, hp_string2);
   fprintf(stdout, "%s: Setting node URI to new URI ", program);
   librdf_uri_print(uri, stdout);
   fputs("\n", stdout);
@@ -981,7 +992,7 @@ main(int argc, char *argv[])
   
     
   fprintf(stdout, "%s: Creating new node\n", program);
-  node2=librdf_new_node();
+  node2=librdf_new_node(world);
 
   fprintf(stdout, "%s: Decoding node from buffer\n", program);
   if(!librdf_node_decode(node2, buffer, size)) {
@@ -996,7 +1007,7 @@ main(int argc, char *argv[])
  
   
   fprintf(stdout, "%s: Creating new literal string node\n", program);
-  node3=librdf_new_node_from_literal(lit_string, NULL, 0, 0);
+  node3=librdf_new_node_from_literal(world, lit_string, NULL, 0, 0);
   buffer=librdf_node_get_literal_value_as_latin1(node3);
   if(!buffer) {
     fprintf(stderr, "%s: Failed to get literal string value as Latin-1\n", program);

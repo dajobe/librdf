@@ -93,7 +93,7 @@ librdf_storage_list_open(librdf_storage* storage, librdf_model* model)
 {
   librdf_storage_list_context *context=(librdf_storage_list_context*)storage->context;
 
-  context->list=librdf_new_list();
+  context->list=librdf_new_list(storage->world);
   if(!context->list)
     return 1;
 
@@ -219,7 +219,8 @@ librdf_storage_list_serialise(librdf_storage* storage)
   }
     
   
-  stream=librdf_new_stream((void*)iterator,
+  stream=librdf_new_stream(storage->world,
+                           (void*)iterator,
                            &librdf_storage_list_serialise_end_of_stream,
                            &librdf_storage_list_serialise_next_statement,
                            &librdf_storage_list_serialise_finished);

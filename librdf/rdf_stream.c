@@ -55,7 +55,8 @@ static librdf_statement* librdf_stream_get_next_mapped_statement(librdf_stream* 
  * Return value:  a new &librdf_stream object or NULL on failure
  **/
 librdf_stream*
-librdf_new_stream(void* context,
+librdf_new_stream(librdf_world *world, 
+                  void* context,
 		  int (*end_of_stream)(void*),
 		  librdf_statement* (*next_statement)(void*),
 		  void (*finished)(void*))
@@ -263,7 +264,8 @@ librdf_new_stream_from_node_iterator(librdf_iterator* iterator,
   scontext->statement=statement;
   scontext->field=field;
   
-  stream=librdf_new_stream((void*)scontext,
+  stream=librdf_new_stream(iterator->world,
+                           (void*)scontext,
                            &librdf_stream_from_node_iterator_end_of_stream,
                            &librdf_stream_from_node_iterator_next_statement,
                            &librdf_stream_from_node_iterator_finished);

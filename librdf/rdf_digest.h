@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 
-typedef void* LIBRDF_DIGEST;
+#ifdef LIBRDF_INTERNAL
 
 /* based on the GNUPG cipher/digest registration stuff */
 struct librdf_digest_factory_s 
@@ -49,6 +49,7 @@ struct librdf_digest_factory_s
   void (*final)( void *c );
   unsigned char *(*get_digest)( void *c );
 };
+typedef struct librdf_digest_factory_s librdf_digest_factory;
 
 
 struct librdf_digest_s {
@@ -56,6 +57,8 @@ struct librdf_digest_s {
   unsigned char *digest;
   librdf_digest_factory* factory;
 };
+
+#endif
 
 
 /* factory static methods */
@@ -70,8 +73,8 @@ void librdf_init_digest(librdf_world *world);
 void librdf_finish_digest(librdf_world *world);
                     
 /* constructor */
-librdf_digest* librdf_new_digest(char *name);
-librdf_digest* librdf_new_digest_from_factory(librdf_digest_factory *factory);
+librdf_digest* librdf_new_digest(librdf_world *world, char *name);
+librdf_digest* librdf_new_digest_from_factory(librdf_world *world, librdf_digest_factory *factory);
 
 /* destructor */
 void librdf_free_digest(librdf_digest *digest);

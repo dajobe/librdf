@@ -56,9 +56,9 @@ librdf_finish_statement(librdf_world *world)
  * Return value: a new &librdf_statement or NULL on failure
  **/
 librdf_statement*
-librdf_new_statement(void) 
+librdf_new_statement(librdf_world *world) 
 {
-  librdf_statement* new_statement=librdf_new_node();
+  librdf_statement* new_statement=librdf_new_node(world);
   if(!new_statement)
     return NULL;
 
@@ -82,7 +82,7 @@ librdf_new_statement_from_statement(librdf_statement* statement)
   if(!statement)
     return NULL;
   
-  new_statement = librdf_new_statement();
+  new_statement = librdf_new_statement(statement->world);
   if(!new_statement)
     return NULL;
 
@@ -123,13 +123,14 @@ librdf_new_statement_from_statement(librdf_statement* statement)
  * Return value: a new &librdf_statement with copy or NULL on failure
  **/
 librdf_statement*
-librdf_new_statement_from_nodes(librdf_node* subject,
+librdf_new_statement_from_nodes(librdf_world *world, 
+                                librdf_node* subject,
                                 librdf_node* predicate,
                                 librdf_node* object)
 {
   librdf_statement* new_statement;
 
-  new_statement = librdf_new_statement();
+  new_statement = librdf_new_statement(world);
   if(!new_statement) {
     if(subject)
       librdf_free_node(subject);
@@ -597,7 +598,7 @@ librdf_statement_decode(librdf_statement* statement,
     if(!length)
       return 0;
     
-    node=librdf_new_node();
+    node=librdf_new_node(statement->world);
     if(!node)
       return 0;
     
@@ -653,7 +654,7 @@ main(int argc, char *argv[])
   char *s, *buffer;
   librdf_world *world;
   
-  RDF_World=world=librdf_new_world();
+  world=librdf_new_world();
   
   /* initialise dependent modules */
   librdf_init_digest(world);
@@ -662,15 +663,15 @@ main(int argc, char *argv[])
   librdf_init_statement(world);
 
   fprintf(stderr, "%s: Creating statement\n", program);
-  statement=librdf_new_statement();
+  statement=librdf_new_statement(world);
 
   s=librdf_statement_to_string(statement);
   fprintf(stderr, "%s: Empty statement: %s\n", program, s);
   LIBRDF_FREE(cstring, s);
 
-  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string("http://www.ilrt.bris.ac.uk/people/cmdjb/"));
-  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/#Creator"));
-  librdf_statement_set_object(statement, librdf_new_node_from_literal("Dave Beckett", NULL, 0, 0));
+  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, "http://www.ilrt.bris.ac.uk/people/cmdjb/"));
+  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/#Creator"));
+  librdf_statement_set_object(statement, librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0, 0));
 
   s=librdf_statement_to_string(statement);
   fprintf(stderr, "%s: Resulting statement: %s\n", program, s);
@@ -689,7 +690,7 @@ main(int argc, char *argv[])
   
     
   fprintf(stdout, "%s: Creating new statement\n", program);
-  statement2=librdf_new_statement();
+  statement2=librdf_new_statement(world);
 
   fprintf(stdout, "%s: Decoding statement from buffer\n", program);
   if(!librdf_statement_decode(statement2, buffer, size)) {

@@ -31,8 +31,11 @@
 extern "C" {
 #endif
 
+#ifdef LIBRDF_INTERNAL
 
 struct librdf_model_s {
+  librdf_world *world;
+  
   /* these two are alternatives (probably should be a union) */
 
   /* 1. model is stored here */
@@ -42,7 +45,7 @@ struct librdf_model_s {
   librdf_list*     sub_models;
 };
 
-
+#endif
 
 /* class methods */
 void librdf_init_model(librdf_world *world);
@@ -52,8 +55,8 @@ void librdf_finish_model(librdf_world *world);
 /* constructors */
 
 /* Create a new Model */
-librdf_model* librdf_new_model(librdf_storage *storage, char* options_string);
-librdf_model* librdf_new_model_with_options(librdf_storage *storage, librdf_hash* options);
+librdf_model* librdf_new_model(librdf_world *world, librdf_storage *storage, char* options_string);
+librdf_model* librdf_new_model_with_options(librdf_world *world, librdf_storage *storage, librdf_hash* options);
 
 /* Create a new Model from an existing Model - CLONE */
 librdf_model* librdf_new_model_from_model(librdf_model* model);

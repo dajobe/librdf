@@ -32,6 +32,8 @@ extern "C" {
 #endif
 
 
+#ifdef LIBRDF_INTERNAL
+
 struct librdf_uri_s
 {
   librdf_world *world;
@@ -43,13 +45,14 @@ struct librdf_uri_s
 #endif
 };
 
+#endif
 
 /* class methods */
 void librdf_init_uri(librdf_world *world);
 void librdf_finish_uri(librdf_world *world);
 
 /* constructors */
-librdf_uri* librdf_new_uri (const char *string);
+librdf_uri* librdf_new_uri (librdf_world *world, const char *string);
 /* Create a new URI from an existing URI - CLONE */
 librdf_uri* librdf_new_uri_from_uri (librdf_uri* uri);
 /* Create a new URI from an existing URI and qname */

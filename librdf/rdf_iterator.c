@@ -43,7 +43,8 @@ static void* librdf_iterator_get_next_mapped_element(librdf_iterator* iterator);
  * Return value: a new &librdf_iterator object or NULL on failure
 **/
 librdf_iterator*
-librdf_new_iterator(void* context,
+librdf_new_iterator(librdf_world *world,
+                    void* context,
 		    int (*have_elements)(void*),
 		    void* (*get_next)(void*),
 		    void (*finished)(void*))
@@ -55,6 +56,8 @@ librdf_new_iterator(void* context,
   if(!new_iterator)
     return NULL;
   
+  new_iterator->world=world;
+
   new_iterator->context=context;
   
   new_iterator->have_elements=have_elements;
