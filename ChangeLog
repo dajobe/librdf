@@ -1,5 +1,7 @@
 2004-08-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* Snapshotted redland_0_9_17 for 0.9.17 release
+
 	* librdf/rdf_init.c (librdf_free_world): Destroy nodes, statements
 	mutexes. 
 	(librdf_world_init_mutex): Init nodes, statements mutexes.
