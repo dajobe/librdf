@@ -308,7 +308,7 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(h, "help            ", "Print this help, then exit"));
     puts(HELP_TEXT(n, "new             ", "Create a new store (default no)"));
     printf(HELP_TEXT(s, "storage TYPE    ", "Storage type (default \"%s\")\n"), storage_name);
-    printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Set storage options (default \"%s\")\n"), storage_options);
+    printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Storage options (default \"%s\")\n"), storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
     puts("  parse FILE|URI [SYNTAX [BASE URI]]        Parse syntax in FILE or URI");
