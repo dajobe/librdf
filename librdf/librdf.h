@@ -66,6 +66,17 @@ typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 #define LIBRDF_ERROR1(world, function, msg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function); abort();} while(0)
 #define LIBRDF_ERROR2(world, function, msg,arg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg); abort();} while(0)
 
+#if defined(HAVE_DMALLOC_H) && defined(LIBRDF_MEMORY_DEBUG_DMALLOC)
+void* librdf_system_malloc(size_t size);
+void librdf_system_free(void *ptr);
+#define SYSTEM_MALLOC(size)   librdf_system_malloc(size)
+#define SYSTEM_FREE(ptr)   librdf_system_free(ptr)
+#else
+#define SYSTEM_MALLOC(size)   malloc(size)
+#define SYSTEM_FREE(ptr)   free(ptr)
+#endif
+
+
 #else
 /* DEBUGGING TURNED OFF */
 
@@ -77,6 +88,9 @@ typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 
 #define LIBRDF_ERROR1(world, function, msg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function)
 #define LIBRDF_ERROR2(world, function, msg, arg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg)
+
+#define SYSTEM_MALLOC(size)   malloc(size)
+#define SYSTEM_FREE(ptr)   free(ptr)
 
 #endif
 
