@@ -903,6 +903,8 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   librdf_stream* stream;
   int status;
   char *errmsg=NULL;
+  raptor_stringbuffer *sb;
+  char *request;
   
   scontext=(librdf_storage_sqlite_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_sqlite_serialise_stream_context, 1, sizeof(librdf_storage_sqlite_serialise_stream_context));
   if(!scontext)
@@ -911,9 +913,42 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   scontext->index_contexts=context->index_contexts;
   scontext->sqlite_context=context;
 
-  char request[200];
-  sprintf(request,
-          "SELECT subject, subjectType, predicate, object, objectType, context FROM triples;");
+  sb=raptor_new_stringbuffer();
+
+  raptor_stringbuffer_append_counted_string(sb, "SELECT\n", 7, 1);
+
+  /* If this order is changed MUST CHANGE order in 
+   * librdf_storage_sqlite_get_next_common 
+   */
+  raptor_stringbuffer_append_string(sb, 
+"  SubjectURIs.uri     AS SubjectURI,\n\
+  SubjectBlanks.blank AS SubjectBlank,\n\
+  PredicateURIs.uri   AS PredicateURI,\n\
+  ObjectURIs.uri      AS ObjectURI,\n\
+  ObjectBlanks.blank  AS ObjectBlank,\n\
+  ObjectLiterals.text AS ObjectLiteralText,\n\
+  ObjectLiterals.language AS ObjectLiteralLanguage,\n\
+  ObjectLiterals.datatype AS ObjectLiteralDatatype,\n\
+  ObjectDatatypeURIs.uri  AS ObjectLiteralDatatypeUri,\n\
+  ContextURIs.uri         AS ContextUri\n",
+                                    1);
+  
+  raptor_stringbuffer_append_counted_string(sb, "FROM triples\n", 13, 1);
+  
+  raptor_stringbuffer_append_string(sb, 
+"  LEFT JOIN uris     AS SubjectURIs    ON SubjectURIs.id    = SubjectUri\n\
+  LEFT JOIN blanks   AS SubjectBlanks  ON SubjectBlanks.id  = SubjectBlank\n\
+  LEFT JOIN uris     AS PredicateURIs  ON PredicateURIs.id  = PredicateUri\n\
+  LEFT JOIN uris     AS ObjectURIs     ON ObjectURIs.id     = ObjectUri\n\
+  LEFT JOIN blanks   AS ObjectBlanks   ON ObjectBlanks.id   = ObjectBlank\n\
+  LEFT JOIN literals AS ObjectLiterals ON ObjectLiterals.id = ObjectLiteral\n\
+  LEFT JOIN uris     AS ObjectDatatypeURIs ON ObjectDatatypeURIs.id = ObjectLiteralDatatype\n\
+  LEFT JOIN uris     AS ContextURIs    ON ContextURIs.id     = ContextUri\n",
+                                    1);
+
+  raptor_stringbuffer_append_counted_string(sb, ";", 1, 1);
+
+  request=raptor_stringbuffer_as_string(sb);
 
 #ifdef HAVE_SQLITE3_H
   status=sqlite3_prepare(context->db,
@@ -935,9 +970,11 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
                context->name, errmsg, status);
 
     librdf_storage_sqlite_serialise_finished((void*)scontext);
+    raptor_free_stringbuffer(sb);
     return NULL;
   }
     
+  raptor_free_stringbuffer(sb);
   
   scontext->storage=storage;
   librdf_storage_add_reference(scontext->storage);
@@ -960,11 +997,15 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 #ifdef HAVE_SQLITE3_H
 static int
 librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
-                                      sqlite3_stmt *vm) {
+                                      sqlite3_stmt *vm,
+                                      librdf_statement **statement,
+                                      librdf_node **context_node) {
 #else
 static int
 librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
-                                      sqlite_vm *vm) {
+                                      sqlite_vm *vm,
+                                      librdf_statement **statement,
+                                      librdf_node **context_node) {
 #endif
   int status=SQLITE_BUSY;
 #ifdef HAVE_SQLITE3_H
@@ -996,7 +1037,92 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
   } while(1);
 
   if(status == SQLITE_ROW) {
-    /* FIXME - turn row data into scontext->statement, scontext->context */
+    /* FIXME - turn row data into statement, scontext->context */
+    int i;
+    librdf_node* node;
+    const unsigned char *uri_string, *blank;
+    
+/*
+ * MUST MATCH fields order in query in librdf_storage_sqlite_serialise
+ *
+ i  field name (all TEXT unless given)
+ 0  SubjectURI
+ 1  SubjectBlank
+ 2  PredicateURI
+ 3  ObjectURI
+ 4  ObjectBlank
+ 5  ObjectLiteralText
+ 6  ObjectLiteralLanguage
+ 7  ObjectLiteralDatatype (INTEGER)
+ 8  ObjectLiteralDatatypeUri
+ 9  ContextUri
+*/
+
+    for(i=0; i<sqlite3_column_count(vm); i++)
+      fprintf(stderr, "%s, ", sqlite3_column_name(vm, i));
+    fputc('\n', stderr);
+
+    for(i=0; i<sqlite3_column_count(vm); i++) {
+      if(i == 7)
+        fprintf(stderr, "%d, ", sqlite3_column_int(vm, i));
+      else
+        fprintf(stderr, "%s, ", sqlite3_column_text(vm, i));
+    }
+    fputc('\n', stderr);
+
+    if(!*statement) {
+      if(!(*statement=librdf_new_statement(scontext->storage->world)))
+        return 1;
+
+    }
+    librdf_statement_clear(*statement);
+
+    /* subject */
+    uri_string=sqlite3_column_text(vm, 0);
+    if(uri_string)
+      node=librdf_new_node_from_uri_string(scontext->storage->world,
+                                           uri_string);
+    else {
+      blank=sqlite3_column_text(vm, 1);
+      node=librdf_new_node_from_blank_identifier(scontext->storage->world,
+                                                 blank);
+    }
+    librdf_statement_set_subject(*statement, node);
+
+
+    uri_string=sqlite3_column_text(vm, 2);
+    node=librdf_new_node_from_uri_string(scontext->storage->world,
+                                         uri_string);
+    librdf_statement_set_predicate(*statement, node);
+
+    uri_string=sqlite3_column_text(vm, 3);
+    blank=sqlite3_column_text(vm, 4);
+    if(uri_string)
+      node=librdf_new_node_from_uri_string(scontext->storage->world,
+                                           uri_string);
+    else if(blank) {
+      node=librdf_new_node_from_blank_identifier(scontext->storage->world,
+                                                 blank);
+    } else {
+      const unsigned char *literal=sqlite3_column_text(vm, 5);
+      const unsigned char *language=sqlite3_column_text(vm, 6);
+      librdf_uri *datatype=NULL;
+      
+      /* int datatype_id= sqlite3_column_int(vm, 7); */
+      uri_string=sqlite3_column_text(vm, 8);
+      if(uri_string)
+        datatype=librdf_new_uri(scontext->storage->world, uri_string);
+      
+      node=librdf_new_node_from_typed_literal(scontext->storage->world,
+                                              literal, language,
+                                              datatype);
+    }
+    librdf_statement_set_object(*statement, node);
+
+    uri_string=sqlite3_column_text(vm, 9);
+    if(uri_string)
+      *context_node=librdf_new_node_from_uri_string(scontext->storage->world,
+                                                    uri_string);
   }
 
   if(status != SQLITE_ROW)
@@ -1040,7 +1166,9 @@ librdf_storage_sqlite_serialise_end_of_stream(void* context)
     return 1;
   
   result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
-                                               scontext->vm);
+                                               scontext->vm,
+                                               &scontext->statement,
+                                               &scontext->context);
   if(result) {
     /* error or finished */
     if(result < 0)
@@ -1059,7 +1187,9 @@ librdf_storage_sqlite_serialise_next_statement(void* context)
   int result;
   
   result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
-                                               scontext->vm);
+                                               scontext->vm,
+                                               &scontext->statement,
+                                               &scontext->context);
   if(result) {
     /* error or finished */
     if(result<0)
@@ -1272,7 +1402,9 @@ librdf_storage_sqlite_find_statements_end_of_stream(void* context)
     return 1;
   
   result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
-                                               scontext->vm);
+                                               scontext->vm,
+                                               &scontext->statement,
+                                               &scontext->context);
   if(result) {
     /* error or finished */
     if(result<0)
@@ -1291,7 +1423,9 @@ librdf_storage_sqlite_find_statements_next_statement(void* context)
   int result;
   
   result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
-                                               scontext->vm);
+                                               scontext->vm,
+                                               &scontext->statement,
+                                               &scontext->context);
   if(result) {
     /* error or finished */
     if(result<0)
