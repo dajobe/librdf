@@ -128,7 +128,7 @@ rdf_files_test rdf_heuristics_test
 
 EXAMPLES=example1 example2 example3 example4
 
-CLEANFILES=$(TESTS) $(EXAMPLES)
+CLEANFILES=$(TESTS) $(EXAMPLES) test.db test1.db
 
 # Memory debugging alternatives
 MEM=@MEM@
