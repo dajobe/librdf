@@ -143,10 +143,8 @@ void librdf_free_node(librdf_node *r);
 /* functions / methods */
 
 librdf_uri* librdf_node_get_uri(librdf_node* node);
-int librdf_node_set_uri(librdf_node* node, librdf_uri *uri);
 
 librdf_node_type librdf_node_get_type(librdf_node* node);
-void librdf_node_set_type(librdf_node* node, librdf_node_type type);
 
 #ifdef LIBRDF_DEBUG
 const char* librdf_node_get_type_as_string(int type);
@@ -158,14 +156,10 @@ char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 librdf_uri* librdf_node_get_literal_value_datatype_uri(librdf_node* node);
-int librdf_node_set_literal_value(librdf_node* node, const char* value, const char *xml_language, int is_wf_xml);
-int librdf_node_set_typed_literal_value(librdf_node* node, const char* value, const char *xml_language, librdf_uri* datatype_uri);
 
 int librdf_node_get_li_ordinal(librdf_node* node);
-void librdf_node_set_li_ordinal(librdf_node* node, int ordinal);
 
 char *librdf_node_get_blank_identifier(librdf_node* node);
-int librdf_node_set_blank_identifier(librdf_node* node, const char *identifier);
 int librdf_node_is_resource(librdf_node* node);
 int librdf_node_is_literal(librdf_node* node);
 int librdf_node_is_blank(librdf_node* node);
