@@ -1294,6 +1294,36 @@ librdf_model_set_feature(librdf_model* model, librdf_uri* feature,
 }
 
 
+/**
+ * librdf_model_find_statements_with_options - search the model for matching statements with match options
+ * @model: &librdf_model object
+ * @statement: &librdf_statement partial statement to find
+ * @context_node: &librdf_node context node or NULL.
+ * @options: &librdf_hash of matching options or NULL
+ * 
+ * Searches the model for a (partial) statement as described in
+ * librdf_statement_match() and returns a &librdf_stream of
+ * matching &librdf_statement objects.
+ * 
+ * If options is given then the match is made according to
+ * the given options.  If options is NULL, this is equivalent
+ * to librdf_model_find_statements_in_context.
+ * 
+ * Return value:  &librdf_stream of matching statements (may be empty) or NULL on failure
+ **/
+librdf_stream*
+librdf_model_find_statements_with_options(librdf_model* model,
+                                          librdf_statement* statement,
+                                          librdf_node* context_node,
+                                          librdf_hash* options) 
+{
+  if(model->factory->find_statements_with_options)
+    return model->factory->find_statements_with_options(model, statement, context_node, options);
+  else
+    return librdf_model_find_statements_in_context(model, statement, context_node);
+}
+
+
 #endif
 
 
