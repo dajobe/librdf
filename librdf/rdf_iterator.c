@@ -116,7 +116,9 @@ librdf_new_iterator(void* context,
   new_iterator->get_next=get_next;
   new_iterator->finished=finished;
 
-  /* Not strictly true, but we will test this later */
+  /* Not strictly true, but we keep testing for the end of the
+   * list as long as this is set
+   */
   new_iterator->have_more_elements=1;
   
   return new_iterator;
