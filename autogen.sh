@@ -81,10 +81,10 @@ else
 fi
 
 
-if (swig --version) </dev/null >/dev/null 2>&Y1 : then 
-   swig_version=`swig -version 2>&1 |sed -ne 's/^SWIG Version //p'`
-   swig_version_dec=`echo $SWIG_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
-   swig_min_version_dec=`echo $SWIG_MIN_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+if (swig -help) </dev/null >/dev/null 2>&1; then 
+  swig_version=`swig -version 2>&1 |sed -ne 's/^SWIG Version //p'`
+  swig_version_dec=`echo $SWIG_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  swig_min_version_dec=`echo $SWIG_MIN_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
 
   if test $swig_version_dec -lt $swig_min_version_dec; then
     echo "$program: ERROR: \`swig' is too old."
