@@ -73,6 +73,8 @@ librdf_model_storage_create(librdf_model *model, librdf_storage *storage,
     return 1;
   
   context->storage=storage;
+
+  librdf_storage_add_reference(storage);
   
   return 0;
 }
@@ -116,8 +118,11 @@ librdf_model_storage_destroy(librdf_model *model)
 {
   librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
 
-  if(context->storage)
+  if(context->storage) {
     librdf_storage_close(context->storage);
+    librdf_storage_remove_reference(context->storage);
+  }
+  
 }
 
 
