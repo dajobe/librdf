@@ -858,6 +858,13 @@ else
   fi
 fi
 
+if test "X$with_rasqal" = Xinternal; then
+  rdf_query="rasqal(internal)"
+else
+  rdf_query="rasqal(system $RASQAL_VERSION)"
+fi
+
+
 dnl Checks for languages
 AC_CHECK_PROG(PHP_CONFIG, php-config, php-config)
 if test "X$PHP" != X -a "X$PHP_CONFIG" != X ; then
@@ -1255,5 +1262,6 @@ Redland build summary:
   Language APIs built:   $languages
   Triple stores:          $store_modules
   RDF parsers:           $rdf_parsers_available
+  RDF query:              $rdf_query
   Content digests:       $digest_modules_available
 ])
