@@ -1013,8 +1013,10 @@ librdf_storage_mysql_find_statements_in_context(librdf_storage* storage, librdf_
                     sizeof(librdf_storage_mysql_sos_context))))
     return NULL;
   sos->storage=storage;
-  sos->query_statement=statement;
-  sos->query_context=context_node;
+  if(statement)
+    sos->query_statement=librdf_new_statement_from_statement(statement);
+  if(context_node)
+    sos->query_context=librdf_new_node_from_node(context_node);
   sos->current_statement=NULL;
   sos->current_context=NULL;
   sos->results=NULL;
@@ -1391,6 +1393,12 @@ librdf_storage_mysql_find_statements_in_context_finished(void* context)
 
   if(sos->current_context)
     librdf_free_node(sos->current_context);
+
+  if(sos->query_statement)
+    librdf_free_statement(sos->query_statement);
+
+  if(sos->query_context)
+    librdf_free_node(sos->query_context);
 
   LIBRDF_FREE(librdf_storage_mysql_sos_context, sos);
 }
