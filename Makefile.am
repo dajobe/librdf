@@ -6,7 +6,7 @@
 #
 #
 
-SUBDIRS=docs
+SUBDIRS=@SD@
 
 lib_LIBRARIES = librdf.a
 
@@ -18,11 +18,11 @@ rdf_uri.h rdf_node.h rdf_statement.h rdf_digest.h rdf_hash.h rdf_hash_gdbm.h \
 rdf_hash_list.h rdf_model.h rdf_storage.h rdf_iterator.h \
 rdf_assertion_context.h rdf_list.h rdf_hash_bdb.h
 
-librdf_a_LIBADD = @DIGEST_OBJS@ @HASH_OBJS@
+librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@
 librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@
 
 EXTRA_librdf_a_SOURCES = md5.c rdf_hash_gdbm.c rdf_digest_openssl.c \
-rdf_hash_bdb.c
+rdf_hash_bdb.c memcmp.c
 
 EXTRA_DIST=ChangeLog \
 README      NEWS \
@@ -75,6 +75,6 @@ NEWS: NEWS.html
 	$(LYNX) $(LYNXARGS) $< > $@
 
 LICENSE.h: LICENSE.txt
-	(echo '/*'; echo ' * file.c - Description'; echo ' *'; echo ' * $$Source$$'; echo ' * $$Id$$'; sed -e '1,/librdf - License/d' -e 's/^/ \* /' LICENSE.txt; echo ' */') > LICENSE.h
+	(echo '/*NL * file.c - DescriptionNL *NL * %Source: %NL * %Id:%' |sed -e 's/%/$$/g' -e 's/NL/\\012/g'; sed -e '1,/librdf - License/d' -e 's/^/ \* /' LICENSE.txt; echo ' */') > LICENSE.h
 
 @SET_MAKE@
