@@ -151,8 +151,11 @@ librdf_parser_register_factory(librdf_world *world,
  * librdf_get_parser_factory - Get a parser factory by name
  * @world: redland world object
  * @name: the name of the factory (NULL or empty string if don't care)
- * @mime_type: the MIME type of the syntax (NULL or empty string if not used)
+ * @mime_type: the MIME type of the syntax (NULL or empty if don't care)
  * @type_uri: URI of syntax (NULL if not used)
+ *
+ * If all fields are NULL, this means any parser supporting
+ * MIME Type "application/rdf+xml"
  * 
  * Return value: the factory or NULL if not found
  **/
@@ -165,8 +168,12 @@ librdf_get_parser_factory(librdf_world *world,
   
   if(name && !*name)
     name=NULL;
-  if(mime_type && !*mime_type)
-    mime_type=NULL;
+  if(!mime_type || (mime_type && !*mime_type)) {
+    if(!name && !type_uri)
+      mime_type="application/rdf+xml";
+    else
+      mime_type=NULL;
+  }
 
   /* return 1st parser if no particular one wanted */
   if(!name && !mime_type && !type_uri) {
@@ -209,6 +216,9 @@ librdf_get_parser_factory(librdf_world *world,
  * @name: the parser factory name
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI of syntax (NULL if not used)
+ * 
+ * If all fields are NULL, this means any parser supporting
+ * MIME Type "application/rdf+xml"
  * 
  * Return value: new &librdf_parser object or NULL
  **/
