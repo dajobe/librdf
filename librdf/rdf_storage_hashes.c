@@ -799,9 +799,6 @@ librdf_storage_hashes_serialise_next_statement(void* context)
   if(!statement)
     return NULL;
   
-  if(librdf_iterator_next(scontext->iterator))
-    return NULL;
-
   hd=(librdf_hash_datum*)librdf_iterator_get_key(scontext->iterator);
   
   /* decode key content */
@@ -817,6 +814,8 @@ librdf_storage_hashes_serialise_next_statement(void* context)
     librdf_free_statement(statement);
     return NULL;
   }
+
+  librdf_iterator_next(scontext->iterator);
 
   return statement;
 }
@@ -1300,9 +1299,6 @@ librdf_storage_hashes_group_serialise_next_statement(void* context)
   if(!statement)
     return NULL;
 
-  if(librdf_iterator_next(scontext->iterator))
-    return NULL;
-
   v=(librdf_hash_datum*)librdf_iterator_get_key(scontext->iterator);
 
   /* decode value content */
@@ -1310,6 +1306,8 @@ librdf_storage_hashes_group_serialise_next_statement(void* context)
     librdf_free_statement(statement);
     return NULL;
   }
+
+  librdf_iterator_next(scontext->iterator);
 
   return statement;
 }
