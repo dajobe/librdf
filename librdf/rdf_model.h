@@ -112,9 +112,6 @@ librdf_model* librdf_new_model_with_options(librdf_storage *storage, librdf_hash
 /* Create a new Model from an existing Model - CLONE */
 librdf_model* librdf_new_model_from_model(librdf_model* model);
 
-/* Create a new Model from a stream */
-librdf_model* librdf_new_model_from_stream(librdf_stream* stream);
-
 /* destructor */
 void librdf_free_model(librdf_model *model);
 
