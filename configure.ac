@@ -22,7 +22,7 @@ dnl
 
 
 AC_INIT([Redland RDF Library], 0.9.13, redland-dev@lists.librdf.org, redland)
-AC_PREREQ(2.50)
+AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR(librdf/rdf_node.c)
 AC_REVISION($Revision$)dnl
 
@@ -950,7 +950,7 @@ AC_SUBST(abs_top_builddir)
 
 AC_CONFIG_SUBDIRS(raptor)
 
-AC_OUTPUT(Makefile
+AC_CONFIG_FILES(Makefile
 redland-config
 redland-src-config
 docs/Makefile
@@ -979,6 +979,8 @@ debian/rules
 utils/Makefile
 librdf/redland.spec,
 [chmod +x redland-config redland-src-config debian/rules])
+
+AC_OUTPUT
 
 AC_MSG_RESULT([
 Redland build summary:
