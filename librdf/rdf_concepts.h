@@ -55,6 +55,12 @@ enum {
   LIBRDF_CONCEPT_MS_aboutEach,
   LIBRDF_CONCEPT_MS_aboutEachPrefix,
 
+  LIBRDF_CONCEPT_MS_nodeID,
+  LIBRDF_CONCEPT_MS_List,
+  LIBRDF_CONCEPT_MS_first,
+  LIBRDF_CONCEPT_MS_rest,
+  LIBRDF_CONCEPT_MS_nil,
+
   /* RDF Schema concepts defined in prose at
    *   http://www.w3.org/TR/2000/CR-rdf-schema-20000327/
    * and in RDF Schema form at 
@@ -109,6 +115,12 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 
 #define LIBRDF_MS_aboutEach librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_aboutEach]
 #define LIBRDF_MS_aboutEachPrefix librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_aboutEachPrefix]
+
+#define LIBRDF_MS_nodeID librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_nodeID]
+#define LIBRDF_MS_List librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_List]
+#define LIBRDF_MS_first librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_first]
+#define LIBRDF_MS_rest librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_rest]
+#define LIBRDF_MS_nil librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_nil]
 
 
 #define LIBRDF_S_Class librdf_concept_resources[LIBRDF_CONCEPT_S_Class]
