@@ -494,16 +494,21 @@ for parser in $parser_modules; do
   if test $found = 1; then
     PARSER_OBJS="$PARSER_OBJS rdf_parser_$parser.lo"
 
+    config_subdir_raptor=no
     if test $parser = raptor; then
       if test $with_raptor = internal; then
         LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor $LIBRDF_INTERNAL_CPPFLAGS"
         LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_INTERNAL_LIBS"
-        AC_CONFIG_SUBDIRS(raptor)
+        config_subdir_raptor=yes
       else
         LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
         LIBRDF_EXTERNAL_LIBS="`$RAPTOR_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
         raptor_dir=
       fi
+    fi
+
+    if test "$config_subdir_raptor" = yes -o "$USE_MAINTAINER_MODE" = yes; then
+      AC_CONFIG_SUBDIRS(raptor)
     fi
 
     n=HAVE_${uname}_RDF_PARSER
@@ -775,15 +780,22 @@ fi
 
 dnl RDF query
 rasqal_dir=
+config_subdir_rasqal=no
+
 if test $with_rasqal = internal; then
   LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/rasqal $LIBRDF_INTERNAL_CPPFLAGS"
   LIBRDF_INTERNAL_LIBS="\$(top_builddir)/rasqal/librasqal.la $LIBRDF_INTERNAL_LIBS"
   rasqal_dir=rasqal
-  AC_CONFIG_SUBDIRS(rasqal)
+  config_subdir_rasqal=yes
 else
   LIBRDF_EXTERNAL_CPPFLAGS="`$RASQAL_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
   LIBRDF_EXTERNAL_LIBS="`$RASQAL_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
 fi
+
+if test "$config_subdir_rasqal" = yes -o "$USE_MAINTAINER_MODE" = yes; then
+  AC_CONFIG_SUBDIRS(rasqal)
+fi
+
 
 
 LIBRDF_EXTERNAL_CPPFLAGS="$LIBRDF_EXTERNAL_CPPFLAGS $LIBRDF_CPPFLAGS"
@@ -795,7 +807,11 @@ LIBRDF_PKGCONFIG_LIBS=$LIBRDF_LIBS
 
 dnl Local sub-packages in sub directories needed to build librdf
 dnl Ordering constraints: rasqal needs raptor
-LOCAL_SUBDIRS="$raptor_dir $rasqal_dir"
+if test "$USE_MAINTAINER_MODE" = yes; then 
+  LOCAL_SUBDIRS="raptor rasqal"
+else
+  LOCAL_SUBDIRS="$raptor_dir $rasqal_dir"
+fi
 
 AC_SUBST(LOCAL_SUBDIRS)
 
