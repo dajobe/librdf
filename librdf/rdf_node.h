@@ -153,6 +153,7 @@ const char* librdf_node_get_type_as_string(int type);
 #endif
 
 char* librdf_node_get_literal_value(librdf_node* node);
+char* librdf_node_get_literal_value_as_counted_string(librdf_node* node, size_t* len_p);
 char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);

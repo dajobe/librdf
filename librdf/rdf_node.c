@@ -560,6 +560,28 @@ librdf_node_get_literal_value(librdf_node* node)
 
 
 /**
+ * librdf_node_get_literal_value_as_counted_string - Get the string literal value of the node as a counted string
+ * @node: the node object
+ * @len_p: pointer to location to store length (or NULL)
+ * 
+ * Returns a pointer to the literal value held by the node, it must be
+ * copied if it is wanted to be used by the caller.
+ *
+ * Return value: the literal string or NULL if node is not a literal
+ **/
+char*
+librdf_node_get_literal_value_as_counted_string(librdf_node* node, 
+                                                size_t *len_p) 
+{
+  if(node->type != LIBRDF_NODE_TYPE_LITERAL)
+    return NULL;
+  if(len_p)
+    *len_p=node->value.literal.string_len;
+  return node->value.literal.string;
+}
+
+
+/**
  * librdf_node_get_literal_value_as_latin1 - Get the string literal value of the node as ISO Latin-1
  * @node: the node object
  * 
