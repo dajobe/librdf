@@ -1,5 +1,20 @@
 2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_query_results.c, rdf_utf8.c, rdf_uri.c, rdf_stream.c,
+	rdf_storage_tstore.c, rdf_storage_mysql.c, rdf_storage_list.c,
+	rdf_storage_hashes.c, rdf_storage_file.c, rdf_storage.c,
+	rdf_statement.c, rdf_serializer_rdfxml.c, rdf_serializer_raptor.c,
+	rdf_serializer.c, rdf_query_triples.c, ChangeLog,
+	rdf_query_rasqal.c, rdf_query.c, rdf_parser_raptor.c,
+	rdf_parser.c, rdf_node.c, rdf_model_storage.c, rdf_model.c,
+	rdf_list.c, rdf_iterator.c, rdf_init.c, rdf_heuristics.c,
+	rdf_hash_memory.c, rdf_hash_cursor.c, rdf_hash_bdb.c, rdf_hash.c,
+	rdf_files.c, rdf_digest_sha1.c, rdf_digest_openssl.c,
+	rdf_digest_md5.c, rdf_digest.c, rdf_concepts.c: Use redland.h in
+	all files not a selection of librdf.h, raptor.h and rasqal.h
+
+2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
 	* Use redland.h in all files not a selection of librdf.h, raptor.h
 	and rasqal.h
 
