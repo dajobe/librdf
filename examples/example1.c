@@ -173,7 +173,6 @@ main(int argc, char *argv[])
     librdf_node_print(target, stdout);
     fputc('\n', stdout);
 
-    librdf_free_node(target);
     count++;
     librdf_iterator_next(iterator);
   }
