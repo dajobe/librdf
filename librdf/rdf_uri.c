@@ -100,7 +100,7 @@ librdf_new_uri (char *uri_string)
 
 /**
  * librdf_new_uri_from_uri:
- * @uri: &librdf_uri object
+ * @old_uri: &librdf_uri object
  * 
  * Copy constructor: create a new &librdf_uri object from an existing
  * &librdf_uri object
