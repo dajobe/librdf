@@ -6,11 +6,9 @@
 Makefile
 Makefile.in
 dmalloc*
-not-used
-old*
 rdf_*_test
 rdf_config.h*
 redland-config
+redland.pc
 redland.spec
 stamp-h*
-test*
