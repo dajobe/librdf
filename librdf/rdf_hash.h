@@ -45,6 +45,7 @@ void librdf_free_hash_datum(librdf_hash_datum *datum) ;
 struct librdf_hash_s
 {
   void *context;
+  int is_open;
   struct librdf_hash_factory_s* factory;
 };
 
@@ -62,7 +63,7 @@ struct librdf_hash_factory_s {
   size_t cursor_context_length;
 
   /* open/create hash with identifier and options  */
-  int (*open)(void* context, char *identifier, void *mode, librdf_hash* options);
+  int (*open)(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
   /* end hash association */
   int (*close)(void* context);
 
@@ -116,7 +117,7 @@ void librdf_free_hash(librdf_hash *hash);
 /* methods */
 
 /* open/create hash with identifier and options  */
-int librdf_hash_open(librdf_hash* hash, char *identifier, void *mode, librdf_hash* options);
+int librdf_hash_open(librdf_hash* hash, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 /* end hash association */
 int librdf_hash_close(librdf_hash* hash);
 
