@@ -33,13 +33,16 @@
 #undef HAVE_BDB_HASH
 
 /* Berkeley DB complexities */
-/* V3 */
-#undef HAVE_DB_CREATE
-/* V2 (V1???) */
-#undef HAVE_DB_OPEN
+/* V2/V3 */
 #undef HAVE_BDB_DB_TXN
 #undef HAVE_BDB_CURSOR
-/* V1??? */
+/* V2 versiosn differ / V3 */
+#define HAVE_BDB_CURSOR_4_ARGS
+/* V3 */
+#undef HAVE_DB_CREATE
+/* V2 */
+#undef HAVE_DB_OPEN
+/* V1 */
 #undef HAVE_DBOPEN
 
 /* java program location */
