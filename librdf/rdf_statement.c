@@ -177,6 +177,29 @@ librdf_statement_init(librdf_world *world, librdf_statement *statement)
 
 
 /**
+ * librdf_statement_clear - empty a librdf_statement of nodes
+ * @statement: &librdf_statement object
+ * 
+ **/
+void
+librdf_statement_clear(librdf_statement *statement)
+{
+  if(LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
+    librdf_free_node(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
+    LIBRDF_NODE_STATEMENT_SUBJECT(statement)=NULL;
+  }
+  if(LIBRDF_NODE_STATEMENT_PREDICATE(statement)) {
+    librdf_free_node(LIBRDF_NODE_STATEMENT_PREDICATE(statement));
+    LIBRDF_NODE_STATEMENT_PREDICATE(statement)=NULL;
+  }
+  if(LIBRDF_NODE_STATEMENT_OBJECT(statement)) {
+    librdf_free_node(LIBRDF_NODE_STATEMENT_OBJECT(statement));
+    LIBRDF_NODE_STATEMENT_OBJECT(statement)=NULL;
+  }
+}
+
+
+/**
  * librdf_free_statement - Destructor - destroy a librdf_statement
  * @statement: &librdf_statement object
  * 
@@ -184,12 +207,7 @@ librdf_statement_init(librdf_world *world, librdf_statement *statement)
 void
 librdf_free_statement(librdf_statement* statement)
 {
-  if(LIBRDF_NODE_STATEMENT_SUBJECT(statement))
-    librdf_free_node(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
-  if(LIBRDF_NODE_STATEMENT_PREDICATE(statement))
-    librdf_free_node(LIBRDF_NODE_STATEMENT_PREDICATE(statement));
-  if(LIBRDF_NODE_STATEMENT_OBJECT(statement))
-    librdf_free_node(LIBRDF_NODE_STATEMENT_OBJECT(statement));
+  librdf_statement_clear(statement);
   LIBRDF_FREE(librdf_statement, statement);
 }
 
@@ -646,14 +664,20 @@ librdf_statement_decode(librdf_statement* statement,
   
     switch(type) {
     case 's': /* subject */
+      if(LIBRDF_NODE_STATEMENT_SUBJECT(statement))
+        librdf_free_node(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
       LIBRDF_NODE_STATEMENT_SUBJECT(statement)=node;
       break;
       
     case 'p': /* predicate */
+      if(LIBRDF_NODE_STATEMENT_PREDICATE(statement))
+        librdf_free_node(LIBRDF_NODE_STATEMENT_PREDICATE(statement));
       LIBRDF_NODE_STATEMENT_PREDICATE(statement)=node;
       break;
       
     case 'o': /* object */
+      if(LIBRDF_NODE_STATEMENT_OBJECT(statement))
+        librdf_free_node(LIBRDF_NODE_STATEMENT_OBJECT(statement));
       LIBRDF_NODE_STATEMENT_OBJECT(statement)=node;
       break;
 
