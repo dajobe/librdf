@@ -245,7 +245,7 @@ librdf_world_set_feature(librdf_world* world, librdf_uri *feature,
 
 /* OLD INTERFACES BELOW HERE */
 
-/* GLOBAL - for old interfaces below */
+/* For old interfaces below ONLY */
 static librdf_world* RDF_World;
 
 /**
