@@ -642,7 +642,7 @@ for parser in $parser_modules; do
 
     raptor)
       if test $have_raptor = 1 ; then
-	if test $xml_parser="libxml"; then
+	if test $xml_parser = "libxml"; then
 	  need_libxml=1
 	  found=1
 	  AC_DEFINE(NEED_LIBXML)
