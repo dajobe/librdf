@@ -815,7 +815,7 @@ librdf_stream* librdf_storage_hashes_find_statements(librdf_storage* storage, li
   if(!librdf_statement_get_subject(statement) &&
      librdf_statement_get_predicate(statement) &&
      !librdf_statement_get_object(statement) &&
-     p2so_index >= 0) {
+     context->p2so_index >= 0) {
     /* (? p ?) -> (s p o) wanted */
     stream=librdf_storage_hashes_serialise_common(storage,
                                                   context->p2so_index,
