@@ -1,7 +1,7 @@
 /*
  * rdf-tree.c - Retrieve statements from persistent Redland storage.
  *
- * Copyright (C) 2003 Morten Frederiksen - http://purl.org/net/morten/
+ * Copyright (C) 2003-2004 Morten Frederiksen - http://purl.org/net/morten/
  *
  * and
  *
@@ -27,19 +27,19 @@
 #include <redland.h>
 #include <openssl/lhash.h>
 
-const char *VERSION = "0.3";
+const char *VERSION = "0.4";
 
 struct options {
   librdf_node *context;
   char *database;
   char *directory;
   char *host;
-  char *id;
+  char *model;
   int level;
   int port;
   char *output;
   char *password;
-  char *query;
+  int quiet;
   char *user;
 } opts;
 
@@ -117,10 +117,11 @@ main(int argc, char *argv[])
   };
 
   /* Create storage. */
-  storage = librdf_new_storage(world, storage_type, opts.id, storage_options);
+  storage =
+    librdf_new_storage(world, storage_type, opts.model, storage_options);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create storage (%s/%s/%s)\n", argv[0],
-	    storage_type, opts.id, storage_options);
+	    storage_type, opts.model, storage_options);
     return (1);
   }
 
@@ -152,9 +153,9 @@ main(int argc, char *argv[])
     return (1);
   }
 
-  if(librdf_model_size(model) != -1)
+  if(librdf_model_size(model) != -1 && !opts.quiet)
     fprintf(stderr, "%s: Model '%s' contains %d statements.\n", argv[0],
-	    opts.id, librdf_storage_size(storage));
+	    opts.model, librdf_storage_size(storage));
 
 /*
 stream=librdf_model_as_stream(model);
@@ -173,7 +174,8 @@ librdf_free_stream(stream);
 
   /* Only statements with given context? */
   if(opts.context) {
-    fprintf(stderr, "%s: Creating context storage...\n", argv[0]);
+    if(!opts.quiet)
+      fprintf(stderr, "%s: Creating context storage...\n", argv[0]);
 
     /* Create context storage. */
     contextstorage = librdf_new_storage(world, "memory", "context", "");
@@ -212,7 +214,8 @@ librdf_free_stream(stream);
       fprintf(stderr, "%s: Failed to create hash table\n", argv[0]);
       return (1);
     };
-    fprintf(stderr, "%s: Populating output model from uri...\n", argv[0]);
+    if(!opts.quiet)
+      fprintf(stderr, "%s: Populating output model from uri...\n", argv[0]);
     /* Recursively extract statements about subject... */
     rc =
       tree(world, librdf_new_node_from_uri(world, uri), model, outputmodel,
@@ -227,12 +230,9 @@ librdf_free_stream(stream);
     librdf_free_model(model);
     librdf_free_storage(storage);
   }
-  else if(opts.query) {
-    librdf_free_model(model);
-    librdf_free_storage(storage);
-  }
   else {
-    fprintf(stderr, "%s: Outputting entire model...\n", argv[0]);
+    if(!opts.quiet)
+      fprintf(stderr, "%s: Outputting entire model...\n", argv[0]);
     /* No restraints, use entire model as output. */
     librdf_free_model(outputmodel);
     librdf_free_storage(outputstorage);
@@ -241,7 +241,8 @@ librdf_free_stream(stream);
   };
 
   /* Serialize output... */
-  fprintf(stderr, "%s: Serializing...\n", argv[0]);
+  if(!opts.quiet)
+    fprintf(stderr, "%s: Serializing...\n", argv[0]);
 
   if(librdf_serializer_serialize_model(serializer, stdout, NULL, outputmodel)) {
     fprintf(stderr, "%s: Failed to serialize output model\n", argv[0]);
@@ -267,22 +268,25 @@ tree(librdf_world * world, librdf_node * node, librdf_model * model,
   librdf_statement *statement;
   int rc;
   librdf_node_type ont;
+  librdf_node *rdftype =
+    librdf_new_node_from_uri_string(world,
+				    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
 
   /* Add node to hash, to prevent cycles. */
   lh_insert(table, strdup(librdf_node_to_string(node)));
-  if(lh_error(table))
+  if(lh_error(table)) {
     return 1;
-
+  }
   /* Find all statements about node. */
   if(!
      (statement =
       librdf_new_statement_from_nodes(world, librdf_new_node_from_node(node),
-				      NULL, NULL)))
+				      NULL, NULL))) {
     return 2;
-
-  if(!(instream = librdf_model_find_statements(model, statement)))
-    return 3;
-
+  }
+  if(!(instream = librdf_model_find_statements(model, statement))) {
+    return 0;
+  }
   while(!librdf_stream_end(instream)) {
     /* Add statement to output model. */
     statement = librdf_stream_get_object(instream);
@@ -290,16 +294,17 @@ tree(librdf_world * world, librdf_node * node, librdf_model * model,
 				  librdf_new_statement_from_statement
 				  (statement)))
       return 4;
-
     /* Recurse? */
-    if(level) {
+    if(level && !librdf_node_equals(rdftype,
+				    librdf_statement_get_predicate
+				    (statement))) {
       object = librdf_statement_get_object(statement);
       ont = librdf_node_get_type(object);
       if(ont == LIBRDF_NODE_TYPE_RESOURCE || ont == LIBRDF_NODE_TYPE_BLANK) {
-	/* 
-	   librdf_statement_print(statement,stderr);
-	   fprintf(stderr,"%s","\n"); 
-	 */
+/*
+librdf_statement_print(statement,stderr);
+fprintf(stderr,"%s","\n");
+*/
 	/* Don't recurse if object is known... */
 	if(!lh_retrieve(table, librdf_node_to_string(object))) {
 	  rc = tree(world, object, model, outputmodel, table, level - 1);
@@ -311,7 +316,6 @@ tree(librdf_world * world, librdf_node * node, librdf_model * model,
     librdf_stream_next(instream);
   };
   librdf_free_stream(instream);
-
   return 0;
 };
 
@@ -331,17 +335,17 @@ getoptions(int argc, char *argv[], librdf_world * world)
     {"database", required_argument, NULL, 's'},
     {"directory", required_argument, NULL, 'd'},
     {"host", required_argument, NULL, 'h'},
-    {"id", required_argument, NULL, 'i'},
     {"level", required_argument, NULL, 'l'},
+    {"model", required_argument, NULL, 'm'},
     {"output", required_argument, NULL, 'o'},
     {"port", required_argument, NULL, 'P'},
     {"password", optional_argument, NULL, 'p'},
-    {"query", required_argument, NULL, 'q'},
+    {"quiet", no_argument, NULL, 'q'},
     {"user", required_argument, NULL, 'u'},
     {"version", no_argument, NULL, 'v'},
     {0, 0, 0, 0}
   };
-  const char *opts_short = "?c:D:d:h:i:l:o:P:p:q:u:v";
+  const char *opts_short = "?c:D:d:h:l:m:o:P:p:qu:v";
   int i = 1;
   char c;
   char *buffer;
@@ -352,11 +356,11 @@ getoptions(int argc, char *argv[], librdf_world * world)
   opts.level = 1;
   opts.password = 0;
   opts.port = 3306;
-  opts.query = 0;
+  opts.quiet = 0;
   opts.user = 0;
   if(!(opts.directory = strdup("./"))
      || !(opts.host = strdup("mysql"))
-     || !(opts.id = strdup("redland"))
+     || !(opts.model = strdup("redland"))
      || !(opts.output = strdup("rdfxml"))
      || !(opts.database = strdup("redland"))) {
     fprintf(stderr, "%s: Failed to allocate default options\n", argv[0]);
@@ -399,12 +403,12 @@ getoptions(int argc, char *argv[], librdf_world * world)
       case 'h':
 	opts.host = buffer;
 	break;
-      case 'i':
-	opts.id = buffer;
-	break;
       case 'l':
 	free(buffer);
 	opts.level = atoi(optarg);
+	break;
+      case 'm':
+	opts.model = buffer;
 	break;
       case 'o':
 	free(opts.output);
@@ -419,7 +423,7 @@ getoptions(int argc, char *argv[], librdf_world * world)
 	ttypasswd = 0;
 	break;
       case 'q':
-	opts.query = buffer;
+	opts.quiet = 1;
 	break;
       case 'u':
 	opts.user = buffer;
@@ -486,13 +490,13 @@ usage: %s [options] [ <URI> ]\n\
                      of 'hashes' storage type instead of 'mysql'.\n\
   -h<host name>, --host=<host name>\n\
                      Host to contact for MySQL connections, default is 'mysql'.\n\
-  -i<storage id>, --id=<storage id>\n\
-                     Identifier for (name of) storage (model name for storage\n\
-                     type 'mysql', base file name for storage type 'hashes'),\n\
-                     default is 'redland'.\n\
   -l<number>, --level=<number>\n\
                      The number of levels of statements to extract. Default is\n\
                      1, also returning statements about objects.\n\
+  -m<model id>, --model=<model id>\n\
+                     Identifier for (name of) storage (model name for storage\n\
+                     type 'mysql', base file name for storage type 'hashes'),\n\
+                     default is 'redland'.\n\
   -o<syntax id>, --output=<syntax id>\n\
                      Syntax identifier for serialization, 'ntriples' or\n\
                      'rdfxml' (default).\n\
@@ -502,9 +506,8 @@ usage: %s [options] [ <URI> ]\n\
   -P<port number>, --port=<port number>\n\
                      The port number to use when connecting to MySQL server.\n\
                      Default port number is 3306.\n\
-  -q<query language>, --query=<query language>\n\
-                     Name of query language for query read from stdin. This\n\
-                     overrides any subject URI given.\n\
+  -q, --quiet\n\
+                     No informational messages, only errors.\n\
   -u<user name>, --user=<user name>\n\
                      User name for MySQL server.\n\
   -v, --version      Output version information and exit.\n\
