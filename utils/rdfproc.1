@@ -8,7 +8,7 @@
 .\" Institute for Learning and Research Technology - http://www.ilrt.org/
 .\" University of Bristol - http://www.bristol.ac.uk/
 .\"
-.TH rdfproc 1 "2004-01-11"
+.TH rdfproc 1 "2004-01-13"
 .\" Please adjust this date whenever revising the manpage.
 .SH NAME
 rdfproc \- Redland RDF processor utility
@@ -65,12 +65,16 @@ require exposing the password in the argument list.
 Set the Redland storage type (default 'hashes').  Alternatives
 are 'memory' which is always present and '3store', 'mysql' when
 support for those is compiled in
+If environment variable RDFPROC_STORAGE_TYPE is set, the storage
+type given here will override it.
 .TP
 .B \-t, \-\-storage-options \fIOPTIONS\fR
 Set options for the the Redland storage, default is "hash-type='bdb',dir='.'"
 to match the default storage "hashes".  For storages types such as 'mysql'
 that need extra options this would typically be something
-like "host='hostname',db='databasename',user='abc',password='pass'"
+like "host='hostname',db='databasename',user='abc',password='pass'".
+If environment variable RDFPROC_STORAGE_OPTIONS is set, the storage
+options given here will be applied afterwards.
 .TP
 .B \-v, \-\-version
 Print the Redland version and exit.
@@ -159,6 +163,14 @@ Show one node/all nodes that match triples (?, \fIPREDICATE\fP, \fIOBJECT\fP)
 .IP "\fBtargets \fISUBJECT\fP \fIPREDICATE\fP\fR"
 Show one node/all nodes that match triples (\fISUBJECT\fP, \fIPREDICATE\fP, ?)
 
+.SH "ENVIRONMENT"
+RDFPROC_STORAGE_OPTIONS can be set to provide storage options
+instead of using the option \-t, \-\-storage-options \fIOPTIONS\fR.
+When both are given, command options are applied last.
+.LP
+RDFPROC_STORAGE_TYPE can be set to provide a storage type
+instead of using the option \-s, \-\-storage \fITYPE\fR.
+When both are given, the storage type from the command is used.
 .SH "CONFORMING TO"
 \fIRDF/XML Syntax (Revised)\fR,
 W3C Working Draft (work in progress),
