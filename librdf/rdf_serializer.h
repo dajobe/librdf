@@ -87,10 +87,6 @@ void librdf_init_serializer(librdf_world *world);
 /* module finish */
 void librdf_finish_serializer(librdf_world *world);
                     
-/* internal callbacks used by serializers invoking errors/warnings upwards to user */
-void librdf_serializer_error(librdf_serializer* serializer, const char *message, ...);
-void librdf_serializer_warning(librdf_serializer* serializer, const char *message, ...);
-
 void librdf_serializer_raptor_constructor(librdf_world* world);
 void librdf_serializer_rdfxml_constructor(librdf_world* world);
 
