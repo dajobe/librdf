@@ -1445,6 +1445,9 @@ librdf_storage_hashes_context_serialise(librdf_storage* storage,
   librdf_storage_hashes_context_serialise_stream_context* scontext;
   librdf_stream* stream;
   size_t size;
+
+  if(context->contexts_index <0)
+    return NULL;
   
   scontext=(librdf_storage_hashes_context_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_hashes_context_serialise_stream_context, 1, sizeof(librdf_storage_hashes_context_serialise_stream_context));
   if(!scontext)
