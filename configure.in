@@ -888,6 +888,7 @@ tcl/Makefile
 java/Makefile
 java/org/Makefile
 java/org/librdf/Makefile
+java/org/librdf/redland/Makefile
 repat/Makefile
 debian/Makefile
 debian/rules
