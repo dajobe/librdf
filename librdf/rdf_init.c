@@ -75,6 +75,7 @@ librdf_free_world(librdf_world *world)
 {
   librdf_finish_parser(world);
   librdf_finish_storage(world);
+  librdf_finish_query(world);
   librdf_finish_model(world);
   librdf_finish_statement(world);
 
@@ -111,6 +112,7 @@ librdf_world_open(librdf_world *world)
 
   librdf_init_statement(world);
   librdf_init_model(world);
+  librdf_init_query(world);
   librdf_init_storage(world);
   librdf_init_parser(world);
 }
