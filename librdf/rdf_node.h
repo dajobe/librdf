@@ -105,6 +105,9 @@ void librdf_finish_node(librdf_world* world);
 const char* librdf_node_get_type_as_string(int type);
 #endif
 
+/* exported public in error but never used */
+librdf_digest* librdf_node_get_digest(librdf_node* node);
+
 #endif
 
 
@@ -162,8 +165,6 @@ REDLAND_API unsigned char *librdf_node_get_blank_identifier(librdf_node* node);
 REDLAND_API int librdf_node_is_resource(librdf_node* node);
 REDLAND_API int librdf_node_is_literal(librdf_node* node);
 REDLAND_API int librdf_node_is_blank(librdf_node* node);
-
-REDLAND_API librdf_digest* librdf_node_get_digest(librdf_node* node);
 
 /* serialise / deserialise */
 REDLAND_API size_t librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length);
