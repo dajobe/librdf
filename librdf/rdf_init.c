@@ -49,6 +49,7 @@ librdf_init_world(char *digest_factory_name)
   librdf_init_statement();
   librdf_init_model();
   librdf_init_storage();
+  librdf_init_parser();
 }
 
 
@@ -62,4 +63,5 @@ librdf_destroy_world(void)
   librdf_finish_statement();
   librdf_finish_model();
   librdf_finish_storage();
+  librdf_finish_parser();
 }
