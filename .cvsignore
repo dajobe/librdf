@@ -13,4 +13,5 @@ librdf*gz
 not-used
 stamp-h*
 test*
+rdf*_test
 .deps*
