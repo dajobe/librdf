@@ -600,11 +600,11 @@ fi
   
 LIBS=$LIBRDF_LIBS
 
-dnl Pick an ECMA CLR implementation
-AC_ARG_WITH(ecma-clr, [  --with-ecma-clr          Choose an ECMA CLR implenentation - mono, dotgnu []], ecma_clr_name="$withval", ecma_clr_name="")
+dnl Pick an ECMA CLI implementation
+AC_ARG_WITH(ecma-cli, [  --with-ecma-cli          Choose an ECMA CLI implenentation - mono, dotgnu []], ecma_cli_name="$withval", ecma_cli_name="")
 
 
-AC_MSG_CHECKING(ECMA CLR implementations available)
+AC_MSG_CHECKING(ECMA CLI implementations available)
 result=
 if test "X$MONO" != X -a "X$MCS" != X; then
   result="$result Mono"
@@ -614,35 +614,35 @@ if test "X$ILRUN" != X -a "X$CSCC" != X; then
 fi
 AC_MSG_RESULT($result)
 
-AC_MSG_CHECKING(ECMA CLR implementations to use)
-ecma_clr=none
-CLRRUN=
+AC_MSG_CHECKING(ECMA CLI implementations to use)
+ecma_cli=none
+CLIRUN=
 CSHARPC=
-for name in $ecma_clr_name mono dotgnu; do
+for name in $ecma_cli_name mono dotgnu; do
   case $name in
     mono)
       if test "X$MONO" != X -a "X$MCS" != X; then
-        CLRRUN=$MONO
+        CLIRUN=$MONO
         CSHARPC=$MCS
-        ecma_clr=Mono
+        ecma_cli=Mono
       fi
       ;;
 
     dotgnu)
       if test "X$ILRUN" != X -a "X$CSCC" != X; then
-        CLRRUN=$ILRUN
+        CLIRUN=$ILRUN
         CSHARPC=$CSCC
-        ecma_clr=dotGNU
+        ecma_cli=dotGNU
       fi
       ;;
 
     *)
-      AC_MSG_ERROR(No such ECMA CLR implementation $name)
+      AC_MSG_ERROR(No such ECMA CLI implementation $name)
       ;;
 esac
 done
-AC_MSG_RESULT($ecma_clr)
-AC_SUBST(CLRRUN)
+AC_MSG_RESULT($ecma_cli)
+AC_SUBST(CLIRUN)
 AC_SUBST(CSHARPC)
 
 
