@@ -101,6 +101,17 @@ librdf_free_hash_list_node(librdf_hash_list_node* node)
 
 /* functions implementing hash api */
 
+/**
+ * librdf_hash_list_open:
+ * @context: list hash contxt
+ * @identifier: not used
+ * @mode: access mode (currently unused)
+ * @options: &librdf_hash of options (currently unused)
+ * 
+ * Open a new list hash.
+ * 
+ * Return value: non 0 on failure
+ **/
 static int
 librdf_hash_list_open(void* context, char *identifier, void *mode, 
                       librdf_hash* options) 
@@ -109,6 +120,15 @@ librdf_hash_list_open(void* context, char *identifier, void *mode,
   return 0;
 }
 
+
+/**
+ * librdf_hash_list_close:
+ * @context: list hash context
+ * 
+ * Finish the association between the rdf hash and the list hash.
+ * 
+ * Return value: non 0 on failure
+ **/
 static int
 librdf_hash_list_close(void* context) 
 {
@@ -123,6 +143,17 @@ librdf_hash_list_close(void* context)
 }
 
 
+/**
+ * librdf_hash_list_get:
+ * @context: list hash context
+ * @key: pointer to key to use
+ * @data: pointer to data to return value
+ * @flags: (not used at present)
+ * 
+ * Retrieve a hash value for the given key
+ * 
+ * Return value: non 0 on failure
+ **/
 static int
 librdf_hash_list_get(void* context, librdf_hash_data *key,
 		     librdf_hash_data *data, unsigned int flags) 
@@ -149,6 +180,17 @@ librdf_hash_list_get(void* context, librdf_hash_data *key,
 }
 
 
+/**
+ * librdf_hash_list_put:
+ * @context: list hash context
+ * @key: pointer to key to store
+ * @value: pointer to value to store
+ * @flags: flags (not used at present)
+ * 
+ * Store a key/value pair in the hash
+ * 
+ * Return value: non 0 on failure
+ **/
 static int
 librdf_hash_list_put(void* context, librdf_hash_data *key, 
 		     librdf_hash_data *value, unsigned int flags) 
@@ -214,6 +256,15 @@ librdf_hash_list_put(void* context, librdf_hash_data *key,
 }
 
 
+/**
+ * librdf_hash_list_exists:
+ * @context: list hash context
+ * @key: pointer to key to store
+ * 
+ * Test the existence of a key in the hash.
+ * 
+ * Return value: non 0 if the key exists in the hash
+ **/
 static int
 librdf_hash_list_exists(void* context, librdf_hash_data *key) 
 {
@@ -227,6 +278,15 @@ librdf_hash_list_exists(void* context, librdf_hash_data *key)
 
 
 
+/**
+ * librdf_hash_list_delete:
+ * @context: list hash context
+ * @key: pointer to key to delete
+ * 
+ * Delete a key and associate value from the hash.
+ * 
+ * Return value: non 0 on failure
+ **/
 static int
 librdf_hash_list_delete(void* context, librdf_hash_data *key) 
 {
@@ -250,6 +310,19 @@ librdf_hash_list_delete(void* context, librdf_hash_data *key)
 }
 
 
+/**
+ * librdf_hash_list_get_seq:
+ * @context: list hash context
+ * @key: pointer to the key
+ * @type: type of operation
+ * 
+ * Start/get keys in a sequence from the hash.  Valid operations are
+ * LIBRDF_HASH_SEQUENCE_FIRST to get the first key in the sequence
+ * LIBRDF_HASH_SEQUENCE_NEXT to get the next in sequence and
+ * LIBRDF_HASH_SEQUENCE_CURRENT to get the current key (again).
+ * 
+ * Return value: non 0 on failure
+ **/
 static int
 librdf_hash_list_get_seq(void* context, librdf_hash_data *key, 
 			 librdf_hash_sequence_type type) 
@@ -282,6 +355,14 @@ librdf_hash_list_get_seq(void* context, librdf_hash_data *key,
 }
 
 
+/**
+ * librdf_hash_list_sync:
+ * @context: list hash context
+ * 
+ * Not used
+ * 
+ * Return value: 0
+ **/
 static int
 librdf_hash_list_sync(void* context) 
 {
@@ -290,6 +371,14 @@ librdf_hash_list_sync(void* context)
 }
 
 
+/**
+ * librdf_hash_list_get_fd:
+ * @context: list hash context
+ * 
+ * Not used
+ * 
+ * Return value: 0
+ **/
 static int
 librdf_hash_list_get_fd(void* context) 
 {
@@ -300,6 +389,12 @@ librdf_hash_list_get_fd(void* context)
 
 /* local function to register LIST hash functions */
 
+/**
+ * librdf_hash_list_register_factory:
+ * @factory: hash factory prototype
+ * 
+ * Register the list hash module with the hash factory
+ **/
 static void
 librdf_hash_list_register_factory(librdf_hash_factory *factory) 
 {
@@ -316,6 +411,11 @@ librdf_hash_list_register_factory(librdf_hash_factory *factory)
   factory->get_fd  = librdf_hash_list_get_fd;
 }
 
+/**
+ * librdf_init_hash_list:
+ * 
+ * Initialise the list hash module.
+ **/
 void
 librdf_init_hash_list(void)
 {
