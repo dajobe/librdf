@@ -27,6 +27,7 @@
 #include <string.h>
 #endif
 
+
 #ifdef HAVE_DB_H
 #include <db.h>
 #endif
@@ -46,10 +47,12 @@
 
 #endif
 
-/* BDB V1 - NO CODE OR TESTS WRITTEN FOR DB 1.x */
-#if 0
-#define BDB_CLOSE_2_ARGS ?
-#define BDB_FD_2_ARGS ?
+/* BDB V1 - NOT WORKING */
+#ifdef HAVE_DBOPEN
+/* for O_ flags */
+#include <fcntl.h>
+#undef BDB_CLOSE_2_ARGS
+#undef BDB_FD_2_ARGS
 #endif
 
 
@@ -107,12 +110,27 @@ librdf_hash_bdb_open(void* context, char *identifier, void *mode, librdf_hash* o
     return 1;
   }
 #else
+#ifdef HAVE_DB_OPEN
   /* db_open() on my system is prototyped as:
      const char *name, DBTYPE, u_int32_t flags, int mode, DB_ENV*, DB_INFO*, DB** */
   if((ret=db_open(file, DB_HASH, DB_CREATE, 0644, NULL, NULL, &bdb)) != 0) {
     LIBRDF_FREE(cstring, file);
     return 1;
   }
+#else
+#ifdef HAVE_DBOPEN
+  /* dbopen() prototyped as:
+    const char *file, int flags, int mode, DBTYPE, const void *openinfo
+  */
+  if((bdb=dbopen(file, O_RDWR, 0644, DB_HASH, NULL)) != 0) {
+    LIBRDF_FREE(cstring, file);
+    return 1;
+  }
+  ret=0;
+#else
+ERROR - no idea how to use Berkeley DB
+#endif
+#endif
 #endif
 
   bdb_context->db=bdb;
@@ -154,13 +172,16 @@ librdf_hash_bdb_get(void* context, librdf_hash_data *key, librdf_hash_data *data
   bdb_key.data = (char*)key->data;
   bdb_key.size = key->size;
 
+#ifdef DB_DBT_MALLOC
+  /* BDB V2 or later? */
   bdb_data.flags=DB_DBT_MALLOC;
+#endif
 
   
 #ifdef HAVE_BDB_DB_TXN
   if((ret=db->get(db, NULL, &bdb_key, &bdb_data, 0)) == DB_NOTFOUND) {
 #else
-  if(ret=db->get(db, &bdb_key, &bdb_data, 0)) {
+  if((ret=db->get(db, &bdb_key, &bdb_data, 0))) {
 #endif
     /* not found */
     data->data = NULL;
@@ -278,8 +299,11 @@ librdf_hash_bdb_get_seq(void* context, librdf_hash_data *key, librdf_hash_sequen
   /* docs say you must zero DBT's before use */
   memset(&bdb_key, 0, sizeof(DBT));
   memset(&bdb_data, 0, sizeof(DBT));
+#ifdef DB_DBT_MALLOC
+  /* BDB V2 or later? */
   bdb_key.flags=DB_DBT_MALLOC;
   bdb_data.flags=DB_DBT_MALLOC;
+#endif
   
   
   if(type == LIBRDF_HASH_SEQUENCE_FIRST) {
@@ -305,7 +329,12 @@ librdf_hash_bdb_get_seq(void* context, librdf_hash_data *key, librdf_hash_sequen
     bdb_cursor=bdb_context->cursor;
     ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_data, DB_CURRENT);
 #else
+#ifdef R_CURRENT
     ret=db->seq(db, &bdb_key, &bdb_data, R_CURRENT);
+#else
+    /* BDB V1 does not define R_CURRENT - just use fail - FIXME */
+    return 1;
+#endif
 #endif
   }
   
