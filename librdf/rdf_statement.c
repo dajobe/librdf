@@ -735,8 +735,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG2(librdf_statement_decode_parts,
-                  "Decoding buffer of %d bytes\n", length);
+    LIBRDF_DEBUG2("Decoding buffer of %d bytes\n", length);
 #endif
 
 
@@ -769,8 +768,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
     total_length += node_len;
     
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_statement_decode_parts, "Found type %c (%d bytes)\n",
-                  type, node_len);
+    LIBRDF_DEBUG3("Found type %c (%d bytes)\n", type, node_len);
 #endif
   
     switch(type) {

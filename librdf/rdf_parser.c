@@ -84,8 +84,7 @@ librdf_parser_register_factory(librdf_world *world,
   char *name_copy;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_parser_register_factory,
-		"Received registration for parser %s\n", name);
+  LIBRDF_DEBUG2("Received registration for parser %s\n", name);
 #endif
   
   parser_factory=(librdf_parser_factory*)LIBRDF_CALLOC(librdf_parser_factory, 1,
@@ -131,9 +130,7 @@ librdf_parser_register_factory(librdf_world *world,
 
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_parser_register_factory,
-		"%s has context size %d\n", name,
-		parser_factory->context_length);
+  LIBRDF_DEBUG3("%s has context size %d\n", name, parser_factory->context_length);
 #endif
   
   parser_factory->next = world->parsers;
@@ -174,7 +171,7 @@ librdf_get_parser_factory(librdf_world *world,
   if(!name && !mime_type && !type_uri) {
     factory=world->parsers;
     if(!factory) {
-      LIBRDF_DEBUG1(librdf_get_parser_factory, "No parsers available\n");
+      LIBRDF_DEBUG1("No parsers available\n");
       return NULL;
     }
   } else {
@@ -310,7 +307,7 @@ librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
                                                 uri, base_uri);
 
   if(!librdf_uri_is_file_uri(uri)) {
-    LIBRDF_DEBUG2(librdf_parser_parse_as_stream, "%s parser can only handle file: URIs\n", parser->factory->name);
+    LIBRDF_DEBUG2("%s parser can only handle file: URIs\n", parser->factory->name);
     return NULL;
   }
   return parser->factory->parse_file_as_stream(parser->context,
@@ -340,7 +337,7 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
                                                  uri, base_uri, model);
   
   if(!librdf_uri_is_file_uri(uri)) {
-    LIBRDF_DEBUG2(librdf_parser_parse_into_stream, "%s parser can only handle file: URIs\n", parser->factory->name);
+    LIBRDF_DEBUG2("%s parser can only handle file: URIs\n", parser->factory->name);
     return 1;
   }
   return parser->factory->parse_file_into_model(parser->context,

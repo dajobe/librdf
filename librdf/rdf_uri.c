@@ -122,7 +122,7 @@ librdf_new_uri (librdf_world *world,
     new_uri=*(librdf_uri**)old_value->data;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_new_uri, "Found existing URI %s in hash with current usage %d\n", uri_string, new_uri->usage);
+    LIBRDF_DEBUG3("Found existing URI %s in hash with current usage %d\n", uri_string, new_uri->usage);
 #endif
 
     librdf_free_hash_datum(old_value);
@@ -140,7 +140,7 @@ librdf_new_uri (librdf_world *world,
   /* otherwise create a new one */
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_new_uri, "Creating new URI %s in hash\n", uri_string);
+  LIBRDF_DEBUG2("Creating new URI %s in hash\n", uri_string);
 #endif
 
   new_uri = (librdf_uri*)LIBRDF_CALLOC(librdf_uri, 1, sizeof(librdf_uri));
@@ -386,7 +386,7 @@ librdf_free_uri (librdf_uri* uri)
   uri->usage--;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_free_uri, "URI %s usage count now %d\n", uri->string, uri->usage);
+  LIBRDF_DEBUG3("URI %s usage count now %d\n", uri->string, uri->usage);
 #endif
 
   /* decrement usage, don't free if not 0 yet*/
@@ -398,7 +398,7 @@ librdf_free_uri (librdf_uri* uri)
   }
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_free_uri, "Deleting URI %s from hash, max usage was %d\n", uri->string, uri->max_usage);
+  LIBRDF_DEBUG3("Deleting URI %s from hash, max usage was %d\n", uri->string, uri->max_usage);
 #endif
 
   key.data=uri->string;

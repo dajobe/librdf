@@ -84,8 +84,7 @@ librdf_serializer_register_factory(librdf_world *world,
   char *name_copy;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_serializer_register_factory,
-		"Received registration for serializer %s\n", name);
+  LIBRDF_DEBUG2("Received registration for serializer %s\n", name);
 #endif
   
   serializer_factory=(librdf_serializer_factory*)LIBRDF_CALLOC(librdf_serializer_factory, 1,
@@ -131,9 +130,7 @@ librdf_serializer_register_factory(librdf_world *world,
 
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_serializer_register_factory,
-		"%s has context size %d\n", name,
-		serializer_factory->context_length);
+  LIBRDF_DEBUG3("%s has context size %d\n", name, serializer_factory->context_length);
 #endif
   
   serializer_factory->next = world->serializers;
@@ -174,7 +171,7 @@ librdf_get_serializer_factory(librdf_world *world,
   if(!name && !mime_type && !type_uri) {
     factory=world->serializers;
     if(!factory) {
-      LIBRDF_DEBUG1(librdf_get_serializer_factory, "No serializers available\n");
+      LIBRDF_DEBUG1("No serializers available\n");
       return NULL;
     }
   } else {

@@ -35,10 +35,10 @@
 /* DEBUGGING TURNED ON */
 
 /* Debugging messages */
-#define LIBRDF_DEBUG1(function, msg) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function); } while(0)
-#define LIBRDF_DEBUG2(function, msg, arg1) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1);} while(0)
-#define LIBRDF_DEBUG3(function, msg, arg1, arg2) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2);} while(0)
-#define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2, arg3);} while(0)
+#define LIBRDF_DEBUG1(msg) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, __func__); } while(0)
+#define LIBRDF_DEBUG2(msg, arg1) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, __func__, arg1);} while(0)
+#define LIBRDF_DEBUG3(msg, arg1, arg2) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, __func__, arg1, arg2);} while(0)
+#define LIBRDF_DEBUG4(msg, arg1, arg2, arg3) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, __func__, arg1, arg2, arg3);} while(0)
 
 #define LIBRDF_ERROR1(world, msg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__); abort();} while(0)
 #define LIBRDF_ERROR2(world, msg,arg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__, arg); abort();} while(0)
@@ -83,10 +83,10 @@ void librdf_system_free(void *ptr);
 /* DEBUGGING TURNED OFF */
 
 /* No debugging messages */
-#define LIBRDF_DEBUG1(function, msg)
-#define LIBRDF_DEBUG2(function, msg, arg1)
-#define LIBRDF_DEBUG3(function, msg, arg1, arg2)
-#define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3)
+#define LIBRDF_DEBUG1(msg)
+#define LIBRDF_DEBUG2(msg, arg1)
+#define LIBRDF_DEBUG3(msg, arg1, arg2)
+#define LIBRDF_DEBUG4(msg, arg1, arg2, arg3)
 
 #define LIBRDF_ERROR1(world, msg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__)
 #define LIBRDF_ERROR2(world, msg, arg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__, arg)

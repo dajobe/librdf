@@ -134,7 +134,7 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
     return NULL;
 
   if(uri_string && uri) {
-    LIBRDF_DEBUG3(librdf_new_node_from_uri_or_uri, "Called with both a URI string %s and object URI %s\n", uri_string, librdf_uri_as_string(uri));
+    LIBRDF_DEBUG3("Called with both a URI string %s and object URI %s\n", uri_string, librdf_uri_as_string(uri));
     return NULL;
   }
 
@@ -160,7 +160,7 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
     librdf_free_uri(new_uri);
     
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_new_node, "Found existing resource node with URI %s in hash with current usage %d\n", uri_string, new_node->usage);
+    LIBRDF_DEBUG3("Found existing resource node with URI %s in hash with current usage %d\n", uri_string, new_node->usage);
 #endif
 
     librdf_free_hash_datum(old_value);
@@ -173,7 +173,7 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
   /* otherwise create a new one */
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_new_node, "Creating new resource node with URI %s in hash\n", uri_string);
+  LIBRDF_DEBUG2("Creating new resource node with URI %s in hash\n", uri_string);
 #endif
 
   new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, sizeof(librdf_node));
@@ -439,7 +439,7 @@ librdf_new_node_from_typed_literal(librdf_world *world,
     new_node=*(librdf_node**)old_value->data;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_new_node_from_typed_literal, "Found existing resource node with typed literal %s in hash with current usage %d\n", value, new_node->usage);
+    LIBRDF_DEBUG3("Found existing resource node with typed literal %s in hash with current usage %d\n", value, new_node->usage);
 #endif
 
     librdf_free_hash_datum(old_value);
@@ -523,7 +523,7 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
     LIBRDF_FREE(cstring, new_identifier);
     
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_new_node_from_blank_identifier, "Found existing blank node identifier %s in hash with current usage %d\n", new_identifier, new_node->usage);
+    LIBRDF_DEBUG3("Found existing blank node identifier %s in hash with current usage %d\n", new_identifier, new_node->usage);
 #endif
 
     librdf_free_hash_datum(old_value);
@@ -604,7 +604,7 @@ librdf_free_node(librdf_node *node)
   node->usage--;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_free_node, "Node %p usage count now %d\n", node, node->usage);
+  LIBRDF_DEBUG3("Node %p usage count now %d\n", node, node->usage);
 #endif
 
   /* decrement usage, don't free if not 0 yet*/
@@ -616,7 +616,7 @@ librdf_free_node(librdf_node *node)
   }
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_free_node, "Deleting Node %p from hash\n", node);
+  LIBRDF_DEBUG2("Deleting Node %p from hash\n", node);
 #endif
 
   switch(node->type) {

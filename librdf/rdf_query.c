@@ -116,9 +116,7 @@ librdf_query_register_factory(const char *name,
   int name_length;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_query_register_factory,
-                "Received registration for query name %s URI %s\n", name, 
-                librdf_uri_as_string(uri));
+  LIBRDF_DEBUG3("Received registration for query name %s URI %s\n", name, librdf_uri_as_string(uri));
 #endif
   
   query=(librdf_query_factory*)LIBRDF_CALLOC(librdf_query_factory, 1,
@@ -156,8 +154,7 @@ librdf_query_register_factory(const char *name,
   (*factory)(query);
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_query_register_factory, "%s has context size %d\n",
-                name, query->context_length);
+  LIBRDF_DEBUG3("%s has context size %d\n", name, query->context_length);
 #endif
   
   query->next = query_factories;
@@ -181,8 +178,7 @@ librdf_get_query_factory (const char *name, librdf_uri *uri)
   if(!name && !uri) {
     factory=query_factories;
     if(!factory) {
-      LIBRDF_DEBUG1(librdf_get_query_factory, 
-                    "No (default) query factories registered\n");
+      LIBRDF_DEBUG1("No (default) query factories registered\n");
       return NULL;
     }
   } else {
@@ -196,9 +192,7 @@ librdf_get_query_factory (const char *name, librdf_uri *uri)
     }
     /* else FACTORY name not found */
     if(!factory) {
-      LIBRDF_DEBUG3(librdf_get_query_factory,
-                    "No query factory with name %s uri %s found\n",
-                    name, librdf_uri_as_string(uri));
+      LIBRDF_DEBUG3("No query factory with name %s uri %s found\n", name, librdf_uri_as_string(uri));
       return NULL;
     }
   }
@@ -300,7 +294,7 @@ librdf_new_query_from_factory (librdf_world *world,
   librdf_query* query;
 
   if(!factory) {
-    LIBRDF_DEBUG1(librdf_new_query, "No factory given\n");
+    LIBRDF_DEBUG1("No query factory given\n");
     return NULL;
   }
   

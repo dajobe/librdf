@@ -200,8 +200,7 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
   char *name_copy;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_hash_register_factory,
-		"Received registration for hash %s\n", name);
+  LIBRDF_DEBUG2("Received registration for hash %s\n", name);
 #endif
   
   hash=(librdf_hash_factory*)LIBRDF_CALLOC(librdf_hash_factory, 1,
@@ -230,8 +229,7 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
   (*factory)(hash);
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_hash_register_factory, "%s has context size %d\n",
-		name, hash->context_length);
+  LIBRDF_DEBUG3("%s has context size %d\n", name, hash->context_length);
 #endif
   
   hash->next = world->hashes;
@@ -258,8 +256,7 @@ librdf_get_hash_factory(librdf_world *world, const char *name)
   if(!name) {
     factory=world->hashes;
     if(!factory) {
-      LIBRDF_DEBUG1(librdf_get_hash_factory,
-		    "No (default) hashes registered\n");
+      LIBRDF_DEBUG1("No (default) hashes registered\n");
       return NULL;
     }
   } else {
@@ -1145,7 +1142,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
     return 0;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_hash_from_string, "Parsing >>%s<<\n", string);
+  LIBRDF_DEBUG2("Parsing >>%s<<\n", string);
 #endif
 
   p=string;
@@ -1156,8 +1153,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
   while(*p) {
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_hash_from_string,
-                  "state %d at %s\n", state, p);
+    LIBRDF_DEBUG3("state %d at %s\n", state, p);
 #endif
 
     switch(state){
@@ -1172,8 +1168,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
         state=HFS_PARSE_STATE_KEY;
         
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_hash_from_string,
-                  "state %d at %s\n", state, p);
+    LIBRDF_DEBUG3("state %d at %s\n", state, p);
 #endif
 
         /* start of key */
@@ -1196,8 +1191,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
         /* fall through to next state */
       
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_hash_from_string,
-                  "state %d at %s\n", state, p);
+    LIBRDF_DEBUG3("state %d at %s\n", state, p);
 #endif
 
         /* got key, now skipping spaces */
@@ -1217,8 +1211,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
         /* fall through to next state */
         
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_hash_from_string,
-                  "state %d at %s\n", state, p);
+    LIBRDF_DEBUG3("state %d at %s\n", state, p);
 #endif
 
         /* got key\s+= now skipping spaces " */
@@ -1238,8 +1231,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
         /* fall through to next state */
         
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_hash_from_string,
-                  "state %d at %s\n", state, p);
+    LIBRDF_DEBUG3("state %d at %s\n", state, p);
 #endif
 
         /* got key\s+=\s+" now reading value */
@@ -1277,8 +1269,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
         *to='\0';
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-        LIBRDF_DEBUG3(librdf_hash_from_string,
-                      "decoded key >>%s<< (true) value >>%s<<\n", key, new_value);
+        LIBRDF_DEBUG3("decoded key >>%s<< (true) value >>%s<<\n", key, new_value);
 #endif
         
         hd_key.data=(void*)key; hd_key.size=key_len;
@@ -1289,8 +1280,7 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
         LIBRDF_FREE(cstring, new_value);
         
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-        LIBRDF_DEBUG1(librdf_hash_from_string,
-                      "after decoding ");
+        LIBRDF_DEBUG1("after decoding ");
         librdf_hash_print (hash, stderr) ;
         fputc('\n', stderr);
 #endif

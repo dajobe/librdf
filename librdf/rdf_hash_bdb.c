@@ -155,13 +155,13 @@ librdf_hash_bdb_open(void* context, char *identifier,
    * int db_create(DB **dbp, DB_ENV *dbenv, u_int32_t flags);
    */
   if((ret=db_create(&bdb, NULL, 0))) {
-    LIBRDF_DEBUG2(librdf_hash_bdb_open, "Failed to create BDB context - %d\n", ret);
+    LIBRDF_DEBUG2("Failed to create BDB context - %d\n", ret);
     return 1;
   }
   
 #ifdef HAVE_BDB_SET_FLAGS
   if((ret=bdb->set_flags(bdb, DB_DUP))) {
-    LIBRDF_DEBUG2(librdf_hash_bdb_open, "Failed to set BDB duplicate flag - %d\n", ret);
+    LIBRDF_DEBUG2("Failed to set BDB duplicate flag - %d\n", ret);
     return 1;
   }
 #endif
@@ -567,7 +567,7 @@ librdf_hash_bdb_cursor_get(void* context,
 #ifdef DB_NOTFOUND
     /* V2 and V3 */
     if(ret != DB_NOTFOUND)
-      LIBRDF_DEBUG2(librdf_hash_bdb_cursor_get, "BDB cursor error - %d\n", ret);
+      LIBRDF_DEBUG2("BDB cursor error - %d\n", ret);
 #endif
     key->data=NULL;
     return ret;
@@ -670,7 +670,7 @@ librdf_hash_bdb_put(void* context, librdf_hash_datum *key,
   ret=db->put(db, &bdb_key, &bdb_value, 0);
 #endif
   if(ret)
-    LIBRDF_DEBUG2(librdf_hash_bdb_put, "BDB put failed - %d\n", ret);
+    LIBRDF_DEBUG2("BDB put failed - %d\n", ret);
 
   return (ret != 0);
 }
@@ -847,7 +847,7 @@ librdf_hash_bdb_delete_key(void* context, librdf_hash_datum *key)
   ret=bdb->del(bdb, &bdb_key, 0);
 #endif
   if(ret)
-    LIBRDF_DEBUG2(librdf_hash_bdb_delete, "BDB del failed - %d\n", ret);
+    LIBRDF_DEBUG2("BDB del failed - %d\n", ret);
 
   return (ret != 0);
 }
@@ -932,7 +932,7 @@ librdf_hash_bdb_delete_key_value(void* context,
 #endif
 
   if(ret)
-    LIBRDF_DEBUG2(librdf_hash_bdb_delete, "BDB del failed - %d\n", ret);
+    LIBRDF_DEBUG2("BDB del failed - %d\n", ret);
 
   return (ret != 0);
 }

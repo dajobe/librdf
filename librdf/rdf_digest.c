@@ -68,8 +68,7 @@ librdf_digest_register_factory(librdf_world *world, const char *name,
   char *name_copy;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_digest_register_factory,
-		"Received registration for digest %s\n", name);
+  LIBRDF_DEBUG2("Received registration for digest %s\n", name);
 #endif
   digest=(librdf_digest_factory*)LIBRDF_CALLOC(librdf_digest_factory, 1,
 					       sizeof(librdf_digest_factory));
@@ -98,9 +97,7 @@ librdf_digest_register_factory(librdf_world *world, const char *name,
 
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG4(librdf_digest_register_factory,
-		"%s has context size %d and digest size %d\n", name,
-		digest->context_length, digest->digest_length);
+  LIBRDF_DEBUG4("%s has context size %d and digest size %d\n", name, digest->context_length, digest->digest_length);
 #endif
   
   digest->next = world->digests;
@@ -125,7 +122,7 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
   if(!name) {
     factory=world->digests;
     if(!factory) {
-      LIBRDF_DEBUG1(librdf_get_digest_factory, "No digests available\n");
+      LIBRDF_DEBUG1("No digests available\n");
       return NULL;
     }
   } else {

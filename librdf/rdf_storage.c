@@ -131,8 +131,7 @@ librdf_storage_register_factory(const char *name,
   char *name_copy;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_storage_register_factory,
-                "Received registration for storage %s\n", name);
+  LIBRDF_DEBUG2("Received registration for storage %s\n", name);
 #endif
   
   storage=(librdf_storage_factory*)LIBRDF_CALLOC(librdf_storage_factory, 1,
@@ -161,8 +160,7 @@ librdf_storage_register_factory(const char *name,
   (*factory)(storage);
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_storage_register_factory, "%s has context size %d\n",
-                name, storage->context_length);
+  LIBRDF_DEBUG3("%s has context size %d\n", name, storage->context_length);
 #endif
   
   storage->next = storages;
@@ -185,8 +183,7 @@ librdf_get_storage_factory (const char *name)
   if(!name) {
     factory=storages;
     if(!factory) {
-      LIBRDF_DEBUG1(librdf_get_storage_factory, 
-                    "No (default) storages registered\n");
+      LIBRDF_DEBUG1("No (default) storages registered\n");
       return NULL;
     }
   } else {
@@ -197,9 +194,7 @@ librdf_get_storage_factory (const char *name)
     }
     /* else FACTORY name not found */
     if(!factory) {
-      LIBRDF_DEBUG2(librdf_get_storage_factory,
-                    "No storage with name %s found\n",
-                    name);
+      LIBRDF_DEBUG2("No storage with name %s found\n", name);
       return NULL;
     }
   }
