@@ -15,6 +15,9 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>BUG: The parser error/warning callbacks are not called - broken. They
+are also rather useless in not passing through the varargs argument.  Maybe
+change the API and the world error/warning api to be more general.</li>
 <li>RFE: allow the raptor parser features (raptor_set_feature) to be
 set via librdf_parser_set_feature</li>
 <li>RFE: Make the parser should be able to adjust error and warning
