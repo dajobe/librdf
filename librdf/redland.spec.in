@@ -155,6 +155,8 @@ cd ..
 %{_libdir}/librdf*.so
 %{_libdir}/pkgconfig/redland.pc
 
+%{_datadir}/%{name}/Redland.i
+
 %{prefix}/include/redland.h
 %{prefix}/include/librdf.h 
 %{prefix}/include/rdf_*.h
@@ -195,6 +197,8 @@ cd ..
 /sbin/ldconfig
 
 %changelog
+* Mon Jul 12 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
+- put /usr/share/redland/Redland.i in redland-devel
 * Wed May  5 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
 - require raptor 1.3.0
 - require rasqal 0.2.0
