@@ -1,3 +1,20 @@
+2004-08-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_init.c (librdf_free_world): Destroy nodes, statements mutexes.
+	(librdf_world_init_mutex): Init nodes, statements mutexes.
+
+	* rdf_init.h: Added statements mutex
+
+	* rdf_statement.c: Statements are now usage counted,
+	Removed old macros throughout.
+	(librdf_new_statement): Set usage to 1.
+	(librdf_new_statement_from_statement): Rewrite to use usage.
+	(librdf_free_statement): Free when usage is zero, using mutex to
+	protect shared structures.
+
+	* rdf_statement.h: Statements are now usage counted,
+	Removed old macros
+
 2004-08-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_parser_raptor.c
