@@ -22,55 +22,16 @@
 
 %module Redland
 %include typemaps.i
+
 %{
 
-#ifdef SWIGPERL
-/* for perl, these are passed in by MakeMaker derived makefile */
-#undef PACKAGE
-#undef VERSION
-
-/* Delete one of many names polluted by Perl in embed.h via perl.h */
-#ifdef list
-#undef list
-#endif
-#endif
-
-/* SWIG BUG - no SWIGTCL is defined - duh */
-#ifdef TCL_MAJOR_VERSION
-  /* want symbols starting librdf_ not _librdf_ */
-#undef SWIG_prefix
-#define SWIG_prefix
-#endif
-
-#if defined(SWIGRUBY) || defined (PHP_VERSION)
-/* Ruby and PHP pollute the #define space with these names */
-#undef PACKAGE_NAME
-#undef PACKAGE_STRING
-#undef PACKAGE_TARNAME
-#undef PACKAGE_VERSION
-#undef PACKAGE_BUGREPORT
+/* compile-time include (not inside a % ... % block) */
+#ifdef REDLAND_PRE_I
+#include <redland-pre.i>
 #endif
 
 #include <rdf_config.h>
 #include <redland.h>
-
-/* Internal prototypes */
-/* FOR TESTING ERRORS ONLY - NOT PART OF API */
-void librdf_internal_test_error(librdf_world *world);
-void librdf_internal_test_warning(librdf_world *world);
-
-#ifdef SWIGPYTHON
-void librdf_python_world_init(librdf_world *world);
-#endif
-#ifdef SWIGPERL
-void librdf_perl_world_init(librdf_world *world);
-void librdf_perl_world_finish(void);
-#endif
-#ifdef SWIGPHP
-librdf_world* librdf_php_get_world(void);
-void librdf_php_world_finish(void);
-#endif
-
 
 /* 
  * Thanks to the patch in this Debian bug for the solution
@@ -90,244 +51,15 @@ void librdf_php_world_finish(void);
 #endif
 #endif
 
-
-
-#ifdef SWIGPYTHON
-/* swig doesn't seem to declare prototypes of get accessors for statics */
-static PyObject *_wrap_librdf_copyright_string_get(void);
-static PyObject *_wrap_librdf_version_string_get(void);
-static PyObject *_wrap_librdf_short_copyright_string_get(void);
-static PyObject *_wrap_librdf_version_decimal_get(void);
-
-static PyObject *_wrap_librdf_version_major_get(void);
-static PyObject *_wrap_librdf_version_minor_get(void);
-static PyObject *_wrap_librdf_version_release_get(void);
-
-SWIGEXPORT(void) SWIG_init(void);
-
-static PyObject *librdf_python_callback = NULL;
-
-static PyObject * librdf_python_set_callback(PyObject *dummy, PyObject *args);
-
-/*
- * set the Python function object callback
- */
-static PyObject *
-librdf_python_set_callback(dummy, args)
-  PyObject *dummy, *args;
-{
-  PyObject *result = NULL;
-  PyObject *temp;
-  
-  if (PyArg_ParseTuple(args, "O:set_callback", &temp)) {
-    if (!PyCallable_Check(temp)) {
-      PyErr_SetString(PyExc_TypeError, "parameter must be callable");
-      return NULL;
-    }
-    Py_XINCREF(temp);         /* Add a reference to new callback */
-    Py_XDECREF(librdf_python_callback);  /* Dispose of previous callback */
-    librdf_python_callback = temp;       /* Remember new callback */
-    /* Boilerplate to return "None" */
-    Py_INCREF(Py_None);
-    result = Py_None;
-  }
-  return result;
-}
-
-
-/* Declare a table of methods that python can call */
-static PyMethodDef librdf_python_methods [] = {
-    {"set_callback",  librdf_python_set_callback, METH_VARARGS,
-     "Set python message callback."},
-    {NULL, NULL, 0, NULL}        /* Sentinel */
-};
-
-
-/*
- * calls a python function defined as:
- *   RDF.message($$)
- * where first argument is an integer, second is a (scalar) string
- * with an integer return value indicating if the message was handled.
- */
-static int
-librdf_call_python_message(int type, const char *message, va_list arguments)
-{
-  char empty_buffer[1];
-  PyObject *arglist;
-  PyObject *result;
-  char *buffer;
-  int len;
-  va_list args_copy;
-  int rc=0;
-
-  if(!librdf_python_callback)
-    return 0;
-
-  /* ask vsnprintf size of buffer required */
-  va_copy(args_copy, arguments);
-  len=vsnprintf(empty_buffer, 1, message, args_copy)+1;
-  va_end(args_copy);
-  buffer=(char*)malloc(len);
-  if(!buffer) {
-    fprintf(stderr, "librdf_call_python_message: Out of memory\n");
-    return 0;
-  }
-  
-  va_copy(args_copy, arguments);
-  vsnprintf(buffer, len, message, args_copy);
-  va_end(args_copy);
-
-  /* call the callback */
-  arglist = Py_BuildValue("(is)", type, buffer);
-  if(!arglist) {
-    fprintf(stderr, "librdf_call_python_message: Out of memory\n");
-    free(buffer);
-    return 0;
-  }
-  result = PyEval_CallObject(librdf_python_callback, arglist);
-  Py_DECREF(arglist);
-  if(result) {
-    if(PyInt_Check(result))
-      rc=(int)PyInt_AS_LONG(result);
-    
-    Py_DECREF(result);
-  }
-
-  free(buffer);
-
-  rc=1;
-  
-  return rc;
-}
-
-static int
-librdf_python_error_handler(void *user_data, 
-                            const char *message, va_list arguments)
-{
-  return librdf_call_python_message(0, message, arguments);
-}
-
-
-static int
-librdf_python_warning_handler(void *user_data,
-                              const char *message, va_list arguments)
-{
-  return librdf_call_python_message(1, message, arguments);
-}
-
-void
-librdf_python_world_init(librdf_world *world)
-{
-  (void) Py_InitModule("Redland_python", librdf_python_methods);
-  librdf_world_set_error(world, NULL, librdf_python_error_handler);
-  librdf_world_set_warning(world,  NULL, librdf_python_warning_handler);
-}
- 
-
+/* compile-time include (inside a % ... % block) */
+#ifdef REDLAND_POST_I
+#include <redland-post.i>
 #endif
 
-#ifdef SWIGPERL
-/*
- * calls a perl subroutine defined as:
- *   RDF::Redland::World::message($$)
- * where first argument is an integer, second is a (scalar) string
- */
-static int
-librdf_call_perl_message(int type, const char *message, va_list arguments)
-{
-  char empty_buffer[1];
-  dSP;
-  char *buffer;
-  int len;
-  va_list args_copy;
-  int rc=0;
-  
-  SAVETMPS;
-
-  /* ask vsnprintf size of buffer required */
-  va_copy(args_copy, arguments);
-  len=vsnprintf(empty_buffer, 1, message, args_copy)+1;
-  va_end(args_copy);
-  buffer=(char*)malloc(len);
-  if(!buffer)
-    fprintf(stderr, "librdf_call_perl_message: Out of memory\n");
-  else {
-    int count;
-    
-    va_copy(args_copy, arguments);
-    vsnprintf(buffer, len, message, args_copy);
-    va_end(args_copy);
-
-    PUSHMARK(SP) ;
-    XPUSHs(sv_2mortal(newSViv(type)));
-    XPUSHs(sv_2mortal(newSVpv(buffer, 0)));
-    PUTBACK;
-  
-    count=call_pv("RDF::Redland::World::message", G_SCALAR);
-
-    SPAGAIN;
-    if(count == 1)
-      rc=POPi;
-    PUTBACK;
-    
-    free(buffer);
-  }
-  
-  FREETMPS;
-  
-  return rc;
-}
-
-static int
-librdf_perl_error_handler(void *user_data, 
-                          const char *message, va_list arguments)
-{
-  return librdf_call_perl_message(0, message, arguments);
-}
-
-
-static int
-librdf_perl_warning_handler(void *user_data,
-                            const char *message, va_list arguments)
-{
-  return librdf_call_perl_message(1, message, arguments);
-}
-
-static librdf_world* librdf_perl_world=NULL;
-
-void
-librdf_perl_world_init(librdf_world *world)
-{
-  librdf_world_set_error(world, NULL, librdf_perl_error_handler);
-  librdf_world_set_warning(world,  NULL, librdf_perl_warning_handler);
-
-  librdf_perl_world=world;
-}
-
-void
-librdf_perl_world_finish(void)
-{
-  librdf_free_world(librdf_perl_world);
-}
-#endif
-
-
-/* When in PHP when being compiled by C */
-#if defined (PHP_VERSION)
-static librdf_world* librdf_php_world;
-
-static librdf_world*
-librdf_php_get_world(void)
-{
-  return librdf_php_world;
-}
-
-void
-librdf_php_world_finish(void)
-{
-  librdf_free_world(librdf_php_world);
-}
-#endif    
+/* Internal prototypes */
+/* FOR TESTING ERRORS ONLY - NOT PART OF API */
+void librdf_internal_test_error(librdf_world *world);
+void librdf_internal_test_warning(librdf_world *world);
 
 
 /* prototypes for internal routines called below - NOT PART OF API */
@@ -352,28 +84,17 @@ librdf_internal_test_warning(librdf_world *world)
 
 
 %init %{
-#ifdef TCL_MAJOR_VERSION
-Tcl_PkgProvide(interp, PACKAGE, (char*)librdf_version_string);
-#endif
-
-#ifdef PHP_VERSION
-  /* PHP seems happier if this happens at module init time */
-  if(!librdf_php_world) {
-    librdf_php_world=librdf_new_world();
-    librdf_world_open(librdf_php_world);
-  }
+/* compile-time include (inside a % ... % block) */
+#ifdef REDLAND_INIT_I
+#include <redland-init.i>
 #endif
 %}
 
-/* optional input strings - can be NULL, need special conversions */
-%typemap(ruby,in) const char *inStrOrNull {
-  $1 = ($input == Qnil) ? NULL : STR2CSTR($input);
-}
-/* returning char* or NULL, need special conversions */
-%typemap(ruby,out) char *{
- $result = ($1 == NULL) ? Qnil : rb_str_new2($1);
-}
 
+/* SWIG-time include (outside a % ... % block) */
+#ifdef REDLAND_TYPES_I
+%include <redland-types.i>
+#endif
 
 typedef struct librdf_world_s librdf_world;
 typedef struct librdf_hash_s librdf_hash;
@@ -595,18 +316,6 @@ int librdf_stream_next(librdf_stream* stream);
 librdf_statement* librdf_stream_get_object(librdf_stream* stream);
 librdf_node* librdf_stream_get_context(librdf_stream* stream);
 
-/* here */
-#ifdef SWIGPYTHON
-void librdf_python_world_init(librdf_world *world);
-#endif
-#ifdef SWIGPERL
-void librdf_perl_world_init(librdf_world *world);
-void librdf_perl_world_finish(void);
-#endif
-#ifdef SWIGPHP
-librdf_world* librdf_php_get_world(void);
-void librdf_php_world_finish(void);
-#endif
 
 /* FOR TESTING ERRORS ONLY - NOT PART OF API */
 void librdf_internal_test_error(librdf_world *world);
@@ -625,3 +334,8 @@ extern const unsigned int librdf_version_release;
 extern const unsigned int librdf_version_decimal;
 %mutable;
 
+
+/* SWIG-time include (not inside a % ... % block) */
+#ifdef REDLAND_DECL_I
+%include <redland-decl.i>
+#endif
