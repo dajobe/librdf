@@ -98,10 +98,10 @@ if test "$echo_prefix" = "yes"; then
   echo $prefix
 fi
 if test "$echo_cflags" = "yes"; then
-  echo $includes
+  echo $includes @LIBRDF_EXTERNAL_CPPFLAGS@
 fi
 if test "$echo_libs" = "yes"; then
-  echo -L@libdir@ -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@
+  echo -L@libdir@ -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ @LIBRDF_EXTERNAL_LIBS@
 fi
 if test "$echo_libtool_libs" = "yes"; then
   echo @libdir@/@LIBRDF_LIBTOOLLIBS@
