@@ -4,7 +4,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2002-2001 David Beckett - http://purl.org/net/dajobe/
+# Copyright (C) 2002-2003 David Beckett - http://purl.org/net/dajobe/
 # Institute for Learning and Research Technology - http://www.ilrt.org/
 # University of Bristol - http://www.bristol.ac.uk/
 # 
