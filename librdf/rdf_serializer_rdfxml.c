@@ -233,6 +233,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   librdf_world* world=statement->world;
   librdf_node* nodes[3];
   unsigned char* uris[3];
+  size_t uris_lens[3];
   unsigned char *name=NULL;  /* where to split predicate name */
   unsigned char *rdf_ns_uri;
   size_t rdf_ns_uri_len;
@@ -251,7 +252,8 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
     librdf_node* n=nodes[i];
     
     if(librdf_node_get_type(n) == LIBRDF_NODE_TYPE_RESOURCE) {
-      uris[i]=librdf_uri_as_string(librdf_node_get_uri(n));
+      uris[i]=librdf_uri_as_counted_string(librdf_node_get_uri(n), 
+                                           &uris_lens[i]);
 
       if(i == 1) {
         unsigned char *p;
@@ -263,12 +265,14 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
           continue;
         }
         
-        p= uris[i] + strlen((const char*)uris[i])-1;
+        /* FIXME: this does too much work, it should end on the first
+         * illegal XML name character - requires a raptor check */
+        p= uris[i] + uris_lens[i]-1;
         while(p >= uris[i]) {
           if(rdf_serializer_rdfxml_ok_xml_name(p))
             name=p;
-          else if(name)
-            /* this char isn't in name, but got name earlier, so stop */
+          else if(name && p>uris[i] && !rdf_serializer_rdfxml_ok_xml_name(p-1))
+            /* if next char would make name invalid, stop */
             break;
           p--;
         }
