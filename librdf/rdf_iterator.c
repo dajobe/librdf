@@ -120,6 +120,9 @@ librdf_iterator_get_next_mapped_element(librdf_iterator* iterator)
 int
 librdf_iterator_have_elements(librdf_iterator* iterator) 
 {
+  if(!iterator)
+    return 0;
+
   if(!iterator->have_more_elements)
     return 0;
 
