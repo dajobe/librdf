@@ -103,9 +103,15 @@ static const int redland_version_release = LIBRDF_VERSION_RELEASE;
 /**
  * librdf_init_world - Initialise the library
  * @digest_factory_name: &librdf_digest_factory
+ * @uris_hash: &librdf_hash for URIs
  * 
  * Initialises various classes and uses the digest factory
  * for various modules that need to make digests of their objects.
+ * See librdf_init_node() for details.
+ *
+ * If a uris_hash is given, that is passed to the URIs class
+ * initialisation and used to store hashes rather than the default
+ * one, currently an in memory hash.  See librdf_init_uri() for details.
  *
  **/
 void
