@@ -632,7 +632,7 @@ main(int argc, char *argv[])
 
   /* print the results */
   while(!librdf_query_results_finished(query)) {
-    const char **names;
+    const char **names=NULL;
     librdf_node* values[VARIABLES_COUNT];
     
     if(librdf_query_get_result_bindings(query, &names, values))
