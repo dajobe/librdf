@@ -70,6 +70,8 @@ void librdf_statement_set_context(librdf_statement *statement, librdf_context *c
 
 /* convert to a string */
 char *librdf_statement_to_string(librdf_statement *statement);
+/* print it prettily */
+void librdf_statement_print(librdf_statement *statement, FILE *fh);
 
 /* compare two statements */
 int librdf_statement_equals(librdf_statement* statement1, librdf_statement* statement2);
