@@ -35,6 +35,8 @@ rdf_query.h \
 rdf_serializer.h \
 rdf_log.h
 
+noinst_HEADERS = win32_rdf_config.h
+
 librdf_la_SOURCES = rdf_init.c \
 rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
