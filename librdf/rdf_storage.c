@@ -32,6 +32,7 @@
 #include <rdf_storage.h>
 #include <rdf_storage_hashes.h>
 #include <rdf_storage_list.h>
+#include <rdf_uri.h>
 
 
 /* prototypes for helper functions */
@@ -849,8 +850,8 @@ librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node,
   librdf_iterator *iterator;
   int status;
   
-  if (storage->factory->has_arc_in)
-    return storage->factory->has_arc_in(storage, node, property);
+  if (storage->factory->has_arc_out)
+    return storage->factory->has_arc_out(storage, node, property);
   
   iterator=librdf_storage_get_targets(storage, node, property);
   if(!iterator)
@@ -861,6 +862,56 @@ librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node,
   librdf_free_iterator(iterator);
 
   return status;
+}
+
+
+
+/**
+ * librdf_storage_group_add_statement - Add a statement to a storage group
+ * @storage: &librdf_storage object
+ * @group_uri: &librdf_uri group URI
+ * @statement: &librdf_statement statement to add
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_storage_group_add_statement(librdf_storage* storage,
+                                   librdf_uri* group_uri,
+                                   librdf_statement* statement) 
+{
+  return storage->factory->group_add_statement(storage, group_uri, statement);
+}
+
+
+/**
+ * librdf_storage_group_remove_statement - Remove a statement from a storage group
+ * @storage: &librdf_storage object
+ * @group_uri: &librdf_uri group URI
+ * @statement: &librdf_statement statement to remove
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_storage_group_remove_statement(librdf_storage* storage, 
+                                      librdf_uri* group_uri,
+                                      librdf_statement* statement) 
+{
+  return storage->factory->group_remove_statement(storage, group_uri, statement);
+}
+
+
+/**
+ * librdf_storage_group_serialise - List all statements in a storage group
+ * @storage: &librdf_storage object
+ * @group_uri: &librdf_uri group URI
+ * 
+ * Return value: &librdf_stream of statements or NULL on failure or group is empty
+ **/
+librdf_stream*
+librdf_storage_group_serialise(librdf_storage* storage,
+                               librdf_uri* group_uri) 
+{
+  return storage->factory->group_serialise(storage, group_uri);
 }
 
 
