@@ -524,6 +524,22 @@ librdf_model_storage_get_contexts(librdf_model* model)
 
 
 
+/**
+ * librdf_model_storage_get_feature - get the value of a storage feature
+ * @storage: &librdf_storage object
+ * @feature: &librdf_uri feature property
+ * 
+ * Return value: &librdf_node feature value or NULL if no such feature
+ * exists or the value is empty.
+ **/
+static librdf_node*
+librdf_model_storage_get_feature(librdf_model* model, librdf_uri* feature)
+{
+  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
+  return librdf_storage_get_feature(context->storage, feature);
+}
+
+
 /* local function to register model_storage functions */
 
 static void
@@ -563,7 +579,8 @@ librdf_model_storage_register_factory(librdf_model_factory *factory)
   factory->query              = librdf_model_storage_query;
   factory->sync               = librdf_model_storage_sync;
   factory->get_storage        = librdf_model_storage_get_storage;
-  factory->get_contexts        = librdf_model_storage_get_contexts;
+  factory->get_contexts       = librdf_model_storage_get_contexts;
+  factory->get_feature        = librdf_model_storage_get_feature;
 }
 
 
