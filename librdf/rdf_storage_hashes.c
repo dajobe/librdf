@@ -1609,6 +1609,40 @@ librdf_storage_hashes_sync(librdf_storage *storage)
 }
 
 
+/**
+ * librdf_storage_hashes_get_feature - get the value of a storage feature
+ * @storage: &librdf_storage object
+ * @feature: &librdf_uri feature property
+ * 
+ * Return value: &librdf_node feature value or NULL if no such feature
+ * exists or the value is empty.
+ **/
+static librdf_node*
+librdf_storage_hashes_get_feature(librdf_storage* storage, librdf_uri* feature)
+{
+  librdf_storage_hashes_context* scontext=(librdf_storage_hashes_context*)storage->context;
+  unsigned char *uri_string;
+
+  if(!feature)
+    return NULL;
+
+  uri_string=librdf_uri_as_string(feature);
+  if(!uri_string)
+    return NULL;
+  
+  if(!strcmp(uri_string, LIBRDF_MODEL_FEATURE_CONTEXTS)) {
+    char value[2];
+
+    sprintf((char*)value, "%d", (scontext->index_contexts != 0));
+    return librdf_new_node_from_typed_literal(storage->world,
+                                              (const char*)value,
+                                              NULL, NULL);
+  }
+
+  return NULL;
+}
+
+
 /* local function to register hashes storage functions */
 
 static void
@@ -1636,8 +1670,8 @@ librdf_storage_hashes_register_factory(librdf_storage_factory *factory)
   factory->context_add_statement    = librdf_storage_hashes_context_add_statement;
   factory->context_remove_statement = librdf_storage_hashes_context_remove_statement;
   factory->context_serialise        = librdf_storage_hashes_context_serialise;
-
-  factory->sync               = librdf_storage_hashes_sync;
+  factory->sync                     = librdf_storage_hashes_sync;
+  factory->get_feature              = librdf_storage_hashes_get_feature;
 }
 
 
