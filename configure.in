@@ -198,6 +198,9 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(stdlib.h unistd.h string.h fcntl.h dmalloc.h stdarg.h)
 
+AC_CHECK_HEADER(expat,h, expat_h=1, expat_h=0)
+AC_CHECK_HEADER(xmlparse,h, xmlparse_h=1, xmlparse_h=0)
+
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -273,18 +276,25 @@ fi
 oLIBS="$LIBS"
 AC_CHECK_LIB(xmltok, main, xmlt=1, xmlt=0)
 
-# edland RDF parser only needs XML_ParserCreate but Repat needs
+# Redland RDF parser only needs XML_ParserCreate but Repat needs
 # XML_ParserCreateNS so check for that
 AC_CHECK_LIB(xmlparse, XML_ParserCreateNS, xmlp=1, xmlp=0, -lxmltok)
 LIBS="$oLIBS"
 AC_MSG_CHECKING(for system expat library)
-if test $xmlp = 1 -a $xmlt = 1; then
+if test $xmlp = 1 -a $xmlt = 1 -a \( $expat_h = 1 -o $xmlparse_h = 1 \); then
   have_expat_lib=1
   have_expat=1
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
 fi
+
+REPAT_FLAGS=
+if test $xmlparse_h = 1; then
+  AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
+  REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
+fi
+
 
 AC_CHECK_PROG(XML_CONFIG, xml-config, xml-config)
 
@@ -525,6 +535,10 @@ for parser in $parser_modules; do
 done
 AC_MSG_CHECKING(RDF parsers available)
 AC_MSG_RESULT($parsers_available)
+
+dnl FIXME
+REPAT_FLAGS="$REPAT_FLAGS -Dsize_t=int -D_MAX_PATH=1024"
+AC_SUBST(REPAT_FLAGS)
 
 
 dnl Checks for languages
