@@ -256,8 +256,9 @@ fi
 
 dnl Checks for XML parsers
 have_expat=0
-need_expat=0
 have_expat_lib=0
+have_expat_source=0
+need_expat=0
 need_expat_source=0
 AC_MSG_CHECKING(for expat sources)
 if test -d expat; then
@@ -281,10 +282,14 @@ else
   AC_MSG_RESULT(no)
 fi
 
+AC_CHECK_PROG(LIBXML_CONFIG, libxml-config, libxml-config)
+
+
 have_libxml=0
-need_libxml=0
 have_libxml_lib=0
 have_libxml_source=0
+need_libxml=0
+need_libxml_source=0
 AC_MSG_CHECKING(for libxml sources)
 for dir in libxml*; do
   if test -d $dir -a -r $dir/libxml.spec ; then
@@ -388,7 +393,7 @@ for parser in $parser_modules; do
         need_libxml=1
 	found=1
         AC_DEFINE(NEED_LIBXML)
-      elif test $have_expat_source = 1; then
+      elif test $have_libxml_source = 1; then
         need_libxml=1
         need_libxml_source=1
         found=1
@@ -545,28 +550,33 @@ AC_SUBST(HASH_SRCS)
 
 
 dnl Checks for building sub-packages in sub directories
-SD=docs
+SD="docs perl"
+
+XML_OBJS=
 
 if test $have_libxml = 1 -a $need_libxml = 1; then
-  if test $need_libxml_sources = 1; then
+  if test $need_libxml_source = 1; then
     SD="$SD $libxml_dir"
     (cd $libxml_dir && ./configure --cache=../config.cache --enable-shared=no)
     CFLAGS="$CFLAGS -I$srcdir/$libxml_dir"
+    XML_OBS="$libxml_dir/libxml.a"
+  else
+    LIBS="$LIBS -L$srcdir/$libxml_dir -lxml"
   fi
-  LIBS="$LIBS -L$srcdir/$libxml_dir -lxml"
 fi
 
 if test $need_expat = 1; then
   # Only build local copy if it is needed
   if test $need_expat_source = 1; then
     SD="$SD expat"
-    CFLAGS="-I$srcdir/expat/xmlparse -I$srcdir/expat/xmltok $CFLAGS"
-    LIBS="$LIBS -L$srcdir/expat/xmlparse -L$srcdir/expat/xmltok"
+    CFLAGS="-I$srcdir/expat/xmlparse $CFLAGS"
+    XML_OBJS="expat/xmlparse/xmlparse.o expat/xmlparse/hashtable.o expat/xmltok/xmlrole.o expat/xmltok/xmltok.o"
+  else
+    LIBS="$LIBS -lxmlparse -lxmltok"
   fi
-  LIBS="$LIBS -lxmlparse -lxmltok"
 fi
 
-
+AC_SUBST(XML_OBJS)
 AC_SUBST(SD)
 
 
@@ -594,6 +604,9 @@ docs/Makefile
 expat/Makefile
 expat/xmlparse/Makefile
 expat/xmltok/Makefile
+perl/Makefile
+perl/lib/Makefile
+perl/lib/RDF/Makefile
 redland.spec
 redland-config,
 [chmod +x redland-config])
