@@ -53,8 +53,8 @@ pre, code, tt {
 .headingbox {
   color: white;
   background-color: #286097;
-  margin: 0em 0em 1em 0em;
-  padding: 1em 1em 1em 1em;
+  margin: 0em 0em 0.5em 0em;
+  padding: 0.2em;
   border-bottom: solid black 1px;
 }
 
