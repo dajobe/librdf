@@ -23,9 +23,10 @@
 
 #include <rdf_config.h>
 
-#include <sys/types.h>
-
 #include <stdio.h>
+#include <stdarg.h>
+
+#include <sys/types.h>
 
 #include <gdbm.h>
 

@@ -33,12 +33,6 @@
 
 #include <librdf.h>
 
-#include <rdf_parser.h>
-#include <rdf_node.h>
-#include <rdf_stream.h>
-#include <rdf_statement.h>
-#include <rdf_list.h>
-
 #define RAPTOR_IN_REDLAND
 #include <raptor.h>
 #include <ntriples.h>
@@ -238,6 +232,56 @@ librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri,
 }
 
 
+static void
+librdf_parser_raptor_error_handler(void *data, raptor_locator *locator,
+                                   const char *message) 
+{
+  librdf_world *world=(librdf_world*)data;
+  static const char *message_prefix=" - Raptor error - ";
+  int prefix_len=strlen(message_prefix);
+  int message_len=strlen(message);
+  int locator_len=raptor_format_locator(NULL, 0, locator);
+  char *buffer;
+
+  buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+prefix_len+message_len+1);
+  if(!buffer) {
+    fprintf(stderr, "librdf_raptor_error_handler: Out of memory\n");
+    return;
+  }
+  raptor_format_locator(buffer, locator_len, locator);
+  strncpy(buffer+locator_len, message_prefix, prefix_len);
+  strcpy(buffer+prefix_len+locator_len, message); /* want extra \0 - using strcpy */
+
+  librdf_error(world, buffer);
+  LIBRDF_FREE(cstring, buffer);
+}
+
+
+static void
+librdf_parser_raptor_warning_handler(void *data, raptor_locator *locator,
+                                     const char *message) 
+{
+  librdf_world *world=(librdf_world*)data;
+  static const char *message_prefix=" - Raptor warning - ";
+  int prefix_len=strlen(message_prefix);
+  int message_len=strlen(message);
+  int locator_len=raptor_format_locator(NULL, 0, locator);
+  char *buffer;
+
+  buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+prefix_len+message_len+1);
+  if(!buffer) {
+    fprintf(stderr, "librdf_raptor_warning_handler: Out of memory\n");
+    return;
+  }
+  raptor_format_locator(buffer, locator_len, locator);
+  strncpy(buffer+locator_len, message_prefix, prefix_len);
+  strcpy(buffer+prefix_len+locator_len, message); /* want extra \0 - using strcpy */
+
+  librdf_warning(world, message);
+  LIBRDF_FREE(cstring, buffer);
+}
+
+
 /**
  * librdf_parser_raptor_parse_common - Retrieve the RDF/XML content at URI and parse it into a librdf_stream or model
  * @context: parser context
@@ -276,6 +320,9 @@ librdf_parser_raptor_parse_common(void *context,
   
     raptor_ntriples_set_statement_handler(ntriples_parser, scontext, 
                                           librdf_parser_raptor_new_statement_handler);
+
+    raptor_ntriples_set_error_handler(ntriples_parser, world,
+                                      librdf_parser_raptor_error_handler);
     
     scontext->ntriples_parser=ntriples_parser;
   } else {
@@ -287,6 +334,11 @@ librdf_parser_raptor_parse_common(void *context,
                                  librdf_parser_raptor_new_statement_handler);
     
     /* raptor_set_feature(rdf_parser, RAPTOR_FEATURE_SCANNING, 1); */
+
+    raptor_set_error_handler(rdf_parser, world, 
+                             librdf_parser_raptor_error_handler);
+    raptor_set_warning_handler(rdf_parser, world,
+                               librdf_parser_raptor_warning_handler);
 
     scontext->rdf_parser=rdf_parser;
   }

@@ -23,19 +23,13 @@
 
 #include <rdf_config.h>
 
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+
 #include <sys/types.h>
 
-#include <stdio.h>
-#ifdef HAVE_STRING_H
-#include <string.h> /* for memcmp */
-#endif
-
 #include <librdf.h>
-#include <rdf_storage.h>
-#include <rdf_storage_list.h>
-#include <rdf_list.h>
-#include <rdf_statement.h>
-#include <rdf_stream.h>
 
 
 typedef struct

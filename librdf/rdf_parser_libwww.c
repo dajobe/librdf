@@ -25,14 +25,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include <librdf.h>
-
-#include <rdf_parser.h>
-#include <rdf_node.h>
-#include <rdf_stream.h>
-#include <rdf_statement.h>
-#include <rdf_list.h>
 
 /* libwww includes */
 #undef PACKAGE

@@ -42,13 +42,10 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
-#ifdef HAVE_STRING_H
-#include <string.h>		/* for memcpy() */
-#endif
+#include <string.h>
+#include <stdarg.h>
 
 #include <librdf.h>
-#include <rdf_digest.h>
-#include <rdf_types.h>
 
 
 /* original code from header - function names have changed */

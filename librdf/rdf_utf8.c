@@ -26,13 +26,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+
 #include <ctype.h> /* for isprint() */
 
 #include <librdf.h>
-
-#include <rdf_types.h>
 #include <rdf_utf8.h>
-
 
 
 /* UTF-8 encoding of 32 bit Unicode chars

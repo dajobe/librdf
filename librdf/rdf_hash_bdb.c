@@ -20,16 +20,14 @@
  * 
  */
 
-
 #include <rdf_config.h>
+
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 
 #include <sys/types.h>
 
-#include <stdio.h>
-#ifdef HAVE_STRING_H
-/* for memset */
-#include <string.h>
-#endif
 /* for the memory allocation functions */
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>

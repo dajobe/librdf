@@ -31,16 +31,6 @@
 #endif
 
 #include <librdf.h>
-#include <rdf_hash.h>
-#include <rdf_uri.h>
-#include <rdf_node.h>
-#include <rdf_digest.h>
-#include <rdf_stream.h>
-#include <rdf_statement.h>
-#include <rdf_storage.h>
-#include <rdf_model.h>
-#include <rdf_parser.h>
-#include <rdf_init.h>
 
 
 const char * const redland_copyright_string = "Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/ - Institute for Learning and Research Technology, University of Bristol.";

@@ -25,8 +25,9 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdarg.h>
+
+#include <ctype.h>
 #include <sys/types.h>
 
 #ifdef HAVE_STDLIB_H
@@ -34,10 +35,6 @@
 #endif
 
 #include <librdf.h>
-
-#include <rdf_query.h>
-#include <rdf_query_triples.h>
-#include <rdf_uri.h>
 
 
 /* prototypes for helper functions */

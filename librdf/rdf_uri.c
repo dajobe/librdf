@@ -24,8 +24,9 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
-#include <string.h> /* for strcat */
+#include <string.h>
 #include <stdarg.h>
+
 #include <ctype.h> /* for isalnum */
 
 #ifdef HAVE_STDLIB_H
@@ -34,8 +35,6 @@
 
 #include <librdf.h>
 
-#include <rdf_uri.h>
-#include <rdf_digest.h>
 
 /* for raptor_uri_resolve_uri_reference */
 #define RAPTOR_IN_REDLAND

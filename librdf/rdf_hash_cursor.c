@@ -24,12 +24,11 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <ctype.h>
 #include <sys/types.h>
 
 #include <librdf.h>
-
-#include <rdf_hash.h>
 
 
 /* private structure */

@@ -32,9 +32,7 @@
 #endif
 
 #include <librdf.h>
-#include <rdf_uri.h>
-#include <rdf_node.h>
-#include <rdf_digest.h>
+/* needed for utf8 functions and definition of 'byte' */
 #include <rdf_utf8.h>
 
 

@@ -30,9 +30,8 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
+
 #include <librdf.h>
-#include <rdf_uri.h>
-#include <rdf_serializer.h>
 
 
 /* prototypes for helper functions */

@@ -32,8 +32,6 @@
 #endif
 
 #include <librdf.h>
-#include <rdf_node.h>
-#include <rdf_statement.h>
 
 
 /* class methods */

@@ -32,7 +32,6 @@
 #endif
 
 #include <librdf.h>
-#include <rdf_parser.h>
 
 
 /* prototypes for helper functions */

@@ -27,18 +27,15 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
+
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
 
 
 #include <librdf.h>
-#include <rdf_storage.h>
-#include <rdf_storage_hashes.h>
-#include <rdf_hash.h>
-#include <rdf_statement.h>
-#include <rdf_stream.h>
-#include <rdf_heuristics.h>
+
 
 typedef struct 
 {

@@ -23,16 +23,13 @@
 
 #include <rdf_config.h>
 
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+
 #include <sys/types.h>
 
-#include <stdio.h>
-#ifdef HAVE_STRING_H
-#include <string.h> /* for strncmp */
-#endif
-
 #include <librdf.h>
-#include <rdf_list.h>
-#include <rdf_iterator.h>
 
 
 /* prototypes for local functions */

@@ -23,19 +23,16 @@
 
 #include <rdf_config.h>
 
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 #include <sys/types.h>
 
-#include <stdio.h>
-#ifdef HAVE_STRING_H
-#include <string.h> /* for memcmp */
-#endif
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
 
 #include <librdf.h>
-#include <rdf_hash.h>
-#include <rdf_hash_memory.h>
 
 
 /* private structures */

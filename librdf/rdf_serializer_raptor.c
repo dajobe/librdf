@@ -29,9 +29,6 @@
 
 #include <librdf.h>
 
-#include <rdf_node.h>
-#include <rdf_stream.h>
-#include <rdf_statement.h>
 
 #define RAPTOR_IN_REDLAND
 #include <raptor.h>

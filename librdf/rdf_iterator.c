@@ -24,9 +24,9 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
+#include <stdarg.h>
 
 #include <librdf.h>
-#include <rdf_iterator.h>
 
 
 /* prototypes of local helper functions */

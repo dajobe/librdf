@@ -26,15 +26,10 @@
 #include <sys/types.h>
 
 #include <stdio.h>
-#ifdef HAVE_STRING_H
-#include <string.h> /* for memcmp */
-#endif
+#include <string.h>
+#include <stdarg.h>
 
 #include <librdf.h>
-#include <rdf_query.h>
-#include <rdf_query_triples.h>
-#include <rdf_statement.h>
-#include <rdf_stream.h>
 
 
 typedef struct

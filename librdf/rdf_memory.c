@@ -24,12 +24,14 @@
 
 #ifdef LIBRDF_MEMORY_DEBUG
 #include <stdio.h>
-
-#include <librdf.h>
+#include <stdarg.h>
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
+
+#include <librdf.h>
+
 
 
 /* In theory these could be changed to use a custom allocator */

@@ -23,6 +23,11 @@
 
 #include <rdf_config.h>
 
+
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+
 #include <openssl/crypto.h>
 
 #include <librdf.h>

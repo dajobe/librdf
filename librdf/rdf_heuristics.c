@@ -24,19 +24,15 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
-#include <ctype.h>
+#include <string.h>
 #include <stdarg.h>
+#include <ctype.h>
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for strtol */
 #endif
 
-#ifdef HAVE_STRING_H
-#include <string.h> /* for strncpy */
-#endif
-
 #include <librdf.h>
-#include <rdf_heuristics.h>
 
 
 /**
