@@ -219,7 +219,7 @@ main(int argc, char *argv[])
 
   rdf_statement_set_subject(statement, rdf_new_node_from_uri_string("http://www.ilrt.bris.ac.uk/people/cmdjb/"));
   rdf_statement_set_predicate(statement, rdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/#Creator"));
-  rdf_statement_set_object(statement, rdf_new_node_from_literal("Dave Beckett", NULL));
+  rdf_statement_set_object(statement, rdf_new_node_from_literal("Dave Beckett", NULL, 0));
 
   s=rdf_statement_to_string(statement);
   fprintf(stderr, "%s: Resulting statement: %s\n", program, s);

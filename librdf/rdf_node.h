@@ -44,7 +44,11 @@ typedef struct
     {
       /* literals have string values and maybe an XML language */
       char *string;
-      char *xml_language; /* yuck */
+      int string_len;
+      /* XML Language */
+      char *xml_language;
+      /* Is the literal "Well Formed XML?" */
+      int is_wf_xml;
     } literal;
   } value;
 }
@@ -67,7 +71,7 @@ rdf_node* rdf_new_node_from_uri_string(char *string);
 rdf_node* rdf_new_node_from_uri(rdf_uri *uri);
 
 /* Create a new Node from literal string / language. */
-rdf_node* rdf_new_node_from_literal(char *string, char *xml_language);
+rdf_node* rdf_new_node_from_literal(char *string, char *xml_language, int is_wf_xml);
 
 /* Create a new Node from an existing Node - CLONE */
 rdf_node* rdf_new_node_from_node(rdf_node *node);
@@ -87,7 +91,7 @@ void rdf_node_set_type(rdf_node* node, int type);
 
 char* rdf_node_get_literal_value(rdf_node* node);
 char* rdf_node_get_literal_value_language(rdf_node* node);
-int rdf_node_set_literal_value(rdf_node* node, char* value, char *xml_language);
+int rdf_node_set_literal_value(rdf_node* node, char* value, char *xml_language, int is_wf_xml);
 
 rdf_digest* rdf_node_get_digest(rdf_node* node);
 
