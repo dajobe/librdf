@@ -15,6 +15,8 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>BDB 4.1 causes include problems in rdf_node.c</li>
+<li>repat still compiles even when disabled</li>
 <li>a report that parsing 370K triples into in-memory hash (storage type hashes, hash type memory) took many hours</li>
 <li>defensive code - check for NULL object parameters, wrong use
 of polymorphic objects such as getting URI of a non-resource node.
@@ -63,6 +65,8 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>parse_as_stream methods assumed the URI object lived throughout the
+parsing.  They may not, and had to be copied on the first call - fixed for raptor only (0.9.13)</li>
 <li>make librdf_statement_set_subject* free any existing node before setting (0.9.12)</li>
 <li>Pass RDF parser error messages to user code, scripting languages (0.9.12)</li>
 <li>Add a swig test in autogen.sh, abort if it is too old (0.9.12)</li>
