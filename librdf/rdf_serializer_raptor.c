@@ -31,7 +31,6 @@
 
 #define RAPTOR_IN_REDLAND
 #include <raptor.h>
-#include <ntriples.h>
 
 
 typedef struct {
@@ -64,7 +63,9 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
   librdf_node *subject=librdf_statement_get_subject(statement);
   librdf_node *predicate=librdf_statement_get_predicate(statement);
   librdf_node *object=librdf_statement_get_object(statement);
-
+  char *lang=NULL;
+  librdf_uri *dt_uri=NULL;
+  
   if(librdf_node_get_type(subject) == LIBRDF_NODE_TYPE_BLANK)
     fprintf(stream, "_:%s", librdf_node_get_blank_identifier(subject));
   else {
@@ -83,10 +84,15 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
       fputc('"', stream);
       raptor_print_ntriples_string(stream, librdf_node_get_literal_value(object), '"');
       fputc('"', stream);
-      if(librdf_node_get_literal_value_language(object))
-        fprintf(stream, "@%s", librdf_node_get_literal_value_language(object));
-      if(librdf_node_get_literal_value_is_wf_xml(object))
-        fputs("^^<http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral>", stream);
+      lang=librdf_node_get_literal_value_language(object);
+      dt_uri=librdf_node_get_literal_value_datatype_uri(object);
+      if(lang)
+        fprintf(stream, "@%s", lang);
+      if(dt_uri) {
+        fputs("^^<", stream);
+        fputs(librdf_uri_as_string(dt_uri), stream);
+        fputc('>', stream);
+      }
       break;
     case LIBRDF_NODE_TYPE_BLANK:
       fprintf(stream, "_:%s", librdf_node_get_blank_identifier(object));
