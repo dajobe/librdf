@@ -96,8 +96,8 @@ void librdf_system_free(void *ptr);
 #define SYSTEM_FREE(ptr)   free(ptr)
 
 #define LIBRDF_ASSERT_RETURN(condition, msg, ret)
-#define LIBRDF_ASSERT_OBJECT_POINTER(pointer)
-#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, ret)
+#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer)
+#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(pointer, ret)
 
 
 #endif
