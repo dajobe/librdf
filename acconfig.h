@@ -66,7 +66,7 @@
 /* RDF parsers */
 #undef HAVE_SIRPAC_RDF_PARSER
 #undef HAVE_LIBWWW_RDF_PARSER
-#undef HAVE_RAPIER_RDF_PARSER
+#undef HAVE_RAPTOR_RDF_PARSER
 #undef HAVE_REPAT_RDF_PARSER
 
 /* XML parsers */

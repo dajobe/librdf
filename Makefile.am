@@ -76,10 +76,10 @@ librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 EXTRA_librdf_a_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
 rdf_parser_sirpac.c rdf_parser_libwww.c \
-rdf_parser_rapier.c \
+rdf_parser_raptor.c \
 rdf_parser_repat.c \
 example1.c example2.c example3.c example4.c \
-@RAPIER_SRCS@
+@RAPTOR_SRCS@
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO      LICENSE.txt \
@@ -91,7 +91,7 @@ PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \
 autogen.sh \
 redland.spec redland.spec.in \
-@RAPIER_INCS@
+@RAPTOR_INCS@
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
@@ -218,13 +218,13 @@ $(top_builddir)/repat/rdfparse.o: $(top_builddir)/expat/xmlparse/xmlparse.o $(to
 	cd repat && $(MAKE) $(AM_MAKEFLAGS) all
 
 # Copy these by hand since they are symlinks to the latest versions
-# in the home rapier source tree and the default rule just copies the
+# in the home raptor source tree and the default rule just copies the
 # (broken) links into the distribution which then fails to work.
 #
 # Note: this can't be protected with @MAINT@ since automake only
 # activates this rule if it is normally in the Makefile.am
 dist-hook: redland.spec
-	@for file in @RAPIER_SRCS@ @RAPIER_INCS@ fake.c; do \
+	@for file in @RAPTOR_SRCS@ @RAPTOR_INCS@ fake.c; do \
           if test -r $(srcdir)/$$file; then \
 	    rm -f $(distdir)/$$file; \
 	    cp -p $(srcdir)/$$file $(distdir)/$$file; \

@@ -336,8 +336,8 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
 void
 librdf_init_parser(librdf_world *world) 
 {
-#ifdef HAVE_RAPIER_RDF_PARSER
-  librdf_parser_rapier_constructor(world);
+#ifdef HAVE_RAPTOR_RDF_PARSER
+  librdf_parser_raptor_constructor(world);
 #endif
 #ifdef HAVE_SIRPAC_RDF_PARSER
   librdf_parser_sirpac_constructor(world);
