@@ -20,7 +20,10 @@ librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@
 
 EXTRA_librdf_a_SOURCES = md5.c rdf_hash_gdbm.c rdf_digest_openssl.c
 
-EXTRA_DIST=ChangeLog
+EXTRA_DIST=ChangeLog \
+README      NEWS \
+README.html NEWS.html \
+INSTALL.html LICENSE.html FAQS.html
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_statement_test \
 rdf_model_test
@@ -45,3 +48,19 @@ rdf_model_test: rdf_model.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DRDF_MODEL_TEST $(srcdir)/rdf_model.c librdf.a $(LIBS)
 
 @SET_MAKE@
+
+SUFFIXES = .html .txt
+
+
+# Create some text files from HTML sources
+LYNX=lynx
+LYNXARGS=-dump -nolist
+
+.html.txt:
+	$(LYNX) $(LYNXARGS) $< > $@
+
+README: README.html
+	$(LYNX) $(LYNXARGS) $< > $@
+
+NEWS: NEWS.html
+	$(LYNX) $(LYNXARGS) $< > $@
