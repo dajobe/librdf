@@ -1934,27 +1934,151 @@ librdf_storage_sqlite_context_serialise_finished(void* context)
 
 typedef struct {
   librdf_storage *storage;
+  librdf_storage_sqlite_context* sqlite_context;
 
+  int finished;
+  
   librdf_node *current;
+
+  /* OUT from sqlite3_prepare (V3) or sqlite_compile (V2) */
+  sqlite_STATEMENT *vm;
+  const char *zTail;
 } librdf_storage_sqlite_get_contexts_iterator_context;
+
+
+
+static int
+librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_context* scontext,
+                                              sqlite_STATEMENT *vm,
+                                              librdf_node **context_node) {
+  int status=SQLITE_BUSY;
+#if SQLITE_API == 2
+  int pN;
+  const char **pazValue;   /* Column data */
+  const char **pazColName; /* Column names and datatypes */
+#endif
+  int result=0;
+  
+  /*
+   * Each invocation of sqlite_step returns an integer code that
+   * indicates what happened during that step. This code may be
+   * SQLITE_BUSY, SQLITE_ROW, SQLITE_DONE, SQLITE_ERROR, or
+   * SQLITE_MISUSE.
+  */
+  do {
+#if SQLITE_API == 3
+    status=sqlite3_step(vm);
+#endif
+#if SQLITE_API == 2
+    status=sqlite_step(vm, &pN, &pazValue, &pazColName);
+#endif
+    if(status == SQLITE_BUSY) {
+      /* FIXME - how to handle busy? */
+      status=SQLITE_ERROR;
+      continue;
+    }
+    break;
+  } while(1);
+
+  if(status == SQLITE_ROW) {
+    /* Turns row data into scontext->context */
+#if LIBRDF_DEBUG > 2
+    int i;
+#endif
+    const unsigned char *uri_string;
+
+#if LIBRDF_DEBUG > 2
+    for(i=0; i<sqlite3_column_count(vm); i++)
+      fprintf(stderr, "%s, ", sqlite3_column_name(vm, i));
+    fputc('\n', stderr);
+
+    for(i=0; i<sqlite3_column_count(vm); i++) {
+      if(i == 7)
+        fprintf(stderr, "%d, ", sqlite3_column_int(vm, i));
+      else
+        fprintf(stderr, "%s, ", sqlite3_column_text(vm, i));
+    }
+    fputc('\n', stderr);
+#endif
+
+    uri_string=GET_COLUMN_VALUE_TEXT(vm, 0);
+    if(uri_string) {
+      if(*context_node)
+        librdf_free_node(*context_node);      
+      *context_node=librdf_new_node_from_uri_string(scontext->storage->world,
+                                                    uri_string);
+    }
+  }
+
+  if(status != SQLITE_ROW)
+    result=1;
+
+  if(status == SQLITE_ERROR) {
+    char *errmsg=NULL;
+
+#if SQLITE_API == 3
+    status=sqlite3_finalize(vm);
+    if(status != SQLITE_OK)
+      errmsg=(char*)sqlite3_errmsg(scontext->db);
+#endif
+#if SQLITE_API == 2
+    status=sqlite_finalize(vm, &errmsg);
+#endif
+    if(status != SQLITE_OK) {
+      librdf_log(scontext->storage->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "SQLite database %s finalize failed - %s (%d)", 
+                 scontext->name, errmsg, status);
+      sqlite_FREE(errmsg);
+    }
+    result= -1;
+  }
+  
+  return result;
+}
 
 
 
 static int
 librdf_storage_sqlite_get_contexts_is_end(void* iterator)
 {
-  /* librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator; */
+  librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator;
+  int result;
+  
+  if(icontext->finished)
+    return 1;
+  
+  result=librdf_storage_sqlite_get_next_context_common(icontext->sqlite_context,
+                                                       icontext->vm,
+                                                       &icontext->current);
+  if(result) {
+    /* error or finished */
+    if(result < 0)
+      icontext->vm=NULL;
+    icontext->finished=1;
+  }
 
-  return 1;
+  return icontext->finished;
 }
 
 
 static int
 librdf_storage_sqlite_get_contexts_next_method(void* iterator) 
 {
-  /* librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator; */
+  librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator;
+  int result;
+  
+  result=librdf_storage_sqlite_get_next_context_common(icontext->sqlite_context,
+                                                       icontext->vm,
+                                                       &icontext->current);
+  if(result) {
+    /* error or finished */
+    if(result<0)
+      icontext->vm=NULL;
+    icontext->finished=1;
+  }
 
-  return 1;
+  return result;
 }
 
 
@@ -1966,7 +2090,7 @@ librdf_storage_sqlite_get_contexts_get_method(void* iterator, int flags)
   
   switch(flags) {
     case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
-      return NULL;
+      return icontext->current;
       break;
 
     case LIBRDF_ITERATOR_GET_METHOD_GET_KEY:
@@ -1991,12 +2115,33 @@ librdf_storage_sqlite_get_contexts_finished(void* iterator)
 {
   librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator;
 
-  if(icontext->current)
-    librdf_free_node(icontext->current);
+  if(icontext->vm) {
+    char *errmsg=NULL;
+    int status;
+    
+#if SQLITE_API == 3
+    status=sqlite3_finalize(icontext->vm);
+    if(status != SQLITE_OK)
+      errmsg=(char*)sqlite3_errmsg(icontext->sqlite_context->db);
+#endif
+#if SQLITE_API == 2
+    status=sqlite_finalize(icontext->vm, &errmsg);
+#endif
+    if(status != SQLITE_OK) {
+      librdf_log(icontext->storage->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "SQLite database %s finalize failed - %s (%d)", 
+                 icontext->sqlite_context->name, errmsg, status);
+      sqlite_FREE(errmsg);
+    }
+  }
 
   if(icontext->storage)
     librdf_storage_remove_reference(icontext->storage);
-  
+
+  if(icontext->current)
+    librdf_free_node(icontext->current);
+
   LIBRDF_FREE(librdf_storage_sqlite_get_contexts_iterator_context, icontext);
 }
 
@@ -2010,17 +2155,65 @@ librdf_storage_sqlite_get_contexts_finished(void* iterator)
 static librdf_iterator*
 librdf_storage_sqlite_get_contexts(librdf_storage* storage) 
 {
-  /* librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context; */
+  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
   librdf_storage_sqlite_get_contexts_iterator_context* icontext;
   librdf_iterator* iterator;
+  int status;
+  char *errmsg=NULL;
+  raptor_stringbuffer *sb;
+  unsigned char *request;
 
   icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)LIBRDF_CALLOC(librdf_storage_sqlite_get_contexts_iterator_context, 1, sizeof(librdf_storage_sqlite_get_contexts_iterator_context));
   if(!icontext)
     return NULL;
 
+  icontext->sqlite_context=context;
+
+  sb=raptor_new_stringbuffer();
+
+  raptor_stringbuffer_append_string(sb, (unsigned char*)
+                                    "SELECT DISTINCT uris.uri", 1);
+  raptor_stringbuffer_append_counted_string(sb,
+                                            (const unsigned char*)" FROM ", 6, 1);
+  raptor_stringbuffer_append_string(sb,  
+                                    (const unsigned char*)sqlite_tables[TABLE_TRIPLES].name, 1);
+  raptor_stringbuffer_append_string(sb,
+                                            (const unsigned char*)" LEFT JOIN uris ON uris.id = contextUri;", 1);
+
+  request=raptor_stringbuffer_as_string(sb);
+  
+  LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
+
+#if SQLITE_API == 3
+  status=sqlite3_prepare(context->db,
+                         (const char*)request,
+                         raptor_stringbuffer_length(sb),
+                         &icontext->vm,
+                         &icontext->zTail);
+  if(status != SQLITE_OK)
+    errmsg=(char*)sqlite3_errmsg(context->db);
+#endif
+#if SQLITE_API == 2  
+  status=sqlite_compile(context->db,
+                        (const char*)request,
+                        &icontext->zTail,
+                        &icontext->vm,
+                        &errmsg);
+#endif
+  raptor_free_stringbuffer(sb);
+
+  if(status != SQLITE_OK) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "SQLite database %s SQL compile failed - %s (%d)", 
+               context->name, errmsg, status);
+
+    librdf_storage_sqlite_get_contexts_finished((void*)icontext);
+    return NULL;
+  }
+    
   icontext->storage=storage;
   librdf_storage_add_reference(icontext->storage);
-  
+
   iterator=librdf_new_iterator(storage->world,
                                (void*)icontext,
                                &librdf_storage_sqlite_get_contexts_is_end,
