@@ -1141,10 +1141,11 @@ fi
 
 
 dnl RDF query
-rasqal_dir=rasqal
+rasqal_dir=
 if test $with_rasqal = internal; then
   LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/rasqal $LIBRDF_INTERNAL_CPPFLAGS"
   LIBRDF_INTERNAL_LIBS="\$(top_builddir)/rasqal/librasqal.la $LIBRDF_INTERNAL_LIBS"
+  rasqal_dir=rasqal
 else
   LIBRDF_EXTERNAL_CPPFLAGS="`$RASQAL_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
   LIBRDF_EXTERNAL_LIBS="`$RASQAL_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
@@ -1248,6 +1249,10 @@ java/org/Makefile
 java/org/librdf/Makefile
 java/org/librdf/redland/Makefile
 ruby/Makefile
+ruby/test/Makefile
+ruby/lib/Makefile
+ruby/lib/rdf/Makefile
+ruby/lib/rdfs/Makefile
 csharp/Makefile
 utils/Makefile
 demos/Makefile
