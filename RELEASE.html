@@ -23,6 +23,86 @@ pre
 
 <h2 id="rel0_9_18"><a name="rel0_9_18">Redland 0.9.18 Changes</a></h2>
 
+<p>This is Redland 1.0 Release Candidate 2.</p>
+
+<p>Redland's License was changed from LGPL 2.1/MPL 1.1 to
+LGPL 2.1/Apache 2</p>
+
+<p>The main changes in this release are to update to use 
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.5
+to provide initial SPARQL query support and to use
+<a href="http://librdf.org/raptor/">Raptor</a> 1.4.2 to
+provide serializing to RDF/XML and N-Triples.</p>
+
+
+<h3><code>rdfproc</code> RDF processor utility program changes</h3>
+
+<p>Updated to allow an optional base URI for the
+<code>serialize</code> command.</p>
+
+
+<h3>Model Class changes</h3>
+
+<p>Added <code>librdf_model_to_string</code> and
+<code>librdf_model_to_counted_string</code> to serialize a model to a
+string using the Serializer class functionality.  Exported
+<code>librdf_model_to_string</code> to the language bindings.</p>
+
+
+<h3>Query Class changes</h3>
+
+<p>Now requires
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.5
+which provides initial support for the
+<a href="http://www.w3.org/TR/2004/WD-rdf-sparql-query-20041012/">
+SPARQL Query Language for RDF</a>,
+W3C Working Draft, 12 October 2004
+from the W3C RDF Data Access Working Group (DAWG).</p>
+
+
+<h3>Serializer Class changes</h3>
+
+<p>Pass on errors and warnings via the existing Redland logging
+mechanism.  Previously they all went to stderr, the default.</p>
+
+<p>Switched to use <a href="http://librdf.org/raptor/">Raptor</a> 1.4
+series serializing classes so now provides RDF/XML and N-Triples
+serializing and will gain any fugure serializing formats as Raptor
+adds them.</p>
+
+<p>Using the Raptor support, the serializers can now serialize to
+strings in addition to the existing serializing to FILE* and files.
+This is performed by the new methods:
+<code>librdf_serializer_serialize_model_to_file_handle</code>
+(deprecating <code>librdf_serializer_serialize_model</code>),
+<code>librdf_serializer_serialize_model_to_string</code>
+and <code>librdf_serializer_serialize_model_to_counted_string</code>.
+Exported <code>librdf_serializer_serialize_model_to_string</code>
+to the language bindings.</p>
+
+
+<h3>Storage Class changes</h3>
+
+<p><code>librdf_storage_context_add_statement</code> and
+<code>librdf_storage_context_add_statements</code> - 
+With a NULL context, call the non-context method as documented.</p>
+
+<p>Fixed bogus '+' in <code>get_contexts</code> method in the mysql
+storage.</p>
+
+
+<h3>World Class changes</h3>
+
+<p><code>librdf_world_get_feature</code> now returns a
+<code>librdf_node*</code>, <code>librdf_world_set_feature</code>
+takes a <code>librdf_node*</code> value.  Export these to
+the language bindings.
+</p>
+
+
+
+<h2 id="rel0_9_18"><a name="rel0_9_18">Redland 0.9.18 Changes</a></h2>
+
 <p>Revert the statement class usage counting - it broke things.</p>
 
 

@@ -1,4 +1,330 @@
+2004-11-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/configure.ac, configure.ac: Need raptor 1.4.2
+
+	* raptor/win32_raptor_config.h, raptor/configure.ac: Bumped
+	version to 1.4.2
+
+	* raptor/raptor_xml_writer.c (raptor_xml_writer_cdata):
+	Return when raptor_xml_escape_string fails.
+
+	* raptor/raptor_xml.c (raptor_xml_escape_string):
+	Return -1 on UTF-8 encoding failure
+
+	* raptor/raptor_xml.c: docs
+
+	* librdf/rdf_serializer.c (main): Undo update expected result length.
+
+	* utils/rdfproc.c (log_handler):
+	Check level against fatal, not facility.
+
+	* librdf/rdf_serializer.c (main): Update expected result length.
+
+	* librdf/rdf_serializer_raptor.c, librdf/rdf_serializer.c,
+	librdf/rdf_query_rasqal.c, librdf/rdf_query.c,
+	librdf/rdf_parser.c, librdf/rdf_model.c, librdf/rdf_init.c: Casts
+	for C++
+
+2004-10-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/configure.ac: Minimum raptor 1.4.1
+
+	* rasqal/rasqal_raptor.c (ordinal_as_uri): Helper, added to
+	Properly calculate uri_string from rdf:_n ordinals
+	(raptor_statement_as_rasqal_triple): Use above for subject,
+	predicate, object
+
+	* rasqal/rasqal_expr.c (rasqal_free_triple):
+	Handle a partially constructed triple.
+
+2004-10-28  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_xml.c (raptor_xml_escape_string): Ensure an empty
+	string is copied out; write a NUL.
+
+	* rasqal/sparql_parser.y, rasqal/rdql_parser.y,
+	rasqal/rasqal_query_test.c: Casts for C++
+
+	* raptor/libraptor.3: int return on raptor_xml_escape_string in body
+
+	* raptor/libraptor.3: 1.4.1 raptor_xml_escape_string return value
+	now int, <0 on failure.
+
+	* raptor/raptor_xml_writer.c (raptor_xml_writer_cdata):
+	Use int for raptor_xml_escape_string
+	return variables and use error return <0
+
+	* raptor/raptor_serialize.c:
+	(raptor_rdfxml_serialize_write_xml_attribute,
+	raptor_rdfxml_serialize_statement) Use int for
+	raptor_xml_escape_string return variables.  Handle empty string
+	attribute when len=0.
+
+	* raptor/raptor_sax2.c (raptor_format_sax2_element):
+	Use int for raptor_xml_escape_string return.
+
+	* raptor/raptor.h: raptor_xml_escape_string changed return value to int
+
+	* raptor/raptor_xml.c (raptor_xml_escape_string):
+	Return value now int, <0 on failure to
+	allow escaping an empty string to return 0 bytes required.
+	(main): Add empty string escaping test.  Check for failure of first
+	raptor_xml_escape_string call.
+
+	* raptor/raptor_rss.c (raptor_rss_parser_processNode):
+	Fix url attribute failing for
+	non-enclosure.
+
+	* rasqal/tests/sparql/check-sparql: Use PATH to find programs.
+	(run-test): More debug messages
+	Add -s $srcdir arg to find manifest
+
+	* rasqal/tests/sparql/syntax/Makefile.am,
+	rasqal/tests/sparql/simple/Makefile.am,
+	rasqal/tests/sparql/part1/Makefile.am,
+	rasqal/tests/sparql/examples/Makefile.am: Invoke check-sparql with
+	PATH set and -s $(srcdir) arg
+
+	* rasqal/tests/sparql/simple/manifest.n3,
+	rasqal/tests/sparql/part1/manifest.n3: Update to latest DAWG
+	tests, no file:
+
+	* rasqal/sparql_lexer.l, rasqal/rdql_lexer.l:
+	Remove YY_INPUT since it never worked.
+	(main): Read query string into a buffer and use *_lexer__scan_buffer
+
+	* rasqal/sparql_parser.y (main):
+	Use full rasqal_init/finish sequence since setup and cleanup
+	is rather complex now.
+
+2004-10-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y (sparql_parse):
+	Added workaround to crash when regex is at very end
+	of input, by appending a space to the parsed query string.
+
+	* rasqal/rdql_parser.y (rdql_parse):
+	Added workaround to crash when regex is at very end of
+	input, by appending a space to the parsed query string.
+
+	* raptor/raptor_rfc2396.c (raptor_new_uri_detail):
+	Do not add schema_len twice to dest pointer;
+	stop buffer overrun
+
+	* rasqal/tests/sparql/check-sparql,
+	rasqal/tests/rdql/testsuite/check-rdql: OK to assume raptor 1.4.0
+
+	* rasqal/roqet.1: updated RDQL URL
+
+	* rasqal/tests/sparql/syntax/data.n3: skeleton data file
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Added check-bad-sparql rule
+	Added nojam.rq bad test
+
+	* rasqal/tests/sparql/syntax/nojam.rq: failure with ? and non var
+
+	* rasqal/rdql_lexer.l:
+	Restore ID state which is used to allow things like ?select.
+	However, make sure ID state is left on errors.
+
+	* rasqal/sparql_lexer.l:
+	In <ID> state with unknown token, return to INITIAL and report the
+	error.
+
+	* rasqal/rdql_lexer.l:
+	Remove ID state - not used and jams parser with non-matched chars in
+	<ID> state.
+
+	* rasqal/tests/sparql/Makefile.am: Added syntax dir
+
+	* rasqal/sparql_parser.y (VarOrURIList):
+	Fix calls to rasqal_new_variable_literal.
+
+	* rasqal/configure.ac: Added dir tests/sparql/syntax
+
+	* rasqal/tests/sparql/syntax/Makefile.am,
+	rasqal/tests/sparql/syntax/describe1.rq: syntax tests for SPARQL
+
+	* rasqal/tests/sparql/examples/Makefile.am: Remove check-sparql-works
+
+	* rasqal/tests/rdql/testsuite/Makefile.am: Remove check-rdql-works
+
+	* rasqal/rasqal_internal.h:
+	Note that describe is a sequence of rasqal_literal*
+
+	* rasqal/sparql_parser.y (VarOrURIList):
+	Build a list of rasqal_literal*
+
+2004-10-26  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c: fix file reading
+
+	* rasqal/roqet.c: Tidy up after failure to get query document
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_error_handler):
+	Added to pass on raptor parser errors
+	to rasqal, and onwards.
+	(rasqal_raptor_new_triples_source): On failure to parser, abort and
+	tidy up.
+
+	* raptor/raptor_locator.c (raptor_format_locator):
+	Only print line if > 0
+
+	* rasqal/rasqal_query.c (rasqal_free_query):
+	Tidy up any half-constructed rasqal_expression
+	sequence when query parsing/execution fails.
+
+	* rasqal/sparql_lexer.l (sparql_token_free):
+	Free raptor_uri objects in URI_LITERAL.  Debug function.
+
+	* rasqal/rdql_lexer.l (rdql_token_free):
+	Free raptor_uri objects in URI_LITERAL.  Debug function.
+
+	* rasqal/rdql_parser.y (main):
+	Use full rasqal_init/finish sequence since setup and cleanup
+	is rather complex now.
+
+	* rasqal/rasqal_engine.c (rasqal_new_triples_source):
+	Do not abort when no explict list of
+	sources are given.
+
+	* rasqal/sparql_lexer.l: More renames
+
+	* rasqal/rdql_lexer.l:
+	Rename static functions to have rdql_ prefix to aid setting
+	breakpoints in debugging.
+	(<PATTERN>.): Only return PATTERN_LITERAL if rdql_copy_regex_token worked.
+	(rdql_copy_regex_token): Report EOF in regex rather than continue.
+	(rdql_copy_string_token): Fix debug message parameters.
+
+	* rasqal/sparql_lexer.l:
+	Rename static functions to have sparql_ prefix to aid setting
+	breakpoints in debugging.
+	(<PATTERN>.): Only return PATTERN_LITERAL if sparql_copy_regex_token
+	worked.
+	(sparql_copy_regex_token): Report EOF in regex rather than continue.
+
+	* rasqal/rasqal-config.1: zap ASCII 160
+
+	* rasqal/rasqal-config.1, raptor/raptor-config.1:
+	Fix --libtool-libs desc
+
+2004-10-25  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_query_rasqal.c (librdf_query_rasqal_execute):
+	Fix for rasqal bug in
+	rasqal_new_triples_source that refuses to run if query->sources is
+	NULL.  Remove this when rasqal 0.9.4 is out.
+
+	* rasqal/win32_rasqal_config.h, rasqal/configure.ac:
+	Bumped version to 0.9.4
+
+	* rasqal/configure.ac: Use AC_TRY_LINK correctly for regcomp test.
+
+	* rasqal/configure.ac:
+	Use AC_TRY_LINK for regcomp test; no need to run it.
+
+	* rasqal/roqet.c: Many casts for c++
+	(roqet_xml_print_xml_attribute, roqet_query_results_print_as_xml):
+	Use type raptor_simple_message_handler for error callbacks.
+
+	* rasqal/rasqal_expr.c: Casts for C++
+
+	* rasqal/rasqal_expr.c (rasqal_prefix_print): Handle NULL prefix
+
+	* rasqal/configure.ac:
+	Do a 'return 0' after regcomp check to ensure the program exits ok
+
+	* rasqal/tests/rdql/testsuite/check-rdql: Handle empty list of vars
+
+	* rasqal/Makefile.am:
+	Execute rasqal_query_test specially, passing in full path to
+	$(srcdir)/data/dc.rdf
+
+	* rasqal/rasqal_query_test.c:
+	Pass in data file as an argument and allocate the query string with
+	path to the file burnt in.
+
+	* rasqal/roqet.c:
+	(roqet_xml_print_xml_attribute, roqet_query_results_print_as_xml):
+	Move experimental XML output code here.
+
+	* rasqal/Makefile.am: Remove rasqal_xml.c from library for now.
+
+	* rasqal/rasqal.h:
+	Remove rasqal_query_results_print_as_xml from pre-release public API
+
+	* rasqal/sparql_parser.y (FromClauseOpt):
+	Store the list of sources got from URIList
+	(URIList): Use rasqal_literal_as_uri to make a list of raptor_uri*
+	from individual rasqal_literal* made by term URI.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_as_uri):
+	Added for getting a URI out of a literal.
+
+	* rasqal/rasqal_internal.h: Added rasqal_literal_as_uri
+
+	* rasqal/sparql_parser.y (sparql_query_error_full):
+	Added, allowing varags.
+	(Literal, URI): Use above to report failure to expand qnames
+	immediately.
+
+	* rasqal/sparql_parser.y (Literal, URI):
+	Invoke rasqal_literal_expand_qname when handling a
+	QNAME_LITERAL, RASQAL_LITERAL_QNAME.
+	(sparql_parse): Check for unexpanded QNames.  SPARQL does the
+	expansion in order, so do not invoke expansions here.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_has_qname):
+	Added, for checking when a QName is
+	leftover.
+
+	* rasqal/rasqal_internal.h: Added rasqal_engine_sequence_has_qname,
+	rasqal_engine_constraints_has_qname, rasqal_literal_has_qname,
+	rasqal_expression_has_qname
+
+	* rasqal/rasqal_expr.c (rasqal_expression_has_qname):
+	Added for use with
+	rasqal_expression_foreach to check for a leftover QName.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_sequence_has_qname,
+	rasqal_engine_constraints_has_qname): Added, for checking when a
+	QName is leftover.
+
+	* rasqal/roqet.c: Set the raptor_www error_handler
+
+	* rasqal/rasqal.h: Added rasqal_prefix depth field.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_declare_prefix):
+	Use query->prefix_depth and increment
+
+	* rasqal/rasqal_query.c (rasqal_query_add_prefix):
+	Undeclare older prefixes with the same prefix.
+
+	* rasqal/rasqal_internal.h: Added prefix_depth to rasqal_query_s
+	Added rasqal_engine_undeclare_prefix prototype
+
 2004-10-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/examples/Makefile.am: Added missing ex-24a files
+
+	* rasqal/roqet.c (main):
+	C99 fix - Move FILE*fh declaration to start of block.
+
+	* rasqal/librasqal.3: Updates for 0.9.3
+
+	* librdf/rdf_query.c (librdf_query_register_factory):
+	Take a uri_string argument.
+
+	* librdf/rdf_query.h:
+	Modify librdf_query_register_factory to take a uri_string
+
+	* utils/rdfproc.c:
+	Allow query command to give '-' for default query language name.
+
+	* librdf/rdf_query_rasqal.c (librdf_query_rasqal_constructor):
+	Use rasqal_languages_enumerate to
+	register all languages that rasqal has.
 
 	* rasqal/roqet.c (main):
 	Use raptor_www_fetch_to_string from raptor 1.4.0
@@ -51,9 +377,8 @@
 	* rasqal/Makefile.am, rasqal/rasqal.spec.in,
 	rasqal/LICENSE-2.0.txt, NOTICE: LGPL / Apache 2.0 license
 
-	* rasqal/tests/sparql/simple/Makefile.am, rasqal/docs/README.html,
-	rasqal/docs/build-docs, rasqal/tests/Makefile.am,
-	rasqal/tests/rdql/Makefile.am,
+	* rasqal/tests/sparql/simple/Makefile.am, rasqal/docs/build-docs,
+	rasqal/tests/Makefile.am, rasqal/tests/rdql/Makefile.am,
 	rasqal/tests/rdql/testsuite/Makefile.am,
 	rasqal/tests/rdql/testsuite/check-rdql,
 	rasqal/tests/sparql/Makefile.am, rasqal/tests/sparql/check-sparql,
@@ -61,16 +386,15 @@
 	rasqal/tests/sparql/part1/Makefile.am, rasqal/docs/Makefile.am,
 	rasqal/sparql_parser.y, rasqal/win32_rasqal_config.h,
 	rasqal/rdql_parser.y, rasqal/roqet.c, rasqal/sparql_common.h,
-	rasqal/sparql_lexer.l, rasqal/Makefile.am, rasqal/README.html,
-	rasqal/configure.ac, rasqal/rasqal-config.in,
-	rasqal/rasqal-src-config.in, rasqal/rasqal.h,
-	rasqal/rasqal.spec.in, rasqal/rasqal_engine.c,
+	rasqal/sparql_lexer.l, rasqal/Makefile.am, rasqal/configure.ac,
+	rasqal/rasqal-config.in, rasqal/rasqal-src-config.in,
+	rasqal/rasqal.h, rasqal/rasqal.spec.in, rasqal/rasqal_engine.c,
 	rasqal/rasqal_expr.c, rasqal/rasqal_general.c,
 	rasqal/rasqal_internal.h, rasqal/rasqal_literal.c,
 	rasqal/rasqal_query.c, rasqal/rasqal_query_test.c,
 	rasqal/rasqal_raptor.c, rasqal/rasqal_redland.c,
-	rasqal/rasqal_xml.c, rasqal/rdql_common.h, rasqal/rdql_lexer.l,
-	rasqal/INSTALL.html: LGPL / Apache 2.0 license
+	rasqal/rasqal_xml.c, rasqal/rdql_common.h, rasqal/rdql_lexer.l:
+	LGPL / Apache 2.0 license
 
 	* rasqal/win32/rasqal.dsp, rasqal/win32/rasqal.dsw:
 	win32 updates including sparql (not tested)
@@ -141,8 +465,7 @@
 
 	* configure.ac: rasqal minimum version 0.9.3
 
-	* raptor/NEWS.html, raptor/configure.ac, raptor/win32_raptor_config.h:
-	1.4.0
+	* raptor/configure.ac, raptor/win32_raptor_config.h: 1.4.0
 
 	* configure.ac, rasqal/configure.ac: raptor minimum version 1.4.0
 
@@ -205,8 +528,6 @@
 	Use librdf_serializer_serialize_model_to_file_handle
 
 	* raptor/configure.ac, rasqal/configure.ac, configure.ac: autoconf mode
-
-	* raptor/ChangeLog: fix rapper
 
 	* raptor/rdfdump.c: default serializer simple
 
@@ -600,10 +921,6 @@
 	(librdf_world_set_feature): Document and change to use
 	librdf_node* value.
 
-2004-10-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
-
-	* rasqal/tests/sparql/.cvsignore: Ignore more
-
 2004-09-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rasqal/tests/sparql/check-sparql: -warnings, new perl only
@@ -667,8 +984,7 @@
 
 	* rasqal/configure.ac: Added sparql subdirs
 
-	* rasqal/tests/sparql/part1/.cvsignore,
-	rasqal/tests/sparql/part1/Makefile.am,
+	* rasqal/tests/sparql/part1/Makefile.am,
 	rasqal/tests/sparql/part1/dawg-data-01.n3,
 	rasqal/tests/sparql/part1/dawg-query-001,
 	rasqal/tests/sparql/part1/dawg-query-002,
@@ -742,8 +1058,6 @@
 	* rasqal/brql_parser.y: brql to sparqal (keeping alias)
 
 	* rasqal/roqet.c: terminology s/data/source/ -d/-s --data/--source
-
-	* rasqal/ChangeLog: changes
 
 	* rasqal/rasqal_query.c (rasqal_query_add_source,
 	 rasqal_query_get_source): Handle NULL query->sources and
