@@ -15,11 +15,12 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>Add module - RDF parser - internal (about 80% done)</li>
+<li>Use <a href="http://xmlsoft.org/">libxml</a> rather than expat as default xml parser? Reasons: uses iconv to handle more content encodings and provides better error reporting</li>
+<li>Pass RDF parser error messages to user code, scripting languages</li>
+<li>Add module - RDF parser - internal (done, not integrated yet)</li>
 <li>Add module - URI syntax, representation, relative URI resolving</li>
 <li>Add module - URI retrieval via (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
-<li>Evaluate if the library can be built shared</li>
-<li>Modularise the library so some parts can be removed</li>
+<li>Make the library work as a shared library/DLL</li>
 <li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build</li>
 <li>If LGPL/MPL license, include compatible code OR add separate package?</li>
 <li>Deal with anonymous resources</li>
@@ -106,6 +107,7 @@ parser will use expat or libxml as necessary.
 <li>Add module - xml sax parser - libxml</li>
 <li>Add module - xml parser - sax</li>
 <li>Add module - xml parser - dom</li>
+<li>Modularise the library so some parts can be removed [already done]</li>
 </ul>
 </li>
 <li>This is not needed as a module, the internal RDF parser will do this.
