@@ -1,5 +1,7 @@
 2004-08-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* configure.ac: Bumped version to 0.9.19
+
 	* Snapshotted redland_0_9_18 for 0.9.18 release
 
 	* librdf/rdf_statement.h, librdf/rdf_statement.c:
