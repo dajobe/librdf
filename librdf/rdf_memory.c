@@ -17,13 +17,9 @@
  */
 
 
-
+#ifdef LIBRDF_MEMORY_DEBUG
 #include <stdio.h>
 #include <stdlib.h>
-
-#define LIBRDF_DEBUG 1
-
-#undef LIBRDF_MEMORY_DEBUG
 
 #define LIBRDF_INTERNAL
 #include <librdf.h>
@@ -196,3 +192,5 @@ librdf_memory_report(FILE *fh)
   }
   fprintf((FILE*)fh, "-----------------------\n");
 }
+#endif
+
