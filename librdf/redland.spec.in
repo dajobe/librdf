@@ -69,7 +69,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/include/rdf_uri.h
 %{prefix}/include/rdf_node.h
 %{prefix}/include/rdf_statement.h
-%{prefix}/include/rdf_context.h
+%{prefix}/include/rdf_concepts.h
 %{prefix}/include/rdf_model.h
 %{prefix}/include/rdf_iterator.h
 %{prefix}/include/rdf_storage.h
