@@ -15,6 +15,10 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>RFE: Python api, add __nonzero__ (check this) so you can do things
+like <code>if redland-stream: do things...</code> to check for
+empty streams before iterating. 
+<code>def __nonzero__(self): return !self.end()</code></li>
 <li>Documentation: describe the redland features available per class</li>
 <li>RFE: add user mappings from URIs to namespace aliases to the serializer</li>
 <li>BUG: The parser error/warning callbacks are not called - broken. They
