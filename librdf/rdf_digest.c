@@ -31,8 +31,25 @@
 #include <rdf_uri.h>
 
 
+/* prototypes for helper functions */
+static void librdf_delete_digest_factories(void);
+
 /** List of digest factories */
 static librdf_digest_factory *digests=NULL;
+
+
+/* helper functions */
+static void
+librdf_delete_digest_factories(void)
+{
+	librdf_digest_factory *factory, *next;
+	
+	for(factory=digests; factory; factory=next) {
+		next=factory->next;
+		LIBRDF_FREE(librdf_digest_factory, factory->name);
+		LIBRDF_FREE(librdf_digest_factory, factory);
+	}
+}
 
 
 /**
@@ -328,6 +345,12 @@ librdf_init_digest(void)
 }
 
 
+void
+librdf_finish_digest(void) 
+{
+	librdf_delete_digest_factories();
+}
+
 
 #ifdef STANDALONE
 
@@ -385,6 +408,11 @@ main(int argc, char *argv[])
         }
         
     
+        /* finish digest module */
+        librdf_finish_digest();
+
+	librdf_memory_report(stderr);
+	
         /* keep gcc -Wall happy */
         return(0);
 }
