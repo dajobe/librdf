@@ -247,7 +247,7 @@ librdf_query_triples_terminate(librdf_query* query)
 static int
 librdf_query_triples_open(librdf_query* query)
 {
-  librdf_query_triples_context *context=(librdf_query_triples_context*)query->context;
+/*  librdf_query_triples_context *context=(librdf_query_triples_context*)query->context; */
   
   return 0;
 }
@@ -265,7 +265,7 @@ librdf_query_triples_open(librdf_query* query)
 static int
 librdf_query_triples_close(librdf_query* query)
 {
-  librdf_query_triples_context* context=(librdf_query_triples_context*)query->context;
+/*  librdf_query_triples_context* context=(librdf_query_triples_context*)query->context; */
 
   return 0;
 }
