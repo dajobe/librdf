@@ -27,7 +27,7 @@ SUBDIRS=@SD@ repat raptor librdf examples
 CONFIG_SUBDIRS=raptor
 # Subdirectories to use for distribution
 DIST_SUBDIRS=librdf docs examples \
-perl python tcl java ruby \
+perl php python tcl java ruby \
 expat repat raptor \
 debian aux
 
