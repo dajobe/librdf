@@ -77,6 +77,7 @@ typedef struct librdf_serializer_s librdf_serializer;
 typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 
 /* Public statics */
+extern const char * const librdf_short_copyright_string;
 extern const char * const librdf_copyright_string;
 extern const char * const librdf_version_string;
 extern const unsigned int librdf_version_major;
