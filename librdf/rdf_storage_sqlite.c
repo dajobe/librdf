@@ -871,6 +871,44 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_stateme
 }
 
 
+static void
+sqlite_construct_select_helper(raptor_stringbuffer* sb) 
+{
+  raptor_stringbuffer_append_counted_string(sb, "SELECT\n", 7, 1);
+
+  /* If this order is changed MUST CHANGE order in 
+   * librdf_storage_sqlite_get_next_common 
+   */
+  raptor_stringbuffer_append_string(sb, 
+"  SubjectURIs.uri     AS subjectUri,\n\
+  SubjectBlanks.blank AS subjectBlank,\n\
+  PredicateURIs.uri   AS predicateUri,\n\
+  ObjectURIs.uri      AS objectUri,\n\
+  ObjectBlanks.blank  AS objectBlank,\n\
+  ObjectLiterals.text AS objectLiteralText,\n\
+  ObjectLiterals.language AS objectLiteralLanguage,\n\
+  ObjectLiterals.datatype AS objectLiteralDatatype,\n\
+  ObjectDatatypeURIs.uri  AS objectLiteralDatatypeUri,\n\
+  ContextURIs.uri         AS contextUri\n",
+                                    1);
+  
+  raptor_stringbuffer_append_counted_string(sb, "FROM ", 5, 1);
+  raptor_stringbuffer_append_string(sb, sqlite_tables[TABLE_TRIPLES].name, 1);
+  raptor_stringbuffer_append_counted_string(sb, " AS T\n", 6, 1);
+  
+  raptor_stringbuffer_append_string(sb, 
+"  LEFT JOIN uris     AS SubjectURIs    ON SubjectURIs.id    = T.subjectUri\n\
+  LEFT JOIN blanks   AS SubjectBlanks  ON SubjectBlanks.id  = T.subjectBlank\n\
+  LEFT JOIN uris     AS PredicateURIs  ON PredicateURIs.id  = T.predicateUri\n\
+  LEFT JOIN uris     AS ObjectURIs     ON ObjectURIs.id     = T.objectUri\n\
+  LEFT JOIN blanks   AS ObjectBlanks   ON ObjectBlanks.id   = T.objectBlank\n\
+  LEFT JOIN literals AS ObjectLiterals ON ObjectLiterals.id = T.objectLiteral\n\
+  LEFT JOIN uris     AS ObjectDatatypeURIs ON ObjectDatatypeURIs.id = objectLiteralDatatype\n\
+  LEFT JOIN uris     AS ContextURIs    ON ContextURIs.id     = T.contextUri\n",
+                                    1);
+}
+
+
 typedef struct {
   librdf_storage *storage;
   librdf_storage_sqlite_context* sqlite_context;
@@ -914,38 +952,7 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   scontext->sqlite_context=context;
 
   sb=raptor_new_stringbuffer();
-
-  raptor_stringbuffer_append_counted_string(sb, "SELECT\n", 7, 1);
-
-  /* If this order is changed MUST CHANGE order in 
-   * librdf_storage_sqlite_get_next_common 
-   */
-  raptor_stringbuffer_append_string(sb, 
-"  SubjectURIs.uri     AS SubjectURI,\n\
-  SubjectBlanks.blank AS SubjectBlank,\n\
-  PredicateURIs.uri   AS PredicateURI,\n\
-  ObjectURIs.uri      AS ObjectURI,\n\
-  ObjectBlanks.blank  AS ObjectBlank,\n\
-  ObjectLiterals.text AS ObjectLiteralText,\n\
-  ObjectLiterals.language AS ObjectLiteralLanguage,\n\
-  ObjectLiterals.datatype AS ObjectLiteralDatatype,\n\
-  ObjectDatatypeURIs.uri  AS ObjectLiteralDatatypeUri,\n\
-  ContextURIs.uri         AS ContextUri\n",
-                                    1);
-  
-  raptor_stringbuffer_append_counted_string(sb, "FROM triples\n", 13, 1);
-  
-  raptor_stringbuffer_append_string(sb, 
-"  LEFT JOIN uris     AS SubjectURIs    ON SubjectURIs.id    = SubjectUri\n\
-  LEFT JOIN blanks   AS SubjectBlanks  ON SubjectBlanks.id  = SubjectBlank\n\
-  LEFT JOIN uris     AS PredicateURIs  ON PredicateURIs.id  = PredicateUri\n\
-  LEFT JOIN uris     AS ObjectURIs     ON ObjectURIs.id     = ObjectUri\n\
-  LEFT JOIN blanks   AS ObjectBlanks   ON ObjectBlanks.id   = ObjectBlank\n\
-  LEFT JOIN literals AS ObjectLiterals ON ObjectLiterals.id = ObjectLiteral\n\
-  LEFT JOIN uris     AS ObjectDatatypeURIs ON ObjectDatatypeURIs.id = ObjectLiteralDatatype\n\
-  LEFT JOIN uris     AS ContextURIs    ON ContextURIs.id     = ContextUri\n",
-                                    1);
-
+  sqlite_construct_select_helper(sb);
   raptor_stringbuffer_append_counted_string(sb, ";", 1, 1);
 
   request=raptor_stringbuffer_as_string(sb);
@@ -1046,16 +1053,16 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
  * MUST MATCH fields order in query in librdf_storage_sqlite_serialise
  *
  i  field name (all TEXT unless given)
- 0  SubjectURI
- 1  SubjectBlank
- 2  PredicateURI
- 3  ObjectURI
- 4  ObjectBlank
- 5  ObjectLiteralText
- 6  ObjectLiteralLanguage
- 7  ObjectLiteralDatatype (INTEGER)
- 8  ObjectLiteralDatatypeUri
- 9  ContextUri
+ 0  subjectUri
+ 1  subjectBlank
+ 2  predicateUri
+ 3  objectUri
+ 4  objectBlank
+ 5  objectLiteralText
+ 6  objectLiteralLanguage
+ 7  objectLiteralDatatype (INTEGER)
+ 8  objectLiteralDatatypeUri
+ 9  contextUri
 */
 
     for(i=0; i<sqlite3_column_count(vm); i++)
@@ -1304,6 +1311,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   const char* fields[4];
   char *errmsg=NULL;
   raptor_stringbuffer *sb;
+  int need_where=1;
   int need_and=0;
   int i;
   
@@ -1327,19 +1335,23 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
 
   /* FIXME contexts and NULL nodes */
   sb=raptor_new_stringbuffer();
-  raptor_stringbuffer_append_string(sb, "SELECT * FROM ", 1);
-  raptor_stringbuffer_append_string(sb, sqlite_tables[TABLE_TRIPLES].name, 1);
-  raptor_stringbuffer_append_counted_string(sb, " WHERE ", 7, 1);
+  sqlite_construct_select_helper(sb);
 
   for(i=0; i<3; i++) {
     if(node_ids[i] < 0)
       continue;
     
+    if(need_where) {
+      raptor_stringbuffer_append_counted_string(sb, " WHERE ", 7, 1);
+      need_where=0;
+    }
     if(need_and)
-      raptor_stringbuffer_append_counted_string(sb, " AND ", 5, 1);
+      raptor_stringbuffer_append_counted_string(sb, "AND ", 5, 1);
+    raptor_stringbuffer_append_counted_string(sb, "T.", 2, 1);
     raptor_stringbuffer_append_string(sb, fields[i], 1);
     raptor_stringbuffer_append_counted_string(sb, "=", 1, 1);
     raptor_stringbuffer_append_decimal(sb, node_ids[i]);
+    raptor_stringbuffer_append_counted_string(sb, "\n", 1, 1);
     need_and=1;
   }
   raptor_stringbuffer_append_counted_string(sb, ";", 1, 1);
