@@ -55,6 +55,8 @@
  * and returns a &librdf_stream of
  * matching &librdf_statement objects.
  * 
+ * NOTE: Not Implemented.  Depends on rasqal_query_results class
+ * 
  * Return value:  &librdf_stream of matching statements (may be empty) or NULL on failure
  **/
 librdf_stream*
