@@ -1,3 +1,9 @@
+2004-07-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* csharp/Redland.cs, csharp/MemoryStorage.cs, csharp/Iterator.cs,
+	csharp/IWrapper.cs, csharp/HashStorage.cs, csharp/URI.cs: Added
+	CVS IDs to the header.
+
 2004-07-14  Edd Dumbill  <edd@usefulinc.com>
 
 	* csharp/examples/example2.cs:
