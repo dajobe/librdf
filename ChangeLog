@@ -1,4 +1,33 @@
+2004-07-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* docs/Makefile.am, configure.ac, Makefile.am:
+	Updates for move of files and dirs to redland-bindings package
+
+	* docs/ruby.html, docs/tcl.html, docs/csharp.html,
+	docs/fix-pod-xhtml, docs/fix-python-xhtml, docs/java.html,
+	docs/perl.html, docs/php.html, docs/python.html: Moved to
+	redland-bindings package
+
+	* Moved csharp, java, perl, php, python, ruby, tcl directories and
+	supporting doc files in docs to the redland-bindings package.
+	
+	* docs/ruby.html: Point to rdf-redland at RubyForge
+
+	* Redland.i:
+	Remove #include <rdf_config.h> since this is now a public file.
+
+2004-07-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/tests/Makefile.am, raptor/tests/ex-54.out,
+	raptor/tests/ex-54.rdf, raptor/tests/warn-03.out,
+	raptor/tests/warn-03.rdf: Renamed warn-03 to ex-54 - it is not an
+	error or a warning, the data is good
+	
 2004-07-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/tests/Makefile.am, raptor/tests/bad-22.rdf:
+	bad-22.rdf testing rdf:li forbidden as a property attribute
+	(Graham Klyne)
 
 	* csharp/Serializer.cs:
 	(Serializer (World world, string name, string mime_type, Uri
