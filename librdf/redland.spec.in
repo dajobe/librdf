@@ -17,8 +17,10 @@ Group:     Development/Libraries
 Source:    http://www.redland.opensource.ac.uk/dist/source/%{name}-%{version}.tar.gz
 URL:       http://www.redland.opensource.ac.uk/
 BuildRoot: /tmp/%{name}-%{version}
+BuildRequires: libxml2 libxml2-devel
 Packager:  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 Docdir: %{prefix}/doc
+Requires:  raptor > 0.9.6
 
 %description
 
@@ -33,6 +35,7 @@ for RDF developers to experiment with the technology.
 Summary: Libraries and header files for programs that use Redland.
 Group: Development/Libraries
 Requires: redland
+Requires: raptor > 0.9.6
 
 %description devel
 Header files for development with Redland
@@ -120,7 +123,6 @@ cd ..
 
 %{prefix}/include/rdf_files.h 
 %{prefix}/include/rdf_hash_bdb.h 
-%{prefix}/include/rdf_hash_gdbm.h
 %{prefix}/include/rdf_hash_memory.h
 %{prefix}/include/rdf_heuristics.h
 %{prefix}/include/rdf_list.h
@@ -144,6 +146,9 @@ cd ..
 /sbin/ldconfig
 
 %changelog
+* Fri Jan 13 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
+- Updated for redland 0.9.12
+
 * Fri Jan 4 2002 Dave Beckett <dave.beckett@bristol.ac.uk>
 - Updated for new Perl module names
 
