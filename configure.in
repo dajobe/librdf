@@ -121,6 +121,7 @@ AC_CHECK_PROGS(JAVA, java jre)
 AC_DEFINE_UNQUOTED(JAVA_COMMAND, "$JAVA")
 AC_CHECK_PROGS(PYTHON, python2.0 python1.5 python)
 AC_CHECK_PROGS(PERL, perl5.6.0 perl5 perl)
+AC_CHECK_PROGS(TCL, tcl)
 
 AC_CHECK_PROG(LIBWWW_CONFIG, libwww-config, libwww-config)
 
@@ -738,7 +739,7 @@ AC_SUBST(HASH_SRCS)
 
 
 dnl Checks for building sub-packages in sub directories
-SD="docs perl python"
+SD="docs perl python tcl"
 
 
 XML_OBJS=
@@ -812,6 +813,7 @@ perl/lib/Makefile
 perl/lib/RDF/Makefile
 python/Makefile
 python/test/Makefile
+tcl/Makefile
 repat/Makefile
 redland.spec
 redland-config,
