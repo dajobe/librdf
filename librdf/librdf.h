@@ -48,6 +48,8 @@ typedef struct librdf_parser_s librdf_parser;
 typedef struct librdf_parser_factory_s librdf_parser_factory;
 typedef struct librdf_query_s librdf_query;
 typedef struct librdf_query_factory_s librdf_query_factory;
+typedef struct librdf_serializer_s librdf_serializer;
+typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 
 
 /* error handling */
@@ -147,6 +149,7 @@ void librdf_memory_report(FILE *fh);
 #include <rdf_model.h>
 #include <rdf_storage.h>
 #include <rdf_parser.h>
+#include <rdf_serializer.h>
 #include <rdf_stream.h>
 #include <rdf_query.h>
 
