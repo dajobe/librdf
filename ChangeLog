@@ -1,19 +1,59 @@
+2005-02-04  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Redland.i: librdf_query_results_to_string returns a char*
+
+	* Redland.i: librdf_query_results_to_file returns an int.
+	%newobject librdf_query_results_to_string
+
+	* rasqal/autogen.sh, raptor/autogen.sh: Add autoheader to the path
+	search.
+
+	* rasqal/configure.ac, raptor/configure.ac, configure.ac:
+	AM_PROG_LIBTOOL to AC_PROG_LIBTOOL seems to make things happier
+
+	* autogen.sh: fix
+
+	* autogen.sh: Add autoheader to the fun
+
+	* rasqal/autogen.sh: Add libtoolize to the path search.
+
+	* raptor/autogen.sh: tidy
+
+	* raptor/autogen.sh: Add libtoolize to the path search.
+
+	* autogen.sh: No need for swig here.  Add libtoolize to the path
+	search.
+
 2005-02-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
-	* rasqal/sparql_lexer.l (sparql_copy_string_token):
-	Fix wrong length on checking qname.
+	* utils/rdfproc.c, rasqal/sparql_lexer.l, rasqal/rasqal_expr.c:
+	casts for C++
 
-	* rasqal/sparql_lexer.l ({QNAME}):
-	Now assigns a uri using sparql_copy_qname.
-	(sparql_copy_qname): expands and returns a raptor_uri* here.
-	When running standalone as rasqal_lexer_test, ignore unexpanded
-	qnames.
+	* rasqal/INSTALL.html, raptor/INSTALL.html: Note flex and bison
+	requirements
+
+	* rasqal/configure.ac: In maintainer mode, stop if flex is too
+	old, no flex or YACC is not GNU bison.
+
+	* raptor/configure.ac: In maintainer mode, stop if there is no
+	flex.
+
+	* raptor/configure.ac: In maintainer mode, stop if flex is too old
+	or YACC is not GNU bison.
+
+	* rasqal/sparql_lexer.l (sparql_copy_string_token): Fix wrong
+	length on checking qname.
+
+	* rasqal/sparql_lexer.l ({QNAME}): Now assigns a uri using
+	sparql_copy_qname.
+	(sparql_copy_qname): expands and returns a raptor_uri* here.  When
+	running standalone as rasqal_lexer_test, ignore unexpanded qnames.
 	(sparql_copy_string_token): When running standalone as
 	rasqal_lexer_test, ignore unexpanded qnames.
 
-	* rasqal/sparql_lexer.l (sparql_copy_string_token):
-	Check and expand datatype qnames here,
-	since prefixes are always defined before qname use..
+	* rasqal/sparql_lexer.l (sparql_copy_string_token): Check and
+	expand datatype qnames here, since prefixes are always defined
+	before qname use..
 
 	* rasqal/rasqal_expr.c: Added support for expressions:
 	STR, LANG, DATATYPE, ISURI, ISBLANK and ISLITERAL
