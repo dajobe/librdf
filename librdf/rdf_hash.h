@@ -120,6 +120,9 @@ struct librdf_hash_factory_s {
   /* size of the cursor context */
   size_t cursor_context_length;
 
+  /* clone an existing storage */
+  int (*clone)(void* context, void* old_context);
+
   /* open/create hash with identifier and options  */
   int (*open)(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
   /* end hash association */
@@ -167,6 +170,7 @@ void librdf_finish_hash(void);
 /* constructors */
 librdf_hash* librdf_new_hash(char *name);
 librdf_hash* librdf_new_hash_from_factory(librdf_hash_factory* factory);
+librdf_hash* librdf_new_hash_from_hash (librdf_hash* old_hash);
 
 /* destructor */
 void librdf_free_hash(librdf_hash *hash);
