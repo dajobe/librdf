@@ -1,5 +1,9 @@
 2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* librdf/rdf_storage_mysql.c, raptor/raptor_locator.c: casts for c++
+
+2004-07-27  Morten Frederiksen
+
 	* Updated to latest version of the MySQL storage written
 	by Morten Frederiksen
 
@@ -39,6 +43,8 @@
 	Add checking there is a statement to return.
 	(librdf_storage_mysql_get_contexts):
 	Updated for new schema.
+
+2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rasqal/rasqal_expr.c: Add #ifndef STANDALONE ... #endif around
 	test functions, linked via library.
