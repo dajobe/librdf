@@ -248,7 +248,9 @@ librdf_new_model_with_options(librdf_world *world,
     LIBRDF_FREE(librdf_model, model);
     return NULL;
   }
-  
+
+  model->usage=1;
+
   return model;
 }
 
@@ -265,9 +267,13 @@ librdf_new_model_with_options(librdf_world *world,
 librdf_model*
 librdf_new_model_from_model(librdf_model* model)
 {
+  librdf_model *new_model;
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
 
-  return model->factory->clone(model);
+  new_model=model->factory->clone(model);
+  new_model->usage=1;
+  return new_model;
 }
 
 
@@ -284,6 +290,9 @@ librdf_free_model(librdf_model *model)
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(model, librdf_model);
 
+  if(--model->usage)
+    return;
+  
   if(model->sub_models) {
     iterator=librdf_list_get_iterator(model->sub_models);
     if(iterator) {
@@ -305,6 +314,20 @@ librdf_free_model(librdf_model *model)
 }
 
 
+void
+librdf_model_add_reference(librdf_model *model)
+{
+  model->usage++;
+}
+
+void
+librdf_model_remove_reference(librdf_model *model)
+{
+  model->usage--;
+}
+
+
+/* methods */
 
 /**
  * librdf_model_size - get the number of statements in the model
@@ -1167,7 +1190,7 @@ librdf_model_query_string(librdf_model* model,
 
 
 /**
- * librdf_model_sync - Synchronise the model to the storage
+ * librdf_model_sync - Synchronise the model to the model implementation
  * @model: &librdf_model object
  * 
  **/
