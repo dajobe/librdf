@@ -529,7 +529,7 @@ librdf_parser_set_warning(librdf_parser* parser, void *user_data,
  * @parser: &librdf_parser object
  * @feature: &librdf_Uuri feature property
  * 
- * Return value: the value of the feature or NULL if no such feature
+ * Return value: new &librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
 librdf_node*

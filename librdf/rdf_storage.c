@@ -1352,7 +1352,7 @@ librdf_storage_get_contexts(librdf_storage* storage)
  * @storage: &librdf_storage object
  * @feature: &librdf_uri feature property
  * 
- * Return value: &librdf_node feature value or NULL if no such feature
+ * Return value: new &librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
 librdf_node*

@@ -1350,7 +1350,7 @@ librdf_model_get_contexts(librdf_model* model)
  * @model: &librdf_model object
  * @feature: &librdf_uri feature property
  * 
- * Return value: &librdf_node feature value or NULL if no such feature
+ * Return value: new &librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
 librdf_node*
