@@ -14,17 +14,9 @@
 <h3>1. From CVS</h3>
   
 <p>(if you have access to it - ILRT private at present)</p>
-<pre>
-    export CVSROOT=:pserver:LOGIN@cvs.desire.org:/usr/local/cvsroot
-    export CVS_RSH=ssh
-    cvs login
-    ...
-    cvs checkout librdf
-</pre>
-where <b>LOGIN</b> is your login on the CVS server.
 
-<p>You will probably then need to create the automake and autoconf
-derived files, as described below.</p>
+<p>You will then need to create the automake and autoconf derived
+files, as described below in <em>configuring the package</em>.</p>
 
 
 <h3>2. From releases</h3>
@@ -50,13 +42,35 @@ derived files, as described below.</p>
    make
 </pre>
 
-<p>If you want to use Sergey Melnik's Java RDF parser to generate
-triples, download the distribution from <a href="http://www-db.stanford.edu/~melnik/rdf/api.html">his site</a> and configure with:</p>
-<pre>
-./configure --with-rdf-java-api=LOCATION-OF-JAR-FILE
-</pre>
-<p>(tested with rdf-api-2000-05-12.jar)
+<h3>configure options</h3>
 
+<dl>
+<dt><tt>--with-libwww</tt><br />
+<dd>Enable use of the W3C <a href="http://www.w3.org/Library/">libwww</a>,
+if available.  configure will automatically enable this if
+the <tt>libwww-config</tt> program can be found in the path unless
+disabled by settign this option to <em>no</em>.</dd>
+
+<dt><tt>--with-rdf-java-api=JAR</tt><br />
+<dd>Enable the use of Sergey Melnik's Java RDF parser (based on SiRPAC)
+to generate triples.  You need to download the distribution from
+<a href="http://www-db.stanford.edu/~melnik/rdf/api.html">his site</a> and 
+enable with this option pointing at the Jar file.</dd>
+
+<dt><tt>--enable-digests=LIST</tt><br />
+<dd>Select the list of digests to be included if the are availble.  The
+valid list of digests are 'md5 sha1 ripem160' (the default).  The
+functions can be provided by external libraries such as
+the OpenSSL libcrypto library or by provided portable
+versions (only MD5 supported in this release).</dd>
+
+<dt><tt>--with-openssl-digests</tt><br />
+<dd>Enable digests provided by the OpenSSL libcrypto library (MD5,
+SHA1 and RIPEMD160) if the library is available. configure will
+automatically enable this unless disabled by setting this option to
+<em>no</em>.</dd>
+
+</dl>
 
 
 <h2>Testing</h2>
