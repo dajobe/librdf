@@ -706,11 +706,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
     if(!length)
       return 0;
     
-    node=librdf_new_node(statement->world);
-    if(!node)
-      return 0;
-    
-    if(!(node_len=librdf_node_decode(node, p, length)))
+    if(!(node=librdf_node_decode(statement->world, &node_len, p, length)))
       return 0;
 
     p += node_len;
