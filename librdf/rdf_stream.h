@@ -31,25 +31,30 @@ extern "C" {
 #ifdef LIBRDF_INTERNAL
 
 struct librdf_stream_s {
+  librdf_world *world;
   void *context;
-  int is_end_stream;
+  int is_finished; /* 1 when have no more statements */
   
   /* Used when mapping */
-  librdf_statement* next; /* stores next statement */
+  librdf_statement *current;
   void *map_context;      /* context to pass on to map */
   
-  int (*end_of_stream)(void*);
-  librdf_statement* (*next_statement)(void*);
-  void (*finished)(void*);
+  int (*is_end_method)(void*);
+  int (*next_method)(void*);
+  void* (*get_method)(void*, int); /* flags: type of get */
+  void (*finished_method)(void*);
 
   librdf_statement* (*map)(void *context, librdf_statement* statement);
 };
 
+/* FIXME - should all short lists be enums */
+#define LIBRDF_STREAM_GET_METHOD_GET_OBJECT  LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  
+#define LIBRDF_STREAM_GET_METHOD_GET_CONTEXT LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT
 #endif
 
 /* constructor */
 
-librdf_stream* librdf_new_stream(librdf_world *world, void* context, int (*end_of_stream)(void*), librdf_statement* (*next_statement)(void*), void (*finished)(void*));
+librdf_stream* librdf_new_stream(librdf_world *world, void* context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
 
 /* destructor */
 
@@ -58,7 +63,9 @@ void librdf_free_stream(librdf_stream* stream);
 /* methods */
 int librdf_stream_end(librdf_stream* stream);
 
-librdf_statement* librdf_stream_next(librdf_stream* stream);
+int librdf_stream_next(librdf_stream* stream);
+librdf_statement* librdf_stream_get_object(librdf_stream* stream);
+void* librdf_stream_get_context(librdf_stream* stream);
 
 void librdf_stream_set_map(librdf_stream* stream, librdf_statement* (*map)(void* context, librdf_statement* statement), void* map_context);
 
