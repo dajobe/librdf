@@ -36,6 +36,17 @@
 
 #ifndef STANDALONE
 
+/* hashes - resource, literal, blank */
+enum {
+  H_RESOURCE,
+  H_LITERAL,
+  H_BLANK,
+  H_LAST=H_BLANK
+};
+
+#define H_COUNT (H_LAST+1)
+
+
 /* class functions */
 
 /**
@@ -46,6 +57,17 @@
 void
 librdf_init_node(librdf_world* world) 
 {
+  int i;
+  
+  for(i=0; i<H_COUNT; i++) {
+    world->nodes_hash[i]=librdf_new_hash(world, NULL);
+    if(!world->nodes_hash[i])
+      LIBRDF_FATAL1(world, librdf_init_node,
+                    "Failed to create Nodes hash from factory");
+    
+    if(librdf_hash_open(world->nodes_hash[i], NULL, 0, 1, 1, NULL))
+      LIBRDF_FATAL1(world, librdf_init_node, "Failed to open Nodes hash");
+  }
 }
 
 
@@ -56,6 +78,14 @@ librdf_init_node(librdf_world* world)
 void
 librdf_finish_node(librdf_world *world)
 {
+  int i;
+
+  for(i=0; i<H_COUNT; i++) {
+    if(world->nodes_hash[i]) {
+      librdf_hash_close(world->nodes_hash[i]);
+      librdf_free_hash(world->nodes_hash[i]);
+    }
+  }
 }
 
 
@@ -80,44 +110,112 @@ librdf_new_node(librdf_world *world)
 
     
 
+/*
+ * librdf_new_node_from_uri_string_or_uri - INTERNAL - Constructor - create a new librdf_node object from a URI string or URI object
+ * @world: redland world object
+ * @uri_string: string representing a URI
+ * @uri: &librdf_uri object
+ * 
+ * Return value: a new &librdf_node object or NULL on failure
+ **/
+static librdf_node*
+librdf_new_node_from_uri_string_or_uri(librdf_world *world, 
+                                       const char *uri_string, librdf_uri *uri) 
+{
+  librdf_node* new_node;
+  librdf_uri *new_uri;
+  librdf_hash_datum key, value; /* on stack - not allocated */
+  librdf_hash_datum *old_value;
+
+  if(!uri_string && !uri)
+    return NULL;
+
+  if(uri_string && uri) {
+    LIBRDF_DEBUG3(librdf_new_node_from_uri_or_uri, "Called with both a URI string %s and object URI %s\n", uri_string, librdf_uri_as_string(uri));
+    return NULL;
+  }
+
+  if(uri_string) {
+    new_uri=librdf_new_uri(world, uri_string);
+    if(!new_uri)
+      return NULL;
+  } else
+    new_uri=librdf_new_uri_from_uri(uri);
+  
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(world->nodes_mutex);
+#endif
+  
+  key.data=&new_uri;
+  key.size=sizeof(librdf_uri*);
+
+  /* if the existing node found in resource hash, return it */
+  if((old_value=librdf_hash_get_one(world->nodes_hash[H_RESOURCE], &key))) {
+    new_node=*(librdf_node**)old_value->data;
+
+    librdf_free_uri(new_uri);
+    
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3(librdf_new_node, "Found existing resource node with URI %s in hash with current usage %d\n", uri_string, new_node->usage);
+#endif
+
+    librdf_free_hash_datum(old_value);
+    new_node->usage++;
+
+    goto unlock;
+  }
+
+
+  /* otherwise create a new one */
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG2(librdf_new_node, "Creating new resource node with URI %s in hash\n", uri_string);
+#endif
+
+  new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, sizeof(librdf_node));
+  if(!new_node) {
+    librdf_free_uri(new_uri);
+    goto unlock;
+  }
+  
+  new_node->world=world;
+  new_node->value.resource.uri=new_uri;
+  new_node->type = LIBRDF_NODE_TYPE_RESOURCE;
+
+  new_node->usage=1;
+
+  value.data=&new_node; value.size=sizeof(librdf_node*);
+
+  /* store in hash: (librdf_uri*)uri => (librdf_node*) */
+  if(librdf_hash_put(world->nodes_hash[H_RESOURCE], &key, &value)) {
+    LIBRDF_FREE(librdf_node, new_node);
+    librdf_free_uri(new_uri);
+    new_node=NULL;
+  }
+
+  
+ unlock:
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(world->nodes_mutex);
+#endif
+
+  return new_node;
+}
+
+    
+
 /**
  * librdf_new_node_from_uri_string - Constructor - create a new librdf_node object from a URI string
  * @world: redland world object
  * @uri_string: string representing a URI
  * 
- * The URI can be NULL, and can be set later.
- *
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_uri_string(librdf_world *world, const char *uri_string) 
 {
-  librdf_node* new_node;
-  librdf_uri *new_uri;
-  
-  new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, 
-                                         sizeof(librdf_node));
-  if(!new_node)
-    return NULL;
-  
-  new_node->world=world;
-
-  new_node->type = LIBRDF_NODE_TYPE_RESOURCE;
-  /* not needed thanks to calloc */
-  /* new_node->value.resource.uri = NULL; */
-  
-  /* return node now if not setting URI */
-  if(!uri_string)
-    return new_node;
-  
-  new_uri=librdf_new_uri(world, uri_string);
-  if (!new_uri) {
-    librdf_free_node(new_node);
-    return NULL;
-  }
-
-  new_node->value.resource.uri=new_uri;
-  return new_node;
+  return librdf_new_node_from_uri_string_or_uri(world, uri_string, NULL);
 }
 
     
@@ -134,13 +232,7 @@ librdf_new_node_from_uri_string(librdf_world *world, const char *uri_string)
 librdf_node*
 librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri) 
 {
-  /* note: librdf_uri_as_string does not allocate string ... */
-  char *uri_string=librdf_uri_as_string(uri); 
-  
-  librdf_node* new_node=librdf_new_node_from_uri_string(world, uri_string);
-  
-  /* ... thus no need for LIBRDF_FREE(uri_string); */
-  return new_node;
+  return librdf_new_node_from_uri_string_or_uri(world, NULL, uri);
 }
 
 
@@ -156,26 +248,16 @@ librdf_node*
 librdf_new_node_from_uri_local_name(librdf_world *world, 
                                     librdf_uri *uri, const char *local_name) 
 {
-  librdf_node* new_node;
   librdf_uri *new_uri;
+  librdf_node* new_node;
 
-  new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, 
-                                         sizeof(librdf_node));
-  if(!new_node)
-    return NULL;
-
-  new_node->world=world;
-  
-  new_node->type = LIBRDF_NODE_TYPE_RESOURCE;
-  /* not needed thanks to calloc */
-  /* new_node->value.resource.uri = NULL; */
-  
   new_uri=librdf_new_uri_from_uri_local_name(uri, local_name);
-  if (!new_uri) {
-    librdf_free_node(new_node);
+  if(!new_uri)
     return NULL;
-  }
-  new_node->value.resource.uri=new_uri;
+
+  new_node=librdf_new_node_from_uri_string_or_uri(world, NULL, new_uri);
+
+  librdf_free_uri(new_uri);
 
   return new_node;
 }
@@ -203,7 +285,7 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
   if(!new_uri)
     return NULL;
 
-  new_node=librdf_new_node_from_uri_string(world, librdf_uri_as_string(new_uri));
+  new_node=librdf_new_node_from_uri_string_or_uri(world, NULL, new_uri);
   librdf_free_uri(new_uri);
   
   return new_node;
@@ -253,11 +335,18 @@ librdf_new_node_from_typed_literal(librdf_world *world,
   int value_len;
   char *new_value;
   char *new_xml_language;
+  librdf_hash_datum key, value_hd; /* on stack - not allocated */
+  librdf_hash_datum *old_value;
+  size_t size;
+  unsigned char *buffer;
   
-  new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1,
-                                         sizeof(librdf_node));
+#ifdef WITH_THREADS
+  pthread_mutex_lock(world->nodes_mutex);
+#endif
+
+  new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, sizeof(librdf_node));
   if(!new_node)
-    return NULL;
+    goto unlock;
 
   new_node->world=world;
   
@@ -270,26 +359,98 @@ librdf_new_node_from_typed_literal(librdf_world *world,
   new_value=(char*)LIBRDF_MALLOC(cstring, value_len + 1);
   if(!new_value) {
     LIBRDF_FREE(librdf_node, new_node);
-    return NULL;
+    new_node=NULL;
+    goto unlock;
   }
   strcpy(new_value, value);
   new_node->value.literal.string=(char*)new_value;
   
   if(xml_language && *xml_language) {
-    new_xml_language=(char*)LIBRDF_MALLOC(cstring, 
-                                          strlen(xml_language) + 1);
+    new_xml_language=(char*)LIBRDF_MALLOC(cstring, strlen(xml_language) + 1);
     if(!new_xml_language) {
       LIBRDF_FREE(cstring, new_value);
       LIBRDF_FREE(librdf_node, new_node);
-      return NULL;
+      new_node=NULL;
+      goto unlock;
     }
     strcpy(new_xml_language, xml_language);
     new_node->value.literal.xml_language=new_xml_language;
+  } else
+    new_xml_language=NULL;
+  
+  if(datatype_uri) {
+    datatype_uri=librdf_new_uri_from_uri(datatype_uri);
+    new_node->value.literal.datatype_uri=datatype_uri;
   }
   
-  if(datatype_uri)
-    new_node->value.literal.datatype_uri=librdf_new_uri_from_uri(datatype_uri);
+
+  size=librdf_node_encode(new_node, NULL, 0);
+  if(size)
+    buffer=(char*)LIBRDF_MALLOC(cstring, size);
+  else
+    buffer=NULL;
   
+  if(!buffer) {
+    if(datatype_uri)
+      librdf_free_uri(datatype_uri);
+    LIBRDF_FREE(cstring, new_value);
+    LIBRDF_FREE(librdf_node, new_node);
+    return NULL;
+  }
+
+  new_node->value.literal.size=size;
+  new_node->value.literal.key=buffer;
+  librdf_node_encode(new_node, buffer, size);
+
+  key.data=buffer;
+  key.size=size;
+
+  /* if the existing node found in resource hash, return it */
+  if((old_value=librdf_hash_get_one(world->nodes_hash[H_LITERAL], &key))) {
+    LIBRDF_FREE(cstring, buffer);
+    if(new_xml_language)
+      LIBRDF_FREE(cstring, new_xml_language);
+    if(datatype_uri)
+      librdf_free_uri(datatype_uri);
+    LIBRDF_FREE(cstring, new_value);
+    LIBRDF_FREE(librdf_node, new_node);
+
+    new_node=*(librdf_node**)old_value->data;
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3(librdf_new_node_from_typed_literal, "Found existing resource node with typed literal %s in hash with current usage %d\n", value, new_node->usage);
+#endif
+
+    librdf_free_hash_datum(old_value);
+    new_node->usage++;
+
+    goto unlock;
+  }
+    
+  /* otherwise add the new node */
+  new_node->usage=1;
+
+  value_hd.data=&new_node; value_hd.size=sizeof(librdf_node*);
+
+  /* store in hash: (serialised node) => (librdf_node*) */
+  if(librdf_hash_put(world->nodes_hash[H_LITERAL], &key, &value_hd)) {
+    LIBRDF_FREE(cstring, buffer);
+    if(new_xml_language)
+      LIBRDF_FREE(cstring, new_xml_language);
+    if(datatype_uri)
+      librdf_free_uri(datatype_uri);
+    LIBRDF_FREE(cstring, new_value);
+    LIBRDF_FREE(librdf_node, new_node);
+
+    new_node=NULL;
+  }
+
+  
+ unlock:
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->nodes_mutex);
+#endif
+
   return new_node;
 }
 
@@ -311,30 +472,73 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   librdf_node* new_node;
   char *new_identifier;
   int len;
+  librdf_hash_datum key, value; /* on stack - not allocated */
+  librdf_hash_datum *old_value;
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(world->nodes_mutex);
+#endif
 
   if(!identifier)
     identifier=librdf_world_get_genid(world);
 
   len=strlen(identifier);
   
-  new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, sizeof(librdf_node));
-  if(!new_node)
-    return NULL;
-
-  new_node->world=world;
-  
-  /* set type */
-  new_node->type=LIBRDF_NODE_TYPE_BLANK;
-
   new_identifier=(char*)LIBRDF_MALLOC(cstring, len+1);
   if(!new_identifier) {
-    LIBRDF_FREE(librdf_node, new_node);
-    return NULL;
+    new_node=NULL;
+    goto unlock;
   }
   strcpy(new_identifier, identifier);
 
+
+  key.data=new_identifier;
+  key.size=len;
+
+  /* if the existing node found in resource hash, return it */
+  if((old_value=librdf_hash_get_one(world->nodes_hash[H_BLANK], &key))) {
+    new_node=*(librdf_node**)old_value->data;
+
+    LIBRDF_FREE(cstring, new_identifier);
+    
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3(librdf_new_node_from_blank_identifier, "Found existing blank node identifier %s in hash with current usage %d\n", new_identifier, new_node->usage);
+#endif
+
+    librdf_free_hash_datum(old_value);
+    new_node->usage++;
+
+    goto unlock;
+  }
+
+
+  new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, sizeof(librdf_node));
+  if(!new_node) {
+    LIBRDF_FREE(cstring, new_identifier);
+    goto unlock;
+  }
+
+  new_node->world=world;
   new_node->value.blank.identifier=new_identifier;
   new_node->value.blank.identifier_len=len;
+  new_node->type=LIBRDF_NODE_TYPE_BLANK;
+
+  new_node->usage=1;
+
+  value.data=&new_node; value.size=sizeof(librdf_node*);
+
+  /* store in hash: (blank node ID string) => (librdf_node*) */
+  if(librdf_hash_put(world->nodes_hash[H_BLANK], &key, &value)) {
+    LIBRDF_FREE(librdf_node, new_node);
+    LIBRDF_FREE(cstring, new_identifier);
+    new_node=NULL;
+  }
+
+
+ unlock:
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->nodes_mutex);
+#endif
 
   return new_node;
 }
@@ -349,51 +553,8 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
 librdf_node*
 librdf_new_node_from_node(librdf_node *node) 
 {
-  librdf_node* new_node=NULL;
-  librdf_world* world=node->world;
-
-  if(!node)
-    return NULL;
-  
-  switch(node->type) {
-    case LIBRDF_NODE_TYPE_RESOURCE:
-      new_node=librdf_new_node_from_uri(world, node->value.resource.uri);
-      break;
-
-    case LIBRDF_NODE_TYPE_LITERAL:
-      new_node=librdf_new_node_from_typed_literal(world,
-                                                  node->value.literal.string,
-                                                  node->value.literal.xml_language,
-                                                  node->value.literal.datatype_uri);
-      break;
-
-    case LIBRDF_NODE_TYPE_BLANK:
-      new_node=librdf_new_node_from_blank_identifier(world, 
-                                                     node->value.blank.identifier);
-      break;
-
-    default:
-      LIBRDF_ERROR2(node->world, librdf_new_node_from_node, 
-                    "Do not know how to copy node type %d\n", node->type);
-      return NULL;
-  }
-  
-  return new_node;
-}
-
-
-/**
- * librdf_node_init - initialise a statically declared librdf_node
- * @world: redland world object
- * @node: &librdf_node object
- * 
- * Return value: a new &librdf_node or NULL on failure
- **/
-void
-librdf_node_init(librdf_world *world, librdf_node *node)
-{
-  node->world=world;
-  node->type=LIBRDF_NODE_TYPE_RESOURCE;
+  node->usage++;
+  return node;
 }
 
 
@@ -405,13 +566,52 @@ librdf_node_init(librdf_world *world, librdf_node *node)
 void
 librdf_free_node(librdf_node *node) 
 {
+  librdf_hash_datum key; /* on stack */
+#ifdef WITH_THREADS
+  librdf_world *world = node->world;
+#endif
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(world->nodes_mutex);
+#endif
+
+  node->usage--;
+  
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG3(librdf_free_node, "Node %s usage count now %d\n", node->string, node->usage);
+#endif
+
+  /* decrement usage, don't free if not 0 yet*/
+  if(node->usage) {
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->nodes_mutex);
+#endif
+    return;
+  }
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG3(librdf_free_node, "Deleting NODE %s from hash, max usage was %d\n", node->string, node->max_usage);
+#endif
+
   switch(node->type) {
     case LIBRDF_NODE_TYPE_RESOURCE:
-      if(node->value.resource.uri != NULL)
-        librdf_free_uri(node->value.resource.uri);
+      key.data=&node->value.resource.uri;
+      key.size=sizeof(librdf_uri*);
+      if(librdf_hash_delete_all(node->world->nodes_hash[H_RESOURCE], &key) )
+        LIBRDF_FATAL1(world, librdf_free_node, "Hash deletion failed");
+
+      librdf_free_uri(node->value.resource.uri);
       break;
       
     case LIBRDF_NODE_TYPE_LITERAL:
+      if(node->value.literal.key) {
+        key.data=node->value.literal.key;
+        key.size=node->value.literal.size;
+        if(librdf_hash_delete_all(node->world->nodes_hash[H_LITERAL], &key) )
+          LIBRDF_FATAL1(world, librdf_free_node, "Hash deletion failed");
+        LIBRDF_FREE(cstring, node->value.literal.key);
+      }
+      
       if(node->value.literal.string != NULL)
         LIBRDF_FREE(cstring, node->value.literal.string);
       if(node->value.literal.xml_language != NULL)
@@ -421,6 +621,11 @@ librdf_free_node(librdf_node *node)
       break;
 
     case LIBRDF_NODE_TYPE_BLANK:
+      key.data=node->value.blank.identifier;
+      key.size=node->value.blank.identifier_len;
+      if(librdf_hash_delete_all(node->world->nodes_hash[H_BLANK], &key) )
+        LIBRDF_FATAL1(world, librdf_free_node, "Hash deletion failed");
+
       if(node->value.blank.identifier != NULL)
         LIBRDF_FREE(cstring, node->value.blank.identifier);
       break;
@@ -428,6 +633,11 @@ librdf_free_node(librdf_node *node)
     default:
       break;
   }
+
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(world->nodes_mutex);
+#endif
+
   LIBRDF_FREE(librdf_node, node);
 }
 
@@ -606,11 +816,20 @@ librdf_node_get_literal_value_datatype_uri(librdf_node* node)
  * librdf_node_get_li_ordinal - Get the node li object ordinal value
  * @node: the node object
  *
- * Return value: the li ordinal value
+ * Return value: the li ordinal value or < 1 on failure
  **/
 int
 librdf_node_get_li_ordinal(librdf_node* node) {
-  return node->value.li.ordinal;
+  char *uri_string;
+  
+  if(node->type != LIBRDF_NODE_TYPE_RESOURCE);
+    return -1;
+
+  uri_string=librdf_uri_as_string(node->value.resource.uri); 
+  if(strncmp(uri_string, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_", 44))
+    return -1;
+  
+  return atoi(uri_string+44);
 }
 
 
