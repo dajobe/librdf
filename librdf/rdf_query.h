@@ -70,7 +70,7 @@ struct librdf_query_factory_s {
   size_t context_length;
   
   /* create a new query */
-  int (*init)(librdf_query* query, const char *name, librdf_uri *uri, const unsigned char *query_string);
+  int (*init)(librdf_query* query, const char *name, librdf_uri *uri, const unsigned char *query_string, librdf_uri *base_uri);
   
   /* copy a query */
   /* clone is assumed to do leave the new query in the same state
@@ -140,9 +140,9 @@ void librdf_query_remove_query_result(librdf_query *query, librdf_query_results*
 REDLAND_API void librdf_query_register_factory(librdf_world *world, const char *name, const unsigned char *uri_string, void (*factory) (librdf_query_factory*));
 
 /* constructor */
-REDLAND_API librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string);
+REDLAND_API librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string, librdf_uri* base_uri);
 REDLAND_API librdf_query* librdf_new_query_from_query (librdf_query* old_query);
-REDLAND_API librdf_query* librdf_new_query_from_factory(librdf_world* world, librdf_query_factory* factory, const char *name, librdf_uri* uri, const unsigned char* query_string);
+REDLAND_API librdf_query* librdf_new_query_from_factory(librdf_world* world, librdf_query_factory* factory, const char *name, librdf_uri* uri, const unsigned char* query_string, librdf_uri* base_uri);
 
 /* destructor */
 REDLAND_API void librdf_free_query(librdf_query *query);
