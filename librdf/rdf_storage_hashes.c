@@ -182,7 +182,7 @@ librdf_storage_hashes_register(librdf_storage *storage,
 {
   librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
   int len;
-  char *full_name;
+  char *full_name=NULL;
   int hash_index;
   librdf_hash_descriptor *desc=(librdf_hash_descriptor*)LIBRDF_MALLOC(librdf_hash_descriptor, sizeof(librdf_hash_descriptor));
   
@@ -195,19 +195,21 @@ librdf_storage_hashes_register(librdf_storage *storage,
   
   context->hash_descriptions[hash_index]=desc;
     
-  len=strlen(desc->name) + 1 + strlen(name) + 1; /* "%s-%s\0" */
-  if(context->db_dir)
-    len+=strlen(context->db_dir) +1;
-  
-  full_name=(char*)LIBRDF_MALLOC(cstring, len);
-  if(!full_name)
-    return 1;
+  if(name) {
+    len=strlen(desc->name) + 1 + strlen(name) + 1; /* "%s-%s\0" */
+    if(context->db_dir)
+      len+=strlen(context->db_dir) +1;
+    
+    full_name=(char*)LIBRDF_MALLOC(cstring, len);
+    if(!full_name)
+      return 1;
 
-  /* FIXME: Implies Unix filenames */
-  if(context->db_dir)
-    sprintf(full_name, "%s/%s-%s", context->db_dir, name, desc->name);
-  else
-    sprintf(full_name, "%s-%s", name, desc->name);
+    /* FIXME: Implies Unix filenames */
+    if(context->db_dir)
+      sprintf(full_name, "%s/%s-%s", context->db_dir, name, desc->name);
+    else
+      sprintf(full_name, "%s-%s", name, desc->name);
+  }
   
   context->hashes[hash_index]=librdf_new_hash(storage->world, 
                                               context->hash_type);
