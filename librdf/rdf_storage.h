@@ -135,6 +135,16 @@ struct librdf_storage_factory_s {
    */
   int (*context_remove_statements)(librdf_storage* storage, librdf_node* context);
 
+  /* search for statement in a context - OPTIONAL (rdf_storage will do
+   * it using find_statements if missing)
+   */
+  librdf_stream* (*find_statements_in_context)(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node);
+
+  /* return an iterator of context nodes in the store - OPTIONAL
+   * (returning NULL)
+   */
+  librdf_iterator* (*get_contexts)(librdf_storage* storage);
+
 };
 
 #include <rdf_storage_list.h>
@@ -216,6 +226,10 @@ REDLAND_API librdf_stream* librdf_storage_query(librdf_storage* storage, librdf_
 /* synchronise a storage to the backing store */
 REDLAND_API void librdf_storage_sync(librdf_storage *storage);
 
+/* find statements in a given context */
+REDLAND_API librdf_stream* librdf_storage_find_statements_in_context(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node);
+
+REDLAND_API librdf_iterator* librdf_storage_get_contexts(librdf_storage* storage);
 
 #ifdef __cplusplus
 }
