@@ -22,10 +22,12 @@
 #include <stdio.h>
 
 #include <rdf_config.h>
+#include <rdf_hash.h>
 #include <rdf_uri.h>
 #include <rdf_node.h>
 #include <rdf_digest.h>
 #include <rdf_statement.h>
+#include <rdf_model.h>
 
 
 void rdf_init_world(char *digest_factory_name) 
@@ -33,8 +35,11 @@ void rdf_init_world(char *digest_factory_name)
   rdf_digest_factory* digest_factory;
 
   digest_factory=get_rdf_digest_factory(digest_factory_name);
-  
+
+  init_rdf_digest();
+  init_rdf_hash();
   init_rdf_uri(digest_factory);
   init_rdf_node(digest_factory);
   init_rdf_statement();
+  init_rdf_model();
 }
