@@ -85,11 +85,11 @@ if test "X$DIE" != X; then
 fi
 
 
-if [ -d $RAPTOR_DIR ]; then
+if test -d $RAPTOR_DIR; then
   failed=no
   for file in $RAPTOR_SRCS $RAPTOR_INCS: do
     rfile=$RAPTOR_DIR/$file
-    if [ -r $rfile [; then   
+    if test -r $rfile; then   
       rm -f $file
       ln -s $file .
     else
