@@ -2,6 +2,8 @@ MYSQL_UTILS=rdf-tree
 
 bin_PROGRAMS=redland-db-upgrade rdfproc
 
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=redland-db-upgrade
+
 EXTRA_PROGRAMS=$(MYSQL_UTILS)
 
 man_MANS = redland-db-upgrade.1 rdfproc.1
