@@ -312,6 +312,7 @@ void librdf_node_set_type(librdf_node* node, int type);
 char* librdf_node_get_literal_value(librdf_node* node);
 char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
+librdf_uri* librdf_node_get_literal_value_datatype_uri(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_language, int is_wf_xml);
 int librdf_node_set_typed_literal_value(librdf_node* node, const char* value, const char *xml_language, librdf_uri* datatype_uri);
