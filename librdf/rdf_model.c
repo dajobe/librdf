@@ -520,9 +520,25 @@ librdf_model_contains_statement(librdf_model* model, librdf_statement* statement
 
 
 /**
- * librdf_model_serialise - serialise the entire model as a stream
+ * librdf_model_as_stream - list the model contents as a stream of statements
  * @model: the model object
  * 
+ * Return value: a &librdf_stream or NULL on failure
+ **/
+librdf_stream*
+librdf_model_as_stream(librdf_model* model)
+{
+  return model->factory->serialise(model);
+}
+
+
+/**
+ * librdf_model_serialise - serialise the entire model as a stream (DEPRECATED)
+ * @model: the model object
+ * 
+ * DEPRECATED to reduce confusion with the librdf_serializer class.
+ * Please use librdf_model_as_stream.
+ *
  * Return value: a &librdf_stream or NULL on failure
  **/
 librdf_stream*
@@ -809,7 +825,7 @@ librdf_model_print(librdf_model *model, FILE *fh)
 {
   librdf_stream* stream;
   
-  stream=librdf_model_serialise(model);
+  stream=librdf_model_as_stream(model);
   if(!stream)
     return;
   fputs("[[\n", fh);
