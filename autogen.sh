@@ -34,7 +34,7 @@ program=`basename $0`
 # automake 1.6 requires autoconf 2.52
 automake_min_vers=1.6
 aclocal_min_vers=$automake_min_vers
-autoconf_min_vers=2.52
+autoconf_min_vers=2.53
 libtoolize_min_vers=1.4
 swig_min_vers=1.3.14
 
