@@ -25,7 +25,7 @@
 
 %{
 
-/* compile-time include (not inside a % ... % block) */
+/* compile-time include (inside a % ... % block) */
 #ifdef REDLAND_PRE_I
 #include <redland-pre.i>
 #endif
