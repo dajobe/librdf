@@ -169,8 +169,8 @@ void librdf_parser_sirpac_constructor(void);
 #ifdef HAVE_LIBWWW_RDF_PARSER
 void librdf_parser_libwww_constructor(void);
 #endif
-#ifdef HAVE_REDLAND_RDF_PARSER
-void librdf_parser_redland_constructor(void);
+#ifdef HAVE_RAPIER_RDF_PARSER
+void librdf_parser_rapier_constructor(void);
 #endif
 #ifdef HAVE_REPAT_RDF_PARSER
 void librdf_parser_repat_constructor(void);

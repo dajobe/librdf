@@ -82,7 +82,6 @@
 #include <stdarg.h>
 #endif
 
-#define LIBRDF_INTERNAL 1
 #include <librdf.h>
 #include <rdf_parser.h>
 
@@ -382,8 +381,8 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
 void
 librdf_init_parser(void) 
 {
-#ifdef HAVE_REDLAND_RDF_PARSER
-  librdf_parser_redland_constructor();
+#ifdef HAVE_RAPIER_RDF_PARSER
+  librdf_parser_rapier_constructor();
 #endif
 #ifdef HAVE_SIRPAC_RDF_PARSER
   librdf_parser_sirpac_constructor();
