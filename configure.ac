@@ -266,21 +266,21 @@ AC_SUBST(TCL_VERSION)
 
 AC_ARG_WITH(tcl_include, [  --with-tcl-include=DIR  Tcl include directory], tcl_include="$withval", tcl_include="")
 AC_MSG_CHECKING(TCL include)
-TCL_INCLUDE=/usr/include
+TCL_INCLUDES=
 if test "X$TCL_VERSION" != X; then
   if test "X$tcl_include" = X ; then
     for dir in /usr/include/tcl$TCL_VERSION /usr/local/include/tcl$TCL_VERSION; do
       if test -r $dir/tcl.h; then
-	TCL_INCLUDE="$dir"
+	TCL_INCLUDES="-I$dir"
 	break
       fi
     done
   elif test "X$tcl_include" != X -a -r $tcl_include/tcl.h; then
-    TCL_INCLUDE="$tcl_include"
+    TCL_INCLUDES="-I$tcl_include"
   fi
 fi
-AC_MSG_RESULT($TCL_INCLUDE)
-AC_SUBST(TCL_INCLUDE)
+AC_MSG_RESULT($TCL_INCLUDES)
+AC_SUBST(TCL_INCLUDES)
 
 
 AC_ARG_WITH(php, [  --with-php(=PHP)        Enable the PHP interface], with_php="$withval", with_php="no")
