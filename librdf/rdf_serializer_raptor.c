@@ -114,6 +114,7 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
       fputc('<', stream);
       raptor_print_ntriples_string(stream, librdf_uri_as_string(librdf_node_get_uri(object)), '\0');
       fputc('>', stream);
+      break;
     default:
       LIBRDF_ERROR2(statement->world, "Do not know how to print triple object type %d\n", librdf_node_get_type(object));
       return;
