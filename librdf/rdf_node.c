@@ -74,7 +74,7 @@ librdf_new_node(void)
  * 
  * Constructor: create a new &librdf_node object with a given URI 
  * which can be NULL, and set later.
-
+ *
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
@@ -118,7 +118,7 @@ librdf_new_node_from_uri_string(char *uri_string)
  * @uri: &rdf_uri object
  * 
  * Constructor: create a new &librdf_node object with a given URI
-
+ *
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
