@@ -173,6 +173,10 @@ int librdf_storage_group_add_statement(librdf_storage* storage, librdf_uri* grou
 int librdf_storage_group_remove_statement(librdf_storage* storage, librdf_uri* group_uri, librdf_statement* statement);
 librdf_stream* librdf_storage_group_serialise(librdf_storage* storage, librdf_uri* group_uri);
 
+/* querying methods */
+int librdf_storage_supports_query(librdf_storage* storage, librdf_query *query);
+librdf_stream* librdf_storage_query(librdf_storage* storage, librdf_query *query);
+
 
 #ifdef __cplusplus
 }
