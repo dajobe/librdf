@@ -1230,6 +1230,109 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
 
 
 
+/* iterator over a static array of nodes; - mostly for testing */
+static int librdf_node_static_iterator_is_end(void* iterator);
+static int librdf_node_static_iterator_next_method(void* iterator);
+static void* librdf_node_static_iterator_get_method(void* iterator, int flags);
+static void librdf_node_static_iterator_finished(void* iterator);
+
+typedef struct {
+  librdf_node** nodes; /* static array of nodes; shared */
+  int size;            /* size of above array */
+  int current;         /* index into above array */
+} librdf_node_static_iterator_context;
+
+
+static int
+librdf_node_static_iterator_is_end(void* iterator)
+{
+  librdf_node_static_iterator_context* context=(librdf_node_static_iterator_context*)iterator;
+
+  return (context->current > context->size-1);
+}
+
+
+static int
+librdf_node_static_iterator_next_method(void* iterator) 
+{
+  librdf_node_static_iterator_context* context=(librdf_node_static_iterator_context*)iterator;
+
+  if(context->current > context->size-1)
+    return 1;
+
+  context->current++;
+  return 0;
+}
+
+
+static void*
+librdf_node_static_iterator_get_method(void* iterator, int flags) 
+{
+  librdf_node_static_iterator_context* context=(librdf_node_static_iterator_context*)iterator;
+  
+  if(context->current > context->size-1)
+    return NULL;
+
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+       return (void*)context->nodes[context->current];
+
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      return NULL;
+
+    default:
+      abort();
+  }
+}
+
+
+static void
+librdf_node_static_iterator_finished(void* iterator) 
+{
+  librdf_node_static_iterator_context* context=(librdf_node_static_iterator_context*)iterator;
+  LIBRDF_FREE(librdf_node_static_iterator_context, context);
+}
+
+
+/**
+ * librdf_node_static_iterator_create - Create an iterator over an array of nodes
+ * @nodes: static array of &librdf_node objects
+ * @size: size of array
+ * 
+ * This creates an iterator for an existing static array of librdf_node
+ * objects.  It is mostly intended for testing iterator code.
+ * 
+ * Return value: a &librdf_iterator serialization of the nodes or NULL on failure
+ **/
+librdf_iterator*
+librdf_node_static_iterator_create(librdf_node** nodes,
+                                   int size)
+{
+  librdf_node_static_iterator_context* context;
+  librdf_iterator *iterator;
+  
+  context=(librdf_node_static_iterator_context*)LIBRDF_CALLOC(librdf_node_static_iterator_context, 1, sizeof(librdf_node_static_iterator_context));
+  if(!context)
+    return NULL;
+
+  context->nodes=nodes;
+  context->size=size;
+  context->current=0;
+
+  iterator=librdf_new_iterator(nodes[0]->world,
+                               (void*)context,
+                               librdf_node_static_iterator_is_end,
+                               librdf_node_static_iterator_next_method,
+                               librdf_node_static_iterator_get_method,
+                               librdf_node_static_iterator_finished);
+  if(!iterator)
+    librdf_node_static_iterator_finished(context);
+
+  return iterator;
+}
+
+
+
 
 #ifdef STANDALONE
 
@@ -1268,14 +1371,14 @@ main(int argc, char *argv[])
   
   fprintf(stdout, "%s: Home page URI is ", program);
   librdf_uri_print(librdf_node_get_uri(node), stdout);
-  fputs("\n", stdout);
+  fputc('\n', stdout);
   
   fprintf(stdout, "%s: Creating URI from string '%s'\n", program, 
           hp_string2);
   uri=librdf_new_uri(world, hp_string2);
   fprintf(stdout, "%s: Setting node URI to new URI ", program);
   librdf_uri_print(uri, stdout);
-  fputs("\n", stdout);
+  fputc('\n', stdout);
   
   /* now uri is owned by node - do not free */
   librdf_node_set_uri(node, uri);
@@ -1283,12 +1386,12 @@ main(int argc, char *argv[])
   uri2=librdf_node_get_uri(node);
   fprintf(stdout, "%s: Node now has URI ", program);
   librdf_uri_print(uri2, stdout);
-  fputs("\n", stdout);
+  fputc('\n', stdout);
 
 
   fprintf(stdout, "%s: Node is: ", program);
   librdf_node_print(node, stdout);
-  fputs("\n", stdout);
+  fputc('\n', stdout);
 
   size=librdf_node_encode(node, NULL, 0);
   fprintf(stdout, "%s: Encoding node requires %d bytes\n", program, size);
@@ -1318,7 +1421,7 @@ main(int argc, char *argv[])
    
   fprintf(stdout, "%s: New node is: ", program);
   librdf_node_print(node2, stdout);
-  fputs("\n", stdout);
+  fputc('\n', stdout);
  
   
   fprintf(stdout, "%s: Creating new literal string node\n", program);
@@ -1364,14 +1467,13 @@ main(int argc, char *argv[])
     return(1);
   }
   fprintf(stdout, "%s: Copied node identifier is: '%s'\n", program, buffer);
-
   fprintf(stdout, "%s: Freeing nodes\n", program);
   librdf_free_node(node5);
   librdf_free_node(node4);
   librdf_free_node(node3);
   librdf_free_node(node2);
   librdf_free_node(node);
-  
+
   librdf_finish_node(world);
   librdf_finish_uri(world);
   librdf_finish_hash(world);
