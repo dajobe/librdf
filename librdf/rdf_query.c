@@ -400,7 +400,7 @@ librdf_query_results_as_stream(librdf_query_results* query_results)
 
 /**
  * librdf_query_get_result_count - Get number of bindings so far
- * @query: &librdf_query query
+ * @query_resuls: &librdf_query_results query results
  * 
  * Return value: number of bindings found so far
  **/
@@ -418,7 +418,7 @@ librdf_query_results_get_count(librdf_query_results *query_results)
 
 /**
  * librdf_query_results_next - Move to the next result
- * @query: &librdf_query query
+ * @query_results: &librdf_query_results query results
  * 
  * Return value: non-0 if failed or results exhausted
  **/
@@ -436,7 +436,7 @@ librdf_query_results_next(librdf_query_results *query_results)
 
 /**
  * librdf_query_results_finished - Find out if binding results are exhausted
- * @query_results: &librdf_query_results query
+ * @query_results: &librdf_query_results query results
  * 
  * Return value: non-0 if results are finished or query failed
  **/
