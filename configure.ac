@@ -415,12 +415,12 @@ AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
 
 
 release_version=no
-AC_ARG_ENABLE(release, [  --enable-release        Turn on optimizations.  ], \
+AC_ARG_ENABLE(release, [  --enable-release        Turn on optimizations (for maintainer).  ], \
  if test "$enableval" = "yes"; then \
-	release_version=yes
+	  release_version=yes
 fi;)	
 
-if test $release_version = no; then 
+if test "$USE_MAINTAINER_MODE" = yes -a $release_version = no; then 
   CFLAGS=`echo $CFLAGS | sed s/-O2//`
   CXXFLAGS=`echo $CXXFLAGS | sed s/-O2//`
   CPPFLAGS=`echo $CPPFLAGS | sed s/-O2//`
