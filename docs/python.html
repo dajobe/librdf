@@ -73,39 +73,39 @@ of the Redland objects with simple mappings between them:</p>
 <th>Concept</th><th>Redland Class</th><th>Python Class</th><th>Purpose</th>
 </tr>
 <tr>
-<td>Resource / Literal</td><td><a href="api/node.html">librdf_node</a></td><td><tt>RDF.node</tt></td>
+<td>Resource / Literal</td><td><a href="api/node.html">librdf_node</a></td><td><tt>RDF.Node</tt></td>
 <td>RDF Model &amp; Syntax nodes</td>
 </tr>
 <tr>
-<td>Statement / Triple</td><td><a href="api/statement.html">librdf_statement</a></td><td><tt>RDF.statement</tt></td>
+<td>Statement / Triple</td><td><a href="api/statement.html">librdf_statement</a></td><td><tt>RDF.Statement</tt></td>
 <td>RDF Model &amp; Syntax arcs (statements, triples) [isa Resource]</td>
 </tr>
 <tr>
-<td>Model</td><td><a href="api/model.html">librdf_model</a></td><td><tt>RDF.model</tt></td>
+<td>Model</td><td><a href="api/model.html">librdf_model</a></td><td><tt>RDF.Model</tt></td>
 <td>Set of <em>Statement</em>s usually held in one <em>Storage</em>.</td>
 </tr>
 <tr>
-<td>Storage</td><td><a href="api/storage.html">librdf_storage</a></td><td><tt>RDF.storage</tt></td>
+<td>Storage</td><td><a href="api/storage.html">librdf_storage</a></td><td><tt>RDF.Storage</tt></td>
 <td>Storage for <em>Model</em>s either persistant or in-memory.</td>
 </tr>
 <tr>
-<td>Stream</td><td><a href="api/stream.html">librdf_stream</a></td><td><tt>RDF.stream</tt></td>
+<td>Stream</td><td><a href="api/stream.html">librdf_stream</a></td><td><tt>RDF.Stream</tt></td>
 <td>Providing sequences of <em>Statement</em>s from <em>Parser</em>s, queries.</td>
 </tr>
 <tr>
-<td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><tt>RDF.parser</tt></td>
+<td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><tt>RDF.Parser</tt></td>
 <td>Syntaxes parsers delivering <em>Stream</em> of <em>Statement</em>s or writing to a <em>Model</em></td>
 </tr>
 <tr>
-<td>Iterator</td><td><a href="api/iterator.html">librdf_iterator</a></td><td><tt>RDF.iterator</tt></td>
+<td>Iterator</td><td><a href="api/iterator.html">librdf_iterator</a></td><td><tt>RDF.Iterator</tt></td>
 <td>Enumerating lists (of <em>Node</em>) from queries.</td>
 </tr>
 <tr>
-<td>URI</td><td><a href="api/uri.html">librdf_uri</a></td><td><tt>RDF.uri</tt></td>
+<td>URI</td><td><a href="api/uri.html">librdf_uri</a></td><td><tt>RDF.Uri</tt></td>
 <td>Provides URIs for <em>Resource</em>s, <em>Parser</em>s, ...</td>
 </tr>
 <tr>
-<td>World</td><td>&nbsp;</td><td><tt>RDF.world</tt></td>
+<td>World</td><td>&nbsp;</td><td><tt>RDF.World</tt></td>
 <td>RDF wrapper class handling Redland startup/shutdown</td>
 </tr>
 <tr>
