@@ -726,6 +726,7 @@ main(int argc, char *argv[])
         if(uri)
           librdf_free_uri(uri);
         librdf_free_query(query);
+        query=NULL;
         break;
       }
 
@@ -846,6 +847,7 @@ main(int argc, char *argv[])
               fprintf(stderr, "%s: Query of model with '%s' failed\n", 
                       program, argv[2]);
               librdf_free_query(query);
+              query=NULL;
               break;
             }
             stream=librdf_query_results_as_stream(results);
