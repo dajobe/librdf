@@ -90,10 +90,10 @@ librdf_serializer_rdfxml_terminate(void *context)
 {
   librdf_serializer_rdfxml_context* pcontext=(librdf_serializer_rdfxml_context*)context;
   
-  if(pcontext->nstack)
-    raptor_free_namespaces(pcontext->nstack);
   if(pcontext->rdf_ns)
     raptor_free_namespace(pcontext->rdf_ns);
+  if(pcontext->nstack)
+    raptor_free_namespaces(pcontext->nstack);
 
 }
 
