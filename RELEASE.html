@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Redland RDF Application Framework - Release Notes</title>
+</head>
+<style type="text/css">
+<!--
+pre
+{
+	margin: 1em 4em 1em 4em;
+	background-color: #eee;
+	padding: 0.5em;
+	border-color: #006;
+	border-width: 1px;
+	border-style: dotted;
+}
+-->
+</style>
+<body bgcolor="#ffffff" text="#000085">
+
+  <h1>Redland RDF Application Framework - Release Notes</h1>
+
+
+<h2 id="rel0_9_12" name="rel0_9_12">Redland 0.9.12 Changes</h2>
+
+<p>This version of Redland is a major update to 0.9.11 incorporating
+a much more improved, complete and stable version 0.9.7 of the 
+<a href="http://www.redland.opensource.ac.uk/raptor/">Raptor parser</a>
+and a significant new feature, contexts.  The
+high-level language APIs received some updates and the start of two
+new languages APIs were added: <a href="docs/ruby.html">Ruby</a> and
+<a href="docs/php.html">PHP</a>.</p>
+
+<p>Several incompatible API changes were made in this release that
+effect the C interface and all the higher level language APIs.  These
+were made to support contexts and to fix some inconsistencies in the
+interface about object ownership.</p>
+
+<p>A Perl script <a href="aux/update-api-0912.pl">aux/update-api-0912.pl</a>
+can help automate the API changes as far as possible or warn about those
+that cannot be automatically updated.<br />
+
+
+<h3>New Feature - Contexts</h3>
+
+<p>This feature allows a Node to be given whenever a statement is
+added to a model which can can be retrieved from any model query that
+returns answers as an Iterator of Nodes or a Stream of Statements.
+Both of these classes gained a new method <code>get_context</code>
+that returns the original Node that was given when the statement
+corresponding to the answer was added to the model.</p>
+
+<p>The context node can also be used to add and remove sets of
+statements to/from a model, and each statement with a given
+context node can be listed as a stream of statements.</p>
+
+<p>Adding this feature required substantial internal changes to these
+two classes and the internal storage apis and implementations along
+with moderate code changes at the application level, which are
+described below.</p>
+
+<p>This feature can be used for the following (not an exhaustive list):</p>
+
+<ul>
+<li>Enable true graph merging / updating / demerging - identify the
+subgraphs with context nodes.</li>
+<li>Statement Identity - add each statement with a different context node</li>
+<li>Statement Provenance - use the context node as the subject of
+other statements about the statement that is returned.</li>
+</ul>
+
+
+<h3>Iterator Class Changes</h3>
+
+<p>The <a href="docs/api/iterator.html">Iterator</a>
+<code>get_next</code> method was split into <code>get_object</code>
+always returning a pointer to a shared object and the
+<code>next</code> method to advance the iterator.
+<code>get_object</code> method is generally called
+<code>current</code> in the higher level language APIs.</p>
+
+<p>(Iterator and Stream now have consistent method names; they
+may be merged in future.)</p>
+
+<p>C example for Redland 0.9.11 and earlier:</p>
+<pre>
+  while(!librdf_iterator_end(iterator)) {
+    node=(librdf_node*)librdf_iterator_get_next(iterator);
+    /* do something with the node */
+  }
+</pre>
+
+<p>Redland 0.9.12:</p>
+<pre>
+  while(!librdf_iterator_end(iterator)) {
+    node=(librdf_node*)librdf_iterator_get_object(iterator);
+    /* do something with the node */
+    librdf_iterator_next(iterator);
+  }
+</pre>
+
+<p>A new method <code>get_context</code> was added returning a Node
+for the context of the original Statement that generated the Iterator
+Node.</p>
+
+<p>C Iterator context example:</p>
+<pre>
+  while(!librdf_iterator_end(iterator)) {
+    node=(librdf_node*)librdf_iterator_get_object(iterator);
+    context_node=(librdf_node*)librdf_iterator_get_context(iterator);
+    /* do something with the node and its context */
+    librdf_iterator_next(iterator);
+  }
+</pre>
+
+
+
+<h3>Model Class Changes</h3>
+
+<p>The <a href="docs/api/model.html">Model</a>
+<code>add_statement</code> method no longer takes ownership of the
+passed in statement object.  The caller now retains ownership and can
+reuse the statement several times and has responsibility for freeing it
+if need be (when it isn't shared).<br />
+
+<p>C example for Redland 0.9.11 and earlier:</p>
+<pre>
+  librdf_model_add_statement(model, statement);
+</pre>
+
+<p>Redland 0.9.12:</p>
+<pre>
+  librdf_model_add_statement(model, statement);
+  librdf_free_statement(statement);
+</pre>
+
+
+<p>C streaming statement example for Redland 0.9.11 and earlier:</p>
+<pre>
+  while(!librdf_stream_end(stream)) {
+    librdf_statement *statement=librdf_stream_next(stream); 
+    /* This statement is new, so could be added directly */
+    librdf_model_add_statement(model, statement);
+  }
+</pre>
+
+<p>Redland 0.9.12:</p>
+<pre>
+  while(!librdf_stream_end(stream)) {
+    librdf_statement *statement=librdf_stream_get_object(stream); 
+    /* This statement is now shared so can still be just added */
+    librdf_model_add_statement(model, statement);
+  }
+</pre>
+
+
+<p><code>librdf_model_add_string_literal_statement</code> lost the
+xml_space argument.</p>
+
+<p>A new method was added to add a Statement with
+an RDF datatyped literals object:</p>
+<pre>
+  int librdf_model_add_typed_literal_statement(librdf_model* model,
+     librdf_node* subject, 
+     librdf_node* predicate, 
+     char* string, char *xml_language, librdf_uri *datatype_uri);
+</pre>
+
+<p>This should be used in preference to
+<code>librdf_model_add_string_literal_statement</code> which remains
+in the API as a wrapper around the above.</p>
+
+<p>New methods were added to add, remove and list Statements to contexts.</p>
+
+<pre>
+  /* Add a single statement to the model with context */
+  int librdf_model_context_add_statement(librdf_model* model,
+    librdf_node* context, librdf_statement* statement);
+
+  /* Add all statements on the stream to the model with context */
+  int librdf_model_context_add_statements(librdf_model* model, 
+    librdf_node* context, librdf_stream* stream);
+
+  /* Remove a single statement from the model with the given context */
+  int librdf_model_context_remove_statement(librdf_model* model, 
+    librdf_node* context, librdf_statement* statement);
+
+  /* Remove all statements from the model with given context */
+  int librdf_model_context_remove_statements(librdf_model* model, 
+    librdf_node* context);
+
+  /* List all statements in the model with the given context */
+  librdf_stream* librdf_model_context_serialize(librdf_model* model, 
+    librdf_node* context);
+</pre>
+
+
+<h3>Node Class Changes</h3>
+
+<p>The <a href="docs/api/node.html">Node</a> class gained a new constructor:</p>
+<pre>
+  librdf_node* librdf_new_node_from_typed_literal(librdf_world *world,
+    const char *string, const char *xml_language, librdf_uri* datatype_uri);
+</pre>
+that should be used in preference to <code>librdf_new_node_from_literal</code> 
+which remains in the API as a wrapper around the above.
+</p>
+
+<p><code>librdf_node_new_nodefrom_literal</code> lost the
+xml_space argument.</p>
+
+
+<h3>Parser Class Changes</h3>
+
+<p>The <a href="docs/api/parser.html">Parser</a> class has an updated
+<a href="http://www.redland.opensource.ac.uk/raptor/">Raptor parser</a>
+version 0.9.7 - parsers named <code>raptor</code> for RDF/XML
+(MIME Type <code>application/rdf+xml</code>)
+and <code>ntriples</code> for N-Triples.  See the
+<a href="http://www.redland.opensource.ac.uk/raptor/NEWS.html">Raptor NEWS</a>
+for the detailed changes since 0.9.5 in the last release of Redland.</p>
+
+<p>The Java SiRPAC parsers <code>sirpac-stanford</code>,
+<code>sirpac-w3c</code> and the W3C LibWWW parser <code>libwww</code>
+have been removed.  Raptor replaces them.</p>
+
+
+<h3>Serializer Class Changes</h3>
+
+<p>The <a href="docs/api/serializer.html">Serializer</a> class
+gained a new method:</p>
+
+<pre>
+  int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
+    const char *name, librdf_uri* base_uri, librdf_model* model);
+</pre>
+
+<p>This writes the serialized model to a filename
+(rather than a file handle as done by 
+<code>librdf_serializer_serialize_model</code>)
+which is easier to use from higher level language APIs until a
+cross-language I/O abstraction is available.</p>
+
+<p>The class gained an RDF/XML serializer that can be called
+either by the name <code>rdfxml</code> or the
+MIME Type <code>application/rdf+xml</code>.  The
+examples in each language have been updated to demonstrate
+using this.</p>
+
+
+<h3>Storage Class Changes</h3>
+
+<p>The built in storage factories (<code>memory</code>,
+<code>hashes</code>) now both support contexts.  These are enabled by
+adding the storage option <code>contexts='yes'</code> to the options
+string.  The hashes storage additionally supports indexing predicates
+as an extra hash which can be enabled with <code>index-predicates='yes'</code>.
+This makes triple queries of the form
+(subject unknown, predicate known, object unknown) fast.
+</p>
+
+<p>C Example of creating a 0.9.12 storage that does contexts using
+on-disk Berkeley/Sleepycat DB:</p>
+<pre>
+   storage=librdf_new_storage(world,
+     "hashes", 
+      name,
+     "hash-type='bdb',write='yes',new='yes',contexts='yes'");
+</pre>
+
+
+<h3>Stream Class Changes</h3>
+
+<p>The <a href="docs/api/stream.html">Stream</a>
+<code>next</code> method was split into <code>get_object</code>
+always returning a pointer to a shared Statement and the
+<code>next</code> method to advance the iterator.
+<code>get_object</code> method is generally called
+<code>current</code> in the higher level language APIs.</p>
+
+<p>(Iterator and Stream now have consistent method names; they
+may be merged in future.)</p>
+
+
+<p>C example for Redland 0.9.11 and earlier:</p>
+<pre>
+  while(!librdf_stream_end(stream)) {
+    statement=(librdf_statement*)librdf_stream_next(stream);
+    /* do something with the statement */
+  }
+</pre>
+
+<p>Redland 0.9.12:</p>
+<pre>
+  while(!librdf_stream_end(stream)) {
+    statement=(librdf_statement*)librdf_stream_get_object(stream);
+    /* do something with the statement */
+    librdf_stream_next(stream);
+  }
+</pre>
+
+
+<p>A new method <code>get_context</code> was added returning a Node
+for the context of the Statement.</p>
+
+<p>C Stream context example:</p>
+<pre>
+  while(!librdf_stream_end(stream)) {
+    statement=(librdf_statement*)librdf_stream_get_object(stream);
+    context_node=(librdf_node*)librdf_stream_get_context(iterator);
+    /* do something with the statement and its context node */
+    librdf_stream_next(stream);
+  }
+</pre>
+
+
+
+<h3>Perl Interface Changes</h3>
+
+<p>The <a href="docs/perl.html">Perl</a> interface
+moved to the <code>RDF::Redland</code> package (the <code>RDF</code>
+namespace was deprecated in 0.9.11).</p>
+
+<p>The interface was updated to receive Redland error and warning
+messages callbacks.  These can be set using the
+<code>RDF::Redland::set_error_handler</code>
+and <code>RDF::Redland::set_warning_handler</code> subroutines
+taking a subroutine argument.  They are called with a single
+scalar argument which is the Redland message.</p>
+
+<p>The interface was updated to match the Interator and Stream
+changes described above.</p>
+
+<p>Perl iterator example for Redland 0.9.11 and earlier:</p>
+<pre>
+  while(!$iterator->end) {
+    my $node=$iterator->next;
+    # do something with the node
+  }
+</pre>
+
+<p>Redland 0.9.12:</p>
+<pre>
+  while(!$iterator->end) {
+    my $node=$iterator->current;
+    # do something with the node
+    $iterator->next;
+  }
+</pre>
+
+
+<p>Perl stream example for Redland 0.9.11 and earlier:</p>
+<pre>
+  while(!$stream->end) {
+    my $statement=$stream->next;
+    # do something with the statement
+  }
+</pre>
+
+<p>Redland 0.9.12:</p>
+<pre>
+  while(!$stream->end) {
+    my $statement=$stream->current;
+    # do something with the statement
+    $stream->next;
+  }
+</pre>
+
+
+<p>Perl example of using the Serializer class:</p>
+
+<pre>
+  # Use any rdf/xml parser that is available
+  my $serializer=new RDF::Redland::Serializer("rdfxml");
+  $serializer->serialize_model_to_file("output.rdf", $uri, $model);
+</pre>
+
+
+<h3>Python API Changes</h3>
+
+<p>The <a href="docs/python.html">Python</a> interface
+gained pydoc comments, along with an
+<a href="docs/pydoc/RDF.html">HTML derived version</a>.
+</p>
+
+<p>The interface was updated to receive Redland error and warning
+messages callbacks as python exceptions.  These can be caught
+using the standard python try {} catch {} blocks.</p>
+
+<p>The interface was updated to match the Interator and Stream
+changes described above.</p>
+
+<p>Python iterator example for Redland 0.9.11 and earlier:</p>
+<pre>
+  while not iterator.end():
+    node=iterator.next()
+    # do something with the node
+</pre>
+
+<p>Redland 0.9.12:</p>
+<pre>
+  while not iterator.end():
+    node=iterator.current()
+    # do something with the node
+    iterator.next()
+</pre>
+
+
+<p>Python stream example for Redland 0.9.11 and earlier:</p>
+<pre>
+  while not stream.end():
+    statement=stream.next()
+    # do something with the statement
+</pre>
+
+<p>Redland 0.9.12:</p>
+<pre>
+  while not stream.end():
+    statement=stream.current()
+    # do something with the statement
+    stream.next()
+</pre>
+
+
+<p>Python example of using the Serializer class:</p>
+
+<pre>
+  # Use any rdf/xml parser that is available
+  serializer=RDF.Serializer()
+  serializer.serialize_model_to_file("output.rdf", model)
+</pre>
+
+
+
+<h3>Java Interface Changes</h3>
+
+<p>The <a href="docs/java.html">Java</a> classes were updated to have
+a <code>finished()</code> method that the user can call to cleanup
+objects replacing the rather useless Java <code>finalize()</code>
+method that gives no guarantees to when it is called.<br />
+
+<p>The Java API is still experimental and may change further.</p>
+
+
+<h2 id="rel_older" name="rel_older">Redland 0.9.1 - Redland 0.9.11 Changes</h2>
+
+<p>Release notes for 0.9.11 and earlier are in the
+<a href="NEWS.html">NEWS page</a> or
+<a href="ChangeLog">ChangeLog</a>
+</p>
+
+
+
+<hr />
+
+<p>Copyright 2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>
