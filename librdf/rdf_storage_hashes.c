@@ -206,12 +206,9 @@ librdf_storage_hashes_register(librdf_storage *storage,
   
   context->hashes[hash_index]=librdf_new_hash(storage->world, 
                                               context->hash_type);
-  if(!context->hashes[hash_index])
-    return 1;
-
   context->names[hash_index]=full_name;
 
-  return 0;
+  return (context->hashes[hash_index] != NULL);
 }
 
 /* helper function for implementing init and clone methods */
