@@ -305,6 +305,7 @@ librdf_storage_list_contains_statement(librdf_storage* storage, librdf_statement
 
 
 typedef struct {
+  librdf_storage *storage;
   int index_contexts;
   librdf_iterator* iterator;
 } librdf_storage_list_serialise_stream_context;
@@ -329,6 +330,9 @@ librdf_storage_list_serialise(librdf_storage* storage)
   }
     
   
+  scontext->storage=storage;
+  librdf_storage_add_reference(scontext->storage);
+
   stream=librdf_new_stream(storage->world,
                            (void*)scontext,
                            &librdf_storage_list_serialise_end_of_stream,
@@ -390,6 +394,10 @@ librdf_storage_list_serialise_finished(void* context)
 
   if(scontext->iterator)
     librdf_free_iterator(scontext->iterator);
+
+  if(scontext->storage)
+    librdf_storage_remove_reference(scontext->storage);
+
   LIBRDF_FREE(librdf_storage_list_serialise_stream_context, scontext);
 }
 
@@ -545,6 +553,7 @@ librdf_storage_list_context_remove_statement(librdf_storage* storage,
 
 
 typedef struct {
+  librdf_storage *storage;
   librdf_iterator* iterator;
   librdf_hash_datum *key;
   librdf_hash_datum *value;
@@ -604,6 +613,9 @@ librdf_storage_list_context_serialise(librdf_storage* storage,
     return NULL;
   }
 
+
+  scontext->storage=storage;
+  librdf_storage_add_reference(scontext->storage);
 
   stream=librdf_new_stream(storage->world,
                            (void*)scontext,
@@ -695,13 +707,16 @@ librdf_storage_list_context_serialise_finished(void* context)
 
   librdf_statement_clear(&scontext->current);
 
+  if(scontext->storage)
+    librdf_storage_remove_reference(scontext->storage);
+
   LIBRDF_FREE(librdf_storage_list_context_serialise_stream_context, scontext);
 }
 
 
 
 typedef struct {
-  librdf_world *world;
+  librdf_storage *storage;
   librdf_iterator *iterator;
   librdf_hash_datum *key;
   librdf_node *current;
@@ -743,7 +758,7 @@ librdf_storage_list_get_contexts_get_method(void* iterator, int flags)
         librdf_free_node(icontext->current);
 
       /* decode value content */
-      icontext->current=librdf_node_decode(icontext->world, NULL,
+      icontext->current=librdf_node_decode(icontext->storage->world, NULL,
                                            (unsigned char*)k->data, k->size);
       result=icontext->current;
       break;
@@ -776,6 +791,9 @@ librdf_storage_list_get_contexts_finished(void* iterator)
   if(icontext->current)
     librdf_free_node(icontext->current);
 
+  if(icontext->storage)
+    librdf_storage_remove_reference(icontext->storage);
+  
   LIBRDF_FREE(librdf_storage_list_get_contexts_iterator_context, icontext);
 }
 
@@ -800,11 +818,12 @@ librdf_storage_list_get_contexts(librdf_storage* storage)
   if(!icontext)
     return NULL;
 
-  icontext->world=storage->world;
-  
   icontext->key=librdf_new_hash_datum(storage->world, NULL, 0);
   if(!icontext->key)
     return NULL;
+  
+  icontext->storage=storage;
+  librdf_storage_add_reference(icontext->storage);
   
   icontext->iterator=librdf_hash_keys(context->contexts, icontext->key);
   if(!icontext->iterator) {
