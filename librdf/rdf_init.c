@@ -31,6 +31,18 @@
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
 
+/* for gettimeofday */
+#if TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#include <time.h>
+#else
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+#endif
+
 #include <librdf.h>
 
 
@@ -51,6 +63,20 @@ const int redland_version_release = LIBRDF_VERSION_RELEASE;
 librdf_world*
 librdf_new_world(void) {
   librdf_world *world=(librdf_world*)LIBRDF_CALLOC(librdf_world, sizeof(librdf_world), 1);
+#ifdef HAVE_GETTIMEOFDAY
+  struct timeval tv;
+  struct timezone tz;
+#endif
+
+#ifdef HAVE_GETTIMEOFDAY
+  if(!gettimeofday(&tv, &tz)) {
+    world->genid_base=tv.tv_sec;
+  } else
+    world->genid_base=1;
+#else
+  world->genid_base=1;
+#endif
+  world->genid_counter=1;
   
   return world;
   
@@ -272,7 +298,73 @@ int
 librdf_world_set_feature(librdf_world* world, librdf_uri *feature,
                          const char *value) 
 {
-  return 1; /* none available */
+  librdf_uri* genid_base=librdf_new_uri(world, LIBRDF_WORLD_FEATURE_GENID_BASE);
+  librdf_uri* genid_counter=librdf_new_uri(world, LIBRDF_WORLD_FEATURE_GENID_COUNTER);
+  int rc=1;
+  
+  if(librdf_uri_equals(feature, genid_base)) {
+    int i=atoi(value);
+    if(i<1)
+      i=1;
+#ifdef WITH_THREADS
+    pthread_mutex_lock(world->mutex);
+#endif
+    world->genid_base=1;
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->mutex);
+#endif
+  } else if(librdf_uri_equals(feature, genid_counter)) {
+    int i=atoi(value);
+    if(i<1)
+      i=1;
+#ifdef WITH_THREADS
+    pthread_mutex_lock(world->mutex);
+#endif
+    world->genid_counter=1;
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->mutex);
+#endif
+  }
+
+  librdf_free_uri(genid_base);
+  librdf_free_uri(genid_counter);
+
+  return rc;
+}
+
+
+/* Internal */
+const unsigned char*
+librdf_world_get_genid(librdf_world* world)
+{
+  int id, tmpid, counter, tmpcounter;
+  int length;
+  unsigned char *buffer;
+
+  /* This is read-only and thread safe */
+  tmpid= (id= world->genid_base);
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(world->mutex);
+#endif
+  tmpcounter=(counter=world->genid_counter++);
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(world->mutex);
+#endif
+
+
+  length=5;  /* min length 1 + "r" + min length 1 + "r" \0 */
+  while(tmpid/=10)
+    length++;
+  while(tmpcounter/=10)
+    length++;
+  
+  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, length);
+  if(!buffer)
+    return NULL;
+
+  sprintf(buffer, "r%dr%d", id, counter);
+  return buffer;
 }
 
 
