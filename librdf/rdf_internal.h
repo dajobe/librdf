@@ -54,6 +54,26 @@ void librdf_system_free(void *ptr);
 #define SYSTEM_FREE(ptr)   free(ptr)
 #endif
 
+#define LIBRDF_ASSERT_RETURN(condition, msg, ret) do { \
+  if(!condition) { \
+    fprintf(stderr, "%s:%d:%s: Assertion failed - " __FILE__, __LINE__, __func__, msg); \
+    return(ret); \
+  }
+
+#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, type) do { \
+  if(!pointer) { \
+     fprintf(stderr, "%s:%d:%s: Assertion failed - object pointer of type " #type " is NULL.", __FILE__, __LINE__, __func__); \
+    return; \
+  } \
+} while(0)
+
+#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(pointer, type, ret) do { \
+  if(!pointer) { \
+    fprintf(stderr, "%s:%d:%s: Assertion failed - object pointer of type " #type " is NULL.", __FILE__, __LINE__, __func__); \
+    return(ret); \
+  } \
+} while(0)
+
 
 #else
 /* DEBUGGING TURNED OFF */
@@ -64,12 +84,17 @@ void librdf_system_free(void *ptr);
 #define LIBRDF_DEBUG3(function, msg, arg1, arg2)
 #define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3)
 
-#define LIBRDF_ERROR1(world, function, msg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function)
-#define LIBRDF_ERROR2(world, function, msg, arg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg)
-#define LIBRDF_ERROR3(world, function, msg, arg1, arg2) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg1, arg2)
+#define LIBRDF_ERROR1(world, notused, msg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__)
+#define LIBRDF_ERROR2(world, notused, msg, arg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__, arg)
+#define LIBRDF_ERROR3(world, notused, msg, arg1, arg2) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , __func__x, arg1, arg2)
 
 #define SYSTEM_MALLOC(size)   malloc(size)
 #define SYSTEM_FREE(ptr)   free(ptr)
+
+#define LIBRDF_ASSERT_RETURN(condition, msg, ret)
+#define LIBRDF_ASSERT_OBJECT_POINTER(pointer)
+#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, ret)
+
 
 #endif
 
@@ -94,8 +119,8 @@ void librdf_system_free(void *ptr);
 
 
 /* Fatal errors - always happen */
-#define LIBRDF_FATAL1(world, function, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , #function); abort();} while(0)
-#define LIBRDF_FATAL2(world, function, msg, arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , #function, arg); abort();} while(0)
+#define LIBRDF_FATAL1(world, notused, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , __func__); abort();} while(0)
+#define LIBRDF_FATAL2(world, notused, msg, arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , __func__, arg); abort();} while(0)
 #include <rdf_list.h>
 #include <rdf_hash.h>
 #include <rdf_digest.h>
