@@ -330,7 +330,9 @@ void
 librdf_free_uri (librdf_uri* uri) 
 {
   librdf_hash_datum key; /* on stack */
+#ifdef WITH_THREADS
   librdf_world *world = uri->world;
+#endif
 
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->mutex);
