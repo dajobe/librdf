@@ -46,10 +46,10 @@ static void* librdf_iterator_get_next_mapped_element(librdf_iterator* iterator);
 librdf_iterator*
 librdf_new_iterator(librdf_world *world,
                     void* context,
-		    int (*is_end)(void*),
+		    int (*is_end_method)(void*),
 		    int (*next_method)(void*),
 		    void* (*get_method)(void*, int),
-		    void (*finished)(void*))
+		    void (*finished_method)(void*))
 {
   librdf_iterator* new_iterator;
   
@@ -62,10 +62,10 @@ librdf_new_iterator(librdf_world *world,
 
   new_iterator->context=context;
   
-  new_iterator->is_end=is_end;
+  new_iterator->is_end_method=is_end_method;
   new_iterator->next_method=next_method;
   new_iterator->get_method=get_method;
-  new_iterator->finished=finished;
+  new_iterator->finished_method=finished_method;
 
   /* Not needed, calloc ensures this */
   /* new_iterator->is_finished=0; */
@@ -94,8 +94,8 @@ librdf_free_iterator(librdf_iterator* iterator)
   if(!iterator)
     return;
   
-  if(iterator->finished)
-    iterator->finished(iterator->context);
+  if(iterator->finished_method)
+    iterator->finished_method(iterator->context);
 
   if(iterator->map_list) {
     librdf_list_foreach(iterator->map_list,
@@ -124,7 +124,7 @@ librdf_iterator_get_next_mapped_element(librdf_iterator* iterator)
   void *element=NULL;
   
   /* find next element subject to map */
-  while(!iterator->is_end(iterator->context)) {
+  while(!iterator->is_end_method(iterator->context)) {
     librdf_iterator* map_iterator; /* Iterator over iterator->map_list librdf_list */
     element=iterator->get_method(iterator->context, 
                                  LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT);
@@ -188,7 +188,7 @@ librdf_iterator_end(librdf_iterator* iterator)
 
   /* simple case, no mapping so pass on */
   if(!iterator->map_list)
-    return (iterator->is_finished=iterator->is_end(iterator->context));
+    return (iterator->is_finished=iterator->is_end_method(iterator->context));
 
 
   /* mapping from here */
@@ -250,7 +250,7 @@ librdf_iterator_get_object(librdf_iterator* iterator)
 
 
 /**
- * librdf_iterator_get_object - Get the context of the current object on the iterator
+ * librdf_iterator_get_context - Get the context of the current object on the iterator
  * @iterator: the &librdf_iterator object
  *
  * Return value: The context or NULL if the iterator has finished.
