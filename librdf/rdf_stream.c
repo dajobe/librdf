@@ -336,3 +336,32 @@ librdf_stream_from_node_iterator_finished(void* context)
 }
 
 
+/**
+ * librdf_stream_print - print the stream
+ * @stream: the stream object
+ * @fh: the FILE stream to print to
+ * 
+ **/
+void
+librdf_stream_print(librdf_stream *stream, FILE *fh)
+{
+  if(!stream)
+    return;
+
+  while(!librdf_stream_end(stream)) {
+    char *s;
+    librdf_statement* statement=librdf_stream_next(stream);
+    if(!statement)
+      break;
+
+    s=librdf_statement_to_string(statement);
+    if(s) {
+      fputs("  ", stdout);
+      fputs(s, stdout);
+      fputs("\n", stdout);
+      LIBRDF_FREE(cstring, s);
+    }
+    librdf_free_statement(statement);
+  }
+}
+
