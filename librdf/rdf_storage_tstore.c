@@ -174,6 +174,8 @@ librdf_storage_tstore_size(librdf_storage* storage)
 static int
 librdf_storage_tstore_add_statement(librdf_storage* storage, librdf_statement* statement)
 {
+  /* FIXME - cannot check for adding duplicate statements */
+
   return librdf_storage_tstore_context_add_statement(storage, NULL, statement);
 }
 
