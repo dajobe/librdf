@@ -92,7 +92,7 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Parsing URI %s\n", program, librdf_uri_as_string(uri));
   stream=librdf_parser_parse_from_uri(parser, uri);
   if(!stream) {
-    fprintf(stderr, "%s: Failed to create sirpac parser stream\n", program);
+    fprintf(stderr, "%s: Failed to create parser stream\n", program);
     return(1);
   }
 
