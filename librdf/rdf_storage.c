@@ -584,24 +584,39 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
   if(!statement)
     return NULL;
 
-  switch(context->want) {
-    case LIBRDF_STATEMENT_SUBJECT: /* SOURCES (subjects) */
-      node=librdf_statement_get_subject(statement);
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+
+      switch(context->want) {
+        case LIBRDF_STATEMENT_SUBJECT: /* SOURCES (subjects) */
+          node=librdf_statement_get_subject(statement);
+          break;
+
+        case LIBRDF_STATEMENT_PREDICATE: /* ARCS (predicates) */
+          node=librdf_statement_get_predicate(statement);
+          break;
+
+        case LIBRDF_STATEMENT_OBJECT: /* TARGETS (objects) */
+          node=librdf_statement_get_object(statement);
+          break;
+
+        default: /* error */
+          LIBRDF_ERROR2(statement->world,
+                        librdf_storage_stream_to_node_iterator_get_method,
+                        "Unknown statement part %d\n", context->want);
+          node=NULL;
+      }
       break;
       
-    case LIBRDF_STATEMENT_PREDICATE: /* ARCS (predicates) */
-      node=librdf_statement_get_predicate(statement);
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      node=librdf_stream_get_context(context->stream);
       break;
       
-    case LIBRDF_STATEMENT_OBJECT: /* TARGETS (objects) */
-      node=librdf_statement_get_object(statement);
-      break;
-      
-    default: /* error */
-      LIBRDF_ERROR2(statement->world,
+    default:
+      LIBRDF_ERROR2(statement->world, 
                     librdf_storage_stream_to_node_iterator_get_method,
-                    "Unknown statement part %d\n", context->want);
-      return NULL;
+                    "Unknown iterator method flag %d\n", flags);
+      node=NULL;
   }
   
   return (void*)node;
