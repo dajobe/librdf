@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2002-2003 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2002-2004 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -124,28 +124,6 @@ rdf_serializer_rdfxml_ok_xml_name(unsigned char *name)
 }
 
 
-/**
- * rdf_serializer_rdfxml_print_as_xml_content - Print the given string XML-escaped for element content
- * @p: Content string
- * @handle: FILE* to print to
- * 
- **/
-static void
-rdf_serializer_rdfxml_print_as_xml_content(unsigned char *p, FILE *handle) 
-{
-  while(*p) {
-    if(*p == '&')
-      fputs("&amp;", handle);
-    else if (*p == '<')
-      fputs("&lt;", handle);
-    else if (*p == '>')
-      fputs("&gt;", handle);
-    else
-      fputc(*p, handle);
-    p++;
-  }
-}
-
 
 static void
 librdf_serializer_rdfxml_raptor_error_handler(void *data, 
@@ -257,6 +235,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   char* nsprefix="ns0";
   unsigned char *content;
   int rc;
+  size_t len;
 
   rdf_ns_uri=librdf_uri_as_counted_string(librdf_concept_ms_namespace_uri, &rdf_ns_uri_len);
   
@@ -330,10 +309,11 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   fputs((const char*)name, handle);
 
   if(!name_is_rdf_ns) {
-    size_t len=name-uris[1];
     size_t escaped_len;
     unsigned char *buffer;
     unsigned char *p;
+
+    len=name-uris[1];
 
     fputs(" xmlns:", handle);
     fputs(nsprefix, handle);
@@ -373,13 +353,15 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
           return 1;
       }
 
-      content=librdf_node_get_literal_value(nodes[2]);
+      content=librdf_node_get_literal_value_as_counted_string(nodes[2], &len);
       
       if(librdf_node_get_literal_value_is_wf_xml(nodes[2])) {
         fputs(" rdf:parseType=\"Literal\">", handle);
         /* Print without escaping XML */
         fputs((const char*)content, handle);
       } else {
+        int xml_string_len;
+
         librdf_uri *duri=librdf_node_get_literal_value_datatype_uri(nodes[2]);
         if(duri) {
           if(rdf_serializer_rdfxml_print_xml_attribute(world, 
@@ -391,7 +373,24 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 
         fputc('>', handle);
 
-        rdf_serializer_rdfxml_print_as_xml_content(content, handle);
+        xml_string_len=raptor_xml_escape_string(content, len,
+                                                NULL, 0, 0,
+                                                librdf_serializer_rdfxml_raptor_error_handler, world);
+        if(!xml_string_len)
+          return 1;
+        
+        if(xml_string_len == (int)len)
+          fputs(content, handle);
+        else {
+          unsigned char *xml_string;
+
+          xml_string=(unsigned char*)LIBRDF_MALLOC(cstring, xml_string_len+1);
+          xml_string_len=raptor_xml_escape_string(content, len,
+                                                  xml_string, xml_string_len, 0,
+                                                  librdf_serializer_rdfxml_raptor_error_handler, world);
+          fputs(xml_string, handle);
+          LIBRDF_FREE(cstring, xml_string);
+        }
       }
 
       fputs("</", handle);
