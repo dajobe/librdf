@@ -1,3 +1,38 @@
+2004-07-26  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_general.c:
+	Add #ifndef STANDALONE ... #endif around body.
+
+2004-07-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_parser.c, librdf/rdf_model.c:
+	Replace parser name "raptor" with "rdfxml"
+
+	* configure.ac: raptor min version 1.3.2
+
+	* examples/example4.c, examples/example2.c:
+	Replace parser name "raptor" with "rdfxml"
+
+2004-07-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/strcasecmp.c, rasqal/roqet.c, rasqal/rasqal_redland.c,
+	rasqal/rasqal_raptor.c, rasqal/rasqal_query.c,
+	rasqal/rasqal_literal.c, rasqal/rasqal_general.c,
+	rasqal/rasqal_expr.c, rasqal/rasqal_engine.c, rasqal/Makefile.am,
+	rasqal/win32_config.h, rasqal/win32_rasqal_config.h: rename
+	win32_config.h to win32_rasqal_config.h
+
+	* raptor/configure.ac: Bumped version to 1.3.3
+
+	* raptor/configure.ac:
+	Removed configuration for gnome glib, pkgconfig and glib-config
+	to get g_utf8_normalize for Unicode NFC checking.
+
+	* raptor/raptor_utf8.c (raptor_utf8_is_nfc):
+	Removed use of g_utf8_normalize for Unicode NFC
+	checking, it seems to give false negatives, is also rather slow since
+	it does normalization rather than just checking for NFC.
+
 2004-07-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* configure.ac: no need for perl dirs
