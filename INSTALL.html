@@ -14,11 +14,10 @@
 
 <h3>1.1. Getting the sources from CVS</h3>
 
-<p>Sorry - not yet publically available, but should be in the near
-future.  Check back with the
+<p>Sorry - not yet publically available.  Check back with the
 <a href="http://www.redland.opensource.ac.uk/">Redland home page</a>
-or the <a href="http://sourceforge.net/projects/librdf/">SourceForge site</a>
-.</p>
+or the
+<a href="http://sourceforge.net/projects/librdf/">SourceForge site</a>.</p>
 
 <p>After the <tt>cvs checkout</tt> or <tt>cvs update</tt> you will
 need to create the automake and autoconf derived files, as described
@@ -33,6 +32,16 @@ below in <em>create the configure program</em>.</p>
 
 
 <h2>2. Configuring and building</h2>
+
+<p>Redland uses the GNU automake / autoconf system to handle system
+dependency checking.  It is developed and built on x86 Linux (Redhat
+6.2), but is also used extensively locally on various versions of
+sparc Sun Solaris 2.x.  I also test it via
+<a href="http://sourceforge.net/">SourceForge</a>s'
+compile farm that it builds on Debian Linux (x86, Alpha, PPC and
+Sparc) and FreeBSD (x86).  I have been told that it builds on Apples'
+Darwin.</p>
+
 
 <h3>2.1. Create <tt>configure</tt> program</h3>
 
@@ -64,11 +73,15 @@ you have).</p>
 <p>Berkeley DB is now known as Sleepcat DB (after version 3) and
 distributed and supported by
 <a href="http://www.sleepycat.com/">SleepyCat Software</a>.
-Versions 3.2.9, 3.1.17, 3.1.14, 2.7.7 and 2.4.14 (the version that
-comes with RedHat 6.2) have been tested and work.</p>
+Versions 3.3.11, 3.2.9, 3.1.17, 3.1.14, 2.7.7 and 2.4.14 (the version that
+comes with RedHat 6.2) have been tested and work.  Some systems do
+not come installed with a working Berkeley/Sleepcat DB so on those
+systems, Redland will have no persistent storage unless BDB is built
+separately.</p>
 
 <p><b>Note</b>: If you change between using the system installed BDB
-or various versions of BDB (2.x, 3.x etc.) then you will need to re-configure the system carefully by tidying up as follows:</p>
+or various versions of BDB (2.x, 3.x etc.) then you will need to
+re-configure the system carefully by tidying up as follows:</p>
 <pre>
   rm -f config.cache
   make clean
@@ -85,17 +98,6 @@ disabled by setting this option to <em>no</em>.  libwww is presently
 only used for its
 <a href="http://www.w3.org/Library/src/HTRDF.html">RDF parser</a>
 </p>
-
-<p><b>WARNING</b> If the libwww libraries are installed in a
-non-default directory, when the final linking occurs, the libraries
-may not be found at run time.  To fix this you will need to use a
-system-specific method of passing this information to the run-time
-loader.  On Linux and Solaris you can set the LD_LIBRARY_PATH
-environment variable to include the directory where the libwww
-libraries are found.  You can also configure it via a system wide
-file - see the <tt>ld</tt>, <tt>ld.so</tt> or<tt>ld.so.1</tt> manual
-pages for details.  The alternative, to link libwww statically, works
-but is difficult to enable.</p>
 </dd>
 
 <dt><tt>--with-java-sirpac-stanford-jar=JAR</tt><br />
@@ -149,6 +151,19 @@ by setting this option to <em>no</em>.</p></dd>
 
 </dl>
 
+
+<p><b>WARNING</b> If the libwww or Sleepycat/Berkeley DB libraries
+are installed in a non-default directory, when the final linking
+occurs, the libraries may not be found at run time.  To fix this you
+will need to use a system-specific method of passing this information
+to the run-time loader.  On Linux and Solaris you can set the
+LD_LIBRARY_PATH environment variable to include the directory where
+the libwww libraries are found.  You can also configure it via a
+system wide file - see the <tt>ld</tt>, <tt>ld.so</tt>
+or<tt>ld.so.1</tt> manual pages for details.  The alternative, to
+link libwww statically, works but is difficult to enable.</p>
+
+
 <h3>2.3 Configuring</h3>
 
 <p>If everything is in the default place, do:</p>
@@ -182,13 +197,18 @@ adding or removing options, you may have to tidy up first with either of these:<
 <pre>
     make check
 </pre>
-<p>which should emit loads of exciting debug messages to the screen.</p>
+<p>which should emit lots of exciting test messages to the screen but
+conclude with somethinf like:<br />
+  <tt>All </tt><em>n</em><tt> tests passed</tt><br />
+if everything works correctly.</p>
+
 
 <h3>2.6 Installing the library</h3>
 
-<p>I don't recommended you do this yet, it hasn't been tested
-and the user/internal header file separation isn't clear yet.  Just
-work in the source tree.</p>
+<p>Although this works, the user interface/internal interface header
+file split hasn't been completed yet, so I currently recommend compiling
+against the source tree.  However, if you choose to install, do:</p>
+
 <pre>
    make install
 </pre>
@@ -317,7 +337,7 @@ full information on installing and using Redland from Java.</p>
 
 <hr />
 
-<p>Copyright 2000 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 <p><a href="http://www.mirror.ac.uk/services/validator/check/referer">Validate me</a></p>
 
