@@ -31,32 +31,42 @@ extern "C" {
 
 #ifdef LIBRDF_INTERNAL
 
+/* used in map_list below */
+typedef struct {
+  void *context; /* context to pass on to map */
+  void* (*fn)(void *context, void *element);
+} librdf_iterator_map;
+
 struct librdf_iterator_s {
   librdf_world *world;
   void *context;
-  int have_more_elements; /* 0 when have no more elements */
+  int is_finished; /* 1 when have no more elements */
 
   /* Used when mapping */
-  void *next;        /* stores next element */
-  void *map_context; /* context to pass on to map */
+  void *next;            /* stores next element */
+  librdf_list *map_list; /* non-empty means there is a list of maps */
   
-  int (*have_elements)(void*);
+  int (*is_end)(void*);
   void* (*get_next)(void*);
   void (*finished)(void*);
-  void* (*map)(void *context, void *element);
 };
 
 #endif
 
-librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*have_elements)(void*), void* (*get_next)(void*), void (*finished)(void*));
+librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*is_end)(void*), void* (*get_next)(void*), void (*finished)(void*));
 
 void librdf_free_iterator(librdf_iterator*);
 
+int librdf_iterator_end(librdf_iterator* iterator);
 int librdf_iterator_have_elements(librdf_iterator* iterator);
+
+int librdf_iterator_finished(librdf_iterator* iterator);
 
 void* librdf_iterator_get_next(librdf_iterator* iterator);
 
-void librdf_iterator_set_map(librdf_iterator* iterator, void* (*map)(void *context, void *item), void *map_context);
+int librdf_iterator_add_map(librdf_iterator* iterator, void* (*fn)(void *context, void *item), void *context);
+
+void* librdf_iterator_map_remove_duplicate_nodes(void *item, void *user_data);
 
 #ifdef __cplusplus
 }
