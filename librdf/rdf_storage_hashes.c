@@ -641,6 +641,10 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
 static int
 librdf_storage_hashes_add_statement(librdf_storage* storage, librdf_statement* statement)
 {
+  /* Do not add duplicate statements */
+  if(librdf_storage_hashes_contains_statement(storage, statement))
+    return 0;
+
   return librdf_storage_hashes_add_remove_statement(storage, statement, NULL, 1);
 }
 
