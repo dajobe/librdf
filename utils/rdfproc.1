@@ -8,7 +8,7 @@
 .\" Institute for Learning and Research Technology - http://www.ilrt.org/
 .\" University of Bristol - http://www.bristol.ac.uk/
 .\"
-.TH rdfproc 1 "2004-01-07"
+.TH rdfproc 1 "2004-01-09"
 .\" Please adjust this date whenever revising the manpage.
 .SH NAME
 rdfproc \- Redland RDF processor utility
@@ -135,6 +135,9 @@ if present.
 .IP "\fBremove \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP \fI[CONTEXT]\fP\fR"
 Remove the given triple graph, in the optional Redland context
 if \fICONTEXT\fR is given.
+
+.IP "\fBremove-context \fICONTEXT\fP\fR"
+Remove all triples in the graph with the Redland context \fICONTEXT\fR.
 
 .IP "\fBserialize [\fISYNTAX\fP [\fIURI\fP [\fIMIME-TYPE\fP]]]\fR"
 Serializes the graph to a syntax with a particular \ISYNTAX\fI
