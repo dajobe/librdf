@@ -266,7 +266,7 @@ AC_SUBST(TCL_VERSION)
 
 AC_ARG_WITH(tcl_include, [  --with-tcl-include=DIR  Tcl include directory], tcl_include="$withval", tcl_include="")
 AC_MSG_CHECKING(TCL include)
-TCL_INCLUDE=
+TCL_INCLUDE=/usr/include
 if test "X$TCL_VERSION" != X; then
   if test "X$tcl_include" = X ; then
     for dir in /usr/include/tcl$TCL_VERSION /usr/local/include/tcl$TCL_VERSION; do
