@@ -86,8 +86,10 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
       fputc('"', stream);
       lang=librdf_node_get_literal_value_language(object);
       dt_uri=librdf_node_get_literal_value_datatype_uri(object);
-      if(lang)
-        fprintf(stream, "@%s", lang);
+      if(lang) {
+        fputc('@', stream);
+        fputs(lang, stream);
+      }
       if(dt_uri) {
         fputs("^^<", stream);
         fputs(librdf_uri_as_string(dt_uri), stream);
@@ -95,7 +97,8 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
       }
       break;
     case LIBRDF_NODE_TYPE_BLANK:
-      fprintf(stream, "_:%s", librdf_node_get_blank_identifier(object));
+      fputs("_:", stream);
+      fputs(librdf_node_get_blank_identifier(object), stream);
       break;
     default:
       /* must be URI */
