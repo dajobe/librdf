@@ -42,6 +42,7 @@ main(int argc, char *argv[])
   const char *parser_name;
   librdf_parser* parser;
   librdf_query* query;
+  librdf_query_results* results;
   librdf_uri *uri;
   char *query_string=NULL;
   
@@ -70,17 +71,18 @@ main(int argc, char *argv[])
 
   query=librdf_new_query(world, "rdql", NULL, query_string);
   
-  if(librdf_model_query_as_bindings(model, query)) {
+  results=librdf_model_query_execute(model, query);
+  if(!results) {
     fprintf(stderr, "%s: Query of model with '%s' failed\n", 
             program, query_string);
     return 1;
   }
 
-  while(!librdf_query_results_finished(query)) {
-    const char **names;
+  while(!librdf_query_results_finished(results)) {
+    const char **names=NULL;
     librdf_node* values[10];
     
-    if(librdf_query_get_result_bindings(query, &names, values))
+    if(librdf_query_results_get_bindings(results, &names, values))
       break;
     
     fputs("result: [", stdout);
@@ -100,12 +102,13 @@ main(int argc, char *argv[])
     }
     fputs("]\n", stdout);
     
-    librdf_query_next_result(query);
+    librdf_query_results_next(results);
   }
   
   fprintf(stdout, "%s: Query returned %d results\n", program, 
-          librdf_query_get_result_count(query));
+          librdf_query_results_get_count(results));
 
+  librdf_free_query_results(results);
   librdf_free_query(query);
   
   librdf_free_model(model);
