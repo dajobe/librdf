@@ -117,7 +117,7 @@ static void librdf_parser_repat_warning_handler(void* user_data, const XML_Char*
  * Repat parser context- not used at present
  */
 typedef struct {
-  char dummy;
+  librdf_parser *parser;    /* Redland parser object */
 } librdf_parser_repat_context;
 
 
@@ -126,6 +126,7 @@ typedef struct {
  * of statements from parsing
  */
 typedef struct {
+  librdf_parser_repat_context* pcontext; /* parser context */
   librdf_uri* source_uri;    /* source URI */
   char *filename;            /* filename part of that */
   librdf_uri* base_uri;      /* base URI */
@@ -133,15 +134,14 @@ typedef struct {
   RDF_Parser repat;
   librdf_list* statements;  /* pending statements */
   int end_of_stream;        /* non 0 if stream finished */
+  int in_literal;           /* non 0 if parseType literal */
   char *literal;            /* literal text being collected */
+  int literal_length;
 } librdf_parser_repat_stream_context;
 
 
 
 /* repat callback handlers */
-
-/* FIXME: Repat should allow per parse user data to be stored */
-static void *librdf_parser_repat__user_data;
 
 static void 
 librdf_parser_repat_statement_handler(void* user_data,
@@ -153,14 +153,9 @@ librdf_parser_repat_statement_handler(void* user_data,
                                       const XML_Char* object_string,
                                       const XML_Char* xml_lang)
 {
-  librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)librdf_parser_repat__user_data;
+  librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
   librdf_statement* statement=NULL;
-  librdf_node *subject, *predicate, *object;
-  char *filename;
-  int filename_len;
-  char *base_uri_string;
-  int base_uri_len;
-  
+  librdf_node *subject=NULL, *predicate=NULL, *object=NULL;
   
   /* got all statement parts now */
   statement=librdf_new_statement();
@@ -184,8 +179,7 @@ librdf_parser_repat_statement_handler(void* user_data,
       subject=librdf_new_node_from_uri_string(subject_string);
       break;
     default:
-      /* FIXME - warn of unknown subject type */
-      abort();
+      LIBRDF_FATAL2(librdf_parser_repat_statement_handler, "Unknown subject type %d\n", subject_type);
   }
   librdf_statement_set_subject(statement,subject);
 
@@ -209,21 +203,30 @@ librdf_parser_repat_statement_handler(void* user_data,
                                                         scontext->base_uri);
       break;
     case RDF_OBJECT_TYPE_LITERAL:
-      object=librdf_new_node_from_literal(object_string, xml_lang, 0, 0);
+      if(scontext->literal) {
+        LIBRDF_DEBUG2(librdf_parser_repat_end_element_handler,
+                      "found literal text: '%s'\n", scontext->literal);
+        object=librdf_new_node_from_literal(scontext->literal, 0, 0, 1);
+        LIBRDF_FREE(cstring, scontext->literal);
+        scontext->literal=NULL;
+        scontext->literal_length=0;
+      } else
+        object=librdf_new_node_from_literal(object_string, xml_lang, 0, 0);
       break;
     case RDF_OBJECT_TYPE_XML:
-      /* FIXME - content is XML literal (parseType="Literal") and should be
-       * taken from collected literal text in parse context 
-       */
-      abort();
-      object=librdf_new_node_from_literal(scontext->literal, 0, 0, 1);
-      LIBRDF_FREE(cstring, scontext->literal);
-      scontext->literal=NULL;
+      /* Emitted when a statement has a rdf:BAGID on it */
+      /* FIXME: what do we do here?  Repat does not pass in the bagid */
+      LIBRDF_DEBUG1(librdf_parser_repat_end_element_handler,
+                    "found object type XML - don't know what to do\n");
+      librdf_free_statement(statement);
+      statement=NULL;
       break;
     default:
-      /* FIXME - warn of unknown object type */
-      abort();
+      LIBRDF_FATAL2(librdf_parser_repat_statement_handler, "Unknown object type %d\n", object_type);
   }
+
+  if(!statement)
+    return;
   
   librdf_statement_set_object(statement,object);
 
@@ -232,7 +235,7 @@ librdf_parser_repat_statement_handler(void* user_data,
   librdf_statement_print(statement, stderr);
   fputs("\n", stderr);
 #endif
-
+  
   librdf_list_add(scontext->statements, statement);
 }
 
@@ -240,14 +243,22 @@ librdf_parser_repat_statement_handler(void* user_data,
 static void 
 librdf_parser_repat_start_parse_type_literal_handler( void* user_data )
 {
-  printf( "start parse type literal\n" );
+  librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
+  if(scontext->in_literal)
+    LIBRDF_FATAL1(librdf_parser_repat_start_parse_type_literal_handler,
+                 "started literal content while in literal content\n");
+    
+  scontext->in_literal=1;
+  scontext->literal=NULL;
+  scontext->literal_length=0;
 }
 
 
 static void 
 librdf_parser_repat_end_parse_type_literal_handler( void* user_data )
 {
-  printf( "end parse type literal\n" );
+  librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
+  scontext->in_literal=0;
 }
 
 
@@ -256,7 +267,72 @@ librdf_parser_repat_start_element_handler(void* user_data,
                                           const XML_Char* name,
                                           const XML_Char** attributes)
 {
-  printf( "start element: %s\n", name );
+  librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
+  char *buffer;
+  int length, l;
+  char *ptr;
+  int i;
+
+  length = 1 + strlen(name); /* <NAME */
+  for(i=0; attributes[i];) {
+    if(!i)
+      length++; /* ' ' between attributes */
+    length += strlen(attributes[i]) + 2; /* =" */
+    i++;
+    length += strlen(attributes[i]) + 1; /* " */
+    i++;
+  }
+  length++; /* > */
+
+
+  /* +1 here is for \0 at end */
+  buffer=(char*)LIBRDF_MALLOC(cstring, scontext->literal_length + length + 1);
+  /* FIXME - no error return possible */
+  if(!buffer)
+    return;
+
+  if(scontext->literal_length) {
+    strncpy(buffer, scontext->literal, scontext->literal_length);
+    LIBRDF_FREE(cstring, scontext->literal);
+  }
+  scontext->literal=buffer;
+
+  ptr=buffer+scontext->literal_length; /* append */
+
+  /* adjust stored length */
+  scontext->literal_length += length;
+
+  /* now write new stuff at end of literal buffer */
+  *ptr++ = '<';
+  l=strlen(name);
+  strcpy(ptr, name);
+  ptr += l;
+   
+  for(i=0; attributes[i];) {
+    if(!i)
+      *ptr++ =' ';
+    
+    l=strlen(attributes[i]);
+    strcpy(ptr, attributes[i]);
+    ptr += l;
+
+    *ptr++ ='=';
+    *ptr++ ='"';
+
+    i++;
+
+    l=strlen(attributes[i]);
+    strcpy(ptr, attributes[i]);
+    ptr += l;
+    *ptr++ ='"';
+    
+    i++;
+  }
+  *ptr++ = '>';
+  *ptr='\0';
+
+  LIBRDF_DEBUG2(librdf_parser_repat_start_element_handler,
+                "literal text now: '%s'\n", buffer);
 }
 
 
@@ -264,7 +340,41 @@ static void
 librdf_parser_repat_end_element_handler(void* user_data,
                                         const XML_Char* name)
 {
-  printf( "end element: %s\n", name );
+  librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
+  char *buffer;
+  int length, l;
+  char *ptr;
+  
+  length = 3 + strlen(name); /* <NAME/> */
+
+  /* +1 here is for \0 at end */
+  buffer=(char*)LIBRDF_MALLOC(cstring, scontext->literal_length + length + 1);
+  /* FIXME - no error return possible */
+  if(!buffer)
+    return;
+
+  if(scontext->literal_length) {
+    strncpy(buffer, scontext->literal, scontext->literal_length);
+    LIBRDF_FREE(cstring, scontext->literal);
+  }
+  scontext->literal=buffer;
+
+  ptr=buffer+scontext->literal_length; /* append */
+
+  /* adjust stored length */
+  scontext->literal_length += length;
+
+  /* now write new stuff at end of literal buffer */
+  *ptr++ = '<';
+  *ptr++ = '/';
+  l=strlen(name);
+  strcpy(ptr, name);
+  ptr += l;
+  *ptr++ = '>';
+  *ptr='\0';
+
+  LIBRDF_DEBUG2(librdf_parser_repat_end_element_handler,
+                "literal text now: '%s'\n", buffer);
 }
 
 
@@ -273,33 +383,42 @@ librdf_parser_repat_character_data_handler(void* user_data,
                                            const XML_Char* s,
                                            int len)
 {
-  int i;
+  librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
+  char *buffer;
+  char *ptr;
   
-  printf( "text: " );
-  
-  for( i = 0; i < len; ++i )
-  {
-    switch( s[ i ] )
-    {
-      case 0x09:
-        printf( "&#x9;" );
-        break;
-      case 0x0A:
-        printf( "&#xA;" );
-        break;
-      default:
-        printf( "%c", s[ i ] );
-    }
+  /* +1 here is for \0 at end */
+  buffer=(char*)LIBRDF_MALLOC(cstring, scontext->literal_length + len + 1);
+  /* FIXME - no error return possible */
+  if(!buffer)
+    return;
+
+  if(scontext->literal_length) {
+    strncpy(buffer, scontext->literal, scontext->literal_length);
+    LIBRDF_FREE(cstring, scontext->literal);
   }
-  
-  printf( "\n" );
+  scontext->literal=buffer;
+
+  ptr=buffer+scontext->literal_length; /* append */
+
+  /* adjust stored length */
+  scontext->literal_length += len;
+
+  /* now write new stuff at end of literal buffer */
+  strncpy(ptr, s, len);
+  ptr += len;
+  *ptr = '\0';
+
+  LIBRDF_DEBUG2(librdf_parser_repat_character_data_handler,
+                "literal text now: '%s'\n", buffer);
 }
 
 
 static void 
 librdf_parser_repat_warning_handler(void* user_data, const XML_Char* msg)
 {
-  fprintf(stderr, "repat RDF parser warning - %s\n", msg);
+  librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)user_data;
+  librdf_parser_warning(scontext->pcontext->parser, msg);
 }
 
 
@@ -310,8 +429,11 @@ librdf_parser_repat_warning_handler(void* user_data, const XML_Char* msg)
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_repat_init(void *context) 
+librdf_parser_repat_init(librdf_parser *parser, void *context) 
 {
+  librdf_parser_repat_context* pcontext=(librdf_parser_repat_context*)context;
+  pcontext->parser = parser;
+
   return 0;
 }
   
@@ -326,10 +448,9 @@ librdf_parser_repat_init(void *context)
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
 static librdf_stream*
-librdf_parser_repat_parse_file_as_stream(void *context, librdf_uri *uri,
-                                         librdf_uri *base_uri) {
-  /* Note: not yet used */
-/*  librdf_parser_repat_context* pcontext=(librdf_parser_repat_context*)context; */
+librdf_parser_repat_parse_file_as_stream(void *context,
+                                         librdf_uri *uri, librdf_uri *base_uri) {
+  librdf_parser_repat_context* pcontext=(librdf_parser_repat_context*)context;
   librdf_parser_repat_stream_context* scontext;
   librdf_stream* stream;
   const char* filename;
@@ -338,6 +459,8 @@ librdf_parser_repat_parse_file_as_stream(void *context, librdf_uri *uri,
   if(!scontext)
     return NULL;
 
+  scontext->pcontext=pcontext;
+  
   scontext->statements=librdf_new_list();
   if(!scontext->statements) {
     librdf_parser_repat_serialise_finished((void*)scontext);
@@ -363,8 +486,7 @@ librdf_parser_repat_parse_file_as_stream(void *context, librdf_uri *uri,
 
   scontext->repat = RDF_ParserCreate(NULL);
 
-  /* FIXME - Repat should allow user data per parse */
-  librdf_parser_repat__user_data=scontext;
+  RDF_SetUserData(scontext->repat, scontext);
 
   RDF_SetStatementHandler(scontext->repat, 
                           librdf_parser_repat_statement_handler );
@@ -410,12 +532,14 @@ librdf_parser_repat_parse_file_as_stream(void *context, librdf_uri *uri,
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_repat_parse_file_into_model(void *context, librdf_uri *uri,
+librdf_parser_repat_parse_file_into_model(void *context,
+                                          librdf_uri *uri, 
                                           librdf_uri *base_uri,
                                           librdf_model *model) {
   librdf_stream* stream;
   
-  stream=librdf_parser_repat_parse_file_as_stream(context, uri, base_uri);
+  stream=librdf_parser_repat_parse_file_as_stream(context,
+                                                  uri, base_uri);
   if(!stream)
     return 1;
 
@@ -452,9 +576,10 @@ librdf_parser_repat_get_next_statement(librdf_parser_repat_stream_context *conte
       return 0; /* done */
 
     if(!ret) {
-      fprintf(stderr, "repat RDF parser failed at line %d - %s\n",
-              XML_GetCurrentLineNumber( RDF_GetXmlParser(context->repat)),
-              XML_ErrorString(XML_GetErrorCode(RDF_GetXmlParser(context->repat))));
+      librdf_parser_error(context->pcontext->parser,
+                          "line %d - %s\n",
+                          XML_GetCurrentLineNumber( RDF_GetXmlParser(context->repat)),
+                          XML_ErrorString(XML_GetErrorCode(RDF_GetXmlParser(context->repat))));
       return -1; /* failed and done */
     }
 
@@ -556,6 +681,10 @@ librdf_parser_repat_serialise_finished(void* context)
       librdf_free_list(scontext->statements);
     }
 
+    /* adjust stored length */
+    if(scontext->literal)
+      LIBRDF_FREE(cstring, scontext->literal);
+
     LIBRDF_FREE(librdf_parser_repat_context, scontext);
   }
 }
@@ -582,5 +711,6 @@ librdf_parser_repat_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_repat_constructor(void)
 {
-  librdf_parser_register_factory("repat", &librdf_parser_repat_register_factory);
+  librdf_parser_register_factory("repat", NULL, NULL,
+                                 &librdf_parser_repat_register_factory);
 }
