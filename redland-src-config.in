@@ -26,7 +26,6 @@ fUsage: redland-src-config [OPTION]
 known values for OPTION are:
 
   --libs                print library linking information
-  --static-libs         print static library linking information
   --cflags              print pre-processor and compiler flags
   --help                display this help and exit
   --version             output version information
@@ -57,9 +56,6 @@ while test $# -gt 0; do
     --libs)
       echo_libs=yes
       ;;
-    --static-libs)
-      echo_static_libs=yes
-      ;;
     --usage)
       usage 0 1>&2
       ;;
@@ -71,18 +67,19 @@ while test $# -gt 0; do
   shift
 done
   
-
-if test ! -r @abs_top_builddir@/raptor/raptor-src-config; then
-  echo "redland-src-config: Source tree not configured - no raptor-src-config, exiting" 1>&2
-  exit 0
+if test @with_raptor@ = internal; then
+  config=@abs_top_builddir@/raptor/raptor-src-config
+  if test ! -r $config; then
+    echo "redland-src-config: Source tree not configured - no raptor-src-config, exiting" 1>&2
+    exit 0
+  fi
+else
+  config=raptor-config
 fi
 
 if test "$echo_cflags" = "yes"; then
-  echo -I@abs_top_srcdir@/librdf `@abs_top_builddir@/raptor/raptor-src-config --cflags`
+  echo `$config --cflags` -I@abs_top_srcdir@/librdf
 fi
 if test "$echo_libs" = "yes"; then
-  echo -L@abs_top_builddir@/librdf/.libs -lrdf  @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ `@abs_top_builddir@/raptor/raptor-src-config --libs`
-fi
-if test "$echo_static_libs" = "yes"; then
-  echo @abs_top_builddir@/librdf/.libs/librdf.a @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ `@abs_top_builddir@/raptor/raptor-src-config --static-libs`
+  echo `$config --libs` -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@
 fi
