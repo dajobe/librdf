@@ -6,6 +6,10 @@
  *
  */
 
+/* Original code notes: */
+
+/* An independent implementation of MD5 by Colin Plumb. */
+
 /* Original copyright message: */
 
 /*
@@ -37,13 +41,14 @@ struct MD5Context {
   u32 buf[4];
   u32 bits[2];
   unsigned char in[64];
+  unsigned char digest[16];
 };
 
 static void MD5Init(struct MD5Context *context);
 static void MD5Update(struct MD5Context *context, 
                       unsigned char const *buf,
                       unsigned len);
-static void MD5Final(unsigned char digest[16], struct MD5Context *context);
+static void MD5Final(struct MD5Context *context);
 static void MD5Transform (u32 buf[4], u32 const in[16]);
 
 
@@ -142,7 +147,9 @@ static void MD5Update(struct MD5Context *ctx,
  * Final wrapup - pad to 64-byte boundary with the bit pattern 
  * 1 0* (64-bit count of bits processed, MSB-first)
  */
-static void MD5Final(unsigned char *digest, struct MD5Context *ctx)
+
+/* Interface altered by DJB to write digest into pre-allocated context */
+static void MD5Final(struct MD5Context *ctx)
 {
   unsigned count;
   unsigned char *p;
@@ -179,7 +186,7 @@ static void MD5Final(unsigned char *digest, struct MD5Context *ctx)
   
   MD5Transform(ctx->buf, (u32 *) ctx->in);
   byteReverse((unsigned char *) ctx->buf, 4);
-  memcpy(digest, ctx->buf, 16);
+  memcpy(ctx->digest, ctx->buf, 16);
   memset(ctx, 0, sizeof(ctx));	/* In case it's sensitive */
 }
 
@@ -286,18 +293,11 @@ static void MD5Transform(u32 buf[4], u32 const in[16])
 
 
 /* my code from here */
-static unsigned char md5_digest[16];
-
-static void
-md5_final(struct MD5Context *c) 
-{
-  MD5Final(md5_digest, c);
-}
 
 static unsigned char *
-md5_get_digest(void *c)
+md5_get_digest(struct MD5Context *c)
 {
-  return md5_digest;
+  return c->digest;
 }
 
 static void
@@ -308,7 +308,7 @@ md5_register_factory(rdf_digest_factory *factory)
 
   factory->init  = (void (*)(void *))MD5Init;
   factory->update = (void (*)(void *, unsigned char*, size_t))MD5Update;
-  factory->final = (void (*)(void *))md5_final;
+  factory->final = (void (*)(void *))MD5Final;
   factory->get_digest  = (unsigned char *(*)(void *))md5_get_digest;
 }
 
