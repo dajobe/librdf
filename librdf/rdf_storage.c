@@ -1126,25 +1126,6 @@ librdf_storage_sync(librdf_storage* storage)
 }
 
 
-static librdf_statement*
-librdf_storage_stream_in_context_map(librdf_stream *stream,
-                                     void* map_context,
-                                     librdf_statement* statement) 
-{
-  librdf_node* context_node=(librdf_node*)map_context;
-
-  /* NULL node matches all statements */
-  if(!context_node)
-    return statement;
-  
-  if (librdf_node_equals(librdf_stream_get_context(stream), context_node))
-    return statement;
-
-  /* not suitable */
-  return NULL;
-}
-
-
 /**
  * librdf_storage_find_statements_in_context - search the storage for matching statements in a given context
  * @storage: &librdf_storage object
@@ -1166,14 +1147,14 @@ librdf_storage_find_statements_in_context(librdf_storage* storage, librdf_statem
   if(storage->factory->find_statements_in_context)
     return storage->factory->find_statements_in_context(storage, statement, context_node);
 
-  stream=librdf_storage_find_statements(storage, statement);
+  stream=librdf_storage_context_as_stream(storage, context_node);
   if(!stream)
     return NULL;
 
   librdf_stream_add_map(stream, 
-                        librdf_storage_stream_in_context_map,
-                        (librdf_stream_map_free_context_handler)librdf_free_node, 
-                        librdf_new_node_from_node(context_node));
+                        &librdf_stream_statement_find_map,
+                        (librdf_stream_map_free_context_handler)&librdf_free_statement, (void*)statement);
+
   return stream;
 }
 
