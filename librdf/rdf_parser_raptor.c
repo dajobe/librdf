@@ -201,11 +201,7 @@ librdf_parser_raptor_new_statement_handler(void *context,
   if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_LITERAL ||
      rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL) {
     int is_xml_literal = (rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL);
-    librdf_uri *datatype_uri=NULL;
-
-    if(rstatement->object_literal_datatype)
-      datatype_uri=librdf_new_uri_from_uri((librdf_uri*)rstatement->object_literal_datatype);
-    
+    librdf_uri *datatype_uri=(librdf_uri*)rstatement->object_literal_datatype;
     
     if(is_xml_literal)
       librdf_statement_set_object(statement,
