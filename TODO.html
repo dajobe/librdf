@@ -16,8 +16,6 @@
 
 <ul>
 <li>RFE: Add node.as_sha1 easy digest methods for literal nodes</li>
-<li>raptor-uri-test may not work in redland when compiled against
-system - fails to find raptor.h.</li>
 <li>PHP may need to include php_config.h not config.h for new php versions</li>
 <li>RFE: return serialized models to syntax as strings</li>
 <li>RFE: model.parseString(format, "string"), model.parseURI(format, URI, baseURI=URI) creating and destroying temporary parser objects for <em>format</em>.
@@ -60,6 +58,8 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>raptor-uri-test in redland when compiled against
+system raptor failed to find raptor.h; fixed in raptor 1.1.0.</li>
 <li>Added <code>librdf_model_get_storage</code> method so storage
 object needn't be kept around when dealing with model (0.9.15).</li>
 <li>Fixed serializing URI http://xmlns.com/foaf/0.1/mbox_sha1 to a property element to breaks the namespace/URI after 'sha1' as the maximal legal XML name (0.9.15)</li>
