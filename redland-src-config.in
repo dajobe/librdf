@@ -76,8 +76,8 @@ if test "$echo_cflags" = "yes"; then
   echo -I@abs_top_srcdir@/librdf `@abs_top_srcdir@/raptor/raptor-src-config --cflags`
 fi
 if test "$echo_libs" = "yes"; then
-  echo -L@abs_top_builddir@/librdf/.libs -lrdf  @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ `@abs_top_builddir@/raptor/raptor-src-config --libs`
+  echo -L@abs_top_builddir@/librdf/.libs -lrdf  @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ `@abs_top_srcdir@/raptor/raptor-src-config --libs`
 fi
 if test "$echo_static_libs" = "yes"; then
-  echo @abs_top_builddir@/librdf/.libs/librdf.a @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ `@abs_top_builddir@/raptor/raptor-src-config --static-libs`
+  echo @abs_top_builddir@/librdf/.libs/librdf.a @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ `@abs_top_srcdir@/raptor/raptor-src-config --static-libs`
 fi
