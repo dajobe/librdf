@@ -261,8 +261,7 @@ static void librdf_stream_from_node_iterator_finished(void* context);
 
 typedef struct {
   librdf_iterator *iterator;
-  librdf_statement* statement;
-  librdf_statement current; /* static, shared statement */
+  librdf_statement *current; /* shared statement */
   unsigned int field;
 } librdf_stream_from_node_iterator_stream_context;
 
@@ -293,33 +292,15 @@ librdf_new_stream_from_node_iterator(librdf_iterator* iterator,
   if(!scontext)
     return NULL;
 
-  librdf_statement_init(iterator->world, &scontext->current);
-
-  /* Initialise static result statement nodes with SHARED copies of nodes .
-   * Since this is a static statement, this is ok, librdf_statement_free
-   * is never called on it, so the shared nodes pointers are never freed.
-   */
-  switch(field) {
-    case LIBRDF_STATEMENT_SUBJECT:
-      librdf_statement_set_predicate(&scontext->current, librdf_statement_get_predicate(statement));
-      librdf_statement_set_object(&scontext->current, librdf_statement_get_object(statement)); 
-      break;
-    case LIBRDF_STATEMENT_PREDICATE:
-      librdf_statement_set_subject(&scontext->current, librdf_statement_get_subject(statement));
-      librdf_statement_set_object(&scontext->current, librdf_statement_get_object(statement)); 
-      break;
-    case LIBRDF_STATEMENT_OBJECT:
-      librdf_statement_set_subject(&scontext->current, librdf_statement_get_subject(statement));
-      librdf_statement_set_predicate(&scontext->current, librdf_statement_get_predicate(statement));
-      break;
-    default:
-      LIBRDF_FATAL2(librdf_stream_from_node_iterator,
-                    "Illegal statement field %d seen\n", scontext->field);
-      
+  /* copy the prototype statement */
+  statement=librdf_new_statement_from_statement(statement);
+  if(!statement) {
+    LIBRDF_FREE(librdf_stream_from_node_iterator_stream_context, scontext);
+    return NULL;
   }
-  
+
   scontext->iterator=iterator;
-  scontext->statement=statement;
+  scontext->current=statement;
   scontext->field=field;
   
   stream=librdf_new_stream(iterator->world,
@@ -373,13 +354,13 @@ librdf_stream_from_node_iterator_get_statement(void* context, int flags)
        */
       switch(scontext->field) {
         case LIBRDF_STATEMENT_SUBJECT:
-          librdf_statement_set_subject(&scontext->current, node);
+          librdf_statement_set_subject(scontext->current, node);
           break;
         case LIBRDF_STATEMENT_PREDICATE:
-          librdf_statement_set_predicate(&scontext->current, node);
+          librdf_statement_set_predicate(scontext->current, node);
           break;
         case LIBRDF_STATEMENT_OBJECT:
-          librdf_statement_set_object(&scontext->current, node);
+          librdf_statement_set_object(scontext->current, node);
           break;
         default:
           LIBRDF_FATAL2(librdf_stream_from_node_iterator_next_statement,
@@ -387,7 +368,7 @@ librdf_stream_from_node_iterator_get_statement(void* context, int flags)
           
       }
       
-      return &scontext->current;
+      return scontext->current;
 
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
       return (librdf_statement*)librdf_iterator_get_context(scontext->iterator);
@@ -405,6 +386,24 @@ librdf_stream_from_node_iterator_finished(void* context)
   
   if(scontext->iterator)
     librdf_free_iterator(scontext->iterator);
+
+  if(scontext->current) {
+    switch(scontext->field) {
+      case LIBRDF_STATEMENT_SUBJECT:
+        librdf_statement_set_subject(scontext->current, NULL);
+        break;
+      case LIBRDF_STATEMENT_PREDICATE:
+        librdf_statement_set_predicate(scontext->current, NULL);
+        break;
+      case LIBRDF_STATEMENT_OBJECT:
+        librdf_statement_set_object(scontext->current, NULL);
+        break;
+      default:
+        LIBRDF_FATAL2(librdf_stream_from_node_iterator_finished,
+                      "Illegal statement field %d seen\n", scontext->field);
+    }
+    librdf_free_statement(scontext->current);
+  }
 
   LIBRDF_FREE(librdf_stream_from_node_iterator_stream_context, scontext);
 }
@@ -446,3 +445,131 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
   }
 }
 
+
+#ifdef STANDALONE
+
+/* one more prototype */
+int main(int argc, char *argv[]);
+
+#define STREAM_NODES_COUNT 6
+#define NODE_URI_PREFIX "http://example.org/node"
+
+int
+main(int argc, char *argv[]) 
+{
+  librdf_statement *statement;
+  librdf_stream* stream;
+  char *program=argv[0];
+  librdf_world *world;
+  librdf_uri* prefix_uri;
+  librdf_node* nodes[STREAM_NODES_COUNT];
+  int i;
+  librdf_iterator* iterator;
+  int count;
+  
+  world=librdf_new_world();
+
+  librdf_init_hash(world);
+  librdf_init_uri(world);
+  librdf_init_node(world);
+
+  prefix_uri=librdf_new_uri(world, NODE_URI_PREFIX);
+  if(!prefix_uri) {
+    fprintf(stderr, "%s: Failed to create prefix URI\n", program);
+    return(1);
+  }
+
+  for(i=0; i < STREAM_NODES_COUNT; i++) {
+    char buf[2];
+    buf[0]='a'+i;
+    buf[1]='\0';
+    nodes[i]=librdf_new_node_from_uri_local_name(world, prefix_uri, buf);
+    if(!nodes[i]) {
+      fprintf(stderr, "%s: Failed to create node %i (%s)\n", program, i, buf);
+      return(1);
+    }
+  }
+  
+  fprintf(stdout, "%s: Creating static node iterator\n", program);
+  iterator=librdf_node_static_iterator_create(nodes, STREAM_NODES_COUNT);
+  if(!iterator) {
+    fprintf(stderr, "%s: Failed to create static node iterator\n", program);
+    return(1);
+  }
+
+  statement=librdf_new_statement_from_nodes(world,
+                                            librdf_new_node_from_uri_string(world, "http://example.org/resource"),
+                                            librdf_new_node_from_uri_string(world, "http://example.org/property"),
+                                            NULL);
+  if(!statement) {
+    fprintf(stderr, "%s: Failed to create statement\n", program);
+    return(1);
+  }
+
+  fprintf(stdout, "%s: Creating stream from node iterator\n", program);
+  stream=librdf_new_stream_from_node_iterator(iterator, statement, LIBRDF_STATEMENT_OBJECT);
+  if(!stream) {
+    fprintf(stderr, "%s: Failed to createstatic  node stream\n", program);
+    return(1);
+  }
+  
+
+  /* This is to check that the stream_from_node_iterator code
+   * *really* takes a copy of what it needs from statement 
+   */
+  fprintf(stdout, "%s: Freeing statement\n", program);
+  librdf_free_statement(statement);
+
+
+  fprintf(stdout, "%s: Listing static node stream\n", program);
+  count=0;
+  while(!librdf_stream_end(stream)) {
+    librdf_statement* s_statement=librdf_stream_get_object(stream);
+    if(!s_statement) {
+      fprintf(stderr, "%s: librdf_stream_current returned NULL when not end of stream\n", program);
+      return(1);
+    }
+
+    fprintf(stdout, "%s: statement %d is: ", program, count);
+    librdf_statement_print(s_statement, stdout);
+    fputc('\n', stdout);
+    
+    librdf_stream_next(stream);
+    count++;
+  }
+
+  if(count != STREAM_NODES_COUNT) {
+    fprintf(stderr, "%s: Stream returned %d statements, expected %d\n", program,
+            count, STREAM_NODES_COUNT);
+    return(1);
+  }
+
+  fprintf(stdout, "%s: stream from node iterator worked ok\n", program);
+
+
+  fprintf(stdout, "%s: Freeing stream\n", program);
+  librdf_free_stream(stream);
+
+
+  fprintf(stdout, "%s: Freeing nodes\n", program);
+  for (i=0; i<STREAM_NODES_COUNT; i++) {
+    librdf_free_node(nodes[i]);
+  }
+
+  librdf_free_uri(prefix_uri);
+  
+  librdf_finish_node(world);
+  librdf_finish_uri(world);
+  librdf_finish_hash(world);
+
+  LIBRDF_FREE(librdf_world, world);
+  
+#ifdef LIBRDF_MEMORY_DEBUG
+  librdf_memory_report(stderr);
+#endif
+	
+  /* keep gcc -Wall happy */
+  return(0);
+}
+
+#endif
