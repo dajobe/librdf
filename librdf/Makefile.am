@@ -8,7 +8,9 @@
 
 SUBDIRS=@SD@
 
+bin_SCRIPTS = librdf-config
 lib_LIBRARIES = librdf.a
+include_HEADERS = librdf.h
 
 librdf_a_SOURCES = rdf_init.c rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_list.c rdf_model.c rdf_iterator.c \
