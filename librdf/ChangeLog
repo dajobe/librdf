@@ -1,6 +1,23 @@
 2004-10-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_serializer_rdfxml.c (rdf_serializer_rdfxml_print_xml_attribute):
+	Take serializer arg.
+	Use librdf_log directly to give a better error message since
+	raptor_xml_escape_string only dies on UTF-8 errors.
+	(librdf_serializer_print_statement_as_rdfxml): Replcae
+	librdf_serializer_warning with direct librdf_log call as above.
+
+	* rdf_serializer.h:
+	Deleted librdf_serializer_error and librdf_serializer_warning
+
+	* rdf_serializer.c (librdf_serializer_error,
+	librdf_serializer_warning): Deleted.
+
+	* rdf_serializer_rdfxml.c (rdf_serializer_rdfxml_print_as_xml_content):
+	Deleted and inlined.
+	Use raptor_xml_escape_string to properly escape UTF-8.
+
+	* rdf_serializer_rdfxml.c (rdf_serializer_rdfxml_print_xml_attribute):
 	Add an error return value and pass on failures.
 	(librdf_serializer_print_statement_as_rdfxml): Add an error return
 	value and pass on failures.  Try to slightly recover from errors.

@@ -1,3 +1,71 @@
+2004-10-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_serializer_rdfxml.c
+	(rdf_serializer_rdfxml_print_xml_attribute): Take serializer arg.
+	Use librdf_log directly to give a better error message since
+	raptor_xml_escape_string only dies on UTF-8 errors.
+	(librdf_serializer_print_statement_as_rdfxml): Replcae
+	librdf_serializer_warning with direct librdf_log call as above.
+
+	* librdf/rdf_serializer.h:
+	Deleted librdf_serializer_error and librdf_serializer_warning
+
+	* librdf/rdf_serializer.c (librdf_serializer_error,
+	librdf_serializer_warning): Deleted.
+
+	* librdf/rdf_serializer_rdfxml.c
+	(rdf_serializer_rdfxml_print_as_xml_content): Deleted and inlined.
+	Use raptor_xml_escape_string to properly escape UTF-8.
+
+	* librdf/rdf_serializer_rdfxml.c
+	(rdf_serializer_rdfxml_print_xml_attribute): Add an error return
+	value and pass on failures.
+	librdf_serializer_print_statement_as_rdfxml): Add an error return
+	value and pass on failures.  Try to slightly recover from errors.
+
+	* librdf/rdf_serializer_rdfxml.c
+	(librdf_serializer_rdfxml_serialize_model): Use raptor_free_memory.
+
+	* raptor/raptor_xml.c (raptor_xml_escape_string):
+	Call error_handler correctly.
+
+2004-10-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/part1/Makefile.am:
+	Use EXPECTED_SPARQL_CORRECT_FAILURES and count the list at run time
+
+2004-10-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y, rasqal/sparql_lexer.l,
+	rasqal/rdql_parser.y, rasqal/rdql_lexer.l,
+	rasqal/rasqal_query_test.c, rasqal/rasqal_expr.c: Use
+	rasqal_basename to make 'program' in test code messages.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_execute_finish):
+	Do a terminating loop through columns.
+
+	* rasqal/rasqal_internal.h: Added rasqal_basename prototype
+
+	* rasqal/rasqal_general.c (rasqal_basename): Added utility function
+
+	* rasqal/rasqal_query_test.c (main):
+	Check prepares and multiple executes work.
+
+	* rasqal/win32/rasqal.dsp: Rename parser, lexer files
+	Add sparql
+
+	* rasqal/win32_rasqal_config.h: Add RDQL and SPARQL defines
+
+	* rasqal/rasqal_expr.c: Make all RASQAL_INLINE functions static.
+
+	* rasqal/rasqal_expr.c: RASQAL_INLINE at start of line
+
+2004-10-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y, rasqal/sparql_lexer.l,
+	rasqal/sparql_common.h, rasqal/rasqal_internal.h,
+	rasqal/rasqal_general.c, rasqal/Makefile.am: BRQL to SPARQL
+
 2004-10-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* Redland.i: Export librdf_world_get_feature and
