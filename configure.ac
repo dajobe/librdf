@@ -94,6 +94,10 @@ AM_INIT_AUTOMAKE(redland, $VERSION)
 LIBRDF_LIBTOOL_VERSION=0:0:0
 AC_SUBST(LIBRDF_LIBTOOL_VERSION)
 
+# OSX Fink
+if [ -d /sw/bin ]; then
+  PATH=/sw/bin:$PATH
+fi
 
 dnl Checks for programs.
 AM_PROG_CC_STDC
@@ -372,10 +376,33 @@ AC_CHECK_SIZEOF(unsigned long, 4)
 dnl Checks for libraries.
 
 dnl Berkeley DB
-AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area [/usr]], bdb_prefix="$withval", bdb_prefix="/usr") 
-AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory [/usr/lib]], bdb_lib_dir="$withval", bdb_lib_dir="$bdb_prefix/lib") 
-AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory [/usr/include]], bdb_include_dir="$withval", bdb_include_dir="$bdb_prefix/include") 
-AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Berkeley DB library name []], bdb_dbname="$withval", bdb_dbname="none")
+AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area (default=/usr)], bdb_prefix="$withval", bdb_prefix="none") 
+AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (default=/usr/lib)], bdb_lib_dir="$withval", bdb_lib_dir="none") 
+AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory (default=/usr/include)], bdb_include_dir="$withval", bdb_include_dir="none") 
+AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Berkeley DB library name (auto)], bdb_dbname="$withval", bdb_dbname="none")
+
+if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_dir" = "Xnone" -a "X$bdb_dbname" = "Xnone" ; then
+  bdb_prefix="/usr"
+  bdb_lib_dir="/usr/lib"
+  bdb_include_dir="/usr/include"
+
+  dbincdir=/usr/include
+  # OSX fink
+  if [ -d /sw/include -a -d /sw/lib ]; then
+    dbincdir=/sw/include
+    bdb_lib_dir=/sw/lib
+  fi
+
+  for version in 4 3 2; do
+    if [ -f $dbincdir/db$version/db.h ]; then
+      bdb_include_dir=$dbincdir/db$version
+      bdb_dbname=db-$version
+      break
+    fi
+  done
+fi
+
+
 
 
 AC_MSG_CHECKING(location of BDB libs)
@@ -392,7 +419,7 @@ if test "$bdb_prefix" != no; then
     nLDFLAGS="-L$bdb_lib_dir";
   fi
 
-  if test "$bdb_name" != none; then
+  if test "$bdb_dbname" != none; then
     # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
     bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb*.a 2>/dev/null |sed -e 's/^lib//' -e 's/\.a$//' | head -1`
     if test "X$bdb_dbname" = X; then
@@ -455,6 +482,20 @@ if test "$bdb_prefix" != no; then
 		AC_DEFINE(HAVE_BDB_OPEN_6_ARGS, 1, [BDB has open method with 6 args])
                 bdb_available="Version 4.0+"
                 have_libdb=yes
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
+    AC_MSG_CHECKING(for BDB DB->close with 2 arguments)
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [DB *bdb; bdb->close(bdb, 0);],
+		AC_DEFINE(HAVE_BDB_CLOSE_2_ARGS, 1, [BDB has close method with 2 args])
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
+    AC_MSG_CHECKING(for BDB DB->fd with 2 arguments)
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [DB *bdb; bdb->fd(bdb, 0);],
+		AC_DEFINE(HAVE_BDB_FD_2_ARGS, 1, [BDB has fd method with 2 args])
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
