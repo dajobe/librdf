@@ -23,8 +23,147 @@ pre
 
 <h2 id="rel0_9_20"><a name="rel0_9_20">Redland 0.9.20 Changes</a></h2>
 
-<p>&nbsp;
+<p>Not yet released.
 </p>
+
+<p>The main changes in this release are to update to use 
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.6
+to provide improved SPARQL query support for optionals and CONSTRUCT,
+<a href="http://librdf.org/raptor/">Raptor</a> 1.4.4 to
+provide better serializing RDF/XML and RSS 1.0 and better
+RSS tag soup parsing and
+a new experimental <a href="http://www.sqlite.org/">SQLite</a>
+storage supporting SQLite V2 and V3 libraries.
+</p>
+
+
+<h3>Configuration changes</h3>
+
+<p>The storages compiled into redland can be individually selected
+with the <code>--enable-storages=</code><em>LIST</em> configure
+option.
+</p>
+
+<p>The default for <code>--with-dmalloc</code> is now no.  Reason:
+<a href="http://valgrind.kde.org/">valgrind</a>.</p>
+
+
+<h3>Portability Fixes</h3>
+
+<p>Removed configure altering the search PATH - which was a bad idea
+as it makes the configure environment different from the user's.</p>
+
+<p>Added <code>/opt/local</code> to the BerkeleyDB / SleepycatDB
+search path to help darwinports.</p>
+
+<p>To help Redland built as an OSX Framework with ObjectiveC, Redland
+public headers can be put in a different directory structure if
+<code>LIBRDF_OBJC_FRAMEWORK</code> is defined in the build
+environment.  In this case the headers are found in a subdirectory
+<code>Redland</code>.  This only applies to the public Redland header
+files that <code>#include</code> other public header files -
+<code>redland.h</code> including <code>librdf.h</code>,
+<code>librdf.h</code> including several <code>rdf_*.h</code> files
+and Rasqal's <code>rasqal.h</code> including
+<code>raptor.h</code>. (Patch from René Puls)
+</p>
+
+
+<h3><code>rdfproc</code> RDF processor utility program changes</h3>
+
+<p>Added a <code>size</code> command calling
+<code>librdf_model_size</code>.</p>
+
+
+<h3>Model Class changes</h3>
+
+<p>Added <code>librdf_model_contains_context</code> to find a context
+node in a model.</p>
+
+<p>The <code>librdf_model_sync</code> now returns a success or failure
+int.</p>
+
+
+<h3>Parser Class Changes</h3>
+
+<p>Updated to <a href="http://librdf.org/raptor/">Raptor</a> 1.4.4
+providing an updated RSS tag soup parser with fixes for RSS 0.9,
+RSS.1.1 and Atom.</p>
+
+<p>The constructor now finds the correct parser when given NULL
+arguments for mime type or type URI.</p>
+
+
+<h3>Query Class changes</h3>
+
+<p>Update to <a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.5
+providing improved SPARQL support: new optionals handling,
+<code>CONSTRUCT</code> to make RDF graphs, formatting of query
+results in the SPARQL XML format along with many other improvements
+and fixes.</p>
+
+
+<p>Added base_uri argument to <code>librdf_new_query</code></p>
+
+<p>Added
+<code>librdf_query_results_to_counted_string</code>,
+<code>librdf_query_results_to_string</code>,
+<code>librdf_query_results_to_file_handle</code> and
+<code>librdf_query_results_to_file</code>
+to get the results of a query written to a syntax using
+Rasqal's rasqal_query_results_write and Raptor's XML writer API.
+</p>
+
+
+<h3>Serializer Class changes</h3>
+
+<p>Updated to <a href="http://librdf.org/raptor/">Raptor</a> 1.4.4
+providing a new XML writer API, an improved RDF/XML serializer
+allowing user namespace declarations and relative URIs, a new RSS 1.0
+serializer.</p>
+
+<p>The serializers now respect any user-declared namespaces done with
+<code>librdf_serializer_set_namespace</code> by passing it on to the
+Raptor serializer with <code>raptor_serialize_set_namespace</code>.
+At present only the Raptor RDF/XML serializer uses these
+user-declared namespace hints.
+</p>
+
+<p>The constructor now finds the correct serializer when given NULL
+arguments for mime type or type URI.</p>
+
+
+<h3>Storage Class changes</h3>
+
+<p>The storages compiled into redland can be individually selected
+with the <code>--enable-storages=</code><em>LIST</em> configure option.
+</p>
+
+<p>SQLite Storage.  A new experimental storage supporting
+<a href="http://www.sqlite.org/">SQLite</a> V2 and V3 libraries.
+</p>
+
+<p>MySQL storage.  Return failure early if the connection failed
+rather than try to continue opening the storage.</p>
+
+<p>MySQL storage.  Only use <code>mysql_real_escape_string</code> if
+a connection was made.  Do not try to free resources such as the
+mysql DB connection owned by iterators after an error, let
+<code>librdf_free_iterator</code> tidy up. (Patch from Morten
+Frederiksen)</p>
+
+
+<h3>URI Class changes</h3>
+
+<p>Handle resolving against a base URI with an omitted path.</p>
+
+
+<h3>Other changes</h3>
+
+<p>Removed <code>librdf_concept_labels</code> - never used or
+exported.</p>
+
+
 
 <h2 id="rel0_9_19"><a name="rel0_9_19">Redland 0.9.19 Changes</a></h2>
 
