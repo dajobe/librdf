@@ -318,9 +318,9 @@ SD=docs
 #  (cd libxml2-2.1.1 && ./configure --cache=../config.cache --enable-shared=no)
 #fi
 
-if test -d expat; then
-  SD="$SD expat"
-fi
+#if test -d expat; then
+#  SD="$SD expat"
+#fi
 
 AC_SUBST(SD)
 
