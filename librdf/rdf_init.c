@@ -303,8 +303,8 @@ int
 librdf_world_set_feature(librdf_world* world, librdf_uri *feature,
                          const char *value) 
 {
-  librdf_uri* genid_base=librdf_new_uri(world, LIBRDF_WORLD_FEATURE_GENID_BASE);
-  librdf_uri* genid_counter=librdf_new_uri(world, LIBRDF_WORLD_FEATURE_GENID_COUNTER);
+  librdf_uri* genid_base=librdf_new_uri(world, (const unsigned char*)LIBRDF_WORLD_FEATURE_GENID_BASE);
+  librdf_uri* genid_counter=librdf_new_uri(world, (const unsigned char*)LIBRDF_WORLD_FEATURE_GENID_COUNTER);
   int rc=1;
   
   if(librdf_uri_equals(feature, genid_base)) {
@@ -339,7 +339,7 @@ librdf_world_set_feature(librdf_world* world, librdf_uri *feature,
 
 
 /* Internal */
-const unsigned char*
+unsigned char*
 librdf_world_get_genid(librdf_world* world)
 {
   int id, tmpid, counter, tmpcounter;
@@ -368,7 +368,7 @@ librdf_world_get_genid(librdf_world* world)
   if(!buffer)
     return NULL;
 
-  sprintf(buffer, "r%dr%d", id, counter);
+  sprintf((char*)buffer, "r%dr%d", id, counter);
   return buffer;
 }
 

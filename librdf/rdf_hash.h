@@ -147,7 +147,7 @@ int librdf_hash_close(librdf_hash* hash);
 int librdf_hash_values_count(librdf_hash* hash);
 
 /* retrieve one value for a given hash key either as char or hash datum */
-char* librdf_hash_get(librdf_hash* hash, char *key);
+char* librdf_hash_get(librdf_hash* hash, const char *key);
 librdf_hash_datum* librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key);
 
 /* retrieve one value for key and delete from hash all other values */

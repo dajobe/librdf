@@ -112,7 +112,7 @@ librdf_new_uri (librdf_world *world,
   pthread_mutex_lock(world->mutex);
 #endif
   
-  length=strlen(uri_string);
+  length=strlen((const char*)uri_string);
 
   key.data=(char*)uri_string;
   key.size=length;
@@ -157,7 +157,7 @@ librdf_new_uri (librdf_world *world,
     goto unlock;
   }
   
-  strcpy(new_string, uri_string);
+  strcpy((char*)new_string, (const char*)uri_string);
   new_uri->string=new_string;
 
   new_uri->usage=1;
@@ -206,7 +206,7 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 librdf_uri*
 librdf_new_uri_from_uri_local_name (librdf_uri* old_uri, 
                                     const unsigned char *local_name) {
-  int len=old_uri->string_length + strlen(local_name) +1 ; /* +1 for \0 */
+  int len=old_uri->string_length + strlen((const char*)local_name) +1 ; /* +1 for \0 */
   unsigned char *new_string;
   librdf_uri* new_uri;
 
@@ -217,8 +217,8 @@ librdf_new_uri_from_uri_local_name (librdf_uri* old_uri,
   if(!new_string)
     return NULL;
 
-  strcpy(new_string, old_uri->string);
-  strcat(new_string, local_name);
+  strcpy((char*)new_string, (const char*)old_uri->string);
+  strcat((char*)new_string, (const char*)local_name);
 
   new_uri=librdf_new_uri (old_uri->world, new_string);
   LIBRDF_FREE(cstring, new_string);
@@ -255,7 +255,7 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
 
   /* not a fragment, and no match - easy */
   if(*uri_string != '#' &&
-     strncmp(uri_string, source_uri->string, source_uri->string_length))
+     strncmp((const char*)uri_string, (const char*)source_uri->string, source_uri->string_length))
     return librdf_new_uri(world, uri_string);
 
   /* darn - is a fragment or matches, is a prefix of the source URI */
@@ -268,7 +268,7 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
     uri_string += source_uri->string_length;
 
   /* size of remaining bytes to copy from uri_string */
-  uri_string_len=strlen(uri_string);
+  uri_string_len=strlen((const char*)uri_string);
 
   /* total bytes */
   len=uri_string_len + 1 + base_uri->string_length;
@@ -276,9 +276,9 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
   new_uri_string=(unsigned char*)LIBRDF_MALLOC(cstring, len);
   if(!new_uri_string)
     return NULL;
-  strncpy(new_uri_string, base_uri->string, base_uri->string_length);
+  strncpy((char*)new_uri_string, (const char*)base_uri->string, base_uri->string_length);
   /* strcpy not strncpy since I want a \0 on the end */
-  strcpy(new_uri_string + base_uri->string_length, uri_string);
+  strcpy((char*)new_uri_string + base_uri->string_length, (const char*)uri_string);
   
   new_uri=librdf_new_uri(world, new_uri_string);
   LIBRDF_FREE(cstring, new_uri_string); /* always free this even on failure */
@@ -313,7 +313,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
   if(!*uri_string)
     return librdf_new_uri_from_uri(base_uri);
   
-  buffer_length=base_uri->string_length + strlen(uri_string) +1;
+  buffer_length=base_uri->string_length + strlen((const char*)uri_string) +1;
   buffer=(unsigned char*)LIBRDF_MALLOC(cstring, buffer_length);
   if(!buffer)
     return NULL;
@@ -337,7 +337,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
 librdf_uri*
 librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
   librdf_uri* new_uri;
-  char *uri_string;
+  unsigned char *uri_string;
 
   if(!filename)
     return NULL;
@@ -474,7 +474,7 @@ librdf_uri_get_digest (librdf_uri* uri)
 void
 librdf_uri_print (librdf_uri* uri, FILE *fh) 
 {
-  fputs(uri->string, fh);
+  fputs((const char*)uri->string, fh);
 }
 
 
@@ -487,7 +487,7 @@ librdf_uri_print (librdf_uri* uri, FILE *fh)
  *
  * Return value: string representation of the URI or NULL on failure
  **/
-char*
+unsigned char*
 librdf_uri_to_string (librdf_uri* uri)
 {
   return librdf_uri_to_counted_string(uri, NULL);
@@ -504,10 +504,10 @@ librdf_uri_to_string (librdf_uri* uri)
  *
  * Return value: string representation of the URI or NULL on failure
  **/
-char*
+unsigned char*
 librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p)
 {
-  char *s;
+  unsigned char *s;
 
   if(!uri)
     return NULL;
@@ -515,11 +515,11 @@ librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p)
   if(len_p)
     *len_p=uri->string_length;
 
-  s=(char*)LIBRDF_MALLOC(cstring, uri->string_length+1);
+  s=(unsigned char*)LIBRDF_MALLOC(cstring, uri->string_length+1);
   if(!s)
     return NULL;
 
-  strcpy(s, uri->string);
+  strcpy((char*)s, (const char*)uri->string);
   return s;
 }
 

@@ -89,7 +89,7 @@ void librdf_statement_set_object(librdf_statement *statement, librdf_node *objec
 int librdf_statement_is_complete(librdf_statement *statement);
 
 /* convert to a string */
-char *librdf_statement_to_string(librdf_statement *statement);
+unsigned char *librdf_statement_to_string(librdf_statement *statement);
 /* print it prettily */
 void librdf_statement_print(librdf_statement *statement, FILE *fh);
 

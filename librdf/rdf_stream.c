@@ -125,7 +125,7 @@ librdf_stream_update_current_statement(librdf_stream* stream)
   
   /* find next statement subject to map */
   while(!stream->is_end_method(stream->context)) {
-    statement=stream->get_method(stream->context,
+    statement=(librdf_statement*)stream->get_method(stream->context,
                                  LIBRDF_STREAM_GET_METHOD_GET_OBJECT);
     if(!statement)
       break;
@@ -441,16 +441,16 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
     return;
 
   while(!librdf_stream_end(stream)) {
-    char *s;
+    unsigned char *s;
     librdf_statement* statement=librdf_stream_get_object(stream);
-    librdf_node* context_node=librdf_stream_get_context(stream);
+    librdf_node* context_node=(librdf_node*)librdf_stream_get_context(stream);
     if(!statement)
       break;
 
     s=librdf_statement_to_string(statement);
     if(s) {
       fputs("  ", fh);
-      fputs(s, fh);
+      fputs((const char*)s, fh);
       if(context_node) {
         fputs(" with context ", fh);
         librdf_node_print(context_node, fh);

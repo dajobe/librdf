@@ -69,7 +69,7 @@ librdf_serializer_rdfxml_init(librdf_serializer *serializer, void *context)
   pcontext->depth=0;
   
   pcontext->rdf_ns=raptor_new_namespace(pcontext->nstack,
-                                        "rdf",
+                                        (const unsigned char*)"rdf",
                                         librdf_uri_as_string(librdf_concept_ms_namespace_uri),
                                         pcontext->depth);
 
@@ -107,7 +107,7 @@ librdf_serializer_rdfxml_terminate(void *context)
  * Return value: non-zero if is a legal XML name
  **/
 static int
-rdf_serializer_rdfxml_ok_xml_name(char *name) 
+rdf_serializer_rdfxml_ok_xml_name(unsigned char *name) 
 {
   if(!isalpha(*name) && *name != '_')
     return 0;
@@ -128,7 +128,7 @@ rdf_serializer_rdfxml_ok_xml_name(char *name)
  * 
  **/
 static void
-rdf_serializer_rdfxml_print_as_xml_content(char *p, FILE *handle) 
+rdf_serializer_rdfxml_print_as_xml_content(unsigned char *p, FILE *handle) 
 {
   while(*p) {
     if(*p == '&')
@@ -184,7 +184,8 @@ librdf_serializer_rdfxml_raptor_error_handler(void *data, const char *message, .
  **/
 static void
 rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
-                                          char *attr, char *value,
+                                          unsigned char *attr,
+                                          unsigned char *value,
                                           FILE *handle) 
 {
   size_t attr_len;
@@ -193,19 +194,19 @@ rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
   unsigned char *buffer;
   unsigned char *p;
   
-  attr_len=strlen(attr);
-  len=strlen(value);
+  attr_len=strlen((const char*)attr);
+  len=strlen((const char*)value);
 
   escaped_len=raptor_xml_escape_string(value, len,
                                        NULL, 0, '"',
                                        librdf_serializer_rdfxml_raptor_error_handler, world);
 
-  buffer=(char*)LIBRDF_MALLOC(cstring, 1 + attr_len + 2 + escaped_len + 1 +1);
+  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, 1 + attr_len + 2 + escaped_len + 1 +1);
   if(!buffer)
     return;
   p=buffer;
   *p++=' ';
-  strncpy(p, attr, attr_len);
+  strncpy((char*)p, (const char*)attr, attr_len);
   p+= attr_len;
   *p++='=';
   *p++='"';
@@ -216,7 +217,7 @@ rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
   *p++='"';
   *p++='\0';
   
-  fputs(buffer, handle);
+  fputs((const char*)buffer, handle);
   LIBRDF_FREE(cstring, buffer);
 }
 
@@ -235,14 +236,16 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 {
   librdf_world* world=statement->world;
   librdf_node* nodes[3];
-  char* uris[3];
-  char *name=NULL;  /* where to split predicate name */
-  char *rdf_ns_uri=librdf_uri_as_string(librdf_concept_ms_namespace_uri);
-  int rdf_ns_uri_len=strlen(rdf_ns_uri);
+  unsigned char* uris[3];
+  unsigned char *name=NULL;  /* where to split predicate name */
+  unsigned char *rdf_ns_uri;
+  size_t rdf_ns_uri_len;
   int name_is_rdf_ns=0;
   int i;
   char* nsprefix="ns0";
-  char *content;
+  unsigned char *content;
+
+  rdf_ns_uri=librdf_uri_as_counted_string(librdf_concept_ms_namespace_uri, &rdf_ns_uri_len);
   
   nodes[0]=librdf_statement_get_subject(statement);
   nodes[1]=librdf_statement_get_predicate(statement);
@@ -255,16 +258,16 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
       uris[i]=librdf_uri_as_string(librdf_node_get_uri(n));
 
       if(i == 1) {
-        char *p;
+        unsigned char *p;
 
-        if(!strncmp(uris[i], rdf_ns_uri, rdf_ns_uri_len)) {
+        if(!strncmp((const char*)uris[i], (const char*)rdf_ns_uri, rdf_ns_uri_len)) {
           name=uris[i] + rdf_ns_uri_len;
           name_is_rdf_ns=1;
           nsprefix="rdf";
           continue;
         }
         
-        p= uris[i] + strlen(uris[i])-1;
+        p= uris[i] + strlen((const char*)uris[i])-1;
         while(p >= uris[i]) {
           if(rdf_serializer_rdfxml_ok_xml_name(p))
             name=p;
@@ -289,11 +292,13 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 
   /* subject */
   if(librdf_node_get_type(nodes[0]) == LIBRDF_NODE_TYPE_BLANK)
-    rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:nodeID", 
+    rdf_serializer_rdfxml_print_xml_attribute(world, 
+                                              (unsigned char*)"rdf:nodeID", 
                                               librdf_node_get_blank_identifier(nodes[0]),
                                               handle);
   else
-    rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:about", 
+    rdf_serializer_rdfxml_print_xml_attribute(world,
+                                              (unsigned char*)"rdf:about", 
                                               uris[0], handle);
 
   fputs(">\n", handle);
@@ -301,7 +306,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   fputs("    <", handle);
   fputs(nsprefix, handle);
   fputc(':', handle);
-  fputs(name, handle);
+  fputs((const char*)name, handle);
 
   if(!name_is_rdf_ns) {
     size_t len=name-uris[1];
@@ -317,7 +322,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
                                          NULL, 0, '"', 
                                          librdf_serializer_rdfxml_raptor_error_handler, world);
     /* " + string + " + \0 */
-    buffer=(char*)LIBRDF_MALLOC(cstring, 1 + escaped_len + 1 + 1);
+    buffer=(unsigned char*)LIBRDF_MALLOC(cstring, 1 + escaped_len + 1 + 1);
     if(!buffer)
       return;
 
@@ -330,15 +335,16 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
     *p++='"';
     *p='\0';
 
-    fputs(buffer, handle);
+    fputs((const char*)buffer, handle);
     LIBRDF_FREE(cstring, buffer);
   }
 
   switch(librdf_node_get_type(nodes[2])) {
     case LIBRDF_NODE_TYPE_LITERAL:
       if(librdf_node_get_literal_value_language(nodes[2]))
-        rdf_serializer_rdfxml_print_xml_attribute(world, "xml:lang",
-                                                  librdf_node_get_literal_value_language(nodes[2]),
+        rdf_serializer_rdfxml_print_xml_attribute(world,
+                                                  (unsigned char*)"xml:lang",
+                                                  (unsigned char*)librdf_node_get_literal_value_language(nodes[2]),
                                                   handle);
 
       content=librdf_node_get_literal_value(nodes[2]);
@@ -346,11 +352,12 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
       if(librdf_node_get_literal_value_is_wf_xml(nodes[2])) {
         fputs(" rdf:parseType=\"Literal\">", handle);
         /* Print without escaping XML */
-        fputs(content, handle);
+        fputs((const char*)content, handle);
       } else {
         librdf_uri *duri=librdf_node_get_literal_value_datatype_uri(nodes[2]);
         if(duri)
-          rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:datatype",
+          rdf_serializer_rdfxml_print_xml_attribute(world, 
+                                                    (unsigned char*)"rdf:datatype",
                                                     librdf_uri_as_string(duri),
                                                     handle);
 
@@ -362,18 +369,20 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
       fputs("</", handle);
       fputs(nsprefix, handle);
       fputc(':', handle);
-      fputs(name, handle);
+      fputs((const char*)name, handle);
       fputc('>', handle);
       break;
     case LIBRDF_NODE_TYPE_BLANK:
-      rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:nodeID",
+      rdf_serializer_rdfxml_print_xml_attribute(world, 
+                                                (unsigned char*)"rdf:nodeID",
                                                 librdf_node_get_blank_identifier(nodes[2]), handle);
       fputs("/>", handle);
       break;
 
     case LIBRDF_NODE_TYPE_RESOURCE:
       /* must be URI */
-      rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:resource",
+      rdf_serializer_rdfxml_print_xml_attribute(world,
+                                                (unsigned char*)"rdf:resource",
                                                 uris[2], handle);
       fputs("/>", handle);
       break;
@@ -424,10 +433,10 @@ librdf_serializer_rdfxml_serialize_model(void *context,
   buffer=raptor_namespaces_format(pcontext->rdf_ns, NULL);
 
   rdf_RDF=raptor_new_qname_from_namespace_local_name(pcontext->rdf_ns,
-                                                     "RDF", NULL);
+                                                     (const unsigned char*)"RDF", NULL);
 
   fputs("<rdf:RDF ", handle);
-  fputs(buffer, handle);
+  fputs((const char*)buffer, handle);
   SYSTEM_FREE(buffer);
   fputs(">\n", handle);
 
@@ -473,6 +482,6 @@ void
 librdf_serializer_rdfxml_constructor(librdf_world *world)
 {
   librdf_serializer_register_factory(world, "rdfxml", "application/rdf+xml",
-                                     "http://www.w3.org/TR/rdf-syntax-grammar/",
+                                     (const unsigned char*)"http://www.w3.org/TR/rdf-syntax-grammar/",
                                      &librdf_serializer_rdfxml_register_factory);
 }

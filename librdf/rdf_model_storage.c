@@ -90,7 +90,7 @@ librdf_model_storage_create(librdf_model *model, librdf_storage *storage,
 static librdf_model*
 librdf_model_storage_clone(librdf_model* old_model)
 {
-  librdf_model_storage_context *old_context=old_model->context;
+  librdf_model_storage_context *old_context=(librdf_model_storage_context *)old_model->context;
   librdf_storage *new_storage;
   librdf_model *new_model;
   

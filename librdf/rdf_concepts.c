@@ -84,8 +84,8 @@ static const char* const librdf_concept_labels[LIBRDF_CONCEPT_LAST+1]={
 
 
 
-static const char * librdf_concept_ms_namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-static const char * librdf_concept_schema_namespace="http://www.w3.org/2000/01/rdf-schema#";
+static const unsigned char * librdf_concept_ms_namespace=(const unsigned char *)"http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+static const unsigned char * librdf_concept_schema_namespace=(const unsigned char *)"http://www.w3.org/2000/01/rdf-schema#";
 
 librdf_uri* librdf_concept_ms_namespace_uri = NULL;
 librdf_uri* librdf_concept_schema_namespace_uri = NULL;
@@ -111,7 +111,7 @@ librdf_init_concepts(librdf_world *world)
   for (i=0; i< LIBRDF_CONCEPT_LAST; i++) {
     librdf_uri* ns_uri=(i < LIBRDF_CONCEPT_FIRST_S_ID) ? librdf_concept_ms_namespace_uri :
       librdf_concept_schema_namespace_uri;
-    const char * token=librdf_concept_tokens[i];
+    const unsigned char * token=(const unsigned char *)librdf_concept_tokens[i];
 
     librdf_concept_resources[i]=librdf_new_node_from_uri_local_name(world, ns_uri, token);
     if(!librdf_concept_resources[i])

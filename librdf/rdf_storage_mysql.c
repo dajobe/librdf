@@ -383,7 +383,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
   id2=(unsigned long long int*)&id[8];
   
   if(type==LIBRDF_NODE_TYPE_RESOURCE) {
-    char *uri=librdf_uri_as_counted_string(librdf_node_get_uri(node), &nodelen);
+    unsigned char *uri=librdf_uri_as_counted_string(librdf_node_get_uri(node), &nodelen);
     
     /* Create digest */
     librdf_digest_update(digest, uri, nodelen);
@@ -396,7 +396,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       if(!escuri)
         return 0;
 
-      mysql_real_escape_string(&context->connection, escuri, uri, nodelen);
+      mysql_real_escape_string(&context->connection, escuri, (const char*)uri, nodelen);
       nodelen=strlen(escuri);
       
       /* Create new resource, ignore if existing */
@@ -417,18 +417,18 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       LIBRDF_FREE(cstring,escuri);
     }
   } else if(type==LIBRDF_NODE_TYPE_LITERAL) {
-    char *value=librdf_node_get_literal_value(node);
+    unsigned char *value=librdf_node_get_literal_value(node);
     char *lang=librdf_node_get_literal_value_language(node);
-    char *datatype=librdf_node_get_literal_value_datatype_uri(node)?librdf_uri_as_string(librdf_node_get_literal_value_datatype_uri(node)):0;
-    int valuelen=strlen(value);
-    int langlen=lang?strlen(lang):0;
-    int datatypelen=datatype?strlen(datatype):0;
+    unsigned char *datatype=librdf_node_get_literal_value_datatype_uri(node) ? librdf_uri_as_string(librdf_node_get_literal_value_datatype_uri(node)) : 0;
+    int valuelen=strlen((const char*)value);
+    int langlen=lang ? strlen(lang) : 0;
+    int datatypelen=datatype ? strlen((const char*)datatype) : 0;
     nodelen=valuelen+langlen+datatypelen;
     
     /* Create digest */
     librdf_digest_update(digest,value,valuelen);
     if(lang)
-      librdf_digest_update(digest,lang,langlen);
+      librdf_digest_update(digest,(unsigned char*)lang,langlen);
 
     if(datatype)
       librdf_digest_update(digest,datatype,datatypelen);
@@ -441,11 +441,11 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       char *escvalue=(char*)LIBRDF_MALLOC(cstring,valuelen*2+1);
       char *esclang=lang?(char*)LIBRDF_MALLOC(cstring,langlen*2+1):0;
       char *escdatatype=datatype?(char*)LIBRDF_MALLOC(cstring,datatypelen*2+1):0;
-      mysql_real_escape_string(&context->connection,escvalue,value,valuelen);
+      mysql_real_escape_string(&context->connection,escvalue,(const char*)value,valuelen);
       if(lang)
         mysql_real_escape_string(&context->connection,esclang,lang,langlen);
       if(datatype)
-        mysql_real_escape_string(&context->connection,escdatatype,datatype,datatypelen);
+        mysql_real_escape_string(&context->connection,escdatatype,(const char*)datatype,datatypelen);
       valuelen=strlen(escvalue);
       langlen=lang?strlen(esclang):0;
       datatypelen=datatype?strlen(escdatatype):0;
@@ -469,11 +469,11 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       LIBRDF_FREE(cstring,escdatatype);
     }
   } else if(type==LIBRDF_NODE_TYPE_BLANK) {
-    char *name=librdf_node_get_blank_identifier(node);
-    nodelen=strlen(name);
+    unsigned char *name=librdf_node_get_blank_identifier(node);
+    nodelen=strlen((const char*)name);
     
     /* Create digest */
-    librdf_digest_update(digest, name, nodelen);
+    librdf_digest_update(digest, (unsigned char*)name, nodelen);
     librdf_digest_final(digest);
     memcpy(id,librdf_digest_get_digest(digest),16);
     
@@ -483,7 +483,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       if(!escname)
         return 0;
 
-      mysql_real_escape_string(&context->connection, escname, name, nodelen);
+      mysql_real_escape_string(&context->connection, escname, (const char*)name, nodelen);
       nodelen=strlen(escname);
       
       /* Create new bnode, ignore if existing */
@@ -678,7 +678,7 @@ librdf_storage_mysql_find_statements(librdf_storage* storage,
   };
 
   if((scontext->count=mysql_num_rows(res))) {
-    scontext->stmts=LIBRDF_CALLOC(unsigned int,sizeof(unsigned int),scontext->count);
+    scontext->stmts=(unsigned int*)LIBRDF_CALLOC(unsigned int,sizeof(unsigned int),scontext->count);
     if(!scontext->stmts) {
       mysql_free_result(res);
       librdf_storage_mysql_context_serialise_finished((void*)scontext);
@@ -1059,7 +1059,7 @@ librdf_storage_mysql_context_serialise(librdf_storage* storage,
   };
 
   if((scontext->count=mysql_num_rows(res))) {
-    if(!(scontext->stmts=LIBRDF_CALLOC(unsigned int, sizeof(unsigned int),
+    if(!(scontext->stmts=(unsigned int*)LIBRDF_CALLOC(unsigned int, sizeof(unsigned int),
                                        scontext->count))) {
       mysql_free_result(res);
       librdf_storage_mysql_context_serialise_finished((void*)scontext);
@@ -1184,7 +1184,7 @@ where T.ID=%u",
   /* Subject. */
   if(!row[0] && 
      (!row[1] || 
-      !(s=row[0] ? librdf_new_node_from_uri_string(scontext->storage->world,row[0]): librdf_new_node_from_blank_identifier(scontext->storage->world, row[1]))
+      !(s=row[0] ? librdf_new_node_from_uri_string(scontext->storage->world,(const unsigned char*)row[0]): librdf_new_node_from_blank_identifier(scontext->storage->world, (const unsigned char*)row[1]))
       )
      )
     return 0;
@@ -1192,13 +1192,13 @@ where T.ID=%u",
 
   /* Predicate. */
   if(!row[2] ||
-     !(p=librdf_new_node_from_uri_string(scontext->storage->world,row[2])))
+     !(p=librdf_new_node_from_uri_string(scontext->storage->world,(const unsigned char*)row[2])))
     return 0;
   librdf_statement_set_predicate(scontext->current,p);
   
   /* Object. */
   if((!row[3] && !row[4] && !row[5]) ||
-     !(o=row[3]? librdf_new_node_from_uri_string(scontext->storage->world,row[3]): row[4]? librdf_new_node_from_blank_identifier(scontext->storage->world,row[4]): librdf_new_node_from_typed_literal(scontext->storage->world,row[5],row[6], row[7] && strlen(row[7])?librdf_new_uri(scontext->storage->world,row[7]):NULL))
+     !(o=row[3]? librdf_new_node_from_uri_string(scontext->storage->world,(const unsigned char*)row[3]): row[4]? librdf_new_node_from_blank_identifier(scontext->storage->world,(const unsigned char*)row[4]): librdf_new_node_from_typed_literal(scontext->storage->world,(const unsigned char*)row[5],row[6], row[7] && strlen(row[7])?librdf_new_uri(scontext->storage->world,(const unsigned char*)row[7]):NULL))
       )
     return 0;
   librdf_statement_set_object(scontext->current,o);
@@ -1208,7 +1208,7 @@ where T.ID=%u",
     if(scontext->current_context_node)
       librdf_free_node(scontext->current_context_node);
 
-    scontext->current_context_node=row[8]? librdf_new_node_from_uri_string(scontext->storage->world,row[8]): row[9]? librdf_new_node_from_blank_identifier(scontext->storage->world,row[9]): row[10]? librdf_new_node_from_typed_literal(scontext->storage->world,row[10],row[11], row[12] && strlen(row[12])? librdf_new_uri(scontext->storage->world,row[12]): NULL): NULL;
+    scontext->current_context_node=row[8]? librdf_new_node_from_uri_string(scontext->storage->world,(const unsigned char*)row[8]): row[9]? librdf_new_node_from_blank_identifier(scontext->storage->world,(const unsigned char*)row[9]): row[10]? librdf_new_node_from_typed_literal(scontext->storage->world,(const unsigned char*)row[10],row[11], row[12] && strlen(row[12])? librdf_new_uri(scontext->storage->world,(const unsigned char*)row[12]): NULL): NULL;
   };
 
   return 0;

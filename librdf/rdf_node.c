@@ -105,7 +105,7 @@ librdf_finish_node(librdf_world *world)
 librdf_node*
 librdf_new_node(librdf_world *world)
 {
-  return librdf_new_node_from_blank_identifier(world, (char*)NULL);
+  return librdf_new_node_from_blank_identifier(world, (unsigned char*)NULL);
 }
 
     
@@ -120,7 +120,8 @@ librdf_new_node(librdf_world *world)
  **/
 static librdf_node*
 librdf_new_node_from_uri_string_or_uri(librdf_world *world, 
-                                       const char *uri_string, librdf_uri *uri) 
+                                       const unsigned char *uri_string, 
+                                       librdf_uri *uri) 
 {
   librdf_node* new_node;
   librdf_uri *new_uri;
@@ -213,7 +214,8 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_uri_string(librdf_world *world, const char *uri_string) 
+librdf_new_node_from_uri_string(librdf_world *world, 
+                                const unsigned char *uri_string) 
 {
   return librdf_new_node_from_uri_string_or_uri(world, uri_string, NULL);
 }
@@ -246,7 +248,8 @@ librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
  **/
 librdf_node*
 librdf_new_node_from_uri_local_name(librdf_world *world, 
-                                    librdf_uri *uri, const char *local_name) 
+                                    librdf_uri *uri, 
+                                    const unsigned char *local_name) 
 {
   librdf_uri *new_uri;
   librdf_node* new_node;
@@ -274,7 +277,7 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
  **/
 librdf_node*
 librdf_new_node_from_normalised_uri_string(librdf_world *world, 
-                                           const char *uri_string,
+                                           const unsigned char *uri_string,
                                            librdf_uri *source_uri,
                                            librdf_uri *base_uri)
 {
@@ -305,7 +308,8 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
  **/
 librdf_node*
 librdf_new_node_from_literal(librdf_world *world, 
-                             const char *string, const char *xml_language, 
+                             const unsigned char *string, 
+                             const char *xml_language, 
                              int is_wf_xml) 
 {
   return librdf_new_node_from_typed_literal(world,
@@ -327,13 +331,13 @@ librdf_new_node_from_literal(librdf_world *world,
  **/
 librdf_node*
 librdf_new_node_from_typed_literal(librdf_world *world, 
-                                   const char *value,
+                                   const unsigned char *value,
                                    const char *xml_language, 
                                    librdf_uri* datatype_uri) 
 {
   librdf_node* new_node;
   int value_len;
-  char *new_value;
+  unsigned char *new_value;
   char *new_xml_language;
   librdf_hash_datum key, value_hd; /* on stack - not allocated */
   librdf_hash_datum *old_value;
@@ -354,16 +358,16 @@ librdf_new_node_from_typed_literal(librdf_world *world,
   new_node->type=LIBRDF_NODE_TYPE_LITERAL;
 
   /* the only time the string literal length should ever be measured */
-  new_node->value.literal.string_len = value_len = strlen(value);
+  new_node->value.literal.string_len = value_len = strlen((const char*)value);
   
-  new_value=(char*)LIBRDF_MALLOC(cstring, value_len + 1);
+  new_value=(unsigned char*)LIBRDF_MALLOC(cstring, value_len + 1);
   if(!new_value) {
     LIBRDF_FREE(librdf_node, new_node);
     new_node=NULL;
     goto unlock;
   }
-  strcpy(new_value, value);
-  new_node->value.literal.string=(char*)new_value;
+  strcpy((char*)new_value, (const char*)value);
+  new_node->value.literal.string=new_value;
   
   if(xml_language && *xml_language) {
     new_xml_language=(char*)LIBRDF_MALLOC(cstring, strlen(xml_language) + 1);
@@ -386,7 +390,7 @@ librdf_new_node_from_typed_literal(librdf_world *world,
 
   size=librdf_node_encode(new_node, NULL, 0);
   if(size)
-    buffer=(char*)LIBRDF_MALLOC(cstring, size);
+    buffer=(unsigned char*)LIBRDF_MALLOC(cstring, size);
   else
     buffer=NULL;
   
@@ -467,10 +471,10 @@ librdf_new_node_from_typed_literal(librdf_world *world,
  **/
 librdf_node*
 librdf_new_node_from_blank_identifier(librdf_world *world,
-                                      const char *identifier)
+                                      const unsigned char *identifier)
 {
   librdf_node* new_node;
-  char *new_identifier;
+  unsigned char *new_identifier;
   int len;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
@@ -482,14 +486,14 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   if(!identifier)
     identifier=librdf_world_get_genid(world);
 
-  len=strlen(identifier);
+  len=strlen((const char*)identifier);
   
-  new_identifier=(char*)LIBRDF_MALLOC(cstring, len+1);
+  new_identifier=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
   if(!new_identifier) {
     new_node=NULL;
     goto unlock;
   }
-  strcpy(new_identifier, identifier);
+  strcpy((char*)new_identifier, (const char*)identifier);
 
 
   key.data=new_identifier;
@@ -712,7 +716,7 @@ librdf_node_get_type_as_string(int type)
  *
  * Return value: the literal string or NULL if node is not a literal
  **/
-char*
+unsigned char*
 librdf_node_get_literal_value(librdf_node* node) 
 {
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
@@ -731,7 +735,7 @@ librdf_node_get_literal_value(librdf_node* node)
  *
  * Return value: the literal string or NULL if node is not a literal
  **/
-char*
+unsigned char*
 librdf_node_get_literal_value_as_counted_string(librdf_node* node, 
                                                 size_t *len_p) 
 {
@@ -752,13 +756,13 @@ librdf_node_get_literal_value_as_counted_string(librdf_node* node,
  *
  * Return value: the literal string or NULL if node is not a literal
  **/
-char*
+unsigned char*
 librdf_node_get_literal_value_as_latin1(librdf_node* node) 
 {
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return NULL;
-  return (char*)librdf_utf8_to_latin1((const byte*)node->value.literal.string,
-                                      node->value.literal.string_len, NULL);
+  return librdf_utf8_to_latin1((const byte*)node->value.literal.string,
+                               node->value.literal.string_len, NULL);
 }
 
 
@@ -820,16 +824,17 @@ librdf_node_get_literal_value_datatype_uri(librdf_node* node)
  **/
 int
 librdf_node_get_li_ordinal(librdf_node* node) {
-  char *uri_string;
+  unsigned char *uri_string;
   
   if(node->type != LIBRDF_NODE_TYPE_RESOURCE);
     return -1;
 
   uri_string=librdf_uri_as_string(node->value.resource.uri); 
-  if(strncmp(uri_string, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_", 44))
+  if(strncmp((const char*)uri_string,
+             (const char*)"http://www.w3.org/1999/02/22-rdf-syntax-ns#_", 44))
     return -1;
   
-  return atoi(uri_string+44);
+  return atoi((const char*)uri_string+44);
 }
 
 
@@ -839,7 +844,7 @@ librdf_node_get_li_ordinal(librdf_node* node) {
  *
  * Return value: the identifier value
  **/
-char *
+unsigned char *
 librdf_node_get_blank_identifier(librdf_node* node) {
   return node->value.blank.identifier;
 }
@@ -889,7 +894,7 @@ librdf_node_is_blank(librdf_node* node) {
  * 
  * Return value: a string value representing the node or NULL on failure
  **/
-char*
+unsigned char*
 librdf_node_to_string(librdf_node* node) 
 {
   return librdf_node_to_counted_string(node, NULL);
@@ -905,12 +910,12 @@ librdf_node_to_string(librdf_node* node)
  * 
  * Return value: a string value representing the node or NULL on failure
  **/
-char*
+unsigned char*
 librdf_node_to_counted_string(librdf_node* node, size_t* len_p) 
 {
-  char *uri_string;
+  unsigned char *uri_string;
   size_t len;
-  char *s;
+  unsigned char *s;
 
   switch(node->type) {
   case LIBRDF_NODE_TYPE_RESOURCE:
@@ -920,32 +925,32 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
     len +=2;
     if(len_p)
       *len_p=len;
-    s=(char*)LIBRDF_MALLOC(cstring, len+1);
+    s=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
     if(!s) {
       LIBRDF_FREE(cstring, uri_string);
       return NULL;
     }
-    sprintf(s, "[%s]", uri_string);
+    sprintf((char*)s, "[%s]", uri_string);
     LIBRDF_FREE(cstring, uri_string);
     break;
   case LIBRDF_NODE_TYPE_LITERAL:
     len=node->value.literal.string_len;
     if(len_p)
       *len_p=len;
-    s=(char*)LIBRDF_MALLOC(cstring, len+1);
+    s=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
     if(!s)
       return NULL;
     /* use strcpy here to add \0 to end of literal string */
-    strcpy(s, node->value.literal.string);
+    strcpy((char*)s, (const char*)node->value.literal.string);
     break;
   case LIBRDF_NODE_TYPE_BLANK:
     len=node->value.blank.identifier_len + 2;
     if(len_p)
       *len_p=len;
-    s=(char*)LIBRDF_MALLOC(cstring, len+1);
+    s=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
     if(!s)
       return NULL;
-    sprintf(s, "(%s)", node->value.blank.identifier);
+    sprintf((char*)s, "(%s)", node->value.blank.identifier);
     break;
   default:
     LIBRDF_ERROR2(node->world, librdf_node_string, 
@@ -968,7 +973,7 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
 void
 librdf_node_print(librdf_node* node, FILE *fh)
 {
-  char* s;
+  unsigned char* s;
 
   if(!node)
     return;
@@ -976,7 +981,7 @@ librdf_node_print(librdf_node* node, FILE *fh)
   s=librdf_node_to_string(node);
   if(!s)
     return;
-  fputs(s, fh);
+  fputs((const char*)s, fh);
   LIBRDF_FREE(cstring, s);
 }
 
@@ -994,7 +999,7 @@ librdf_digest*
 librdf_node_get_digest(librdf_node* node) 
 {
   librdf_digest* d=NULL;
-  char *s;
+  unsigned char *s;
   librdf_world* world=node->world;
   
   switch(node->type) {
@@ -1140,7 +1145,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
         strcpy((char*)buffer, (const char*)string);
         buffer += string_length+1;
         if(datatype_uri_length) {
-          strcpy((char*)buffer, datatype_uri_string);
+          strcpy((char*)buffer, (const char*)datatype_uri_string);
           buffer += datatype_uri_length+1;
         }
         if(language_length)
@@ -1195,10 +1200,10 @@ librdf_node_decode(librdf_world *world,
   size_t string_length;
   size_t total_length;
   size_t language_length;
-  char *datatype_uri_string=NULL;
+  unsigned char *datatype_uri_string=NULL;
   size_t datatype_uri_length;
   librdf_uri* datatype_uri=NULL;
-  char *language=NULL;
+  unsigned char *language=NULL;
   int status=0;
   librdf_node* node=NULL;
 
@@ -1216,7 +1221,7 @@ librdf_node_decode(librdf_world *world,
       string_length=(buffer[1] << 8) | buffer[2];
       total_length = 3 + string_length + 1;
       
-      node = librdf_new_node_from_uri_string(world, (const char*)buffer+3);
+      node = librdf_new_node_from_uri_string(world, buffer+3);
 
       break;
 
@@ -1236,7 +1241,7 @@ librdf_node_decode(librdf_world *world,
       }
       
       node=librdf_new_node_from_typed_literal(world,
-                                              (const char*)buffer+6,
+                                              buffer+6,
                                               (const char*)language,
                                               is_wf_xml ? LIBRDF_RS_XMLLiteral_URI : NULL);
     
@@ -1265,7 +1270,7 @@ librdf_node_decode(librdf_world *world,
         datatype_uri=librdf_new_uri(world, datatype_uri_string);
       
       node=librdf_new_node_from_typed_literal(world,
-                                              (const char*)buffer+6,
+                                              buffer+6,
                                               (const char*)language,
                                               datatype_uri);
       if(datatype_uri)
@@ -1285,7 +1290,7 @@ librdf_node_decode(librdf_world *world,
 
       total_length= 3 + string_length + 1; /* +1 for \0 at end */
       
-      node = librdf_new_node_from_blank_identifier(world, (const char*)buffer+3);
+      node = librdf_new_node_from_blank_identifier(world, buffer+3);
     
     break;
 

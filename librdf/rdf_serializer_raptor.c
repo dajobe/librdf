@@ -92,13 +92,13 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
       }
       if(dt_uri) {
         fputs("^^<", stream);
-        fputs(librdf_uri_as_string(dt_uri), stream);
+        fputs((const char*)librdf_uri_as_string(dt_uri), stream);
         fputc('>', stream);
       }
       break;
     case LIBRDF_NODE_TYPE_BLANK:
       fputs("_:", stream);
-      fputs(librdf_node_get_blank_identifier(object), stream);
+      fputs((const char*)librdf_node_get_blank_identifier(object), stream);
       break;
     default:
       /* must be URI */
@@ -155,6 +155,6 @@ void
 librdf_serializer_raptor_constructor(librdf_world *world)
 {
   librdf_serializer_register_factory(world, "ntriples", "text/plain",
-                                     "http://www.w3.org/TR/rdf-testcases/#ntriples",
+                                     (const unsigned char*)"http://www.w3.org/TR/rdf-testcases/#ntriples",
                                      &librdf_serializer_raptor_register_factory);
 }

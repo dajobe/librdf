@@ -330,8 +330,8 @@ librdf_hash_bdb_clone(librdf_hash *hash, void* context, char *new_identifier,
 
   iterator=librdf_hash_get_all(old_hcontext->hash, key, value);
   while(!librdf_iterator_end(iterator)) {
-    librdf_hash_datum* k= librdf_iterator_get_key(iterator);
-    librdf_hash_datum* v= librdf_iterator_get_value(iterator);
+    librdf_hash_datum* k= (librdf_hash_datum*)librdf_iterator_get_key(iterator);
+    librdf_hash_datum* v= (librdf_hash_datum*)librdf_iterator_get_value(iterator);
 
     if(librdf_hash_bdb_put(hcontext, k, v)) {
       status=1;

@@ -527,7 +527,7 @@ librdf_storage_list_context_remove_statement(librdf_storage* storage,
   search_sln.context=context_node;
 
   /* Remove stored statement+context */
-  sln=librdf_list_remove(context->list, &search_sln);
+  sln=(librdf_storage_list_node*)librdf_list_remove(context->list, &search_sln);
   if(!sln)
     return 1;
 
@@ -658,7 +658,7 @@ librdf_storage_list_context_serialise_get_statement(void* context, int flags)
   
   switch(flags) {
     case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
-      if(!(v=librdf_iterator_get_value(scontext->iterator)))
+      if(!(v=(librdf_hash_datum*)librdf_iterator_get_value(scontext->iterator)))
         return NULL;
 
       librdf_statement_clear(&scontext->current);

@@ -77,7 +77,7 @@ librdf_delete_parser_factories(librdf_world *world)
 void
 librdf_parser_register_factory(librdf_world *world,
                                const char *name, const char *mime_type,
-                               const char *uri_string,
+                               const unsigned char *uri_string,
 			       void (*factory) (librdf_parser_factory*))
 {
   librdf_parser_factory *parser_factory;
@@ -346,7 +346,8 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
  * Return value: &librdf_stream of statements or NULL
  **/
 librdf_stream*
-librdf_parser_parse_string_as_stream(librdf_parser* parser, const char *string,
+librdf_parser_parse_string_as_stream(librdf_parser* parser, 
+                                     const unsigned char *string,
                                      librdf_uri* base_uri) 
 {
   if(parser->factory->parse_string_as_stream)
@@ -368,7 +369,7 @@ librdf_parser_parse_string_as_stream(librdf_parser* parser, const char *string,
  **/
 int
 librdf_parser_parse_string_into_model(librdf_parser* parser, 
-                                      const char *string,
+                                      const unsigned char *string,
                                       librdf_uri* base_uri, librdf_model* model) 
 {
   if(parser->factory->parse_string_into_model)

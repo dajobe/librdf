@@ -411,7 +411,8 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
 int
 librdf_model_add_typed_literal_statement(librdf_model* model, 
                                          librdf_node* subject, 
-                                         librdf_node* predicate, char* literal,
+                                         librdf_node* predicate, 
+                                         const unsigned char* literal,
                                          char *xml_language,
                                          librdf_uri *datatype_uri)
 {
@@ -449,7 +450,8 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
 int
 librdf_model_add_string_literal_statement(librdf_model* model, 
 					  librdf_node* subject, 
-					  librdf_node* predicate, char* literal,
+					  librdf_node* predicate, 
+                                          const unsigned char* literal,
 					  char *xml_language,
                                           int is_wf_xml)
 {
@@ -1012,7 +1014,7 @@ librdf_model_query(librdf_model* model, librdf_query* query)
 librdf_stream*
 librdf_model_query_string(librdf_model* model,
                           const char *name, librdf_uri *uri,
-                          const char *query_string)
+                          const unsigned char *query_string)
 {
   librdf_query *query;
   librdf_stream *stream;

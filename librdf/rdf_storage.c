@@ -682,7 +682,7 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
       break;
       
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
-      node=librdf_stream_get_context(context->stream);
+      node=(librdf_node*)librdf_stream_get_context(context->stream);
       break;
       
     default:

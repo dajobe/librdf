@@ -81,7 +81,7 @@ struct librdf_serializer_s {
 #endif
 
 /* factory static methods */
-void librdf_serializer_register_factory(librdf_world *world, const char *name, const char *mime_type, const char *uri_string, void (*factory) (librdf_serializer_factory*));
+void librdf_serializer_register_factory(librdf_world *world, const char *name, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_serializer_factory*));
 
 librdf_serializer_factory* librdf_get_serializer_factory(librdf_world *world, const char *name, const char *mime_type, librdf_uri *type_uri);
 

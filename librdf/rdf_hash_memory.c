@@ -41,7 +41,7 @@
 struct librdf_hash_memory_node_value_s
 {
   struct librdf_hash_memory_node_value_s* next;
-  char *value;
+  void *value;
   size_t value_len;
 };
 typedef struct librdf_hash_memory_node_value_s librdf_hash_memory_node_value;
@@ -50,7 +50,7 @@ typedef struct librdf_hash_memory_node_value_s librdf_hash_memory_node_value;
 struct librdf_hash_memory_node_s
 {
   struct librdf_hash_memory_node_s* next;
-  char *key;
+  void *key;
   size_t key_len;
   u32 hash_key;
   librdf_hash_memory_node_value *values;
@@ -91,7 +91,7 @@ static const int librdf_hash_initial_capacity=8;
 
 
 /* prototypes for local functions */
-static librdf_hash_memory_node* librdf_hash_memory_find_node(librdf_hash_memory_context* hash, char *key, size_t key_len, int *bucket, librdf_hash_memory_node** prev);
+static librdf_hash_memory_node* librdf_hash_memory_find_node(librdf_hash_memory_context* hash, void *key, size_t key_len, int *bucket, librdf_hash_memory_node** prev);
 static void librdf_free_hash_memory_node(librdf_hash_memory_node* node);
 static int librdf_hash_memory_expand_size(librdf_hash_memory_context* hash);
 
@@ -137,7 +137,7 @@ static void librdf_hash_memory_register_factory(librdf_hash_factory *factory);
 
 #define ONE_AT_A_TIME_HASH(hash,str,len) \
      do { \
-        register const unsigned char *c_oneat = str+len-1; \
+        register const unsigned char *c_oneat = (unsigned char*)str+len-1; \
         register int i_oneat = len; \
         register u32 hash_oneat = 0; \
         while (i_oneat--) { \
@@ -173,7 +173,7 @@ static void librdf_hash_memory_register_factory(librdf_hash_factory *factory);
  **/
 static librdf_hash_memory_node*
 librdf_hash_memory_find_node(librdf_hash_memory_context* hash, 
-			     char *key, size_t key_len,
+			     void *key, size_t key_len,
 			     int *user_bucket,
 			     librdf_hash_memory_node** prev) 
 {
@@ -412,8 +412,8 @@ librdf_hash_memory_clone(librdf_hash *hash, void* context, char *new_identifer,
 
   iterator=librdf_hash_get_all(old_hcontext->hash, key, value);
   while(!librdf_iterator_end(iterator)) {
-    librdf_hash_datum* k= librdf_iterator_get_key(iterator);
-    librdf_hash_datum* v= librdf_iterator_get_value(iterator);
+    librdf_hash_datum* k= (librdf_hash_datum*)librdf_iterator_get_key(iterator);
+    librdf_hash_datum* v= (librdf_hash_datum*)librdf_iterator_get_value(iterator);
 
     if(librdf_hash_memory_put(hcontext, k, v)) {
       status=1;
@@ -655,8 +655,8 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
   librdf_hash_memory_node *node;
   librdf_hash_memory_node_value *vnode;
   u32 hash_key;
-  char *new_key=NULL;
-  char *new_value;
+  void *new_key=NULL;
+  void *new_value;
   int bucket= (-1);
   int is_new_node;
 
@@ -666,7 +666,7 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
   
   /* find node for key */
   node=librdf_hash_memory_find_node(hash,
-				    (char*)key->data, key->size,
+				    key->data, key->size,
 				    NULL, NULL);
 
   is_new_node=(node == NULL);
@@ -686,7 +686,7 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
     node->hash_key=hash_key;
     
     /* allocate key for new node */
-    new_key=(char*)LIBRDF_MALLOC(cstring, key->size);
+    new_key=LIBRDF_MALLOC(cstring, key->size);
     if(!new_key) {
       LIBRDF_FREE(librdf_hash_memory_node, node);
       return 1;
@@ -700,7 +700,7 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
   
   
   /* always allocate new value */
-  new_value=(char*)LIBRDF_MALLOC(cstring, value->size);
+  new_value=LIBRDF_MALLOC(cstring, value->size);
   if(!new_value) {
     if(is_new_node) {
       LIBRDF_FREE(cstring, new_key);

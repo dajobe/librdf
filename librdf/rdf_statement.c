@@ -331,15 +331,15 @@ librdf_statement_is_complete(librdf_statement *statement)
  * 
  * Return value: the string or NULL on failure.
  **/
-char *
+unsigned char *
 librdf_statement_to_string(librdf_statement *statement)
 {
-  char *subject_string, *predicate_string, *object_string;
-  char *s;
+  unsigned char *subject_string, *predicate_string, *object_string;
+  unsigned char *s;
   int statement_string_len=0;
-  char *format;
+  const char *format;
 #define NULL_STRING_LENGTH 6
-  static char *null_string="(null)";
+  static const unsigned char *null_string=(const unsigned char *)"(null)";
   size_t len;
 
   if(LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
@@ -348,7 +348,7 @@ librdf_statement_to_string(librdf_statement *statement)
       return NULL;
     statement_string_len += len;
   } else {
-    subject_string=null_string;
+    subject_string=(unsigned char*)null_string;
     statement_string_len += NULL_STRING_LENGTH;
   }
 
@@ -362,7 +362,7 @@ librdf_statement_to_string(librdf_statement *statement)
     }
     statement_string_len += len;
   } else {
-    predicate_string=null_string;
+    predicate_string=(unsigned char*)null_string;
     statement_string_len += NULL_STRING_LENGTH;
   }
   
@@ -378,7 +378,7 @@ librdf_statement_to_string(librdf_statement *statement)
     }
     statement_string_len += len;
   } else {
-    object_string=null_string;
+    object_string=(unsigned char*)null_string;
     statement_string_len += NULL_STRING_LENGTH;
   }
   
@@ -398,9 +398,9 @@ librdf_statement_to_string(librdf_statement *statement)
     format=LIBRDF_STATEMENT_FORMAT_RESOURCE_LITERAL;
   }
     
-  s=(char*)LIBRDF_MALLOC(cstring, statement_string_len+1);
+  s=(unsigned char*)LIBRDF_MALLOC(cstring, statement_string_len+1);
   if(s)
-    sprintf(s, format, subject_string, predicate_string, object_string);
+    sprintf((char*)s, format, subject_string, predicate_string, object_string);
 
   /* always free allocated intermediate strings */
   if(subject_string != null_string)
@@ -425,7 +425,7 @@ librdf_statement_to_string(librdf_statement *statement)
 void
 librdf_statement_print(librdf_statement *statement, FILE *fh) 
 {
-  char *s;
+  unsigned char *s;
 
   if(!statement)
     return;
@@ -433,7 +433,7 @@ librdf_statement_print(librdf_statement *statement, FILE *fh)
   s=librdf_statement_to_string(statement);
   if(!s)
     return;
-  fputs(s, fh);
+  fputs((const char*)s, fh);
   LIBRDF_FREE(cstring, s);
 }
 

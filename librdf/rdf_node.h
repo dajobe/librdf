@@ -69,9 +69,9 @@ struct librdf_node_s
     } resource;
     struct
     {
-      /* literals have string values ... */
-      char *string;
-      int string_len;
+      /* literals are UTF-8 string values ... */
+      unsigned char *string;
+      unsigned int string_len;
 
       /* datatype URI or null */
       librdf_uri* datatype_uri;
@@ -88,7 +88,7 @@ struct librdf_node_s
     struct 
     {
       /* blank nodes have an identifier */
-      char *identifier;
+      unsigned char *identifier;
       int identifier_len;
     } blank;
   } value;
@@ -109,25 +109,25 @@ void librdf_finish_node(librdf_world* world);
 librdf_node* librdf_new_node(librdf_world* world);
 
 /* Create a new resource Node from URI string. */
-librdf_node* librdf_new_node_from_uri_string(librdf_world* world, const char *string);
+librdf_node* librdf_new_node_from_uri_string(librdf_world* world, const unsigned char *string);
 
 /* Create a new resource Node from URI object. */
 librdf_node* librdf_new_node_from_uri(librdf_world* world, librdf_uri *uri);
 
 /* Create a new resource Node from URI object with a local_name */
-librdf_node* librdf_new_node_from_uri_local_name(librdf_world* world, librdf_uri *uri, const char *local_name);
+librdf_node* librdf_new_node_from_uri_local_name(librdf_world* world, librdf_uri *uri, const unsigned char *local_name);
 
 /* Create a new resource Node from URI string renormalised to a new base */
-librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world, const char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
+librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world, const unsigned char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
 
 /* Create a new Node from literal string / language. */
-librdf_node* librdf_new_node_from_literal(librdf_world* world, const char *string, const char *xml_language, int is_wf_xml);
+librdf_node* librdf_new_node_from_literal(librdf_world* world, const unsigned char *string, const char *xml_language, int is_wf_xml);
 
 /* Create a new Node from a typed literal string / language. */
-librdf_node* librdf_new_node_from_typed_literal(librdf_world *world, const char *string, const char *xml_language, librdf_uri* datatype_uri);
+librdf_node* librdf_new_node_from_typed_literal(librdf_world *world, const unsigned char *string, const char *xml_language, librdf_uri* datatype_uri);
 
 /* Create a new Node from blank node identifier. */
-librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world, const char *identifier);
+librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world, const unsigned char *identifier);
 
 /* Create a new Node from an existing Node - CLONE */
 librdf_node* librdf_new_node_from_node(librdf_node *node);
@@ -150,16 +150,16 @@ librdf_node_type librdf_node_get_type(librdf_node* node);
 const char* librdf_node_get_type_as_string(int type);
 #endif
 
-char* librdf_node_get_literal_value(librdf_node* node);
-char* librdf_node_get_literal_value_as_counted_string(librdf_node* node, size_t* len_p);
-char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
+unsigned char* librdf_node_get_literal_value(librdf_node* node);
+unsigned char* librdf_node_get_literal_value_as_counted_string(librdf_node* node, size_t* len_p);
+unsigned char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 librdf_uri* librdf_node_get_literal_value_datatype_uri(librdf_node* node);
 
 int librdf_node_get_li_ordinal(librdf_node* node);
 
-char *librdf_node_get_blank_identifier(librdf_node* node);
+unsigned char *librdf_node_get_blank_identifier(librdf_node* node);
 int librdf_node_is_resource(librdf_node* node);
 int librdf_node_is_literal(librdf_node* node);
 int librdf_node_is_blank(librdf_node* node);
@@ -172,8 +172,8 @@ librdf_node* librdf_node_decode(librdf_world *world, size_t* len_p, unsigned cha
 
 
 /* convert to a string */
-char *librdf_node_to_string(librdf_node* node);
-char* librdf_node_to_counted_string(librdf_node* node, size_t* len_p);
+unsigned char *librdf_node_to_string(librdf_node* node);
+unsigned char* librdf_node_to_counted_string(librdf_node* node, size_t* len_p);
 
 /* pretty print it */
 void librdf_node_print(librdf_node* node, FILE *fh);

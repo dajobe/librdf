@@ -358,10 +358,10 @@ void*
 librdf_iterator_map_remove_duplicate_nodes(void *item, void *user_data) 
 {
   librdf_node *node=(librdf_node *)item;
-  static const char *null_string="NULL";
-  char *s;
+  static const unsigned char *null_string=(const unsigned char*)"NULL";
+  unsigned char *s;
 
-  s=node ? librdf_node_to_string(node) : (char*)null_string;
+  s=node ? librdf_node_to_string(node) : (unsigned char*)null_string;
   fprintf(stderr, "librdf_iterator_remove_duplicate_nodes: node %s and user_data %p\n", s, user_data);
   if(s != null_string)
     LIBRDF_FREE(cstring, s);

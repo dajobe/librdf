@@ -51,7 +51,7 @@ struct librdf_query_factory_s {
   size_t context_length;
   
   /* create a new query */
-  int (*init)(librdf_query* query, const char *name, librdf_uri *uri, const char *query_string);
+  int (*init)(librdf_query* query, const char *name, librdf_uri *uri, const unsigned char *query_string);
   
   /* copy a query */
   /* clone is assumed to do leave the new query in the same state
@@ -91,9 +91,9 @@ void librdf_query_register_factory(const char *name, librdf_uri* uri, void (*fac
 librdf_query_factory* librdf_get_query_factory(const char *name, librdf_uri* uri);
 
 /* constructor */
-librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const char *query_string);
+librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string);
 librdf_query* librdf_new_query_from_query (librdf_query* old_query);
-librdf_query* librdf_new_query_from_factory(librdf_world* world, librdf_query_factory* factory, const char *name, librdf_uri* uri, const char* query_string);
+librdf_query* librdf_new_query_from_factory(librdf_world* world, librdf_query_factory* factory, const char *name, librdf_uri* uri, const unsigned char* query_string);
 
 /* destructor */
 void librdf_free_query(librdf_query *query);

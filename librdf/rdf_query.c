@@ -221,7 +221,7 @@ librdf_get_query_factory (const char *name, librdf_uri *uri)
 librdf_query*
 librdf_new_query (librdf_world *world,
                   const char *name, librdf_uri *uri,
-                  const char *query_string) {
+                  const unsigned char *query_string) {
   librdf_query_factory* factory;
 
   factory=librdf_get_query_factory(name, uri);
@@ -297,7 +297,7 @@ librdf_query*
 librdf_new_query_from_factory (librdf_world *world,
                                librdf_query_factory* factory,
                                const char *name, librdf_uri *uri,
-                               const char *query_string) {
+                               const unsigned char *query_string) {
   librdf_query* query;
 
   if(!factory) {

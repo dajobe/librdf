@@ -38,7 +38,7 @@ typedef struct
 
 
 /* prototypes for local functions */
-static int librdf_query_triples_init(librdf_query* query, const char *name, librdf_uri* uri, const char *query_string);
+static int librdf_query_triples_init(librdf_query* query, const char *name, librdf_uri* uri, const unsigned char *query_string);
 static int librdf_query_triples_open(librdf_query* queryl);
 static int librdf_query_triples_close(librdf_query* query);
 static librdf_stream* librdf_query_triples_run(librdf_query* query, librdf_model* mode);
@@ -56,11 +56,11 @@ static void librdf_query_triples_register_factory(librdf_query_factory *factory)
  * 
  * Return value: pointer to the character in the string or NULL
  **/
-static char *
-librdf_query_triples_find_next_term(char *string) 
+static unsigned char *
+librdf_query_triples_find_next_term(unsigned char *string) 
 {
-  char c;
-  char delim='\0';
+  unsigned char c;
+  unsigned char delim='\0';
 
   if(!string)
     return NULL;
@@ -119,19 +119,19 @@ librdf_query_triples_find_next_term(char *string)
 static int
 librdf_query_triples_init(librdf_query* query, 
                           const char *name, librdf_uri* uri,
-                          const char* query_string)
+                          const unsigned char* query_string)
 {
   librdf_query_triples_context *context=(librdf_query_triples_context*)query->context;
   int len;
-  char *query_string_copy;
-  char *cur, *p;
+  unsigned char *query_string_copy;
+  unsigned char *cur, *p;
   librdf_node *subject, *predicate, *object;
   
-  len=strlen(query_string);
-  query_string_copy=LIBRDF_MALLOC(cstring, len+1);
+  len=strlen((const char*)query_string);
+  query_string_copy=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
   if(!query_string_copy)
     return 0;
-  strcpy(query_string_copy, query_string);
+  strcpy((char*)query_string_copy, (const char*)query_string);
 
   cur=query_string_copy;
   
@@ -144,7 +144,7 @@ librdf_query_triples_init(librdf_query* query,
   }
   *p='\0';
   p++;
-  if(strcmp(cur, "-")) {
+  if(strcmp((const char*)cur, "-")) {
     /* Expecting query_string='[URI]' */
     cur++; /* Move past '[' */
     p[-2]='\0';     /* Zap ']' */
@@ -158,7 +158,7 @@ librdf_query_triples_init(librdf_query* query,
   cur=p;
   
   /* predicate - NULL or URI */
-  p=(char*)librdf_query_triples_find_next_term(cur);
+  p=(unsigned char*)librdf_query_triples_find_next_term(cur);
   if(!p) {
     librdf_error(query->world, "Bad triples query language syntax - bad predicate in '%s'", cur);
     LIBRDF_FREE(cstring, query_string_copy);
@@ -167,7 +167,7 @@ librdf_query_triples_init(librdf_query* query,
   }
   *p='\0';
   p++;
-  if(strcmp(cur, "-")) {
+  if(strcmp((const char*)cur, "-")) {
     /* Expecting cur='[URI]' */
     cur++; /* Move past '[' */
     p[-2]='\0';     /* Zap ']' */
@@ -182,7 +182,7 @@ librdf_query_triples_init(librdf_query* query,
   cur=p;
   
   /* object - NULL, literal or URI */
-  p=(char*)librdf_query_triples_find_next_term(cur);
+  p=librdf_query_triples_find_next_term(cur);
   if(!p) {
     librdf_error(query->world, "Bad triples query language syntax - bad object in '%s'", cur);
     LIBRDF_FREE(cstring, query_string_copy);
@@ -192,7 +192,7 @@ librdf_query_triples_init(librdf_query* query,
   }
   *p='\0';
   p++;
-  if(strcmp(cur, "-")) {
+  if(strcmp((const char*)cur, "-")) {
     /* Expecting cur='[URI]' or '"string"' */
     cur++; /* Move past '[' or '"' */
     p[-2]='\0';     /* Zap ']' or '"' */

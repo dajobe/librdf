@@ -77,7 +77,7 @@ librdf_delete_serializer_factories(librdf_world *world)
 void
 librdf_serializer_register_factory(librdf_world *world,
                                    const char *name, const char *mime_type,
-                                   const char *uri_string,
+                                   const unsigned char *uri_string,
                                    void (*factory) (librdf_serializer_factory*))
 {
   librdf_serializer_factory *serializer_factory;
