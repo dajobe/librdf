@@ -309,7 +309,7 @@ librdf_parser_raptor_parse_common(void *context,
     raptor_set_statement_handler(rdf_parser, scontext, 
                                  librdf_parser_raptor_new_statement_handler);
     
-    raptor_set_feature(rdf_parser, RAPTOR_FEATURE_SCANNING, 1);
+    /* raptor_set_feature(rdf_parser, RAPTOR_FEATURE_SCANNING, 1); */
 
     scontext->rdf_parser=rdf_parser;
   }
