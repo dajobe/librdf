@@ -195,7 +195,7 @@ main(int argc, char *argv[])
 
   type=commands[cmd_index].type;
   
-#ifdef NOT_TESTING_CONTEXTS
+#ifdef TESTING_CONTEXTS
   if(commands[cmd_index].write)
     if (type == CMD_PARSE_MODEL || type == CMD_PARSE_STREAM)
       storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
@@ -204,7 +204,13 @@ main(int argc, char *argv[])
   else
     storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='no',contexts='yes'");
 #else
-  storage=librdf_new_storage(world, "memory", identifier, "contexts='yes'");
+  if(commands[cmd_index].write)
+    if (type == CMD_PARSE_MODEL || type == CMD_PARSE_STREAM)
+      storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='yes',new='yes'");
+    else
+      storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='yes'");
+  else
+    storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='no'");
 #endif
 
   if(!storage) {
