@@ -91,7 +91,7 @@ AC_SUBST(LIBRDF_LIBTOOL_VERSION)
 
 # OSX Fink
 if test -d /sw/bin ; then
-  PATH=/sw/bin:$PATH
+  PATH=$PATH:/sw/bin
 fi
 
 dnl Checks for programs.
