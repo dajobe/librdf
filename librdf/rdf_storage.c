@@ -1251,25 +1251,14 @@ librdf_storage_supports_query(librdf_storage* storage, librdf_query *query)
 }
 
 
-librdf_stream*
-librdf_storage_query_as_stream(librdf_storage* storage, librdf_query *query) 
+librdf_query_results*
+librdf_storage_query_execute(librdf_storage* storage, librdf_query *query) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
 
   /* FIXME - no storage system supports querying yet */
   return NULL;
-}
-
-
-int
-librdf_storage_query_as_bindings(librdf_storage* storage, librdf_query *query) 
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
-
-  /* FIXME - no storage system supports querying yet */
-  return 1;
 }
 
 
