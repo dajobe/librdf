@@ -1,4 +1,19 @@
+2004-07-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_internal.h:
+	Switch to WWW read buffer size of 4096 (from 256 bytes!)
+
+	* raptor/raptor_general.c: Switch to read buffer size of 4096
+
 2004-07-28  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* autogen.sh, rasqal/autogen.sh, raptor/autogen.sh:
+	move 'rm's inside configure.ac loop
+
+	* rasqal/autogen.sh, raptor/autogen.sh, autogen.sh: typo
+
+	* raptor/autogen.sh, rasqal/autogen.sh, autogen.sh:
+	Ensure subdirs get config.guess, config.sub
 
 	* librdf/rdf_storage_tstore.c (librdf_storage_list_add_statement):
 	Note FIXME - cannot enforce not adding duplicate statements.
