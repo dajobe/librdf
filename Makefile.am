@@ -45,22 +45,25 @@ redland-config.in \
 redland-src-config.in \
 $(man_MANS)
 
+if MAINTAINER_MODE
 # Create some text files from HTML sources
 LYNX=lynx
-HTML_TO_TEXT=TERM=vt100 $(LYNX) -dump -nolist
+
+HTML_TO_TEXT=TERM=vt100 $(LYNX) -dump $< | sed -e 's,file://localhost.*librdf/,,' > $@
 
 SUFFIXES = .html .txt
 
 .html.txt:
-	$(HTML_TO_TEXT) $< > $@
+	$(HTML_TO_TEXT)
 
 README: README.html
-	$(HTML_TO_TEXT) $< > $@
+	$(HTML_TO_TEXT)
 
 NEWS: NEWS.html
-	$(HTML_TO_TEXT) $< > $@
+	$(HTML_TO_TEXT)
 
 TODO: TODO.html
-	$(HTML_TO_TEXT) $< > $@
+	$(HTML_TO_TEXT)
+endif
 
 @SET_MAKE@
