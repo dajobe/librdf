@@ -47,7 +47,7 @@ static librdf_statement* librdf_parser_sirpac_serialise_next_statement(void* con
 static void librdf_parser_sirpac_serialise_finished(void* context);
 
 
-/**
+/*
  * SiRPAC parser context- not used at present
  */
 typedef struct {
@@ -55,7 +55,7 @@ typedef struct {
 } librdf_parser_sirpac_context;
 
 
-/**
+/*
  * context used for the SiRPAC parser to create &librdf_stream
  * of statements from parsing the output of the java command
  */
