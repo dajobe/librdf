@@ -113,7 +113,7 @@ typedef struct {
   rapier_parser *rdf_parser;      /* source URI string (for rapier) */
   librdf_statement* next;   /* next statement */
   librdf_model *model;      /* model to store in */
-  librdf_list *statements;  /* OR list to store statements */
+  librdf_list statements;  /* OR list to store statements (STATIC) */
   librdf_uri *source_uri;   /* source URI */
   librdf_uri *base_uri;     /* base URI */
   int end_of_stream;        /* non 0 if stream finished */
@@ -171,7 +171,14 @@ librdf_parser_rapier_new_statement_handler (void *context,
                                                   scontext->base_uri);
   librdf_statement_set_subject(statement, node);
   
-  node=librdf_new_node_from_normalised_uri_string(librdf_uri_as_string((librdf_uri*)rstatement->predicate),
+  if(rstatement->predicate_type == RAPIER_PREDICATE_TYPE_ORDINAL) {
+    static char ordinal_buffer[100];
+    int ordinal=*(int*)rstatement->predicate;
+    sprintf(ordinal_buffer, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_%d", ordinal);
+    
+    node=librdf_new_node_from_uri_string(ordinal_buffer);
+  } else
+    node=librdf_new_node_from_normalised_uri_string(librdf_uri_as_string((librdf_uri*)rstatement->predicate),
                                                   scontext->source_uri,
                                                   scontext->base_uri);
   librdf_statement_set_predicate(statement, node);
@@ -201,7 +208,7 @@ librdf_parser_rapier_new_statement_handler (void *context,
     librdf_model_add_statement(scontext->model, statement);
     librdf_free_statement(statement);
   } else {
-    librdf_list_add(scontext->statements, statement);
+    librdf_list_add(&scontext->statements, statement);
   }
 }
 
@@ -335,7 +342,7 @@ librdf_parser_rapier_parse_common(void *context,
 static librdf_statement*
 librdf_parser_rapier_get_next_statement(librdf_parser_rapier_stream_context *context)
 {
-  context->next=(librdf_statement*)librdf_list_pop(context->statements);
+  context->next=(librdf_statement*)librdf_list_pop(&context->statements);
 
   if(!context->next)
     context->end_of_stream=1;
@@ -418,16 +425,15 @@ librdf_parser_rapier_serialise_finished(void* context)
   librdf_parser_rapier_context* pcontext=scontext->pcontext;
 
   if(scontext) {
+    librdf_statement* statement;
 
     if(scontext->rdf_parser)
       rapier_free(scontext->rdf_parser);
 
-    if(scontext->statements) {
-      librdf_statement* statement;
-      while((statement=(librdf_statement*)librdf_list_pop(scontext->statements)))
-        librdf_free_statement(statement);
-      librdf_free_list(scontext->statements);
-    }
+    /* Empty static list of any remaining things */
+    while((statement=(librdf_statement*)librdf_list_pop(&scontext->statements)))
+      librdf_free_statement(statement);
+    librdf_list_clear(&scontext->statements);
 
     if(scontext->next)
       librdf_free_statement(scontext->next);
