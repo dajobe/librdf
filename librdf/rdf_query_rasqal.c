@@ -510,6 +510,13 @@ librdf_query_rasqal_execute(librdf_query* query, librdf_model* model)
                           (raptor_uri*)context->uri))
     return NULL;
 
+  if(rasqal_version_decimal < 904) { 
+    /* FIXME: Remove this when Rasqal 0.9.4 is out */
+    /* This ensures query->sources is not NULL but contains no sources */
+    rasqal_query_add_source(context->rq, NULL);
+    raptor_sequence_unshift(rasqal_query_get_source_sequence(context->rq));
+  }
+
   context->results=rasqal_query_execute(context->rq);
   
   results=(librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, sizeof(librdf_query_results));
