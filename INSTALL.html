@@ -295,10 +295,22 @@ by setting this option to <em>no</em>.</p></dd>
 <dt><code>--with-raptor=</code> <code>system</code> or <code>internal</code><br /></dt>
 <dd><p>
 This option tells redland to use either the system installed version
-of raptor or the internal version.  If the option is omittted,
+of <a href="http://www.redland.opensource.ac.uk/raptor/">raptor</a>
+or the internal version.  If the option is omittted,
 redland will guess and choose either the system one, if new enough or
 the internal one (always present).  If <code>--with-raptor=system</code>
 is used and redland discovers that the system raptor is too old,
+a warning will be given but the configuration will continue.
+</p></dd>
+
+<dt><code>--with-rasqal=</code> <code>system</code> or <code>internal</code><br /></dt>
+<dd><p>
+This option tells redland to use either the system installed version
+of <a href="http://www.redland.opensource.ac.uk/rasqal/">rasqal</a>
+or the internal version.  If the option is omittted,
+redland will guess and choose either the system one, if new enough or
+the internal one (always present).  If <code>--with-rasqal=system</code>
+is used and redland discovers that the system rasqal is too old,
 a warning will be given but the configuration will continue.
 </p></dd>
 
