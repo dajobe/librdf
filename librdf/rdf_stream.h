@@ -115,6 +115,8 @@ librdf_statement* librdf_stream_next(librdf_stream* stream);
 
 void librdf_stream_set_map(librdf_stream* stream, librdf_statement* (*map)(void* context, librdf_statement* statement), void* map_context);
 
+librdf_stream* librdf_new_stream_from_node_iterator(librdf_iterator* iterator, librdf_statement* statement, unsigned int field);
+
 
 #ifdef __cplusplus
 }
