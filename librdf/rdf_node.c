@@ -407,12 +407,13 @@ librdf_node_set_type(librdf_node* node, librdf_node_type type)
 }
 
 
+#ifdef LIBRDF_DEBUG
 /* FIXME: For debugging purposes only */
 static const char* const librdf_node_type_names[] =
 {"Unknown", "Resource", "Literal", "Statement", "Bag", "Seq", "Alt", "Li", "Model"};
 
 
-/**
+/*
  * librdf_node_get_type_as_string - Get a string representation for the type of the node
  * @type: the node type 
  * 
@@ -427,6 +428,7 @@ librdf_node_get_type_as_string(int type)
     return NULL;
   return librdf_node_type_names[type];
 }
+#endif
 
 
 
