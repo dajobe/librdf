@@ -802,6 +802,8 @@ librdf_query_rasqal_query_results_update_statement(void* context)
   librdf_node* node;
   
   raptor_statement *rstatement=rasqal_query_results_get_triple(scontext->qcontext->results);
+  if(!rstatement)
+    return 1;
   
   scontext->statement=librdf_new_statement(world);
   if(!scontext->statement)
@@ -960,7 +962,10 @@ librdf_query_rasqal_results_as_stream(librdf_query_results* query_results) {
   scontext->query=query;
   scontext->qcontext=context;
 
-  librdf_query_rasqal_query_results_update_statement(scontext);
+  if(librdf_query_rasqal_query_results_update_statement(scontext)) {
+    librdf_query_rasqal_query_results_finished((void*)scontext);
+    return NULL;
+  }
   
   stream=librdf_new_stream(query->world,
                            (void*)scontext,
