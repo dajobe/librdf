@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_storage_list.c - RDF Storage List Interface Implementation
+ * rdf_storage_list.c - RDF Storage in memory as a list implementation
  *
  * $Id$
  *
