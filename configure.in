@@ -64,10 +64,35 @@ AC_PROG_RANLIB
 AC_CHECK_PROGS(TAR, gnutar gtar tar)
 
 AC_CHECK_PROGS(JAVA, java jre)
+AC_CHECK_PROGS(JAVAC, javac)
 AC_DEFINE_UNQUOTED(JAVA_COMMAND, "$JAVA")
-AC_CHECK_PROGS(PYTHON, python2.0 python1.5 python)
+AC_CHECK_PROGS(PYTHON, python2.0 python2 python)
 AC_CHECK_PROGS(PERL, perl5.6.0 perl5 perl)
 AC_CHECK_PROGS(TCL, tcl)
+AC_CHECK_PROGS(SWIG, swig)
+
+
+SWIG_MIN_VERSION=1.3.6
+
+AC_MSG_CHECKING(SWIG support)
+if test "X$SWIG" != "X"; then
+  SWIG_VERSION=`$SWIG -version 2>&1 |sed -ne 's/^SWIG Version //p'`
+  SWIG_VERSION_DEC=`echo $SWIG_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  SWIG_MIN_VERSION_DEC=`echo $SWIG_MIN_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+
+  if test $SWIG_VERSION_DEC -ge $SWIG_MIN_VERSION_DEC; then
+    AC_MSG_RESULT($SWIG_VERSION - OK for Java)
+  else
+    AC_MSG_RESULT($SWIG_VERSION - no Java support present)
+    AC_MSG_WARN(SWIG is present but this version has no Java support)
+    AC_MSG_WARN(If you want to change the interface you will need at least)
+    AC_MSG_WARN(version $SWIG_MIN_VERSION from http://www.swig.org/)
+    AC_MSG_WARN(Alternatively you can use the pre-generated interface files)
+  fi
+else
+  AC_MSG_RESULT(not present - using pre-generated interface files)
+fi
+
 
 AC_CHECK_PROG(LIBWWW_CONFIG, libwww-config, libwww-config)
 
