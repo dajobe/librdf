@@ -132,6 +132,28 @@ librdf_list_remove(librdf_list* list, void *data)
 }
 
 
+void*
+librdf_list_pop(librdf_list* list)
+{
+  librdf_list_node *node;
+  void *data;
+
+  node=list->first;
+  if(!node)
+    return NULL;
+     
+  list->first=node->next;
+  /* save data */
+  data=node->data;
+
+  /* free node */
+  LIBRDF_FREE(librdf_list_node, node);
+
+  list->length--;
+  return data;
+}
+
+
 int
 librdf_list_contains(librdf_list* list, void *data) 
 {
