@@ -114,6 +114,8 @@ typedef struct librdf_hash_memory_node_s librdf_hash_memory_node;
 
 typedef struct
 {
+  /* the hash object */
+  librdf_hash* hash;
   /* An array pointing to a list of nodes (buckets) */
   librdf_hash_memory_node** nodes;
   /* this many buckets used */
@@ -158,8 +160,11 @@ static void librdf_hash_memory_cursor_finish(void* context);
 
 /* functions implementing the API */
 
+static int librdf_hash_memory_create(librdf_hash* new_hash, void* context);
+static int librdf_hash_memory_destroy(void* context);
 static int librdf_hash_memory_open(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 static int librdf_hash_memory_close(void* context);
+static int librdf_hash_memory_clone(librdf_hash* new_hash, void *new_context, char *new_identifier, void* old_context);
 static int librdf_hash_memory_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 static int librdf_hash_memory_exists(void* context, librdf_hash_datum *key);
 static int librdf_hash_memory_delete(void* context, librdf_hash_datum *key);
@@ -316,8 +321,61 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
 /* functions implementing hash api */
 
 /**
- * librdf_hash_memory_open - Open a new memory hash
+ * librdf_hash_memory_create - Create a new memory hash
+ * @hash: &librdf_hash hash
  * @context: memory hash contxt
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_hash_memory_create(librdf_hash* hash, void* context) 
+{
+  librdf_hash_memory_context* hcontext=(librdf_hash_memory_context*)context;
+
+  hcontext->hash=hash;
+  hcontext->load_factor=librdf_hash_default_load_factor;
+  return librdf_hash_memory_expand_size(hcontext);
+}
+
+
+/**
+ * librdf_hash_memory_destroy - Destroy a memory hash
+ * @context: memory hash context
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_hash_memory_destroy(void* context) 
+{
+  librdf_hash_memory_context* hcontext=(librdf_hash_memory_context*)context;
+
+  if(hcontext->nodes) {
+    int i;
+  
+    for(i=0; i<hcontext->capacity; i++) {
+      librdf_hash_memory_node *node=hcontext->nodes[i];
+      
+      /* this entry is used */
+      if(node) {
+	librdf_hash_memory_node *next;
+	/* free all attached nodes */
+	while(node) {
+	  next=node->next;
+	  librdf_free_hash_memory_node(node);
+	  node=next;
+	}
+      }
+    }
+    LIBRDF_FREE(librdf_hash_memory_nodes, hcontext->nodes);
+  }
+
+  return 0;
+}
+
+
+/**
+ * librdf_hash_memory_open - Open memory hash with given parameters
+ * @context: memory hash context
  * @identifier: identifier - not used
  * @mode: access mode - not used
  * @is_writable: is hash writable? - not used
@@ -331,10 +389,8 @@ librdf_hash_memory_open(void* context, char *identifier,
                         int mode, int is_writable, int is_new,
                         librdf_hash* options) 
 {
-  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
-
-  hash->load_factor=librdf_hash_default_load_factor;
-  return librdf_hash_memory_expand_size(hash);
+  /* NOP */
+  return 0;
 }
 
 
@@ -347,29 +403,53 @@ librdf_hash_memory_open(void* context, char *identifier,
 static int
 librdf_hash_memory_close(void* context) 
 {
-  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
-
-  if(hash->nodes) {
-    int i;
-  
-    for(i=0; i<hash->capacity; i++) {
-      librdf_hash_memory_node *node=hash->nodes[i];
-      
-      /* this entry is used */
-      if(node) {
-	librdf_hash_memory_node *next;
-	/* free all attached nodes */
-	while(node) {
-	  next=node->next;
-	  librdf_free_hash_memory_node(node);
-	  node=next;
-	}
-      }
-    }
-    LIBRDF_FREE(librdf_hash_memory_nodes, hash->nodes);
-  }
+  /* NOP */
   return 0;
 }
+
+
+static int
+librdf_hash_memory_clone(librdf_hash *hash, void* context, char *new_identifer,
+                         void *old_context) 
+{
+  librdf_hash_memory_context* hcontext=(librdf_hash_memory_context*)context;
+  librdf_hash_memory_context* old_hcontext=(librdf_hash_memory_context*)old_context;
+  librdf_hash_datum *key, *value;
+  librdf_iterator *iterator;
+  int status=0;
+  
+  /* copy data fields that might change */
+  hcontext->hash=hash;
+  hcontext->load_factor=old_hcontext->load_factor;
+
+  /* Don't need to deal with new_identifier - not used for memory hashes */
+
+  /* Use higher level functions to iterator this data
+   * on the other hand, maybe this is a good idea since that
+   * code is tested and works
+   */
+
+  key=librdf_new_hash_datum(NULL, 0);
+  value=librdf_new_hash_datum(NULL, 0);
+
+  iterator=librdf_hash_get_all(old_hcontext->hash, key, value);
+  while(librdf_iterator_have_elements(iterator)) {
+    librdf_iterator_get_next(iterator);
+
+    if(librdf_hash_memory_put(hcontext, key, value)) {
+      status=1;
+      break;
+    }
+  }
+  if(iterator)
+    librdf_free_iterator(iterator);
+
+  librdf_free_hash_datum(value);
+  librdf_free_hash_datum(key);
+
+  return status;
+}
+
 
 
 typedef struct {
@@ -810,8 +890,13 @@ librdf_hash_memory_register_factory(librdf_hash_factory *factory)
   factory->context_length = sizeof(librdf_hash_memory_context);
   factory->cursor_context_length = sizeof(librdf_hash_memory_cursor_context);
   
+  factory->create  = librdf_hash_memory_create;
+  factory->destroy = librdf_hash_memory_destroy;
+
   factory->open    = librdf_hash_memory_open;
   factory->close   = librdf_hash_memory_close;
+  factory->clone   = librdf_hash_memory_clone;
+
   factory->put     = librdf_hash_memory_put;
   factory->exists  = librdf_hash_memory_exists;
   factory->delete_key  = librdf_hash_memory_delete;
