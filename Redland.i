@@ -253,7 +253,6 @@ librdf_call_perl_message(int type, const char *message, va_list arguments)
   int len;
   va_list args_copy;
   
-  ENTER;
   SAVETMPS;
 
   /* ask vsnprintf size of buffer required */
@@ -279,7 +278,6 @@ librdf_call_perl_message(int type, const char *message, va_list arguments)
   }
   
   FREETMPS;
-  LEAVE;
 }
 
 static void
@@ -383,6 +381,8 @@ typedef struct librdf_parser_s librdf_parser;
 typedef struct librdf_serializer_s librdf_serializer;
 
 /* rdf_init.h */
+%newobject librdf_new_world;
+
 librdf_world* librdf_new_world(void);
 void librdf_free_world(librdf_world *world);
 void librdf_world_open(librdf_world *world);
@@ -395,6 +395,10 @@ librdf_node* librdf_iterator_get_context(librdf_iterator* iterator);
 int librdf_iterator_next(librdf_iterator* iterator);
 
 /* rdf_uri.h */
+%newobject librdf_new_uri;
+%newobject librdf_new_uri_from_uri;
+%newobject librdf_new_uri_from_filenam;
+
 librdf_uri* librdf_new_uri (librdf_world *world, char *string);
 librdf_uri* librdf_new_uri_from_uri (librdf_uri* uri);
 librdf_uri* librdf_new_uri_from_filename(librdf_world* world, const char *filename);
@@ -404,6 +408,14 @@ char* librdf_uri_to_string (librdf_uri* uri);
 int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
 
 /* rdf_node.h */
+%newobject librdf_new_node;
+%newobject librdf_new_node_from_uri_string;
+%newobject librdf_new_node_from_uri;
+%newobject librdf_new_node_from_literal;
+%newobject librdf_new_node_from_typed_literal;
+%newobject librdf_new_node_from_node;
+%newobject librdf_new_node_from_blank_identifier;
+
 librdf_node* librdf_new_node(librdf_world *world);
 librdf_node* librdf_new_node_from_uri_string(librdf_world *world, const char *string);
 librdf_node* librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri);
@@ -432,6 +444,10 @@ int librdf_node_equals(librdf_node* first_node, librdf_node* second_node);
 
 
 /* rdf_statement.h */
+%newobject librdf_new_statement;
+%newobject librdf_new_statement_from_statement;
+%newobject librdf_new_statement_from_nodes;
+
 librdf_statement* librdf_new_statement(librdf_world *world);
 librdf_statement* librdf_new_statement_from_statement(librdf_statement* statement);
 librdf_statement* librdf_new_statement_from_nodes(librdf_world *world, librdf_node* subject, librdf_node* predicate, librdf_node* object);
@@ -449,6 +465,10 @@ void librdf_statement_set_object(librdf_statement *statement, librdf_node *objec
 char *librdf_statement_to_string(librdf_statement *statement);
 
 /* rdf_model.h */
+%newobject librdf_new_model;
+%newobject librdf_new_model_with_options;
+%newobject librdf_new_model_from_model;
+
 librdf_model* librdf_new_model(librdf_world *world, librdf_storage *storage, char* options_string);
 librdf_model* librdf_new_model_with_options(librdf_world *world, librdf_storage *storage, librdf_hash* options);
 librdf_model* librdf_new_model_from_model(librdf_model* model);
@@ -460,41 +480,62 @@ int librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 int librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream);
 int librdf_model_remove_statement(librdf_model* model, librdf_statement* statement);
 int librdf_model_contains_statement(librdf_model* model, librdf_statement* statement);
+%newobject librdf_model_as_stream;
 librdf_stream* librdf_model_as_stream(librdf_model* model);
+%newobject librdf_model_find_statements;
 librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
+%newobject librdf_model_find_statements_in_context;
 librdf_stream* librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* statement, librdf_node* context_node);
+%newobject librdf_model_get_sources;
 librdf_iterator* librdf_model_get_sources(librdf_model *model, librdf_node *arc, librdf_node *target);
+%newobject librdf_model_get_arcs;
 librdf_iterator* librdf_model_get_arcs(librdf_model *model, librdf_node *source, librdf_node *target);
+%newobject librdf_model_get_targets;
 librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *source, librdf_node *arc);
+%newobject librdf_model_get_source;
 librdf_node* librdf_model_get_source(librdf_model *model, librdf_node *arc, librdf_node *target);
+%newobject librdf_model_get_arc;
 librdf_node* librdf_model_get_arc(librdf_model *model, librdf_node *source, librdf_node *target);
+%newobject librdf_model_get_target;
 librdf_node* librdf_model_get_target(librdf_model *model, librdf_node *source, librdf_node *arc);
 int librdf_model_context_add_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
 int librdf_model_context_add_statements(librdf_model* model, librdf_node* context, librdf_stream* stream);
 int librdf_model_context_remove_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
 int librdf_model_context_remove_statements(librdf_model* model, librdf_node* context);
+%newobject librdf_model_context_as_stream;
 librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* context);
 void librdf_model_sync(librdf_model* model);
+%newobject librdf_model_get_contexts;
 librdf_iterator* librdf_model_get_contexts(librdf_model* model);
 librdf_node* librdf_model_get_feature(librdf_model* model, librdf_uri* feature);
 int librdf_model_set_feature(librdf_model* model, librdf_uri* feature, librdf_node* value);
 
 /* rdf_storage.h */
+%newobject librdf_new_storage;
+%newobject librdf_new_storage_from_storage;
+
 librdf_storage* librdf_new_storage(librdf_world *world, char *storage_name, char *name, char *options_string);
 librdf_storage* librdf_new_storage_from_storage (librdf_storage* old_storage);
 void librdf_free_storage(librdf_storage *storage);
 
 /* rdf_parser.h */
+%newobject librdf_new_parser;
+
 librdf_parser* librdf_new_parser(librdf_world *world, const char *name, const char *mime_type, librdf_uri *type_uri);
 void librdf_free_parser(librdf_parser *parser);
+
+%newobject librdf_parser_parse_as_stream;
 librdf_stream* librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri);
 int librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri, librdf_model* model);
+%newobject librdf_parser_parse_string_as_stream;
 librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const char *string, librdf_uri* base_uri);
 int librdf_parser_parse_string_into_model(librdf_parser* parser, const char *string, librdf_uri* base_uri, librdf_model* model);
 librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
 int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, librdf_node* value);
 
 /* rdf_serializer.h */
+%newobject librdf_new_serializer;
+
 librdf_serializer* librdf_new_serializer(librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri);
 void librdf_free_serializer(librdf_serializer *serializer);
 int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer, const char *name, librdf_uri* base_uri, librdf_model* model);
