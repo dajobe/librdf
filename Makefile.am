@@ -244,12 +244,6 @@ TODO: TODO.html
 # The action is the COMPILE definition but always using least warning CFLAGS
 @MAINT@rdf_parser_libwww.o: rdf_parser_libwww.c
 @MAINT@	$(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(STANDARD_CFLAGS) -c $<
-@MAINT@
-@MAINT@PrintParser.class: PrintParser.java
-@MAINT@	javac -classpath .:$(RDF_JAVA_API_JAR) $<
-@MAINT@
-@MAINT@PrintConsumer.class: PrintConsumer.java
-@MAINT@	javac -classpath .:$(RDF_JAVA_API_JAR) $<
 
 @SET_MAKE@
 
