@@ -113,7 +113,32 @@ re-configure the system carefully by tidying up as follows:</p>
   ./configure ... # any configure arguments here
 </pre>
 
+<p>If the BerkeleyDB is installed in different places from
+<em>ROOT</em><tt>/lib</tt> (library) and
+<em>ROOT</em><tt>/include</tt> (header) or
+the library name is something that can't be worked out automatically,
+then you can use the following options to specify them.</p>
+
 </dd>
+
+<dt><tt>--with-bdb-lib=</tt><em>LIBDIR</em><br /></dt>
+<dt><tt>--with-bdb-include=</tt><em>INCDIR</em><br /></dt>
+<dt><tt>--with-bdb-name=</tt><em>NAME</em><br /></dt>
+<dd><p>Use Berkeley DB with the installed library in <em>LIBDIR</em>
+and the <tt>db.h</tt> header in <em>INCDIR</em> and
+the installed library called <em>NAME</em>
+like <tt>-l</tt><em>NAME</em>.  This is relative to <em>LIBDIR</em>.
+All of these options can be omitted and <tt>configure</tt> will
+try to find or guess the values from the system.</p>
+
+<p>For example, to compile redland on OSX with <a href="http://fink.sourceforge.net/">fink</a> required a configure line something like this:</p>
+<pre>
+  ./configure  --with-bdb-lib=/sw/lib --with-bdb-include=/sw/include/db3
+</pre>
+<p>The name of the BDB library was correctly discovered for this
+configuration, as <tt>db-3.3</tt></p>
+</dd>
+
 
 <dt><tt>--with-libwww</tt><br /></dt>
 <dd><p>Enable use of the W3C <a href="http://www.w3.org/Library/">libwww</a>,
