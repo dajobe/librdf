@@ -113,7 +113,12 @@ typedef struct
   int contexts_index;
 
   int all_statements_hash_index;
-  
+
+  /* growing buffers used to en/decode keys/values */
+  unsigned char *key_buffer;
+  size_t key_buffer_len;
+  unsigned char *value_buffer;
+  size_t value_buffer_len;
 } librdf_storage_hashes_context;
 
 
@@ -406,6 +411,11 @@ librdf_storage_hashes_terminate(librdf_storage* storage)
   if(context->indexes)
     LIBRDF_FREE(cstring, context->indexes);
 
+  if(context->key_buffer)
+    LIBRDF_FREE(data, context->key_buffer);
+  if(context->value_buffer)
+    LIBRDF_FREE(data, context->value_buffer);
+
 }
 
 
@@ -510,6 +520,23 @@ librdf_storage_hashes_size(librdf_storage* storage)
 
 
 static int
+librdf_storage_hashes_grow_buffer(unsigned char **buffer, size_t *len,
+                                  size_t required_len) 
+{
+  if(required_len <= *len)
+    return 0;
+
+  if(*buffer)
+    LIBRDF_FREE(data, *buffer);
+  *len=required_len+8;
+  *buffer=(unsigned char*)LIBRDF_MALLOC(data, *len);
+  if(!*buffer)
+    *len=0;
+  return (*len >= required_len);
+}
+
+
+static int
 librdf_storage_hashes_add_remove_statement(librdf_storage* storage, 
                                            librdf_statement* statement,
                                            librdf_node* context_node,
@@ -530,7 +557,6 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
 
   for(i=0; i<context->hash_count; i++) {
     librdf_hash_datum hd_key, hd_value; /* on stack */
-    unsigned char *key_buffer, *value_buffer;
     int key_len, value_len;
 
     /* ENCODE KEY */
@@ -542,14 +568,15 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     key_len=librdf_statement_encode_parts(statement, NULL, NULL, 0, fields);
     if(!key_len)
       return 1;
-    if(!(key_buffer=(unsigned char*)LIBRDF_MALLOC(data, key_len))) {
+    if(librdf_storage_hashes_grow_buffer(&context->key_buffer, 
+                                         &context->key_buffer_len, key_len)) {
       status=1;
       break;
     }
        
     if(!librdf_statement_encode_parts(statement, NULL,
-                                      key_buffer, key_len, fields)) {
-      LIBRDF_FREE(data, key_buffer);
+                                      context->key_buffer,
+                                      context->key_buffer_len, fields)) {
       status=1;
       break;
     }
@@ -564,22 +591,19 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     value_len=librdf_statement_encode_parts(statement, context_node,
                                             NULL, 0, fields);
     if(!value_len) {
-      LIBRDF_FREE(data, key_buffer);
       status=1;
       break;
     }
     
-    if(!(value_buffer=(unsigned char*)LIBRDF_MALLOC(data, value_len))) {
-      LIBRDF_FREE(data, key_buffer);
+    if(librdf_storage_hashes_grow_buffer(&context->value_buffer, 
+                                         &context->value_buffer_len, value_len)) {
       status=1;
       break;
     }
-
        
     if(!librdf_statement_encode_parts(statement, context_node,
-                                      value_buffer, value_len, fields)) {
-      LIBRDF_FREE(data, key_buffer);
-      LIBRDF_FREE(data, value_buffer);
+                                      context->value_buffer,
+                                      context->value_buffer_len, fields)) {
       status=1;
       break;
     }
@@ -590,17 +614,14 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
 #endif
 
     /* Finally, store / remove the sucker */
-    hd_key.data=key_buffer; hd_key.size=key_len;
-    hd_value.data=value_buffer; hd_value.size=value_len;
+    hd_key.data=context->key_buffer; hd_key.size=context->key_buffer_len;
+    hd_value.data=context->value_buffer; hd_value.size=context->value_buffer_len;
     
     if(is_addition)
       status=librdf_hash_put(context->hashes[i], &hd_key, &hd_value);
     else
       status=librdf_hash_delete(context->hashes[i], &hd_key, &hd_value);
     
-    LIBRDF_FREE(data, key_buffer);
-    LIBRDF_FREE(data, value_buffer);
-
     if(status)
       break;
   }
