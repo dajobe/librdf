@@ -154,6 +154,15 @@ librdf_serializer_rdfxml_raptor_error_handler(void *data, const char *message, .
   va_list arguments;
   char *buffer;
   
+  /* FIXME - this is a workaround to a bug in 
+   * raptor_xml_escape_string (raptor up to 1.3.3)
+   * where error_handler is called as:
+   *   error_handler(error_data, NULL, "Bad UTF-8 encoding.");
+   *
+   */
+  if(!message)
+    message="%s";
+  
   va_start(arguments, message);
 
   buffer=raptor_vsnprintf(message, arguments);
@@ -434,7 +443,7 @@ librdf_serializer_rdfxml_serialize_model(void *context,
 
   fputs("<rdf:RDF ", handle);
   fputs((const char*)buffer, handle);
-  SYSTEM_FREE(buffer);
+  raptor_free_memory(buffer);
   fputs(">\n", handle);
 
   while(!librdf_stream_end(stream)) {
