@@ -1,6 +1,6 @@
 2004-08-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
-	* Snapshotted redland_0_9_17 for 0.9.17 release
+	* Snapshotted redland_0_9_18 for 0.9.18 release
 
 	* librdf/rdf_statement.h, librdf/rdf_statement.c:
 	Revert statement usage counting.
