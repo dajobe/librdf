@@ -1,54 +1,62 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-  <TITLE>librdf - Installation instructions</TITLE>
-</HEAD>
-<BODY BGCOLOR="#ffffff" TEXT="#000085">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "blah">
+<html>
+<head>
+  <title>librdf - Installation instructions</title>
+</head>
+<body bgcolor="#ffffff" text="#000085">
 
-<H1 ALIGN="CENTER">librdf - Installation instructions</H1>
+<h1 align="center">librdf - Installation instructions</h1>
 
-<H2>Getting the sources</H2>
 
-<H3>1. From CVS</H3>
+<h2>Getting the sources</h2>
+
+
+<h3>1. From CVS</h3>
   
-<P>(if you have access to it - ILRT private at present)
-<PRE>
+<p>(if you have access to it - ILRT private at present)</p>
+<pre>
     export CVSROOT=:pserver:LOGIN@cvs.desire.org:/usr/local/cvsroot
     export CVS_RSH=ssh
     cvs login
     ...
     cvs checkout librdf
-</PRE>
-where <B>LOGIN</B> is your login on the CVS server.
+</pre>
+where <b>LOGIN</b> is your login on the CVS server.
 
-<P>You will probably then need to create the automake and autoconf
-derived files, as described below.
+<p>You will probably then need to create the automake and autoconf
+derived files, as described below.</p>
 
-<H3>2. From releases</H3>
 
-<P>See
-<A HREF="http://FIXME-url-needed-here/">http://FIXME-url-needed-here/</A>
+<h3>2. From releases</h3>
 
-<H2>Configuring the package</H2>
+<p>See
+<a href="http://FIXME-url-needed-here/">http://FIXME-url-needed-here/</a></p>
 
-<P>If there is no <TT>configure</TT> program, you can create it with:
-<PRE>
+
+<h2>Configuring the package</h2>
+
+<p>If there is no <TT>configure</TT> program, you can create it with:</p>
+<pre>
   automake --add-missing; aclocal; autoheader; autoconf
-</PRE>
+</pre>
 
-<H2>Building</H2>
-<P>See also the generic GNU installation instructions in 
-<A HREF="INSTALL">INSTALL</A>
-<PRE>
+
+<h2>Building</h2>
+
+<p>See also the generic GNU installation instructions in 
+<a href="INSTALL">INSTALL</a></p>
+<pre>
    ./configure
    make
-</PRE>
+</pre>
 
-<H2>Testing</H2>
-<P>Build and run the built in tests with:
-<PRE>
+
+<h2>Testing</h2>
+
+<p>Build and run the built in tests with:</p>
+<pre>
     make check
-</PRE>
+</pre>
 
-</BODY>
-</HTML>
+</body>
+</html>
