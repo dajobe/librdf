@@ -93,7 +93,7 @@ main(int argc, char *argv[])
   
   librdf_init_world(NULL, NULL);
 
-  model=librdf_new_model(storage=librdf_new_storage("hashes", "test", "hash_type='bdb',dir='.'"), NULL);
+  model=librdf_new_model(storage=librdf_new_storage("hashes", "test", "hash-type='bdb',dir='.'"), NULL);
 
   librdf_model_add_statement(model, 
                              librdf_new_statement_from_nodes(librdf_new_node_from_uri_string("http://purl.org/net/dajobe/"),
