@@ -10,15 +10,108 @@
 
 <h2>Redland Java interface</h2>
 
-<p>Sorry, there is no Java interface at present since
-I rely on <a href="http://www.swig.org/">SWIG</a> and
-the latest version I have (1.3a5) doesn't handle Java.</p>
+<p>The Java interface is new at 2001-08-22 and is likely to change a
+lot if the current date is close to that.</p>
 
-<p>For the moment you might want to try the references below for Java
-RDF interfaces and applications.</p>
+<p>This is not automatically built or installed at present since this
+interface may not be required.  You can easily build it by hand as
+follows</p>
 
-<h2>RDF Java APIs and applications</h2>
 
+<pre>
+  cd java
+  make build-java
+  make test-java   # optional
+  # might need to run the test code like this:
+  LD_LIBRARY_PATH=. java -classpath . test
+</pre>
+
+
+<p>To install it system wide (this is optional) do this as <em>root</em>:</p>
+
+<pre>
+  root# make install-java
+</pre>
+
+<p>The Redland Java interface has been tested with J2SDK 1.3.1 on Linux
+only.  It will need customising for different operating systems since
+the shared library creation has been hard-coded for Linux at present.</p>
+
+<h2>Testing the Redland Java interface</h2>
+
+<p>There is the beginnings of an example program in <a href="../java/example.java">example.java</a> which is mostly for reading but can be compiled
+and run with:</p>
+<pre>
+  make example
+  LD_LIBRARY_PATH=. java -classpath . example
+</pre>
+
+
+<h2>Redland Java API Introduction</h2>
+
+<p>The Java API is an object-based API reflecting the same structure
+of the Redland objects with simple mappings between them:</p>
+
+<center>
+<table align="center" border="1">
+<tr>
+<th>Concept</th><th>Redland Class</th><th>Java Class</th><th>Purpose</th>
+</tr>
+<tr>
+<td>Resource / Literal</td><td><a href="api/node.html">librdf_node</a></td><td><tt>org.librdf.node</tt></td>
+<td>RDF Model &amp; Syntax nodes</td>
+</tr>
+<tr>
+<td>Statement / Triple</td><td><a href="api/statement.html">librdf_statement</a></td><td><tt>org.librdf.statement</tt></td>
+<td>RDF Model &amp; Syntax arcs (statements, triples) [isa Resource]</td>
+</tr>
+<tr>
+<td>Model</td><td><a href="api/model.html">librdf_model</a></td><td><tt>org.librdf.model</tt></td>
+<td>Set of <em>Statement</em>s usually held in one <em>Storage</em>.</td>
+</tr>
+<tr>
+<td>Storage</td><td><a href="api/storage.html">librdf_storage</a></td><td><tt>org.librdf.storage</tt></td>
+<td>Storage for <em>Model</em>s either persistant or in-memory.</td>
+</tr>
+<tr>
+<td>Stream</td><td><a href="api/stream.html">librdf_stream</a></td><td><tt>org.librdf.stream</tt></td>
+<td>Providing sequences of <em>Statement</em>s from <em>Parser</em>s, queries.</td>
+</tr>
+<tr>
+<td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><tt>org.librdf.parser</tt></td>
+<td>Syntaxes parsers delivering <em>Stream</em> of <em>Statement</em>s or writing to a <em>Model</em></td>
+</tr>
+<tr>
+<td>Iterator</td><td><a href="api/iterator.html">librdf_iterator</a></td><td><tt>org.librdf.iterator</tt></td>
+<td>Enumerating lists (of <em>Node</em>) from queries.</td>
+</tr>
+<tr>
+<td>URI</td><td><a href="api/uri.html">librdf_uri</a></td><td><tt>org.librdf.uri</tt></td>
+<td>Provides URIs for <em>Resource</em>s, <em>Parser</em>s, ...</td>
+</tr>
+<tr>
+<td>World</td><td>&nbsp;</td><td><tt>org.librdf.world</tt></td>
+<td>RDF wrapper class handling Redland startup/shutdown</td>
+</tr>
+<tr>
+<td>Digest</td><td><a href="api/digest.html">librdf_digest</a></td><td>&nbsp;</td>
+<td>Internal content digest class</td>
+</tr>
+<tr>
+<td>Hash</td><td><a href="api/hash.html">librdf_hash</a></td><td>&nbsp;</td>
+<td>Internal key:value maps class</td>
+</tr>
+<tr>
+<td>List</td><td><a href="api/list.html">librdf_list</a></td><td>&nbsp;</td>
+<td>Internal list class</td>
+</tr>
+</table>
+</center>
+
+
+<h2>Other RDF Java APIs and applications</h2>
+
+<p>The follow are useful pure-Java applications (no C library)</p>
 <ul>
 <li><a href="http://www-db.stanford.edu/~melnik/rdf/api.html">Java API</a>
 including an RDF/XML parser by <a href="http://www-db.stanford.edu/~melnik/">Sergey Melnik</a>, Stanford. Based on:</li>
