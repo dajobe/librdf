@@ -34,6 +34,14 @@ extern "C" {
 struct librdf_storage_s
 {
   librdf_world *world;
+
+  /* usage count of this instance
+   * Used by other redland classes such as model, iterator, stream
+   * via  librdf_storage_add_reference librdf_storage_remove_reference
+   * The usage count of storage after construction is 1.
+   */
+  int usage;
+  
   librdf_model *model;
   void *context;
   int index_contexts;
@@ -175,6 +183,9 @@ void librdf_finish_storage(librdf_world *world);
 
 /* class methods */
 librdf_storage_factory* librdf_get_storage_factory(const char *name);
+
+void librdf_storage_add_reference(librdf_storage *storage);
+void librdf_storage_remove_reference(librdf_storage *storage);
 
 #endif
 
