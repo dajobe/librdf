@@ -253,10 +253,10 @@ link libwww statically, works but is difficult to enable.</p>
    ./configure
 </pre>
 
-<p>More commonly you will be doing something like this, when compiling
-with the Stanford version of the SiRPAC Java parser:</p>
+<p>More commonly you will be doing something like this, when
+giving the installation location of Berkeley/Sleeypcat DB:</p>
 <pre>
-   ./configure --with-sirpac-stanford-jar=rdf-api-2000-10-30.jar
+   ./configure --with-bdb=/usr/local/berkeleydb
 </pre>
 
 <p>If you are having problems with configuring several times when
@@ -343,16 +343,6 @@ to use the in-memory hashes, edit the lines reading something like</p>
   storage=librdf_new_storage("hashes", "test", "hash_type='memory',dir='.'");
 </pre>
 
-<p>Note: there is very poor error reporting support at present from
-the RDF parsers.  Generally if the results are just an empty model
-when something was expected, an error ocurred.  If the URI works (check
-it in a browser) then probably it was a parsing problem.</p>
-
-<p>You can check that you have a functioning Java/SiRPAC installation by
-running the Java parser directly against some RDF URL, eg.:</p>
-<pre>
-  java -classpath .../rdf-api-2000-10-30.jar org.w3c.rdf.examples.ListStatements http://purl.org/dc/index.htm.rdf
-</pre>
 
 
 <h3>3.1. <a href="example1.c">example1.c</a></h3>
