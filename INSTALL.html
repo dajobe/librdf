@@ -273,7 +273,7 @@ adding or removing options, you may have to tidy up first with either of these:<
 </pre>
 
 
-<h2>2.5. Testing</h2>
+<h2 id="sec-testing">2.5. Testing</h2>
 
 <p>You can build and run the built-in tests with:</p>
 <pre>
@@ -288,6 +288,15 @@ if everything works correctly.</p>
 you can also do <code>make distcheck</code> which does a longer
 check that the distribution installation, configuring and building
 works.  This does not perform any additional core testing).</p>
+
+<p>Each of the language APIs has it's own test and example
+code that can be run.  See the language-specific page for further
+details, however most of them can be run with:</p>
+<pre>
+   cd language
+   make test-language
+</pre>
+
 
 
 <h3>2.6 Installing the library</h3>
