@@ -1125,6 +1125,77 @@ librdf_storage_sync(librdf_storage* storage)
     storage->factory->sync(storage);
 }
 
+
+static librdf_statement*
+librdf_storage_stream_in_context_map(librdf_stream *stream,
+                                     void* map_context,
+                                     librdf_statement* statement) 
+{
+  librdf_node* context_node=(librdf_node*)map_context;
+
+  /* NULL node matches all statements */
+  if(!context_node)
+    return statement;
+  
+  if (librdf_node_equals(librdf_stream_get_context(stream), context_node))
+    return statement;
+
+  /* not suitable */
+  return NULL;
+}
+
+
+/**
+ * librdf_storage_find_statements_in_context - search the storage for matching statements in a given context
+ * @storage: &librdf_storage object
+ * @statement: &librdf_statement partial statement to find
+ * @context_node: context &librdf_node (or NULL)
+ * 
+ * Searches the storage for a (partial) statement as described in
+ * librdf_statement_match() in the given context and returns a
+ * &librdf_stream of matching &librdf_statement objects.  If
+ * context is NULL, this is equivalent to librdf_storage_find_statements.
+ * 
+ * Return value: &librdf_stream of matching statements (may be empty) or NULL on failure
+ **/
+librdf_stream*
+librdf_storage_find_statements_in_context(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node) 
+{
+  librdf_stream *stream;
+
+  if(storage->factory->find_statements_in_context)
+    return storage->factory->find_statements_in_context(storage, statement, context_node);
+
+  stream=librdf_storage_find_statements(storage, statement);
+  if(!stream)
+    return NULL;
+
+  librdf_stream_add_map(stream, 
+                        librdf_storage_stream_in_context_map,
+                        (librdf_stream_map_free_context_handler)librdf_free_node, 
+                        librdf_new_node_from_node(context_node));
+  return stream;
+}
+
+
+/**
+ * librdf_storage_get_contexts - return the list of contexts in the store
+ * @storage: &librdf_storage object
+ * 
+ * Returns an iterator of &librdf_node context nodes for each
+ * context in the store.
+ *
+ * Return value: &librdf_iterator of context nodes or NULL on failure or if contexts are not supported
+ **/
+librdf_iterator*
+librdf_storage_get_contexts(librdf_storage* storage) 
+{
+  if(storage->factory->get_contexts)
+    return storage->factory->get_contexts(storage);
+  else
+    return NULL;
+}
+
 #endif
 
 
