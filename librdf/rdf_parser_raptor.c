@@ -339,10 +339,6 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   
   scontext->fh=fopen(filename, "r");
   if(!scontext->fh) {
-#ifndef WIN32
-    extern int errno;
-#endif
-    
     LIBRDF_DEBUG3(librdf_new_parser_repat, "Failed to open file '%s' - %s\n",
                   filename, strerror(errno));
     free(filename);
