@@ -107,5 +107,5 @@ if test "$echo_cflags" = "yes"; then
   echo $includes
 fi
 if test "$echo_libs" = "yes"; then
-  echo -L@libdir@ -lrdf @LIBS@
+  echo -L@libdir@ -lrdf @LDFLAGS@ @LIBS@
 fi
