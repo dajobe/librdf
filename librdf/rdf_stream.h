@@ -45,6 +45,7 @@ struct librdf_stream_s {
   void (*finished_method)(void*);
 
   librdf_statement* (*map)(void *context, librdf_statement* statement);
+  void (*free_map)(void *context);
 };
 
 /* FIXME - should all short lists be enums */
@@ -67,7 +68,7 @@ int librdf_stream_next(librdf_stream* stream);
 librdf_statement* librdf_stream_get_object(librdf_stream* stream);
 void* librdf_stream_get_context(librdf_stream* stream);
 
-void librdf_stream_set_map(librdf_stream* stream, librdf_statement* (*map)(void* context, librdf_statement* statement), void* map_context);
+void librdf_stream_set_map(librdf_stream* stream, librdf_statement* (*map)(void* context, librdf_statement* statement), void (*free_context)(void *map_context), void* map_context);
 
 #ifdef LIBRDF_INTERNAL
 librdf_stream* librdf_new_stream_from_node_iterator(librdf_iterator* iterator, librdf_statement* statement, unsigned int field);
