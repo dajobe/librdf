@@ -1,9 +1,8 @@
 2004-10-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_serializer_rdfxml.c (rdf_serializer_rdfxml_print_xml_attribute):
-	Add an error return
-	value and pass on failures.
-	librdf_serializer_print_statement_as_rdfxml): Add an error return
+	Add an error return value and pass on failures.
+	(librdf_serializer_print_statement_as_rdfxml): Add an error return
 	value and pass on failures.  Try to slightly recover from errors.
 
 	* rdf_serializer_rdfxml.c (librdf_serializer_rdfxml_serialize_model):
