@@ -299,6 +299,19 @@ librdf_new_node_from_node(librdf_node *node)
 
 
 /**
+ * librdf_node_init - initialise a statically declared librdf_node
+ * 
+ * Return value: a new &librdf_node or NULL on failure
+ **/
+void
+librdf_node_init(librdf_world *world, librdf_node *node)
+{
+  node->world=world;
+  node->type=LIBRDF_NODE_TYPE_RESOURCE;
+}
+
+
+/**
  * librdf_free_node - Destructor - destroy an librdf_node object
  * @node: &librdf_node object
  * 

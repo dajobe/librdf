@@ -851,6 +851,8 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
   icontext->hash_index=hash_index;
   icontext->want=want;
 
+  librdf_statement_init(storage->world, &icontext->statement);
+
   hash=scontext->hashes[icontext->hash_index];
 
   /* set the fields in the static statement contained in the context */

@@ -49,6 +49,9 @@ librdf_statement* librdf_new_statement_from_statement(librdf_statement* statemen
 /* Create a new Statement from existing Nodes */
 librdf_statement* librdf_new_statement_from_nodes(librdf_world *world, librdf_node* subject, librdf_node* predicate, librdf_node* object);
 
+/* Init a statically allocated node */
+void librdf_statement_init(librdf_world *world, librdf_statement *statement);
+
 /* destructor */
 void librdf_free_statement(librdf_statement* statement);
 

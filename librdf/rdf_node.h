@@ -148,6 +148,9 @@ librdf_node* librdf_new_node_from_literal(librdf_world* world, const char *strin
 /* Create a new Node from an existing Node - CLONE */
 librdf_node* librdf_new_node_from_node(librdf_node *node);
 
+/* Init a statically allocated node */
+void librdf_node_init(librdf_world *world, librdf_node *node);
+
 /* destructor */
 void librdf_free_node(librdf_node *r);
 

@@ -150,6 +150,19 @@ librdf_new_statement_from_nodes(librdf_world *world,
 
 
 /**
+ * librdf_statement_init - initialise a statically declared librdf_statement
+ * 
+ * Return value: a new &librdf_statement or NULL on failure
+ **/
+void
+librdf_statement_init(librdf_world *world, librdf_statement *statement)
+{
+  librdf_node_init(world, statement);
+  librdf_node_set_type(statement, LIBRDF_NODE_TYPE_STATEMENT);
+}
+
+
+/**
  * librdf_free_statement - Destructor - destroy a librdf_statement
  * @statement: &librdf_statement object
  * 
