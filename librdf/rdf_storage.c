@@ -303,7 +303,7 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
 
   /* FIXME: fail if clone is not supported by this storage (factory) */
   if(!old_storage->factory->clone) {
-    LIBRDF_FATAL2(librdf_new_storage_from_storage, "clone not implemented for factory type %s", old_storage->factory->name);
+    LIBRDF_FATAL2(librdf_new_storage_from_storage, "clone not implemented for storage factory type %s", old_storage->factory->name);
     return NULL;
   }
 
@@ -318,18 +318,21 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
     librdf_free_storage(new_storage);
     return NULL;
   }
-  
-  if(old_storage->factory->clone(new_storage, old_storage)) {
-    librdf_free_storage(new_storage);
-    return NULL;
-
-  }
 
   /* do this now so librdf_free_storage won't call new factory on
    * partially copied storage 
    */
   new_storage->factory=old_storage->factory;
-  
+
+  /* clone is assumed to do leave the new storage in the same state
+   * after an init() method on an existing storage - i.e ready to
+   * use but closed.
+   */
+  if(old_storage->factory->clone(new_storage, old_storage)) {
+    librdf_free_storage(new_storage);
+    return NULL;
+  }
+
   return new_storage;
 }
 
