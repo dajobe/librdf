@@ -133,7 +133,7 @@ main(int argc, char *argv[])
   } else {
     count=0;
     while(!librdf_stream_end(stream)) {
-      librdf_statement *statement=librdf_stream_next(stream);
+      librdf_statement *statement=librdf_stream_get_object(stream);
       if(!statement) {
         fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
         break;
@@ -143,7 +143,7 @@ main(int argc, char *argv[])
       librdf_statement_print(statement, stdout);
       fputc('\n', stdout);
       
-      librdf_free_statement(statement);
+      librdf_stream_next(stream);
       count++;
     }
     librdf_free_stream(stream);  

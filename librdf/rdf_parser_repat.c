@@ -43,7 +43,8 @@
 
 /* serialising implementing functions */
 static int librdf_parser_repat_serialise_end_of_stream(void* context);
-static librdf_statement* librdf_parser_repat_serialise_next_statement(void* context);
+static int librdf_parser_repat_serialise_next_statement(void* context);
+static void* librdf_parser_repat_serialise_get_statement(void* context, int flags);
 static void librdf_parser_repat_serialise_finished(void* context);
 
 
@@ -76,8 +77,15 @@ typedef struct {
   librdf_uri* base_uri;      /* base URI */
   FILE *fh;
   RDF_Parser repat;
-  librdf_list* statements;  /* pending statements */
-  int end_of_stream;        /* non 0 if stream finished */
+
+  /* The set of statements pending is a sequence, with 'current'
+   * as the first entry and any remaining ones held in 'statements'.
+   * The latter are filled by the repat parser
+   * sequence is empty := current=NULL and librdf_list_size(statements)=0
+   */
+  librdf_statement* current; /* current statement */
+  librdf_list statements;   /* STATIC following statements after current */
+
   int in_literal;           /* non 0 if parseType literal */
   char *literal;            /* literal text being collected */
   int literal_length;
@@ -234,7 +242,7 @@ librdf_parser_repat_statement_handler(void* user_data,
   fputs("\n", stderr);
 #endif
   
-  librdf_list_add(scontext->statements, statement);
+  librdf_list_add(&scontext->statements, statement);
 }
 
 
@@ -282,7 +290,7 @@ librdf_parser_repat_end_parse_type_literal_handler( void* user_data )
     fputs("\n", stderr);
 #endif
 
-    librdf_list_add(scontext->statements, statement);
+    librdf_list_add(&scontext->statements, statement);
     
   } else {
     LIBRDF_FATAL1(librdf_parser_repat_end_element_handler,
@@ -473,6 +481,10 @@ librdf_parser_repat_init(librdf_parser *parser, void *context)
 }
   
 
+
+static int librdf_parser_repat_get_next_statement(librdf_parser_repat_stream_context *context);
+
+
 /**
  * librdf_parser_repat_parse_as_stream - Retrieve the RDF/XML content at file and parse it into a librdf_stream
  * @context: serialisation context
@@ -487,7 +499,7 @@ librdf_parser_repat_parse_file_as_stream(void *context,
   librdf_parser_repat_context* pcontext=(librdf_parser_repat_context*)context;
   librdf_parser_repat_stream_context* scontext;
   librdf_stream* stream;
-  const char* filename;
+  char* filename;
   librdf_world *world=pcontext->parser->world;
 
   scontext=(librdf_parser_repat_stream_context*)LIBRDF_CALLOC(librdf_parser_repat_stream_context, 1, sizeof(librdf_parser_repat_stream_context));
@@ -496,18 +508,12 @@ librdf_parser_repat_parse_file_as_stream(void *context,
 
   scontext->pcontext=pcontext;
   
-  scontext->statements=librdf_new_list(world);
-  if(!scontext->statements) {
-    librdf_parser_repat_serialise_finished((void*)scontext);
-    return NULL;
-  }
-
   scontext->source_uri=uri;
   if(!base_uri)
     base_uri=uri;
   scontext->base_uri=base_uri;
 
-  filename=librdf_uri_to_filename(uri);
+  filename=(char*)librdf_uri_to_filename(uri);
   if(!filename)
     return NULL;
   
@@ -519,11 +525,11 @@ librdf_parser_repat_parse_file_as_stream(void *context,
     
     LIBRDF_DEBUG3(librdf_new_parser_repat, "Failed to open file '%s' - %s\n",
                   filename, strerror(errno));
-    LIBRDF_FREE(cstring, filename);
+    free(filename);
     librdf_parser_repat_serialise_finished((void*)scontext);
     return(NULL);
   }
-  LIBRDF_FREE(cstring, filename);
+  free(filename); /* free since it is actually malloc()ed by libraptor */
 
   scontext->repat = RDF_ParserCreate(NULL);
 
@@ -548,23 +554,26 @@ librdf_parser_repat_parse_file_as_stream(void *context,
   
   RDF_SetBase(scontext->repat, librdf_uri_as_string(base_uri));
 
+  /* start parsing; initialises scontext->statements, scontext->current */
+  librdf_parser_repat_get_next_statement(scontext);
 
   stream=librdf_new_stream(world,
                            (void*)scontext,
                            &librdf_parser_repat_serialise_end_of_stream,
                            &librdf_parser_repat_serialise_next_statement,
+                           &librdf_parser_repat_serialise_get_statement,
                            &librdf_parser_repat_serialise_finished);
   if(!stream) {
     librdf_parser_repat_serialise_finished((void*)scontext);
     return NULL;
   }
-  
+
   return stream;  
 }
 
 
 /**
- * librdf_parser_repat_parse_into_model - Retrieve the RDF/XML content at URI and store in a librdf_model
+ * librdf_parser_repat_parse_file_into_model - Retrieve the RDF/XML content at file and store in a librdf_model
  * @context: serialisation context
  * @uri: URI of RDF content
  * @base_uri: the base URI to use (or NULL if the same)
@@ -589,30 +598,31 @@ librdf_parser_repat_parse_file_into_model(void *context,
 
 
 /* FIXME: Yeah?  What about it? */
-#define LINE_BUFFER_LEN 1024
+#define REPAT_IO_BUFFER_LEN 1024
 
 
 /*
  * librdf_parser_repat_get_next_statement - helper function to get the next statement
  * @context: serialisation context
  * 
- * Return value: the number of &librdf_statement-s found or 0
+ * Return value: the number of &librdf_statement-s found, 0 at end of file, or <0 on error
  */
 static int
 librdf_parser_repat_get_next_statement(librdf_parser_repat_stream_context *context) {
-  char buffer[LINE_BUFFER_LEN];
+  char buffer[REPAT_IO_BUFFER_LEN];
 
   if(!context->fh)
     return 0;
   
+  context->current=NULL;
   while(!feof(context->fh)) {
     int len;
     int ret;
     int count;
     
-    len=fread(buffer, 1, LINE_BUFFER_LEN, context->fh);
+    len=fread(buffer, 1, REPAT_IO_BUFFER_LEN, context->fh);
 
-    ret=RDF_Parse(context->repat, buffer, len, (len == 0));
+    ret=RDF_Parse(context->repat, buffer, len, (len < REPAT_IO_BUFFER_LEN));
     if(!len)
       return 0; /* done */
 
@@ -625,9 +635,11 @@ librdf_parser_repat_get_next_statement(librdf_parser_repat_stream_context *conte
     }
 
     /* parsing found at least 1 statement, return */
-    count=librdf_list_size(context->statements);
-    if(count)
-      return count;
+    count=librdf_list_size(&context->statements);
+    if(count) {
+      context->current=(librdf_statement*)librdf_list_pop(&context->statements);
+      return 1;
+    }
   }
 
 
@@ -650,21 +662,8 @@ static int
 librdf_parser_repat_serialise_end_of_stream(void* context)
 {
   librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)context;
-  int count;
   
-  if(scontext->end_of_stream)
-    return 1;
-
-  /* have at least 1 stored item - not end yet */
-  count=librdf_list_size(scontext->statements);
-  if(count > 0)
-    return 0;
-
-  count=librdf_parser_repat_get_next_statement(scontext);
-  if(count <= 0)
-    scontext->end_of_stream=1;
-
-  return (count == 0);
+  return (!scontext->current && !librdf_list_size(&scontext->statements));
 }
 
 
@@ -672,29 +671,52 @@ librdf_parser_repat_serialise_end_of_stream(void* context)
  * librdf_parser_repat_serialise_next_statement - Get the next librdf_statement from the stream of statements from the Repat RDF parser
  * @context: serialisation context
  * 
- * Return value: next &librdf_statement or NULL at end of stream.
+ * Return value: non 0 at end of stream.
  **/
-static librdf_statement*
+static int
 librdf_parser_repat_serialise_next_statement(void* context)
 {
   librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)context;
-  librdf_statement* statement=NULL;
+
+  librdf_free_statement(scontext->current);
+  scontext->current=NULL;
 
   /* get another statement if there is one */
-  while(!scontext->end_of_stream) {
-    int count;
-    
-    statement=(librdf_statement*)librdf_list_pop(scontext->statements);
-    if(statement)
-      return statement;
+  while(!scontext->current) {
+    scontext->current=(librdf_statement*)librdf_list_pop(&scontext->statements);
+    if(scontext->current)
+      break;
   
     /* else get a new one or NULL at end */
-    count=librdf_parser_repat_get_next_statement(scontext);
-    if(count <= 0)
-      scontext->end_of_stream=1;
+    if(librdf_parser_repat_get_next_statement(scontext) <=0)
+      break;
   }
 
-  return statement;
+  return (scontext->current == NULL);
+}
+
+
+/**
+ * librdf_parser_repat_serialise_get_statement - Get the next librdf_statement from the stream of statements from the Repat RDF parser
+ * @context: serialisation context
+ * 
+ * Return value: next &librdf_statement or NULL at end of stream.
+ **/
+static void*
+librdf_parser_repat_serialise_get_statement(void* context, int flags)
+{
+  librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)context;
+
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      return scontext->current;
+      
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      return NULL;
+      
+    default:
+      abort();
+  }
 }
 
 
@@ -716,11 +738,12 @@ librdf_parser_repat_serialise_finished(void* context)
     if(scontext->repat)
       RDF_ParserFree(scontext->repat);
 
-    if(scontext->statements) {
-      while((statement=(librdf_statement*)librdf_list_pop(scontext->statements)))
-        librdf_free_statement(statement);
-      librdf_free_list(scontext->statements);
-    }
+    if(scontext->current)
+      librdf_free_statement(scontext->current);
+  
+    while((statement=(librdf_statement*)librdf_list_pop(&scontext->statements)))
+      librdf_free_statement(statement);
+    librdf_list_clear(&scontext->statements);
 
     /* adjust stored length */
     if(scontext->literal)

@@ -418,6 +418,9 @@ librdf_storage_size(librdf_storage* storage)
  * @storage: &librdf_storage object
  * @statement: &librdf_statement statement to add
  * 
+ * The passed-in statement is copied when added to the store, not
+ * shared with the store.
+ *
  * Return value: non 0 on failure
  **/
 int
@@ -547,7 +550,6 @@ librdf_storage_find_statements(librdf_storage* storage,
 typedef struct {
   librdf_stream *stream;
   librdf_statement *partial_statement;
-  librdf_statement *current_statement;
   int want;
   int duplicates_allowed;
 } librdf_storage_stream_to_node_iterator_context;
@@ -567,15 +569,7 @@ librdf_storage_stream_to_node_iterator_next_method(void* iterator)
 {
   librdf_storage_stream_to_node_iterator_context* context=(librdf_storage_stream_to_node_iterator_context*)iterator;
 
-  if(librdf_stream_end(context->stream))
-    return 1;
-
-  if(context->current_statement)
-    librdf_free_statement(context->current_statement);
-
-  context->current_statement=librdf_stream_next(context->stream);
-
-  return (context->current_statement != NULL);
+  return librdf_stream_next(context->stream);
 }
 
 
@@ -584,16 +578,10 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
 {
   librdf_storage_stream_to_node_iterator_context* context=(librdf_storage_stream_to_node_iterator_context*)iterator;
   librdf_node* node;
-  librdf_statement* statement=context->current_statement;
-  
-  if(librdf_stream_end(context->stream))
-    return NULL;
+  librdf_statement* statement=librdf_stream_get_object(context->stream);
 
-  if(!statement) {
-    statement=context->current_statement=librdf_stream_next(context->stream);
-    if(!statement)
-      return NULL;
-  }
+  if(!statement)
+    return NULL;
 
   switch(context->want) {
     case LIBRDF_STATEMENT_SUBJECT: /* SOURCES (subjects) */
@@ -633,9 +621,6 @@ librdf_storage_stream_to_node_iterator_finished(void* iterator)
 
     librdf_free_statement(partial_statement);
   }
-
-  if(context->current_statement)
-    librdf_free_statement(context->current_statement);
 
   if(context->stream)
     librdf_free_stream(context->stream);

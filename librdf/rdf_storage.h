@@ -120,6 +120,9 @@ struct librdf_storage_factory_s {
 
 };
 
+#include <rdf_storage_list.h>
+#include <rdf_storage_hashes.h>
+
 #endif
 
 

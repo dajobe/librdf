@@ -54,7 +54,8 @@ static librdf_stream* librdf_storage_list_find_statements(librdf_storage* storag
 
 /* serialising implementing functions */
 static int librdf_storage_list_serialise_end_of_stream(void* context);
-static librdf_statement* librdf_storage_list_serialise_next_statement(void* context);
+static int librdf_storage_list_serialise_next_statement(void* context);
+static void* librdf_storage_list_serialise_get_statement(void* context, int flags);
 static void librdf_storage_list_serialise_finished(void* context);
 
 /* group functions */
@@ -64,7 +65,8 @@ static librdf_stream* librdf_storage_list_group_serialise(librdf_storage* storag
 
 /* group list statement stream methods */
 static int librdf_storage_list_group_serialise_end_of_stream(void* context);
-static librdf_statement* librdf_storage_list_group_serialise_next_statement(void* context);
+static int librdf_storage_list_group_serialise_next_statement(void* context);
+static void* librdf_storage_list_group_serialise_get_statement(void* context, int flags);
 static void librdf_storage_list_group_serialise_finished(void* context);
 
 
@@ -198,11 +200,19 @@ librdf_storage_list_add_statements(librdf_storage* storage,
   int status=0;
 
   while(!librdf_stream_end(statement_stream)) {
-    statement=librdf_stream_next(statement_stream);
-    if(statement)
+    statement=librdf_stream_get_object(statement_stream);
+
+    if(statement) {
+      /* copy shared statement */
+      statement=librdf_new_statement_from_statement(statement);
+      if(!statement) {
+        status=1;
+        break;
+      }
       librdf_list_add(context->list, statement);
-    else
+    } else
       status=1;
+    librdf_stream_next(statement_stream);
   }
   librdf_free_stream(statement_stream);
   
@@ -252,6 +262,7 @@ librdf_storage_list_serialise(librdf_storage* storage)
                            (void*)iterator,
                            &librdf_storage_list_serialise_end_of_stream,
                            &librdf_storage_list_serialise_next_statement,
+                           &librdf_storage_list_serialise_get_statement,
                            &librdf_storage_list_serialise_finished);
   if(!stream) {
     librdf_storage_list_serialise_finished((void*)iterator);
@@ -271,20 +282,28 @@ librdf_storage_list_serialise_end_of_stream(void* context)
 
 }
 
-static librdf_statement*
+static int
 librdf_storage_list_serialise_next_statement(void* context)
 {
   librdf_iterator* iterator=(librdf_iterator*)context;
-  librdf_statement* statement=(librdf_statement*)librdf_iterator_get_object(iterator);
-  if(!statement)
-    return NULL;
 
-  /* copy before moving on to guarantee statement is ok */
-  statement=librdf_new_statement_from_statement(statement);
+  return librdf_iterator_next(iterator);
+}
 
-  librdf_iterator_next(iterator);
-  
-  return statement;
+
+static void*
+librdf_storage_list_serialise_get_statement(void* context, int flags)
+{
+  librdf_iterator* iterator=(librdf_iterator*)context;
+
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      return (librdf_statement*)librdf_iterator_get_object(iterator);
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      return librdf_iterator_get_context(iterator);
+    default:
+      abort();
+  }
 }
 
 
@@ -412,6 +431,7 @@ typedef struct {
   librdf_iterator* iterator;
   librdf_hash_datum *key;
   librdf_hash_datum *value;
+  librdf_statement current; /* static, shared statement */
 } librdf_storage_list_group_serialise_stream_context;
 
 
@@ -433,6 +453,8 @@ librdf_storage_list_group_serialise(librdf_storage* storage,
   scontext=(librdf_storage_list_group_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_list_group_serialise_stream_context, 1, sizeof(librdf_storage_list_group_serialise_stream_context));
   if(!scontext)
     return NULL;
+
+  librdf_statement_init(storage->world, &scontext->current);
 
   scontext->key=librdf_new_hash_datum(storage->world, NULL, 0);
   if(!scontext->key)
@@ -459,6 +481,7 @@ librdf_storage_list_group_serialise(librdf_storage* storage,
                            (void*)scontext,
                            &librdf_storage_list_group_serialise_end_of_stream,
                            &librdf_storage_list_group_serialise_next_statement,
+                           &librdf_storage_list_group_serialise_get_statement,
                            &librdf_storage_list_group_serialise_finished);
   if(!stream) {
     librdf_storage_list_group_serialise_finished((void*)scontext);
@@ -478,29 +501,40 @@ librdf_storage_list_group_serialise_end_of_stream(void* context)
 }
 
 
-static librdf_statement*
+static int
 librdf_storage_list_group_serialise_next_statement(void* context)
 {
   librdf_storage_list_group_serialise_stream_context* scontext=(librdf_storage_list_group_serialise_stream_context*)context;
-  librdf_statement* statement;
+
+  return librdf_iterator_next(scontext->iterator);
+}
+
+
+static void*
+librdf_storage_list_group_serialise_get_statement(void* context, int flags)
+{
+  librdf_storage_list_group_serialise_stream_context* scontext=(librdf_storage_list_group_serialise_stream_context*)context;
   librdf_hash_datum* v;
   
-  if(!(v=librdf_iterator_get_object(scontext->iterator)))
-    return NULL;
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      if(!(v=librdf_iterator_get_object(scontext->iterator)))
+        return NULL;
 
-  statement=librdf_new_statement(scontext->iterator->world);
-  if(!statement)
-    return NULL;
+      /* decode value content */
+      if(!librdf_statement_decode(&scontext->current,
+                                  (unsigned char*)v->data, v->size)) {
+        return NULL;
+      }
 
-  /* decode value content */
-  if(!librdf_statement_decode(statement, (unsigned char*)v->data, v->size)) {
-    librdf_free_statement(statement);
-    return NULL;
+      return &scontext->current;
+
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      return librdf_iterator_get_context(scontext->iterator);
+    default:
+      abort();
   }
-
-  librdf_iterator_next(scontext->iterator);
-
-  return statement;
+  
 }
 
 
