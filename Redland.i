@@ -514,6 +514,8 @@ void librdf_model_sync(librdf_model* model);
 librdf_iterator* librdf_model_get_contexts(librdf_model* model);
 librdf_node* librdf_model_get_feature(librdf_model* model, librdf_uri* feature);
 int librdf_model_set_feature(librdf_model* model, librdf_uri* feature, librdf_node* value);
+int librdf_model_load(librdf_model* model, librdf_uri *uri, const char *inStrOrNull, const char *inStrOrNull, librdf_uri *type_uri);
+
 
 /* rdf_storage.h */
 %newobject librdf_new_storage;

@@ -263,6 +263,7 @@ REDLAND_API void librdf_model_sync(librdf_model* model);
 
 REDLAND_API librdf_storage* librdf_model_get_storage(librdf_model *model);
 
+REDLAND_API int librdf_model_load(librdf_model* model, librdf_uri *uri, const char *name, const char *mime_type, librdf_uri *type_uri);
 
 /* find statements in a given context */
 REDLAND_API librdf_stream* librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* statement, librdf_node* context_node);
