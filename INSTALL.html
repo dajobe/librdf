@@ -199,6 +199,20 @@ libcrypto library (MD5, SHA1 and RIPEMD160) if the library is
 available. configure will automatically enable this unless disabled
 by setting this option to <em>no</em>.</p></dd>
 
+<dt><tt>--with-xml-parser=NAME</tt><br /></dt>
+<dd><p>Pick an XML parser to use for Raptor - either <tt>libxml</tt>
+(default) or <tt>expat</tt>.  If this option is not given,
+either will be used, with libxml preferred if both are present.
+libxml must be present as a system library but expat is always available
+since it is provided inside Redland.</p>
+
+<p>Raptor has been tested with various combinations of these libraries
+that are described further in the Raptor
+<a href="http://www.redland.opensource.ac.uk/raptor/INSTALL.html">install</a>
+documentation.
+</p>
+</dd>
+
 </dl>
 
 
