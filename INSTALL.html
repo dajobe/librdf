@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+  <TITLE>librdf - Installation instructions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff" TEXT="#000085">
+
+<H1 ALIGN="CENTER">librdf - Installation instructions</H1>
+
+<H2>Getting the sources</H2>
+
+<H3>1. From CVS</H3>
+  
+<P>(if you have access to it - ILRT private at present)
+<PRE>
+    export CVSROOT=:pserver:LOGIN@cvs.desire.org:/usr/local/cvsroot
+    export CVS_RSH=ssh
+    cvs login
+    ...
+    cvs checkout librdf
+</PRE>
+where <B>LOGIN</B> is your login on the CVS server.
+
+<P>You will probably then need to create the automake and autoconf
+derived files, as described below.
+
+<H3>2. From releases</H3>
+
+<P>See
+<A HREF="http://FIXME-url-needed-here/">http://FIXME-url-needed-here/</A>
+
+<H2>Configuring the package</H2>
+
+<P>If there is no <TT>configure</TT> program, you can create it with:
+<PRE>
+    automake --add-missing
+    aclocal
+    autoheader
+    autoconf
+</PRE>
+
+<H2>Building</H2>
+<P>See also the generic GNU installation instructions in 
+<A HREF="INSTALL">INSTALL</A>
+<PRE>
+   ./configure
+   make
+</PRE>
+
+<H2>Testing</H2>
+<P>Build and run the built in tests with:
+<PRE>
+    make check
+</PRE>
+
+</BODY>
+</HTML>

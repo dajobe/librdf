@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+  <TITLE>librdf Frequently Asked Questions (FAQs)</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff" TEXT="#000085">
+
+<H1 ALIGN="CENTER">librdf Frequently Asked Questions (FAQs)</H1>
+
+
+<UL>
+
+<LI>What is the license?
+
+<P>librdf is
+<A HREF="http://www.gnu.org/philosophy/free-sw.html">free software</A>,
+or
+<A HREF="http://www.opensource.org/">Open Source</A> if you prefer.
+
+<LI>Why is the code released under two licenses - LGPL and BSD?
+
+<P>I originally considered just a GPL version of the library but I
+considered this too restrictive, hence the LGPL version.  LGPL also
+allows the user, at their choice, to license the software under the
+GPL (See LGPL Term 3) in which case this software can also be used
+with all the other GPLed code -- see next answer.
+
+<P>As an alternative, the entire library can be used under the terms
+of the 
+<A HREF="http://www.opensource.org/licenses/bsd-license.html">modified BSD</A>
+style license which allow you use it in whatever way you
+like as long as you don't pretend you wrote it, or use the authors
+name to promote it.
+
+<LI>Can I link this library with code under license XXX?
+
+<P>Firstly,  
+<A HREF="http://www.tuxedo.org/~esr/jargon/html/entry/IANAL.html">IANAL</A>
+however I here is an overview of how you can use this software:
+<UL>
+<LI>If you choose the LGPL/GPL licenses, the <A HREF="http://www.gnu.org/philosophy/license-list.html">GNU project list of licenses page</A> says that you can link the following licensed software with the code:<BR>
+GPLed, LGPLed, X11, original BSD, modified BSD, Perl (as GPL), zlib<BR>
+and <B>not</B> these types:<BR>
+Apache, Zope, IBM, LaTeX (LPPL), MPL, NOSL, Sun PL, NPL, QPL, Artistic, APPL, Sun CSL, Plan 9<BR>
+check the link above for updates, this is probably not a definite
+list.
+
+<LI>If you choose the modified BSD license, you should be able to
+link with most anything else except you might have problems
+distributing stuff which includes GPLed/LGPLed parts, in which case,
+choose the LGPL or GPL licenses.
+</UL>
+
+
+<LI>Why is librdf written in C?
+
+<P>Writing in C to allow reuse in many ways and can be used in many
+languages since most of them allow importing of C libraries or
+calling of C functions.
+
+</UL>
+
+</BODY>
+</HTML>
