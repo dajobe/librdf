@@ -111,7 +111,8 @@ librdf_parser_repat_statement_handler(void* user_data,
   librdf_statement* statement=NULL;
   librdf_node *subject=NULL, *predicate=NULL, *object=NULL;
   librdf_world *world=scontext->pcontext->parser->world;
-
+  const XML_Char *c;
+  
   /* got all statement parts now */
   statement=librdf_new_statement(world);
   if(!statement)
@@ -132,7 +133,11 @@ librdf_parser_repat_statement_handler(void* user_data,
       subject=librdf_new_node_from_uri_string(world, subject_string);
       break;
     case RDF_SUBJECT_TYPE_ANONYMOUS:
-      subject=librdf_new_node_from_uri_string(world, subject_string);
+      c=subject_string;
+      while(*c++);
+      while(*--c != '#');
+      c++;
+      subject=librdf_new_node_from_blank_identifier(world, c);
       break;
     default:
       LIBRDF_FATAL2(librdf_parser_repat_statement_handler, "Unknown subject type %d\n", subject_type);
