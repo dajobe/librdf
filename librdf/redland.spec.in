@@ -20,7 +20,7 @@ URL:       http://www.redland.opensource.ac.uk/
 BuildRoot: /tmp/%{name}-%{version}
 BuildRequires: libxml2-devel >= 2.4.0
 BuildRequires: curl-devel
-BuildRequires: raptor-devel >= 1.1.0
+BuildRequires: raptor-devel >= 1.2.0
 BuildRequires: perl
 BuildRequires: python >= 2.0.0 python-devel
 Packager:  Dave Beckett <Dave.Beckett@bristol.ac.uk>
@@ -191,6 +191,7 @@ cd ..
 
 %changelog
 * Fri Jan 30 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
+- require raptor 1.2.0
 - update for removal of python distutils
 
 * Sun Jan 4 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
