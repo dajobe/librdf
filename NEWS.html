@@ -8,6 +8,24 @@
 
   <h1>Redland RDF Application Framework - News</h1>
 
+<h2>2001-06-07 Redland 0.9.9 Released</h2>
+<p>Added librdf_world class to manage Redland environment
+startup/shutdown - pervasive change throughout all other classes<br />
+configure improvements to try to get expat variants detected and
+working more automatically<br />
+Added Debian (.deb) package support<br />
+SiRPAC parser wrapper now handles multi-line literals<br />
+Changed stream and iterator interfaces and classes to be
+compatible, in preparation for unifying in one new filter class.
+NOTE: This requires changes to user-code -
+librdf_iterator_have_elements is now !librdf_iterator_is_end and
+librdf_iterator_set_map is now librdf_iterator_add_map<br />
+Added perl and python interface warnings for above changes<br />
+Preparation work for querying for arcs to/from a resource node,
+filtering<br />
+Additional examples and explanations added to perl interface documentation
+</p>
+
 <h2>2001-02-05 Redland 0.9.8 Released</h2>
 <p>Added <a href="docs/tcl.html">Tcl</a> interface<br />
 Added <a href="http://www.redland.opensource.ac.uk/rapier/">Rapier</a> RDF parser, written by me (alpha quality) and made some changes to support it.<br />
