@@ -47,15 +47,15 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_BIGENDIAN
 
-GNUPG_CHECK_TYPEDEF(byte, HAVE_BYTE_TYPEDEF)
-GNUPG_CHECK_TYPEDEF(ushort, HAVE_USHORT_TYPEDEF)
-GNUPG_CHECK_TYPEDEF(ulong, HAVE_ULONG_TYPEDEF)
-GNUPG_CHECK_TYPEDEF(u16, HAVE_U16_TYPEDEF)
-GNUPG_CHECK_TYPEDEF(u32, HAVE_U32_TYPEDEF)
+AC_CHECK_TYPE(byte, MISSING)
+AC_CHECK_TYPE(u16, MISSING)
+AC_CHECK_TYPE(u32, MISSING)
 
+AC_CHECK_SIZEOF(unsigned char, 1)
 AC_CHECK_SIZEOF(unsigned short, 2)
 AC_CHECK_SIZEOF(unsigned int, 4)
 AC_CHECK_SIZEOF(unsigned long, 4)
+AC_CHECK_SIZEOF(unsigned long long, 8)
 
 if test "$ac_cv_sizeof_unsigned_short" = "0" \
    || test "$ac_cv_sizeof_unsigned_int" = "0" \
@@ -98,21 +98,21 @@ if test "$enable_openssl_digests" = yes ; then
       case "$func" in
         MD5)
 	  AC_CHECK_LIB(crypto, MD5)
-          if test "$ac_cv_func_MD5"; then
+          if test "$ac_cv_lib_crypto_MD5"; then
             AC_DEFINE(HAVE_OPENSSL_CRYPTO_MD5_DIGEST)
 	    found=yes
           fi
 	  ;;
         SHA1)
 	  AC_CHECK_LIB(crypto, SHA1)
-          if test "$ac_cv_func_SHA1"; then
+          if test "$ac_cv_lib_crypto_SHA1"; then
             AC_DEFINE(HAVE_OPENSSL_CRYPTO_SHA1_DIGEST)
 	    found=yes
           fi
 	  ;;
         RIPEMD160)
 	  AC_CHECK_LIB(crypto, RIPEMD160)
-          if test "$ac_cv_func_RIPEMD160"; then
+          if test "$ac_cv_lib_crypto_RIPEMD160"; then
             AC_DEFINE(HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST)
 	    found=yes
           fi
@@ -148,7 +148,6 @@ for module in $digest_modules; do
     case "$module_u" in
       MD5) AC_DEFINE(HAVE_LOCAL_MD5_DIGEST) ;;
       SHA1) AC_DEFINE(HAVE_LOCAL_SHA1_DIGEST) ;;
-      RIPEMD160) AC_DEFINE(HAVE_LOCAL_RIPEMD160_DIGEST) ;;
     esac
     DIGEST_OBJS="$DIGEST_OBJS $module.o"
     DIGEST_SRCS="$DIGEST_SRCS $module.c"
