@@ -109,11 +109,12 @@ static librdf_stream* librdf_parser_libwww_parse_common(void *context, librdf_ur
 
 /* not used at present */
 typedef struct {
-  char *dummy;
+  librdf_parser *parser;    /* Redland parser object */
 } librdf_parser_libwww_context;
 
 
 typedef struct {
+  librdf_parser_libwww_context* pcontext; /* parser context */
   char* uri;                /* source URI string (for libwww) */
   HTRDF* parser;            /* libwww RDF parser */
   HTRequest* request;       /* request for URI */
@@ -130,14 +131,19 @@ typedef struct {
 
 /**
  * librdf_parser_libwww_init - Initialise the libwww RDF parser
+ * @parser: the parser
  * @context: context
  * 
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_libwww_init(void *context) 
+librdf_parser_libwww_init(librdf_parser *parser, void *context) 
 {
-  /* always succeeds ? */
+  librdf_parser_libwww_stream_context* scontext=(librdf_parser_libwww_stream_context*)context;
+
+  context->parser = parser;
+  
+  /* always succeeds ? */  
   return 0;
 }
   
@@ -376,7 +382,8 @@ tracer (const char * fmt, va_list pArgs)
 /**
  * librdf_parser_libwww_parse_uri_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: parser context
- * @uri: &librdf_uri URI of RDF/XML content
+ * @uri: &librdf_uri URI of RDF/XML content source
+ * @base_uri: &librdf_uri URI of the content location
  *
  * Retrieves all statements into memory in a list and emits them
  * when the URI content has been exhausted.  Use 
@@ -394,7 +401,8 @@ librdf_parser_libwww_parse_uri_as_stream(void *context, librdf_uri *uri,
 /**
  * librdf_parser_libwww_parse_uri_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
  * @context: parser context
- * @uri: &librdf_uri URI of RDF/XML content
+ * @uri: &librdf_uri URI of RDF/XML content source
+ * @base_uri: &librdf_uri URI of the content location
  * @model: &librdf_model of model
  *
  * Retrieves all statements and stores them in the given model.
@@ -408,8 +416,8 @@ librdf_parser_libwww_parse_uri_into_model(void *context, librdf_uri *uri,
 {
   void *status;
 
-  status=(void*)librdf_parser_libwww_parse_common(context, uri, base_uri, 
-                                                  model);
+  status=(void*)librdf_parser_libwww_parse_common(context, 
+                                                  uri, base_uri, model);
   
   return (status == NULL);
 }
@@ -418,7 +426,8 @@ librdf_parser_libwww_parse_uri_into_model(void *context, librdf_uri *uri,
 /**
  * librdf_parser_libwww_parse_common - Retrieve the RDF/XML content at URI and parse it into a librdf_stream or model
  * @context: parser context
- * @uri: &librdf_uri URI of RDF/XML content
+ * @uri: &librdf_uri URI of RDF/XML content source
+ * @base_uri: &librdf_uri URI of the content location
  * @model: &librdf_model of model
  *
  * Uses the libwww RDF routines to resolve RDF/XML content at a URI
@@ -429,12 +438,11 @@ librdf_parser_libwww_parse_uri_into_model(void *context, librdf_uri *uri,
  * Otherwise the return value is a &librdf_stream or NULL on failure.
  **/
 static librdf_stream*
-librdf_parser_libwww_parse_common(void *context, librdf_uri *uri,
-                                  librdf_uri *base_uri, librdf_model* model)
+librdf_parser_libwww_parse_common(void *context,
+                                  librdf_uri *uri, librdf_uri *base_uri,
+                                  librdf_model* model)
 {
-  /* Note: not yet used:
   librdf_parser_libwww_context* pcontext=(librdf_parser_libwww_context*)context;
-  */
   librdf_parser_libwww_stream_context* scontext;
   char * cwd;
   HTAnchor *anchor;
@@ -445,6 +453,7 @@ librdf_parser_libwww_parse_common(void *context, librdf_uri *uri,
   if(!scontext)
     return NULL;
 
+  scontext->pcontext=context;
   
   librdf_parser_libwww_client_profile("librdf_parser_libwwww", "1.0");
 
@@ -619,13 +628,14 @@ static void
 librdf_parser_libwww_serialise_finished(void* context)
 {
   librdf_parser_libwww_stream_context* scontext=(librdf_parser_libwww_stream_context*)context;
+  librdf_parser_libwww_context* pcontext=scontext->pcontext;
 
   if(scontext) {
     if(scontext->request)
       HTRequest_delete(scontext->request);
 
     if(scontext->parser)
-      HTRDF_delete(scontext->parser);
+      HTRDF_delete(scontext->libwww_parser);
 
     if(scontext->statements)
       librdf_free_list(scontext->statements);
