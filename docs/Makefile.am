@@ -39,12 +39,14 @@ POD_MODULES=RDF/Redland RDF/Redland/Iterator RDF/Redland/Model RDF/Redland/Node 
 
 DOC_C_FILES=$(DOC_CLASSES:%=$(srcdir)/../librdf/rdf_%.c)
 API_DOCBOOK_FILES=$(DOC_CLASSES:%=%.sgml)
+API_HTML_FILES=$(DOC_CLASSES:%=api_%.html)
 
 PERL_HTML_POD_FILES=$(POD_MODULES:%=pod/%.html)
 PYTHON_HTML_PYDOC_FILES=pydoc/RDF.html
 
 CLEANFILES=README
-MAINTAINERCLEANFILES=api.sgml api pod pydoc $(API_DOCBOOK_FILES)
+MAINTAINERCLEANFILES=api.sgml api pod pydoc $(API_DOCBOOK_FILES) \
+$(API_HTML_FILES)
 
 PERL=perl
 
@@ -82,14 +84,17 @@ api/index.html: api.sgml
 @MAINT@api.sgml: $(srcdir)/build-docs api.sgml.in $(API_DOCBOOK_FILES)
 @MAINT@	$(PERL) $(srcdir)/build-docs api.sgml.in > api.sgml
 @MAINT@
+@MAINT@$(API_HTML_FILES): api_%.html: $(srcdir)/../librdf/rdf_%.c $(srcdir)/kernel-doc
+@MAINT@	$(PERL) $(srcdir)/kernel-doc -html $< > $@
+@MAINT@
+@MAINT@api.html: $(srcdir)/build-docs api.html.in $(API_HTML_FILES)
+@MAINT@	$(PERL) $(srcdir)/build-docs api.html.in > api.html
+@MAINT@
 @MAINT@overview.ps: overview.xfig
 @MAINT@	fig2dev -L ps -l dummy -z A4 overview.xfig overview.pdf
 @MAINT@
 @MAINT@overview.pdf: overview.ps
 @MAINT@	ps2pdf overview.ps overview.pdf
-@MAINT@
-@MAINT@api-big.html: api.sgml
-@MAINT@	-jade -t sgml -ihtml -d /usr/lib/sgml/stylesheets/cygnus-both.dsl -V nochunks $< > $@
 @MAINT@
 @MAINT@$(PERL_HTML_POD_FILES): pod/%.html: $(srcdir)/../perl/lib/%.pm $(srcdir)/fix-pod-xhtml
 @MAINT@	mkdir -p pod/RDF/Redland
