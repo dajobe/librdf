@@ -28,7 +28,7 @@ pre
 <p>The main changes in this release are the addition of the
 Query and Query Results classes, and the removal of the 
 language bindings into the new
-<a href="http://www.redland.opensource.ac.uk//bindings/">Redland Bindings</a>
+<a href="http://www.redland.opensource.ac.uk/bindings/">Redland Bindings</a>
 package.
 </p>
 
@@ -40,20 +40,29 @@ swig interface file <code>Redland.i</code> which is now installed in
 
 <h3>Portability changes</h3>
 
-<p>Win32 building patches from Jose Kahan<br />
-Added win32_rdf_config.h hard-coded config<br />
-Added <code>#include win32_rdf_config.h</code> when WIN32 defined.<br />
-Use <code>REDLAND_STATIC</code> in librdf.h for statically linked Win32 builds.
+<p>Several patches for building Redland natively on Win32 
+were provided by Jose Kahan.  These included
+adding an <code>win32_rdf_config.h</code> hard-coded config
+for Win32, using that in the all the C source files and adding an
+<code>REDLAND_STATIC</code> define to help statically linking Win32
+builds of Redland.
 </p>
 
 
 <h3>Configuration changes</h3>
 
-<p>Redland 0.9.17 requires Raptor 1.3.2 either installed otherwise
-the copy in the source tree will be installed.</p>
+<p>Redland 0.9.17 requires Raptor 1.3.2 and Rasqal 0.9.1.  Installed
+versions are used if available by default, otherwise the copies in
+the source tree will be used.  The
+<code>--with-raptor=</code> and
+<code>--with-rasqal=</code> configure options with
+values <code>internal</code> or <code>system</code> can be
+used to select when both are available.
+</p>
 
-<p>Removed all the language binding-specific options such as
-<code>--with-perl</code> that are now used by Redland Bindings.</p>
+<p>Removed all the language binding-specific configuration code
+including options such as <code>--with-perl</code> that are now used
+by Redland Bindings.</p>
 
 
 <h3>Packaging changes</h3>
@@ -62,19 +71,20 @@ the copy in the source tree will be installed.</p>
 and redland-python RPMs which are now made in the redland-bindings
 package.</p>
 
-<p>Added -lrdf to redland.pc (Curtis Hovey)</p>
+<p>Added <code>-lrdf</code> to the pkgconfig redland.pc file (Curtis Hovey)</p>
 
-<p>Requires automake 1.7 and autoconf 2.54</p>
+<p>Redland requires automake 1.7 and autoconf 2.54 to build from CVS.</p>
 
 
 <h3>Query and Query Result Classes</h3>
 
-<p>Added Query (<code>librdf_query</code>) and Query Results
-(<code>librdf_query_results</code>) classes
-to provide RDF query support using Rasqal 0.9.1, now included
-in the Redland distribution.</p>
+<p>The Query (<code>librdf_query</code>) and Query Results
+(<code>librdf_query_results</code>) classes are new in Redland 0.9.17.
+They provide RDF query support using
+<a href="http://www.redland.opensource.ac.uk/rasqal/">Rasqal</a>
+0.9.1, which is now included in the Redland distribution.</p>
 
-<p>The Query class has the following new functions and methods:</p>
+<p>The Query class has the following functions and methods:</p>
 <ul>
 <li><code>librdf_new_query</code> (constructor)</li>
 <li><code>librdf_new_query_from_query</code> (constructor)</li>
@@ -98,7 +108,8 @@ in the Redland distribution.</p>
 </ul>
 
 
-<p>Added example5.c to demonstrate using the news query classes.</p>
+<p>A new example example5.c was created to demonstrate using the
+query classes.</p>
 
 
 <h3>Model Class changes</h3>
@@ -124,8 +135,8 @@ methods affected are:</p>
 <li><code>librdf_model_get_contexts</code></li>
 </ul>
 
-<p><code>librdf_model_find_statements_in_context</code> When applying
-map, copy the statement so it can be freed later.
+<p>Fixed a memory leak
+inside <code>librdf_model_find_statements_in_context</code>.
 </p>
 
 
@@ -155,8 +166,8 @@ contexts are not supported or enabled.  The methods affected are:</p>
 <li><code>librdf_storage_get_contexts</code></li>
 </ul>
 
-<p><code>librdf_storage_find_statements_in_context</code>
-When applying map, copy the statement so it can be freed later.
+<p>Fixed a memory leak
+inside <code>librdf_storage_find_statements_in_context</code>.
 </p>
 
 <p>A bug was fixed in method
