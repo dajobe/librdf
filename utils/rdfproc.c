@@ -78,7 +78,8 @@ enum command_type {
   CMD_HAS_ARC_OUT,
   CMD_QUERY,
   CMD_SERIALIZE,
-  CMD_REMOVE_CONTEXT
+  CMD_REMOVE_CONTEXT,
+  CMD_CONTEXTS
 };
 
 typedef struct
@@ -113,6 +114,7 @@ static command commands[]={
   {CMD_QUERY, "triples-match-query", 3, 3, 0},
   {CMD_SERIALIZE, "serialize", 0, 3, 0},
   {CMD_REMOVE_CONTEXT, "remove-context", 1, 1, 0},
+  {CMD_CONTEXTS, "contexts", 0, 0, 0},
   {(enum command_type)-1, NULL}  
 };
  
@@ -404,6 +406,7 @@ main(int argc, char *argv[])
 #endif
     puts("  find SUBJECT|- PREDICATE|- OBJECT|- [CONTEXT] Find matching triples");
     puts("  contains SUBJECT PREDICATE OBJECT         Check if triple is in the graph.");
+    puts("  contexts CONTEXT                          List the contexts in the graph.");
     puts("  add SUBJECT PREDICATE OBJECT [CONTEXT]    Add triple to graph.");
     puts("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]");
     puts("                                            Add datatyped triple to graph.");
@@ -762,7 +765,7 @@ main(int argc, char *argv[])
             librdf_free_node(context_node);
           } else {
             if(argv[3])
-              fprintf(stderr, "%s: WARNING: Cannot add in context with contexts not enabled (-c)\n", program);
+              fprintf(stderr, "%s: ERROR: Cannot add in context - contexts not enabled (-c)\n", program);
             rc=librdf_model_add_statement(model, partial_statement);
           }
           if(rc)
@@ -785,7 +788,7 @@ main(int argc, char *argv[])
             librdf_free_node(context_node);
           } else {
             if(argv[3])
-              fprintf(stderr, "%s: WARNING: Cannot remove in context with contexts not enabled (-c)\n", program);
+              fprintf(stderr, "%s: ERROR: Cannot remove triple in context - contexts not enabled (-c)\n", program);
             rc=librdf_model_remove_statement(model, partial_statement);
           }
           if(rc)
@@ -1037,9 +1040,35 @@ main(int argc, char *argv[])
           fprintf(stdout, "%s: failed to remove context triples from the graph\n", program);
         else
           fprintf(stdout, "%s: removed context triples from the graph\n", program);
-
       } else
-        fprintf(stderr, "%s: WARNING: Cannot remove context with contexts not enabled (-c)\n", program);
+        fprintf(stderr, "%s: ERROR: Cannot remove contexts - contexts not enabled (-c)\n", program);
+
+      break;
+
+
+    case CMD_CONTEXTS:
+      if(contexts) {
+        count=0;
+        while(!librdf_iterator_end(iterator)) {
+          node=(librdf_node*)librdf_iterator_get_object(iterator);
+          if(!node) {
+            fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
+                    program);
+            break;
+          }
+          
+          fputs("Context: ", stdout);
+          librdf_node_print(node, stdout);
+          fputc('\n', stdout);
+          
+          librdf_free_node(node);
+          count++;
+          librdf_iterator_next(iterator);
+        }
+        librdf_free_iterator(iterator);
+        fprintf(stderr, "%s: contexts: %d\n", program, count);
+} else
+        fprintf(stderr, "%s: ERROR: Cannot list contexts - contexts not enabled (-c)\n", program);
       break;
 
 
