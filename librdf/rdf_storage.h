@@ -118,6 +118,9 @@ struct librdf_storage_factory_s {
   /* list statements in a context  */
   librdf_stream* (*context_serialise)(librdf_storage* storage, librdf_node* context);
 
+  /* synchronise to underlying storage */
+  void (*sync)(librdf_storage* storage);
+
 };
 
 #include <rdf_storage_list.h>
@@ -179,6 +182,9 @@ librdf_stream* librdf_storage_context_serialise(librdf_storage* storage, librdf_
 /* querying methods */
 int librdf_storage_supports_query(librdf_storage* storage, librdf_query *query);
 librdf_stream* librdf_storage_query(librdf_storage* storage, librdf_query *query);
+
+/* synchronise a storage to the backing store */
+void librdf_storage_sync(librdf_storage *storage);
 
 
 #ifdef __cplusplus
