@@ -66,16 +66,26 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
   char *lang=NULL;
   librdf_uri *dt_uri=NULL;
   
-  if(librdf_node_get_type(subject) == LIBRDF_NODE_TYPE_BLANK)
+  if(librdf_node_is_blank(subject))
     fprintf(stream, "_:%s", librdf_node_get_blank_identifier(subject));
-  else {
+  else if(librdf_node_is_resource(subject)) {
+    /* Must be a URI */
     fputc('<', stream);
-    librdf_uri_print(librdf_node_get_uri(subject), stream);
+    raptor_print_ntriples_string(stream, librdf_uri_as_string(librdf_node_get_uri(subject)), '\0');
     fputc('>', stream);
+  } else {
+    LIBRDF_ERROR2(statement->world, "Do not know how to print triple subject type %d\n", librdf_node_get_type(subject));
+    return;
   }
+
+  if(!librdf_node_is_resource(predicate)) {
+    LIBRDF_ERROR2(statement->world, "Do not know how to print triple predicate type %d\n", librdf_node_get_type(predicate));
+    return;
+  }
+
   fputc(' ', stream);
   fputc('<', stream);
-  librdf_uri_print(librdf_node_get_uri(predicate), stream);
+  raptor_print_ntriples_string(stream, librdf_uri_as_string(librdf_node_get_uri(predicate)), '\0');
   fputc('>', stream);
   fputc(' ', stream);
 
@@ -100,11 +110,13 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
       fputs("_:", stream);
       fputs((const char*)librdf_node_get_blank_identifier(object), stream);
       break;
-    default:
-      /* must be URI */
+    case LIBRDF_NODE_TYPE_RESOURCE:
       fputc('<', stream);
       raptor_print_ntriples_string(stream, librdf_uri_as_string(librdf_node_get_uri(object)), '\0');
       fputc('>', stream);
+    default:
+      LIBRDF_ERROR2(statement->world, "Do not know how to print triple object type %d\n", librdf_node_get_type(object));
+      return;
   }
   fputs(" .", stream);
 }
