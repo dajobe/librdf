@@ -155,7 +155,7 @@ main(int argc, char *argv[])
   while(librdf_iterator_have_elements(iterator)) {
     librdf_node *target;
     
-    target=librdf_iterator_get_next(iterator);
+    target=(librdf_node*)librdf_iterator_get_next(iterator);
     if(!target) {
       fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n", program);
       break;

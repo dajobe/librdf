@@ -1478,8 +1478,8 @@ main(int argc, char *argv[])
       fprintf(stdout, "%s: Adding key/value pair: %s=%s\n", program,
 	      (char*)hd_key.data, (char*)hd_value.data);
       
-      hd_key.size=strlen(hd_key.data);
-      hd_value.size=strlen(hd_value.data); 
+      hd_key.size=strlen((char*)hd_key.data);
+      hd_value.size=strlen((char*)hd_value.data); 
       librdf_hash_put(h, &hd_key, &hd_value);
       
       fprintf(stdout, "%s: resulting ", program);
@@ -1489,7 +1489,7 @@ main(int argc, char *argv[])
     
     fprintf(stdout, "%s: Deleting key '%s'\n", program, test_hash_delete_key);
     hd_key.data=test_hash_delete_key;
-    hd_key.size=strlen(hd_key.data);
+    hd_key.size=strlen((char*)hd_key.data);
     librdf_hash_delete_all(h, &hd_key);
     
     fprintf(stdout, "%s: resulting ", program);
@@ -1560,7 +1560,7 @@ main(int argc, char *argv[])
       key_string=(char*)LIBRDF_MALLOC(cstring, key_hd->size+1);
       if(!key_string)
         break;
-      strncpy(key_string, key_hd->data, key_hd->size);
+      strncpy(key_string, (char*)key_hd->data, key_hd->size);
       key_string[key_hd->size]='\0';
       
       fprintf(stdout, "%s: boolean value of key '%s' is ", program,

@@ -257,7 +257,7 @@ librdf_utf8_to_latin1(const byte *input, int length, int *output_length)
   utf8_byte_length=i;
 
 
-  output=(byte*)LIBRDF_MALLOC(cstring, utf8_byte_length+1);
+  output=(byte*)LIBRDF_MALLOC(byte_string, utf8_byte_length+1);
   if(!output)
     return NULL;
   
@@ -310,7 +310,7 @@ librdf_latin1_to_utf8(const byte *input, int length, int *output_length)
     utf8_length += size;
   }
 
-  output=(byte*)LIBRDF_MALLOC(cstring, utf8_length+1);
+  output=(byte*)LIBRDF_MALLOC(byte_string, utf8_length+1);
   if(!output)
     return NULL;
   
@@ -387,25 +387,25 @@ main(int argc, char *argv[])
   struct tv *t;
   struct tv test_values[]={
     /* what is the capital of England? 'E' */
-    {"E", 1, 'E'},
+    {(const byte*)"E", 1, 'E'},
     /* latin small letter e with acute, U+00E9 ISOlat1 */
-    {"\xc3\xa9", 2, 0xE9},
+    {(const byte*)"\xc3\xa9", 2, 0xE9},
     /*  euro sign, U+20AC NEW */
-    {"\xe2\x82\xac", 3, 0x20AC}, 
+    {(const byte*)"\xe2\x82\xac", 3, 0x20AC}, 
     /* unknown char - U+1FFFFF (21 bits) */
-    {"\xf7\xbf\xbf\xbf", 4, 0x1FFFFF},
+    {(const byte*)"\xf7\xbf\xbf\xbf", 4, 0x1FFFFF},
     /* unknown char - U+3FFFFFF (26 bits) */
-    {"\xfb\xbf\xbf\xbf\xbf", 5, 0x3FFFFFF},
+    {(const byte*)"\xfb\xbf\xbf\xbf\xbf", 5, 0x3FFFFFF},
     /* unknown char - U+7FFFFFFF (31 bits) */
-    {"\xfd\xbf\xbf\xbf\xbf\xbf", 6, 0x7FFFFFFF},
+    {(const byte*)"\xfd\xbf\xbf\xbf\xbf\xbf", 6, 0x7FFFFFFF},
     {NULL, 0, 0}
   };
   const byte test_utf8_string[]="Lib" "\xc3\xa9" "ration costs " "\xe2\x82\xac" "3.50";
-  int test_utf8_string_length=strlen(test_utf8_string);
+  int test_utf8_string_length=strlen((const char*)test_utf8_string);
   const byte result_latin1_string[]="Lib" "\xe9" "ration costs 3.50";
-  int result_latin1_string_length=strlen(result_latin1_string);
+  int result_latin1_string_length=strlen((const char*)result_latin1_string);
   const byte result_utf8_string[]="Lib" "\xc3\xa9" "ration costs 3.50";
-  int result_utf8_string_length=strlen(result_utf8_string);
+  int result_utf8_string_length=strlen((const char*)result_utf8_string);
   
   int i;
   byte *latin1_string;

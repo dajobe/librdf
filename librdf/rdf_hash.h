@@ -170,7 +170,7 @@ void librdf_hash_print_keys(librdf_hash* hash, FILE *fh);
 void librdf_hash_print_values(librdf_hash* hash, char *key, FILE *fh);
 
 /* import a hash from a string representation */
-int librdf_hash_from_string (librdf_hash* hash, char *string);
+int librdf_hash_from_string (librdf_hash* hash, const char *string);
 
 /* import a hash from an array of strings */
 int librdf_hash_from_array_of_strings (librdf_hash* hash, char *array[]);

@@ -291,7 +291,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
       return librdf_new_uri_from_uri_qname(base_uri, uri_string);
 
     /* otherwise, take the prefix of base URI and add the fragment part */
-    new_uri_string=LIBRDF_MALLOC(cstring, (p-base_uri->string) + uri_string_length + 1);
+    new_uri_string=(char*)LIBRDF_MALLOC(cstring, (p-base_uri->string) + uri_string_length + 1);
     if(!new_uri_string)
       return NULL;
     strncpy(new_uri_string, base_uri->string, (p-base_uri->string));
@@ -326,7 +326,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
       p--)
     ;
 
-  new_uri_string=LIBRDF_MALLOC(cstring, (p-base_uri->string)+1+uri_string_length+1);
+  new_uri_string=(char*)LIBRDF_MALLOC(cstring, (p-base_uri->string)+1+uri_string_length+1);
   if(!new_uri_string)
     return NULL;
 

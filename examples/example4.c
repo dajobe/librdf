@@ -70,7 +70,7 @@ static command commands[]={
   {CMD_REMOVE, "remove", 3, 3, 1},
   {CMD_PARSE_MODEL, "parse", 2, 3, 1},
   {CMD_PARSE_STREAM, "parse-stream", 2, 3, 1},
-  {-1, NULL}  
+  {(enum command_type)-1, NULL}  
 };
  
 
@@ -421,7 +421,7 @@ main(int argc, char *argv[])
     /* (Common code) Print out nodes */
     count=0;
     while(librdf_iterator_have_elements(iterator)) {
-      node=librdf_iterator_get_next(iterator);
+      node=(librdf_node*)librdf_iterator_get_next(iterator);
       if(!node) {
         fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
                 program);

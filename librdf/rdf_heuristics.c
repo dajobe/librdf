@@ -93,7 +93,7 @@ librdf_heuristic_gen_name(char *name)
   char *new_name;
   char *p=name;
   size_t len;
-  int offset;
+  size_t offset;
   long l=-1L;
 
   /* Move to last character of name */

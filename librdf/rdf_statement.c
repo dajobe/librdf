@@ -695,7 +695,7 @@ main(int argc, char *argv[])
   buffer=(char*)LIBRDF_MALLOC(cstring, size);
 
   fprintf(stdout, "%s: Encoding statement in buffer\n", program);
-  size2=librdf_statement_encode(statement, buffer, size);
+  size2=librdf_statement_encode(statement, (unsigned char*)buffer, size);
   if(size2 != size) {
     fprintf(stderr, "%s: Encoding statement used %d bytes, expected it to use %d\n", program, size2, size);
     return(1);
@@ -706,7 +706,7 @@ main(int argc, char *argv[])
   statement2=librdf_new_statement(world);
 
   fprintf(stdout, "%s: Decoding statement from buffer\n", program);
-  if(!librdf_statement_decode(statement2, buffer, size)) {
+  if(!librdf_statement_decode(statement2, (unsigned char*)buffer, size)) {
     fprintf(stderr, "%s: Decoding statement failed\n", program);
     return(1);
   }
