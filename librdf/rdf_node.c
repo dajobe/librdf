@@ -841,6 +841,10 @@ librdf_node_get_literal_value_is_wf_xml(librdf_node* node)
 
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return 0;
+
+  if(!node->value.literal.datatype_uri)
+    return 0;
+  
   return librdf_uri_equals(node->value.literal.datatype_uri,
                            LIBRDF_RS_XMLLiteral_URI);
 }
