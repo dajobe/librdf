@@ -90,16 +90,10 @@ static librdf_hash_memory_node* librdf_hash_memory_find_node(librdf_hash_memory_
 static void librdf_free_hash_memory_node(librdf_hash_memory_node* node);
 static int librdf_hash_memory_expand_size(librdf_hash_memory_context* hash);
 
-/* Implementing hash keys iterator */
-static librdf_hash_memory_node* librdf_hash_memory_keys_iterator_get_next_datum(void *context);
-static int librdf_hash_memory_keys_iterator_have_elements(void* context);
-static void* librdf_hash_memory_keys_iterator_get_next(void* context);
-static void librdf_hash_memory_keys_iterator_finished(void* context);
-
-/* Implementing the hash get iterator */
-static int librdf_hash_memory_get_iterator_have_elements(void* context);
-static void* librdf_hash_memory_get_iterator_get_next(void* context);
-static void librdf_hash_memory_get_iterator_finished(void* context);
+/* Implementing the hash cursor */
+static int librdf_hash_memory_cursor_init(void* context, librdf_hash* hash);
+static int librdf_hash_memory_cursor_get(void* context, librdf_hash_datum* key, librdf_hash_datum* value, unsigned int flags);
+static void librdf_hash_memory_cursor_finish(void* context);
 
 
 
@@ -108,11 +102,9 @@ static void librdf_hash_memory_get_iterator_finished(void* context);
 
 static int librdf_hash_memory_open(void* context, char *identifier, void *mode, librdf_hash* options);
 static int librdf_hash_memory_close(void* context);
-static librdf_iterator* librdf_hash_memory_get(void* context, librdf_hash_datum *key, unsigned int flags);
 static int librdf_hash_memory_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data, unsigned int flags);
 static int librdf_hash_memory_exists(void* context, librdf_hash_datum *key);
 static int librdf_hash_memory_delete(void* context, librdf_hash_datum *key);
-static librdf_iterator* librdf_hash_memory_keys(void* context);
 static int librdf_hash_memory_sync(void* context);
 static int librdf_hash_memory_get_fd(void* context);
 
@@ -316,111 +308,183 @@ librdf_hash_memory_close(void* context)
 
 
 typedef struct {
-  librdf_hash_memory_context *hash;
-  librdf_hash_memory_node_value *values;
-} librdf_hash_memory_get_iterator_context;
+  librdf_hash_memory_context* hash;
+  int current_bucket;
+  librdf_hash_memory_node* current_node;
+  librdf_hash_memory_node_value *current_value;
+} librdf_hash_memory_cursor_context;
 
 
 
 /**
- * librdf_hash_memory_get - Retrieve a hash value for the given key
- * @context: memory hash context
- * @key: pointer to key to use
- * @data: pointer to data to return value
- * @flags: (not used at present)
+ * librdf_hash_memory_cursor_init - Initialise a new hash cursor
+ * @context: hash cursor context
+ * @hash: hash to operate over
  * 
  * Return value: non 0 on failure
  **/
-static librdf_iterator*
-librdf_hash_memory_get(void* context, librdf_hash_datum *key,
-		       unsigned int flags) 
+int
+librdf_hash_memory_cursor_init(void* context, librdf_hash* hash) 
 {
-  librdf_hash_memory_context *hash=(librdf_hash_memory_context*)context;
-  librdf_hash_memory_get_iterator_context *gcontext;
-  librdf_hash_memory_node *node;
+  librdf_hash_memory_cursor_context *cursor=(librdf_hash_memory_cursor_context*)context;
 
-  /* find node for key */
-  node=librdf_hash_memory_find_node(hash,
-				    (char*)key->data, key->size,
-				    NULL, NULL);
-  /* not found */
-  if(!node)
-    return NULL;
-
-  gcontext=(librdf_hash_memory_get_iterator_context*)LIBRDF_CALLOC(librdf_hash_memory_get_iterator_context, 1, sizeof(librdf_hash_memory_get_iterator_context));
-  if(!gcontext)
-    return NULL;
-  
-  gcontext->hash = hash;
-  gcontext->values=node->values;
-
-  return librdf_new_iterator((void*)gcontext,
-                             librdf_hash_memory_get_iterator_have_elements,
-                             librdf_hash_memory_get_iterator_get_next,
-                             librdf_hash_memory_get_iterator_finished);
+  cursor->hash = (librdf_hash_memory_context*)hash->context;
+  return 0;
 }
 
 
 /**
- * librdf_hash_memory_get_iterator_have_elements - Check for the end of the iterator of statements from the SiRPARC parser
- * @context: iteration context
+ * librdf_hash_memory_cursor_get - Retrieve a hash value for the given key
+ * @context: memory hash cursor context
+ * @key: pointer to key to use
+ * @value: pointer to value to use
+ * @flags: flags
  * 
- * Return value: non 0 at end of iterator.
+ * Return value: non 0 on failure
  **/
 static int
-librdf_hash_memory_get_iterator_have_elements(void* context)
+librdf_hash_memory_cursor_get(void* context, 
+                              librdf_hash_datum *key,
+                              librdf_hash_datum *value,
+                              unsigned int flags)
 {
-  librdf_hash_memory_get_iterator_context* gcontext=(librdf_hash_memory_get_iterator_context*)context;
+  librdf_hash_memory_cursor_context *cursor=(librdf_hash_memory_cursor_context*)context;
+  librdf_hash_memory_node_value *vnode=NULL;
+  librdf_hash_memory_node *node;
 
-  return (gcontext->values != NULL);
-}
+  /* First step, make sure cursor->current_node points to a valid node,
+     if possible */
+
+  /* Move to start of hash if necessary  */
+  if(flags == LIBRDF_HASH_CURSOR_FIRST) {
+    int i;
+    
+    cursor->current_node=NULL;
+    /* find first used bucket (with keys) */
+    cursor->current_bucket=0;
+
+    for(i=0; i< cursor->hash->capacity; i++)
+      if((cursor->current_node=cursor->hash->nodes[i])) {
+        cursor->current_bucket=i;
+        break;
+      }
+
+    if(cursor->current_node)
+      cursor->current_value=cursor->current_node->values;
+  }
+
+  /* If still have no current node, try to find it from the key */
+  if(!cursor->current_node  && key && key->data) {
+    cursor->current_node=librdf_hash_memory_find_node(cursor->hash,
+                                                      (char*)key->data,
+                                                      key->size,
+                                                      NULL, NULL);
+    if(cursor->current_node)
+      cursor->current_value=cursor->current_node->values;
+  }
 
 
-/**
- * librdf_hash_memory_get_iterator_get_next - Get the next value from the iterator over key values
- * @context: hash memory get iterator context
- * 
- * Return value: next value or NULL at end of iterator.
- **/
-static void*
-librdf_hash_memory_get_iterator_get_next(void* context)
-{
-  librdf_hash_memory_get_iterator_context* gcontext=(librdf_hash_memory_get_iterator_context*)context;
-  librdf_hash_memory_node_value *vnode;
-  librdf_hash_datum *value;
-  void *data;
+  /* If still have no node, failed */
+  if(!cursor->current_node)
+    return 1;
 
-  if(!(vnode=gcontext->values))
-    return NULL;
+  /* Check for end of values */
 
-  data=LIBRDF_MALLOC(cstring, vnode->value_len);
-  if(!data)
-    return NULL;
-  memcpy(data, vnode->value, vnode->value_len);
+  switch(flags) {
+  case LIBRDF_HASH_CURSOR_NEXT_VALUE:
+    /* If want values and have reached end of values list, end */
+    if(!cursor->current_value)
+      return 1;
+    break;
 
-  value=librdf_hash_datum_new(data, vnode->value_len);
-  if(!value) {
-    if(data)
-      LIBRDF_FREE(cstring, data);
-    return NULL;
+  case LIBRDF_HASH_CURSOR_FIRST:
+  case LIBRDF_HASH_CURSOR_NEXT:
+    /* If have reached last bucket, end */
+    if(cursor->current_bucket >= cursor->hash->capacity)
+      return 1;
+  
+    break;
+  default:
+    abort();
   }
   
-  gcontext->values=vnode->next;
 
-  return (void*)value;
+  /* Ok, there is data, retrieve it */
+
+  switch(flags) {
+  case LIBRDF_HASH_CURSOR_NEXT_VALUE:
+    vnode=cursor->current_value;
+
+    /* copy value */
+    value->data=vnode->value;
+    value->size=vnode->value_len;
+
+    /* move on */
+    cursor->current_value=vnode->next;
+    break;
+    
+  case LIBRDF_HASH_CURSOR_FIRST:
+  case LIBRDF_HASH_CURSOR_NEXT:
+    node=cursor->current_node;
+
+    /* copy key */
+    key->data=node->key;
+    key->size=node->key_len;
+    
+    /* if want values, walk through them */
+    if(value) {
+      vnode=cursor->current_value;
+      
+      /* copy value */
+      value->data=vnode->value;
+      value->size=vnode->value_len;
+
+      /* move on */
+      cursor->current_value=vnode->next;
+
+      /* stop here if there are more values, otherwise need next
+       * key & values so drop through and move to the next node
+       */
+      if(cursor->current_value)
+        break;
+    }
+    
+    /* move on to next node in current bucket */
+    if(!(node=cursor->current_node->next)) {
+      int i;
+      
+      /* end of list - move to next used bucket */
+      for(i=cursor->current_bucket+1; i< cursor->hash->capacity; i++)
+        if((node=cursor->hash->nodes[i])) {
+          cursor->current_bucket=i;
+          break;
+        }
+
+    }
+    
+    if((cursor->current_node=node))
+      cursor->current_value=node->values;
+
+    break;
+  default:
+    abort();
+  }
+  
+
+  return 0;
 }
 
 
 /**
- * librdf_hash_memory_get_iterator_finished - Finish the serialisation of the hash memory get
+ * librdf_hash_memory_cursor_finished - Finish the serialisation of the hash memory get
  * @context: hash memory get iterator context
  **/
 static void
-librdf_hash_memory_get_iterator_finished(void* context)
+librdf_hash_memory_cursor_finish(void* context)
 {
-  librdf_hash_memory_get_iterator_context* gcontext=(librdf_hash_memory_get_iterator_context*)context;
+  librdf_hash_memory_cursor_context* cursor=(librdf_hash_memory_cursor_context*)context;
 
-  LIBRDF_FREE(librdf_hash_memory_get_iterator_context, gcontext);
+  LIBRDF_FREE(librdf_hash_memory_cursor_context, cursor);
 }
 
 
@@ -602,163 +666,6 @@ librdf_hash_memory_delete(void* context, librdf_hash_datum *key)
 }
 
 
-
-typedef struct {
-  librdf_hash_memory_context* hash;
-  int current_bucket;
-  librdf_hash_memory_node* current_node;
-  int have_elements;
-} librdf_hash_memory_keys_iterator_context;
-
-
-/**
- * librdf_hash_memory_keys - Get the hash keys
- * @context: memory hash context
- * 
- * Return value: &librdf_iterator serialisation of keys or NULL on failure
- **/
-static librdf_iterator*
-librdf_hash_memory_keys(void* context)
-{
-  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
-  librdf_hash_memory_node* node=NULL;
-  librdf_hash_memory_keys_iterator_context* scontext;
-  int i;
-
-  scontext=(librdf_hash_memory_keys_iterator_context*)LIBRDF_CALLOC(librdf_hash_memory_keys_iterator_context, 1, sizeof(librdf_hash_memory_keys_iterator_context));
-  if(!scontext)
-    return NULL;
-  
-  scontext->hash = hash;
-
-  /* find first used bucket */
-  scontext->current_bucket=0;
-  for(i=0; i< hash->capacity; i++)
-    if((node=hash->nodes[i])) {
-      scontext->current_bucket=i;
-      break;
-    }
-
-  /* if current bucket is now 0, iterator is OK but empty */
-  scontext->have_elements= (!scontext) ? 0 : 1;
-
-  scontext->current_node=node;
-
-  return librdf_new_iterator((void*)scontext,
-                             librdf_hash_memory_keys_iterator_have_elements,
-                             librdf_hash_memory_keys_iterator_get_next,
-                             librdf_hash_memory_keys_iterator_finished);
-}
-
-
-static librdf_hash_memory_node*
-librdf_hash_memory_keys_iterator_get_next_datum(void *context) 
-{
-  librdf_hash_memory_keys_iterator_context* scontext=(librdf_hash_memory_keys_iterator_context*)context;
-  librdf_hash_memory_node* node;
-
-  if(!scontext->have_elements)
-    return NULL;
-  
-  /* move on to next node in current bucket */
-  if(!(node=scontext->current_node->next)) {
-    int i;
-
-    /* end of list - find next used bucket */
-    for(i=scontext->current_bucket+1; i< scontext->hash->capacity; i++)
-      if((node=scontext->hash->nodes[i])) {
-        scontext->current_bucket=i;
-        break;
-      }
-
-    if(!node)
-      scontext->have_elements=0;
-  }
-
-  /* save new current node */
-  scontext->current_node=node;
-  
-  return node;
-}
-
-
-/**
- * librdf_hash_memory_keys_iterator_have_elements - Check for the end of the iterator of statements from the SiRPARC parser
- * @context: hash memory keys iterator context
- * 
- * Return value: non 0 at end of iterator.
- **/
-static int
-librdf_hash_memory_keys_iterator_have_elements(void* context)
-{
-  librdf_hash_memory_keys_iterator_context* scontext=(librdf_hash_memory_keys_iterator_context*)context;
-
-  if(!scontext->have_elements)
-    return 0;
-
-  /* already have 1 stored item - not end yet */
-  if(scontext->current_node)
-    return 1;
-
-  /* get next datum / check for end */
-  if(!librdf_hash_memory_keys_iterator_get_next_datum(scontext))
-    scontext->have_elements=0;
-
-  return scontext->have_elements;
-}
-
-
-/**
- * librdf_hash_memory_keys_iterator_get_next - Get the next eleemnt from the iterator
- * @context: hash memory keys iterator context
- * 
- * Return value: next value or NULL at end of iterator.
- **/
-static void*
-librdf_hash_memory_keys_iterator_get_next(void* context)
-{
-  librdf_hash_memory_keys_iterator_context* scontext=(librdf_hash_memory_keys_iterator_context*)context;
-  librdf_hash_memory_node* node;
-  librdf_hash_datum *key;
-  void *data=NULL;
-
-  if(!scontext->have_elements)
-    return NULL;
-
-  node=scontext->current_node;
-  
-  data=LIBRDF_MALLOC(cstring, node->key_len);
-  if(!data)
-    return NULL;
-  memcpy(data, node->key, node->key_len);
-
-  key=librdf_hash_datum_new(data, node->key_len);
-  if(!key) {
-    if(data)
-      LIBRDF_FREE(cstring, data);
-    return NULL;
-  }
-
-  /* get next datum */
-  librdf_hash_memory_keys_iterator_get_next_datum(scontext);
-
-  return (void*)key;
-}
-
-
-/**
- * librdf_hash_memory_keys_iterator_finished - Finish the serialisation of the hash memory keys
- * @context: hash memory keys iterator context
- **/
-static void
-librdf_hash_memory_keys_iterator_finished(void* context)
-{
-  librdf_hash_memory_keys_iterator_context* scontext=(librdf_hash_memory_keys_iterator_context*)context;
-
-  LIBRDF_FREE(librdf_hash_memory_keys_iterator_context, scontext);
-}
-
-
 /**
  * librdf_hash_memory_sync - Flush the hash to disk
  * @context: memory hash context
@@ -802,16 +709,19 @@ static void
 librdf_hash_memory_register_factory(librdf_hash_factory *factory) 
 {
   factory->context_length = sizeof(librdf_hash_memory_context);
+  factory->cursor_context_length = sizeof(librdf_hash_memory_cursor_context);
   
   factory->open    = librdf_hash_memory_open;
   factory->close   = librdf_hash_memory_close;
-  factory->get     = librdf_hash_memory_get;
   factory->put     = librdf_hash_memory_put;
   factory->exists  = librdf_hash_memory_exists;
   factory->delete_key  = librdf_hash_memory_delete;
-  factory->keys    = librdf_hash_memory_keys;
   factory->sync    = librdf_hash_memory_sync;
   factory->get_fd  = librdf_hash_memory_get_fd;
+
+  factory->cursor_init   = librdf_hash_memory_cursor_init;
+  factory->cursor_get    = librdf_hash_memory_cursor_get;
+  factory->cursor_finish = librdf_hash_memory_cursor_finish;
 }
 
 /**
