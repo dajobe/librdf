@@ -134,7 +134,7 @@ if test "$echo_libtool_libs" = "yes"; then
 fi
 
 if test "$echo_libs" = "yes"; then
-  echo -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ `$rasqal_config --libs` `$raptor_config --cflags`
+  echo -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ `$rasqal_config --libs` `$raptor_config --libs`
 fi
 
 if test "$echo_swig" = "yes"; then  
