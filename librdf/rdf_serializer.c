@@ -155,6 +155,9 @@ librdf_serializer_register_factory(librdf_world *world,
  * @mime_type: the MIME type of the syntax (NULL or empty string if not used)
  * @type_uri: URI of syntax (NULL if not used)
  * 
+ * If all fields are NULL, this means any parser supporting
+ * MIME Type "application/rdf+xml"
+ *
  * Return value: the factory or NULL if not found
  **/
 librdf_serializer_factory*
@@ -166,8 +169,12 @@ librdf_get_serializer_factory(librdf_world *world,
   
   if(name && !*name)
     name=NULL;
-  if(mime_type && !*mime_type)
-    mime_type=NULL;
+  if(!mime_type || (mime_type && !*mime_type)) {
+    if(!name && !type_uri)
+      mime_type="application/rdf+xml";
+    else
+      mime_type=NULL;
+  }
 
   /* return 1st serializer if no particular one wanted */
   if(!name && !mime_type && !type_uri) {
@@ -307,9 +314,7 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
 void
 librdf_init_serializer(librdf_world *world) 
 {
-#ifdef HAVE_RAPTOR_RDFXML_SERIALIZER
   librdf_serializer_raptor_constructor(world);
-#endif
 }
 
 
