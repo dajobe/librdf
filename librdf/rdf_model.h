@@ -211,7 +211,8 @@ int librdf_model_context_add_statement(librdf_model* model, librdf_node* context
 int librdf_model_context_add_statements(librdf_model* model, librdf_node* context, librdf_stream* stream);
 int librdf_model_context_remove_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
 int librdf_model_context_remove_statements(librdf_model* model, librdf_node* context);
-librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* context);
+librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* context);
+/* DEPRECATED */ librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* context);
 
 /* query language */
 librdf_stream* librdf_model_query(librdf_model* model, librdf_query* query);

@@ -943,10 +943,27 @@ librdf_model_context_remove_statements(librdf_model* model,
 
 
 /**
+ * librdf_model_context_as_stream - list all statements in a model context
+ * @model: &librdf_model object
+ * @context: &librdf_uri context
+ * 
+ * Return value: &librdf_stream of statements or NULL on failure
+ **/
+librdf_stream*
+librdf_model_context_as_stream(librdf_model* model, librdf_node* context) 
+{
+  return model->factory->context_serialize(model, context);
+}
+
+
+/**
  * librdf_model_context_serialize - List all statements in a model context
  * @model: &librdf_model object
  * @context: &librdf_uri context
  * 
+ * DEPRECATED to reduce confusion with the librdf_serializer class.
+ * Please use librdf_model_context_as_stream.
+ *
  * Return value: &librdf_stream of statements or NULL on failure
  **/
 librdf_stream*
