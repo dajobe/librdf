@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2002-2003 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2002-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -33,13 +33,12 @@
 
 #include <librdf.h>
 #include <rdf_query.h>
-#include <rdf_query_triples.h>
 
 
 #ifndef STANDALONE
 
 /* prototypes for helper functions */
-static void librdf_delete_query_factories(void);
+static void librdf_delete_query_factories(librdf_world *world);
 
 
 /**
@@ -53,8 +52,9 @@ static void librdf_delete_query_factories(void);
 void
 librdf_init_query(librdf_world *world) 
 {
-  /* Always have query triple implementations available */
-  librdf_init_query_triples(world);
+  /* Always have query triple, rasqal implementations available */
+  librdf_query_triples_constructor(world);
+  librdf_query_rasqal_constructor(world);
 }
 
 
@@ -65,14 +65,10 @@ librdf_init_query(librdf_world *world)
 void
 librdf_finish_query(librdf_world *world) 
 {
-  librdf_delete_query_factories();
+  librdf_query_rasqal_destructor();
+  librdf_delete_query_factories(world);
 }
 
-
-/* statics */
-
-/* list of query adaptor factories */
-static librdf_query_factory* query_factories;
 
 
 /* helper functions */
@@ -82,18 +78,18 @@ static librdf_query_factory* query_factories;
  * librdf_delete_query_factories - helper function to delete all the registered query factories
  */
 static void
-librdf_delete_query_factories(void)
+librdf_delete_query_factories(librdf_world *world)
 {
   librdf_query_factory *factory, *next;
   
-  for(factory=query_factories; factory; factory=next) {
+  for(factory=world->query_factories; factory; factory=next) {
     next=factory->next;
     LIBRDF_FREE(librdf_query_factory, factory->name);
     if(factory->uri)
       librdf_free_uri(factory->uri);
     LIBRDF_FREE(librdf_query_factory, factory);
   }
-  query_factories=NULL;
+  world->query_factories=NULL;
 }
 
 
@@ -142,7 +138,7 @@ librdf_query_register_factory(librdf_world *world, const char *name,
     }
   }
         
-  for(h = query_factories; h; h = h->next ) {
+  for(h = world->query_factories; h; h = h->next ) {
     if(!strcmp(h->name, name_copy)) {
       LIBRDF_FREE(cstring, name_copy); 
       LIBRDF_FREE(librdf_query, query);
@@ -160,8 +156,8 @@ librdf_query_register_factory(librdf_world *world, const char *name,
   LIBRDF_DEBUG3("%s has context size %d\n", name, query->context_length);
 #endif
   
-  query->next = query_factories;
-  query_factories = query;
+  query->next = world->query_factories;
+  world->query_factories = query;
 }
 
 
@@ -173,19 +169,20 @@ librdf_query_register_factory(librdf_world *world, const char *name,
  * Return value: the factory object or NULL if there is no such factory
  **/
 librdf_query_factory*
-librdf_get_query_factory (const char *name, librdf_uri *uri) 
+librdf_get_query_factory (librdf_world *world, 
+                          const char *name, librdf_uri *uri) 
 {
   librdf_query_factory *factory;
 
   /* return 1st query if no particular one wanted - why? */
   if(!name && !uri) {
-    factory=query_factories;
+    factory=world->query_factories;
     if(!factory) {
       LIBRDF_DEBUG1("No (default) query factories registered\n");
       return NULL;
     }
   } else {
-    for(factory=query_factories; factory; factory=factory->next) {
+    for(factory=world->query_factories; factory; factory=factory->next) {
       if(name && !strcmp(factory->name, name)) {
         break;
       }
@@ -220,7 +217,7 @@ librdf_new_query (librdf_world *world,
                   const unsigned char *query_string) {
   librdf_query_factory* factory;
 
-  factory=librdf_get_query_factory(name, uri);
+  factory=librdf_get_query_factory(world, name, uri);
   if(!factory)
     return NULL;
 
@@ -344,36 +341,9 @@ librdf_free_query (librdf_query* query)
 
 /* methods */
 
-/**
- * librdf_query_open - Start a query
- * @query: &librdf_query object
- *
- * This is ended with librdf_query_close()
- * 
- * Return value: non 0 on failure
- **/
-int
-librdf_query_open(librdf_query* query)
-{
-  return query->factory->open(query);
-}
-
 
 /**
- * librdf_query_close - End a model / query association
- * @query: &librdf_query object
- * 
- * Return value: non 0 on failure
- **/
-int
-librdf_query_close(librdf_query* query)
-{
-  return query->factory->close(query);
-}
-
-
-/**
- * librdf_query_run - Run the query on a model giving matching statements
+ * librdf_query_run_as_stream - Run the query on a model giving matching statements
  * @query: &librdf_query object
  * @model: model to operate query on
  * 
@@ -384,9 +354,135 @@ librdf_query_close(librdf_query* query)
  * Return value:  &librdf_stream of matching statements (may be empty) or NULL on failure
  **/
 librdf_stream*
-librdf_query_run(librdf_query* query, librdf_model* model)
+librdf_query_run_as_stream(librdf_query* query, librdf_model* model)
 {
-  return query->factory->run(query, model);
+  if(query->factory->run_as_stream)
+    return query->factory->run_as_stream(query, model);
+  else
+    return NULL;
+}
+
+
+/**
+ * librdf_query_run_as_bindings - Run the query on a model giving variable bindings
+ * @query: &librdf_query object
+ * @model: model to operate query on
+ * 
+ * Runs the query against the (previously registered) model
+ * 
+ * Return value:  non-0 on failure
+ **/
+int
+librdf_query_run_as_bindings(librdf_query* query, librdf_model* model)
+{
+  if(query->factory->run_as_bindings)
+    return query->factory->run_as_bindings(query, model);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_query_get_result_count: Get number of bindings so far
+ * @query: &librdf_query query
+ * 
+ * Return value: number of bindings found so far
+ **/
+int
+librdf_query_get_result_count(librdf_query *query)
+{
+  if(query->factory->get_result_count)
+    return query->factory->get_result_count(query);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_query_results_finished: Find out if binding results are exhausted
+ * @query: &librdf_query query
+ * 
+ * Return value: non-0 if results are finished or query failed
+ **/
+int
+librdf_query_results_finished(librdf_query *query)
+{
+  if(query->factory->results_finished)
+    return query->factory->results_finished(query);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_query_get_result_bindings: Get all binding names, values for current result
+ * @query: &librdf_query query
+ * @names: pointer to an array of binding names (or NULL)
+ * @values: pointer to an array of binding value &librdf_node (or NULL)
+ * 
+ * If either of the pointers is not NULL, pointers to shared copies
+ * of the binding names or values are returned.
+ * 
+ * Return value: non-0 if the assignment failed
+ **/
+int
+librdf_query_get_result_bindings(librdf_query *query, 
+                                 const char ***names, librdf_node **values)
+{
+  if(query->factory->get_result_bindings)
+    return query->factory->get_result_bindings(query, names, values);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_query_get_result_binding: Get one binding value for the current result
+ * @query: &librdf_query query
+ * @offset: offset of binding name into array of known names
+ * 
+ * Return value: a new &librdf_node binding value or NULL on failure
+ **/
+librdf_node*
+librdf_query_get_result_binding(librdf_query *query, int offset)
+{
+  if(query->factory->get_result_binding)
+    return query->factory->get_result_binding(query, offset);
+  else
+    return NULL;
+}
+
+
+/**
+ * librdf_query_get_result_binding_by_name: Get one binding value for a given name in the current result
+ * @query: &librdf_query query
+ * @name: variable name
+ * 
+ * Return value: a new &librdf_node binding value or NULL on failure
+ **/
+librdf_node*
+librdf_query_get_result_binding_by_name(librdf_query *query, const char *name)
+{
+  if(query->factory->get_result_binding_by_name)
+    return query->factory->get_result_binding_by_name(query, name);
+  else
+    return NULL;
+}
+
+
+/**
+ * librdf_query_next_result: Move to the next result
+ * @query: &librdf_query query
+ * 
+ * Return value: non-0 if failed or results exhausted
+ **/
+int
+librdf_query_next_result(librdf_query *query)
+{
+  if(query->factory->next_result)
+    return query->factory->next_result(query);
+  else
+    return 1;
 }
 
 #endif
