@@ -24,13 +24,13 @@
 #include <stdio.h>
 #include <string.h>		/* for memcpy() */
 
-#include <types.h>
-
+#include <rdf_config.h>
 #include <rdf_digest.h>
+#include <rdf_types.h>
 
-#include <types.h>
 
-/* original code from header (functions names renamed) */
+/* original code from header - function names have changed */
+
 struct MD5Context {
   u32 buf[4];
   u32 bits[2];
@@ -283,6 +283,7 @@ static void MD5Transform(u32 buf[4], u32 const in[16])
 }
 
 
+/* my code from here */
 static unsigned char md5_digest[16];
 
 static void
@@ -306,7 +307,7 @@ md5_register_factory(rdf_digest_factory *factory)
   factory->init  = (void (*)(void *))MD5Init;
   factory->update = (void (*)(void *, unsigned char*, size_t))MD5Update;
   factory->final = (void (*)(void *))md5_final;
-  factory->get_digest  = (byte *(*)(void *))md5_get_digest;
+  factory->get_digest  = (unsigned char *(*)(void *))md5_get_digest;
 }
 
 void
