@@ -46,6 +46,8 @@ typedef struct librdf_storage_factory_s librdf_storage_factory;
 typedef struct librdf_stream_s librdf_stream;
 typedef struct librdf_parser_s librdf_parser;
 typedef struct librdf_parser_factory_s librdf_parser_factory;
+typedef struct librdf_query_s librdf_query;
+typedef struct librdf_query_factory_s librdf_query_factory;
 
 
 /* error handling */
@@ -146,6 +148,7 @@ void librdf_memory_report(FILE *fh);
 #include <rdf_storage.h>
 #include <rdf_parser.h>
 #include <rdf_stream.h>
+#include <rdf_query.h>
 
 
 #ifdef __cplusplus
