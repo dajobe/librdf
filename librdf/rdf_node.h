@@ -181,7 +181,7 @@ int librdf_node_get_li_ordinal(librdf_node* node);
 void librdf_node_set_li_ordinal(librdf_node* node, int ordinal);
 
 char *librdf_node_get_blank_identifier(librdf_node* node);
-char *librdf_node_set_blank_identifier(librdf_node* node, char *identifier);
+int librdf_node_set_blank_identifier(librdf_node* node, char *identifier);
 
 librdf_digest* librdf_node_get_digest(librdf_node* node);
 

@@ -673,24 +673,24 @@ librdf_node_get_blank_identifier(librdf_node* node) {
  * @node: the node object
  * @identifier: the identifier
  *
- * Return value: the old identifier or NULL on failure
+ * Return value: non 0 on failure
  **/
-char *
+int
 librdf_node_set_blank_identifier(librdf_node* node, char *identifier) 
 {
-  char *old_identifier;
   char *new_identifier;
   int len=strlen(identifier);
   
   new_identifier=(char*)LIBRDF_MALLOC(cstring, len+1);
   if(!new_identifier)
-    return NULL;
+    return 1;
   strcpy(new_identifier, identifier);
-  old_identifier=node->value.blank.identifier;
+
+  LIBRDF_FREE(cstring, node->value.blank.identifier);
   node->value.blank.identifier=new_identifier;
   node->value.blank.identifier_len=len;
 
-  return old_identifier;
+  return 0;
 }
 
 
