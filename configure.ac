@@ -506,11 +506,12 @@ if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_
 
   # Sigh!  And this still might not be good enough.
   for bdbc_version in 4.2 4.1 4.0 4 3.3 3.2 3.1 3 2; do
-    for bdbc_prefix in $extraprefix /usr/local /usr; do
-      bdbc_major=`echo $bdbc_version | sed -e 's/^\(.\).*$/\1/'`;
-      bdbc_version2=`echo $bdbc_version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
+    bdbc_major=`echo $bdbc_version | sed -e 's/^\(.\).*$/\1/'`;
+    bdbc_version2=`echo $bdbc_version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
 
+    for bdbc_prefix in $extraprefix /usr/local/BerkeleyDB.$bdbc_version /usr/local /usr; do
       bdbc_libdir=$bdbc_prefix/lib
+
       for bdbc_incdir in $bdbc_prefix/include/db$bdbc_version $bdbc_prefix/include/db$bdbc_version2 $bdbc_prefix/include/db$bdbc_major $bdbc_prefix/include ; do
         if test -r $bdbc_incdir/db.h ; then
           header_bdbc_version=`sed -ne 's/^.*DB_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $bdbc_incdir/db.h`
