@@ -234,6 +234,10 @@ librdf_storage_list_size(librdf_storage* storage)
 static int
 librdf_storage_list_add_statement(librdf_storage* storage, librdf_statement* statement)
 {
+  /* Do not add duplicate statements */
+  if(librdf_storage_list_contains_statement(storage, statement))
+    return 0;
+
   return librdf_storage_list_context_add_statement(storage, NULL, statement);
 }
 
@@ -245,29 +249,35 @@ librdf_storage_list_add_statements(librdf_storage* storage,
   librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
   int status=0;
 
-  while(!librdf_stream_end(statement_stream)) {
+  for(; !librdf_stream_end(statement_stream);
+      librdf_stream_next(statement_stream)) {
     librdf_statement* statement=librdf_stream_get_object(statement_stream);
     librdf_storage_list_node* sln;
 
-    if(statement) {
-      sln=(librdf_storage_list_node*)LIBRDF_MALLOC(librdf_storage_list_node, sizeof(librdf_storage_list_node));
-      if(!sln) {
-        status=1;
-        break;
-      }
-
-      /* copy shared statement */
-      sln->statement=librdf_new_statement_from_statement(statement);
-      if(!sln->statement) {
-        LIBRDF_FREE(librdf_storage_list_node, sln);
-        status=1;
-        break;
-      }
-      sln->context=NULL;
-      librdf_list_add(context->list, sln);
-    } else
+    if(!statement) {
       status=1;
-    librdf_stream_next(statement_stream);
+      break;
+    }
+
+    /* Do not add duplicate statements */
+    if(librdf_storage_list_contains_statement(storage, statement))
+      continue;
+
+    sln=(librdf_storage_list_node*)LIBRDF_MALLOC(librdf_storage_list_node, sizeof(librdf_storage_list_node));
+    if(!sln) {
+      status=1;
+      break;
+    }
+    
+    /* copy shared statement */
+    sln->statement=librdf_new_statement_from_statement(statement);
+    if(!sln->statement) {
+      LIBRDF_FREE(librdf_storage_list_node, sln);
+      status=1;
+      break;
+    }
+    sln->context=NULL;
+    librdf_list_add(context->list, sln);
   }
   
   return status;
