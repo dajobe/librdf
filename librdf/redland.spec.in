@@ -120,6 +120,7 @@ cd ..
 %doc *.html
 
 %doc %{_mandir}/man1/redland-config.1*
+%doc %{_mandir}/man1/redland-db-upgrade.1*
 %doc %{_mandir}/man3/redland.3*
 
 %files devel
@@ -150,6 +151,9 @@ cd ..
 /sbin/ldconfig
 
 %changelog
+* Thu Aug 21 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
+- Add redland-db-upgrade.1
+
 * Sun Aug 17 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
 - Updates for new perl module names.
 
