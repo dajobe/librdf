@@ -263,6 +263,54 @@ librdf_new_uri_from_uri_qname (librdf_uri* old_uri, const char *qname) {
 
 
 /**
+ * librdf_new_uri_normalised_to_base - Constructor - create a new librdf_uri object from a URI string stripped of the source URI, made relative to the base URI
+ * @uri_string: URI in string form
+ * @source_uri: source URI to remove
+ * @base_uri: base URI to add
+ * 
+ * Return value: a new &librdf_uri object or NULL on failure
+ **/
+librdf_uri*
+librdf_new_uri_normalised_to_base(const char *uri_string,
+                                  librdf_uri* source_uri,
+                                  librdf_uri* base_uri) 
+{
+  int uri_string_len;
+  int len;
+  char *new_uri_string;
+  librdf_uri *new_uri;
+  
+  /* no match - easy */
+  if(strncmp(uri_string, source_uri->string, source_uri->string_length))
+    return librdf_new_uri(uri_string);
+
+  /* darn - matches the source URI */
+
+  /* move uri_string pointer to first non-matching char */
+  uri_string += source_uri->string_length;
+
+  /* size of remaining bytes to copy from uri_string */
+  uri_string_len=strlen(uri_string);
+
+  /* total bytes */
+  len=uri_string_len + 1 + base_uri->string_length;
+
+  new_uri_string=(char*)LIBRDF_MALLOC(cstring, len);
+  if(!new_uri_string)
+    return NULL;
+  strncpy(new_uri_string, base_uri->string, base_uri->string_length);
+  /* strcpy not strncpy since I want a \0 on the end */
+  strcpy(new_uri_string + base_uri->string_length, uri_string);
+  
+  new_uri=librdf_new_uri(new_uri_string);
+  LIBRDF_FREE(cstring, new_uri_string); /* always free this even on failure */
+
+  return new_uri; /* new URI or NULL from librdf_new_uri failure */
+}
+
+
+
+/**
  * librdf_free_uri - Destructor - destroy a librdf_uri object
  * @uri: &librdf_uri object
  * 
@@ -394,6 +442,39 @@ librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri)
 }
 
 
+/**
+ * librdf_uri_is_file_uri - Test if a URI points to a filename
+ * @uri: &librdf_uri object
+ * 
+ * Return value: 0 if the URI points to a file
+ **/
+int
+librdf_uri_is_file_uri(librdf_uri* uri) 
+{
+  /* FIXME: Almost certainly missing something subtle here */
+  return strncmp(uri->string, "file:", 5)==0;
+}
+
+
+/**
+ * librdf_uri_as_filename - Return pointer to filename part of URI
+ * @uri: &librdf_uri object
+ * 
+ * Note - returns a pointer to a shared copy; this assumes that
+ * the URI encodes the filename without changing any characters -
+ * a simple but in general wrong assumption (e.g. files with spaces
+ * or slashes).
+ *
+ * Return value: pointer to shared copy of name or NULL if the URI does not point to a file
+ **/
+const char*
+librdf_uri_as_filename(librdf_uri* uri) 
+{
+  if(!librdf_uri_is_file_uri(uri))
+    return NULL;
+  return uri->string + 5;
+}
+
 
 #ifdef STANDALONE
 
@@ -405,10 +486,12 @@ int
 main(int argc, char *argv[]) 
 {
   char *hp_string="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
-  librdf_uri *uri1, *uri2;
+  librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5;
   librdf_digest_factory* digest_factory;
   librdf_digest *d;
   char *program=argv[0];
+  const char *uri_string=  "file:/big/long/directory/blah#1.rdf";
+  
 
   librdf_init_digest();
   librdf_init_hash();
@@ -451,10 +534,28 @@ main(int argc, char *argv[])
   fputs("\n", stderr);
   librdf_free_digest(d);
 
+  uri3=librdf_new_uri("file:/big/long/directory/");
+  uri4=librdf_new_uri("http://somewhere/dir/");
+  fprintf(stderr, "%s: Source URI is ", program);
+  librdf_uri_print(uri3, stderr);
+  fputs("\n", stderr);
+  fprintf(stderr, "%s: Base URI is ", program);
+  librdf_uri_print(uri4, stderr);
+  fputs("\n", stderr);
+  fprintf(stderr, "%s: URI string is '%s'\n", program, uri_string);
+
+  uri5=librdf_new_uri_normalised_to_base(uri_string, uri3, uri4);
+  fprintf(stderr, "%s: Normalised URI is ", program);
+  librdf_uri_print(uri5, stderr);
+  fputs("\n", stderr);
+
 
   fprintf(stderr, "%s: Freeing URIs\n", program);
   librdf_free_uri(uri1);
   librdf_free_uri(uri2);
+  librdf_free_uri(uri3);
+  librdf_free_uri(uri4);
+  librdf_free_uri(uri5);
   
   librdf_finish_uri();
   librdf_finish_hash();
