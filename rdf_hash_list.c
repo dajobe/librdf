@@ -153,11 +153,13 @@ rdf_hash_list_put(void* context, rdf_hash_data *key, rdf_hash_data *value, unsig
       return 1;
   }
 
-  new_key=(char*)RDF_MALLOC(cstring, key->size);
-  if(!new_key) {
-    if(is_new_node)
+  /* allocate key only for a new node */
+  if(is_new_node) {
+    new_key=(char*)RDF_MALLOC(cstring, key->size);
+    if(!new_key) {
       RDF_FREE(rdf_hash_list_node, node);
-    return 1;
+      return 1;
+    }
   }
     
   new_value=(char*)RDF_MALLOC(cstring, value->size);
@@ -169,10 +171,15 @@ rdf_hash_list_put(void* context, rdf_hash_data *key, rdf_hash_data *value, unsig
   }
 
   /* at this point, all mallocs worked and list hasn't been touched*/
-  memcpy(new_key, key->data, key->size);
-  node->key=new_key;
-  node->key_len=key->size;
-
+  if(is_new_node) {
+    memcpy(new_key, key->data, key->size);
+    node->key=new_key;
+    node->key_len=key->size;
+  } else {
+    /* only now delete old data */
+    RDF_FREE(cstring, node->value);
+  }
+  
   memcpy(new_value, value->data, value->size);
   node->value=new_value;
   node->value_len=value->size;
@@ -181,9 +188,6 @@ rdf_hash_list_put(void* context, rdf_hash_data *key, rdf_hash_data *value, unsig
     /* only now touch list */
     node->next=list_context->first;
     list_context->first=node;
-  } else {
-    /* only now delete old data */
-    RDF_FREE(cstring, node->value);
   }
   return 0;
 }
