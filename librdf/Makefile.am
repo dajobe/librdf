@@ -78,7 +78,16 @@ SUBDIRS=@SD@
 
 bin_SCRIPTS = redland-config
 lib_LIBRARIES = librdf.a
-include_HEADERS = redland.h
+# FIXME: Should *not* install all headers
+include_HEADERS = redland.h librdf.h \
+rdf_types.h \
+rdf_uri.h rdf_node.h rdf_statement.h rdf_context.h \
+rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
+rdf_model.h rdf_iterator.h \
+rdf_list.h \
+rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
+rdf_stream.h \
+rdf_parser.h
 
 librdf_a_SOURCES = rdf_init.c \
 rdf_uri.c rdf_node.c rdf_statement.c \
@@ -88,7 +97,7 @@ rdf_list.c rdf_memory.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c \
-redland.h rdf_types.h \
+librdf.h rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_context.h \
 rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
 rdf_model.h rdf_iterator.h \
