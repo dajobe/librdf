@@ -354,6 +354,11 @@ LIBS="$LIBRDF_LIBS"
 
 
 dnl Checks for XML parsers
+
+# At present this is for passing on to raptor and not used here
+AC_ARG_WITH(xml-parser, [  --with-xml-parser=NAME  Use XML parser - expat, libxml [expat]], xml_parser="$withval", xml_parser="expat") 
+
+
 have_expat=0
 have_expat_lib=0
 have_expat_source=0
