@@ -26,6 +26,11 @@
 #include <sys/types.h>
 
 #include <stdio.h>
+#include <string.h>
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h> /* for abort() as used in errors */
+#endif
+
 
 #include <librdf.h>
 #include <rdf_storage.h>
@@ -135,11 +140,12 @@ static int librdf_storage_hashes_group_add_statement(librdf_storage* storage, li
 static int librdf_storage_hashes_group_remove_statement(librdf_storage* storage, librdf_uri* group_uri, librdf_statement* statement);
 static librdf_stream* librdf_storage_hashes_group_serialise(librdf_storage* storage, librdf_uri* group_uri);
 
+#ifdef LIBRDF_STORAGE_HASH_GROUPS
 /* group list statement stream methods */
 static int librdf_storage_hashes_group_serialise_end_of_stream(void* context);
 static librdf_statement* librdf_storage_hashes_group_serialise_next_statement(void* context);
 static void librdf_storage_hashes_group_serialise_finished(void* context);
-
+#endif
 
 static void librdf_storage_hashes_register_factory(librdf_storage_factory *factory);
 
