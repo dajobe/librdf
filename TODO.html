@@ -15,6 +15,10 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>Add arcs_in/arcs_out model methods</li>
+<li>Add container class for manipulating RDF containers - Seq, Bag, Alt, ...</li>
+<li>Add a N3 parser</li>
+<li>Add an XSLT 'parser' based on <a href="http://xmlsoft.org/XSLT/">libxslt</a></li>
 <li>Handle xml:lang when the rdf parsers provide it</li>
 <li>Use <a href="http://xmlsoft.org/">libxml</a> rather than expat as default xml parser? Reasons: uses iconv to handle more content encodings and provides better error reporting</li>
 <li>Pass RDF parser error messages to user code, scripting languages</li>
@@ -31,7 +35,7 @@
 <li>Write a quickstart / howto document</li>
 <li>Split the header files into internal / user ones.  Maybe generate
 part of librdf.h automatically to make a 1-header file system.</li>
-<li>Make GDBM hash handle duplicates</li>
+<li>Make GDBM hash handle duplicates (code is present but never used)</li>
 <li>Make API docbook sgml generate decent PostScript / PDF output</li>
 <li>Fix the URI hash mechanism - currently stores URI/pointer pairs in hash - wrong</li>
 <li>Make the library thread safe</li>
@@ -47,14 +51,12 @@ part of librdf.h automatically to make a 1-header file system.</li>
 
 <p>(Excluding all the <tt>FIXME</tt>s in the source)</p>
 
-<p>1. String encoding - needs iconv posix function and/or Unicode library.
-Some utility functions have been written for UTF-8 to/from ISO Latin-1.</p>
+<ul>
+<li>String encoding - needs iconv posix function and/or Unicode library.
+Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 
-<p>2. rdf_hash.c <tt>librdf_hash_from_string()</tt> - \ escaping doesn't work properly</p>
-
-<p>3. BerkeleyDB V1 code has been tested and does not work - probably not worth fixing.</p>
-
-<p>4. GDBM hash code does not support duplicates, so is not used.</p>
+<li>BerkeleyDB V1 code has been tested and does not work - probably not worth fixing.</li>
+</ul>
 
 
 <h2>Done</h2>
@@ -63,6 +65,7 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</p>
 release version where appropriate.</p>
 
 <ul>
+<li><tt>librdf_hash_from_string()</tt> - \ escaping doesn't work properly (0.9.9)</li>
 <li>SiRPAC wrappers handle multi-line literal objects (0.9.9)</li>
 <li>Added <a href="docs/tcl.html">Tcl</a> interface (0.9.8)</li>
 <li>Add module - <a href="http://www.redland.opensource.ac.uk/rapier/">Rapier</a> RDF parser - internal (0.9.8)</li>
@@ -120,7 +123,7 @@ parser will use expat or libxml as necessary.
 
 <hr />
 
-<p>Copyright 2000 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 <p><a href="http://www.mirror.ac.uk/services/validator/check/referer">Validate me</a></p>
 
