@@ -158,7 +158,7 @@ librdf_parser_sirpac_parse_as_stream(void *context, librdf_uri *uri) {
   int command_len;
   char *command;
   FILE *fh;
-  static const char *command_format_string="%s -classpath %s org.w3c.rdf.examples.ListStatements %s 2>&1";
+  static const char *command_format_string="%s -classpath %s -Dorg.xml.sax.parser=com.microstar.xml.SAXDriver org.w3c.rdf.examples.ListStatements %s";
   char *uri_string;
 
   scontext=(librdf_parser_sirpac_stream_context*)LIBRDF_CALLOC(librdf_parser_sirpac_stream_context, 1, sizeof(librdf_parser_sirpac_stream_context));
@@ -325,6 +325,19 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
     break;
   }
 
+
+  if(feof(context->fh)) {
+    int status=pclose(context->fh);
+
+    if(status) {
+      /* FIXME: something failed e.g. fork, exec or SiRPAC exited
+       * with an error */
+      fprintf(stderr, "SiRPAC command '%s' exited with status %d\n",
+              context->command, status);
+    }
+    context->fh=NULL;
+  }
+  
   return statement;
 }
 
@@ -398,11 +411,19 @@ librdf_parser_sirpac_serialise_finished(void* context)
   if(scontext) {
     if(scontext->fh) {
       char buffer[LINE_BUFFER_LEN];
+      int status;
+      
       /* throw away any remaining data, to prevent EPIPE signal */
       while(!feof(scontext->fh)) {
 	fgets(buffer, LINE_BUFFER_LEN, scontext->fh);
       }
-      fclose(scontext->fh);
+      status=pclose(scontext->fh);
+      if(status) {
+        /* FIXME: something failed e.g. fork, exec or SiRPAC exited
+         * with an error */
+        fprintf(stderr, "SiRPAC command '%s' exited with status %d\n",
+                scontext->command, status);
+      }
       scontext->fh=NULL;
     }
 
