@@ -118,23 +118,25 @@ AC_MSG_CHECKING(location of BDB)
 AC_MSG_RESULT($bdb_prefix)
 if test "$bdb_prefix" != no; then
   oCFLAGS="$CFLAGS"
+  oLDFLAGS="$LDFLAGS"
   oLIBS="$LIBS"
   if test "$bdb_prefix" != /usr; then
-    nLIBS="-L$bdb_prefix/lib $LIBS";
+    nLDFLAGS="-L$bdb_prefix/lib $LDFLAGS";
     CFLAGS="-I$bdb_prefix/include $CFLAGS";
   else
-    nLIBS="$LIBS"
+    nLDFLAGS="$LDFLAGS"
   fi
-  LIBS="$nLIBS"
+  LDFLAGS="$nLDFLAGS"
   AC_CHECK_HEADERS(db.h)
   if test "$ac_cv_header_db_h" = yes ; then
-    LIBS="$nLIBS"
+    LIBS="$oLIBS"
     AC_CHECK_LIB(db, db_create)
-    LIBS="$nLIBS"
+    LIBS="$oLIBS"
     AC_CHECK_LIB(db, db_open)
-    LIBS="$nLIBS"
+    LIBS="$oLIBS"
     AC_CHECK_LIB(db, dbopen)
-    LIBS="$nLIBS -ldb"
+    LIBS="$oLIBS -ldb"
+    LDFLAGS="$nLDFLAGS"
     have_libdb=no
     if test "$ac_cv_lib_db_db_create" = yes; then
       AC_DEFINE(HAVE_DB_CREATE)
@@ -149,7 +151,8 @@ if test "$bdb_prefix" != no; then
     fi
     AC_MSG_CHECKING(whether DB_TXN defined in db.h)
     dnl In BDB, DB_TXN is a pointer to a structure never defined
-    AC_TRY_LINK([#include <db.h>], [DB_TXN* ptr=(DB_TXN*)NULL],
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [DB_TXN* ptr=(DB_TXN*)NULL],
 		AC_DEFINE(HAVE_BDB_DB_TXN)
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
@@ -159,7 +162,8 @@ if test "$bdb_prefix" != no; then
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
     AC_MSG_CHECKING(number of arguments to db_cursor)
-    AC_TRY_LINK([#include <db.h>], [DB* db; db->cursor(db, NULL, NULL, 0);],
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [DB* db; db->cursor(db, NULL, NULL, 0);],
 		AC_DEFINE(HAVE_BDB_CURSOR_4_ARGS)
 		AC_MSG_RESULT(4),
 		AC_MSG_RESULT(3))
@@ -167,6 +171,7 @@ if test "$bdb_prefix" != no; then
 
   if test "$have_libdb" != yes; then
     LIBS="$oLIBS"
+    LDFLAGS="$oLDFLAGS"
     CFLAGS="$oCFLAGS"
    fi
 
