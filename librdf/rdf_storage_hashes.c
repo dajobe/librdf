@@ -377,11 +377,11 @@ librdf_storage_hashes_terminate(librdf_storage* storage)
   int i;
   
   for(i=0; i<context->hash_count; i++) {
-    if(context->hash_descriptions[i])
+    if(context->hash_descriptions && context->hash_descriptions[i])
       LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions[i]);
-    if(context->hashes[i])
+    if(context->hashes && context->hashes[i])
       librdf_free_hash(context->hashes[i]);
-    if(context->names[i])
+    if(context->names && context->names[i])
       LIBRDF_FREE(cstring,context->names[i]);
   }
 
