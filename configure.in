@@ -107,8 +107,8 @@ AC_CHECK_PROGS(TAR, gnutar gtar tar)
 AC_CHECK_PROGS(JAVA, java jre)
 AC_CHECK_PROGS(JAVAC, javac)
 AC_DEFINE_UNQUOTED(JAVA_COMMAND, "$JAVA")
-AC_CHECK_PROGS(PYTHON, python2.0 python2 python)
-AC_CHECK_PROGS(PERL, perl5.6.0 perl5 perl)
+AC_CHECK_PROGS(PYTHON, python2.2 python2.1 python2.0 python2 python)
+AC_CHECK_PROGS(PERL, perl5.6.1 perl5.6.0 perl5 perl)
 AC_CHECK_PROGS(TCL, tcl)
 AC_CHECK_PROGS(SWIG, swig)
 
@@ -935,6 +935,7 @@ expat/xmltok/Makefile
 perl/Makefile
 perl/lib/Makefile
 perl/lib/RDF/Makefile
+perl/lib/RDF/Redland/Makefile
 python/Makefile
 python/test/Makefile
 tcl/Makefile
