@@ -1300,6 +1300,12 @@ librdf_storage_sqlite_serialise_finished(void* context)
   if(scontext->storage)
     librdf_storage_remove_reference(scontext->storage);
 
+  if(scontext->statement)
+    librdf_free_statement(scontext->statement);
+
+  if(scontext->context)
+    librdf_free_node(scontext->context);
+
   LIBRDF_FREE(librdf_storage_sqlite_serialise_stream_context, scontext);
 }
 
@@ -1311,6 +1317,8 @@ typedef struct {
   int finished;
 
   int index_contexts;
+
+  librdf_statement *query_statement;
 
   librdf_statement *statement;
   librdf_node* context;
@@ -1365,8 +1373,8 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   scontext->sqlite_context=context;
 
 
-  statement=librdf_new_statement_from_statement(statement);
-  if(!statement)
+  scontext->query_statement=librdf_new_statement_from_statement(statement);
+  if(!scontext->query_statement)
     return NULL;
 
   if(librdf_storage_sqlite_statement_helper(storage,
@@ -1549,6 +1557,15 @@ librdf_storage_sqlite_find_statements_finished(void* context)
 
   if(scontext->storage)
     librdf_storage_remove_reference(scontext->storage);
+
+  if(scontext->query_statement)
+    librdf_free_statement(scontext->query_statement);
+
+  if(scontext->statement)
+    librdf_free_statement(scontext->statement);
+
+  if(scontext->context)
+    librdf_free_node(scontext->context);
 
   LIBRDF_FREE(librdf_storage_sqlite_find_statements_stream_context, scontext);
 }
