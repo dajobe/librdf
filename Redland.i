@@ -183,6 +183,9 @@ librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statemen
 librdf_iterator* librdf_model_get_sources(librdf_model *model, librdf_node *arc, librdf_node *target);
 librdf_iterator* librdf_model_get_arcs(librdf_model *model, librdf_node *source, librdf_node *target);
 librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *source, librdf_node *arc);
+librdf_node* librdf_model_get_source(librdf_model *model, librdf_node *arc, librdf_node *target);
+librdf_node* librdf_model_get_arc(librdf_model *model, librdf_node *source, librdf_node *target);
+librdf_node* librdf_model_get_target(librdf_model *model, librdf_node *source, librdf_node *arc);
 
 /* rdf_storage.h */
 librdf_storage* librdf_new_storage(char *storage_name, char *name, char *options_string);
