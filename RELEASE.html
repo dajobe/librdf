@@ -65,10 +65,10 @@ cleanly with g++ 3.2, 3.3 and all warnings enabled.</p>
 
 <h3><code>rdfproc</code> RDF processor utility program changes</h3>
 
-<p><code>rdfproc</code> was extensively updated and it can now more
-easily work with any type of Redland store and has better
-support for working with contexts. The detailed changes are
-as follows:</p>
+<p><a href="utils/rdfproc.html">rdfproc</a> was extensively updated
+and it can now more easily work with any type of Redland store and
+has better support for working with contexts. The detailed changes
+are as follows:</p>
 
 <ul>
 <li>Added an -s TYPE option to specify a storage type</li>
@@ -262,6 +262,8 @@ directly.</p>
 <p>Updated to match API changes above.  Fix Node literal_values
 to work with datatype URIs.  Export the NS class.  Added
 a FileStorage class for the storage type <code>file</code>.
+Removed use of the python Distutils which was often
+getting the linking wrong.
 </p>
 
 <h3>Ruby API changes</h3>
@@ -288,7 +290,7 @@ with the
 <a href="http://www.redland.opensource.ac.uk/raptor/NEWS.html">Raptor NEWS</a>
 for the changes since 0.9.12.</p>
 
-<p>New in this version is the <code>rdfproc</code> utility
+<p>New in this version is the <a href="utils/rdfproc.html">rdfproc</a> utility
 which allows command line creation of redland stores, parsing
 of syntaxes and manipulation of the model.</p>
 
