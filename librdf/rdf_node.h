@@ -114,6 +114,8 @@ void librdf_node_set_type(librdf_node* node, librdf_node_type type);
 
 char* librdf_node_get_literal_value(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
+int librdf_node_get_literal_value_xml_space(librdf_node* node);
+int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_language, int xml_space, int is_wf_xml);
 
 librdf_digest* librdf_node_get_digest(librdf_node* node);
