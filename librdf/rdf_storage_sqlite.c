@@ -322,18 +322,29 @@ librdf_storage_sqlite_set_helper(librdf_storage *storage,
                                  int table, const char *values) 
 {
   librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
-  char request[1024];
+  int rc;
+  raptor_stringbuffer *sb;
+  char *request;
 
-  sprintf(request, "INSERT INTO %s (id, %s) VALUES(NULL, %s);",
-          sqlite_tables[table].name, 
-          sqlite_tables[table].columns,
-          values);
+  sb=raptor_new_stringbuffer();
+  raptor_stringbuffer_append_string(sb, "INSERT INTO ", 1);
+  raptor_stringbuffer_append_string(sb, sqlite_tables[table].name, 1);
+  raptor_stringbuffer_append_counted_string(sb, " (id, ", 6, 1);
+  raptor_stringbuffer_append_string(sb, sqlite_tables[table].columns, 1);
+  raptor_stringbuffer_append_counted_string(sb, ") VALUES(NULL, ", 15, 1);
+  raptor_stringbuffer_append_string(sb, values, 1);
+  raptor_stringbuffer_append_counted_string(sb, ");", 2, 1);
+  request=raptor_stringbuffer_as_string(sb);
 
-  if(librdf_storage_sqlite_exec(storage,
+  rc=librdf_storage_sqlite_exec(storage,
                                 request,
                                 NULL, /* no callback */
                                 NULL, /* arg */
-                                0))
+                                0);
+
+  raptor_free_stringbuffer(sb);
+
+  if(rc)
     return -1;
 
   return sqlite_last_insert_rowid(context->db);
@@ -1197,7 +1208,6 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   }
     
 
-  raptor_free_memory(request);
   raptor_free_stringbuffer(sb);
   
   scontext->storage=storage;
