@@ -21,6 +21,258 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<h2 id="rel0_9_15"><a name="rel0_9_15">Redland 0.9.15 Changes</a></h2>
+
+<p>This section is <b>draft</b> until 0.9.15 is released</p>
+
+<p>This version of Redland updates to use Raptor 1.1.0
+and ...
+</p>
+
+<h3>URI and Literal string type changes</h3>
+
+<p>Most of these changes are to properly use and return UTF-8 strings
+as <code>unsigned char*</code> for URIs (looking forward to
+Internationalized Resource Identifiers, IRIs emerging) and for RDF
+literal strings, plus other fixes to work better with C++ correcting
+the use of <code>const</code>.  Redland and Raptor now both compile
+cleanly with g++.</p>
+
+
+<h3>Model Class changes</h3>
+
+<p>Methods
+<code>add_string_literal_statement</code> and
+<code>add_typed_literal_statement</code>
+now take a <code>const unsigned char* string</code>.
+Method
+<code>query_string</code> now takes
+a <code>const unsigned char* string</code> query.
+</p>
+
+<!--<pre>
+Methods
+-int librdf_model_add_string_literal_statement(librdf_model* model,
+   librdf_node* subject, librdf_node* predicate, char* string, char *xml_language, int is_wf_xml);
++int librdf_model_add_string_literal_statement(librdf_model* model,
+   librdf_node* subject, librdf_node* predicate, const unsigned char* string, char *xml_language, int is_wf_xml);
+
+-int librdf_model_add_typed_literal_statement(librdf_model* model,
+   librdf_node* subject, librdf_node* predicate, char* string, char *xml_language, librdf_uri *datatype_uri);
++int librdf_model_add_typed_literal_statement(librdf_model* model, 
+   librdf_node* subject, librdf_node* predicate, const unsigned char* string, char *xml_language, librdf_uri *datatype_uri);
+
+-librdf_stream* librdf_model_query_string(librdf_model* model,
+   const char *name, librdf_uri* uri, const char *query_string);
++librdf_stream* librdf_model_query_string(librdf_model* model,
+   const char *name, librdf_uri* uri, const unsigned char *query_string);
+</pre>-->
+
+
+<h3>Node Class changes</h3>
+
+<p>Constructors
+<code>from_uri_string</code>,
+<code>from_uri_local_name</code> and
+<code>from_normalised_uri_string</code>
+now take a <code>const unsigned char*
+string</code> URI string.
+Constructors
+<code>from_literal</code> and
+<code>from_typed_literal</code>
+now take a <code>const unsigned char* string</code> RDF literal.
+Constructor <code>from_blank_identifier</code>
+now takes a <code>const unsigned char* string</code> blank node identifier.
+</p>
+
+<p>Methods
+<code>get_literal_value</code>,
+<code>get_literal_value_as_counted_string</code> and
+<code>get_blank_identifier</code>
+now return a <code>const unsigned char* string</code> RDF literal,
+blank node identifier
+
+</p>
+
+<p>(Debugging methods
+<code>to_string</code> and <code>to_counted_string</code> now return a
+<code>const unsigned char* string</code>)
+</p>
+
+<!--<pre>
+Constructors
+-librdf_node* librdf_new_node_from_uri_string(librdf_world* world,
+   const char *string);
++librdf_node* librdf_new_node_from_uri_string(librdf_world* world,
+   const unsigned char *string);
+
+-librdf_node* librdf_new_node_from_uri_local_name(librdf_world* world,
+   librdf_uri *uri, const char *local_name);
++librdf_node* librdf_new_node_from_uri_local_name(librdf_world* world,
+   librdf_uri *uri, const unsigned char *local_name);
+ 
+-librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world,
+   const char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
++librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world,
+   const unsigned char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);
+ 
+-librdf_node* librdf_new_node_from_literal(librdf_world* world,
+   const char *string, const char *xml_language, int is_wf_xml);
++librdf_node* librdf_new_node_from_literal(librdf_world* world,
+   const unsigned char *string, const char *xml_language, int is_wf_xml);
+ 
+-librdf_node* librdf_new_node_from_typed_literal(librdf_world *world,
+   const char *string, const char *xml_language,
+   librdf_uri* datatype_uri);
++librdf_node* librdf_new_node_from_typed_literal(librdf_world *world,
+   const unsigned char *string, const char *xml_language,
+   librdf_uri* datatype_uri);
+ 
+-librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world,
+   const char *identifier);
++librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world,
+   const unsigned char *identifier);
+
+
+Methods
+-char* librdf_node_get_literal_value(librdf_node* node);
++unsigned char* librdf_node_get_literal_value(librdf_node* node);
+
+-char* librdf_node_get_literal_value_as_counted_string(librdf_node* node, 
+   size_t* len_p);
++unsigned char* librdf_node_get_literal_value_as_counted_string(librdf_node* node,
+   size_t* len_p);
+
+-char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
++unsigned char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
+
+-char *librdf_node_get_blank_identifier(librdf_node* node);
++unsigned char *librdf_node_get_blank_identifier(librdf_node* node);
+ 
+-char *librdf_node_to_string(librdf_node* node);
++unsigned char *librdf_node_to_string(librdf_node* node);
+
+-char* librdf_node_to_counted_string(librdf_node* node, size_t* len_p);
++unsigned char* librdf_node_to_counted_string(librdf_node* node, size_t* len_p);
+</pre>-->
+
+
+<h3>Parser Class changes</h3>
+
+<p>Methods
+<code>parse_string_as_stream</code> and
+<code>parse_string_into_model</code>
+now take a <code>const unsigned char* string</code> syntax buffer.
+</p>
+
+<!--<pre>
+Methods 
+-librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser,
+   const char* string, librdf_uri* base_uri);
++librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser,
+   const unsigned char* string, librdf_uri* base_uri);
+
+-int librdf_parser_parse_string_into_model(librdf_parser* parser,
+   const char *string, librdf_uri* base_uri, librdf_model* model);
++int librdf_parser_parse_string_into_model(librdf_parser* parser,
+   const unsigned char *string, librdf_uri* base_uri, librdf_model* model);
+</pre>-->
+
+
+
+<h3>Query Class changes</h3>
+
+<p>Constructor
+<code>query</code> 
+now takes a <code>const unsigned char* string</code> query.
+</p>
+
+<!--<pre>
+Constructor
+-librdf_query* librdf_new_query(librdf_world* world,
+   const char *name, librdf_uri* uri, const char *query_string);
++librdf_query* librdf_new_query(librdf_world* world,
+   const char *name, librdf_uri* uri, const unsigned char *query_string);
+</pre>-->
+
+
+<h3>Statement Class changes</h3>
+
+<p>(Debugging method
+<code>to_string</code>
+now returns a <code>const unsigned char* string</code>)
+</p>
+
+<!--<pre>
+Methods
+-char *librdf_statement_to_string(librdf_statement *statement);
++unsigned char *librdf_statement_to_string(librdf_statement *statement);
+</pre>-->
+
+
+<h3>URI Class changes</h3>
+
+<p>Constructors
+<code>librdf_new_uri</code>, 
+...<code>from_uri_local_name</code>,
+... <code>normalised_to_base</code> and
+... <code>relative_to_base</code>.
+now take a <code>const unsigned char* string</code> URI string.
+</p>
+
+<p>Methods
+<code>as_string</code>,
+<code>as_counted_string</code>,
+<code>to_string</code> and
+<code>to_counted_string</code>
+now return a <code>const unsigned char* string</code> URI string.
+</p>
+
+
+
+<!--<pre>
+Constructors
+-librdf_uri* librdf_new_uri (librdf_world *world,
+   const char *string);
++librdf_uri* librdf_new_uri (librdf_world *world,
+   const unsigned char *string);
+
+-librdf_uri* librdf_new_uri_from_uri_local_name (librdf_uri* uri,
+   const char *local_name);
++librdf_uri* librdf_new_uri_from_uri_local_name (librdf_uri* uri,
+   const unsigned char *local_name);
+
+-librdf_uri* librdf_new_uri_normalised_to_base(const char *uri_string,
+   librdf_uri* source_uri, librdf_uri* base_uri);
++librdf_uri* librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
+   librdf_uri* source_uri, librdf_uri* base_uri);
+
+-librdf_uri* librdf_new_uri_relative_to_base(librdf_uri* base_uri,
+   const char *uri_string);
++librdf_uri* librdf_new_uri_relative_to_base(librdf_uri* base_uri,
+   const unsigned char *uri_string);
+
+
+Methods
+-char* librdf_uri_as_string (librdf_uri *uri);
++unsigned char* librdf_uri_as_string (librdf_uri *uri);
+
+-char* librdf_uri_as_counted_string (librdf_uri *uri,
+   size_t *len_p);
++unsigned char* librdf_uri_as_counted_string (librdf_uri *uri,
+   size_t *len_p);
+
+-char* librdf_uri_to_string (librdf_uri* uri);
++unsigned char* librdf_uri_to_string (librdf_uri* uri);
+
+-char* librdf_uri_to_counted_string (librdf_uri* uri,
+   size_t* len_p);
++unsigned char* librdf_uri_to_counted_string (librdf_uri* uri,
+   size_t* len_p);
+</pre>-->
+
+
+
 <h2 id="rel0_9_14"><a name="rel0_9_14">Redland 0.9.14 Changes</a></h2>
 
 <p>This version of Redland is an update mostly to synchronise
