@@ -245,6 +245,19 @@ librdf_hash_gdbm_clone(librdf_hash *hash, void* context, char *new_identifier,
 }
 
 
+/**
+ * librdf_hash_gdbm_values_count - Get the number of values in the hash
+ * @context: GDBM hash context
+ * 
+ * Return value: number of values in the hash or <0 on failure
+ **/
+static int
+librdf_hash_gdbm_values_count(void *context) 
+{
+  /* Does not seem to be possible to implement */
+  return -1;
+}
+
 
 typedef struct {
   librdf_hash_gdbm_context* hash;
@@ -503,6 +516,8 @@ librdf_hash_gdbm_register_factory(librdf_hash_factory *factory)
   factory->open    = librdf_hash_gdbm_open;
   factory->close   = librdf_hash_gdbm_close;
   factory->clone   = librdf_hash_gdbm_clone;
+
+  factory->values_count = librdf_hash_gdbm_values_count;
 
   factory->put     = librdf_hash_gdbm_put;
   factory->exists  = librdf_hash_gdbm_exists;
