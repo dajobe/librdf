@@ -1,4 +1,7 @@
-2004-11-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+2004-11-10  cmdjb  <cmdjb@hedwig.dajobe.org>
+
+	* rdf_serializer_raptor.c (librdf_serializer_raptor_set_namespace):
+	raptor_serialize_set_namespace, typo
 
 	* rdf_serializer.c (librdf_serializer_set_namespace):
 	Note may not be implemented.

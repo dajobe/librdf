@@ -1,5 +1,56 @@
 2004-11-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* librdf/rdf_serializer_raptor.c
+	(librdf_serializer_raptor_set_namespace):
+	raptor_serialize_set_namespace, typo
+
+	* utils/rdfproc.c: Init partial_statement, uri_string
+
+	* configure.ac: Need raptor 1.4.3 and rasqal 0.9.5
+
+	* raptor/raptor_sequence.c (raptor_sequence_join):
+	Copy pointers correctly
+
+	* rasqal/rdql_parser.y (ConstraintClause): Don't add constraint
+	sequence here.
+	(CommaAndConstraintClause): Instead, add constraints here.
+
+	* rasqal/sparql_parser.y (GraphPattern): Use raptor_sequence_join
+
+	* rasqal/rdql_parser.y (Query): Don't set contraints here.
+	(ConstraintClause): Use rasqal_query_add_constraint.
+
+	* rasqal/configure.ac: require raptor 1.4.3
+
+	* raptor/raptor_sequence.c (raptor_sequence_join):
+	Added, to move all items between two
+	sequences leaving one empty.
+
+	* raptor/raptor.h: Added raptor_sequence_join
+
+	* librdf/rdf_serializer.c (librdf_serializer_set_namespace):
+	Note may not be implemented.
+
+	* librdf/rdf_query_results.c (librdf_query_results_as_stream):
+	Docs, note implemented.
+
+	* librdf/rdf_serializer_raptor.c
+	(librdf_serializer_raptor_get_feature,
+	librdf_serializer_raptor_set_feature): Added to use new serializer
+	features.
+	(librdf_serializer_raptor_set_namespace): Added calling
+	raptor_serializer_set_namespace which should work sometime.
+
+	* raptor/raptor.h: Added raptor_serialize_set_namespace
+
+	* raptor/raptor_serialize.c (raptor_serialize_set_namespace):
+	Added, not implemented.
+
+	* librdf/rdf_query_results.c (librdf_free_query_results): Add docs.
+
+	* raptor/raptor_rss.c (raptor_rss_parse_recognise_syntax):
+	Boost in recognising xml rss
+
 	* rasqal/rasqal.h, librdf/redland.h, librdf/rdf_utf8.h,
 	librdf/rdf_node.h, librdf/rdf_model.h, librdf/rdf_list.h,
 	librdf/librdf.h: Applied patch from René Puls to allow for Redland
