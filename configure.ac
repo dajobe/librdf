@@ -470,7 +470,18 @@ done
 
 
 dnl Checks for languages
-AC_DEFINE_UNQUOTED(JAVA_CLASS_DIR, "$prefix/share/$PACKAGE", [Java installation directory])
+AC_ARG_WITH(jdk, [  --with-jdk=DIR          Java JDK location []], jdk="$withval", jdk="")
+AC_MSG_CHECKING(Java JDK includes)
+JDK_INCLUDES=
+if test "X$jdk" != X -a -r $jdk/include/jni.h; then
+  JDK_INCLUDES="-I$jdk/include"
+  if test -d $jdk/include/linux; then
+    JDK_INCLUDES="$JDK_INCLUDES -I$jdk/include/linux"
+  fi
+fi
+AC_SUBST(JDK_INCLUDES)
+AC_MSG_RESULT($JDK_INCLUDES)
+
 
 AC_CHECK_PROG(PHP_CONFIG, php-config, php-config)
 if test "X$PHP" != X -a "X$PHP_CONFIG" != X ; then
