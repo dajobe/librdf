@@ -75,7 +75,4 @@ README: README.html
 NEWS: NEWS.html
 	$(LYNX) $(LYNXARGS) $< > $@
 
-LICENSE.h: LICENSE.txt
-	(echo '/*NL * file.c - DescriptionNL *NL * %Source: %NL * %Id:%' |sed -e 's/%/$$/g' -e 's/NL/\\012/g'; sed -e '1,/librdf - License/d' -e 's/^/ \* /' LICENSE.txt; echo ' */') > LICENSE.h
-
 @SET_MAKE@
