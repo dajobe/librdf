@@ -152,7 +152,8 @@ librdf_storage_factory* librdf_get_storage_factory(const char *name);
 
 /* constructor */
 librdf_storage* librdf_new_storage(librdf_world *world, char *storage_name, char *name, char *options_string);
-librdf_storage* librdf_new_storage_from_storage (librdf_storage* old_storage);
+librdf_storage* librdf_new_storage_with_options(librdf_world *world, char *storage_name, char *name, librdf_hash *options);
+librdf_storage* librdf_new_storage_from_storage(librdf_storage* old_storage);
 librdf_storage* librdf_new_storage_from_factory(librdf_world *world, librdf_storage_factory* factory, char *name, librdf_hash* options);
 
 /* destructor */
