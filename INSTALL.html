@@ -115,9 +115,13 @@ automatically enable this unless disabled by setting this option to
 <pre>
     make check
 </pre>
+<p>which should emit loads of exciting debug messages to the screen.</p>
 
 <h3>2.6 Installing the library</h3>
 
+<p>I don't recommended you do this yet, it hasn't been tested
+and the user/internal header file separation isn't clear yet.  Just
+work in the source tree.</p>
 <pre>
    make install
 </pre>
@@ -125,11 +129,16 @@ automatically enable this unless disabled by setting this option to
 
 <h2>3. Using librdf</h2>
 
-<p>See <a href="example.c">example.c</a> for the only example at present.  It can be built with</p>
+<p>See <a href="example.c">example.c</a> and
+<a href="example2.c">example2.c</a> which can be built with:</p>
 <pre>
    make example
 </pre>
-
+<p>or</p>
+<pre>
+   make example2
+</pre>
+<p>once the library has been configured and built.</p>
 
 <hr />
 
