@@ -68,6 +68,23 @@ dnl Checks for library functions.
 AC_FUNC_MEMCMP
 
 
+dnl Checks for URI resolvers
+AC_ARG_WITH(libwww, [  --with-libww  Use libwww [yes]], enable_libwww="$withval", enable_libwww="yes") 
+
+AC_MSG_CHECKING(whether to use libwww)
+if test "$enable_libwww" = yes ; then
+  AC_MSG_RESULT(yes)
+  AC_CHECK_PROG(LIBWWW_CONFIG, libwww-config, yes, no)
+  if test "$LIBWWW_CONFIG" = yes; then
+    LIBS="`libwww-config --libs` $LIBS"
+    CFLAGS="`libwww-config --cflags` $CFLAGS"
+    AC_DEFINE(HAVE_LIBWWW)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
+
+
 dnl Checks for modules
 digest_modules="md5 sha1 ripemd160"
 
@@ -136,6 +153,7 @@ if test "$enable_openssl_digests" = yes ; then
 else
   AC_MSG_RESULT(no)
 fi
+
 
 # Maybe add some local digest modules
 for module in $digest_modules; do
