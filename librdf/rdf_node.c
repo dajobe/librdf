@@ -24,10 +24,6 @@
 
 #include <stdio.h>
 
-#ifdef HAVE_STRING_H
-#include <string.h> /* for memcpy */
-#endif
-
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
 #include <rdf_uri.h>
@@ -381,7 +377,7 @@ librdf_node_set_literal_value(librdf_node* node, char* value,
   new_value=(char*)LIBRDF_MALLOC(cstring, value_len + 1);
   if(!new_value)
     return 1;
-  memcpy(new_value, value, value_len);
+  strcpy(new_value, value);
   
   if(xml_language) {
     new_xml_language=(char*)LIBRDF_MALLOC(cstring, 
