@@ -1018,6 +1018,8 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
                     sizeof(librdf_storage_mysql_sos_context))))
     return NULL;
   sos->storage=storage;
+  librdf_storage_add_reference(sos->storage);
+
   if(statement)
     sos->query_statement=librdf_new_statement_from_statement(statement);
   if(context_node)
@@ -1196,6 +1198,7 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
     librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
     return NULL;
   }
+
   stream=librdf_new_stream(storage->world,(void*)sos,
                            &librdf_storage_mysql_find_statements_in_context_end_of_stream,
                            &librdf_storage_mysql_find_statements_in_context_next_statement,
@@ -1441,6 +1444,9 @@ librdf_storage_mysql_find_statements_in_context_finished(void* context)
   if(sos->query_context)
     librdf_free_node(sos->query_context);
 
+  if(sos->storage)
+    librdf_storage_remove_reference(sos->storage);
+
   LIBRDF_FREE(librdf_storage_mysql_sos_context, sos);
 }
 
@@ -1453,7 +1459,8 @@ librdf_storage_mysql_find_statements_in_context_finished(void* context)
  *
  * Return value: a &librdf_iterator or NULL on failure
  **/
-static librdf_iterator* librdf_storage_mysql_get_contexts(librdf_storage* storage)
+static librdf_iterator*
+librdf_storage_mysql_get_contexts(librdf_storage* storage)
 {
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
   librdf_storage_mysql_get_contexts_context* gccontext;
@@ -1474,6 +1481,8 @@ WHERE Model=%llu";
                     sizeof(librdf_storage_mysql_get_contexts_context))))
     return NULL;
   gccontext->storage=storage;
+  librdf_storage_add_reference(gccontext->storage);
+
   gccontext->current_context=NULL;
   gccontext->results=NULL;
 
@@ -1514,6 +1523,7 @@ WHERE Model=%llu";
     librdf_storage_mysql_get_contexts_finished((void*)gccontext);
     return NULL;
   }
+
   iterator=librdf_new_iterator(storage->world,(void*)gccontext,
                            &librdf_storage_mysql_get_contexts_end_of_iterator,
                            &librdf_storage_mysql_get_contexts_next_context,
@@ -1613,6 +1623,9 @@ librdf_storage_mysql_get_contexts_finished(void* context)
 
   if(gccontext->current_context)
     librdf_free_node(gccontext->current_context);
+
+  if(gccontext->storage)
+    librdf_storage_remove_reference(gccontext->storage);
 
   LIBRDF_FREE(librdf_storage_mysql_get_contexts_context, gccontext);
 
