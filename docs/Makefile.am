@@ -86,12 +86,19 @@ api/index.html: api.sgml
 @MAINT@	mkdir -p pod/RDF/Redland
 @MAINT@	-pod2html --noindex --htmlroot /docs/pod --infile=$< | tidy -asxml -wrap 1000 2>/dev/null | perl $(srcdir)/fix-pod-xhtml $@
 @MAINT@	rm -f pod2htm*
-@MAINT@
-@MAINT@redland.3: redland.pod
-@MAINT@	pod2man --section=3 --center="Redland RDF Library" \
-@MAINT@	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @LIBRDF_VERSION@" $? | \
-@MAINT@	sed -e "s;REDLAND_VERSION_STRING;@LIBRDF_VERSION@;" > $@
-@MAINT@
+
+if MAINTAINER_MODE
+redland.3: redland.pod
+	pod2man --section=3 --center="Redland RDF Library" \
+	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @LIBRDF_VERSION@" $? | \
+	sed -e "s;REDLAND_VERSION_STRING;@LIBRDF_VERSION@;" > $@
+	rm -f pod2htm*
+else
+redland.3: redland.pod
+	# This is the best that can be done without pod2man
+	cp $? $@
+endif
+
 
 clean-local:
 	rm -rf $(API_DOCBOOK_FILES) api.junk DBTOHTML* pod2htm*
