@@ -120,6 +120,10 @@ sub log_action ($$;$) {
 sub end_page($) {
   my $q=shift;
 
+  print <<'EOT';
+<!-- SOURCE CODE -->
+EOT
+
   print qq{<hr />\n\n<p class="copyright"><a href="http://purl.org/net/dajobe/">Dave Beckett</a></p>\n\n</body></html>\n};
 }
 
