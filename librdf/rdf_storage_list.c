@@ -274,6 +274,23 @@ librdf_storage_list_contains_statement(librdf_storage* storage, librdf_statement
   sln.statement=statement;
   sln.context=NULL;
 
+  if(context->index_contexts) {
+    /* When we have contexts, we have to use find_statements for contains
+     * since we do not know what context node may be stored for a statement
+     */
+    librdf_stream *stream=librdf_storage_list_find_statements(storage, statement);
+    int status;
+
+    if(!stream)
+      return 0;
+    /* librdf_stream_end returns 0 if have more, non-0 at end */
+    status=!librdf_stream_end(stream);
+    /* convert to 0 if at end (not found) and non-zero otherwise (found) */
+    librdf_free_stream(stream);
+    return status;
+  }
+  
+
   return librdf_list_contains(context->list, &sln);
 }
 
