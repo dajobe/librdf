@@ -21,10 +21,13 @@
 
 
 # Subdirectories to build/install etc.
-SUBDIRS=@SD@ librdf examples
+SUBDIRS=@SD@ repat raptor librdf examples
 CONFIG_SUBDIRS=raptor
 # Subdirectories to use for distribution
-DIST_SUBDIRS=docs perl python tcl java ruby expat repat debian
+DIST_SUBDIRS=librdf docs examples \
+perl python tcl java ruby \
+expat repat raptor \
+debian
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO      LICENSE.txt \
