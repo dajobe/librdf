@@ -81,6 +81,7 @@
 
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
+#include <rdf_init.h>
 #include <rdf_hash.h>
 #include <rdf_uri.h>
 #include <rdf_node.h>
