@@ -26,11 +26,41 @@ follows</p>
   root# make install-python
 </pre>
 
-<p>The python interface has been tested with Python 2.0 and 1.5 however
-for 1.5 you need to install the
+<p>The python interface has been tested with Python 1.5 and 2.0.
+For 1.5, however, you will need to install the optional
 <a href="http://www.python.org/doc/current/dist/dist.html">Distutils</a> 
 package.  The combination of Python 1.5 and Distutils 0.9.4 works.  All
 future development will be with the Python 2.0 series.</p>
+
+
+<h2>Testing the Redland Python interface</h2>
+
+<p>If you did the optional install above, run the python example
+program with:</p>
+<pre>
+  python example.py
+</pre>
+
+<p>Otherwise, to run it in the source tree you need to find out the
+architecture-specific sub-directory it created in the <em>build</em>
+directory such as <em>build/lib.linux-i686-2.0</em> and run it with:</p>
+<pre>
+  PYTHONPATH=build/lib.linux-i686-2.0 python example.py
+</pre>
+
+<p>and the result should be:</p>
+<pre>
+  found statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+  Parsing URI (file) ../perl/dc.rdf
+  Parsing added 3 statements
+  Printing all statements
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page of Dave Beckett."}
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+</pre>
+
+
 
 
 <h2>Redland Python API Introduction</h2>
@@ -97,8 +127,9 @@ of the Redland objects with simple mappings between them:</p>
 <h2>Other RDF Python APIs and applications</h2>
 
 <ul>
-<li><a href="http://sourceforge.net/projects/redfoot/">Redfoot</a> -  store/viewer/editor framework for RDF that includes peer-to-peer communication between stores.</li>
-<li><a href="http://www.fourthought.com/4Suite/4RDF/">4RDF</a> - toolkit and library for RDF processing by <a href="http://www.fourthought.com/">Fourthought, Inc.</a></li>
+<li><a href="http://sourceforge.net/projects/redfoot/">Redfoot</a> -  parser, store, viewer, editor, query system framework for RDF with web interface for building peer-to-peer web applications.</li>
+<li><a href="http://4suite.org/4SuiteIndex.html">4Suite</a> - collection of python tools including <em>4RDF</em> that includes RDF metadata support by <a href="http://www.fourthought.com/">Fourthought, Inc.</a></li>
+<li><a href="http://www.w3.org/2000/10/swap/">W3C Semantic Web Area for Play</a> - lots of tools for RDF and beyond research including the <a href="http://www.w3.org/2000/10/swap/cwm.py">Closed World Machine (CWM)</a> data manipulator, rules processor and query system mostly using the Notation 3 textual RDF syntax</li>
 </ul>
 
 <hr />
