@@ -226,7 +226,21 @@ librdf_query_triples_init(librdf_query* query,
 static void
 librdf_query_triples_terminate(librdf_query* query)
 {
-  /* nop */  
+  librdf_query_triples_context *context=(librdf_query_triples_context*)query->context;
+  librdf_node *node;
+
+  node=librdf_statement_get_subject(&context->statement);
+  if(node)
+    librdf_free_node(node);
+
+  node=librdf_statement_get_predicate(&context->statement);
+  if(node)
+    librdf_free_node(node);
+
+  node=librdf_statement_get_object(&context->statement);
+  if(node)
+    librdf_free_node(node);
+
 }
 
 
