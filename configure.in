@@ -842,7 +842,7 @@ if test $have_libxml = 1 -a $need_libxml = 1; then
     CFLAGS="$CFLAGS -I$srcdir/libxml"
     XML_OBS="libxml/libxml.a"
   else
-    LIBS="$LIBS `$XML_CONFIG --libs`"
+    LIBS="`$XML_CONFIG --libs` $LIBS"
     CFLAGS="$CFLAGS `$XML_CONFIG --cflags`"
   fi
 fi
@@ -864,7 +864,7 @@ if test $need_expat = 1; then
     # We know local expat sources has XML_SetNamespaceDeclHandler already
     found=yes
   else
-    LIBS="$LIBS $expat_libs"
+    LIBS="$expat_libs $LIBS"
     found=no
   fi
 
