@@ -6,7 +6,7 @@
 #
 #
 
-noinst_LIBRARIES = librdf.a
+lib_LIBRARIES = librdf.a
 
 librdf_a_SOURCES = rdf_init.c rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_list.c rdf_model.c \
@@ -30,7 +30,12 @@ rdf_model_test
 
 CLEANFILES=$(TESTS) test.gdbm
 
-CFLAGS=-g -Wall -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
+CFLAGS=-Wall
+@MAINT@ CFLAGS=-g -Wall -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
+
+
+
+# Rules to construct test programs
 
 rdf_node_test: rdf_node.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DRDF_NODE_TEST $(srcdir)/rdf_node.c librdf.a $(LIBS)
@@ -47,14 +52,13 @@ rdf_statement_test: rdf_statement.c librdf.a
 rdf_model_test: rdf_model.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DRDF_MODEL_TEST $(srcdir)/rdf_model.c librdf.a $(LIBS)
 
-@SET_MAKE@
-
-SUFFIXES = .html .txt
 
 
 # Create some text files from HTML sources
 LYNX=lynx
 LYNXARGS=-dump -nolist
+
+SUFFIXES = .html .txt
 
 .html.txt:
 	$(LYNX) $(LYNXARGS) $< > $@
@@ -64,3 +68,6 @@ README: README.html
 
 NEWS: NEWS.html
 	$(LYNX) $(LYNXARGS) $< > $@
+
+
+@SET_MAKE@
