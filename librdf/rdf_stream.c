@@ -298,7 +298,7 @@ librdf_stream_from_node_iterator_next_statement(void* context)
   librdf_node* node;
   librdf_statement* statement;
   
-  if(!(node=(librdf_node*)librdf_iterator_get_next(scontext->iterator)))
+  if(!(node=(librdf_node*)librdf_iterator_get_object(scontext->iterator)))
     return NULL;
 
   statement=librdf_new_statement_from_statement(scontext->statement);
@@ -322,6 +322,8 @@ librdf_stream_from_node_iterator_next_statement(void* context)
                     "Illegal statement field %d seen\n", scontext->field);
 
   }
+
+  librdf_iterator_next(scontext->iterator);
 
   return statement;
 }
