@@ -57,10 +57,8 @@ void rdf_hash_register_factory(const char *name,
   rdf_hash_factory *hash, *h;
   char *name_copy;
 
-#if 0
   RDF_DEBUG2(rdf_hash_register_factory,
              "Received registration for hash %s\n", name);
-#endif
 
   hash=(rdf_hash_factory*)RDF_CALLOC(rdf_hash_factory, sizeof(rdf_hash_factory), 1);
   if(!hash)
@@ -83,9 +81,7 @@ void rdf_hash_register_factory(const char *name,
   /* Call the hash registration function on the new object */
   (*factory)(hash);
 
-#if 0
   RDF_DEBUG3(rdf_hash_register_factory, "%s has context size %d\n", name, hash->context_length);
-#endif
   
   hash->next = hashes;
   hashes = hash;
