@@ -16,13 +16,24 @@
  * See LICENSE.html or LICENSE.txt for the full license terms.
  */
 
+#include <rdf_config.h>
 
 #ifdef LIBRDF_MEMORY_DEBUG
 #include <stdio.h>
-#include <stdlib.h>
 
 #define LIBRDF_INTERNAL
 #include <librdf.h>
+
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
+
+/* In theory these could be changed to use a custom allocator */
+#define os_malloc malloc
+#define os_calloc calloc
+#define os_free free
+
 
 struct librdf_memory_s
 {
@@ -67,7 +78,7 @@ librdf_memory_find_node(librdf_memory* list, void *addr, librdf_memory** prev)
 static void
 librdf_free_memory(librdf_memory* node) 
 {
-  free(node);
+  os_free(node);
 }
 
 
@@ -82,13 +93,17 @@ librdf_add_memory(char *file, int line, char *type,
   if(node) {
     /* duplicated node added! */
     fprintf(stderr, "librdf_add_memory: Duplicate memory address %p added\n", addr);
+    fprintf(stderr, "%s:%d: prev - %d bytes for type %s\n",
+            node->file, node->line, node->size, node->type);
+    fprintf(stderr, "%s:%d: this - %d bytes for type %s\n",
+            file, line, size, type);
     abort();
     /* never returns actually */
   }
 
     
   /* need new node */
-  node=(librdf_memory*)calloc(sizeof(librdf_memory), 1);
+  node=(librdf_memory*)os_calloc(sizeof(librdf_memory), 1);
   if(!node)
     return NULL;
 
@@ -111,7 +126,7 @@ librdf_add_memory(char *file, int line, char *type,
 void*
 librdf_malloc(char *file, int line, char *type, size_t size) 
 {
-  void *addr=malloc(size);
+  void *addr=os_malloc(size);
   librdf_memory* node;
   
   if(!addr)
@@ -128,7 +143,7 @@ librdf_malloc(char *file, int line, char *type, size_t size)
 void*
 librdf_calloc(char *file, int line, char *type, size_t nmemb, size_t size) 
 {
-  void *addr=calloc(nmemb, size);
+  void *addr=os_calloc(nmemb, size);
   librdf_memory* node;
   
   if(!addr)
@@ -193,4 +208,3 @@ librdf_memory_report(FILE *fh)
   fprintf((FILE*)fh, "-----------------------\n");
 }
 #endif
-
