@@ -563,6 +563,8 @@ librdf_query_results_get_bindings_count(librdf_query_results *query_results)
 void
 librdf_free_query_results(librdf_query_results* query_results)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(query_results, librdf_query_results);
+
   if(query_results->query->factory->free_results)
     return query_results->query->factory->free_results(query_results);
   LIBRDF_FREE(librdf_query_results, query_results);
