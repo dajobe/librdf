@@ -139,9 +139,9 @@ typedef struct {
 static int
 librdf_parser_libwww_init(librdf_parser *parser, void *context) 
 {
-  librdf_parser_libwww_stream_context* scontext=(librdf_parser_libwww_stream_context*)context;
+  librdf_parser_libwww_context* pcontext=(librdf_parser_libwww_context*)context;
 
-  context->parser = parser;
+  pcontext->parser = parser;
   
   /* always succeeds ? */  
   return 0;
@@ -635,7 +635,7 @@ librdf_parser_libwww_serialise_finished(void* context)
       HTRequest_delete(scontext->request);
 
     if(scontext->parser)
-      HTRDF_delete(scontext->libwww_parser);
+      HTRDF_delete(scontext->parser);
 
     if(scontext->statements)
       librdf_free_list(scontext->statements);
@@ -673,5 +673,6 @@ librdf_parser_libwww_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_libwww_constructor(void)
 {
-  librdf_parser_register_factory("libwww", &librdf_parser_libwww_register_factory);
+  librdf_parser_register_factory("libwww", NULL, NULL,
+                                 &librdf_parser_libwww_register_factory);
 }
