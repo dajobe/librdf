@@ -2,15 +2,15 @@
 <book id="redlandAPI">
   <?dbhtml filename='index.html'>
   <bookinfo>
-    <date>2000-08-10</date>
-    <title>Redland - An RDF Application Framework - APIs</title>
+    <date>2000-11-04</date>
+    <title>Redland - RDF Application Framework - APIs</title>
     <author>
       <firstname>Dave</firstname>
       <surname>Beckett</surname>
     </author>
     <affiliation>
       <orgname>University of Bristol</orgname>
-      <orgdiv>ILRT</orgdiv>
+      <orgdiv>Institute for Learning and Research Technology (ILRT)</orgdiv>
     </affiliation>
     <copyright>
       <holder role="mailto:Dave.Beckett@bristol.ac.uk">Dave Beckett</holder>
@@ -21,7 +21,7 @@
 	    <surname>Beckett</surname>
 	    <affiliation>
 	      <orgname>University of Bristol</orgname>
-	      <orgdiv>ILRT</orgdiv>
+	      <orgdiv>Institute for Learning and Research Technology (ILRT)</orgdiv>
 	    </affiliation>
 	  </author>
          </primary>
@@ -50,13 +50,14 @@
     <abstract>
       <title>Abstract</title>
       <para>
-This document describes the APIs provided by Redland to use the RDF
+This document describes the APIs provided by
+<ulink url="http://purl.org/net/redland/">Redland</ulink> to use the RDF
 model; manipulate statements, resources, predicates and objects in the model;
 parse RDF/XML syntax, query and store the models.
       </para>
 <para>
-See also the <ulink url="http://www.redland.opensource.ac.uk/">Home Page</ulink>
-and the <ulink url="../">main document area</ulink>.
+See also the <ulink url="http://purl.org/net/redland/">Home Page</ulink>
+and the <ulink url="../README.html">main document overview</ulink>.
 </para>
 
     </abstract>
@@ -156,14 +157,15 @@ be queries and stored which is implemented by the storage classes.
 <title>RDF Statement / Assertion / Triple</title>
 <para>
 This module provides the RDF statement functionality, and contains
-three main elements: resource, predicate and object which are all
+three parts: resource, predicate and object which are all
 nodes provided by the librdf_node class.  Statements can be added /
 removed from models.
 </para>
 <para>
-Statements also contain an addition element 'context' which is
-intended to be used to track how/when/etc. statements were added
-to models, including transactions and provenance.
+Statements have at least one rdf:type and are always of rdf:type rdf:resource.
+They can be present in the model and/or
+<emphasis>reified</emphasis> in which they are quoted or talked about
+by other statements.
 </para>
 <sect1>
 <title>RDF Statement Class</title>
@@ -211,6 +213,10 @@ RDF/XML parser and can be used without one.
 <sect1>
 <title>SiRPAC RDF Parser Implementation Class</title>
 @INCLUDE parser_sirpac.sgml
+</sect1>
+<sect1>
+<title>Repat RDF Parser Implementation Class</title>
+@INCLUDE parser_repat.sgml
 </sect1>
 </chapter>
 
