@@ -104,7 +104,7 @@ librdf_files_temporary_file_name(void)
   const char *tmp_dir;
   size_t length;
   char *name;
-  static const char * const template="librdf_tmp_XXXXXX"; /* FIXME */
+  static const char * const file_template="librdf_tmp_XXXXXX"; /* FIXME */
 #ifdef HAVE_MKSTEMP
   int fd;
 #endif
@@ -114,14 +114,14 @@ librdf_files_temporary_file_name(void)
   if(!tmp_dir)
     tmp_dir="/tmp";
 
-  length=strlen(tmp_dir) + strlen(template) + 2; /* 2: / sep and \/0 */
+  length=strlen(tmp_dir) + strlen(file_template) + 2; /* 2: / sep and \/0 */
   
   name=(char*)LIBRDF_MALLOC(cstring, length);
   if(!name)
     return NULL;
 
   /* FIXME: unix dependency - file/dir separator */
-  sprintf(name, "%s/%s", tmp_dir, template);
+  sprintf(name, "%s/%s", tmp_dir, file_template);
   
 #ifdef HAVE_MKSTEMP
   /* Proritise mkstemp() since GNU libc says: Never use mktemp(). */
