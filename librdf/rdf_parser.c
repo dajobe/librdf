@@ -633,7 +633,7 @@ main(int argc, char *argv[])
     librdf_model *model;
     librdf_parser* parser;
     librdf_stream *stream=NULL;
-    size_t length=strlen(file_content[i]);
+    size_t length=strlen((const char*)file_content[i]);
     int size;
 
     fprintf(stderr, "%s: Testing parsing syntax '%s'\n", program, type);

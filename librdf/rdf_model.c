@@ -1586,7 +1586,7 @@ main(int argc, char *argv[])
   int expected_count;
 #define EXPECTED_BAD_STRING_LENGTH 299
   librdf_uri* base_uri;
-  char *string;
+  unsigned char *string;
   size_t string_length=0;
 
   librdf_world_open(world);
@@ -1790,9 +1790,10 @@ main(int argc, char *argv[])
   }
 
   fprintf(stderr, "%s: Serializing model\n", program);
-  base_uri=librdf_new_uri(world, "http://example.org/base#");
+  base_uri=librdf_new_uri(world, (const unsigned char*)"http://example.org/base#");
   string=librdf_model_to_counted_string(model, base_uri,
-                                        "rdfxml", NULL, NULL,
+                                        "rdfxml", 
+                                        NULL, NULL,
                                         &string_length);
   if(string_length != EXPECTED_BAD_STRING_LENGTH) {
     fprintf(stderr, "%s: Serialising to RDF/XML returned string size %d, expected %d\n", program,

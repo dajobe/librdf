@@ -310,7 +310,7 @@ librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
     if(!librdf_node_is_resource(value))
       rc=1;
     else {
-      int i=atoi(librdf_node_get_literal_value(value));
+      int i=atoi((const char*)librdf_node_get_literal_value(value));
       if(i<1)
         i=1;
 #ifdef WITH_THREADS
@@ -326,7 +326,7 @@ librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
     if(!librdf_node_is_resource(value))
       rc=1;
     else {
-      int i=atoi(librdf_node_get_literal_value(value));
+      int i=atoi((const char*)librdf_node_get_literal_value(value));
       if(i<1)
         i=1;
 #ifdef WITH_THREADS

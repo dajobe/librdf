@@ -616,40 +616,40 @@ main(int argc, char *argv[])
 
   /* ERROR: Subject URI is bad UTF-8 */
   statement=librdf_new_statement_from_nodes(world,
-    librdf_new_node_from_uri_string(world, "http://example.org/foo\xfc"),
-    librdf_new_node_from_uri_string(world, "http://example.org/bar"),
-    librdf_new_node_from_literal(world, "blah", NULL, 0));
+    librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/foo\xfc"),
+    librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/bar"),
+    librdf_new_node_from_literal(world, (const unsigned char*)"blah", NULL, 0));
 
   librdf_model_add_statement(model, statement);
   librdf_free_statement(statement);
 
   /* ERROR: Predicate URI is not serializable */
   statement=librdf_new_statement_from_nodes(world,
-    librdf_new_node_from_uri_string(world, "http://example.org/foo"),
-    librdf_new_node_from_uri_string(world, "http://bad.example.org/"),
-    librdf_new_node_from_literal(world, "blah", NULL, 0));
+    librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/foo"),
+    librdf_new_node_from_uri_string(world, (const unsigned char*)"http://bad.example.org/"),
+    librdf_new_node_from_literal(world, (const unsigned char*)"blah", NULL, 0));
 
   librdf_model_add_statement(model, statement);
   librdf_free_statement(statement);
 
   /* ERROR: Object literal is bad UTF-8 */
   statement=librdf_new_statement_from_nodes(world,
-    librdf_new_node_from_uri_string(world, "http://example.org/foo"),
-    librdf_new_node_from_uri_string(world, "http://example.org/abc"),
-    librdf_new_node_from_literal(world, "\xfc", NULL, 0));
+    librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/foo"),
+    librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/abc"),
+    librdf_new_node_from_literal(world, (const unsigned char*)"\xfc", NULL, 0));
 
   librdf_model_add_statement(model, statement);
   librdf_free_statement(statement);
 
   serializer=librdf_new_serializer(world, "rdfxml", NULL, NULL);
-  base_uri=librdf_new_uri(world,"http://example.org/base#");
+  base_uri=librdf_new_uri(world, (const unsigned char*)"http://example.org/base#");
 
   string=librdf_serializer_serialize_model_to_counted_string(serializer,
                                                              base_uri, model,
                                                              &string_length);
 #define EXPECTED_BAD_STRING_LENGTH 237
   if(string_length != EXPECTED_BAD_STRING_LENGTH) {
-    fprintf(stderr, "%s: Serialising to RDF/XML returned string size %d, expected %d\n", program,
+    fprintf(stderr, "%s: Serialising to RDF/XML returned string '%s' size %d, expected %d\n", program, string,
             string_length, EXPECTED_BAD_STRING_LENGTH);
     return 1;
   }

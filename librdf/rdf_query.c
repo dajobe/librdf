@@ -478,15 +478,17 @@ main(int argc, char *argv[])
   }
 
   /* read the example data in */
-  uri=librdf_new_uri(world, DATA_BASE_URI);
+  uri=librdf_new_uri(world, (const unsigned char*)DATA_BASE_URI);
   parser=librdf_new_parser(world, DATA_LANGUAGE, NULL, NULL);
-  librdf_parser_parse_string_into_model(parser, DATA, uri, model);
+  librdf_parser_parse_string_into_model(parser, (const unsigned char*)DATA,
+                                        uri, model);
   librdf_free_parser(parser);
   librdf_free_uri(uri);
 
 
   fprintf(stdout, "%s: Creating query\n", program);
-  query=librdf_new_query(world, QUERY_LANGUAGE, NULL, query_string);
+  query=librdf_new_query(world, QUERY_LANGUAGE,
+                         NULL, (const unsigned char*)query_string);
   if(!query) {
     fprintf(stderr, "%s: Failed to create new query\n", program);
     return(1);

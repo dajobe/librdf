@@ -123,7 +123,7 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
       rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_LITERAL;
       
       /* or RAPTOR_IDENTIFIER_TYPE_XML_LITERAL ? */
-      rstatement.object_literal_language=librdf_node_get_literal_value_language(object);
+      rstatement.object_literal_language=(const unsigned char*)librdf_node_get_literal_value_language(object);
       rstatement.object_literal_datatype=(raptor_uri*)librdf_node_get_literal_value_datatype_uri(object);
       break;
 
