@@ -261,7 +261,7 @@ have_expat_source=0
 need_expat=0
 need_expat_source=0
 AC_MSG_CHECKING(for expat sources)
-if test -d expat; then
+if test -d $srcdir/expat; then
   have_expat_source=1
   have_expat=1
   AC_MSG_RESULT(yes)
@@ -271,7 +271,10 @@ fi
 
 oLIBS="$LIBS"
 AC_CHECK_LIB(xmltok, main, xmlt=1, xmlt=0)
-AC_CHECK_LIB(xmlparse, XML_Parser_Create, xmlp=1, xmlp=0, -lxmltok)
+
+# edland RDF parser only needs XML_ParserCreate but Repat needs
+# XML_ParserCreateNS so check for that
+AC_CHECK_LIB(xmlparse, XML_ParserCreateNS, xmlp=1, xmlp=0, -lxmltok)
 LIBS="$oLIBS"
 AC_MSG_CHECKING(for system expat library)
 if test $xmlp = 1 -a $xmlt = 1; then
@@ -291,15 +294,9 @@ have_libxml_source=0
 need_libxml=0
 need_libxml_source=0
 AC_MSG_CHECKING(for libxml sources)
-for dir in libxml*; do
-  if test -d $dir -a -r $dir/libxml.spec ; then
-    have_libxml_source=1
-    libxml_dir=$dir
-    break
-  fi
-done
-if test $have_libxml_source = 1; then
-  AC_MSG_RESULT(yes - $libxml_dir)
+if test -d $srcdir/libxml -a -r $srcdir/libxml/libxml.spec ; then
+  have_libxml_source=1
+  AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
 fi
@@ -444,6 +441,25 @@ fi
 
 
 
+AC_MSG_CHECKING(XML parsers required)
+result=
+if test $need_libxml = 1; then
+  if test $need_libxml_source = 1; then
+    result="$result libxml(source)"
+  else
+    result="$result libxml(system)"
+  fi
+fi
+if test $need_expat = 1; then
+  if test $need_expat_source = 1; then
+    result="$result expat(source)"
+  else
+    result="$result expat(system)"
+  fi
+fi
+AC_MSG_RESULT($result)
+
+
 
 dnl Checks for modules
 digest_modules="md5 sha1 ripemd160"
@@ -570,14 +586,15 @@ AC_SUBST(HASH_SRCS)
 dnl Checks for building sub-packages in sub directories
 SD="docs perl"
 
+
 XML_OBJS=
 
 if test $have_libxml = 1 -a $need_libxml = 1; then
   if test $need_libxml_source = 1; then
-    SD="$SD $libxml_dir"
-    (cd $libxml_dir && ./configure --cache=../config.cache --enable-shared=no)
-    CFLAGS="$CFLAGS -I$srcdir/$libxml_dir"
-    XML_OBS="$libxml_dir/libxml.a"
+    SD="$SD libxml"
+    (cd libxml && ./configure --cache=../config.cache --enable-shared=no)
+    CFLAGS="$CFLAGS -I$srcdir/libxml"
+    XML_OBS="libxml/libxml.a"
   else
     LIBS="$LIBS `$XML_CONFIG --libs`"
     CFLAGS="$CFLAGS `$XML_CONFIG --cflags`"
@@ -588,7 +605,7 @@ if test $need_expat = 1; then
   # Only build local copy if it is needed
   if test $need_expat_source = 1; then
     SD="$SD expat"
-    CFLAGS="-I\$(srcdir)/expat/xmlparse $CFLAGS"
+    CFLAGS="-I\$(top_srcdir)/expat/xmlparse $CFLAGS"
     XML_OBJS="\$(top_builddir)/expat/xmlparse/xmlparse.o \$(top_builddir)/expat/xmlparse/hashtable.o \$(top_builddir)/expat/xmltok/xmlrole.o \$(top_builddir)/expat/xmltok/xmltok.o"
   else
     LIBS="$LIBS -lxmlparse -lxmltok"
