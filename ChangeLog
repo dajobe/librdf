@@ -2,6 +2,13 @@
 
 	* Snapshotted redland_0_9_17 for 0.9.17 release
 
+	* librdf/rdf_statement.h, librdf/rdf_statement.c:
+	Revert statement usage counting.
+
+	* configure.ac: Bumped version to 0.9.18
+
+	* Snapshotted redland_0_9_17 for 0.9.17 release
+
 	* librdf/rdf_init.c (librdf_free_world): Destroy nodes, statements
 	mutexes. 
 	(librdf_world_init_mutex): Init nodes, statements mutexes.

@@ -1,5 +1,8 @@
 2004-08-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_statement.h, librdf/rdf_statement.c:
+	Revert statement usage counting.
+
 	* rdf_init.c (librdf_free_world): Destroy nodes, statements mutexes.
 	(librdf_world_init_mutex): Init nodes, statements mutexes.
 
