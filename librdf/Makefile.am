@@ -187,3 +187,6 @@ rdf_iterator_test: rdf_iterator.c librdf.la
 
 $(top_builddir)/raptor/libraptor.la:
 	cd $(top_builddir)/raptor && $(MAKE) $(AM_MAKEFLAGS) libraptor.la
+
+$(top_builddir)/rasqal/librasqal.la:
+	cd $(top_builddir)/rasqal && $(MAKE) $(AM_MAKEFLAGS) librasqal.la
