@@ -12,7 +12,7 @@ lib_LIBRARIES = librdf.a
 
 librdf_a_SOURCES = rdf_init.c rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_list.c rdf_model.c rdf_iterator.c \
-rdf_list.c \
+rdf_list.c rdf_memory.c \
 rdf_config.h rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_digest.h rdf_hash.h rdf_hash_gdbm.h \
 rdf_hash_list.h rdf_model.h rdf_storage.h rdf_iterator.h \
@@ -37,7 +37,7 @@ rdf_model_test
 CLEANFILES=$(TESTS) test.gdbm test.db
 
 CFLAGS=-Wall
-@MAINT@ CFLAGS=-g -Wall -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
+@MAINT@ CFLAGS=-DLIBRDF_DEBUG=1 -g -Wall -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
 
 
 
