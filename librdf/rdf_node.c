@@ -800,6 +800,40 @@ librdf_node_set_blank_identifier(librdf_node* node, const char *identifier)
 }
 
 
+/**
+ * librdf_node_is_resource -  Check node is a resource
+ * @node: the node object
+ * 
+ * Return value: non-zero if the node is a resource (URI)
+ **/
+int
+librdf_node_is_resource(librdf_node* node) {
+  return (node->type == LIBRDF_NODE_TYPE_RESOURCE);
+}
+
+
+/**
+ * librdf_node_is_resource -  Check node is a literal
+ * @node: the node object
+ * 
+ * Return value: non-zero if the node is a literal
+ **/
+int
+librdf_node_is_literal(librdf_node* node) {
+  return (node->type == LIBRDF_NODE_TYPE_LITERAL);
+}
+
+
+/**
+ * librdf_node_is_blank -  Check node is a blank nodeID
+ * @node: the node object
+ * 
+ * Return value: non-zero if the node is a blank nodeID
+ **/
+int
+librdf_node_is_blank(librdf_node* node) {
+  return (node->type == LIBRDF_NODE_TYPE_BLANK);
+}
 
 
 /**
@@ -1378,8 +1412,6 @@ librdf_node_static_iterator_create(librdf_node** nodes,
 
   return iterator;
 }
-
-
 
 
 #ifdef STANDALONE

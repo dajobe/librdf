@@ -323,6 +323,10 @@ int librdf_node_set_typed_literal_value(librdf_node* node, const char* value, co
 char *librdf_node_to_string(librdf_node* node);
 char *librdf_node_get_blank_identifier(librdf_node* node);
 int librdf_node_set_blank_identifier(librdf_node* node, const char *identifier);
+int librdf_node_is_resource(librdf_node* node);
+int librdf_node_is_literal(librdf_node* node);
+int librdf_node_is_blank(librdf_node* node);
+
 int librdf_node_equals(librdf_node* first_node, librdf_node* second_node);
 
 
