@@ -4,7 +4,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+# Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
 # Institute for Learning and Research Technology - http://www.ilrt.org/
 # University of Bristol - http://www.bristol.ac.uk/
 # 
@@ -32,8 +32,8 @@ expat repat raptor \
 debian aux
 
 EXTRA_DIST=ChangeLog \
-README      NEWS      TODO      LICENSE.txt \
-README.html NEWS.html TODO.html LICENSE.html \
+README      NEWS      TODO      LICENSE.txt  RELEASE \
+README.html NEWS.html TODO.html LICENSE.html RELEASE.html \
 INSTALL.html FAQS.html MPL.html \
 Redland.i \
 autogen.sh \
@@ -58,6 +58,9 @@ NEWS: NEWS.html
 	$(HTML_TO_TEXT) $< > $@
 
 TODO: TODO.html
+	$(HTML_TO_TEXT) $< > $@
+
+RELEASE: RELEASE.html
 	$(HTML_TO_TEXT) $< > $@
 
 @SET_MAKE@
