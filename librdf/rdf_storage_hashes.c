@@ -43,7 +43,10 @@ typedef struct
 } librdf_hash_descriptor;
 
 
-static const librdf_hash_descriptor librdf_storage_hashes_descriptions[3]= {
+/* FIXME: STATIC */
+#define NUMBER_OF_HASHES 4
+
+static const librdf_hash_descriptor librdf_storage_hashes_descriptions[NUMBER_OF_HASHES]= {
   {"sp2o",
    LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_PREDICATE,
    LIBRDF_STATEMENT_OBJECT},  /* For 'get targets' */
@@ -52,7 +55,10 @@ static const librdf_hash_descriptor librdf_storage_hashes_descriptions[3]= {
    LIBRDF_STATEMENT_SUBJECT},  /* For 'get sources' */
   {"so2p", 
    LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_OBJECT,
-   LIBRDF_STATEMENT_PREDICATE}   /* For 'get arcs' */
+   LIBRDF_STATEMENT_PREDICATE},  /* For 'get arcs' */
+  {"groups",
+   0L, /* for groups - do not touch when storing statements! */
+   0L}
 };
 
 
@@ -76,14 +82,16 @@ typedef struct
   librdf_hash  *options;     /* remaining options for hash open method */
 
   /* internals */
-  int           hash_count; /* how many hashes are present? STATIC 3 - FIXME */
-  librdf_hash* hashes[3];   /* here they are in a STATIC array */
+  int           hash_count; /* how many hashes are present? STATIC */
+  librdf_hash* hashes[NUMBER_OF_HASHES]; /* here they are in a STATIC array */
   const librdf_hash_descriptor *hash_descriptions; /* points to STATIC hash_descriptions above - FIXME */
-  char* names[3];           /* hash names for hash open method */
+  char* names[NUMBER_OF_HASHES];       /* hash names for hash open method */
 
   int sources_index;
   int arcs_index;
   int targets_index;
+
+  int groups_index;
   
 } librdf_storage_hashes_context;
 
@@ -114,6 +122,16 @@ static librdf_iterator* librdf_storage_hashes_find_targets(librdf_storage* stora
 static int librdf_storage_hashes_serialise_end_of_stream(void* context);
 static librdf_statement* librdf_storage_hashes_serialise_next_statement(void* context);
 static void librdf_storage_hashes_serialise_finished(void* context);
+
+/* group functions */
+static int librdf_storage_hashes_group_add_statement(librdf_storage* storage, librdf_uri* group_uri, librdf_statement* statement);
+static int librdf_storage_hashes_group_remove_statement(librdf_storage* storage, librdf_uri* group_uri, librdf_statement* statement);
+static librdf_stream* librdf_storage_hashes_group_serialise(librdf_storage* storage, librdf_uri* group_uri);
+
+/* group list statement stream methods */
+static int librdf_storage_hashes_group_serialise_end_of_stream(void* context);
+static librdf_statement* librdf_storage_hashes_group_serialise_next_statement(void* context);
+static void librdf_storage_hashes_group_serialise_finished(void* context);
 
 
 static void librdf_storage_hashes_register_factory(librdf_storage_factory *factory);
@@ -148,8 +166,7 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
   context->is_writable=is_writable;
   context->is_new=is_new;
 
-  /* FIXME: STATIC 3 hashes */
-  context->hash_count=3;
+  context->hash_count=NUMBER_OF_HASHES;
   desc=context->hash_descriptions=librdf_storage_hashes_descriptions;
 
   context->options=options;
@@ -188,6 +205,8 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
   context->sources_index= -1;
   context->arcs_index= -1;
   context->targets_index= -1;
+  /* and index for groups (no key or value fields) */
+  context->groups_index= -1;
   for(i=0; i<context->hash_count; i++) {
     int key_fields=context->hash_descriptions[i].key_fields;
     int value_fields=context->hash_descriptions[i].value_fields;
@@ -201,6 +220,8 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
     } else if(key_fields == (LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_OBJECT) &&
               value_fields == LIBRDF_STATEMENT_PREDICATE) {
       context->arcs_index=i;
+    } else if(!key_fields || !value_fields) {
+      context->groups_index=i;
     }
   }
 
@@ -409,6 +430,8 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     /* ENCODE KEY */
 
     int fields=context->hash_descriptions[i].key_fields;
+    if(!fields)
+      continue;
     
     key_len=librdf_statement_encode_parts(statement, NULL, 0, fields);
     if(!key_len)
@@ -429,7 +452,9 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     /* ENCODE VALUE */
     
     fields=context->hash_descriptions[i].value_fields;
-
+    if(!fields)
+      continue;
+    
     value_len=librdf_statement_encode_parts(statement, NULL, 0, fields);
     if(!value_len) {
       LIBRDF_FREE(data, key_buffer);
@@ -960,6 +985,186 @@ librdf_storage_hashes_find_targets(librdf_storage* storage,
 }
 
 
+/**
+ * librdf_storage_hashes_group_add_statement - Add a statement to a storage group
+ * @storage: &librdf_storage object
+ * @group_uri: &librdf_uri object
+ * @statement: &librdf_statement statement to add
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_storage_hashes_group_add_statement(librdf_storage* storage,
+                                          librdf_uri* group_uri,
+                                          librdf_statement* statement) 
+{
+  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_hash_datum key, value; /* on stack - not allocated */
+  int size;
+  int status;
+  
+  key.data=(char*)librdf_uri_as_string(group_uri);
+  key.size=strlen(key.data);
+
+  size=librdf_statement_encode(statement, NULL, 0);
+
+  value.data=(char*)LIBRDF_MALLOC(cstring, size);
+  value.size=librdf_statement_encode(statement, (unsigned char*)value.data, size);
+
+  status=librdf_hash_put(context->hashes[context->groups_index], &key, &value);
+  LIBRDF_FREE(data, value.data);
+
+  return status;
+}
+
+
+/**
+ * librdf_storage_hashes_group_remove_statement - Remove a statement from a storage group
+ * @storage: &librdf_storage object
+ * @group_uri: &librdf_uri object
+ * @statement: &librdf_statement statement to remove
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_storage_hashes_group_remove_statement(librdf_storage* storage, 
+                                             librdf_uri* group_uri,
+                                             librdf_statement* statement) 
+{
+  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_hash_datum key, value; /* on stack - not allocated */
+  int size;
+  int status;
+  
+  key.data=(char*)librdf_uri_as_string(group_uri);
+  key.size=strlen(key.data);
+
+  size=librdf_statement_encode(statement, NULL, 0);
+
+  value.data=(char*)LIBRDF_MALLOC(cstring, size);
+  value.size=librdf_statement_encode(statement, (unsigned char*)value.data, size);
+
+  status=librdf_hash_delete(context->hashes[context->groups_index], &key, &value);
+  LIBRDF_FREE(data, value.data);
+  
+  return status;
+}
+
+
+typedef struct {
+  librdf_iterator* iterator;
+  librdf_hash_datum *key;
+  librdf_hash_datum *value;
+} librdf_storage_hashes_group_serialise_stream_context;
+
+
+/**
+ * librdf_storage_hashes_group_serialise - List all statements in a storage group
+ * @storage: &librdf_storage object
+ * @group_uri: &librdf_uri object
+ * 
+ * Return value: &librdf_stream of statements or NULL on failure or group is empty
+ **/
+static librdf_stream*
+librdf_storage_hashes_group_serialise(librdf_storage* storage,
+                                      librdf_uri* group_uri) 
+{
+  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_group_serialise_stream_context* scontext;
+  librdf_stream* stream;
+
+  scontext=(librdf_storage_hashes_group_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_hashes_group_serialise_stream_context, 1, sizeof(librdf_storage_hashes_group_serialise_stream_context));
+  if(!scontext)
+    return NULL;
+
+  scontext->key=librdf_new_hash_datum(storage->world, NULL, 0);
+  if(!scontext->key)
+    return NULL;
+  
+  scontext->value=librdf_new_hash_datum(storage->world, NULL, 0);
+  if(!scontext->value) {
+    librdf_free_hash_datum(scontext->key);
+    return NULL;
+  }
+
+  scontext->key->data=librdf_uri_as_string(group_uri);
+  scontext->key->size=strlen(scontext->key->data);
+
+  scontext->iterator=librdf_hash_get_all(context->hashes[context->groups_index], 
+                                         scontext->key, scontext->value);
+  if(!scontext->iterator) {
+    librdf_storage_hashes_group_serialise_finished(scontext);
+    return NULL;
+  }
+
+
+  stream=librdf_new_stream(storage->world,
+                           (void*)scontext,
+                           &librdf_storage_hashes_group_serialise_end_of_stream,
+                           &librdf_storage_hashes_group_serialise_next_statement,
+                           &librdf_storage_hashes_group_serialise_finished);
+  if(!stream) {
+    librdf_storage_hashes_group_serialise_finished((void*)scontext);
+    return NULL;
+  }
+  
+  return stream;  
+}
+
+
+static int
+librdf_storage_hashes_group_serialise_end_of_stream(void* context)
+{
+  librdf_storage_hashes_group_serialise_stream_context* scontext=(librdf_storage_hashes_group_serialise_stream_context*)context;
+
+  return librdf_iterator_end(scontext->iterator);
+}
+
+
+static librdf_statement*
+librdf_storage_hashes_group_serialise_next_statement(void* context)
+{
+  librdf_storage_hashes_group_serialise_stream_context* scontext=(librdf_storage_hashes_group_serialise_stream_context*)context;
+  librdf_statement* statement;
+  
+  statement=librdf_new_statement(scontext->iterator->world);
+  if(!statement)
+    return NULL;
+
+  if(!librdf_iterator_get_next(scontext->iterator))
+    return NULL;
+
+  /* decode value content */
+  if(!librdf_statement_decode(statement, 
+                              (unsigned char*)scontext->value->data,
+                              scontext->value->size)) {
+    librdf_free_statement(statement);
+    return NULL;
+  }
+
+  return statement;
+}
+
+
+static void
+librdf_storage_hashes_group_serialise_finished(void* context)
+{
+  librdf_storage_hashes_group_serialise_stream_context* scontext=(librdf_storage_hashes_group_serialise_stream_context*)context;
+  
+  if(scontext->iterator)
+    librdf_free_iterator(scontext->iterator);
+
+  if(scontext->key) {
+    scontext->key->data=NULL;
+    librdf_free_hash_datum(scontext->key);
+  }
+  if(scontext->value) {
+    scontext->value->data=NULL;
+    librdf_free_hash_datum(scontext->value);
+  }
+
+  LIBRDF_FREE(librdf_storage_hashes_group_serialise_stream_context, scontext);
+}
 
 
 /* local function to register hashes storage functions */
@@ -985,6 +1190,10 @@ librdf_storage_hashes_register_factory(librdf_storage_factory *factory)
   factory->find_sources       = librdf_storage_hashes_find_sources;
   factory->find_arcs          = librdf_storage_hashes_find_arcs;
   factory->find_targets       = librdf_storage_hashes_find_targets;
+
+  factory->group_add_statement    = librdf_storage_hashes_group_add_statement;
+  factory->group_remove_statement = librdf_storage_hashes_group_remove_statement;
+  factory->group_serialise        = librdf_storage_hashes_group_serialise;
 }
 
 
