@@ -8,65 +8,75 @@
 <h1 align="center">librdf - Installation instructions</h1>
 
 
-<h2>Getting the sources</h2>
+<h2>1. Getting the sources</h2>
 
 
-<h3>1. From CVS</h3>
+<h3>1.1. Getting the sources from CVS</h3>
+
+<p>Sorry - not yet publically available.</p>
   
-<p>(if you have access to it - ILRT private at present)</p>
+<p>After the cvs checkout or update you will need to create the
+automake and autoconf derived files, as described below in
+<em>create the configure program</em>.</p>
 
-<p>You will then need to create the automake and autoconf derived
-files, as described below in <em>configuring the package</em>.</p>
 
-
-<h3>2. From releases</h3>
+<h3>1.2. Getting source bundles</h3>
 
 <p>See
 <a href="http://FIXME-url-needed-here/">http://FIXME-url-needed-here/</a></p>
 
 
-<h2>Configuring the package</h2>
+<H2>2. Configuring and building</H2>
 
-<p>If there is no <TT>configure</TT> program, you can create it with:</p>
+<h3>2.1. Create <tt>configure</tt> program</h3>
+
+<p>If there is no <tt>configure</tt> program, you can create it 
+using the
+<a href="http://www.gnu.org/software/automake/automake.html">automake</a> and
+<a href="http://www.gnu.org/software/autoconf/autoconf.html">autoconf</a>
+tools with:</p>
 <pre>
   automake --add-missing; aclocal; autoheader; autoconf
 </pre>
 
 
-<h2>Building</h2>
+<h3>2.2. Options for <tt>configure</tt></h3>
 
 <p>See also the generic GNU installation instructions in 
-<a href="INSTALL">INSTALL</a></p>
-<pre>
-   ./configure
-   make
-</pre>
-
-<h3>configure options</h3>
+<a href="INSTALL">INSTALL</a> for information about general options
+such as <tt>--prefix</tt> etc.</p>
 
 <dl>
 <dt><tt>--with-libwww</tt><br />
 <dd>Enable use of the W3C <a href="http://www.w3.org/Library/">libwww</a>,
 if available.  configure will automatically enable this if
 the <tt>libwww-config</tt> program can be found in the path unless
-disabled by setting this option to <em>no</em>.
+disabled by setting this option to <em>no</em>.  libwww is presently
+only used for its
+<a href="http://www.w3.org/Library/src/HTRDF.html">RDF parser</a>
+</p>
 
 <p><b>WARNING</b> If the libwww libraries are installed in a
 non-default directory, when the final linking occurs, the libraries
 may not be found at run time.  To fix this you will need to use a
 system-specific method of passing this information to the run-time
 loader.  On Linux and Solaris you can set the LD_LIBRARY_PATH
-variable to include the directory where the libwww libraries are
-found.  You can also configure it via a system wide file - see the
-ld.so manual page for details.  The alternative, to link libwww
-statically, works but is difficult to enable.</p>
+environment variable to include the directory where the libwww
+libraries are found.  You can also configure it via a system wide
+file - see the <tt>ld</tt>, <tt>ld.so</tt> or<tt>ld.so.1</tt> manual
+pages for details.  The alternative, to link libwww statically, works
+but is difficult to enable.</p>
 </dd>
 
 <dt><tt>--with-rdf-java-api=JAR</tt><br />
-<dd>Enable the use of Sergey Melnik's Java API RDF parser (based on
-SiRPAC) to generate triples.  You need to download the distribution
-from <a href="http://www-db.stanford.edu/~melnik/rdf/api.html">his
-site</a> and enable with this option pointing at the Jar file.</dd>
+<dd>Enable the use of Sergey Melnik's
+<a href="http://www-db.stanford.edu/~melnik/rdf/api.html">Java API</a>
+RDF parser (based on 
+<a href="http://www.w3.org/RDF/Implementations/SiRPAC/">SiRPAC</a>)
+to generate triples.  You need to download 
+the distribution from
+<a href="http://www-db.stanford.edu/~melnik/rdf/api.html">his site</a>
+and enable with this option pointing at the Jar file.</dd>
 
 <dt><tt>--enable-digests=LIST</tt><br />
 <dd>Select the list of digests to be included if the are availble.  The
@@ -84,13 +94,41 @@ automatically enable this unless disabled by setting this option to
 
 </dl>
 
+<h3>2.3 Configuring</h3>
 
-<h2>Testing</h2>
+<pre>
+   ./configure
+</pre>
 
-<p>Build and run the built in tests with:</p>
+
+<h3>2.4 Compiling</h3>
+
+<pre>
+   make
+</pre>
+
+
+<h2>2.5. Testing</h2>
+
+<p>You can build and run the built in tests with:</p>
 <pre>
     make check
 </pre>
+
+<h3>2.6 Installing the library</h3>
+
+<pre>
+   make install
+</pre>
+
+
+<h2>3. Using librdf</h2>
+
+<p>See <a href="example.c">example.c</a> for the only example at present.  It can be built with
+<pre>
+   make example
+</pre>
+
 
 </body>
 </html>
