@@ -26,16 +26,22 @@ extern "C" {
 #endif
 
 typedef struct {
-  void *datum;
-  int (*have_elements)(void*);
-  void* (*get_next)(void*);
+	void *context;
+	int (*have_elements)(void*);
+	void* (*get_next)(void*);
+	void (*finished)(void*);
 } librdf_iterator;
 
 
 librdf_iterator* librdf_new_iterator(void *datum,
-                               int (*have_elements)(void*),
-                               void* (*get_next)(void*));
+				     int (*have_elements)(void*),
+				     void* (*get_next)(void*),
+				     void (*finished)(void*));
 void librdf_free_iterator(librdf_iterator*);
+
+int librdf_iterator_have_elements(librdf_iterator* iterator);
+
+void* librdf_iterator_get_next(librdf_iterator* iterator);
 
 
 #ifdef __cplusplus
