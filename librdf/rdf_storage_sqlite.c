@@ -946,13 +946,12 @@ typedef struct {
 #if SQLITE_API == 3
   /* OUT from sqlite3_prepare: */
   sqlite3_stmt *vm;
-  const char *pzTail;
+  const char *zTail;
 #endif
 #if SQLITE_API == 2
-  sqlite_vm *vm;
   /* OUT from vm: */
-  const char *pzTail;
-  sqlite_vm *ppVm;
+  sqlite_vm *vm;
+  const char *zTail;
 #endif
 } librdf_storage_sqlite_serialise_stream_context;
 
@@ -987,14 +986,15 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
                          (const char*)request,
                          strlen((const char*)request),
                          &scontext->vm,
-                         &scontext->pzTail);
+                         &scontext->zTail);
   if(status != SQLITE_OK)
     errmsg=(char*)sqlite3_errmsg(context->db);
 #endif
 #if SQLITE_API == 2  
   status=sqlite_compile(context->db,
                         request,
-                        &scontext->pzTail, &scontext->ppVm,
+                        &scontext->zTail,
+                        &scontext->vm,
                         &errmsg);
 #endif
   if(status != SQLITE_OK) {
@@ -1318,13 +1318,12 @@ typedef struct {
 #if SQLITE_API == 3
   /* OUT from sqlite3_prepare: */
   sqlite3_stmt *vm;
-  const char *pzTail;
+  const char *zTail;
 #endif
 #if SQLITE_API == 2
-  sqlite_vm *vm;
   /* OUT from vm: */
-  const char *pzTail;
-  sqlite_vm *ppVm;
+  sqlite_vm *vm;
+  const char *zTail;
 #endif
 } librdf_storage_sqlite_find_statements_stream_context;
 
@@ -1415,14 +1414,15 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
                          (const char*)request,
                          raptor_stringbuffer_length(sb),
                          &scontext->vm,
-                         &scontext->pzTail);
+                         &scontext->zTail);
   if(status != SQLITE_OK)
     errmsg=(char*)sqlite3_errmsg(context->db);
 #endif
 #if SQLITE_API == 2  
   status=sqlite_compile(context->db,
                         request,
-                        &scontext->pzTail, &scontext->ppVm,
+                        &scontext->zTail, 
+                        &scontext->vm,
                         &errmsg);
 #endif
   if(status != SQLITE_OK) {
