@@ -34,17 +34,6 @@ if test "$ac_cv_header_gdbm_h" = yes ; then
   AC_CHECK_LIB(gdbm,gdbm_firstkey)
 fi
 
-AC_CHECK_HEADERS(openssl/crypto.h)
-if test "$ac_cv_header_openssl_crypto_h" = yes ; then
-  AC_CHECK_LIB(crypto,MD5)
-  if test "$ac_cv_lib_crypto_MD5" = yes ; then
-    AC_DEFINE(HAVE_OPENSSL_CRYPTO_MD5_DIGEST)
-  fi
-  AC_CHECK_LIB(crypto,SHA)
-  if test "$ac_cv_lib_crypto_SHA" = yes ; then
-    AC_DEFINE(HAVE_OPENSSL_CRYPTO_SHA1_DIGEST)
-  fi
-fi
 
 
 
@@ -79,36 +68,45 @@ dnl Checks for library functions.
 
 
 dnl Checks for modules
+digest_modules="md5 sha1 ripemd160"
+
 DIGEST_OBJS=
 DIGEST_SRCS=
-AC_MSG_CHECKING(for sha1 digest module)
-if test -r $srcdir/sha1.c; then
-  AC_MSG_RESULT(yes);
-  AC_DEFINE(HAVE_SHA1_DIGEST)
-  DIGEST_OBJS="$DIGEST_OBJS sha1.o"
-  DIGEST_SRCS="$DIGEST_SRCS sha1.c"
-else
-  AC_MSG_RESULT(no);
 
+AC_CHECK_HEADERS(openssl/crypto.h)
+if test "$ac_cv_header_openssl_crypto_h" = yes ; then
+  AC_DEFINE(HAVE_OPENSSL_DIGESTS)
+  new_digest_modules=
+  have_libcrypto=
+  for module in $digest_modules; do
+    func=`echo $module | tr 'a-z' 'A-Z'`
+    AC_CHECK_LIB(crypto, $func,[
+      # Have to do this since macro version doesn't expand variables
+      echo "#define HAVE_OPENSSL_CRYPTO_${func}_DIGEST 1" >> confdefs.h
+    ], [
+      new_digest_modules="${new_digest_modules} $module"
+    ])
+  done
+  LIBS="-lcrypto $LIBS"
+  DIGEST_OBJS="$DIGEST_OBJS rdf_digest_openssl.o"
+  DIGEST_SRCS="$DIGEST_SRCS rdf_digest_openssl.c"
+  digest_modules=$new_digest_modules
 fi
-AC_MSG_CHECKING(for md5 digest module)
-if test -r $srcdir/md5.c; then
-  AC_MSG_RESULT(yes);
-  AC_DEFINE(HAVE_MD5_DIGEST)
-  DIGEST_OBJS="$DIGEST_OBJS md5.o"
-  DIGEST_SRCS="$DIGEST_SRCS md5.c"
-else
-  AC_MSG_RESULT(no);
-fi
-AC_MSG_CHECKING(for ripem160 digest module)
-if test -r $srcdir/rmd160.c; then
-  AC_MSG_RESULT(yes);
-  AC_DEFINE(HAVE_RIPEM160_DIGEST)
-  DIGEST_OBJS="$DIGEST_OBJS rmd160.o"
-  DIGEST_SRCS="$DIGEST_SRCS rmd160.c"
-else
-  AC_MSG_RESULT(no);
-fi
+
+for module in $digest_modules; do
+  module_u=`echo $module | tr 'a-z' 'A-Z'`
+  AC_MSG_CHECKING(for $module digest module)
+  if test -r $srcdir/$module.c; then
+    AC_MSG_RESULT(yes);
+    # Have to do this since macro version doesn't expand variables
+    echo "#define HAVE_${module_u}_DIGEST 1" >> confdefs.h
+    DIGEST_OBJS="$DIGEST_OBJS $module.o"
+    DIGEST_SRCS="$DIGEST_SRCS $module.c"
+  else
+    AC_MSG_RESULT(no);
+  fi
+done
+
 AC_SUBST(DIGEST_OBJS)
 AC_SUBST(DIGEST_SRCS)
 
