@@ -120,6 +120,14 @@ struct librdf_query_factory_s {
 
   /* write the query results to an existing file handle */
   int (*results_to_file_handle)(librdf_query_results *query_results, FILE *handle, librdf_uri *format_uri, librdf_uri *base_uri);
+
+  /* Return true/false if result is format given - OPTIONAL */
+  int (*results_is_bindings)(librdf_query_results *query_results);
+  int (*results_is_boolean)(librdf_query_results *query_results);
+  int (*results_is_graph)(librdf_query_results *query_results);
+  
+  /* get a boolean result - OPTIONAL */
+  int (*results_get_boolean)(librdf_query_results *query_results);
 };
 
 
@@ -174,6 +182,13 @@ REDLAND_API int librdf_query_results_to_file_handle(librdf_query_results *query_
 REDLAND_API int librdf_query_results_to_file(librdf_query_results *query_results, const char *name, librdf_uri *format_uri, librdf_uri *base_uri);
 
 REDLAND_API void librdf_free_query_results(librdf_query_results* query_results);
+
+REDLAND_API int librdf_query_results_is_bindings(librdf_query_results *query_results);
+REDLAND_API int librdf_query_results_is_boolean(librdf_query_results *query_results);
+REDLAND_API int librdf_query_results_is_graph(librdf_query_results *query_results);
+
+REDLAND_API int librdf_query_results_get_boolean(librdf_query_results *query_results);
+
 
 #ifdef __cplusplus
 }
