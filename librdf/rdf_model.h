@@ -15,17 +15,21 @@
  */
 
 
-#ifndef RDF_NODE_H
-#define RDF_NODE_H
+#ifndef RDF_MODEL_H
+#define RDF_MODEL_H
 
 #include <rdf_uri.h>
 #include <rdf_node.h>
+#include <rdf_statement.h>
+#include <rdf_model_storage.h>
+#include <rdf_iterator.h>
 
-/* placeholder */
-typedef struct {
-  int count; /* number of stored statements */
-  rdf_model_storage* storage;
-} rdf_model;
+
+struct rdf_model_s {
+  rdf_model_storage*  storage;
+  struct rdf_model_s* sub_models;
+};
+typedef struct rdf_model_s rdf_model;
 
 
 /* class methods */
@@ -35,10 +39,10 @@ void init_rdf_model(void);
 /* constructors */
 
 /* Create a new Model */
-int new_rdf_model();
+rdf_model* new_rdf_model();
 
 /* Create a new Model from an existing Model - CLONE */
-int new_rdf_model_from_model(rdf_model* model);
+rdf_model* new_rdf_model_from_model(rdf_model* model);
 
 /* destructor */
 void free_rdf_model(rdf_model *model);
