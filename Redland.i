@@ -118,6 +118,20 @@ librdf_call_python_message(int type, const char *message, va_list arguments)
   else {
     vsnprintf(buffer, len, message, arguments);
 
+    if(type == 0) {
+#ifdef PYTHON_EXCEPTIONS_WORKING
+      PyObject *error = PyErr_NewException("Redland.error", NULL, NULL);
+      /* error */
+      PyErr_SetString(error, buffer);
+#else
+      PyErr_Warn(NULL, buffer);
+#endif
+    } else {
+      /* warning */
+       PyErr_Warn(NULL, buffer);
+    }
+
+#ifdef PYTHON_EXCEPTIONS_WORKING
     /* call the callback */
     arglist = Py_BuildValue("(is)", type, buffer);
     if(!arglist) {
@@ -134,7 +148,7 @@ librdf_call_python_message(int type, const char *message, va_list arguments)
     
     /* no result */
     Py_DECREF(result);
-
+#endif
     free(buffer);
   }
 }
