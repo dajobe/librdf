@@ -285,8 +285,6 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
                                          librdf_uri *datatype_uri)
 {
   librdf_node* object;
-  int result;
-  
   object=librdf_new_node_from_typed_literal(model->world,
                                             string, xml_language, 
                                             datatype_uri);
