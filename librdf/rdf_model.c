@@ -1535,6 +1535,29 @@ librdf_model_to_string(librdf_model* model, librdf_uri *uri,
 }
 
 
+/**
+ * librdf_model_contains_context - Check for a context in the model
+ * @model: the model object
+ * @context: the contest
+ * 
+ * Return value: non 0 if the model contains the context node
+ **/
+int
+librdf_model_contains_context(librdf_model* model, librdf_node* context) {
+  librdf_stream* stream;
+  int result;
+
+  stream=librdf_model_context_as_stream(model, context);
+  if(!stream)
+    return 0;
+  
+  result=!librdf_stream_end(stream);
+  librdf_free_stream(stream);
+
+  return result;
+}
+
+
 #endif
 
 
@@ -1786,6 +1809,16 @@ main(int argc, char *argv[])
     }
   }
 
+#define TEST_CONTEXT_URI_INDEX 0
+
+  if(librdf_model_contains_context(model, nodes[TEST_CONTEXT_URI_INDEX])) {
+    fprintf(stderr, "%s: Model contains context %s\n", program, 
+            librdf_uri_as_string(uris[TEST_CONTEXT_URI_INDEX]));
+  } else {
+    fprintf(stderr, "%s: librdf_model_contains_contexts failed to find context URI %s\n", 
+            program, librdf_uri_as_string(uris[TEST_CONTEXT_URI_INDEX]));
+    exit(1);
+  }
   
 
   for (i=0; i<URI_STRING_COUNT; i++) {
