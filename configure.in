@@ -265,7 +265,7 @@ LIBS="$oLIBS"
 # Remove any expat lurking around from, say, w3c libwww
 LIBS=`echo $LIBS | sed -e 's/-lxmlparse//' -e 's/-lxmltok//'`
 
-AC_CHECK_LIB(expat, XML_SetNamespaceDeclHandler, libexpat=1, libexpat=0)
+AC_CHECK_LIB(expat, XML_ParserCreateNS, libexpat=1, libexpat=0)
 
 LIBS="$oLIBS"
 
@@ -273,7 +273,8 @@ REPAT_FLAGS=
 
 AC_MSG_CHECKING(for working expat in libxmlparse and libxmltok)
 if test $xmlp = 1 -a $xmlt = 1 -a  $ac_cv_header_xmlparse_h = yes; then
-  AC_TRY_RUN([main() {XML_SetNamespaceDeclHandler();}], worked=yes, worked=no, worked=no)
+  LIBS="$LIBS -lxmlparse -lxmltok"
+  AC_TRY_RUN([main() {XML_ParserCreateNS(); return(0);}], worked=yes, worked=no, worked=no)
   if test $worked = yes; then
     # Old expat
     have_expat_lib=1
@@ -291,9 +292,12 @@ else
   AC_MSG_RESULT(no)
 fi
 
+LIBS="$oLIBS"
+
 AC_MSG_CHECKING(for working expat in libexpat)
 if test $libexpat = 1 -a $ac_cv_header_expat_h = yes ; then
-  AC_TRY_RUN([main() {XML_SetNamespaceDeclHandler();}], worked=yes, worked=no, worked=no)
+  LIBS="$LIBS -lexpat"
+  AC_TRY_RUN([main() {XML_ParserCreateNS(); return(0);}], worked=yes, worked=no, worked=no)
   if test $worked = yes; then
     # New expat - expat-1.95.0 or later
     have_expat_lib=1
@@ -308,6 +312,7 @@ else
   AC_MSG_RESULT(no)
 fi
 
+LIBS="$oLIBS"
 
 AC_CHECK_PROG(XML_CONFIG, xml-config, xml-config)
 
@@ -614,7 +619,7 @@ if test $need_expat = 1; then
   if test $need_expat_source = 1; then
     xml_parsers_available="$xml_parsers_available expat(source)"
   else
-    if $libexpat = 1; then
+    if test $libexpat = 1; then
       xml_parsers_available="$xml_parsers_available expat(system libexpat)"
     else
       xml_parsers_available="$xml_parsers_available expat(system libxmlparse,libxmltok)"
@@ -780,9 +785,28 @@ if test $need_expat = 1; then
     # version then need to remove these two lines:
     AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
     REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
+
+    # We know local expat sources has XML_SetNamespaceDeclHandler already
+    found=yes
   else
     LIBS="$LIBS $expat_libs"
+    found=no
   fi
+
+  AC_MSG_CHECKING(for XML_SetNamespaceDeclHandler in expat)
+  if test $found = yes; then
+    worked=yes
+  else
+    AC_TRY_RUN([main() {XML_SetNamespaceDeclHandler(); return(0);}], worked=yes, worked=no, worked=no)
+  fi
+
+  if test $worked = yes; then
+    AC_DEFINE(HAVE_XML_SetNamespaceDeclHandler)
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi
+
 fi
 
 if test $need_repat = 1; then
