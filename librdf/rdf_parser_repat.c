@@ -675,7 +675,7 @@ librdf_parser_repat_serialise_finished(void* context)
       RDF_ParserFree(scontext->repat);
 
     if(scontext->statements) {
-      while((statement=librdf_list_pop(scontext->statements)))
+      while((statement=(librdf_statement*)librdf_list_pop(scontext->statements)))
         librdf_free_statement(statement);
       librdf_free_list(scontext->statements);
     }
