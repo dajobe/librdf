@@ -284,14 +284,19 @@ librdf_new_uri_normalised_to_base(const char *uri_string,
   if((!uri_string || !*uri_string) && base_uri)
     return librdf_new_uri_from_uri(base_uri);
 
-  /* no match - easy */
-  if(strncmp(uri_string, source_uri->string, source_uri->string_length))
+  /* not a fragment, and no match - easy */
+  if(*uri_string != '#' &&
+     strncmp(uri_string, source_uri->string, source_uri->string_length))
     return librdf_new_uri(uri_string);
 
-  /* darn - matches the source URI */
+  /* darn - is a fragment or matches, is a prefix of the source URI */
 
-  /* move uri_string pointer to first non-matching char */
-  uri_string += source_uri->string_length;
+  /* move uri_string pointer to first non-matching char 
+   * unless a fragment, when all of the uri_string will 
+   * be appended
+   */
+  if(*uri_string != '#')
+    uri_string += source_uri->string_length;
 
   /* size of remaining bytes to copy from uri_string */
   uri_string_len=strlen(uri_string);
