@@ -128,7 +128,9 @@ librdf_parser_sirparc_parse_from_uri(void *context, librdf_uri *uri) {
 	  uri_string);
   scontext->command=command;
 
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2(librdf_parser_sirparc_parse_from_uri, "Running command '%s'\n", command);
+#endif
 
   fh=popen(command, "r");
   if(!fh) {
@@ -350,5 +352,5 @@ librdf_parser_sirpac_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_sirpac_constructor(void)
 {
-  librdf_parser_register_factory("SiRPAC", &librdf_parser_sirpac_register_factory);
+  librdf_parser_register_factory("sirpac", &librdf_parser_sirpac_register_factory);
 }
