@@ -242,8 +242,49 @@ librdf_new_node_from_literal(librdf_world *world,
   /* set type */
   new_node->type=LIBRDF_NODE_TYPE_LITERAL;
 
-  if (librdf_node_set_literal_value(new_node, string, xml_language,
-                                    is_wf_xml)) {
+  if (librdf_node_set_typed_literal_value(new_node, string, xml_language,
+                                          (is_wf_xml ? 
+                                           LIBRDF_RS_XMLLiteral_URI : NULL)
+                                          )) {
+    librdf_free_node(new_node);
+    return NULL;
+  }
+  
+  return new_node;
+}
+
+
+/**
+ * librdf_new_node_from_typed_literal -  Constructor - create a new typed literal librdf_node object
+ * @world: redland world object
+ * @string: literal string value
+ * @xml_language: literal XML language (or NULL, empty string)
+ * @datatype_uri: non 0 if literal is XML
+ * 
+ * 0.9.12: xml_space argument deleted
+ *
+ * Return value: new &librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_new_node_from_typed_literal(librdf_world *world, 
+                                   const char *string,
+                                   const char *xml_language, 
+                                   librdf_uri* datatype_uri) 
+{
+  librdf_node* new_node;
+  
+  new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1,
+                                         sizeof(librdf_node));
+  if(!new_node)
+    return NULL;
+
+  new_node->world=world;
+  
+  /* set type */
+  new_node->type=LIBRDF_NODE_TYPE_LITERAL;
+
+  if (librdf_node_set_typed_literal_value(new_node, string, xml_language,
+                                          datatype_uri)) {
     librdf_free_node(new_node);
     return NULL;
   }
@@ -322,10 +363,10 @@ librdf_new_node_from_node(librdf_node *node)
       break;
 
     case LIBRDF_NODE_TYPE_LITERAL:
-      if (librdf_node_set_literal_value(new_node,
-                                        node->value.literal.string,
-                                        node->value.literal.xml_language,
-                                        node->value.literal.is_wf_xml)) {
+      if (librdf_node_set_typed_literal_value(new_node,
+                                              node->value.literal.string,
+                                              node->value.literal.xml_language,
+                                              node->value.literal.datatype_uri)) {
         LIBRDF_FREE(librdf_node, new_node);
         return NULL;
       }
@@ -382,6 +423,8 @@ librdf_free_node(librdf_node *node)
         LIBRDF_FREE(cstring, node->value.literal.string);
       if(node->value.literal.xml_language != NULL)
         LIBRDF_FREE(cstring, node->value.literal.xml_language);
+      if(node->value.literal.datatype_uri != NULL)
+        librdf_free_uri(node->value.literal.datatype_uri);
       break;
 
     case LIBRDF_NODE_TYPE_BLANK:
@@ -569,7 +612,23 @@ librdf_node_get_literal_value_is_wf_xml(librdf_node* node)
 {
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return 0;
-  return node->value.literal.is_wf_xml;
+  return librdf_uri_equals(node->value.literal.datatype_uri,
+                           LIBRDF_RS_XMLLiteral_URI);
+}
+
+
+/**
+ * librdf_node_get_literal_value_datatype_uri - Get the typed literal datatype URI of the literal node
+ * @node: the node object
+ * 
+ * Return value: shared URI of the datatyped literal or NULL if the node is not a literal, or has no datatype URI
+ **/
+librdf_uri*
+librdf_node_get_literal_value_datatype_uri(librdf_node* node)
+{
+  if(node->type != LIBRDF_NODE_TYPE_LITERAL)
+    return 0;
+  return node->value.literal.datatype_uri;
 }
 
 
@@ -587,13 +646,38 @@ librdf_node_get_literal_value_is_wf_xml(librdf_node* node)
  * method (xml:space="default") or 2 - preserve space (xml:space="preserve").
  *
  * 0.9.12: xml_space argument deleted
- * 
+ *
  * Return value: non 0 on failure
  **/
 int
 librdf_node_set_literal_value(librdf_node* node, const char* value,
 			      const char *xml_language,
                               int is_wf_xml) 
+{
+  return librdf_node_set_typed_literal_value(node, value, xml_language,
+                                             (is_wf_xml ? 
+                                              LIBRDF_RS_XMLLiteral_URI : NULL)
+                                             );
+}
+
+
+
+/**
+ * librdf_node_set_typed_literal_value - Set the node typed literal value with options
+ * @node: the node object
+ * @value: pointer to the literal string value
+ * @xml_language: pointer to the literal language (or NULL, empty string if not defined)
+ * @datatype_uri: URI of typed literal or NULL
+ * 
+ * Sets the node literal value, optional language
+ * and optional literal datatype URI.
+ *
+ * Return value: non 0 on failure
+ **/
+int
+librdf_node_set_typed_literal_value(librdf_node* node, const char* value,
+                                    const char *xml_language,
+                                    librdf_uri* datatype_uri)
 {
   int value_len;
   char *new_value;
@@ -624,7 +708,10 @@ librdf_node_set_literal_value(librdf_node* node, const char* value,
     LIBRDF_FREE(cstring, node->value.literal.xml_language);
   node->value.literal.xml_language=new_xml_language;
 
-  node->value.literal.is_wf_xml=is_wf_xml;
+  if(node->value.literal.datatype_uri)
+    librdf_free_uri(node->value.literal.datatype_uri);
+  if(datatype_uri)
+    node->value.literal.datatype_uri=librdf_new_uri_from_uri(datatype_uri);
   
   return 0;
 }
@@ -843,11 +930,20 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
 
       status=strcmp(first_node->value.literal.string,
                     second_node->value.literal.string);
-      if(!status)
+      if(status)
+        return 0;
+      
+      /* No datatypes, must be equal */
+      if(!first_node->value.literal.datatype_uri && !second_node->value.literal.datatype_uri)
         return 1;
 
-      /* FIXME: compare xml_language and is_wf_xml ?  Probably not */
-      return 0;
+      /* Only one URI - must be different */
+      if(!first_node->value.literal.datatype_uri || !second_node->value.literal.datatype_uri)
+        return 0;
+
+      return librdf_uri_equals(first_node->value.literal.datatype_uri,
+                               second_node->value.literal.datatype_uri);
+      
 
     case LIBRDF_NODE_TYPE_STATEMENT:
       return librdf_statement_equals(first_node, second_node);
@@ -888,6 +984,8 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
   unsigned char *string;
   size_t string_length;
   size_t language_length=0;
+  unsigned char *datatype_uri_string;
+  size_t datatype_uri_length=0;
   
   switch(node->type) {
     case LIBRDF_NODE_TYPE_RESOURCE:
@@ -908,6 +1006,8 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       break;
       
     case LIBRDF_NODE_TYPE_LITERAL:
+#if 0
+      /* old encoding before 0.9.12 */
       string=(unsigned char*)node->value.literal.string;
       string_length=node->value.literal.string_len;
       if(node->value.literal.xml_language)
@@ -930,6 +1030,44 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
         strcpy((char*)buffer+6, (const char*)string);
         if(language_length)
           strcpy((char*)buffer+string_length+7, (const char*)node->value.literal.xml_language);
+      }
+      break;
+      
+#endif
+      string=(unsigned char*)node->value.literal.string;
+      string_length=node->value.literal.string_len;
+      if(node->value.literal.xml_language)
+        language_length=strlen(node->value.literal.xml_language);
+      if(node->value.literal.datatype_uri) {
+        datatype_uri_string=librdf_uri_as_string(node->value.literal.datatype_uri);
+        datatype_uri_length=strlen(datatype_uri_string);
+      }
+      
+      total_length= 6 + string_length + 1; /* +1 for \0 at end */
+      if(language_length)
+        total_length += language_length+1;
+      if(datatype_uri_length)
+        total_length += datatype_uri_length+1;
+      
+      if(length && total_length > length)
+        return 0;    
+      
+      if(buffer) {
+        buffer[0]='M';
+        buffer[1]=(string_length & 0xff00) >> 8;
+        buffer[2]=(string_length & 0x00ff);
+        buffer[3]=(datatype_uri_length & 0xff00) >> 8;
+        buffer[4]=(datatype_uri_length & 0x00ff);
+        buffer[5]=(language_length & 0x00ff);
+        buffer += 6;
+        strcpy((char*)buffer, (const char*)string);
+        buffer += string_length+1;
+        if(datatype_uri_length) {
+          strcpy((char*)buffer, (const char*)node->value.literal.datatype_uri);
+          buffer += datatype_uri_length+1;
+        }
+        if(language_length)
+          strcpy((char*)buffer, (const char*)node->value.literal.xml_language);
       }
       break;
       
@@ -978,8 +1116,12 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
   size_t string_length;
   size_t total_length;
   size_t language_length;
+  char *datatype_uri_string=NULL;
+  size_t datatype_uri_length;
+  librdf_uri* datatype_uri=NULL;
   librdf_uri* new_uri;
   char *language=NULL;
+  int status=0;
   
   /* absolute minimum - first byte is type */
   if (length < 1)
@@ -1009,7 +1151,7 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
 
       break;
 
-    case 'L': /* LIBRDF_NODE_TYPE_LITERAL */
+    case 'L': /* Old encoding form for LIBRDF_NODE_TYPE_LITERAL */
       /* min */
       if(length < 6)
         return 1;
@@ -1026,11 +1168,47 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
       
       /* Now initialise fields */
       node->type = LIBRDF_NODE_TYPE_LITERAL;
-      if (librdf_node_set_literal_value(node, (const char*)buffer+6,
-                                        (const char*)language,
-                                        is_wf_xml))
+      datatype_uri=is_wf_xml ? LIBRDF_RS_XMLLiteral_URI : NULL;
+      if (librdf_node_set_typed_literal_value(node, (const char*)buffer+6,
+                                              (const char*)language,
+                                              datatype_uri))
         return 0;
     
+    break;
+
+    case 'M': /* LIBRDF_NODE_TYPE_LITERAL 0.9.12+ */
+      /* min */
+      if(length < 6)
+        return 1;
+      
+      string_length=(buffer[1] << 8) | buffer[2];
+      datatype_uri_length=(buffer[3] << 8) | buffer[4];
+      language_length=buffer[5];
+
+      total_length= 6 + string_length + 1; /* +1 for \0 at end */
+      if(language_length) {
+        language = buffer + total_length;
+        total_length += language_length+1;
+      }
+      if(datatype_uri_length) {
+        datatype_uri_string = buffer + total_length;
+        total_length += datatype_uri_length+1;
+      }
+
+      if(datatype_uri_string)
+        datatype_uri=librdf_new_uri(node->world, datatype_uri_string);
+      
+      /* Now initialise fields */
+      node->type = LIBRDF_NODE_TYPE_LITERAL;
+      status=librdf_node_set_typed_literal_value(node, (const char*)buffer+6,
+                                                 (const char*)language,
+                                                 datatype_uri);
+      if(datatype_uri)
+        librdf_free_uri(datatype_uri);
+      
+      if(status)
+        return 0;
+      
     break;
 
     case 'B': /* LIBRDF_NODE_TYPE_BLANK */
