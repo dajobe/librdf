@@ -120,6 +120,8 @@ librdf_serializer_raptor_serialize_model(void *context,
   while(!librdf_stream_end(stream)) {
     librdf_statement *statement=librdf_stream_next(stream);
     librdf_serializer_print_statement_as_ntriple(statement, handle);
+    fputc('\n', handle);
+    librdf_free_statement(statement);
   }
   librdf_free_stream(stream);
   return 0;
