@@ -44,6 +44,7 @@
 #include <unistd.h>
 
 #include <redland.h>
+#include <raptor.h>
 
 #ifdef NEED_OPTIND_DECLARATION
 extern int optind;
@@ -123,7 +124,7 @@ static command commands[]={
 #endif
 
 
-#define GETOPT_STRING "chv"
+#define GETOPT_STRING "chns:t:v"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_options[] =
@@ -131,6 +132,9 @@ static struct option long_options[] =
   /* name, has_arg, flag, val */
   {"contexts", 0, 0, 'c'},
   {"help", 0, 0, 'h'},
+  {"new", 0, 0, 'n'},
+  {"storage", 1, 0, 's'},
+  {"storage-options", 1, 0, 't'},
   {"version", 0, 0, 'v'},
   {NULL, 0, 0, 0}
 };
@@ -159,6 +163,7 @@ main(int argc, char *argv[])
   librdf_hash *options;
   int usage=0;
   int help=0;
+  int is_new=0;
   int contexts=0;
   char *identifier=NULL;
   char *cmd=NULL;
@@ -171,6 +176,10 @@ main(int argc, char *argv[])
   char *p;
   int i;
   int rc;
+  char *storage_name="hashes";
+  char *storage_options="hash-type='bdb',dir='.'";
+  unsigned char *uri_string;
+  int free_uri_string=0;
 
   program=argv[0];
   if((p=strrchr(program, '/')))
@@ -207,6 +216,18 @@ main(int argc, char *argv[])
 
       case 'h':
         help=1;
+        break;
+
+      case 'n':
+        is_new=1;
+        break;
+
+      case 's':
+        storage_name=optarg;
+        break;
+
+      case 't':
+        storage_options=optarg;
         break;
 
       case 'v':
@@ -285,6 +306,9 @@ main(int argc, char *argv[])
     puts("\nMain options:");
     puts(HELP_TEXT(c, "contexts        ", "Use Redland contexts"));
     puts(HELP_TEXT(h, "help            ", "Print this help, then exit"));
+    puts(HELP_TEXT(n, "new             ", "Create a new store"));
+    printf(HELP_TEXT(s, "storage TYPE    ", "Storage type (default \"%s\")\n"), storage_name);
+    printf(HELP_TEXT(t, "storage-options OPTIONS", "\n                Set storage options (default \"%s\")\n"), storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
     puts("  parse URI [SYNTAX [BASE URI]]             Parse syntax at URI into");
@@ -320,23 +344,24 @@ main(int argc, char *argv[])
   type=commands[cmd_index].type;
 
   options=librdf_new_hash(world, NULL);
-  librdf_hash_put_strings(options, "hash-type", "bdb");
-  librdf_hash_put_strings(options, "dir", ".");
+  librdf_hash_open(options, NULL, 0, 1, 1, NULL);
+
+  librdf_hash_from_string(options, storage_options);
   if(contexts)
     librdf_hash_put_strings(options, "contexts", "yes");
 
   if(commands[cmd_index].write) {
     librdf_hash_put_strings(options, "write", "yes");
-    if (type == CMD_PARSE_MODEL || type == CMD_PARSE_STREAM)
+    if (is_new)
       librdf_hash_put_strings(options, "new", "yes");
   }
   
-  storage=librdf_new_storage_with_options(world, "hashes", identifier, 
+  storage=librdf_new_storage_with_options(world, storage_name, identifier, 
                                           options);
 
   if(!storage) {
-    fprintf(stderr, "%s: Failed to open BerkelyDB storage %s\n", program,
-            identifier);
+    fprintf(stderr, "%s: Failed to open %s storage '%s'\n", program, 
+            storage_name, identifier);
     return(1);
   }
 
@@ -365,7 +390,12 @@ main(int argc, char *argv[])
       break;
     case CMD_PARSE_MODEL:
     case CMD_PARSE_STREAM:
-      uri=librdf_new_uri(world, (const unsigned char *)argv[0]);
+      uri_string=(unsigned char *)argv[0];
+      if(!access((const char*)uri_string, R_OK)) {
+        uri_string=raptor_uri_filename_to_uri_string((char*)uri_string);
+        free_uri_string=1;
+      }
+      uri=librdf_new_uri(world, uri_string);
       if(!uri) {
         fprintf(stderr, "%s: Failed to create URI from %s\n", program, argv[0]);
         break;
@@ -834,6 +864,9 @@ main(int argc, char *argv[])
 
   if(query)
     librdf_free_query(query);
+
+  if(free_uri_string)
+    free(uri_string);
   
   librdf_free_hash(options);
 
