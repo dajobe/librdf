@@ -384,13 +384,15 @@ librdf_parser_raptor_parse_file_into_model(void *context, librdf_uri *uri,
                                           librdf_uri *base_uri,
                                           librdf_model* model)
 {
-  librdf_stream* stream;
-  
-  stream=librdf_parser_raptor_parse_file_as_stream(context, uri, base_uri);
+  int status=0;
+  librdf_stream* stream=librdf_parser_raptor_parse_file_as_stream(context, 
+                                                                  uri, base_uri);
   if(!stream)
     return 1;
 
-  return librdf_model_add_statements(model, stream);
+  status=librdf_model_add_statements(model, stream);
+  librdf_free_stream(stream);
+  return status;
 }
 
 
