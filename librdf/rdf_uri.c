@@ -36,6 +36,8 @@
 #include <rdf_uri.h>
 #include <rdf_digest.h>
 
+/* for raptor_uri_resolve_uri_reference */
+#include <raptor.h>
 
 /* class methods */
 
@@ -262,85 +264,34 @@ librdf_new_uri_normalised_to_base(const char *uri_string,
  * librdf_new_uri_relative_to_base - Constructor - create a new librdf_uri object from a URI string relative to a base URI
  * @base_uri: absolute base URI
  * @uri_string: relative URI string
- * 
- * NOTE: This method is not a full relative URI implementation but handles
- * common cases where uri_string is empty, "#id", "id" where id has
- * no "/" or "../" inside.  FIXME.
  *
+ * An empty uri_string or NULL is equivalent to 
+ * librdf_new_uri_from_uri(base_uri)
+ * 
  * Return value: a new &librdf_uri object or NULL on failure
  **/
 librdf_uri*
 librdf_new_uri_relative_to_base(librdf_uri* base_uri,
                                 const char *uri_string) {
-  const char *p;
-  int uri_string_length;
-  char *new_uri_string;
+  char *buffer;
+  int buffer_length;
   librdf_uri* new_uri;
   librdf_world *world=base_uri->world;
                                   
   /* If URI string is empty, just copy base URI */
-  if(!*uri_string)
+  if(!uri_string || !*uri_string)
     return librdf_new_uri_from_uri(base_uri);
-
-  uri_string_length=strlen(uri_string);
-
-  /* If URI string is a fragment #foo ... */
-  if(*uri_string == '#') {
-
-    /* Check if base URI has a fragment - # somewhere */
-    for(p=base_uri->string;*p; p++)
-      if(*p == '#')
-        break;
-
-    /* just append to base URI if it has no fragment */
-    if(!*p)
-      return librdf_new_uri_from_uri_local_name(base_uri, uri_string);
-
-    /* otherwise, take the prefix of base URI and add the fragment part */
-    new_uri_string=(char*)LIBRDF_MALLOC(cstring, (p-base_uri->string) + uri_string_length + 1);
-    if(!new_uri_string)
-      return NULL;
-    strncpy(new_uri_string, base_uri->string, (p-base_uri->string));
-    strcpy(new_uri_string + (p-base_uri->string), uri_string);
-    new_uri=librdf_new_uri(world, new_uri_string);
-    LIBRDF_FREE(cstring, new_uri_string);
-    return new_uri;
-  }
   
-
-  /* If URI string is an absolute URI, just copy it 
-   * FIXME - need to check what is allowed before a :
-   */
-  for(p=uri_string;*p; p++)
-    if(!isalnum(*p))
-       break;
-
-  /* If first non-alphanumeric char is a ':' then probably a absolute URI
-   * FIXME - wrong, but good enough for a short while...
-   */
-  if(*p && *p == ':')
-    return librdf_new_uri(world, uri_string);
-
-
-  /* Otherwise is a general URI relative to base URI */
-
-  /* FIXME do this properly */
-
-  /* Move p to the last / or : char in the base URI */
-  for(p= base_uri->string + base_uri->string_length - 1;
-      p > base_uri->string && *p != '/' && *p != ':';
-      p--)
-    ;
-
-  new_uri_string=(char*)LIBRDF_MALLOC(cstring, (p-base_uri->string)+1+uri_string_length+1);
-  if(!new_uri_string)
+  buffer_length=base_uri->string_length + strlen(uri_string) +1;
+  buffer=(char*)LIBRDF_MALLOC(cstring, buffer_length);
+  if(!buffer)
     return NULL;
-
-  strncpy(new_uri_string, base_uri->string, p-base_uri->string+1);
-  strcpy(new_uri_string + (p-base_uri->string) + 1, uri_string);
-  new_uri=librdf_new_uri(world, new_uri_string);
-  LIBRDF_FREE(cstring, new_uri_string);
   
+  raptor_uri_resolve_uri_reference(base_uri->string, uri_string,
+                                   buffer, buffer_length);
+
+  new_uri=librdf_new_uri(world, buffer);
+  LIBRDF_FREE(cstring, buffer);
   return new_uri;
 }
 
