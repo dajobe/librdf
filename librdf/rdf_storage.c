@@ -34,6 +34,14 @@
 static void librdf_delete_storage_factories(void);
 
 
+/* prototypes for functions implementing get_sources, arcs, targets
+ * librdf_iterator via conversion from a librdf_stream of librdf_statement
+ */
+static int librdf_storage_stream_to_node_iterator_have_elements(void* iterator);
+static void* librdf_storage_stream_to_node_iterator_get_next(void* iterator);
+static void librdf_storage_stream_to_node_iterator_finished(void* iterator);
+
+
 /**
  * librdf_init_storage - Initialise the librdf_storage module
  * 
@@ -397,6 +405,259 @@ librdf_storage_find_statements(librdf_storage* storage,
 {
   return storage->factory->find_statements(storage, statement);
 }
+
+
+typedef struct {
+  librdf_stream *stream;
+  librdf_statement *partial_statement;
+#define LIBRDF_STREAM_TO_NODE_ITERATOR_WANT_SOURCES 0
+#define LIBRDF_STREAM_TO_NODE_ITERATOR_WANT_ARCS 1
+#define LIBRDF_STREAM_TO_NODE_ITERATOR_WANT_TARGETS 2
+  int want;
+} librdf_storage_stream_to_node_iterator_context;
+
+
+static int
+librdf_storage_stream_to_node_iterator_have_elements(void* iterator)
+{
+  librdf_storage_stream_to_node_iterator_context* context=(librdf_storage_stream_to_node_iterator_context*)iterator;
+
+  return !librdf_stream_end(context->stream);
+}
+
+
+static void*
+librdf_storage_stream_to_node_iterator_get_next(void* iterator) 
+{
+  librdf_storage_stream_to_node_iterator_context* context=(librdf_storage_stream_to_node_iterator_context*)iterator;
+  librdf_statement* statement;
+  librdf_node* node;
+  
+  statement=librdf_stream_next(context->stream);
+  if(!statement)
+    return NULL;
+
+  switch(context->want) {
+    case LIBRDF_STREAM_TO_NODE_ITERATOR_WANT_SOURCES: /* SOURCES (subjects) */
+      node=librdf_statement_get_subject(statement);
+      librdf_statement_set_subject(statement, NULL);
+      break;
+      
+    case LIBRDF_STREAM_TO_NODE_ITERATOR_WANT_ARCS: /* ARCS (predicates) */
+      node=librdf_statement_get_predicate(statement);
+      librdf_statement_set_predicate(statement, NULL);
+      break;
+      
+    case LIBRDF_STREAM_TO_NODE_ITERATOR_WANT_TARGETS: /* TARGETS (objects) */
+      node=librdf_statement_get_object(statement);
+      librdf_statement_set_object(statement, NULL);
+      break;
+      
+    default: /* error */
+    abort();
+  }
+  
+  librdf_free_statement(statement);
+
+  return (void*)node;
+}
+
+
+static void
+librdf_storage_stream_to_node_iterator_finished(void* iterator) 
+{
+  librdf_storage_stream_to_node_iterator_context* context=(librdf_storage_stream_to_node_iterator_context*)iterator;
+  librdf_statement *partial_statement=context->partial_statement;
+
+  /* make sure librdf_free_statement() doesn't free anything here */
+  librdf_statement_set_subject(partial_statement, NULL);
+  librdf_statement_set_predicate(partial_statement, NULL);
+  librdf_statement_set_object(partial_statement, NULL);
+
+  librdf_free_statement(partial_statement);
+
+  librdf_free_stream(context->stream);
+
+  LIBRDF_FREE(librdf_storage_stream_to_node_iterator_context, context);
+}
+
+
+/**
+ * librdf_storage_get_sources - return the sources (subjects) of arc in an RDF graph given arc (predicate) and target (object)
+ * @storage: &librdf_storage object
+ * @arc: &librdf_node arc
+ * @target: &librdf_node target
+ * 
+ * Searches the storage for arcs matching the given arc and target
+ * and returns a list of the source &librdf_node objects as an iterator
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_storage_get_sources(librdf_storage *storage,
+                           librdf_node *arc, librdf_node *target) 
+{
+  librdf_statement *partial_statement;
+  librdf_stream *stream;
+  librdf_storage_stream_to_node_iterator_context* context;
+  librdf_iterator *iterator;
+  
+  if (storage->factory->find_sources)
+    return storage->factory->find_sources(storage, arc, target);
+
+  partial_statement=librdf_new_statement();
+  if(!partial_statement)
+    return NULL;
+  
+  context=(librdf_storage_stream_to_node_iterator_context*)LIBRDF_CALLOC(librdf_storage_stream_to_node_iterator_context, 1, sizeof(librdf_storage_stream_to_node_iterator_context));
+  if(!context) {
+    librdf_free_statement(partial_statement);
+    return NULL;
+  }
+  
+  /*  librdf_statement_set_subject(partial_statement, NULL); */
+  librdf_statement_set_predicate(partial_statement, arc);
+  librdf_statement_set_object(partial_statement, target);
+
+  stream=storage->factory->find_statements(storage, partial_statement);
+  if(!stream) {
+    librdf_storage_stream_to_node_iterator_finished(context);
+    return NULL;
+  }
+  
+  /* initialise context */
+  context->partial_statement=partial_statement;
+  context->stream=stream;
+  context->want=LIBRDF_STREAM_TO_NODE_ITERATOR_WANT_SOURCES;
+  
+  iterator=librdf_new_iterator((void*)context,
+                               librdf_storage_stream_to_node_iterator_have_elements,
+                               librdf_storage_stream_to_node_iterator_get_next,
+                               librdf_storage_stream_to_node_iterator_finished);
+  if(!iterator)
+    librdf_storage_stream_to_node_iterator_finished(context);
+
+  return iterator;
+}
+
+
+/**
+ * librdf_storage_get_arcs - return the arcs (predicates) of an arc in an RDF graph given source (subject) and target (object)
+ * @storage: &librdf_storage object
+ * @source: &librdf_node source
+ * @target: &librdf_node target
+ * 
+ * Searches the storage for arcs matching the given source and target
+ * and returns a list of the arc &librdf_node objects as an iterator
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_storage_get_arcs(librdf_storage *storage,
+                        librdf_node *source, librdf_node *target) 
+{
+  librdf_statement *partial_statement;
+  librdf_stream *stream;
+  librdf_storage_stream_to_node_iterator_context* context;
+  librdf_iterator *iterator;
+  
+  if (storage->factory->find_arcs)
+    return storage->factory->find_arcs(storage, source, target);
+
+  partial_statement=librdf_new_statement();
+  if(!partial_statement)
+    return NULL;
+  
+  context=(librdf_storage_stream_to_node_iterator_context*)LIBRDF_CALLOC(librdf_storage_stream_to_node_iterator_context, 1, sizeof(librdf_storage_stream_to_node_iterator_context));
+  if(!context) {
+    librdf_free_statement(partial_statement);
+    return NULL;
+  }
+  
+  librdf_statement_set_subject(partial_statement, source);
+  /* librdf_statement_set_predicate(partial_statement, NULL); */
+  librdf_statement_set_object(partial_statement, target);
+
+  stream=storage->factory->find_statements(storage, partial_statement);
+  if(!stream) {
+    librdf_storage_stream_to_node_iterator_finished(context);
+    return NULL;
+  }
+  
+  /* initialise context */
+  context->partial_statement=partial_statement;
+  context->stream=stream;
+  context->want=LIBRDF_STREAM_TO_NODE_ITERATOR_WANT_ARCS;
+  
+  iterator=librdf_new_iterator((void*)context,
+                               librdf_storage_stream_to_node_iterator_have_elements,
+                               librdf_storage_stream_to_node_iterator_get_next,
+                               librdf_storage_stream_to_node_iterator_finished);
+  if(!iterator)
+    librdf_storage_stream_to_node_iterator_finished(context);
+
+  return iterator;
+}
+
+
+/**
+ * librdf_storage_get_targets - return the targets (objects) of an arc in an RDF graph given source (subject) and arc (predicate)
+ * @storage: &librdf_storage object
+ * @source: &librdf_node source
+ * @arc: &librdf_node arc
+ * 
+ * Searches the storage for targets matching the given source and arc
+ * and returns a list of the source &librdf_node objects as an iterator
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_storage_get_targets(librdf_storage *storage,
+                           librdf_node *source, librdf_node *arc) 
+{
+  librdf_statement *partial_statement;
+  librdf_stream *stream;
+  librdf_storage_stream_to_node_iterator_context* context;
+  librdf_iterator *iterator;
+  
+  if (storage->factory->find_targets)
+    return storage->factory->find_targets(storage, source, arc);
+
+  partial_statement=librdf_new_statement();
+  if(!partial_statement)
+    return NULL;
+  
+  context=(librdf_storage_stream_to_node_iterator_context*)LIBRDF_CALLOC(librdf_storage_stream_to_node_iterator_context, 1, sizeof(librdf_storage_stream_to_node_iterator_context));
+  if(!context) {
+    librdf_free_statement(partial_statement);
+    return NULL;
+  }
+  
+  librdf_statement_set_subject(partial_statement, source);
+  librdf_statement_set_predicate(partial_statement, arc);
+  /* librdf_statement_set_object(partial_statement, NULL); */
+
+  stream=storage->factory->find_statements(storage, partial_statement);
+  if(!stream) {
+    librdf_storage_stream_to_node_iterator_finished(context);
+    return NULL;
+  }
+  
+  /* initialise context */
+  context->partial_statement=partial_statement;
+  context->stream=stream;
+  context->want=LIBRDF_STREAM_TO_NODE_ITERATOR_WANT_TARGETS;
+  
+  iterator=librdf_new_iterator((void*)context,
+                               librdf_storage_stream_to_node_iterator_have_elements,
+                               librdf_storage_stream_to_node_iterator_get_next,
+                               librdf_storage_stream_to_node_iterator_finished);
+  if(!iterator)
+    librdf_storage_stream_to_node_iterator_finished(context);
+
+  return iterator;
+}
+
 
 
 
