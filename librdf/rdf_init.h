@@ -60,6 +60,12 @@ struct librdf_world_s
    /* hash load_factor out of 1000 */
   int hash_load_factor;
 
+  /* ID base from startup time */
+  long genid_base;
+
+  /* Unique counter from there */
+  long genid_counter;
+
 #ifdef WITH_THREADS
   /* mutex so we can lock around this when we need to */
   pthread_mutex_t* mutex;
@@ -79,6 +85,10 @@ void librdf_world_set_warning(librdf_world* world, void *user_data, void (*warni
 void librdf_world_set_digest(librdf_world*, const char *name);
 void librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash);
 
+
+#define LIBRDF_WORLD_FEATURE_GENID_BASE "http://feature.librdf.org/genid-base"
+#define LIBRDF_WORLD_FEATURE_GENID_COUNTER "http://feature.librdf.org/genid-counter"
+
 const char *librdf_world_get_feature(librdf_world* world, librdf_uri *feature);
 int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, const char *value);
 
@@ -86,6 +96,8 @@ int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, const cha
 /* internal routines used to invoking errors/warnings upwards to user */
 void librdf_error(librdf_world* world, const char *message, ...);
 void librdf_warning(librdf_world* world, const char *message, ...);
+
+const unsigned char* librdf_world_get_genid(librdf_world* world);
 #endif
 
 /* OLD INTERFACES */
