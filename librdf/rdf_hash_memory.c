@@ -100,7 +100,7 @@ static void librdf_hash_memory_cursor_finish(void* context);
 
 /* functions implementing the API */
 
-static int librdf_hash_memory_open(void* context, char *identifier, void *mode, librdf_hash* options);
+static int librdf_hash_memory_open(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 static int librdf_hash_memory_close(void* context);
 static int librdf_hash_memory_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 static int librdf_hash_memory_exists(void* context, librdf_hash_datum *key);
@@ -140,6 +140,10 @@ librdf_hash_memory_find_node(librdf_hash_memory_context* hash,
   int bucket;
   int hash_key;
 
+  /* empty hash */
+  if(!hash->capacity)
+    return NULL;
+  
   hash_key=librdf_hash_memory_crc32((unsigned char*)key, key_len);
 
   if(prev)
@@ -256,15 +260,18 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
 /**
  * librdf_hash_memory_open - Open a new memory hash
  * @context: memory hash contxt
- * @identifier: not used
- * @mode: access mode (currently unused)
- * @options: &librdf_hash of options (currently unused)
+ * @identifier: identifier - not used
+ * @mode: access mode - not used
+ * @is_writable: is hash writable? - not used
+ * @is_new: is hash new? - not used
+ * @options: &librdf_hash of options - not used
  * 
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_memory_open(void* context, char *identifier, void *mode, 
-                      librdf_hash* options) 
+librdf_hash_memory_open(void* context, char *identifier,
+                        int mode, int is_writable, int is_new,
+                        librdf_hash* options) 
 {
   librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
 
@@ -309,6 +316,8 @@ librdf_hash_memory_close(void* context)
 
 typedef struct {
   librdf_hash_memory_context* hash;
+  void *last_key;
+  void *last_value;
   int current_bucket;
   librdf_hash_memory_node* current_node;
   librdf_hash_memory_node_value *current_value;
@@ -351,6 +360,19 @@ librdf_hash_memory_cursor_get(void* context,
   librdf_hash_memory_cursor_context *cursor=(librdf_hash_memory_cursor_context*)context;
   librdf_hash_memory_node_value *vnode=NULL;
   librdf_hash_memory_node *node;
+  
+
+  /* Free previous key and values */
+  if(cursor->last_key) {
+    LIBRDF_FREE(cstring, cursor->last_key);
+    cursor->last_key=NULL;
+  }
+    
+  if(cursor->last_value) {
+    LIBRDF_FREE(cstring, cursor->last_value);
+    cursor->last_value=NULL;
+  }
+
 
   /* First step, make sure cursor->current_node points to a valid node,
      if possible */
@@ -433,27 +455,36 @@ librdf_hash_memory_cursor_get(void* context,
     case LIBRDF_HASH_CURSOR_FIRST:
     case LIBRDF_HASH_CURSOR_NEXT:
       node=cursor->current_node;
-      
+
       /* copy key */
-      key->data=node->key;
+      cursor->last_key = key->data = LIBRDF_MALLOC(cstring, node->key_len);
+      if(!key->data)
+        return 1;
+  
+      memcpy(key->data, node->key, node->key_len);
       key->size=node->key_len;
-      
+
       /* if want values, walk through them */
       if(value) {
         vnode=cursor->current_value;
         
         /* copy value */
-        value->data=vnode->value;
-      value->size=vnode->value_len;
+        cursor->last_value = value->data = LIBRDF_MALLOC(cstring,
+                                                         vnode->value_len);
+        if(!value->data)
+          return 1;
+    
+        memcpy(value->data, vnode->value, vnode->value_len);
+        value->size=vnode->value_len;
 
-      /* move on */
-      cursor->current_value=vnode->next;
-
-      /* stop here if there are more values, otherwise need next
-       * key & values so drop through and move to the next node
-       */
-      if(cursor->current_value)
-        break;
+        /* move on */
+        cursor->current_value=vnode->next;
+        
+        /* stop here if there are more values, otherwise need next
+         * key & values so drop through and move to the next node
+         */
+        if(cursor->current_value)
+          break;
       }
       
       /* move on to next node in current bucket */
@@ -489,7 +520,13 @@ librdf_hash_memory_cursor_get(void* context,
 static void
 librdf_hash_memory_cursor_finish(void* context)
 {
-  /* nop */
+  librdf_hash_memory_cursor_context *cursor=(librdf_hash_memory_cursor_context*)context;
+
+  if(cursor->last_key)
+    LIBRDF_FREE(cstring, cursor->last_key);
+    
+  if(cursor->last_value)
+    LIBRDF_FREE(cstring, cursor->last_value);
 }
 
 
