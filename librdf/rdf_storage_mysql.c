@@ -268,7 +268,7 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   const char create_model[]="INSERT INTO Models (ID,Name) VALUES (%llu,'%s')";
   const char check_model[]="SELECT HIGH_PRIORITY 1 FROM Models WHERE ID=%llu AND Name='%s'";
   int status=0;
-  char *escaped_name;
+  char *escaped_name=NULL;
   char *query=NULL;
   MYSQL_RES *res;
 
@@ -344,10 +344,12 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   }
 
   /* Create model if new and not existing, or check for existence */
-  if(!(escaped_name=(char*)LIBRDF_MALLOC(cstring,strlen(name)*2+1)))
-    status=1;
-  mysql_real_escape_string(&context->connection, escaped_name,
-                           (const char*)name, strlen(name));
+  if(!status) {
+    if(!(escaped_name=(char*)LIBRDF_MALLOC(cstring,strlen(name)*2+1)))
+      status=1;
+    mysql_real_escape_string(&context->connection, escaped_name,
+                             (const char*)name, strlen(name));
+  }
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) {
     /* Create new model */
     if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(create_model)+20+
@@ -388,7 +390,8 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   }
   if(query)
     LIBRDF_FREE(cstring, query);
-  LIBRDF_FREE(cstring, escaped_name);
+  if(escaped_name)
+    LIBRDF_FREE(cstring, escaped_name);
 
   /* Optimize loads? */
   context->bulk=(librdf_hash_get_as_boolean(options, "bulk")>0);
@@ -1573,10 +1576,9 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
     }
     /* Make sure we have a statement object to return */
     if(!sos->current_statement) {
-      if(!(sos->current_statement=librdf_new_statement(sos->storage->world))) {
-        librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+      if(!(sos->current_statement=librdf_new_statement(sos->storage->world)))
         return 1;
-      }
+
     }
     librdf_statement_clear(sos->current_statement);
     /* Query without variables? */
@@ -1595,20 +1597,15 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
         /* Resource or Bnode? */
         if(row[part]) {
           if(!(node=librdf_new_node_from_uri_string(sos->storage->world,
-                                                     (const unsigned char*)row[part]))) {
-            librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+                                                     (const unsigned char*)row[part])))
             return 1;
-          }
         } else if(row[part+1]) {
           if(!(node=librdf_new_node_from_blank_identifier(sos->storage->world,
-                                                           (const unsigned char*)row[part+1]))) {
-            librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+                                                           (const unsigned char*)row[part+1])))
             return 1;
-          }
-        } else {
-          librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+        } else
           return 1;
-        }
+
         librdf_statement_set_subject(sos->current_statement,node);
         part+=2;
       }
@@ -1619,14 +1616,11 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
         /* Resource? */
         if(row[part]) {
           if(!(node=librdf_new_node_from_uri_string(sos->storage->world,
-                                                     (const unsigned char*)row[part]))) {
-            librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+                                                     (const unsigned char*)row[part])))
             return 1;
-          }
-        } else {
-          librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+        } else
           return 1;
-        }
+
         librdf_statement_set_predicate(sos->current_statement,node);
         part+=1;
       }
@@ -1637,16 +1631,12 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
         /* Resource, Bnode or Literal? */
         if(row[part]) {
           if(!(node=librdf_new_node_from_uri_string(sos->storage->world,
-                                                     (const unsigned char*)row[part]))) {
-            librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+                                                     (const unsigned char*)row[part])))
             return 1;
-          }
         } else if(row[part+1]) {
           if(!(node=librdf_new_node_from_blank_identifier(sos->storage->world,
-                                                           (const unsigned char*)row[part+1]))) {
-            librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+                                                           (const unsigned char*)row[part+1])))
             return 1;
-          }
         } else if(row[part+2]) {
           /* Typed literal? */
           librdf_uri *datatype=NULL;
@@ -1656,14 +1646,11 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
           if(!(node=librdf_new_node_from_typed_literal(sos->storage->world,
                                                         (const unsigned char*)row[part+2],
                                                         row[part+3],
-                                                        datatype))) {
-            librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+                                                        datatype)))
             return 1;
-          }
-        } else {
-          librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+        } else
           return 1;
-        }
+
         librdf_statement_set_object(sos->current_statement,node);
         part+=5;
       }
@@ -1674,16 +1661,12 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
         /* Resource, Bnode or Literal? */
         if(row[part]) {
           if(!(node=librdf_new_node_from_uri_string(sos->storage->world,
-                                                     (const unsigned char*)row[part]))) {
-            librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+                                                     (const unsigned char*)row[part])))
             return 1;
-          }
         } else if(row[part+1]) {
           if(!(node=librdf_new_node_from_blank_identifier(sos->storage->world,
-                                                           (const unsigned char*)row[part+1]))) {
-            librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+                                                           (const unsigned char*)row[part+1])))
             return 1;
-          }
         } else if(row[part+2]) {
           /* Typed literal? */
           librdf_uri *datatype=NULL;
@@ -1693,10 +1676,8 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
           if(!(node=librdf_new_node_from_typed_literal(sos->storage->world,
                                                         (const unsigned char*)row[part+2],
                                                         row[part+3],
-                                                        datatype))) {
-            librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
+                                                        datatype)))
             return 1;
-          }
         } else
           /* no context */
           node=NULL;
@@ -1875,16 +1856,12 @@ librdf_storage_mysql_get_contexts_next_context(void* context)
     /* Resource, Bnode or Literal? */
     if(row[0]) {
       if(!(node=librdf_new_node_from_uri_string(gccontext->storage->world,
-                                                 (const unsigned char*)row[0]))) {
-        librdf_storage_mysql_get_contexts_finished((void*)gccontext);
+                                                 (const unsigned char*)row[0])))
         return 1;
-      }
     } else if(row[1]) {
       if(!(node=librdf_new_node_from_blank_identifier(gccontext->storage->world,
-                                                       (const unsigned char*)row[1]))) {
-        librdf_storage_mysql_get_contexts_finished((void*)gccontext);
+                                                       (const unsigned char*)row[1])))
         return 1;
-      }
     } else if(row[2]) {
       /* Typed literal? */
       librdf_uri *datatype=NULL;
@@ -1894,14 +1871,11 @@ librdf_storage_mysql_get_contexts_next_context(void* context)
       if(!(node=librdf_new_node_from_typed_literal(gccontext->storage->world,
                                                     (const unsigned char*)row[2],
                                                     row[3],
-                                                    datatype))) {
-        librdf_storage_mysql_get_contexts_finished((void*)gccontext);
+                                                    datatype)))
         return 1;
-      }
-    } else {
-      librdf_storage_mysql_get_contexts_finished((void*)gccontext);
+    } else
       return 1;
-    }
+
     gccontext->current_context=node;
   } else {
     if(gccontext->current_context)
