@@ -108,11 +108,11 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
 
 
 static int
-librdf_serializer_raptor_serialize_model (void *context,
-                                          FILE *handle, librdf_uri* base_uri,
-                                          librdf_model *model) 
+librdf_serializer_raptor_serialize_model(void *context,
+                                         FILE *handle, librdf_uri* base_uri,
+                                         librdf_model *model) 
 {
-  librdf_serializer_raptor_context* pcontext=(librdf_serializer_raptor_context*)context;
+  /* librdf_serializer_raptor_context* pcontext=(librdf_serializer_raptor_context*)context; */
 
   librdf_stream *stream=librdf_model_serialise(model);
   if(!stream)
