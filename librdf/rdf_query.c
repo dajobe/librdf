@@ -101,6 +101,7 @@ librdf_delete_query_factories(void)
 
 /**
  * librdf_query_register_factory - Register a query factory
+ * @world: redland world object
  * @name: the query language name
  * @uri: the query language URI (or NULL if none)
  * @factory: pointer to function to call to register the factory

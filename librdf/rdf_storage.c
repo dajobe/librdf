@@ -57,6 +57,7 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
 
 /**
  * librdf_init_storage - Initialise the librdf_storage module
+ * @world: redland world object
  * 
  * Initialises and registers all
  * compiled storage modules.  Must be called before using any of the storage

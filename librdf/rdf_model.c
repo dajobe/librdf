@@ -87,6 +87,7 @@ librdf_delete_model_factories(void)
 
 /**
  * librdf_model_register_factory - Register a model factory
+ * @world: redland world object
  * @name: the model factory name
  * @factory: pointer to function to call to register the factory
  * 
