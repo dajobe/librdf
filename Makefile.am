@@ -154,6 +154,9 @@ LIBS=@LIBS@ $(MEM_LIBS)
 
 # Rules to construct test programs
 
+# Some people need a little help ;-)
+test: check
+
 rdf_node_test: rdf_node.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_node.c librdf.a $(LIBS)
 
