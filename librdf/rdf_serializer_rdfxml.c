@@ -411,7 +411,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
  * Return value: non-zero on failure
  **/
 static int
-librdf_serializer_rdfxml_serialize_model(void *context,
+librdf_serializer_rdfxml_serialize_modelo(void *context,
                                          FILE *handle, librdf_uri* base_uri,
                                          librdf_model *model) 
 {
@@ -447,6 +447,8 @@ librdf_serializer_rdfxml_serialize_model(void *context,
   librdf_free_stream(stream);
 
   fputs("</rdf:RDF>\n", handle);
+
+  raptor_free_qname(rdf_RDF);
 
   raptor_namespaces_end_for_depth(pcontext->nstack, pcontext->depth);
   pcontext->depth--;
