@@ -333,8 +333,8 @@ librdf_new_node_from_node(librdf_node *node)
       break;
 
     case LIBRDF_NODE_TYPE_BLANK:
-      if (!librdf_node_set_blank_identifier(new_node,
-                                            node->value.blank.identifier)) {
+      if (librdf_node_set_blank_identifier(new_node,
+                                           node->value.blank.identifier)) {
         LIBRDF_FREE(librdf_node, new_node);
         return NULL;
       }
@@ -733,7 +733,7 @@ librdf_node_to_string(librdf_node* node)
 {
   char *uri_string;
   char *s;
-  
+
   switch(node->type) {
   case LIBRDF_NODE_TYPE_RESOURCE:
     uri_string=librdf_uri_to_string(node->value.resource.uri);
@@ -875,6 +875,11 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
 
     case LIBRDF_NODE_TYPE_STATEMENT:
       return librdf_statement_equals(first_node, second_node);
+
+    case LIBRDF_NODE_TYPE_BLANK:
+
+      return !strcmp(first_node->value.blank.identifier,
+                     second_node->value.blank.identifier);
 
     default:
       /* FIXME */
@@ -1092,7 +1097,7 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_node *node, *node2, *node3, *node4;
+  librdf_node *node, *node2, *node3, *node4, *node5;
   char *hp_string1="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
   char *hp_string2="http://purl.org/net/dajobe/";
   char *lit_string="Dave Beckett";
@@ -1204,8 +1209,21 @@ main(int argc, char *argv[])
   }
   fprintf(stdout, "%s: Node identifier is: '%s'\n", program, buffer);
   
+  node5=librdf_new_node_from_node(node4);
+  if(!node5) {
+    fprintf(stderr, "%s: Failed to make new blank node from old one\n", program);
+    return(1);
+  } 
+
+  buffer=librdf_node_get_blank_identifier(node5);
+  if(!buffer) {
+    fprintf(stderr, "%s: Failed to get copied blank node identifier\n", program);
+    return(1);
+  }
+  fprintf(stdout, "%s: Copied node identifier is: '%s'\n", program, buffer);
 
   fprintf(stdout, "%s: Freeing nodes\n", program);
+  librdf_free_node(node5);
   librdf_free_node(node4);
   librdf_free_node(node3);
   librdf_free_node(node2);
