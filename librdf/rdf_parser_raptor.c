@@ -36,7 +36,6 @@
 
 #define RAPTOR_IN_REDLAND
 #include <raptor.h>
-#include <ntriples.h>
 
 
 /* serialising implementing functions */
@@ -154,12 +153,22 @@ librdf_parser_raptor_new_statement_handler (void *context,
   if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_LITERAL ||
      rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL) {
     int is_xml_literal = (rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL);
+    librdf_uri *datatype_uri=(librdf_uri*)rstatement->object_literal_datatype;
     
-    librdf_statement_set_object(statement,
-                                librdf_new_node_from_literal(world,
-                                                             rstatement->object,
-                                                             rstatement->object_literal_language,
-                                                             is_xml_literal));
+    
+    if(is_xml_literal)
+      librdf_statement_set_object(statement,
+                                 librdf_new_node_from_literal(world,
+                                                              rstatement->object,
+                                                              rstatement->object_literal_language,
+                                                              is_xml_literal));
+    else
+      librdf_statement_set_object(statement,
+                                  librdf_new_node_from_typed_literal(world,
+                                                                     rstatement->object,
+                                                                     rstatement->object_literal_language,
+                                                                     datatype_uri));
+
   } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
     node=librdf_new_node_from_blank_identifier(world, rstatement->object);
     librdf_statement_set_object(statement, node);
