@@ -1,3 +1,40 @@
+2004-10-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_init.h: Update librdf_world_get_feature and
+	librdf_world_set_feature to use librdf_node*
+
+	* rdf_init.c (librdf_world_get_feature): Document and change to
+	return librdf_node*
+	(librdf_world_set_feature): Document and change to use
+	librdf_node* value.
+
+2004-09-22  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage.c (librdf_storage_context_add_statement,
+	librdf_storage_context_add_statements): With a NULL context, call
+	the non-context method as documented.  Fix NULL statement pointer
+	checks.
+
+2004-09-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_log.c (librdf_fatal): Off by 1 in snprintf on OSX
+
+2004-08-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_mysql.c (librdf_storage_mysql_get_contexts): Removed
+	bogus '+' in the sql statement.  Thanks to DJ Adams for finding
+	this.
+
+2004-08-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* win32_rdf_config.h: 0.9.19
+
+2004-08-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_parser.c, rdf_storage.c, rdf_storage_hashes.c, rdf_model.c,
+	rdf_model_storage.c: Documentation - Note that the model, storage
+	and parser get_feature methods return new librdf_node objects
+
 2004-08-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_model.c (librdf_model_context_add_statement,
