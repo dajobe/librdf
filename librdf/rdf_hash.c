@@ -336,7 +336,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
     switch(state){
       /* start of config - before key */
       case RHS_STATE_INIT:
-        while(*p && (isspace(*p) || *p == ','))
+        while(*p && (isspace((int)*p) || *p == ','))
           p++;
         if(!*p)
           break;
@@ -346,7 +346,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
 
       /* collecting key characters */
       case RHS_STATE_KEY:
-        while(*p && isalnum(*p))
+        while(*p && isalnum((int)*p))
           p++;
         if(!*p)
           break;
@@ -364,7 +364,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
 
       /* got key, now skipping spaces */
       case RHS_STATE_SEP:
-        while(*p && isspace(*p))
+        while(*p && isspace((int)*p))
           p++;
         if(!*p)
           break;
@@ -380,7 +380,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
 
       /* got key\s+= now skipping spaces " */
       case RHS_STATE_EQ:
-        while(*p && isspace(*p))
+        while(*p && isspace((int)*p))
           p++;
         if(!*p)
           break;
