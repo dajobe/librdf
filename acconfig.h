@@ -59,3 +59,6 @@
 #undef HAVE_LIBWWW_RDF_PARSER
 #undef HAVE_REDLAND_RDF_PARSER
 
+/* XML parsers */
+#undef NEED_EXPAT
+#undef NEED_LIBXML
