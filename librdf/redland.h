@@ -28,10 +28,13 @@
 extern "C" {
 #endif
 
-/* Redland consists of librdf */
-#include <librdf.h>
-/* and raptor */
+/* Redland consists of */
+/* raptor */
 #include <raptor.h>
+/* rasqal */
+#include <rasqal.h>
+/* librdf */
+#include <librdf.h>
 
 #ifdef __cplusplus
 }
