@@ -1,5 +1,7 @@
 2004-07-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* redland.spec.in: Ship /usr/share/redland/Redland.i in redland-devel
+
 	* rdf_query_results.c (librdf_query_results_get_bindings):
 	Fix docucomment so jade works again
 

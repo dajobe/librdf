@@ -1,5 +1,13 @@
 2004-07-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* librdf/redland.spec.in:
+	Ship /usr/share/redland/Redland.i in redland-devel
+
+	* redland-src-config.in, redland-config.in:
+	Added --swig option to print the path to the SWIG interface file
+
+	* Makefile.am: Install Redland.i in $(pkgdata)
+
 	* Redland.i, python/Makefile.am, ruby/Makefile.am,
 	ruby/redland-pre.i, ruby/redland-types.i, tcl/Makefile.am,
 	tcl/redland-init.i, tcl/redland-pre.i, php/Makefile.am,
