@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2004-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2004-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -306,10 +306,11 @@ typedef struct {
 } rasqal_redland_triples_match_context;
 
 
-static int
+static rasqal_triple_parts
 rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
                           void *user_data,
-                          rasqal_variable* bindings[4]) 
+                          rasqal_variable* bindings[4],
+                          rasqal_triple_parts parts) 
 {
   rasqal_redland_triples_match_context* rtmc=(rasqal_redland_triples_match_context*)rtm->user_data;
   rasqal_literal* l;
@@ -325,14 +326,14 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
 
   /* set 1 or 2 variable values from the fields of statement */
 
-  if(bindings[0]) {
+  if(bindings[0] && (parts & RASQAL_TRIPLE_SUBJECT)) {
     LIBRDF_DEBUG1("binding subject to variable\n");
     l=redland_node_to_rasqal_literal(librdf_statement_get_subject(statement));
     rasqal_variable_set_value(bindings[0], rasqal_literal_as_node(l));
     rasqal_free_literal(l);
   }
 
-  if(bindings[1]) {
+  if(bindings[1] && (parts & RASQAL_TRIPLE_PREDICATE)) {
     if(bindings[0] == bindings[1]) {
       if(!librdf_node_equals(librdf_statement_get_subject(statement),
                              librdf_statement_get_predicate(statement)))
@@ -346,7 +347,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     }
   }
 
-  if(bindings[2]) {
+  if(bindings[2] && (parts & RASQAL_TRIPLE_OBJECT)) {
     int bind=1;
     
     if(bindings[0] == bindings[2]) {
@@ -375,6 +376,11 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
   }
 
   /* FIXME contexts */
+  /*
+  if(bindings[3] && (parts & RASQAL_TRIPLE_ORIGIN)) {
+    ...
+  }
+  */
 
   return 1;
 }
@@ -639,6 +645,56 @@ librdf_query_rasqal_free_results(librdf_query_results* query_results)
 }
 
 
+static unsigned char*
+librdf_query_rasqal_results_to_counted_string(librdf_query_results *query_results,
+                                              librdf_uri *format_uri,
+                                              librdf_uri *base_uri,
+                                              size_t *length_p) 
+{
+  librdf_query *query=query_results->query;
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  unsigned char *string=NULL;
+  size_t string_length=0;
+  raptor_iostream *iostr;
+
+  iostr=raptor_new_iostream_to_string((void**)&string, &string_length, malloc);
+  if(!iostr)
+    return NULL;
+              
+  rasqal_query_results_write(iostr, context->results,
+                             (raptor_uri*)format_uri, (raptor_uri*)base_uri);
+
+  raptor_free_iostream(iostr);
+
+  if(length_p)
+    *length_p=string_length;
+  
+  return string;
+}
+
+
+static int
+librdf_query_rasqal_results_to_file_handle(librdf_query_results *query_results, 
+                                           FILE *handle,
+                                           librdf_uri *format_uri,
+                                           librdf_uri *base_uri) {
+  librdf_query *query=query_results->query;
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  raptor_iostream *iostr;
+
+  iostr=raptor_new_iostream_to_file_handle(handle);
+  if(!iostr)
+    return 1;
+              
+  rasqal_query_results_write(iostr, context->results,
+                             (raptor_uri*)format_uri, (raptor_uri*)base_uri);
+
+  raptor_free_iostream(iostr);
+
+  return 0;
+}
+
+
 /* local function to register list query functions */
 
 static void
@@ -658,6 +714,8 @@ librdf_query_rasqal_register_factory(librdf_query_factory *factory)
   factory->results_get_binding_value_by_name = librdf_query_rasqal_results_get_binding_value_by_name;
   factory->results_get_bindings_count         = librdf_query_rasqal_results_get_bindings_count;
   factory->free_results                       = librdf_query_rasqal_free_results;
+  factory->results_to_counted_string          = librdf_query_rasqal_results_to_counted_string;
+  factory->results_to_file_handle             = librdf_query_rasqal_results_to_file_handle;
 }
 
 
