@@ -69,8 +69,12 @@ by using the <code>autogen.sh</code> script.</p>
 
 <p>Building Redland in this way requires some particular development
 tools not needed when building from snapshot releases - automake,
-autoconf and swig.  The <code>autogen.sh</code> script checks for the
-appropriate versions.</p>
+autoconf, swig and those also required by Raptor if it is built
+See the
+<a href="http://www.redland.opensource.ac.uk/raptor/INSTALL.html">Raptor install document</a>
+for the details.
+The <code>autogen.sh</code> script looks for the newest versions
+of the auto* tools and checks that they meet the minimum versions.</p>
 
 
 
@@ -82,7 +86,17 @@ but is also used extensively locally on various versions of
 sparc Sun Solaris 2.x.  I also test it via
 <a href="http://sourceforge.net/">SourceForge</a>s'
 compile farm and it builds on Debian Linux (x86, Alpha, PPC and
-Sparc), FreeBSD (x86) and Apple OSX.</p>
+Sparc, IA64), FreeBSD (x86) and Apple OSX.</p>
+
+
+<p>Configure tries very hard to find several programs and libraries
+that Redland might need.  These include the language APIs (perl,
+python, etc.), the storage modules (Berkeley/Sleepycat DB, MySQL,
+3store), the XML parsers -- via Raptor's configure -- and various
+others.  A summary of the modular parts found is given at the end of
+the configure run.  Several options to configure given below can be
+used to point to locations or names of dependencies that cannot
+be automatically determined.</p>
 
 
 <h3><a id="sec-create-configure" name="sec-create-configure"></a>2.1. Create <code>configure</code> program</h3>
@@ -115,6 +129,17 @@ by an autoconf macro and seems to be an autoconf bug.)</p>
 such as <code>--prefix</code> etc.</p>
 
 <dl>
+<dt><code>--disable-assert</code><br /></dt>
+<dd><p>Disable compiling run-time assertions.  In maintainer
+mode, assertion failures are fatal.</p>
+</dd>
+
+<dt><code>--disable-assert-messages</code><br /></dt>
+<dd><p>Disable compiling run-time assertion failure messages.
+In maintainer mode, assertion failures are fatal after the assertion
+failure is reported.</p>
+</dd>
+
 <dt><code>--enable-digests=LIST</code><br /></dt>
 <dd><p>Select the list of content digests to be included if the are
 availble.  The valid list of digests are: <code>md5 sha1
@@ -412,7 +437,14 @@ to use the in-memory hashes, edit the lines reading something like</p>
 
 
 
-<h3>3.1. <a href="example1.c">example1.c</a></h3>
+<h3>3.1 rdfproc</h3>
+
+<p>The <code>rdfproc</code> utility in the utils directory exercises
+the majority of the useful parts of the Redland API and can
+demonstrate many ways to store, search and manipulate the graph from C.
+</p>
+
+<h3>3.2. <a href="example1.c">example1.c</a></h3>
 
 <p><code>example1</code> uses a RDF parser, if you have one available, to
 parse a URI of RDF/XML content, store it in multple Berkeley DB
@@ -422,25 +454,23 @@ arguments, the first the URI of the RDF/XML content (or
 name of the RDF parser to use.  At present these can be
 <code>sirpac</code> or <code>libwww</code></p>
 
-<h3>3.2. <a href="example2.c">example2.c</a></h3>
+<h3>3.3. <a href="example2.c">example2.c</a></h3>
 
 <p><code>example2</code> does not use a RDF parser, but reads from a
 simple triple dump format and again stores the data on disk in
 multiple Berkeley DB hashes.</p>
 
-<h3>3.3. <a href="example3.c">example3.c</a></h3>
+<h3>3.4. <a href="example3.c">example3.c</a></h3>
 
 <p><code>example3</code> contains a 10 line main program that creates
 an RDF model, a statement, adds it to the model and stores it on
 disk.</p>
 
+<h3>3.5. <a href="example4.c">example4.c</a></h3>
 
-<h3>3.4 rdfproc</h3>
+<p><code>example4</code> contains an example of how to
+serialize an RDF model to a syntax.</p>
 
-<p>The <code>rdfproc</code> utility in the utils directory
-extensively exercises the Redland API and can demonstrate
-many ways to store, search and manipulate the graph from C.
-</p>
 
 
 <h2>3. Using the Perl interface</h2>
@@ -477,7 +507,7 @@ full information on installing and using Redland from PHP.</p>
 
 <hr />
 
-<p>Copyright 2000-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-2004 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
