@@ -306,6 +306,7 @@ librdf_new_query_from_query(librdf_query* old_query)
  * @name: query language name
  * @uri: query language URI (or NULL)
  * @query_string: the query string
+ * @base_uri: base URI of the query string (or NULL)
  *
  * Return value: a new &librdf_query object or NULL on failure
  */
