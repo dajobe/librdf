@@ -45,6 +45,9 @@ struct librdf_world_s
   /* List of parser factories */
   librdf_parser_factory* parsers;
 
+  /* List of serializer factories */
+  librdf_serializer_factory* serializers;
+
   /* List of digest factories */
   librdf_digest_factory *digests;
 
