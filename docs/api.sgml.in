@@ -284,7 +284,7 @@ either via an adaptor class or direct by persistant storage.
 </sect1>
 </chapter>
 
-<chapter id="query_results">
+<chapter id="query-results">
 <?dbhtml filename='query_results.html'>
 <title>RDF QueryResults</title>
 <para>
