@@ -981,9 +981,9 @@ librdf_node_to_string(librdf_node* node)
 unsigned char*
 librdf_node_to_counted_string(librdf_node* node, size_t* len_p) 
 {
-  unsigned char *uri_string;
-  size_t len;
-  unsigned char *s;
+  unsigned char *uri_string, *datatype_uri_string;
+  size_t len, datatype_len, language_len;
+  unsigned char *s, *d;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
@@ -1005,13 +1005,39 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
     break;
   case LIBRDF_NODE_TYPE_LITERAL:
     len=node->value.literal.string_len;
+    if(node->value.literal.xml_language) {
+      language_len=strlen(node->value.literal.xml_language);
+      len+=1+language_len;
+    }
+    
+    if(node->value.literal.datatype_uri) {
+      datatype_uri_string=librdf_uri_to_counted_string(node->value.literal.datatype_uri, &datatype_len);
+      len+=4+datatype_len;
+    } else
+      datatype_uri_string=NULL;
     if(len_p)
       *len_p=len;
     s=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
     if(!s)
       return NULL;
     /* use strcpy here to add \0 to end of literal string */
-    strcpy((char*)s, (const char*)node->value.literal.string);
+    d=s;
+    strncpy((char*)d, (const char*)node->value.literal.string, node->value.literal.string_len);
+    d+= node->value.literal.string_len;
+    
+    if(node->value.literal.xml_language) {
+      *d++='@';
+      strncpy((char*)d, node->value.literal.xml_language, language_len);
+      d+= language_len;
+    }
+    if(datatype_uri_string) {
+      strncpy((char*)d, "^^<", 3);
+      d+= 3;
+      strncpy((char*)d, datatype_uri_string, datatype_len);
+      d+= datatype_len;
+      *d++='>';
+    }
+    *d='\0';
     break;
   case LIBRDF_NODE_TYPE_BLANK:
     len=node->value.blank.identifier_len + 2;
