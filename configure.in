@@ -963,6 +963,7 @@ expat/Makefile
 expat/xmlparse/Makefile
 expat/xmltok/Makefile
 perl/Makefile
+perl/t/Makefile
 perl/lib/Makefile
 perl/lib/RDF/Makefile
 perl/lib/RDF/Redland/Makefile
