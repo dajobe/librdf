@@ -86,6 +86,11 @@ while(<PROTO>) {
     my $content='';
     open(IN, $file) or die "$prototype:$.: Cannot open $file - $!\n";
     while(<IN>) {
+      # Try to shorten SGML ids - otherwise jade moans
+      s/id="API-librdf-/id="/;
+
+      # kernel-doc doesn't seem to get this right - why?
+      s%\&amp;((struct\s*)?\w+)%<structname>$1</structname>%g;
       $content.=$_;
     }
     close(IN);
