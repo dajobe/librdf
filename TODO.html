@@ -15,16 +15,14 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>RFE: consider how to allow raptor parser guessing in redland parser API</li>
+<li>RFE: consider how to add parser guessing (via raptor) into the
+redland parser API</li>
 <li>RFE: Python api, add __nonzero__ (check this) so you can do things
 like <code>if redland-stream: do things...</code> to check for
 empty streams before iterating. 
 <code>def __nonzero__(self): return !self.end()</code></li>
 <li>Documentation: describe the redland features available per class</li>
 <li>RFE: add user mappings from URIs to namespace aliases to the serializer</li>
-<li>BUG: The parser error/warning callbacks are not called - broken. They
-are also rather useless in not passing through the varargs argument.  Maybe
-change the API and the world error/warning api to be more general.</li>
 <li>RFE: The parser should be able to adjust error and warning
 actions, stopping immediately or ignoring them by features. Document
 the defaults.</li>
@@ -38,7 +36,7 @@ for model.serialize() and Serializer class, however take care with serialise() m
 <li>in-memory storage uses more memory than needed</li>
 <li>defensive code - check object types are correct by adding magic fields to start of all objects</li>
 <li>Consider an AVL-tree in-memory store (<a href="http://www.msu.edu/user/pfaffben/avl/">libavl</a>)</li>
-<li>Docs: note that compiling redland also builds raptor, if both are wanted</li>
+<li>Docs: note that compiling redland may also build raptor and rasqal, if they are needed</li>
 <li>RFE: Allow base URIs in Perl parser methods to be undef</li>
 <li>Document the storage constructor hash options under the main class</li>
 <li>RFE: make add_statement method on model take URIs</li>
@@ -69,6 +67,9 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Removed the useless parser error/warning callbacks with a proper
+logging API that can be accessed by the application to and dealt with
+as desired. (0.9.17)</li>
 <li>Allow raptor parser features (<code>raptor_set_feature</code>) to be
 set via <code>librdf_parser_set_feature</code> (0.9.17)</li>
 <li>rdf_uri.h and rdf_node.h exported functions returning rdf_digest* which is a private structure, now made internal (0.9.16)</li>
