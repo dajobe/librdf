@@ -224,16 +224,16 @@ extern "C" {
 /* #undef LIBRDF_DISABLE_ASSERT_MESSAGES */
 
 /* Release version as a decimal */
-#define LIBRDF_VERSION_DECIMAL 920
+#define LIBRDF_VERSION_DECIMAL 10000
 
 /* Major version number */
-#define LIBRDF_VERSION_MAJOR 0
+#define LIBRDF_VERSION_MAJOR 1
 
 /* Minor version number */
-#define LIBRDF_VERSION_MINOR 9
+#define LIBRDF_VERSION_MINOR 0
 
 /* Release version number */
-#define LIBRDF_VERSION_RELEASE 20
+#define LIBRDF_VERSION_RELEASE 0
 
 /* The size of a `unsigned char', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_CHAR 1
@@ -254,7 +254,7 @@ extern "C" {
 /* #define TIME_WITH_SYS_TIME*/
 
 /* Version number of package */
-#define VERSION "0.9.20"
+#define VERSION "1.0.0"
 
 /* Use POSIX threads */
 /* #undef WITH_THREADS */

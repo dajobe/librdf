@@ -21,16 +21,15 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
-<h2 id="rel0_9_20"><a name="rel0_9_20">Redland 0.9.20 Changes</a></h2>
+<h2 id="rel1_0_0"><a name="rel1_0_0">Redland 1.0.0 Changes</a></h2>
 
-<p>Not yet released.
-</p>
+<p>This is Redland 1.0.0.</p>
 
 <p>The main changes in this release are to update to use 
 <a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.6
-to provide improved SPARQL query support for optionals and CONSTRUCT,
+to provide improved SPARQL query support for optionals, CONSTRUCT, ASK, builtins,
 <a href="http://librdf.org/raptor/">Raptor</a> 1.4.4 to
-provide better serializing RDF/XML and RSS 1.0 and better
+provide better serializing to RDF/XML and RSS 1.0 and better
 RSS tag soup parsing and
 a new experimental <a href="http://www.sqlite.org/">SQLite</a>
 storage supporting SQLite V2 and V3 libraries.
@@ -114,6 +113,14 @@ to get the results of a query written to a syntax using
 Rasqal's rasqal_query_results_write and Raptor's XML writer API.
 </p>
 
+<p>Added boolean returning methods:
+<code>librdf_query_results_is_bindings</code>,
+<code>librdf_query_results_is_boolean</code>,
+<code>librdf_query_results_is_graph</code> for testing result formats
+and <code>librdf_query_results_get_boolean</code> to get a boolean
+result back.</p>
+
+
 
 <h3>Serializer Class changes</h3>
 
@@ -182,7 +189,8 @@ provide serializing to RDF/XML and N-Triples.</p>
 <h3><code>rdfproc</code> RDF processor utility program changes</h3>
 
 <p>Updated to allow an optional base URI for the
-<code>serialize</code> command.</p>
+<code>serialize</code> command and to handle the three forms
+of query results - bindings, graph or boolean.</p>
 
 
 <h3>Model Class changes</h3>
