@@ -14,8 +14,9 @@ CLEANFILES=$(TESTS) $(EXAMPLES) $(DBUS_EXAMPLES) test*db
 
 examples: $(EXAMPLES)
 
-AM_CPPFLAGS=-I$(top_srcdir)/librdf $(MEM)
-AM_LDFLAGS=$(top_builddir)/librdf/librdf.la @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ @LIBRDF_EXTERNAL_LIBS@ $(MEM_LIBS)
+AM_CPPFLAGS=@CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_INTERNAL_CPPFLAGS@ -I$(top_srcdir)/librdf @LIBRDF_EXTERNAL_CPPFLAGS@
+AM_CFLAGS=@CFLAGS@ $(MEM)
+AM_LDFLAGS=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la @LIBRDF_INTERNAL_LIBS@ @LIBRDF_EXTERNAL_LIBS@ $(MEM_LIBS)
 
 example1_SOURCES = example1.c
 
@@ -29,10 +30,8 @@ example5_SOURCES = example5.c
 
 
 redland_dbus_SOURCES = redland_dbus.c
-redland_dbus_LDADD=$(top_builddir)/librdf/librdf.la @LIBRDF_EXTERNAL_LIBS@
 redland_dbus_CFLAGS=`pkg-config --cflags dbus-1 glib-2.0 dbus-glib-1 gthread`
 redland_dbus_LDFLAGS=`pkg-config --libs dbus-1 glib-2.0 dbus-glib-1 gthread`
-redland_dbus_DEPENDENCIES = $(top_builddir)/librdf/librdf.la
 
 
 $(top_builddir)/raptor/libraptor.la:
