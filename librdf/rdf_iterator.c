@@ -36,7 +36,7 @@ static void* librdf_iterator_get_next_mapped_element(librdf_iterator* iterator);
 /**
  * librdf_new_iterator - Constructor - create a new librdf_iterator object
  * @context: context to pass to the iterator functions
- * @have_elements: function to call to see if there are more elements
+ * @is_end: function to call to see if the iteration has ended
  * @get_next: function to get the next element
  * @finished: function to destroy the iterator context (or NULL if not needed)
  * 
@@ -45,7 +45,7 @@ static void* librdf_iterator_get_next_mapped_element(librdf_iterator* iterator);
 librdf_iterator*
 librdf_new_iterator(librdf_world *world,
                     void* context,
-		    int (*have_elements)(void*),
+		    int (*is_end)(void*),
 		    void* (*get_next)(void*),
 		    void (*finished)(void*))
 {
@@ -60,18 +60,25 @@ librdf_new_iterator(librdf_world *world,
 
   new_iterator->context=context;
   
-  new_iterator->have_elements=have_elements;
+  new_iterator->is_end=is_end;
   new_iterator->get_next=get_next;
   new_iterator->finished=finished;
 
-  /* Not strictly true, but we keep testing for the end of the
-   * list as long as this is set
-   */
-  new_iterator->have_more_elements=1;
+  /* Not needed, calloc ensures this */
+  /* new_iterator->is_finished=0; */
   
   return new_iterator;
 }
 
+
+/* helper function for deleting list map */
+static void
+librdf_iterator_free_iterator_map(void *list_data, void *user_data) 
+{
+  LIBRDF_FREE(librdf_iterator_map, (librdf_iterator_map*)list_data);
+}
+
+  
 
 /**
  * librdf_free_iterator - Destructor - destroy a librdf_iterator object
@@ -86,6 +93,13 @@ librdf_free_iterator(librdf_iterator* iterator)
   
   if(iterator->finished)
     iterator->finished(iterator->context);
+
+  if(iterator->map_list) {
+    librdf_list_foreach(iterator->map_list,
+                        librdf_iterator_free_iterator_map, NULL);
+    librdf_free_list(iterator->map_list);
+  }
+  
   LIBRDF_FREE(librdf_iterator, iterator);
 }
 
@@ -107,13 +121,29 @@ librdf_iterator_get_next_mapped_element(librdf_iterator* iterator)
   void *element=NULL;
   
   /* find next element subject to map */
-  while(iterator->have_elements(iterator->context)) {
+  while(!iterator->is_end(iterator->context)) {
+    librdf_iterator* map_iterator; /* Iterator over iterator->map_list librdf_list */
     element=iterator->get_next(iterator->context);
     if(!element)
       break;
+
+    map_iterator=librdf_list_get_iterator(iterator->map_list);
+    if(!map_iterator)
+      break;
     
-    /* apply the map to the element  */
-    element=iterator->map(iterator->map_context, element);
+    while(!librdf_iterator_end(map_iterator)) {
+      librdf_iterator_map *map=(librdf_iterator_map*)librdf_iterator_get_next(map_iterator);
+      if(!map)
+        break;
+      
+      /* apply the map to the element  */
+      element=map->fn(element, map->context);
+      if(!element)
+        break;
+    }
+    librdf_free_iterator(map_iterator);
+    
+
     /* found something, return it */
     if(element)
       break;
@@ -126,34 +156,49 @@ librdf_iterator_get_next_mapped_element(librdf_iterator* iterator)
  * librdf_iterator_have_elements - Test if the iterator has finished
  * @iterator: the &librdf_iterator object
  * 
+ * DEPRECATED - use !librdf_iterator_end(iterator)
+ *
  * Return value: 0 if the iterator has finished
  **/
 int
 librdf_iterator_have_elements(librdf_iterator* iterator) 
 {
-  if(!iterator)
-    return 0;
+  return !librdf_iterator_end(iterator);
+}
 
-  if(!iterator->have_more_elements)
-    return 0;
+
+/**
+ * librdf_iterator_end - Test if the iterator has finished
+ * @iterator: the &librdf_iterator object
+ * 
+ * Return value: non 0 if the iterator has finished
+ **/
+int
+librdf_iterator_end(librdf_iterator* iterator) 
+{
+  if(!iterator)
+    return 1;
+
+  if(iterator->is_finished)
+    return 1;
 
   /* simple case, no mapping so pass on */
-  if(!iterator->map)
-    return (iterator->have_more_elements=iterator->have_elements(iterator->context));
+  if(!iterator->map_list)
+    return (iterator->is_finished=iterator->is_end(iterator->context));
 
 
   /* mapping from here */
 
   /* already have 1 stored item */
   if(iterator->next)
-    return 1;
+    return 0;
 
   /* get next item subject to map or NULL if list ended */
   iterator->next=librdf_iterator_get_next_mapped_element(iterator);
   if(!iterator->next)
-    iterator->have_more_elements=0;
+    iterator->is_finished=1;
   
-  return (iterator->next != NULL);
+  return (iterator->next == NULL);
 }
 
 
@@ -168,11 +213,11 @@ librdf_iterator_get_next(librdf_iterator* iterator)
 {
   void *element;
   
-  if(!iterator->have_more_elements)
+  if(iterator->is_finished)
     return NULL;
 
   /* simple case, no mapping so pass on */
-  if(!iterator->map)
+  if(!iterator->map_list)
     return iterator->get_next(iterator->context);
 
   /* mapping from here */
@@ -187,30 +232,69 @@ librdf_iterator_get_next(librdf_iterator* iterator)
   /* else get a new one or NULL at end of list */
   iterator->next=librdf_iterator_get_next_mapped_element(iterator);
   if(!iterator->next)
-    iterator->have_more_elements=0;
+    iterator->is_finished=1;
   
   return iterator->next;
 }
 
 
 /**
- * librdf_iterator_set_map - Set the librdf_iterator mapping function
+ * librdf_iterator_add_map - Add a librdf_iterator mapping function
  * @iterator: the iterator
  * @map: the function to operate
  * @map_context: the context to pass to the map function
  * 
- * Sets the iterator mapping function which operates over the iterator to
+ * Adds an iterator mapping function which operates over the iterator to
  * select which elements are returned; it will be applied as soon as
  * this method is called.
  *
+ * Several mapping functions can be added and they are applied in
+ * the order given
+ *
  * The mapping function should return non 0 to allow the element to be
  * returned.
+ *
+ * Return value: Non 0 on failure
  **/
-void
-librdf_iterator_set_map(librdf_iterator* iterator, 
-                        void* (*map)(void *context, void *element),
-                        void *map_context)
+int
+librdf_iterator_add_map(librdf_iterator* iterator, 
+                        void* (*fn)(void *context, void *element),
+                        void *context)
 {
-  iterator->map=map;
-  iterator->map_context=map_context;
+  librdf_iterator_map *map;
+  
+  if(!iterator->map_list) {
+    iterator->map_list=librdf_new_list(iterator->world);
+    if(!iterator->map_list)
+      return 1;
+  }
+
+  map=(librdf_iterator_map*)LIBRDF_CALLOC(librdf_iterator_map, sizeof(librdf_iterator_map), 1);
+  if(!map)
+    return 1;
+
+  map->fn=fn;
+  map->context=context;
+
+  if(librdf_list_add(iterator->map_list, map)) {
+    LIBRDF_FREE(librdf_iterator_map, map);
+    return 1;
+  }
+  
+  return 0;
+}
+
+
+void*
+librdf_iterator_map_remove_duplicate_nodes(void *item, void *user_data) 
+{
+  librdf_node *node=(librdf_node *)item;
+  static const char *null_string="NULL";
+  char *s;
+
+  s=node ? librdf_node_to_string(node) : (char*)null_string;
+  fprintf(stderr, "librdf_iterator_remove_duplicate_nodes: node %s and user_data %p\n", s, user_data);
+  if(s != null_string)
+    LIBRDF_FREE(cstring, s);
+  return item;
 }
