@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -26,6 +26,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h> /* for isalnum */
+#ifdef WITH_THREADS
+#include <pthread.h>
+#endif
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
@@ -97,6 +100,10 @@ librdf_new_uri (librdf_world *world,
   int length;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(world->mutex);
+#endif
   
   length=strlen(uri_string);
 
@@ -118,6 +125,11 @@ librdf_new_uri (librdf_world *world,
     if(new_uri->usage > new_uri->max_usage)
       new_uri->max_usage=new_uri->usage;
 #endif    
+
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->mutex);
+#endif
+
     return new_uri;
   }
   
@@ -129,8 +141,12 @@ librdf_new_uri (librdf_world *world,
 #endif
 
   new_uri = (librdf_uri*)LIBRDF_CALLOC(librdf_uri, 1, sizeof(librdf_uri));
-  if(!new_uri)
+  if(!new_uri) {
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->mutex);
+#endif
     return NULL;
+  }
 
   new_uri->world=world;
   new_uri->string_length=length;
@@ -138,6 +154,9 @@ librdf_new_uri (librdf_world *world,
   new_string=(char*)LIBRDF_MALLOC(librdf_uri, length+1);
   if(!new_string) {
     LIBRDF_FREE(librdf_uri, new_uri);
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->mutex);
+#endif
     return NULL;
   }
   
@@ -154,8 +173,15 @@ librdf_new_uri (librdf_world *world,
   /* store in hash: URI-string => (librdf_uri*) */
   if(librdf_hash_put(world->uris_hash, &key, &value)) {
     LIBRDF_FREE(librdf_uri, new_uri);
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->mutex);
+#endif
     new_uri=NULL;
   }
+
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(world->mutex);
+#endif
 
   return new_uri;
 }
@@ -304,6 +330,11 @@ void
 librdf_free_uri (librdf_uri* uri) 
 {
   librdf_hash_datum key; /* on stack */
+  librdf_world *world = uri->world;
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(world->mutex);
+#endif
 
   uri->usage--;
   
@@ -312,13 +343,17 @@ librdf_free_uri (librdf_uri* uri)
 #endif
 
   /* decrement usage, don't free if not 0 yet*/
-  if(uri->usage)
+  if(uri->usage) {
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->mutex);
+#endif
     return;
+  }
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3(librdf_free_uri, "Deleting URI %s from hash, max usage was %d\n", uri->string, uri->max_usage);
 #endif
-  
+
   key.data=uri->string;
   key.size=uri->string_length;
   if(librdf_hash_delete_all(uri->world->uris_hash, &key) )
@@ -328,6 +363,10 @@ librdf_free_uri (librdf_uri* uri)
   if(uri->string)
     LIBRDF_FREE(cstring, uri->string);
   LIBRDF_FREE(librdf_uri, uri);
+
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(world->mutex);
+#endif
 }
 
 
@@ -519,7 +558,8 @@ main(int argc, char *argv[])
   librdf_world *world;
   
   world=librdf_new_world();
-  
+  librdf_world_init_mutex(world);
+
   librdf_init_digest(world);
   librdf_init_hash(world);
   librdf_init_uri(world);
