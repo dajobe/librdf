@@ -1,3 +1,45 @@
+2004-07-28  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_tstore.c (librdf_storage_list_add_statement):
+	Note FIXME - cannot enforce not adding duplicate statements.
+
+	* librdf/rdf_storage_mysql.c (librdf_storage_mysql_add_statement,
+	librdf_storage_mysql_add_statements): Enforce not adding duplicate
+	statements.
+
+	* librdf/rdf_storage_list.c (librdf_storage_list_add_statement):
+	Enforce not adding duplicate statements.
+	(librdf_storage_list_add_statements): Enforce not adding duplicate
+	statements. Tidy the code.
+
+	* librdf/rdf_storage_hashes.c (librdf_storage_hashes_add_statement):
+	Enforce not adding duplicate statements.
+	This is not needed for librdf_storage_hashes_add_statements since
+	it calls the above method.
+
+	* librdf/rdf_storage.c:
+	(librdf_storage_add_statement, librdf_storage_add_statements):
+	Document that duplicate statements are ignored on addition.
+
+	* docs/api.sgml.in: In model class intro, document that duplicate
+	statements are ignored on adding.
+
+	* librdf/rdf_model.c (librdf_model_add_statement):
+	Document that duplicate statements are
+	ignored and use librdf_model_contains_statement to enforce it.
+	(librdf_model_add_statements): Document that duplicate statements are
+	ignored.
+
+	* configure.ac:
+	For maintainer-mode, always invoke AC_CONFG_SUBDIR on raptor
+	and rasqal.  The extra configures for the maintainer is fine
+	and ensures the tarball is made OK.
+
+	* Makefile.am: Zap customised DIST_SUBDIRS again
+
+	* raptor/win32/raptortest.cpp:
+	Added raptor_init, raptor_finish (untested).
+
 2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_storage_mysql.c, raptor/raptor_locator.c: casts for c++
