@@ -22,7 +22,7 @@
 man_MANS=redland.3
 
 EXTRA_DIST=api.sgml.in api.sgml README.html README \
-perl.html python.html tcl.html java.html \
+perl.html python.html tcl.html java.html ruby.html \
 build-docs fix-pod-xhtml overview.png overview.ps overview.pdf api pod \
 redland.pod \
 $(man_MANS)
