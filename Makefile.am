@@ -76,7 +76,7 @@ librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @XML_OBJS@
 
-librdf_la_LIBADD = @LIBSOBJS@ @DIGEST_SOBJS@ @HASH_SOBJS@ @PARSER_SOBJS@ \
+librdf_la_LIBADD = @LTLIBOBJS@ @DIGEST_SOBJS@ @HASH_SOBJS@ @PARSER_SOBJS@ \
 @XML_SOBJS@
 librdf_la_DEPENDENCIES = @DIGEST_SOBJS@ @HASH_SOBJS@ @PARSER_SOBJS@ \
 @XML_SOBJS@
@@ -102,6 +102,8 @@ $(JAVA_CLASSES) \
 autogen.sh \
 redland.spec redland.spec.in \
 @RAPTOR_INCS@
+
+librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
