@@ -36,13 +36,13 @@ init_rdf_statement(void)
 rdf_statement*
 new_rdf_statement(void) 
 {
-  rdf_statement* new_rdf_statement;
+  rdf_statement* new_statement;
   
-  new_rdf_statement = (rdf_statement*)RDF_CALLOC(rdf_statement, 1, sizeof(rdf_statement));
-  if(!new_rdf_statement)
+  new_statement = (rdf_statement*)RDF_CALLOC(rdf_statement, 1, sizeof(rdf_statement));
+  if(!new_statement)
     return NULL;
 
-  return new_rdf_statement;
+  return new_statement;
 }
 
 
