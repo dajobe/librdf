@@ -119,7 +119,7 @@ TAR=@TAR@
 CC=@CC@
 
 AM_CPPFLAGS=@CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_INTERNAL_CPPFLAGS@
-AML_CFLAGS=@CFLAGS@ $(MEM)
+AM_CFLAGS=@CFLAGS@ $(MEM)
 STANDARD_CFLAGS=@STANDARD_CFLAGS@ $(MEM)
 AM_LDFLAGS=@LIBRDF_LDFLAGS@
 LIBS=@LIBRDF_LIBS@ $(MEM_LIBS)
@@ -140,8 +140,9 @@ rdf_digest_test: rdf_digest.c librdf.la
 rdf_hash_test: rdf_hash.c librdf.la
 	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_hash.c librdf.la $(LIBS)
 
+# This needs raptor.h
 rdf_uri_test: rdf_uri.c librdf.la
-	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_uri.c librdf.la $(LIBS)
+	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE @LIBRDF_INTERNAL_CPPFLAGS@ $(srcdir)/rdf_uri.c librdf.la $(LIBS)
 
 rdf_statement_test: rdf_statement.c librdf.la
 	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la $(LIBS)
