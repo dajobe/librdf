@@ -3,7 +3,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2001 David Beckett - http://purl.org/net/dajobe/
+# Copyright (C) 2001-2003 David Beckett - http://purl.org/net/dajobe/
 # Institute for Learning and Research Technology - http://www.ilrt.org/
 # University of Bristol - http://www.bristol.ac.uk/
 # 
@@ -56,7 +56,7 @@ $PACKAGE=$ENV{PACKAGE} || "Redland";
 my $version=$ENV{VERSION};
 
 if(!$version) {
-  my $conf_in_file="$TOP_SRCDIR/configure.in";
+  my $conf_in_file="$TOP_SRCDIR/configure.ac";
   open(CONF, $conf_in_file) or die "Cannot open $conf_in_file for version - $!\n";
   my $v;
   while(<CONF>) {
@@ -78,6 +78,8 @@ unlink "$TOP_SRCDIR/$perl_makefile";
 unlink "$TOP_SRCDIR/$standalone_makefile";
 
 my $perl = $Config{perlpath};
+
+my $prefix = $Config{prefix};
 
 my $cc = $Config{cc};
 my $ccarg = "";
@@ -126,8 +128,8 @@ all: config
 config:
 	\@if [ ! -f ${standalone_makefile} ]; then \\
 	  cp ${perl_makefile} Makefile.perl; \\
-	  echo "${ccarg}PERL=$perl ./configure"; \\
-	  ${ccarg}PERL=$perl ./configure; \\
+	  echo "${ccarg}PERL=$perl ./configure --prefix=$prefix"; \\
+	  ${ccarg}PERL=$perl ./configure --prefix=$prefix; \\
 	  cp Makefile ${standalone_makefile}; \\
 	  cp Makefile.perl ${perl_makefile}; \\
 	  rm Makefile.perl; \\
@@ -144,20 +146,27 @@ config:
 	fi
 
 # MakeMaker targets
-install test: config
+test: config
+	cd perl && \$(MAKE) \$(MFLAGS) -f Makefile.perl \$@
+
+install: config
+	\@if [ -f ${standalone_makefile} ]; then \\
+	  cd raptor && \$(MAKE) \$(MFLAGS) install-libLTLIBRARIES; cd ..; \\
+	  cd librdf && \$(MAKE) \$(MFLAGS) install-libLTLIBRARIES; cd ..; \\
+	fi
 	cd perl && \$(MAKE) \$(MFLAGS) -f Makefile.perl \$@
 
 # MakeMaker target
 clean:
 	\@if [ -f ${standalone_makefile} ]; then \\
 	  echo \$(MAKE) -k \$(MFLAGS) -f ${standalone_makefile} \$@; \\
-	  \$(MAKE) -k \$(MFLAGS) -f ${standalone_makefile} \$@; \\
+	  (\$(MAKE) -k \$(MFLAGS) -f ${standalone_makefile} \$@; exit 0; ); \\
 	fi
 	\@if [ -f perl/Makefile.perl ]; then \\
 	  echo "cd perl"; \\
 	  cd perl; \\
-	  echo "\$(MAKE) \$(MFLAGS) \$@-perl"; \\
-	  \$(MAKE) \$(MFLAGS) \$@-perl; \\
+	  echo "\$(MAKE) \$(MFLAGS) \$@\-perl"; \\
+	  \$(MAKE) \$(MFLAGS) \$\@-perl; \\
 	fi
 
 # MakeMaker/GNU target
@@ -186,11 +195,6 @@ skipcheck:
 	${perl} -MExtUtils::Manifest=skipcheck -e skipcheck
 
 manifest: MANIFEST
-
-# Build the perl MakeMaker MANIFEST file from the results of
-# the GNU configure 'make dist'
-MANIFEST: dist
-	tar tvfz `ls -1t *.tar.gz|head -1`| awk '{print \$\$6}' | sed -e 's,^[^/]+/,,' > MANIFEST
 
 # MakeMaker dist_dir section:
 perl-distdir: MANIFEST
