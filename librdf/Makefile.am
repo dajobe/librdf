@@ -119,6 +119,9 @@ MEM_LIBS=@MEM_LIBS@
 #MEM_LIBS=-ldmalloc
 
 
+# Use tar, whatever it is called (better be GNU tar though)
+TAR=@TAR@
+
 # Why is this not in the default makefile?
 CC=@CC@
 
@@ -221,10 +224,9 @@ $(top_builddir)/repat/rdfparse.o: $(top_builddir)/expat/xmlparse/xmlparse.o $(to
 # Note: this can't be protected with @MAINT@ since automake only
 # activates this rule if it is normally in the Makefile.am
 dist-hook: redland.spec
-	-cp redland.spec $(distdir)
 	@for file in @RAPIER_SRCS@ @RAPIER_INCS@ fake.c; do \
-	  rm -f $(distdir)/$$file; \
           if test -r $(srcdir)/$$file; then \
+	    rm -f $(distdir)/$$file; \
 	    cp -p $(srcdir)/$$file $(distdir)/$$file; \
 	  fi; \
 	done

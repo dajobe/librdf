@@ -60,6 +60,9 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+# Find a tar command for 'make dist'
+AC_CHECK_PROGS(TAR, gnutar gtar tar)
+
 AC_CHECK_PROGS(JAVA, java jre)
 AC_DEFINE_UNQUOTED(JAVA_COMMAND, "$JAVA")
 AC_CHECK_PROGS(PYTHON, python2.0 python1.5 python)
