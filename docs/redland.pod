@@ -1,3 +1,4 @@
+## -*- perl -*-
 ##
 ## redland.pod - redland Unix manual page
 ##
@@ -338,6 +339,12 @@ using B<librdf_new_uri_from_uri> to be shared correctly.
 
 =item librdf_stream* B<librdf_model_find_statements>(librdf_model* I<model>, librdf_statement* I<statement>)
 
+=item librdf_stream* B<librdf_model_find_statements_in_context>(librdf_model* I<model>, librdf_statement* I<statement>, librdf_node* I<context_node>)
+
+=item librdf_stream* B<librdf_model_find_statements_with_options>(librdf_model* I<model>, librdf_statement* I<statement>, librdf_node* I<context_node>, librdf_hash* I<options>)
+
+=item librdf_iterator* B<librdf_model_get_contexts>(librdf_model* I<model>)
+
 =item librdf_iterator* B<librdf_model_get_sources>(librdf_model* I<model>, librdf_node* I<arc>, librdf_node* I<target>)
 
 =item librdf_iterator* B<librdf_model_get_arcs>(librdf_model* I<model>, librdf_node* I<source>, librdf_node* I<target>)
@@ -377,6 +384,9 @@ using B<librdf_new_uri_from_uri> to be shared correctly.
 =item void B<librdf_model_sync>(librdf_model* I<model>)
 
 =item librdf_storage* B<librdf_model_get_storage>(librdf_model* I<model>)
+
+=item librdf_node* B<librdf_model_get_feature>(librdf_model* I<model>, librdf_uri* I<feature>)
+=item int B<librdf_model_set_feature>(librdf_model* I<model>, librdf_uri* I<feature>, librdf_node* I<value>)
 
 =back
 
@@ -472,11 +482,39 @@ using B<librdf_new_uri_from_uri> to be shared correctly.
 
 =item void B<librdf_parser_set_warning>(librdf_parser* I<parser>, void* I<user_data>, void (*I<warning_fn>)(void* I<user_data>, const char* I<msg>, ...))
 
-=item const char* B<librdf_parser_get_feature>(librdf_parser* I<parser>, librdf_uri* I<feature>)
+=item librdf_node* B<librdf_parser_get_feature>(librdf_parser* I<parser>, librdf_uri* I<feature>)
 
-=item int B<librdf_parser_set_feature>(librdf_parser* I<parser>, librdf_uri* I<feature>, const char* I<value>)
+=item int B<librdf_parser_set_feature>(librdf_parser* I<parser>, librdf_uri* I<feature>, librdf_node* I<value>)
 
 =back
+
+
+=head2 class serializer
+
+=over 4
+
+=item librdf_serializer* librdf_new_serializer(librdf_world* I<world>, const char *I<name>, const char *I<mime_type>, librdf_uri *I<type_uri>)
+
+=item librdf_serializer* librdf_new_serializer_from_factory(librdf_world* I<world>, librdf_serializer_factory *I<factory>)
+
+=item void librdf_free_serializer(librdf_serializer *I<serializer>)
+
+=item int librdf_serializer_serialize_model(librdf_serializer* I<serializer>, FILE* I<handle>, librdf_uri* I<base_uri>, librdf_model* I<model>)
+
+=item int librdf_serializer_serialize_model_to_file(librdf_serializer* I<serializer>, const char *I<name>, librdf_uri* I<base_uri>, librdf_model* I<model>)
+
+=item void librdf_serializer_set_error(librdf_serializer* I<serializer>, void *I<user_data>, void (*I<error_fn>)(void *user_data, const char *msg, ...))
+
+=item void librdf_serializer_set_warning(librdf_serializer* I<serializer>, void *I<user_data>, void (*I<warning_fn>)(void *user_data, const char *msg, ...))
+
+=item librdf_node* librdf_serializer_get_feature(librdf_serializer* I<serializer>, librdf_uri* I<feature>)
+
+=item int librdf_serializer_set_feature(librdf_serializer* I<serializer>, librdf_uri* I<feature>, librdf_node* I<value>)b
+
+=item int librdf_serializer_set_namespace(librdf_serializer* I<serializer>, librdf_uri* I<uri>, const char* I<prefix>)
+
+=back
+
 
 =head2 class stream
 
