@@ -532,6 +532,9 @@ librdf_query_rasqal_execute(librdf_query* query, librdf_model* model)
                           (raptor_uri*)context->uri))
     return NULL;
 
+  if(context->results)
+    rasqal_free_query_results(context->results);
+  
   context->results=rasqal_query_execute(context->rq);
   
   results=(librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, sizeof(librdf_query_results));
@@ -670,6 +673,7 @@ librdf_query_rasqal_free_results(librdf_query_results* query_results)
     return;
   
   rasqal_free_query_results(context->results);
+  context->results=NULL;
 }
 
 
