@@ -105,6 +105,10 @@ struct librdf_storage_factory_s {
   int (*init)(librdf_storage* storage, char *name, librdf_hash* options);
   
   /* copy a storage */
+  /* clone is assumed to do leave the new storage in the same state
+   * after an init() method on an existing storage - i.e ready to
+   * use but closed.
+   */
   int (*clone)(librdf_storage* new_storage, librdf_storage* old_storage);
 
   /* destroy a storage */
