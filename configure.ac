@@ -21,7 +21,7 @@ dnl
 dnl 
 
 
-AC_INIT([Redland RDF Application Framework], 0.9.15, redland-dev@lists.librdf.org, redland)
+AC_INIT([Redland RDF Application Framework], 0.9.16, redland-dev@lists.librdf.org, redland)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR(librdf/rdf_node.c)
 AC_REVISION($Revision$)dnl
