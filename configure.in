@@ -433,7 +433,6 @@ fi
 AC_MSG_RESULT($parser_modules)
 
 PARSER_OBJS=
-PARSER_SOBJS=
 PARSER_SRCS=
 JAVA_SIRPACSTANFORD_JAR=
 JAVA_SIRPACW3C_JAR=
@@ -638,13 +637,11 @@ for parser in $parser_modules; do
 
   # Add objects, sources only if the parser was found
   if test $found = 1; then
-    PARSER_OBJS="$PARSER_OBJS rdf_parser_$parser.o"
-    PARSER_SOBJS="$PARSER_SOBJS rdf_parser_$parser.lo"
+    PARSER_OBJS="$PARSER_OBJS rdf_parser_$parser.lo"
     PARSER_SRCS="$PARSER_SRCS rdf_parser_$parser.c"
 
     if test $parser = raptor; then
-      PARSER_OBJS="$PARSER_OBJS raptor_parse.o ntriples_parse.o"
-      PARSER_SOBJS="$PARSER_SOBJS raptor_parse.lo ntriples_parse.lo"
+      PARSER_OBJS="$PARSER_OBJS raptor_parse.lo ntriples_parse.lo"
       PARSER_SRCS="$PARSER_SRCS raptor_parse.c ntriples_parse.c"
     fi
 
@@ -677,7 +674,6 @@ else
 fi
 
 AC_SUBST(PARSER_OBJS)
-AC_SUBST(PARSER_SOBJS)
 AC_SUBST(PARSER_SRCS)
 
 if test "X$PARSER_OBJS" = X; then
@@ -716,7 +712,6 @@ AC_ARG_ENABLE(digests, [  --enable-digests=LIST   Use digests [md5 sha1 ripemd16
 AC_MSG_RESULT($digest_modules)
 
 DIGEST_OBJS=
-DIGEST_SOBJS=
 DIGEST_SRCS=
 
 AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests [yes]], enable_openssl_digests="$withval", enable_openssl_digests="yes") 
@@ -763,8 +758,7 @@ if test "$enable_openssl_digests" = yes ; then
     if test "$have_libcrypto" = no; then
       LIBS="$oLIBS"
     fi
-    DIGEST_OBJS="$DIGEST_OBJS rdf_digest_openssl.o"
-    DIGEST_SOBJS="$DIGEST_SOBJS rdf_digest_openssl.lo"
+    DIGEST_OBJS="$DIGEST_OBJS rdf_digest_openssl.lo"
     DIGEST_SRCS="$DIGEST_SRCS rdf_digest_openssl.c"
     digest_modules=$new_digest_modules
   fi
@@ -792,8 +786,7 @@ for module in $digest_modules; do
     n=HAVE_LOCAL_${module_u}_DIGEST
     AC_DEFINE_UNQUOTED($n)
 
-    DIGEST_OBJS="$DIGEST_OBJS $base.o"
-    DIGEST_SOBJS="$DIGEST_SOBJS $base.lo"
+    DIGEST_OBJS="$DIGEST_OBJS $base.lo"
     DIGEST_SRCS="$DIGEST_SRCS $base.c"
    digest_modules_available="$digest_modules_available $module"
   else
@@ -802,12 +795,10 @@ for module in $digest_modules; do
 done
 
 AC_SUBST(DIGEST_OBJS)
-AC_SUBST(DIGEST_SOBJS)
 AC_SUBST(DIGEST_SRCS)
 
 
 HASH_OBJS=
-HASH_SOBJS=
 HASH_SRCS=
 
 # GDBM is not available anymore because it cannot handle duplicate
@@ -817,8 +808,7 @@ HASH_SRCS=
 #if test "$ac_cv_lib_gdbm_gdbm_firstkey" = yes ; then
 #  AC_MSG_RESULT(yes);
 #  AC_DEFINE(HAVE_GDBM_HASH)
-#  HASH_OBJS="$HASH_OBJS rdf_hash_gdbm.o"
-#  HASH_SOBJS="$HASH_SOBJS rdf_hash_gdbm.lo"
+#  HASH_OBJS="$HASH_OBJS rdf_hash_gdbm.lo"
 #  HASH_SRCS="$HASH_SRCS rdf_hash_gdbm.c"
 #else
 #  AC_MSG_RESULT(no);
@@ -828,8 +818,7 @@ AC_MSG_CHECKING(for bdb hash support)
 if test "$have_libdb" = yes; then
   AC_MSG_RESULT(yes);
   AC_DEFINE(HAVE_BDB_HASH)
-  HASH_OBJS="$HASH_OBJS rdf_hash_bdb.o"
-  HASH_SOBJS="$HASH_SOBJS rdf_hash_bdb.lo"
+  HASH_OBJS="$HASH_OBJS rdf_hash_bdb.lo"
   HASH_SRCS="$HASH_SRCS rdf_hash_bdb.c"
 else
   AC_MSG_RESULT(no);
@@ -837,7 +826,6 @@ fi
 
 
 AC_SUBST(HASH_OBJS)
-AC_SUBST(HASH_SOBJS)
 AC_SUBST(HASH_SRCS)
 
 
@@ -846,7 +834,6 @@ SD="docs perl python tcl java"
 
 
 XML_OBJS=
-XML_SOBJS=
 
 if test $have_libxml = 1 -a $need_libxml = 1; then
   if test $need_libxml_source = 1; then
@@ -865,8 +852,7 @@ if test $need_expat = 1; then
   if test $need_expat_source = 1; then
     SD="$SD expat"
     CFLAGS="-I\$(top_srcdir)/expat/xmlparse $CFLAGS"
-    XML_OBJS="\$(top_builddir)/expat/xmlparse/xmlparse.o \$(top_builddir)/expat/xmlparse/hashtable.o \$(top_builddir)/expat/xmltok/xmlrole.o \$(top_builddir)/expat/xmltok/xmltok.o"
-    XML_SOBJS="\$(top_builddir)/expat/xmlparse/xmlparse.lo \$(top_builddir)/expat/xmlparse/hashtable.lo \$(top_builddir)/expat/xmltok/xmlrole.lo \$(top_builddir)/expat/xmltok/xmltok.lo"
+    XML_OBJS="\$(top_builddir)/expat/xmlparse/xmlparse.lo \$(top_builddir)/expat/xmlparse/hashtable.lo \$(top_builddir)/expat/xmltok/xmlrole.lo \$(top_builddir)/expat/xmltok/xmltok.lo"
     REPAT_FLAGS="$REPAT_FLAGS -I\$(top_srcdir)/expat/xmlparse"
 
     AC_DEFINE(NEED_EXPAT_SOURCE)
@@ -901,13 +887,11 @@ fi
 if test $need_repat = 1; then
   # Always have local copy
   SD="$SD repat"
-  XML_OBJS="$XML_OBJS \$(top_builddir)/repat/rdfparse.o"
-  XML_SOBJS="$XML_SOBJS \$(top_builddir)/repat/rdfparse.lo"
+  XML_OBJS="$XML_OBJS \$(top_builddir)/repat/rdfparse.lo"
 fi
 
 AC_SUBST(REPAT_FLAGS)
 AC_SUBST(XML_OBJS)
-AC_SUBST(XML_SOBJS)
 AC_SUBST(SD)
 
 
