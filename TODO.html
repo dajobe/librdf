@@ -15,35 +15,17 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>python. reported the code needs to be:
-<pre>
-[foo = RDF.Parser("turtle", "application/x-turtle")]
-</pre> "Leaving out the mime_type argument does not work."
-</li>
-<li>Python: add factories for all parsers</li>
 <li>remove "raptor" parser name in any examples, replace with syntax names such as "rdfxml"</li>
-<li>In RDF.py, parse_into_model, allow promotion of base_uri arg.
-<pre>
-if type(base_uri) is str:
-  base_uri = Uri(string=base_uri)
-</pre>
-like the other methods, and as documented (BUG)</li>
-<li>Check parser errors are still sent back to perl, python (BUG TBC)</li>
 <li>Docs: it was hard to find the legal (parser) feature URIs in
 the documentation, or what values to use.</li>
 <li>RFE: consider how to add parser guessing (via raptor) into the
 redland parser API</li>
-<li>RFE: Python api, add __nonzero__ (check this) so you can do things
-like <code>if redland-stream: do things...</code> to check for
-empty streams before iterating. 
-<code>def __nonzero__(self): return !self.end()</code></li>
 <li>Documentation: describe the redland features available per class</li>
 <li>RFE: add user mappings from URIs to namespace aliases to the serializer</li>
 <li>RFE: The parser should be able to adjust error and warning
 actions, stopping immediately or ignoring them by features. Document
 the defaults.</li>
 <li>RFE: Add node.as_sha1 easy digest methods for literal nodes</li>
-<li>PHP may need to include php_config.h not config.h for new php versions</li>
 <li>RFE: return serialized models to syntax as strings</li>
 <li>RFE: model.parseString(format, "string"), model.parseURI(format, URI, baseURI=URI) creating and destroying temporary parser objects for <em>format</em>.
 Means no need to care about parser class if you just want simple things.  Similarly
@@ -53,7 +35,6 @@ for model.serialize() and Serializer class, however take care with serialise() m
 <li>defensive code - check object types are correct by adding magic fields to start of all objects</li>
 <li>Consider an AVL-tree in-memory store (<a href="http://www.msu.edu/user/pfaffben/avl/">libavl</a>)</li>
 <li>Docs: note that compiling redland may also build raptor and rasqal, if they are needed</li>
-<li>RFE: Allow base URIs in Perl parser methods to be undef</li>
 <li>Document the storage constructor hash options under the main class</li>
 <li>RFE: make add_statement method on model take URIs</li>
 <li>Add arcs_in/arcs_out model methods</li>
