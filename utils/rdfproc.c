@@ -739,7 +739,7 @@ main(int argc, char *argv[])
         if(names) {
           for(i=0; names[i]; i++) {
             fprintf(stdout, "%s=", names[i]);
-            if(values[i]) {
+            if(values && values[i]) {
               librdf_node_print(values[i], stdout);
               librdf_free_node(values[i]);
             } else
