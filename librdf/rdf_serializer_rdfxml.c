@@ -55,7 +55,14 @@ librdf_serializer_rdfxml_init(librdf_serializer *serializer, void *context)
 }
 
 
-/* check name is OK XML Name - starts with alpha, ends with alnum */
+/**
+ * rdf_serializer_rdfxml_ok_xml_name - check name is OK XML Name
+ * @name: XML name to check
+ * 
+ * An XML name starts with alpha or _, continues with alnum or _ - . */
+ * 
+ * Return value: non-zero if is a legal XML name
+ **/
 static int
 rdf_serializer_rdfxml_ok_xml_name(char *name) 
 {
@@ -63,7 +70,7 @@ rdf_serializer_rdfxml_ok_xml_name(char *name)
     return 0;
   name++;
   while(*name) {
-    if(!isalnum(*name))
+    if(!isalnum(*name)  && *name != '_' && *name != '-'  && *name != '.')
       return 0;
     name++;
   }
@@ -71,6 +78,12 @@ rdf_serializer_rdfxml_ok_xml_name(char *name)
 }
 
 
+/**
+ * rdf_serializer_rdfxml_print_as_xml_content - Print the given string XML-escaped for element content
+ * @p: Content string
+ * @handle: FILE* to print to
+ * 
+ **/
 static void
 rdf_serializer_rdfxml_print_as_xml_content(char *p, FILE *handle) 
 {
@@ -89,6 +102,14 @@ rdf_serializer_rdfxml_print_as_xml_content(char *p, FILE *handle)
   }
 }
 
+
+/**
+ * rdf_serializer_rdfxml_print_as_xml_attribute - Print the given string XML-escaped for attribute content
+ * @p: Content string
+ * @quote: Quote character - " or '
+ * @handle: FILE* to print to
+ * 
+ **/
 static void
 rdf_serializer_rdfxml_print_as_xml_attribute(char *p, char quote, 
                                              FILE *handle) 
@@ -112,6 +133,14 @@ rdf_serializer_rdfxml_print_as_xml_attribute(char *p, char quote,
   }
 }
 
+
+/**
+ * rdf_serializer_rdfxml_print_xml_attribute - Print the attribute/value as an XML attribute, XML escaped
+ * @attr: attribute name
+ * @value: attribute value
+ * @handle: FILE* to print to
+ * 
+ **/
 static void
 rdf_serializer_rdfxml_print_xml_attribute(char *attr, char *value,
                                           FILE *handle) 
@@ -125,6 +154,13 @@ rdf_serializer_rdfxml_print_xml_attribute(char *attr, char *value,
 }
 
 
+/**
+ * librdf_serializer_print_statement_as_rdfxml - Print the given statement as RDF/XML
+ * @context: serializer context
+ * @statement: &librdf_statement to print
+ * @handle: FILE* to print to
+ * 
+ **/
 static void
 librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *context,
                                             librdf_statement * statement,
@@ -177,8 +213,8 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
     }
   }
 
-
   fputs("  <rdf:Description", handle);
+
 
   /* subject */
   if(librdf_node_get_type(nodes[0]) == LIBRDF_NODE_TYPE_BLANK)
@@ -263,6 +299,17 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 }
 
 
+/**
+ * librdf_serializer_rdfxml_serialize_model - Print the given model as RDF/XML
+ * @context: serializer context
+ * @handle: FILE* to print to
+ * @base_uri: base URI of model
+ * @model: &librdf_model to print
+ * 
+ * Formats the model as complete RDF/XML document.
+ * 
+ * Return value: non-zero on failure
+ **/
 static int
 librdf_serializer_rdfxml_serialize_model(void *context,
                                          FILE *handle, librdf_uri* base_uri,
