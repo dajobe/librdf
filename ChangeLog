@@ -1,7 +1,910 @@
+2005-01-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.1: Document -f/--format.  Reference -o xml spec
+
+	* rasqal/roqet.c: Note that -o xml writes the SPARQL xml format.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_assign_variables):
+	variables_declared_in is now an array of integer (triple) column
+	numbers not pointers to graph patterns.
+	(rasqal_reset_triple_meta): Return number of variables that were
+	set to NULL.
+	(rasqal_graph_pattern_init): Update to compare triple column
+	numbers, not graph patterns for defining vars.
+	(rasqal_query_build_declared_in): Update for variables_declared_in
+	changed.
+	(rasqal_graph_pattern_get_next_match): Adjust new_bindings_count
+	by number of variables reset by rasqal_reset_triple_meta.  Only
+	run the bind_match factory method if there are triple parts to
+	bind. If it is run, adjust the new_bindings_count when variables
+	are set.
+	(rasqal_engine_do_optional_step): If there were new bindings,
+	return a result otherwise continue searching.
+	(rasqal_engine_get_next_result): Reset new_bindings_count on
+	entry.
+
+	* rasqal/rasqal_internal.h: rasqal_query: variables_declared_in is
+	now an array of integer column numbers.  Added new_bindings_count
+
+	* rasqal/rasqal_query.c (rasqal_free_query): tidy free of
+	variables_declared_in, now an intarray.
+
+2005-01-28  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c: Add -f / --format to set output syntax format
+	for graph results.
+
+	* rasqal/roqet.c: Update for rasqal_query_results_get_triple
+	returning a shared raptor_statement.  Use a raptor_serializer to
+	format it.
+
+	* rasqal/rasqal_query.c (rasqal_free_query): Free rasqal_triple
+	allocated.
+	(rasqal_prefix_id): Prefix a blank node id with 'r'<query result
+	number>'_'
+	(rasqal_query_results_get_triple): Return a shared
+	raptor_statement.
+	(rasqal_query_results_next_triple): Free the internal
+	rasqal_triple before moving on.
+
+	* rasqal/rasqal_internal.h: Added rasqal_triple internal to
+	rasqal_query
+
+	* rasqal/rasqal.h: Changed rasqal_query_results_get_triple to
+	return raptor_statement
+
+	* rasqal/rasqal_internal.h: Added raptor_statement to rasqal_query
+
+2005-01-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/rdql/testsuite/check-rdql,
+	rasqal/tests/sparql/check-sparql (run_test): don't delete test
+	output files here, let main do it.
+
+	* rasqal/roqet.c: Free returned triple result
+
+	* rasqal/roqet.c: Tidy the query result messages
+
+	* rasqal/roqet.c (main): Format bindings, triples and boolean
+	results.
+
+	* rasqal/rasqal_query.c (rasqal_query_execute): Init
+	current_triple_result.
+	(rasqal_query_results_is_bindings,
+	rasqal_query_results_is_boolean, rasqal_query_results_is_graph):
+	Added to test query result formats.
+	(rasqal_query_results_get_count, rasqal_query_results_next,
+	rasqal_query_results_finished, rasqal_query_results_get_bindings,
+	rasqal_query_results_get_binding_value,
+	rasqal_query_results_get_binding_name,
+	rasqal_query_results_get_binding_value_by_name,
+	rasqal_query_results_get_bindings_count): Fail if result type is
+	not bindings.
+	(rasqal_query_results_get_triple): Added, to get the current
+	triple from a graph result.
+	(rasqal_query_results_next_triple): Added, to move to the next
+	triple in a graph result.
+	(rasqal_query_results_get_boolean): Added, always false for now.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_as_node): Handle
+	variable values, convert the variable result.
+
+	* rasqal/rasqal_internal.h: Added current_triple_result to
+	rasqal_query
+
+	* rasqal/rasqal.h: Added rasqal_query_results_is_bindings,
+	rasqal_query_results_is_boolean, rasqal_query_results_get_boolean,
+	rasqal_query_results_is_graph, rasqal_query_results_get_triple and
+	rasqal_query_results_next_triple
+
+	* rasqal/rasqal_engine.c (rasqal_engine_assign_variables): Build
+	construct triples when CONSTRUCT * is given
+
+	* rasqal/rasqal_expr.c (rasqal_new_triple_from_triple): Added copy
+	constructor
+
+	* rasqal/rasqal.h: Added rasqal_new_triple_from_triple
+
+	* rasqal/tests/sparql/syntax/Makefile.am,
+	rasqal/tests/sparql/syntax/construct1.rq,
+	rasqal/tests/sparql/syntax/construct0.rq: CONSTRUCT syntax
+
+2005-01-26  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/rapper.1: mention what RSS tag soup can do
+
+	* raptor/turtle_parser.y, raptor/n3_parser.y: Rename
+	raptor_new_triple/raptor_free_triple to have n3/turtle in the
+	name.
+
+	* raptor/raptor_internal.h, raptor/raptor_general.c,
+	raptor/n3_parser.y, raptor/n3_lexer.l, raptor/n3_common.h,
+	raptor/configure.ac, raptor/Makefile.am: Update Notation3 code
+	with later Turtle improvements.  Built it with maintainer mode
+	only.
+
+	* raptor/turtle_lexer.l (turtle_copy_token): Renamed from
+	copy_token
+	(turtle_copy_string_token): Renamed from copy_string_token.
+	(main): filename moved here from global!
+
+2005-01-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c (raptor_rss_emit_item): Do not emit an items
+	property, that's only done by raptor_rss_emit_connection.
+
+	* rasqal/rasqal_expr.c (rasqal_new_function_expression): Added to
+	create a function call expression.
+	(rasqal_free_expression, rasqal_expression_print): Handle
+	RASQAL_EXPR_FUNCTION.
+
+	* rasqal/rasqal.h: Added name, args fields to rasqal_expression
+	Added rasqal_new_function_expression
+
+	* rasqal/Makefile.am: Added rasqal_xsd_datatypes_test
+
+	* rasqal/rasqal_xsd_datatypes.c: Rasqal XSD datatypes
+
+2005-01-22  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c: Added RSS1.1 namespace
+	http://inamidst.com/rss1.1/
+	(raptor_rss_parser_processNode): Turn Channel into RSS type
+	channel.
+	(raptor_rss_emit_type_triple, raptor_rss_emit_enclosure,
+	raptor_rss_emit_item, raptor_rss_emit_connection,
+	raptor_rss_emit): Add error return value and stop if there is no
+	identifier.
+	(raptor_rss_emit): Stop if channel or any item has no identifier.
+	(raptor_rss_parse_chunk): Pass on failures from above to user.
+	(raptor_rss10_build_xml_names): Replace RSS1.1 namespace with
+	RSS1.0
+	(raptor_rss10_emit_item): Add item_type arg and use it to only
+	emit items for the channel.
+
+2005-01-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor.h: Added const to src arg of
+	raptor_ntriples_string_as_utf8_string.
+
+	* rasqal/tests/rdql/testsuite/Makefile.am: S-03, S-04, S-05 work
+
+	* rasqal/sparql_lexer.l (PREFIX): Allow \
+	(NAME): Allow \
+	(<ID>{NAME}, <PREF>{PREFIX}, {QNAME}) Terminate when a name is not
+	created.
+	(sparql_copy_name, sparql_copy_qname): Use
+	rasqal_escaped_name_to_utf8_string to turn the escaped name into
+	just UTF-8, then check it is a legal XML name.
+
+	* rasqal/rdql_lexer.l (PREFIX): Allow \
+	(NAME): Allow \
+	(<*>{NAME}, {QNAME}, <{QNAME}>) Terminate when a name is not
+	created.
+	(rdql_copy_name, rdql_copy_qname): Use
+	rasqal_escaped_name_to_utf8_string to turn the escaped name into
+	just UTF-8, then check it is a legal XML name.
+
+	* rasqal/rasqal_internal.h: Added prototype for
+	rasqal_escaped_name_to_utf8_string
+
+	* rasqal/rasqal_general.c (rasqal_escaped_name_to_utf8_string):
+	Added to turn a UTF-8 and/or \u-escaped name as a UTF-8 string.
+	Intended as a lexer helper function.  A combination of
+	raptor_ntriples_string_as_utf8_string and raptor_ntriples_term
+	with the parsing part stripped out, and just \u, \U allowed,
+	always allowing UTF-8 and working just on full strings.
+
+	* raptor/libraptor.3: Deprecate
+	raptor_ntriples_string_as_utf8_string
+
+	* raptor/raptor.h: Deprecate raptor_ntriples_string_as_utf8_string
+	- rather too internal to be useful, since it only works with a
+	parser.
+
+	* raptor/ntriples_parse.c (raptor_ntriples_term_valid): Remove
+	rdf_parser arg; only for a fatal error - just die.
+	(raptor_ntriples_term): Make start a const arg.  When copying UTF8
+	bytes, move on the correct number of bytes in src and dest.
+	Update use of raptor_ntriples_term_valid.
+	(raptor_ntriples_string_as_utf8_string,
+	raptor_ntriples_parse_line): Update uses of
+	raptor_ntriples_term_valid.
+
+2005-01-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/rdql/testsuite/Makefile.am: Remove S-02 from
+	expected failures now that the formatting matches the expected
+	N-Triples escaped output.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_print): Print string as
+	N-Triples-escaped using raptor_print_ntriples_string.
+
+2005-01-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_general.c
+	(raptor_statement_part_as_counted_string): Declare language_len to
+	NULL, uri_string as unsigned char*.
+
+2005-01-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c (raptor_rss10_emit_item): Copy original
+	base_uri each time, a raptor_new_xml_element is made and don't
+	lose the original reference.
+
+	* raptor/raptor_xml_writer.c (main): Copy original base_uri each
+	time, don't lose the original reference.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write): Copy
+	original base_uri each time, don't lose the original reference.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write): Handle
+	RASQAL_LITERAL_BLANK. Doh!
+
+	* rasqal/win32_rasqal_config.h, rasqal/configure.ac: Bumped
+	version to 0.9.6
+
+	* rasqal/Makefile.am: Add @RASQAL_EXTERNAL_LIBS@ $(MEM_LIBS) to
+	all *_LDADD It seems to help mysterious shared library linking
+	problems on Solaris.
+
+	* rasqal/Makefile.am: Remove AM_LDFLAGS, libtool works that out
+	from the LIBADD for librasqal and adds it into the .la and uses it
+	from there.
+
+	* rasqal/Makefile.am: Make the tests using automake rules rather
+	than hand-crafted compile and link rules which were tricky to
+	maintain.  Added EXTRA_PROGRAMS for the tests.
+
+	* rasqal/rasqal_query_test.c: Handle rdql or sparql tests
+
+	* rasqal/rasqal_query_test.c:
+	(main) Handle no rdql available with an warning and exit 0
+
+2005-01-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_literal.c (rasqal_literal_compare): Move
+	declarations to start of block.
+
+	* rasqal/librasqal.3: Updates for 0.9.5
+
+	* rasqal/configure.ac: Require raptor 1.4.4
+
+	* raptor/raptor_general.c
+	(raptor_statement_part_as_counted_string): Initialise
+	language_len, uri_string used in some cases to prevent gcc
+	warnings.
+
+	* raptor/win32_raptor_config.h, raptor/configure.ac: Bumped
+	version to 1.4.5
+
+	* raptor/Makefile.am: Add ChangeLog.2 ChangeLog.3 ChangeLog.4
+
+	* raptor/raptor_rss.c (raptor_rss10_emit_item): Portability -
+	declare rdf_Seq* variables at start of block.
+
+	* rasqal/rasqal_redland.c, rasqal/rasqal_raptor.c,
+	rasqal/rasqal_engine.c: Casts for C++
+
+	* rasqal/sparql_parser.y (URIList): Copy the URI before freeing
+	the rasqal_literal.
+
+2005-01-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Redland.i: Added librdf_model_contains_context
+
+	* rasqal/tests/sparql/part1/dawg-result-004.n3,
+	rasqal/tests/sparql/part1/manifest.n3,
+	rasqal/tests/sparql/part1/dawg-query-004: Import dawg-query-004
+	dawg-result-004.n3
+
+	* librdf/rdf_model.h: Added librdf_model_contains_context
+
+	* librdf/rdf_model.c (librdf_model_contains_context): Added, to
+	find a context node in a model.
+	(main): Added test.
+
+2005-01-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/win32_raptor_config.h: win32 build update (patch from
+	Dave Viner)
+
+	* raptor/win32/Makefile.am: Added rapepr.dsp
+
+	* raptor/win32/rapper.dsp, raptor/win32/raptor.dsp,
+	raptor/win32/raptor.dsw, raptor/win32/raptortest.dsp: win32 build
+	update (patch from Dave Viner)
+
+	* raptor/win32_raptor_config.h: RAPTOR_INTERNAL should be defined
+	in the build configuration
+
+	* rasqal/win32_rasqal_config.h: RASQAL_INTERNAL should be defined
+	in the build configuration
+
+	* librdf/win32_rdf_config.h: Do not define REDLAND_INTERNAL at
+	all.  LIBRDF_INTERNAL should be defined in the build configuration
+
+	* librdf/librdf.h: Use LIBRDF_INTERNAL not REDLAND_INTERNAL
+
+2005-01-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c: Recognise old RSS 0.9 namespace and handle
+	it as rss 1.0.
+
+	* rasqal/sparql_lexer.l: Updated to use yyterminate() when an
+	error is reported, either in the lexer or in a failing function
+	called.  Deleted use of ERROR_TOKEN.  Mention SPARQL in all the
+	error and warning messages.
+
+	* rasqal/rdql_lexer.l: Updated to use yyterminate() when an error
+	is reported, either in the lexer or in a failing function called.
+	Deleted use of ERROR_TOKEN.  Mention RDQL in all the error and
+	warning messages.
+
+	* rasqal/sparql_parser.y: Delete ERROR_TOKEN
+	(PatternElementForms): Add SPARQL to warning message.
+	(sparql_parse): Add SPARQL to error message.
+
+	* rasqal/rdql_parser.y: Delete ERROR_TOKEN
+
+	* Redland.i: Export librdf_query_results_to_file and
+	librdf_query_results_to_string
+
+	* rasqal/rasqal_expr.c (rasqal_expression_evaluate): For
+	STR_MATCH, STR_NMATCH ensure the literal returned from the lhs
+	expression evaluation is always freed.
+
+2005-01-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rdql_parser.y (rdql_parse): set parsing debug flag before
+	starting parse when RASQAL_DEBUG > 2
+
+	* librdf/rdf_serializer.c (main): Update latest raptor 1.4.3+
+	style serialised rdf/xml length.
+
+	* librdf/rdf_serializer.c
+	(librdf_serializer_serialize_model_to_file_handle): Require FILE*
+	to be not null.
+
+	* librdf/rdf_query_rasqal.c (rasqal_redland_bind_match): Update
+	return to add parts arg, return.
+	(librdf_query_rasqal_results_to_counted_string): Added to
+	implement query results as string factory method, via Rasqal.
+	(librdf_query_rasqal_results_to_file_handle): Added to implement
+	query results to a file handle factory method, via Rasqal.
+
+	* librdf/rdf_query_results.c
+	(librdf_query_results_to_counted_string,
+	librdf_query_results_to_string): Added to write formatted query
+	results as a syntax in a string (via Rasqal).
+	(librdf_query_results_to_file_handle,
+	 librdf_query_results_to_file): Added to write formatted query
+	 results as a syntax to a file or already open FILE* handle (via
+	 Rasqal)
+
+	* librdf/rdf_query.c (main): Add query results to string test.
+
+	* librdf/rdf_query.h: Added results_to_counted_string,
+	results_to_file_handle to librdf_query_factory.  Added prototypes
+	for librdf_query_results_to_counted_string,
+	librdf_query_results_to_string,
+	librdf_query_results_to_file_handle and
+	librdf_query_results_to_file to public api.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_do_optional_step): Handle
+	an all optional query and finish all results when first optional
+	finishes.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write): Handle NULL
+	base_uri, pass it on the XML writer.
+
+	* rasqal/tests/sparql/examples/ex2-4a.rq: Kill the , between
+	SELECT vars
+
+	* rasqal/rasqal_xml.c: Removed, not used
+
+2005-01-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_finish_triples_match):
+	Free any literals copied into the triple used for comparing
+	matches.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_bind_match): Reformatting.
+	(rasqal_raptor_new_triples_match): Set unbound triple matches
+	literal values as shared pointers, not copies of literals.
+
+	* rasqal/rasqal_redland.c (rasqal_redland_bind_match): Update
+	return value.
+
+	* rasqal/rasqal_engine.c (rasqal_free_graph_pattern): Zap
+	triple_meta pointer when done.
+
+	* rasqal/sparql_lexer.l, rasqal/rdql_lexer.l (<PATTERN>.): Recover
+	state after an error in a regex.
+
+	* rasqal/rasqal_engine.c (rasqal_graph_pattern_order): Sort using
+	pointers in data, not array pointers.
+
+	* rasqal/rasqal_query.c (rasqal_free_query): Delete
+	ordered_triples tidy.
+	(rasqal_query_print): Delete ordered_triples tidy.
+
+	* rasqal/rasqal_engine.c:
+	(rasqal_query_order_triples_score, rasqal_query_order_triples):
+	Deleted - no longer used.
+
+	* rasqal/rasqal_internal.h: Deleted unused ordered_triples field
+	from rasqal_query.
+
+2005-01-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/part1/Makefile.am: All tests pass, empty
+	EXPECTED_SPARQL_CORRECT_FAILURES
+
+	* rasqal/rasqal_internal.h: Added max_optional_graph_pattern to
+	query.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_do_step): Set gp->matched
+	flag here
+	(rasqal_engine_do_optional_step): Set gp->matched flag
+	(rasqal_engine_get_next_result): Do not set gp->matched flag here.
+	For an optional step, if no bound values were returned ensure
+	search continues.
+
+	* rasqal/rasqal_engine.c: Add a few more debug messages.
+
+	* rasqal/rasqal_engine.c: delete a #if 1
+
+	* rasqal/rasqal_engine.c (rasqal_engine_move_to_graph_pattern):
+	Use max_optional_graph_patterns to walk through combinations of
+	optional graph patterns.
+	(rasqal_engine_do_optional_step): CHeck against
+	max_optional_graph_patterns limit and lower it when backtracking.
+	(rasqal_engine_get_next_result): Count # returned values and
+	continue searching when=0.  This is a fixup hack, not a final
+	solution.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_move_to_graph_pattern):
+	Take a delta since only ever moving by +1 or -1.  When there are
+	no optionals, just move.  When backtracking optionals, re-init the
+	finished graph pattern.
+	(rasqal_engine_do_step, rasqal_engine_do_optional_step): Update
+	calls to above.
+
+2005-01-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c (rasqal_reset_triple_meta): Added.
+	(rasqal_free_graph_pattern, rasqal_graph_pattern_get_next_match):
+	Call new rasqal_reset_triple_meta
+	(rasqal_engine_do_optional_step): Comment out duff test
+
+	* rasqal/rasqal_engine.c: messages
+
+	* rasqal/rasqal_engine.c (rasqal_engine_do_optional_step): Copy
+	tidying
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_result): Debug
+	messages.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_check_constraint): Added,
+	from body of rasqal_engine_get_next_result.
+	(rasqal_engine_do_step): Now just for mandatory graph patterns
+	rasqal_engine_do_optional_step): Added, just for optional graph
+	patterns.
+	(rasqal_engine_get_next_result): Call rasqal_engine_do_step or
+	rasqal_engine_do_optional_step depending on graph pattern optional
+	flag.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_do_step): Added, from body
+	of rasqal_engine_get_next_result
+	(rasqal_engine_get_next_result): Smaller, see above.
+
+	* rasqal/rasqal_engine.c: Added rasqal_engine_step and use in
+	(rasqal_engine_get_next_result): Replace step=X; break with
+	step=X; continue to let the loop do the work
+
+	* rasqal/rasqal_engine.c: Added rasqal_engine_step and use in
+	rasqal_engine_get_next_result
+
+	* rasqal/rasqal_engine.c (rasqal_engine_move_to_graph_pattern): No
+	need for return
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_result): Init all
+	matched flags to 0 at start.
+
+	* rasqal/rasqal_engine.c: Comment out not-used triple ordering
+	code.
+	(rasqal_triples_match_bind_match): Add parts arg and pass on to
+	factory bind_match method.
+	(rasqal_new_graph_pattern_from_triples): Add query arg at start.
+	Init query, finished, matches_returned.
+	(rasqal_new_graph_pattern_from_sequence): Add query arg at start.
+	Init query, finished, matches_returned.
+	(rasqal_free_graph_pattern): Free variables matching the parts.
+	(rasqal_graph_pattern_init): Initialise the triple meta parts
+	depending on the variables_declared_in information.
+	(rasqal_query_build_declared_in): Added to mark which in graph
+	pattern variables are first declared in the query so that they are
+	never bound multiple times.  Also warns of selected but never used
+	variables.
+	(rasqal_graph_pattern_get_next_match): After a triple match ends,
+	free variables matching the parts only.
+	(rasqal_engine_prepare): Disable ordering triples.  Call
+	rasqal_query_build_declared_in.
+	(rasqal_engine_move_to_graph_pattern): Helper added for:
+	(rasqal_engine_get_next_result): Many changes trying to get
+	optionals working.
+
+	* rasqal/rasqal_internal.h: Add query, finished, matches fields to
+	graph_pattern.  Add query arg to start of
+	rasqal_new_graph_pattern_from_triples and
+	rasqal_new_graph_pattern_from_sequence Add variables_declared_in
+	array field, optional_graph_pattern_matches_count field to query.
+
+	* rasqal/rasqal_redland.c (rasqal_redland_bind_match): Take parts
+	argument and use to just bind those parts of the triple.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_bind_match): Take parts
+	argument and use to just bind those parts of the triple.
+
+	* rasqal/rdql_parser.y, rasqal/sparql_parser.y: Add query arg at
+	start of rasqal_new_graph_pattern_from_triples and
+	rasqal_new_graph_pattern_from_sequence calls.
+
+	* rasqal/rasqal.h: Added triple parts to rasqal_triple_meta.
+
+	* rasqal/rasqal_query.c (rasqal_free_query): Tidy
+	query->variables_declared_in.
+
+2005-01-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal.h: Added rasqal_triple_parts rasqal_triples_match
+	factory method bind_match now takes and returns
+	rasqal_triple_parts, returns 0 on failure
+
+	* librdf/rdf_query_rasqal.c, rasqal/rasqal_redland.c,
+	rasqal/rasqal_raptor.c, rasqal/rasqal_engine.c, rasqal/rasqal.h:
+	Invert return value of rasqal_triples_match factory method
+	bind_match.  Now returns 0 on failure.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_result): Handle
+	failed constraint by moving to next match.
+
+	* rasqal/tests/sparql/part1/dawg-data-01.n3,
+	rasqal/tests/sparql/part1/dawg-result-003.n3: <fred@edu> to
+	<mailto:fred@edu>
+
+	* rasqal/tests/sparql/check-sparql: Remove =NULL from roqet output
+	to handle optionals
+
+	* rasqal/rasqal_query.c (rasqal_new_query): Init
+	gp->optional_graph_pattern.
+
+	* rasqal/rasqal_internal.h: Add finished, matches,
+	optional_graph_pattern to rasqal_graph_pattern Add
+	optional_graph_pattern to rasqal_query.
+
+	* rasqal/rasqal_engine.c (rasqal_new_graph_pattern_from_triples):
+	Init gp->optional_graph_pattern.
+	(rasqal_graph_pattern_init): Init optional_graph_pattern, finished
+	and matches.
+	(rasqal_graph_pattern_order): Added, to sort graph_patterns in a
+	query into mandatory first, optional last.
+	(rasqal_engine_execute_init): Sort graph_patterns using
+	raptor_sequence_sort and above helper Initialise
+	query->optional_graph_pattern to the index of the first optional
+	graph_pattern.
+	(rasqal_engine_get_next_result): Many changes on the way to
+	getting optionals working.  Track what patterns have ended with
+	the finished flag, and count matches to determine when nothing
+	matched.
+
+2005-01-05  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_sqlite.c: Implement get_contexts.
+	(librdf_storage_sqlite_get_next_context_common,
+	librdf_storage_sqlite_get_contexts_is_end,
+	librdf_storage_sqlite_get_contexts_next_method,
+	librdf_storage_sqlite_get_contexts_get_method,
+	librdf_storage_sqlite_get_contexts_finished,
+	librdf_storage_sqlite_get_contexts): Implement, based on
+	find_statements technique.  No special database schema support for
+	contexts at present.
+
+2005-01-04  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_serialize.c:
+	(raptor_rdfxml_serialize_start,
+	raptor_rdfxml_serialize_statement): Only copy non-NULL base URIs
+
+	* raptor/raptor_rss.c:
+	(raptor_rss10_move_statements, raptor_rss10_store_statement,
+	raptor_rss10_build_xml_names, raptor_rss10_emit_item):Handle
+	predicates of type RAPTOR_IDENTIFIER_TYPE_RESOURCE as well as type
+	RAPTOR_IDENTIFIER_TYPE_PREDICATE
+
+	* raptor/raptor_general.c (raptor_free_statement): Free predicate
+	URIs that were RAPTOR_IDENTIFIER_TYPE_RESOURCE
+
+	* raptor/raptor_uri.c (raptor_uri_to_relative_counted_uri_string):
+	Handle no path in base URI
+	(main): Add test for that and test for no path in both.
+
+	* raptor/raptor_uri.c (raptor_uri_to_relative_counted_uri_string):
+	Handle no path in reference URI
+	(main): Add test for that
+
+	* rasqal/rasqal_query.c (rasqal_new_query): Init sources sequence
+	always.
+	(rasqal_query_add_source): No need to init sources sequence here.
+
+	* rasqal/sparql_parser.y (WhereClauseOpt): Don't overwrite
+	query->graph_patterns sequence, append if necessary.
+
+	* rasqal/sparql_parser.y (FromClauseOpt): Don't overwrite
+	query->sources sequence, append if necessary.
+
+	* rasqal/rdql_parser.y (Query): Don't overwrite query->sources
+	sequence, append if necessary.
+	(TriplePattern): Append to query->triples sequence, don't
+	overwrite it.
+
+2005-01-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c (main): Declare query_string as void* to prevent
+	type punning warning.
+
+	* rasqal/sparql_lexer.l, rasqal/roqet.c, rasqal/rdql_lexer.l,
+	rasqal/rasqal_query.c: casts for c++
+
+	* raptor/win32_raptor_config.h, raptor/configure.ac: Bumped
+	version to 1.4.4
+
+	* raptor/raptor_rdfxml.c (raptor_xml_start_element_handler):
+	Updates for unsigned char* string namespace URI strings.
+
+	* raptor/raptor_namespace.c: Turn namespace URI string constants
+	into unsigned char* strings.
+
+	* raptor/raptor_identifier.c (raptor_identifier_print): Casts for
+	printing rdf:XMLLiteral URI string constant.
+
+	* raptor/raptor_general.c: Turn rdf:XMLLiteral URI string constant
+	into a unsigned char* string.
+	(raptor_print_statement, raptor_print_statement_part_as_ntriples):
+	Casts for printing above constants.
+
+	* raptor/raptor_uri.c (raptor_default_new_uri_for_rdf_concept):
+	Use RDF namespace URI string constants.
+
+	* raptor/Makefile.am: Link libraptor.la for URI tests, to get the
+	namespace URI string constants.
+
+	* raptor/raptor.h: Turn namespace URI string constants into
+	unsigned char* strings.  Change namespace URI defines into uses of
+	the constants.
+
+	* raptor/rdfdump.c (main): Init parser_feature and
+	serializer_feature to -1 to avoid compiler warnings.
+
+	* raptor/raptor_rss.c (raptor_rss10_serialize_statement): Init
+	item to NULL to avoid a compiler warning.
+
+	* raptor/rdfdump.c, raptor/raptor_uri.c,
+	raptor/raptor_serialize.c, raptor/raptor_rss.c,
+	raptor/raptor_parse.c: Casts for c++
+
+	* raptor/raptor.h: remove old comment re xml writer
+
+2005-01-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/rdfdump.c: set serializer features before starting to
+	serialize
+
+	* raptor/rdfdump.c: Actually set parser feature values again.  Set
+	strings for parser or serializer string feature values.
+
+	* raptor/raptor_general.c: 2005 copyrights
+
+	* raptor/rapper.1: No simple output format anymore
+
+	* raptor/rapper.1: Added RSS 1.0 ref
+
+2005-01-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/rapper.1: Update for new parser, serializers, xmlns
+	syntax
+
+	* raptor/raptor_serialize.c
+	(raptor_serializer_set_feature_string): Docs, and return values
+	for integer value features
+	(raptor_serializer_get_feature_string): Return a new string for
+	the start uri if set.
+
+	* raptor/raptor_parse.c (raptor_parser_set_feature_string): Docs,
+	and return values for integer value features
+
+	* raptor/libraptor.3, raptor/raptor.h: Added
+	raptor_uri_to_counted_string and raptor_uri_to_string
+
+	* raptor/raptor_uri.c
+	(raptor_uri_to_counted_string,raptor_uri_to_string): Added.
+
+	* raptor/raptor_feature.c: doc
+
+	* raptor/libraptor.3: changelog edit - cluster 1.4.3 entries by
+	class
+
+	* raptor/libraptor.3: Added raptor_parser_get_feature_string,
+	raptor_parser_set_feature_string,
+	raptor_serializer_set_feature_string,
+	raptor_serializer_get_feature_string, raptor_feature_value_type,
+	raptor_namespaces_find_namespace_by_uri
+
+	* raptor/raptor_serialize.c, raptor/raptor_general.c: Use
+	raptor_rdf_namespace_uri and raptor_rdf_namespace_uri_len to
+	replace some constants.
+
+	* raptor/raptor_serialize.c (raptor_rdfxml_serialize_statement):
+	Handle ordinal subject and objects.
+
+	* raptor/raptor_serialize.c: Add XML Writer to
+	raptor_rdfxml_serializer_context, delete depth.
+	(raptor_rdfxml_serialize_init): Delete depth stuff.
+	(raptor_rdfxml_serialize_terminate): Tidy up xml writer,
+	namespaces and rdf:RDF element.
+	(raptor_rdfxml_serialize_declare_namespace): Don't copy uri,
+	prefixes since raptor_new_namesapce_from_uri copies them anyway.
+	(raptor_rdfxml_serialize_start): Convert to use xml writer.
+	(raptor_rdfxml_serialize_write_xml_attribute): Deleted.
+	(raptor_rdfxml_serialize_statement, raptor_rdfxml_serialize_end):
+	Convert to use xml writer.
+
+	* raptor/raptor_xml_writer.c (raptor_xml_writer_empty_element):
+	Ensure namespace declarations are removed at end of element.
+
+	* raptor/raptor.h: Added raptor_namespaces_find_namespace_by_uri
+
+	* raptor/raptor_namespace.c
+	(raptor_namespaces_find_namespace_by_uri): Added.
+
+	* raptor/libraptor.3, raptor/raptor_sax2.c, raptor/raptor_rss.c,
+	raptor/raptor.h: raptor_xml_declare_namespace renamed to
+	raptor_xml_element_declare_namespace
+
+	* raptor/raptor_rss.c (raptor_rss10_build_xml_names): Use
+	raptor_xml_declare_namespace
+
+	* raptor/raptor_rss.c: 9raptor_rss10_build_xml_names): Use
+	raptor_xml_declare_namespace
+
+	* raptor/raptor_sax2.c, raptor/raptor.h:
+	raptor_sax2_declare_namespace renamed to
+	raptor_xml_declare_namespace
+
+	* raptor/raptor_serialize.c (raptor_new_serializer): Default to
+	emitting relative URIs
+
+	* raptor/raptor_serialize.c (raptor_rdfxml_serialize_ok_xml_name):
+	Deleted.
+	(raptor_rdfxml_serialize_statement): Replace use of
+	raptor_rdfxml_serialize_ok_xml_name with raptor_xml_name_check for
+	XML 1.0 names.
+
+	* raptor/raptor_sax2.c, raptor/raptor_rdfxml.c, raptor/raptor.h,
+	raptor/libraptor.3: Rename raptor_xml_element_get_element to
+	raptor_xml_element_get_name
+
+	* rasqal/roqet.c (roqet_xml_print_xml_attribute): Deleted
+	(roqet_query_results_print_as_xml): Replaced with call to
+	rasqal_query_results_write.
+	(main): Set error and fatal_error handlers for query.  Remove xml
+	format warning.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write): Added
+	docs. Declare own namespace stack and free up elements.
+
+	* rasqal/rasqal.h: Added rasqal_query_results_write
+
+	* raptor/raptor_rss.c: Added rss:image and rss:textinput
+	properties
+
+	* raptor/raptor_rss.c (raptor_rss10_store_statement): Don't lose
+	statements that are about a known type node, but of unknown
+	predicate.
+	(raptor_rss10_serialize_end): Add more debug info on remaining
+	statements.
+
+	* raptor/raptor_rdfxml.c (raptor_start_element_grammar): Update
+	raptor_new_xml_writer call.
+
+	* raptor/raptor.h: raptor_new_xml_writer gets nstack parameter.
+	raptor_xml_writer_start_namespace_full deleted
+
+	* raptor/libraptor.3: raptor_new_xml_writer gets nstack param.
+	raptor_xml_writer_start_namespace_full gone
+
+	* raptor/raptor_general.c (raptor_free_statement): Don't free null
+	pointers.
+
+2004-12-31  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c (raptor_rss10_serialize_terminate): Free all
+	namespaces, now they are not stacked explicitly.  Free namespace
+	stack.
+	(raptor_rss10_build_xml_names): Use raptor_new_namespace and don't
+	start the rdf namespace.
+	(raptor_rss10_build_xml_names): Use raptor_new_namespace and don't
+	start the namespaces
+	((raptor_rss10_serialize_end): Make a namespace stack here, with
+	only xml: defined.
+
+	* raptor/raptor_xml_writer.c
+	(raptor_xml_writer_start_namespace_full): Deleted.
+	(main): Declare the foo namespace but don't start it, so that the
+	xml writer will do that.
+
+	* raptor/raptor_xml_writer.c: Optionally declare a namespace stack
+	internally.
+	(raptor_new_xml_writer): Add optional raptor_namespace_stack
+	parameter, if NULL declare one internally.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write): Added,
+	writing query results in form of
+	http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/
+
+	* rasqal/sparql_parser.y: Undef RASQAL_DEBUG 2 always
+
+	* raptor/turtle_lexer.l, raptor/turtle_parser.y: Delete unused WS
+	token
+
+	* raptor/raptor_xml_writer.c, raptor/raptor_sax2.c,
+	raptor/raptor_rss.c, raptor/raptor_rdfxml.c,
+	raptor/raptor_internal.h, raptor/raptor.h, raptor/libraptor.3:
+	Rename raptor_sax2_element to raptor_xml_element throughout.
+
+	* raptor/raptor_internal.h: Added feature_start_uri to
+	raptor_serializer
+
+	* raptor/raptor_serialize.c (raptor_free_serializer): Tidy up any
+	feature_start_uri set.
+	(raptor_serializer_set_feature_string): Added, handling
+	feature_start_uri.  created from a passed in string.
+	(raptor_serializer_get_feature_string): Added, handling
+	feature_start_uri as a returned shared string.
+
+	* raptor/raptor_parse.c (raptor_parser_set_feature_string): Added,
+	always failing.
+	(raptor_parser_get_feature_string): Added, always failing.
+
+	* raptor/raptor.h: Added feature RAPTOR_FEATURE_START_URI Added
+	prototypes for raptor_parser_set_feature_string,
+	raptor_parser_get_feature_string,
+	raptor_serializer_set_feature_string,
+	raptor_serializer_get_feature_string and raptor_feature_value_type
+
+	* raptor/raptor_feature.c: Added flag bits for string valued
+	features.  Added startUri (RAPTOR_FEATURE_START_URI) with a string
+	value.
+	(raptor_feature_value_type): Added, to return value of a feature.
+
+2004-12-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/libraptor.3: Added SAX2 XML Element and XML Writer
+	classes.
+
+	* raptor/raptor_internal.h, raptor/raptor.h: Moved
+	raptor_sax2_element and raptor_xml_writer to public API.
+
+	* raptor/libraptor.3: Added rss-1.0 to raptor_new_serializer
+	description.
+
+	* raptor/libraptor.3: More updates for 1.4.3
+
 2004-12-29  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 
-	* librdf/rdf_storage_sqlite.c:
-	Make get_contexts fail rather than do useless things.
+	* librdf/rdf_storage_sqlite.c: Make get_contexts fail rather than
+	do useless things.
 
 	* librdf/rdf_storage_sqlite.c: Moved GET_COLUMN* defines to top.
 	Deleted all index_contexts - always supported.

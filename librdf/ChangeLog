@@ -1,3 +1,56 @@
+2005-01-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_model.h: Added librdf_model_contains_context
+
+	* rdf_model.c (librdf_model_contains_context): Added, to find a
+	context node in a model.
+	(main): Added test.
+
+2005-01-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* win32_rdf_config.h: Do not define REDLAND_INTERNAL at all.
+	LIBRDF_INTERNAL should be defined in the build configuration
+
+	* librdf.h: Use LIBRDF_INTERNAL not REDLAND_INTERNAL
+
+2005-01-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_serializer.c (main): Update latest raptor 1.4.3+ style
+	serialised rdf/xml length.
+
+	* rdf_serializer.c
+	(librdf_serializer_serialize_model_to_file_handle): Require FILE*
+	to be not null.
+
+	* rdf_query_rasqal.c (rasqal_redland_bind_match): Update return to
+	add parts arg, return.
+	(librdf_query_rasqal_results_to_counted_string): Added to
+	implement query results as string factory method, via Rasqal.
+	(librdf_query_rasqal_results_to_file_handle): Added to implement
+	query results to a file handle factory method, via Rasqal.
+
+	* rdf_query_results.c (librdf_query_results_to_counted_string,
+	librdf_query_results_to_string): Added to write formatted query
+	results as a syntax in a string (via Rasqal).
+	(librdf_query_results_to_file_handle,
+	 librdf_query_results_to_file): Added to write formatted query
+	 results as a syntax to a file or already open FILE* handle (via
+	 Rasqal)
+
+	* rdf_query.c (main): Add query results to string test.
+
+	* rdf_query.h: Added results_to_counted_string,
+	results_to_file_handle to librdf_query_factory.  Added prototypes
+	for librdf_query_results_to_counted_string,
+	librdf_query_results_to_string,
+	librdf_query_results_to_file_handle and
+	librdf_query_results_to_file to public api.
+
+2005-01-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_rasqal.c: Invert return value of rasqal_triples_match
+	factory method bind_match.  Now returns 0 on failure.
+
 2005-01-05  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_storage_sqlite.c: Implement get_contexts.
