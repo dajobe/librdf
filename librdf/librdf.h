@@ -97,6 +97,7 @@ extern const unsigned int librdf_version_decimal;
 
 #define LIBRDF_ERROR1(world, function, msg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function); abort();} while(0)
 #define LIBRDF_ERROR2(world, function, msg,arg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg); abort();} while(0)
+#define LIBRDF_ERROR3(world, function, msg,arg1,arg2) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg1, arg2); abort();} while(0)
 
 #if defined(HAVE_DMALLOC_H) && defined(LIBRDF_MEMORY_DEBUG_DMALLOC)
 void* librdf_system_malloc(size_t size);
@@ -120,6 +121,7 @@ void librdf_system_free(void *ptr);
 
 #define LIBRDF_ERROR1(world, function, msg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function)
 #define LIBRDF_ERROR2(world, function, msg, arg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg)
+#define LIBRDF_ERROR3(world, function, msg, arg1, arg2) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg1, arg2)
 
 #define SYSTEM_MALLOC(size)   malloc(size)
 #define SYSTEM_FREE(ptr)   free(ptr)
