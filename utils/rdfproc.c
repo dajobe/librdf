@@ -845,7 +845,10 @@ main(int argc, char *argv[])
       
     case CMD_ARCS_IN:
     case CMD_ARCS_OUT:
-      source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
+      if (librdf_heuristic_is_blank_node(argv[0]))
+        source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
+      else
+        source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
       iterator=(type == CMD_ARCS_IN) ? librdf_model_get_arcs_in(model, source) :
                                        librdf_model_get_arcs_out(model, source);
       if(!iterator) {
@@ -885,7 +888,10 @@ main(int argc, char *argv[])
       
     case CMD_HAS_ARC_IN:
     case CMD_HAS_ARC_OUT:
-      source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
+      if (librdf_heuristic_is_blank_node(argv[0]))
+        source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
+      else
+        source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
       arc=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[1]);
       result=(type == CMD_HAS_ARC_IN) ? librdf_model_has_arc_in(model, arc, source) :
                                         librdf_model_has_arc_out(model, source, arc);
