@@ -70,8 +70,7 @@ make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc install
 
 cd perl
 
-PACKAGE=%{name} VERSION=%{version} TOP_SRCDIR=.. perl Makefile.PL PREFIX=$RPM_BUILD_ROOT%{prefix}
-make -f Makefile.perl install
+make prefix=$RPM_BUILD_ROOT%{prefix} install-perl
 
 cd ..
 
