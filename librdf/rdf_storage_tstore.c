@@ -153,7 +153,7 @@ librdf_storage_tstore_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_tstore_close(librdf_storage* storage)
 {
-  librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context;
+  /* librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context; */
 
   return 0;
 }
