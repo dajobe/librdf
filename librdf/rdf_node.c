@@ -21,6 +21,10 @@
 
 #include <stdio.h>
 
+#ifdef HAVE_STRING_H
+#include <string.h> /* for memcpy */
+#endif
+
 #ifdef STANDALONE
 #define RDF_DEBUG 1
 #endif
@@ -98,7 +102,7 @@ rdf_new_node_from_uri(rdf_uri *uri)
 
 /* Create a new literal Node. */
 rdf_node*
-rdf_new_node_from_literal(char *string, char *xml_language) 
+rdf_new_node_from_literal(char *string, char *xml_language, int is_wf_xml) 
 {
   rdf_node* new_node;
   
@@ -109,7 +113,7 @@ rdf_new_node_from_literal(char *string, char *xml_language)
   /* set type */
   new_node->type=RDF_NODE_TYPE_LITERAL;
 
-  if (rdf_node_set_literal_value(new_node, string, xml_language)) {
+  if (rdf_node_set_literal_value(new_node, string, xml_language, is_wf_xml)) {
     rdf_free_node(new_node);
     return NULL;
   }
@@ -140,7 +144,8 @@ rdf_new_node_from_node(rdf_node *node)
     /* must be a RDF_NODE_TYPE_LITERAL */
     if (rdf_node_set_literal_value(node,
                                    node->value.literal.string,
-                                   node->value.literal.xml_language)) {
+                                   node->value.literal.xml_language,
+                                   node->value.literal.is_wf_xml)) {
       RDF_FREE(rdf_node, new_node);
       return NULL;
     }
@@ -231,18 +236,23 @@ rdf_node_get_literal_value_language(rdf_node* node)
 
 
 int
-rdf_node_set_literal_value(rdf_node* node, char* value, char *xml_language) 
+rdf_node_set_literal_value(rdf_node* node, char* value, char *xml_language,
+                           int is_wf_xml) 
 {
+  int value_len;
   char *new_value;
   char *new_xml_language=NULL;
 
-  new_value=(char*)RDF_MALLOC(cstring, strlen(value)+1);
+  /* only time the string literal length should ever be measured */
+  value_len = node->value.literal.string_len = strlen(value);
+
+  new_value=(char*)RDF_MALLOC(cstring, value_len + 1);
   if(!new_value)
     return 1;
-  strcpy(new_value, value);
+  memcpy(new_value, value, value_len);
   
   if(xml_language) {
-    new_xml_language=(char*)RDF_MALLOC(cstring, strlen(xml_language)+1);
+    new_xml_language=(char*)RDF_MALLOC(cstring, strlen(xml_language) + 1);
     if(!new_xml_language) {
       RDF_FREE(cstring, value);
       return 1;
@@ -256,6 +266,8 @@ rdf_node_set_literal_value(rdf_node* node, char* value, char *xml_language)
   if(node->value.literal.xml_language)
     RDF_FREE(cstring, node->value.literal.xml_language);
   node->value.literal.xml_language=new_xml_language;
+
+  node->value.literal.is_wf_xml=is_wf_xml;
 
   return 0;
 }
@@ -281,10 +293,10 @@ rdf_node_to_string(rdf_node* node)
       sprintf(s, "[%s]", uri_string);
       break;
     case RDF_NODE_TYPE_LITERAL:
-      s=(char*)RDF_MALLOC(cstring, strlen(node->value.literal.string)+1);
+      s=(char*)RDF_MALLOC(cstring, node->value.literal.string_len + 1);
       if(!s)
         return NULL;
-      strcpy(s, node->value.literal.string);
+      memcpy(s, node->value.literal.string, node->value.literal.string_len);
       break;
     default:
       RDF_FATAL2(rdf_node_string, "Illegal node type %d seen\n", node->type);
@@ -296,7 +308,23 @@ rdf_node_to_string(rdf_node* node)
 rdf_digest*
 rdf_node_get_digest(rdf_node* node) 
 {
-  return rdf_uri_get_digest(node->value.resource.uri);
+  rdf_digest* d;
+  char *s;
+  
+  if(node->type == RDF_NODE_TYPE_RESOURCE) {
+    d=rdf_uri_get_digest(node->value.resource.uri);
+  } else {
+    /* RDF_NODE_TYPE_LITERAL */
+    s=node->value.literal.string;
+    d=rdf_new_digest(rdf_node_digest_factory);
+    if(!d)
+      return NULL;
+    rdf_digest_init(d);
+    rdf_digest_update(d, s, node->value.literal.string_len);
+    rdf_digest_final(d);
+  }
+    
+  return d;
 }
 
 
