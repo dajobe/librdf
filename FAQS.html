@@ -20,19 +20,18 @@ or
 </p>
 </li>
 
-<li>Why is the code released under two licenses - LGPL and MPL?
+<li>Why is the code released under two licenses - LGPL and Apache 2?
 
-<p>I originally considered just a GPL version of the library but I
-considered this too restrictive, hence the LGPL version.  LGPL also
+<p>I originally considered solely a GPL version of the library but
+this was too restrictive, hence the LGPL version.  LGPL also
 allows the user, at their choice, to license the software under the
 GPL (See LGPL Term 3) in which case this software can also be used
 with all the other GPLed code -- see next answer.</p>
 
 <p>As an alternative, the entire library can be used under the terms
 of the 
-<a href="http://www.mozilla.org/MPL/MPL-1.1.html">Mozilla Public License V1.1</a>
-which allow you use it in other ways that aren't so <em>virus-y</em> (ahem)
-as the (L)GPL.</p>
+<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>
+which allows you use the library in most situations.</p>
 </li>
 
 <li>Can I link this library with code under license XXX?
@@ -49,10 +48,11 @@ Affero, Arphic, original BSD, Original BSD, AFL 1.1, OSL 1.0, Apache 1.0, Apache
 check the link above for updates, since the above is not a definitive
 list.</li>
 
-<li>If you choose the MPL, you should be able to
-link with most anything else except you might have problems
-distributing stuff which includes GPLed/LGPLed parts, in which case,
-choose the LGPL or GPL licenses.</li>
+<li>If you choose Apache 2.0, you should be able to
+link with most anything else.  There is current
+debate if the (L)GPL2 is compatible with Apache 2.0
+(FSF says no, ASF says yes) so when linking with LGPL or GPLed
+code it makes sense to pick either of the LGPL or GPL licenses.</li>
 </ul>
 </li>
 
@@ -82,11 +82,12 @@ finding this.</p>
 
 <li>Why is it called Redland?
 
-<p>Well, librdf was too boring <tt>:-)</tt>!  I work for
+<p>Well, librdf was too boring <tt>:)</tt>!  I work for
 the <a href="http://www.bristol.ac.uk/">University of Bristol</a>
 and <em>Redland</em> is an area of Bristol which has an 'R' and a 'D'
 in the name.  Plus I couldn't find a decent word with the letters 'RDF'
-in it.</p>
+in it.  Years later I discover there's an area of Bristol called
+Redcliffe, but that opportunity has passed.</p>
 </li>
 
 <li>Redmond?
@@ -106,30 +107,30 @@ yourself relatively easily, following the existing scheme.</p>
 
 <li>Does it support an RDF query language?<br />
 
-<p>This is work in progress initially targetted at
-the functionality in the SquishQL /
-<a href="http://www.hpl.hp.com/semweb/rdql.htm">RDQL RDF Data Query Language</a>
-and will be delivered as a separate library 
+<p>Yes.  As of Redland 0.9.18, Redland ships with
 <a href="http://www.redland.opensource.ac.uk/rasqal/">Rasqal</a>
-which Redland will then use.
+supporting RDQL.  Redland Bindings 0.9.18.1 provides APIS for querying
+and query results in several langauges.
 </p>
 
 </li>
 
 <li>Does it run on MS Windows?<br />
 
-<p>Yes, from reports others have had success compiling Redland
-and Raptor for that system.  As of Raptor 1.1.0 and Redland 0.9.15
-the C++ compilation should be a lot easier which should help this.
+<p>Yes, from reports others have had success compiling the Redland
+libraries for win32.  As of Redland 0.9.19, Raptor 1.3.3 and Rasqal
+0.9.3 several patches have been merged in from people who built it
+for win32.
 </p>
 
 <p>With respect to portability and "unix"-isms in the code, they are
 flagged in comments and only related to file name handling and maybe in
-creating temporary files.  Raptor's URI module handles some Win32
-file URI combinations that it knows of.</p>
+creating temporary files.  Raptor's URI module handles win32
+file URI combinations which have been working for win32 users.</p>
 
-<p>Redland and Raptor build under the <a
-href="http://cygwin.com/">Cygwin</a> environment relatively easily.
+<p>The Redland libraries all build under the <a
+href="http://cygwin.com/">Cygwin</a> environment relatively easily
+using the standard configure and make system.
 </p>
 </li>
 
@@ -170,6 +171,44 @@ and
 </p>
 </li>
 
+<li>Why was the license changed from LGPL/MPL to LGPL/Apache?<br />
+<p>I outlined my reasons in my
+<a href="http://lists.usefulinc.com/pipermail/redland-dev/2004-August/000607.html">message to redland-dev</a> 2004-08-27:
+</p>
+<blockquote>
+<p>In my opinion, the MPL isn't very widely used - it is mostly used by
+the Mozilla project for the browser and it's components.  It is based
+in US law and rather long(*).  This means there is a cost in
+evaluating it, so people tend to use Redland's LGPL/GPL terms since
+they are one of the most used licenses.</p>
+
+<p>The Apache 2.0 license[1] has had widespread and detailed
+consideration including issues with international law.  It is a
+modern license, clear to read and easy to apply.  All the Apache
+Software Foundation (ASF) projects either use it or will be switching
+to it, and there are lots of similarly licensed BSD-style work that
+are compatible.  It provides good terms for commercial users,
+requiring just acknowledgement notices.  I've not written the notices
+I'd use for Redland yet.</p>
+
+<p>I think anyone who was using the Redland libraries under the MPL will
+be fine with the Apache 2.0 license.  Of the commercial users I am
+aware of, they are using the libraries under the LGPL so this
+shouldn't affect them, or even be beneficial.</p>
+
+<p>So why not Apache 2.0 alone?  There is still a dispute if it is
+compatible with the GPL, and until the FSF and the ASF both agree
+that they are compatible, I will be including explicit GPL
+compatibility by using the LGPL 2.1.</p>
+
+...
+
+Dave
+
+<p>(*) Yes so is the GPL/LGPL, but they are very common and familiar.</p>
+
+</blockquote>
+</li>
 
 </ol>
 
