@@ -36,7 +36,7 @@ struct librdf_iterator_s {
   int (*have_elements)(void*);
   void* (*get_next)(void*);
   void (*finished)(void*);
-  int (*map)(void *context, void *element);
+  void* (*map)(void *context, void *element);
 };
 
 
@@ -48,7 +48,7 @@ int librdf_iterator_have_elements(librdf_iterator* iterator);
 
 void* librdf_iterator_get_next(librdf_iterator* iterator);
 
-void librdf_iterator_set_map(librdf_iterator* iterator, int (*map)(void *context, void *item), void *map_context);
+void librdf_iterator_set_map(librdf_iterator* iterator, void* (*map)(void *context, void *item), void *map_context);
 
 #ifdef __cplusplus
 }

@@ -91,7 +91,7 @@ librdf_free_iterator(librdf_iterator* iterator)
  * map function (as set by &librdf_iterator_set_map ) or NULL
  * if the iterator has ended.
  * 
- * Return value: the next
+ * Return value: the next element
  **/
 static void*
 librdf_iterator_get_next_mapped_element(librdf_iterator* iterator) 
@@ -101,8 +101,10 @@ librdf_iterator_get_next_mapped_element(librdf_iterator* iterator)
   /* find next element subject to map */
   while(iterator->have_elements(iterator->context)) {
     element=iterator->get_next(iterator->context);
-    /* return 'next' element  */
-    if(iterator->map(iterator->map_context, element))
+    /* apply the map to the element  */
+    element=iterator->map(iterator->map_context, element);
+    /* found something, return it */
+    if(element)
       break;
   }
   return element;
@@ -115,7 +117,7 @@ librdf_iterator_have_elements(librdf_iterator* iterator)
   if(!iterator->have_more_elements)
     return 0;
 
-  /* simple case, no maping so pass on */
+  /* simple case, no mapping so pass on */
   if(!iterator->map)
     return (iterator->have_more_elements=iterator->have_elements(iterator->context));
 
@@ -151,7 +153,7 @@ librdf_iterator_get_next(librdf_iterator* iterator)
   if(!iterator->have_more_elements)
     return NULL;
 
-  /* simple case, no maping so pass on */
+  /* simple case, no mapping so pass on */
   if(!iterator->map)
     return iterator->get_next(iterator->context);
 
@@ -184,7 +186,7 @@ librdf_iterator_get_next(librdf_iterator* iterator)
  **/
 void
 librdf_iterator_set_map(librdf_iterator* iterator, 
-                        int (*map)(void *context, void *element),
+                        void* (*map)(void *context, void *element),
                         void *map_context)
 {
   iterator->map=map;
