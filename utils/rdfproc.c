@@ -475,6 +475,18 @@ main(int argc, char *argv[])
   }
 
 
+  uri=librdf_new_uri(world, LIBRDF_MODEL_FEATURE_CONTEXTS);
+  contexts=0;
+  if(uri) {
+    node=librdf_model_get_feature(model, uri);
+    if(node) {
+      contexts=1;
+      librdf_free_node(node);
+    }
+    librdf_free_uri(uri);
+  }
+
+
   /* Do this or gcc moans */
   stream=NULL;
   iterator=NULL;
@@ -577,13 +589,17 @@ main(int argc, char *argv[])
       if(rc) {
         librdf_uri* error_count_uri=librdf_new_uri(world, LIBRDF_PARSER_FEATURE_ERROR_COUNT);
         librdf_uri* warning_count_uri=librdf_new_uri(world, LIBRDF_PARSER_FEATURE_WARNING_COUNT);
+        librdf_node* error_count_node;
+        librdf_node* warning_count_node;
         const char *error_count_string, *warning_count_string;
         int error_count, warning_count;
         
-        error_count_string =librdf_parser_get_feature(parser, error_count_uri);
+        error_count_node =librdf_parser_get_feature(parser, error_count_uri);
+        error_count_string =librdf_node_get_literal_value(error_count_node);
         error_count=atoi(error_count_string);
         
-        warning_count_string=librdf_parser_get_feature(parser, warning_count_uri);
+        warning_count_node =librdf_parser_get_feature(parser, warning_count_uri);
+        warning_count_string =librdf_node_get_literal_value(error_count_node);
         warning_count=atoi(warning_count_string);
 
         if(error_count+warning_count >0)
@@ -591,6 +607,8 @@ main(int argc, char *argv[])
                   "%s: The parsing returned %d errors and %d warnings\n", 
                   program, error_count, warning_count);
         
+        librdf_free_node(error_count_node);
+        librdf_free_node(warning_count_node);
         librdf_free_uri(error_count_uri);
         librdf_free_uri(warning_count_uri);
       }
@@ -790,7 +808,7 @@ main(int argc, char *argv[])
             librdf_free_node(context_node);
           } else {
             if(argv[3])
-              fprintf(stderr, "%s: ERROR: Cannot add in context - contexts not enabled (-c)\n", program);
+              fprintf(stderr, "%s: ERROR: Cannot add in context - model does not support contexts\n", program);
             rc=librdf_model_add_statement(model, partial_statement);
           }
           if(rc)
@@ -813,7 +831,7 @@ main(int argc, char *argv[])
             librdf_free_node(context_node);
           } else {
             if(argv[3])
-              fprintf(stderr, "%s: ERROR: Cannot remove triple in context - contexts not enabled (-c)\n", program);
+              fprintf(stderr, "%s: ERROR: Cannot remove triple in context - model does not support contexts\n", program);
             rc=librdf_model_remove_statement(model, partial_statement);
           }
           if(rc)
@@ -1066,7 +1084,7 @@ main(int argc, char *argv[])
         else
           fprintf(stdout, "%s: removed context triples from the graph\n", program);
       } else
-        fprintf(stderr, "%s: ERROR: Cannot remove contexts - contexts not enabled (-c)\n", program);
+        fprintf(stderr, "%s: ERROR: Cannot remove contexts - model does not support contexts\n", program);
 
       break;
 
@@ -1099,7 +1117,7 @@ main(int argc, char *argv[])
         librdf_free_iterator(iterator);
         fprintf(stderr, "%s: contexts: %d\n", program, count);
 } else
-        fprintf(stderr, "%s: ERROR: Cannot list contexts - contexts not enabled (-c)\n", program);
+        fprintf(stderr, "%s: ERROR: Cannot list contexts - model does not support contexts\n", program);
       break;
 
 
