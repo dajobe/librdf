@@ -12,10 +12,13 @@
 
 <h2>OVERVIEW</h2>
 
-<p><a href="http://www.redland.opensource.ac.uk/">Redland</a> is an
-application framework for RDF that allows plugging in of various
-modules to support different parsers, storage mechanisms or
-models.</p>
+<p><a href="http://www.redland.opensource.ac.uk/">Redland</a> is a
+library that provides a high-level interface for RDF allowing the model
+to be stored, queried and manipulated.  Redland provides each of the RDF
+model concepts in its own class so provides object based API.
+Some of the classes providing the parsers, storage mechanisms and other
+elements are built as modules that can be added or removed as required.
+</p>
 
 <p>This library is <b>beta</b> quality.  See the
 <a href="TODO.html">todo list</a>
@@ -27,14 +30,12 @@ detailed changes in the <a href="ChangeLog">ChangeLog</a>.</p>
 
 <p>Redland provides:</p>
 <ul>
-<li>A modular, object based library (or application framework) written in C</li>
-<li>APIs for manipulating the RDF <a href="docs/api/model.html">Model</a> and parts - <a href="docs/api/statement.html">Statements</a>, <a href="docs/api/node.html">Resources and Literals</a></li>
-<li><a href="docs/api/parser.html">Parsers</a> for importing the model from RDF/XML syntax (both parsers external)</li>
-<li><a href="docs/api/storage.html">Storage</a> for models in memory and persistant, via Berkeley DB</li>
-<li>Query APIs for the model by Statement or by Nodes and Arcs</li>
-<li><a href="docs/api/stream.html">Statement Streams</a> can be used as well as static APIs for construction, parsing, (de-)serialisation of models</li>
-<li>Internal utility classes such as <a href="docs/api/list.html">Lists</a>, <a href="docs/api/hash.html">Hashes</a>, <a href="docs/api/digest.html">Digests</a>, <a href="docs/api/uri.html">URI</a>, <a href="docs/api/iterator.html">Iterators</a></li>
-<li>The parsers, storage, hashes and digests are all modules that can be removed or added to at run time.</li>
+<li>A modular, object based library written in C</li>
+<li>C and Perl APIs for manipulating the RDF <a href="docs/api/model.html">Model</a> and parts - <a href="docs/api/statement.html">Statements</a>, <a href="docs/api/node.html">Resources and Literals</a></li>
+<li><a href="docs/api/parser.html">Parsers</a> for importing the model from RDF/XML syntax (both parsers external at present)</li>
+<li><a href="docs/api/storage.html">Storage</a> for models in memory and on disk via Berkeley DB (SleepyCat)</li>
+<li>Query APIs for the model by Statement (triples) or by Nodes and Arcs</li>
+<li><a href="docs/api/stream.html">Statement Streams</a> for construction, parsing, de/serialisation of models</li>
 <li>No memory leaks so far.</li>
 </ul>
 
@@ -42,7 +43,10 @@ detailed changes in the <a href="ChangeLog">ChangeLog</a>.</p>
 
 <p>The sources are available from
 <a href="http://www.redland.opensource.ac.uk/dist/source/">http://www.redland.opensource.ac.uk/dist/source/</a> (master site) and also from the
-<a href="http://sourceforge.net/projects/librdf/">SourceForge site</a>.</p>
+<a href="http://sourceforge.net/projects/librdf/">SourceForge site</a>.
+The sources can also be browsed in hyperlinked form via the
+<a href="http://www.redland.opensource.ac.uk/lxr/source/">LXR source cross reference</a>.
+</p>
 
 
 <p>NOTE: At present Redland has no built in RDF/XML parser, so if you
@@ -65,13 +69,18 @@ under the LGPL or MPL licenses.  See
 <p>See <a href="INSTALL.html">INSTALL.html</a> for installation and
 configuration information.</p>
 
-
-<h2>DOCUMENTATION</h2>
-
-<p>Documentation is available in the
+<p>Further documentation is available in the
 <a href="docs/">docs directory</a> including the
 <a href="docs/api/index.html">API document.</a>
 </p>
+
+
+<h2>DISCUSSIONS</h2>
+
+<p>Please join the
+<a href="http://www.egroups.com/group/redland/">Redland discussion list on eGroups</a>
+if you want to participate with the development.</p>
+
 
 <h2>SEE ALSO</h2>
 
@@ -81,11 +90,11 @@ try some of these sites:</p>
 <li><a href="http://www.w3.org/RDF/">W3C Resource Description Framework (RDF) </a> activity page (official home page)</li>
 <li><a href="http://www.ilrt.bristol.ac.uk/discovery/rdf/resources/">Dave Beckett's Resource Description Framework (RDF) Resource Guide</a> (yes that's me)</li>
 <li><a href="http://purl.org/DC/">Dublin Core Metadata Initiative</a></li>
-<li>Sergey Melnik's
-<a href="http://www-db.stanford.edu/~melnik/rdf/api.html">Java API</a>
-RDF parser (based on 
+<li><a href="http://www-db.stanford.edu/~melnik/rdf/api.html">Java API</a>
+RDF parser by Sergey Melnik's (based on 
 <a href="http://www.w3.org/RDF/Implementations/SiRPAC/">SiRPAC</a>) [Supported in Redland]</li>
-<li><a href="http://www.guha.com/rdfdb/">RDFDB : An RDF Database</a> by <a href="http://www.guha.com/">R.V. Guha.</a></li>
+<li><a href="http://www-uk.hpl.hp.com/people/bwm/rdf/jena/index.htm">Jena Java API for RDF</a> by Brian McBride, HP</li>
+<li><a href="http://www.guha.com/rdfdb/">RDFDB : An RDF Database</a> by R.V. Guha.</li>
 <li><a href="http://www.mozilla.org/rdf/doc/">Mozilla Resource Description Framework (RDF) page</a></li>
 </ul>
 
