@@ -1,5 +1,5 @@
 /*
- * RDF List Implementation
+ * rdf_list.c - RDF List Implementation
  *
  * $Source$
  * $Id$
@@ -7,12 +7,15 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
+
 
 #include <config.h>
 
@@ -23,24 +26,25 @@
 #include <string.h> /* for strncmp */
 #endif
 
+#define LIBRDF_INTERNAL 1
 #include <rdf_config.h>
 #include <rdf_list.h>
 #include <rdf_iterator.h>
 
 
 /* prototypes for local functions */
-static rdf_list_node* rdf_list_find_node(rdf_list_node* list, void *data, rdf_list_node** prev);
+static librdf_list_node* librdf_list_find_node(librdf_list_node* list, void *data, librdf_list_node** prev);
 
-static int rdf_list_iterator_have_elements(void* iterator);
-static void* rdf_list_iterator_get_next(void* iterator);
+static int librdf_list_iterator_have_elements(void* iterator);
+static void* librdf_list_iterator_get_next(void* iterator);
 
 
 
 /* helper functions */
-static rdf_list_node*
-rdf_list_find_node(rdf_list_node* list, void *data, rdf_list_node** prev) 
+static librdf_list_node*
+librdf_list_find_node(librdf_list_node* list, void *data, librdf_list_node** prev) 
 {
-  rdf_list_node* node;
+  librdf_list_node* node;
   
   if(prev)
     *prev=list;
@@ -54,12 +58,12 @@ rdf_list_find_node(rdf_list_node* list, void *data, rdf_list_node** prev)
 }
 
 
-rdf_list*
-rdf_new_list(void)
+librdf_list*
+librdf_new_list(void)
 {
-  rdf_list* new_list;
+  librdf_list* new_list;
 
-  new_list=(rdf_list*)RDF_CALLOC(rdf_list, 1, sizeof(rdf_list));
+  new_list=(librdf_list*)LIBRDF_CALLOC(librdf_list, 1, sizeof(librdf_list));
   if(!new_list)
     return NULL;
   
@@ -68,26 +72,26 @@ rdf_new_list(void)
 
 
 int
-rdf_free_list(rdf_list* list) 
+librdf_free_list(librdf_list* list) 
 {
-  rdf_list_node *node, *next;
+  librdf_list_node *node, *next;
   
   for(node=list->first; node; node=next) {
     next=node->next;
-    RDF_FREE(rdf_list_node, node);
+    LIBRDF_FREE(librdf_list_node, node);
   }
-  RDF_FREE(rdf_list, list);
+  LIBRDF_FREE(librdf_list, list);
   return 0;
 }
 
 
 int
-rdf_list_add(rdf_list* list, void *data) 
+librdf_list_add(librdf_list* list, void *data) 
 {
-  rdf_list_node* node;
+  librdf_list_node* node;
   
   /* need new node */
-  node=(rdf_list_node*)RDF_CALLOC(rdf_list_node, sizeof(rdf_list_node), 1);
+  node=(librdf_list_node*)LIBRDF_CALLOC(librdf_list_node, sizeof(librdf_list_node), 1);
   if(!node)
     return 1;
     
@@ -100,11 +104,11 @@ rdf_list_add(rdf_list* list, void *data)
 
 
 int
-rdf_list_remove(rdf_list* list, void *data) 
+librdf_list_remove(librdf_list* list, void *data) 
 {
-  rdf_list_node *node, *prev;
+  librdf_list_node *node, *prev;
 
-  node=rdf_list_find_node(list->first, data, &prev);
+  node=librdf_list_find_node(list->first, data, &prev);
   if(!node) {
     /* not found */
     return 1;
@@ -115,29 +119,29 @@ rdf_list_remove(rdf_list* list, void *data)
     prev->next=node->next;
 
   /* free node */
-  RDF_FREE(rdf_list_node, node);
+  LIBRDF_FREE(librdf_list_node, node);
   list->length--;
   return 0;
 }
 
 
-rdf_iterator*
-rdf_list_get_iterator(rdf_list* list)
+librdf_iterator*
+librdf_list_get_iterator(librdf_list* list)
 {
   /* Initialise walk */
   list->current=list->first;
 
-  return rdf_new_iterator((void*)list, rdf_list_iterator_have_elements,
-                          rdf_list_iterator_get_next);
+  return librdf_new_iterator((void*)list, librdf_list_iterator_have_elements,
+                          librdf_list_iterator_get_next);
   
 }
 
 
 static int
-rdf_list_iterator_have_elements(void* iterator) 
+librdf_list_iterator_have_elements(void* iterator) 
 {
-  rdf_list *list=(rdf_list*)iterator;
-  rdf_list_node *node;
+  librdf_list *list=(librdf_list*)iterator;
+  librdf_list_node *node;
   
   if(!list)
     return 0;
@@ -148,10 +152,10 @@ rdf_list_iterator_have_elements(void* iterator)
 
 
 static void*
-rdf_list_iterator_get_next(void* iterator) 
+librdf_list_iterator_get_next(void* iterator) 
 {
-  rdf_list *list=(rdf_list*)iterator;
-  rdf_list_node* node;
+  librdf_list *list=(librdf_list*)iterator;
+  librdf_list_node* node;
 
   if(!list || !list->current)
     return NULL;

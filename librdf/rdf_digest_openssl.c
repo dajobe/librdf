@@ -1,5 +1,5 @@
 /*
- * RDF Digest OpenSSL Digest interface
+ * rdf_digest_openssl.c - RDF Digest OpenSSL Digest interface
  *
  * $Source$
  * $Id$
@@ -7,17 +7,21 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
+
 
 #include <config.h>
 
 #include <openssl/crypto.h>
 
+#define LIBRDF_INTERNAL 1
 #include <rdf_config.h>
 #include <rdf_digest.h>
 
@@ -47,7 +51,7 @@ md5_get_digest(MD5_CTX_2 *c)
 
 
 static void
-rdf_openssl_md5_register_factory(rdf_digest_factory *factory) 
+librdf_openssl_md5_register_factory(librdf_digest_factory *factory) 
 {
   factory->context_length = sizeof(MD5_CTX_2);
   factory->digest_length = MD5_DIGEST_LENGTH;
@@ -85,7 +89,7 @@ sha1_get_digest(SHA_CTX_2 *c)
 
 
 static void
-rdf_openssl_sha1_register_factory(rdf_digest_factory *factory) 
+librdf_openssl_sha1_register_factory(librdf_digest_factory *factory) 
 {
   factory->context_length = sizeof(SHA_CTX_2);
   factory->digest_length = SHA_DIGEST_LENGTH;
@@ -124,7 +128,7 @@ ripemd160_get_digest(RIPEMD160_CTX_2 *c)
 
 
 static void
-rdf_openssl_ripemd160_register_factory(rdf_digest_factory *factory) 
+librdf_openssl_ripemd160_register_factory(librdf_digest_factory *factory) 
 {
   factory->context_length = sizeof(RIPEMD160_CTX_2);
   factory->digest_length = SHA_DIGEST_LENGTH;
@@ -138,16 +142,16 @@ rdf_openssl_ripemd160_register_factory(rdf_digest_factory *factory)
 
 
 void
-rdf_digest_openssl_constructor(void)
+librdf_digest_openssl_constructor(void)
 {
 #ifdef HAVE_OPENSSL_CRYPTO_MD5_DIGEST
-  rdf_digest_register_factory("MD5", &rdf_openssl_md5_register_factory);
+  librdf_digest_register_factory("MD5", &librdf_openssl_md5_register_factory);
 #endif
 #ifdef HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST
-  rdf_digest_register_factory("RIPEMD160", &rdf_openssl_ripemd160_register_factory);
+  librdf_digest_register_factory("RIPEMD160", &librdf_openssl_ripemd160_register_factory);
 #endif
 #ifdef HAVE_OPENSSL_CRYPTO_SHA1_DIGEST
-  rdf_digest_register_factory("SHA1", &rdf_openssl_sha1_register_factory);
+  librdf_digest_register_factory("SHA1", &librdf_openssl_sha1_register_factory);
 #endif
 
 }

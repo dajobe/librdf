@@ -1,5 +1,5 @@
 /*
- * RDF List Interface definition
+ * rdf_list.h - RDF List Interface definition
  *
  * $Source$
  * $Id$
@@ -7,16 +7,19 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
 
 
-#ifndef RDF_LIST_H
-#define RDF_LIST_H
+
+#ifndef LIBRDF_LIST_H
+#define LIBRDF_LIST_H
 
 #include <rdf_iterator.h>
 
@@ -24,28 +27,28 @@
 extern "C" {
 #endif
 
-struct rdf_list_node_s
+struct librdf_list_node_s
 {
-  struct rdf_list_node_s* next;
+  struct librdf_list_node_s* next;
   void *data;
 };
-typedef struct rdf_list_node_s rdf_list_node;
+typedef struct librdf_list_node_s librdf_list_node;
 
 
 typedef struct
 {
-  rdf_list_node* first;
-  rdf_list_node* current;
+  librdf_list_node* first;
+  librdf_list_node* current;
   int length;
-} rdf_list;
+} librdf_list;
 
 
-rdf_list* rdf_new_list(void);
-int rdf_free_list(rdf_list* list);
+librdf_list* librdf_new_list(void);
+int librdf_free_list(librdf_list* list);
 
-int rdf_list_add(rdf_list* list, void *data);
-int rdf_list_remove(rdf_list* list, void *data);
-rdf_iterator* rdf_list_get_iterator(rdf_list* list);
+int librdf_list_add(librdf_list* list, void *data);
+int librdf_list_remove(librdf_list* list, void *data);
+librdf_iterator* librdf_list_get_iterator(librdf_list* list);
 
 
 #ifdef __cplusplus

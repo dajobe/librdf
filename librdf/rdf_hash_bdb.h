@@ -1,5 +1,5 @@
 /*
- * RDF DB Berkeley DB Interface definition
+ * rdf_hash_bdb.h - RDF DB Berkeley DB Interface definition
  *
  * $Source$
  * $Id$
@@ -7,22 +7,25 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
 
 
-#ifndef RDF_HASH_BDB_H
-#define RDF_HASH_BDB_H
+
+#ifndef LIBRDF_HASH_BDB_H
+#define LIBRDF_HASH_BDB_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void rdf_init_hash_bdb(void);
+void librdf_init_hash_bdb(void);
 
 #ifdef __cplusplus
 }

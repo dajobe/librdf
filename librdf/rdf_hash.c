@@ -1,5 +1,5 @@
 /*
- * RDF HASH Implementation
+ * rdf_hash.c - RDF HASH Implementation
  *
  * $Source$
  * $Id$
@@ -7,12 +7,15 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
+
 
 #include <config.h>
 
@@ -21,9 +24,10 @@
 #include <sys/types.h>
 
 #ifdef STANDALONE
-#define RDF_DEBUG 1
+#define LIBRDF_DEBUG 1
 #endif
 
+#define LIBRDF_INTERNAL 1
 #include <rdf_config.h>
 
 #include <rdf_hash.h>
@@ -36,21 +40,21 @@
 #include <rdf_hash_list.h>
 
 
-/** Initialise the rdf_hash module */
+/** Initialise the librdf_hash module */
 void
-rdf_init_hash(void) 
+librdf_init_hash(void) 
 {
 #ifdef HAVE_GDBM_HASH
-  rdf_init_hash_gdbm();
+  librdf_init_hash_gdbm();
 #endif
 #ifdef HAVE_BDB_HASH
-  rdf_init_hash_bdb();
+  librdf_init_hash_bdb();
 #endif
-  rdf_init_hash_list();
+  librdf_init_hash_list();
 }
 
 /** list of hash factories */
-static rdf_hash_factory* hashes;
+static librdf_hash_factory* hashes;
 
 
 /* class methods */
@@ -59,38 +63,38 @@ static rdf_hash_factory* hashes;
  * @param name the hash factory name
  * @param factory pointer to function to call to register the factory
  */
-void rdf_hash_register_factory(const char *name,
-                               void (*factory) (rdf_hash_factory*)
+void librdf_hash_register_factory(const char *name,
+                               void (*factory) (librdf_hash_factory*)
                                ) 
 {
-  rdf_hash_factory *hash, *h;
+  librdf_hash_factory *hash, *h;
   char *name_copy;
 
-  RDF_DEBUG2(rdf_hash_register_factory,
+  LIBRDF_DEBUG2(librdf_hash_register_factory,
              "Received registration for hash %s\n", name);
 
-  hash=(rdf_hash_factory*)RDF_CALLOC(rdf_hash_factory, sizeof(rdf_hash_factory), 1);
+  hash=(librdf_hash_factory*)LIBRDF_CALLOC(librdf_hash_factory, sizeof(librdf_hash_factory), 1);
   if(!hash)
-    RDF_FATAL1(rdf_hash_register_factory, "Out of memory\n");
+    LIBRDF_FATAL1(librdf_hash_register_factory, "Out of memory\n");
 
-  name_copy=(char*)RDF_CALLOC(cstring, strlen(name)+1, 1);
+  name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
-    RDF_FREE(rdf_hash, hash);
-    RDF_FATAL1(rdf_hash_register_factory, "Out of memory\n");
+    LIBRDF_FREE(librdf_hash, hash);
+    LIBRDF_FATAL1(librdf_hash_register_factory, "Out of memory\n");
   }
   strcpy(name_copy, name);
   hash->name=name_copy;
 
   for(h = hashes; h; h = h->next ) {
     if(!strcmp(h->name, name_copy)) {
-      RDF_FATAL2(rdf_hash_register_factory, "hash %s already registered\n", h->name);
+      LIBRDF_FATAL2(librdf_hash_register_factory, "hash %s already registered\n", h->name);
     }
   }
 
   /* Call the hash registration function on the new object */
   (*factory)(hash);
 
-  RDF_DEBUG3(rdf_hash_register_factory, "%s has context size %d\n", name, hash->context_length);
+  LIBRDF_DEBUG3(librdf_hash_register_factory, "%s has context size %d\n", name, hash->context_length);
   
   hash->next = hashes;
   hashes = hash;
@@ -101,16 +105,16 @@ void rdf_hash_register_factory(const char *name,
  * @param name the factory name or NULL for the default factory
  * @returns the factory object or NULL if there is no such factory
  */
-rdf_hash_factory*
-rdf_get_hash_factory (const char *name) 
+librdf_hash_factory*
+librdf_get_hash_factory (const char *name) 
 {
-  rdf_hash_factory *factory;
+  librdf_hash_factory *factory;
 
   /* return 1st hash if no particular one wanted - why? */
   if(!name) {
     factory=hashes;
     if(!factory) {
-      RDF_DEBUG1(rdf_get_hash_factory, "No (default) hashes registered\n");
+      LIBRDF_DEBUG1(librdf_get_hash_factory, "No (default) hashes registered\n");
       return NULL;
     }
   } else {
@@ -121,7 +125,7 @@ rdf_get_hash_factory (const char *name)
     }
     /* else FACTORY name not found */
     if(!factory) {
-      RDF_DEBUG2(rdf_get_hash_factory, "No hash with name %s found\n",
+      LIBRDF_DEBUG2(librdf_get_hash_factory, "No hash with name %s found\n",
               name);
       return NULL;
     }
@@ -134,21 +138,21 @@ rdf_get_hash_factory (const char *name)
 
 /* constructors */
 
-/** constructor for rdf_hash
+/** constructor for librdf_hash
  * @param factory object from the factory
  * @returns a new hash object
  */
-rdf_hash*
-rdf_new_hash (rdf_hash_factory* factory) {
-  rdf_hash* h;
+librdf_hash*
+librdf_new_hash (librdf_hash_factory* factory) {
+  librdf_hash* h;
 
-  h=(rdf_hash*)RDF_CALLOC(rdf_hash, sizeof(rdf_hash), 1);
+  h=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
   if(!h)
     return NULL;
 
-  h->context=(char*)RDF_CALLOC(hash_context, factory->context_length, 1);
+  h->context=(char*)LIBRDF_CALLOC(hash_context, factory->context_length, 1);
   if(!h->context) {
-    rdf_free_hash(h);
+    librdf_free_hash(h);
     return NULL;
   }
 
@@ -158,13 +162,13 @@ rdf_new_hash (rdf_hash_factory* factory) {
 }
 
 
-/** destructor for rdf_hash objects
+/** destructor for librdf_hash objects
  * @param hash object
  */
 void
-rdf_free_hash (rdf_hash* hash) 
+librdf_free_hash (librdf_hash* hash) 
 {
-  RDF_FREE(rdf_hash, hash);
+  LIBRDF_FREE(librdf_hash, hash);
 }
 
 /* methods */
@@ -176,7 +180,7 @@ rdf_free_hash (rdf_hash* hash)
  * @param options a hash of options for the hash factory or NULL if there are none.
 */
 int
-rdf_hash_open(rdf_hash* hash, char *identifier, void *mode, rdf_hash* options) 
+librdf_hash_open(librdf_hash* hash, char *identifier, void *mode, librdf_hash* options) 
 {
   return (*(hash->factory->open))(hash->context, identifier, mode, options);
 }
@@ -185,7 +189,7 @@ rdf_hash_open(rdf_hash* hash, char *identifier, void *mode, rdf_hash* options)
  * @param hash hash object
  */
 int
-rdf_hash_close(rdf_hash* hash)
+librdf_hash_close(librdf_hash* hash)
 {
   return (*(hash->factory->close))(hash->context);
 }
@@ -202,13 +206,13 @@ rdf_hash_close(rdf_hash* hash)
  * @param flags 0 at present
  */
 int
-rdf_hash_get(rdf_hash* hash, void *key, size_t key_len,
+librdf_hash_get(librdf_hash* hash, void *key, size_t key_len,
              void **value, size_t* value_len, unsigned int flags)
 {
-  rdf_hash_data hd_key, hd_value;
+  librdf_hash_data hd_key, hd_value;
   int result;
   
-  /* copy key pointers and lengths into rdf_hash_data structures */
+  /* copy key pointers and lengths into librdf_hash_data structures */
   hd_key.data=key; hd_key.size=key_len;
   
   result=(*(hash->factory->get))(hash->context, &hd_key, &hd_value, flags);
@@ -228,16 +232,16 @@ rdf_hash_get(rdf_hash* hash, void *key, size_t key_len,
  * @param flags 0 at present
  */
 int
-rdf_hash_put(rdf_hash* hash, void *key, size_t key_len,
+librdf_hash_put(librdf_hash* hash, void *key, size_t key_len,
              void *value, size_t value_len, unsigned int flags)
 {
-  rdf_hash_data hd_key, hd_value;
+  librdf_hash_data hd_key, hd_value;
 
-  /* copy pointers and lengths into rdf_hash_data structures */
+  /* copy pointers and lengths into librdf_hash_data structures */
   hd_key.data=key; hd_key.size=key_len;
   hd_value.data=value; hd_value.size=value_len;
 
-  /* call generic routine using rdf_hash_data structs */
+  /* call generic routine using librdf_hash_data structs */
   return (*(hash->factory->put))(hash->context, &hd_key, &hd_value, flags);
 }
 
@@ -249,10 +253,10 @@ rdf_hash_put(rdf_hash* hash, void *key, size_t key_len,
  * @returns true (not 0) if the key is present in the hash
  */
 int
-rdf_hash_exists(rdf_hash* hash, void *key, size_t key_len) 
+librdf_hash_exists(librdf_hash* hash, void *key, size_t key_len) 
 {
-  rdf_hash_data hd_key;
-  /* copy key pointers and lengths into rdf_hash_data structures */
+  librdf_hash_data hd_key;
+  /* copy key pointers and lengths into librdf_hash_data structures */
   hd_key.data=key; hd_key.size=key_len;
   
   return (*(hash->factory->exists))(hash->context, &hd_key);
@@ -265,11 +269,11 @@ rdf_hash_exists(rdf_hash* hash, void *key, size_t key_len)
  * @param key_len length of key in bytes
  */
 int
-rdf_hash_delete(rdf_hash* hash, void *key, size_t key_len)
+librdf_hash_delete(librdf_hash* hash, void *key, size_t key_len)
 {
-  rdf_hash_data hd_key;
+  librdf_hash_data hd_key;
 
-  /* copy key pointers and lengths into rdf_hash_data structures */
+  /* copy key pointers and lengths into librdf_hash_data structures */
   hd_key.data=key; hd_key.size=key_len;
 
   return (*(hash->factory->delete_key))(hash->context, &hd_key);
@@ -281,13 +285,13 @@ rdf_hash_delete(rdf_hash* hash, void *key, size_t key_len)
  * @param hash
  * @param key pointer to variable to store key pointer
  * @param key_len pointer to variable to store key length
- * @param flags RDF_HASH_FLAGS_FIRST to return first key, RDF_HASH_FLAGS_NEXT to return next key, RDF_HASH_FLAGS_CURRENT to return current key in sequence
+ * @param flags LIBRDF_HASH_FLAGS_FIRST to return first key, LIBRDF_HASH_FLAGS_NEXT to return next key, LIBRDF_HASH_FLAGS_CURRENT to return current key in sequence
  */
 int
-rdf_hash_get_seq(rdf_hash* hash, void **key, size_t* key_len,
-                 rdf_hash_sequence_type type)
+librdf_hash_get_seq(librdf_hash* hash, void **key, size_t* key_len,
+                 librdf_hash_sequence_type type)
 {
-  rdf_hash_data hd_key;
+  librdf_hash_data hd_key;
   
   int result=(*(hash->factory->get_seq))(hash->context, &hd_key, type);
   /* copy out results into user variables */
@@ -300,7 +304,7 @@ rdf_hash_get_seq(rdf_hash* hash, void **key, size_t* key_len,
  * @param hash hash object
  */
 int
-rdf_hash_sync(rdf_hash* hash)
+librdf_hash_sync(librdf_hash* hash)
 {
   return (*(hash->factory->sync))(hash->context);
 }
@@ -310,7 +314,7 @@ rdf_hash_sync(rdf_hash* hash)
  * @param hash hash object
  * */
 int
-rdf_hash_get_fd(rdf_hash* hash)
+librdf_hash_get_fd(librdf_hash* hash)
 {
   return (*(hash->factory->get_fd))(hash->context);
 }
@@ -321,29 +325,29 @@ rdf_hash_get_fd(rdf_hash* hash)
  * @param hash hash object
  * @param key pointer to variable to store key pointer
  * @param key_len pointer to variable to store key length
- * @see rdf_hash_next()
- * @see rdf_hash_get_seq()
+ * @see librdf_hash_next()
+ * @see librdf_hash_get_seq()
  */
 
 int
-rdf_hash_first(rdf_hash* hash, void** key, size_t* key_len)
+librdf_hash_first(librdf_hash* hash, void** key, size_t* key_len)
 {
-  return rdf_hash_get_seq(hash, key, key_len, RDF_HASH_SEQUENCE_FIRST);
+  return librdf_hash_get_seq(hash, key, key_len, LIBRDF_HASH_SEQUENCE_FIRST);
 }
 
 /** return the 'next' hash key in a sequential access of the hash as
- * started by rdf_hash_first
+ * started by librdf_hash_first
  * Note: the key pointer will return newly allocated memory each time.
  * @param hash hash object
  * @param key pointer to variable to store key pointer
  * @param key_len pointer to variable to store key length
- * @see rdf_hash_first()
- * @see rdf_hash_get_seq()
+ * @see librdf_hash_first()
+ * @see librdf_hash_get_seq()
  */
 int
-rdf_hash_next(rdf_hash* hash, void** key, size_t* key_len)
+librdf_hash_next(librdf_hash* hash, void** key, size_t* key_len)
 {
-  return rdf_hash_get_seq(hash, key, key_len, RDF_HASH_SEQUENCE_NEXT);
+  return librdf_hash_get_seq(hash, key, key_len, LIBRDF_HASH_SEQUENCE_NEXT);
 }
 
 
@@ -353,7 +357,7 @@ rdf_hash_next(rdf_hash* hash, void** key, size_t* key_len)
  * @param fh   file descriptor
  */
 void
-rdf_hash_print (rdf_hash* hash, FILE *fh) 
+librdf_hash_print (librdf_hash* hash, FILE *fh) 
 
 {
   void *key;
@@ -362,10 +366,10 @@ rdf_hash_print (rdf_hash* hash, FILE *fh)
   size_t value_len;
 
   fprintf(fh, "%s hash: {\n", hash->factory->name);
-  for(rdf_hash_first(hash, &key, &key_len);
+  for(librdf_hash_first(hash, &key, &key_len);
       key;
-      rdf_hash_next(hash, &key, &key_len)) {
-    rdf_hash_get(hash, key, key_len, &value, &value_len, 0);
+      librdf_hash_next(hash, &key, &key_len)) {
+    librdf_hash_get(hash, key, key_len, &value, &value_len, 0);
     fputs("  '", fh);
     fwrite(key, key_len, 1, fh);
     fputs("'=>'", fh);
@@ -373,7 +377,7 @@ rdf_hash_print (rdf_hash* hash, FILE *fh)
     fputs("'\n", fh);
 
     /* key points to new data each time */
-    RDF_FREE(cstring, key);
+    LIBRDF_FREE(cstring, key);
   }
   fputc('}', fh);
 }
@@ -384,7 +388,7 @@ rdf_hash_print (rdf_hash* hash, FILE *fh)
  * @param string hash encoded as a string
  */
 int
-rdf_hash_from_string (rdf_hash* hash, char *string) 
+librdf_hash_from_string (librdf_hash* hash, char *string) 
 {
   char *p;
   char *key;
@@ -405,7 +409,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
   char *to;
 
   
-  RDF_DEBUG2(rdf_hash_from_string, "Parsing >>%s<<\n", string);
+  LIBRDF_DEBUG2(librdf_hash_from_string, "Parsing >>%s<<\n", string);
 
   p=string;
   state=RHS_STATE_INIT;
@@ -485,7 +489,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
             /* end of value found */
             value_len=p-value;
             real_value_len=value_len-backslashes;
-            new_value=(char*)RDF_MALLOC(cstring, real_value_len);
+            new_value=(char*)LIBRDF_MALLOC(cstring, real_value_len);
             if(!new_value)
               return 1;
             for(i=0, to=new_value; i<(int)value_len; i++){
@@ -494,11 +498,11 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
               *to=value[i];
             }
 
-            rdf_hash_put(hash, key, key_len, new_value, real_value_len, 0);
+            librdf_hash_put(hash, key, key_len, new_value, real_value_len, 0);
 
-            RDF_DEBUG1(rdf_hash_from_string, "after decoding ");
-#ifdef RDF_DEBUG
-            rdf_hash_print (hash, stderr) ;
+            LIBRDF_DEBUG1(librdf_hash_from_string, "after decoding ");
+#ifdef LIBRDF_DEBUG
+            librdf_hash_print (hash, stderr) ;
             fputc('\n', stderr);
 #endif
             state=RHS_STATE_INIT;
@@ -518,7 +522,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
         break;
 
       default:
-        RDF_FATAL2(rdf_hash_from_string, "No such state %d", state);
+        LIBRDF_FATAL2(librdf_hash_from_string, "No such state %d", state);
     }
   }
   return 0;
@@ -530,7 +534,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
  * @param array address of the start of the array of char* pointers
  */
 int
-rdf_hash_from_array_of_strings (rdf_hash* hash, char *array[]) 
+librdf_hash_from_array_of_strings (librdf_hash* hash, char *array[]) 
 {
   int i;
   char *key;
@@ -539,8 +543,8 @@ rdf_hash_from_array_of_strings (rdf_hash* hash, char *array[])
   for(i=0; (key=array[i]); i+=2) {
     value=array[i+1];
     if(!value)
-      RDF_FATAL2(rdf_hash_from_array_of_strings, "Array contains an odd number of strings - %d", i);
-    rdf_hash_put(hash, key, strlen(key), value, strlen(value), 0);
+      LIBRDF_FATAL2(librdf_hash_from_array_of_strings, "Array contains an odd number of strings - %d", i);
+    librdf_hash_put(hash, key, strlen(key), value, strlen(value), 0);
   }
   return 0;
 }
@@ -557,8 +561,8 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  rdf_hash_factory *factory, *default_factory;
-  rdf_hash *h, *h2;
+  librdf_hash_factory *factory, *default_factory;
+  librdf_hash *h, *h2;
   char *test_hash_types[]={"GDBM", "FAKE", "BDB", "LIST", NULL};
   char *test_hash_values[]={"colour", "yellow",
                             "age", "new",
@@ -578,28 +582,28 @@ main(int argc, char *argv[])
   
   
   /* initialise hash module */
-  rdf_init_hash();
+  librdf_init_hash();
 
   if(argc ==2) {
-    factory=rdf_get_hash_factory(NULL);
+    factory=librdf_get_hash_factory(NULL);
     if(!factory) {
       fprintf(stderr, "%s: No hash factory called '%s'\n", program, type);
       return(0);
     }
     
-    h=rdf_new_hash(factory);
+    h=librdf_new_hash(factory);
     if(!h) {
       fprintf(stderr, "%s: Failed to create new hash type '%s'\n", program, type);
       return(0);
     }
 
-    rdf_hash_open(h, "test", "mode", NULL);
-    rdf_hash_from_string(h, argv[1]);
+    librdf_hash_open(h, "test", "mode", NULL);
+    librdf_hash_from_string(h, argv[1]);
     fprintf(stderr, "%s: resulting ", program);    
-    rdf_hash_print(h, stderr);
+    librdf_hash_print(h, stderr);
     fprintf(stderr, "\n");
-    rdf_hash_close(h);
-    rdf_free_hash(h);
+    librdf_hash_close(h);
+    librdf_free_hash(h);
     return(0);
     
   }
@@ -607,19 +611,19 @@ main(int argc, char *argv[])
 
   for(i=0; (type=test_hash_types[i]); i++) {
     fprintf(stderr, "%s: Trying to create new %s hash\n", program, type);
-    factory=rdf_get_hash_factory(type);
+    factory=librdf_get_hash_factory(type);
     if(!factory) {
       fprintf(stderr, "%s: No hash factory called '%s'\n", program, type);
       continue;
     }
     
-    h=rdf_new_hash(factory);
+    h=librdf_new_hash(factory);
     if(!h) {
       fprintf(stderr, "%s: Failed to create new hash type '%s'\n", program, type);
       continue;
     }
 
-    if(rdf_hash_open(h, "test", "mode", NULL)) {
+    if(librdf_hash_open(h, "test", "mode", NULL)) {
       fprintf(stderr, "%s: Failed to open new hash type '%s'\n", program, type);
       continue;
     }
@@ -630,53 +634,53 @@ main(int argc, char *argv[])
       value=test_hash_values[j+1];
       fprintf(stderr, "%s: Adding key/value pair: %s=%s\n", program, key, value);
       
-      rdf_hash_put(h, key, strlen(key), value, strlen(value),
+      librdf_hash_put(h, key, strlen(key), value, strlen(value),
                    0);
       
       fprintf(stderr, "%s: resulting ", program);    
-      rdf_hash_print(h, stderr);
+      librdf_hash_print(h, stderr);
       fprintf(stderr, "\n");
     }
 
     fprintf(stderr, "%s: Deleting key '%s'\n", program, test_hash_delete_key);
-    rdf_hash_delete(h, test_hash_delete_key, strlen(test_hash_delete_key));
+    librdf_hash_delete(h, test_hash_delete_key, strlen(test_hash_delete_key));
 
     fprintf(stderr, "%s: resulting ", program);    
-    rdf_hash_print(h, stderr);
+    librdf_hash_print(h, stderr);
     fprintf(stderr, "\n");
     
-    rdf_hash_close(h);
+    librdf_hash_close(h);
 
     fprintf(stderr, "%s: Freeing hash\n", program);
-    rdf_free_hash(h);
+    librdf_free_hash(h);
   }
 
   
   fprintf(stderr, "%s: Getting default hash factory\n", program);
-  default_factory=rdf_get_hash_factory(NULL);
+  default_factory=librdf_get_hash_factory(NULL);
   if(!default_factory) {
     fprintf(stderr, "%s: No default hash factory found\n", program);
     return(0);
   }
   fprintf(stderr, "%s: Creating new hash from default factory\n", program);
-  h2=rdf_new_hash(default_factory);
+  h2=librdf_new_hash(default_factory);
   if(!h2) {
     fprintf(stderr, "%s: Failed to create new hash from default factory\n", program);
     return(0);
   }
   fprintf(stderr, "%s: Initialising hash from array of strings\n", program);
-  if(rdf_hash_from_array_of_strings(h2, test_hash_array)) {
+  if(librdf_hash_from_array_of_strings(h2, test_hash_array)) {
     fprintf(stderr, "%s: Failed to init hash from array of strings\n", program);
     return(0);
   }
   fprintf(stderr, "%s: resulting hash ", program);    
-  rdf_hash_print(h2, stderr);
+  librdf_hash_print(h2, stderr);
   fprintf(stderr, "\n");
   
-  rdf_hash_close(h2);
+  librdf_hash_close(h2);
   
   fprintf(stderr, "%s: Freeing hash\n", program);
-  rdf_free_hash(h2);
+  librdf_free_hash(h2);
     
   
     

@@ -1,5 +1,5 @@
 /*
- * RDF URI Implementation
+ * rdf_uri.c - RDF URI Implementation
  *
  * $Source$
  * $Id$
@@ -7,91 +7,95 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
+
 
 #include <config.h>
 
 #include <stdio.h>
 
+#define LIBRDF_INTERNAL 1
 #include <rdf_config.h>
 
-/* This define tells rdf_uri.h not to include this file again */
-#define RDF_INSIDE_RDF_URI_C
+/* This define tells librdf_uri.h not to include this file again */
+#define LIBRDF_INSIDE_LIBRDF_URI_C
 #include <rdf_uri.h>
 
 
-static rdf_digest_factory* rdf_uri_digest_factory;
+static librdf_digest_factory* librdf_uri_digest_factory;
 
 /* class methods */
-void rdf_init_uri(rdf_digest_factory* factory) 
+void librdf_init_uri(librdf_digest_factory* factory) 
 {
-  rdf_uri_digest_factory=factory;
+  librdf_uri_digest_factory=factory;
 }
 
 
-#ifndef RDF_URI_INLINE
+#ifndef LIBRDF_URI_INLINE
 
 /* constructors */
-INLINE rdf_uri*
-rdf_new_uri (char *uri_string) {
-  char *new_uri=(char*)RDF_MALLOC(rdf_uri, strlen(uri_string)+1);
+INLINE librdf_uri*
+librdf_new_uri (char *uri_string) {
+  char *new_uri=(char*)LIBRDF_MALLOC(librdf_uri, strlen(uri_string)+1);
   if(!new_uri)
     return 0;
 
   strcpy(new_uri, uri_string);
-  return (rdf_uri*)new_uri;
+  return (librdf_uri*)new_uri;
 }
 
-INLINE rdf_uri*
-rdf_new_uri_from_uri (rdf_uri* old_uri) {
-  char *new_uri=(char*)RDF_MALLOC(rdf_uri, strlen(old_uri)+1);
+INLINE librdf_uri*
+librdf_new_uri_from_uri (librdf_uri* old_uri) {
+  char *new_uri=(char*)LIBRDF_MALLOC(librdf_uri, strlen(old_uri)+1);
   if(!new_uri)
     return 0;
 
   strcpy(new_uri, old_uri);
-  return (rdf_uri*)new_uri;
+  return (librdf_uri*)new_uri;
 }
 
 /* destructor */
 INLINE void
-rdf_free_uri (rdf_uri* uri) 
+librdf_free_uri (librdf_uri* uri) 
 {
-  RDF_FREE(rdf_uri, uri);
+  LIBRDF_FREE(librdf_uri, uri);
 }
 
 /* methods */
 
 /* note: does not allocate a new string */
 INLINE char*
-rdf_uri_as_string (rdf_uri *uri) 
+librdf_uri_as_string (librdf_uri *uri) 
 {
   return (char*)uri;
 }
 
-rdf_digest*
-rdf_uri_get_digest (rdf_uri* uri) 
+librdf_digest*
+librdf_uri_get_digest (librdf_uri* uri) 
 {
-  rdf_digest* d;
+  librdf_digest* d;
 
-  d=rdf_new_digest(rdf_uri_digest_factory);
+  d=librdf_new_digest(librdf_uri_digest_factory);
   if(!d)
     return NULL;
 
-  rdf_digest_init(d);
-  rdf_digest_update(d, (unsigned char*)uri, strlen(uri));
-  rdf_digest_final(d);
+  librdf_digest_init(d);
+  librdf_digest_update(d, (unsigned char*)uri, strlen(uri));
+  librdf_digest_final(d);
   
   return d;
 }
 
 
 void
-rdf_uri_print (rdf_uri* uri, FILE *fh) 
+librdf_uri_print (librdf_uri* uri, FILE *fh) 
 {
   fputs(uri, fh);
 }
@@ -99,9 +103,9 @@ rdf_uri_print (rdf_uri* uri, FILE *fh)
 
 /* allocates a new string since this is a _to_ method */
 char*
-rdf_uri_to_string (rdf_uri* uri)
+librdf_uri_to_string (librdf_uri* uri)
 {
-  char *s=(char*)RDF_MALLOC(cstring, strlen(uri)+1);
+  char *s=(char*)LIBRDF_MALLOC(cstring, strlen(uri)+1);
   if(!s)
     return NULL;
   strcpy(s, uri);

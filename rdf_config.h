@@ -1,5 +1,5 @@
 /*
- * RDF System Configuration
+ * rdf_config.h - RDF System Configuration
  *
  * $Source$
  * $Id$
@@ -7,15 +7,18 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
 
-#ifndef RDF_CONFIG_H
-#define RDF_CONFIG_H
+
+#ifndef LIBRDF_CONFIG_H
+#define LIBRDF_CONFIG_H
 
 #ifdef HAVE_INLINE
 #define INLINE inline
@@ -24,7 +27,7 @@
 #endif
 
 #ifdef HAVE_INLINE
-#define RDF_URI_INLINE yes
+#define LIBRDF_URI_INLINE yes
 #endif
 
 /* for the memory allocation functions below */
@@ -33,39 +36,39 @@
 #endif
 
 
-#ifdef RDF_DEBUG
+#ifdef LIBRDF_DEBUG
 /* DEBUGGING TURNED ON */
 
-#define RDF_MALLOC(type, size) malloc(size)
-#define RDF_CALLOC(type, size, count) calloc(size, count)
-#define RDF_FREE(type, ptr)   free(ptr)
+#define LIBRDF_MALLOC(type, size) malloc(size)
+#define LIBRDF_CALLOC(type, size, count) calloc(size, count)
+#define LIBRDF_FREE(type, ptr)   free(ptr)
 
 /* Debugging messages */
-#define RDF_DEBUG1(function, msg) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function); } while(0)
-#define RDF_DEBUG2(function, msg, arg1) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1);} while(0)
-#define RDF_DEBUG3(function, msg, arg1, arg2) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2);} while(0)
-#define RDF_DEBUG4(function, msg, arg1, arg2, arg3) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2, arg3);} while(0)
+#define LIBRDF_DEBUG1(function, msg) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function); } while(0)
+#define LIBRDF_DEBUG2(function, msg, arg1) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1);} while(0)
+#define LIBRDF_DEBUG3(function, msg, arg1, arg2) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2);} while(0)
+#define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2, arg3);} while(0)
 
 #else
 
 /* DEBUGGING TURNED OFF */
 
-#define RDF_MALLOC(type, size) malloc(size)
-#define RDF_CALLOC(type, size, count) calloc(size, count)
-#define RDF_FREE(type, ptr)   free(ptr)
+#define LIBRDF_MALLOC(type, size) malloc(size)
+#define LIBRDF_CALLOC(type, size, count) calloc(size, count)
+#define LIBRDF_FREE(type, ptr)   free(ptr)
 
 /* Debugging messages */
-#define RDF_DEBUG1(function, msg)
-#define RDF_DEBUG2(function, msg, arg1)
-#define RDF_DEBUG3(function, msg, arg1, arg2)
-#define RDF_DEBUG4(function, msg, arg1, arg2, arg3)
+#define LIBRDF_DEBUG1(function, msg)
+#define LIBRDF_DEBUG2(function, msg, arg1)
+#define LIBRDF_DEBUG3(function, msg, arg1, arg2)
+#define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3)
 
 #endif
 
 
 /* Fatal errors - always happen */
-#define RDF_FATAL1(function, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function); abort();} while(0)
-#define RDF_FATAL2(function, msg,arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function, arg); abort();} while(0)
+#define LIBRDF_FATAL1(function, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function); abort();} while(0)
+#define LIBRDF_FATAL2(function, msg,arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function, arg); abort();} while(0)
 
 #endif
 

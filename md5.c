@@ -1,10 +1,18 @@
 /*
- * md5.c : MD5 Message Digest Algorithm
+ * md5.c - MD5 Message Digest Algorithm
  *
  * $Source$
  * $Id$
  *
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
+ *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
+
 
 /* Original code notes: */
 
@@ -30,9 +38,10 @@
 #include <string.h>		/* for memcpy() */
 #endif
 
-#include <rdf_config.h>
-#include <rdf_digest.h>
-#include <rdf_types.h>
+#define LIBRDF_INTERNAL 1
+#include <librdf_config.h>
+#include <librdf_digest.h>
+#include <librdf_types.h>
 
 
 /* original code from header - function names have changed */
@@ -301,7 +310,7 @@ md5_get_digest(struct MD5Context *c)
 }
 
 static void
-md5_register_factory(rdf_digest_factory *factory) 
+md5_register_factory(librdf_digest_factory *factory) 
 {
   factory->context_length = sizeof(struct MD5Context);
   factory->digest_length = 16;
@@ -315,5 +324,5 @@ md5_register_factory(rdf_digest_factory *factory)
 void
 md5_constructor(void)
 {
-  rdf_digest_register_factory("MD5", &md5_register_factory);
+  librdf_digest_register_factory("MD5", &md5_register_factory);
 }

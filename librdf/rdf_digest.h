@@ -1,5 +1,5 @@
 /*
- * RDF Digest Factory / Digest interfaces and definition
+ * rdf_digest.h - RDF Digest Factory / Digest interfaces and definition
  *
  * $Source$
  * $Id$
@@ -7,27 +7,30 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
 
 
-#ifndef RDF_DIGEST_H
-#define RDF_DIGEST_H
+
+#ifndef LIBRDF_DIGEST_H
+#define LIBRDF_DIGEST_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef void* RDF_DIGEST;
+typedef void* LIBRDF_DIGEST;
 
 /* based on the GNUPG cipher/digest registration stuff */
-struct rdf_digest_factory_s 
+struct librdf_digest_factory_s 
 {
-  struct rdf_digest_factory_s* next;
+  struct librdf_digest_factory_s* next;
   char *   name;
 
   /* the rest of this structure is populated by the
@@ -41,49 +44,49 @@ struct rdf_digest_factory_s
   void (*final)( void *c );
   unsigned char *(*get_digest)( void *c );
 };
-typedef struct rdf_digest_factory_s rdf_digest_factory;
+typedef struct librdf_digest_factory_s librdf_digest_factory;
 
 
 typedef struct
 {
   char *context;
   unsigned char *digest;
-  rdf_digest_factory* factory;
-} rdf_digest;
+  librdf_digest_factory* factory;
+} librdf_digest;
 
 
 void
-rdf_digest_register_factory(const char *name,
-                            void (*factory) (rdf_digest_factory*)
+librdf_digest_register_factory(const char *name,
+                            void (*factory) (librdf_digest_factory*)
                             );
 
-rdf_digest_factory*
-rdf_get_digest_factory(const char *name);
+librdf_digest_factory*
+librdf_get_digest_factory(const char *name);
 
 
 /* module init */
-void rdf_init_digest(void);
+void librdf_init_digest(void);
                     
 /* constructor */
-rdf_digest* rdf_new_digest(rdf_digest_factory *factory);
+librdf_digest* librdf_new_digest(librdf_digest_factory *factory);
 
 /* destructor */
-void rdf_free_digest(rdf_digest *digest);
+void librdf_free_digest(librdf_digest *digest);
 
 
 /* methods */
-void rdf_digest_init(rdf_digest* digest);
-void rdf_digest_update(rdf_digest* digest, unsigned char *buf, size_t length);
-void rdf_digest_final(rdf_digest* digest);
-void* rdf_digest_get_digest(rdf_digest* digest);
+void librdf_digest_init(librdf_digest* digest);
+void librdf_digest_update(librdf_digest* digest, unsigned char *buf, size_t length);
+void librdf_digest_final(librdf_digest* digest);
+void* librdf_digest_get_digest(librdf_digest* digest);
 
-char* rdf_digest_to_string(rdf_digest* digest);
-void rdf_digest_print(rdf_digest* digest, FILE* fh);
+char* librdf_digest_to_string(librdf_digest* digest);
+void librdf_digest_print(librdf_digest* digest, FILE* fh);
 
 
-/* in rdf_digest_openssl.c */
+/* in librdf_digest_openssl.c */
 #ifdef HAVE_OPENSSL_DIGESTS
-void rdf_digest_openssl_constructor(void);
+void librdf_digest_openssl_constructor(void);
 #endif
 
 /* in sha1.c */

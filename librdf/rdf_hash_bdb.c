@@ -1,5 +1,5 @@
 /*
- * RDF hash Berkeley DB Interface Implementation
+ * rdf_hash_bdb.c - RDF hash Berkeley DB Interface Implementation
  *
  * $Source$
  * $Id$
@@ -7,12 +7,15 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
+
 
 #include <config.h>
 
@@ -50,6 +53,7 @@
 #endif
 
 
+#define LIBRDF_INTERNAL 1
 #include <rdf_config.h>
 #include <rdf_hash.h>
 #include <rdf_hash_bdb.h>
@@ -62,34 +66,34 @@ typedef struct
   DBC* cursor;
 #endif
   char* file_name;
-} rdf_hash_bdb_context;
+} librdf_hash_bdb_context;
 
 
 /* prototypes for local functions */
-static int rdf_hash_bdb_open(void* context, char *identifier, void *mode, rdf_hash* options);
-static int rdf_hash_bdb_close(void* context);
-static int rdf_hash_bdb_get(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigned int flags);
-static int rdf_hash_bdb_put(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigned int flags);
-static int rdf_hash_bdb_exists(void* context, rdf_hash_data *key);
-static int rdf_hash_bdb_delete(void* context, rdf_hash_data *key);
-static int rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type type);
-static int rdf_hash_bdb_sync(void* context);
-static int rdf_hash_bdb_get_fd(void* context);
+static int librdf_hash_bdb_open(void* context, char *identifier, void *mode, librdf_hash* options);
+static int librdf_hash_bdb_close(void* context);
+static int librdf_hash_bdb_get(void* context, librdf_hash_data *key, librdf_hash_data *data, unsigned int flags);
+static int librdf_hash_bdb_put(void* context, librdf_hash_data *key, librdf_hash_data *data, unsigned int flags);
+static int librdf_hash_bdb_exists(void* context, librdf_hash_data *key);
+static int librdf_hash_bdb_delete(void* context, librdf_hash_data *key);
+static int librdf_hash_bdb_get_seq(void* context, librdf_hash_data *key, librdf_hash_sequence_type type);
+static int librdf_hash_bdb_sync(void* context);
+static int librdf_hash_bdb_get_fd(void* context);
 
-static void rdf_hash_bdb_register_factory(rdf_hash_factory *factory);
+static void librdf_hash_bdb_register_factory(librdf_hash_factory *factory);
 
 
 /* functions implementing hash api */
 
 static int
-rdf_hash_bdb_open(void* context, char *identifier, void *mode, rdf_hash* options) 
+librdf_hash_bdb_open(void* context, char *identifier, void *mode, librdf_hash* options) 
 {
-  rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* bdb;
   char *file;
   int ret;
   
-  file=(char*)RDF_MALLOC(cstring, strlen(identifier)+6);
+  file=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+6);
   if(!file)
     return 1;
   sprintf(file, "%s.db", identifier);
@@ -99,14 +103,14 @@ rdf_hash_bdb_open(void* context, char *identifier, void *mode, rdf_hash* options
   if((ret=db_create(&bdb, NULL, 0)) != 0)
     return 1;
   if((ret=bdb->open(bdb, file, NULL, DB_HASH, DB_CREATE, 0644)) != 0) {
-    RDF_FREE(cstring, file);
+    LIBRDF_FREE(cstring, file);
     return 1;
   }
 #else
   /* db_open() on my system is prototyped as:
      const char *name, DBTYPE, u_int32_t flags, int mode, DB_ENV*, DB_INFO*, DB** */
   if((ret=db_open(file, DB_HASH, DB_CREATE, 0644, NULL, NULL, &bdb)) != 0) {
-    RDF_FREE(cstring, file);
+    LIBRDF_FREE(cstring, file);
     return 1;
   }
 #endif
@@ -117,9 +121,9 @@ rdf_hash_bdb_open(void* context, char *identifier, void *mode, rdf_hash* options
 }
 
 static int
-rdf_hash_bdb_close(void* context) 
+librdf_hash_bdb_close(void* context) 
 {
-  rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   int ret;
   
@@ -128,15 +132,15 @@ rdf_hash_bdb_close(void* context)
 #else
   ret=db->close(db);
 #endif
-  RDF_FREE(cstring, bdb_context->file_name);
+  LIBRDF_FREE(cstring, bdb_context->file_name);
   return ret;
 }
 
 
 static int
-rdf_hash_bdb_get(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigned int flags) 
+librdf_hash_bdb_get(void* context, librdf_hash_data *key, librdf_hash_data *data, unsigned int flags) 
 {
-  rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   DBT bdb_data;
   DBT bdb_key;
@@ -163,7 +167,7 @@ rdf_hash_bdb_get(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigne
     return ret;
   }
   
-  data->data = RDF_MALLOC(bdb_data, bdb_data.size);
+  data->data = LIBRDF_MALLOC(bdb_data, bdb_data.size);
   if(!data->data) {
     free(bdb_data.data);
     return 1;
@@ -178,9 +182,9 @@ rdf_hash_bdb_get(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigne
 
 
 static int
-rdf_hash_bdb_put(void* context, rdf_hash_data *key, rdf_hash_data *value, unsigned int flags) 
+librdf_hash_bdb_put(void* context, librdf_hash_data *key, librdf_hash_data *value, unsigned int flags) 
 {
-  rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   DBT bdb_data;
   DBT bdb_key;
@@ -208,9 +212,9 @@ rdf_hash_bdb_put(void* context, rdf_hash_data *key, rdf_hash_data *value, unsign
 
 
 static int
-rdf_hash_bdb_exists(void* context, rdf_hash_data *key) 
+librdf_hash_bdb_exists(void* context, librdf_hash_data *key) 
 {
-  rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   DBT bdb_key;
   DBT bdb_data;
@@ -240,9 +244,9 @@ rdf_hash_bdb_exists(void* context, rdf_hash_data *key)
 
 
 static int
-rdf_hash_bdb_delete(void* context, rdf_hash_data *key) 
+librdf_hash_bdb_delete(void* context, librdf_hash_data *key) 
 {
-  rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   DBT bdb_key;
   int ret;
@@ -260,9 +264,9 @@ rdf_hash_bdb_delete(void* context, rdf_hash_data *key)
 
 
 static int
-rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type type) 
+librdf_hash_bdb_get_seq(void* context, librdf_hash_data *key, librdf_hash_sequence_type type) 
 {
-  rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   DBT bdb_key;
   DBT bdb_data;
@@ -278,7 +282,7 @@ rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type t
   bdb_data.flags=DB_DBT_MALLOC;
   
   
-  if(type == RDF_HASH_SEQUENCE_FIRST) {
+  if(type == LIBRDF_HASH_SEQUENCE_FIRST) {
 #ifdef HAVE_BDB_CURSOR
     ret=db->cursor(db, NULL, &bdb_context->cursor);
     if(!ret) {
@@ -289,14 +293,14 @@ rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type t
 #else
     ret=db->seq(db, &bdb_key, &bdb_data, R_FIRST);
 #endif
-  } else if (type == RDF_HASH_SEQUENCE_NEXT) {
+  } else if (type == LIBRDF_HASH_SEQUENCE_NEXT) {
 #ifdef HAVE_BDB_CURSOR
     bdb_cursor=bdb_context->cursor;
     ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_data, DB_NEXT);
 #else
     ret=db->seq(db, &bdb_key, &bdb_data, R_NEXT);
 #endif
-  } else { /* RDF_HASH_SEQUENCE_CURRENT */
+  } else { /* LIBRDF_HASH_SEQUENCE_CURRENT */
 #ifdef HAVE_BDB_CURSOR
     bdb_cursor=bdb_context->cursor;
     ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_data, DB_CURRENT);
@@ -311,7 +315,7 @@ rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type t
     return ret;
   }
   
-  key->data = RDF_MALLOC(bdb_data, bdb_key.size);
+  key->data = LIBRDF_MALLOC(bdb_data, bdb_key.size);
   if(!key->data) {
     /* always allocated by BDB using system malloc */
     free(bdb_key.data);
@@ -329,9 +333,9 @@ rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type t
 }
 
 static int
-rdf_hash_bdb_sync(void* context) 
+librdf_hash_bdb_sync(void* context) 
 {
-  rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   int ret;
 
@@ -340,9 +344,9 @@ rdf_hash_bdb_sync(void* context)
 
 
 static int
-rdf_hash_bdb_get_fd(void* context) 
+librdf_hash_bdb_get_fd(void* context) 
 {
-  rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   int fd;
   int ret;
@@ -360,23 +364,23 @@ rdf_hash_bdb_get_fd(void* context)
 /* local function to register BDB hash functions */
 
 static void
-rdf_hash_bdb_register_factory(rdf_hash_factory *factory) 
+librdf_hash_bdb_register_factory(librdf_hash_factory *factory) 
 {
-  factory->context_length = sizeof(rdf_hash_bdb_context);
+  factory->context_length = sizeof(librdf_hash_bdb_context);
 
-  factory->open    = rdf_hash_bdb_open;
-  factory->close   = rdf_hash_bdb_close;
-  factory->get     = rdf_hash_bdb_get;
-  factory->put     = rdf_hash_bdb_put;
-  factory->exists  = rdf_hash_bdb_exists;
-  factory->delete_key  = rdf_hash_bdb_delete;
-  factory->get_seq = rdf_hash_bdb_get_seq;
-  factory->sync    = rdf_hash_bdb_sync;
-  factory->get_fd  = rdf_hash_bdb_get_fd;
+  factory->open    = librdf_hash_bdb_open;
+  factory->close   = librdf_hash_bdb_close;
+  factory->get     = librdf_hash_bdb_get;
+  factory->put     = librdf_hash_bdb_put;
+  factory->exists  = librdf_hash_bdb_exists;
+  factory->delete_key  = librdf_hash_bdb_delete;
+  factory->get_seq = librdf_hash_bdb_get_seq;
+  factory->sync    = librdf_hash_bdb_sync;
+  factory->get_fd  = librdf_hash_bdb_get_fd;
 }
 
 void
-rdf_init_hash_bdb(void)
+librdf_init_hash_bdb(void)
 {
-  rdf_hash_register_factory("BDB", &rdf_hash_bdb_register_factory);
+  librdf_hash_register_factory("BDB", &librdf_hash_bdb_register_factory);
 }

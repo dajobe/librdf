@@ -1,5 +1,5 @@
 /*
- * RDF Iterator Implementation
+ * rdf_iterator.c - RDF Iterator Implementation
  *
  * $Source$
  * $Id$
@@ -7,29 +7,33 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
+
 
 #include <config.h>
 
 #include <sys/types.h>
 
+#define LIBRDF_INTERNAL 1
 #include <rdf_config.h>
 #include <rdf_iterator.h>
 
 
-rdf_iterator*
-rdf_new_iterator(void* datum,
+librdf_iterator*
+librdf_new_iterator(void* datum,
                  int (*have_elements)(void*),
                  void* (*get_next)(void*))
 {
-  rdf_iterator* new_iterator;
+  librdf_iterator* new_iterator;
   
-  new_iterator=(rdf_iterator*)RDF_CALLOC(rdf_iterator, 1, sizeof(rdf_iterator));
+  new_iterator=(librdf_iterator*)LIBRDF_CALLOC(librdf_iterator, 1, sizeof(librdf_iterator));
   if(!new_iterator)
     return NULL;
 
@@ -40,8 +44,8 @@ rdf_new_iterator(void* datum,
 }
 
 void
-rdf_free_iterator(rdf_iterator* iterator) 
+librdf_free_iterator(librdf_iterator* iterator) 
 {
-  RDF_FREE(rdf_iterator, iterator);
+  LIBRDF_FREE(librdf_iterator, iterator);
 }
 

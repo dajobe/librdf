@@ -1,5 +1,5 @@
 /*
- * RDF URI Definition / Implementation (if inline)
+ * rdf_uri.h - RDF URI Definition / Implementation (if inline)
  *
  * $Source$
  * $Id$
@@ -7,16 +7,19 @@
  * (C) Dave Beckett 2000 ILRT, University of Bristol
  * http://www.ilrt.bristol.ac.uk/people/cmdjb/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *                                       
+ * This program is free software distributed under either of these licenses:
+ *   1. The GNU Lesser General Public License (LGPL)
+ * OR ALTERNATIVELY
+ *   2. The modified BSD license
  *
+ * See LICENSE.html or LICENSE.txt for the full license terms.
  */
 
 
-#ifndef RDF_URI_H
-#define RDF_URI_H
+
+#ifndef LIBRDF_URI_H
+#define LIBRDF_URI_H
 
 #include <rdf_digest.h>
 
@@ -24,31 +27,31 @@
 extern "C" {
 #endif
 
-typedef char rdf_uri;
+typedef char librdf_uri;
 
 /* class methods */
-void rdf_init_uri(rdf_digest_factory *factory);
+void librdf_init_uri(librdf_digest_factory *factory);
 
 /* constructors */
-rdf_uri* rdf_new_uri (char *string);
+librdf_uri* librdf_new_uri (char *string);
 /* Create a new URI from an existing URI - CLONE */
-rdf_uri* rdf_new_uri_from_uri (rdf_uri* uri);
+librdf_uri* librdf_new_uri_from_uri (librdf_uri* uri);
 
 /* destructor */
-void rdf_free_uri(rdf_uri *uri);
+void librdf_free_uri(librdf_uri *uri);
 
 /* methods */
-char* rdf_uri_as_string (rdf_uri *uri);
-rdf_digest* rdf_uri_get_digest (rdf_uri *uri);
-void rdf_uri_print (rdf_uri* uri, FILE *fh);
-char* rdf_uri_to_string (rdf_uri* uri);
+char* librdf_uri_as_string (librdf_uri *uri);
+librdf_digest* librdf_uri_get_digest (librdf_uri *uri);
+void librdf_uri_print (librdf_uri* uri, FILE *fh);
+char* librdf_uri_to_string (librdf_uri* uri);
 
 
-#if defined(RDF_URI_INLINE) && !defined(RDF_INSIDE_RDF_URI_C)
+#if defined(LIBRDF_URI_INLINE) && !defined(LIBRDF_INSIDE_LIBRDF_URI_C)
 /* Please inline the functions */
-#undef RDF_URI_INLINE
-#include <rdf_uri.c>
-#define RDF_URI_INLINE yes
+#undef LIBRDF_URI_INLINE
+#include <librdf_uri.c>
+#define LIBRDF_URI_INLINE yes
 #endif
 
 
