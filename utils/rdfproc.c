@@ -480,7 +480,7 @@ main(int argc, char *argv[])
   if(uri) {
     node=librdf_model_get_feature(model, uri);
     if(node) {
-      contexts=1;
+      contexts=atoi(librdf_node_get_literal_value(node));
       librdf_free_node(node);
     }
     librdf_free_uri(uri);
@@ -591,24 +591,32 @@ main(int argc, char *argv[])
         librdf_uri* warning_count_uri=librdf_new_uri(world, LIBRDF_PARSER_FEATURE_WARNING_COUNT);
         librdf_node* error_count_node;
         librdf_node* warning_count_node;
-        const char *error_count_string, *warning_count_string;
         int error_count, warning_count;
         
         error_count_node =librdf_parser_get_feature(parser, error_count_uri);
-        error_count_string =librdf_node_get_literal_value(error_count_node);
-        error_count=atoi(error_count_string);
+        if(error_count_node) {
+          error_count= atoi(librdf_node_get_literal_value(error_count_node));
+          librdf_free_node(error_count_node);
+        } else {
+          fprintf(stderr, "%s: Could not get parsing error count\n", program);
+          error_count= (-1);
+        }
         
         warning_count_node =librdf_parser_get_feature(parser, warning_count_uri);
-        warning_count_string =librdf_node_get_literal_value(error_count_node);
-        warning_count=atoi(warning_count_string);
+        if(warning_count_node) {
+          warning_count =atoi(librdf_node_get_literal_value(error_count_node));
+          librdf_free_node(warning_count_node);
+        } else {
+          fprintf(stderr, "%s: Could not get parsing warning count\n", program);
+          warning_count= (-1);
+        }
 
-        if(error_count+warning_count >0)
+        if((error_count >=0) && (warning_count >=0) &&
+           error_count+warning_count >0)
           fprintf(stderr,
                   "%s: The parsing returned %d errors and %d warnings\n", 
                   program, error_count, warning_count);
         
-        librdf_free_node(error_count_node);
-        librdf_free_node(warning_count_node);
         librdf_free_uri(error_count_uri);
         librdf_free_uri(warning_count_uri);
       }
