@@ -345,12 +345,17 @@ librdf_parser_libwww_parse_into_model(void *context, librdf_uri *uri,
 
 
 /**
- * librdf_parser_libwww_parse_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
+ * librdf_parser_libwww_parse_common - Retrieve the RDF/XML content at URI and parse it into a librdf_stream or model
  * @context: parser context
  * @uri: &librdf_uri URI of RDF/XML content
+ * @model: &librdf_model of model
  *
- * FIXME: Implementation currently stores all statements in memory in
- * a list and emits when the URI content has been exhausted.
+ * Uses the libwww RDF routines to resolve RDF/XML content at a URI
+ * and store it. If the model argument is not NULL, that is used
+ * to store the data otherwise the data will be returned as a stream
+ *
+ * Return value:  If a model is given, the return value is NULL on success.
+ * Otherwise the return value is a &librdf_stream or NULL on failure.
  **/
 static librdf_stream*
 librdf_parser_libwww_parse_common(void *context, librdf_uri *uri,
