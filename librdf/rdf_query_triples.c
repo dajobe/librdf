@@ -49,7 +49,7 @@ typedef struct
 
 
 /* prototypes for local functions */
-static int librdf_query_triples_init(librdf_query* query, const char *name, librdf_uri* uri, const unsigned char *query_string);
+static int librdf_query_triples_init(librdf_query* query, const char *name, librdf_uri* uri, const unsigned char *query_string, librdf_uri* base_uri);
 static librdf_query_results* librdf_query_triples_query_execute(librdf_query* query, librdf_model* model);
 static librdf_stream* librdf_query_triples_results_as_stream(librdf_query_results* query_results);
 
@@ -129,7 +129,8 @@ librdf_query_triples_find_next_term(unsigned char *string)
 static int
 librdf_query_triples_init(librdf_query* query, 
                           const char *name, librdf_uri* uri,
-                          const unsigned char* query_string)
+                          const unsigned char* query_string, 
+                          librdf_uri* base_uri)
 {
   librdf_query_triples_context *context=(librdf_query_triples_context*)query->context;
   int len;
