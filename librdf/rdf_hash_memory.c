@@ -53,9 +53,11 @@ typedef struct
   int size;
   /* Total array length */
   int capacity;
-  /* max "fullness ratio" out of 10000.
-   * Always true: (size/capacity * 1000) < ratio */
-  int ratio;
+  /* array load factor expressed out of 1000.
+   * Always true: (size/capacity * 1000) < load_factor,
+   * or in the code: size * 1000 < load_factor * capacity
+   */
+  int load_factor;
   /* used for get_seq */
   int current_bucket;
   librdf_hash_memory_node* current_node;
@@ -64,8 +66,8 @@ typedef struct
 
 /* statics */
 
-/* default fullness ratio /10000 */
-static int librdf_hash_default_ratio=7000;
+/* default load_factor out of 1000 */
+static int librdf_hash_default_load_factor=750;
 
 /* starting capacity - MUST BE POWER OF 2 */
 static int librdf_hash_initial_capacity=8;
@@ -270,7 +272,7 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
 
   if (hash->capacity) {
     /* big enough */
-    if(10000 * hash->size < hash->ratio * hash->capacity)
+    if((1000 * hash->size) < (hash->load_factor * hash->capacity))
       return 0;
     /* grow hash (keeping it a power of two) */
     required_capacity=hash->capacity << 1;
@@ -343,7 +345,7 @@ librdf_hash_memory_open(void* context, char *identifier, void *mode,
 {
   librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
 
-  hash->ratio=librdf_hash_default_ratio;
+  hash->load_factor=librdf_hash_default_load_factor;
   return librdf_hash_memory_expand_size(hash);
 }
 
@@ -678,11 +680,10 @@ librdf_hash_memory_register_factory(librdf_hash_factory *factory)
  * Initialise the memory hash module.
  **/
 void
-librdf_init_hash_memory(int default_ratio)
+librdf_init_hash_memory(int default_load_factor)
 {
-  if(default_ratio < 0 || default_ratio > 10000)
-    default_ratio=7000;
-  librdf_hash_default_ratio=default_ratio;
+  if(default_load_factor >= 0 && default_load_factor < 1000)
+    librdf_hash_default_load_factor=default_load_factor;
 
   librdf_hash_register_factory("memory", &librdf_hash_memory_register_factory);
 }
