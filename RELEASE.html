@@ -34,9 +34,9 @@ along with the new syntax
 
 <p>Three new storage modules were added:</p>
 <ol>
-<li>MySQL written by Morten Frederiksen</li>
-<li> <a href="http://triplestore.aktors.org/">AKT Triplestore</a></li>
-<li>File and URI-backed store</li>
+<li>MySQL store written by <a href="http://purl.org/net/morten/">Morten Frederiksen</a></li>
+<li><a href="http://triplestore.aktors.org/">AKT Triplestore</a></li>
+<li>File and URI-backed in-memory store</li>
 </ol>
 
 <p>The runtime is now compiled with assertions to check for illegal
@@ -235,6 +235,13 @@ install the files rather than try to force it based on the prefix
 argument to configure.  Make Parser method parse_string_into_model
 call the correct Redland function.  Added OSX Java directories
 to JDK search path.</p>
+
+
+<h3>PHP API Changes</h3>
+
+<p>Updated to match API changes above.  Redland is now started up and
+shutdown once in the PHP module code and does not need to called
+directly.</p>
 
 
 <h3>Python API changes</h3>
