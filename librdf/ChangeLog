@@ -1,3 +1,24 @@
+2005-01-31  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_rasqal.c (librdf_query_rasqal_results_is_bindings,
+	librdf_query_rasqal_results_is_boolean,
+	librdf_query_rasqal_results_is_graph,
+	librdf_query_rasqal_results_get_boolean): Added, calling rasqal.
+	(librdf_query_rasqal_results_as_stream): Added, not implemented.
+
+	* rdf_query_results.c (librdf_query_results_as_stream): Moved to
+	end to match new query results.
+	(librdf_query_results_is_bindings,
+	librdf_query_results_is_boolean, librdf_query_results_is_graph,
+	librdf_query_results_get_boolean, librdf_query_results_as_stream):
+	Added.
+
+	* rdf_query.h: Added results_is_bindings, results_is_boolean,
+	results_is_grpah and results_get_boolean factory methods.
+	Added prototypes for librdf_query_results_is_bindings,
+	librdf_query_results_is_boolean, librdf_query_results_is_graph and
+	librdf_query_results_get_boolean
+
 2005-01-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_query.c: docs

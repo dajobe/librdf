@@ -1,3 +1,42 @@
+2005-01-31  cmdjb  <cmdjb@hedwig.dajobe.org>
+
+	* librdf/rdf_query_rasqal.c
+	(librdf_query_rasqal_results_is_bindings,
+	librdf_query_rasqal_results_is_boolean,
+	librdf_query_rasqal_results_is_graph,
+	librdf_query_rasqal_results_get_boolean):
+	Added, calling rasqal.
+	(librdf_query_rasqal_results_as_stream): Added, not implemented.
+
+	* librdf/rdf_query_results.c (librdf_query_results_as_stream):
+	Moved to end to match new query results.
+	(librdf_query_results_is_bindings, librdf_query_results_is_boolean,
+	librdf_query_results_is_graph, librdf_query_results_get_boolean,
+	librdf_query_results_as_stream): Added.
+
+	* librdf/rdf_query.h: Added results_is_bindings,
+	results_is_boolean, results_is_grpah and results_get_boolean
+	factory methods.
+	Added prototypes for librdf_query_results_is_bindings,
+	librdf_query_results_is_boolean, librdf_query_results_is_graph and
+	librdf_query_results_get_boolean
+
+	* rasqal/rasqal_query.c (rasqal_query_execute): Init ask_result.
+	(rasqal_free_query_results, rasqal_query_results_is_bindings,
+	rasqal_query_results_is_boolean, rasqal_query_results_is_graph):
+	Docs.
+	(rasqal_query_results_next, rasqal_query_results_get_triple,
+	rasqal_query_results_next_triple): C style.
+	(rasqal_query_results_get_triple): FIXME about bnodeids is done.
+	(rasqal_query_results_get_boolean): Docs and implement by getting
+	first result and storing if it worked.
+
+	* rasqal/rasqal_internal.h: Added ask_result to rasqal_query.
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Added ask0.rq
+
+	* rasqal/tests/sparql/syntax/ask0.rq: ASK test
+
 2005-01-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_query.c: docs
