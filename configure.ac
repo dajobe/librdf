@@ -474,9 +474,11 @@ AC_ARG_WITH(jdk, [  --with-jdk=DIR          Java JDK location []], jdk="$withval
 AC_MSG_CHECKING(Java JDK includes)
 JDK_INCLUDES=
 if test "X$jdk" != X -a -r $jdk/include/jni.h; then
-  JDK_INCLUDES="-I$jdk/include"
-  if test -d $jdk/include/linux; then
-    JDK_INCLUDES="$JDK_INCLUDES -I$jdk/include/linux"
+  inc1="$jdk/include"
+  inc2=`find $inc1 -type d | grep -v "$inc1\$" | head -1`
+  JDK_INCLUDES="-I$inc1"
+  if test -r $inc2/jni_md.h; then
+    JDK_INCLUDES="$JDK_INCLUDES -I$inc2"
   fi
 fi
 AC_SUBST(JDK_INCLUDES)
