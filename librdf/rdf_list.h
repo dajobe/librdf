@@ -48,7 +48,6 @@ struct librdf_list_s
   librdf_world *world;
   librdf_list_node* first;
   librdf_list_node* last;
-  librdf_list_node* current;
   int length;
   int (*equals) (void* data1, void *data2);
 };
