@@ -360,6 +360,11 @@ librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *sour
 librdf_node* librdf_model_get_source(librdf_model *model, librdf_node *arc, librdf_node *target);
 librdf_node* librdf_model_get_arc(librdf_model *model, librdf_node *source, librdf_node *target);
 librdf_node* librdf_model_get_target(librdf_model *model, librdf_node *source, librdf_node *arc);
+int librdf_model_context_add_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
+int librdf_model_context_add_statements(librdf_model* model, librdf_node* context, librdf_stream* stream);
+int librdf_model_context_remove_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
+int librdf_model_context_remove_statements(librdf_model* model, librdf_node* context);
+librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* context);
 
 /* rdf_storage.h */
 librdf_storage* librdf_new_storage(librdf_world *world, char *storage_name, char *name, char *options_string);
