@@ -65,8 +65,12 @@ Print the Redland version and exit.
 .SH COMMANDS
 Where a node is allowed, such as \fINODE\fP, \fISUBJECT\fP,
 \fIPREDICATE\fP or \fIOBJECT\fP below, simple heuristics are used to
-guess which are URIs or literals (to add a statement with a literal,
-use add-typed).  No Blank Node identifiers are supported.
+guess which are blank node identifiers, URIs or literals
+(to add a statement with a literal, use add-typed).  If the
+item starts with _: then it is assumed to be a blank node identifier,
+otherwise if it matches something:// it is assumed to be a URI,
+otherwise it is a literal.  Literals are only allowed as objects
+of statements and blank nodes are not allowed as predicates.
 .IP "\fBadd \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP \fI[CONTEXT]\fP\fR"
 Add the given triple to graph, in the optional Redland context
 if the \fICONTEXT\fR node is given.
@@ -148,7 +152,7 @@ W3C Working Draft (work in progress),
 http://www.w3.org/TR/rdf-testcases/#ntriples
 .UE
 .SH SEE ALSO
-.BR redland (3)
+.BR redland(3), libraptor(3), rapper(1)
 .SH AUTHOR
 Dave Beckett - 
 .UR http://purl.org/net/dajobe/
