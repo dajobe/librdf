@@ -345,8 +345,10 @@ librdf_storage_list_serialise_get_statement(void* context, int flags)
       else
         return NULL;
     default:
-      LIBRDF_FATAL2(librdf_storage_list_serialise_get_statement,
-                    "Unknown flags %d\n", flags);
+      LIBRDF_ERROR2(scontext->iterator->world, 
+                    librdf_storage_list_serialise_get_statement,
+                    "Unknown iterator method flag %d\n", flags);
+      return NULL;
   }
 }
 
@@ -649,8 +651,10 @@ librdf_storage_list_context_serialise_get_statement(void* context, int flags)
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
       return scontext->context_node;
     default:
-      LIBRDF_FATAL2(librdf_storage_list_context_serialise_get_statement,
+      LIBRDF_ERROR2(scontext->iterator->world,
+                    librdf_storage_list_context_serialise_get_statement,
                     "Unknown iterator method flag %d\n", flags);
+      return NULL;
   }
   
 }

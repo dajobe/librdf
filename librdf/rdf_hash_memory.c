@@ -550,8 +550,9 @@ librdf_hash_memory_cursor_get(void* context,
       
       break;
     default:
-      LIBRDF_FATAL2(librdf_hash_memory_cursor_get,
+      LIBRDF_ERROR2(cursor->hash->hash->world, librdf_hash_memory_cursor_get,
                     "Unknown hash method flag %d\n", flags);
+      return 1;
   }
   
 
@@ -616,8 +617,9 @@ librdf_hash_memory_cursor_get(void* context,
       
       break;
     default:
-      LIBRDF_FATAL2(librdf_hash_memory_cursor_get,
+      LIBRDF_ERROR2(cursor->hash->hash->world, librdf_hash_memory_cursor_get,
                     "Unknown hash method flag %d\n", flags);
+      return 1;
   }
   
 

@@ -131,8 +131,13 @@ librdf_parser_raptor_new_statement_handler (void *context,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->subject),
                                                     scontext->source_uri,
                                                     scontext->base_uri);
-  } else
-    LIBRDF_FATAL2(librdf_parser_raptor_new_statement_handler,"Unknown Raptor subject identifier type %d", rstatement->subject_type);
+  } else {
+    LIBRDF_ERROR2(world, librdf_parser_raptor_new_statement_handler,
+                  "Unknown Raptor subject identifier type %d", 
+                  rstatement->subject_type);
+    librdf_free_statement(statement);
+    return;
+  }
   
   librdf_statement_set_subject(statement, node);
   
@@ -151,8 +156,13 @@ librdf_parser_raptor_new_statement_handler (void *context,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->predicate),
                                                     scontext->source_uri,
                                                     scontext->base_uri);
-  } else
-    LIBRDF_FATAL2(librdf_parser_raptor_new_statement_handler,"Unknown Raptor predicate identifier type %d", rstatement->predicate_type);
+  } else {
+    LIBRDF_ERROR2(world, librdf_parser_raptor_new_statement_handler,
+                  "Unknown Raptor predicate identifier type %d", 
+                  rstatement->predicate_type);
+    librdf_free_statement(statement);
+    return;
+  }
 
   librdf_statement_set_predicate(statement, node);
 
@@ -185,8 +195,13 @@ librdf_parser_raptor_new_statement_handler (void *context,
                                                     scontext->source_uri,
                                                     scontext->base_uri);
     librdf_statement_set_object(statement, node);
-  } else
-    LIBRDF_FATAL2(librdf_parser_raptor_new_statement_handler,"Unknown Raptor object identifier type %d", rstatement->object_type);
+  } else {
+    LIBRDF_ERROR2(world, librdf_parser_raptor_new_statement_handler,
+                  "Unknown Raptor object identifier type %d", 
+                  rstatement->object_type);
+    librdf_free_statement(statement);
+    return;
+  }
 
 
 #ifdef LIBRDF_DEBUG
@@ -630,8 +645,10 @@ librdf_parser_raptor_serialise_get_statement(void* context, int flags)
       return NULL;
       
     default:
-      LIBRDF_FATAL2(librdf_parser_raptor_serialise_get_statement,
+      LIBRDF_ERROR2(scontext->pcontext->parser->world,
+                    librdf_parser_raptor_serialise_get_statement,
                     "Unknown iterator method flag %d\n", flags);
+      return NULL;
   }
 
 }

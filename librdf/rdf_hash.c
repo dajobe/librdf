@@ -206,20 +206,23 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
   hash=(librdf_hash_factory*)LIBRDF_CALLOC(librdf_hash_factory, 1,
                                            sizeof(librdf_hash_factory));
   if(!hash)
-    LIBRDF_FATAL1(librdf_hash_register_factory, "Out of memory\n");
+    LIBRDF_FATAL1(world, librdf_hash_register_factory, "Out of memory");
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_hash, hash);
-    LIBRDF_FATAL1(librdf_hash_register_factory, "Out of memory\n");
+    LIBRDF_FATAL1(world, librdf_hash_register_factory, "Out of memory");
   }
   strcpy(name_copy, name);
   hash->name=name_copy;
   
   for(h = world->hashes; h; h = h->next ) {
     if(!strcmp(h->name, name_copy)) {
-      LIBRDF_FATAL2(librdf_hash_register_factory,
-		    "hash %s already registered\n", h->name);
+      LIBRDF_FREE(cstring, name_copy); 
+      LIBRDF_FREE(librdf_hash_factory, hash);
+      LIBRDF_ERROR2(world, librdf_hash_register_factory,
+		    "hash %s already registered", h->name);
+      return;
     }
   }
   
@@ -1295,7 +1298,9 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
         break;
         
       default:
-        LIBRDF_FATAL2(librdf_hash_from_string, "No such state %d", state);
+        LIBRDF_ERROR2(hash->world, librdf_hash_from_string,
+                      "No such state %d", state);
+        return 1;
     }
   }
   return 0;
@@ -1317,9 +1322,11 @@ librdf_hash_from_array_of_strings (librdf_hash* hash, char **array)
   
   for(i=0; (key.data=array[i]); i+=2) {
     value.data=array[i+1];
-    if(!value.data)
-      LIBRDF_FATAL2(librdf_hash_from_array_of_strings,
+    if(!value.data) {
+      LIBRDF_ERROR2(hash->world, librdf_hash_from_array_of_strings,
                     "Array contains an odd number of strings - %d", i);
+      return;
+    }
     key.size=strlen((char*)key.data);
     value.size=strlen((char*)value.data);
     librdf_hash_put(hash, &key, &value);

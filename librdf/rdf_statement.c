@@ -754,9 +754,9 @@ librdf_statement_decode_parts(librdf_statement* statement,
       break;
 
     default:
-      LIBRDF_FATAL2(librdf_statement_decode_parts,
-                    "Illegal statement encoding %d seen\n",
-                    p[-1]);
+      LIBRDF_ERROR2(statement->world, librdf_statement_decode_parts,
+                    "Illegal statement encoding '%c' seen\n", p[-1]);
+      return 0;
     }
   }
 

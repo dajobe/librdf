@@ -384,8 +384,9 @@ librdf_new_node_from_node(librdf_node *node)
       break;
 
     default:
-      LIBRDF_FATAL2(librdf_node_from_node, 
+      LIBRDF_ERROR2(node->world, librdf_node_from_node, 
                     "Do not know how to copy node type %d\n", node->type);
+      return NULL;
   }
   
   return new_node;
@@ -910,9 +911,9 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
     sprintf(s, "(%s)", node->value.blank.identifier);
     break;
   default:
-    /* FIXME */
-    LIBRDF_FATAL2(librdf_node_string, 
+    LIBRDF_ERROR2(node->world, librdf_node_string, 
                   "Do not know how to print node type %d\n", node->type);
+    return NULL;
   }
   return s;
 }
@@ -975,9 +976,10 @@ librdf_node_get_digest(librdf_node* node)
       librdf_digest_final(d);
       break;
     default:
-      /* FIXME */
-      LIBRDF_FATAL2(librdf_node_get_digest,
-                    "Do not know how to make digest for node type %d\n", node->type);
+      LIBRDF_ERROR2(world, librdf_node_get_digest,
+                    "Do not know how to make digest for node type %d\n", 
+                    node->type);
+      return NULL;
   }
   
   return d;
@@ -992,7 +994,7 @@ librdf_node_get_digest(librdf_node* node)
  * Note - for literal nodes, XML language, XML space and well-formness are 
  * presently ignored in the comparison.
  * 
- * Return value: non 0 if nodes are equal
+ * Return value: non 0 if nodes are equal.  0 if equal or failure
  **/
 int
 librdf_node_equals(librdf_node* first_node, librdf_node* second_node) 
@@ -1037,9 +1039,10 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
                      second_node->value.blank.identifier);
 
     default:
-      /* FIXME */
-      LIBRDF_FATAL2(librdf_node_equals,
-                    "Do not know how to compare node type %d\n", first_node->type);
+      LIBRDF_ERROR2(first_node->world, librdf_node_equals,
+                    "Do not know how to compare node type %d\n",
+                    first_node->type);
+      return 0;
   }
 
   /* NOTREACHED */
@@ -1170,9 +1173,9 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       break;
       
     default:
-      /* FIXME */
-      LIBRDF_FATAL2(librdf_node_encode,
+      LIBRDF_ERROR2(node->world, librdf_node_encode,
                     "Do not know how to encode node type %d\n", node->type);
+      return 0;
   }
   
   return total_length;
@@ -1318,9 +1321,10 @@ librdf_node_decode(librdf_world *world,
     break;
 
   default:
-    LIBRDF_FATAL2(librdf_node_decode, "Illegal node encoding %d seen\n",
-                  buffer[0]);
-
+    LIBRDF_FREE(librdf_node, node);
+    LIBRDF_ERROR2(world, librdf_node_decode,
+                  "Illegal node encoding '%c' seen\n", buffer[0]);
+    return NULL;
   }
   
   if(size_p)
@@ -1338,6 +1342,7 @@ static void* librdf_node_static_iterator_get_method(void* iterator, int flags);
 static void librdf_node_static_iterator_finished(void* iterator);
 
 typedef struct {
+  librdf_world *world;
   librdf_node** nodes; /* static array of nodes; shared */
   int size;            /* size of above array */
   int current;         /* index into above array */
@@ -1382,8 +1387,9 @@ librdf_node_static_iterator_get_method(void* iterator, int flags)
       return NULL;
 
     default:
-      LIBRDF_FATAL2(librdf_node_static_iterator_get_method,
+      LIBRDF_ERROR2(context->world, librdf_node_static_iterator_get_method,
                     "Unknown iterator method flag %d\n", flags);
+      return NULL;
   }
 }
 
