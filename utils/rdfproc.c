@@ -79,7 +79,8 @@ enum command_type {
   CMD_QUERY,
   CMD_SERIALIZE,
   CMD_REMOVE_CONTEXT,
-  CMD_CONTEXTS
+  CMD_CONTEXTS,
+  CMD_MATCH
 };
 
 typedef struct
@@ -115,6 +116,7 @@ static command commands[]={
   {CMD_SERIALIZE, "serialize", 0, 3, 0},
   {CMD_REMOVE_CONTEXT, "remove-context", 1, 1, 0},
   {CMD_CONTEXTS, "contexts", 0, 0, 0},
+  {CMD_MATCH, "match", 3, 4, 0},
   {(enum command_type)-1, NULL}  
 };
  
@@ -702,6 +704,7 @@ main(int argc, char *argv[])
 
     case CMD_CONTAINS:
     case CMD_FIND:
+    case CMD_MATCH:
     case CMD_ADD:
     case CMD_REMOVE:
     case CMD_ADD_TYPED:
@@ -741,7 +744,7 @@ main(int argc, char *argv[])
       librdf_statement_set_predicate(partial_statement, arc);
       librdf_statement_set_object(partial_statement, target);
       
-      if(type != CMD_FIND) {
+      if((type != CMD_FIND) && (type != CMD_MATCH)) {
         if(!source || !arc || !target) {
           fprintf(stderr, "%s: cannot have missing triple parts for %s\n", program, cmd);
           librdf_free_statement(partial_statement);
@@ -759,26 +762,38 @@ main(int argc, char *argv[])
           break;
           
         case CMD_FIND:
+        case CMD_MATCH:
         case CMD_QUERY:
           /* Print out matching statements */
-          if(type==CMD_FIND) {
-            if(argc == 4) {
-              librdf_node *context_node;
+          if(type==CMD_FIND || type==CMD_MATCH) {
+            if(argc == 4 || type==CMD_MATCH) {
+              librdf_node *context_node=NULL;
               
-              if (librdf_heuristic_is_blank_node(argv[3]))
-                context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
-              else
-                context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
-              stream=librdf_model_find_statements_in_context(model, partial_statement, context_node);
-              librdf_free_node(context_node);
+              if(argc == 4) {
+                if (librdf_heuristic_is_blank_node(argv[3]))
+                  context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
+                else
+                  context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
+              }
+              if(type == CMD_MATCH) {
+                librdf_hash* match_options=librdf_new_hash(world, NULL);
+                librdf_hash_open(match_options, NULL, 0, 1, 1, NULL);
+                librdf_hash_put_strings(match_options, "match-substring", "yes");
+                stream=librdf_model_find_statements_with_options(model, partial_statement, context_node, match_options);
+                librdf_free_hash(match_options);
+              } else {
+                stream=librdf_model_find_statements_in_context(model, partial_statement, context_node);
+              }
+
+              if(context_node)
+                librdf_free_node(context_node);
             } else
               stream=librdf_model_find_statements(model, partial_statement);
           } else
             stream=librdf_model_query(model, query);
 
           if(!stream) {
-            fprintf(stderr, "%s: %s returned NULL stream\n", program,
-                    ((type==CMD_FIND) ? (argc ==4 ? "librdf_model_find_statements_in_context" : "librdf_model_find_statements") : "librdf_model_query"));
+            fprintf(stderr, "%s: %s returned no results (NULL stream)\n", program, commands[type].name);
           } else {
             count=0;
             while(!librdf_stream_end(stream)) {
