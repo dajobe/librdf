@@ -1589,10 +1589,8 @@ librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
   factory->context_remove_statement   = librdf_storage_mysql_context_remove_statement;
   factory->context_remove_statements  = librdf_storage_mysql_context_remove_statements;
   factory->context_serialise          = librdf_storage_mysql_context_serialise;
-/* Recent additions...
   factory->find_statements_in_context = librdf_storage_mysql_find_statements_in_context;
-  factory->get_contexts = librdf_storage_mysql_get_contexts;
-*/
+  factory->get_contexts               = librdf_storage_mysql_get_contexts;
 }
 
 
