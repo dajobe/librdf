@@ -311,6 +311,7 @@ void
 librdf_init_serializer(librdf_world *world) 
 {
   librdf_serializer_raptor_constructor(world);
+  librdf_serializer_rdfxml_constructor(world);
 }
 
 
