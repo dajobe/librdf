@@ -33,7 +33,6 @@
 #undef HAVE_LIBWWW_RDF
 
 /* defined if specific hashes are available */
-#undef HAVE_GDBM_HASH
 #undef HAVE_BDB_HASH
 
 /* Berkeley DB complexities */

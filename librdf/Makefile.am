@@ -34,7 +34,7 @@ rdf_stream.h \
 rdf_parser.h \
 rdf_heuristics.h \
 rdf_list.h \
-rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
+rdf_hash_bdb.h rdf_hash_memory.h \
 rdf_files.h \
 rdf_storage_list.h rdf_storage_hashes.h rdf_utf8.h \
 rdf_query.h \
@@ -56,7 +56,7 @@ rdf_serializer_raptor.c rdf_serializer_rdfxml.c \
 redland.h librdf.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
-rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
+rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_memory.h \
 rdf_types.h \
 rdf_model.h rdf_iterator.h \
 rdf_list.h \
@@ -77,7 +77,7 @@ librdf_la_DEPENDENCIES = \
 @LIBRDF_XML_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 
-EXTRA_librdf_la_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
+EXTRA_librdf_la_SOURCES = rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
 rdf_parser_raptor.c \
 rdf_parser_repat.c

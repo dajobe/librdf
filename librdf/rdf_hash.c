@@ -36,9 +36,6 @@
 #include <librdf.h>
 
 #include <rdf_hash.h>
-#ifdef HAVE_GDBM_HASH
-#include <rdf_hash_gdbm.h>
-#endif
 #ifdef HAVE_BDB_HASH
 #include <rdf_hash_bdb.h>
 #endif
@@ -81,11 +78,6 @@ librdf_init_hash(librdf_world *world)
 {
   /* Init hash datum cache */
   librdf_init_hash_datums(world);
-#if 0  
-#ifdef HAVE_GDBM_HASH
-  librdf_init_hash_gdbm(world);
-#endif
-#endif
 #ifdef HAVE_BDB_HASH
   librdf_init_hash_bdb(world);
 #endif
@@ -1423,7 +1415,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_hash *h, *h2, *ch;
-  char *test_hash_types[]={"gdbm", "bdb", "memory", NULL};
+  char *test_hash_types[]={"bdb", "memory", NULL};
   char *test_hash_values[]={"colour","yellow", /* Made in UK, can you guess? */
 			    "age", "new",
 			    "size", "large",

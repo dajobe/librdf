@@ -817,19 +817,6 @@ AC_SUBST(DIGEST_SRCS)
 HASH_OBJS=
 HASH_SRCS=
 
-# GDBM is not available anymore because it cannot handle duplicate
-# keys, without extra support. Dave -- 2000-08-11
-#
-#AC_MSG_CHECKING(for libgdbm support)
-#if test "$ac_cv_lib_gdbm_gdbm_firstkey" = yes ; then
-#  AC_MSG_RESULT(yes);
-#  AC_DEFINE(HAVE_GDBM_HASH)
-#  HASH_OBJS="$HASH_OBJS rdf_hash_gdbm.lo"
-#  HASH_SRCS="$HASH_SRCS rdf_hash_gdbm.c"
-#else
-#  AC_MSG_RESULT(no);
-#fi
-
 AC_MSG_CHECKING(for bdb hash support)
 if test "$have_libdb" = yes; then
   AC_MSG_RESULT(yes);
