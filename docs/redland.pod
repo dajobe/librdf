@@ -461,9 +461,7 @@ libxml(4).
 =head1 HISTORY
 
 The B<redland> library was written by Dave Beckett from around June
-2000 onwards.  It includes the expat XML parser originally by James
-Clarke (optionally compiled) and the repat RDF/XML parser by Jason
-Diamond (optionally compiled).
+2000 onwards.
 
 
 =head1 AUTHOR

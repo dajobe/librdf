@@ -205,19 +205,10 @@ LIBRDF_LDFLAGS=
 LIBRDF_LIBS=
 
 # Internally linked libraries - never given to users
-#   (such as repat)
 # -Dfoo -Idir
 LIBRDF_INTERNAL_CPPFLAGS=
 # -Ldir -llib
 LIBRDF_INTERNAL_LIBS=
-
-# Links to internal/external XML parsers (for repat)
-# -I/path/to/expat
-LIBRDF_XML_CPPFLAGS=
-# -lexpatname
-LIBRDF_XML_LIBS=
-# XML objects that must be linked into the raptor library (expat usually)
-LIBRDF_XML_OBJS=
 
 # do these first because somehow they get messed up by bdb checks
 AC_CHECK_TYPE([byte u32])
@@ -357,7 +348,6 @@ fi
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h)
-AC_CHECK_HEADERS(expat.h xmlparse.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -397,131 +387,13 @@ dnl Checks for XML parsers
 AC_ARG_WITH(xml-parser, [  --with-xml-parser=NAME  Use XML parser - expat, libxml [expat]], xml_parser="$withval", xml_parser="libxml") 
 
 
-have_expat=0
-have_expat_lib=0
-need_expat=0
-
-oLIBS="$LIBS"
-AC_CHECK_LIB(xmltok, main, xmlt=1, xmlt=0)
-
-# Raptor only needs XML_ParserCreate but Repat needs
-# XML_ParserCreateNS so check for that
-AC_CHECK_LIB(xmlparse, XML_ParserCreateNS, xmlp=1, xmlp=0, -lxmltok)
-
-LIBS="$LIBRDF_LIBS"
-
-# Remove any expat lurking around from, say, w3c libwww
-LIBS=`echo $LIBS | sed -e 's/-lxmlparse//' -e 's/-lxmltok//'`
-
-AC_CHECK_LIB(expat, XML_ParserCreateNS, libexpat=1, libexpat=0)
-
-LIBS="$LIBRDF_LIBS"
-
-REPAT_FLAGS=
-REPAT_LIBS=
-
-AC_MSG_CHECKING(for working expat in libxmlparse and libxmltok)
-if test $xmlp = 1 -a $xmlt = 1 -a  $ac_cv_header_xmlparse_h = yes; then
-  LIBS="-lxmlparse -lxmltok $LIBRDF_LIBS"
-  AC_TRY_RUN([#include <stdio.h>
-	      main() {XML_ParserCreateNS(NULL); return(0);}], 
-              worked=yes, worked=no, worked=no)
-  if test $worked = yes; then
-    # Old expat
-    have_expat_lib=1
-    have_expat=1
-    expat_libs="-lxmlparse -lxmltok"
-
-    AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE, 1, [Repat needs xmlparse library])
-    REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
-    REPAT_LIBS="$expat_libs"
-
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no)
-  fi
-else
-  AC_MSG_RESULT(no)
-fi
-
-LIBS="$LIBRDF_LIBS"
-
-AC_MSG_CHECKING(for working expat in libexpat)
-if test $libexpat = 1 -a $ac_cv_header_expat_h = yes ; then
-  LIBS="-lexpat $LIBRDF_LIBS"
-  AC_TRY_RUN([#include <stdio.h>
-	     main() {XML_ParserCreateNS(NULL); return(0);}],
-             worked=yes, worked=no, worked=no)
-  if test $worked = yes; then
-    # New expat - expat-1.95.0 or later
-    have_expat_lib=1
-    have_expat=1
-    expat_libs="-lexpat"
-    REPAT_LIBS="$expat_libs"
-
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no)
-  fi
-else
-  AC_MSG_RESULT(no)
-fi
-
-LIBS="$LIBRDF_LIBS"
-
-AC_ARG_WITH(xml2-config, [  --with-xml2-config=PATH Location of libxml xml2-config []], xml2_config="$withval", xml2_config="")
-
-if test "X$xml2_config" != "X" ; then
-  AC_MSG_CHECKING(for $xml2_config)
-
-  if test -f $xml2_config ; then
-    XML_CONFIG=$xml2_config
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no - searching PATH)
-  fi
-fi
-if test "X$XML_CONFIG" = "X"; then
-  AC_CHECK_PROGS(XML_CONFIG, xml2-config xml-config)
-fi
-
-have_libxml=0
-have_libxml_lib=0
-need_libxml=0
-
-if test "X$XML_CONFIG" != X; then
-  LIBS="`$XML_CONFIG --libs` $LIBS"
-  AC_CHECK_FUNC(xmlCreatePushParserCtxt, have_xmlCreatePushParserCtxt=yes, have_xmlCreatePushParserCtxt=no)
-  LIBS="$LIBRDF_LIBS"
-  AC_MSG_CHECKING(for system (GNOME) libxml library)
-  if test $have_xmlCreatePushParserCtxt = yes; then
-    have_libxml_lib=1
-    have_libxml=1
-    AC_MSG_RESULT(yes)
-
-
-    CPPFLAGS="$CPPFLAGS `$XML_CONFIG --cflags`"
-
-    AC_CHECK_HEADERS(libxml/parser.h libxml/hash.h gnome-xml/parser.h)
-    if test "$ac_cv_header_libxml_parser_h" = no -a "$ac_cv_header_gnome_xml_parser_h" = no; then
-      AC_MSG_WARN(libxml library found but not headers - disabling)
-      have_libxml_lib=0
-      have_libxml=0
-    fi
-
-    CPPFLAGS="$LIBRDF_CPPFLAGS"
-
-  else
-    AC_MSG_RESULT(no)
-  fi
-fi
 
 
 dnl Checks for RDF parsers
-parser_modules="raptor repat"
+parser_modules="raptor"
 
 AC_MSG_CHECKING(RDF parsers required)
-AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [raptor repat]], parser_modules="$enableval") 
+AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [raptor]], parser_modules="$enableval") 
 if test "X$parser_modules" = "Xno" -o "X$parser_modules" = X; then
   parser_modules=
 fi
@@ -535,17 +407,14 @@ PARSER_SRCS=
 # symbols must be pulled from acconfig.h into config.h.in
 if test "x" = "y"; then
   AC_DEFINE(HAVE_RAPTOR_RDF_PARSER, 1, [Have Raptor RDF parser])
-  AC_DEFINE(HAVE_REPAT_RDF_PARSER, 1, [Have Repat RDF parser])
 fi
 
 
 # Always have these
 have_raptor=1
-have_repat=1
 
 
-need_repat=0
-need_raptor=0
+need_raptor=1
 rdf_parsers_available=
 for parser in $parser_modules; do
   uname=`echo $parser | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
@@ -555,32 +424,10 @@ for parser in $parser_modules; do
   case $parser in
     raptor)
       if test $have_raptor = 1 ; then
-	if test $xml_parser = "libxml"; then
-	  need_libxml=1
-	  found=1
-	  AC_DEFINE(NEED_LIBXML, 1, [Need libxml2 XML library])
-	  AC_DEFINE(RAPTOR_XML_LIBXML, 1, [Raptor needs libxml2 XML library])
-	else # expat
-	  if test $have_expat_lib = 1; then
-	    need_expat=1
-	    found=1
-	    AC_DEFINE(NEED_EXPAT, 1, [Need expat XML parser library])
-	    AC_DEFINE(RAPTOR_XML_EXPAT, 1, [Raptor needs expat XML parser library])
-	  fi
-        fi
        	need_raptor=1
+	found=1
       fi
         
-      ;;
-    repat)
-      if test $have_repat = 1 ; then
-	if test $have_expat_lib = 1; then
-	  need_expat=1
-	  found=1
-	  AC_DEFINE(NEED_EXPAT, 1, [Need expat XML parser librar])
-	fi
-	need_repat=1
-      fi
       ;;
     *)
       AC_MSG_ERROR(No such parser $parser)
@@ -659,20 +506,6 @@ AC_SUBST(PARSER_SRCS)
 
 if test "X$PARSER_OBJS" = X; then
   AC_MSG_WARN(No RDF parser configured)
-fi
-
-
-
-xml_parsers_available=
-if test $need_libxml = 1; then
-  xml_parsers_available="$xml_parsers_available libxml(system)"
-fi
-if test $need_expat = 1; then
-  if test $libexpat = 1; then
-    xml_parsers_available="$xml_parsers_available expat(system libexpat)"
-  else
-    xml_parsers_available="$xml_parsers_available expat(system libxmlparse,libxmltok)"
-  fi
 fi
 
 
@@ -807,44 +640,6 @@ dnl Checks for building sub-packages in sub directories
 SD="docs perl python tcl java"
 
 
-if test $have_libxml = 1 -a $need_libxml = 1; then
-  l=`$XML_CONFIG --libs`
-  c=`$XML_CONFIG --cflags`
-  LIBRDF_LIBS="$l $LIBRDF_LIBS"
-  LIBRDF_CPPFLAGS="$c $LIBRDF_CPPFLAGS"
-  LIBRDF_XML_LIBS="$l $LIBRDF_XML_LIBS"
-  LIBRDF_XML_CPPFLAGS="$c $LIBRDF_XML_CPPFLAGS"
-fi
-
-if test $need_expat = 1; then
-  LIBRDF_LIBS="$expat_libs $LIBRDF_LIBS"
-  LIBRDF_XML_LIBS="$expat_libs $LIBRDF_XML_LIBS"
-  REPAT_LIBS="$expat_libs"
-
-  LIBS=$LIBRDF_LIBS
-
-  AC_MSG_CHECKING(for XML_SetNamespaceDeclHandler in expat)
-  AC_TRY_RUN([main() {XML_SetNamespaceDeclHandler(); return(0);}], worked=yes, worked=no, worked=no)
-
-  if test $worked = yes; then
-    AC_DEFINE(HAVE_XML_SetNamespaceDeclHandler, 1, [expat has XML_SetNamespaceDeclHandler method])
-    AC_MSG_RESULT(yes)
-  else
-    AC_MSG_RESULT(no)
-  fi
-
-fi
-
-if test $need_repat = 1; then
-  # Always have local copy
-  SD="$SD repat"
-  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir) $LIBRDF_INTERNAL_CPPFLAGS"
-  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/repat/librepat.la $LIBRDF_INTERNAL_LIBS"
-fi
-
-
-AC_SUBST(REPAT_FLAGS)
-AC_SUBST(REPAT_LIBS)
 AC_SUBST(SD)
 
 
@@ -870,10 +665,6 @@ fi
 LIBS=
 CPPFLAGS=
 LDFLAGS=
-
-AC_SUBST(LIBRDF_XML_CPPFLAGS)
-AC_SUBST(LIBRDF_XML_LIBS)
-AC_SUBST(LIBRDF_XML_OBJS)
 
 AC_SUBST(LIBRDF_INTERNAL_CPPFLAGS)
 AC_SUBST(LIBRDF_INTERNAL_LIBS)
@@ -911,7 +702,6 @@ java/org/Makefile
 java/org/librdf/Makefile
 java/org/librdf/redland/Makefile
 ruby/Makefile
-repat/Makefile
 debian/Makefile
 utils/Makefile
 demos/Makefile])
@@ -924,7 +714,6 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 Redland build summary:
-  XML parsers:           $xml_parsers_available
   RDF parsers:           $rdf_parsers_available
   Hash digests:          $digest_modules_available
   Berkeley/Sleepycat DB:  $bdb_available

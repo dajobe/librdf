@@ -88,7 +88,7 @@ my(%command_labels)=('compare'            =>'Compare two parsers (NOT IMPL)',
 		     'show-parser-detail' =>'Show parser detail',
 		     'upload'             =>'Upload RDF/XML model');
 
-my $working_parser='repat';
+my $working_parser='raptor';
 my $default_command='compare-all';
 
 my $tmp_dir="$::ROOT_DIR/tmp";
@@ -311,7 +311,6 @@ if($command && $command eq 'init') {
     # Parser Data:
     'http://ilrt.org/discovery/swsw/pt/inputs/parsers/libwww.rdf',
     'http://ilrt.org/discovery/swsw/pt/inputs/parsers/raptor.rdf',
-    'http://ilrt.org/discovery/swsw/pt/inputs/parsers/repat.rdf',
     'http://ilrt.org/discovery/swsw/pt/inputs/parsers/sirpac-stanford.rdf',
     'http://ilrt.org/discovery/swsw/pt/inputs/parsers/sirpac-w3c.rdf',
     'http://zoe.mathematik.uni-osnabrueck.de/RDF/cara.rdf',

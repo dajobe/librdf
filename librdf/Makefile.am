@@ -70,17 +70,14 @@ rdf_serializer.h
 
 librdf_la_LIBADD = \
 @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
-@LIBRDF_XML_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 librdf_la_DEPENDENCIES = \
 @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
-@LIBRDF_XML_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 
 EXTRA_librdf_la_SOURCES = rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
-rdf_parser_raptor.c \
-rdf_parser_repat.c
+rdf_parser_raptor.c
 
 EXTRA_DIST=\
 memcmp.c \
@@ -184,6 +181,3 @@ rdf_iterator_test: rdf_iterator.c librdf.la
 
 $(top_builddir)/raptor/libraptor.la:
 	cd $(top_builddir)/raptor && $(MAKE) $(AM_MAKEFLAGS) libraptor.la
-
-$(top_builddir)/repat/librepat.la:
-	cd $(top_builddir)/repat && $(MAKE) $(AM_MAKEFLAGS) librepat.la

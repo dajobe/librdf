@@ -115,9 +115,6 @@ void librdf_parser_warning(librdf_parser* parser, const char *message, ...);
 void librdf_parser_raptor_constructor(librdf_world* world);
 void librdf_parser_raptor_destructor(void);
 #endif
-#ifdef HAVE_REPAT_RDF_PARSER
-void librdf_parser_repat_constructor(librdf_world* world);
-#endif
 
 
 #ifdef __cplusplus

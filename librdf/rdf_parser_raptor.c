@@ -62,7 +62,7 @@ typedef struct {
 
   /* The set of statements pending is a sequence, with 'current'
    * as the first entry and any remaining ones held in 'statements'.
-   * The latter are filled by the repat parser
+   * The latter are filled by the parser
    * sequence is empty := current=NULL and librdf_list_size(statements)=0
    */
   librdf_statement* current; /* current statement */
@@ -348,7 +348,7 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   
   scontext->fh=fopen(filename, "r");
   if(!scontext->fh) {
-    LIBRDF_DEBUG3(librdf_new_parser_repat, "Failed to open file '%s' - %s\n",
+    LIBRDF_DEBUG3(librdf_parser_raptor_parse_file_as_stream, "Failed to open file '%s' - %s\n",
                   filename, strerror(errno));
     free(filename);
     librdf_parser_raptor_serialise_finished((void*)scontext);

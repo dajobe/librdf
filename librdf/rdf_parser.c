@@ -348,9 +348,6 @@ librdf_init_parser(librdf_world *world)
 #ifdef HAVE_RAPTOR_RDF_PARSER
   librdf_parser_raptor_constructor(world);
 #endif
-#ifdef HAVE_REPAT_RDF_PARSER
-  librdf_parser_repat_constructor(world);
-#endif
 }
 
 
@@ -499,7 +496,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_parser* d;
-  char *test_parser_types[]={"sirpac-stanford", "sirpac-w3c", "libwww", "repat", "raptor", NULL};
+  char *test_parser_types[]={"ntriples", "raptor", NULL};
   int i;
   char *type;
   char *program=argv[0];

@@ -228,10 +228,6 @@ RDF/XML parser and can be used without one.
 <title>Raptor RDF Parser Implementation Class</title>
 @INCLUDE parser_raptor.sgml
 </sect1>
-<sect1>
-<title>Repat RDF Parser Implementation Class</title>
-@INCLUDE parser_repat.sgml
-</sect1>
 </chapter>
 
 <chapter id="digest">

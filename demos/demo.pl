@@ -44,13 +44,11 @@ my(%command_labels)=('destroy'  =>'Delete database',
 		     'add',     =>'Add a statement',
 		     'parse',   =>'Parse RDF',
 		     'print',   =>'Print database');
-my(@parsers)=qw(raptor repat ntriples);
-my(%parser_labels)=('repat' => 'Repat RDF/XML (Jason Diamond)',
-		    'raptor' => 'Raptor RDF/XML (Dave Beckett)',
+my(@parsers)=qw(raptor ntriples);
+my(%parser_labels)=('raptor' => 'Raptor RDF/XML (Dave Beckett)',
 		    'ntriples' => 'Raptor N-Triples (Dave Beckett)'
 		    );
-my(%parser_just_file_uris)=('repat' => 1,
-			    'raptor' => 1,
+my(%parser_just_file_uris)=('raptor' => 1,
 			    'ntriples' => 1
 			    );
 my $default_command='parse';
