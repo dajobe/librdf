@@ -304,6 +304,10 @@ librdf_perl_world_finish(void)
 #endif
 
 
+/* prototypes for internal routines called below - NOT PART OF API */
+void librdf_error(librdf_world* world, const char *message, ...);
+void librdf_warning(librdf_world* world, const char *message, ...);
+
 /* FOR TESTING ERRORS ONLY - NOT PART OF API */
 void
 librdf_internal_test_error(librdf_world *world) 
