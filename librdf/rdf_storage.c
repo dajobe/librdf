@@ -1284,13 +1284,14 @@ librdf_storage_query_execute(librdf_storage* storage, librdf_query *query)
 }
 
 
-void
+int
 librdf_storage_sync(librdf_storage* storage) 
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(storage, librdf_storage);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
 
   if(storage->factory->sync)
-    storage->factory->sync(storage);
+    return storage->factory->sync(storage);
+  return 0;
 }
 
 
