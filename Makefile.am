@@ -16,12 +16,13 @@ rdf_list.c \
 rdf_config.h rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_digest.h rdf_hash.h rdf_hash_gdbm.h \
 rdf_hash_list.h rdf_model.h rdf_storage.h rdf_iterator.h \
-rdf_assertion_context.h rdf_list.h
+rdf_assertion_context.h rdf_list.h rdf_hash_bdb.h
 
 librdf_a_LIBADD = @DIGEST_OBJS@ @HASH_OBJS@
 librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@
 
-EXTRA_librdf_a_SOURCES = md5.c rdf_hash_gdbm.c rdf_digest_openssl.c
+EXTRA_librdf_a_SOURCES = md5.c rdf_hash_gdbm.c rdf_digest_openssl.c \
+rdf_hash_bdb.c
 
 EXTRA_DIST=ChangeLog \
 README      NEWS \
@@ -31,7 +32,7 @@ INSTALL.html LICENSE.html FAQS.html
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_statement_test \
 rdf_model_test
 
-CLEANFILES=$(TESTS) test.gdbm
+CLEANFILES=$(TESTS) test.gdbm test.db
 
 CFLAGS=-Wall
 @MAINT@ CFLAGS=-g -Wall -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
