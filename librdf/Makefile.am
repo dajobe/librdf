@@ -49,7 +49,7 @@ rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
 rdf_query.c rdf_query_results.c \
 rdf_query_triples.c rdf_query_rasqal.c \
 rdf_serializer.c \
-rdf_serializer_raptor.c rdf_serializer_rdfxml.c \
+rdf_serializer_raptor.c \
 rdf_log.c \
 redland.h librdf.h \
 rdf_internal.h \
@@ -194,3 +194,6 @@ $(top_builddir)/raptor/libraptor.la:
 
 $(top_builddir)/rasqal/librasqal.la:
 	cd $(top_builddir)/rasqal && $(MAKE) $(AM_MAKEFLAGS) librasqal.la
+
+newman-bug: newman-bug.c librdf.la
+	$(LINK) -o newman-bug $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. $(srcdir)/newman-bug.c librdf.la
