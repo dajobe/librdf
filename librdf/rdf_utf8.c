@@ -309,7 +309,7 @@ librdf_utf8_to_latin1(const byte *input, int length, int *output_length)
   /* This is a maximal length; since chars may be discarded, the
    * actual length of the resulting can be shorter
    */
-  utf8_byte_length=i-1;
+  utf8_byte_length=i;
 
 
   output=(byte*)LIBRDF_MALLOC(cstring, utf8_byte_length+1);
@@ -318,7 +318,7 @@ librdf_utf8_to_latin1(const byte *input, int length, int *output_length)
   
 
   i=0; j=0;
-  while(i <= utf8_byte_length) {
+  while(i < utf8_byte_length) {
     librdf_unichar c;
     int size=librdf_utf8_to_unicode_char(&c, &input[i], length-i);
     if(size <= 0)
