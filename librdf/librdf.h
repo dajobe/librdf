@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -63,6 +63,9 @@ typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 #define LIBRDF_DEBUG3(function, msg, arg1, arg2) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2);} while(0)
 #define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2, arg3);} while(0)
 
+#define LIBRDF_ERROR1(world, function, msg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function); abort();} while(0)
+#define LIBRDF_ERROR2(world, function, msg,arg) do {fprintf(stderr, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg); abort();} while(0)
+
 #else
 /* DEBUGGING TURNED OFF */
 
@@ -71,6 +74,9 @@ typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 #define LIBRDF_DEBUG2(function, msg, arg1)
 #define LIBRDF_DEBUG3(function, msg, arg1, arg2)
 #define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3)
+
+#define LIBRDF_ERROR1(world, function, msg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function)
+#define LIBRDF_ERROR2(world, function, msg, arg) librdf_error(world, "%s:%d:%s: error: " msg, __FILE__, __LINE__ , #function, arg)
 
 #endif
 
@@ -114,8 +120,8 @@ void librdf_memory_report(FILE *fh);
 
 
 /* Fatal errors - always happen */
-#define LIBRDF_FATAL1(function, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function); abort();} while(0)
-#define LIBRDF_FATAL2(function, msg,arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg, __FILE__, __LINE__ , #function, arg); abort();} while(0)
+#define LIBRDF_FATAL1(world, function, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , #function); abort();} while(0)
+#define LIBRDF_FATAL2(world, function, msg, arg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , #function, arg); abort();} while(0)
 
 
 /* Required for va_list in error handler function registrations
