@@ -177,6 +177,8 @@ librdf_new_node_from_node(librdf_node *node)
   if(!new_node)
     return NULL;
   
+  new_node->type=node->type;
+
   if(node->type == LIBRDF_NODE_TYPE_RESOURCE) {
     new_uri=librdf_new_uri_from_uri(node->value.resource.uri);
     if(!new_uri){
@@ -186,7 +188,7 @@ librdf_new_node_from_node(librdf_node *node)
     librdf_node_set_uri(new_node, new_uri);
   } else {
     /* must be a LIBRDF_NODE_TYPE_LITERAL */
-    if (librdf_node_set_literal_value(node,
+    if (librdf_node_set_literal_value(new_node,
                                       node->value.literal.string,
                                       node->value.literal.xml_language,
                                       node->value.literal.xml_space,
@@ -467,6 +469,28 @@ librdf_node_to_string(librdf_node* node)
 
 
 /**
+ * librdf_node_print - pretty print the node to a file descriptor
+ * @node: the node
+ * @fh: file handle
+ **/
+void
+librdf_node_print(librdf_node* node, FILE *fh)
+{
+  char* s;
+
+  if(!node)
+    return;
+  
+  s=librdf_node_to_string(node);
+  if(!s)
+    return;
+  fputs(s, fh);
+  LIBRDF_FREE(cstring, s);
+}
+
+
+
+/**
  * librdf_node_get_digest - Get a digest representing a librdf_node
  * @node: the node object
  * 
@@ -506,7 +530,7 @@ librdf_node_get_digest(librdf_node* node)
  * Note - for literal nodes, XML language, XML space and well-formness are 
  * presently ignored in the comparison.
  * 
- * Return value: non 0 if nodes are different
+ * Return value: non 0 if nodes are equal
  **/
 int
 librdf_node_equals(librdf_node* first_node, librdf_node* second_node) 
@@ -514,17 +538,18 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
   int status;
   
   if(first_node->type != first_node->type)
-    return 1;
+    return 0;
   
   if(first_node->type == LIBRDF_NODE_TYPE_RESOURCE) {
-    status=librdf_uri_equals(first_node->value.resource.uri,
+    return librdf_uri_equals(first_node->value.resource.uri,
                              second_node->value.resource.uri);
-    if(status)
-      return 1;
   } else {
+    if(first_node->value.literal.string_len != second_node->value.literal.string_len)
+      return 0;
+
     status=strcmp(first_node->value.literal.string,
                   second_node->value.literal.string);
-    if(status)
+    if(!status)
       return 1;
 
     /* FIXME: compare xml_language, xml_space and is_wf_xml ?  Probably not */
