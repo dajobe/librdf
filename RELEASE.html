@@ -37,6 +37,12 @@ effect the C interface and all the higher level language APIs.  These
 were made to support contexts and to fix some inconsistencies in the
 interface about object ownership.</p>
 
+<p>The persistent storage format was changed to support RDF typed
+literals and this requires an upgrade of any existing
+Berkeley/Sleepycat DB stores created by Redland 0.9.11 or earlier.  A
+utility <em>redland-db-upgrade</em> is provided that will create an
+updated store from an existing one.</p>
+
 <p>A Perl script <a href="utils/update-api-0912.pl">utils/update-api-0912.pl</a>
 can help automate the API changes as far as possible or warn about those
 that cannot be automatically updated.</p>

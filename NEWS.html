@@ -11,6 +11,11 @@
 <h2>????-??-?? next release</h2>
 
 <p>
+<strong>FORMAT CHANGE</strong> The persistent storage format was
+changed to support RDF typed literals and this will require an
+upgrade of any existing Berkeley/Sleepycat DB stores created by
+Redland 0.9.11 or earlier.  A utility <em>redland-db-upgrade</em> is
+provided that will create an updated store from an existing one.<br />
 <strong>API CHANGE</strong> <a href="docs/api/iterator.html">Iterator</a> and <a href="docs/api/stream.html">Stream</a> classes. The next/get_next method is split into get_object always returning a shared object and next methods.  get_context method added.  (get_object is called current in higher level language APIs)<br />
 <strong>API CHANGE</strong> <a href="docs/api/model.html">Model</a> class. Method add_statement no longer takes ownership of the passed in statement.  The caller now retains ownership.<br />
 <strong>API CHANGE</strong> <a href="docs/api/model.html">Model</a> class. Method add_statements no longer frees the passed in librdf_stream; the caller must free it now.<br />
