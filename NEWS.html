@@ -8,6 +8,16 @@
 
   <h1>Redland RDF Application Framework - News</h1>
 
+<h2>2001-01-05 Redland 0.9.7 Released</h2>
+<p>Changed <a href="docs/pod/RDF/Model.html">Perl Model API</a> - renamed get_* method names, added deprecated warnings for old names.<br />
+Updated <a href="http://injektilo.org/rdf/repat.html">Repat</a> to 2000-12-24 version (plus some patches).<br />
+Added <a href="docs/pod/RDF.html">Perl Plain Old Documentation (POD)</a>.<br />
+Fixed subtle <a href="docs/perl.html">Perl interface</a> object reference bugs.<br />
+Changed <a href="docs/api/model.html">Model API</a> - add_statement now does not own the added statement<br />
+Added to <a href="docs/api/model.html">Model API</a> - get_source, get_arc, get_target return one matching <a href="docs/api/node.html">librdf_node</a>, not a list of them like get_sources etc. do via <a href="docs/api/iterator.html">librdf_iterator</a>.<br />
+Added <a href="docs/api/utf8.html">UTF-8 support</a> for converting between UTF-8 and ISO Latin-1.
+</p>
+
 <h2>2000-11-06 Redland 0.9.6 Released</h2>
 <p>Added python interface (2.0 and 1.5)<br />
 More perl interface fixes<br />
@@ -16,7 +26,7 @@ now have features allowing the setting/querying of parser options.
 </p>
 
 <h2>2000-10-20 Redland 0.9.5 Released</h2>
-<p>Added Repat RDF parser by Jason Diamond - <em>jason at njektilo dot org</em><br />
+<p>Added <a href="http://injektilo.org/rdf/repat.html">Repat</a> RDF parser by Jason Diamond - <em>jason at njektilo dot org</em><br />
 More perl API fixes and improvements<br />
 Internal changes preparing for proper reification support
 and use of rdf:, rdfs: concepts
