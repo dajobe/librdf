@@ -292,6 +292,10 @@ This module provides query language support for RDF models
 either via an adaptor class or direct by persistant storage.
 </para>
 <sect1>
+<title>RDF Query Class</title>
+@INCLUDE query.sgml
+</sect1>
+<sect1>
 <title>RDF Query Triples Class</title>
 @INCLUDE query_triples.sgml
 </sect1>
@@ -304,6 +308,10 @@ either via an adaptor class or direct by persistant storage.
 This module provides RDF graph to syntax serialization support
 via factory classes providing one or more particular target syntaxes.
 </para>
+<sect1>
+<title>RDF Serializer Class</title>
+@INCLUDE serializer.sgml
+</sect1>
 <sect1>
 <title>RDF Serializer Raptor Class</title>
 @INCLUDE serializer_raptor.sgml
