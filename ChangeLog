@@ -1,4 +1,102 @@
+2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* docs/Makefile.am:
+	Dont ship old pictures overview.png overview.ps overview.pdf
+
+	* csharp/ChangeLog: ChangeLog in CVS now
+
+2004-07-09  Edd Dumbill <edd@usefulinc.com>
+
+	* csharp/World.cs:
+	Move logging to use the new librdf logging API.
+	(Messages property): Added, an array of LogMessages accumulated since
+	the last ClearLog call.
+	(LogLevel method): Added, for getting and setting the logging level.
+
+	* csharp/Parser.cs:
+	Use World.Messages as the basis of exceptions.
+
+	* csharp/Errors.cs: Added enums LogLevel and Facility.
+	Added class Locator to encapsulate locator part of a log message.
+	Added class LogMessage to encapsulate a returned log message from
+	librdf.
+	Changed RedlandFault and RedlandError to store an array of
+	LogMessages instead of strings. (Edd Dumbill)
+
+	* librdf/rdf_log.c:
+	Add accessors for components of the librdf_log_message type.
+	Replace librdf.h, raptor.h with redland.h.
+
+	* librdf/rdf_log.h: add accessors for components of the
+	librdf_log_message type.
+
+2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/redland.h: Include rasqal.h, reorder so raptor.h is first.
+
+	* librdf/rdf_query_results.c, librdf/rdf_utf8.c, librdf/rdf_uri.c,
+	librdf/rdf_stream.c, librdf/rdf_storage_tstore.c,
+	librdf/rdf_storage_mysql.c, librdf/rdf_storage_list.c,
+	librdf/rdf_storage_hashes.c, librdf/rdf_storage_file.c,
+	librdf/rdf_storage.c, librdf/rdf_statement.c,
+	librdf/rdf_serializer_rdfxml.c, librdf/rdf_serializer_raptor.c,
+	librdf/rdf_serializer.c, librdf/rdf_query_triples.c,
+	librdf/ChangeLog, librdf/rdf_query_rasqal.c, librdf/rdf_query.c,
+	librdf/rdf_parser_raptor.c, librdf/rdf_parser.c,
+	librdf/rdf_node.c, librdf/rdf_model_storage.c, librdf/rdf_model.c,
+	librdf/rdf_list.c, librdf/rdf_iterator.c, librdf/rdf_init.c,
+	librdf/rdf_heuristics.c, librdf/rdf_hash_memory.c,
+	librdf/rdf_hash_cursor.c, librdf/rdf_hash_bdb.c,
+	librdf/rdf_hash.c, librdf/rdf_files.c, librdf/rdf_digest_sha1.c,
+	librdf/rdf_digest_openssl.c, librdf/rdf_digest_md5.c,
+	librdf/rdf_digest.c, librdf/rdf_concepts.c: Use redland.h in all
+	files not a selection of librdf.h, raptor.h and rasqal.h
+
+	* librdf/ChangeLog: ChangeLog in CVS now
+
+2004-07-09  Edd Dumbill <edd@usefulinc.com>
+	
+	* raptor_locator.c: add accessors for parts of the raptor_locator
+	struct.
+	* raptor.h: add prototypes for the accessors
+
+2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/ChangeLog, ChangeLog, raptor/ChangeLog: ChangeLog in CVS now
+
 2004-07-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* csharp/Parser.cs: Added ParseError, a RedlandError subclass.
+	(ParseStringIntoModel, ParseIntoModel, ParseStringAsStream): Check
+	for errors during parsing.
+
+	* csharp/World.cs: Added Errors, Warnings support
+	(ClearLog): Added to empty the errors and warnings lists.
+	(Enter): To lock world for gathering errors
+	(Exit): To unlock world after gathering errors
+	(setupHandlers): Use a delegate intErrorHandler (function pointer in C) to
+	register callbacks for errors and warnings.
+	(dispatchError, dispatchWarning): Added the error, warning gatherers.
+
+	* csharp/Errors.cs, csharp/Makefile.am: Added Errors.cs
+
+	* examples/example5.c: Updated to use librdf_query_results
+
+	* librdf/rdf_query_results.c (librdf_query_results_get_bindings):
+	Added a doc example
+
+	* librdf/rdf_query_results.c: doc
+
+	* librdf/rdf_log.c (librdf_log_simple):
+	Use correct user_data.  Patch from René Puls.
+
+	* utils/rdfproc.c (log_handler):
+	Added, used to report things here, rather than let the
+	default code do it.
+
+	* raptor/raptor_general.c (raptor_parse_uri_with_connection):
+	Pass up WWW errors to the parser
+	error handler.
 
 	* docs/api.sgml.in: Added QueryResults as a separate file
 
