@@ -75,6 +75,7 @@ typedef struct librdf_parser_s librdf_parser;
 typedef struct librdf_parser_factory_s librdf_parser_factory;
 typedef struct librdf_query_s librdf_query;
 typedef struct librdf_query_factory_s librdf_query_factory;
+typedef struct librdf_query_results_s librdf_query_results;
 typedef struct librdf_serializer_s librdf_serializer;
 typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 
