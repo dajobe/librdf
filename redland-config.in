@@ -36,10 +36,12 @@ Usage: redland-config [OPTION]
 known values for OPTION are:
 
   --prefix[=DIR]        change redland prefix [default $prefix]
-  --libs                print library linking information
-  --libtool-libs        print linking information for use with libtool
+
   --cflags              print pre-processor and compiler flags
   --help                display this help and exit
+  --libs                print library linking information
+  --libtool-libs        print linking information for use with libtool
+  --swig                display the SWIG interface file
   --version             output version information
   --version-decimal     output version as a decimal integer
 EOF
@@ -62,26 +64,37 @@ while test $# -gt 0; do
     --prefix=*)
         prefix=$optarg
         ;;
+
     --prefix)
       echo_prefix=yes
       ;;
+
     --version)
       echo @VERSION@
       exit 0
       ;;
+
     --version-decimal)
       echo @LIBRDF_VERSION_DECIMAL@
       exit 0
       ;;
+
     --cflags)
       echo_cflags=yes
       ;;
+
     --libs)
       echo_libs=yes
       ;;
+
     --libtool-libs)
       echo_libtool_libs=yes
       ;;
+
+    --swig)
+      echo_swig=yes
+      ;;
+
     --help|--usage)
       usage 0
       ;;
@@ -97,12 +110,19 @@ done
 if test "$echo_prefix" = "yes"; then
   echo $prefix
 fi
+
 if test "$echo_cflags" = "yes"; then
   echo $includes @LIBRDF_EXTERNAL_CPPFLAGS@
 fi
+
 if test "$echo_libs" = "yes"; then
   echo -L@libdir@ -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@
 fi
+
 if test "$echo_libtool_libs" = "yes"; then
   echo @libdir@/@LIBRDF_LIBTOOLLIBS@
+fi
+
+if test "$echo_swig" = "yes"; then  
+  echo @datadir@/@PACKAGE@/Redland.i
 fi

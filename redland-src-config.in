@@ -31,6 +31,7 @@ known values for OPTION are:
   --version             output version information
   --run COMMAND         run the COMMAND with the shared libraries for
                         the source tree
+  --swig                display the SWIG interface file
 EOF
   exit $1
 }
@@ -89,6 +90,10 @@ while test $# -gt 0; do
       exec ${1+"$@"}
       ;;
 
+    --swig)
+      echo_swig=yes
+      ;;
+
     *)
       usage 1 1>&2
       ;;
@@ -96,7 +101,7 @@ while test $# -gt 0; do
 
   shift
 done
-  
+
 if test @with_raptor@ = internal; then
   raptor_config=@abs_top_builddir@/raptor/raptor-src-config
   if test ! -r $raptor_config; then
@@ -122,4 +127,8 @@ if test "$echo_cflags" = "yes"; then
 fi
 if test "$echo_libs" = "yes"; then
   echo -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ `$rasqal_config --libs` `$raptor_config --cflags`
+fi
+
+if test "$echo_swig" = "yes"; then  
+  echo @abs_top_builddir@/Redland.i
 fi
