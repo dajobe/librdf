@@ -119,6 +119,9 @@ REDLAND_API int librdf_parser_parse_string_into_model(librdf_parser* parser, con
 REDLAND_API void librdf_parser_set_error(librdf_parser* parser, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
 REDLAND_API void librdf_parser_set_warning(librdf_parser* parser, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
 
+#define LIBRDF_PARSER_FEATURE_ERROR_COUNT "http://feature.librdf.org/parser-error-count"
+#define LIBRDF_PARSER_FEATURE_WARNING_COUNT "http://feature.librdf.org/parser-warning-count"
+
 REDLAND_API const char *librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
 REDLAND_API int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, const char *value);
 
