@@ -15,9 +15,9 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>Add module - RDF parser - internal, written by me</li>
-<li>Add module - URI syntax / representation</li>
-<li>Add module - URI resolving via (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
+<li>Add module - RDF parser - internal (about 80% done)</li>
+<li>Add module - URI syntax, representation, relative URI resolving</li>
+<li>Add module - URI retrieval via (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
 <li>Evaluate if the library can be built shared</li>
 <li>Modularise the library so some parts can be removed</li>
 <li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build</li>
@@ -38,6 +38,7 @@ part of librdf.h automatically to make a 1-header file system.</li>
 <li>Provide a way to represent reified statements with instantiated statements - related to anonymous resources</li>
 <li>Add proper error/warning reporting in general</li>
 <li>Write stringbuffer for easy creation of growing in-memory strings</li>
+<li>Write a Java interface</li>
 </ul>
 
 
@@ -45,13 +46,16 @@ part of librdf.h automatically to make a 1-header file system.</li>
 
 <p>(Excluding all the <tt>FIXME</tt>s in the source)</p>
 
-<p>1. String encoding - needs iconv posix function and/or Unicode library.</p>
+<p>1. String encoding - needs iconv posix function and/or Unicode library.
+Some utility functions have been written for UTF-8 to/from ISO Latin-1.</p>
 
 <p>2. rdf_hash.c <tt>librdf_hash_from_string()</tt> - \ escaping doesn't work properly</p>
 
 <p>3. BerkeleyDB V1 code has been tested and does not work - probably not worth fixing.</p>
 
 <p>4. GDBM hash code does not support duplicates, so is not used.</p>
+
+<p>5. SiRPAC wrappers do not handle multi-line literal objects.</p>
 
 
 <h2>Done</h2>
