@@ -47,33 +47,6 @@
 
 
 /**
- * librdf_query_results_as_stream - Return the query results as statements
- * @query_results: &librdf_query_results object
- * @model: model to operate query on
- * 
- * Runs the query against the (previously registered) model
- * and returns a &librdf_stream of
- * matching &librdf_statement objects.
- * 
- * NOTE: Not Implemented.  Depends on rasqal_query_results class
- * 
- * Return value:  &librdf_stream of matching statements (may be empty) or NULL on failure
- **/
-librdf_stream*
-librdf_query_results_as_stream(librdf_query_results* query_results)
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
-
-  if(query_results->query->factory->results_as_stream)
-    return query_results->query->factory->results_as_stream(query_results);
-  else
-    return NULL;
-}
-
-
-
-
-/**
  * librdf_query_get_result_count - Get number of bindings so far
  * @query_results: &librdf_query_results query results
  * 
@@ -380,4 +353,95 @@ librdf_query_results_to_file(librdf_query_results *query_results,
                                              format_uri, base_uri);
   fclose(fh);
   return status;
+}
+
+
+/**
+ * librdf_query_results_is_bindings - test if librdf_query_results is variable bindings format
+ * @query_results: &librdf_query_results object
+ * 
+ * Return value: non-0 if true
+ **/
+int
+librdf_query_results_is_bindings(librdf_query_results* query_results) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
+
+  if(query_results->query->factory->results_is_bindings)
+    return query_results->query->factory->results_is_bindings(query_results);
+  else
+    return -1;
+}
+  
+
+/**
+ * librdf_query_results_is_boolean - test if librdf_query_results is boolean format
+ * @query_results: &librdf_query_results object
+ * 
+ * Return value: non-0 if true
+ **/
+int
+librdf_query_results_is_boolean(librdf_query_results* query_results) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
+
+  if(query_results->query->factory->results_is_boolean)
+    return query_results->query->factory->results_is_boolean(query_results);
+  else
+    return -1;
+}
+
+
+/**
+ * librdf_query_results_is_graph - test if librdf_query_results is RDF graph format
+ * @query_results: &librdf_query_results object
+ * 
+ * Return value: non-0 if true
+ **/
+int
+librdf_query_results_is_graph(librdf_query_results* query_results) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
+
+  if(query_results->query->factory->results_is_graph)
+    return query_results->query->factory->results_is_graph(query_results);
+  else
+    return -1;
+}
+
+
+/**
+ * librdf_query_results_get_boolean - Get boolean query result
+ * @query_results: &librdf_query_results query_results
+ *
+ * The return value is only meaningful if this is a boolean
+ * query result - see &librdf_query_results_is_boolean
+ *
+ * Return value: boolean query result - >0 is true, 0 is false, <0 on error or finished
+ */
+int
+librdf_query_results_get_boolean(librdf_query_results* query_results) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
+
+  if(query_results->query->factory->results_get_boolean)
+    return query_results->query->factory->results_get_boolean(query_results);
+  else
+    return -1;
+}
+
+
+/**
+ * librdf_query_results_as_stream - Get RDF graph query result
+ * @query_results: &librdf_query_results query_results
+ *
+ * The return value is only meaningful if this is an RDF graph
+ * query result - see &librdf_query_results_is_graph
+ *
+ * Return value: RDF graph query result or NULL on error
+ */
+librdf_stream*
+librdf_query_results_as_stream(librdf_query_results* query_results) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, NULL);
+
+  if(query_results->query->factory->results_as_stream)
+    return query_results->query->factory->results_as_stream(query_results);
+  else
+    return NULL;
 }
