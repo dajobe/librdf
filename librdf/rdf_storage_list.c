@@ -42,7 +42,7 @@ typedef struct
 
 
 /* prototypes for local functions */
-static int librdf_storage_list_init(librdf_storage* storage, librdf_hash* options);
+static int librdf_storage_list_init(librdf_storage* storage, char *name, librdf_hash* options);
 static int librdf_storage_list_open(librdf_storage* storage, librdf_model* model);
 static int librdf_storage_list_close(librdf_storage* storage);
 static int librdf_storage_list_size(librdf_storage* storage);
@@ -65,11 +65,24 @@ static void librdf_storage_list_register_factory(librdf_storage_factory *factory
 
 /* functions implementing storage api */
 static int
-librdf_storage_list_init(librdf_storage* storage, librdf_hash* options)
+librdf_storage_list_init(librdf_storage* storage, char *name,
+                         librdf_hash* options)
 {
-  /* nop */
+
+  /* do not need options, might as well free them now */
+  if(options)
+    librdf_free_hash(options);
+
   return 0;
 }
+
+
+static void
+librdf_storage_list_terminate(librdf_storage* storage)
+{
+  /* nop */  
+}
+
 
 
 static int
@@ -94,7 +107,7 @@ librdf_storage_list_open(librdf_storage* storage, librdf_model* model)
  * Close the storage list storage, and free all content since there is no 
  * persistance.
  * 
- * Return value: non 0 on sucess
+ * Return value: non 0 on failure
  **/
 static int
 librdf_storage_list_close(librdf_storage* storage)
@@ -156,6 +169,8 @@ librdf_storage_list_add_statements(librdf_storage* storage,
     else
       status=1;
   }
+  librdf_free_stream(statement_stream);
+  
   return status;
 }
 
@@ -289,6 +304,7 @@ librdf_storage_list_register_factory(librdf_storage_factory *factory)
   factory->context_length     = sizeof(librdf_storage_list_context);
   
   factory->init               = librdf_storage_list_init;
+  factory->terminate          = librdf_storage_list_terminate;
   factory->open               = librdf_storage_list_open;
   factory->close              = librdf_storage_list_close;
   factory->size               = librdf_storage_list_size;
@@ -304,5 +320,6 @@ librdf_storage_list_register_factory(librdf_storage_factory *factory)
 void
 librdf_init_storage_list(void)
 {
-  librdf_storage_register_factory("LIST", &librdf_storage_list_register_factory);
+  librdf_storage_register_factory("memory",
+                                  &librdf_storage_list_register_factory);
 }
