@@ -663,9 +663,8 @@ if test "$bdb_prefix" != no; then
 
   if test "$have_libdb" = yes; then
     bdb_available="Version $bdb_version (library $bdb_dbname in $bdb_lib_dir)"
-    LIBRDF_LIBS="-l$bdb_dbname $LIBRDF_LIBS"
-    LIBRDF_LDFLAGS="$nLDFLAGS $LIBRDF_LDFLAGS"
-    LIBRDF_CPPFLAGS="$nCPPFLAGS $LIBRDF_CPPFLAGS"
+    LIBRDF_LIBS="$LIBRDF_LIBS $nLDFLAGS -l$bdb_dbname"
+    LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $nCPPFLAGS"
   fi
 
 fi
@@ -698,8 +697,8 @@ AC_MSG_CHECKING(whether have working libwww)
 if test "$enable_libwww" = yes ; then
   if test -n "$LIBWWW_CONFIG"; then
     AC_MSG_RESULT(yes)
-    LIBRDF_LIBS="`$LIBWWW_CONFIG --libs` $LIBRDF_LIBS"
-    LIBRDF_CPPFLAGS="`$LIBWWW_CONFIG --cflags` $LIBRDF_CPPFLAGS"
+    LIBRDF_LIBS="$LIBRDF_LIBS `$LIBWWW_CONFIG --libs`"
+    LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$LIBWWW_CONFIG --cflags`"
     AC_DEFINE(HAVE_LIBWWW, 1, [W3C libwww is present])
     have_libwww=yes
   else
@@ -950,7 +949,7 @@ if test "$enable_openssl_digests" = yes ; then
   if test "$ac_cv_header_openssl_crypto_h" = yes ; then
     AC_DEFINE(HAVE_OPENSSL_DIGESTS, 1, [Have openssl digests])
     new_digest_modules=
-    LIBS="-lcrypto $LIBRDF_LIBS"
+    LIBS="$LIBRDF_LIBS -lcrypto"
     have_libcrypto=no
 
     for module in $digest_modules; do
@@ -973,7 +972,7 @@ if test "$enable_openssl_digests" = yes ; then
       fi
     done
     if test "$have_libcrypto" = yes; then
-      LIBRDF_LIBS="-lcrypto $LIBRDF_LIBS"
+      LIBRDF_LIBS="$LIBRDF_LIBS -lcrypto"
     fi
     DIGEST_OBJS="$DIGEST_OBJS rdf_digest_openssl.lo"
     DIGEST_SRCS="$DIGEST_SRCS rdf_digest_openssl.c"
@@ -1068,7 +1067,7 @@ if test $with_threads = "yes" ; then
 
   if test "$ac_cv_header_pthread_h" = yes ; then
     AC_DEFINE(WITH_THREADS, 1, [Use POSIX threads])
-    LIBRDF_LIBS="-lpthread $LIBRDF_LIBS"
+    LIBRDF_LIBS="$LIBRDF_LIBS -lpthread"
     AC_MSG_RESULT(yes)
   else
     AC_MSG_RESULT(no)
@@ -1149,6 +1148,9 @@ else
 fi
 
 
+LIBRDF_EXTERNAL_CPPFLAGS="$LIBRDF_EXTERNAL_CPPFLAGS $LIBRDF_CPPFLAGS"
+LIBRDF_EXTERNAL_LIBS="$LIBRDF_EXTERNAL_LIBS $LIBRDF_LIBS"
+
 
 dnl Checks for building sub-packages in sub directories
 dnl before librdf (pre-requisites). rasqal may need raptor
@@ -1215,7 +1217,6 @@ AC_SUBST(LIBRDF_INTERNAL_LIBS)
 
 AC_SUBST(LIBRDF_CPPFLAGS)
 AC_SUBST(LIBRDF_LDFLAGS)
-AC_SUBST(LIBRDF_LIBS)
 AC_SUBST(LIBRDF_LIBTOOLLIBS)
 
 AC_SUBST(MEM)
