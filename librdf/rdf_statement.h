@@ -78,6 +78,23 @@ int librdf_statement_equals(librdf_statement* statement1, librdf_statement* stat
 /* match statement against one with partial content */
 int librdf_statement_match(librdf_statement* statement, librdf_statement* partial_statement);
 
+/* serialising/deserialising */
+size_t librdf_statement_encode(librdf_statement* statement, unsigned char *buffer, size_t length);
+size_t librdf_statement_encode_parts(librdf_statement* statement, unsigned char *buffer, size_t length, int fields);
+size_t librdf_statement_decode(librdf_statement* statement, unsigned char *buffer, size_t length);
+
+
+#ifdef LIBRDF_INTERNAL
+
+/* Or-ed to provide fields argument to librdf_statement_encode() */
+#define LIBRDF_STATEMENT_SUBJECT 1
+#define LIBRDF_STATEMENT_PREDICATE 2
+#define LIBRDF_STATEMENT_OBJECT 4
+#define LIBRDF_STATEMENT_CONTEXT 8
+
+#define LIBRDF_STATEMENT_ALL 15 /* must be or of all of the above */
+
+#endif
 
 #ifdef __cplusplus
 }
