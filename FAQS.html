@@ -66,9 +66,13 @@ C libraries or calling of C functions.</p>
 should be compilable on many different systems.  I have access to
 and have built it on (at various times):</p>
 
-<p>Linux 2.x (x86), Solaris 2.5, 7, 8 (Sparc), OSX (PPC), DEC Alpha, FreeBSD 4.7 (x86) and HP-UX 10.</p>
+<p>Redhat 7-9, Gentoo, Debian 3.0/unstable GNU/Linux (x86); Solaris
+2.5, 7, 8 (Sparc); OSX 10.2, 10.3 (PPC); Debian GNU/Linux (DEC
+Alpha); FreeBSD 4.7-4.9 (x86); HP-UX 10.</p>
 
-<p>it configured, built and tested out of the box on all of these.</p>
+<p>it configured, built and tested out of the box on all of these (C
+interface; the other language APIs depend on the particular support
+of each OS).</p>
 
 <p>See also the W3C Library note on
 <a href="http://www.w3.org/Library/User/Style/Cpp.html">C++ in C</a>
@@ -87,13 +91,13 @@ in it.</p>
 
 <li>Redmond?
 
-<p>No, Redland - not related to an area near Seattle, Washington
-State, USA home to an illegal monopolist.</p>
+<p>No. It is named after Redland which is a region of Bristol, UK.
+Not related to an area near Seattle, Washington State, USA.</p>
 </li>
 
 <li>Where is the <em>LANG</em> higher-level language interface?
 
-<p>Redland provides 6 language interfaces (at 2003-02-13)
+<p>Redland provides 7 language interfaces (at 2004-01-30)
 via <a href="http://www.swig.org/">SWIG</a>.  If SWIG does another
 language you want and supports it, you should be able to build one
 yourself relatively easily, following the existing scheme.</p>
@@ -130,9 +134,9 @@ href="http://cygwin.com/">Cygwin</a> environment relatively easily.
 </li>
 
 <li>Does it run on Apple OSX?<br />
-<p>Yes.  The most recent version of this operating system has most of the
-basic requirements for using Redland and Raptor - an XML parser.  The
-<a href="http://fink.sourceforge.net/">Fink</a> environment
+<p>Yes.  The most recent version of this operating system has most of
+the basic requirements for using Redland and Raptor - an XML parser
+(in 10.3).  The <a href="http://fink.sourceforge.net/">Fink</a> environment
 provides the GNU toolchain, GNU make, autotools and others needed
 if building from CVS.  It also provides Berkeley/Sleepcat DB
 needed for a persistent store.  Redland and Raptor can probably
