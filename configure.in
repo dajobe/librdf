@@ -252,7 +252,6 @@ if test "$enable_libwww" = yes ; then
 else
   AC_MSG_RESULT(no)
 fi
-AC_CHECK_FUNCS(HTRDFParseFile)
 
 
 dnl Checks for RDF parsers
