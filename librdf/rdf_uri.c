@@ -535,9 +535,7 @@ librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri)
 {
   if(!first_uri || !second_uri)
     return 0;
-  if(first_uri->string_length != second_uri->string_length)
-    return 0;
-  return !strcmp(first_uri->string, second_uri->string);
+  return (first_uri == second_uri);
 }
 
 
