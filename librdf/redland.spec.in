@@ -11,7 +11,7 @@ Summary:   Redland RDF Application Framework
 Name:      %{name}
 Version:   %{version}
 Release:   %{release}
-Prefix:    %{prefix}
+Prefix:    %{_prefix}
 Copyright: LGPL/MPL
 Group:     Development/Libraries
 Source:    http://www.redland.opensource.ac.uk/dist/source/%{name}-%{version}.tar.gz
@@ -58,9 +58,9 @@ PYTHON=python
 export PYTHON
 
 if [ ! -f configure ]; then
-  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --enable-release --sysconfdir=/etc
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --enable-release --sysconfdir=/etc --mandir=%{_mandir} --libdir=%{_libdir}
 else
-  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --enable-release --sysconfdir=/etc
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --enable-release --sysconfdir=/etc --mandir=%{_mandir} --libdir=%{_libdir}
 fi
 
 if [ "$SMP" != "" ]; then
@@ -69,10 +69,11 @@ else
   make
 fi
 
+
 %install
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
-make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc install
+make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc libdir=$RPM_BUILD_ROOT%{_libdir} mandir=$RPM_BUILD_ROOT%{_mandir} install
 
 # Fix it so -L.. -llibrdf works from perl, python, ... subdirs
 # Must find a way to do this better
@@ -95,41 +96,25 @@ cd ..
 %{prefix}/lib/librdf.so.*
 
 %defattr (0444, bin, bin, 0555)
-%{prefix}/include/redland.h
-%{prefix}/include/librdf.h 
-%{prefix}/include/rdf_concepts.h
-%{prefix}/include/rdf_digest.h
-%{prefix}/include/rdf_hash.h 
-%{prefix}/include/rdf_init.h
-%{prefix}/include/rdf_iterator.h
-%{prefix}/include/rdf_model.h
-%{prefix}/include/rdf_node.h
-%{prefix}/include/rdf_parser.h
-%{prefix}/include/rdf_statement.h
-%{prefix}/include/rdf_storage.h
-%{prefix}/include/rdf_stream.h
-%{prefix}/include/rdf_types.h
-%{prefix}/include/rdf_uri.h
-%{prefix}/include/rdf_utf8.h
 %{prefix}/lib/librdf.la
 %{prefix}/lib/librdf.so
 
-%doc %{prefix}/man/man3/*
-
-%doc AUTHORS COPYING COPYING.LIB ChangeLog LICENSE.txt NEWS README TODO
+%doc AUTHORS COPYING COPYING.LIB ChangeLog LICENSE.txt 
+%doc NEWS README TODO RELEASE
 %doc *.html
+
+%doc %{_mandir}/man3/redland.3*
 
 %files devel
 %defattr(-, root, root)
 
-%{prefix}/include/rdf_files.h 
-%{prefix}/include/rdf_hash_bdb.h 
-%{prefix}/include/rdf_hash_memory.h
-%{prefix}/include/rdf_heuristics.h
-%{prefix}/include/rdf_list.h
-%{prefix}/include/rdf_storage_hashes.h
-%{prefix}/include/rdf_storage_list.h
-%doc docs/README.html docs/perl.html docs/python.html docs/api
+%{prefix}/include/redland.h
+%{prefix}/include/librdf.h 
+%{prefix}/include/rdf_*.h
+%doc docs/README.html
+%doc docs/java.html docs/perl.html docs/php.html
+%doc docs/python.html docs/ruby.html docs/tcl.html
+%doc docs/api
 
 %files perl
 %defattr(-, bin, bin)
@@ -138,7 +123,7 @@ cd ..
 %{perlinstallsitearch}/RDF/Redland
 %{perlinstallsitearch}/RDF/Redland.pm
 
-%doc %{perlman3dir}/redland.3*
+%doc %{perlman3dir}/RDF::Redland*.3pm*
 
 %post
 /sbin/ldconfig
