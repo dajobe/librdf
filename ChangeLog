@@ -1,4 +1,312 @@
+2004-11-23  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* configure.ac:
+	Rip out STORAGE_OBJS code and make all storage modules have
+	available/enabled set.  memory is always available and required
+	file, hashes are always available and enabled by default.
+	Test for sqlite.h
+	Reduce mysql min to 3.23.56 - should go lower.
+
+2004-11-22  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/Makefile.am:
+	Use STORAGE_ conditionals instead of @STORAGE_OBJS@
+
+	* librdf/rdf_storage.c:
+	Delete rdf_storage_hashes.h and rdf_storage_list.h includes, they are
+	called from rdf_storage.h already.
+	(librdf_init_storage) Use STORAGE_ defines.
+
+	* librdf/rdf_storage_sqlite.c:
+	don't sleep now, this should be fixed later
+
+	* librdf/rdf_storage.h: Use STORAGE_ defines.
+	Delete rdf_storage_tstore.h and rdf_storage_mysql.h includes
+
+	* librdf/rdf_storage.c (librdf_init_storage):
+	Added call to librdf_init_storage_sqlite
+
+	* librdf/Makefile.am: Added rdf_storage_sqlite.c
+
+	* librdf/rdf_storage.h: added librdf_init_storage_sqlite prototype
+
+	* librdf/rdf_storage_sqlite.c: sqlite storage
+
+2004-11-21  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c (rasqal_new_graph_pattern_from_triples):
+	Init current column to -1 so no execution or tidy happens.
+	(rasqal_free_graph_pattern): Clean up until reach start_column, not 0.
+	(rasqal_graph_pattern_init): Do triple init work only if there are
+	triples.
+
+	* rasqal/sparql_parser.y: s/puts/fputs(..., stdout)/
+
+	* rasqal/rasqal_engine.c (rasqal_new_graph_pattern_from_sequence):
+	Fold sequence of 1 graph
+	pattern into the return value, tidying up.
+	(rasqal_graph_pattern_print): Print just the triple columns that are
+	used.  Print flags using words.
+	(rasqal_graph_pattern_get_next_match): Note failing not-implemented
+	sequence of graph_patterns.
+	(rasqal_engine_prepare): Do not invoke rasqal_query_order_triples -
+	does not make sense to do with the graph_pattern code.
+	(rasqal_engine_get_next_result): Note failing not-implemented
+	sequence of graph_patterns.
+	Debug message when an optional graph pattern failed to patch.
+
+	* rasqal/rasqal_expr.c (rasqal_variable_set_value):
+	Debug fatal error when there is no name.
+
+2004-11-20  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c (rasqal_new_graph_pattern_from_sequence):
+	lose triples argument
+	(rasqal_graph_pattern_get_next_match, rasqal_engine_get_next_result):
+	Check and fail for sequence of graph_patterns.
+
+	* rasqal/rasqal_internal.h:
+	Update rasqal_new_graph_pattern_from_sequence to lose triples argument
+
+	* rasqal/rdql_parser.y (rasqal_rdql_query_engine_prepare):
+	Use rasqal_new_graph_pattern_from_triples
+
+	* rasqal/rasqal_query.c (rasqal_new_query): Init triples here.
+	(rasqal_query_print): Print graph_patterns
+
+	* rasqal/rasqal_internal.h:
+	Add graph_patterns sequence to rasqal_graph_pattern.
+	Added prototypes for rasqal_new_graph_pattern_from_triples and
+	rasqal_new_graph_pattern_from_sequence
+
+	* rasqal/rasqal_engine.c (rasqal_new_graph_pattern_from_triples):
+	Renamed from rasqal_new_graph_pattern
+	(rasqal_new_graph_pattern_from_sequence): Added to handle a graph
+	pattern as a sequence of graph patterns.
+	(rasqal_free_graph_pattern): Handle cleanup for sequence.
+	(rasqal_graph_pattern_print): Handle sequence and simplify.
+	(rasqal_engine_execute_init): Abort with messsage if sequence has a
+	NULL graph pattern in it.
+
+2004-11-19  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c (rasqal_engine_execute_init):
+	Init current_graph_pattern.
+	(rasqal_engine_get_next_result): Attempt to walk through graph_patterns
+	without failing on optional ones.
+
+	* rasqal/rasqal_internal.h:
+	Added current_graph_pattern to rasqal_query.
+
+	* rasqal/sparql_lexer.l (sparql_token_print): Added UNION token
+
+	* rasqal/sparql_parser.y: Added UNION token
+
+	* rasqal/sparql_lexer.l: Added UNION|union keyword
+
+	* rasqal/sparql_parser.y (rasqal_sparql_query_engine_prepare): Add
+	graph pqttern of all triples found.
+
+	* rasqal/rdql_parser.y (rasqal_rdql_query_engine_prepare): Add
+	graph pqttern of all triples found.
+
+	* rasqal/rasqal_engine.c (rasqal_new_graph_pattern):
+	No triples_size.  Don't init triple_meta
+	here but on each execution.
+	(rasqal_free_graph_pattern, rasqal_graph_pattern_get_next_match):
+	update triple_meta offset
+	(rasqal_graph_pattern_init): Added, to init for execution.
+	(rasqal_graph_pattern_print): Added for debug printing.
+	(rasqal_engine_execute_init): Use query->graph_patterns - init them
+	with rasqal_graph_pattern_init
+	(rasqal_engine_execute_finish): Do not delete query->graph_pattern.
+	(rasqal_engine_get_next_result): Pick 0th item from
+	query->graph_patterns to execute.
+
+	* rasqal/rasqal_query.c (rasqal_new_query, rasqal_free_query):
+	Init/free
+	query->graph-patterns sequence
+
+	* rasqal/rasqal_internal.h:
+	Delete triples_count from rasqal_graph_pattern.
+	Only use exactly what's needed - end-start+1 columns
+	Added rasqal_graph_pattern_init and rasqal_graph_pattern_print
+	prototypes
+
+	* configure.ac: Doc fix, --with-mysql works for mysql 3/4
+
+	* rasqal/sparql_parser.y (PatternElementForms):
+	'SOURCE * ...' Warn this is ignored.
+	'Source VarOrURI ...' Set triple origin from the literal
+	(UnaryExpressionNotPlusMinus): Delete ignored ArgList for now.
+
+	* rasqal/rasqal_internal.h: Added rasqal_graph_pattern_adjust prototype
+
+	* rasqal/rasqal_engine.c (rasqal_new_graph_pattern,
+	rasqal_free_graph_pattern): Docs, code tidy.
+	(rasqal_graph_pattern_adjust): Added, to shift graph pattern
+	columns.
+	(rasqal_graph_pattern_get_next_match): Code tidy.
+
+2004-11-17  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/examples/grapper.c:
+	Extensively updated to use GTK 2.4, 2.5 features when available.
+	Triples/Errors windows have a scalable pane between them
+	Triple columns can be sorted by clicking, width resized.
+	All known parser features are available on the preferences menu.
+	Added parser guessing button.
+	Moved syntax menu to top of display.
+	Updated about box fields to include more info when possible to
+	display.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_result):
+	More code tweaks
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_result):
+	Evaluate constraint_expression
+
+2004-11-16  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_internal.h, rasqal/rasqal_engine.c:
+	pattern_graph to graph_pattern
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_result):
+	Inner loop logic tidying.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_result):
+	triples_size deleted, never used.
+
+	* rasqal/rasqal_engine.c: source re-ordering
+
+	* rasqal/rasqal_engine.c (rasqal_engine_prepare): set flags here.
+	(rasqal_engine_execute_init): Always init a new pattern_graph.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_execute_init,
+	rasqal_engine_run): Remove remaining use of query->column field.
+
+	* rasqal/rasqal_internal.h: rasqal_query remove column field
+
+	* rasqal/rasqal.h: words
+
+	* rasqal/rasqal_engine.c:
+	(rasqal_engine_execute_init); Added pattern_graph field, using
+	rasqal_new_pattern_graph
+	(rasqal_engine_execute_finish): Tidy up, deleting pattern_graph.
+	(rasqal_graph_pattern_get_next_triple): Renamed from
+	rasqal_engine_get_next_triple_pattern_result and using
+	rasqal_pattern_graph argument.
+	(rasqal_new_pattern_graph): tidy.
+	(rasqal_free_pattern_graph): Delete the triple_meta array.
+	(rasqal_engine_get_next_result): Use
+	rasqal_graph_pattern_get_next_triple and evaluate the constraints
+	here.
+
+	* rasqal/rasqal_internal.h: rasqal_query rename to pattern_graph field
+
+	* rasqal/rasqal_internal.h: rasqal_pattern_graph add column
+	Remove rasqal_triple_meta field from rasqal_query
+	and add graph_pattern field
+
+	* rasqal/rasqal_internal.h: Update rasqal_new_pattern_graph prototype.
+
+	* rasqal/rasqal_expr.c: Replace calloc() with RASQAL_CALLOC(type,...)
+
+	* rasqal/rasqal_internal.h: Added rasqal_pattern_flags enum.
+	Added rasqal_pattern_graph
+	Added rasqal_new_pattern_graph, rasqal_free_pattern_graph prototypes.
+
+	* rasqal/rasqal_engine.c (rasqal_new_pattern_graph,
+	rasqal_free_pattern_graph): Added.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_triple_pattern_result):
+	Added, split
+	off from rasqal_engine_get_next_result.
+
+	* rasqal/sparql_parser.y (rasqal_sparql_query_engine_prepare):
+	Call rasqal_engine_prepare.
+
+	* rasqal/rdql_parser.y (rasqal_rdql_query_engine_prepare):
+	Call rasqal_engine_prepare.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_prepare):
+	Added, split some bits from
+	rasqal_engine_execute_init that were just query preparation, rather
+	than execution.
+
+	* rasqal/rasqal_internal.h: Added rasqal_engine_prepare prototype
+
+2004-11-12  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y (PatternElementForms):
+	Set triple optional flags.
+
+	* rasqal/rasqal_expr.c: Added rasqal_triple_flag_strings consts
+	(rasqal_triple_print): Use rasqal_triple_flag_strings to print flags
+	out.
+
+	* rasqal/roqet.c: Cast for c++
+
+	* rasqal/rasqal_engine.c (rasqal_engine_execute_init): Set triple flags
+	RASQAL_TRIPLE_FLAGS_EXACT rather than triple meta is_exact.
+	(rasqal_engine_get_next_result): Use triple flags
+	RASQAL_TRIPLE_FLAGS_EXACT rather than using triple meta is_exact.
+
+	* rasqal/rasqal_expr.c (rasqal_triple_set_flags,
+	rasqal_triple_get_flags): Added
+
+	* rasqal/rasqal.h: Added enum rasqal_triple_flags
+	Added flags field to rasqal_triple.
+	Added prototypes for rasqal_triple_set_flags and
+	rasqal_triple_get_flags
+
+	* raptor/rapper.1: Updated -f for serializer features
+
+2004-11-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y (GraphPattern):
+	Only join non-empty PatternElement
+	(PatternElement.1): Return something.
+	(PatternElementForms): Return NULL for AND Expression part.
+
 2004-11-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y (rasqal_init_query_engine_sparql):
+	URL now http://www.w3.org/TR/rdf-sparql-query/
+
+	* rasqal/sparql_parser.y (rasqal_init_query_engine_sparql): No alias.
+
+	* rasqal/sparql_parser.y: typo
+
+	* rasqal/rdql_lexer.l, rasqal/rdql_parser.y,
+	rasqal/sparql_lexer.l, rasqal/sparql_parser.y: Rename terminals:
+	PLUS MINUS STAR SLASH REM TILDE BANG to be the single symbol they
+	are.
+
+	* rasqal/rdql_parser.y, rasqal/rdql_lexer.l:
+	Rename terminals: COMMA LPAREN RPAREN VARPREFIX to be the single
+	symbol they are.
+
+	* rasqal/sparql_lexer.l:
+	Rename terminals: COMMA LPAREN RPAREN LSQUARE RSQUARE LCURLY RCURLY
+	VARPREFIX AMP to be the single symbol they are.
+
+	* rasqal/sparql_parser.y: Enable YYERROR_VERBOSE for now
+	Rename terminals: COMMA LPAREN RPAREN LSQUARE RSQUARE LCURLY RCURLY
+	VARPREFIX AMP to be the single symbol they are.
+
+	* rasqal/sparql_parser.y: Removed ()s for groups
+
+	* rasqal/sparql_parser.y: Added {}s for groups
+
+	* rasqal/tests/sparql/syntax/Makefile.am,
+	rasqal/tests/sparql/syntax/groups.rq: Added groups.rq
+
+	* librdf/rdf_serializer_raptor.c
+	(librdf_serializer_raptor_set_namespace):
+	raptor_serialize_set_namespace
+
+	* utils/rdfproc.c: Init partial_statement, uri_string
 
 	* librdf/rdf_serializer_raptor.c
 	(librdf_serializer_raptor_set_namespace):
