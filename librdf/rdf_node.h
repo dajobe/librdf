@@ -184,6 +184,10 @@ void librdf_node_print(librdf_node* node, FILE *fh);
 int librdf_node_equals(librdf_node* first_node, librdf_node* second_node);
 
 
+/* create an iterator for a static array of nodes */
+librdf_iterator* librdf_node_static_iterator_create(librdf_node** nodes, int size);
+
+
 #ifdef __cplusplus
 }
 #endif
