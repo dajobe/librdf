@@ -1,4 +1,660 @@
+2005-03-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage.c
+	(librdf_storage_node_stream_to_node_create): node1 or node2 can be
+	NULL but not both - edit docs and assertion.
+
+2005-03-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_graph_pattern.c (rasqal_graph_pattern_init): Set
+	origin parts only if there is an origin.
+
+	* rasqal/rasqal_engine.c
+	(rasqal_query_graph_pattern_build_declared_in): Set origin vars
+	only if there is an origin.
+
+	* rasqal/rasqal_query.c (rasqal_graph_pattern_set_origin): Set all
+	columns, not 1 less.
+
+	* rasqal/rasqal_graph_pattern.c (rasqal_graph_pattern_init): Add
+	origin triple parts.
+
+	* rasqal/rasqal_engine.c
+	(rasqal_query_graph_pattern_build_declared_in): Mark vars declared
+	in origin.
+
+	* rasqal/rdql_parser.y (Query): Add background data graphs as this
+	rdql does not allow origin queries.
+
+	* rasqal/sparql_parser.y (LoadClauseOpt): Add named data graphs
+	from LOAD
+	(GraphOrPattern, NamedGraphPattern, OptionalGraphPattern): Add
+	FIXMEs for UNION, GRAPH *, SOURCE *, deprecated SOURCE, deprecated
+	[]
+
+	* rasqal/rasqal_query.c (rasqal_query_add_data_graph,
+	rasqal_query_add_variable, rasqal_query_add_prefix): Add data
+	graphs, sources, variables, prefixes to the end of the sequence -
+	more sensible and also quicker.
+
+	* rasqal/rasqal_graph_pattern.c
+	(rasqal_graph_pattern_add_constraint): Add constraints to end of
+	sequence - more sensible and also quicker.
+
+	* rasqal/rdql_parser.y (Query): Make data graphs here, don't edit
+	deprecated sources list.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_new_triples_source): Pass
+	in graph names as base URIs to parsing.
+
+	* rasqal/rasqal_redland.c (rasqal_redland_new_triples_source): Use
+	data graphs to gather source URIs and graph URI names.  Pass in
+	graph names as base URIs to parsing.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_new_triples_source): Use
+	data graphs to gather source URIs and graph URI names
+
+2005-03-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y (NamedGraphClauseOpt): Set name uri when
+	adding a data graph, to same uri as source uri
+
+	* rasqal/librasqal.3: 0.9.8 API changes, style, refs
+
+	* rasqal/rasqal.h, rasqal/rasqal_query.c:
+	(rasqal_query_get_variable_sequence, rasqal_query_add_triple):
+	Removed.  Were announced deprecated in 0.9.7
+
+	* rasqal/rasqal_expr.c (main): Call rasqal_uri_init and
+	rasqal_uri_finish around test code.
+
+	* rasqal/rasqal_literal.c (rasqal_new_integer_literal): Use
+	rasqal_xsd_integer_uri.
+	(rasqal_new_floating_literal): Use rasqal_xsd_double_uri.
+	(rasqal_literal_string_to_native): Use rasqal_xsd_integer_uri and
+	rasqal_xsd_double_uri.  Also convert xsd:boolean rdf literals into
+	internal RASQAL_LITERAL_BOOLEAN
+
+	* rasqal/rasqal_general.c (rasqal_init): Call rasqal_uri_init
+	(rasqal_finish): Call rasqal_uri_finish and always call
+	raptor_finish.
+	(rasqal_uri_init, rasqal_uri_finish): Added to initialise/free
+	URIs used in the library.
+
+	* rasqal/rasqal_internal.h: Added interanl URIs
+	rasqal_xsd_namespace_uri, rasqal_xsd_integer_uri,
+	rasqal_xsd_double_uri and rasqal_xsd_boolean_uri.  Added
+	prototypes for rasqal_uri_init and rasqal_uri_finish to make them.
+
+	* rasqal/tests/sparql/syntax/cast1.rq: Type check should be
+	xsd:integer.
+
+2005-03-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_result): Finish
+	if the query has query graph or the query graph has no graph
+	patterns in it.
+
+2005-03-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/syntax/Makefile.am,
+	rasqal/tests/sparql/syntax/cast1.rq: Added cast1.rq
+
+	* Redland.i: Added librdf_log_message_code,
+	librdf_log_message_level, librdf_log_message_facility,
+	librdf_log_message_message, librdf_log_message_locator,
+	fraptor_locator_line, raptor_locator_column, raptor_locator_byte,
+	raptor_locator_file, raptor_locator_uri for raptor locators.
+
+	* rasqal/sparql_parser.y (PatternElementConstraint): Added, Taking
+	the AND Expression out of PatternElement, ensuring the constraint
+	gets added to the adjacent graph pattern rather than one with no
+	other content.  Replaced all other references to PatternElement
+	with this term.
+	[now have 2 shift/reduce conflicts]
+
+	* rasqal/rasqal_engine.c (rasqal_query_build_declared_in): Less
+	debug noise for defined variables
+
+	* rasqal/tests/sparql/syntax/describe1.rq: use ?p in the query
+
+	* rasqal/tests/sparql/syntax/groups.rq: select ?mbox mentioned in
+	query
+
+2005-03-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/Makefile.am, rasqal/rasqal_engine.c,
+	rasqal/rasqal_internal.h, rasqal/rasqal_graph_pattern.c: Move
+	rasqal_graph_pattern to new rasqal_graph_pattern.c
+
+2005-03-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c
+	(rasqal_engine_query_constraints_has_qname): Check for query
+	constraints in sub-graph patterns via
+	rasqal_engine_graph_pattern_constraints_has_qname on
+	query_graph_pattern.
+	(rasqal_engine_graph_pattern_constraints_has_qname): Check in
+	sub-graph patterns here.
+	(rasqal_engine_expand_graph_pattern_constraints_qnames): Expand
+	qnames in sub graph patterns via recursion.
+	(rasqal_engine_expand_query_constraints_qnames): Expand via
+	rasqal_engine_expand_graph_pattern_constraints_qnames on
+	query_graph_pattern.
+	(rasqal_engine_build_constraints_expression): Build constraints in
+	sub graph patterns via recursion.
+	(rasqal_new_graph_pattern_from_triples): Use
+	rasqal_graph_pattern_add_triples to init.
+	(rasqal_graph_pattern_add_triples): Added, to add triples to an
+	existing graph pattern.
+	(rasqal_graph_pattern_init): Init sub graph_patterns by recusion.
+	Optional flags are now stored per graph pattern.
+	(rasqal_query_graph_pattern_build_declared_in): Added to build the
+	variables_declared_in fields per graph_pattern.
+	(rasqal_query_build_declared_in): Use the above to init from the
+	query_graph_pattern down.
+	(rasqal_engine_prepare): Use
+	rasqal_engine_build_constraints_expression to init
+	query_graph_pattern constraints.
+	(rasqal_engine_execute_init): Moved graph pattern sequence init
+	into rasqal_graph_pattern_init.
+	(rasqal_engine_move_to_graph_pattern): Move within an outer graph
+	pattern not a query.
+	(rasqal_engine_do_step, rasqal_engine_do_optional_step): Perform a
+	step within an outer graph_pattern containing graph pattern gp.
+	(rasqal_engine_get_next_result): Execute over contents of query's
+	query_graph_pattern.
+
+	* rasqal/sparql_parser.y (WhereClauseOpt): Append to
+	query_graph_pattern
+
+	* rasqal/rdql_parser.y (rasqal_rdql_query_engine_prepare): Use
+	rasqal_graph_pattern_add_sub_graph_pattern on query_graph_pattern
+
+	* rasqal/rasqal_query.c (rasqal_new_query, rasqal_free_query):
+	Remove graph_patterns and optional_graph_pattern fields.
+	(rasqal_query_add_constraint,
+	rasqal_query_get_constraint_sequence,
+	rasqal_query_get_constraint): Still deprecated, but now use the
+	query's query_graph_pattern field.
+	(rasqal_query_get_graph_pattern_sequence,
+	rasqal_query_get_graph_pattern): Use the graph pattern sequence
+	inside the query's query_graph_pattern.
+	(rasqal_graph_pattern_add_sub_graph_pattern): Added.
+	(rasqal_query_print): Print from the query_graph_pattern.
+
+	* rasqal/rasqal_internal.h: Moved from structure rasqal_query to
+	rasqal_graph_pattern fields: current_graph_pattern,
+	max_optional_graph_pattern, optional_graph_pattern_matches_count
+	to graph_pattern structure for execution of sub-graph patterns.
+	Added prototype of rasqal_graph_pattern_add_triples.
+
+	* rasqal/rasqal.h: Added prototype for
+	rasqal_graph_pattern_add_sub_graph_pattern
+
+2005-03-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c (rasqal_new_graph_pattern): Added.
+
+	* rasqal/rasqal_query.c (rasqal_new_query, rasqal_free_query):
+	Init query_graph_pattern using rasqal_new_graph_pattern.
+
+	* rasqal/rasqal_internal.h: Added prototype for
+	rasqal_new_graph_pattern
+
+	* rasqal/sparql_parser.y, rasqal/rdql_parser.y: execute factory
+	method takes rasqal_query_results* arg
+
+	* rasqal/rasqal_engine.c: style
+
+	* rasqal/rasqal_query.c (rasqal_query_execute): execute factory
+	method takes rasqal_query_results*
+
+	* rasqal/rasqal_internal.h: execute method takes
+	rasqal_query_results*
+
+	* rasqal/rasqal_internal.h: style
+
+2005-03-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y (rasqal_sparql_query_engine_prepare):
+	Move qname expansion checks from sparql_parse.
+
+	* rasqal/sparql_parser.y: Restore TriplePatternList as first part
+	of PatternElement.
+
+	* rasqal/tests/sparql/syntax/data.n3: Add something for casting
+
+	* rasqal/rasqal_expr.c (rasqal_expression_evaluate): Evaluate
+	RASQAL_EXPR_CAST.
+
+	* rasqal/rdql_parser.y (main): Cast for C++
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Added cast0.rq
+
+	* rasqal/tests/sparql/syntax/cast0.rq: Added cast test
+
+	* rasqal/sparql_lexer.l: and {QUOTEDURI} add optional ')' and
+	return URI_LITERAL_BRACE, QNAME_LITERAL_BRACE instead of
+	URI_LITERAL / QNAME_LITERAL.
+
+	* rasqal/sparql_parser.y: Added tokens URI_LITERAL_BRACE
+	QNAME_LITERAL_BRACE for URI+'(' and QNAME+'('
+	(URIBrace): Added for handling the two above, replacing two
+	alternatives in BuiltinExpression, removing a conflict.
+
+	* raptor/tests/turtle/Makefile.am: add test-17.out
+
+	* rasqal/rasqal_expr.c (rasqal_new_cast_expression): Added for
+	type casting
+	(rasqal_free_expression, rasqal_expression_foreach,
+	rasqal_expression_evaluate, rasqal_expression_print): Added
+	RASQAL_EXPR_CAST support
+
+	* rasqal/rasqal.h: Added RASQAL_EXPR_CAST for sparql type casting
+	Added prototype for rasqal_new_cast_expression
+
+	* rasqal/sparql_lexer.l, rasqal/rdql_lexer.l,
+	raptor/turtle_lexer.l, raptor/n3_lexer.l: Tidy to use .|\n to
+	match any char
+
+	* raptor/n3_lexer.l, raptor/turtle_lexer.l: Added """long
+	literals""" Use yyterminate() to end on errors
+
+	* raptor/tests/turtle/test-17.out: test-17
+
+	* raptor/tests/turtle/bad-14.ttl, raptor/tests/turtle/test-17.ttl:
+	long literals
+
+	* raptor/tests/turtle/Makefile.am: Added test-17.ttl bad-14.ttl for
+	long literals
+
+	* rasqal/rdql_lexer.l, rasqal/sparql_lexer.l ('-strings, and
+	"-strings): Count passed into sparql_copy_string_token is one too
+	small.
+
+	* rasqal/rasqal_query.c (rasqal_graph_pattern_set_origin): Set
+	origin only on this graph pattern's columns/triples.
+
+	* rasqal/roqet.c: Indenting tidying
+
+2005-03-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c (roqet_graph_pattern_walk): Print constraints
+	per-graph pattern.
+
+	* rasqal/rasqal_engine.c (rasqal_graph_pattern_get_constraint):
+	use idx
+
+	* rasqal/sparql_lexer.l: Remove NOT
+
+	* rasqal/sparql_parser.y: Updates to grammar structure to match
+	that of the 17 February 2005 WD in
+	http://www.w3.org/TR/2005/WD-rdf-sparql-query-20050217/ Remove
+	unused NOT token 1 shift/reduce conflcit near: URI '(' which can
+	be a cast in a rule part of BuiltinExpression or a Literal.
+
+	* rasqal/sparql_parser.y (sparql_parse): Use
+	rasqal_engine_query_constraints_has_qname.
+
+	* rasqal/rdql_parser.y: Construct constraints in parsing via query
+	field constraints_sequence
+	(rasqal_rdql_query_engine_prepare): Init constraints_sequence and
+	after parsing, assign to the main graph pattern and delete it.
+	Then do the qname expansion.
+	(rdql_parse): Remove qname expansion to above function.
+	(main): Use rasqal_query_prepare rather than writing internal
+	fields directly.
+
+	* rasqal/rasqal.h: Deprecate rasqal_query_add_constraint,
+	rasqal_query_get_constraint_sequence and
+	rasqal_query_get_constraint Added prototypes for
+	rasqal_graph_pattern_add_constraint,
+	rasqal_graph_pattern_get_constraint_sequence and
+	rasqal_graph_pattern_get_constraint
+
+	* rasqal/rasqal_query.c: Moved constraints code to graph_pattern
+	(rasqal_free_query): Removed constraints code.
+	(rasqal_query_add_source, rasqal_query_get_source_sequence,
+	rasqal_query_get_source, rasqal_query_get_variable_sequence): Add
+	RASQAL_DEPRECATED_MESSAGE pointing at new choice.
+	(rasqal_query_add_constraint,
+	rasqal_query_get_constraint_sequence,
+	rasqal_query_get_constraint): Deprecated to methods on a
+	rasqal_graph_pattern
+	(rasqal_query_print): Remove constraints printing.
+
+	* rasqal/rasqal_engine.c
+	(rasqal_engine_query_constraints_has_qname): Renamed from
+	rasqal_engine_constraints_has_qname
+	(rasqal_engine_graph_pattern_constraints_has_qname): Added.
+	(rasqal_engine_expand_graph_pattern_constraints_qnames): Renamed
+	from rasqal_engine_expand_constraints_qnames
+	(rasqal_engine_expand_query_constraints_qnames): Added.
+	(rasqal_free_graph_pattern): Free constraints_expression and
+	constraints when present (moved from rasqal_free_query).
+	(rasqal_graph_pattern_add_constraint): Added, based on
+	rasqal_query_add_constraint.
+	(rasqal_graph_pattern_get_constraint_sequence): Added, based on
+	rasqal_query_get_constraint_sequence
+	(rasqal_graph_pattern_get_constraint): Added, based on
+	rasqal_query_get_constraint
+	(rasqal_graph_pattern_print): Add printing of constraints
+	(rasqal_engine_prepare): Build constraints expressions per graph
+	pattern.
+	(rasqal_engine_check_constraint, rasqal_engine_do_step,
+	rasqal_engine_do_optional_step): Operate constraints per-current
+	graph pattern.
+
+	* rasqal/rasqal_internal.h: RASQAL_DEPRECATED_MESSAGE gains a
+	count so it warns just once.  rasqal_graph_pattern gains
+	constraints, constraints_expression fields.  rasqal_query internal
+	looses constraints.  Gains constraints_equence for rdql parsing
+	use.  Added prototypes for
+	rasqal_engine_query_constraints_has_qname,
+	rasqal_engine_graph_pattern_constraints_has_qname,
+	rasqal_engine_expand_query_constraints_qnames and
+	rasqal_engine_expand_graph_pattern_constraints_qnames
+
+2005-03-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_serialize_rdfxmla.c
+	(raptor_new_qname_from_resource): Use maximal xml name length for
+	splitting predicate.
+
+	* raptor/raptor_serialize.c (raptor_rdfxml_serialize_statement):
+	Use maximal xml name length for splitting predicate.
+
+2005-03-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c: Update to use rasqal_data_graph* and methods.
+
+	* rasqal/rasqal_query.c (rasqal_query_print): Prefer printing
+	query->data_graphs not sources.
+
+	* rasqal/sparql_parser.y (FromClauseOpt): Add either a NAMED or
+	BACKGROUND rasqal_data_graph with FROM and WITH respectively.
+
+	* rasqal/rasqal_internal.h: rasqal_query gains data_graphs field,
+	note sources is DEPRECATED.
+
+	* rasqal/rasqal_query.c (rasqal_new_query, rasqal_free_query):
+	Added data_graphs field init, tidy.
+	(rasqal_query_add_data_graph,
+	rasqal_query_get_data_graph_sequence,
+	rasqal_query_get_data_graph): Added for rasqal_data_graph access
+	(rasqal_query_add_source, rasqal_query_get_source_sequence,
+	rasqal_query_get_source): Added deprecated docs
+
+	* rasqal/rasqal_expr.c (rasqal_query_add_source,
+	rasqal_query_get_source_sequence and rasqal_query_get_source):
+	Added deprecated notices.
+	(rasqal_new_data_graph, rasqal_free_data_graph,
+	rasqal_data_graph_print): Added for rasqal_data_graph class.
+
+	* rasqal/rasqal.h: Added rasqal_data_graph and
+	rasqal_data_graph_flags.  Deprecated rasqal_query_add_source,
+	rasqal_query_get_source_sequence and rasqal_query_get_source Added
+	prototypes for rasqal_query_add_data_graph,
+	rasqal_query_get_data_graph_sequence, rasqal_query_get_data_graph,
+	rasqal_new_data_graph, rasqal_free_data_graph,
+	rasqal_data_graph_print
+
+2005-02-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/win32_rasqal_config.h, rasqal/configure.ac,
+	rasqal/ChangeLog: Bumped version to 0.9.8
+
+2005-02-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.1: roqet is a query util
+
+	* rasqal/roqet.c (roqet_graph_pattern_walk): Renamed from
+	roqet_walk_graph_pattern
+
+	* rasqal/roqet.c (roqet_query_walk): Added to do all query API
+	walking.
+
+	* rasqal/rasqal_query.c (rasqal_query_print): Tweak distinct,
+	limits wording>
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Added distinct0.rq
+	limit0.rq
+
+	* rasqal/tests/sparql/syntax/distinct0.rq,
+	rasqal/tests/sparql/syntax/limit0.rq: Tests for DISTINCT and LIMIT
+	syntax
+
+	* rasqal/librasqal.3: Added rasqal_query_get_distinct and
+	rasqal_query_get_limit
+
+	* rasqal/sparql_parser.y (LimitClauseOpt): Set limit field.
+
+	* rasqal/rasqal_query.c: Tidy some docucomments.
+	(rasqal_new_query): Initialise distinct, limit fields.
+	(rasqal_query_get_distinct): Added, returning if query results
+	should be distinct.
+	(rasqal_query_get_limit): Added, returning the query results limit
+	specified in the query.
+	(rasqal_query_print): Print distinct, limit fields.
+
+	* rasqal/rasqal.h: Added rasqal_query_get_distinct and
+	rasqal_query_get_limit
+
+	* rasqal/rasqal_internal.h: Added limit field to struct
+	rasqal_query_s
+
+	* rasqal/rasqal_literal.c (rasqal_literal_compare): Recheck for
+	NULL variable values so that ?var1 compare ?var2 fails properly
+	when one is not bound.
+
+	* rasqal/sparql_parser.y: tweak optional warning
+
+2005-02-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c: Casts for C++
+
+	* rasqal/rasqal_redland.c (rasqal_redland_new_triples_source):
+	Return -1 on no data.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_new_triples_source):
+	Return -1 on no data.
+
+	* rasqal/rasqal_query.c (rasqal_query_prepare): Init line, column,
+	byte to undefined.
+
+	* rasqal/rasqal_engine.c (rasqal_new_triples_source): Throw no
+	data/general error when new triple source factory fails to
+	construct.
+	(rasqal_engine_execute_init): Remove error throwing from here.
+
+	* rasqal/rasqal.h: new_triples_source factory method document
+	return value
+
+	* rasqal/roqet.c: Use raptor_stringbuffer to read large queries
+	from files, > buffer size.
+
+2005-02-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/examples/Makefile.am: Add gconf-2.0 to grapper args
+
+2005-02-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/part1/Makefile.am: Add dawg-query-004
+	dawg-result-004.n3
+
+	* rasqal/tests/sparql/part1/dawg-query-001,
+	rasqal/tests/sparql/part1/dawg-query-002,
+	rasqal/tests/sparql/part1/dawg-query-003,
+	rasqal/tests/sparql/part1/dawg-query-004: 2005-02-17 WD syntax
+	changes
+
+2005-02-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c: help typo
+
+	* rasqal/tests/sparql/syntax/construct2.rq,
+	rasqal/tests/sparql/syntax/construct1.rq,
+	rasqal/tests/sparql/syntax/construct0.rq,
+	rasqal/tests/sparql/syntax/ask0.rq: FROM to WITH for 2005-02-17 WD
+
+	* rasqal/sparql_parser.y (PatternElementForms): Remove unused
+	vars.
+
+	* rasqal/sparql_parser.y: Some updates for 2005-02-17 SPARQL query
+	WD.  Added GRAPH, WITH tokens
+	(FromClauseOpt): Warn about FROM, add WITH.
+	(PatternElementForms): Warn with SOURCE, add GRAPH.  Use
+	rasqal_graph_pattern_set_origin to pass on the varOrURI
+	(PatternElementForms): Warn about []
+
+	* rasqal/sparql_lexer.l: Added graph, with
+
+	* rasqal/rasqal_internal.h: Added rasqal_graph_pattern_set_origin
+	prototype.
+
+	* rasqal/rasqal_query.c (rasqal_graph_pattern_set_origin): Added,
+	to recursively set the origin on all triples inside.
+
+2005-02-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/librasqal.3: Document 0.9.7 and graph pattern api calls.
+
+	* rasqal/roqet.1: Document -d, -n
+
+	* rasqal/roqet.c: Added -n/--dryrun to stop after preparing the
+	query.  Added -w/--walk-query to walk and print the query using
+	the API.
+	(roqet_walk_graph_pattern): Added to walk the tree.
+
+	* rasqal/rasqal_query.c (rasqal_graph_pattern_get_triple): fix
+	range check
+
+	* rasqal/rasqal_query.c (rasqal_query_add_triple): Deprecated as
+	it doesn't construct the graph patterns and is of little use.
+	(rasqal_query_get_graph_pattern_sequence,
+	rasqal_query_get_graph_pattern): Added to get the
+	rasqal_graph_patterns inside a query.
+	(rasqal_graph_pattern_get_triple): Added to get a rasqal_triple
+	inside a graph_pattern.
+	(rasqal_graph_pattern_get_sub_graph_pattern_sequence,
+	(rasqal_graph_pattern_get_sub_graph_pattern): Added to get a
+	sub-graph pattern inside a graph pattern.
+	(rasqal_graph_pattern_get_flags): Added to get graph pattern
+	flags.
+
+	* rasqal/rasqal.h: Typo
+
+	* rasqal/rasqal_internal.h: Move rasqal_graph_pattern typedef,
+	rasqal_pattern_flags and rasqal_graph_pattern_print to public api.
+	Added RASQAL_DEPRECATED_MESSAGE macro.
+
+	* rasqal/rasqal.h: Export rasqal_graph_pattern typedef Export
+	rasqal_pattern_flags enum with value RASQAL_PATTERN_FLAGS_OPTIONAL
+	Deprecate rasqal_query_add_triple as it doesn't construct the
+	graph patterns and is of little use.  Added prototypes for
+	rasqal_query_get_graph_pattern_sequence,
+	rasqal_query_get_graph_pattern, rasqal_graph_pattern_get_triple,
+	rasqal_graph_pattern_get_sub_graph_patterns_sequence,
+	rasqal_graph_pattern_get_sub_graph_pattern,
+	rasqal_graph_pattern_get_flags and exported
+	rasqal_graph_pattern_print
+
+	* rasqal/tests/rdql/testsuite/check-rdql,
+	rasqal/tests/sparql/check-sparql: Handle roqet select: and bound
+	variables:
+
+	* rasqal/rasqal.h: Added RASQAL_DEPRECATED macro.  Deprecated
+	rasqal_query_get_variable_sequence Added
+	rasqal_query_get_bound_variable_sequence and
+	rasqal_query_get_all_variable_sequence.
+
+	* rasqal/rasqal_query.c (rasqal_query_get_variable_sequence):
+	Deprecate, prefer rasqal_query_get_bound_variable_sequence
+	(rasqal_query_get_bound_variable_sequence): Added, returning the
+	sequence of rasqal_variable* that are to be bound - appearing in
+	the query result.
+	(rasqal_query_get_all_variable_sequence): Added, return the
+	sequence of all rasqal_variable* mentioned in the query.
+	(rasqal_query_print): Print all variables as well as selected.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_as_integer,
+	rasqal_literal_as_floating, rasqal_literal_as_string,
+	rasqal_literal_compare): Added remaining LITERAL enums for
+	-Wswitch-enum.
+	(rasqal_literal_compare): Handle two literal values.
+	(rasqal_literal_as_node): Handle RASQAL_LITERAL_BOOLEAN into a
+	xsd:boolean typed value.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_get_binding_name):
+	Work even when query results are finished.
+
+	* rasqal/rasqal_query.c (rasqal_query_set_feature): Added
+	RASQAL_FEATURE_LAST case for -Wswitch-enum (there are no
+	features).
+	(rasqal_query_results_write, rasqal_query_results_get_triple):
+	Added RASQAL_LITERAL_UNKNOWN case for -Wswitch-enum.
+	(rasqal_query_results_get_triple): Added remaining LITERAL enums
+	for -Wswitch-enum.  Note why forbidden - literal subjects,
+	predicates, bnode predicates.
+
+	* rasqal/rasqal_expr.c (rasqal_free_expression,
+	rasqal_expression_foreach, rasqal_expression_evaluate,
+	rasqal_expression_print): Added RASQAL_EXPR_UNKNOWN case for
+	-Wswitch-enum.  Deleted "pattern" from rasqal_op_labels.
+	(rasqal_expression_print): Deleted RASQAL_EXPR_PATTERN Handle
+	RASQAL_EXPR_FUNCTION.
+
+	* rasqal/rasqal_literal.c (rasqal_free_literal,
+	rasqal_literal_print, rasqal_literal_as_boolean,
+	rasqal_literal_as_integer, rasqal_literal_as_floating,
+	rasqal_literal_as_string, rasqal_literal_compare,
+	rasqal_literal_equals): Added RASQAL_LITERAL_UNKNOWN case for
+	-Wswitch-enum.
+	(rasqal_literal_as_integer, rasqal_literal_as_floating): Return
+	RASQAL_LITERAL_BLANK as an error.
+
+	* rasqal/rasqal.h: Deleted RASQAL_EXPR_PATTERN - never used.
+
+	* rasqal/configure.ac: Add -Wswitch-enum to maintainer-mode gcc
+	switches to catch missing enum values in switches.  Lots of those
+	near expression and literal handling.
+
+	* librdf/rdf_statement.c (librdf_free_statement): with threads fix
+
+2005-02-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/examples/grapper.c: Added gconf storing of window
+	width/height at namespace /apps/grapper
+
+2005-02-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/win32_raptor_config.h: Define RASQAL_INLINE to __inline
+
+	* raptor/raptor_nfc.c: Change inline to RAPTOR_INLINE
+
+	* raptor/raptor_internal.h:
+	Define RAPTOR_INLINE to inline if not alerady defined to something
+	else
+
+	* rasqal/win32_rasqal_config.h: Define RASQAL_INLINE to __inline
+
+	* rasqal/rasqal_query.c: Change inline to RASQAL_INLINE
+
+	* rasqal/rasqal_internal.h: Add RASQAL_INLINE protection and set
+	RASQAL_DEBUG if LIBRDF_DEBUG set.
+
+	* rasqal/rasqal.h: rasqal_query_results_write with RASQAL_API prefix.
+
 2005-02-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_serialize_rdfxmla.c
+	 (raptor_rdfxmla_emit_subject_list_items,
+	 raptor_rdfxmla_emit_subject_properties,
+	 raptor_rdfxmla_emit_subject, raptor_rdfxmla_serialize_start): Copy
+	base URIs only when they are not NULL.
+	(raptor_rdfxmla_serialize_statement): Handle
+	predicate type RAPTOR_IDENTIFIER_TYPE_RESOURCE as an alternative.
 
 	* librdf/rdf_query_rasqal.c (librdf_query_rasqal_execute): Free
 	any existing stored rasqal result before executing.
@@ -101,9 +757,6 @@
 
 	* utils/rdfproc.c, rasqal/sparql_lexer.l, rasqal/rasqal_expr.c:
 	casts for C++
-
-	* rasqal/INSTALL.html, raptor/INSTALL.html: Note flex and bison
-	requirements
 
 	* rasqal/configure.ac: In maintainer mode, stop if flex is too
 	old, no flex or YACC is not GNU bison.
