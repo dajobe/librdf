@@ -143,13 +143,25 @@ librdf_new_list(void)
 void
 librdf_free_list(librdf_list* list) 
 {
+  librdf_list_clear(list);
+  LIBRDF_FREE(librdf_list, list);
+}
+
+
+/**
+ * librdf_list_clear - empty an librdf_list
+ * @list: &librdf_list object
+ * 
+ **/
+void
+librdf_list_clear(librdf_list* list) 
+{
   librdf_list_node *node, *next;
   
   for(node=list->first; node; node=next) {
     next=node->next;
     LIBRDF_FREE(librdf_list_node, node);
   }
-  LIBRDF_FREE(librdf_list, list);
 }
 
 
@@ -450,3 +462,25 @@ librdf_list_iterator_get_next(void* iterator)
   list->current = list->current->next;
   return node->data;
 }
+
+
+/**
+ * librdf_list_foreach - apply a function for each data item in a librdf_list
+ * @list: &librdf_list object
+ * @fn: pointer to function to apply that takes data pointer and user data parameters
+ * @user_data: user data for applied function 
+ * 
+ **/
+void
+librdf_list_foreach(librdf_list* list, void (*fn)(void *, void *),
+                    void *user_data) 
+{
+  librdf_list_node *node, *next;
+  
+  for(node=list->first; node; node=next) {
+    next=node->next;
+    (*fn)(node->data, user_data);
+  }
+}
+
+
