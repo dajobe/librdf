@@ -443,11 +443,10 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
   raptor_parser *rdf_parser;
-  librdf_world *world=uri->world;
-  raptor_www *www;
+  librdf_world *world;
   librdf_stream *stream;
   
-  if(librdf_uri_is_file_uri(uri))
+  if(uri && librdf_uri_is_file_uri(uri))
     return librdf_parser_raptor_parse_file_as_stream(context, uri, base_uri);
 
 
@@ -476,37 +475,52 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   scontext->rdf_parser=rdf_parser;
 
   scontext->pcontext=pcontext;
-  scontext->source_uri = librdf_new_uri_from_uri(uri);
   if(!base_uri)
     base_uri=uri;
+
+  /* No base URI given, cannot proceed */
+  if(!base_uri)
+    return NULL;
+
+  if(uri)
+    scontext->source_uri = librdf_new_uri_from_uri(uri);
+  else
+    scontext->source_uri = librdf_new_uri_from_uri(base_uri);
   scontext->base_uri = librdf_new_uri_from_uri(base_uri);
 
-  www=raptor_www_new();
-  if(!www) {
-    LIBRDF_FREE(librdf_parser_raptor_stream_context, scontext);
-    raptor_free_parser(rdf_parser);
-    return NULL;
-  }
+  if(uri) {
+    raptor_www *www=raptor_www_new();
+    if(!www) {
+      LIBRDF_FREE(librdf_parser_raptor_stream_context, scontext);
+      raptor_free_parser(rdf_parser);
+      return NULL;
+    }
+    
+    raptor_www_set_write_bytes_handler(www, 
+                                       librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler,
+                                       scontext);
+    
+    if(raptor_start_parse(rdf_parser, (raptor_uri*)base_uri)) {
+      raptor_www_free(www);
+      return NULL;
+    }
+    
+    raptor_www_fetch(www, (raptor_uri*)uri);
+    raptor_parse_chunk(rdf_parser, NULL, 0, 1);
 
-  raptor_www_set_write_bytes_handler(www, 
-                                     librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler,
-                                     scontext);
-
-  if(raptor_start_parse(rdf_parser, (raptor_uri*)base_uri)) {
     raptor_www_free(www);
-    return NULL;
+  } else {
+    if(raptor_start_parse(rdf_parser, (raptor_uri*)base_uri))
+      return NULL;
+    
+    raptor_parse_chunk(rdf_parser, string, strlen(string), 1);
   }
-
-  raptor_www_fetch(www, (raptor_uri*)uri);
-
-  raptor_parse_chunk(rdf_parser, NULL, 0, 1);
-
-  raptor_www_free(www);
+  
 
   /* get first statement, else is empty */
   scontext->current=(librdf_statement*)librdf_list_pop(&scontext->statements);
 
-  stream=librdf_new_stream(world,
+  stream=librdf_new_stream(base_uri->world,
                            (void*)scontext,
                            &librdf_parser_raptor_serialise_end_of_stream,
                            &librdf_parser_raptor_serialise_next_statement,
@@ -602,9 +616,19 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   
   scontext->rdf_parser=rdf_parser;
   scontext->pcontext=pcontext;
-  scontext->source_uri = librdf_new_uri_from_uri(uri);
+
   if(!base_uri)
     base_uri=uri;
+
+  /* No base URI given, cannot proceed */
+  if(!base_uri)
+    return 1;
+    
+  if(uri)
+    scontext->source_uri = librdf_new_uri_from_uri(uri);
+  else
+    scontext->source_uri = librdf_new_uri_from_uri(base_uri);
+
   scontext->base_uri = librdf_new_uri_from_uri(base_uri);
 
   /* direct into model */
