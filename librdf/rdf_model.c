@@ -24,6 +24,7 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
+#include <string.h>
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for exit()  */
 #endif
@@ -643,6 +644,8 @@ librdf_model_has_arc_out(librdf_model *model, librdf_node *node,
  * @model: the model object
  * @fh: the FILE stream to print to
  * 
+ * This method is for debugging and the format of the output should
+ * not be relied on.
  **/
 void
 librdf_model_print(librdf_model *model, FILE *fh)
@@ -660,17 +663,36 @@ librdf_model_print(librdf_model *model, FILE *fh)
 
 
 /**
- * librdf_model_add_statements_group - Add statements to model in a group
+ * librdf_model_context_add_statement - Add a statement to a model with a context
  * @model: &librdf_model object
- * @group_uri: &librdf_uri group URI
+ * @context: &librdf_node context
+ * @statement: &librdf_statement statement object
+ * 
+ * Return value: Non 0 on failure
+ **/
+int
+librdf_model_context_add_statement(librdf_model* model, 
+                                   librdf_node* context,
+                                   librdf_statement* statement) 
+{
+  return librdf_storage_context_add_statement(model->storage,
+                                              context, statement);
+}
+
+
+
+/**
+ * librdf_model_context_add_statements - Add statements to a model with a context
+ * @model: &librdf_model object
+ * @context: &librdf_node context
  * @stream: &librdf_stream stream object
  * 
  * Return value: Non 0 on failure
  **/
 int
-librdf_model_add_statements_group(librdf_model* model, 
-                                  librdf_uri* group_uri,
-                                  librdf_stream* stream) 
+librdf_model_context_add_statements(librdf_model* model, 
+                                    librdf_node* context,
+                                    librdf_stream* stream) 
 {
   int status=0;
   
@@ -681,14 +703,12 @@ librdf_model_add_statements_group(librdf_model* model,
     librdf_statement* statement=librdf_stream_get_object(stream);
     if(!statement)
       break;
-    status=librdf_storage_group_add_statement(model->storage,
-                                              group_uri, statement);
-    librdf_model_add_statement(model, statement);
+    status=librdf_storage_context_add_statement(model->storage,
+                                                context, statement);
     if(status)
       break;
     librdf_stream_next(stream);
   }
-  librdf_free_stream(stream);
 
   return status;
 }
@@ -696,18 +716,36 @@ librdf_model_add_statements_group(librdf_model* model,
 
 
 /**
- * librdf_model_remove_statements_group - Remove statements from model by group
+ * librdf_model_context_remove_statement - Remove a statement from a model in a context
  * @model: &librdf_model object
- * @group_uri: &librdf_uri group URI
+ * @context: &librdf_uri context
+ * @statement: &librdf_statement statement
  * 
  * Return value: Non 0 on failure
  **/
 int
-librdf_model_remove_statements_group(librdf_model* model,
-                                     librdf_uri* group_uri) 
+librdf_model_context_remove_statement(librdf_model* model,
+                                      librdf_node* context,
+                                      librdf_statement* statement) 
 {
-  librdf_stream *stream=librdf_storage_group_serialise(model->storage,
-                                                       group_uri);
+  return librdf_storage_context_remove_statement(model->storage,
+                                                 context, statement);
+}
+
+
+/**
+ * librdf_model_context_remove_statements - Remove statements from a model with the given context
+ * @model: &librdf_model object
+ * @context: &librdf_uri context
+ * 
+ * Return value: Non 0 on failure
+ **/
+int
+librdf_model_context_remove_statements(librdf_model* model,
+                                       librdf_node* context) 
+{
+  librdf_stream *stream=librdf_storage_context_serialise(model->storage,
+                                                         context);
   if(!stream)
     return 1;
 
@@ -715,13 +753,26 @@ librdf_model_remove_statements_group(librdf_model* model,
     librdf_statement *statement=librdf_stream_get_object(stream);
     if(!statement)
       break;
-    librdf_storage_group_remove_statement(model->storage,
-                                          group_uri, statement);
-    librdf_model_remove_statement(model, statement);
+    librdf_storage_context_remove_statement(model->storage,
+                                            context, statement);
     librdf_stream_next(stream);
   }
   librdf_free_stream(stream);  
   return 0;
+}
+
+
+/**
+ * librdf_model_context_serialize - List all statements in a model context
+ * @model: &librdf_model object
+ * @context: &librdf_uri context
+ * 
+ * Return value: &librdf_stream of statements or NULL on failure
+ **/
+librdf_stream*
+librdf_model_context_serialize(librdf_model* model, librdf_node* context) 
+{
+  return librdf_storage_context_serialise(model->storage, context);
 }
 
 
@@ -832,6 +883,7 @@ main(int argc, char *argv[])
   const char *file_uri_strings[URI_STRING_COUNT]={"file:model_test1.rdf", "file:model_test2.rdf"};
   const char *file_content[URI_STRING_COUNT]={EX1_CONTENT, EX2_CONTENT};
   librdf_uri* uris[URI_STRING_COUNT];
+  librdf_node* nodes[URI_STRING_COUNT];
   int i;
   char *program=argv[0];
   /* initialise dependent modules - all of them! */
@@ -839,7 +891,8 @@ main(int argc, char *argv[])
   librdf_world_open(world);
   
   fprintf(stderr, "%s: Creating storage\n", program);
-  storage=librdf_new_storage(world, NULL, NULL, NULL);
+  storage=librdf_new_storage(world, NULL, NULL, "contexts='yes'");
+  //storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
@@ -850,7 +903,7 @@ main(int argc, char *argv[])
   statement=librdf_new_statement(world);
   /* after this, nodes become owned by model */
   librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, "http://www.ilrt.bris.ac.uk/people/cmdjb/"));
-  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/#Creator"));
+  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/creator"));
   librdf_statement_set_object(statement, librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0));
 
   librdf_model_add_statement(model, statement);
@@ -882,15 +935,17 @@ main(int argc, char *argv[])
     fclose(fh);
 
     uris[i]=librdf_new_uri(world, file_uri_strings[i]);
+    nodes[i]=librdf_new_node_from_uri_string(world, file_uri_strings[i]);
 
-    fprintf(stderr, "%s: Adding content from %s into statement group\n", program,
+    fprintf(stderr, "%s: Adding content from %s into statement context\n", program,
             librdf_uri_as_string(uris[i]));
     if(!(stream=librdf_parser_parse_as_stream(parser, uris[i], NULL))) {
       fprintf(stderr, "%s: Failed to parse RDF from %s as stream\n", program,
               librdf_uri_as_string(uris[i]));
       exit(1);
     }
-    librdf_model_add_statements_group(model, uris[i], stream);
+    librdf_model_context_add_statements(model, nodes[i], stream);
+    librdf_free_stream(stream);
 
     fprintf(stderr, "%s: Printing model\n", program);
     librdf_model_print(model, stderr);
@@ -904,18 +959,19 @@ main(int argc, char *argv[])
 
 
   for (i=0; i<URI_STRING_COUNT; i++) {
-    fprintf(stderr, "%s: Removing statement group %s\n", program, 
+    fprintf(stderr, "%s: Removing statement context %s\n", program, 
             librdf_uri_as_string(uris[i]));
-    librdf_model_remove_statements_group(model, uris[i]);
+    librdf_model_context_remove_statements(model, nodes[i]);
 
     fprintf(stderr, "%s: Printing model\n", program);
     librdf_model_print(model, stderr);
   }
 
 
-  fprintf(stderr, "%s: Freeing URIs\n", program);
+  fprintf(stderr, "%s: Freeing URIs and Nodes\n", program);
   for (i=0; i<URI_STRING_COUNT; i++) {
     librdf_free_uri(uris[i]);
+    librdf_free_node(nodes[i]);
   }
   
   fprintf(stderr, "%s: Freeing model\n", program);
