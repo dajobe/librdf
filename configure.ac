@@ -928,7 +928,7 @@ fi
 
 
 AC_ARG_WITH(threestore, [  --with-threestore=DIR          3store installation location], tstore="$withval", tstore="")
-AC_MSG_CHECKING(for tstore)
+AC_MSG_CHECKING(for 3store)
 if test "X$tstore" != "X" -a -r $tstore/include/rdfsql/rdfsql.h -a -r $tstore/lib/librdfsql.la ; then
   # FIXME - this assumes glib-config exists
   LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS -I$tstore/include `glib-config --cflags`"
