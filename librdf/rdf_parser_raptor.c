@@ -163,7 +163,7 @@ librdf_parser_raptor_new_statement_handler (void *context,
                                 librdf_new_node_from_literal(world,
                                                              rstatement->object,
                                                              rstatement->object_literal_language,
-                                                             0, is_xml_literal));
+                                                             is_xml_literal));
   } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
     node=librdf_new_node_from_blank_identifier(world, rstatement->object);
     librdf_statement_set_object(statement, node);

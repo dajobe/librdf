@@ -204,16 +204,14 @@ librdf_parser_repat_statement_handler(void* user_data,
       if(scontext->literal) {
         LIBRDF_DEBUG2(librdf_parser_repat_end_element_handler,
                       "found literal text: '%s'\n", scontext->literal);
-        object=librdf_new_node_from_literal(world, 
-                                            scontext->literal, NULL, 0, 0);
+        object=librdf_new_node_from_literal(world, scontext->literal, NULL, 0);
         LIBRDF_FREE(cstring, scontext->literal);
         scontext->literal=NULL;
         scontext->literal_length=0;
       } else {
         if(!object_string)
           object_string="";
-        object=librdf_new_node_from_literal(world, 
-                                            object_string, xml_lang, 0, 0);
+        object=librdf_new_node_from_literal(world, object_string, xml_lang, 0);
       }
       break;
     case RDF_OBJECT_TYPE_XML:
@@ -276,8 +274,7 @@ librdf_parser_repat_end_parse_type_literal_handler( void* user_data )
      *   'URI-of-element-namespace '^' qname
      * i.e. the literal is NOT legal an XML document or XML fragment.
      */
-    object=librdf_new_node_from_literal(world, 
-                                        scontext->literal, NULL, 0, 1);
+    object=librdf_new_node_from_literal(world, scontext->literal, NULL, 1);
     LIBRDF_FREE(cstring, scontext->literal);
     scontext->literal=NULL;
     scontext->literal_length=0;

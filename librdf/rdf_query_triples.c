@@ -204,8 +204,7 @@ librdf_query_triples_init(librdf_query* query,
     cur++; /* Move past '[' or '"' */
     p[-2]='\0';     /* Zap ']' or '"' */
     if(cur[-1] == '"')
-      object=librdf_new_node_from_literal(query->world, 
-                                          cur, NULL, 0, 0);
+      object=librdf_new_node_from_literal(query->world, cur, NULL, 0);
     else
       object=librdf_new_node_from_uri_string(query->world, cur);
     if(!object) {

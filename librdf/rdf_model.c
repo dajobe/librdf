@@ -292,7 +292,7 @@ librdf_model_add_string_literal_statement(librdf_model* model,
   int result;
   
   object=librdf_new_node_from_literal(model->world,
-                                      string, xml_language, 0, 
+                                      string, xml_language, 
                                       is_wf_xml);
   if(!object)
     return 1;

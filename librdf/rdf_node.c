@@ -244,7 +244,7 @@ librdf_new_node_from_literal(librdf_world *world,
   new_node->type=LIBRDF_NODE_TYPE_LITERAL;
 
   if (librdf_node_set_literal_value(new_node, string, xml_language,
-                                    0, is_wf_xml)) {
+                                    is_wf_xml)) {
     librdf_free_node(new_node);
     return NULL;
   }
@@ -326,7 +326,6 @@ librdf_new_node_from_node(librdf_node *node)
       if (librdf_node_set_literal_value(new_node,
                                         node->value.literal.string,
                                         node->value.literal.xml_language,
-                                        0,
                                         node->value.literal.is_wf_xml)) {
         LIBRDF_FREE(librdf_node, new_node);
         return NULL;
@@ -1031,7 +1030,7 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
       node->type = LIBRDF_NODE_TYPE_LITERAL;
       if (librdf_node_set_literal_value(node, (const char*)buffer+6,
                                         (const char*)language,
-                                        0, is_wf_xml))
+                                        is_wf_xml))
         return 0;
     
     break;
