@@ -148,7 +148,8 @@ static struct option long_options[] =
 
 static const char *title_format_string="Redland RDF processor utility %s\n";
 
-  
+static const char *default_storage_name="hashes";
+static const char *default_storage_options="hash-type='bdb',dir='.'";
 
 
 int
@@ -182,8 +183,8 @@ main(int argc, char *argv[])
   char *p;
   int i;
   int rc;
-  char *storage_name="hashes";
-  char *storage_options="hash-type='bdb',dir='.'";
+  char *storage_name=(char*)default_storage_name;
+  char *storage_options=(char*)default_storage_options;
   char *storage_password=NULL;
   unsigned char *uri_string;
   int free_uri_string=0;
@@ -202,6 +203,18 @@ main(int argc, char *argv[])
 
   world=librdf_new_world();
   librdf_world_open(world);
+
+  options=librdf_new_hash(world, NULL);
+  librdf_hash_open(options, NULL, 0, 1, 1, NULL);
+
+#ifdef HAVE_GETENV
+  if((name=getenv("RDFPROC_STORAGE_OPTIONS")))
+    storage_options=name;
+
+  if((name=getenv("RDFPROC_STORAGE_TYPE")))
+    storage_name=name;
+#endif
+
 
   while (!usage && !help)
   {
@@ -223,7 +236,7 @@ main(int argc, char *argv[])
         break;
         
       case 'c':
-        contexts=1;
+        librdf_hash_put_strings(options, "contexts", "yes");
         break;
 
       case 'h':
@@ -298,6 +311,11 @@ main(int argc, char *argv[])
             free(storage_password);
             storage_password=NULL;
           }
+        }
+
+        if(storage_password) {
+          librdf_hash_put_strings(options, "password", storage_password);
+          free(storage_password);
         }
         break;
 
@@ -391,7 +409,7 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(p, "password        ", "Read storage option 'password' from standard input"));
     puts(HELP_TEXT(s, "storage TYPE    ", "Set the graph storage type"));
     puts("    'memory'                In memory\n    'hashes'                Indexed hashes (default)\n    'mysql'                 MySQL - when available\n    '3store'                AKT triplestore - when available");
-    printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Storage options (default \"%s\")\n"), storage_options);
+    printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Storage options (default \"%s\")\n"), default_storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
     puts("  parse FILE|URI [SYNTAX [BASEURI]]");
@@ -432,23 +450,12 @@ main(int argc, char *argv[])
   
   type=commands[cmd_index].type;
 
-  options=librdf_new_hash(world, NULL);
-  librdf_hash_open(options, NULL, 0, 1, 1, NULL);
-
-  if(contexts)
-    librdf_hash_put_strings(options, "contexts", "yes");
-
   if(commands[cmd_index].write) {
     librdf_hash_put_strings(options, "write", "yes");
     if (is_new)
       librdf_hash_put_strings(options, "new", "yes");
   }
 
-  if(storage_password) {
-    librdf_hash_put_strings(options, "password", storage_password);
-    free(storage_password);
-  }
-  
   librdf_hash_from_string(options, storage_options);
 
 
