@@ -612,31 +612,83 @@ void
 librdf_model_print(librdf_model *model, FILE *fh)
 {
   librdf_stream* stream;
-  librdf_statement* statement;
-  char *s;
   
   stream=librdf_model_serialise(model);
   if(!stream)
     return;
-  
   fputs("[[\n", fh);
-  while(!librdf_stream_end(stream)) {
-    statement=librdf_stream_next(stream);
-    if(!statement)
-      break;
-    s=librdf_statement_to_string(statement);
-    if(s) {
-      fputs("  ", fh);
-      fputs(s, fh);
-      fputs("\n", fh);
-      LIBRDF_FREE(cstring, s);
-    }
-    librdf_free_statement(statement);
-  }
+  librdf_stream_print(stream, fh);
   fputs("]]\n", fh);
-  
   librdf_free_stream(stream);
 }
+
+
+/**
+ * librdf_model_add_statements_group - Add statements to model in a group
+ * @model: &librdf_model object
+ * @group_uri: &librdf_uri group URI
+ * @stream: &librdf_stream stream object
+ * 
+ * Return value: Non 0 on failure
+ **/
+int
+librdf_model_add_statements_group(librdf_model* model, 
+                                  librdf_uri* group_uri,
+                                  librdf_stream* stream) 
+{
+  int status=0;
+  
+  if(!stream)
+    return 1;
+
+  while(!librdf_stream_end(stream)) {
+    librdf_statement* statement=librdf_stream_next(stream);
+    if(!statement)
+      break;
+    status=librdf_storage_group_add_statement(model->storage,
+                                              group_uri, statement);
+    librdf_model_add_statement(model, statement);
+    librdf_free_statement(statement);
+    if(status)
+      break;
+  }
+  librdf_free_stream(stream);
+
+  return status;
+}
+
+
+
+/**
+ * librdf_model_remove_statements_group - Remove statements from model by group
+ * @model: &librdf_model object
+ * @group_uri: &librdf_uri group URI
+ * 
+ * Return value: Non 0 on failure
+ **/
+int
+librdf_model_remove_statements_group(librdf_model* model,
+                                     librdf_uri* group_uri) 
+{
+  librdf_stream *stream=librdf_storage_group_serialise(model->storage,
+                                                       group_uri);
+  if(!stream)
+    return 1;
+
+  while(!librdf_stream_end(stream)) {
+    librdf_statement *statement=librdf_stream_next(stream);
+    if(!statement)
+      break;
+    librdf_storage_group_remove_statement(model->storage,
+                                          group_uri, statement);
+    librdf_model_remove_statement(model, statement);
+    librdf_free_statement(statement);
+  }
+  librdf_free_stream(stream);  
+  return 0;
+}
+
+
 
 
 
@@ -654,6 +706,13 @@ main(int argc, char *argv[])
   librdf_storage* storage;
   librdf_model* model;
   librdf_statement *statement;
+  librdf_parser* parser;
+  librdf_stream* stream;
+  const char *parser_name="raptor";
+  #define URI_STRING_COUNT 2
+  const char *file_uri_strings[URI_STRING_COUNT]={"file:ex1.rdf", "file:ex2.rdf"};
+  librdf_uri* uris[URI_STRING_COUNT];
+  int i;
   char *program=argv[0];
   
   /* initialise dependent modules - all of them! */
@@ -680,6 +739,49 @@ main(int argc, char *argv[])
 
   fprintf(stderr, "%s: Printing model\n", program);
   librdf_model_print(model, stderr);
+
+  parser=librdf_new_parser(world, parser_name, NULL, NULL);
+  if(!parser) {
+    fprintf(stderr, "%s: Failed to create new parser type %s\n", program,
+            parser_name);
+    exit(1);
+  }
+
+  for (i=0; i<URI_STRING_COUNT; i++) {
+    uris[i]=librdf_new_uri(world, file_uri_strings[i]);
+
+    fprintf(stderr, "%s: Adding content from %s into statement group\n", program,
+            librdf_uri_as_string(uris[i]));
+    if(!(stream=librdf_parser_parse_as_stream(parser, uris[i], NULL))) {
+      fprintf(stderr, "%s: Failed to parse RDF from %s as stream\n", program,
+              librdf_uri_as_string(uris[i]));
+      exit(1);
+    }
+    librdf_model_add_statements_group(model, uris[i], stream);
+
+    fprintf(stderr, "%s: Printing model\n", program);
+    librdf_model_print(model, stderr);
+  }
+
+
+  fprintf(stderr, "%s: Freeing Parser\n", program);
+  librdf_free_parser(parser);
+
+
+  for (i=0; i<URI_STRING_COUNT; i++) {
+    fprintf(stderr, "%s: Removing statement group %s\n", program, 
+            librdf_uri_as_string(uris[i]));
+    librdf_model_remove_statements_group(model, uris[i]);
+
+    fprintf(stderr, "%s: Printing model\n", program);
+    librdf_model_print(model, stderr);
+  }
+
+
+  fprintf(stderr, "%s: Freeing URIs\n", program);
+  for (i=0; i<URI_STRING_COUNT; i++) {
+    librdf_free_uri(uris[i]);
+  }
   
   fprintf(stderr, "%s: Freeing model\n", program);
   librdf_free_model(model);
