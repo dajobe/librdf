@@ -351,7 +351,9 @@ main(int argc, char *argv[])
   librdf_finish_storage();
   librdf_finish_statement();
   
+#ifdef LIBRDF_DEBUG
   librdf_memory_report(stderr);
+#endif
 	
   /* keep gcc -Wall happy */
   return(0);
