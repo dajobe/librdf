@@ -202,12 +202,12 @@ AC_MSG_RESULT($bdb_prefix)
 
 bdb_available=
 if test "$bdb_prefix" != no; then
-  oCFLAGS="$CFLAGS"
+  oCPPFLAGS="$CPPFLAGS"
   oLDFLAGS="$LDFLAGS"
   oLIBS="$LIBS"
   if test "$bdb_prefix" != /usr; then
     nLDFLAGS="-L$bdb_prefix/lib $LDFLAGS";
-    CFLAGS="-I$bdb_prefix/include $CFLAGS";
+    CPPFLAGS="-I$bdb_prefix/include $CPPFLAGS";
     # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
     DBname=`cd $bdb_prefix/lib; ls -1 libdb*.a|sed -e 's/^lib//' -e 's/\.a$//' | head -1`
   else
@@ -275,7 +275,7 @@ if test "$bdb_prefix" != no; then
   if test "$have_libdb" != yes; then
     LIBS="$oLIBS"
     LDFLAGS="$oLDFLAGS"
-    CFLAGS="$oCFLAGS"
+    CPPFLAGS="$oCPPFLAGS"
    fi
 
 fi
