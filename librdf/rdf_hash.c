@@ -471,7 +471,7 @@ librdf_hash_open(librdf_hash* hash, char *identifier,
   int status;
 
   if(identifier) {
-    hash->identifier=LIBRDF_MALLOC(cstring, strlen(identifier)+1);
+    hash->identifier=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+1);
     if(!hash->identifier)
       return 1;
     strcpy(hash->identifier, identifier);
@@ -527,7 +527,7 @@ librdf_hash_get(librdf_hash* hash, char *key)
 
   if(hd_value) {
     if(hd_value->data) {
-      value=LIBRDF_MALLOC(cstring, hd_value->size+1);
+      value=(char*)LIBRDF_MALLOC(cstring, hd_value->size+1);
       if(value) {
         /* Copy into new null terminated string for userland */
         memcpy(value, hd_value->data, hd_value->size);
@@ -576,7 +576,7 @@ librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key)
   status=librdf_hash_cursor_get_next(cursor, key, value);
   if(!status) {
     /* value->data will point to SHARED area, so copy it */
-    new_value=LIBRDF_MALLOC(cstring, value->size);
+    new_value=(char*)LIBRDF_MALLOC(cstring, value->size);
     if(new_value) {
       memcpy(new_value, value->data, value->size);
       value->data=new_value;
@@ -1359,8 +1359,8 @@ librdf_hash_from_array_of_strings (librdf_hash* hash, char **array)
     if(!value.data)
       LIBRDF_FATAL2(librdf_hash_from_array_of_strings,
                     "Array contains an odd number of strings - %d", i);
-    key.size=strlen(key.data);
-    value.size=strlen(value.data);
+    key.size=strlen((char*)key.data);
+    value.size=strlen((char*)value.data);
     librdf_hash_put(hash, &key, &value);
   }
   return 0;
