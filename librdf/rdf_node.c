@@ -904,7 +904,7 @@ unsigned char *
 librdf_node_get_blank_identifier(librdf_node* node) {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
   LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_BLANK),
-                       "node is not type resource", NULL);
+                       "node is not type blank", NULL);
 
   return node->value.blank.identifier;
 }
