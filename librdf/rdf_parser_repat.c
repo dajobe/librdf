@@ -42,7 +42,7 @@
 #include <rdf_stream.h>
 #include <rdf_statement.h>
 
-#include <repat/rdfparse.h>
+#include <rdfparse.h>
 
 
 
