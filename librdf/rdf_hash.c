@@ -139,11 +139,13 @@ librdf_hash_datum*
 librdf_hash_datum_new(void *data, size_t size)
 {
   librdf_hash_datum *datum;
-  
+
+  /* get one from free list, or allocate new one */ 
   if((datum=hash_datums_list)) {
     hash_datums_list=datum->next;
-  }
-  datum=(librdf_hash_datum*)LIBRDF_CALLOC(librdf_hash_datum, 1, sizeof(librdf_hash_datum));
+  } else 
+    datum=(librdf_hash_datum*)LIBRDF_CALLOC(librdf_hash_datum, 1, sizeof(librdf_hash_datum));
+
   if(datum) {
     datum->data=data;
     datum->size=size;
