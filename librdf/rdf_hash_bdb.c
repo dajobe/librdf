@@ -528,8 +528,8 @@ librdf_hash_bdb_cursor_get(void* context,
          memcmp(cursor->last_key, bdb_key.data, bdb_key.size)) {
         
         /* always allocated by BDB using system malloc */
-        free(bdb_key.data);
-        free(bdb_value.data);
+        SYSTEM_FREE(bdb_key.data);
+        SYSTEM_FREE(bdb_value.data);
 
 #ifdef DB_NOTFOUND
         /* V2 and V3 */
@@ -567,8 +567,8 @@ librdf_hash_bdb_cursor_get(void* context,
           break;
         
         /* always allocated by BDB using system malloc */
-        free(bdb_key.data);
-        free(bdb_value.data);
+        SYSTEM_FREE(bdb_key.data);
+        SYSTEM_FREE(bdb_value.data);
       }
 #endif
 #else
@@ -612,8 +612,8 @@ librdf_hash_bdb_cursor_get(void* context,
   if(!key->data) {
     /* always allocated by BDB using system malloc */
     if(flags != LIBRDF_HASH_CURSOR_SET)
-      free(bdb_key.data);
-    free(bdb_value.data);
+      SYSTEM_FREE(bdb_key.data);
+    SYSTEM_FREE(bdb_value.data);
     return 1;
   }
   
@@ -625,8 +625,8 @@ librdf_hash_bdb_cursor_get(void* context,
     if(!value->data) {
       /* always allocated by BDB using system malloc */
       if(flags != LIBRDF_HASH_CURSOR_SET)
-        free(bdb_key.data);
-      free(bdb_value.data);
+        SYSTEM_FREE(bdb_key.data);
+      SYSTEM_FREE(bdb_value.data);
       return 1;
     }
     
@@ -636,8 +636,8 @@ librdf_hash_bdb_cursor_get(void* context,
 
   /* always allocated by BDB using system malloc */
   if(flags != LIBRDF_HASH_CURSOR_SET)
-    free(bdb_key.data);
-  free(bdb_value.data);
+    SYSTEM_FREE(bdb_key.data);
+  SYSTEM_FREE(bdb_value.data);
 
   return 0;
 }
