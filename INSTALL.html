@@ -167,10 +167,10 @@ version/name your system uses).</p>
 <p>Berkeley DB is now known as Sleepycat DB (after version 2) and
 distributed and supported by
 <a href="http://www.sleepycat.com/">SleepyCat Software</a>.
-Versions 4.1.24, 4.0.14, 3.3.11, 3.2.9, 3.1.17, 3.1.14, 2.7.7 and 2.4.14
-have been tested and work.  Some systems do
-not come installed with a working Berkeley/Sleepycat DB so on those
-systems, Redland will have no persistent storage unless BDB is built
+Versions 4.1.25, 4.1.24, 4.0.14, 3.3.11, 3.2.9, 3.1.17, 3.1.14, 2.7.7
+and 2.4.14 have been tested and work.  Some systems do not come
+installed with a working Berkeley/Sleepycat DB so on those systems,
+Redland will have no persistent storage unless BDB is built
 separately and enabled via this option.</p>
 
 <p><b>Note</b>: If you change installed versions of BDB then you will
@@ -259,11 +259,17 @@ at present.
 </dd>
 
 <dt><code>--with-mysql</code>(<code>=</code><em>CONFIG</em>|<code>yes</code>|<code>no</code>)<br /></dt>
-<dd><p>Enable use of the Redland MySQL 4.x triple store backend using
-<em>CONFIG</em> for the <em>mysql_config</em> program. The default
-when either no argument is given, or <code>--with-mysql</code> alone,
-is to search for <em>mysql_config</em> on the search PATH.  With
-<code>--with-mysql=no</code>, this store is disabled.</p></dd>
+
+<dd><p>Enable use of the Redland MySQL 3.x, 4.x triple store backend
+using <em>CONFIG</em> for the <em>mysql_config</em> program. The
+default when either no argument is given, or
+<code>--with-mysql</code> alone, is to search for
+<em>mysql_config</em> on the search PATH.  With
+<code>--with-mysql=no</code>, this store is disabled.</p>
+
+<p>Versions 3.23.58 and 4.0.4 have been tested and work.</p>
+
+</dd>
 
 <dt><code>--with-openssl-digests</code><br /></dt>
 <dd><p>Enable the content digests provided by the
