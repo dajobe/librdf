@@ -96,6 +96,9 @@ void
 librdf_free_stream(librdf_stream* stream) 
 {
   stream->finished_method(stream->context);
+
+  if(stream->free_map)
+    stream->free_map(stream->map_context);
   
   LIBRDF_FREE(librdf_stream, stream);
 }
@@ -229,6 +232,7 @@ librdf_stream_get_context(librdf_stream* stream)
  * librdf_stream_set_map - Set the filtering/mapping function for the stream
  * @stream: &librdf_stream object
  * @map: mapping function.
+ * @free_map: free map context function 
  * @map_context: context
  * 
  * The function 
@@ -238,10 +242,13 @@ librdf_stream_get_context(librdf_stream* stream)
  **/
 void
 librdf_stream_set_map(librdf_stream* stream, 
-		      librdf_statement* (*map)(void* context, librdf_statement* statement), 
+		      librdf_statement* (*map)(void* map_context, librdf_statement* statement), 
+                      void (*free_context)(void *map_context),
 		      void* map_context) 
 {
   stream->map=map;
+  stream->free_map=free_context;
+
   stream->map_context=map_context;
 }
 
