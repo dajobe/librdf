@@ -74,9 +74,8 @@ struct librdf_node_s
       char *string;
       int string_len;
 
-      /* and for RDF the content may also be "Well Formed" XML 
-       * such as when rdf:parseType="Literal" is used */
-      int is_wf_xml;
+      /* datatype URI or null */
+      librdf_uri* datatype_uri;
 
       /* XML defines these additional attributes for literals */
 
@@ -138,6 +137,9 @@ librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world, con
 /* Create a new Node from literal string / language. */
 librdf_node* librdf_new_node_from_literal(librdf_world* world, const char *string, const char *xml_language, int is_wf_xml);
 
+/* Create a new Node from a typed literal string / language. */
+librdf_node* librdf_new_node_from_typed_literal(librdf_world *world, const char *string, const char *xml_language, librdf_uri* datatype_uri);
+
 /* Create a new Node from blank node identifier. */
 librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world, const char *identifier);
 
@@ -168,7 +170,9 @@ char* librdf_node_get_literal_value(librdf_node* node);
 char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
+librdf_uri* librdf_node_get_literal_value_datatype_uri(librdf_node* node);
 int librdf_node_set_literal_value(librdf_node* node, const char* value, const char *xml_language, int is_wf_xml);
+int librdf_node_set_typed_literal_value(librdf_node* node, const char* value, const char *xml_language, librdf_uri* datatype_uri);
 
 int librdf_node_get_li_ordinal(librdf_node* node);
 void librdf_node_set_li_ordinal(librdf_node* node, int ordinal);
