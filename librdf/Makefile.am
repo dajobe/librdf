@@ -25,7 +25,7 @@ include_HEADERS = librdf.h
 librdf_a_SOURCES = rdf_init.c rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_memory.c rdf_model.c rdf_iterator.c \
 rdf_list.c rdf_memory.c rdf_storage.c rdf_storage_list.c rdf_stream.c \
-rdf_parser.c \
+rdf_parser.c rdf_heuristics.c \
 librdf.h rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_digest.h rdf_hash.h rdf_hash_gdbm.h \
 rdf_hash_memory.h rdf_model.h rdf_storage.h rdf_iterator.h \
@@ -49,7 +49,7 @@ librdf-config.in \
 memcmp.c
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
-rdf_statement_test rdf_model_test rdf_storage_test
+rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test
 
 CLEANFILES=$(TESTS) test example
 
@@ -83,6 +83,9 @@ rdf_model_test: rdf_model.c librdf.a
 
 rdf_storage_test: rdf_storage.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_storage.c librdf.a $(LIBS)
+
+rdf_parser_test: rdf_parser.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_parser.c librdf.a $(LIBS)
 
 example: example.c librdf.a
 	$(LINK) -I$(srcdir) -I. $(srcdir)/example.c librdf.a $(LIBS)
