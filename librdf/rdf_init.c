@@ -275,42 +275,69 @@ librdf_world_set_digest(librdf_world* world, const char *name) {
 }
 
 
-const char *
+/**
+ * librdf_world_get_feature - get the value of a world feature 
+ * @world: &librdf_world object
+ * @feature: &librdf_uri feature property
+ * 
+ * Return value: new &librdf_node feature value or NULL if no such feature
+ * exists or the value is empty.
+ **/
+librdf_node*
 librdf_world_get_feature(librdf_world* world, librdf_uri *feature) 
 {
   return NULL; /* none retrievable */
 }
 
+
+/**
+ * librdf_world_set_feature - set the value of a world feature
+ * @world: &librdf_world object
+ * @feature: &librdf_uri feature property
+ * @value: &librdf_node feature property value
+ * 
+ * Return value: non 0 on failure (negative if no such feature)
+ **/
 int
-librdf_world_set_feature(librdf_world* world, librdf_uri *feature,
-                         const char *value) 
+librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
+                         librdf_node* value) 
 {
   librdf_uri* genid_base=librdf_new_uri(world, (const unsigned char*)LIBRDF_WORLD_FEATURE_GENID_BASE);
   librdf_uri* genid_counter=librdf_new_uri(world, (const unsigned char*)LIBRDF_WORLD_FEATURE_GENID_COUNTER);
-  int rc=1;
-  
+  int rc= -1;
+
   if(librdf_uri_equals(feature, genid_base)) {
-    int i=atoi(value);
-    if(i<1)
-      i=1;
+    if(!librdf_node_is_resource(value))
+      rc=1;
+    else {
+      int i=atoi(librdf_node_get_literal_value(value));
+      if(i<1)
+        i=1;
 #ifdef WITH_THREADS
-    pthread_mutex_lock(world->mutex);
+      pthread_mutex_lock(world->mutex);
 #endif
-    world->genid_base=1;
+      world->genid_base=1;
 #ifdef WITH_THREADS
-    pthread_mutex_unlock(world->mutex);
+      pthread_mutex_unlock(world->mutex);
 #endif
+      rc=0;
+    }
   } else if(librdf_uri_equals(feature, genid_counter)) {
-    int i=atoi(value);
-    if(i<1)
-      i=1;
+    if(!librdf_node_is_resource(value))
+      rc=1;
+    else {
+      int i=atoi(librdf_node_get_literal_value(value));
+      if(i<1)
+        i=1;
 #ifdef WITH_THREADS
-    pthread_mutex_lock(world->mutex);
+      pthread_mutex_lock(world->mutex);
 #endif
-    world->genid_counter=1;
+      world->genid_counter=1;
 #ifdef WITH_THREADS
-    pthread_mutex_unlock(world->mutex);
+      pthread_mutex_unlock(world->mutex);
 #endif
+      rc=0;
+    }
   }
 
   librdf_free_uri(genid_base);
