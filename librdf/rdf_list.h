@@ -110,6 +110,7 @@ struct librdf_list_s
 librdf_list* librdf_new_list(void);
 void librdf_free_list(librdf_list* list);
 
+void librdf_list_clear(librdf_list* list);
 /* add to end of list (push) */
 int librdf_list_add(librdf_list* list, void *data);
 /* add to start of list */
@@ -126,6 +127,7 @@ void librdf_list_set_equals(librdf_list* list, int (*equals) (void* data1, void 
 
 librdf_iterator* librdf_list_get_iterator(librdf_list* list);
 
+void librdf_list_foreach(librdf_list* list, void (*fn)(void *, void *), void *user_data);
 
 #ifdef __cplusplus
 }
