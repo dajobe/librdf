@@ -21,6 +21,122 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<!--<h2 id="rel0_9_13"><a name="rel0_9_13">Redland 0.9.13 Changes</a></h2>
+
+<p>This version of Redland is a major update to 0.9.12 changing the
+node class.  librdf_node objects are now immutable once created,
+higher-level language APIs no longer have deal with sharing or
+copying internals, some additional API support for parsing content
+from strings.</p>
+
+<p>This includes the stable and complete version 0.9.12 of the 
+<a href="http://www.redland.opensource.ac.uk/raptor/">Raptor parser</a>
+which supports all of the revised RDF/XML syntax.</p>
+
+<p>Inital work was added on an ECMA CLI interface using
+the C# ("C sharp") language.</p>
+
+<p>The Perl, Python and Java APIs now always return new nodes
+and statements removing the need to consider sharing at this
+level.  This means that the following operation is legal in
+Perl, Python and Java:</p>
+<pre>
+# perl
+$n=RDF::Redland::Node->from_uri("http://example.org/foo");
+$s=new RDF::Redland::Statement($n, $n, $n);
+$model->add($s);
+
+# python
+n=RDF.Node(uri_string="http://example.org/foo")
+s=RDF.Statement(n, n, n)
+model.add_statement(s)
+</pre>
+
+
+<h3>Node Class changes</h3>
+
+<p>The librdf_node class was modifed to make objects immutable once
+constructed, they cannot be modified.  The following set methods were
+consequently removed.</p>
+
+<ul>
+<li>librdf_node_set_blank_identifier</li>
+<li>librdf_node_set_li_ordinal</li>
+<li>librdf_node_set_literal_value</li>
+<li>librdf_node_set_type</li>
+<li>librdf_node_set_typed_literal_value</li>
+<li>librdf_node_set_uri</li>
+</ul>
+
+<p>The following utility methods were added (covering
+all the librdf_node_get_type values):</p>
+
+<ul>
+<li>librdf_node_is_blank - return non-0 if the node is a blank node</li>
+<li>librdf_node_is_literal - return non-0 if the node is a literal</li>
+<li>librdf_node_is_resource - return non-0 if the node is a URI</li>
+</ul>
+
+<p>(These are reflected into the same methods on
+the Perl, Python and Java node classes)</p>
+
+<p><tt>LIBRDF_NODE_TYPE_LI</tt> as returned by librdf_node_get_type
+was deleted, it was never used.</p>
+
+<p>To support datatyped literals, the following method was added:</p>
+
+<ul>
+<li>librdf_node_get_literal_value_datatype_uri - get the typed literal datatype URI of the literal node</li>
+</ul>
+
+
+<h3>Model Class changes</h3>
+
+<p>Added librdf_model_sync to sync the model to the backing store.</p>
+
+
+<h3>Parser Class changes</h3>
+
+<p>Added librdf_parser_parse_string_as_stream and
+librdf_parser_parse_string_into_model to allow parsing content from
+strings.</p>
+
+
+<h3>Statement Class changes</h3>
+
+<p>Added librdf_statement_is_complete to test if a statement has
+all the subject, predicate and object fields assigned.  Partial
+statements cannot be added to a model but can be used in
+matching statement queries with librdf_model_find_statements.</p>
+
+
+<h3>Storage Class changes</h3>
+
+<p>Added librdf_storage_sync to sync the backing store.  (This is
+slightly internal to Redland, you should not be calling this
+directly)</p>
+
+
+<h3>Internal changes</h3>
+
+<p>Added Sleepycat/BDB 4.0 and 4.1 support - the open API changed again</p>
+
+<p>Split the librdf_model class into model interface (librdf_model)
+and implementation class (librdf_model_storage).</p>
+
+<p>Removed the old and outdated repat RDF parser.</p>
+
+<p>Removed the very old expat XML parser from the sources;
+much newer or expat or libxml2 are very widespread.</p>
+
+<p>Added simple thread support with configuration option
+<tt>--with-threads</tt> that locks key shared classes to
+allow separate threads to work in the same memory space. The
+current locked classes are URI and World.
+</p>
+-->
+
+
 
 <h2 id="rel0_9_12"><a name="rel0_9_12">Redland 0.9.12 Changes</a></h2>
 
