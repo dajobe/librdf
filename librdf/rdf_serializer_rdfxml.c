@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2002 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2002-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -287,8 +287,6 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
     default:
       LIBRDF_FATAL2(librdf_serializer_print_statement_as_rdfxml,
                     "Do not know how to serialize node type %d\n", librdf_node_get_type(nodes[2]));
-      abort();
-        
   }
 
   fputc('\n', handle);

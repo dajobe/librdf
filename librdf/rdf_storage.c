@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -594,7 +594,8 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
       break;
       
     default: /* error */
-      abort();
+      LIBRDF_FATAL2(librdf_storage_stream_to_node_iterator_get_method,
+                    "Unknown statement part %d\n", context->want);
   }
   
   return (void*)node;

@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -561,7 +561,8 @@ librdf_hash_bdb_cursor_get(void* context,
       break;
       
     default:
-      abort();
+      LIBRDF_FATAL2(librdf_hash_bdb_cursor_get, 
+                    "Unknown hash method flag %d\n", flags);
   }
 
 

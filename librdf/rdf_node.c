@@ -1382,7 +1382,8 @@ librdf_node_static_iterator_get_method(void* iterator, int flags)
       return NULL;
 
     default:
-      abort();
+      LIBRDF_FATAL2(librdf_node_static_iterator_get_method,
+                    "Unknown iterator method flag %d\n", flags);
   }
 }
 

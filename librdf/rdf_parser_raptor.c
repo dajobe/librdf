@@ -630,7 +630,8 @@ librdf_parser_raptor_serialise_get_statement(void* context, int flags)
       return NULL;
       
     default:
-      abort();
+      LIBRDF_FATAL2(librdf_parser_raptor_serialise_get_statement,
+                    "Unknown iterator method flag %d\n", flags);
   }
 
 }

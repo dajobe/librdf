@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -146,7 +146,8 @@ librdf_parser_repat_statement_handler(void* user_data,
       subject=librdf_new_node_from_blank_identifier(world, c);
       break;
     default:
-      LIBRDF_FATAL2(librdf_parser_repat_statement_handler, "Unknown subject type %d\n", subject_type);
+      LIBRDF_FATAL2(librdf_parser_repat_statement_handler,
+                    "Unknown subject type %d\n", subject_type);
   }
   if(!subject) {
     librdf_free_statement(statement);
@@ -228,7 +229,8 @@ librdf_parser_repat_statement_handler(void* user_data,
 
       break;
     default:
-      LIBRDF_FATAL2(librdf_parser_repat_statement_handler, "Unknown object type %d\n", object_type);
+      LIBRDF_FATAL2(librdf_parser_repat_statement_handler, 
+                    "Unknown object type %d\n", object_type);
   }
   if(!object) {
     librdf_free_statement(statement);
@@ -713,7 +715,8 @@ librdf_parser_repat_serialise_get_statement(void* context, int flags)
       return NULL;
       
     default:
-      abort();
+      LIBRDF_FATAL2(librdf_parser_repat_serialise_get_statement,
+                    "Unknown iterator method flag %d\n", flags)
   }
 }
 

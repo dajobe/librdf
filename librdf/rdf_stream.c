@@ -373,7 +373,8 @@ librdf_stream_from_node_iterator_get_statement(void* context, int flags)
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
       return (librdf_statement*)librdf_iterator_get_context(scontext->iterator);
     default:
-      abort();
+      LIBRDF_FATAL2(librdf_stream_from_node_iterator_get_statement,
+                    "Unknown iterator method flag %d\n", flags);
   }
 
 }

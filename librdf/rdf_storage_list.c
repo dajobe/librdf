@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -345,7 +345,8 @@ librdf_storage_list_serialise_get_statement(void* context, int flags)
       else
         return NULL;
     default:
-      abort();
+      LIBRDF_FATAL2(librdf_storage_list_serialise_get_statement,
+                    "Unknown flags %d\n", flags);
   }
 }
 
@@ -648,7 +649,8 @@ librdf_storage_list_context_serialise_get_statement(void* context, int flags)
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
       return scontext->context_node;
     default:
-      abort();
+      LIBRDF_FATAL2(librdf_storage_list_context_serialise_get_statement,
+                    "Unknown iterator method flag %d\n", flags);
   }
   
 }
