@@ -870,7 +870,7 @@ AC_SUBST(with_rasqal)
 
 dnl Checks for languages
 AC_CHECK_PROG(PHP_CONFIG, php-config, php-config)
-if test "X$PHP" != X -a "X$PHP_CONFIG" != X ; then
+if test "X$PHP_CONFIG" != X ; then
 
   PHP_INCLUDES=`$PHP_CONFIG --includes`
 
