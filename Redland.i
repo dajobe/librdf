@@ -292,6 +292,7 @@ int librdf_iterator_next(librdf_iterator* iterator);
 /* rdf_uri.h */
 librdf_uri* librdf_new_uri (librdf_world *world, char *string);
 librdf_uri* librdf_new_uri_from_uri (librdf_uri* uri);
+librdf_uri* librdf_new_uri_from_filename(librdf_world* world, const char *filename);
 void librdf_free_uri(librdf_uri *uri);
 %newobject librdf_uri_to_string;
 char* librdf_uri_to_string (librdf_uri* uri);
