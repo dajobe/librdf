@@ -89,7 +89,7 @@ memcmp.c Redland.i \
 PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \
 autogen.sh \
-redland.spec.in
+redland.spec redland.spec.in
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
@@ -218,8 +218,12 @@ $(top_builddir)/repat/rdfparse.o: $(top_builddir)/expat/xmlparse/xmlparse.o $(to
 #
 # Note: this can't be protected with @MAINT@ since automake only
 # activates this rule if it is normally in the Makefile.am
-dist-hook:
+dist-hook: redland.spec
+	-cp redland.spec $(distdir)
 	@for file in rapier_parse.c rapier.h; do \
 	  rm -f $(distdir)/$$file; \
 	  cp -p $(srcdir)/$$file $(distdir)/$$file; \
 	done
+
+rpm: distcheck
+	rpm -ta $(distdir).tar.gz
