@@ -33,27 +33,22 @@ AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
 
-LIBRDF_VERSION_MAJOR=0
-LIBRDF_VERSION_MINOR=9
-LIBRDF_VERSION_RELEASE=14
-LIBRDF_VERSION=$LIBRDF_VERSION_MAJOR.$LIBRDF_VERSION_MINOR.$LIBRDF_VERSION_RELEASE
-LIBRDF_VERSION_INFO=`expr $LIBRDF_VERSION_MAJOR + $LIBRDF_VERSION_MINOR`:$LIBRDF_VERSION_RELEASE:$LIBRDF_VERSION_MINOR
+changequote(<<, >>)dnl
+version_major=`echo $VERSION | sed -e 's/^\([^\.]*\)\.\([^\.]*\)\.\(.*\)$/\1/'`
+version_minor=`echo $VERSION | sed -e 's/^\([^\.]*\)\.\([^\.]*\)\.\(.*\)$/\2/'`
+version_release=`echo $VERSION | sed -e 's/^\([^\.]*\)\.\([^\.]*\)\.\(.*\)$/\3/'`
+changequote([, ])dnl
 
-LIBRDF_VERSION_NUMBER=`expr $LIBRDF_VERSION_MAJOR \* 10000 + $LIBRDF_VERSION_MINOR \* 100 + $LIBRDF_VERSION_RELEASE`
+version_decimal=`expr $version_major \* 10000 + $version_minor \* 100 + $version_release`
 
-AC_SUBST(LIBRDF_VERSION_MAJOR)
-AC_SUBST(LIBRDF_VERSION_MINOR)
-AC_SUBST(LIBRDF_VERSION_RELEASE)
-AC_SUBST(LIBRDF_VERSION)
-AC_SUBST(LIBRDF_VERSION_INFO)
-AC_SUBST(LIBRDF_VERSION_NUMBER)
-AC_DEFINE_UNQUOTED(LIBRDF_VERSION_MAJOR, $LIBRDF_VERSION_MAJOR, [Redland major version number])
-AC_DEFINE_UNQUOTED(LIBRDF_VERSION_MINOR, $LIBRDF_VERSION_MINOR, [Redland minor version number])
-AC_DEFINE_UNQUOTED(LIBRDF_VERSION_RELEASE, $LIBRDF_VERSION_RELEASE, [Redland release version number])
+AC_DEFINE_UNQUOTED(LIBRDF_VERSION_MAJOR, $version_major, [Major version number])
+AC_DEFINE_UNQUOTED(LIBRDF_VERSION_MINOR, $version_minor, [Minor version number])
+AC_DEFINE_UNQUOTED(LIBRDF_VERSION_RELEASE, $version_release, [Release version number])
+AC_DEFINE_UNQUOTED(LIBRDF_VERSION_DECIMAL, $version_decimal, [Release version as a decimal])
 
-VERSION=${LIBRDF_VERSION}
-
-AM_INIT_AUTOMAKE(redland, $VERSION)
+# for redland-config.in
+LIBRDF_VERSION_DECIMAL=$version_decimal
+AC_SUBST(REDLAND_VERSION_DECIMAL)
 
 
 # Libtool versioning
