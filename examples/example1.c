@@ -106,7 +106,7 @@ main(int argc, char *argv[])
   /* Construct the query predicate (arc) and object (target) 
    * and partial statement bits
    */
-  subject=librdf_new_node_from_uri_string(world, "http://www.ilrt.bristol.ac.uk/people/cmdjb/");
+  subject=librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/");
   predicate=librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/title");
   if(!subject || !predicate) {
     fprintf(stderr, "%s: Failed to create nodes for searching\n", program);
