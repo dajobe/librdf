@@ -32,12 +32,15 @@ struct librdf_uri_s
 {
   char *string;
   int string_length; /* useful for fast comparisons (that fail) */
-  int usage_count;
+  int usage;
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  int max_usage;
+#endif
 };
 
 
 /* class methods */
-void librdf_init_uri(librdf_digest_factory *factory);
+void librdf_init_uri(librdf_digest_factory *factory, librdf_hash *hash);
 void librdf_finish_uri(void);
 
 /* constructors */
