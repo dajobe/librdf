@@ -26,11 +26,10 @@ follows</p>
   root# make install-python
 </pre>
 
-<p>The python interface has been tested with Python 1.5, 2.0 and 2.1.
-For 1.5, however, you will need to install the optional
-<a href="http://www.python.org/doc/current/dist/dist.html">Distutils</a> 
-package.  The combination of Python 1.5 and Distutils 0.9.4 works.  All
-future development will be with the Python 2.0 series.</p>
+<p>The python interface for Redland 0.9.11+ requires
+<a href="http://www.python.org/2.2/">Python 2.2</a> (it also
+seems to work with 2.1).  Earlier versions of Redland work with
+previous python versions.</p>
 
 
 <h2>Testing the Redland Python interface</h2>
@@ -43,9 +42,9 @@ program with:</p>
 
 <p>Otherwise, to run it in the source tree you need to find out the
 architecture-specific sub-directory it created in the <em>build</em>
-directory such as <em>build/lib.linux-i686-2.0</em> and run it with:</p>
+directory such as <em>build/lib.linux-i686-2.2</em> and run it with:</p>
 <pre>
-  PYTHONPATH=build/lib.linux-i686-2.0 python example.py
+  PYTHONPATH=build/lib.linux-i686-2.2 python example.py
 </pre>
 
 <p>and the result should be:</p>
