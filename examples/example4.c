@@ -282,8 +282,8 @@ main(int argc, char *argv[])
 
 
     if (type == CMD_PARSE_MODEL) {
-      librdf_parser_set_feature(parser, LIBRDF_SYNTAX_aboutEach_URI, "yes");
-      librdf_parser_set_feature(parser, LIBRDF_SYNTAX_aboutEachPrefix_URI, "yes");
+      librdf_parser_set_feature(parser, LIBRDF_MS_aboutEach_URI, "yes");
+      librdf_parser_set_feature(parser, LIBRDF_MS_aboutEachPrefix_URI, "yes");
       if(librdf_parser_parse_into_model(parser, uri, base_uri, model)) {
         fprintf(stderr, "%s: Failed to parse RDF into model\n", program);
         librdf_free_parser(parser);
@@ -293,8 +293,8 @@ main(int argc, char *argv[])
       }
     } else {
       /* must be CMD_PARSE_STREAM */
-      librdf_parser_set_feature(parser, LIBRDF_SYNTAX_aboutEach_URI, "no");
-      librdf_parser_set_feature(parser, LIBRDF_SYNTAX_aboutEachPrefix_URI, "no");
+      librdf_parser_set_feature(parser, LIBRDF_MS_aboutEach_URI, "no");
+      librdf_parser_set_feature(parser, LIBRDF_MS_aboutEachPrefix_URI, "no");
       if(!(stream=librdf_parser_parse_as_stream(parser, uri, base_uri))) {
         fprintf(stderr, "%s: Failed to parse RDF as stream\n", program);
         librdf_free_parser(parser);
