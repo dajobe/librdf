@@ -118,6 +118,10 @@ librdf_world* librdf_new_world(void);
 void librdf_free_world(librdf_world *world);
 void librdf_world_open(librdf_world *world);
 
+%newobject librdf_world_get_feature;
+librdf_node* librdf_world_get_feature(librdf_world* world, librdf_uri *feature);int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, librdf_node* value);
+
+
 /* rdf_iterator.h */
 void librdf_free_iterator(librdf_iterator*);
 int librdf_iterator_end(librdf_iterator* iterator);
