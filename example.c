@@ -82,17 +82,10 @@ main(int argc, char *argv[])
 
   /* PARSE the URI as RDF/XML*/
   fprintf(stdout, "%s: Parsing URI %s\n", program, librdf_uri_as_string(uri));
-  stream=librdf_parser_parse_from_uri(parser, uri);
-  if(!stream) {
-    fprintf(stderr, "%s: Failed to create parser stream\n", program);
+  if(librdf_parser_parse_into_model(parser, uri, model)) {
+    fprintf(stderr, "%s: Failed to parser into model\n", program);
     return(1);
   }
-
-  if(librdf_model_add_statements(model, stream)) {
-    fprintf(stderr, "%s: Failed to add statements to model\n", program);
-    return(1);
-  }
-  librdf_free_stream(stream);
   librdf_free_parser(parser);
 
 
