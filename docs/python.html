@@ -10,9 +10,11 @@
 
 <h2>Installing the Redland Python interface</h2>
 
-<p>This is not automatically built or installed at present since this
-interface may not be required.  You can easily build it by hand as
-follows</p>
+<p>This is built if <tt>--with-python</tt> is given to the configure
+line, or <tt>--with-python=python2.3</tt> to use a particular python
+version/program.  The standard 'make' at the top level will build it.</p>
+
+<p>You can also compile the python interface by hand as follows:</p>
 
 <pre>
   cd python
@@ -23,28 +25,27 @@ follows</p>
 <p>To install it system wide (this is optional) do this as <em>root</em>:</p>
 
 <pre>
-  root# make install-python
+  root# make install
 </pre>
 
 <p>The python interface for Redland 0.9.11+ requires
-<a href="http://www.python.org/2.2/">Python 2.2</a> (it also
-seems to work with 2.1).  Earlier versions of Redland work with
-previous python versions.</p>
+<a href="http://www.python.org/2.2/">Python 2.2</a>
+(it also works fine with 2.3).</p>
 
 
 <h2>Testing the Redland Python interface</h2>
 
-<p>If you did the optional install above, run the python example
-program with:</p>
+<p>If you did the install above, run the python example program with:</p>
 <pre>
   python example.py
 </pre>
+<p>(Using the same chosen earlier)</p>
 
 <p>Otherwise, to run it in the source tree you need to find out the
 architecture-specific sub-directory it created in the <em>build</em>
 directory such as <em>build/lib.linux-i686-2.2</em> and run it with:</p>
 <pre>
-  PYTHONPATH=build/lib.linux-i686-2.2 python example.py
+  PYTHONPATH=build/lib.linux-i686-2.3 python example.py
 </pre>
 
 <p>and the result should be:</p>
@@ -53,12 +54,11 @@ directory such as <em>build/lib.linux-i686-2.2</em> and run it with:</p>
   Parsing URI (file) ../perl/dc.rdf
   Parsing added 3 statements
   Printing all statements
-  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
   Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page of Dave Beckett."}
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
   Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
   Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
   Writing model to test-out.rdf as rdf/xml
-  Done
 </pre>
 
 
@@ -66,8 +66,8 @@ directory such as <em>build/lib.linux-i686-2.2</em> and run it with:</p>
 
 <h2>Redland Python API Introduction</h2>
 
-<p>Read the <a href="pydoc/RDF.html">Redland Python API</a> (Pydoc)
-for full details of the classes.</p>
+<p>The pydoc <a href="pydoc/RDF.html">Redland Python API</a>
+contains full details of the classes and methods provided.</p>
 
 <p>The Python API is an object-based API reflecting the same structure
 of the Redland objects with simple mappings between them:</p>
@@ -143,7 +143,7 @@ of the Redland objects with simple mappings between them:</p>
 
 <hr />
 
-<p>Copyright 2000-2002 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
