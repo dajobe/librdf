@@ -83,6 +83,13 @@
 #undef VERSION
 #endif
 
+/* SWIG BUG - no SWIGTCL is defined - duh */
+#ifdef TCL_MAJOR_VERSION
+  /* want symbols starting librdf_ not _librdf_ */
+#undef SWIG_prefix
+#define SWIG_prefix
+#endif
+
 #include <rdf_config.h>
 #include <redland.h>
 
@@ -106,6 +113,14 @@ static PyObject *_wrap_redland_version_release_get(void);
 #endif
 
 %}
+
+
+%init %{
+#ifdef TCL_MAJOR_VERSION
+Tcl_PkgProvide(interp, PACKAGE, (char*)redland_version_string);
+#endif
+%}
+  
 
 typedef struct librdf_hash_s librdf_hash;
 typedef struct librdf_uri_s librdf_uri;
