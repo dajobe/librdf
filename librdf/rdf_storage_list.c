@@ -351,10 +351,14 @@ librdf_stream* librdf_storage_list_find_statements(librdf_storage* storage, libr
 {
   librdf_stream* stream;
 
+  statement=librdf_new_statement_from_statement(statement);
+  if(!statement)
+    return NULL;
+  
   stream=librdf_storage_list_serialise(storage);
   if(stream)
     librdf_stream_set_map(stream, &librdf_storage_list_find_map,
-                          (void*)statement);
+                          &librdf_free_statement, (void*)statement);
   return stream;
 }
 
