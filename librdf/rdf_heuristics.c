@@ -37,6 +37,40 @@
 
 #ifndef STANDALONE
 /**
+ * librdf_heuristic_is_blank_node - try to guess if an node string is a blank node identifier
+ * @object: string object to guess type
+ *
+ * The guessing is done by assuming the object is a blank node if it matches
+ * ^_: like N-Triples, N3 and related.
+ *
+ * Return value: non 0 if node is probably a blank node identifier
+ **/
+
+int
+librdf_heuristic_is_blank_node(char *node)
+{
+  return node && (*node == '_' && node[1] == ':'); 
+}
+
+
+/**
+ * librdf_heuristic_get_blank_node - get a blank node identifier from a node string
+ * @object: string object to guess type
+ *
+ * Picks the blank node identifier out of a string.  Looks for things
+ * like _:ABC
+ *
+ * Return value: the blank node identifer string or NULL if the node does not seem to be a blank node identifier
+ **/
+
+char*
+librdf_heuristic_get_blank_node(char *node)
+{
+  return librdf_heuristic_is_blank_node(node) ? node+2 : NULL;
+}
+
+
+/**
  * librdf_heuristic_object_is_literal - try to guess if an object string is a literal or a resource
  * @object: string object to guess type
  *
@@ -54,6 +88,9 @@ librdf_heuristic_object_is_literal(char *object)
 {
   int object_is_literal=1; /* assume the worst */
 
+  if(librdf_heuristic_is_blank_node(object))
+    return 0;
+  
   /* Find first non alphanumeric */
   for(;*object; object++)
     if(!isalnum(*object))
