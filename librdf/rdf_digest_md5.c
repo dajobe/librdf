@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * md5.c - MD5 Message Digest Algorithm
+ * rdf_digest_md5.c - MD5 Message Digest Algorithm
  *
  * $Id$
  *
@@ -305,13 +305,13 @@ static void MD5Transform(u32 buf[4], u32 const in[16])
 /* my code from here */
 
 static unsigned char *
-md5_get_digest(struct MD5Context *c)
+librdf_digest_md5_get_digest(struct MD5Context *c)
 {
   return c->digest;
 }
 
 static void
-md5_register_factory(librdf_digest_factory *factory) 
+librdf_digest_md5_register_factory(librdf_digest_factory *factory) 
 {
   factory->context_length = sizeof(struct MD5Context);
   factory->digest_length = 16;
@@ -319,11 +319,14 @@ md5_register_factory(librdf_digest_factory *factory)
   factory->init  = (void (*)(void *))MD5Init;
   factory->update = (void (*)(void *, unsigned char*, size_t))MD5Update;
   factory->final = (void (*)(void *))MD5Final;
-  factory->get_digest  = (unsigned char *(*)(void *))md5_get_digest;
+  factory->get_digest  = (unsigned char *(*)(void *))librdf_digest_md5_get_digest;
 }
 
+/**
+ * librdf_digest_md5_constructor - Initialise the MD5 digest factory
+ **/
 void
-md5_constructor(void)
+librdf_digest_md5_constructor(void)
 {
-  librdf_digest_register_factory("MD5", &md5_register_factory);
+  librdf_digest_register_factory("MD5", &librdf_digest_md5_register_factory);
 }
