@@ -893,11 +893,21 @@ main(int argc, char *argv[])
   char *program=argv[0];
   /* initialise dependent modules - all of them! */
   librdf_world *world=librdf_new_world();
+  librdf_iterator* iterator;
+  librdf_node *n1, *n2;
+  int count;
+  int expected_count;
+
   librdf_world_open(world);
   
   fprintf(stderr, "%s: Creating storage\n", program);
-  storage=librdf_new_storage(world, NULL, NULL, "contexts='yes'");
-  //storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
+  if(1) {
+    /* test contexts in memory */
+    storage=librdf_new_storage(world, NULL, NULL, "contexts='yes'");
+  } else {
+    /* test contexts on disk */
+    storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
+  }
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
@@ -962,6 +972,102 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Freeing Parser\n", program);
   librdf_free_parser(parser);
 
+
+  /* sources */
+  n1=librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/creator");
+  n2=librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0);
+
+  fprintf(stderr, "%s: Looking for sources of arc=", program);
+  librdf_node_print(n1, stderr);
+  fputs(" target=", stderr);
+  librdf_node_print(n2, stderr);
+  fputs("\n", stderr);
+
+  iterator=librdf_model_get_sources(model, n1, n2);
+  if(!iterator) {
+    fprintf(stderr, "%s: librdf_model_get_sources failed\n", program);
+    exit(1);
+  }
+
+  expected_count=3;
+  for(count=0; !librdf_iterator_end(iterator); librdf_iterator_next(iterator), count++) {
+    librdf_node* n=(librdf_node*)librdf_iterator_get_object(iterator);
+    fputs("  ", stderr);
+    librdf_node_print(n, stderr);
+    fputs("\n", stderr);
+  }
+  librdf_free_iterator(iterator);
+  if(count != expected_count) {
+    fprintf(stderr, "%s: librdf_model_get_sources returned %d nodes, expected %d\n", program, count, expected_count);
+    exit(1);
+  }
+  librdf_free_node(n1);
+  librdf_free_node(n2);
+  
+
+  /* targets */
+  n1=librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/");
+  n2=librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/description");
+
+  fprintf(stderr, "%s: Looking for targets of source=", program);
+  librdf_node_print(n1, stderr);
+  fputs(" arc=", stderr);
+  librdf_node_print(n2, stderr);
+  fputs("\n", stderr);
+
+  iterator=librdf_model_get_targets(model, n1, n2);
+  if(!iterator) {
+    fprintf(stderr, "%s: librdf_model_get_targets failed\n", program);
+    exit(1);
+  }
+
+  expected_count=2;
+  for(count=0; !librdf_iterator_end(iterator); librdf_iterator_next(iterator), count++) {
+    librdf_node* n=(librdf_node*)librdf_iterator_get_object(iterator);
+    fputs("  ", stderr);
+    librdf_node_print(n, stderr);
+    fputs("\n", stderr);
+  }
+  librdf_free_iterator(iterator);
+  if(count != expected_count) {
+    fprintf(stderr, "%s: librdf_model_get_targets returned %d nodes, expected %d\n", program, count, expected_count);
+    exit(1);
+  }
+  librdf_free_node(n1);
+  librdf_free_node(n2);
+  
+
+  /* arcs */
+  n1=librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/");
+  n2=librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0);
+
+  fprintf(stderr, "%s: Looking for arcs of source=", program);
+  librdf_node_print(n1, stderr);
+  fputs(" target=", stderr);
+  librdf_node_print(n2, stderr);
+  fputs("\n", stderr);
+
+  iterator=librdf_model_get_arcs(model, n1, n2);
+  if(!iterator) {
+    fprintf(stderr, "%s: librdf_model_get_arcs failed\n", program);
+    exit(1);
+  }
+
+  expected_count=2;
+  for(count=0; !librdf_iterator_end(iterator); librdf_iterator_next(iterator), count++) {
+    librdf_node* n=(librdf_node*)librdf_iterator_get_object(iterator);
+    fputs("  ", stderr);
+    librdf_node_print(n, stderr);
+    fputs("\n", stderr);
+  }
+  librdf_free_iterator(iterator);
+  if(count != expected_count) {
+    fprintf(stderr, "%s: librdf_model_get_arcs returned %d nodes, expected %d\n", program, count, expected_count);
+    exit(1);
+  }
+  librdf_free_node(n1);
+  librdf_free_node(n2);
+  
 
   for (i=0; i<URI_STRING_COUNT; i++) {
     fprintf(stderr, "%s: Removing statement context %s\n", program, 
