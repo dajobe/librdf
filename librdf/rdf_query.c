@@ -35,7 +35,8 @@
 #endif
 
 #include <librdf.h>
-
+#include <rdf_query.h>
+#include <rdf_query_triples.h>
 
 /* prototypes for helper functions */
 static void librdf_delete_query_factories(void);
