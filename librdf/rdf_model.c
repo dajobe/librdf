@@ -83,6 +83,16 @@ librdf_delete_model_factories(void)
 }
 
 
+/*
+ * librdf_model_supports_contexts - helper function to determine if this model supports contexts
+ **/
+static inline int
+librdf_model_supports_contexts(librdf_model* model) {
+  return model->supports_contexts;
+}
+
+
+
 /* class methods */
 
 /**
@@ -227,6 +237,7 @@ librdf_new_model_with_options(librdf_world *world,
                               librdf_storage *storage, librdf_hash* options)
 {
   librdf_model *model;
+  librdf_uri *uri;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
 
@@ -253,6 +264,16 @@ librdf_new_model_with_options(librdf_world *world,
     return NULL;
   }
 
+  uri=librdf_new_uri(world, (const unsigned char*)LIBRDF_MODEL_FEATURE_CONTEXTS);
+  if(uri) {
+    librdf_node *node=librdf_model_get_feature(model, uri);
+    if(node) {
+      model->supports_contexts=atoi((const char*)librdf_node_get_literal_value(node));
+      librdf_free_node(node);
+    }
+    librdf_free_uri(uri);
+  }
+
   model->usage=1;
 
   return model;
@@ -276,6 +297,7 @@ librdf_new_model_from_model(librdf_model* model)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
 
   new_model=model->factory->clone(model);
+  new_model->supports_contexts=model->supports_contexts;
   new_model->usage=1;
   return new_model;
 }
@@ -992,6 +1014,10 @@ librdf_model_context_add_statement(librdf_model* model,
   if(!librdf_statement_is_complete(statement))
     return 1;
 
+  if(!librdf_model_supports_contexts(model))
+    librdf_log(model->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_MODEL, NULL,
+               "Model does not support contexts");
+
   return model->factory->context_add_statement(model, context, statement);
 }
 
@@ -1019,6 +1045,10 @@ librdf_model_context_add_statements(librdf_model* model,
 
   if(!stream)
     return 1;
+
+  if(!librdf_model_supports_contexts(model))
+    librdf_log(model->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_MODEL, NULL,
+               "Model does not support contexts");
 
   if(model->factory->context_add_statements)
     return model->factory->context_add_statements(model, context, stream);
@@ -1062,6 +1092,10 @@ librdf_model_context_remove_statement(librdf_model* model,
   if(!librdf_statement_is_complete(statement))
     return 1;
 
+  if(!librdf_model_supports_contexts(model))
+    librdf_log(model->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_MODEL, NULL,
+               "Model does not support contexts");
+
   return model->factory->context_remove_statement(model, context, statement);
 }
 
@@ -1081,6 +1115,10 @@ librdf_model_context_remove_statements(librdf_model* model,
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_node, 1);
+
+  if(!librdf_model_supports_contexts(model))
+    librdf_log(model->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_MODEL, NULL,
+               "Model does not support contexts");
 
   if(model->factory->context_remove_statements)
     return model->factory->context_remove_statements(model, context);
@@ -1114,6 +1152,10 @@ librdf_model_context_as_stream(librdf_model* model, librdf_node* context)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_node, NULL);
 
+  if(!librdf_model_supports_contexts(model))
+    librdf_log(model->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_MODEL, NULL,
+               "Model does not support contexts");
+
   return model->factory->context_serialize(model, context);
 }
 
@@ -1133,6 +1175,10 @@ librdf_model_context_serialize(librdf_model* model, librdf_node* context)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_node, NULL);
+
+  if(!librdf_model_supports_contexts(model))
+    librdf_log(model->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_MODEL, NULL,
+               "Model does not support contexts");
 
   return model->factory->context_serialize(model, context);
 }
@@ -1278,6 +1324,9 @@ librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* s
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
+  if(!librdf_model_supports_contexts(model))
+    librdf_log(model->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_MODEL, NULL,
+               "Model does not support contexts");
 
   if(model->factory->find_statements_in_context)
     return model->factory->find_statements_in_context(model, statement, context_node);
@@ -1307,6 +1356,10 @@ librdf_iterator*
 librdf_model_get_contexts(librdf_model* model) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+
+  if(!librdf_model_supports_contexts(model))
+    librdf_log(model->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_MODEL, NULL,
+               "Model does not support contexts");
 
   if(model->factory->get_contexts)
     return model->factory->get_contexts(model);
@@ -1380,6 +1433,10 @@ librdf_model_find_statements_with_options(librdf_model* model,
                                           librdf_node* context_node,
                                           librdf_hash* options) 
 {
+  if(context_node && !librdf_model_supports_contexts(model))
+    librdf_log(model->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_MODEL, NULL,
+               "Model does not support contexts");
+
   if(model->factory->find_statements_with_options)
     return model->factory->find_statements_with_options(model, statement, context_node, options);
   else
