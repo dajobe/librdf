@@ -387,6 +387,10 @@ librdf_model_size(librdf_model* model)
  * shared with the model.  It must be a complete statement - all
  * of subject, predicate, object parts must be present.
  *
+ * If the statement already exists in the model, it is not added.
+ * Duplicate statements can be added when used with Redland Contexts
+ * such as with &librdf_model_context_add_statement
+ *
  * Return value: non 0 on failure
  **/
 int
@@ -397,6 +401,10 @@ librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 
   if(!librdf_statement_is_complete(statement))
     return 1;
+
+  /* Do not add duplicate statements */
+  if(librdf_model_contains_statement(model, statement))
+    return 0;
   
   return model->factory->add_statement(model, statement);
 }
@@ -407,6 +415,10 @@ librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
  * @model: model object
  * @statement_stream: stream of statements to use
  * 
+ * If any of the statements already exists in the store, they are not
+ * added unless Redland contexts are being used.  See also
+ * &librdf_model_context_add_statements
+ *
  * Return value: non 0 on failure
  **/
 int
