@@ -1,7 +1,56 @@
 2004-12-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
-	* rdf_storage_sqlite.c (librdf_storage_sqlite_open): Auto-set new
-	if file is missing.
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_set_helper):
+	Add length arg.
+	(librdf_storage_sqlite_uri_helper,
+	librdf_storage_sqlite_blank_helper,
+	librdf_storage_sqlite_literal_helper): Pass length to
+	librdf_storage_sqlite_set_helper.
+	(librdf_storage_sqlite_statement_helper): Do context nodes.
+	(librdf_storage_sqlite_add_statements): Do context node field when
+	present.
+	(librdf_storage_sqlite_statement_operator_helper): Added, with
+	content mostly from librdf_storage_sqlite_contains_statement.
+	(librdf_storage_sqlite_contains_statement): Use above.
+	(librdf_storage_sqlite_serialise,
+	librdf_storage_sqlite_find_statements): Always free stringbuffer.
+	(librdf_storage_sqlite_context_add_statement): Do context node field
+	when present.
+	(librdf_storage_sqlite_context_remove_statement): Implemented using
+	librdf_storage_sqlite_statement_operator_helper.
+
+	* rdf_storage_sqlite.c: Added sqlite_DB define for another 2/3 hide
+	(librdf_storage_sqlite_serialise): Use raptor_stringbuffer_length(sb)
+	for request length.
+
+	* rdf_storage_sqlite.c: Alter GET_COLUMN* defines to take vm arg.
+
+	* rdf_storage_sqlite.c:
+	Fix sqlite_FREE and GET_COLUMN defines for sqlite API v3
+
+	* rdf_storage_sqlite.c: casts for c++
+
+	* rdf_storage_sqlite.c:
+	Replace all use of fields with unsigned char* fields.
+
+	* rdf_storage_sqlite.c (sqlite_string_escape):
+	Emit 'string' - 2 more chars.
+	(librdf_storage_sqlite_uri_helper,
+	librdf_storage_sqlite_blank_helper): Malloc expressions based on
+	actual lengths.
+	(librdf_storage_sqlite_literal_helper): Remove ''s
+
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_set_helper):
+	Take unsigned values string.
+	(librdf_storage_sqlite_get_helper): Take unsigned expression string.
+	(librdf_storage_sqlite_uri_helper): Use unsigned expression.
+	(librdf_storage_sqlite_literal_helper): Use stringbuffer to build
+	expression.
+	(librdf_storage_sqlite_contains_statement): use stringbuffer to build
+	request.
+
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_open):
+	Auto-set new if file is missing.
 
 	* rdf_storage_sqlite.c: Revert over EXEC named change.
 
