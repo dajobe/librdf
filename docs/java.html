@@ -10,8 +10,8 @@
 
 <h2>Redland Java interface</h2>
 
-<p>The Java interface is new at 2001-08-22 and is likely to change a
-lot if the current date is close to that.</p>
+<p>The Java interface is still rather experimental and is still
+likely to change somewhat.</p>
 
 <p>This is not automatically built or installed at present since this
 interface may not be required.  You can easily build it by hand as
@@ -27,23 +27,30 @@ follows</p>
 </pre>
 
 
-<p>To install it system wide (this is optional) do this as <em>root</em>:</p>
+<p>To install it system wide, you will have to copy the
+<code>redland-java.jar<code> file to somewhere in your java CLASSPATH
+and the shared library <code>libredland-java.so</code> to somewhere
+in your dynamic library load path such as /usr/lib or /usr/local/lib.
+This varies between systems.
+</p>
 
-<pre>
-  root# make install-java
-</pre>
+<p>The Redland Java interface has been tested with J2SDK 1.3.1 and
+J2SDK 1.4.1_01 on Linux/x86 only.  It will need customising for
+different operating systems since the shared library creation has
+been hard-coded for Linux.  (This in particular will be hard to make
+portable).</p>
 
-<p>The Redland Java interface has been tested with J2SDK 1.3.1 on Linux
-only.  It will need customising for different operating systems since
-the shared library creation has been hard-coded for Linux at present.</p>
 
 <h2>Testing the Redland Java interface</h2>
 
-<p>There is the beginnings of an example program in <a href="../java/example.java">example.java</a> which is mostly for reading but can be compiled
-and run with:</p>
+<p>There is the beginnings of an example program in
+<a href="../java/example.java">example.java</a>
+which is mostly for reading (along with the tes1.java)
+but can be compiled and run with:</p>
 <pre>
   make example
-  LD_LIBRARY_PATH=. java -classpath . example
+  # the following asssumes you have done 'make install' for Redland
+  java -classpath .:redland-java.jar example
 </pre>
 
 
@@ -79,7 +86,11 @@ of the Redland objects with simple mappings between them:</p>
 </tr>
 <tr>
 <td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><tt>org.librdf.redland.Parser</tt></td>
-<td>Syntaxes parsers delivering <em>Stream</em> of <em>Statement</em>s or writing to a <em>Model</em></td>
+<td>Syntax parsers delivering <em>Stream</em> of <em>Statement</em>s or writing to a <em>Model</em></td>
+</tr>
+<tr>
+<td>Serializer</td><td><a href="api/serializer.html">librdf_serializer</a></td><td><tt>org.librdf.redland.Serializer</tt></td>
+<td>Serialize <em>Model</em>s into various syntaxes such as RDF/XML.</td>
 </tr>
 <tr>
 <td>Iterator</td><td><a href="api/iterator.html">librdf_iterator</a></td><td><tt>org.librdf.redland.Iterator</tt></td>
