@@ -73,6 +73,9 @@ librdf_new_iterator(void* context,
 void
 librdf_free_iterator(librdf_iterator* iterator) 
 {
+  if(!iterator)
+    return;
+  
   if(iterator->finished)
     iterator->finished(iterator->context);
   LIBRDF_FREE(librdf_iterator, iterator);
