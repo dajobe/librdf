@@ -624,14 +624,6 @@ main(int argc, char *argv[])
   world=librdf_new_world();
   librdf_world_open(world);
 
-  while(*program++)
-    ;
-  for(; 1; program--)
-    if(*program == '/' || *program == '\\') {
-      program++;
-      break;
-    }
-  
   for (i=0; i<URI_STRING_COUNT; i++) {
     uris[i]=librdf_new_uri(world, file_uri_strings[i]);
   }
