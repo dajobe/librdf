@@ -1,5 +1,60 @@
 2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* Updated to latest version of the MySQL storage written
+	by Morten Frederiksen
+
+	* librdf/rdf_storage_mysql.c: Add new storage options:
+	  bulk - if inserts should be optimized by locking and index
+	         optimizations 
+	  merge - if a table with merged models should be maintained
+	Added a digest object to the storage context for use and re-use
+	of MD5 digesting.
+	(librdf_storage_mysql_hash): Changed to use context digest option.
+	(librdf_storage_mysql_init): Added and documented the bulk and merge
+	options.  Document the new option, already implemented, to create
+	tables.  Update the MySQL schemas.
+	(librdf_storage_mysql_merge): Added, to re/create merged view of all
+	models.
+	(librdf_storage_mysql_terminate): Tidy up digest from context.
+	(librdf_storage_mysql_sync): Added to flush tables.  Now used
+	by librdf_storage_mysql_close.
+	(librdf_storage_mysql_size, librdf_storage_mysql_node_hash): Updated
+	for new schema.
+	(librdf_storage_mysql_start_bulk, librdf_storage_mysql_stop_bulk):
+	Added, to start and stop bulk op.
+	(librdf_storage_mysql_context_add_statements): Add bulk start
+	operations when enabled.
+	(librdf_storage_mysql_context_add_statement_helper,
+	librdf_storage_mysql_contains_statement,
+	librdf_storage_mysql_remove_statement): Docucomments.
+	Updated for new schema.
+	(librdf_storage_mysql_context_remove_statements):
+	Updated for new schema.
+	(librdf_storage_mysql_serialise,
+	librdf_storage_mysql_find_statements,
+	librdf_storage_mysql_find_statements_in_context): Docucomments
+	(librdf_storage_mysql_find_statements_with_options): Docucomments.
+	Updated for new schema.
+	(librdf_storage_mysql_find_statements_in_context_next_statement):
+	Add checking there is a statement to return.
+	(librdf_storage_mysql_get_contexts):
+	Updated for new schema.
+
+	* rasqal/rasqal_expr.c: Add #ifndef STANDALONE ... #endif around
+	test functions, linked via library.
+
+	* configure.ac: Remove extra -DLIBRDF_DEBUG when using dmalloc
+
+	* rasqal/configure.ac: Remove -DLIBRDF_DEBUG
+
+	* rasqal/configure.ac:
+	raptor-config, redland-config --version-decimal 2>/dev/null
+
+	* rasqal/configure.ac:
+	Use raptor-config, redland-config --version-decimal
+
+	* rasqal/configure.ac: Remove duplicate redland-config test
+
 	* librdf/rdf_query_rasqal.c, librdf/rdf_parser_raptor.c,
 	librdf/rdf_node.c, librdf/rdf_log.c: Casts for C++
 
