@@ -333,11 +333,13 @@ main(int argc, char *argv[])
     puts("  arcs-in | arcs-out NODE                   Show properties in/out of NODE");
     puts("  has-arc-in | has-arc-out NODE ARC         Check for property in/out of NODE");
     puts("\nNotation:");
-    puts("    source means subject of triples matching (?,  NODE1, NODE2)");
-    puts("    target means object of triples matching (NODE1, NODE2, ?)");
-    puts("    arc means predicate of triples matching (NODE1, ?, NODE2)");
-    puts("\nIf a node (URI or literal or blank node) can be given, blank nodes");
-    puts("are like _:ABC, URIs like http://example.org, otherwise lierals.");
+    puts("  nodes are either blank node identifiers like _:ABC,");
+    puts("    URIs like http://example.org otherwise are literal strings.");
+    puts("  triples are three nodes (subject, predicate, object)");
+    puts("    predicates cannot be blank node identifiers, only objects can be literals");
+    puts("  source means subject of triples matching (?,  NODE1, NODE2)");
+    puts("  target means object of triples matching (NODE1, NODE2, ?)");
+    puts("  arc means predicate of triples matching (NODE1, ?, NODE2)");
     puts("\nReport bugs to <redland-dev@lists.librdf.org>.");
     puts("Redland home page: http://www.redland.opensource.ac.uk/");
     exit(0);
@@ -631,7 +633,13 @@ main(int argc, char *argv[])
         case CMD_ADD:
         case CMD_ADD_TYPED:
           if(argv[3] && contexts) {
-            librdf_node* context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
+            librdf_node* context_node;
+
+            if (librdf_heuristic_is_blank_node(argv[3]))
+              context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
+            else
+              context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
+
             rc=librdf_model_context_add_statement(model, context_node,
                                                   partial_statement);
             librdf_free_node(context_node);
@@ -648,7 +656,13 @@ main(int argc, char *argv[])
           
         case CMD_REMOVE:
           if(argv[3] && contexts) {
-            librdf_node* context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
+            librdf_node* context_node;
+
+            if (librdf_heuristic_is_blank_node(argv[3]))
+              context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
+            else
+              context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
+
             rc=librdf_model_context_remove_statement(model, context_node,
                                                      partial_statement);
             librdf_free_node(context_node);
