@@ -110,6 +110,8 @@ cd ..
 %{prefix}/lib/librdf.la
 %{prefix}/lib/librdf.so
 
+%doc %{prefix}/man/man3/*
+
 %doc AUTHORS COPYING COPYING.LIB ChangeLog LICENSE.txt NEWS README TODO
 %doc *.html
 
@@ -129,10 +131,9 @@ cd ..
 %files perl
 %defattr(-, bin, bin)
 
-%{perlinstallsitearch}/auto/Redland
-%{perlinstallsitearch}/Redland.pm
-%{perlinstallsitearch}/RDF
-%{perlinstallsitearch}/RDF.pm
+%{perlinstallsitearch}/auto/RDF/Redland
+%{perlinstallsitearch}/RDF/Redland
+%{perlinstallsitearch}/RDF/Redland.pm
 
 %doc %{perlman3dir}/*
 
@@ -143,5 +144,8 @@ cd ..
 /sbin/ldconfig
 
 %changelog
+* Fri Jan 4 2002 Dave Beckett <dave.beckett@bristol.ac.uk>
+- Updated for new Perl module names
+
 * Fri Sep 14 2001 Dave Beckett <dave.beckett@bristol.ac.uk>
 - Added shared libraries
