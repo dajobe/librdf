@@ -1018,6 +1018,7 @@ AC_SUBST(abs_top_builddir)
 AC_CONFIG_SUBDIRS(raptor)
 
 AC_OUTPUT(Makefile
+redland-src-config
 docs/Makefile
 librdf/Makefile
 examples/Makefile
@@ -1040,7 +1041,6 @@ repat/Makefile
 debian/Makefile
 debian/rules
 librdf/redland.spec
-librdf/redland-src-config
 librdf/redland-config,
 [chmod +x redland-src-config librdf/redland-config debian/rules])
 
