@@ -56,7 +56,8 @@ static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
   "aboutEach", "aboutEachPrefix",
   /* all new in RDF/XML revised */
   "nodeID",
-  "List", "first", "rest", "nil",
+  "List", "first", "rest", "nil", 
+  "XMLLiteral",
 
   /* RDF S */
   "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"
@@ -74,6 +75,7 @@ static const char* const librdf_concept_labels[LIBRDF_CONCEPT_LAST+1]={
   /* all new in RDF/XML revised */
   "nodeID",
   "List", "first", "rest", "nil",
+  "XMLLiteral",
 
   /* RDF S */
   "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"

@@ -60,6 +60,7 @@ enum {
   LIBRDF_CONCEPT_RS_first,
   LIBRDF_CONCEPT_RS_rest,
   LIBRDF_CONCEPT_RS_nil,
+  LIBRDF_CONCEPT_RS_XMLLiteral,
 
   /* RDF Schema concepts defined in prose at
    *   http://www.w3.org/TR/2000/CR-rdf-schema-20000327/
@@ -121,6 +122,7 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_RS_first librdf_concept_resources[LIBRDF_CONCEPT_RS_first]
 #define LIBRDF_RS_rest librdf_concept_resources[LIBRDF_CONCEPT_RS_rest]
 #define LIBRDF_RS_nil librdf_concept_resources[LIBRDF_CONCEPT_RS_nil]
+#define LIBRDF_RS_XMLLiteral librdf_concept_resources[LIBRDF_CONCEPT_RS_XMLLiteral]
 
 
 #define LIBRDF_S_Class librdf_concept_resources[LIBRDF_CONCEPT_S_Class]
@@ -166,6 +168,7 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_RS_first_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_first]
 #define LIBRDF_RS_rest_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_rest]
 #define LIBRDF_RS_nil_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_nil]
+#define LIBRDF_RS_XMLLiteral_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_XMLLiteral]
 
 
 #define LIBRDF_S_subPropertyOf_URI librdf_concept_uris[LIBRDF_CONCEPT_S_subPropertyOf]
