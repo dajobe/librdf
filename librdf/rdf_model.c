@@ -358,6 +358,61 @@ librdf_model_find_statements(librdf_model* model,
 }
 
 
+/**
+ * librdf_modeeel_get_sources - return the sources (subjects) of arc in an RDF graph given arc (predicate) and target (object)
+ * @model: &librdf_model object
+ * @arc: &librdf_node arc
+ * @target: &librdf_node target
+ * 
+ * Searches the model for arcs matching the given arc and target
+ * and returns a list of the source &librdf_node objects as an iterator
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_model_get_sources(librdf_model *model,
+                         librdf_node *arc, librdf_node *target) 
+{
+  return librdf_storage_get_sources(model->storage, arc, target);
+}
+
+
+/**
+ * librdf_model_get_arcs - return the arcs (predicates) of an arc in an RDF graph given source (subject) and target (object)
+ * @model: &librdf_model object
+ * @source: &librdf_node source
+ * @target: &librdf_node target
+ * 
+ * Searches the model for arcs matching the given source and target
+ * and returns a list of the arc &librdf_node objects as an iterator
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_model_get_arcs(librdf_model *model,
+                      librdf_node *source, librdf_node *target) 
+{
+  return librdf_storage_get_arcs(model->storage, source, target);
+}
+
+
+/**
+ * librdf_model_get_targets - return the targets (objects) of an arc in an RDF graph given source (subject) and arc (predicate)
+ * @model: &librdf_model object
+ * @source: &librdf_node source
+ * @arc: &librdf_node arc
+ * 
+ * Searches the model for targets matching the given source and arc
+ * and returns a list of the source &librdf_node objects as an iterator
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_model_get_targets(librdf_model *model,
+                         librdf_node *source, librdf_node *arc) 
+{
+  return librdf_storage_get_targets(model->storage, source, arc);
+}
 
 
 /**
@@ -440,7 +495,8 @@ librdf_model_print(librdf_model *model, FILE *fh)
       fputs(s, fh);
       fputs("\n", fh);
       LIBRDF_FREE(cstring, s);
-    }    
+    }
+    librdf_free_statement(statement);
   }
   fputs("]]\n", fh);
   
