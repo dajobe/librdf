@@ -516,7 +516,7 @@ librdf_storage_list_group_serialise_get_statement(void* context, int flags)
   
   switch(flags) {
     case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
-      if(!(v=librdf_iterator_get_object(scontext->iterator)))
+      if(!(v=librdf_iterator_get_value(scontext->iterator)))
         return NULL;
 
       /* decode value content */
