@@ -112,6 +112,7 @@ SUFFIXES = .html .txt .sgml .ps .pdf
 @MAINT@	kernel-doc -docbook $< > $@
 @MAINT@
 @MAINT@api.sgml: $(srcdir)/build-docs api.sgml.in $(API_DOCBOOK_FILES)
+@MAINT@	rm -rf DBTOHTML*
 @MAINT@	$(PERL) $(srcdir)/build-docs api.sgml.in > api.sgml
 @MAINT@
 @MAINT@overview.ps: overview.xfig
