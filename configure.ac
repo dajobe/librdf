@@ -381,6 +381,7 @@ AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (defau
 AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory (default=/usr/include)], bdb_include_dir="$withval", bdb_include_dir="none") 
 AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Berkeley DB library name (auto)], bdb_dbname="$withval", bdb_dbname="none")
 
+bdb_version=none
 if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_dir" = "Xnone" -a "X$bdb_dbname" = "Xnone" ; then
   bdb_prefix="/usr"
   bdb_lib_dir="/usr/lib"
@@ -401,10 +402,11 @@ if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_
       bdbc_libdir=$bdbc_prefix/lib
       for bdbc_incdir in $bdbc_prefix/include/db$bdbc_version $bdbc_prefix/include/db$bdbc_version2 $bdbc_prefix/include/db$bdbc_major $bdbc_prefix/include ; do
         if test -r $bdbc_incdir/db.h ; then
-          bdbc_header_version=`sed -ne 's/^.*DB_BDBC_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $bdbc_incdir/db.h`
-          if test "X$bdbc_header_version" = "X$bdbc_version" ; then 
+          header_bdbc_version=`sed -ne 's/^.*DB_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $bdbc_incdir/db.h`
+          if test "X$header_bdbc_version" = "X$bdbc_version" ; then 
             for bdbc_name in db-$bdbc_version db$bdbc_version db-$bdbc_version2 db$bdbc_version2; do
               if test -r $bdbc_libdir/lib$bdbc_name.a -o -r $bdbc_libdir/lib$bdbc_name.so -o -r $bdbc_libdir/lib$bdbc_name.dylib; then
+  	        bdb_version=$bdbc_version
   	        bdb_prefix=$bdbc_prefix
   	        bdb_include_dir=$bdbc_incdir
 	        bdb_lib_dir=$bdbc_libdir
@@ -413,14 +415,16 @@ if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_
               fi
             done
           fi
-
         fi
+
       done
      done
    done
 
 fi
 
+AC_MSG_CHECKING(BDB version)
+AC_MSG_RESULT($bdb_version)
 AC_MSG_CHECKING(location of BDB libs)
 AC_MSG_RESULT($bdb_lib_dir)
 AC_MSG_CHECKING(location of BDB includes)
@@ -476,10 +480,7 @@ if test "$bdb_prefix" != no; then
     AC_TRY_LINK([#include <stdio.h>
                  #include <db.h>], [db_open(NULL, DB_BTREE, 0, 0, NULL, NULL, NULL);],
 		AC_DEFINE(HAVE_DB_OPEN, 1, [BDB has db_open method])
-                if test $have_libdb = no; then
-                  bdb_available="Version 2.x"
-                  have_libdb=yes
-                fi
+                have_libdb=yes
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
@@ -487,7 +488,6 @@ if test "$bdb_prefix" != no; then
     AC_TRY_LINK([#include <stdio.h>
                  #include <db.h>], [db_create(NULL, NULL, 0);],
 		AC_DEFINE(HAVE_DB_CREATE, 1, [BDB has db_create method])
-                bdb_available="Version 3.x/4.x"
                 have_libdb=yes
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
@@ -496,7 +496,6 @@ if test "$bdb_prefix" != no; then
     AC_TRY_LINK([#include <stdio.h>
                  #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, DB_BTREE, 0, 0);],
 		AC_DEFINE(HAVE_BDB_OPEN_6_ARGS, 1, [BDB has open method with 6 args])
-                bdb_available="Version 4.0+"
                 have_libdb=yes
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
@@ -519,7 +518,6 @@ if test "$bdb_prefix" != no; then
     AC_TRY_LINK([#include <stdio.h>
                  #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);],
 		AC_DEFINE(HAVE_BDB_OPEN_7_ARGS, 1, [BDB has open method with 7 args])
-                bdb_available="Version 4.1+"
                 have_libdb=yes
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
@@ -545,6 +543,7 @@ if test "$bdb_prefix" != no; then
   fi
 
   if test "$have_libdb" = yes; then
+    bdb_available="Version $bdb_version (library $bdb_dbname in $bdb_lib_dir)"
     LIBRDF_LIBS="-l$bdb_dbname $LIBRDF_LIBS"
     LIBRDF_LDFLAGS="$nLDFLAGS $LIBRDF_LDFLAGS"
     LIBRDF_CPPFLAGS="$nCPPFLAGS $LIBRDF_CPPFLAGS"
