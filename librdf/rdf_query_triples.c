@@ -72,7 +72,7 @@ librdf_query_triples_find_next_term(char *string)
   if(!string)
     return NULL;
   
-  switch(*string) {
+  switch(*string++) {
     case '"':
       delim='"';
       break;
@@ -80,23 +80,15 @@ librdf_query_triples_find_next_term(char *string)
       delim=']';
       break;
     case '-':
-      break;
+      return string;
     default:
       /* Bad value - includes '\0' */
       return NULL;
   }
 
-  while((c=*string)) {
-    if(delim) {
-      if(c == delim) {
-        string++;
-        break;
-      }
-    } else {
-      if(c == ' ')
-        break;
-    }
-    string++;
+  while((c=*string++)) {
+    if(c == delim)
+      break;
   }
   
   if(!c)
