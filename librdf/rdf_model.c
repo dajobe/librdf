@@ -481,7 +481,7 @@ librdf_model_get_source(librdf_model *model,
 {
   librdf_iterator *iterator=librdf_storage_get_sources(model->storage, 
                                                       arc, target);
-  librdf_node *node=librdf_iterator_get_next(iterator);
+  librdf_node *node=(librdf_node*)librdf_iterator_get_next(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
 
@@ -507,7 +507,7 @@ librdf_model_get_arc(librdf_model *model,
 {
   librdf_iterator *iterator=librdf_storage_get_arcs(model->storage, 
                                                    source, target);
-  librdf_node *node=librdf_iterator_get_next(iterator);
+  librdf_node *node=(librdf_node*)librdf_iterator_get_next(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
 
@@ -533,7 +533,7 @@ librdf_model_get_target(librdf_model *model,
 {
   librdf_iterator *iterator=librdf_storage_get_targets(model->storage, 
                                                       source, arc);
-  librdf_node *node=librdf_iterator_get_next(iterator);
+  librdf_node *node=(librdf_node*)librdf_iterator_get_next(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
   
