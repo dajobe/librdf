@@ -30,7 +30,6 @@
 #include <redland-pre.i>
 #endif
 
-#include <rdf_config.h>
 #include <redland.h>
 
 /* 
