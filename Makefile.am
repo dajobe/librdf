@@ -29,7 +29,7 @@ SUBDIRS=@SD@ raptor librdf examples utils demos
 CONFIG_SUBDIRS=raptor
 # Subdirectories to use for distribution
 DIST_SUBDIRS=librdf docs examples \
-perl php python tcl java ruby \
+perl php python tcl java ruby csharp \
 raptor \
 utils demos
 
