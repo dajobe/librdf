@@ -133,7 +133,7 @@ README      NEWS      TODO      LICENSE.txt \
 README.html NEWS.html TODO.html LICENSE.html \
 INSTALL.html FAQS.html MPL.html \
 redland-config.in \
-memcmp.c \
+memcmp.c Redland.i \
 PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \
 autogen.sh
