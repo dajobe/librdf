@@ -284,8 +284,9 @@ librdf_storage_file_sync(librdf_storage *storage)
                "failed to open file '%s' for writing - %s",
                new_name, strerror(errno));
   else {
-    librdf_serializer_serialize_model(serializer, fh, context->uri,
-                                      context->model);
+    librdf_serializer_serialize_model_to_file_handle(serializer, fh,
+                                                     context->uri,
+                                                     context->model);
     fclose(fh);
   }
   librdf_free_serializer(serializer);
