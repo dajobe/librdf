@@ -348,6 +348,19 @@ librdf_statement* librdf_stream_get_object(librdf_stream* stream);
 librdf_node* librdf_stream_get_context(librdf_stream* stream);
 
 
+/* rdf_log.h and raptor.h */
+int librdf_log_message_code(librdf_log_message *message);
+int librdf_log_message_level(librdf_log_message *message);
+int librdf_log_message_facility(librdf_log_message *message);
+const char * librdf_log_message_message(librdf_log_message *message);
+raptor_locator* librdf_log_message_locator(librdf_log_message *message);
+int fraptor_locator_line(raptor_locator *locator);
+int raptor_locator_column(raptor_locator *locator);
+int raptor_locator_byte(raptor_locator *locator);
+const char* raptor_locator_file(raptor_locator *locator);
+const char* raptor_locator_uri(raptor_locator *locator);
+
+
 /* FOR TESTING ERRORS ONLY - NOT PART OF API */
 void librdf_internal_test_error(librdf_world *world);
 void librdf_internal_test_warning(librdf_world *world);
