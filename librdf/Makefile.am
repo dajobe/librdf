@@ -86,7 +86,8 @@ rdf_storage_mysql.c rdf_storage_mysql.h
 
 EXTRA_DIST=\
 memcmp.c \
-redland.spec redland.spec.in
+redland.spec redland.spec.in \
+redland.pc.in
 
 librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@
 
