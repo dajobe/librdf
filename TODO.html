@@ -5,16 +5,16 @@
 </head>
 <body bgcolor="#ffffff" text="#000085">
 
-<h1 align="center">librdf todo list</title>
+<h1 align="center">librdf todo list</h1>
 
 <h2>To Do Pre-0.1</h2>
 
 <ul>
+<li>module - model</li>
 <li>module - storage as hashes</li>
 <li>module - storage factory</li>
-<li>module - rdf parser - internal?</li>
-<li>module - rdf parser - external</li>
-<li>module - model</li>
+<li>module - rdf parser - external program such as sirpac</li>
+<li>module - rdf parser - external (e.g. the one in the libwww)</li>
 <li>annotate the functions with the JavaDoc style documents and so it is clear who owns the memory returned by functions</li>
 <li>sourceforge registration for lists, bugs etc.</li>
 <li>register librdf.org</li>
@@ -22,21 +22,20 @@
 
 <h2>To Do Post First Release</h2>
 <ul>
+<li>module - rdf parser - internal to librdf written by me</li>
 <li>module - xml dom parser - external</li>
 <li>module - xml dom parser - libxml</li>
 <li>module - xml sax parser - libxml</li>
-<li>module - berkeley DB hash</li>
 <li>module - xml parser - sax</li>
 <li>module - xml parser - dom</li>
 <li>module - rdf parser - libwww</li>
 <li>module - uri syntax / representation</li>
 <li>module - uri resolving</li>
-<li>module - memory allocation</li>
 <li>module - xml namespaces</li>
 <li>find a decent documentation generation system - doc++ fixed by
 me? or write a quick hack Perl doc generator for the style of C I have</li>
 <li>check out if the library can be built shared</li>
-<li>wrap the code with #ifdef IMPLEMENTATION etc. to prevent exposing too many external functions?</li>
+<li>wrap the code with <tt>#ifdef IMPLEMENTATION</tt> etc. to prevent exposing too many internal functions?</li>
 <li>modularise the library so some parts can be removed?</li>
 <li>added #ifdef WIN32 around including config file - win32 build?</li>
 <li>If GPL license, pull in other code - libxml OR add separate package?</li>
@@ -48,7 +47,12 @@ me? or write a quick hack Perl doc generator for the style of C I have</li>
 
 
 <h2>Done</h2>
+
+<p>(Most recent done at top of list)</p>
+
 <ul>
+<li>module - memory allocation</li>
+<li>module - berkeley DB hash</li>
 <li>change functions to all start with RDF_ - new and free functions</li>
 <li>decide on the license(s)  - GPL/LGPL and BSDish ???</li>
 <li>iterator interface and module for returning results</li>
