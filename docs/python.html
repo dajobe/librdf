@@ -8,11 +8,11 @@
 
 <h1 align="center">Redland - An RDF Application Framework - Python Interface</h1>
 
-<h2>Installing the Python interface</h2>
+<h2>Installing the Redland Python interface</h2>
 
-<p>This is not automatically built or installed at present, since the
-installation system isn't quite finished.  You can easily build it by
-hand as follows</p>
+<p>This is not automatically built or installed at present since this
+interface may not be required.  You can easily build it by hand as
+follows</p>
 
 <pre>
   cd python
@@ -20,17 +20,16 @@ hand as follows</p>
   make test-python   # optional
 </pre>
 
-<p>You can ignore any compiling warnings about discarding 'const'.
-To install it system wide (this is optional) do this as <em>root</em>:</p>
+<p>To install it system wide (this is optional) do this as <em>root</em>:</p>
 
 <pre>
   root# make install-python
 </pre>
 
-<p>The python interface has been tested with Python 2.0.</p>
+<p>The python interface has been tested with Python 2.0 (release version).</p>
 
 
-<h2>Python API Introduction</h2>
+<h2>Redland Python API Introduction</h2>
 
 <p>The Python API is an object-based API reflecting the same structure
 of the Redland objects with simple mappings between them:
@@ -87,6 +86,11 @@ of the Redland objects with simple mappings between them:
 </table>
 </center>
 
+<h2>Other RDF Python APIs and applications</h2>
+
+<ul>
+<li><a href="http://sourceforge.net/projects/redfoot/">Redfoot</a> -  store/viewer/editor framework for RDF that includes peer-to-peer communication between stores.</li>
+</ul>
 
 <hr />
 
