@@ -114,13 +114,21 @@ below for what these are):</p>
 <pre>
   ./autogen.sh --prefix=/usr/local/somewhere
 </pre>
+
 <p>Alternatively you can run the automake and autoconf programs by
 hand with:</p>
 <pre>
   aclocal; autoheader; automake --add-missing; autoconf
 </pre>
-<p>(Ignore any warnings from autoconf about AC_TRY_RUN, it is caused
-by an autoconf macro and seems to be an autoconf bug.)</p>
+
+<p>The automake and autoconf tools have many different versions and
+at present development is being done with automake 1.8.3 (minimum
+version 1.7), autoconf 2.59 (minimum version 2.54) and libtool 1.5.4
+(minimum version 1.4).  These are only needed when compiling from CVS
+sources.  autogen.sh enforces the requirements.  In future
+development will move to require automake 1.8, autoconf 2.58 and
+libtool 1.5.</p>
+
 
 <h3>2.2. Options for <code>configure</code></h3>
 
