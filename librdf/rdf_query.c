@@ -467,7 +467,9 @@ main(int argc, char *argv[])
   librdf_uri *uri;
   char *program=argv[0];
   librdf_world *world;
-
+  librdf_uri* format_uri;
+  size_t string_length;
+  unsigned char *string;
   char *query_string=QUERY_STRING;
 
   world=librdf_new_world();
@@ -551,9 +553,8 @@ main(int argc, char *argv[])
     return 1;
   }
 
-  librdf_uri* format_uri=librdf_new_uri(world, (unsigned const char*)"http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/");
-  size_t string_length=0;
-  unsigned char *string;
+  format_uri=librdf_new_uri(world, (unsigned const char*)"http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/");
+  string_length=0;
 
   string=librdf_query_results_to_counted_string(results, 
                                                 format_uri, NULL,
