@@ -220,12 +220,6 @@ LIBRDF_XML_OBJS=
 
 
 dnl Checks for libraries.
-dnl GNU GDBM
-AC_CHECK_HEADERS(gdbm.h)
-if test "$ac_cv_header_gdbm_h" = yes ; then
-  AC_CHECK_LIB(gdbm,gdbm_firstkey)
-  LIBS="$LIBRDF_LIBS"
-fi
 
 dnl Berkeley DB
 AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area [/usr]], bdb_prefix="$withval", bdb_prefix="/usr") 
