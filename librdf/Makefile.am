@@ -79,7 +79,7 @@ rdf_parser_sirpac.c rdf_parser_libwww.c \
 rdf_parser_rapier.c \
 rdf_parser_repat.c \
 example1.c example2.c example3.c example4.c \
-@RAPIER_OPT_SOURCES@
+@RAPIER_SRCS@
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO      LICENSE.txt \
@@ -91,7 +91,7 @@ PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \
 autogen.sh \
 redland.spec redland.spec.in \
-@RAPIER_OPT_HEADERS@
+@RAPIER_INCS@
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
@@ -222,7 +222,7 @@ $(top_builddir)/repat/rdfparse.o: $(top_builddir)/expat/xmlparse/xmlparse.o $(to
 # activates this rule if it is normally in the Makefile.am
 dist-hook: redland.spec
 	-cp redland.spec $(distdir)
-	@for file in @RAPIER_OPT_SOURCES@ @RAPIER_OPT_HEADERS@ fake.c; do \
+	@for file in @RAPIER_SRCS@ @RAPIER_INCS@ fake.c; do \
 	  rm -f $(distdir)/$$file; \
           if test -r $(srcdir)/$$file; then \
 	    cp -p $(srcdir)/$$file $(distdir)/$$file; \
