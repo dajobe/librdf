@@ -16,6 +16,12 @@
 #
 
 PACKAGE=redland
+
+# Where raptor may be found, in an adjacent directory
+RAPTOR_DIR=../raptor
+RAPTOR_INCS="raptor.h ntriples.h"
+RAPTOR_SRCS="raptor_parse.c ntriples_parse.c"
+
 DIE=
 
 if test "X$DRYRUN" != X; then
@@ -77,6 +83,28 @@ fi
 if test "X$DIE" != X; then
   exit 1
 fi
+
+
+if [ -d $RAPTOR_DIR ]; then
+  failed=no
+  for file in $RAPTOR_SRCS $RAPTOR_INCS: do
+    rfile=$RAPTOR_DIR/$file
+    if [ -r $rfile [; then   
+      rm -f $file
+      ln -s $file .
+    else
+      failed=yes
+    fi
+  done
+  # Need all raptor files present
+  if test "$failed" = yes; then
+    rm -f $RAPTOR_SRCS $RAPTOR_INCS
+  else
+    echo "$program: Found and enabled Raptor sources in $RAPTOR_DIR"
+  fi
+fi
+
+
 
 if test -z "$*"; then
   echo "$program: WARNING: Running \`configure' with no arguments."
