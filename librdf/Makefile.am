@@ -12,11 +12,13 @@ lib_LIBRARIES = librdf.a
 
 librdf_a_SOURCES = rdf_init.c rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_list.c rdf_model.c rdf_iterator.c \
-rdf_list.c rdf_memory.c rdf_storage.c \
-rdf_config.h rdf_types.h \
+rdf_list.c rdf_memory.c rdf_storage.c rdf_storage_list.c rdf_stream.c \
+librdf.h rdf_config.h rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_digest.h rdf_hash.h rdf_hash_gdbm.h \
 rdf_hash_list.h rdf_model.h rdf_storage.h rdf_iterator.h \
-rdf_context.h rdf_list.h rdf_hash_bdb.h rdf_storage.h
+rdf_context.h rdf_list.h rdf_hash_bdb.h rdf_storage.h rdf_storage_list.h \
+rdf_stream.h \
+example.c
 
 librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@
 librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@
@@ -63,6 +65,9 @@ rdf_model_test: rdf_model.c librdf.a
 
 rdf_storage_test: rdf_storage.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_storage.c librdf.a $(LIBS)
+
+example: example.c librdf.a
+	$(LINK) -I$(srcdir) -I. $(srcdir)/example.c librdf.a $(LIBS)
 
 
 
