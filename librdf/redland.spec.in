@@ -136,7 +136,8 @@ cd ..
 %files perl
 %defattr(-, bin, bin)
 
-%{perlinstallsitearch}/auto/RDF/Redland
+%{perlinstallsitearch}/auto/redland/CORE
+%{perlinstallsitearch}/auto/redland/CORE/CORE.*
 %{perlinstallsitearch}/RDF/Redland
 %{perlinstallsitearch}/RDF/Redland.pm
 
@@ -149,6 +150,9 @@ cd ..
 /sbin/ldconfig
 
 %changelog
+* Sun Aug 17 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
+- Updates for new perl module names.
+
 * Tue Apr 22 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
 - Updated for Redhat 9, RPM 4
 
