@@ -16,7 +16,7 @@ rdf_list.c rdf_memory.c \
 rdf_config.h rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_digest.h rdf_hash.h rdf_hash_gdbm.h \
 rdf_hash_list.h rdf_model.h rdf_storage.h rdf_iterator.h \
-rdf_assertion_context.h rdf_list.h rdf_hash_bdb.h
+rdf_context.h rdf_list.h rdf_hash_bdb.h
 
 librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@
 librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@
@@ -25,8 +25,8 @@ EXTRA_librdf_a_SOURCES = md5.c rdf_hash_gdbm.c rdf_digest_openssl.c \
 rdf_hash_bdb.c
 
 EXTRA_DIST=ChangeLog \
-README      NEWS \
-README.html NEWS.html \
+README      NEWS      TODO \
+README.html NEWS.html TODO.html \
 INSTALL.html LICENSE.html FAQS.html \
 librdf-config.in \
 memcmp.c
@@ -76,6 +76,9 @@ README: README.html
 	$(LYNX) $(LYNXARGS) $< > $@
 
 NEWS: NEWS.html
+	$(LYNX) $(LYNXARGS) $< > $@
+
+TODO: TODO.html
 	$(LYNX) $(LYNXARGS) $< > $@
 
 @SET_MAKE@
