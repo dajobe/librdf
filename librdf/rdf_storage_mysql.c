@@ -1579,6 +1579,42 @@ librdf_storage_mysql_get_contexts_finished(void* context)
 
 }
 
+
+/**
+ * librdf_storage_mysql_get_feature - get the value of a storage feature
+ * @storage: &librdf_storage object
+ * @feature: &librdf_uri feature property
+ * 
+ * Return value: &librdf_node feature value or NULL if no such feature
+ * exists or the value is empty.
+ **/
+static librdf_node*
+librdf_storage_mysql_get_feature(librdf_storage* storage, librdf_uri* feature)
+{
+  unsigned char *uri_string;
+
+  if(!feature)
+    return NULL;
+
+  uri_string=librdf_uri_as_string(feature);
+  if(!uri_string)
+    return NULL;
+  
+  if(!strcmp(uri_string, LIBRDF_MODEL_FEATURE_CONTEXTS)) {
+    /* Always have contexts */
+    static const char value[2]="1";
+
+    return librdf_new_node_from_typed_literal(storage->world,
+                                              value,
+                                              NULL, NULL);
+  }
+
+  return NULL;
+}
+
+
+
+
 /* local function to register MySQL storage functions */
 static void
 librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
@@ -1602,6 +1638,7 @@ librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
   factory->context_serialise          = librdf_storage_mysql_context_serialise;
   factory->find_statements_in_context = librdf_storage_mysql_find_statements_in_context;
   factory->get_contexts               = librdf_storage_mysql_get_contexts;
+  factory->get_feature                = librdf_storage_mysql_get_feature;
 }
 
 
