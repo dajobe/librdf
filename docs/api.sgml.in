@@ -1,9 +1,9 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V3.1//EN"[]>
-<book id="librdfAPI">
+<book id="redlandAPI">
   <?dbhtml filename='index.html'>
   <bookinfo>
     <date>2000-08-10</date>
-    <title>librdf - Resource Description Framework (RDF) application framework APIs</title>
+    <title>Redland - An RDF Application Framework - APIs</title>
     <author>
       <firstname>Dave</firstname>
       <surname>Beckett</surname>
@@ -49,7 +49,7 @@
 
     <abstract>
       <para>
-This document describes the APIs provided by librdf to use the RDF
+This document describes the APIs provided by Redland to use the RDF
 model; manipulate statements, resources, predicates and objects in the model;
 parse RDF/XML syntax, query and store the models.
       </para>
@@ -59,6 +59,79 @@ parse RDF/XML syntax, query and store the models.
 
 <toc></toc>
 
+
+<chapter id="model">
+<title>RDF Model</title>
+<para>
+This module provides the RDF model support which is a bag of statements
+(duplicates are allowed).  Models can have statements added and removed,
+be queries and stored which is implemented by the storage classes.
+</para>
+<sect1>
+<title>RDF Model Class</title>
+@INCLUDE model.sgml
+</sect1>
+</chapter>
+
+<chapter id="statement">
+<title>RDF Statement / Assertion / Triple</title>
+<para>
+This module provides the RDF statement functionality, and contains
+three main elements: resource, predicate and object which are all
+nodes provided by the librdf_node class.  Statements can be added /
+removed from models.
+</para>
+<para>
+Statements also contain an addition element 'context' which is
+intended to be used to track how/when/etc. statements were added
+to models, including transactions and provenance.
+</para>
+<sect1>
+<title>RDF Statement Class</title>
+@INCLUDE statement.sgml
+</sect1>
+</chapter>
+
+<chapter id="node">
+<title>RDF Resource / Predicate / Literal</title>
+<para>
+This module provides the elements of the RDF statement - resource (or subject o source), predicate (or property or arc) and object (or target): resource / literal.  These make up parts of the statement object.
+</para>
+
+<para>
+Nodes have two types - resource (used for subject, predicate and
+object) and literal (only used for object).  Resources have URIs,
+Literals have string content plus optional XML Language, XML space
+statement and a flag if the content is XML which is used for
+supporting RDF parseType="Literal".
+</para>
+
+<sect1>
+<title>RDF Node Class</title>
+@INCLUDE node.sgml
+</sect1>
+</chapter>
+
+<chapter id="parser">
+<title>RDF Parsers</title>
+<para>
+These modules parse RDF/XML syntax and construct models, maybe via
+streams of statements.  At present Redland does not have a built in
+RDF/XML parser and can be used without one.
+</para>
+<sect1>
+<title>RDF Parser Class</title>
+@INCLUDE parser.sgml
+</sect1>
+<sect1>
+<title>W3C LibWWW RDF Parser Implementation Class</title>
+@INCLUDE parser_libwww.sgml
+</sect1>
+<sect1>
+<title>SiRPAC RDF Parser Implementation Class</title>
+@INCLUDE parser_sirpac.sgml
+</sect1>
+</chapter>
 
 <chapter id="digest">
 <title>Content Digests</title>
@@ -86,7 +159,7 @@ for hashes and identifiers based on content.
 <chapter id="hash">
 <title>Hashes</title>
 <para>
-A hash in librdf is a bag of key/value pairs (with duplicates allowed)
+A hash in this library is a bag of key/value pairs (with duplicates allowed)
 indexed and manipulated by the key.  The hashes can be stored in
 memory or with persistant storage.
 </para>
@@ -129,78 +202,6 @@ This class is implemented as a stack, new items are added to the front
 of the list.
 </para>
 @INCLUDE list.sgml
-</sect1>
-</chapter>
-
-<chapter id="model">
-<title>RDF Model</title>
-<para>
-This module provides the RDF model support which is a bag of statements
-(duplicates are allowed).  Models can have statements added and removed,
-be queries and stored which is implemented by the storage classes.
-</para>
-<sect1>
-<title>RDF Model Class</title>
-@INCLUDE model.sgml
-</sect1>
-</chapter>
-
-<chapter id="node">
-<title>RDF Resource / Predicate / Literal</title>
-<para>
-This module provides the elements of the RDF statement - resource (or subject o source), predicate (or property or arc) and object (or target): resource / literal.  These make up parts of the statement object.
-</para>
-
-<para>
-Nodes have two types - resource (used for subject, predicate and
-object) and literal (only used for object).  Resources have URIs,
-Literals have string content plus optional XML Language, XML space
-statement and a flag if the content is XML which is used for
-supporting RDF parseType="Literal".
-</para>
-
-<sect1>
-<title>RDF Node Class</title>
-@INCLUDE node.sgml
-</sect1>
-</chapter>
-
-<chapter id="parser">
-<title>RDF Parsers</title>
-<para>
-These modules parse RDF/XML syntax and construct models, maybe via
-streams of statements.
-</para>
-<sect1>
-<title>RDF Parser Class</title>
-@INCLUDE parser.sgml
-</sect1>
-<sect1>
-<title>W3C LibWWW RDF Parser Implementation Class</title>
-@INCLUDE parser_libwww.sgml
-</sect1>
-<sect1>
-<title>SiRPAC RDF Parser Implementation Class</title>
-@INCLUDE parser_sirpac.sgml
-</sect1>
-</chapter>
-
-<chapter id="statement">
-<title>RDF Statement / Assertion / Triple</title>
-<para>
-This module provides the RDF statement functionality, and contains
-three main elements: resource, predicate and object which are all
-nodes provided by the librdf_node class.  Statements can be added /
-removed from models.
-</para>
-<para>
-Statements also contain an addition element 'context' which is
-intended to be used to track how/when/etc. statements were added
-to models, including transactions and provenance.
-</para>
-<sect1>
-<title>RDF Statement Class</title>
-@INCLUDE statement.sgml
 </sect1>
 </chapter>
 
