@@ -33,11 +33,18 @@
 
 typedef struct {
   librdf_serializer *serializer;
+
+  int depth;
+  raptor_namespace_stack *nstack;
 } librdf_serializer_rdfxml_context;
 
 
+/* local prototypes */
+static void librdf_serializer_rdfxml_raptor_error_handler(void *data, const char *message, ...);
+
+
 /**
- * librdf_serializer_rdfxml_init - Initialise the N-Triples RDF serializer
+ * librdf_serializer_rdfxml_init - Initialise the RDF/XML serializer
  * @serializer: the serializer
  * @context: context
  * 
@@ -46,11 +53,37 @@ typedef struct {
 static int
 librdf_serializer_rdfxml_init(librdf_serializer *serializer, void *context) 
 {
+  librdf_world *world=serializer->world;
   librdf_serializer_rdfxml_context* pcontext=(librdf_serializer_rdfxml_context*)context;
-
+  raptor_uri_handler *uri_handler;
+  void *uri_context;
+  
   pcontext->serializer = serializer;
 
+  raptor_uri_get_handler(&uri_handler, &uri_context);
+  pcontext->nstack=raptor_namespaces_new(uri_handler, uri_context,
+                                         librdf_serializer_rdfxml_raptor_error_handler, world,
+                                         1);
+
+  pcontext->depth=0;
+  
   return 0;
+}
+
+
+/**
+ * librdf_serializer_rdfxml_terminate - Terminate the RDF/XML serializer
+ * @serializer: the serializer
+ * @context: context
+ * 
+ * Return value: non 0 on failure
+ **/
+static void
+librdf_serializer_rdfxml_terminate(void *context) 
+{
+  librdf_serializer_rdfxml_context* pcontext=(librdf_serializer_rdfxml_context*)context;
+
+  raptor_namespaces_free(pcontext->nstack);
 }
 
 
@@ -93,37 +126,6 @@ rdf_serializer_rdfxml_print_as_xml_content(char *p, FILE *handle)
       fputs("&lt;", handle);
     else if (*p == '>')
       fputs("&gt;", handle);
-    else if (*p > 0x7e)
-      fprintf(handle, "&#%d;", *p);
-    else
-      fputc(*p, handle);
-    p++;
-  }
-}
-
-
-/**
- * rdf_serializer_rdfxml_print_as_xml_attribute - Print the given string XML-escaped for attribute content
- * @p: Content string
- * @quote: Quote character - " or '
- * @handle: FILE* to print to
- * 
- **/
-static void
-rdf_serializer_rdfxml_print_as_xml_attribute(char *p, char quote, 
-                                             FILE *handle) 
-{
-  while(*p) {
-    if(*p == '&')
-      fputs("&amp;", handle);
-    else if (*p == '<')
-      fputs("&lt;", handle);
-    else if (*p == '>')
-      fputs("&gt;", handle);
-    else if (*p == '"' && *p == quote)
-      fputs("&quot;", handle);
-    else if (*p == '\'' && *p == quote)
-      fputs("&apos;", handle);
     else if (*p > 0x7e)
       fprintf(handle, "&#%d;", *p);
     else
@@ -255,6 +257,9 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
         while(p >= uris[i]) {
           if(rdf_serializer_rdfxml_ok_xml_name(p))
             name=p;
+          else if(name)
+            /* this char isn't in name, but got name earlier, so stop */
+            break;
           p--;
         }
 
@@ -277,7 +282,8 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
                                               librdf_node_get_blank_identifier(nodes[0]),
                                               handle);
   else
-    rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:about", uris[0], handle);
+    rdf_serializer_rdfxml_print_xml_attribute(world, "rdf:about", 
+                                              uris[0], handle);
 
   fputs(">\n", handle);
 
@@ -287,14 +293,34 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   fputs(name, handle);
 
   if(!name_is_rdf_ns) {
-    char c=*name;
+    size_t len=name-uris[1];
+    size_t escaped_len;
+    unsigned char *buffer;
+    unsigned char *p;
+
     fputs(" xmlns:", handle);
     fputs(nsprefix, handle);
-    fputs("=\"", handle);
-    *name='\0';
-    rdf_serializer_rdfxml_print_as_xml_attribute(uris[1], '"', handle);
-    *name=c;
-    fputc('"', handle);
+    fputc('=', handle);
+
+    escaped_len=raptor_xml_escape_string(uris[1], len,
+                                         NULL, 0, '"', 
+                                         librdf_serializer_rdfxml_raptor_error_handler, world);
+    /* " + string + " + \0 */
+    buffer=(char*)LIBRDF_MALLOC(cstring, 1 + escaped_len + 1 + 1);
+    if(!buffer)
+      return;
+
+    p=buffer;
+    *p++='"';
+    raptor_xml_escape_string(uris[1], len, 
+                             p, escaped_len, '"', 
+                             librdf_serializer_rdfxml_raptor_error_handler, world);
+    p+= escaped_len;
+    *p++='"';
+    *p='\0';
+
+    fputs(buffer, handle);
+    LIBRDF_FREE(cstring, buffer);
   }
 
   switch(librdf_node_get_type(nodes[2])) {
@@ -371,21 +397,43 @@ librdf_serializer_rdfxml_serialize_model(void *context,
                                          FILE *handle, librdf_uri* base_uri,
                                          librdf_model *model) 
 {
-  librdf_serializer_rdfxml_context* scontext=(librdf_serializer_rdfxml_context*)context;
-
+  librdf_serializer_rdfxml_context* pcontext=(librdf_serializer_rdfxml_context*)context;
+  raptor_namespace *ns;
+  unsigned char *buffer;
   librdf_stream *stream=librdf_model_as_stream(model);
+
   if(!stream)
     return 1;
+
   fputs("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n", handle);
-  fputs("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n", handle);
+
+  pcontext->depth++;
+  ns=raptor_namespace_new(pcontext->nstack,
+                          "rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                          pcontext->depth);
+
+  raptor_namespaces_start_namespace(pcontext->nstack, ns);
+
+  buffer=raptor_namespaces_format(ns, NULL);
+
+  fputs("<rdf:RDF ", handle);
+  fputs(buffer, handle);
+  SYSTEM_FREE(buffer);
+  fputs(">\n", handle);
+
   while(!librdf_stream_end(stream)) {
     librdf_statement *statement=librdf_stream_get_object(stream);
-    librdf_serializer_print_statement_as_rdfxml(scontext, statement, handle);
+    librdf_serializer_print_statement_as_rdfxml(pcontext, statement, handle);
     fputc('\n', handle);
     librdf_stream_next(stream);
   }
   librdf_free_stream(stream);
+
   fputs("</rdf:RDF>\n", handle);
+
+  raptor_namespaces_end_for_depth(pcontext->nstack, pcontext->depth);
+  pcontext->depth--;
+
   return 0;
 }
 
@@ -402,6 +450,7 @@ librdf_serializer_rdfxml_register_factory(librdf_serializer_factory *factory)
   factory->context_length = sizeof(librdf_serializer_rdfxml_context);
   
   factory->init  = librdf_serializer_rdfxml_init;
+  factory->terminate  = librdf_serializer_rdfxml_terminate;
   factory->serialize_model = librdf_serializer_rdfxml_serialize_model;
 }
 
