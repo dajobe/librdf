@@ -735,6 +735,6 @@ librdf_parser_repat_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_repat_constructor(librdf_world *world)
 {
-  librdf_parser_register_factory(world, "repat", NULL, NULL,
+  librdf_parser_register_factory(world, "repat", "application/rdf+xml", NULL,
                                  &librdf_parser_repat_register_factory);
 }

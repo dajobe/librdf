@@ -606,12 +606,14 @@ void
 librdf_parser_sirpac_constructor(librdf_world *world)
 {
 #ifdef JAVA_SIRPACSTANFORD_JAR
-  librdf_parser_register_factory(world, "sirpac-stanford", NULL, NULL,
+  librdf_parser_register_factory(world, "sirpac-stanford", 
+                                 "application/rdf+xml", NULL,
                                  &librdf_parser_sirpac_stanford_register_factory);
 #endif
 
 #ifdef JAVA_SIRPACW3C_JAR
-  librdf_parser_register_factory(world, "sirpac-w3c", NULL, NULL,
+  librdf_parser_register_factory(world, "sirpac-w3c", 
+                                 "application/rdf+xml", NULL,
                                  &librdf_parser_sirpac_w3c_register_factory);
 #endif
 }

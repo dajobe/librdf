@@ -491,7 +491,7 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_raptor_constructor(librdf_world *world)
 {
-  librdf_parser_register_factory(world, "raptor", NULL, NULL,
+  librdf_parser_register_factory(world, "raptor", "application/rdf+xml", NULL,
                                  &librdf_parser_raptor_register_factory);
   librdf_parser_register_factory(world, "ntriples", "text/plain",
                                  "http://www.w3.org/TR/rdf-testcases/#ntriples",
