@@ -147,6 +147,9 @@ librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world, con
 /* Create a new Node from literal string / language. */
 librdf_node* librdf_new_node_from_literal(librdf_world* world, const char *string, const char *xml_language, int xml_space, int is_wf_xml);
 
+/* Create a new Node from blank node identifier. */
+librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world, const char *identifier);
+
 /* Create a new Node from an existing Node - CLONE */
 librdf_node* librdf_new_node_from_node(librdf_node *node);
 
@@ -181,7 +184,7 @@ int librdf_node_get_li_ordinal(librdf_node* node);
 void librdf_node_set_li_ordinal(librdf_node* node, int ordinal);
 
 char *librdf_node_get_blank_identifier(librdf_node* node);
-int librdf_node_set_blank_identifier(librdf_node* node, char *identifier);
+int librdf_node_set_blank_identifier(librdf_node* node, const char *identifier);
 
 librdf_digest* librdf_node_get_digest(librdf_node* node);
 
