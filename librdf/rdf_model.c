@@ -480,11 +480,8 @@ librdf_model_get_source(librdf_model *model,
                         librdf_node *arc, librdf_node *target) 
 {
   librdf_iterator *iterator=librdf_storage_get_sources(model->storage, 
-                                                      arc, target);
+                                                       arc, target);
   librdf_node *node=(librdf_node*)librdf_iterator_get_next(iterator);
-  if(node)
-    node=librdf_new_node_from_node(node);
-
   librdf_free_iterator(iterator);
   return node;
 }
@@ -506,11 +503,8 @@ librdf_model_get_arc(librdf_model *model,
                      librdf_node *source, librdf_node *target) 
 {
   librdf_iterator *iterator=librdf_storage_get_arcs(model->storage, 
-                                                   source, target);
+                                                    source, target);
   librdf_node *node=(librdf_node*)librdf_iterator_get_next(iterator);
-  if(node)
-    node=librdf_new_node_from_node(node);
-
   librdf_free_iterator(iterator);
   return node;
 }
@@ -532,11 +526,8 @@ librdf_model_get_target(librdf_model *model,
                         librdf_node *source, librdf_node *arc) 
 {
   librdf_iterator *iterator=librdf_storage_get_targets(model->storage, 
-                                                      source, arc);
+                                                       source, arc);
   librdf_node *node=(librdf_node*)librdf_iterator_get_next(iterator);
-  if(node)
-    node=librdf_new_node_from_node(node);
-  
   librdf_free_iterator(iterator);
   return node;
 }
@@ -661,12 +652,13 @@ main(int argc, char *argv[])
   model=librdf_new_model(storage, NULL);
 
   statement=librdf_new_statement();
+  /* after this, nodes become owned by model */
   librdf_statement_set_subject(statement, librdf_new_node_from_uri_string("http://www.ilrt.bris.ac.uk/people/cmdjb/"));
   librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/#Creator"));
   librdf_statement_set_object(statement, librdf_new_node_from_literal("Dave Beckett", NULL, 0, 0));
 
-  /* after this, statement becomes owned by model */
   librdf_model_add_statement(model, statement);
+  librdf_free_statement(statement);
 
   fprintf(stderr, "%s: Printing model\n", program);
   librdf_model_print(model, stderr);
