@@ -831,10 +831,11 @@ main(int argc, char *argv[])
       return(1);
   }
 
-
   if(query)
     librdf_free_query(query);
   
+  librdf_free_hash(options);
+
   librdf_free_model(model);
   librdf_free_storage(storage);
 
