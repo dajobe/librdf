@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -1180,13 +1180,13 @@ librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
       language_length=buffer[5];
 
       total_length= 6 + string_length + 1; /* +1 for \0 at end */
-      if(language_length) {
-        language = buffer + total_length;
-        total_length += language_length+1;
-      }
       if(datatype_uri_length) {
         datatype_uri_string = buffer + total_length;
         total_length += datatype_uri_length+1;
+      }
+      if(language_length) {
+        language = buffer + total_length;
+        total_length += language_length+1;
       }
 
       if(datatype_uri_string)
@@ -1345,7 +1345,7 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_node *node, *node2, *node3, *node4, *node5, *node6;
+  librdf_node *node, *node2, *node3, *node4, *node5, *node6, *node7;
   char *hp_string1="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
   char *hp_string2="http://purl.org/net/dajobe/";
   char *lit_string="Dave Beckett";
@@ -1471,12 +1471,41 @@ main(int argc, char *argv[])
   fprintf(stdout, "%s: Copied node identifier is: '%s'\n", program, buffer);
 
 
-  uri3=librdf_new_uri(world, "http://example.org/subj");
+  uri3=librdf_new_uri(world, "http://example.org/datatypeURI");
   node6=librdf_new_node_from_typed_literal(world, "Datatyped literal value",
                                            "en-GB", uri3);
   librdf_free_uri(uri3);
 
+  size=librdf_node_encode(node6, NULL, 0);
+  fprintf(stdout, "%s: Encoding typed node requires %d bytes\n", program, size);
+  buffer=(char*)LIBRDF_MALLOC(cstring, size);
+
+  fprintf(stdout, "%s: Encoding typed node in buffer\n", program);
+  size2=librdf_node_encode(node6, (unsigned char*)buffer, size);
+  if(size2 != size) {
+    fprintf(stderr, "%s: Encoding typed node used %d bytes, expected it to use %d\n", program, size2, size);
+    return(1);
+  }
+  
+  fprintf(stdout, "%s: Creating new node\n", program);
+  node7=librdf_new_node(world);
+  if(!node2) {
+    fprintf(stderr, "%s: librdf_new_node failed\n", program);
+    return(1);
+  }
+
+  fprintf(stdout, "%s: Decoding typed node from buffer\n", program);
+  if(!librdf_node_decode(node7, (unsigned char*)buffer, size)) {
+    fprintf(stderr, "%s: Decoding typed node failed\n", program);
+    return(1);
+  }
+  LIBRDF_FREE(cstring, buffer);
+   
+    
+
+
   fprintf(stdout, "%s: Freeing nodes\n", program);
+  librdf_free_node(node7);
   librdf_free_node(node6);
   librdf_free_node(node5);
   librdf_free_node(node4);
