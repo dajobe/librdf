@@ -163,6 +163,11 @@ librdf_new_statement_from_nodes(librdf_world *world,
  * @world: redland world object
  * @statement: &librdf_statement object
  * 
+ * This MUST be called on a statically declared librdf_statement
+ * to initialise it properly.  It is the responsibility of the
+ * user of the statically allocated librdf_statement to deal
+ * with deallocation of any statement parts (subject, predicate, object).
+ *
  * Return value: a new &librdf_statement or NULL on failure
  **/
 void
