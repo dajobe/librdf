@@ -29,12 +29,16 @@
 extern "C" {
 #endif
 
+typedef void* (*librdf_iterator_map_handler)(librdf_iterator *iterator, void *map_context, void *item);
+typedef void (*librdf_iterator_map_free_context_handler)(void *map_context);
+
 #ifdef LIBRDF_INTERNAL
 
 /* used in map_list below */
 typedef struct {
   void *context; /* context to pass on to map */
-  void* (*fn)(void *context, void *element);
+  librdf_iterator_map_handler fn;
+  librdf_iterator_map_free_context_handler free_context;
 } librdf_iterator_map;
 
 struct librdf_iterator_s {
@@ -76,7 +80,7 @@ REDLAND_API void* librdf_iterator_get_context(librdf_iterator* iterator);
 REDLAND_API void* librdf_iterator_get_key(librdf_iterator* iterator);
 REDLAND_API void* librdf_iterator_get_value(librdf_iterator* iterator);
 
-REDLAND_API int librdf_iterator_add_map(librdf_iterator* iterator, void* (*fn)(void *context, void *item), void *context);
+REDLAND_API int librdf_iterator_add_map(librdf_iterator* iterator, librdf_iterator_map_handler map_function, librdf_iterator_map_free_context_handler free_context, void *map_context);
 
 #ifdef __cplusplus
 }
