@@ -683,7 +683,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
     if(dt)
       datatype=librdf_uri_as_counted_string(dt,&datatypelen);
     if(datatype)
-      datatypelen=strlen(datatype);
+      datatypelen=strlen((const char*)datatype);
 
     /* Create composite node string for hash generation */
     if(!(nodestring=(char*)LIBRDF_MALLOC(cstring, valuelen+langlen+datatypelen+3)))
