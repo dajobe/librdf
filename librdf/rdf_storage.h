@@ -36,6 +36,7 @@ struct librdf_storage_s
   librdf_world *world;
   librdf_model *model;
   void *context;
+  int index_contexts;
   struct librdf_storage_factory_s* factory;
 };
 
