@@ -366,70 +366,19 @@ librdf_finish_serializer(librdf_world *world)
 }
 
 
-/*
- * librdf_serializer_error - Error from a serializer - Internal
- **/
-void
-librdf_serializer_error(librdf_serializer* serializer, const char *message, ...)
-{
-  va_list arguments;
-
-  if(serializer->error_fn) {
-    serializer->error_fn(serializer->error_user_data, message);
-    return;
-  }
-  
-  va_start(arguments, message);
-
-  fprintf(stderr, "%s serializer error - ", serializer->factory->name);
-  vfprintf(stderr, message, arguments);
-  fputc('\n', stderr);
-
-  va_end(arguments);
-}
-
-
-/*
- * librdf_serializer_warning - Warning from a serializer - Internal
- **/
-void
-librdf_serializer_warning(librdf_serializer* serializer, const char *message, ...)
-{
-  va_list arguments;
-
-  if(serializer->warning_fn) {
-    serializer->warning_fn(serializer->warning_user_data, message);
-    return;
-  }
-  
-  va_start(arguments, message);
-
-  fprintf(stderr, "%s serializer warning - ", serializer->factory->name);
-  vfprintf(stderr, message, arguments);
-  fputc('\n', stderr);
-
-  va_end(arguments);
-}
-
-
 /**
  * librdf_serializer_set_error - Set the serializer error handling function
  * @serializer: the serializer
  * @user_data: user data to pass to function
  * @error_fn: pointer to the function
  * 
- * The function will receive callbacks when the serializer fails.
+ * DEPRECATED: Does nothing
  * 
  **/
 void
 librdf_serializer_set_error(librdf_serializer* serializer, void *user_data,
                             void (*error_fn)(void *user_data, const char *msg, ...))
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(serializer, librdf_serializer);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(error_fn, error handler);
-
-  serializer->error_user_data=user_data;
-  serializer->error_fn=error_fn;
 }
 
 
@@ -439,18 +388,13 @@ librdf_serializer_set_error(librdf_serializer* serializer, void *user_data,
  * @user_data: user data to pass to function
  * @warning_fn: pointer to the function
  * 
- * The function will receive callbacks when the serializer gives a warning.
+ * DEPRECATED: Does nothing
  * 
  **/
 void
 librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data,
                               void (*warning_fn)(void *user_data, const char *msg, ...))
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(serializer, librdf_serializer);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(warning_fn, warning handler);
-
-  serializer->warning_user_data=user_data;
-  serializer->warning_fn=warning_fn;
 }
 
 
