@@ -1052,7 +1052,11 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
   }
   strcpy(query,"SELECT HIGH_PRIORITY");
   sprintf(where," WHERE Model=%llu", context->model);
-  strcpy(joins," FROM Statements AS S");
+  if(sos->is_literal_match)
+    strcpy(joins," FROM Literals AS L LEFT JOIN Statements as S ON L.ID=S.Object");
+  else
+    strcpy(joins," FROM Statements AS S");
+
 
   if(statement) {
     subject=librdf_statement_get_subject(statement);
@@ -1107,15 +1111,22 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
           return NULL;
         }
       }
-      if(librdf_storage_mysql_find_statements_in_context_augment_query(&query, " ObjectL.Value AS ObV, ObjectL.Language AS ObL, ObjectL.Datatype AS ObD")) {
+      if(librdf_storage_mysql_find_statements_in_context_augment_query(&query, " ObjectR.URI AS ObR, ObjectB.Name AS ObB, ObjectL.Value AS ObV, ObjectL.Language AS ObL, ObjectL.Datatype AS ObD")) {
         librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
         return NULL;
       }
       strcat(joins," LEFT JOIN Resources AS ObjectR ON S.Object=ObjectR.ID");
       strcat(joins," LEFT JOIN Bnodes AS ObjectB ON S.Object=ObjectB.ID");
       strcat(joins," LEFT JOIN Literals AS ObjectL ON S.Object=ObjectL.ID");
-      sprintf(tmp, " AND ObjectL.Value LIKE '%%%s%%'", 
+
+      sprintf(tmp, " AND MATCH(L.Value) AGAINST ('%s')", 
               librdf_node_get_literal_value(object));
+
+      /* NOTE:  This is NOT USED but could be if FULLTEXT wasn't enabled */
+      /*
+        sprintf(tmp, " AND L.Value LIKE '%%%s%%'", 
+                librdf_node_get_literal_value(object));
+       */
       strcat(where,tmp);
     }
   } else {
@@ -1249,7 +1260,10 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
     if(sos->query_statement) {
       subject=librdf_statement_get_subject(sos->query_statement);
       predicate=librdf_statement_get_predicate(sos->query_statement);
-      object=librdf_statement_get_object(sos->query_statement);
+      if(sos->is_literal_match)
+        object=NULL;
+      else
+        object=librdf_statement_get_object(sos->query_statement);
     }
     /* Query without variables? */
     if(sos->query_statement && subject && predicate && object && sos->query_context) {
