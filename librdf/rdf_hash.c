@@ -586,7 +586,7 @@ typedef struct {
  * The iterator returns &librdf_hash_datum objects containing the values.
  * These are newly allocated memory which the caller must free.
  * 
- * Return value: non 0 on failure
+ * Return value: a &librdf_iterator serialization of all values or NULL on failure
  **/
 librdf_iterator*
 librdf_hash_get_all(librdf_hash* hash, 
