@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -24,6 +24,9 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
+#ifdef WITH_THREADS
+#include <pthread.h>
+#endif
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
@@ -79,7 +82,30 @@ librdf_free_world(librdf_world *world)
 
   librdf_finish_digest(world);
 
+#ifdef WITH_THREADS
+   if (world->mutex)
+   {
+     pthread_mutex_destroy(world->mutex);
+     free(world->mutex);
+     world->mutex = NULL;
+   }
+#endif
+
   LIBRDF_FREE(librdf_world, world);
+}
+
+
+/**
+ * Internal
+ */
+void
+librdf_world_init_mutex(librdf_world* world)
+{
+#ifdef WITH_THREADS
+  world->mutex = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+  pthread_mutex_init(world->mutex, NULL);
+#else
+#endif
 }
 
 
@@ -91,6 +117,8 @@ librdf_free_world(librdf_world *world)
 void
 librdf_world_open(librdf_world *world)
 {
+  librdf_world_init_mutex(world);
+  
   /* Digests first, lots of things use these */
   librdf_init_digest(world);
 
