@@ -725,6 +725,10 @@ main(int argc, char *argv[])
     case CMD_QUERY:
       /* args are name, uri (may be NULL), query_string/mime_type */
 
+      name=argv[0];
+      if(!strcmp(name, "-"))
+        name=NULL;
+      
       if(!strcmp(argv[1], "-"))
         uri=NULL;
       else {
@@ -735,7 +739,7 @@ main(int argc, char *argv[])
         }
       }
 
-      query=librdf_new_query(world, argv[0], uri, (const unsigned char *)argv[2]);
+      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2]);
       goto printmatching;
       break;
 
@@ -757,8 +761,7 @@ main(int argc, char *argv[])
         }
       }
 
-      query=librdf_new_query(world, argv[0], uri,
-                             (const unsigned char *)argv[2]);
+      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2]);
       if(!query) {
         fprintf(stderr, "%s: Failed to create new query %s\n", program, argv[2]);
         if(uri)
