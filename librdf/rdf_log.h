@@ -83,10 +83,8 @@ typedef struct
   librdf_log_level level;
   librdf_log_facility facility;
   const char *message;
-  /* a raptor_locator* valid for certain facilities
-   * such as LIBRDF_FROM_PARSER 
-   */
-  void *locator;
+  /* valid for certain facilities such as LIBRDF_FROM_PARSER */
+  raptor_locator *locator;
 } librdf_log_message;
 
 
@@ -108,10 +106,6 @@ typedef int (*librdf_log_level_func)(void *user_data, const char *message, va_li
  * Return value: non-zero to indicate log message has been handled 
  */
 typedef int (*librdf_log_func)(void *user_data, librdf_log_message *message);
-  
-void librdf_log_set_level(librdf_world* world, librdf_log_level level);
-void librdf_log_set_handler(librdf_world* world, void *user_data, librdf_log_func handler);
-
 
 #ifdef LIBRDF_INTERNAL
 void librdf_log_simple(librdf_world* world, int code, librdf_log_level level, librdf_log_facility facility, void *locator, const char *message);
@@ -123,6 +117,14 @@ void librdf_test_error(librdf_world* world, const char *message);
 void librdf_test_warning(librdf_world* world, const char *message);
 
 #endif
+
+/* log message accessors */
+REDLAND_API int librdf_log_message_code(librdf_log_message *message);
+REDLAND_API librdf_log_level librdf_log_message_level(librdf_log_message *message);
+REDLAND_API librdf_log_facility librdf_log_message_facility(librdf_log_message *message);
+REDLAND_API const char * librdf_log_message_message(librdf_log_message *message);
+REDLAND_API raptor_locator* librdf_log_message_locator(librdf_log_message *message);
+
 
 #ifdef __cplusplus
 }
