@@ -21,7 +21,7 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
-<!--<h2 id="rel0_9_13"><a name="rel0_9_13">Redland 0.9.13 Changes</a></h2>
+<h2 id="rel0_9_13"><a name="rel0_9_13">Redland 0.9.13 Changes</a></h2>
 
 <p>This version of Redland is a major update to 0.9.12 changing the
 node class.  librdf_node objects are now immutable once created,
@@ -117,6 +117,102 @@ slightly internal to Redland, you should not be calling this
 directly)</p>
 
 
+<h3>Perl Interface Changes</h3>
+
+<p>Updated to make the object constructors less verbose and to allow
+Redland URI objects and native perl URIs to be used in place of
+Redland Nodes where convienent (such as in making Statements).  All
+existing code should work but can be shortened.
+</p>
+
+
+<h3>Python API changes</h3>
+
+<p>A major update to use Python 2.2+ idioms and features by Edd
+Dumbill.  Edd wrote the following change log.</p>
+
+<p>General changes</p>
+<ul>
+  <li>Removed string exceptions and replaced with RedlandError ones</li>
+  <li>Where underlying Redland C objects were unexpectedly null, raise
+    exceptions rather than returning None, "" or [] as appropriate.</li>
+  <li>Raise exceptions if Redland C constructors fail in Python
+    constructors.</li>
+  <li>Did quite a lot of documentation updating, where possible
+    demonstrating preferred Pythonic usages.</li>
+  <li>Added more unit tests to test changed functionality.</li>
+</ul>
+
+<h4>RDF.Node class</h4>
+<ul>
+  <li>Constructor now accepts Uri to make a resource/property node, or
+    a string to make a string literal</li>
+  <li>Removed usage of node_type() in favour of is_resource(), is_blank()
+    etc methods.</li>
+  <li><strong>DEPRECATED</strong> get_blank_identifier() etc. methods in favour of
+    node.blank_identifier etc properties.  Raise exception if properties
+    inconsistent with the node type are requested.</li>
+</ul>
+
+<h4>RDF.Statement class</h4>
+<ul>
+  <li>No need to name subject, predicate, object in constructor any more.
+    Uris or string literals accepted in place of nodes in constructor
+    argument.</li>
+  <li>__getattr__ method deleted, using new-style property() for
+    subject, predicate, object</li>
+</ul>
+
+<h4>RDF.Model class</h4>
+
+<ul>
+  <li>Deleted get_*_iterator methods</li>
+  <li>Renamed sources() to get_sources(), targets() to get_targets(),
+    arcs() to get_predicates().  Retained old method names as aliases.</li>
+  <li>Added get_sources_context(), get_targets_context(),
+    get_predicates_context() which return (node, context) tuples.</li>
+  <li>Amended get_source(), get_sources() etc methods so that Uri and
+    string literals were acceptable as shortcut types for nodes.</li>
+  <li>Added find_statements_context() which returns (statement, context)
+    tuples.</li>
+  <li>Renamed context_remove_statements() to
+    remove_statements_with_context(). Retained old method name as an
+    alias.</li>
+  <li>Added __delitem__ method so del[statement] and del[statement,
+    context] work.</li>
+  <li>Added append() method so append(statement) and append(statement,
+    context) work.  Suggest that append() is used in preference to
+    add_statement() for Python idiomatic usage.</li>
+  <li><strong>DEPRECATED</strong> serialise() in favour of as_stream().</li>
+  <li>Added as_stream_context() to serialise (statement, context) tuples.</li>
+  <li>Exception raised if len() is attempted on model with a non-countable
+    storage.</li>
+  <li><strong>DEPRECATED</strong> Model.add(), Model.add_typed_literal_statement() usages:
+    now that constructing Statements is easier, it's incongruous to have
+    these in the model.  Additionally it saves reproducing various bits
+    of error checking that properly belong in the Node() constructor.</li>
+  <li>Implemented __contains__() so "if statement in model" and
+    "if (statement, context) in model" work as expected using the more
+    efficient Redland C methods where possible.</li>
+</ul>
+
+<h4>RDF.Stream class</h4>
+
+<ul>
+  <li><strong>DEPRECATED</strong> Stream.context_iter().  Use in preference the _context
+    variants of the appropriate Model methods.  This leads to fewer
+    lines of code.</li>
+</ul>
+
+<h4>RDF.Uri class</h4>
+
+<ul>
+  <li>Amended constructor so strings or Uri instances can be passed as
+    the first argument, without named parameters being required, and
+    the right thing still happen.</li>
+</ul>
+
+
 <h3>Internal changes</h3>
 
 <p>Added Sleepycat/BDB 4.0 and 4.1 support - the open API changed again</p>
@@ -134,7 +230,6 @@ much newer or expat or libxml2 are very widespread.</p>
 allow separate threads to work in the same memory space. The
 current locked classes are URI and World.
 </p>
--->
 
 
 
