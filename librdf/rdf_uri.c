@@ -281,7 +281,12 @@ librdf_uri_print (librdf_uri* uri, FILE *fh)
 char*
 librdf_uri_to_string (librdf_uri* uri)
 {
-  char *s=(char*)LIBRDF_MALLOC(cstring, uri->string_length+1);
+  char *s;
+
+  if(!uri)
+    return NULL;
+  
+  s=(char*)LIBRDF_MALLOC(cstring, uri->string_length+1);
   if(!s)
     return NULL;
 
