@@ -1154,7 +1154,7 @@ main(int argc, char *argv[])
  
   
   fprintf(stdout, "%s: Creating new literal string node\n", program);
-  node3=librdf_new_node_from_literal(world, lit_string, NULL, 0, 0);
+  node3=librdf_new_node_from_literal(world, lit_string, NULL, 0);
   if(!node3) {
     fprintf(stderr, "%s: librdf_new_node_from_literal failed\n", program);
     return(1);

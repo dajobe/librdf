@@ -796,7 +796,7 @@ main(int argc, char *argv[])
   /* after this, nodes become owned by model */
   librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, "http://www.ilrt.bris.ac.uk/people/cmdjb/"));
   librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/#Creator"));
-  librdf_statement_set_object(statement, librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0, 0));
+  librdf_statement_set_object(statement, librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0));
 
   librdf_model_add_statement(model, statement);
   librdf_free_statement(statement);
