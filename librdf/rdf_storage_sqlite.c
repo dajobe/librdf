@@ -355,18 +355,28 @@ static int
 librdf_storage_sqlite_get_helper(librdf_storage *storage,
                                  int table, const char *expression) 
 {
-  char request[1024];
   int id= -1;
-  
-  sprintf(request, "SELECT id FROM %s WHERE %s;",
-          sqlite_tables[table].name,
-          expression);
+  int rc;
+  raptor_stringbuffer *sb;
+  char *request;
 
-  if(librdf_storage_sqlite_exec(storage,
+  sb=raptor_new_stringbuffer();
+  raptor_stringbuffer_append_string(sb, "SELECT id FROM ", 1);
+  raptor_stringbuffer_append_string(sb, sqlite_tables[table].name, 1);
+  raptor_stringbuffer_append_counted_string(sb, " WHERE ", 7, 1);
+  raptor_stringbuffer_append_string(sb, expression, 1);
+  raptor_stringbuffer_append_counted_string(sb, ";", 1, 1);
+  request=raptor_stringbuffer_as_string(sb);
+
+  rc=librdf_storage_sqlite_exec(storage,
                                 request,
                                 librdf_storage_sqlite_get_1int_callback,
                                 &id,
-                                0))
+                                0);
+
+  raptor_free_stringbuffer(sb);
+
+  if(rc)
     return -1;
 
   return id;
@@ -733,13 +743,20 @@ static int
 librdf_storage_sqlite_add_statements(librdf_storage* storage,
                                      librdf_stream* statement_stream)
 {
-  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
+  /* librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context; */
   int status=0;
-  char *errmsg=NULL;
 
   for(; !librdf_stream_end(statement_stream);
       librdf_stream_next(statement_stream)) {
     librdf_statement* statement=librdf_stream_get_object(statement_stream);
+    librdf_node* context_node=librdf_stream_get_context(statement_stream);
+    triple_node_type node_types[4];
+    int node_ids[4];
+    const char* fields[4];
+    raptor_stringbuffer *sb;
+    int i;
+    unsigned char* request;
+    int rc;
 
     if(!statement) {
       status=1;
@@ -750,27 +767,44 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
     if(librdf_storage_sqlite_contains_statement(storage, statement))
       continue;
 
-    /* FIXME - add a statement */
-    char request[1024];
-    sprintf(request, "INSERT INTO triples (subjectUri, subjectBlank, predicateUri, objectUri, objectBlank, objectLiteral, contextUri) VALUES(%s, %s, %s, %s, %s, %s, %s);",
-            "1", "2",
-            "3",
-            "4", "5", "6", 
-            "7");
+    if(librdf_storage_sqlite_statement_helper(storage,
+                                              statement,
+                                              context_node,
+                                              node_types, node_ids, fields))
+      return -1;
     
-    status=sqlite_exec(context->db,
-                       request,
-                       NULL,
-                       NULL, &errmsg);
-    if(status != SQLITE_OK) {
-      librdf_log(storage->world,
-                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "SQLite database %s SQL exec failed - %s (%d)", 
-                 context->name, errmsg, status);
-      sqlite_freemem(errmsg);
-      return 0;
-  }
+    /* FIXME no context field used */
+    sb=raptor_new_stringbuffer();
+    raptor_stringbuffer_append_string(sb, "INSERT INTO ", 1);
+    raptor_stringbuffer_append_string(sb, sqlite_tables[TABLE_TRIPLES].name, 1);
+    raptor_stringbuffer_append_counted_string(sb, " ( ", 3, 1);
+    for(i=0; i<3; i++) {
+      raptor_stringbuffer_append_string(sb, fields[i], 1);
+      if(i < 2)
+        raptor_stringbuffer_append_counted_string(sb, ", ", 2, 1);
+    }
     
+    raptor_stringbuffer_append_counted_string(sb, ") VALUES(", 9, 1);
+    for(i=0; i<3; i++) {
+      raptor_stringbuffer_append_decimal(sb, node_ids[i]);
+      if(i < 2)
+        raptor_stringbuffer_append_counted_string(sb, ", ", 2, 1);
+    }
+    raptor_stringbuffer_append_counted_string(sb, ");", 2, 1);
+    
+    request=raptor_stringbuffer_as_string(sb);
+
+    rc=librdf_storage_sqlite_exec(storage,
+                                  request,
+                                  NULL, /* no callback */
+                                  NULL, /* arg */
+                                  0);
+
+    raptor_free_stringbuffer(sb);
+
+    if(rc)
+      return 1;
+
   }
   
   return status;
@@ -1133,7 +1167,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
   librdf_storage_sqlite_find_statements_stream_context* scontext;
   librdf_stream* stream;
-  char* request;
+  unsigned char* request;
   int status;
   triple_node_type node_types[4];
   int node_ids[4];
@@ -1340,8 +1374,11 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   triple_node_type node_types[4];
   int node_ids[4];
   const char* fields[4];
-  char request[1024];
-
+  raptor_stringbuffer *sb;
+  unsigned char* request;
+  int i;
+  int rc;
+  
   if(context_node && !context->index_contexts) {
     librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
                "Storage was created without context support");
@@ -1357,17 +1394,35 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
     return -1;
 
   /* FIXME no context field used */
-  sprintf(request,
-          "INSERT INTO %s (%s, %s, %s) VALUES(%d, %d, %d);",
-          sqlite_tables[TABLE_TRIPLES].name, 
-          fields[TRIPLE_SUBJECT],  fields[TRIPLE_PREDICATE],  fields[TRIPLE_OBJECT], 
-          node_ids[TRIPLE_SUBJECT], node_ids[TRIPLE_PREDICATE], node_ids[TRIPLE_OBJECT]);
+  sb=raptor_new_stringbuffer();
+  raptor_stringbuffer_append_string(sb, "INSERT INTO ", 1);
+  raptor_stringbuffer_append_string(sb, sqlite_tables[TABLE_TRIPLES].name, 1);
+  raptor_stringbuffer_append_counted_string(sb, " ( ", 3, 1);
+  for(i=0; i<3; i++) {
+    raptor_stringbuffer_append_string(sb, fields[i], 1);
+    if(i < 2)
+      raptor_stringbuffer_append_counted_string(sb, ", ", 2, 1);
+  }
   
-  if(librdf_storage_sqlite_exec(storage,
+  raptor_stringbuffer_append_counted_string(sb, ") VALUES(", 9, 1);
+  for(i=0; i<3; i++) {
+    raptor_stringbuffer_append_decimal(sb, node_ids[i]);
+    if(i < 2)
+      raptor_stringbuffer_append_counted_string(sb, ", ", 2, 1);
+  }
+  raptor_stringbuffer_append_counted_string(sb, ");", 2, 1);
+  
+  request=raptor_stringbuffer_as_string(sb);
+  
+  rc=librdf_storage_sqlite_exec(storage,
                                 request,
                                 NULL, /* no callback */
                                 NULL, /* arg */
-                                0))
+                                0);
+  
+  raptor_free_stringbuffer(sb);
+  
+  if(rc)
     return 1;
 
   return 0;
