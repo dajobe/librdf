@@ -35,7 +35,7 @@ extern "C" {
   #undef u64
   #if SIZEOF_UNSIGNED_INT == 8
     typedef unsigned int u64;
-o  #elif SIZEOF_UNSIGNED_LONG == 8
+  #elif SIZEOF_UNSIGNED_LONG == 8
     typedef unsigned long u64;
   #elif SIZEOF_UNSIGNED_LONG_LONG == 8
     typedef unsigned long long u64;
