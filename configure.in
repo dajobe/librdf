@@ -188,6 +188,10 @@ if test "$bdb_prefix" != no; then
 
 fi
 
+if test "$have_libdb" != yes; then
+  AC_MSG_WARN(No persistant storage configured)
+fi
+
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -274,6 +278,11 @@ fi
 
 AC_SUBST(PARSER_OBJS)
 AC_SUBST(PARSER_SRCS)
+
+if test "X$PARSER_OBJS" = X; then
+  AC_MSG_WARN(No RDF parser configured)
+fi
+
 
 
 
