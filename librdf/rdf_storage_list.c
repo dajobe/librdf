@@ -147,9 +147,10 @@ librdf_storage_list_close(librdf_storage* storage)
     status=(iterator != 0);
     if(iterator) {
       while(!librdf_iterator_end(iterator)) {
-        statement=(librdf_statement*)librdf_iterator_get_next(iterator);
+        statement=(librdf_statement*)librdf_iterator_get_object(iterator);
         if(statement)
           librdf_free_statement(statement);
+        librdf_iterator_next(iterator);
       }
       librdf_free_iterator(iterator);
     }
@@ -280,11 +281,16 @@ static librdf_statement*
 librdf_storage_list_serialise_next_statement(void* context)
 {
   librdf_iterator* iterator=(librdf_iterator*)context;
-  librdf_statement* statement=(librdf_statement*)librdf_iterator_get_next(iterator);
+  librdf_statement* statement=(librdf_statement*)librdf_iterator_get_object(iterator);
   if(!statement)
     return NULL;
+
+  /* copy before moving on to guarantee statement is ok */
+  statement=librdf_new_statement_from_statement(statement);
+
+  librdf_iterator_next(iterator);
   
-  return librdf_new_statement_from_statement(statement);
+  return statement;
 }
 
 
@@ -483,21 +489,22 @@ librdf_storage_list_group_serialise_next_statement(void* context)
 {
   librdf_storage_list_group_serialise_stream_context* scontext=(librdf_storage_list_group_serialise_stream_context*)context;
   librdf_statement* statement;
+  librdf_hash_datum* v;
   
+  if(!(v=librdf_iterator_get_object(scontext->iterator)))
+    return NULL;
+
   statement=librdf_new_statement(scontext->iterator->world);
   if(!statement)
     return NULL;
 
-  if(!librdf_iterator_get_next(scontext->iterator))
-    return NULL;
-
   /* decode value content */
-  if(!librdf_statement_decode(statement, 
-                              (unsigned char*)scontext->value->data,
-                              scontext->value->size)) {
+  if(!librdf_statement_decode(statement, (unsigned char*)v->data, v->size)) {
     librdf_free_statement(statement);
     return NULL;
   }
+
+  librdf_iterator_next(scontext->iterator);
 
   return statement;
 }
