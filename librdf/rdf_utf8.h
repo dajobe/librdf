@@ -83,6 +83,7 @@
 extern "C" {
 #endif
 
+#include <rdf_types.h>
 
 
 typedef u32 librdf_unichar;
