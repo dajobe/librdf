@@ -15,6 +15,9 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>RFE: model.parseString(format, "string"), model.parseURI(format, URI, baseURI=URI) creating and destroying temporary parser objects for <em>format</em>.
+Means need to care about parser class if you just want simple things.  Similarly
+for model.serialize() and Serializer class, however take care with serialise() method.</li>
 <li>Update the RDF/RDFS terms/labels for the latest RDF Schema revision</li>
 <li>RFE: alias methods *_serialize as *_to_stream in order to
 reduce confusion versus serializer class</li>
