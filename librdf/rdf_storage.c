@@ -812,7 +812,7 @@ librdf_storage_stream_to_node_iterator_finished(void* iterator)
  * librdf_storage_node_stream_to_node_create - Create a stream for get sources, targets or arcs methods using find_statements method
  * @storage: the storage object to use
  * @node1: the first node to encode in the key
- * @node2: the second node to encode in the key
+ * @node2: the second node to encode in the key (or NULL if not needed)
  * @want: the field required from the statement
  * 
  * Return value: a new &librdf_iterator or NULL on failure
@@ -830,7 +830,6 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node1, librdf_node, NULL);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node2, librdf_node, NULL);
 
   partial_statement=librdf_new_statement(storage->world);
   if(!partial_statement)
