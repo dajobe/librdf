@@ -26,6 +26,8 @@ my($file)=@ARGV;
 my($pod_rdf_rel)=($file =~ m%^pod/RDF/%) ? '../' : '';
 my($pod_rdf_redland_rel)=($file =~ m%^pod/RDF/Redland/%) ? '' : 'Redland/';
 
+my $skip_heading=0;
+
 open(OUT, ">$file") or die "$progname: Cannot create $file - $!\n";
 print OUT qq{<?xml version="1.0" encoding="iso-8859-1"?>\n};
 open(IN, "-");
@@ -40,6 +42,18 @@ while(<IN>) {
 
   next if /^<link|meta/i;
 
+  # skip the #-commented heading 
+  if(!$skip_heading && m%^<p><tt>\#%) {
+     $skip_heading=1;
+     next;
+   } elsif ($skip_heading == 1) {
+     if(m%\#</tt></p>%) {
+       $skip_heading=2;
+       print "<!-- LICENSE HEADING -->\n";
+     }
+     next;
+   }
+
   # Links to other Python modules, exceptions
   s%<a href="(Redland|string|sys|exceptions).html[^"]*">(.+?)</a>%$2%g; #"
   # The horrors of guessing urls in text
@@ -50,7 +64,7 @@ while(<IN>) {
   s%RDF.html\#%#%;
 
   # Bad IDs, who writes this stuff?
-  s%<a id="-([^"]+)" name="[^"]+">%<a id="$1" name="$1">%g;
+  s%<a id="([^"]+)" name="[^"]+">%my $a=$1; $a =~ s/^-//; $a=~ s/ /-/g; qq{<a id="$a" name="$a">}%ge;
   s%<a href="#-[^"+]">%<a href="#$1">%g;
 			    
   if(m%^<body.*>%) {
