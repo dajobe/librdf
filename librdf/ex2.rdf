@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <Description about="http://purl.org/net/dajobe/">
+    <dc:title>Dave Beckett's Home Page</dc:title>
+    <dc:creator>Dave Beckett</dc:creator>
+    <dc:description>I do development-based research on RDF, metadata and web searching.</dc:description>
+    <dc:rights>Copyright &#169; 2001 Dave Beckett</dc:rights>
+  </Description> 
+</RDF>
