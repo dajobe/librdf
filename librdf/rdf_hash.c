@@ -916,11 +916,24 @@ librdf_hash_keys_iterator_get_method(void* iterator, int flags)
   
   if(context->is_end)
     return NULL;
-  
-  if(flags == LIBRDF_ITERATOR_GET_METHOD_GET_KEY)
-    result=&context->next_key;
-  else
-    result=NULL;
+
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      /* This is so that librdf_iterator_update_current_element works OK,
+       * since the get_object method isn't used for hashes,
+       * might as well return something useful to signify not-end-of-list.
+       */
+
+      result=&context;
+      break;
+      
+    case LIBRDF_ITERATOR_GET_METHOD_GET_KEY:
+      result=&context->next_key;
+      break;
+      
+    default:
+      result=NULL;
+  }
 
   return result;
 }
