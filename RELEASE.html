@@ -25,9 +25,49 @@ pre
 
 <p>This is Redland 1.0 Release Candidate 1.</p>
 
-<p>Moved language bindings into the new
+<p>The main changes in this release are the addition of the
+Query and Query Results classes, and the removal of the 
+language bindings into the new
 <a href="http://www.redland.opensource.ac.uk//bindings/">Redland Bindings</a>
+package.
+</p>
+
+<p>The interface between the Redland library and Redland Bindings
+when done via <a href="http://www.swig.org/">swig</a> is by the
+swig interface file <code>Redland.i</code> which is now installed in
+<code>/usr/share/redland/Redland.i</code>.</p>
+
+
+<h3>Portability changes</h3>
+
+<p>Win32 building patches from Jose Kahan<br />
+Added win32_rdf_config.h hard-coded config<br />
+Added <code>#include win32_rdf_config.h</code> when WIN32 defined.<br />
+Use <code>REDLAND_STATIC</code> in librdf.h for statically linked Win32 builds.
+</p>
+
+
+<h3>Configuration changes</h3>
+
+<p>Redland 0.9.17 requires Raptor 1.3.2 either installed otherwise
+the copy in the source tree will be installed.</p>
+
+<p>Removed all the language binding-specific options such as
+<code>--with-perl</code> that are now used by Redland Bindings.</p>
+
+
+<h3>Packaging changes</h3>
+
+<p>Updated the RPM spec file to remove building of the redland-perl
+and redland-python RPMs which are now made in the redland-bindings
 package.</p>
+
+<p>Added -lrdf to redland.pc (Curtis Hovey)</p>
+
+<p>Requires automake 1.7 and autoconf 2.54</p>
+
+
+<h3>Query and Query Result Classes</h3>
 
 <p>Added Query (<code>librdf_query</code>) and Query Results
 (<code>librdf_query_results</code>) classes
@@ -57,31 +97,22 @@ in the Redland distribution.</p>
 <li><code>librdf_free_query_results</code> (destructor)</li>
 </ul>
 
-<p>Added example5.c to use the news query classes.</p>
 
-<p>Export the SWIG interface to Redland by installing the Redland.i
-in <code>/usr/share/redland/Redland.i</code>, for use by
-the Redland Bindings package</p>
+<p>Added example5.c to demonstrate using the news query classes.</p>
 
-<p>Update the logging API to provide structured information
-returned including message level, facility, line, column, byte offset
-filename and/or URI of the activity.  Returns a
-<code>librdf_log_message</code>.</p>
 
-<p>Added <code>librdf_model_load</code> method to the model class
-that uses Raptor parser guessing to load content from a URI into a
-model.</p>
+<h3>Model Class changes</h3>
 
-<p>Fix assert bug in <code>librdf_node_get_blank_identifier</code>
-that caused it to always fail.</p>
+<p>Added <code>librdf_model_query_execute</code> method to execute a
+<code>librdf_query</code> against a model, returning an
+<code>librdf_query_results</code></p>
 
-<p>Deprecated methods <code>librdf_parser_set_error</code> and 
-<code>librdf_parser_set_warning</code> which never worked.  The
-new logging API works correctly with this code.</p>
+<p>Added <code>librdf_model_load</code> method that uses Raptor
+parser guessing to load content from a URI into a model.</p>
 
-<p>The contexts methods of the Model class now give
-a run time warning if called and the model does not support
-contexts.  The methods affected are:</p>
+<p>The contexts methods now give a run time warning if called when
+the model does not support contexts or the are not enabled.  The
+methods affected are:</p>
 <ul>
 <li><code>librdf_model_context_add_statement</code></li>
 <li><code>librdf_model_context_add_statements</code></li>
@@ -93,9 +124,30 @@ contexts.  The methods affected are:</p>
 <li><code>librdf_model_get_contexts</code></li>
 </ul>
 
-<p>Storage class context methods will give a run time warning
-if called and contexts are not supported or enabled.  The
-methods affected are:</p>
+<p><code>librdf_model_find_statements_in_context</code> When applying
+map, copy the statement so it can be freed later.
+</p>
+
+
+<h3>Node Class changes</h3>
+
+<p>Fix assert bug in <code>librdf_node_get_blank_identifier</code>
+that caused it to always fail.</p>
+
+<p>A bug was fixed in <code>librdf_node_get_li_ordinal</code>
+to not always fail, returning -1</p>
+
+
+<h3>Parser Class changes</h3>
+
+<p>Deprecated methods <code>librdf_parser_set_error</code> and 
+<code>librdf_parser_set_warning</code> which never worked.  The
+new logging API works correctly with this code.</p>
+
+<h3>Storage Class changes</h3>
+
+<p>Context methods will give a run time warning if called and
+contexts are not supported or enabled.  The methods affected are:</p>
 <ul>
 <li><code>librdf_storage_context_add_statement</code></li>
 <li><code>librdf_storage_context_remove_statement</code></li>
@@ -103,35 +155,25 @@ methods affected are:</p>
 <li><code>librdf_storage_get_contexts</code></li>
 </ul>
 
-<p>Node class, <code>librdf_node_get_li_ordinal</code>
-bug fix, do not always return -1</p>
-
-<p>Storage class, <code>librdf_storage_find_statements_in_context</code>
-and Model class <code>librdf_model_find_statements_in_context</code>
+<p><code>librdf_storage_find_statements_in_context</code>
 When applying map, copy the statement so it can be freed later.
 </p>
 
-<p>Win32 building patches from Jose Kahan<br />
-Added win32_rdf_config.h hard-coded config<br />
-Added <code>#include win32_rdf_config.h</code> when WIN32 defined.<br />
-Use <code>REDLAND_STATIC</code> in librdf.h for statically linked Win32 builds.
-</p>
-
-<p>Storage class method
-<code>librdf_storage_node_stream_to_node_create</code> allow second
-node to be NULL, so that methods
+<p>A bug was fixed in method
+<code>librdf_storage_node_stream_to_node_create</code> to allow the
+second node parameter to be NULL, so that methods
 <code>librdf_storage_get_arcs_out</code> and
-<code>librdf_storage_get_arcs_in</code> that can use it, will now
-work.</p>
+<code>librdf_storage_get_arcs_in</code> that can use it to work.</p>
 
-<p>Updated RPM spec file to remove build of redland-perl and redland-python
-which are now done by redland-bindings</p>
 
-<p>Added -lrdf to redland.pc (Curtis Hovey)</p>
 
-<p>Update to Raptor 1.3.2</p>
+<h3>General changes</h3>
 
-<p>Require automake 1.7 and autoconf 2.54</p>
+<p>Update the logging API to provide structured information
+returned including message level, facility, line, column, byte offset
+filename and/or URI of the activity.  Returns a
+<code>librdf_log_message</code>.</p>
+
 
 
 
