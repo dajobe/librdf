@@ -75,7 +75,6 @@
 
 
 EXTRA_DIST=api.sgml.in api.sgml README.html README perl.html python.html \
-stylesheet.css \
 build-docs overview.png overview.ps overview.pdf api
 
 DOC_CLASSES=node statement model storage storage_hashes storage_list stream parser parser_libwww parser_repat parser_redland parser_sirpac concepts init digest digest_md5 digest_openssl hash hash_bdb hash_cursor hash_memory heuristics iterator list uri
