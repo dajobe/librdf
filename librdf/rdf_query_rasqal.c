@@ -883,6 +883,8 @@ librdf_query_rasqal_query_results_update_statement(void* context)
     scontext->statement=NULL;
     return 1;
   }
+
+  return 0;
 }
 
 
