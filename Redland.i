@@ -66,6 +66,10 @@ void librdf_python_world_init(librdf_world *world);
 void librdf_perl_world_init(librdf_world *world);
 void librdf_perl_world_finish(void);
 #endif
+#ifdef SWIGPHP
+librdf_world* librdf_php_get_world(void);
+void librdf_php_world_finish(void);
+#endif
 
 
 /* 
@@ -312,6 +316,24 @@ librdf_perl_world_finish(void)
 #endif
 
 
+/* When in PHP when being compiled by C */
+#if defined (PHP_VERSION)
+static librdf_world* librdf_php_world;
+
+static librdf_world*
+librdf_php_get_world(void)
+{
+  return librdf_php_world;
+}
+
+void
+librdf_php_world_finish(void)
+{
+  librdf_free_world(librdf_php_world);
+}
+#endif    
+
+
 /* prototypes for internal routines called below - NOT PART OF API */
 void librdf_error(librdf_world* world, const char *message, ...);
 void librdf_warning(librdf_world* world, const char *message, ...);
@@ -337,8 +359,16 @@ librdf_internal_test_warning(librdf_world *world)
 #ifdef TCL_MAJOR_VERSION
 Tcl_PkgProvide(interp, PACKAGE, (char*)librdf_version_string);
 #endif
+
+#ifdef PHP_VERSION
+  /* PHP seems happier if this happens at module init time */
+  if(!librdf_php_world) {
+    librdf_php_world=librdf_new_world();
+    librdf_world_open(librdf_php_world);
+  }
+#endif
 %}
-  
+
 
 typedef struct librdf_world_s librdf_world;
 typedef struct librdf_hash_s librdf_hash;
@@ -350,6 +380,7 @@ typedef struct librdf_model_s librdf_model;
 typedef struct librdf_storage_s librdf_storage;
 typedef struct librdf_stream_s librdf_stream;
 typedef struct librdf_parser_s librdf_parser;
+typedef struct librdf_serializer_s librdf_serializer;
 
 /* rdf_init.h */
 librdf_world* librdf_new_world(void);
@@ -484,6 +515,10 @@ void librdf_python_world_init(librdf_world *world);
 #ifdef SWIGPERL
 void librdf_perl_world_init(librdf_world *world);
 void librdf_perl_world_finish(void);
+#endif
+#ifdef SWIGPHP
+librdf_world* librdf_php_get_world(void);
+void librdf_php_world_finish(void);
 #endif
 
 /* FOR TESTING ERRORS ONLY - NOT PART OF API */
