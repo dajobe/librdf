@@ -431,6 +431,7 @@ int librdf_model_remove_statement(librdf_model* model, librdf_statement* stateme
 int librdf_model_contains_statement(librdf_model* model, librdf_statement* statement);
 librdf_stream* librdf_model_as_stream(librdf_model* model);
 librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
+librdf_stream* librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* statement, librdf_node* context_node);
 librdf_iterator* librdf_model_get_sources(librdf_model *model, librdf_node *arc, librdf_node *target);
 librdf_iterator* librdf_model_get_arcs(librdf_model *model, librdf_node *source, librdf_node *target);
 librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *source, librdf_node *arc);
@@ -444,6 +445,8 @@ int librdf_model_context_remove_statements(librdf_model* model, librdf_node* con
 librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* context);
 void librdf_model_sync(librdf_model* model);
 librdf_iterator* librdf_model_get_contexts(librdf_model* model);
+librdf_node* librdf_model_get_feature(librdf_model* model, librdf_uri* feature);
+int librdf_model_set_feature(librdf_model* model, librdf_uri* feature, librdf_node* value);
 
 /* rdf_storage.h */
 librdf_storage* librdf_new_storage(librdf_world *world, char *storage_name, char *name, char *options_string);
@@ -464,8 +467,8 @@ int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, librdf
 librdf_serializer* librdf_new_serializer(librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri);
 void librdf_free_serializer(librdf_serializer *serializer);
 int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer, const char *name, librdf_uri* base_uri, librdf_model* model);
-const char *librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
-int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, const char *value);
+librdf_node* librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
+int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, librdf_node* value);
 
 /* rdf_stream.h */
 void librdf_free_stream(librdf_stream* stream);
