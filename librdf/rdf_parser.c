@@ -302,14 +302,14 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
 void
 librdf_init_parser(void) 
 {
+#ifdef HAVE_REDLAND_RDF_PARSER
+  librdf_parser_redland_constructor();
+#endif
 #ifdef HAVE_SIRPAC_RDF_PARSER
   librdf_parser_sirpac_constructor();
 #endif
 #ifdef HAVE_LIBWWW_RDF_PARSER
   librdf_parser_libwww_constructor();
-#endif
-#ifdef HAVE_REDLAND_RDF_PARSER
-  librdf_parser_redland_constructor();
 #endif
 }
 
