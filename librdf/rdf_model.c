@@ -173,9 +173,10 @@ librdf_free_model(librdf_model *model)
     iterator=librdf_list_get_iterator(model->sub_models);
     if(iterator) {
       while(!librdf_iterator_end(iterator)) {
-        m=(librdf_model*)librdf_iterator_get_next(iterator);
+        m=(librdf_model*)librdf_iterator_get_object(iterator);
         if(m)
           librdf_free_model(m);
+        librdf_iterator_next(iterator);
       }
       librdf_free_iterator(iterator);
     }
@@ -437,7 +438,7 @@ librdf_model_get_source(librdf_model *model,
 {
   librdf_iterator *iterator=librdf_storage_get_sources(model->storage, 
                                                        arc, target);
-  librdf_node *node=(librdf_node*)librdf_iterator_get_next(iterator);
+  librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
   librdf_free_iterator(iterator);
   return node;
 }
@@ -460,7 +461,7 @@ librdf_model_get_arc(librdf_model *model,
 {
   librdf_iterator *iterator=librdf_storage_get_arcs(model->storage, 
                                                     source, target);
-  librdf_node *node=(librdf_node*)librdf_iterator_get_next(iterator);
+  librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
   librdf_free_iterator(iterator);
   return node;
 }
@@ -483,7 +484,7 @@ librdf_model_get_target(librdf_model *model,
 {
   librdf_iterator *iterator=librdf_storage_get_targets(model->storage, 
                                                        source, arc);
-  librdf_node *node=(librdf_node*)librdf_iterator_get_next(iterator);
+  librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
   librdf_free_iterator(iterator);
   return node;
 }
@@ -800,7 +801,7 @@ main(int argc, char *argv[])
 
   fprintf(stderr, "%s: Printing model\n", program);
   librdf_model_print(model, stderr);
-
+  
   parser=librdf_new_parser(world, parser_name, NULL, NULL);
   if(!parser) {
     fprintf(stderr, "%s: Failed to create new parser type %s\n", program,
