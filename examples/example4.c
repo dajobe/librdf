@@ -87,10 +87,13 @@ int main(int argc, char *argv[]);
 
 enum command_type {
   CMD_PRINT,
+  CMD_CONTAINS,
   CMD_STATEMENTS,
   CMD_SOURCES,
   CMD_ARCS,
-  CMD_TARGETS
+  CMD_TARGETS,
+  CMD_ADD,
+  CMD_REMOVE,
 };
 
 typedef struct
@@ -98,14 +101,18 @@ typedef struct
   enum command_type type;
   char *name;
   int nargs; /* how many args needed? */
+  int write; /* write to db? */
 } command;
 
 static command commands[]={
-  {CMD_PRINT, "print", 0},
-  {CMD_STATEMENTS, "statements", 3},
-  {CMD_SOURCES, "sources", 2},
-  {CMD_ARCS, "arcs", 2},
-  {CMD_TARGETS, "targets", 2},
+  {CMD_PRINT, "print", 0, 0},
+  {CMD_CONTAINS, "contains", 3, 0},
+  {CMD_STATEMENTS, "statements", 3, 0},
+  {CMD_SOURCES, "sources", 2, 0},
+  {CMD_ARCS, "arcs", 2, 0},
+  {CMD_TARGETS, "targets", 2, 0},
+  {CMD_ADD, "add", 3, 1},
+  {CMD_REMOVE, "remove", 3, 1},
   {-1, NULL}  
 };
  
@@ -194,9 +201,13 @@ main(int argc, char *argv[])
   }
 
 
-  storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='no'");
+  if(commands[cmd].write)
+    storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='yes'");
+  else
+    storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='no'");
+
   if(!storage) {
-    fprintf(stderr, "%s: Failed to open storage (read only)\n", program);
+    fprintf(stderr, "%s: Failed to open storage\n", program);
     return(1);
   }
 
@@ -218,7 +229,10 @@ main(int argc, char *argv[])
   case CMD_PRINT:
     librdf_model_print(model, stdout);
     break;
+  case CMD_CONTAINS:
   case CMD_STATEMENTS:
+  case CMD_ADD:
+  case CMD_REMOVE:
     if(!strcmp(argv[0], "-"))
       source=NULL;
     else
@@ -239,40 +253,76 @@ main(int argc, char *argv[])
     }
     
     partial_statement=librdf_new_statement();
-    if(source)
-      librdf_statement_set_subject(partial_statement, source);
-    if(arc)
-      librdf_statement_set_predicate(partial_statement, arc);
-    if(target)
-      librdf_statement_set_object(partial_statement, target);
+    librdf_statement_set_subject(partial_statement, source);
+    librdf_statement_set_predicate(partial_statement, arc);
+    librdf_statement_set_object(partial_statement, target);
 
-    /* Print out matching statements */
-    stream=librdf_model_find_statements(model, partial_statement);
-    if(!stream) {
-      fprintf(stderr, "%s: librdf_model_find_statements returned NULL stream\n", program);
-    } else {
-      count=0;
-      while(!librdf_stream_end(stream)) {
-        librdf_statement *statement=librdf_stream_next(stream);
-        if(!statement) {
-          fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
-          break;
-        }
-        
-        fputs("Matched statement: ", stdout);
-        librdf_statement_print(statement, stdout);
-        fputc('\n', stdout);
-        
-        librdf_free_statement(statement);
-        count++;
+    if(commands[cmd].type != CMD_STATEMENTS) {
+      if(!source || !arc || !target) {
+        fprintf(stderr, "%s: cannot have missing statement parts for %s\n", program, commands[cmd].name);
+        librdf_free_statement(partial_statement);
+        break;
       }
-      librdf_free_stream(stream);  
-      fprintf(stderr, "%s: got %d matching statements\n", program, count);
     }
-    /* also frees the nodes */
-    librdf_free_statement(partial_statement);
 
+    switch(commands[cmd].type) {
+      case CMD_CONTAINS:
+        if(librdf_model_contains_statement(model, partial_statement))
+          fprintf(stdout, "%s: the model contains the statement\n", program);
+        else
+          fprintf(stdout, "%s: the model does not contains the statement\n", program);
+        break;
+
+    case CMD_STATEMENTS:
+      /* Print out matching statements */
+      stream=librdf_model_find_statements(model, partial_statement);
+      if(!stream) {
+        fprintf(stderr, "%s: librdf_model_find_statements returned NULL stream\n", program);
+      } else {
+        count=0;
+        while(!librdf_stream_end(stream)) {
+          librdf_statement *statement=librdf_stream_next(stream);
+          if(!statement) {
+            fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
+            break;
+          }
+          
+          fputs("Matched statement: ", stdout);
+          librdf_statement_print(statement, stdout);
+          fputc('\n', stdout);
+          
+          librdf_free_statement(statement);
+          count++;
+        }
+        librdf_free_stream(stream);  
+        fprintf(stderr, "%s: got %d matching statements\n", program, count);
+      }
+      break;
+      
+    case CMD_ADD:
+      if(librdf_model_add_statement(model, partial_statement))
+        fprintf(stdout, "%s: failed to add statement to model\n", program);
+      else
+        fprintf(stdout, "%s: added statement to model\n", program);
+      break;
+
+    case CMD_REMOVE:
+      if(librdf_model_remove_statement(model, partial_statement))
+        fprintf(stdout, "%s: failed to remove statement from model\n", program);
+      else
+        fprintf(stdout, "%s: removed statement from model\n", program);
+      break;
+
+    default:
+      fprintf(stderr, "Unexpected command %d\n", commands[cmd].type);
+
+    } /* end inner switch */
+
+    /* also frees the nodes */
+    if(commands[cmd].type != CMD_ADD)
+      librdf_free_statement(partial_statement);
     break;
+
   case CMD_SOURCES:
     arc=librdf_new_node_from_uri_string(argv[0]);
     if(librdf_heuristic_object_is_literal(argv[1]))
@@ -282,7 +332,7 @@ main(int argc, char *argv[])
 
     iterator=librdf_model_get_sources(model, arc, target);
     if(!iterator) {
-      fprintf(stderr, "Failed to get sources\n");
+      fprintf(stderr, "%s: Failed to get sources\n", program);
       break;
     }
 
@@ -308,7 +358,7 @@ main(int argc, char *argv[])
       arc=librdf_new_node_from_uri_string(argv[1]);
       iterator=librdf_model_get_targets(model, source, arc);
       if(!iterator) {
-        fprintf(stderr, "Failed to get targets\n");
+        fprintf(stderr, "%s: Failed to get targets\n", program);
         break;
       }
     }
@@ -320,7 +370,8 @@ main(int argc, char *argv[])
       
       node=librdf_iterator_get_next(iterator);
       if(!node) {
-        fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n", program);
+        fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
+                program);
         break;
       }
       
@@ -342,7 +393,7 @@ main(int argc, char *argv[])
       librdf_free_node(target);
     break;
   default:
-    fprintf(stderr, "Unknown command number %d\n", cmd);
+    fprintf(stderr, "%s: Unknown command %d\n", program, commands[cmd].type);
     return(1);
   }
 
