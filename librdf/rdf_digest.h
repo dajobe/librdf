@@ -78,6 +78,11 @@ char* rdf_digest_to_string(rdf_digest* digest);
 void rdf_digest_print(rdf_digest* digest, FILE* fh);
 
 
+/* in rdf_digest_openssl.c */
+#ifdef HAVE_OPENSSL_DIGESTS
+void rdf_digest_openssl_constructor(void);
+#endif
+
 /* in sha1.c */
 #ifdef HAVE_SHA1_DIGEST
 void sha1_constructor(void);
@@ -86,9 +91,10 @@ void sha1_constructor(void);
 #ifdef HAVE_MD5_DIGEST
 void md5_constructor(void);
 #endif
-/* in rmd160.c */
+/* in ripemd160.c */
 #ifdef HAVE_RIPEM160_DIGEST
 void rmd160_constructor(void);
 #endif
+
 
 #endif
