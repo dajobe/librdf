@@ -55,13 +55,18 @@ struct librdf_parser_factory_s
   /* get/set features of parser (think of Java properties) */
   librdf_node* (*get_feature)(void *_context, librdf_uri *feature);
   int (*set_feature)(void *_context, librdf_uri *feature, librdf_node *value);
-  
+
+  /* parsing methods - all are optional but the only
+   * current implementation, raptor, implements all of them
+   */
   librdf_stream* (*parse_uri_as_stream)(void *_context, librdf_uri *uri, librdf_uri* base_uri);
   int (*parse_uri_into_model)(void *_context, librdf_uri *uri, librdf_uri* base_uri, librdf_model *model);
   librdf_stream* (*parse_file_as_stream)(void *_context, librdf_uri *uri, librdf_uri *base_uri);
   int (*parse_file_into_model)(void *_context, librdf_uri *uri, librdf_uri *base_uri, librdf_model *model);
   int (*parse_string_into_model)(void *_context, const unsigned char *string, librdf_uri* base_uri, librdf_model *model);
   librdf_stream* (*parse_string_as_stream)(void *_context, const unsigned char *string, librdf_uri *base_uri);
+  int (*parse_counted_string_into_model)(void *_context, const unsigned char *string, size_t length, librdf_uri* base_uri, librdf_model *model);
+  librdf_stream* (*parse_counted_string_as_stream)(void *_context, const unsigned char *string, size_t length, librdf_uri *base_uri);
 };
 
 
@@ -109,6 +114,8 @@ REDLAND_API librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* p
 REDLAND_API int librdf_parser_parse_string_into_model(librdf_parser* parser, const unsigned char *string, librdf_uri* base_uri, librdf_model* model);
 REDLAND_API REDLAND_DEPRECATED void librdf_parser_set_error(librdf_parser* parser, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
 REDLAND_API REDLAND_DEPRECATED void librdf_parser_set_warning(librdf_parser* parser, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
+REDLAND_API librdf_stream* librdf_parser_parse_counted_string_as_stream(librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri);
+REDLAND_API int librdf_parser_parse_counted_string_into_model(librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri, librdf_model* model);
 
 #define LIBRDF_PARSER_FEATURE_ERROR_COUNT "http://feature.librdf.org/parser-error-count"
 #define LIBRDF_PARSER_FEATURE_WARNING_COUNT "http://feature.librdf.org/parser-warning-count"
