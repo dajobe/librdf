@@ -291,11 +291,9 @@ librdf_free_serializer(librdf_serializer *serializer)
  * @base_uri: the base URI to use or NULL
  * @model: the &librdf_model model to use
  * 
- * INTERNAL
- *
  * Return value: non 0 on failure
  **/
-static int
+int
 librdf_serializer_serialize_model(librdf_serializer* serializer,
                                   FILE *handle, librdf_uri* base_uri,
                                   librdf_model* model) 
