@@ -34,6 +34,7 @@ extern "C" {
 struct librdf_query_s
 {
   librdf_world *world;
+  int usage;
   void *context;
   struct librdf_query_factory_s* factory;
 };
