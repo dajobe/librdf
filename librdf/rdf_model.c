@@ -877,6 +877,9 @@ librdf_model_context_add_statements(librdf_model* model,
   if(!stream)
     return 1;
 
+  if(model->factory->context_add_statements)
+    return model->factory->context_add_statements(model, context, stream);
+
   while(!librdf_stream_end(stream)) {
     librdf_statement* statement=librdf_stream_get_object(stream);
     if(!statement)
@@ -926,7 +929,11 @@ int
 librdf_model_context_remove_statements(librdf_model* model,
                                        librdf_node* context) 
 {
-  librdf_stream *stream=librdf_model_context_serialize(model, context);
+  librdf_stream *stream;
+  if(model->factory->context_remove_statements)
+    return model->factory->context_remove_statements(model, context);
+
+  stream=librdf_model_context_as_stream(model, context);
   if(!stream)
     return 1;
 
