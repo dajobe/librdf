@@ -116,9 +116,12 @@ librdf_free_stream(librdf_stream* stream)
  * Return value: the next statement or NULL at end of stream
  */
 static librdf_statement*
-librdf_stream_update_current_statement(librdf_stream* stream) 
+librdf_stream_update_current_statement(librdf_stream* stream)
 {
   librdf_statement* statement=NULL;
+
+  if(stream->is_updated)
+    return stream->current;
   
   /* find next statement subject to map */
   while(!stream->is_end_method(stream->context)) {
@@ -143,6 +146,8 @@ librdf_stream_update_current_statement(librdf_stream* stream)
   stream->current=statement;
   if(!stream->current)
     stream->is_finished=1;
+
+  stream->is_updated=1;
 
   return statement;
 }
@@ -184,6 +189,7 @@ librdf_stream_next(librdf_stream* stream)
     return 1;
   }
   
+  stream->is_updated=0;
   librdf_stream_update_current_statement(stream);
 
   return stream->is_finished;
@@ -202,11 +208,7 @@ librdf_stream_get_object(librdf_stream* stream)
   if(stream->is_finished)
     return NULL;
 
-  if(!librdf_stream_update_current_statement(stream))
-    return NULL;
-
-  return stream->get_method(stream->context, 
-                            LIBRDF_STREAM_GET_METHOD_GET_OBJECT);
+  return librdf_stream_update_current_statement(stream);
 }
 
 
