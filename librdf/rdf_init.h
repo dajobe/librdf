@@ -86,6 +86,9 @@ struct librdf_world_s
 
   /* mutex to lock the nodes class */
   pthread_mutex_t* nodes_mutex;
+
+  /* mutex to lock the statements class */
+  pthread_mutex_t* statements_mutex;
 #endif
 };
 
