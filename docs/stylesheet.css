@@ -1,23 +1,38 @@
-/* Placeholder for better style sheet */
+/* Smush of CSS from ILRT, Rudolf, W3C REC */
 
-BODY {
-  background-color: #ffffff;
+body {
+  margin: 2em 1em 2em 1em;
+  font-family: sans-serif;
   color: #000085;
-  font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
-
+  background: white;
 }
 
-H1, H2, H3, H4, H5 {
-  text-align: left;
-  font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
-  font-weight: normal;
-  color: #880000; 
-}
+/* NS 4 needs this */
+th, td { font-family: sans-serif; }
 
-PRE {
+h1, h2, h3, h4, h5, h6 { text-align: left; color: #880000; }
+
+h1 { font: 170% sans-serif; }
+h2 { font: 140% sans-serif; }
+h3 { font: 120% sans-serif; }
+h4 { font: bold 100% sans-serif; }
+h5 { font: italic 100% sans-serif; }
+
+
+pre { margin-left: 2em }
+
+/* NS 4 needs this */
+pre, code { font-family: monospace; }
+
+tt {
   font-family: monospace
 }
 
-TT {
-  font-family: monospace
+
+a:link  {
+  color : #000099;
+}
+
+a:hover  {
+  color : red;
 }
