@@ -736,7 +736,6 @@ librdf_node_to_string(librdf_node* node)
     s=(char*)LIBRDF_MALLOC(cstring, node->value.blank.identifier_len + 3);
     if(!s)
       return NULL;
-    /* use strcpy here to add \0 to end of literal string */
     sprintf(s, "(%s)", node->value.blank.identifier);
     break;
   case LIBRDF_NODE_TYPE_STATEMENT:
