@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 
-/* forward references / private structures */
+/* forward references to private structures */
 typedef struct librdf_hash_s librdf_hash;
 typedef struct librdf_digest_s librdf_digest;
 /* typedef struct librdf_uri_s librdf_uri; */
@@ -62,7 +62,7 @@ void librdf_free(char *file, int line, char *type, void *ptr);
 #define LIBRDF_CALLOC(type, size, count) librdf_calloc(__FILE__, __LINE__, #type, size, count)
 #define LIBRDF_FREE(type, ptr) librdf_free(__FILE__, __LINE__, #type, ptr)
 
-void librdf_memory_report(void *fh);
+void librdf_memory_report(FILE *fh);
 
 /* Debugging messages */
 #define LIBRDF_DEBUG1(function, msg) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function); } while(0)
@@ -107,7 +107,6 @@ void librdf_destroy_world(void);
 
 /* the rest should be automatically pulled from rdf_*.h headers */
 
-/*
 #include <rdf_list.h>
 #include <rdf_iterator.h>
 #include <rdf_uri.h>
@@ -118,7 +117,6 @@ void librdf_destroy_world(void);
 #include <rdf_storage.h>
 #include <rdf_stream.h>
 #include <rdf_context.h>
-*/
 
 
 #ifdef __cplusplus
