@@ -57,9 +57,9 @@
 #include <redland.h>
 
 
-const char * const librdf_short_copyright_string = "Copyright (C) 2000-2004 David Beckett, ILRT, University of Bristol";
+const char * const librdf_short_copyright_string = "Copyright (C) 2000-2005 David Beckett, ILRT, University of Bristol";
 
-const char * const librdf_copyright_string = "Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/\nInstitute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/,\nUniversity of Bristol - http://www.bristol.ac.uk/";
+const char * const librdf_copyright_string = "Copyright (C) 2000-2005 David Beckett - http://purl.org/net/dajobe/\nInstitute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/,\nUniversity of Bristol - http://www.bristol.ac.uk/";
 
 const char * const librdf_version_string = VERSION;
 
