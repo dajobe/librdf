@@ -79,6 +79,11 @@ static librdf_stream*
 static librdf_stream*
        librdf_storage_mysql_find_statements(librdf_storage* storage,
                                             librdf_statement* statement);
+static librdf_stream*
+       librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
+                                                         librdf_statement* statement,
+                                                         librdf_node* context_node,
+                                                         librdf_hash* options);
 
 /* context functions */
 static int librdf_storage_mysql_context_add_statement(librdf_storage* storage,
@@ -974,6 +979,29 @@ static librdf_stream*
 librdf_storage_mysql_find_statements_in_context(librdf_storage* storage, librdf_statement* statement,
                          librdf_node* context_node)
 {
+  return librdf_storage_mysql_find_statements_with_options(storage, statement, context_node, NULL);
+}
+
+
+/**
+ * librdf_storage_mysql_find_statements_with_options:
+ * @storage: the storage
+ * @statement: the statement to match
+ * @context_node: the context to search
+ * @options: &librdf_hash of match options or NULL
+ *
+ * Return a stream of statements matching the given statement (or
+ * all statements if NULL).  Parts (subject, predicate, object) of the
+ * statement can be empty in which case any statement part will match that.
+ *
+ * Return value: a &librdf_stream or NULL on failure
+ **/
+static librdf_stream*
+librdf_storage_mysql_find_statements_with_options(librdf_storage* storage, 
+                                                  librdf_statement* statement,
+                                                  librdf_node* context_node,
+                                                  librdf_hash* options)
+{
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
   librdf_storage_mysql_sos_context* sos;
   librdf_node *subject, *predicate, *object;
@@ -1603,6 +1631,7 @@ librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
   factory->contains_statement = librdf_storage_mysql_contains_statement;
   factory->serialise          = librdf_storage_mysql_serialise;
   factory->find_statements    = librdf_storage_mysql_find_statements;
+  factory->find_statements_with_options    = librdf_storage_mysql_find_statements_with_options;
   factory->context_add_statement      = librdf_storage_mysql_context_add_statement;
   factory->context_add_statements     = librdf_storage_mysql_context_add_statements;
   factory->context_remove_statement   = librdf_storage_mysql_context_remove_statement;
