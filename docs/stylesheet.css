@@ -2,5 +2,12 @@
 body {
   background-color: #FFFFFF;
   color: #000085;
-  font-family: serif
+  font-family: sans-serif
+}
+
+pre {
+  font-family: monospace
+}
+tt {
+  font-family: monospace
 }
