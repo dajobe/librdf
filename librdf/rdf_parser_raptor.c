@@ -450,6 +450,7 @@ librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler(raptor_www *www,
  * @context: parser context
  * @uri: &librdf_uri URI of ontent source
  * @string: or content string
+ * @length: length of the string or 0 if not yet counted
  * @base_uri: &librdf_uri URI of the content location or NULL if the same
  *
  * Only one of uri or string may be given
@@ -458,6 +459,7 @@ librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler(raptor_www *www,
 static librdf_stream*
 librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
                                             const unsigned char *string,
+                                            size_t length,
                                             librdf_uri *base_uri)
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
@@ -525,7 +527,9 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     if(raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri))
       return NULL;
     
-    raptor_parse_chunk(pcontext->rdf_parser, string, strlen((const char*)string), 1);
+    if(!length)
+      length=strlen((const char*)string);
+    raptor_parse_chunk(pcontext->rdf_parser, string, length, 1);
   }
   
 
@@ -559,8 +563,9 @@ static librdf_stream*
 librdf_parser_raptor_parse_uri_as_stream(void *context, librdf_uri *uri,
                                          librdf_uri *base_uri)
 {
-  return librdf_parser_raptor_parse_as_stream_common(context, 
-                                                     uri, NULL, base_uri);
+  return librdf_parser_raptor_parse_as_stream_common(context, uri,
+                                                     NULL, 0,
+                                                     base_uri);
 }
 
 
@@ -577,16 +582,38 @@ librdf_parser_raptor_parse_string_as_stream(void *context,
                                             const unsigned char *string,
                                             librdf_uri *base_uri)
 {
-  return librdf_parser_raptor_parse_as_stream_common(context, 
-                                                     NULL, string, base_uri);
+  return librdf_parser_raptor_parse_as_stream_common(context, NULL,
+                                                     string, 0,
+                                                     base_uri);
 }
 
+
+/**
+ * librdf_parser_raptor_parse_counted_string_as_stream - Parse a counted string of content to a librdf_stream of statements
+ * @context: parser context
+ * @string: string content to parse
+ * @length: length of the string content (must be >0)
+ * @base_uri: the base URI to use
+ * 
+ * Return value: &librdf_stream of statements or NULL
+ **/
+static librdf_stream*
+librdf_parser_raptor_parse_counted_string_as_stream(void *context,
+                                                    const unsigned char *string,
+                                                    size_t length,
+                                                    librdf_uri* base_uri) 
+{
+  return librdf_parser_raptor_parse_as_stream_common(context, NULL,
+                                                     string, length,
+                                                     base_uri);
+}
 
 /**
  * librdf_parser_raptor_parse_uri_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
  * @context: parser context
  * @uri: &librdf_uri URI of RDF/XML content source
  * @string: string content to parser
+ * @length: length of the string or 0 if not yet counted
  * @base_uri: &librdf_uri URI of the content location
  * @model: &librdf_model of model
  *
@@ -599,6 +626,7 @@ static int
 librdf_parser_raptor_parse_into_model_common(void *context,
                                              librdf_uri *uri, 
                                              const unsigned char *string,
+                                             size_t length,
                                              librdf_uri *base_uri,
                                              librdf_model* model)
 {
@@ -648,8 +676,12 @@ librdf_parser_raptor_parse_into_model_common(void *context,
     status=raptor_parse_uri(pcontext->rdf_parser, (raptor_uri*)uri, (raptor_uri*)base_uri);
   } else {
     status=raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
-    if(!status)
-      status=raptor_parse_chunk(pcontext->rdf_parser, string, strlen((const char*)string), 1);
+    if(!status) {
+      if(!length)
+        length=strlen((const char*)string);
+      status=raptor_parse_chunk(pcontext->rdf_parser, string, length, 1);
+    }
+    
   }
   
 
@@ -675,15 +707,15 @@ librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri,
                                           librdf_uri *base_uri,
                                           librdf_model* model)
 {
-  return librdf_parser_raptor_parse_into_model_common(context,
-                                                      uri, NULL,
+  return librdf_parser_raptor_parse_into_model_common(context, uri, 
+                                                      NULL, 0,
                                                       base_uri, model);}
 
 
 /**
  * librdf_parser_raptor_parse_string_into_model - Parse the RDF/XML content in a string and store it into a librdf_model
  * @context: parser context
- * @string: RDF/XML source
+ * @string: content to parse
  * @base_uri: &librdf_uri URI of the content location
  * @model: &librdf_model of model
  *
@@ -697,8 +729,31 @@ librdf_parser_raptor_parse_string_into_model(void *context,
                                              librdf_uri *base_uri,
                                              librdf_model* model)
 {
-  return librdf_parser_raptor_parse_into_model_common(context,
-                                                      NULL, string,
+  return librdf_parser_raptor_parse_into_model_common(context, NULL,
+                                                      string, 0,
+                                                      base_uri, model);
+}
+
+
+/**
+ * librdf_parser_raptor_parse_counted_string_into_model - Parse a counted string of content into an librdf_model
+ * @context: parser context
+ * @string: the content to parse
+ * @length: length of content (must be >0)
+ * @base_uri: the base URI to use
+ * @model: the model to use
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_parser_raptor_parse_counted_string_into_model(void *context,
+                                                     const unsigned char *string,
+                                                     size_t length,
+                                                     librdf_uri* base_uri, 
+                                                     librdf_model* model)
+{
+  return librdf_parser_raptor_parse_into_model_common(context, NULL,
+                                                      string, length,
                                                       base_uri, model);
 }
 
@@ -937,6 +992,7 @@ librdf_raptor_uri_as_counted_string(void *context, raptor_uri *uri, size_t *len_
 }
 
 
+
 static raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_new_uri,
   librdf_raptor_new_uri_from_uri_local_name,
@@ -967,6 +1023,8 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
   factory->parse_uri_into_model = librdf_parser_raptor_parse_uri_into_model;
   factory->parse_string_as_stream = librdf_parser_raptor_parse_string_as_stream;
   factory->parse_string_into_model = librdf_parser_raptor_parse_string_into_model;
+  factory->parse_counted_string_as_stream = librdf_parser_raptor_parse_counted_string_as_stream;
+  factory->parse_counted_string_into_model = librdf_parser_raptor_parse_counted_string_into_model;
   factory->get_feature = librdf_parser_raptor_get_feature;
   factory->set_feature = librdf_parser_raptor_set_feature;
 }
