@@ -115,6 +115,12 @@ AC_CHECK_PROGS(PHP, php)
 AC_CHECK_PROGS(TCL, tcl)
 AC_CHECK_PROGS(RUBY, ruby)
 AC_CHECK_PROGS(SWIG, swig)
+# dotGNU
+AC_CHECK_PROGS(ILRUN, ilrun)
+AC_CHECK_PROGS(CSCC, cscc)
+# Mono
+AC_CHECK_PROGS(MONO, mono)
+AC_CHECK_PROGS(MCS, mcs)
 
 if test "X$PERL" != "X"; then
   PERLINSTALLSITEARCH=`$PERL -MConfig -e 'print $Config{installsitearch};'`
@@ -594,6 +600,51 @@ fi
   
 LIBS=$LIBRDF_LIBS
 
+dnl Pick an ECMA CLR implementation
+AC_ARG_WITH(ecma-clr, [  --with-ecma-clr          Choose an ECMA CLR implenentation - mono, dotgnu []], ecma_clr_name="$withval", ecma_clr_name="")
+
+
+AC_MSG_CHECKING(ECMA CLR implementations available)
+result=
+if test "X$MONO" != X -a "X$MCS" != X; then
+  result="$result Mono"
+fi
+if test "X$ILRUN" != X -a "X$CSCC" != X; then
+  result="$result dotGNU"
+fi
+AC_MSG_RESULT($result)
+
+AC_MSG_CHECKING(ECMA CLR implementations to use)
+ecma_clr=none
+CLRRUN=
+CSHARPCC=
+for name in $ecma_clr_name mono dotgnu; do
+  case $name in
+    mono)
+      if test "X$MONO" != X -a "X$MCS" != X; then
+        CLRRUN=$MONO
+        CSHARPCC=$MCS
+        ecma_clr=Mono
+      fi
+      ;;
+
+    dotgnu)
+      if test "X$ILRUN" != X -a "X$CSCC" != X; then
+        CLRRUN=$ILRUN
+        CSHARPCC=$CSCC
+        ecma_clr=dotGNU
+      fi
+      ;;
+
+    *)
+      AC_MSG_ERROR(No such ECMA CLR implementation $name)
+      ;;
+esac
+done
+AC_MSG_RESULT($ecma_clr)
+AC_SUBST(CLRRUN)
+AC_SUBST(CSHARPCC)
+
 
 # Maybe add some local digest modules
 for module in $digest_modules; do
@@ -702,6 +753,7 @@ java/org/Makefile
 java/org/librdf/Makefile
 java/org/librdf/redland/Makefile
 ruby/Makefile
+csharp/Makefile
 utils/Makefile
 demos/Makefile])
 AC_CONFIG_FILES([librdf/redland.spec])
