@@ -43,7 +43,7 @@ main(int argc, char *argv[])
   librdf_stream* stream;
   librdf_node *subject, *predicate;
   librdf_iterator* iterator;
-  librdf_statement *partial_statement;
+  librdf_statement *partial_statement, *statement2;
   char *program=argv[0];
   librdf_uri *uri;
   char *parser_name=NULL;
@@ -64,7 +64,9 @@ main(int argc, char *argv[])
     return(1);
   }
 
-  storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',new='yes'");
+//  storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',new='yes'");
+//  storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',new='yes'");
+  storage=librdf_new_storage(world, "memory", "test", NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
@@ -95,13 +97,16 @@ main(int argc, char *argv[])
   }
   librdf_free_parser(parser);
 
+  
+  statement2=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/"),
+                                             librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/title"),
+                                             librdf_new_node_from_literal(world, "My Home Page", NULL, 0)
+                                             );
+  librdf_model_add_statement(model, statement2);
 
-  librdf_model_add_statement(model, 
-                             librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/"),
-                                                             librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/title"),
-                                                             librdf_new_node_from_literal(world, "My Home Page", NULL, 0)
-                                                             )
-                             );
+  /* Free what we just used to add to the model - now it should be stored */
+  librdf_free_statement(statement2);
+
 
   /* Print out the model*/
 
