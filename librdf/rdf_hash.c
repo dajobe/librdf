@@ -65,6 +65,12 @@ librdf_init_hash(void)
   librdf_init_hash_list();
 }
 
+/**
+ * librdf_finish_hash:
+ * @void: 
+ * 
+ * Close down the rdf_hash module
+ **/
 void
 librdf_finish_hash(void) 
 {
