@@ -392,6 +392,10 @@ librdf_statement_to_string(librdf_statement *statement)
  * librdf_statement_print - pretty print the statement to a file descriptor
  * @statement: the statement
  * @fh: file handle
+ * 
+ * This method is for debugging and the format of the output should
+ * not be relied on.
+ * 
  **/
 void
 librdf_statement_print(librdf_statement *statement, FILE *fh) 
@@ -495,7 +499,8 @@ librdf_statement_encode(librdf_statement* statement,
                         size_t length)
 {
 
-  return librdf_statement_encode_parts(statement, buffer, length,
+  return librdf_statement_encode_parts(statement, NULL,
+                                       buffer, length,
                                        LIBRDF_STATEMENT_ALL);
 }
 
@@ -513,13 +518,16 @@ librdf_statement_encode(librdf_statement* statement,
  *
  * The fields values are or-ed combinations of:
  * LIBRDF_STATEMENT_SUBJECT LIBRDF_STATEMENT_PREDICATE
- * LIBRDF_STATEMENT_OBJECT LIBRDF_STATEMENT_ID LIBRDF_STATEMENT_FLAGS
- * or LIBRDF_STATEMENT_ALL for all fields
+ * LIBRDF_STATEMENT_OBJECT
+ * or LIBRDF_STATEMENT_ALL for subject,prdicate,object fields
  * 
+ * If context_node is given, it is encoded also
+ *
  * Return value: the number of bytes written or 0 on failure.
  **/
 size_t
 librdf_statement_encode_parts(librdf_statement* statement, 
+                              librdf_node* context_node,
                               unsigned char *buffer, size_t length,
                               int fields)
 {
@@ -598,6 +606,25 @@ librdf_statement_encode_parts(librdf_statement* statement,
     total_length += node_len;
   }
 
+  if(context_node) {
+    /* 'o' object */
+    if(p) {
+      *p++='c';
+      length--;
+    }
+    total_length++;
+
+    node_len= librdf_node_encode(context_node, p, length);
+    if(!node_len)
+      return 0;
+    if(p) {
+      p += node_len;
+      length -= node_len;
+    }
+
+    total_length += node_len;
+  }
+
   return total_length;
 }
 
@@ -617,14 +644,36 @@ size_t
 librdf_statement_decode(librdf_statement* statement, 
                         unsigned char *buffer, size_t length)
 {
+  return librdf_statement_decode_parts(statement, NULL, buffer, length);
+}
+
+
+/**
+ * librdf_statement_decode_parts - Decodes a statement + context node from a buffer
+ * @statement: the statement to deserialise into
+ * @context_node: pointer to &librdf_node context_node to deserialise into
+ * @buffer: the buffer to use
+ * @length: buffer size
+ * 
+ * Decodes the serialised statement (as created by librdf_statement_encode() )
+ * from the given buffer.  If a context node is found and context_node is
+ * not NULL, a pointer to the new &librdf_node is stored in *context_node.
+ * 
+ * Return value: number of bytes used or 0 on failure (bad encoding, allocation failure)
+ **/
+size_t
+librdf_statement_decode_parts(librdf_statement* statement, 
+                              librdf_node** context_node,
+                              unsigned char *buffer, size_t length)
+{
   unsigned char *p;
   librdf_node* node;
   unsigned char type;
   size_t total_length=0;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG2(librdf_statement_decode, "Decoding buffer of %d bytes\n", 
-                  length);
+    LIBRDF_DEBUG2(librdf_statement_decode_parts,
+                  "Decoding buffer of %d bytes\n", length);
 #endif
 
 
@@ -661,7 +710,7 @@ librdf_statement_decode(librdf_statement* statement,
     total_length += node_len;
     
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3(librdf_statement_decode, "Found type %c (%d bytes)\n",
+    LIBRDF_DEBUG3(librdf_statement_decode_parts, "Found type %c (%d bytes)\n",
                   type, node_len);
 #endif
   
@@ -678,8 +727,15 @@ librdf_statement_decode(librdf_statement* statement,
       LIBRDF_NODE_STATEMENT_OBJECT(statement)=node;
       break;
 
+    case 'c': /* context */
+      if(context_node)
+        *context_node=node;
+      else
+        librdf_free_node(node);
+      break;
+
     default:
-      LIBRDF_FATAL2(librdf_statement_decode,
+      LIBRDF_FATAL2(librdf_statement_decode_parts,
                     "Illegal statement encoding %d seen\n",
                     p[-1]);
     }
