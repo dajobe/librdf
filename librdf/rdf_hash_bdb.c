@@ -72,7 +72,7 @@ static int rdf_hash_bdb_get(void* context, rdf_hash_data *key, rdf_hash_data *da
 static int rdf_hash_bdb_put(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigned int flags);
 static int rdf_hash_bdb_exists(void* context, rdf_hash_data *key);
 static int rdf_hash_bdb_delete(void* context, rdf_hash_data *key);
-static int rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, unsigned int flags);
+static int rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type type);
 static int rdf_hash_bdb_sync(void* context);
 static int rdf_hash_bdb_get_fd(void* context);
 
@@ -260,7 +260,7 @@ rdf_hash_bdb_delete(void* context, rdf_hash_data *key)
 
 
 static int
-rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, unsigned int flags) 
+rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type type) 
 {
   rdf_hash_bdb_context* bdb_context=(rdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
@@ -278,7 +278,7 @@ rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, unsigned int flags)
   bdb_data.flags=DB_DBT_MALLOC;
   
   
-  if(flags == RDF_HASH_FLAGS_FIRST) {
+  if(type == RDF_HASH_SEQUENCE_FIRST) {
 #ifdef HAVE_BDB_CURSOR
     ret=db->cursor(db, NULL, &bdb_context->cursor);
     if(!ret) {
@@ -289,14 +289,14 @@ rdf_hash_bdb_get_seq(void* context, rdf_hash_data *key, unsigned int flags)
 #else
     ret=db->seq(db, &bdb_key, &bdb_data, R_FIRST);
 #endif
-  } else if (flags == RDF_HASH_FLAGS_NEXT) {
+  } else if (type == RDF_HASH_SEQUENCE_NEXT) {
 #ifdef HAVE_BDB_CURSOR
     bdb_cursor=bdb_context->cursor;
     ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_data, DB_NEXT);
 #else
     ret=db->seq(db, &bdb_key, &bdb_data, R_NEXT);
 #endif
-  } else { /* RDF_HASH_FLAGS_CURRENT */
+  } else { /* RDF_HASH_SEQUENCE_CURRENT */
 #ifdef HAVE_BDB_CURSOR
     bdb_cursor=bdb_context->cursor;
     ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_data, DB_CURRENT);

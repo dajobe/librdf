@@ -55,7 +55,7 @@ static int rdf_hash_list_get(void* context, rdf_hash_data *key, rdf_hash_data *d
 static int rdf_hash_list_put(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigned int flags);
 static int rdf_hash_list_exists(void* context, rdf_hash_data *key);
 static int rdf_hash_list_delete(void* context, rdf_hash_data *key);
-static int rdf_hash_list_get_seq(void* context, rdf_hash_data *key, unsigned int flags);
+static int rdf_hash_list_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type type);
 static int rdf_hash_list_sync(void* context);
 static int rdf_hash_list_get_fd(void* context);
 
@@ -232,16 +232,16 @@ rdf_hash_list_delete(void* context, rdf_hash_data *key)
 
 
 static int
-rdf_hash_list_get_seq(void* context, rdf_hash_data *key, unsigned int flags) 
+rdf_hash_list_get_seq(void* context, rdf_hash_data *key, rdf_hash_sequence_type type) 
 {
   rdf_hash_list_context* list_context=(rdf_hash_list_context*)context;
   rdf_hash_list_node* node;
 
-  if(flags == RDF_HASH_FLAGS_FIRST) {
+  if(type == RDF_HASH_SEQUENCE_FIRST) {
     node=list_context->first;
-  } else if (flags == RDF_HASH_FLAGS_NEXT) {
+  } else if (type == RDF_HASH_SEQUENCE_NEXT) {
     node=list_context->current_key ? list_context->current_key->next : NULL;
-  } else { /* RDF_HASH_FLAGS_CURRENT */
+  } else { /* RDF_HASH_SEQUENCE_CURRENT */
     node=list_context->current_key;
   }
 

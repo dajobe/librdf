@@ -285,11 +285,11 @@ rdf_hash_delete(rdf_hash* hash, void *key, size_t key_len)
  */
 int
 rdf_hash_get_seq(rdf_hash* hash, void **key, size_t* key_len,
-                 unsigned int flags)
+                 rdf_hash_sequence_type type)
 {
   rdf_hash_data hd_key;
   
-  int result=(*(hash->factory->get_seq))(hash->context, &hd_key, flags);
+  int result=(*(hash->factory->get_seq))(hash->context, &hd_key, type);
   /* copy out results into user variables */
   *key=hd_key.data; *key_len=hd_key.size;
   return result;
@@ -328,7 +328,7 @@ rdf_hash_get_fd(rdf_hash* hash)
 int
 rdf_hash_first(rdf_hash* hash, void** key, size_t* key_len)
 {
-  return rdf_hash_get_seq(hash, key, key_len, RDF_HASH_FLAGS_FIRST);
+  return rdf_hash_get_seq(hash, key, key_len, RDF_HASH_SEQUENCE_FIRST);
 }
 
 /** return the 'next' hash key in a sequential access of the hash as
@@ -343,7 +343,7 @@ rdf_hash_first(rdf_hash* hash, void** key, size_t* key_len)
 int
 rdf_hash_next(rdf_hash* hash, void** key, size_t* key_len)
 {
-  return rdf_hash_get_seq(hash, key, key_len, RDF_HASH_FLAGS_NEXT);
+  return rdf_hash_get_seq(hash, key, key_len, RDF_HASH_SEQUENCE_NEXT);
 }
 
 

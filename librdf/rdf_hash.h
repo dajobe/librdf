@@ -29,21 +29,16 @@ typedef struct
 } rdf_hash_data;
 
 
-/* Return the current hash key/value pair in a sequence
+/* Return various hash key/value pairs in a sequence
  * @see rdf_hash_get_seq
  */
-#define RDF_HASH_FLAGS_CURRENT 0
+typedef enum {
+  RDF_HASH_SEQUENCE_CURRENT,  /* current hash key/value pair in a sequence */
+  RDF_HASH_SEQUENCE_FIRST,    /* first hash key/value pair in a sequence */
+  RDF_HASH_SEQUENCE_NEXT      /* next hash key/value pair in a sequence */
+} rdf_hash_sequence_type;
 
-/* Return first hash key/value pair in a sequence
- * @see rdf_hash_get_seq
- */
-#define RDF_HASH_FLAGS_FIRST 1
-
-/* Return next hash key/value pair in a sequence
- * @see rdf_hash_get_seq
- */
-#define RDF_HASH_FLAGS_NEXT 2
-
+  
 /** A hash object */
 typedef struct
 {
@@ -75,7 +70,7 @@ struct rdf_hash_factory_s {
 
   int (*delete_key)(void* context, rdf_hash_data *key);
   /* retrieve a key/data pair via cursor-based/sequential access */
-  int (*get_seq)(void* context, rdf_hash_data *key, unsigned int flags);
+  int (*get_seq)(void* context, rdf_hash_data *key, rdf_hash_sequence_type type);
   /* flush any cached information to disk */
   int (*sync)(void* context);
   /* get the file descriptor for the hash, if it is file based (for locking) */
@@ -119,7 +114,7 @@ int rdf_hash_exists(rdf_hash* hash, void *key, size_t key_len);
 
 int rdf_hash_delete(rdf_hash* hash, void *key, size_t key_len);
 /* retrieve a key/data pair via cursor-based/sequential access */
-int rdf_hash_get_seq(rdf_hash* hash, void **key, size_t* key_len, unsigned int flags);
+int rdf_hash_get_seq(rdf_hash* hash, void **key, size_t* key_len, rdf_hash_sequence_type type);
 /* flush any cached information to disk */
 int rdf_hash_sync(rdf_hash* hash);
 /* get the file descriptor for the hash, if it is file based (for locking) */
