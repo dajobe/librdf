@@ -39,9 +39,7 @@ typedef struct
 
 /* prototypes for local functions */
 static int librdf_query_triples_init(librdf_query* query, const char *name, librdf_uri* uri, const unsigned char *query_string);
-static int librdf_query_triples_open(librdf_query* queryl);
-static int librdf_query_triples_close(librdf_query* query);
-static librdf_stream* librdf_query_triples_run(librdf_query* query, librdf_model* mode);
+static librdf_stream* librdf_query_triples_run_as_stream(librdf_query* query, librdf_model* mode);
 
 
 static void librdf_query_triples_register_factory(librdf_query_factory *factory);
@@ -239,35 +237,8 @@ librdf_query_triples_terminate(librdf_query* query)
 }
 
 
-static int
-librdf_query_triples_open(librdf_query* query)
-{
-/*  librdf_query_triples_context *context=(librdf_query_triples_context*)query->context; */
-  
-  return 0;
-}
-
-
-/**
- * librdf_query_triples_close:
- * @query: the query
- * 
- * Close the query list query, and free all content since there is no 
- * persistance.
- * 
- * Return value: non 0 on failure
- **/
-static int
-librdf_query_triples_close(librdf_query* query)
-{
-/*  librdf_query_triples_context* context=(librdf_query_triples_context*)query->context; */
-
-  return 0;
-}
-
-
 static librdf_stream*
-librdf_query_triples_run(librdf_query* query, librdf_model* model)
+librdf_query_triples_run_as_stream(librdf_query* query, librdf_model* model)
 {
   librdf_query_triples_context* context=(librdf_query_triples_context*)query->context;
 
@@ -283,14 +254,12 @@ librdf_query_triples_register_factory(librdf_query_factory *factory)
   
   factory->init               = librdf_query_triples_init;
   factory->terminate          = librdf_query_triples_terminate;
-  factory->open               = librdf_query_triples_open;
-  factory->close              = librdf_query_triples_close;
-  factory->run                = librdf_query_triples_run;
+  factory->run_as_stream      = librdf_query_triples_run_as_stream;
 }
 
 
 void
-librdf_init_query_triples(librdf_world *world)
+librdf_query_triples_constructor(librdf_world *world)
 {
   librdf_query_register_factory(world, "triples", NULL,
                                 &librdf_query_triples_register_factory);
