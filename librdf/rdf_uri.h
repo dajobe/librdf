@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_uri.h - RDF URI Definition / Implementation (if inline)
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -27,6 +27,7 @@
 extern "C" {
 #endif
 
+
 typedef char librdf_uri;
 
 /* class methods */
@@ -45,6 +46,7 @@ char* librdf_uri_as_string (librdf_uri *uri);
 librdf_digest* librdf_uri_get_digest (librdf_uri *uri);
 void librdf_uri_print (librdf_uri* uri, FILE *fh);
 char* librdf_uri_to_string (librdf_uri* uri);
+int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
 
 
 #if defined(LIBRDF_URI_INLINE) && !defined(LIBRDF_INSIDE_LIBRDF_URI_C)
