@@ -33,7 +33,7 @@
 #include <rdf_hash_list.h>
 
 
-/** initialise module */
+/** Initialise the rdf_hash module */
 void
 rdf_init_hash(void) 
 {
@@ -49,7 +49,10 @@ static rdf_hash_factory* hashes;
 
 /* class methods */
 
-/** register a hash factory */
+/** register a hash factory
+ * @param name the hash factory name
+ * @param factory pointer to function to call to register the factory
+ */
 void rdf_hash_register_factory(const char *name,
                                void (*factory) (rdf_hash_factory*)
                                ) 
@@ -88,7 +91,10 @@ void rdf_hash_register_factory(const char *name,
 }
 
 
-/** return the hash factory for a given name or NULL */
+/** get a hash factory for a given has name
+ * @param name the factory name or NULL for the default factory
+ * @returns the factory object or NULL if there is no such factory
+ */
 rdf_hash_factory*
 get_rdf_hash_factory (const char *name) 
 {
@@ -124,6 +130,7 @@ get_rdf_hash_factory (const char *name)
 
 /** constructor for rdf_hash
  * @param factory object from the factory
+ * @returns a new hash object
  */
 rdf_hash*
 rdf_new_hash (rdf_hash_factory* factory) {
@@ -145,7 +152,9 @@ rdf_new_hash (rdf_hash_factory* factory) {
 }
 
 
-/** destructor for rdf_hash objects */
+/** destructor for rdf_hash objects
+ * @param hash object
+ */
 void
 rdf_free_hash (rdf_hash* hash) 
 {
@@ -154,14 +163,21 @@ rdf_free_hash (rdf_hash* hash)
 
 /* methods */
 
-/** open/create hash with identifier (usually file or URI), mode and options */
+/** start hash association - open and/or create a new hash
+ * @param hash hash object
+ * @param identifier indentifier for the hash factory - usually a URI or file name
+ * @param mode hash access mode
+ * @param options a hash of options for the hash factory or NULL if there are none.
+*/
 int
-rdf_hash_open(rdf_hash* hash, char *identifier, void *mode, void *options) 
+rdf_hash_open(rdf_hash* hash, char *identifier, void *mode, rdf_hash* options) 
 {
   return (*(hash->factory->open))(hash->context, identifier, mode, options);
 }
 
-/** end hash association */
+/** end hash association
+ * @param hash hash object
+ */
 int
 rdf_hash_close(rdf_hash* hash)
 {
@@ -169,7 +185,16 @@ rdf_hash_close(rdf_hash* hash)
 }
 
 
-/** retrieve / insert key/data pairs from hash according to flags */
+/** retrieve data from hash given a key according to flags
+ * The key and values returned are from newly allocated memory which the
+ * called must free.
+ * @param hash hash object
+ * @param key pointer to key
+ * @param key_len key length in bytes
+ * @param value pointer to variable to store value pointer
+ * @param value_len pointer to variable to store value length
+ * @param flags 0 at present
+ */
 int
 rdf_hash_get(rdf_hash* hash, void *key, size_t key_len,
              void **value, size_t* value_len, unsigned int flags)
@@ -186,7 +211,16 @@ rdf_hash_get(rdf_hash* hash, void *key, size_t key_len,
   return result;
 }
 
-/** insert key/value pairs into hash according to flags */
+/** insert key/value pairs into hash according to flags
+ * The key and values are copied into the hash; the original pointers
+ * can be deleted.
+ * @param hash hash object
+ * @param key pointer to key 
+ * @param key_len length of key in bytes
+ * @param value pointer to the value
+ * @param value_len length of the value in bytes
+ * @param flags 0 at present
+ */
 int
 rdf_hash_put(rdf_hash* hash, void *key, size_t key_len,
              void *value, size_t value_len, unsigned int flags)
@@ -202,7 +236,28 @@ rdf_hash_put(rdf_hash* hash, void *key, size_t key_len,
 }
 
 
-/** delete a key (and associated value) from hash */
+/** check if a given key is in the hash
+ * @param hash hash object
+ * @param key pointer to the key
+ * @param key_len length of key in bytes
+ * @returns true (not 0) if the key is present in the hash
+ */
+int
+rdf_hash_exists(rdf_hash* hash, void *key, size_t key_len) 
+{
+  rdf_hash_data hd_key;
+  /* copy key pointers and lengths into rdf_hash_data structures */
+  hd_key.data=key; hd_key.size=key_len;
+  
+  return (*(hash->factory->exists))(hash->context, &hd_key);
+}
+
+
+/** delete a key/value pair from the hash
+ * @param hash hash object
+ * @param key pointer to key
+ * @param key_len length of key in bytes
+ */
 int
 rdf_hash_delete(rdf_hash* hash, void *key, size_t key_len)
 {
@@ -214,7 +269,14 @@ rdf_hash_delete(rdf_hash* hash, void *key, size_t key_len)
   return (*(hash->factory->delete_key))(hash->context, &hd_key);
 }
 
-/** retrieve a key/value pair via cursor-based/sequential access */
+
+/** retrieve keys via sequential access
+ * Note; the key pointer will return newly allocate memory each time
+ * @param hash
+ * @param key pointer to variable to store key pointer
+ * @param key_len pointer to variable to store key length
+ * @param flags RDF_HASH_FLAGS_FIRST to return first key, RDF_HASH_FLAGS_NEXT to return next key, RDF_HASH_FLAGS_CURRENT to return current key in sequence
+ */
 int
 rdf_hash_get_seq(rdf_hash* hash, void **key, size_t* key_len,
                  unsigned int flags)
@@ -227,25 +289,34 @@ rdf_hash_get_seq(rdf_hash* hash, void **key, size_t* key_len,
   return result;
 }
 
-/** flush any cached information to disk if appropriate */
+
+/** flush any cached information to disk if appropriate
+ * @param hash hash object
+ */
 int
 rdf_hash_sync(rdf_hash* hash)
 {
   return (*(hash->factory->sync))(hash->context);
 }
 
-/** get the file descriptor for the hash, if it is file based (for locking) */
+
+/** get the file descriptor for the hash, if it is file based (for locking)
+ * @param hash hash object
+ * */
 int
 rdf_hash_get_fd(rdf_hash* hash)
 {
   return (*(hash->factory->get_fd))(hash->context);
 }
 
+
 /** return the 'first' hash key in a sequential access of the hash
  * Note: the key pointer will return newly allocated memory each time.
  * @param hash hash object
- * @param key pointer to void* where key will be stored
- * @param key_len pointer to size_t where length will be stored
+ * @param key pointer to variable to store key pointer
+ * @param key_len pointer to variable to store key length
+ * @see rdf_hash_next()
+ * @see rdf_hash_get_seq()
  */
 
 int
@@ -254,14 +325,14 @@ rdf_hash_first(rdf_hash* hash, void** key, size_t* key_len)
   return rdf_hash_get_seq(hash, key, key_len, RDF_HASH_FLAGS_FIRST);
 }
 
-/**
- * return the 'next' hash key in a sequential access of the hash as
+/** return the 'next' hash key in a sequential access of the hash as
  * started by rdf_hash_first
  * Note: the key pointer will return newly allocated memory each time.
  * @param hash hash object
- * @param key pointer to void* where key will be stored
- * @param key_len pointer to size_t where length will be stored
+ * @param key pointer to variable to store key pointer
+ * @param key_len pointer to variable to store key length
  * @see rdf_hash_first()
+ * @see rdf_hash_get_seq()
  */
 int
 rdf_hash_next(rdf_hash* hash, void** key, size_t* key_len)
@@ -272,8 +343,8 @@ rdf_hash_next(rdf_hash* hash, void** key, size_t* key_len)
 
 
 /** pretty-print the has to a file descriptior.
- * @param hash the hash
- * @param fh   file descriptork   actually a FILE*
+ * @param hash hash object
+ * @param fh   file descriptor
  */
 void
 rdf_hash_print (rdf_hash* hash, FILE *fh) 
@@ -303,10 +374,10 @@ rdf_hash_print (rdf_hash* hash, FILE *fh)
 
 
 /** initialise a hash from a string
- * @param hash the hash
- * @param string flat hash
+ * @param hash hash object
+ * @param string hash encoded as a string
  */
-void
+int
 rdf_hash_from_string (rdf_hash* hash, char *string) 
 {
   char *p;
@@ -410,7 +481,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
             real_value_len=value_len-backslashes;
             new_value=(char*)RDF_MALLOC(cstring, real_value_len);
             if(!new_value)
-              return;
+              return 1;
             for(i=0, to=new_value; i<(int)value_len; i++){
               if(value[i]=='\\')
                 i++;
@@ -418,9 +489,12 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
             }
 
             rdf_hash_put(hash, key, key_len, new_value, real_value_len, 0);
-            fprintf(stderr, "rdf_hash_from_string: after decoding ");
+
+            RDF_DEBUG1(rdf_hash_from_string, "after decoding ");
+#ifdef RDF_DEBUG
             rdf_hash_print (hash, stderr) ;
             fputc('\n', stderr);
+#endif
             state=RHS_STATE_INIT;
             p++;
             break;
@@ -441,8 +515,29 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
         RDF_FATAL2(rdf_hash_from_string, "No such state %d", state);
     }
   }
+  return 0;
 }
 
+
+/** initialise a hash from an array of strings
+ * @param hash hash object
+ * @param array address of the start of the array of char* pointers
+ */
+int
+rdf_hash_from_array_of_strings (rdf_hash* hash, char *array[]) 
+{
+  int i;
+  char *key;
+  char *value;
+
+  for(i=0; (key=array[i]); i+=2) {
+    value=array[i+1];
+    if(!value)
+      RDF_FATAL2(rdf_hash_from_array_of_strings, "Array contains an odd number of strings - %d", i);
+    rdf_hash_put(hash, key, strlen(key), value, strlen(value), 0);
+  }
+  return 0;
+}
 
 
 
@@ -456,14 +551,19 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  rdf_hash_factory* factory;
-  rdf_hash* h;
+  rdf_hash_factory *factory, *default_factory;
+  rdf_hash *h, *h2;
   char *test_hash_types[]={"GDBM", "FAKE", "LIST", NULL};
   char *test_hash_values[]={"colour", "yellow",
                             "age", "new",
                             "size", "large",
                             "fruit", "banana",
                             NULL, NULL};
+  char *test_hash_array[]={"shape", "cube",
+                           "sides", "six",
+                           "colours", "six",
+                           "creator", "rubik",
+                            NULL};
   char *test_hash_delete_key="size";
   int i,j;
   char *type;
@@ -477,17 +577,17 @@ main(int argc, char *argv[])
   if(argc ==2) {
     factory=get_rdf_hash_factory(NULL);
     if(!factory) {
-      fprintf(stderr, "%s: No hash factory called %s\n", program, type);
+      fprintf(stderr, "%s: No hash factory called '%s'\n", program, type);
       return(0);
     }
     
     h=rdf_new_hash(factory);
     if(!h) {
-      fprintf(stderr, "%s: Failed to create new hash type %s\n", program, type);
+      fprintf(stderr, "%s: Failed to create new hash type '%s'\n", program, type);
       return(0);
     }
 
-    rdf_hash_open(h, "test.gdbm", "mode", "options");
+    rdf_hash_open(h, "test.gdbm", "mode", NULL);
     rdf_hash_from_string(h, argv[1]);
     fprintf(stderr, "%s: resulting ", program);    
     rdf_hash_print(h, stderr);
@@ -503,17 +603,17 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Trying to create new %s hash\n", program, type);
     factory=get_rdf_hash_factory(type);
     if(!factory) {
-      fprintf(stderr, "%s: No hash factory called %s\n", program, type);
+      fprintf(stderr, "%s: No hash factory called '%s'\n", program, type);
       continue;
     }
     
     h=rdf_new_hash(factory);
     if(!h) {
-      fprintf(stderr, "%s: Failed to create new hash type %s\n", program, type);
+      fprintf(stderr, "%s: Failed to create new hash type '%s'\n", program, type);
       continue;
     }
 
-    rdf_hash_open(h, "test.gdbm", "mode", "options");
+    rdf_hash_open(h, "test.gdbm", "mode", NULL);
 
     for(j=0; test_hash_values[j]; j+=2) {
       key=test_hash_values[j];
@@ -540,6 +640,34 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Freeing hash\n", program);
     rdf_free_hash(h);
   }
+
+  
+  fprintf(stderr, "%s: Getting default hash factory\n", program);
+  default_factory=get_rdf_hash_factory(NULL);
+  if(!default_factory) {
+    fprintf(stderr, "%s: No default hash factory found\n", program);
+    return(0);
+  }
+  fprintf(stderr, "%s: Creating new hash from default factory\n", program);
+  h2=rdf_new_hash(default_factory);
+  if(!h2) {
+    fprintf(stderr, "%s: Failed to create new hash from default factory\n", program);
+    return(0);
+  }
+  fprintf(stderr, "%s: Initialising hash from array of strings\n", program);
+  if(rdf_hash_from_array_of_strings(h2, test_hash_array)) {
+    fprintf(stderr, "%s: Failed to init hash from array of strings\n", program);
+    return(0);
+  }
+  fprintf(stderr, "%s: resulting hash ", program);    
+  rdf_hash_print(h2, stderr);
+  fprintf(stderr, "\n");
+  
+  rdf_hash_close(h2);
+  
+  fprintf(stderr, "%s: Freeing hash\n", program);
+  rdf_free_hash(h2);
+    
   
     
   /* keep gcc -Wall happy */
