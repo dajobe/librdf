@@ -71,17 +71,18 @@ rdf_query_triples.h \
 rdf_serializer.h
 
 librdf_la_LIBADD = \
-@LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+@LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ @STORAGE_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 
 librdf_la_DEPENDENCIES = \
-@DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+@DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ @STORAGE_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 
 EXTRA_librdf_la_SOURCES = rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
 rdf_parser_raptor.c \
-rdf_storage_tstore.c rdf_storage_tstore.h
+rdf_storage_tstore.c rdf_storage_tstore.h \
+rdf_storage_mysql.c rdf_storage_mysql.h
 
 EXTRA_DIST=\
 memcmp.c \
