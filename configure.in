@@ -129,35 +129,50 @@ if test "$bdb_prefix" != no; then
   if test "$bdb_prefix" != /usr; then
     nLDFLAGS="-L$bdb_prefix/lib $LDFLAGS";
     CFLAGS="-I$bdb_prefix/include $CFLAGS";
+    # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
+    DBname=`cd $bdb_prefix/lib; ls -1 libdb*.a|sed -e 's/^lib//' -e 's/\.a$//' | head -1`
   else
     nLDFLAGS="$LDFLAGS"
+    DBname="db"
   fi
+
   LDFLAGS="$nLDFLAGS"
   AC_CHECK_HEADERS(db.h)
   if test "$ac_cv_header_db_h" = yes ; then
-    LIBS="$oLIBS"
-    AC_CHECK_LIB(db, db_create)
-    LIBS="$oLIBS"
-    AC_CHECK_LIB(db, db_open)
-    LIBS="$oLIBS"
-    AC_CHECK_LIB(db, dbopen)
-    LIBS="$oLIBS -ldb"
     LDFLAGS="$nLDFLAGS"
+    LIBS="$oLIBS -l$DBname"
     have_libdb=no
-    if test "$ac_cv_lib_db_db_create" = yes; then
-      AC_DEFINE(HAVE_DB_CREATE)
-      bdb_available="Version 3.x"
-      have_libdb=yes
-    elif test "$ac_cv_lib_db_db_open" = yes; then
-      AC_DEFINE(HAVE_DB_OPEN)
-      bdb_available="Version 2.x"
-      have_libdb=yes
-    elif test "$ac_cv_lib_db_dbopen" = yes; then
-      AC_DEFINE(HAVE_DBOPEN)
-      AC_MSG_WARN(Berkeley DB version 1 found - this is not supported)
-      bdb_available="Version 1.x - not supported"
-      have_libdb=no
-    fi
+    AC_MSG_CHECKING(for BDB V3 db_create)
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [db_create(NULL, NULL, 0);],
+		AC_DEFINE(HAVE_DB_CREATE)
+                bdb_available="Version 3.x"
+                have_libdb=yes
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
+    AC_MSG_CHECKING(for BDB V2 db_open)
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [db_open(NULL, DB_BTREE, 0, 0, NULL, NULL, NULL);],
+		AC_DEFINE(HAVE_DB_OPEN)
+                if test $have_libdb = no; then
+                  bdb_available="Version 2.x"
+                  have_libdb=yes
+                fi
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
+    AC_MSG_CHECKING(for BDB V1 dbopen)
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [dbopen(NULL, 0, 0, DB_BTREE, NULL);],
+		AC_DEFINE(HAVE_DBOPEN)
+                if test $have_libdb = no; then
+                  bdb_available="Version 1.x - not supported"
+                  have_libdb=no
+                fi
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
     AC_MSG_CHECKING(whether DB_TXN defined in db.h)
     dnl In BDB, DB_TXN is a pointer to a structure never defined
     AC_TRY_LINK([#include <stdio.h>
@@ -749,7 +764,7 @@ AC_SUBST(HASH_SRCS)
 
 
 dnl Checks for building sub-packages in sub directories
-SD="docs perl python tcl"
+SD="docs perl python tcl java"
 
 
 XML_OBJS=
@@ -845,6 +860,9 @@ perl/lib/RDF/Makefile
 python/Makefile
 python/test/Makefile
 tcl/Makefile
+java/Makefile
+java/org/Makefile
+java/org/librdf/Makefile
 repat/Makefile
 debian/Makefile
 debian/rules
