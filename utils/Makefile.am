@@ -1,4 +1,4 @@
-MYSQL_UTILS=rdf-digest rdf-load rdf-tree
+MYSQL_UTILS=rdf-tree
 
 bin_PROGRAMS=redland-db-upgrade rdfproc
 
