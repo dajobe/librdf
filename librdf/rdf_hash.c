@@ -331,8 +331,11 @@ librdf_new_hash_from_factory (librdf_hash_factory* factory) {
 void
 librdf_free_hash (librdf_hash* hash) 
 {
-  if(hash->context)
+  if(hash->context) {
+    if(hash->is_open)
+      hash->factory->close(hash->context);
     LIBRDF_FREE(librdf_hash_context, hash->context);
+  }
   LIBRDF_FREE(librdf_hash, hash);
 }
 
@@ -344,6 +347,8 @@ librdf_free_hash (librdf_hash* hash)
  * @hash: hash object
  * @identifier: indentifier for the hash factory - usually a URI or file name
  * @mode: hash access mode
+ * @is_writable: is hash writable?
+ * @is_new: is hash new?
  * @options: a hash of options for the hash factory or NULL if there are none.
  * 
  * This method opens and/or creates a new hash with any resources it
@@ -352,10 +357,18 @@ librdf_free_hash (librdf_hash* hash)
  * Return value: non 0 on failure
  **/
 int
-librdf_hash_open(librdf_hash* hash, char *identifier, void *mode,
+librdf_hash_open(librdf_hash* hash, char *identifier,
+                 int mode, int is_writable, int is_new,
                  librdf_hash* options) 
 {
-  return hash->factory->open(hash->context, identifier, mode, options);
+  int status;
+
+  status=hash->factory->open(hash->context, identifier, 
+                             mode, is_writable, is_new, 
+                             options);
+  if(!status)
+    hash->is_open=1;
+  return status;
 }
 
 
@@ -368,6 +381,7 @@ librdf_hash_open(librdf_hash* hash, char *identifier, void *mode,
 int
 librdf_hash_close(librdf_hash* hash)
 {
+  hash->is_open=0;
   return hash->factory->close(hash->context);
 }
 
@@ -394,16 +408,21 @@ librdf_hash_get(librdf_hash* hash, char *key)
 
   hd_value=librdf_hash_get_one(hash, hd_key);
 
-  if(hd_value && hd_value->data) {
-    /* FIXME: intimate knowledge about hash datum destructor here
-     * to save an extra allocation and copy.
-     */
-    value=hd_value->data;
-    hd_value->data=NULL;
+  if(hd_value) {
+    if(hd_value->data) {
+      value=LIBRDF_MALLOC(cstring, hd_value->size+1);
+      if(value) {
+        /* Copy into new null terminated string for userland */
+        memcpy(value, hd_value->data, hd_value->size);
+        value[hd_value->size]='\0';
+      }
+    }
+    librdf_free_hash_datum(hd_value);
   }
 
+  /* don't free user key */
+  hd_key->data=NULL;
   librdf_free_hash_datum(hd_key);
-  librdf_free_hash_datum(hd_value);
 
   return value;
 }
@@ -425,6 +444,7 @@ librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key)
   librdf_hash_datum *value;
   librdf_hash_cursor *cursor;
   int status;
+  char *new_value;
   
   value=librdf_new_hash_datum(NULL, 0);
   if(!value)
@@ -437,7 +457,21 @@ librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key)
   }
 
   status=librdf_hash_cursor_get_next(cursor, key, value);
+  if(!status) {
+    /* value->data will point to SHARED area, so copy it */
+    new_value=LIBRDF_MALLOC(cstring, value->size);
+    if(new_value) {
+      memcpy(new_value, value->data, value->size);
+      value->data=new_value;
+    } else {
+      status=1;
+      value->data=NULL;
+    }
+  }
+
+  /* this deletes the data behind the datum */
   librdf_free_hash_cursor(cursor);
+
   if(status) {
     librdf_free_hash_datum(value);
     return NULL;
@@ -968,9 +1002,10 @@ typedef enum {
   HFS_PARSE_STATE_KEY = 1,
   HFS_PARSE_STATE_SEP = 2,
   HFS_PARSE_STATE_EQ = 3,
-  HFS_PARSE_STATE_VALUE = 4,
-  HFS_PARSE_STATE_VALUE_BQ = 5
+  HFS_PARSE_STATE_VALUE = 4
 } librdf_hfs_parse_state;
+
+
 
 /**
  * librdf_hash_from_string - Initialise a hash from a string
@@ -1002,7 +1037,9 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
   if(!string)
     return 0;
   
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2(librdf_hash_from_string, "Parsing >>%s<<\n", string);
+#endif
 
   p=string;
   key=NULL; key_len=0;
@@ -1010,6 +1047,12 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
   backslashes=0;
   state=HFS_PARSE_STATE_INIT;
   while(*p) {
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3(librdf_hash_from_string,
+                  "state %d at %s\n", state, p);
+#endif
+
     switch(state){
       /* start of config - before key */
       case HFS_PARSE_STATE_INIT:
@@ -1017,13 +1060,19 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
           p++;
         if(!*p)
           break;
-        key=p;
+
         /* fall through to next state */
         state=HFS_PARSE_STATE_KEY;
         
-        /* collecting key characters */
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3(librdf_hash_from_string,
+                  "state %d at %s\n", state, p);
+#endif
+
+        /* start of key */
       case HFS_PARSE_STATE_KEY:
-        while(*p && isalnum((int)*p))
+        key=p;
+        while(*p && (isalnum((int)*p) || *p == '_' || *p == '-'))
           p++;
         if(!*p)
           break;
@@ -1039,6 +1088,11 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
         state=HFS_PARSE_STATE_SEP;
         /* fall through to next state */
       
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3(librdf_hash_from_string,
+                  "state %d at %s\n", state, p);
+#endif
+
         /* got key, now skipping spaces */
       case HFS_PARSE_STATE_SEP:
         while(*p && isspace((int)*p))
@@ -1055,6 +1109,11 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
         state=HFS_PARSE_STATE_EQ;
         /* fall through to next state */
         
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3(librdf_hash_from_string,
+                  "state %d at %s\n", state, p);
+#endif
+
         /* got key\s+= now skipping spaces " */
       case HFS_PARSE_STATE_EQ:
         while(*p && isspace((int)*p))
@@ -1068,56 +1127,61 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
           break;
         }
         p++;
-        value=p;
-        backslashes=0;
         state=HFS_PARSE_STATE_VALUE;
         /* fall through to next state */
         
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3(librdf_hash_from_string,
+                  "state %d at %s\n", state, p);
+#endif
+
         /* got key\s+=\s+" now reading value */
       case HFS_PARSE_STATE_VALUE:
+        value=p;
+        backslashes=0;
         while(*p) {
-          if(*p == '\\') {
+          if(*p == '\\')
             /* backslashes are removed during value copy later */
-            state=HFS_PARSE_STATE_VALUE_BQ;
-            p++;
+            backslashes++; /* reduces real length */
+          else if (*p == '\'')
             break;
-          } else if (*p != '\'') {
-            /* keep searching for ' */
-            p++;
-            continue;
-          }
 
-          /* end of value found */
-          value_len=p-value;
-          real_value_len=value_len-backslashes;
-          new_value=(char*)LIBRDF_MALLOC(cstring, real_value_len);
-          if(!new_value)
-            return 1;
-          for(i=0, to=new_value; i<(int)value_len; i++){
-            if(value[i]=='\\')
-              i++;
-            *to=value[i];
-          }
-          
-          librdf_hash_put(hash, key, key_len, new_value, real_value_len);
-          
-          LIBRDF_DEBUG1(librdf_hash_from_string,
-                        "after decoding ");
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-          librdf_hash_print (hash, stderr) ;
-          fputc('\n', stderr);
-#endif
-          state=HFS_PARSE_STATE_INIT;
           p++;
         }
-        break;
-        
-      case HFS_PARSE_STATE_VALUE_BQ:
         if(!*p)
-          break;
-        backslashes++; /* reduces real length */
+          return 1;
+        
+        /* ' at end of value found */
+        value_len=p-value;
+        real_value_len=value_len-backslashes;
+        new_value=(char*)LIBRDF_MALLOC(cstring, real_value_len+1);
+        if(!new_value)
+          return 1;
+        for(i=0, to=new_value; i<(int)value_len; i++){
+          if(value[i]=='\\')
+            i++;
+          *to++=value[i];
+        }
+        *to='\0';
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+        LIBRDF_DEBUG3(librdf_hash_from_string,
+                      "decoded key >>%s<< (true) value >>%s<<\n", key, new_value);
+#endif
+        
+        librdf_hash_put(hash, key, key_len, new_value, real_value_len);
+        
+        LIBRDF_FREE(cstring, new_value);
+        
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+        LIBRDF_DEBUG1(librdf_hash_from_string,
+                      "after decoding ");
+        librdf_hash_print (hash, stderr) ;
+        fputc('\n', stderr);
+#endif
+        state=HFS_PARSE_STATE_INIT;
         p++;
-        state=HFS_PARSE_STATE_VALUE;
+
         break;
         
       default:
@@ -1274,7 +1338,7 @@ main(int argc, char *argv[])
       return(0);
     }
     
-    librdf_hash_open(h, "test", "mode", NULL);
+    librdf_hash_open(h, "test", 0644, 1, 1, NULL);
     librdf_hash_from_string(h, argv[1]);
     fprintf(stdout, "%s: resulting ", program);    
     librdf_hash_print(h, stdout);
@@ -1293,10 +1357,7 @@ main(int argc, char *argv[])
       continue;
     }
 
-    /* delete DB file */
-    remove("test");
-    
-    if(librdf_hash_open(h, "test", "mode", NULL)) {
+    if(librdf_hash_open(h, "test", 0644, 1, 1, NULL)) {
       fprintf(stderr, "%s: Failed to open new hash type '%s'\n", program, type);
       continue;
     }
