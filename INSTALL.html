@@ -304,26 +304,33 @@ removal of statements.  To see a usage message type:</p>
   example4
 </pre>
 
-<p>For example, to parse some RDF/XML (using SiRPAC java based
-parser) into a BerkeleyDB store, print it, do some queries, you could
-do the following:</p>
+<p>For example, to parse some RDF/XML using the repat parser into a
+BerkeleyDB store, print it, do some queries, you could do the
+following (some lines broken for clarity)</p>
 <pre>
 $ cd examples
 $ example4 test parse file:../perl/dc.rdf repat
 example4: Parsing URI file:../perl/dc.rdf with repat parser
+
 $ example4 test print
 [[
   {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
   {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
-  {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page of Dave Beckett."}
+  {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page\
+of Dave Beckett."}
 ]]
+
 $ example4 test targets http://purl.org/net/dajobe/ http://purl.org/dc/elements/1.1/title
 Matched node: Dave Beckett's Home Page
 example4: matching nodes: 1
+
 $ example4 test statements http://purl.org/net/dajobe/ - -
-Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
-Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
-Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page of Dave Beckett."}
+Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Becke\
+tt's Home Page"}
+Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Bec\
+kett"}
+Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The \
+generic home page of Dave Beckett."}
 example4: matching statements: 3
 </pre>
 
