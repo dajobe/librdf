@@ -1,4 +1,198 @@
+2004-11-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal.h, librdf/redland.h, librdf/rdf_utf8.h,
+	librdf/rdf_node.h, librdf/rdf_model.h, librdf/rdf_list.h,
+	librdf/librdf.h: Applied patch from René Puls to allow for Redland
+	public headers to be in a different directory structure. If
+	LIBRDF_OBJC_FRAMEWORK is defined, the headers are in a Redland
+	subdirectory.  Only applies to public Redland header files that
+	#include other public header files.  rasqal.h includes raptor.h so
+	needs modifying also.
+
+	* librdf/rdf_storage_mysql.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_file.c: Changed sync methods to return an int
+	status.
+
+	* librdf/rdf_storage.c (librdf_storage_sync): Changed to return an
+	int.  API change but most C won't care much.
+
+	* librdf/rdf_storage.h: sync factory method returns a status int
+	API CHANGE: librdf_storage_sync returns an int
+
+	* librdf/rdf_model_storage.c (librdf_model_storage_sync):
+	Changed to return an int.
+
+	* librdf/rdf_model.c (librdf_model_sync):
+	Changed to return an int.  API change but most C won't care much.
+
+	* librdf/rdf_model.h: sync factory method returns a status int
+	API CHANGE: librdf_model_sync returns an int
+
+2004-11-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Redland.i: Add base_uri argumemt to librdf_new_query
+
+	* utils/rdfproc.c: Add NULL base_URI arg to librdf_new_query calls.
+
+	* librdf/rdf_query_triples.c (librdf_query_triples_init):
+	Add new base_uri argument, not used.
+
+	* librdf/rdf_query_rasqal.c (librdf_query_rasqal_init): Use new
+	base_uri argument and store that, not language URI.
+
+	* librdf/rdf_query.h:
+	Update query factory init method to add base_uri argument.
+	API CHANGE: Add base_uri argument to librdf_new_query and
+	librdf_new_query_from_factory
+
+	* librdf/rdf_query.c (librdf_new_query, librdf_new_query_from_factory):
+	Add optional base_uri argument.  Stop overloading query language
+	identifier URI and base URI.
+	(main): Update test to match.
+
+	* librdf/rdf_query.c (librdf_get_query_factory):
+	librdf_uri_equals test was negated
+
+2004-11-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_mysql.c (librdf_storage_mysql_init): Return
+	failure early if connection failed.
+
+	* raptor/rdfdump.c: allow -f to set serializer features
+
+	* raptor/raptor_feature.c (raptor_features_enumerate_common): return -1
+
+2004-11-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_uri.c (raptor_uri_path_make_relative_path):
+	C style, indenting, const unsigned char.  Remove a small memcpy.
+	(raptor_uri_to_relative_counted_uri_string) C style, indentng, docs.
+	Remove a large if {} block.  Rename 'reference' var since libxml2
+	defines it (SEP).  Use buildresult to make empty string result.
+
+	* raptor/raptor_serialize.c (raptor_rdfxml_serialize_statement):
+	use feature feature_relative_uris to decide when to emit an
+	absolute or relative URI, the latter using
+	raptor_uri_to_relative_uri_string.
+
+	* raptor/raptor_uri.c:
+	Added raptor relative URI generating code patch from René Puls
+	(raptor_uri_path_common_base_length): Added. Helper to return the
+	common base length of two paths
+	(raptor_uri_path_make_relative_path): Added. Helper to build the
+	result relative URI string from already analysed parts.
+	(raptor_uri_to_relative_counted_uri_string): Added. Get the relative
+	URI string between a base and reference URI.
+	(raptor_uri_to_relative_uri_string): Added.  Wrapper about the above.
+	(assert_uri_to_relative): Added.  Helper for tests for above.
+	(main): Added relative URI string generation tests.
+
+	* raptor/raptor.h:
+	Added prototypes for raptor_uri_to_relative_counted_uri_string and
+	raptor_uri_to_relative_uri_string
+
+	* librdf/rdf_storage_mysql.c
+	(librdf_storage_mysql_find_statements_with_options): Ensure
+	subject, predicate and object are initialised.
+
+	* librdf/rdf_query_triples.c (librdf_query_triples_init):
+	Ensure subject, predicate are
+	initialised.  Free them only if they are set.
+
+	* librdf/rdf_node.c (librdf_node_to_counted_string): Init
+	datatype_uri_string, language_len.
+
+	* raptor/raptor_rss.c (raptor_rss_parser_processNode): Add cast
+	for name when returned from xmlTextReaderConstLocalName.
+
+	* raptor/raptor_rss.c (raptor_rss_parser_processNode):
+	Always declare name as xmlChar*
+
+2004-11-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/rdfdump.c: Tidy help messages about features, other words.
+
+	* raptor/raptor_parse.c (raptor_feature_from_uri):
+	Moved to raptor_feature.c
+
+	* raptor/raptor.h:
+	Moved raptor_feature_from_uri to separate section, not just parsers
+
+	* raptor/raptor_internal.h: Deleted raptor_feature_from_uri_common
+
+	* raptor/raptor_feature.c (raptor_feature_from_uri):
+	Defined here, no need for
+	raptor_feature_from_uri_common
+
+	* raptor/rdfdump.c:
+	In feature help code, list parser and serializer features
+	separately, using new raptor_features_enumerate.
+
+	* raptor/raptor_serialize.c (raptor_serializer_features_enumerate):
+	Added, a wrapper around
+	raptor_features_enumerate_common.
+	(raptor_serializer_set_feature): Added.
+	(raptor_serializer_get_feature): Added.
+
+	* raptor/raptor_parse.c: Moved raptor_features_list to raptor_feature.c
+	(raptor_features_enumerate): Changed to be a wrapper around
+	raptor_features_enumerate_common now containing the body of the code.
+	(raptor_feature_from_uri): Changed to be a wraper around
+	raptor_feature_from_uri_common now containing the body of the code.
+
+	* raptor/raptor_internal.h:
+	Added feature_relative_uris for raptor_serializer.
+	Added prototypes for raptor_features_enumerate_common and
+	raptor_feature_from_uri_common
+
+	* raptor/raptor.h: Added RAPTOR_FEATURE_RELATIVE_URIS for serializing.
+	Added prototypes for raptor_serializer_features_enumerate,
+	raptor_serializer_set_feature and raptor_serializer_get_feature
+
+	* raptor/Makefile.am: Added raptor_feature.c
+
+	* raptor/raptor_feature.c:
+	Moved common raptor_feature code from raptor_parse.c
+
+	* raptor/raptor_rss.c:
+	Added <none> entry to raptor_rss_fields_info so that when indexed
+	with RAPTOR_RSS_FIELDS_NONE, does not access invalid data.
+	Fixes for xmlReader API for older libxml2s:
+	Added node type defines for <2.5.9
+	Use xmlTextReaderLocalName, xmlTextReaderNamespaceUri instead of the
+	Const versions with additional corresponding xmlFree()s for <2.6.0
+
+2004-11-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_raptor.c (ordinal_as_uri): Utterly broken
+
+	* rasqal/tests/sparql/check-sparql (run_test):
+	Take array of data files and use them to invoke roqet
+	Tidy some rapper invoking.
+	Add more debug messages.
+
+	* rasqal/sparql_parser.y (GraphPattern):
+	Merge the two sequences to make one sequence of triples.
+	(PatternElement): Pass on PatternElementForms sequence
+	(GraphPattern1:) Make a new triple sequence and pass on
+	PatternElementForms.
+
+	* rasqal/roqet.c (main): Add sources before prepare.
+
+	* rasqal/roqet.c (main):
+	Form a list of files/source URIs to add using a
+	raptor_sequence and add them once the query is created.
+
+	* librdf/win32_rdf_config.h, configure.ac: Bumped version to
+	0.9.20
+
+	* rasqal/configure.ac, rasqal/win32_rasqal_config.h: Bumped
+	version to 0.9.5
+
 2004-11-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/configure.ac, raptor/win32_raptor_config.h: Bumped
+	version to 1.4.3
 
 	* Snapshotted redland_0_9_19 for 0.9.19 release
 

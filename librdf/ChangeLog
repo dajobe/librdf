@@ -1,5 +1,13 @@
 2004-11-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* redland.h, rdf_utf8.h, rdf_node.h, rdf_model.h, rdf_list.h, librdf.h:
+	Applied patch from René Puls to allow for Redland public headers to
+	be in a different directory structure. If LIBRDF_OBJC_FRAMEWORK
+	is defined, the headers are in a Redland subdirectory.
+	Only applies to public Redland header files that #include other
+	public header files.  rasqal.h includes raptor.h so needs modifying
+	also.
+
 	* rdf_storage_mysql.c, rdf_storage_hashes.c, rdf_storage_file.c:
 	Changed sync methods to return an int status.
 
