@@ -36,7 +36,7 @@
 
 #include <openssl/crypto.h>
 
-#include <librdf.h>
+#include <redland.h>
 #include <rdf_digest.h>
 
 #ifdef HAVE_OPENSSL_CRYPTO_MD5_DIGEST

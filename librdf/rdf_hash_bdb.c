@@ -44,7 +44,7 @@
 #include <db.h>
 #endif
 
-#include <librdf.h>
+#include <redland.h>
 #include <rdf_hash.h>
 #include <rdf_hash_bdb.h>
 

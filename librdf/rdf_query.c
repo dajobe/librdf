@@ -37,7 +37,7 @@
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
 
-#include <librdf.h>
+#include <redland.h>
 #include <rdf_query.h>
 
 

@@ -49,7 +49,7 @@
 #endif
 #endif
 
-#include <librdf.h>
+#include <redland.h>
 
 
 const char * const librdf_short_copyright_string = "Copyright (C) 2000-2004 David Beckett, ILRT, University of Bristol";

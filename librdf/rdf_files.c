@@ -46,7 +46,7 @@
 #define LIBRDF_DEBUG 1
 #endif
 
-#include <librdf.h>
+#include <redland.h>
 
 #ifndef STANDALONE
 char *

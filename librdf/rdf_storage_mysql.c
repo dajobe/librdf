@@ -41,8 +41,9 @@
 #endif
 #include <sys/types.h>
 
-#include <librdf.h>
+#include <redland.h>
 #include <rdf_types.h>
+
 #include <mysql.h>
 #include <mysqld_error.h>
 

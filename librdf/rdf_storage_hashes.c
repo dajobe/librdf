@@ -38,7 +38,7 @@
 #endif
 
 
-#include <librdf.h>
+#include <redland.h>
 #include <rdf_storage.h>
 #include <rdf_storage_hashes.h>
 

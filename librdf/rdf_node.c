@@ -35,7 +35,7 @@
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
 
-#include <librdf.h>
+#include <redland.h>
 /* needed for utf8 functions and definition of 'byte' */
 #include <rdf_utf8.h>
 

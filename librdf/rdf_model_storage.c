@@ -35,7 +35,7 @@
 #include <stdlib.h> /* for exit()  */
 #endif
 
-#include <librdf.h>
+#include <redland.h>
 
 
 typedef struct 

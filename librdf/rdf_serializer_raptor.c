@@ -32,11 +32,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <librdf.h>
-
-
-#define RAPTOR_IN_REDLAND
-#include <raptor.h>
+#include <redland.h>
 
 
 typedef struct {

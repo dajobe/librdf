@@ -38,10 +38,7 @@
 #include <errno.h>
 #endif
 
-#include <librdf.h>
-
-#define RAPTOR_IN_REDLAND
-#include <raptor.h>
+#include <redland.h>
 
 
 /* serialising implementing functions */

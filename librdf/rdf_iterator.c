@@ -31,7 +31,7 @@
 
 #include <stdio.h>
 
-#include <librdf.h>
+#include <redland.h>
 
 
 #ifndef STANDALONE

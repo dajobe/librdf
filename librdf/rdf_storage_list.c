@@ -36,7 +36,7 @@
 #endif
 #include <sys/types.h>
 
-#include <librdf.h>
+#include <redland.h>
 
 
 typedef struct

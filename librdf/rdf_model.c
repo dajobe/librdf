@@ -35,8 +35,7 @@
 #include <stdlib.h> /* for exit()  */
 #endif
 
-#include <librdf.h>
-#include <raptor.h>
+#include <redland.h>
 
 #ifndef STANDALONE
 /* prototypes for helper functions */

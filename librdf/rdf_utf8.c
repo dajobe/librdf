@@ -33,7 +33,7 @@
 #include <string.h>
 #include <ctype.h> /* for isprint() */
 
-#include <librdf.h>
+#include <redland.h>
 #include <rdf_utf8.h>
 
 

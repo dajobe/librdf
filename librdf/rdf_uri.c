@@ -39,12 +39,7 @@
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
 
-#include <librdf.h>
-
-
-/* for raptor_uri_resolve_uri_reference */
-#define RAPTOR_IN_REDLAND
-#include <raptor.h>
+#include <redland.h>
 
 
 #ifndef STANDALONE

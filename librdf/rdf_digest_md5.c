@@ -51,7 +51,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include <librdf.h>
+#include <redland.h>
 
 /* for u32 here - never used in a public interface  */
 #include <rdf_types.h>

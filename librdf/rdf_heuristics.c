@@ -38,7 +38,7 @@
 #include <stdlib.h> /* for strtol */
 #endif
 
-#include <librdf.h>
+#include <redland.h>
 
 
 #ifndef STANDALONE

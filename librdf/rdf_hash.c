@@ -39,7 +39,7 @@
 #include <stdlib.h> /* for strtol */
 #endif
 
-#include <librdf.h>
+#include <redland.h>
 
 #include <rdf_hash.h>
 #ifdef HAVE_BDB_HASH

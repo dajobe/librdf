@@ -33,8 +33,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <librdf.h>
-#include <raptor.h>
+#include <redland.h>
 
 
 typedef struct {

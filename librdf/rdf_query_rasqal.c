@@ -39,9 +39,7 @@
 #include <errno.h>
 #endif
 
-#include <librdf.h>
-
-#include <rasqal.h>
+#include <redland.h>
 
 
 
