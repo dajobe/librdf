@@ -321,14 +321,15 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
       /* Read more lines for rest of literal */
       while(!feof(context->fh)) {
         char *literal_buffer2;
+        char *c;
         char literal_line_buffer[LINE_BUFFER_LEN];
         int len;
         
         if(!fgets(literal_line_buffer, LINE_BUFFER_LEN, context->fh))
           break;
         
-        if((p=strstr(literal_line_buffer, "\")"))) {
-          len=(p-literal_line_buffer);
+        if((c=strstr(literal_line_buffer, "\")"))) {
+          len=(c-literal_line_buffer);
         } else {
           len=strlen(literal_line_buffer);
         }
@@ -351,7 +352,7 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
         literal_buffer=literal_buffer2;
 
         /* found end so stop */
-        if(p)
+        if(c)
           break;
       }
     }
