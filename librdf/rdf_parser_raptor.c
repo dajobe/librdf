@@ -305,7 +305,6 @@ librdf_parser_raptor_parse_common(void *context,
   librdf_parser_raptor_stream_context* scontext;
   librdf_stream *stream;
   raptor_parser *rdf_parser;
-  raptor_ntriples_parser *ntriples_parser;
   int rc;
   librdf_world *world=uri->world;
   
@@ -313,36 +312,25 @@ librdf_parser_raptor_parse_common(void *context,
   if(!scontext)
     return NULL;
 
-  if(pcontext->is_ntriples) {
-    ntriples_parser=raptor_ntriples_new(world);
-    if(!ntriples_parser)
-      return NULL;
-  
-    raptor_ntriples_set_statement_handler(ntriples_parser, scontext, 
-                                          librdf_parser_raptor_new_statement_handler);
+  if(pcontext->is_ntriples)
+    rdf_parser=raptor_new_parser("ntriples");
+  else
+    rdf_parser=raptor_new_parser("rdfxml");
 
-    raptor_ntriples_set_error_handler(ntriples_parser, world,
-                                      librdf_parser_raptor_error_handler);
-    
-    scontext->ntriples_parser=ntriples_parser;
-  } else {
-    rdf_parser=raptor_new(world);
-    if(!rdf_parser)
-      return NULL;
+  if(!rdf_parser)
+    return NULL;
   
-    raptor_set_statement_handler(rdf_parser, scontext, 
-                                 librdf_parser_raptor_new_statement_handler);
-    
-    /* raptor_set_feature(rdf_parser, RAPTOR_FEATURE_SCANNING, 1); */
-
-    raptor_set_error_handler(rdf_parser, world, 
-                             librdf_parser_raptor_error_handler);
-    raptor_set_warning_handler(rdf_parser, world,
-                               librdf_parser_raptor_warning_handler);
-
-    scontext->rdf_parser=rdf_parser;
-  }
+  raptor_set_statement_handler(rdf_parser, scontext, 
+                               librdf_parser_raptor_new_statement_handler);
   
+  /* raptor_set_feature(rdf_parser, RAPTOR_FEATURE_SCANNING, 1); */
+  
+  raptor_set_error_handler(rdf_parser, world, 
+                           librdf_parser_raptor_error_handler);
+  raptor_set_warning_handler(rdf_parser, world,
+                             librdf_parser_raptor_warning_handler);
+  
+  scontext->rdf_parser=rdf_parser;
 
   scontext->pcontext=pcontext;
   scontext->source_uri = uri;
@@ -363,10 +351,7 @@ librdf_parser_raptor_parse_common(void *context,
   }
 
   /* Do the work all in one go - should do incrementally - FIXME */
-  if(pcontext->is_ntriples)
-    rc=raptor_ntriples_parse_file(ntriples_parser, uri, base_uri);
-  else
-    rc=raptor_parse_file(rdf_parser, uri, base_uri);
+  rc=raptor_parse_file(rdf_parser, (raptor_uri*)uri, (raptor_uri*)base_uri);
 
   /* Above line does it all for adding to model */
   if(model) {
@@ -498,9 +483,9 @@ librdf_parser_raptor_serialise_finished(void* context)
 
 
 static raptor_uri*
-librdf_raptor_uri_new_uri(void *context, const char *uri_string) 
+librdf_raptor_new_uri(void *context, const char *uri_string) 
 {
-  return librdf_new_uri((librdf_world*)context, uri_string);
+  return (raptor_uri*)librdf_new_uri((librdf_world*)context, uri_string);
 }
 
 static raptor_uri*
@@ -508,7 +493,7 @@ librdf_raptor_new_uri_from_uri_local_name(void *context,
                                           raptor_uri *uri,
                                           const char *local_name)
 {
-   return librdf_new_uri_from_uri_local_name(uri, local_name);
+   return (raptor_uri*)librdf_new_uri_from_uri_local_name((librdf_uri*)uri, local_name);
 }
 
 static raptor_uri*
@@ -516,7 +501,7 @@ librdf_raptor_new_uri_relative_to_base(void *context,
                                        raptor_uri *base_uri,
                                        const char *uri_string) 
 {
-  return librdf_new_uri_relative_to_base(base_uri, uri_string);
+  return (raptor_uri*)librdf_new_uri_relative_to_base((librdf_uri*)base_uri, uri_string);
 }
 
 
@@ -524,35 +509,35 @@ static raptor_uri*
 librdf_raptor_new_uri_for_rdf_concept(void *context, const char *name) 
 {
   librdf_uri *uri;
-  librdf_get_concept_by_name((librdf_world*)context,, 1, name, &uri, NULL);
-  return librdf_new_uri_from_uri(uri);
+  librdf_get_concept_by_name((librdf_world*)context, 1, name, &uri, NULL);
+  return (raptor_uri*)librdf_new_uri_from_uri(uri);
 }
 
 static void
 librdf_raptor_free_uri(void *context, raptor_uri *uri) 
 {
-  return librdf_free_uri(uri);
+  librdf_free_uri((librdf_uri*)uri);
 }
 
 
 static int
 librdf_raptor_uri_equals(void *context, raptor_uri* uri1, raptor_uri* uri2)
 {
-  return librdf_uri_equals(uri1, uri2);
+  return librdf_uri_equals((librdf_uri*)uri1, (librdf_uri*)uri2);
 }
 
 
 static raptor_uri*
 librdf_raptor_uri_copy(void *context, raptor_uri *uri)
 {
-  return librdf_new_uri_from_uri(uri);
+  return (raptor_uri*)librdf_new_uri_from_uri((librdf_uri*)uri);
 }
 
 
 static char*
 librdf_raptor_uri_as_string(void *context, raptor_uri *uri)
 {
-  return librdf_uri_as_string(uri);
+  return librdf_uri_as_string((librdf_uri*)uri);
 }
 
 
@@ -592,6 +577,8 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_raptor_constructor(librdf_world *world)
 {
+  raptor_uri_init();
+
   raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
 
   librdf_parser_register_factory(world, "raptor", "application/rdf+xml", NULL,
