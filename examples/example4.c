@@ -338,7 +338,8 @@ main(int argc, char *argv[])
       serializer=librdf_new_serializer(world, name, mime_type, uri);
       if(!serializer) {
         fprintf(stderr, "%s: Failed to create new serializer name %s, uri %s, mime type %s\n", program, argv[0], argv[1], argv[2]);
-        librdf_free_uri(uri);
+        if(uri)
+          librdf_free_uri(uri);
         break;
       }
 
