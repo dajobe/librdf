@@ -420,9 +420,12 @@ librdf_parser_error(librdf_parser* parser, const char *message, ...)
     return;
   }
   
-  fprintf(stderr, "%s parser error - ", parser->factory->name);
   va_start(arguments, message);
+
+  fprintf(stderr, "%s parser error - ", parser->factory->name);
   vfprintf(stderr, message, arguments);
+  fputc('\n', stderr);
+
   va_end(arguments);
 }
 
@@ -440,9 +443,12 @@ librdf_parser_warning(librdf_parser* parser, const char *message, ...)
     return;
   }
   
-  fprintf(stderr, "%s parser warning - ", parser->factory->name);
   va_start(arguments, message);
+
+  fprintf(stderr, "%s parser warning - ", parser->factory->name);
   vfprintf(stderr, message, arguments);
+  fputc('\n', stderr);
+
   va_end(arguments);
 }
 
