@@ -94,11 +94,6 @@ AC_SUBST(LIBRDF_VERSION_DECIMAL)
 LIBRDF_LIBTOOL_VERSION=0:0:0
 AC_SUBST(LIBRDF_LIBTOOL_VERSION)
 
-# OSX Fink
-if test -d /sw/bin ; then
-  PATH=$PATH:/sw/bin
-fi
-
 dnl Checks for programs.
 AM_PROG_CC_STDC
 AM_SANITY_CHECK
@@ -210,7 +205,7 @@ if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_
     bdbc_major=`echo $bdbc_version | sed -e 's/^\(.\).*$/\1/'`;
     bdbc_version2=`echo $bdbc_version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
 
-    for bdbc_prefix in $extraprefix /usr/local/BerkeleyDB.$bdbc_version /usr/local /usr; do
+    for bdbc_prefix in $extraprefix /usr/local/BerkeleyDB.$bdbc_version /usr/local /opt/local /usr; do
       bdbc_libdir=$bdbc_prefix/lib
 
       for bdbc_incdir in $bdbc_prefix/include/db$bdbc_version $bdbc_prefix/include/db$bdbc_version2 $bdbc_prefix/include/db$bdbc_major $bdbc_prefix/include ; do
