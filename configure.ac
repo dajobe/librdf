@@ -1151,7 +1151,8 @@ java/org/librdf/redland/Makefile
 ruby/Makefile
 csharp/Makefile
 utils/Makefile
-demos/Makefile])
+demos/Makefile
+librdf/redland.pc])
 AC_CONFIG_FILES([librdf/redland.spec])
 AC_CONFIG_FILES([redland-config], [chmod +x redland-config])
 AC_CONFIG_FILES([redland-src-config], [chmod +x redland-src-config])
