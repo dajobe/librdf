@@ -117,8 +117,10 @@ rdf_stream.h \
 rdf_parser.h rdf_heuristics.h rdf_files.h
 
 
-librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ 
-librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@
+librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+@XML_OBJS@
+librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+@XML_OBJS@
 
 EXTRA_librdf_a_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
