@@ -419,7 +419,7 @@ librdf_parser_libwww_parse_uri_into_model(void *context, librdf_uri *uri,
   status=(void*)librdf_parser_libwww_parse_common(context, 
                                                   uri, base_uri, model);
   
-  return (status == NULL);
+  return (status != NULL);
 }
 
 
