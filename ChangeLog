@@ -1,4 +1,184 @@
+2004-12-21  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_mysql.c (librdf_storage_mysql_init): Applied
+	patch from Morten to only use mysql_real_escape_string if a
+	connection was made.
+	(librdf_storage_mysql_find_statements_in_context_next_statement):
+	Do not call librdf_storage_mysql_find_statements_in_context_finished
+	when errors happen, the iterator class will do that on destruction.
+	(librdf_storage_mysql_get_contexts_next_context): Do not call
+	librdf_storage_mysql_get_contexts_finished when errors happen, the
+	iterator class will do that on destruction.
+
+	* raptor/raptor_rss.c: Added rss_namespace_prefix_strings to list
+	namespaces to declare.  raptor_rss10_serializer_context gains
+	raptor_namespace_stack nstack field.
+	(raptor_rss10_serialize_init): Init the namespace stack.
+	(raptor_rss10_serialize_terminate): Clean namespace stack and any
+	defined qnames.
+	(raptor_rss10_emit_item): Padding.
+	(raptor_rss10_serialize_end): Write namespace decls using stack.
+
+	* raptor/raptor_rss.c: Rename some destructors more normally:
+	(raptor_free_rss_item): Renamed from raptor_item_free.
+	(raptor_free_rss_items): Renamed from raptor_rss_items_free.
+	(raptor_rss10_move_statements, raptor_rss10_store_statement):
+	Record field counts per item.
+	(raptor_rss10_build_items): Find the rdf:_<n> items and put them
+	into a raptor sequence.
+	(raptor_rss10_emit_item): Skeleton rss item writer.
+	(raptor_rss10_serialize_end): Make the final structures and do the
+	serializing in skeleton form.
+
+2004-12-20  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c: Added seq_uri to
+	raptor_rss10_serializer_context
+	(raptor_rss10_serialize_terminate): Tidy seq_uri
+	(raptor_rss10_move_statements, raptor_rss10_store_statement):
+	Ignore checking fields with no URI.
+	(raptor_rss10_serialize_statement): For rdf:Seq node, store the
+	URI or blank node - as fake URI.  Make fake object node correctly
+	for general statements.
+
+	* raptor/raptor_rss.c (raptor_rss_common_init):	Prevent 2x
+	initialising.
+	(raptor_item_free): Free type URI
+	(raptor_rss10_serialize_terminate): Call raptor_rss_common_terminate.
+	(raptor_rss10_move_statements): Use RAPTOR_IDENTIFIER_TYPE_PREDICATE
+	set raptor_sequence_set_at destroy overwritten object.
+	(raptor_rss10_store_statement): Use RAPTOR_IDENTIFIER_TYPE_PREDICATE
+	Make fake URIs from blank node strings and free them.
+
+	* raptor/raptor_general.c (raptor_free_statement):
+	Handle more statement part types.
+
+	* raptor/raptor_rss.c: RAPTOR_RSS_FIELDS_SIZE now stops before
+	UNKNOWN for real field names.
+	(raptor_rss10_move_statements): Added, to move statements from the
+	sequence of triples to below a typed node once a new typed node of
+	the given type appears.
+	(raptor_rss10_store_statement): Added, to store a given statement
+	either below an existing typed node or in a sequence of triples if
+	it can't be found one.
+
+	* raptor/raptor_rss.c (raptor_rss10_serialize_statement): iostream
+	write turned into debug.
+
+2004-12-19  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_uri.c (raptor_uri_print): Cast for gcc
+
+	* raptor/raptor_rss.c: Use raptor_uri in raptor_rss_item.
+	(raptor_rss_context_init, raptor_rss_context_terminate): Added and
+	used in parser and serializer init and terminate.
+	(raptor_rss10_serialize_init): Initialise list of triples, items.
+	(raptor_rss10_serialize_terminate): Tidy up triples, items.
+	(raptor_rss10_serialize_statement): Look for known typed nodes,
+	identify ones matching rss 1.0 model and also look for the rdf:Seq.
+	Store other triples for later.
+	(raptor_rss10_serialize_end): Added skeleton.
+
+2004-12-18  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_uri.c (raptor_uri_print): Added.
+
+	* raptor/raptor.h: Added raptor_uri_print
+
+	* raptor/raptor_general.c (raptor_statement_copy):
+	Added statement copy constructor
+	(raptor_free_statement): Added statement destructor.
+
+	* raptor/raptor_internal.h:
+	Added raptor_statement_copy and raptor_free_statement
+
+	* raptor/raptor_rss.c:
+	Moved parser namespace URIs to common code rss_namespace_uris.
+	(raptor_rss_common_init, raptor_rss_common_terminate): Added to
+	initialise and free up common rss items - namespace URIs, URIs for
+	types and uris for properties.
+	Added skeleton RSS 1.0 serializer
+	(raptor_rss10_serialize_init, raptor_rss10_serialize_terminate,
+	raptor_rss10_serialize_statement,
+	raptor_rss10_serialize_finish_factory,
+	raptor_rss10_serializer_register_factory,
+	raptor_init_serializer_rss10): Added skeleton RSS 1.0 serializer
+	factory and methods.
+
+	* raptor/raptor_general.c (raptor_init):
+	Added call to raptor_init_serializer_rss10
+
+	* raptor/raptor_internal.h: Added raptor_init_serializer_rss10
+
+	* raptor/raptor_rss.c (raptor_rss_parse_recognise_syntax):
+	Add atom checks.
+
+2004-12-17  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/tests/Makefile.am: Added
+	RDF_MAYFAIL_XML_TEST_FILES,RDF_MAYFAIL_XML_OUT_FILES and rule
+	check-mayfail-xml-rdf to run checks that may fail due to XML
+	parser bugs.
+
+	* raptor/raptor_iostream.c, raptor/raptor_nfc.c,
+	raptor/raptor_rdfxml.c, raptor/raptor_sax2.c,
+	raptor/raptor_serialize.c: Initialising possibly using
+	uninitialised vars
+
+	* raptor/raptor.h, raptor/raptor_internal.h,
+	raptor/raptor_iostream.c, raptor/raptor_namespace.c,
+	raptor/raptor_rdfxml.c, raptor/raptor_serialize.c,
+	raptor/raptor_xml_writer.c, raptor/rdfdump.c: Casts for c++
+
+	* raptor/raptor_rdfxml.c: Fix using wrong element name in warnings.
+
+	* raptor/raptor_rdfxml.c (raptor_xml_start_element_handler):
+	Use raptor_sax2_element_set_attributes.
+
+	* raptor/raptor_xml_writer.c (raptor_xml_writer_empty_element): Added.
+	(raptor_xml_writer_start_element, raptor_xml_writer_end_element):
+	Updated raptor_iostream_write_sax2_element calls
+	(main): Add attributes and test writing empty element.
+
+	* raptor/raptor_internal.h: Added raptor_sax2_element_set_attributes
+	Added is_empty arg to raptor_iostream_write_sax2_element
+	Added raptor_xml_writer_empty_element
+
+	* raptor/raptor_sax2.c (raptor_sax2_element_set_attributes): Added.
+	(raptor_print_sax2_element): tidy
+	(raptor_iostream_write_sax2_element): Added is_empty arg
+	and use it for <foo... /> form.
+
+2004-12-14  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/libraptor.3: Updated for 1.4.3 so far
+
+	* raptor/tests/turtle/README.txt,
+	raptor/tests/turtle/rdfq-results.out,
+	raptor/tests/turtle/test-00.out, raptor/tests/turtle/Makefile.am:
+	Switch to base URI http://www.w3.org/2001/sw/DataAccess/df1/tests/
+
+	* raptor/tests/turtle/bad-08.ttl, raptor/tests/turtle/bad-09.ttl,
+	raptor/tests/turtle/bad-10.ttl, raptor/tests/turtle/bad-11.ttl,
+	raptor/tests/turtle/bad-12.ttl, raptor/tests/turtle/bad-13.ttl,
+	raptor/tests/turtle/manifest-bad.ttl,
+	raptor/tests/turtle/manifest.ttl, raptor/tests/turtle/test-13.out,
+	raptor/tests/turtle/test-13.ttl, raptor/tests/turtle/Makefile.am,
+	raptor/tests/turtle/bad-04.ttl, raptor/tests/turtle/bad-05.ttl,
+	raptor/tests/turtle/bad-06.ttl, raptor/tests/turtle/bad-07.ttl:
+	Import more bad turtle tests, initial manifest files
+
+	* raptor/raptor_namespace.c (raptor_iostream_write_namespace):
+	Handle ns->uri is NULL and no prefix, i.e. emitting xmlns=""
+
+	* raptor/raptor_namespace.c (raptor_namespaces_format): Handle
+	ns->uri is NULL and no prefix, i.e. emitting xmlns=""
+
 2004-12-08  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_uri.c (librdf_new_uri_relative_to_base): Ask for 1
+	more char for new URI buffer for raptor_uri_resolve_uri_reference
+	to allow inserting of a missing "/" path.
 
 	* librdf/rdf_uri.c (librdf_new_uri_relative_to_base): Ask for 1
 	more char for new URI buffer for raptor_uri_resolve_uri_reference
