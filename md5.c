@@ -22,7 +22,9 @@
 
 #include <config.h>
 #include <stdio.h>
+#ifdef HAVE_STRING_H
 #include <string.h>		/* for memcpy() */
+#endif
 
 #include <rdf_config.h>
 #include <rdf_digest.h>
