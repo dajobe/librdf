@@ -5,7 +5,11 @@ my $main_title="Redland RDF Application Framework";
 my $doc_title;
 
 while(<>) {
-  $doc_title=$1 if s%<title>(.*?)</title>%<title>$main_title - $1</title>%;
+  if(m%<title>(.*?)</title>%) {
+    $doc_title=$1;
+    $doc_title =~ s/^(.*) - Redland (.*) Class$/Perl $1 Class/;
+    s%<title>(.*?)</title>%<title>$main_title - $doc_title</title>%;
+  }
 
   s%<h1>%<h2>%; s%</h1>%</h2>%;
   s%<hr />%%;
