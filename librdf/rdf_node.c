@@ -1382,6 +1382,7 @@ main(int argc, char *argv[])
   char *program=argv[0];
 	
   world=librdf_new_world();
+  librdf_world_init_mutex(world);
 
   librdf_init_digest(world);
   librdf_init_hash(world);

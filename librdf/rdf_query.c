@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2002 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2002-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -402,6 +402,7 @@ main(int argc, char *argv[])
   librdf_world *world;
   
   world=librdf_new_world();
+  librdf_world_init_mutex(world);
   
   /* initialise hash, model and query modules */
   librdf_init_hash(world);
