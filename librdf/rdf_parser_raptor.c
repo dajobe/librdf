@@ -141,28 +141,23 @@ librdf_parser_raptor_new_statement_handler (void *context,
 #endif
   librdf_world* world=scontext->pcontext->parser->world;
 
-  if(rstatement->predicate_type == RAPTOR_PREDICATE_TYPE_XML_NAME)
-    return;
-
-  if(rstatement->object_type == RAPTOR_OBJECT_TYPE_XML_NAME)
-    return;
-
   statement=librdf_new_statement(world);
   if(!statement)
     return;
-  
-  if(rstatement->subject_type == RAPTOR_SUBJECT_TYPE_ANONYMOUS) {
+
+  if(rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
     node=librdf_parser_raptor_make_node_from_anon(scontext, rstatement->subject);
-  } else {
+  } else if (rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
     node=librdf_new_node_from_normalised_uri_string(world,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->subject),
                                                     scontext->source_uri,
                                                     scontext->base_uri);
-  }
+  } else
+    LIBRDF_FATAL2(librdf_parser_raptor_new_statement_handler,"Unknown Raptor subject identifier type %d", rstatement->subject_type);
   
   librdf_statement_set_subject(statement, node);
   
-  if(rstatement->predicate_type == RAPTOR_PREDICATE_TYPE_ORDINAL) {
+  if(rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_ORDINAL) {
     /* FIXME - but only a little
      * Do I really need to do log10(ordinal) [or /10 and count] + 1 ? 
      * See also librdf_heuristic_gen_name for some code to repurpose.
@@ -172,33 +167,36 @@ librdf_parser_raptor_new_statement_handler (void *context,
     sprintf(ordinal_buffer, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_%d", ordinal);
     
     node=librdf_new_node_from_uri_string(world, ordinal_buffer);
-  } else {
+  } else if (rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_PREDICATE) {
     node=librdf_new_node_from_normalised_uri_string(world,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->predicate),
                                                     scontext->source_uri,
                                                     scontext->base_uri);
-  }
+  } else
+    LIBRDF_FATAL2(librdf_parser_raptor_new_statement_handler,"Unknown Raptor predicate identifier type %d", rstatement->predicate_type);
+
   librdf_statement_set_predicate(statement, node);
 
 
-  if(rstatement->object_type == RAPTOR_OBJECT_TYPE_LITERAL ||
-     rstatement->object_type == RAPTOR_OBJECT_TYPE_XML_LITERAL) {
-    int is_xml_literal = (rstatement->object_type == RAPTOR_OBJECT_TYPE_XML_LITERAL);
+  if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_LITERAL ||
+     rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL) {
+    int is_xml_literal = (rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL);
     
     librdf_statement_set_object(statement,
                                 librdf_new_node_from_literal(world,
                                                              rstatement->object,
                                                              NULL, 0, is_xml_literal));
-  } else if(rstatement->object_type == RAPTOR_OBJECT_TYPE_ANONYMOUS) {
+  } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
     node=librdf_parser_raptor_make_node_from_anon(scontext, rstatement->object);
     librdf_statement_set_object(statement, node);
-  } else if(rstatement->object_type == RAPTOR_OBJECT_TYPE_RESOURCE) {
+  } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
     node=librdf_new_node_from_normalised_uri_string(world,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->object),
                                                     scontext->source_uri,
                                                     scontext->base_uri);
     librdf_statement_set_object(statement, node);
-  }
+  } else
+    LIBRDF_FATAL2(librdf_parser_raptor_new_statement_handler,"Unknown Raptor object identifier type %d", rstatement->object_type);
 
 
 #ifdef LIBRDF_DEBUG
