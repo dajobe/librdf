@@ -414,8 +414,6 @@ AC_SUBST(JDK_INCLUDES)
 AC_MSG_RESULT($JDK_INCLUDES)
 
 
-AC_CHECK_PROG(LIBWWW_CONFIG, libwww-config, libwww-config)
-
 AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
 AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
 AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
@@ -698,23 +696,6 @@ AM_CONDITIONAL(MEMCMP, test $ac_cv_func_memcmp = no)
 AM_CONDITIONAL(GETOPT, test $ac_cv_func_getopt = no -a $ac_cv_func_getopt_long = no)
 
 dnl Checks for URI resolvers
-AC_ARG_WITH(libwww, [  --with-libwww           Use libwww (default=auto)], enable_libwww="$withval", enable_libwww="no") 
-
-have_libwww=
-AC_MSG_CHECKING(whether have working libwww)
-if test "$enable_libwww" = yes ; then
-  if test -n "$LIBWWW_CONFIG"; then
-    AC_MSG_RESULT(yes)
-    LIBRDF_LIBS="$LIBRDF_LIBS `$LIBWWW_CONFIG --libs`"
-    LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$LIBWWW_CONFIG --cflags`"
-    AC_DEFINE(HAVE_LIBWWW, 1, [W3C libwww is present])
-    have_libwww=yes
-  else
-    AC_MSG_RESULT(no)
-  fi
-else
-  AC_MSG_RESULT(no)
-fi
 
 CPPFLAGS="$LIBRDF_CPPFLAGS"
 LDFLAGS="$LIBRDF_LDFLAGS"
