@@ -1,3 +1,12 @@
+2004-08-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_model.c (librdf_model_context_add_statement,
+	librdf_model_context_add_statements,
+	librdf_model_context_remove_statement,
+	librdf_model_context_remove_statements,
+	librdf_model_context_as_stream, librdf_model_context_serialize):
+	Return failure when contexts are not supported, don't just carry on.
+
 2004-08-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_statement.h, librdf/rdf_statement.c:

@@ -1,4 +1,64 @@
+2004-08-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_model.c (librdf_model_context_add_statement,
+	librdf_model_context_add_statements,
+	librdf_model_context_remove_statement,
+	librdf_model_context_remove_statements,
+	librdf_model_context_as_stream, librdf_model_context_serialize):
+	Return failure when contexts are not supported, don't just carry on.
+
+	* raptor/raptor_nfc.c: Tidy debug messages.
+	Reset prev_class explicitly.
+
 2004-08-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_parse.c (raptor_record_ID): c99
+
+	* raptor/raptor_nfc.c: Return 0 from raptor_nfc_check on failure
+
+	* raptor/raptor_nfc_test.c: Raptor NFC test
+
+	* raptor/Makefile.am: Added raptor_nfc_test.c
+
+	* raptor/Makefile.am: Add raptor_nfc_data.c raptor_nfc.c raptor_nfc.h
+	Added raptor_nfc_test
+
+	* raptor/raptor_utf8.c (raptor_utf8_is_nfc): Use raptor_nfc_check.
+
+	* raptor/raptor_nfc.c, raptor/raptor_nfc.h: Unicode NFC
+
+	* raptor/raptor_internal.h: Added prototype for raptor_nfc_check
+
+	* raptor/configure.ac:
+	Check for lengths of u8, u16, u32, char, short, int, long
+
+	* raptor/raptor_nfc_data.c: Unicode NFC data tables
+
+	* raptor/raptor_parse.c:
+	Updated for raptor_set to raptor_id_set renaming.
+	(raptor_record_ID): Pass in the base_uri to the raptor_id_set_add, do
+	not malloc / free a larger string.
+
+	* raptor/raptor_internal.h:
+	Rename the raptor_set* typedef and functions to be raptor_id_set
+
+	* raptor/raptor_set.c:
+	Change the implementation to a list of (set of IDs)-per base URI.
+	Each time a base URI is checked it is swapped with the first in
+	the list.  The set of IDs (raptor_base_id_set) takes a lot less
+	memory since it isn't storing the string concat(base URI,ID) but just
+	ID.  The capacity and size parts are part of the raptor_base_id_set.
+	Rename the structures and functions to be raptor_id_set not raptor_set.
+
+	* raptor/raptor_parse.c (raptor_end_element_grammar):
+	Add check for a non-empty property
+	element with both a node element <rdf:Description/> child and
+	property attributes.  For bad test bad-23.rdf
+
+	* raptor/tests/bad-23.rdf:
+	bad-23.rdf - property attributes and node element content check
+
+	* raptor/tests/Makefile.am: Added bad-23.rdf
 
 	* Makefile.am: Add srcdir for Redland.i install
 
