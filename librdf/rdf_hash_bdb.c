@@ -326,14 +326,16 @@ librdf_hash_bdb_cursor_init(void *cursor_context, void *hash_context)
    * int DB->cursor(DB *db, DB_TXN *txnid, DBC **cursorp, u_int32_t flags);
    */
   if(db->cursor(db, NULL, &cursor->cursor, 0))
+    return 1;
 #else
   /* V2 prototype:
    * int DB->cursor(DB *db, DB_TXN *txnid, DBC **cursorp);
    */
   if(db->cursor(db, NULL, &cursor->cursor))
+    return 1;
 #endif
-    return 0;
 #endif
+
   return 0;
 }
 
@@ -355,6 +357,9 @@ librdf_hash_bdb_cursor_get(void* context,
   librdf_hash_bdb_cursor_context *cursor=(librdf_hash_bdb_cursor_context*)context;
 #ifdef HAVE_BDB_CURSOR
   DBC *bdb_cursor=cursor->cursor;
+#else
+  /* For BDB V1 */
+  DB* db;
 #endif
   DBT bdb_key;
   DBT bdb_value;
@@ -372,6 +377,11 @@ librdf_hash_bdb_cursor_get(void* context,
   /* BDB V2 or later? */
   bdb_key.flags=DB_DBT_MALLOC;   /* Return in malloc() allocated memory */
   bdb_value.flags=DB_DBT_MALLOC;
+#endif
+
+#ifndef HAVE_BDB_CURSOR
+  /* For BDB V1 */
+  db=cursor->hash->db;
 #endif
   
   switch(flags) {
@@ -417,7 +427,12 @@ librdf_hash_bdb_cursor_get(void* context,
         free(bdb_key.data);
         free(bdb_value.data);
 
+#ifdef DB_NOTFOUND
+        /* V2 and V3 */
         ret=DB_NOTFOUND;
+#else
+        ret=1;
+#endif
       }
       
       break;
@@ -477,8 +492,11 @@ librdf_hash_bdb_cursor_get(void* context,
   
 
   if(ret) {
+#ifdef DB_NOTFOUND
+    /* V2 and V3 */
     if(ret != DB_NOTFOUND)
       LIBRDF_DEBUG2(librdf_hash_bdb_cursor_get, "BDB cursor error - %d\n", ret);
+#endif
     key->data=NULL;
     return ret;
   }
