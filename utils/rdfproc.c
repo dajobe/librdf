@@ -406,7 +406,7 @@ main(int argc, char *argv[])
 #endif
     puts("  find SUBJECT|- PREDICATE|- OBJECT|- [CONTEXT] Find matching triples");
     puts("  contains SUBJECT PREDICATE OBJECT         Check if triple is in the graph.");
-    puts("  contexts CONTEXT                          List the contexts in the graph.");
+    puts("  contexts                                  List the contexts in the graph.");
     puts("  add SUBJECT PREDICATE OBJECT [CONTEXT]    Add triple to graph.");
     puts("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]");
     puts("                                            Add datatyped triple to graph.");
