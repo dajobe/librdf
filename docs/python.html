@@ -64,6 +64,9 @@ directory such as <em>build/lib.linux-i686-2.2</em> and run it with:</p>
 
 <h2>Redland Python API Introduction</h2>
 
+<p>Read the <a href="pydoc/RDF.html">Redland Python API</a> (Pydoc)
+for full details of the classes.</p>
+
 <p>The Python API is an object-based API reflecting the same structure
 of the Redland objects with simple mappings between them:</p>
 
@@ -73,43 +76,43 @@ of the Redland objects with simple mappings between them:</p>
 <th>Concept</th><th>Redland Class</th><th>Python Class</th><th>Purpose</th>
 </tr>
 <tr>
-<td>Resource / Literal</td><td><a href="api/node.html">librdf_node</a></td><td><tt>RDF.Node</tt></td>
+<td>Resource / Literal</td><td><a href="api/node.html">librdf_node</a></td><td><a href="pydoc/RDF.html#Node"><tt>RDF.Node</tt></a></td>
 <td>RDF Model &amp; Syntax nodes</td>
 </tr>
 <tr>
-<td>Statement / Triple</td><td><a href="api/statement.html">librdf_statement</a></td><td><tt>RDF.Statement</tt></td>
+<td>Statement / Triple</td><td><a href="api/statement.html">librdf_statement</a></td><td><a href="pydoc/RDF.html#Statement"><tt>RDF.Statement</tt></a></td>
 <td>RDF Model &amp; Syntax arcs (statements, triples) [isa Resource]</td>
 </tr>
 <tr>
-<td>Model</td><td><a href="api/model.html">librdf_model</a></td><td><tt>RDF.Model</tt></td>
+<td>Model</td><td><a href="api/model.html">librdf_model</a></td><td><a href="pydoc/RDF.html#Model"><tt>RDF.Model</tt></a></td>
 <td>Set of <em>Statement</em>s usually held in one <em>Storage</em>.</td>
 </tr>
 <tr>
-<td>Storage</td><td><a href="api/storage.html">librdf_storage</a></td><td><tt>RDF.Storage</tt></td>
+<td>Storage</td><td><a href="api/storage.html">librdf_storage</a></td><td><a href="pydoc/RDF.html#Storage"><tt>RDF.Storage</tt></a></td>
 <td>Storage for <em>Model</em>s either persistant or in-memory.</td>
 </tr>
 <tr>
-<td>Stream</td><td><a href="api/stream.html">librdf_stream</a></td><td><tt>RDF.Stream</tt></td>
+<td>Stream</td><td><a href="api/stream.html">librdf_stream</a></td><td><a href="pydoc/RDF.html#Stream"><tt>RDF.Stream</tt></a></td>
 <td>Providing sequences of <em>Statement</em>s from <em>Parser</em>s, queries.</td>
 </tr>
 <tr>
-<td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><tt>RDF.Parser</tt></td>
+<td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><a href="pydoc/RDF.html#Parser"><tt>RDF.Parser</tt></a></td>
 <td>Syntaxes parsers delivering <em>Stream</em> of <em>Statement</em>s or writing to a <em>Model</em></td>
 </tr>
 <tr>
-<td>Serializer</td><td><a href="api/serializer.html">librdf_serializer</a></td><td><tt>RDF.Serializer</tt></td>
+<td>Serializer</td><td><a href="api/serializer.html">librdf_serializer</a></td><td><a href="pydoc/RDF.html#Serializer"><tt>RDF.Serializer</tt></a></td>
 <td>Serializes a <em>Model</em> into a syntax such as RDF/XML</td>
 </tr>
 <tr>
-<td>Iterator</td><td><a href="api/iterator.html">librdf_iterator</a></td><td><tt>RDF.Iterator</tt></td>
+<td>Iterator</td><td><a href="api/iterator.html">librdf_iterator</a></td><td><a href="pydoc/RDF.html#Iterator"><tt>RDF.Iterator</tt></a></td>
 <td>Enumerating lists (of <em>Node</em>) from queries.</td>
 </tr>
 <tr>
-<td>URI</td><td><a href="api/uri.html">librdf_uri</a></td><td><tt>RDF.Uri</tt></td>
+<td>URI</td><td><a href="api/uri.html">librdf_uri</a></td><td><a href="pydoc/RDF.html#Uri"><tt>RDF.Uri</tt></a></td>
 <td>Provides URIs for <em>Resource</em>s, <em>Parser</em>s, ...</td>
 </tr>
 <tr>
-<td>World</td><td>&nbsp;</td><td><tt>RDF.World</tt></td>
+<td>World</td><td>&nbsp;</td><td><a href="pydoc/RDF.html#World"><tt>RDF.World</tt></a></td>
 <td>RDF wrapper class handling Redland startup/shutdown</td>
 </tr>
 <tr>
