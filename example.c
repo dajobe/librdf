@@ -22,9 +22,6 @@
 
 #include <librdf.h>
 
-/* FIXME: This should not be in user code */
-#include <rdf_parser.h>
-
 
 /* one prototype needed */
 int main(int argc, char *argv[]);
@@ -34,15 +31,13 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_storage_factory* sfactory;
   librdf_storage* storage;
-  librdf_parser_factory* pfactory;
   librdf_parser* parser;
   librdf_model* model;
   librdf_stream* stream;
   char *program=argv[0];
   librdf_uri *uri;
-  char *parser_factory_name=NULL;
+  char *parser_name=NULL;
 
 
   if(argc <2 || argc >3) {
@@ -59,13 +54,7 @@ main(int argc, char *argv[])
     return(1);
   }
 
-  sfactory=librdf_get_storage_factory(NULL);
-  if(!sfactory) {
-    fprintf(stderr, "%s: Failed to get any storage factory\n", program);
-    return(1);
-  }
-
-  storage=librdf_new_storage(sfactory, NULL);
+  storage=librdf_new_storage(NULL, NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
@@ -79,14 +68,9 @@ main(int argc, char *argv[])
   
       
   if(argc==3)
-    parser_factory_name=argv[2];
-  pfactory=librdf_get_parser_factory(parser_factory_name);
-  if(!pfactory) {
-    fprintf(stderr, "%s: Failed to get any parser factory\n", program);
-    return(1);
-  }
+    parser_name=argv[2];
 
-  parser=librdf_new_parser(pfactory);
+  parser=librdf_new_parser(parser_name);
   if(!parser) {
     fprintf(stderr, "%s: Failed to create new parser\n", program);
     return(1);
@@ -122,7 +106,7 @@ main(int argc, char *argv[])
 
   librdf_destroy_world();
 
-#ifdef LIBRDF_DEBUG
+#ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);
 #endif
 	
