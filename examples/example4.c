@@ -562,6 +562,8 @@ main(int argc, char *argv[])
       node=librdf_model_get_source(model, arc, target);
       if(!node) {
         fprintf(stderr, "%s: Failed to get source\n", program);
+        librdf_free_node(arc);
+        librdf_free_node(target);
         break;
       }
       
@@ -576,6 +578,8 @@ main(int argc, char *argv[])
         node=librdf_model_get_arc(model, source, target);
         if(!node) {
           fprintf(stderr, "Failed to get arc\n");
+          librdf_free_node(source);
+          librdf_free_node(target);
           break;
         }
       }
@@ -588,6 +592,8 @@ main(int argc, char *argv[])
         node=librdf_model_get_target(model, source, arc);
         if(!node) {
           fprintf(stderr, "%s: Failed to get target\n", program);
+          librdf_free_node(source);
+          librdf_free_node(arc);
           break;
         }
       }
