@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * redland.h - Redland RDF Application Framework main header
+ * redland.h - Redland RDF Library public API
  *
  * $Id$
  *
