@@ -602,6 +602,7 @@ librdf_query_rasqal_free_results(librdf_query_results* query_results)
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   rasqal_free_query_results(context->results);
+  LIBRDF_FREE(librdf_query_results, query_results);
 }
 
 
