@@ -587,6 +587,10 @@ static int
 librdf_storage_mysql_add_statement(librdf_storage* storage,
                                    librdf_statement* statement)
 {
+  /* Do not add duplicate statements */
+  if(librdf_storage_mysql_contains_statement(storage, statement))
+    return 0;
+
   return librdf_storage_mysql_context_add_statement_helper(storage, 0,
                                                            statement);
 }
@@ -609,8 +613,10 @@ librdf_storage_mysql_add_statements(librdf_storage* storage,
 
   while(!helper && !librdf_stream_end(statement_stream)) {
     librdf_statement* statement=librdf_stream_get_object(statement_stream);
-    helper=librdf_storage_mysql_context_add_statement_helper(storage, 0,
-                                                             statement);
+    /* Do not add duplicate statements */
+    if(!librdf_storage_mysql_contains_statement(storage, statement))
+      helper=librdf_storage_mysql_context_add_statement_helper(storage, 0,
+                                                               statement);
     librdf_stream_next(statement_stream);
   };
 
