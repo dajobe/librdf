@@ -145,7 +145,9 @@ main(int argc, char *argv[])
   argc--;
 
 
+  /* keep gcc happy */
   usage=0;
+  cmd=NULL;
   cmd_index= -1;
   identifier=NULL;
   
