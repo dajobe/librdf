@@ -85,6 +85,9 @@ void
 librdf_free_stream(librdf_stream* stream) 
 {
   stream->finished(stream->context);
+  if(stream->next)
+    librdf_free_statement(stream->next);
+  
   LIBRDF_FREE(librdf_stream, stream);
 }
 
@@ -183,7 +186,7 @@ librdf_stream_end(librdf_stream* stream)
   if(!stream->next)
     stream->is_end_stream=1;
   
-  return (stream->next != NULL);
+  return stream->is_end_stream;
 }
 
 
