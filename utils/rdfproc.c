@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -236,6 +236,7 @@ main(int argc, char *argv[])
   librdf_serializer* output_serializer=NULL;
   size_t capacity;
   size_t size;
+  const unsigned char *query_graph_serializer_syntax_name="rdfxml";
 
   program=argv[0];
   if((p=strrchr(program, '/')))
@@ -787,28 +788,73 @@ main(int argc, char *argv[])
         break;
       }
 
-      while(!librdf_query_results_finished(results)) {
-        fputs("result: [", stdout);
-        for(i=0; i<librdf_query_results_get_bindings_count(results); i++) {
-          librdf_node *value=librdf_query_results_get_binding_value(results, i);
-          name=(char*)librdf_query_results_get_binding_name(results, i);
-
-          if(i>0)
-            fputs(", ", stdout);
-          fprintf(stdout, "%s=", name);
-          if(value) {
-            librdf_node_print(value, stdout);
-            librdf_free_node(value);
-          } else
-            fputs("NULL", stdout);
-        }
-        fputs("]\n", stdout);
+      if (librdf_query_results_is_bindings(results)) {
+        fprintf(stderr, "%s: Query returned bindings results:\n", program);
         
-        librdf_query_results_next(results);
-      }
+        while(!librdf_query_results_finished(results)) {
+          fputs("result: [", stdout);
+          for(i=0; i<librdf_query_results_get_bindings_count(results); i++) {
+            librdf_node *value=librdf_query_results_get_binding_value(results, i);
+            name=(char*)librdf_query_results_get_binding_name(results, i);
 
-      fprintf(stdout, "%s: Query returned %d results\n", program, 
-              librdf_query_results_get_count(results));
+            if(i>0)
+              fputs(", ", stdout);
+            fprintf(stdout, "%s=", name);
+            if(value) {
+              librdf_node_print(value, stdout);
+              librdf_free_node(value);
+            } else
+              fputs("NULL", stdout);
+          }
+          fputs("]\n", stdout);
+
+          librdf_query_results_next(results);
+        }
+
+        fprintf(stdout, "%s: Query returned %d results\n", program, 
+                librdf_query_results_get_count(results));
+     } else if (librdf_query_results_is_boolean(results)) {
+       fprintf(stdout, "%s: Query returned boolean result: %s\n",
+               program,
+               librdf_query_results_get_boolean(results) ? "true" : "false");
+     } else if (librdf_query_results_is_graph(results)) {
+       librdf_storage* tmp_storage;
+       librdf_model* tmp_model;
+
+       tmp_storage=librdf_new_storage(world, NULL, NULL, NULL);
+       tmp_model=librdf_new_model(world, tmp_storage, NULL);
+
+       fprintf(stdout, "%s: Query returned graph result:\n", program);
+       
+       stream=librdf_query_results_as_stream(results);
+       if(!stream) {
+         fprintf(stderr, "%s: Failed to get query results graph\n", program);
+         return(1);
+       }
+       librdf_model_add_statements(tmp_model, stream);
+       librdf_free_stream(stream);
+
+       fprintf(stdout, "%s: Total %d triples\n", program, librdf_model_size(model));
+
+       serializer=librdf_new_serializer(world, 
+                                        query_graph_serializer_syntax_name, 
+                                        NULL, NULL);
+       if(!serializer) {
+         fprintf(stderr, 
+                 "%s: Failed to create serializer type %s\n", program,
+                 query_graph_serializer_syntax_name);
+         return(1);
+       }
+
+       librdf_serializer_serialize_model_to_file_handle(serializer, stdout, NULL, tmp_model);
+       librdf_free_serializer(serializer);
+       librdf_free_model(tmp_model);
+       librdf_free_storage(tmp_storage);
+     } else {
+       fprintf(stdout, "%s: Query returned unknown result format\n", program);
+       rc=1;
+     }
+      
       if(uri)
         librdf_free_uri(uri);
       librdf_free_query_results(results);
