@@ -205,7 +205,7 @@ LIBRDF_LDFLAGS=
 LIBRDF_LIBS=
 
 # Internally linked libraries - never given to users
-#   (such as repat, expat)
+#   (such as repat)
 # -Dfoo -Idir
 LIBRDF_INTERNAL_CPPFLAGS=
 # -Ldir -llib
@@ -399,17 +399,7 @@ AC_ARG_WITH(xml-parser, [  --with-xml-parser=NAME  Use XML parser - expat, libxm
 
 have_expat=0
 have_expat_lib=0
-have_expat_source=0
 need_expat=0
-need_expat_source=0
-AC_MSG_CHECKING(for expat sources)
-if test -d $srcdir/expat; then
-  have_expat_source=1
-  have_expat=1
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-fi
 
 oLIBS="$LIBS"
 AC_CHECK_LIB(xmltok, main, xmlt=1, xmlt=0)
@@ -497,16 +487,7 @@ fi
 
 have_libxml=0
 have_libxml_lib=0
-have_libxml_source=0
 need_libxml=0
-need_libxml_source=0
-AC_MSG_CHECKING(for libxml sources)
-if test -d $srcdir/libxml -a -r $srcdir/libxml/libxml.spec ; then
-  have_libxml_source=1
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-fi
 
 if test "X$XML_CONFIG" != X; then
   LIBS="`$XML_CONFIG --libs` $LIBS"
@@ -579,20 +560,11 @@ for parser in $parser_modules; do
 	  found=1
 	  AC_DEFINE(NEED_LIBXML, 1, [Need libxml2 XML library])
 	  AC_DEFINE(RAPTOR_XML_LIBXML, 1, [Raptor needs libxml2 XML library])
-	  if test $have_libxml_source = 1; then
-	    need_libxml_source=1
-          fi
 	else # expat
 	  if test $have_expat_lib = 1; then
 	    need_expat=1
 	    found=1
 	    AC_DEFINE(NEED_EXPAT, 1, [Need expat XML parser library])
-	    AC_DEFINE(RAPTOR_XML_EXPAT, 1, [Raptor needs expat XML parser library])
-	  elif test $have_expat_source = 1; then
-	    need_expat=1
-  	    need_expat_source=1
-	    found=1
-	    AC_DEFINE(NEED_EXPAT, 1, [Need expat XML parser librar])
 	    AC_DEFINE(RAPTOR_XML_EXPAT, 1, [Raptor needs expat XML parser library])
 	  fi
         fi
@@ -604,11 +576,6 @@ for parser in $parser_modules; do
       if test $have_repat = 1 ; then
 	if test $have_expat_lib = 1; then
 	  need_expat=1
-	  found=1
-	  AC_DEFINE(NEED_EXPAT, 1, [Need expat XML parser librar])
-	elif test $have_expat_source = 1; then
-	  need_expat=1
-	  need_expat_source=1
 	  found=1
 	  AC_DEFINE(NEED_EXPAT, 1, [Need expat XML parser librar])
 	fi
@@ -698,21 +665,13 @@ fi
 
 xml_parsers_available=
 if test $need_libxml = 1; then
-  if test $need_libxml_source = 1; then
-    xml_parsers_available="$xml_parsers_available libxml(source)"
-  else
-    xml_parsers_available="$xml_parsers_available libxml(system)"
-  fi
+  xml_parsers_available="$xml_parsers_available libxml(system)"
 fi
 if test $need_expat = 1; then
-  if test $need_expat_source = 1; then
-    xml_parsers_available="$xml_parsers_available expat(source)"
+  if test $libexpat = 1; then
+    xml_parsers_available="$xml_parsers_available expat(system libexpat)"
   else
-    if test $libexpat = 1; then
-      xml_parsers_available="$xml_parsers_available expat(system libexpat)"
-    else
-      xml_parsers_available="$xml_parsers_available expat(system libxmlparse,libxmltok)"
-    fi
+    xml_parsers_available="$xml_parsers_available expat(system libxmlparse,libxmltok)"
   fi
 fi
 
@@ -828,60 +787,23 @@ SD="docs perl python tcl java"
 
 
 if test $have_libxml = 1 -a $need_libxml = 1; then
-  if test $need_libxml_source = 1; then
-    SD="$SD libxml"
-    (cd libxml && ./configure --cache=../config.cache --enable-shared=no)
-    l="libxml/libxml.a"
-    c="-I$srcdir/libxml"
-    LIBRDF_LIBS="$l $LIBRDF_LIBS"
-    LIBRDF_CPPFLAGS="$c $LIBRDF_CPPFLAGS"
-    LIBRDF_XML_LIBS="$l $LIBRDF_XML_LIBS"
-    LIBRDF_XML_CPPFLAGS="$c $LIBRDF_XML_CPPFLAGS"
-  else
-    l=`$XML_CONFIG --libs`
-    c=`$XML_CONFIG --cflags`
-    LIBRDF_LIBS="$l $LIBRDF_LIBS"
-    LIBRDF_CPPFLAGS="$c $LIBRDF_CPPFLAGS"
-    LIBRDF_XML_LIBS="$l $LIBRDF_XML_LIBS"
-    LIBRDF_XML_CPPFLAGS="$c $LIBRDF_XML_CPPFLAGS"
-  fi
+  l=`$XML_CONFIG --libs`
+  c=`$XML_CONFIG --cflags`
+  LIBRDF_LIBS="$l $LIBRDF_LIBS"
+  LIBRDF_CPPFLAGS="$c $LIBRDF_CPPFLAGS"
+  LIBRDF_XML_LIBS="$l $LIBRDF_XML_LIBS"
+  LIBRDF_XML_CPPFLAGS="$c $LIBRDF_XML_CPPFLAGS"
 fi
 
 if test $need_expat = 1; then
-  # Only build local copy if it is needed
-  if test $need_expat_source = 1; then
-    SD="$SD expat"
-    c="-I\$(top_srcdir)/expat/xmlparse"
-    LIBRDF_CPPFLAGS="$c $LIBRDF_CPPFLAGS"
-    LIBRDF_XML_CPPFLAGS="$c $LIBRDF_XML_CPPFLAGS"
-    LIBRDF_XML_OBJS="\$(top_builddir)/expat/xmlparse/xmlparse.lo \$(top_builddir)/expat/xmlparse/hashtable.lo \$(top_builddir)/expat/xmltok/xmlrole.lo \$(top_builddir)/expat/xmltok/xmltok.lo"
-    REPAT_FLAGS="$REPAT_FLAGS -I\$(top_srcdir)/expat/xmlparse"
-    REPAT_LIBS="$LIBRDF_XML_OBJS"
-
-    AC_DEFINE(NEED_EXPAT_SOURCE, 1, [Need expat sources])
-    # FIXME - when expat in source tree is updated to new (sourceforge)
-    # version then need to remove these two lines:
-    AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE, 1, [Repat needs xmlparse library])
-    REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
-
-    # We know local expat sources has XML_SetNamespaceDeclHandler already
-    found=yes
-  else
-    LIBRDF_LIBS="$expat_libs $LIBRDF_LIBS"
-    LIBRDF_XML_LIBS="$expat_libs $LIBRDF_XML_LIBS"
-    REPAT_LIBS="$expat_libs"
-
-    found=no
-  fi
+  LIBRDF_LIBS="$expat_libs $LIBRDF_LIBS"
+  LIBRDF_XML_LIBS="$expat_libs $LIBRDF_XML_LIBS"
+  REPAT_LIBS="$expat_libs"
 
   LIBS=$LIBRDF_LIBS
 
   AC_MSG_CHECKING(for XML_SetNamespaceDeclHandler in expat)
-  if test $found = yes; then
-    worked=yes
-  else
-    AC_TRY_RUN([main() {XML_SetNamespaceDeclHandler(); return(0);}], worked=yes, worked=no, worked=no)
-  fi
+  AC_TRY_RUN([main() {XML_SetNamespaceDeclHandler(); return(0);}], worked=yes, worked=no, worked=no)
 
   if test $worked = yes; then
     AC_DEFINE(HAVE_XML_SetNamespaceDeclHandler, 1, [expat has XML_SetNamespaceDeclHandler method])
@@ -954,9 +876,6 @@ AC_CONFIG_FILES([Makefile
 docs/Makefile
 librdf/Makefile
 examples/Makefile
-expat/Makefile
-expat/xmlparse/Makefile
-expat/xmltok/Makefile
 perl/Makefile
 perl/t/Makefile
 perl/lib/Makefile
