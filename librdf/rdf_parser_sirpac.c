@@ -70,13 +70,13 @@ typedef struct {
 
 
 /**
- * librdf_parser_sirparc_init - Initialise the SiRPAC RDF parser
+ * librdf_parser_sirpac_init - Initialise the SiRPAC RDF parser
  * @context: context
  *
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_sirparc_init(void *context) 
+librdf_parser_sirpac_init(void *context) 
 {
   return 0;
 }
@@ -92,7 +92,7 @@ librdf_parser_sirparc_init(void *context)
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
 static librdf_stream*
-librdf_parser_sirparc_parse_as_stream(void *context, librdf_uri *uri) {
+librdf_parser_sirpac_parse_as_stream(void *context, librdf_uri *uri) {
   /* Note: not yet used */
 /*  librdf_parser_sirpac_context* pcontext=(librdf_parser_sirpac_context*)context; */
   librdf_parser_sirpac_stream_context* scontext;
@@ -129,7 +129,7 @@ librdf_parser_sirparc_parse_as_stream(void *context, librdf_uri *uri) {
   scontext->command=command;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_parser_sirparc_parse_as_stream, "Running command '%s'\n", command);
+  LIBRDF_DEBUG2(librdf_parser_sirpac_parse_as_stream, "Running command '%s'\n", command);
 #endif
 
   fh=popen(command, "r");
@@ -166,18 +166,15 @@ librdf_parser_sirparc_parse_as_stream(void *context, librdf_uri *uri) {
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_sirparc_parse_into_model(void *context, librdf_uri *uri,
+librdf_parser_sirpac_parse_into_model(void *context, librdf_uri *uri,
                                        librdf_model *model) {
   librdf_stream* stream;
-  int status;
   
-  stream=librdf_parser_sirparc_parse_as_stream(context, uri);
+  stream=librdf_parser_sirpac_parse_as_stream(context, uri);
   if(!stream)
     return 1;
 
-  status=librdf_model_add_statements(model, stream);
-  librdf_free_stream(stream);
-  return status;
+  return librdf_model_add_statements(model, stream);
 }
 
 
@@ -275,7 +272,7 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
 
 
 /**
- * librdf_parser_sirpac_serialise_end_of_stream - Check for the end of the stream of statements from the SiRPARC parser
+ * librdf_parser_sirpac_serialise_end_of_stream - Check for the end of the stream of statements from the Sirpac parser
  * @context: serialisation context
  * 
  * Return value: non 0 at end of stream.
@@ -301,7 +298,7 @@ librdf_parser_sirpac_serialise_end_of_stream(void* context)
 
 
 /**
- * librdf_parser_sirpac_serialise_next_statement - Get the next librdf_statement from the stream of statements from the SiRPARC RDF parse
+ * librdf_parser_sirpac_serialise_next_statement - Get the next librdf_statement from the stream of statements from the Sirpac RDF parse
  * @context: serialisation context
  * 
  * Return value: next &librdf_statement or NULL at end of stream.
@@ -351,6 +348,9 @@ librdf_parser_sirpac_serialise_finished(void* context)
       scontext->fh=NULL;
     }
 
+    if(scontext->next)
+      librdf_free_statement(scontext->next);
+
     if(scontext->command)
       LIBRDF_FREE(cstring, scontext->command);
 
@@ -368,9 +368,9 @@ librdf_parser_sirpac_register_factory(librdf_parser_factory *factory)
 {
   factory->context_length = sizeof(librdf_parser_sirpac_context);
   
-  factory->init  = librdf_parser_sirparc_init;
-  factory->parse_as_stream = librdf_parser_sirparc_parse_as_stream;
-  factory->parse_into_model = librdf_parser_sirparc_parse_into_model;
+  factory->init  = librdf_parser_sirpac_init;
+  factory->parse_as_stream = librdf_parser_sirpac_parse_as_stream;
+  factory->parse_into_model = librdf_parser_sirpac_parse_into_model;
 }
 
 
