@@ -447,7 +447,7 @@ librdf_model_storage_context_serialize(librdf_model* model,
                                        librdf_node* context) 
 {
   librdf_model_storage_context *mcontext=(librdf_model_storage_context *)model->context;
-  return librdf_storage_context_serialise(mcontext->storage, context);
+  return librdf_storage_context_as_stream(mcontext->storage, context);
 }
 
 
