@@ -35,6 +35,11 @@ dist_pkgdata_DATA = Redland.i
 # Summary: always make the tarball from the top level
 SUBDIRS=@LOCAL_SUBDIRS@ librdf examples utils demos docs data
 
+if MAINTAINER_MODE
+# Use ALL subdirectories when making distribution as maintainer
+DIST_SUBDIRS=raptor rasqal librdf examples utils demos docs data
+endif
+
 EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
 README      NEWS      LICENSE.txt  TODO \
 README.html NEWS.html LICENSE.html TODO.html \
