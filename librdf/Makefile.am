@@ -77,10 +77,11 @@
 SUBDIRS=@SD@
 
 bin_SCRIPTS = redland-config
-lib_LIBRARIES = libredland.a
+lib_LIBRARIES = librdf.a
 include_HEADERS = redland.h
 
-libredland_a_SOURCES = rdf_init.c rdf_uri.c rdf_node.c rdf_statement.c \
+librdf_a_SOURCES = rdf_init.c \
+rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
 rdf_model.c rdf_iterator.c \
 rdf_list.c rdf_memory.c \
@@ -88,17 +89,19 @@ rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c \
 redland.h rdf_types.h \
-rdf_uri.h rdf_node.h rdf_statement.h rdf_digest.h rdf_hash.h rdf_hash_gdbm.h \
-rdf_hash_memory.h rdf_model.h rdf_storage.h rdf_iterator.h \
-rdf_context.h rdf_list.h rdf_hash_bdb.h \
+rdf_uri.h rdf_node.h rdf_statement.h rdf_context.h \
+rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
+rdf_model.h rdf_iterator.h \
+rdf_list.h \
 rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
-rdf_stream.h rdf_parser.h
+rdf_stream.h \
+rdf_parser.h
 
 
-libredland_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ 
-libredland_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@
+librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ 
+librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@
 
-EXTRA_libredland_a_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
+EXTRA_librdf_a_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
 rdf_parser_sirpac.c rdf_parser_libwww.c \
 example.c example2.c
@@ -142,35 +145,35 @@ LIBS=@LIBS@ $(MEM_LIBS)
 
 # Rules to construct test programs
 
-rdf_node_test: rdf_node.c libredland.a
-	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_node.c libredland.a $(LIBS)
+rdf_node_test: rdf_node.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_node.c librdf.a $(LIBS)
 
-rdf_digest_test: rdf_digest.c libredland.a
-	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_digest.c libredland.a $(LIBS)
+rdf_digest_test: rdf_digest.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_digest.c librdf.a $(LIBS)
 
-rdf_hash_test: rdf_hash.c libredland.a
-	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_hash.c libredland.a $(LIBS)
+rdf_hash_test: rdf_hash.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_hash.c librdf.a $(LIBS)
 
-rdf_uri_test: rdf_uri.c libredland.a
-	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_uri.c libredland.a $(LIBS)
+rdf_uri_test: rdf_uri.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_uri.c librdf.a $(LIBS)
 
-rdf_statement_test: rdf_statement.c libredland.a
-	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c libredland.a $(LIBS)
+rdf_statement_test: rdf_statement.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c librdf.a $(LIBS)
 
-rdf_model_test: rdf_model.c libredland.a
-	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_model.c libredland.a $(LIBS)
+rdf_model_test: rdf_model.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_model.c librdf.a $(LIBS)
 
-rdf_storage_test: rdf_storage.c libredland.a
-	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_storage.c libredland.a $(LIBS)
+rdf_storage_test: rdf_storage.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_storage.c librdf.a $(LIBS)
 
-rdf_parser_test: rdf_parser.c libredland.a
-	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_parser.c libredland.a $(LIBS)
+rdf_parser_test: rdf_parser.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_parser.c librdf.a $(LIBS)
 
-example: example.c libredland.a
-	$(LINK) -I$(srcdir) -I. $(srcdir)/example.c libredland.a $(LIBS)
+example: example.c librdf.a
+	$(LINK) -I$(srcdir) -I. $(srcdir)/example.c librdf.a $(LIBS)
 
-example2: example2.c libredland.a
-	$(LINK) -I$(srcdir) -I. $(srcdir)/example2.c libredland.a $(LIBS)
+example2: example2.c librdf.a
+	$(LINK) -I$(srcdir) -I. $(srcdir)/example2.c librdf.a $(LIBS)
 
 
 
