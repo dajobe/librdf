@@ -1,3 +1,46 @@
+2004-10-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_namespace.c: less namespace debugs
+
+	* raptor/raptor_xml_writer.c: less cdata debugs
+
+	* raptor/raptor_namespace.c: Make most namespace debug messages
+	appear only if #ifdef RAPTOR_DEBUG_VERBOSE
+
+	* raptor/raptor_rdfxml.c:
+	Make most rdf/xml parsing debug messages appear only if
+	#ifdef RAPTOR_DEBUG_VERBOSE
+
+	* librdf/rdf_serializer.c
+	(librdf_serializer_serialize_model_to_counted_string,
+	librdf_serializer_serialize_model_to_string): Do not require a
+	base_uri.
+
+	* examples/example6.c:
+	Redland example code using model methods load and to_string
+
+	* librdf/rdf_serializer_raptor.c
+	(librdf_serializer_raptor_serialize_statement): Convert statement
+	object URI correctly.
+	(librdf_serializer_raptor_serialize_model_to_counted_string): Zap
+	string, string_length before starting.
+
+	* raptor/raptor_serialize.c:
+	(raptor_serialize_start, raptor_serialize_start_to_filename,
+	raptor_serialize_start_to_string,
+	raptor_serialize_start_to_file_handle,
+	raptor_serialize_statement, raptor_serialize_end):
+	Fail if no iostream is made or available.
+
+	* raptor/raptor_iostream.c (raptor_new_iostream_to_string):
+	Docs, zap string and length before
+	starting.
+
+	* examples/Makefile.am: Added example6.c
+
+	* raptor/raptor_serialize.c (raptor_rdfxml_serialize_statement):
+	Print datatype URIs correctly.
+
 2004-10-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_query_rasqal.c:
