@@ -95,7 +95,7 @@ LIBRDF_LIBTOOL_VERSION=0:0:0
 AC_SUBST(LIBRDF_LIBTOOL_VERSION)
 
 # OSX Fink
-if [ -d /sw/bin ]; then
+if test -d /sw/bin ; then
   PATH=/sw/bin:$PATH
 fi
 
@@ -388,13 +388,13 @@ if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_
 
   dbincdir=/usr/include
   # OSX fink
-  if [ -d /sw/include -a -d /sw/lib ]; then
+  if test -d /sw/include -a -d /sw/lib ; then
     dbincdir=/sw/include
     bdb_lib_dir=/sw/lib
   fi
 
   for version in 4 3 2; do
-    if [ -f $dbincdir/db$version/db.h ]; then
+    if test -f $dbincdir/db$version/db.h ; then
       bdb_include_dir=$dbincdir/db$version
       bdb_dbname=db-$version
       break
