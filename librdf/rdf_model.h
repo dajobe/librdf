@@ -81,17 +81,11 @@ librdf_stream* librdf_model_serialise(librdf_model* model);
 
 /* queries */
 
-/* NOT YET USED
-int librdf_model_find_statements_as_count(librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
-*/
-
 librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
 
-/* S, P, O Node versions - NOT YET USED:
-int librdf_model_find_statements(librdf_model* input_model, librdf_model* output_model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
-
-librdf_stream* librdf_model_find_statements_as_stream(librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
-*/
+librdf_iterator* librdf_model_get_sources(librdf_model *model, librdf_node *arc, librdf_node *target);
+librdf_iterator* librdf_model_get_arcs(librdf_model *model, librdf_node *source, librdf_node *target);
+librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *source, librdf_node *arc);
 
 
 /* submodels */
