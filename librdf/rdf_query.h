@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2002 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2002-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -63,19 +63,32 @@ struct librdf_query_factory_s {
   /* destroy a query */
   void (*terminate)(librdf_query* query);
   
-  /* make query be started */
-  int (*open)(librdf_query* query);
-  
-  /* close query/model context */
-  int (*close)(librdf_query* query);
-  
-  /* perform the query on a model, returning results as a stream  */
-  librdf_stream* (*run)(librdf_query* query, librdf_model* model);
+  /* perform the query on a model, returning results as a stream - OPTIONAL */
+  librdf_stream* (*run_as_stream)(librdf_query* query, librdf_model* model);
+
+  /* perform the query on a model, returning results as bindings  - OPTIONAL */
+  int (*run_as_bindings)(librdf_query* query, librdf_model* model);
+
+  /* get number of results (so far) - OPTIONAL */
+  int (*get_result_count)(librdf_query *query);
+
+  /* find out if binding results are exhausted - OPTIONAL */
+  int (*results_finished)(librdf_query *query);
+
+  /* get all binding names, values for current result - OPTIONAL */
+  int (*get_result_bindings)(librdf_query *query, const char ***names, librdf_node **values);
+
+  /* get one value for current result - OPTIONAL */
+  librdf_node* (*get_result_binding)(librdf_query *query, int offset);
+
+  /* get one value by name for current result - OPTIONAL */
+  librdf_node* (*get_result_binding_by_name)(librdf_query *query, const char *name);
+
+  /* get next result - OPTIONAL */
+  int (*next_result)(librdf_query *query);
   
 };
 
-
-#include <rdf_query_triples.h>
 
 /* module init */
 void librdf_init_query(librdf_world *world);
@@ -84,7 +97,12 @@ void librdf_init_query(librdf_world *world);
 void librdf_finish_query(librdf_world *world);
 
 /* class methods */
-librdf_query_factory* librdf_get_query_factory(const char *name, librdf_uri* uri);
+librdf_query_factory* librdf_get_query_factory(librdf_world *world, const char *name, librdf_uri* uri);
+
+void librdf_query_triples_constructor(librdf_world *world);
+void librdf_query_rasqal_constructor(librdf_world *world);
+
+void librdf_query_rasqal_destructor(void);
 
 #endif
 
@@ -101,10 +119,14 @@ REDLAND_API void librdf_free_query(librdf_query *query);
 
 
 /* methods */
-REDLAND_API int librdf_query_open(librdf_query* query);
-REDLAND_API int librdf_query_close(librdf_query* query);
-
-REDLAND_API librdf_stream* librdf_query_run(librdf_query* query, librdf_model *model);
+REDLAND_API librdf_stream* librdf_query_run_as_stream(librdf_query* query, librdf_model *model);
+REDLAND_API int librdf_query_run_as_bindings(librdf_query* query, librdf_model *model);
+REDLAND_API int librdf_query_get_result_count(librdf_query *query);
+REDLAND_API int librdf_query_results_finished(librdf_query *query);
+REDLAND_API int librdf_query_get_result_bindings(librdf_query *query, const char ***names, librdf_node **values);
+REDLAND_API librdf_node* librdf_query_get_result_binding(librdf_query *query, int offset);
+REDLAND_API librdf_node* librdf_query_get_result_binding_by_name(librdf_query *query, const char *name);
+REDLAND_API int librdf_query_next_result(librdf_query *query);
 
 #ifdef __cplusplus
 }
