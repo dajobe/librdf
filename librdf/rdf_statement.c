@@ -155,6 +155,42 @@ librdf_new_statement_from_statement(librdf_statement* statement)
 
 
 /**
+ * librdf_new_statement_from_nodes - Constructor - create a new librdf_statement from existing librdf_node objects
+ * @subject: &librdf_node
+ * @predicate: &librdf_node
+ * @object: &librdf_node
+ * 
+ * The node objects become owned by the new statement (or freed on error).
+ *
+ * Return value: a new &librdf_statement with copy or NULL on failure
+ **/
+librdf_statement*
+librdf_new_statement_from_nodes(librdf_node* subject,
+                                librdf_node* predicate,
+                                librdf_node* object)
+{
+  librdf_statement* new_statement;
+
+  new_statement = librdf_new_statement();
+  if(!new_statement) {
+    if(subject)
+      librdf_free_node(subject);
+    if(predicate)
+      librdf_free_node(predicate);
+    if(object)
+      librdf_free_node(object);
+    return NULL;
+  }
+  
+  new_statement->subject=subject;
+  new_statement->predicate=predicate;
+  new_statement->object=object;
+
+  return new_statement;
+}
+
+
+/**
  * librdf_free_statement - Destructor - destroy a librdf_statement
  * @statement: &librdf_statement object
  * 
