@@ -35,7 +35,13 @@ redland REDLAND_VERSION_STRING
 =head1 DESCRIPTION
 
 The B<redland> library is a general RDF library written in ANSI C
-that provides application support for the RDF model, ...
+that provides application support for the RDF model,
+
+This manual page is INCOMPLETE.  See the HTML API documentation for
+full details on the interfaces either on the Redland web site
+http://www.redland.opensource.ac.uk/ or with the software release in
+the docs/api directory.  Documentation on the Perl and Python
+APIs in POD and Pydoc respectively are also available.
 
 =head1 FUNCTIONS
 
