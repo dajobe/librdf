@@ -72,7 +72,7 @@ while test $# -gt 0; do
 done
   
 
-if test !- r @abs_top_builddir@/raptor/raptor-src-config; then
+if test ! -r @abs_top_builddir@/raptor/raptor-src-config; then
   echo "redland-src-config: Source tree not configured - no raptor-src-config, exiting" 1>&2
   exit 0
 fi
