@@ -503,19 +503,19 @@ librdf_query_get_result_binding_name(librdf_query *query, int offset)
 
 
 /**
- * librdf_query_get_result_binding_by_name - Get one binding value for a given name in the current result
+ * librdf_query_get_result_binding_value_by_name - Get one binding value for a given name in the current result
  * @query: &librdf_query query
  * @name: variable name
  * 
  * Return value: a new &librdf_node binding value or NULL on failure
  **/
 librdf_node*
-librdf_query_get_result_binding_by_name(librdf_query *query, const char *name)
+librdf_query_get_result_binding_value_by_name(librdf_query *query, const char *name)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
 
-  if(query->factory->get_result_binding_by_name)
-    return query->factory->get_result_binding_by_name(query, name);
+  if(query->factory->get_result_binding_value_by_name)
+    return query->factory->get_result_binding_value_by_name(query, name);
   else
     return NULL;
 }
