@@ -202,23 +202,6 @@ librdf_new_model_from_model(librdf_model* old_model)
 
 
 /**
- * librdf_new_model_from_stream - Constructor - create a new librdf_model from a stream
- *
- * @stream: &librdf_stream to create from
- *
- * FIXME: Not implemented yet
- * 
- * Return value: a new &librdf_model or NULL on failure
- **/
-librdf_model*
-librdf_new_model_from_stream(librdf_stream* stream)
-{
-  abort();
-  return NULL;
-}
-
-
-/**
  * librdf_free_model - Destructor - Destroy a librdf_model object
  * @model: &librdf_model model to destroy
  * 
