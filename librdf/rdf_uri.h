@@ -63,9 +63,11 @@ void librdf_free_uri(librdf_uri *uri);
 
 /* methods */
 char* librdf_uri_as_string (librdf_uri *uri);
+char* librdf_uri_as_counted_string (librdf_uri *uri, size_t *len_p);
 librdf_digest* librdf_uri_get_digest (librdf_uri *uri);
 void librdf_uri_print (librdf_uri* uri, FILE *fh);
 char* librdf_uri_to_string (librdf_uri* uri);
+char* librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p);
 int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
 int librdf_uri_is_file_uri(librdf_uri* uri);
 const char* librdf_uri_to_filename(librdf_uri* uri);
