@@ -78,7 +78,13 @@ int librdf_model_add_statements(librdf_model* model, librdf_stream* statement_st
 int librdf_model_remove_statement(librdf_model* model, librdf_statement* statement);
 
 /* containment */
+/* check for exact statement match */
 int librdf_model_contains_statement(librdf_model* model, librdf_statement* statement);
+/* check for [node, property, ?] */
+int librdf_model_has_arc_in(librdf_model *model, librdf_node *node, librdf_node *property);
+/* check for [?, property, node] */
+int librdf_model_has_arc_out(librdf_model *model, librdf_node *node, librdf_node *property);
+
 
 /* serialise the entire model */
 librdf_stream* librdf_model_serialise(librdf_model* model);
@@ -93,6 +99,11 @@ librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *sour
 librdf_node* librdf_model_get_source(librdf_model *model, librdf_node *arc, librdf_node *target);
 librdf_node* librdf_model_get_arc(librdf_model *model, librdf_node *source, librdf_node *target);
 librdf_node* librdf_model_get_target(librdf_model *model, librdf_node *source, librdf_node *arc);
+
+/* return list of properties to/from a node */
+librdf_iterator* librdf_model_get_arcs_in(librdf_model *model, librdf_node *node);
+librdf_iterator* librdf_model_get_arcs_out(librdf_model *model, librdf_node *node);
+
 
 
 /* submodels */

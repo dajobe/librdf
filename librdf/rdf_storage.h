@@ -81,8 +81,13 @@ struct librdf_storage_factory_s {
   /* remove a statement from the storage  */
   int (*remove_statement)(librdf_storage* storage, librdf_statement* statement);
   
-  /* true if statement in storage  */
+  /* check if statement in storage  */
   int (*contains_statement)(librdf_storage* storage, librdf_statement* statement);
+  /* check for [node, property, ?] */
+  int (*has_arc_in)(librdf_storage *storage, librdf_node *node, librdf_node *property);
+  /* check for [?, property, node] */
+  int (*has_arc_out)(librdf_storage *storage, librdf_node *node, librdf_node *property);
+
   
   /* serialise the model in storage  */
   librdf_stream* (*serialise)(librdf_storage* storage);
@@ -98,6 +103,10 @@ struct librdf_storage_factory_s {
 
   /* return a list of Nodes marching given source, target */
   librdf_iterator* (*find_targets)(librdf_storage* storage, librdf_node *source, librdf_node *target);
+
+  /* return list of properties to/from a node */
+  librdf_iterator* (*get_arcs_in)(librdf_storage *storage, librdf_node *node);
+  librdf_iterator* (*get_arcs_out)(librdf_storage *storage, librdf_node *node);
 };
 
 #endif
@@ -137,6 +146,16 @@ librdf_stream* librdf_storage_find_statements(librdf_storage* storage, librdf_st
 librdf_iterator* librdf_storage_get_sources(librdf_storage *storage, librdf_node *arc, librdf_node *target);
 librdf_iterator* librdf_storage_get_arcs(librdf_storage *storage, librdf_node *source, librdf_node *target);
 librdf_iterator* librdf_storage_get_targets(librdf_storage *storage, librdf_node *source, librdf_node *arc);
+
+
+/* return list of properties to/from a node */
+librdf_iterator* librdf_storage_get_arcs_in(librdf_storage *storage, librdf_node *node);
+librdf_iterator* librdf_storage_get_arcs_out(librdf_storage *storage, librdf_node *node);
+
+/* check for [node, property, ?] */
+int librdf_storage_has_arc_in(librdf_storage *storage, librdf_node *node, librdf_node *property);
+/* check for [?, property, node] */
+int librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node, librdf_node *property);
 
 
 #ifdef __cplusplus
