@@ -29,7 +29,7 @@ CONFIG_SUBDIRS=raptor
 DIST_SUBDIRS=librdf docs examples \
 perl php python tcl java ruby \
 expat repat raptor \
-debian scripts
+debian utils
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO      LICENSE.txt  RELEASE \
