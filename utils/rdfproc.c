@@ -101,13 +101,14 @@ static command commands[]={
   {CMD_ADD, "add", 3, 4, 1},
   {CMD_REMOVE, "remove", 3, 4, 1},
   {CMD_ADD_TYPED, "add-typed", 5, 6, 1},
-  {CMD_PARSE_MODEL, "parse", 2, 3, 1},
-  {CMD_PARSE_STREAM, "parse-stream", 2, 3, 1},
+  {CMD_PARSE_MODEL, "parse", 1, 3, 1},
+  {CMD_PARSE_STREAM, "parse-stream", 1, 3, 1},
   {CMD_ARCS_IN, "arcs-in", 1, 1, 0},
   {CMD_ARCS_OUT, "arcs-out", 1, 1, 0},
   {CMD_HAS_ARC_IN, "has-arc-in", 2, 2, 0},
   {CMD_HAS_ARC_OUT, "has-arc-out", 2, 2, 0},
-  {CMD_QUERY, "query", 3, 3, 0},
+  /* FIXME triples-match-query is deliberately not documented */
+  {CMD_QUERY, "triples-match-query", 3, 3, 0},
   {CMD_SERIALIZE, "serialize", 0, 3, 0},
   {(enum command_type)-1, NULL}  
 };
@@ -245,7 +246,7 @@ main(int argc, char *argv[])
       break;
     }
   if(cmd_index<0) {
-    fprintf(stderr, "%s: No such command %s\n", program, argv[0]);
+    fprintf(stderr, "%s: No such command `%s'\n", program, argv[0]);
     usage=1;
     goto usage;
   }
@@ -266,8 +267,10 @@ main(int argc, char *argv[])
 
   usage:
   if(usage) {
-    if(usage>1)
+    if(usage>1) {
       fprintf(stderr, title_format_string, librdf_version_string);
+      fprintf(stderr, "%s\n", librdf_short_copyright_string);
+    }
     fprintf(stderr, "Try `%s " HELP_ARG(h, help) "' for more information.\n",
                     program);
     exit(1);
@@ -279,18 +282,18 @@ main(int argc, char *argv[])
     printf("%s\n", librdf_short_copyright_string);
     printf("Utility for processing RDF using the Redland library.\n");
     printf("\nMain options:\n");
-    printf(HELP_TEXT(c, "contexts        ", "Use store with Redland contexts"));
+    printf(HELP_TEXT(c, "contexts        ", "Use Redland contexts"));
     printf(HELP_TEXT(h, "help            ", "Print this help, then exit"));
     printf(HELP_TEXT(v, "version         ", "Print the Redland version"));
     printf("\nCommands:\n");
-    printf("  parse URI PARSER [BASE URI]               Parse syntax at URI into\n");
-    printf("                                            the graph using PARSER\n");
-    printf("  parse-stream URI PARSER [BASE URI]        Streaming parse syntax at URI\n");
-    printf("                                            into the graph using PARSER\n");
+    printf("  parse URI [SYNTAX [BASE URI]]             Parse syntax at URI into\n");
+    printf("                                            the graph (RDF/XML)\n");
+    printf("  parse-stream URI [SYNTAX [BASE URI]       Streaming parse syntax at URI\n");
+    printf("                                            into the graph (RDF/XML)\n");
     printf("  print                                     Print the graph triples.\n");
-    printf("  serialize [NAME [URI [MIME-TYPE]]]        Serializes to a syntax (RDF/XML)\n");
+    printf("  serialize [SYNTAX [URI [MIME-TYPE]]]      Serializes to a syntax (RDF/XML)\n");
 #if 0
-    /* Not a query -> results table query, so leave out for now */
+    /* FIXME Not a query -> results table query, so leave out for now */
     printf("  query NAME URI|- QUERY-STRING             Query for matching triples\n");
 #endif
     printf("  find SUBJECT|- PREDICATE|- OBJECT|-       Find matching triples\n");
@@ -367,16 +370,17 @@ main(int argc, char *argv[])
         break;
       }
       
-      parser=librdf_new_parser(world, argv[1], NULL, NULL);
+      parser=librdf_new_parser(world, ((argc > 1) ? argv[1] : NULL), NULL, NULL);
       if(!parser) {
         fprintf(stderr, "%s: Failed to create new parser %s\n", program, argv[1]);
         librdf_free_uri(uri);
         break;
       }
       fprintf(stdout, "%s: Parsing URI %s with %s parser\n", program,
-              librdf_uri_as_string(uri), argv[1]);
+              librdf_uri_as_string(uri), 
+              (argc > 1) ? argv[1] : "default");
       
-      if(argv[2]) {
+      if(argc == 3 && argv[2]) {
         base_uri=librdf_new_uri(world, argv[2]);
         if(!base_uri) {
           fprintf(stderr, "%s: Failed to create base URI from %s\n", program, argv[2]);
@@ -389,8 +393,6 @@ main(int argc, char *argv[])
       
       
       if (type == CMD_PARSE_MODEL) {
-        librdf_parser_set_feature(parser, LIBRDF_MS_aboutEach_URI, "yes");
-        librdf_parser_set_feature(parser, LIBRDF_MS_aboutEachPrefix_URI, "yes");
         if(librdf_parser_parse_into_model(parser, uri, base_uri, model)) {
           fprintf(stderr, "%s: Failed to parse RDF into model\n", program);
           librdf_free_parser(parser);
@@ -400,8 +402,6 @@ main(int argc, char *argv[])
         }
       } else {
         /* must be CMD_PARSE_STREAM */
-        librdf_parser_set_feature(parser, LIBRDF_MS_aboutEach_URI, "no");
-        librdf_parser_set_feature(parser, LIBRDF_MS_aboutEachPrefix_URI, "no");
         if(!(stream=librdf_parser_parse_as_stream(parser, uri, base_uri))) {
           fprintf(stderr, "%s: Failed to parse RDF as stream\n", program);
           librdf_free_parser(parser);
