@@ -543,8 +543,11 @@ in the API as a wrapper around the above.</p>
 
 <p>The <a href="docs/api/node.html">Node</a> class gained a new constructor:</p>
 <pre>
-  librdf_node* librdf_new_node_from_typed_literal(librdf_world *world,
-    const char *string, const char *xml_language, librdf_uri* datatype_uri);
+  librdf_node* librdf_new_node_from_typed_literal(
+    librdf_world *world,
+    const char *string,
+    const char *xml_language, 
+    librdf_uri* datatype_uri);
 </pre>
 
 <p>that should be used in preference to
@@ -576,8 +579,11 @@ have been removed.  Raptor replaces them.</p>
 gained a new method:</p>
 
 <pre>
-  int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
-    const char *name, librdf_uri* base_uri, librdf_model* model);
+  int librdf_serializer_serialize_model_to_file(
+    librdf_serializer* serializer,
+    const char *name,
+    librdf_uri* base_uri, 
+    librdf_model* model);
 </pre>
 
 <p>This writes the serialized model to a filename
