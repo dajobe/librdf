@@ -46,7 +46,7 @@ static void* librdf_storage_stream_to_node_iterator_get_next(void* iterator);
 static void librdf_storage_stream_to_node_iterator_finished(void* iterator);
 
 /* helper function for creating iterators for get sources, targets, arcs */
-static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage* storage, librdf_node* node1, librdf_node *node2, int want);
+static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage* storage, librdf_node* node1, librdf_node *node2, int want, int duplicates_allowed);
 
 
 /**
@@ -537,6 +537,7 @@ typedef struct {
   librdf_stream *stream;
   librdf_statement *partial_statement;
   int want;
+  int duplicates_allowed;
 } librdf_storage_stream_to_node_iterator_context;
 
 
@@ -621,7 +622,8 @@ static librdf_iterator*
 librdf_storage_node_stream_to_node_create(librdf_storage* storage,
                                           librdf_node *node1,
                                           librdf_node *node2,
-                                          int want)
+                                          int want,
+                                          int duplicates_allowed)
 {
   librdf_statement *partial_statement;
   librdf_stream *stream;
@@ -666,6 +668,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   context->partial_statement=partial_statement;
   context->stream=stream;
   context->want=want;
+  context->duplicates_allowed=duplicates_allowed;
   
   iterator=librdf_new_iterator(storage->world,
                                (void*)context,
@@ -674,6 +677,15 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
                                librdf_storage_stream_to_node_iterator_finished);
   if(!iterator)
     librdf_storage_stream_to_node_iterator_finished(context);
+
+  if(!duplicates_allowed) {
+    /* FIXME - need to add code to make iterator remove duplicate nodes */
+    /* was: librdf_iterator_add_map(iterator,
+                            librdf_iterator_map_remove_duplicate_nodes,
+                            NULL);
+    */
+  }
+
 
   return iterator;
 }
@@ -698,7 +710,8 @@ librdf_storage_get_sources(librdf_storage *storage,
     return storage->factory->find_sources(storage, arc, target);
 
   return librdf_storage_node_stream_to_node_create(storage, arc, target,
-                                                   LIBRDF_STATEMENT_SUBJECT);
+                                                   LIBRDF_STATEMENT_SUBJECT,
+                                                   1);
 }
 
 
@@ -721,7 +734,8 @@ librdf_storage_get_arcs(librdf_storage *storage,
     return storage->factory->find_arcs(storage, source, target);
 
   return librdf_storage_node_stream_to_node_create(storage, source, target,
-                                                   LIBRDF_STATEMENT_PREDICATE);
+                                                   LIBRDF_STATEMENT_PREDICATE,
+                                                   0);
 }
 
 
@@ -744,9 +758,106 @@ librdf_storage_get_targets(librdf_storage *storage,
     return storage->factory->find_targets(storage, source, arc);
 
   return librdf_storage_node_stream_to_node_create(storage, source, arc,
-                                                   LIBRDF_STATEMENT_OBJECT);
+                                                   LIBRDF_STATEMENT_OBJECT,
+                                                   0);
 }
 
+
+/**
+ * librdf_storage_get_arcs_in - return the properties pointing to the given resource
+ * @storage: &librdf_storage object
+ * @node: &librdf_node resource node
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_storage_get_arcs_in(librdf_storage *storage, librdf_node *node) 
+{
+  if (storage->factory->get_arcs_in)
+    return storage->factory->get_arcs_in(storage, node);
+
+  return librdf_storage_node_stream_to_node_create(storage, NULL, node,
+                                                   LIBRDF_STATEMENT_PREDICATE,
+                                                   0);
+}
+
+
+/**
+ * librdf_storage_get_arcs_out - return the properties pointing from the given resource
+ * @storage: &librdf_storage object
+ * @node: &librdf_node resource node
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_storage_get_arcs_out(librdf_storage *storage, librdf_node *node) 
+{
+  if (storage->factory->get_arcs_out)
+    return storage->factory->get_arcs_out(storage, node);
+  return librdf_storage_node_stream_to_node_create(storage, node, NULL,
+                                                   LIBRDF_STATEMENT_PREDICATE,
+                                                   0);
+}
+
+
+/**
+ * librdf_storage_has_arc_in - check if a node has a given property pointing to it
+ * @storage: &librdf_storage object
+ * @node: &librdf_node resource node
+ * @property: &librdf_node property node
+ * 
+ * Return value: non 0 if arc property does point to the resource node
+ **/
+int
+librdf_storage_has_arc_in(librdf_storage *storage, librdf_node *node,
+                          librdf_node *property) 
+{
+  librdf_iterator *iterator;
+  int status;
+  
+  if (storage->factory->has_arc_in)
+    return storage->factory->has_arc_in(storage, node, property);
+  
+  iterator=librdf_storage_get_sources(storage, property, node);
+  if(!iterator)
+    return 0;
+
+  /* a non-empty list of sources is success */
+  status=librdf_iterator_have_elements(iterator);
+  librdf_free_iterator(iterator);
+
+  return status;
+}
+
+
+/**
+ * librdf_storage_has_arc_out - check if a node has a given property pointing from it
+ * @storage: &librdf_storage object
+ * @node: &librdf_node resource node
+ * @property: &librdf_node property node
+ * 
+ * Return value: non 0 if arc property does point from the resource node
+ **/
+int
+librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node, 
+                           librdf_node *property) 
+{
+  librdf_iterator *iterator;
+  int status;
+  
+  if (storage->factory->has_arc_in)
+    return storage->factory->has_arc_in(storage, node, property);
+  
+  iterator=librdf_storage_get_targets(storage, node, property);
+  if(!iterator)
+    return 0;
+
+  /* a non-empty list of targets is success */
+  status=librdf_iterator_have_elements(iterator);
+  librdf_free_iterator(iterator);
+
+  return status;
+}
 
 
 
