@@ -39,6 +39,9 @@ typedef struct {
   librdf_serializer *serializer;        /* librdf serializer object */
   raptor_serializer *rdf_serializer;    /* raptor serializer object */
   char *serializer_name;                /* raptor serializer name to use */
+
+  int errors;
+  int warnings;
 } librdf_serializer_raptor_context;
 
 
@@ -145,6 +148,28 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
 }
 
 
+static void
+librdf_serializer_raptor_error_handler(void *data, raptor_locator *locator,
+                                       const char *message) 
+{
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)data;
+  scontext->errors++;
+
+  librdf_log_simple(scontext->serializer->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, locator, message);
+}
+
+
+static void
+librdf_serializer_raptor_warning_handler(void *data, raptor_locator *locator,
+                                         const char *message) 
+{
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)data;
+  scontext->warnings++;
+
+  librdf_log_simple(scontext->serializer->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_SERIALIZER, locator, message);
+}
+
+
 static int
 librdf_serializer_raptor_serialize_model_to_file_handle(void *context,
                                                         FILE *handle, 
@@ -163,6 +188,13 @@ librdf_serializer_raptor_serialize_model_to_file_handle(void *context,
                                            (raptor_uri*)base_uri, handle);
   if(rc)
     return 1;
+
+  scontext->errors=0;
+  scontext->warnings=0;
+  raptor_serializer_set_error_handler(scontext->rdf_serializer, scontext, 
+                                      librdf_serializer_raptor_error_handler);
+  raptor_serializer_set_warning_handler(scontext->rdf_serializer, scontext, 
+                                        librdf_serializer_raptor_warning_handler);
     
   while(!librdf_stream_end(stream)) {
     librdf_statement *statement=librdf_stream_get_object(stream);
@@ -179,9 +211,10 @@ librdf_serializer_raptor_serialize_model_to_file_handle(void *context,
 
 
 static unsigned char*
-librdf_serializer_raptor_serialize_model_to_string(void *context,
-                                                   librdf_uri* base_uri,
-                                                   librdf_model *model) 
+librdf_serializer_raptor_serialize_model_to_counted_string(void *context,
+                                                           librdf_uri* base_uri,
+                                                           librdf_model *model,
+                                                           size_t* length_p)
 {
   librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
   raptor_iostream *iostr;
@@ -210,6 +243,13 @@ librdf_serializer_raptor_serialize_model_to_string(void *context,
     return NULL;
   }
     
+  scontext->errors=0;
+  scontext->warnings=0;
+  raptor_serializer_set_error_handler(scontext->rdf_serializer, scontext, 
+                                      librdf_serializer_raptor_error_handler);
+  raptor_serializer_set_warning_handler(scontext->rdf_serializer, scontext, 
+                                        librdf_serializer_raptor_warning_handler);
+    
   while(!librdf_stream_end(stream)) {
     librdf_statement *statement=librdf_stream_get_object(stream);
     librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
@@ -219,6 +259,9 @@ librdf_serializer_raptor_serialize_model_to_string(void *context,
   librdf_free_stream(stream);
   raptor_serialize_end(scontext->rdf_serializer);
 
+  if(length_p)
+    *length_p=string_length;
+  
   return string;
 }
 
@@ -238,7 +281,7 @@ librdf_serializer_raptor_register_factory(librdf_serializer_factory *factory)
   factory->terminate = librdf_serializer_raptor_terminate;
 
   factory->serialize_model_to_file_handle = librdf_serializer_raptor_serialize_model_to_file_handle;
-  factory->serialize_model_to_string = librdf_serializer_raptor_serialize_model_to_string;
+  factory->serialize_model_to_counted_string = librdf_serializer_raptor_serialize_model_to_counted_string;
 }
 
 
