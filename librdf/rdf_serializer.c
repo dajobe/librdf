@@ -629,7 +629,8 @@ main(int argc, char *argv[])
   serializer=librdf_new_serializer(world, "rdfxml", NULL, NULL);
   base_uri=librdf_new_uri(world,"http://example.org/base#");
 
-  librdf_serializer_serialize_model(serializer, fh, base_uri, model);
+  librdf_serializer_serialize_model_to_file_handle(serializer, fh, 
+                                                   base_uri, model);
   librdf_free_serializer(serializer);
   fclose(fh);
 
