@@ -39,6 +39,9 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 #include <sys/types.h>
 
 #include <redland.h>
@@ -268,7 +271,7 @@ sqlite_string_escape(const unsigned char *raw, size_t raw_len, size_t *len_p)
   p=escaped;
   while(raw_len > 0) {
     if(*raw == '\'') {
-      *p++='\\';
+      *p++='\'';
     }
     *p++=*raw++;
     raw_len--;
@@ -358,8 +361,8 @@ librdf_storage_sqlite_get_helper(librdf_storage *storage,
 
 
 static int
-librdf_storage_sqlite_store_uri_helper(librdf_storage* storage,
-                                       librdf_uri* uri) 
+librdf_storage_sqlite_uri_helper(librdf_storage* storage,
+                                 librdf_uri* uri) 
 {
   const unsigned char *uri_string;
   size_t uri_len;
@@ -388,8 +391,8 @@ librdf_storage_sqlite_store_uri_helper(librdf_storage* storage,
 
 
 static int
-librdf_storage_sqlite_store_blank_helper(librdf_storage* storage,
-                                         const unsigned char *blank) 
+librdf_storage_sqlite_blank_helper(librdf_storage* storage,
+                                   const unsigned char *blank)
 {
   size_t blank_len;
   char expression[2048];
@@ -417,6 +420,74 @@ librdf_storage_sqlite_store_blank_helper(librdf_storage* storage,
 
 
 static int
+librdf_storage_sqlite_literal_helper(librdf_storage* storage,
+                                     const unsigned char *value,
+                                     size_t value_len,
+                                     const char *language,
+                                     librdf_uri *datatype) 
+{
+  char expression[2048];
+  int id;
+  size_t len;
+  unsigned char *value_e;
+  unsigned char *language_e=NULL;
+  unsigned char *datatype_e=NULL;
+
+  value_e=sqlite_string_escape(value, value_len, NULL);
+  if(!value_e)
+    return -1;
+  
+  sprintf(expression, "text = '%s'", value_e);
+  if(language) {
+    len=strlen(language);
+    language_e=sqlite_string_escape((unsigned const char*)language, len, NULL);
+    if(!language_e)
+      return -1;
+    sprintf(expression+strlen(expression), "AND language = '%s'", language_e);
+  }
+
+  if(datatype) {
+    unsigned char *datatype_str;
+    datatype_str=librdf_uri_as_counted_string(datatype, &len);
+    datatype_e=sqlite_string_escape((unsigned const char*)datatype, len, NULL);
+    if(!datatype_e)
+      return -1;
+    sprintf(expression+strlen(expression), "AND datatype = '%s'", datatype_e);
+  }
+  
+  id=librdf_storage_sqlite_get_helper(storage, TABLE_LITERALS, expression);
+  if(id >=0)
+    goto tidy;
+  
+  strcpy(expression, "'");
+  strcat(expression, value_e);
+  strcat(expression, "'");
+  if(language_e) {
+    strcat(expression, ", '");
+    strcat(expression, language_e);
+    strcat(expression, "'");
+  } else
+    strcat(expression, ", NULL");
+  if(datatype_e) {
+    strcat(expression, ", '");
+    strcat(expression, datatype_e);
+    strcat(expression, "'");
+  } else
+    strcat(expression, ", NULL");
+  id=librdf_storage_sqlite_set_helper(storage, TABLE_LITERALS, expression);
+
+  tidy:
+  LIBRDF_FREE(cstring, value_e);
+  if(language_e)
+    LIBRDF_FREE(cstring, language_e);
+  if(datatype_e)
+    LIBRDF_FREE(cstring, datatype_e);
+
+  return id;
+}
+
+
+static int
 librdf_storage_sqlite_node_helper(librdf_storage* storage,
                                   librdf_node* node,
                                   int* id_p,
@@ -424,25 +495,33 @@ librdf_storage_sqlite_node_helper(librdf_storage* storage,
 {
   int id;
   triple_node_type node_type;
+  unsigned char *value;
+  size_t value_len;
 
   switch(librdf_node_get_type(node)) {
     case LIBRDF_NODE_TYPE_RESOURCE:
-      id=librdf_storage_sqlite_store_uri_helper(storage,
-                                                librdf_node_get_uri(node));
-      if(id <0)
+      id=librdf_storage_sqlite_uri_helper(storage,
+                                          librdf_node_get_uri(node));
+      if(id < 0)
         return 1;
       node_type=TRIPLE_URI;
       break;
 
     case LIBRDF_NODE_TYPE_LITERAL:
-      id=9999;
+      value=librdf_node_get_literal_value_as_counted_string(node, &value_len);
+      id=librdf_storage_sqlite_literal_helper(storage,
+                                              value, value_len,
+                                              librdf_node_get_literal_value_language(node),
+                                              librdf_node_get_literal_value_datatype_uri(node));
+      if(id < 0)
+        return 1;
       node_type=TRIPLE_LITERAL;
       break;
 
     case LIBRDF_NODE_TYPE_BLANK:
-      id=librdf_storage_sqlite_store_blank_helper(storage,
-                                                  librdf_node_get_blank_identifier(node));
-      if(id <0)
+      id=librdf_storage_sqlite_blank_helper(storage,
+                                            librdf_node_get_blank_identifier(node));
+      if(id < 0)
         return 1;
       node_type=TRIPLE_BLANK;
       break;
@@ -503,6 +582,13 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 #else
   int mode=0;
 #endif
+  int db_file_exists=0;
+  
+  if(!access((const char*)context->name, F_OK))
+    db_file_exists=1;
+
+  if(context->is_new && db_file_exists)
+    unlink(context->name);
 
 #ifdef HAVE_SQLITE3_H
   context->db=NULL;
@@ -531,13 +617,15 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 
     for(i=0; i < NTABLES; i++) {
 
+#if 0
       sprintf(request, "DROP TABLE %s;", sqlite_tables[i].name);
       librdf_storage_sqlite_exec(storage,
                                  request,
                                  NULL, /* no callback */
                                  NULL, /* arg */
                                  1); /* don't care if this fails */
-    
+#endif
+
       sprintf(request, "CREATE TABLE %s (%s);",
               sqlite_tables[i].name, sqlite_tables[i].schema);
       
@@ -757,7 +845,7 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_stateme
 
   if(librdf_storage_sqlite_statement_helper(storage,
                                             statement,
-                                            NULL,
+                                            NULL, 
                                             node_types, node_ids, fields))
     return -1;
   
