@@ -91,7 +91,8 @@ rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
 rdf_model.h rdf_iterator.h \
 rdf_storage.h \
 rdf_stream.h \
-rdf_parser.h rdf_heuristics.h \
+rdf_parser.h rapier.h \
+rdf_heuristics.h \
 rdf_list.h \
 rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
 rdf_files.h \
@@ -117,7 +118,8 @@ rdf_model.h rdf_iterator.h \
 rdf_list.h \
 rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
 rdf_stream.h \
-rdf_parser.h rdf_heuristics.h rdf_files.h rdf_utf8.h
+rdf_parser.h rapier.h \
+rdf_heuristics.h rdf_files.h rdf_utf8.h
 
 
 librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
@@ -127,7 +129,8 @@ librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 
 EXTRA_librdf_a_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
-rdf_parser_sirpac.c rdf_parser_libwww.c rdf_parser_redland.c \
+rdf_parser_sirpac.c rdf_parser_libwww.c \
+rdf_parser_rapier.c rapier_parser.c \
 rdf_parser_repat.c \
 example1.c example2.c example3.c example4.c
 
