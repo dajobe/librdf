@@ -27,12 +27,10 @@ man_MANS = redland-config.1
 dist_pkgdata_DATA = Redland.i
 
 # Subdirectories to build/install etc.
-SUBDIRS=@SD_PRE@ librdf examples utils @SD_POST@ demos docs data
-CONFIG_SUBDIRS=raptor rasqal
+SUBDIRS=@SD_PRE@ librdf examples utils demos docs data
+
 # Subdirectories to use for distribution
-DIST_SUBDIRS=librdf docs data examples \
-raptor rasqal \
-utils demos
+DIST_SUBDIRS=raptor rasqal librdf examples utils demos docs data
 
 EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
 README      NEWS      LICENSE.txt  TODO \
