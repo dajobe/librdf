@@ -140,13 +140,13 @@ SWIG_MIN_VERSION=1.3.10
 AC_MSG_CHECKING(SWIG support)
 if test "X$SWIG" != "X"; then
   SWIG_VERSION=`$SWIG -version 2>&1 |sed -ne 's/^SWIG Version //p'`
-  SWIG_VERSION_DEC=`echo $SWIG_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  SWIG_VERSION_DEC=`echo $SWIG_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
 
  if test $SWIG_VERSION_DEC -ge 010314; then
    SWIG_PYTHON_ARGS=-noproxy
  fi
 
-  SWIG_MIN_VERSION_DEC=`echo $SWIG_MIN_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  SWIG_MIN_VERSION_DEC=`echo $SWIG_MIN_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
 
   if test $SWIG_VERSION_DEC -ge $SWIG_MIN_VERSION_DEC; then
     AC_MSG_RESULT($SWIG_VERSION - OK)
@@ -173,82 +173,156 @@ AC_SUBST(SWIG_PYTHON_ARGS)
 
 
 languages=
+languages_available=
 
 
 AC_ARG_WITH(perl, [  --with-perl(=PERL)      Enable the Perl interface], with_perl="$withval", with_perl="no")
 AC_MSG_CHECKING(Enable Perl API)
-if test "X$with_perl" != "Xno"; then
-  if test "X$with_perl" != "Xyes" -a "X$with_perl" != "Xauto"; then
+if test "X$with_perl" != Xno ; then
+  if test "X$with_perl" != Xyes; then
     PERL=$with_perl
   fi
   with_perl=yes
-  languages="$languages perl"
-else
-  with_perl=no
+fi
+
+PERL_VERSION=`$PERL -MConfig -e 'print $Config{version}' 2>/dev/null`
+if test "X$PERL_VERSION" != X; then
+  languages_available="$languages_available perl($PERL_VERSION)"
+  if test $with_perl = yes; then
+    languages="$languages perl"
+  fi
 fi
 AC_MSG_RESULT($with_perl)
+AC_SUBST(PERL_VERSION)
 
 
 AC_ARG_WITH(python, [  --with-python(=PYTHON)  Enable the Python interface], with_python="$withval", with_python="no")
 AC_MSG_CHECKING(Enable Python API)
-if test "X$with_python" != "Xno"; then
-  if test "X$with_python" != "Xyes" -a "X$with_python" != "Xauto"; then
+if test "X$with_python" != Xno; then
+  if test "X$with_python" != Xyes; then
     PYTHON=$with_python
   fi
   with_python=yes
-  languages="$languages python"
-else
-  with_python=no
+fi
+
+dnl need to change quotes to allow square brackets
+changequote(<<, >>)dnl
+PYTHON_VERSION=`$PYTHON -c 'import sys; print sys.version[:3]' 2>/dev/null`
+python_prefix=`$PYTHON -c 'import sys; print sys.prefix' 2>/dev/null`
+changequote([, ])dnl
+if test "X$PYTHON_VERSION" != X; then
+  languages_available="$languages_available python($PYTHON_VERSION)"
+  if test $with_python = yes; then
+    languages="$languages python"
+  fi
 fi
 AC_MSG_RESULT($with_python)
+AC_SUBST(PYTHON_VERSION)
 
 
 AC_ARG_WITH(java, [  --with-java(=JAVA)      Enable the java interface], with_java="$withval", with_java="no")
 AC_MSG_CHECKING(Enable Java API)
-if test  "X$with_java" != "Xyes" -a "X$with_java" != "Xno"; then
-  JAVA=$with_java
+if test "X$with_java" != Xno ; then
+  if test "X$with_java" != Xyes; then
+    JAVA=$with_java
+  fi
   with_java=yes
-  languages="$languages java"
-else
-  with_java=no
+fi
+
+dnl need to change quotes to allow square brackets
+changequote(<<, >>)dnl
+JAVA_VERSION=`$JAVA -version 2>&1 | $SED -ne 's/java version "\([^"]*\)".*/\1/p' 2>/dev/null`
+changequote([, ])dnl
+if test "X$JAVA_VERSION" != X; then
+  languages_available="$languages_available java($JAVA_VERSION)"
+  if test $with_java = yes; then
+    languages="$languages java"
+  fi
 fi
 AC_MSG_RESULT($with_java)
+AC_SUBST(JAVA_VERSION)
 
 
 AC_ARG_WITH(tcl, [  --with-tcl(=TCL)        Enable the Tcl interface], with_tcl="$withval", with_tcl="no")
 AC_MSG_CHECKING(Enable Tcl API)
-if test "X$with_tcl" != "Xyes" -a "X$with_tcl" != "Xno"; then
-  TCL=$with_tcl
+if test "X$with_tcl" != Xno ; then
+  if test "X$with_tcl" != Xyes; then
+    TCL=$with_tcl
+  fi
   with_tcl=yes
-  languages="$languages tcl"
-else
-  with_tcl=no
+fi
+
+changequote(<<, >>)dnl
+TCL_VERSION=`echo 'puts [info tclversion]' | $TCL 2>/dev/null`
+changequote([, ])dnl
+if test "X$TCL_VERSION" != X; then
+  languages_available="$languages_available tcl($TCL_VERSION)"
+  if test $with_tcl = yes; then
+    languages="$languages tcl"
+  fi
 fi
 AC_MSG_RESULT($with_tcl)
+AC_SUBST(TCL_VERSION)
+
+AC_ARG_WITH(tcl_include, [  --with-tcl-include=DIR  Tcl include directory], tcl_include="$withval", tcl_include="")
+AC_MSG_CHECKING(TCL include)
+TCL_INCLUDE=
+if test "X$TCL_VERSION" != X; then
+  if test "X$tcl_include" = X ; then
+    for dir in /usr/include/tcl$TCL_VERSION /usr/local/include/tcl$TCL_VERSION; do
+      if test -r $dir/tcl.h; then
+	TCL_INCLUDE="$dir"
+	break
+      fi
+    done
+  elif test "X$tcl_include" != X -a -r $tcl_include/tcl.h; then
+    TCL_INCLUDE="$tcl_include"
+  fi
+fi
+AC_MSG_RESULT($TCL_INCLUDE)
+AC_SUBST(TCL_INCLUDE)
 
 
 AC_ARG_WITH(php, [  --with-php(=PHP)        Enable the PHP interface], with_php="$withval", with_php="no")
 AC_MSG_CHECKING(Enable PHP API)
-if test "X$with_php" != "Xyes" -a "X$with_php" != "Xno"; then
-  PHP=$with_php
+if test "X$with_php" != Xno ; then
+  if test "X$with_php" != Xyes; then
+    PHP=$with_php
+  fi
   with_php=yes
-  languages="$languages php"
-else
-  with_php=no
+fi
+
+PHP_VERSION=`php-config --version 2>/dev/null`
+if test "X$PHP_VERSION" != X; then
+  languages_available="$languages_available php($PHP_VERSION)"
+  if test $with_php = yes; then
+    languages="$languages php"
+  fi
 fi
 AC_MSG_RESULT($with_php)
+AC_SUBST(PHP_VERSION)
 
 
 AC_ARG_WITH(ruby, [  --with-ruby(=RUBY)      Enable the Ruby interface], with_ruby="$withval", with_ruby="no")
 AC_MSG_CHECKING(Enable Ruby API)
-if test "X$with_ruby" != "Xyes" -a "X$with_ruby" != "Xno"; then
-  RUBY=$with_ruby
+if test "X$with_ruby" != Xno ; then
+  if test "X$with_ruby" != Xyes; then
+    RUBY=$with_ruby
+  fi
   with_ruby=yes
-  languages="$languages ruby"
-else
-  with_ruby=no
+fi
+
+RUBY_VERSION=`$RUBY --version 2>/dev/null | $AWK '{print $2}'`
+if test "X$RUBY_VERSION" != X; then
+  languages_available="$languages_available ruby($RUBY_VERSION)"
+  if test $with_ruby = yes; then
+    languages="$languages ruby"
+  fi
 fi
 AC_MSG_RESULT($with_ruby)
+AC_SUBST(RUBY_VERSION)
+
+
 
 with_ecma_cla=
 dnl Pick an ECMA CLI implementation
@@ -306,13 +380,23 @@ fi
 
 AC_ARG_WITH(jdk, [  --with-jdk=DIR          Java JDK location []], jdk="$withval", jdk="")
 AC_MSG_CHECKING(Java JDK includes)
-JDK_INCLUDES=
-if test "X$jdk" != X -a -r $jdk/include/jni.h; then
-  inc1="$jdk/include"
-  inc2=`find $inc1 -type d | grep -v "$inc1\$" | head -1`
-  JDK_INCLUDES="-I$inc1"
-  if test -r $inc2/jni_md.h; then
-    JDK_INCLUDES="$JDK_INCLUDES -I$inc2"
+if test "X$JAVA_VERSION" != X; then
+  if test "X$jdk" = X ; then
+    for jdkdir in `ls -1dr /usr/local/jdk* 2>/dev/null` /usr/j2se `ls -1dr /usr/lib/java* 2>/dev/null`; do
+      if test -r $jdkdir/include/jni.h ; then
+        jdk=$jdkdir
+        break
+      fi
+    done
+  fi
+
+  if test "X$jdk" != X -a -r $jdk/include/jni.h; then
+    inc1="$jdk/include"
+    inc2=`find $inc1 -type d | grep -v "$inc1\$" | head -1`
+    JDK_INCLUDES="-I$inc1"
+    if test -r $inc2/jni_md.h; then
+      JDK_INCLUDES="$JDK_INCLUDES -I$inc2"
+    fi
   fi
 fi
 AC_SUBST(JDK_INCLUDES)
@@ -612,7 +696,7 @@ parser_modules="raptor"
 
 AC_MSG_CHECKING(RDF parsers required)
 AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [raptor]], parser_modules="$enableval") 
-if test "X$parser_modules" = "Xno" -o "X$parser_modules" = X; then
+if test "X$parser_modules" = Xno -o "X$parser_modules" = X; then
   parser_modules=
 fi
 AC_MSG_RESULT($parser_modules)
@@ -687,14 +771,8 @@ fi
 
 if test "X$PYTHON" != X; then
 
-  dnl need to change quotes to allow square brackets
-  changequote(<<, >>)dnl
-  python_version=`$PYTHON -c 'import sys; print sys.version[:3]'`
-  python_prefix=`$PYTHON -c 'import sys; print sys.prefix'`
-  changequote([, ])dnl
-
   # What a crock
-  PYTHON_INCLUDES="-I$python_prefix/include/python$python_version"
+  PYTHON_INCLUDES="-I$python_prefix/include/python$PYTHON_VERSION"
   AC_SUBST(PYTHON_INCLUDES)
 else
   # This allows 'make clean' in the python directory to work when
@@ -926,7 +1004,8 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 Redland build summary:
-  Language interfaces:   $languages
+  Languages available:   $languages_available
+  Language APIs built:   $languages
   RDF parsers:           $rdf_parsers_available
   Hash digests:          $digest_modules_available
   Berkeley/Sleepycat DB:  $bdb_available
