@@ -137,6 +137,20 @@ returned to a <emphasis>newly allocated</emphasis> string in which
 case the method ends <literal>_to_string</literal>.</para>
 </chapter>
 
+<chapter id="world">
+<?dbhtml filename='world.html'>
+<title>RDF World</title>
+<para>
+This module initialises the Redland library and reference all resources
+from it.
+</para>
+
+<sect1>
+<title>RDF World Class</title>
+@INCLUDE init.sgml
+</sect1>
+</chapter>
+
 <chapter id="model">
 <?dbhtml filename='model.html'>
 <title>RDF Model</title>
