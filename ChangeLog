@@ -1,5 +1,89 @@
 2004-10-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rasqal/rasqal_redland.c:
+	Update redland support to changes after addition of origin.
+
+	* rasqal/rasqal_general.c:
+	Added rasqal_initialising and rasqal_finishing statics
+	(rasqal_init, rasqal_finish): Use the above to prevent
+	recursion in these methods when rasqal uses redland using rasqal.
+
+	* rasqal/configure.ac:
+	use $srcdir not .. when looking for raptor sources nearby
+
+	* configure.ac: rasqal minimum version 0.9.3
+
+	* raptor/NEWS.html, raptor/configure.ac, raptor/win32_raptor_config.h:
+	1.4.0
+
+	* configure.ac, rasqal/configure.ac: raptor minimum version 1.4.0
+
+	* rasqal/roqet.c: cast for fprintf
+
+	* librdf/rdf_model.h:
+	Change librdf_model_to_counted_string and librdf_model_to_string to
+	return unsigned char*
+
+	* librdf/rdf_model.c
+	(librdf_model_to_counted_string,librdf_model_to_string): Return
+	unsigned char*
+
+	* Redland.i: Added librdf_serializer_serialize_model_to_string
+
+	* Redland.i: Added librdf_model_to_string
+
+	* librdf/rdf_model.c (librdf_model_to_counted_string,
+	librdf_model_to_string): Added.
+	(main): Added test for above.
+
+	* librdf/rdf_model.h:
+	Added librdf_model_to_counted_string, librdf_model_to_string
+
+	* librdf/rdf_serializer_raptor.c:
+	Added errors, warnings counting in context.
+	(librdf_serializer_raptor_error_handler,
+	librdf_serializer_raptor_warning_handler): Added, called by raptor
+	serializing code.
+	(librdf_serializer_raptor_serialize_model_to_file_handle): Link to
+	error, warning handlers above.
+	(librdf_serializer_raptor_serialize_model_to_counted_string): Added.
+	(librdf_serializer_raptor_register_factory): Update for new factory
+	method names.
+
+	* librdf/rdf_serializer.c
+	(librdf_serializer_serialize_model_to_counted_string): Added to
+	return string length.
+	(main): Test serialize to string.
+
+	* librdf/rdf_serializer.h:
+	Rename factory method to serialize_model_to_counted_string
+	Added librdf_serializer_serialize_model_to_counted_string
+
+	* librdf/rdf_serializer.c (main):
+	rdf/xml bad predicate URI is now an error
+
+	* raptor/raptor_internal.h:
+	Added warning_user_data, warning_handler to serializer
+	Added prototypes for raptor_serializer_warning and
+	raptor_serializer_warning_varargs
+
+	* raptor/raptor_serialize.c (raptor_serializer_warning,
+	raptor_serializer_warning_varargs): Added
+	(raptor_serializer_set_warning_handler): Added
+
+	* raptor/raptor.h: Added raptor_serializer_set_warning_handler
+
+	* librdf/rdf_serializer.c (main):
+	Use librdf_serializer_serialize_model_to_file_handle
+
+	* raptor/configure.ac, rasqal/configure.ac, configure.ac: autoconf mode
+
+	* raptor/ChangeLog: fix rapper
+
+	* raptor/rdfdump.c: default serializer simple
+
+	* utils/rdfproc.c: allow base URI to serialize command
+
 	* librdf/rdf_serializer_rdfxml.c: Deleted. raptor does all this now
 
 	* librdf/Makefile.am: Remove rdf_serializer_rdfxml.c
