@@ -13,5 +13,7 @@ AM_LDFLAGS=@LIBRDF_LDFLAGS@ @LIBRDF_LIBS@ $(top_builddir)/librdf/librdf.la @LIBR
 
 redland_db_upgrade_SOURCES = db_upgrade.c
 
-rdfproc_SOURCES = rdfproc.c
-
+rdfproc_SOURCES = rdfproc.c rdfproc_getopt.h
+rdfproc_LDADD = @RDFPROC_EXTRA_OBJS@
+rdfproc_DEPENDENCIES = @RDFPROC_EXTRA_OBJS@
+EXTRA_rdfproc_SOURCES = getopt.c
