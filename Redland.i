@@ -23,6 +23,10 @@
 %module Redland
 %include typemaps.i
 
+#ifdef REDLAND_TYPEMAP_I
+%include <redland-typemap.i>
+#endif
+
 %{
 
 /* compile-time include (inside a % ... % block) */
