@@ -226,6 +226,9 @@ librdf_new_node_from_node(librdf_node *node)
 {
   librdf_node* new_node;
   librdf_uri *new_uri;
+
+  if(!node)
+    return NULL;
   
   new_node = (librdf_node*)LIBRDF_CALLOC(librdf_node, 1, 
                                          sizeof(librdf_node));
