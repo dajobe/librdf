@@ -78,16 +78,21 @@ SUBDIRS=@SD@
 
 bin_SCRIPTS = redland-config
 lib_LIBRARIES = librdf.a
-# FIXME: Should *not* install all headers
+
 include_HEADERS = redland.h librdf.h \
+rdf_init.h \
+rdf_hash.h \
+rdf_digest.h \
 rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_context.h \
-rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
 rdf_model.h rdf_iterator.h \
-rdf_list.h \
-rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
+rdf_storage.h \
 rdf_stream.h \
-rdf_parser.h
+rdf_parser.h rdf_heuristics.h \
+rdf_list.h \
+rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
+rdf_files.h \
+rdf_storage_list.h rdf_storage_hashes.h
 
 JAVA_CLASSES=@JAVA_CLASSES@
 pkgdata_DATA = $(JAVA_CLASSES)
@@ -100,14 +105,16 @@ rdf_list.c rdf_memory.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c rdf_files.c \
-librdf.h rdf_types.h \
+redland.h librdf.h \
+rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_context.h \
 rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_gdbm.h rdf_hash_memory.h \
+rdf_types.h \
 rdf_model.h rdf_iterator.h \
 rdf_list.h \
 rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
 rdf_stream.h \
-rdf_parser.h rdf_files.h
+rdf_parser.h rdf_heuristics.h rdf_files.h
 
 
 librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ 
@@ -119,9 +126,9 @@ rdf_parser_sirpac.c rdf_parser_libwww.c \
 example1.c example2.c example3.c example4.c
 
 EXTRA_DIST=ChangeLog \
-README      NEWS      TODO \
-README.html NEWS.html TODO.html \
-INSTALL.html LICENSE.html FAQS.html MPL.html \
+README      NEWS      TODO      LICENSE.txt \
+README.html NEWS.html TODO.html LICENSE.html \
+INSTALL.html FAQS.html MPL.html \
 redland-config.in \
 memcmp.c \
 PrintConsumer.java PrintParser.java \
