@@ -6,7 +6,9 @@ EXTRA_PROGRAMS=$(MYSQL_UTILS)
 
 man_MANS = redland-db-upgrade.1 rdfproc.1
 
-EXTRA_DIST=$(man_MANS)
+EXTRA_DIST= rdfproc.html \
+fix-groff-xhtml \
+$(man_MANS)
 
 CLEANFILES=*.db $(EXTRA_PROGRAMS)
 
@@ -22,3 +24,7 @@ rdfproc_DEPENDENCIES = @RDFPROC_EXTRA_OBJS@
 EXTRA_rdfproc_SOURCES = getopt.c
 
 mysql-utils: $(MYSQL_UTILS)
+
+@MAINT@rdfproc.html: $(srcdir)/rdfproc.1
+@MAINT@	-groff -man -Thtml -P-l $< | tidy -asxml -wrap 1000 2>/dev/null | perl $(srcdir)/fix-groff-xhtml $@
+
