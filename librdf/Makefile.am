@@ -1,9 +1,19 @@
+# -*- Mode: Makefile -*-
 #
-# automake-file for librdf
+# Makefile.am - top level automake file for librdf
 #
-# $Source$
 # $Id$
 #
+# (C) Dave Beckett 2000 ILRT, University of Bristol
+# http://www.ilrt.bristol.ac.uk/people/cmdjb/
+#
+#
+# This program is free software distributed under either of these licenses:
+#   1. The GNU Lesser General Public License (LGPL)
+# OR ALTERNATIVELY
+#   2. The modified BSD license
+#
+# See LICENSE.html or LICENSE.txt for the full license terms.
 #
 
 SUBDIRS=@SD@
@@ -44,8 +54,8 @@ CLEANFILES=$(TESTS) test example
 # Why is this not in the default makefile?
 CC=@CC@
 
-CFLAGS=-Wall
-@MAINT@ CFLAGS=-DLIBRDF_DEBUG=1 -g -Wall -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
+CFLAGS=@CFLAGS@
+STANDARD_CFLAGS=@STANDARD_CFLAGS@
 
 
 
@@ -91,5 +101,9 @@ NEWS: NEWS.html
 
 TODO: TODO.html
 	$(LYNX) $(LYNXARGS) $< > $@
+
+# The action is the COMPILE definition but always using least warning CFLAGS
+@MAINT@rdf_parser_libwww.o: rdf_parser_libwww.c
+@MAINT@	$(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(STANDARD_CFLAGS) -c $<
 
 @SET_MAKE@
