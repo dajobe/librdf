@@ -693,6 +693,65 @@ librdf_model_remove_statements_group(librdf_model* model,
 }
 
 
+/**
+ * librdf_model_query - Run a query against the model returning matching statements
+ * @model: &librdf_model object
+ * @query: &librdf_query object
+ * 
+ * Run the given query against the model and return a &librdf_stream of
+ * matching &librdf_statement objects
+ * 
+ * Return value: &librdf_stream of matching statements (may be empty) or NULL on failure
+ **/
+librdf_stream*
+librdf_model_query(librdf_model* model, librdf_query* query) 
+{
+  librdf_stream *stream;
+  
+  librdf_query_open(query);
+
+  if(librdf_storage_supports_query(model->storage, query))
+    stream=librdf_storage_query(model->storage, query);
+  else
+    stream=librdf_query_run(query,model);
+
+  librdf_query_close(query);
+
+  return stream;
+}
+
+
+/**
+ * librdf_model_query_string - Run a query string against the model returning matching statements
+ * @model: &librdf_model object
+ * @name: query language name
+ * @uri: query language URI (or NULL)
+ * @query_string: string in query language
+ * 
+ * Run the given query against the model and return a &librdf_stream of
+ * matching &librdf_statement objects
+ * 
+ * Return value: &librdf_stream of matching statements (may be empty) or NULL on failure
+ **/
+librdf_stream*
+librdf_model_query_string(librdf_model* model,
+                          const char *name, librdf_uri *uri,
+                          const char *query_string)
+{
+  librdf_query *query;
+  librdf_stream *stream;
+
+  query=librdf_new_query(model->world, name, uri, query_string);
+  if(!query)
+    return NULL;
+  
+  stream=librdf_model_query(model, query);
+
+  librdf_free_query(query);
+  
+  return stream;
+}
+
 
 
 
