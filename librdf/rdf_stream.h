@@ -28,7 +28,17 @@
 extern "C" {
 #endif
 
+typedef librdf_statement* (*librdf_stream_map_handler)(librdf_stream *stream, void *map_context, librdf_statement *item);
+typedef void (*librdf_stream_map_free_context_handler)(void *map_context);
+
 #ifdef LIBRDF_INTERNAL
+
+/* used in map_list below */
+typedef struct {
+  void *context; /* context to pass on to map */
+  librdf_stream_map_handler fn;
+  librdf_stream_map_free_context_handler free_context;
+} librdf_stream_map;
 
 struct librdf_stream_s {
   librdf_world *world;
@@ -38,15 +48,12 @@ struct librdf_stream_s {
   
   /* Used when mapping */
   librdf_statement *current;
-  void *map_context;      /* context to pass on to map */
+  librdf_list *map_list; /* non-empty means there is a list of maps */
   
   int (*is_end_method)(void*);
   int (*next_method)(void*);
   void* (*get_method)(void*, int); /* flags: type of get */
   void (*finished_method)(void*);
-
-  librdf_statement* (*map)(void *context, librdf_statement* statement);
-  void (*free_map)(void *context);
 };
 
 /* FIXME - should all short lists be enums */
@@ -71,9 +78,7 @@ REDLAND_API int librdf_stream_next(librdf_stream* stream);
 REDLAND_API librdf_statement* librdf_stream_get_object(librdf_stream* stream);
 REDLAND_API void* librdf_stream_get_context(librdf_stream* stream);
 
-typedef void (*librdf_stream_map_free_context_handler)(void *map_context);
-
-REDLAND_API void librdf_stream_set_map(librdf_stream* stream, librdf_statement* (*map)(void* context, librdf_statement* statement), librdf_stream_map_free_context_handler free_context, void* map_context);
+REDLAND_API int librdf_stream_add_map(librdf_stream* stream, librdf_stream_map_handler map_function, librdf_stream_map_free_context_handler free_context, void *map_context);
 
 REDLAND_API void librdf_stream_print(librdf_stream *stream, FILE *fh);
 
