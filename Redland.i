@@ -98,6 +98,7 @@ librdf_uri* librdf_new_uri (librdf_world *world, char *string);
 librdf_uri* librdf_new_uri_from_uri (librdf_uri* uri);
 void librdf_free_uri(librdf_uri *uri);
 char* librdf_uri_to_string (librdf_uri* uri);
+int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
 
 /* rdf_node.h */
 librdf_node* librdf_new_node(librdf_world *world);
@@ -117,6 +118,7 @@ int librdf_node_get_literal_value_xml_space(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_language, int xml_space, int is_wf_xml);
 char *librdf_node_to_string(librdf_node* node);
+int librdf_node_equals(librdf_node* first_node, librdf_node* second_node);
 
 /* rdf_statement.h */
 librdf_statement* librdf_new_statement(librdf_world *world);
