@@ -54,12 +54,29 @@ rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test
 
 CLEANFILES=$(TESTS) test example example2
 
+# Memory debugging alternatives
+MEM=@MEM@
+MEM_LIBS=@MEM_LIBS@
+
+# 1) None (use standard functions directly)
+#MEM=
+#MEM_LIBS=
+
+# 2) Use librdf debug
+#MEM=-DLIBRDF_MEMORY_DEBUG=1
+#MEM_LIBS=
+
+# 3) Use dmalloc library
+#MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
+#MEM_LIBS=-ldmalloc
+
+
 # Why is this not in the default makefile?
 CC=@CC@
 
-CFLAGS=@CFLAGS@
-STANDARD_CFLAGS=@STANDARD_CFLAGS@
-
+CFLAGS=@CFLAGS@ $(MEM)
+STANDARD_CFLAGS=@STANDARD_CFLAGS@ $(MEM)
+LIBS=@LIBS@ $(MEM_LIBS)
 
 
 # Rules to construct test programs
