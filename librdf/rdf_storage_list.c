@@ -452,6 +452,12 @@ librdf_storage_list_context_add_statement(librdf_storage* storage,
   librdf_storage_list_node* sln;
   int status;
 
+  if(context_node && !context->index_contexts) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
+               "Storage was created without context support");
+    return 1;
+  }
+  
   /* Store statement + node in the storage_list */
   sln=(librdf_storage_list_node*)LIBRDF_MALLOC(librdf_storage_list_node, sizeof(librdf_storage_list_node));
   if(!sln)
@@ -521,6 +527,12 @@ librdf_storage_list_context_remove_statement(librdf_storage* storage,
   size_t size;
   int status;
 
+  if(context_node && !context->index_contexts) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
+               "Storage was created without context support");
+    return 1;
+  }
+  
   search_sln.statement=statement;
   search_sln.context=context_node;
 
@@ -581,8 +593,11 @@ librdf_storage_list_context_serialise(librdf_storage* storage,
   librdf_stream* stream;
   size_t size;
 
-  if(!context->index_contexts)
+  if(!context->index_contexts) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
+               "Storage was created without context support");
     return NULL;
+  }
   
   scontext=(librdf_storage_list_context_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_list_context_serialise_stream_context, 1, sizeof(librdf_storage_list_context_serialise_stream_context));
   if(!scontext)
@@ -817,8 +832,11 @@ librdf_storage_list_get_contexts(librdf_storage* storage)
   librdf_storage_list_get_contexts_iterator_context* icontext;
   librdf_iterator* iterator;
 
-  if(!context->index_contexts)
+  if(!context->index_contexts) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
+               "Storage was created without context support");
     return NULL;
+  }
   
   icontext=(librdf_storage_list_get_contexts_iterator_context*)LIBRDF_CALLOC(librdf_storage_list_get_contexts_iterator_context, 1, sizeof(librdf_storage_list_get_contexts_iterator_context));
   if(!icontext)
