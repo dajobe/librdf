@@ -36,12 +36,24 @@
 #endif
 
 
+/* from rdf_init.c */
+void librdf_init_world(char *digest_factory_name);
+void librdf_destroy_world(void);
+
+
 #ifdef LIBRDF_DEBUG
 /* DEBUGGING TURNED ON */
 
-#define LIBRDF_MALLOC(type, size) malloc(size)
-#define LIBRDF_CALLOC(type, size, count) calloc(size, count)
-#define LIBRDF_FREE(type, ptr)   free(ptr)
+void* librdf_malloc(char *file, int line, char *type, size_t size);
+void* librdf_calloc(char *file, int line, char *type, size_t nmemb, size_t size);
+void librdf_free(char *file, int line, char *type, void *ptr);
+
+#define LIBRDF_MALLOC(type, size) librdf_malloc(__FILE__, __LINE__, #type, size)
+#define LIBRDF_CALLOC(type, size, count) librdf_calloc(__FILE__, __LINE__, #type, size, count)
+#define LIBRDF_FREE(type, ptr)   librdf_free(__FILE__, __LINE__, #type, ptr)
+
+#include <stdio.h>
+void librdf_memory_report(FILE *fh);
 
 /* Debugging messages */
 #define LIBRDF_DEBUG1(function, msg) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function); } while(0)
