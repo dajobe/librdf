@@ -117,6 +117,9 @@ void librdf_model_print(librdf_model *model, FILE *fh);
 int librdf_model_add_statements_group(librdf_model* model, librdf_uri* group_uri, librdf_stream* stream);
 int librdf_model_remove_statements_group(librdf_model* model, librdf_uri* group_uri);
 
+/* query language */
+librdf_stream* librdf_model_query(librdf_model* model, librdf_query* query);
+librdf_stream* librdf_model_query_string(librdf_model* model, const char *name, librdf_uri* uri, const char *query_string);
 
 
 #ifdef __cplusplus
