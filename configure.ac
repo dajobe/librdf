@@ -618,12 +618,14 @@ AC_MSG_CHECKING(ECMA CLR implementations to use)
 ecma_clr=none
 CLRRUN=
 CSHARPCC=
+CSHARP_COMPILE=
 for name in $ecma_clr_name mono dotgnu; do
   case $name in
     mono)
       if test "X$MONO" != X -a "X$MCS" != X; then
         CLRRUN=$MONO
         CSHARPCC=$MCS
+        CSHARP_COMPILE='$(CSHARPCC) $(CHSHARPCCFLAGS) $< -target:library -out:$@'
         ecma_clr=Mono
       fi
       ;;
@@ -632,6 +634,7 @@ for name in $ecma_clr_name mono dotgnu; do
       if test "X$ILRUN" != X -a "X$CSCC" != X; then
         CLRRUN=$ILRUN
         CSHARPCC=$CSCC
+        CSHARP_COMPILE='$(CSHARPCC) $(CHSHARPCCFLAGS) $< -o $@'
         ecma_clr=dotGNU
       fi
       ;;
@@ -644,6 +647,7 @@ done
 AC_MSG_RESULT($ecma_clr)
 AC_SUBST(CLRRUN)
 AC_SUBST(CSHARPCC)
+AC_SUBST(CSHARP_COMPILE)
 
 
 # Maybe add some local digest modules
