@@ -124,6 +124,9 @@ typedef struct
   /* from options */
   char         *hash_type;
   char         *db_dir;
+  int           mode;
+  int           is_writable;
+  int           is_new;
   /* internals */
   int           hash_count;   /* how many hashes are present? STATIC 3 - FIXME */
   const librdf_hash_descriptor *hash_descriptions; /* points to STATIC hash_descriptions above - FIXME */
@@ -134,8 +137,14 @@ typedef struct
 
 
 
+/* helper function for implementing init and clone methods */
+static int librdf_storage_hashes_init_common(librdf_storage* storage, char *name, char *hash_type, char *db_dir, int mode, int is_writable, int is_new, librdf_hash* options);
+
+
 /* prototypes for local functions */
 static int librdf_storage_hashes_init(librdf_storage* storage, char *name, librdf_hash* options);
+static void librdf_storage_hashes_terminate(librdf_storage* storage);
+static int librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_storage);
 static int librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model);
 static int librdf_storage_hashes_close(librdf_storage* storage);
 static int librdf_storage_hashes_size(librdf_storage* storage);
@@ -156,27 +165,26 @@ static void librdf_storage_hashes_register_factory(librdf_storage_factory *facto
 
 
 
-/* functions implementing storage api */
+/* helper function for implementing init and clone methods */
+
 static int
-librdf_storage_hashes_init(librdf_storage* storage, char *name,
-                           librdf_hash* options)
+librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
+                                  char *hash_type, char *db_dir,
+                                  int mode, int is_writable, int is_new,
+                                  librdf_hash* options)
 {
   librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
   const librdf_hash_descriptor *desc;
   int i;
   int status;
+  
+  context->hash_type=hash_type;
+  context->db_dir=db_dir;
 
-  context->hash_type=librdf_hash_get(options, "hash-type");
-  if(!context->hash_type)
-    return 1;
+  context->mode=mode;
+  context->is_writable=is_writable;
+  context->is_new=is_new;
 
-  librdf_hash_delete(options, "hash-type", 9); /* FIXME strlen("hash-type") */
-  
-  context->db_dir=librdf_hash_get(options, "dir");
-  if(context->db_dir)
-    librdf_hash_delete(options, "dir", 3); /* FIXME strlen("dir") */
-  
-  
   /* FIXME: STATIC 3 hashes */
   context->hash_count=3;
   desc=context->hash_descriptions=librdf_storage_hashes_descriptions;
@@ -228,6 +236,41 @@ librdf_storage_hashes_init(librdf_storage* storage, char *name,
 }
 
 
+/* functions implementing storage api */
+static int
+librdf_storage_hashes_init(librdf_storage* storage, char *name,
+                           librdf_hash* options)
+{
+  char *hash_type, *db_dir;
+  int mode, is_writable, is_new;
+  
+  if(!options)
+    return 1;
+
+  hash_type=librdf_hash_get_del(options, "hash-type");
+  if(!hash_type)
+    return 1;
+
+  db_dir=librdf_hash_get_del(options, "dir");
+  
+  if((mode=librdf_hash_get_as_long(options, "mode"))<0)
+    mode=0644; /* default mode */
+  
+  if((is_writable=librdf_hash_get_as_boolean(options, "write"))<0)
+    is_writable=1; /* default is WRITABLE */
+  
+  if((is_new=librdf_hash_get_as_boolean(options, "new"))<0)
+    is_new=0; /* default is NOT NEW */
+  
+
+  return librdf_storage_hashes_init_common(storage, name, 
+                                           hash_type, db_dir,
+                                           mode, is_writable, is_new, 
+                                           options);
+}
+
+  
+
 static void
 librdf_storage_hashes_terminate(librdf_storage* storage)
 {
@@ -254,6 +297,40 @@ librdf_storage_hashes_terminate(librdf_storage* storage)
 
 
 static int
+librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_storage)
+{
+  librdf_storage_hashes_context *old_context=(librdf_storage_hashes_context*)old_storage->context;
+  librdf_storage_hashes_context *new_context=(librdf_storage_hashes_context*)new_storage->context;
+  librdf_hash *options;
+  
+  new_context->name=librdf_heuristic_gen_name(old_context->name);
+  if(!new_context->name)
+    return 1;
+
+  /* This is always a copy of an in-memory hash */
+  options=librdf_new_hash_from_hash(old_context->options);
+  if(!options) {
+    LIBRDF_FREE(cstring, new_context->name);
+    return 1;
+  }
+
+  if(librdf_storage_hashes_init_common(new_storage, new_context->name,
+                                       old_context->hash_type,
+                                       old_context->db_dir,
+                                       old_context->mode,
+                                       old_context->is_writable,
+                                       old_context->is_new,
+                                       options)) {
+    librdf_free_hash(options);
+    LIBRDF_FREE(cstring, new_context->name);
+    return 1;
+  }
+
+  return 0;
+}
+ 
+
+static int
 librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
 {
   librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
@@ -263,7 +340,7 @@ librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
     librdf_hash *hash=context->hashes[i];
 
     if(librdf_hash_open(hash, context->names[i], 
-                        0644, 1, 1, /* FIXME - mode, is_writable, is_new */
+                        context->mode, context->is_writable, context->is_new,
                         context->options)) {
       /* I still have my "Structured Fortran" book */
       int j;
@@ -312,19 +389,25 @@ librdf_storage_hashes_size(librdf_storage* storage)
 
 
 static int
-librdf_storage_hashes_add_statement(librdf_storage* storage, librdf_statement* statement)
+librdf_storage_hashes_add_remove_statement(librdf_storage* storage, 
+                                           librdf_statement* statement,
+                                           int is_addition)
 {
   librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
   int i;
   int status=0;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG1(librdf_storage_hashes_add_statement, "Adding statement: ");
+  if(is_addition)
+    LIBRDF_DEBUG1(librdf_storage_hashes_add_remove_statement, "Adding statement: ");
+  else
+    LIBRDF_DEBUG1(librdf_storage_hashes_add_remove_statement, "Removing statement: ");
   librdf_statement_print(statement, stderr);
   fputc('\n', stderr);
 #endif  
 
   for(i=0; i<context->hash_count; i++) {
+    librdf_hash_datum hd_key, hd_value; /* on stack */
     char *key_buffer, *value_buffer;
     int key_len, value_len;
 
@@ -376,12 +459,17 @@ librdf_storage_hashes_add_statement(librdf_storage* storage, librdf_statement* s
 
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG4(librdf_storage_hashes_add_statement, "Writing %s hash key %d bytes -> value %d bytes\n", context->hash_descriptions[i].name, key_len, value_len);
+    LIBRDF_DEBUG4(librdf_storage_hashes_add_statement, "Using %s hash key %d bytes -> value %d bytes\n", context->hash_descriptions[i].name, key_len, value_len);
 #endif
 
-    /* Finally, store the sucker */
-    status=librdf_hash_put(context->hashes[i], key_buffer, key_len,
-                           value_buffer, value_len);
+    /* Finally, store / remove the sucker */
+    hd_key.data=key_buffer; hd_key.size=key_len;
+    hd_value.data=value_buffer; hd_value.size=value_len;
+    
+    if(is_addition)
+      status=librdf_hash_put(context->hashes[i], &hd_key, &hd_value);
+    else
+      status=librdf_hash_delete(context->hashes[i], &hd_key, &hd_value);
     
     LIBRDF_FREE(data, key_buffer);
     LIBRDF_FREE(data, value_buffer);
@@ -394,10 +482,20 @@ librdf_storage_hashes_add_statement(librdf_storage* storage, librdf_statement* s
    * operation is only partially complete (but reported as a failure)
    */
 
-  /* Free it since it is stored and ównership passed in here */
-  librdf_free_statement(statement);
+  /* Free statement if this is an addition and the statement is now
+   * stored - statement ownership was passed in
+   */
+  if(is_addition)
+    librdf_free_statement(statement);
 
   return status;
+}
+
+
+static int
+librdf_storage_hashes_add_statement(librdf_storage* storage, librdf_statement* statement)
+{
+  return librdf_storage_hashes_add_remove_statement(storage, statement, 1);
 }
 
 
@@ -430,14 +528,70 @@ librdf_storage_hashes_add_statements(librdf_storage* storage,
 static int
 librdf_storage_hashes_remove_statement(librdf_storage* storage, librdf_statement* statement)
 {
-  LIBRDF_FATAL1(librdf_storage_hashes_remove_statement, "Not implemented\n");
+  return librdf_storage_hashes_add_remove_statement(storage, statement, 0);
 }
 
 
 static int
 librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_statement* statement)
 {
-  LIBRDF_FATAL1(librdf_storage_hashes_contains_statement, "Not implemented\n");
+  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_hash_datum hd_key, hd_value; /* on stack */
+  char *key_buffer, *value_buffer;
+  int key_len, value_len;
+  int hash_index=ANY_OLD_HASH_INDEX;
+  int fields;
+  int status;
+  
+  /* ENCODE KEY */
+  fields=context->hash_descriptions[hash_index].key_fields;
+  key_len=librdf_statement_encode_parts(statement, NULL, 0, fields);
+  if(!key_len)
+    return 1;
+  if(!(key_buffer=(char*)LIBRDF_MALLOC(data, key_len)))
+    return 1;
+       
+  if(!librdf_statement_encode_parts(statement, key_buffer, key_len,
+                                    fields)) {
+    LIBRDF_FREE(data, key_buffer);
+    return 1;
+  }
+
+  /* ENCODE VALUE */
+  fields=context->hash_descriptions[hash_index].value_fields;
+  value_len=librdf_statement_encode_parts(statement, NULL, 0, fields);
+  if(!value_len) {
+    LIBRDF_FREE(data, key_buffer);
+    return 1;
+  }
+    
+  if(!(value_buffer=(char*)LIBRDF_MALLOC(data, value_len))) {
+    LIBRDF_FREE(data, key_buffer);
+    return 1;
+  }
+
+       
+  if(!librdf_statement_encode_parts(statement, value_buffer, value_len,
+                                    fields)) {
+    LIBRDF_FREE(data, key_buffer);
+    LIBRDF_FREE(data, value_buffer);
+    return 1;
+  }
+
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG4(librdf_storage_hashes_contains_statement, "Using %s hash key %d bytes -> value %d bytes\n", context->hash_descriptions[hash_index].name, key_len, value_len);
+#endif
+
+  hd_key.data=key_buffer; hd_key.size=key_len;
+  hd_value.data=value_buffer; hd_value.size=value_len;
+  status=librdf_hash_exists(context->hashes[hash_index], &hd_key, &hd_value);
+  
+  LIBRDF_FREE(data, key_buffer);
+  LIBRDF_FREE(data, value_buffer);
+
+  /* DO NOT free statement, ownership was not passed in */
+  return status;
 }
 
 
@@ -614,6 +768,7 @@ librdf_storage_hashes_register_factory(librdf_storage_factory *factory)
   factory->context_length     = sizeof(librdf_storage_hashes_context);
   
   factory->init               = librdf_storage_hashes_init;
+  factory->clone              = librdf_storage_hashes_clone;
   factory->terminate          = librdf_storage_hashes_terminate;
   factory->open               = librdf_storage_hashes_open;
   factory->close              = librdf_storage_hashes_close;
