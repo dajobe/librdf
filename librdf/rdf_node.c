@@ -219,7 +219,7 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
  * librdf_new_node_from_literal -  Constructor - create a new literal librdf_node object
  * @world: redland world object
  * @string: literal string value
- * @xml_language: literal XML language (or NULL)
+ * @xml_language: literal XML language (or NULL, empty string)
  * @xml_space: XML space properties (0 if unknown)
  * @is_wf_xml: non 0 if literal is XML
  * 
@@ -241,7 +241,7 @@ librdf_new_node_from_literal(librdf_world *world,
   
   /* set type */
   new_node->type=LIBRDF_NODE_TYPE_LITERAL;
-  
+
   if (librdf_node_set_literal_value(new_node, string, xml_language,
                                     xml_space, is_wf_xml)) {
     librdf_free_node(new_node);
@@ -560,7 +560,7 @@ librdf_node_get_literal_value_xml_space(librdf_node* node)
  * librdf_node_set_literal_value - Set the node literal value with options
  * @node: the node object
  * @value: pointer to the literal string value
- * @xml_language: pointer to the literal language (or NULL if not defined)
+ * @xml_language: pointer to the literal language (or NULL, empty string if not defined)
  * @xml_space: XML space properties (0 if unknown)
  * @is_wf_xml: non 0 if the value is Well Formed XML
  * 
@@ -589,7 +589,7 @@ librdf_node_set_literal_value(librdf_node* node, const char* value,
     return 1;
   strcpy(new_value, value);
   
-  if(xml_language) {
+  if(xml_language && *xml_language) {
     new_xml_language=(char*)LIBRDF_MALLOC(cstring, 
                                           strlen(xml_language) + 1);
     if(!new_xml_language) {
