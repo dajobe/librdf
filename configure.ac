@@ -330,11 +330,13 @@ AC_ARG_WITH(ecma-cli, [  --with-ecma-cli=SYSTEM  Enable ECMA CLI interface - mon
 
 AC_MSG_CHECKING(ECMA CLI implementations available)
 result=
-if test "X$MONO" != X -a "X$MCS" != X; then
+if test "X$MONO" != X -a "X$MCS" != X -a "X$GACUTIL" != X -a "X$SN" != X; then
   result="$result Mono"
+  languages_available="$languages_available C# (Mono)"
 fi
-if test "X$ILRUN" != X -a "X$CSCC" != X; then
+if test "X$ILRUN" != X -a "X$CSCC" != X -a "X$ILGAC" != X; then
   result="$result dotGNU"
+  languages_available="$languages_available C# (dotGNU)"
 fi
 AC_MSG_RESULT($result)
 
@@ -347,7 +349,7 @@ CLI_PREFIX=
 for name in $ecma_cli_name mono dotgnu no; do
   case $name in
     mono)
-      if test "X$MONO" != X -a "X$MCS" != X; then
+      if test "X$MONO" != X -a "X$MCS" != X -a "X$GACUTIL" != X -a "X$SN" != X; then
         CLIRUN=$MONO
         CSHARPC=$MCS
         CSHARPCFLAGS="-debug+"
@@ -357,7 +359,7 @@ for name in $ecma_cli_name mono dotgnu no; do
       ;;
 
     dotgnu)
-      if test "X$ILRUN" != X -a "X$CSCC" != X; then
+      if test "X$ILRUN" != X -a "X$CSCC" != X -a "X$ILGAC" != X; then
         CLIRUN=$ILRUN
         CSHARPC=$CSCC
         CSHARPCFLAGS="-g"
