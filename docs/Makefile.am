@@ -74,10 +74,11 @@
 #      under either the MPL or the LGPL License.
 
 
-EXTRA_DIST=api.sgml.in api.sgml README.html README build-docs \
-overview.png overview.ps overview.pdf api
+EXTRA_DIST=api.sgml.in api.sgml README.html README perl.html python.html \
+stylesheet.css \
+build-docs overview.png overview.ps overview.pdf api
 
-DOC_CLASSES=digest digest_md5 digest_openssl hash hash_bdb hash_cursor hash_memory heuristics init iterator list model node parser parser_libwww parser_sirpac statement storage storage_hashes storage_list stream uri
+DOC_CLASSES=node statement model storage storage_hashes storage_list stream parser parser_libwww parser_repat parser_redland parser_sirpac concepts init digest digest_md5 digest_openssl hash hash_bdb hash_cursor hash_memory heuristics iterator list uri
 
 DOC_C_FILES=$(DOC_CLASSES:%=$(srcdir)/rdf_%.c)
 API_DOCBOOK_FILES=$(DOC_CLASSES:%=%.sgml)
@@ -99,6 +100,7 @@ api: api/index.html
 api/index.html: api.sgml
 	rm -rf api.junk DBTOHTML*
 	db2html $<
+	rm -rf api.junk
 
 .html.txt:
 	$(LYNX) $(LYNXARGS) $< > $@
