@@ -393,22 +393,22 @@ if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_
   fi
 
   # Sigh!  And this still might not be good enough.
-  for version in 4.1 4.0 4 3.3 3.2 3.1 3 2; do
-    for prefix in $extraprefix /usr/local /usr; do
-      major=`echo $version | sed -e 's/^\(.\).*$/\1/'`;
-      version2=`echo $version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
+  for bdbc_version in 4.1 4.0 4 3.3 3.2 3.1 3 2; do
+    for bdbc_prefix in $extraprefix /usr/local /usr; do
+      bdbc_major=`echo $bdbc_version | sed -e 's/^\(.\).*$/\1/'`;
+      bdbc_version2=`echo $bdbc_version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
 
-      libdir=$prefix/lib
-      for incdir in $prefix/include/db$version $prefix/include/db$version2 $prefix/include/db$major $prefix/include ; do
-        if test -r $incdir/db.h ; then
-          header_version=`sed -ne 's/^.*DB_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $incdir/db.h`
-          if test "X$header_version" = "X$version" ; then 
-            for name in db-$version db$version db-$version2 db$version2; do
-              if test -r $libdir/lib$name.a -o -r $libdir/lib$name.so -o -r $libdir/lib$name.dylib; then
-  	        bdb_prefix=$prefix
-  	        bdb_include_dir=$incdir
-	        bdb_lib_dir=$libdir
-	        bdb_dbname=$name
+      bdbc_libdir=$bdbc_prefix/lib
+      for bdbc_incdir in $bdbc_prefix/include/db$bdbc_version $bdbc_prefix/include/db$bdbc_version2 $bdbc_prefix/include/db$bdbc_major $bdbc_prefix/include ; do
+        if test -r $bdbc_incdir/db.h ; then
+          bdbc_header_version=`sed -ne 's/^.*DB_BDBC_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $bdbc_incdir/db.h`
+          if test "X$bdbc_header_version" = "X$bdbc_version" ; then 
+            for bdbc_name in db-$bdbc_version db$bdbc_version db-$bdbc_version2 db$bdbc_version2; do
+              if test -r $bdbc_libdir/lib$bdbc_name.a -o -r $bdbc_libdir/lib$bdbc_name.so -o -r $bdbc_libdir/lib$bdbc_name.dylib; then
+  	        bdb_prefix=$bdbc_prefix
+  	        bdb_include_dir=$bdbc_incdir
+	        bdb_lib_dir=$bdbc_libdir
+	        bdb_dbname=$bdbc_name
                 break 4
               fi
             done
