@@ -360,12 +360,13 @@ librdf_hash_bdb_cursor_get(void* context,
        */
       while(1) {
         ret=bdb_cursor->c_get(bdb_cursor, &bdb_key, &bdb_value, DB_NEXT);
-        /* finished on error or want all values */
-        if(ret || value)
+        /* finish on error, want all values or no previous key */
+        if(ret || value || !cursor->last_key)
           break;
-        /* else want unique keys, so check key changed */
-        if(cursor->last_key &&
-           memcmp(cursor->last_key, bdb_key.data, bdb_key.size))
+        /* else have previous key and want unique keys, so keep
+         * going until the key changes
+         */
+        if(memcmp(cursor->last_key, bdb_key.data, bdb_key.size))
           break;
         
         /* always allocated by BDB using system malloc */
