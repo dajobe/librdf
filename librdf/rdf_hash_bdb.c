@@ -122,7 +122,7 @@ librdf_hash_bdb_open(void* context, char *identifier, void *mode,
   file=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+1);
   if(!file)
     return 1;
-  strcpy(file, filename);
+  strcpy(file, identifier);
 	
 #ifdef HAVE_DB_CREATE
   if((ret=db_create(&bdb, NULL, 0)) != 0)
