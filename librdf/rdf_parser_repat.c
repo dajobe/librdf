@@ -507,7 +507,7 @@ librdf_parser_repat_parse_file_as_stream(void *context,
     base_uri=uri;
   scontext->base_uri=base_uri;
 
-  filename=librdf_uri_as_filename(uri);
+  filename=librdf_uri_to_filename(uri);
   if(!filename)
     return NULL;
   
@@ -519,9 +519,11 @@ librdf_parser_repat_parse_file_as_stream(void *context,
     
     LIBRDF_DEBUG3(librdf_new_parser_repat, "Failed to open file '%s' - %s\n",
                   filename, strerror(errno));
+    LIBRDF_FREE(cstring, filename);
     librdf_parser_repat_serialise_finished((void*)scontext);
     return(NULL);
   }
+  LIBRDF_FREE(cstring, filename);
 
   scontext->repat = RDF_ParserCreate(NULL);
 
