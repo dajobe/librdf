@@ -395,6 +395,9 @@ librdf_statement_equals(librdf_statement* statement1,
 {
   /* FIXME: use digests? */
 
+  if(!statement1 || !statement2)
+    return 0;
+  
   if(!librdf_node_equals(LIBRDF_NODE_STATEMENT_SUBJECT(statement1), 
                          LIBRDF_NODE_STATEMENT_SUBJECT(statement2)))
       return 0;
