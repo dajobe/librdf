@@ -519,7 +519,7 @@ librdf_node_set_type(librdf_node* node, librdf_node_type type)
 #ifdef LIBRDF_DEBUG
 /* FIXME: For debugging purposes only */
 static const char* const librdf_node_type_names[] =
-{"Unknown", "Resource", "Literal", "Statement", "LI", "Blank"};
+{"Unknown", "Resource", "Literal", "LI", "Blank"};
 
 
 /*
@@ -822,9 +822,6 @@ librdf_node_to_string(librdf_node* node)
       return NULL;
     sprintf(s, "(%s)", node->value.blank.identifier);
     break;
-  case LIBRDF_NODE_TYPE_STATEMENT:
-    s=librdf_statement_to_string(node);
-    break;
   default:
     /* FIXME */
     LIBRDF_FATAL2(librdf_node_string, 
@@ -942,9 +939,6 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
       return librdf_uri_equals(first_node->value.literal.datatype_uri,
                                second_node->value.literal.datatype_uri);
       
-
-    case LIBRDF_NODE_TYPE_STATEMENT:
-      return librdf_statement_equals(first_node, second_node);
 
     case LIBRDF_NODE_TYPE_BLANK:
 

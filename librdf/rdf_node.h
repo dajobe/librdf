@@ -40,11 +40,9 @@ extern "C" {
 typedef enum {
   LIBRDF_NODE_TYPE_UNKNOWN   = 0,  /* To catch uninitialised nodes */
   LIBRDF_NODE_TYPE_RESOURCE  = 1,  /* rdf:Resource (& rdf:Property) - has a URI */
-  LIBRDF_NODE_TYPE_PROPERTY  = LIBRDF_NODE_TYPE_RESOURCE,
   LIBRDF_NODE_TYPE_LITERAL   = 2,  /* rdf:Literal - has an XML string, language, XML space */
-  LIBRDF_NODE_TYPE_STATEMENT = 3,  /* rdf:Statement - has a subject, predicate, object, is_stated */
-  LIBRDF_NODE_TYPE_LI        = 4,  /* rdf:li (a rdf:Property) - has an integer */
-  LIBRDF_NODE_TYPE_BLANK     = 5,  /* blank node has an identifier string */
+  LIBRDF_NODE_TYPE_LI        = 3,  /* rdf:li (a rdf:Property) - has an integer */
+  LIBRDF_NODE_TYPE_BLANK     = 4,  /* blank node has an identifier string */
   LIBRDF_NODE_TYPE_LAST      = LIBRDF_NODE_TYPE_BLANK
 } librdf_node_type;
 
@@ -84,13 +82,6 @@ struct librdf_node_s
     } literal;
     struct 
     {
-      /* rdf:Statement-s have s,p and o */
-      librdf_node* subject;
-      librdf_node* predicate;
-      librdf_node* object;
-    } statement;
-    struct 
-    {
       /* rdf:li and rdf:_-s have an ordinal */ 
       int ordinal;
     } li;
@@ -103,11 +94,6 @@ struct librdf_node_s
   } value;
 };
 
-
-/* convienience macros - internal */
-#define LIBRDF_NODE_STATEMENT_SUBJECT(s)   ((s)->value.statement.subject)
-#define LIBRDF_NODE_STATEMENT_PREDICATE(s) ((s)->value.statement.predicate)
-#define LIBRDF_NODE_STATEMENT_OBJECT(s)    ((s)->value.statement.object)
 
 #endif
 

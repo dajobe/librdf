@@ -63,11 +63,12 @@ librdf_finish_statement(librdf_world *world)
 librdf_statement*
 librdf_new_statement(librdf_world *world) 
 {
-  librdf_statement* new_statement=librdf_new_node(world);
+  librdf_statement* new_statement=(librdf_statement*)LIBRDF_CALLOC(librdf_statement, 1, 
+                                                                   sizeof(librdf_statement));
   if(!new_statement)
     return NULL;
 
-  librdf_node_set_type(new_statement, LIBRDF_NODE_TYPE_STATEMENT);
+  new_statement->world=world;
 
   return new_statement;
 }
@@ -171,8 +172,7 @@ librdf_new_statement_from_nodes(librdf_world *world,
 void
 librdf_statement_init(librdf_world *world, librdf_statement *statement)
 {
-  librdf_node_init(world, statement);
-  librdf_node_set_type(statement, LIBRDF_NODE_TYPE_STATEMENT);
+  statement->world=world;
 }
 
 

@@ -31,7 +31,22 @@ extern "C" {
 #endif
 
 
-/* a librdf_statement (RDF:Statement) ISA librdf_node (RDF:Resource) */
+#ifdef LIBRDF_INTERNAL
+
+struct librdf_statement_s
+{
+  librdf_world* world;
+  librdf_node* subject;
+  librdf_node* predicate;
+  librdf_node* object;
+};
+
+/* convienience macros - internal */
+#define LIBRDF_NODE_STATEMENT_SUBJECT(s)   ((s)->subject)
+#define LIBRDF_NODE_STATEMENT_PREDICATE(s) ((s)->predicate)
+#define LIBRDF_NODE_STATEMENT_OBJECT(s)    ((s)->object)
+
+#endif
 
 
 /* class methods */

@@ -39,7 +39,7 @@ typedef struct librdf_uri_s librdf_uri;
 typedef struct librdf_list_s librdf_list;
 typedef struct librdf_iterator_s librdf_iterator;
 typedef struct librdf_node_s librdf_node;
-typedef struct librdf_node_s librdf_statement;
+typedef struct librdf_statement_s librdf_statement;
 typedef struct librdf_model_s librdf_model;
 typedef struct librdf_storage_s librdf_storage;
 typedef struct librdf_storage_factory_s librdf_storage_factory;
