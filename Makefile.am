@@ -59,3 +59,6 @@ TODO: TODO.html
 
 $(SRCDIR)/repat/librepat.la:
 	cd $(srcdir)/../repat && $(MAKE) $(AM_MAKEFLAGS) all
+
+$(SRCDIR)/raptor/libraptor.la:
+	cd $(srcdir)/../raptor && $(MAKE) $(AM_MAKEFLAGS) all

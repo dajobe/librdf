@@ -74,10 +74,10 @@ rdf_serializer.h
 
 librdf_la_LIBADD = \
 @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
-@LIBRDF_EXTRA_LIBS@
+@LIBRDF_INTERNAL_LIBS@
 librdf_la_DEPENDENCIES = \
 @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
-@LIBRDF_EXTRA_LIBS@
+@LIBRDF_INTERNAL_LIBS@
 
 EXTRA_librdf_la_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
@@ -126,9 +126,11 @@ TAR=@TAR@
 # Why is this not in the default makefile?
 CC=@CC@
 
+CPPFLAGS=@CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_INTERNAL_CPPFLAGS@
 CFLAGS=@CFLAGS@ $(MEM)
 STANDARD_CFLAGS=@STANDARD_CFLAGS@ $(MEM)
-LIBS=@LIBS@ $(MEM_LIBS)
+LDFLAGS=@LIBRDF_LDFLAGS@
+LIBS=@LIBRDF_LIBS@ $(MEM_LIBS)
 
 
 # Rules to construct test programs
@@ -137,46 +139,46 @@ LIBS=@LIBS@ $(MEM_LIBS)
 test: check
 
 rdf_node_test: rdf_node.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_node.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_node.c librdf.la $(LIBS)
 
 rdf_digest_test: rdf_digest.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_digest.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_digest.c librdf.la $(LIBS)
 
 rdf_hash_test: rdf_hash.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_hash.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_hash.c librdf.la $(LIBS)
 
 rdf_uri_test: rdf_uri.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_uri.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_uri.c librdf.la $(LIBS)
 
 rdf_statement_test: rdf_statement.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la $(LIBS)
 
 rdf_model_test: rdf_model.c librdf.la ex1.rdf ex2.rdf
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_model.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_model.c librdf.la $(LIBS)
 
 rdf_storage_test: rdf_storage.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_storage.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_storage.c librdf.la $(LIBS)
 
 rdf_parser_test: rdf_parser.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_parser.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_parser.c librdf.la $(LIBS)
 
 rdf_files_test: rdf_files.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_files.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_files.c librdf.la $(LIBS)
 
 rdf_heuristics_test: rdf_heuristics.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_heuristics.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_heuristics.c librdf.la $(LIBS)
 
 rdf_utf8_test: rdf_utf8.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_utf8.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_utf8.c librdf.la $(LIBS)
 
 rdf_concepts_test: rdf_concepts.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_concepts.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_concepts.c librdf.la $(LIBS)
 
 rdf_query_test: rdf_query.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_query.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_query.c librdf.la $(LIBS)
 
 rdf_serializer_test: rdf_serializer.c librdf.la
-	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_serializer.c librdf.la $(LIBS)
+	$(LINK) $(LIBRDF_CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_serializer.c librdf.la $(LIBS)
 
 # The action is the COMPILE definition but always using least warning CFLAGS
 @MAINT@rdf_parser_libwww.o: rdf_parser_libwww.c

@@ -183,14 +183,34 @@ else
 fi
 
 
+# Externally linked libraries - appear in redland-config
+# -Dfoo -Idir
+LIBRDF_CPPFLAGS=
+# -Ldir
+LIBRDF_LDFLAGS=
+# -llib
+LIBRDF_LIBS=
+
+# Internally linked libraries - never given to users
+#   (such as repat, expat)
+# -Dfoo -Idir
+LIBRDF_INTERNAL_CPPFLAGS=
+# -Ldir -llib
+LIBRDF_INTERNAL_LIBS=
+
+# Links to internal/external XML parsers (for repat)
+# -I/path/to/expat
+LIBRDF_XML_CPPFLAGS=
+# -lexpatname
+LIBRDF_XML_LIBS=
+
 
 dnl Checks for libraries.
 dnl GNU GDBM
 AC_CHECK_HEADERS(gdbm.h)
 if test "$ac_cv_header_gdbm_h" = yes ; then
-  oLIBS="$LIBS"
   AC_CHECK_LIB(gdbm,gdbm_firstkey)
-  LIBS="$oLIBS"
+  LIBS="$LIBRDF_LIBS"
 fi
 
 dnl Berkeley DB
@@ -202,24 +222,23 @@ AC_MSG_RESULT($bdb_prefix)
 
 bdb_available=
 if test "$bdb_prefix" != no; then
-  oCPPFLAGS="$CPPFLAGS"
-  oLDFLAGS="$LDFLAGS"
-  oLIBS="$LIBS"
   if test "$bdb_prefix" != /usr; then
-    nLDFLAGS="-L$bdb_prefix/lib $LDFLAGS";
-    CPPFLAGS="-I$bdb_prefix/include $CPPFLAGS";
+    nLDFLAGS="-L$bdb_prefix/lib";
+    nCPPFLAGS="-I$bdb_prefix/include";
     # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
     DBname=`cd $bdb_prefix/lib; ls -1 libdb*.a|sed -e 's/^lib//' -e 's/\.a$//' | head -1`
   else
-    nLDFLAGS="$LDFLAGS"
+    nLDFLAGS=
+    nCPPFLAGS=
     DBname="db"
   fi
 
-  LDFLAGS="$nLDFLAGS"
+  LDFLAGS="$nLDFLAGS $LDFLAGS"
+  CPPFLAGS="$nCPPFLAGS $CPPFLAGS"
+  LIBS="-l$DBname $LIBS"
+
   AC_CHECK_HEADERS(db.h)
   if test "$ac_cv_header_db_h" = yes ; then
-    LDFLAGS="$nLDFLAGS"
-    LIBS="$oLIBS -l$DBname"
     have_libdb=no
     AC_MSG_CHECKING(for BDB V3 db_create)
     AC_TRY_LINK([#include <stdio.h>
@@ -272,13 +291,18 @@ if test "$bdb_prefix" != no; then
 		AC_MSG_RESULT(3))
   fi
 
-  if test "$have_libdb" != yes; then
-    LIBS="$oLIBS"
-    LDFLAGS="$oLDFLAGS"
-    CPPFLAGS="$oCPPFLAGS"
-   fi
+  if test "$have_libdb" = yes; then
+    LIBRDF_LIBS="-l$DBname $LIBRDF_LIBS"
+    LIBRDF_LDFLAGS="$nLDFLAGS $LIBRDF_LDFLAGS"
+    LIBRDF_CPPFLAGS="$nCPPFLAGS $LIBRDF_CFLAGS"
+  fi
 
 fi
+
+CPPFLAGS="$LIBRDF_CPPFLAGS"
+LDFLAGS="$LIBRDF_LDFLAGS"
+LIBS="$LIBRDF_LIBS"
+
 
 if test "$have_libdb" != yes; then
   AC_MSG_WARN(No persistant storage configured)
@@ -314,8 +338,8 @@ AC_MSG_CHECKING(whether have working libwww)
 if test "$enable_libwww" = yes ; then
   if test -n "$LIBWWW_CONFIG"; then
     AC_MSG_RESULT(yes)
-    LIBS="$LIBS `$LIBWWW_CONFIG --libs`"
-    CFLAGS="$CFLAGS `$LIBWWW_CONFIG --cflags`"
+    LIBRDF_LIBS="`$LIBWWW_CONFIG --libs` $LIBRDF_LIBS"
+    LIBRDF_CPPFLAGS="`$LIBWWW_CONFIG --cflags` $LIBRDF_CFLAGS"
     AC_DEFINE(HAVE_LIBWWW)
     have_libwww=yes
   else
@@ -324,6 +348,10 @@ if test "$enable_libwww" = yes ; then
 else
   AC_MSG_RESULT(no)
 fi
+
+CPPFLAGS="$LIBRDF_CPPFLAGS"
+LDFLAGS="$LIBRDF_LDFLAGS"
+LIBS="$LIBRDF_LIBS"
 
 
 dnl Checks for XML parsers
@@ -348,20 +376,20 @@ AC_CHECK_LIB(xmltok, main, xmlt=1, xmlt=0)
 # XML_ParserCreateNS so check for that
 AC_CHECK_LIB(xmlparse, XML_ParserCreateNS, xmlp=1, xmlp=0, -lxmltok)
 
-LIBS="$oLIBS"
+LIBS="$LIBRDF_LIBS"
 
 # Remove any expat lurking around from, say, w3c libwww
 LIBS=`echo $LIBS | sed -e 's/-lxmlparse//' -e 's/-lxmltok//'`
 
 AC_CHECK_LIB(expat, XML_ParserCreateNS, libexpat=1, libexpat=0)
 
-LIBS="$oLIBS"
+LIBS="$LIBRDF_LIBS"
 
 REPAT_FLAGS=
 
 AC_MSG_CHECKING(for working expat in libxmlparse and libxmltok)
 if test $xmlp = 1 -a $xmlt = 1 -a  $ac_cv_header_xmlparse_h = yes; then
-  LIBS="$LIBS -lxmlparse -lxmltok"
+  LIBS="-lxmlparse -lxmltok $LIBRDF_LIBS"
   AC_TRY_RUN([#include <stdio.h>
 	      main() {XML_ParserCreateNS(NULL); return(0);}], 
               worked=yes, worked=no, worked=no)
@@ -382,11 +410,11 @@ else
   AC_MSG_RESULT(no)
 fi
 
-LIBS="$oLIBS"
+LIBS="$LIBRDF_LIBS"
 
 AC_MSG_CHECKING(for working expat in libexpat)
 if test $libexpat = 1 -a $ac_cv_header_expat_h = yes ; then
-  LIBS="$LIBS -lexpat"
+  LIBS="-lexpat $LIBRDF_LIBS"
   AC_TRY_RUN([#include <stdio.h>
 	     main() {XML_ParserCreateNS(NULL); return(0);}],
              worked=yes, worked=no, worked=no)
@@ -404,7 +432,8 @@ else
   AC_MSG_RESULT(no)
 fi
 
-LIBS="$oLIBS"
+LIBS="$LIBRDF_LIBS"
+
 
 AC_CHECK_PROGS(XML_CONFIG, xml2-config xml-config)
 
@@ -423,11 +452,9 @@ else
 fi
 
 if test "X$XML_CONFIG" != X; then
-  oLIBS="$LIBS"
-  oCPPFLAGS="$CPPFLAGS"
-  LIBS="$LIBS `$XML_CONFIG --libs`"
+  LIBS="`$XML_CONFIG --libs` $LIBS"
   AC_CHECK_LIB(xml, xmlCreatePushParserCtxt)
-  LIBS="$oLIBS"
+  LIBS="$LIBRDF_LIBS"
   AC_MSG_CHECKING(for system (GNOME) libxml library)
   if test $ac_cv_lib_xml_xmlCreatePushParserCtxt = yes; then
     have_libxml_lib=1
@@ -444,7 +471,7 @@ if test "X$XML_CONFIG" != X; then
       have_libxml=0
     fi
 
-    CFLAGS="$oCPPFLAGS"
+    CPPFLAGS="$LIBRDF_CPPFLAGS"
 
   else
     AC_MSG_RESULT(no)
@@ -667,8 +694,8 @@ for parser in $parser_modules; do
     PARSER_SRCS="$PARSER_SRCS rdf_parser_$parser.c"
 
     if test $parser = raptor; then
-      CFLAGS="$CFLAGS -I\$(top_srcdir)/raptor"
-      LIBS="\$(top_builddir)/raptor/libraptor.la $LIBS"
+      LIBRDF_CPPFLAGS="-I\$(top_srcdir)/raptor $LIBRDF_CPPFLAGS"
+      LIBRDF_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_LIBS"
     fi
 
     n=HAVE_${uname}_RDF_PARSER
@@ -773,8 +800,7 @@ if test "$enable_openssl_digests" = yes ; then
   if test "$ac_cv_header_openssl_crypto_h" = yes ; then
     AC_DEFINE(HAVE_OPENSSL_DIGESTS)
     new_digest_modules=
-    oLIBS="$LIBS"
-    LIBS="-lcrypto $LIBS"
+    LIBS="-lcrypto $LIBRDF_LIBS"
     have_libcrypto=no
 
     for module in $digest_modules; do
@@ -796,8 +822,8 @@ if test "$enable_openssl_digests" = yes ; then
 	new_digest_modules="${new_digest_modules} $module"
       fi
     done
-    if test "$have_libcrypto" = no; then
-      LIBS="$oLIBS"
+    if test "$have_libcrypto" = yes; then
+      LIBRDF_LIBS="-lcrypto $LIBRDF_LIBS"
     fi
     DIGEST_OBJS="$DIGEST_OBJS rdf_digest_openssl.lo"
     DIGEST_SRCS="$DIGEST_SRCS rdf_digest_openssl.c"
@@ -806,6 +832,8 @@ if test "$enable_openssl_digests" = yes ; then
 else
   AC_MSG_RESULT(no)
 fi
+
+LIBS=$LIBRDF_LIBS
 
 
 # This is needed because autoheader can't work out which computed
@@ -821,7 +849,7 @@ for module in $digest_modules; do
   module_u=`echo $module | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
   AC_MSG_CHECKING(for local $module digest module)
   base=rdf_digest_$module
-  if test -r $srcdir/$base.c; then
+  if test -r $srcdir/librdf/$base.c; then
     AC_MSG_RESULT(yes);
 
     n=HAVE_LOCAL_${module_u}_DIGEST
@@ -829,7 +857,7 @@ for module in $digest_modules; do
 
     DIGEST_OBJS="$DIGEST_OBJS $base.lo"
     DIGEST_SRCS="$DIGEST_SRCS $base.c"
-   digest_modules_available="$digest_modules_available $module"
+    digest_modules_available="$digest_modules_available $module"
   else
     AC_MSG_RESULT(no);
   fi
@@ -874,18 +902,23 @@ dnl Checks for building sub-packages in sub directories
 SD="docs perl python tcl java"
 
 
-LIBRDF_EXTRA_LIBS=
-LIBRDF_XML_LIBS=
-
 if test $have_libxml = 1 -a $need_libxml = 1; then
   if test $need_libxml_source = 1; then
     SD="$SD libxml"
     (cd libxml && ./configure --cache=../config.cache --enable-shared=no)
-    CFLAGS="$CFLAGS -I$srcdir/libxml"
-    LIBRDF_XML_LIBS="libxml/libxml.a"
+    l="libxml/libxml.a"
+    c="-I$srcdir/libxml"
+    LIBRDF_LIBS="$l $LIBRDF_LIBS"
+    LIBRDF_CPPFLAGS="$c $LIBRDF_CPPFLAGS"
+    LIBRDF_XML_LIBS="$l $LIBRDF_XML_LIBS"
+    LIBRDF_XML_CPPFLAGS="$c $LIBRDF_XML_CPPFLAGS"
   else
-    LIBS="`$XML_CONFIG --libs` $LIBS"
-    CFLAGS="$CFLAGS `$XML_CONFIG --cflags`"
+    l=`$XML_CONFIG --libs`
+    c=`$XML_CONFIG --cflags`
+    LIBRDF_LIBS="$l $LIBRDF_LIBS"
+    LIBRDF_CPPFLAGS="$c $LIBRDF_CPPFLAGS"
+    LIBRDF_XML_LIBS="$l $LIBRDF_XML_LIBS"
+    LIBRDF_XML_CPPFLAGS="$c $LIBRDF_XML_CPPFLAGS"
   fi
 fi
 
@@ -893,8 +926,12 @@ if test $need_expat = 1; then
   # Only build local copy if it is needed
   if test $need_expat_source = 1; then
     SD="$SD expat"
-    CFLAGS="-I\$(top_srcdir)/expat/xmlparse $CFLAGS"
-    LIBRDF_XML_LIBS="\$(top_builddir)/expat/xmlparse/libxmlparse.la \$(top_builddir)/expat/xmltok/libxmltok.la"
+    c="-I\$(top_srcdir)/expat/xmlparse"
+    l="\$(top_builddir)/expat/xmlparse/libxmlparse.la \$(top_builddir)/expat/xmltok/libxmltok.la"
+    LIBRDF_CPPFLAGS="$c $LIBRDF_CPPFLAGS"
+    LIBRDF_LIBS="$l $LIBRDF_LIBS"
+    LIBRDF_XML_CPPFLAGS="$c $LIBRDF_XML_CPPFLAGS"
+    LIBRDF_XML_LIBS="$l $LIBRDF_XML_LIBS"
     REPAT_FLAGS="$REPAT_FLAGS -I\$(top_srcdir)/expat/xmlparse"
 
     AC_DEFINE(NEED_EXPAT_SOURCE)
@@ -907,6 +944,7 @@ if test $need_expat = 1; then
     found=yes
   else
     LIBS="$expat_libs $LIBS"
+    LIBRDF_XML_LIBS="$expat_libs $LIBRDF_XML_LIBS"
     found=no
   fi
 
@@ -929,15 +967,12 @@ fi
 if test $need_repat = 1; then
   # Always have local copy
   SD="$SD repat"
-  CFLAGS="$CFLAGS -I\$(top_srcdir)"
-  LIBRDF_XML_LIBS="\$(top_builddir)/repat/librepat.la $LIBRDF_XML_LIBS"
+  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/repat $LIBRDF_INTERNAL_CFLAGS"
+  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/repat/librepat.la $LIBRDF_INTERNAL_LIBS"
 fi
 
-LIBRDF_EXTRA_LIBS="$LIBRDF_XML_LIBS $LIBRDF_EXTRA_LIBS"
 
 AC_SUBST(REPAT_FLAGS)
-AC_SUBST(LIBRDF_XML_LIBS)
-AC_SUBST(LIBRDF_EXTRA_LIBS)
 AC_SUBST(SD)
 
 
@@ -956,6 +991,21 @@ STANDARD_CFLAGS="$STANDARD_CFLAGS $CFLAGS"
 if test "$USE_MAINTAINER_MODE" = yes; then
   CFLAGS="$MAINTAINER_CFLAGS $CFLAGS"
 fi
+
+LIBS=
+CPPFLAGS=
+LDFLAGS=
+
+AC_SUBST(LIBRDF_XML_CPPFLAGS)
+AC_SUBST(LIBRDF_XML_LIBS)
+
+AC_SUBST(LIBRDF_INTERNAL_CPPFLAGS)
+AC_SUBST(LIBRDF_INTERNAL_LIBS)
+
+AC_SUBST(LIBRDF_CPPFLAGS)
+AC_SUBST(LIBRDF_LDFLAGS)
+AC_SUBST(LIBRDF_LIBS)
+
 AC_SUBST(MEM)
 AC_SUBST(MEM_LIBS)
 AC_SUBST(STANDARD_CFLAGS)
