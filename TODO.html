@@ -12,11 +12,6 @@
 <h2>To Do Pre-0.1</h2>
 
 <ul>
-<li>make BDB hash use btree and handle duplicates</li>
-<li>remove GDBM from default code until handles duplicates</li>
-<li>remove references factories from simple user code</li>
-<li>make <tt>get</tt> method in all hash impls. return a list of
-values via an iterator</li>
 <li>module - storage implemented as hashes</li>
 </ul>
 
@@ -69,6 +64,11 @@ part of librdf.h automatically to make a 1-header file system.</li>
 <p>(Most recent done at top of list)</p>
 
 <ul>
+<li>made <tt>get</tt> methods in all hash impls. use iterators (side
+effecting - yuck)</li>
+<li>made BDB V2 and V3 use btree and handle duplicates</li>
+<li>removed GDBM from default code since doesn't handle duplicates</li>
+<li>removed references to factories from simple user code</li>
 <li>module - rdf parser - via libwww RDF parser</li>
 <li>annotate the functions with gnome-doc / kernel-doc style comments
 (after JavaDoc) with care taken to make sure it is clear who owns the
