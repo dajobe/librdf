@@ -182,7 +182,7 @@ librdf_storage_mysql_hash(librdf_storage* storage, char *type,
  * @name: model name
  * @options: host, port, database, user, password.
  *
- * Create connection to database.
+ * Create connection to database.  Defaults to port 3306 if not given.
  *
  * Return value: Non-zero on failure (negative values are MySQL errors).
  **/
@@ -247,6 +247,9 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   /* Save connection parameters */
   context->host=librdf_hash_get_del(options, "host");
   context->port=librdf_hash_get_as_long(options, "port");
+  if(context->port < 0)
+    port=3306; /* default mysql port */
+  
   context->database=librdf_hash_get_del(options, "database");
   context->user=librdf_hash_get_del(options, "user");
   context->password=librdf_hash_get_del(options, "password");
