@@ -719,26 +719,33 @@ main(int argc, char *argv[])
         break;
       }
 
+      if(librdf_model_query_as_bindings(model, query)) {
+        fprintf(stderr, "%s: Query of model with '%s' failed\n", 
+                program, argv[2]);
+        if(uri)
+          librdf_free_uri(uri);
+        librdf_free_query(query);
+        break;
+      }
+
       while(!librdf_query_results_finished(query)) {
-        const char **names;
-        librdf_node **values;
+        const char **names=NULL;
+        librdf_node **values=NULL;
         
         if(librdf_query_get_result_bindings(query, &names, values))
           break;
         
-        if(!count) {
-          fputs("result: [", stdout);
-          if(names) {
-            for(i=0; names[i]; i++) {
-              fprintf(stdout, "%s=", names[i]);
-              if(values[i]) {
-                librdf_node_print(values[i], stdout);
-                librdf_free_node(values[i]);
-              } else
-                fputs("NULL", stdout);
-              if(names[i+1])
-                fputs(", ", stdout);
-            }
+        fputs("result: [", stdout);
+        if(names) {
+          for(i=0; names[i]; i++) {
+            fprintf(stdout, "%s=", names[i]);
+            if(values[i]) {
+              librdf_node_print(values[i], stdout);
+              librdf_free_node(values[i]);
+            } else
+              fputs("NULL", stdout);
+            if(names[i+1])
+              fputs(", ", stdout);
           }
           fputs("]\n", stdout);
         }
