@@ -524,6 +524,8 @@ librdf_serializer_set_feature(librdf_serializer* serializer,
  * @uri: URI of namespace
  * @prefix: prefix to use
  * 
+ * NOTE: May not be implemented yet - depends on raptor_serializer work.
+ * 
  * Return value: non 0 on failure
  **/
   
