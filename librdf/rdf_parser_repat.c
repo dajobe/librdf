@@ -126,7 +126,9 @@ typedef struct {
  * of statements from parsing
  */
 typedef struct {
-  librdf_uri* uri;          /* source */
+  librdf_uri* source_uri;    /* source URI */
+  char *filename;            /* filename part of that */
+  librdf_uri* base_uri;      /* base URI */
   FILE *fh;
   RDF_Parser repat;
   librdf_list* statements;  /* pending statements */
@@ -154,7 +156,12 @@ librdf_parser_repat_statement_handler(void* user_data,
   librdf_parser_repat_stream_context* scontext=(librdf_parser_repat_stream_context*)librdf_parser_repat__user_data;
   librdf_statement* statement=NULL;
   librdf_node *subject, *predicate, *object;
-
+  char *filename;
+  int filename_len;
+  char *base_uri_string;
+  int base_uri_len;
+  
+  
   /* got all statement parts now */
   statement=librdf_new_statement();
   if(!statement)
@@ -163,7 +170,9 @@ librdf_parser_repat_statement_handler(void* user_data,
   switch(subject_type)
   {
     case RDF_SUBJECT_TYPE_URI:
-      subject=librdf_new_node_from_uri_string(subject_string);
+      subject=librdf_new_node_from_normalised_uri_string(subject_string,
+                                                         scontext->source_uri,
+                                                         scontext->base_uri);
       break;
     case RDF_SUBJECT_TYPE_DISTRIBUTED:
       subject=librdf_new_node_from_uri_string(subject_string);
@@ -182,7 +191,9 @@ librdf_parser_repat_statement_handler(void* user_data,
 
   
   if(!ordinal) {
-    predicate=librdf_new_node_from_uri_string(predicate_string);
+    predicate=librdf_new_node_from_normalised_uri_string(predicate_string,
+                                                         scontext->source_uri,
+                                                         scontext->base_uri);
   } else {
     /* FIXME - an ordinal predicate li:<ordinal> should be generated */
     predicate=librdf_new_node_from_uri_string(predicate_string);
@@ -193,7 +204,9 @@ librdf_parser_repat_statement_handler(void* user_data,
   switch( object_type )
   {
     case RDF_OBJECT_TYPE_RESOURCE:
-      object=librdf_new_node_from_uri_string(object_string);
+      object=librdf_new_node_from_normalised_uri_string(object_string,
+                                                        scontext->source_uri,
+                                                        scontext->base_uri);
       break;
     case RDF_OBJECT_TYPE_LITERAL:
       object=librdf_new_node_from_literal(object_string, xml_lang, 0, 0);
@@ -304,7 +317,7 @@ librdf_parser_repat_init(void *context)
   
 
 /**
- * librdf_parser_repat_parse_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
+ * librdf_parser_repat_parse_as_stream - Retrieve the RDF/XML content at file and parse it into a librdf_stream
  * @context: serialisation context
  * @uri: URI of RDF content
  * 
@@ -313,13 +326,13 @@ librdf_parser_repat_init(void *context)
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
 static librdf_stream*
-librdf_parser_repat_parse_as_stream(void *context, librdf_uri *uri) {
+librdf_parser_repat_parse_file_as_stream(void *context, librdf_uri *uri,
+                                         librdf_uri *base_uri) {
   /* Note: not yet used */
 /*  librdf_parser_repat_context* pcontext=(librdf_parser_repat_context*)context; */
   librdf_parser_repat_stream_context* scontext;
   librdf_stream* stream;
-  char *filename;
-  char *uri_string;
+  const char* filename;
 
   scontext=(librdf_parser_repat_stream_context*)LIBRDF_CALLOC(librdf_parser_repat_stream_context, 1, sizeof(librdf_parser_repat_stream_context));
   if(!scontext)
@@ -331,21 +344,19 @@ librdf_parser_repat_parse_as_stream(void *context, librdf_uri *uri) {
     return NULL;
   }
 
-  scontext->uri=uri;
-  
-  if(strncmp(librdf_uri_as_string(uri), "file:", 5)) {
-    fprintf(stderr, "librdf_parser_repat_parse_as_stream: parser cannot handle non file: URI %s\n",
-            librdf_uri_as_string(uri));
-    librdf_parser_repat_serialise_finished((void*)scontext);
-    return NULL;
-  }
-  
-  uri_string=librdf_uri_as_string(uri);
-  filename=uri_string+5; /* FIXME - copy this */
+  scontext->source_uri=uri;
+  scontext->base_uri=base_uri;
 
+  filename=librdf_uri_as_filename(uri);
+  if(!filename)
+    return NULL;
+  
   scontext->fh=fopen(filename, "r");
   if(!scontext->fh) {
-    LIBRDF_DEBUG2(librdf_new_parser_repat, "Failed to open file URI 'file:%s'\n", uri_string);
+    extern int errno;
+    
+    LIBRDF_DEBUG3(librdf_new_parser_repat, "Failed to open file '%s' - %s\n",
+                  filename, strerror(errno));
     librdf_parser_repat_serialise_finished((void*)scontext);
     return(NULL);
   }
@@ -372,7 +383,7 @@ librdf_parser_repat_parse_as_stream(void *context, librdf_uri *uri) {
   RDF_SetWarningHandler(scontext->repat, 
                         librdf_parser_repat_warning_handler);
   
-  RDF_SetBase(scontext->repat, uri_string);
+  RDF_SetBase(scontext->repat, librdf_uri_as_string(base_uri));
 
 
   stream=librdf_new_stream((void*)scontext,
@@ -399,11 +410,12 @@ librdf_parser_repat_parse_as_stream(void *context, librdf_uri *uri) {
  * Return value: non 0 on failure
  **/
 static int
-librdf_parser_repat_parse_into_model(void *context, librdf_uri *uri,
-                                       librdf_model *model) {
+librdf_parser_repat_parse_file_into_model(void *context, librdf_uri *uri,
+                                          librdf_uri *base_uri,
+                                          librdf_model *model) {
   librdf_stream* stream;
   
-  stream=librdf_parser_repat_parse_as_stream(context, uri);
+  stream=librdf_parser_repat_parse_file_as_stream(context, uri, base_uri);
   if(!stream)
     return 1;
 
@@ -559,8 +571,8 @@ librdf_parser_repat_register_factory(librdf_parser_factory *factory)
   factory->context_length = sizeof(librdf_parser_repat_context);
   
   factory->init  = librdf_parser_repat_init;
-  factory->parse_as_stream = librdf_parser_repat_parse_as_stream;
-  factory->parse_into_model = librdf_parser_repat_parse_into_model;
+  factory->parse_file_as_stream = librdf_parser_repat_parse_file_as_stream;
+  factory->parse_file_into_model = librdf_parser_repat_parse_file_into_model;
 }
 
 
