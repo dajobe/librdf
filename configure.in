@@ -271,9 +271,9 @@ fi
 
 oLIBS="$LIBS"
 AC_CHECK_LIB(xmltok, main, xmlt=1, xmlt=0)
-AC_CHECK_LIB(xmlparse, XML_Parser_CreateNS, xmlp=1, xmlp=0, -lxmltok)
+AC_CHECK_LIB(xmlparse, XML_Parser_Create, xmlp=1, xmlp=0, -lxmltok)
 LIBS="$oLIBS"
-AC_MSG_CHECKING(for system expat library with Namespace support)
+AC_MSG_CHECKING(for system expat library)
 if test $xmlp = 1 -a $xmlt = 1; then
   have_expat_lib=1
   have_expat=1
