@@ -10,12 +10,38 @@
 
 <h2>????-??-?? next release</h2>
 
-<p>Changed the APIs for literals to remove all mention of XML Space
-which is not part of an RDF literal.
+<p>
+<strong>API CHANGE</strong> <a href="docs/api/iterator.html">Iterator</a> and <a href="docs/api/stream.html">Stream</a> classes. The next/get_next method is split into get_object always returning a shared object and next methods.  get_context method added.  (get_object is called current in higher level language APIs)<br />
+<strong>API CHANGE</strong> <a href="docs/api/model.html">Model</a> class. Method add_statement no longer takes ownership of the passed in statement.  The caller now retains ownership.<br />
+<strong>API CHANGE</strong> <a href="docs/api/model.html">Model</a> class. Method add_statements no longer frees the passed in librdf_stream; the caller must free it now.<br />
+<strong>API CHANGE</strong> <a href="docs/api/node.html">Node</a> and <a href="docs/api/model.html">Model</a> classes.  Added RDF Datatyped Literals.  Other literal is_wf_xml constructors and methods deprecated.<br />
+<strong>API CHANGE</strong> All literals methods and constructors have no
+mention of the never-used or supported XML Space argument which hasis not part
+of an RDF literal.<br />
 Added a script <a href="aux/update-api-0912.pl">aux/update-api-0912.pl</a>
-to help automate the change as far as possible - or just compile, run scripts
-and look for errors about too many parameters.
+to help automate the API changes as far as possible or warn about those
+that cannot be automatically updated.<br />
+Added contexts - Statements added to <a href="docs/api/model.html">Model</a> (when using a Storage that
+supports contexts) can take an optional  <a href="docs/api/node.html">Node</a>, returned by the new
+get_context method on <a href="docs/api/iterator.html">Iterator</a> and <a href="docs/api/stream.html">Stream</a> classes.<br />
+Many portability and compiling fixes (OSX, gcc 3.x, FreeBSD, non-gcc compiler)<br />
+<a href="docs/java.html">Java API</a> classes.  Add finished() method replacing useless finalize().<br />
+Use Raptor message callbacks to get parser warnings and errors<br />
+Build Java API working around the stupid things recent SWIG versions do.<br />
+Make Redland work with BDB/Sleepycat DB v4 (as well as v2 and v3)<br />
+<a href="docs/python.html">Python</a> API gains <a href="docs/pydoc/RDF.html">pydoc</a> comments and HTML derived version<br />
+<a href="docs/perl.html">Perl</a> and <a href="docs/python.html">Python</a> APIs now receive Redland message callbacks<br />
+Redland URI class now registers with Raptor rather than specially compile Raptor<br />
+Added RDF/XML <a href="docs/api/serializer.html">Serializer</a> class and made higher level language APIs to it<br />
+Update to <a href="http://www.redland.opensource.ac.uk/raptor/">Raptor</a> version 0.9.7 (RDF/XML and N-Triples parser) - see
+<a href="http://www.redland.opensource.ac.uk/raptor/NEWS.html">Raptor NEWS</a>
+for detailed changes since 0.9.5<br />
+Added skeleton <a href="docs/ruby.html">Ruby</a> and <a href="docs/php.html">PHP</a> APIs<br />
+Major source reorganisation.
 </p>
+
+<p>See also the <a href="RELEASE.html#rel0_9_12">Detailed 0.9.12 Release Notes</a></p>
+
 
 <h2>2002-06-08 Redland 0.9.11 Released</h2>
 <p>Update to <a href="http://www.redland.opensource.ac.uk/raptor/">Raptor</a> version 0.9.5 (RDF/XML and N-Triples parser)<br />
@@ -128,7 +154,7 @@ from LGPL/BSD.</p>
 
 <hr />
 
-<p>Copyright 2000-2002 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
