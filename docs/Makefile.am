@@ -29,11 +29,9 @@ overview.png overview.ps overview.pdf api pod pydoc \
 redland.pod kernel-doc \
 $(man_MANS)
 
-DOC_CLASSES=node statement model \
-storage storage_hashes storage_list storage_mysql storage_tstore \
-stream parser parser_raptor query query_rasqal query_triples serializer \
-serializer_raptor concepts init digest digest_md5 digest_openssl hash \
-hash_bdb hash_cursor hash_memory heuristics iterator list uri utf8
+DOC_CLASSES=init node statement model \
+storage stream parser query serializer concepts uri \
+digest hash heuristics iterator utf8
 
 POD_MODULES=RDF/Redland RDF/Redland/Iterator RDF/Redland/Model RDF/Redland/Node RDF/Redland/Parser RDF/Redland/RSS RDF/Redland/Serializer RDF/Redland/Statement RDF/Redland/Storage RDF/Redland/Stream RDF/Redland/URI
 
