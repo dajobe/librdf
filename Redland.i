@@ -90,7 +90,7 @@ librdf_call_perl_message(int type, const char *message, va_list arguments)
   
     call_pv("RDF::Redland::World::message", G_DISCARD);
 
-    free(message);
+    free(buffer);
   }
   
   FREETMPS;
