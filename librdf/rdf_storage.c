@@ -542,7 +542,10 @@ librdf_storage_size(librdf_storage* storage)
  * @statement: &librdf_statement statement to add
  * 
  * The passed-in statement is copied when added to the store, not
- * shared with the store.
+ * shared with the store.  
+ *
+ * If the statement already exists in the store, it is not added
+ * unless Redland contexts are being used.
  *
  * Return value: non 0 on failure
  **/
@@ -564,6 +567,9 @@ librdf_storage_add_statement(librdf_storage* storage,
  * @storage: &librdf_storage object
  * @statement_stream: &librdf_stream of statements
  * 
+ * If any of the statements already exists in the store, they are not
+ * added unless Redland contexts are being used.
+ *
  * Return value: non 0 on failure
  **/
 int
