@@ -75,10 +75,13 @@ librdf_statement*
 librdf_new_statement_from_statement(librdf_statement* statement)
 {
   librdf_statement* new_statement;
+
+  if(!statement)
+    return NULL;
   
   new_statement = librdf_new_statement();
   if(!new_statement)
-	  return NULL;
+    return NULL;
 
   new_statement->subject=librdf_new_node_from_node(statement->subject);
   new_statement->predicate=librdf_new_node_from_node(statement->predicate);
@@ -302,7 +305,7 @@ librdf_statement_to_string(librdf_statement *statement)
     
   s=(char*)LIBRDF_MALLOC(cstring, statement_string_len);
   if(s)
-    sprintf(s, format, predicate_string, subject_string, object_string);
+    sprintf(s, format, subject_string, predicate_string, object_string);
 
   /* always free allocated intermediate strings */
   if(subject_string != null_string)
@@ -314,6 +317,27 @@ librdf_statement_to_string(librdf_statement *statement)
 
   return s;
 }
+
+/**
+ * librdf_hash_print - pretty print the statement to a file descriptor
+ * @statement: the statement
+ * @fh: file handle
+ **/
+void
+librdf_statement_print(librdf_statement *statement, FILE *fh) 
+{
+  char *s;
+
+  if(!statement)
+    return;
+  
+  s=librdf_statement_to_string(statement);
+  if(!s)
+    return;
+  fputs(s, fh);
+  LIBRDF_FREE(cstring, s);
+}
+
 
 
 /**
