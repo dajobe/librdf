@@ -10,13 +10,13 @@
 # 
 # This package is Free Software or Open Source available under the
 # following licenses (these are alternatives):
-#   1. GNU Lesser General Public License (LGPL) Version 2
-#   2. GNU General Public License (GPL) Version 2
-#   3. Mozilla Public License (MPL) Version 1.1
-# and no other versions of those licenses.
+#   1. GNU Lesser General Public License (LGPL)
+#   2. GNU General Public License (GPL)
+#   3. Mozilla Public License (MPL)
 # 
-# See INSTALL.html or INSTALL.txt at the top of this package for the
+# See LICENSE.html or LICENSE.txt at the top of this package for the
 # full license terms.
+# 
 # 
 
 

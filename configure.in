@@ -11,13 +11,13 @@ dnl University of Bristol - http://www.bristol.ac.uk/
 dnl 
 dnl This package is Free Software or Open Source available under the
 dnl following licenses (these are alternatives):
-dnl   1. GNU Lesser General Public License (LGPL) Version 2
-dnl   2. GNU General Public License (GPL) Version 2
-dnl   3. Mozilla Public License (MPL) Version 1.1
-dnl and no other versions of those licenses.
+dnl   1. GNU Lesser General Public License (LGPL)
+dnl   2. GNU General Public License (GPL)
+dnl   3. Mozilla Public License (MPL)
 dnl 
-dnl See INSTALL.html or INSTALL.txt at the top of this package for the
+dnl See LICENSE.html or LICENSE.txt at the top of this package for the
 dnl full license terms.
+dnl 
 dnl 
 
 
