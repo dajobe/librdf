@@ -1036,8 +1036,6 @@ librdf_node_get_digest(librdf_node* node)
 int
 librdf_node_equals(librdf_node* first_node, librdf_node* second_node) 
 {
-  int status;
-  
   if(!first_node || !second_node)
     return 0;
   
