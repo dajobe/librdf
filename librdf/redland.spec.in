@@ -114,7 +114,7 @@ cd ..
 
 cd python
 
-python setup.py install --prefix=$RPM_BUILD_ROOT%{prefix}
+make install DESTDIR=$RPM_BUILD_ROOT%{prefix}
 find $RPM_BUILD_ROOT%{prefix} -name "*.py[co]" -exec rm -f {} \;
 
 cd ..
