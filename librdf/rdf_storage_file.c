@@ -249,9 +249,9 @@ librdf_storage_file_sync(librdf_storage *storage)
     backup_name[context->name_len+1]='\0';
 
     if(rename(context->name, backup_name) < 0) {
-      librdf_error(storage->world,
-                   "rename of '%s' to '%s' failed - %s",
-                   context->name, backup_name, strerror(errno));
+      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "rename of '%s' to '%s' failed - %s",
+                 context->name, backup_name, strerror(errno));
       LIBRDF_FREE(cstring, backup_name);
       return;
     }
@@ -274,8 +274,9 @@ librdf_storage_file_sync(librdf_storage *storage)
   
   fh=fopen(new_name, "w+");
   if(!fh)
-    librdf_error(storage->world, "failed to open file '%s' for writing - %s",
-                 new_name, strerror(errno));
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "failed to open file '%s' for writing - %s",
+               new_name, strerror(errno));
   else {
     librdf_serializer_serialize_model(serializer, fh, context->uri,
                                       context->model);
@@ -284,9 +285,9 @@ librdf_storage_file_sync(librdf_storage *storage)
   librdf_free_serializer(serializer);
 
   if(fh && rename(new_name, context->name) < 0) {
-    librdf_error(storage->world,
-                 "rename of '%s' to '%s' failed - %s (%d)",
-                 new_name, context->name, strerror(errno), errno);
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "rename of '%s' to '%s' failed - %s (%d)",
+               new_name, context->name, strerror(errno), errno);
     fh=NULL;
   }
 
@@ -294,9 +295,9 @@ librdf_storage_file_sync(librdf_storage *storage)
   
   /* restore backup on failure (fh=NULL) */
   if(!fh && backup_name && rename(backup_name, context->name) < 0)
-      librdf_error(storage->world,
-                   "rename of '%s' to '%s' failed - %s",
-                   backup_name, context->name, strerror(errno));
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "rename of '%s' to '%s' failed - %s",
+               backup_name, context->name, strerror(errno));
 
   if(backup_name)
     LIBRDF_FREE(cstring, backup_name);

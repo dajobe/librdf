@@ -185,8 +185,8 @@ librdf_hash_bdb_open(void* context, char *identifier,
  *              const char *database, DBTYPE type, u_int32_t flags, int mode);
  */
   if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
-    librdf_error(bdb_context->hash->world, "BDB V4.0+ open of '%s' failed - %s",
-                 file, db_strerror(ret));
+    librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "BDB V4.0+ open of '%s' failed - %s", file, db_strerror(ret));
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -198,8 +198,8 @@ librdf_hash_bdb_open(void* context, char *identifier,
  *              const char *database, DBTYPE type, u_int32_t flags, int mode);
  */
   if((ret=bdb->open(bdb, NULL, file, NULL, DB_BTREE, flags, mode))) {
-    librdf_error(bdb_context->hash->world, "BDB V4.1+ open of '%s' failed - %s",
-                 file, db_strerror(ret));
+    librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "BDB V4.1+ open of '%s' failed - %s", file, db_strerror(ret));
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -220,8 +220,8 @@ librdf_hash_bdb_open(void* context, char *identifier,
     flags |= DB_TRUNCATE;
 
   if((ret=db_open(file, DB_BTREE, flags, mode, NULL, &bdb_info, &bdb))) {
-    librdf_error(bdb_context->hash->world, "BDB V2 open of '%s' failed - %d", 
-                 file, ret);
+    librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "BDB V2 open of '%s' failed - %d", file, ret);
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -239,8 +239,8 @@ librdf_hash_bdb_open(void* context, char *identifier,
     remove(file);
 
   if((bdb=dbopen(file, flags, mode, DB_BTREE, NULL)) == 0) {
-    librdf_error(bdb_context->hash->world, "BDB V1 open of '%s' failed - %d",
-                 file, ret);
+    librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "BDB V1 open of '%s' failed - %d", file, ret);
     LIBRDF_FREE(cstring, file);
     return 1;
   }

@@ -138,7 +138,8 @@ librdf_query_triples_init(librdf_query* query,
   /* subject - NULL or URI */
   p=librdf_query_triples_find_next_term(cur);
   if(!p) {
-    librdf_error(query->world, "Bad triples query language syntax - bad subject in '%s'", cur);
+    librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+               "Bad triples query language syntax - bad subject in '%s'", cur);
     LIBRDF_FREE(cstring, query_string_copy);
     return 0;
   }
@@ -160,7 +161,8 @@ librdf_query_triples_init(librdf_query* query,
   /* predicate - NULL or URI */
   p=(unsigned char*)librdf_query_triples_find_next_term(cur);
   if(!p) {
-    librdf_error(query->world, "Bad triples query language syntax - bad predicate in '%s'", cur);
+    librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+               "Bad triples query language syntax - bad predicate in '%s'", cur);
     LIBRDF_FREE(cstring, query_string_copy);
     librdf_free_node(subject);
     return 0;
@@ -184,7 +186,8 @@ librdf_query_triples_init(librdf_query* query,
   /* object - NULL, literal or URI */
   p=librdf_query_triples_find_next_term(cur);
   if(!p) {
-    librdf_error(query->world, "Bad triples query language syntax - bad object in '%s'", cur);
+    librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+               "Bad triples query language syntax - bad object in '%s'", cur);
     LIBRDF_FREE(cstring, query_string_copy);
     librdf_free_node(subject);
     librdf_free_node(predicate);
