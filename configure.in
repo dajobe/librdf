@@ -874,14 +874,15 @@ dnl Checks for building sub-packages in sub directories
 SD="docs perl python tcl java"
 
 
-XML_OBJS=
+LIBRDF_EXTRA_LIBS=
+LIBRDF_XML_LIBS=
 
 if test $have_libxml = 1 -a $need_libxml = 1; then
   if test $need_libxml_source = 1; then
     SD="$SD libxml"
     (cd libxml && ./configure --cache=../config.cache --enable-shared=no)
     CFLAGS="$CFLAGS -I$srcdir/libxml"
-    XML_OBS="libxml/libxml.a"
+    LIBRDF_XML_LIBS="libxml/libxml.a"
   else
     LIBS="`$XML_CONFIG --libs` $LIBS"
     CFLAGS="$CFLAGS `$XML_CONFIG --cflags`"
@@ -893,7 +894,7 @@ if test $need_expat = 1; then
   if test $need_expat_source = 1; then
     SD="$SD expat"
     CFLAGS="-I\$(top_srcdir)/expat/xmlparse $CFLAGS"
-    XML_OBJS="\$(top_builddir)/expat/xmlparse/xmlparse.lo \$(top_builddir)/expat/xmlparse/hashtable.lo \$(top_builddir)/expat/xmltok/xmlrole.lo \$(top_builddir)/expat/xmltok/xmltok.lo"
+    LIBRDF_XML_LIBS="\$(top_builddir)/expat/xmlparse/libxmlparse.la \$(top_builddir)/expat/xmltok/libxmltok.la"
     REPAT_FLAGS="$REPAT_FLAGS -I\$(top_srcdir)/expat/xmlparse"
 
     AC_DEFINE(NEED_EXPAT_SOURCE)
@@ -929,11 +930,14 @@ if test $need_repat = 1; then
   # Always have local copy
   SD="$SD repat"
   CFLAGS="$CFLAGS -I\$(top_srcdir)"
-  LIBS="\$(top_builddir)/repat/librepat.la $LIBS"
+  LIBRDF_XML_LIBS="\$(top_builddir)/repat/librepat.la $LIBRDF_XML_LIBS"
 fi
 
+LIBRDF_EXTRA_LIBS="$LIBRDF_XML_LIBS $LIBRDF_EXTRA_LIBS"
+
 AC_SUBST(REPAT_FLAGS)
-AC_SUBST(XML_OBJS)
+AC_SUBST(LIBRDF_XML_LIBS)
+AC_SUBST(LIBRDF_EXTRA_LIBS)
 AC_SUBST(SD)
 
 
