@@ -548,6 +548,14 @@ librdf_raptor_uri_copy(void *context, raptor_uri *uri)
   return librdf_new_uri_from_uri(uri);
 }
 
+
+static char*
+librdf_raptor_uri_as_string(void *context, raptor_uri *uri)
+{
+  return librdf_uri_as_string(uri);
+}
+
+
 static raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_new_uri,
   librdf_raptor_new_uri_from_uri_local_name,
@@ -556,6 +564,7 @@ static raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_free_uri,
   librdf_raptor_uri_equals,
   librdf_raptor_uri_copy,
+  librdf_raptor_uri_as_string,
   1
 };
 
