@@ -1177,6 +1177,44 @@ librdf_storage_get_contexts(librdf_storage* storage)
     return NULL;
 }
 
+
+
+/**
+ * librdf_storage_get_feature - get the value of a storage feature
+ * @storage: &librdf_storage object
+ * @feature: &librdf_uri feature property
+ * 
+ * Return value: &librdf_node feature value or NULL if no such feature
+ * exists or the value is empty.
+ **/
+librdf_node*
+librdf_storage_get_feature(librdf_storage* storage, librdf_uri* feature)
+{
+  if(storage->factory->get_feature)
+    return storage->factory->get_feature(storage, feature);
+  return NULL;
+}
+
+
+/**
+ * librdf_storage_set_feature - set the value of a storage feature
+ * @storage: &librdf_storage object
+ * @feature: &librdf_uri feature property
+ * @value: &librdf_node feature property value
+ * 
+ * Return value: non 0 on failure (negative if no such feature)
+ **/
+int
+librdf_storage_set_feature(librdf_storage* storage, librdf_uri* feature,
+                           librdf_node* value)
+{
+  if(storage->factory->set_feature)
+    return storage->factory->set_feature(storage, feature, value);
+  return -1;
+}
+
+
+
 #endif
 
 
