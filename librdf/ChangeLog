@@ -1,5 +1,11 @@
 2004-10-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_serializer.c (main):
+	Add serializer error and warning report tests
+
+	* rdf_query_rasqal.c (librdf_query_rasqal_results_get_bindings):
+	Casts for variable names array.
+
 	* rdf_serializer_rdfxml.c (rdf_serializer_rdfxml_print_xml_attribute):
 	Take serializer arg.
 	Use librdf_log directly to give a better error message since
