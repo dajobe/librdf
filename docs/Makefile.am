@@ -31,7 +31,7 @@ DOC_CLASSES=node statement model storage storage_hashes storage_list stream pars
 
 POD_MODULES=RDF/Redland RDF/Redland/Iterator RDF/Redland/Model RDF/Redland/Node RDF/Redland/Parser RDF/Redland/RSS RDF/Redland/Statement RDF/Redland/Storage RDF/Redland/Stream RDF/Redland/URI
 
-DOC_C_FILES=$(DOC_CLASSES:%=$(srcdir)/../rdf_%.c)
+DOC_C_FILES=$(DOC_CLASSES:%=$(srcdir)/../librdf/rdf_%.c)
 API_DOCBOOK_FILES=$(DOC_CLASSES:%=%.sgml)
 
 PERL_HTML_POD_FILES=$(POD_MODULES:%=pod/%.html)
@@ -67,7 +67,7 @@ api/index.html: api.sgml
 .sgml.pdf:
 	db2pdf $<
 
-@MAINT@$(API_DOCBOOK_FILES): %.sgml: $(srcdir)/../rdf_%.c
+@MAINT@$(API_DOCBOOK_FILES): %.sgml: $(srcdir)/../librdf/rdf_%.c
 @MAINT@	kernel-doc -docbook $< > $@
 @MAINT@
 @MAINT@api.sgml: $(srcdir)/build-docs api.sgml.in $(API_DOCBOOK_FILES)

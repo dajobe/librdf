@@ -20,16 +20,8 @@
 # 
 
 
-# Subdirectories to build/install etc.
-SUBDIRS=@SD@
-# Subdirectories to use for distribution
-DIST_SUBDIRS=docs perl python tcl java ruby expat repat debian
-
 bin_SCRIPTS = redland-config
 lib_LTLIBRARIES = librdf.la
-
-# Need this so that automake doesn't moan
-noinst_PROGRAMS = $(EXAMPLES)
 
 include_HEADERS = redland.h librdf.h \
 rdf_init.h \
@@ -80,18 +72,18 @@ rdf_query.h \
 rdf_query_triples.h \
 rdf_serializer.h
 
-librdf_la_LIBADD = @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+librdf_la_LIBADD = \
+@LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @XML_OBJS@
-librdf_la_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+librdf_la_DEPENDENCIES = \
+@DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @XML_OBJS@
 
 EXTRA_librdf_la_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
 rdf_parser_sirpac.c rdf_parser_libwww.c \
 rdf_parser_raptor.c \
-rdf_parser_repat.c \
-example1.c example2.c example3.c example4.c \
-@RAPTOR_SRCS@
+rdf_parser_repat.c
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO      LICENSE.txt \
@@ -104,7 +96,6 @@ $(JAVA_CLASSES) \
 autogen.sh \
 Makefile.PL \
 redland.spec redland.spec.in \
-@RAPTOR_INCS@ \
 ex1.rdf ex2.rdf
 
 librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@
@@ -114,9 +105,7 @@ rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
 rdf_query_test rdf_serializer_test
 
-EXAMPLES=example1 example2 example3 example4
-
-CLEANFILES=$(TESTS) $(EXAMPLES) test.db test1.db
+CLEANFILES=$(TESTS) test.db test1.db
 MAINTAINERCLEANFILES=$(JAVA_CLASSES)
 
 # Memory debugging alternatives
@@ -194,43 +183,6 @@ rdf_query_test: rdf_query.c librdf.la
 rdf_serializer_test: rdf_serializer.c librdf.la
 	$(LINK) -static -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_serializer.c librdf.la $(LIBS)
 
-examples: $(EXAMPLES)
-
-example1_SOURCES = example1.c
-example1_LDADD = librdf.la
-example1_LDFLAGS = -static
-
-example2_SOURCES = example2.c
-example2_LDADD = librdf.la
-example2_LDFLAGS = -static
-
-example3_SOURCES = example3.c
-example3_LDADD = librdf.la
-example3_LDFLAGS = -static
-
-example4_SOURCES = example4.c
-example4_LDADD = librdf.la
-example4_LDFLAGS = -static
-
-
-# Create some text files from HTML sources
-LYNX=lynx
-HTML_TO_TEXT=TERM=vt100 $(LYNX) -dump -nolist
-
-SUFFIXES = .html .txt
-
-.html.txt:
-	$(HTML_TO_TEXT) $< > $@
-
-README: README.html
-	$(HTML_TO_TEXT) $< > $@
-
-NEWS: NEWS.html
-	$(HTML_TO_TEXT) $< > $@
-
-TODO: TODO.html
-	$(HTML_TO_TEXT) $< > $@
-
 # The action is the COMPILE definition but always using least warning CFLAGS
 @MAINT@rdf_parser_libwww.o: rdf_parser_libwww.c
 @MAINT@	$(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(STANDARD_CFLAGS) -c $<
@@ -238,10 +190,13 @@ TODO: TODO.html
 @SET_MAKE@
 
 $(top_builddir)/expat/xmlparse/xmlparse.lo $(top_builddir)/expat/xmlparse/hashtable.lo $(top_builddir)/expat/xmltok/xmlrole.lo $(top_builddir)/expat/xmltok/xmltok.lo:
-	cd expat && $(MAKE) $(AM_MAKEFLAGS) all
+	cd $(srcdir)/../expat && $(MAKE) $(AM_MAKEFLAGS) all
 
-$(top_builddir)/repat/rdfparse.lo: $(top_builddir)/expat/xmlparse/xmlparse.lo $(top_builddir)/expat/xmlparse/hashtable.lo $(top_builddir)/expat/xmltok/xmlrole.lo $(top_builddir)/expat/xmltok/xmltok.lo
-	cd repat && $(MAKE) $(AM_MAKEFLAGS) all
+$(SRCDIR)/../raptor/libraptor.la:
+	cd $(srcdir)/../raptor && $(MAKE) $(AM_MAKEFLAGS) all
+
+$(SRCDIR)/../repat/librepat.la:
+	cd $(srcdir)/../repat && $(MAKE) $(AM_MAKEFLAGS) all
 
 # Copy these by hand since they are symlinks to the latest versions
 # in the home raptor source tree and the default rule just copies the
