@@ -229,8 +229,8 @@ librdf_node* librdf_model_get_arc(librdf_model *model, librdf_node *source, libr
 librdf_iterator* librdf_model_get_arcs_out(librdf_model *model,librdf_node *node);
 %newobject librdf_model_get_arcs_in;
 librdf_iterator* librdf_model_get_arcs_in(librdf_model *model,librdf_node *node);
-librdf_iterator* librdf_model_has_arc_in(librdf_model *model,librdf_node *node,librdf_node *property);
-librdf_iterator* librdf_model_has_arc_out(librdf_model *model,librdf_node *node,librdf_node *property);
+int librdf_model_has_arc_in(librdf_model *model,librdf_node *node,librdf_node *property);
+int librdf_model_has_arc_out(librdf_model *model,librdf_node *node,librdf_node *property);
 %newobject librdf_model_get_target;
 librdf_node* librdf_model_get_target(librdf_model *model, librdf_node *source, librdf_node *arc);
 int librdf_model_context_add_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
@@ -242,6 +242,7 @@ librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* 
 void librdf_model_sync(librdf_model* model);
 %newobject librdf_model_get_contexts;
 librdf_iterator* librdf_model_get_contexts(librdf_model* model);
+%newobject librdf_model_get_feature;
 librdf_node* librdf_model_get_feature(librdf_model* model, librdf_uri* feature);
 int librdf_model_set_feature(librdf_model* model, librdf_uri* feature, librdf_node* value);
 int librdf_model_load(librdf_model* model, librdf_uri *uri, const char *inStrOrNull=NULL, const char *inStrOrNull=NULL, librdf_uri *type_uri=NULL);
@@ -270,6 +271,7 @@ librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const
 int librdf_parser_parse_string_into_model(librdf_parser* parser, const char *string, librdf_uri* base_uri, librdf_model* model);
 librdf_stream* librdf_parser_parse_counted_string_as_stream(librdf_parser* parser, const char *string, size_t length, librdf_uri* base_uri);
 int librdf_parser_parse_counted_string_into_model(librdf_parser* parser, const char *string, size_t length, librdf_uri* base_uri, librdf_model* model);
+%newobject librdf_parser_get_feature;
 librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
 int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, librdf_node* value);
 
