@@ -371,6 +371,10 @@ Tcl_PkgProvide(interp, PACKAGE, (char*)librdf_version_string);
 %typemap(ruby,in) const char *inStrOrNull {
   $1 = ($input == Qnil) ? NULL : STR2CSTR($input);
 }
+/* returning char* or NULL, need special conversions */
+%typemap(ruby,out) char *{
+ $result = ($1 == NULL) ? Qnil : rb_str_new2($1);
+}
 
 
 typedef struct librdf_world_s librdf_world;
@@ -501,6 +505,12 @@ librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *sour
 librdf_node* librdf_model_get_source(librdf_model *model, librdf_node *arc, librdf_node *target);
 %newobject librdf_model_get_arc;
 librdf_node* librdf_model_get_arc(librdf_model *model, librdf_node *source, librdf_node *target);
+%newobject librdf_model_get_arcs_out;
+librdf_iterator* librdf_model_get_arcs_out(librdf_model *model,librdf_node *node);
+%newobject librdf_model_get_arcs_in;
+librdf_iterator* librdf_model_get_arcs_in(librdf_model *model,librdf_node *node);
+librdf_iterator* librdf_model_has_arc_in(librdf_model *model,librdf_node *node,librdf_node *property);
+librdf_iterator* librdf_model_has_arc_out(librdf_model *model,librdf_node *node,librdf_node *property);
 %newobject librdf_model_get_target;
 librdf_node* librdf_model_get_target(librdf_model *model, librdf_node *source, librdf_node *arc);
 int librdf_model_context_add_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
@@ -548,6 +558,7 @@ void librdf_free_serializer(librdf_serializer *serializer);
 int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer, const char *name, librdf_uri* base_uri, librdf_model* model);
 librdf_node* librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
 int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, librdf_node* value);
+int librdf_serializer_set_namespace(librdf_serializer* serializer, librdf_uri *nspace, const char * prefix);
 
 /* rdf_stream.h */
 void librdf_free_stream(librdf_stream* stream);
