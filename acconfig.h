@@ -22,5 +22,8 @@
 #undef HAVE_OPENSSL_CRYPTO_SHA1_DIGEST
 #undef HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST
 
+/* defined if have W3C libwww available */
+#undef HAVE_LIBWWW
+
 /* defined if specific hashes are available */
 #undef HAVE_GDBM_HASH
