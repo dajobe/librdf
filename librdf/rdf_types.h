@@ -38,7 +38,11 @@ extern "C" {
   #elif SIZEOF_UNSIGNED_LONG == 8
     typedef unsigned long u64;
   #elif SIZEOF_UNSIGNED_LONG_LONG == 8
-    typedef unsigned long long u64;
+    #ifdef WIN32
+      typedef __int64 u64;
+    #else
+       typedef unsigned long long u64;
+    #endif
   #else
     #error u64 type not defined
   #endif
