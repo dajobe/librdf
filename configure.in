@@ -244,6 +244,12 @@ if test "$bdb_prefix" != no; then
   if test "$bdb_name" != none; then
     # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
     bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb*.a 2>/dev/null |sed -e 's/^lib//' -e 's/\.a$//' | head -1`
+    if test "X$bdb_dbname" = X; then
+      AC_MSG_WARN(Cannot find the BDB library name from the files in $bdb_lib_dir)
+      AC_MSG_WARN(Assuming it is 'db' and will link like -ldb)
+      AC_MSG_WARN(Use --with-bdb-dbname=NAME if this is wrong)
+      bdb_dbname=db
+    fi
   fi
 
   AC_MSG_CHECKING(name of BDB library)
