@@ -87,7 +87,7 @@ static void librdf_hash_bdb_cursor_finish(void* context);
 
 
 /* prototypes for local functions */
-static int librdf_hash_bdb_open(void* context, char *identifier, void *mode, librdf_hash* options);
+static int librdf_hash_bdb_open(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 static int librdf_hash_bdb_close(void* context);
 static int librdf_hash_bdb_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 static int librdf_hash_bdb_exists(void* context, librdf_hash_datum *key);
@@ -104,28 +104,36 @@ static void librdf_hash_bdb_register_factory(librdf_hash_factory *factory);
  * librdf_hash_bdb_open - Open and maybe create a BerkeleyDB hash
  * @context: BerkeleyDB hash context
  * @identifier: filename to use for BerkeleyDB file
- * @mode: access mode (currently unused)
+ * @mode: file creation mode
+ * @is_writable: is hash writable?
+ * @is_new: is hash new?
  * @options: hash options (currently unused)
  * 
  * Return value: non 0 on failure.
  **/
 static int
-librdf_hash_bdb_open(void* context, char *identifier, void *mode,
+librdf_hash_bdb_open(void* context, char *identifier, 
+                     int mode, int is_writable, int is_new,
                      librdf_hash* options) 
 {
   librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* bdb;
   char *file;
   int ret;
+  int flags;
+  
 #ifdef HAVE_DB_OPEN
   DB_INFO bdb_info;
 #endif
   
-  file=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+1);
+  file=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+4);
   if(!file)
     return 1;
-  strcpy(file, identifier);
-	
+  sprintf(file, "%s.db", identifier);
+
+  if(is_new)
+    remove(file);
+
 #ifdef HAVE_DB_CREATE
   /* V3 prototype:
    * int db_create(DB **dbp, DB_ENV *dbenv, u_int32_t flags);
@@ -144,7 +152,11 @@ librdf_hash_bdb_open(void* context, char *identifier, void *mode,
    * int DB->open(DB *db, const char *file, const char *database,
    *              DBTYPE type, u_int32_t flags, int mode);
    */
-  if((ret=bdb->open(bdb, file, NULL, DB_BTREE, DB_CREATE, 0644))) {
+  flags=DB_CREATE;
+  if(!is_writable)
+    flags|=DB_RDONLY;
+  
+  if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -157,8 +169,12 @@ librdf_hash_bdb_open(void* context, char *identifier, void *mode,
 
   memset(&bdb_info, 0, sizeof(DB_INFO));
   bdb_info.flags=DB_DUP;
-  
-  if((ret=db_open(file, DB_BTREE, DB_CREATE, 0644, NULL, &bdb_info, &bdb))) {
+
+  flags=DB_CREATE;
+  if(!is_writable)
+    flags|=DB_RDONLY;
+
+  if((ret=db_open(file, DB_BTREE, flags, mode, NULL, &bdb_info, &bdb))) {
     LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB db_open failed - %d\n", ret);
     LIBRDF_FREE(cstring, file);
     return 1;
@@ -168,7 +184,11 @@ librdf_hash_bdb_open(void* context, char *identifier, void *mode,
   /* V1 prototype:
     const char *file, int flags, int mode, DBTYPE, const void *openinfo
   */
-  if((bdb=dbopen(file, O_CREAT | O_RDWR | R_DUP, 0644, DB_BTREE, NULL)) == 0) {
+  flags=O_CREAT;
+  if(is_writable)
+    flags|=O_RDWR;
+
+  if((bdb=dbopen(file, O_CREAT | R_DUP, mode, DB_BTREE, NULL)) == 0) {
     LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB dbopen failed - %d\n", ret);
     LIBRDF_FREE(cstring, file);
     return 1;
