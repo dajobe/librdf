@@ -166,6 +166,7 @@ librdf_free(char *file, int line, char *type, void *addr)
   if(!node) {
     fprintf(stderr, "%s:%d: free of type %s addr %p never allocated\n",
             file, line, type, addr);
+    abort();
     return;
   }
   
