@@ -25,24 +25,22 @@ extern "C" {
 #endif
 
 
-/** private data type used to describe hash key and data */
-typedef struct 
+/** data type used to describe hash key and data */
+struct librdf_hash_datum_s
 {
   void *data;
   size_t size;
-} librdf_hash_data;
+  /* used internally to build lists of these  */
+  struct librdf_hash_datum_s *next;
+};
+typedef struct librdf_hash_datum_s librdf_hash_datum;
 
-
-/* Return various hash key/value pairs in a sequence
- * @see librdf_hash_get_seq
- */
-typedef enum {
-  LIBRDF_HASH_SEQUENCE_CURRENT,  /* current hash key/value pair in a sequence */
-  LIBRDF_HASH_SEQUENCE_FIRST,    /* first hash key/value pair in a sequence */
-  LIBRDF_HASH_SEQUENCE_NEXT      /* next hash key/value pair in a sequence */
-} librdf_hash_sequence_type;
-
+/* constructor / destructor for above */
+librdf_hash_datum* librdf_hash_datum_new(void *data, size_t size);
+void librdf_hash_datum_free(librdf_hash_datum *datum) ;
   
+
+
 /** A hash object */
 struct librdf_hash_s
 {
@@ -65,16 +63,18 @@ struct librdf_hash_factory_s {
   /* end hash association */
   int (*close)(void* context);
 
-  /* retrieve / insert key/data pairs according to flags */
-  int (*get)(void* context, librdf_hash_data *key, librdf_hash_data *data, unsigned int flags);
-  int (*put)(void* context, librdf_hash_data *key, librdf_hash_data *data, unsigned int flags);
+  /* get all values for a given key according to flags */
+  librdf_iterator* (*get)(void* context, librdf_hash_datum *key, unsigned int flags);
+
+  /* insert key/value pairs according to flags */
+  int (*put)(void* context, librdf_hash_datum *key, librdf_hash_datum *data, unsigned int flags);
 
   /* returns true if key exists in hash, without returning value */
-  int (*exists)(void* context, librdf_hash_data *key);
+  int (*exists)(void* context, librdf_hash_datum *key);
 
-  int (*delete_key)(void* context, librdf_hash_data *key);
-  /* retrieve a key/data pair via cursor-based/sequential access */
-  int (*get_seq)(void* context, librdf_hash_data *key, librdf_hash_sequence_type type);
+  int (*delete_key)(void* context, librdf_hash_datum *key);
+  /* serialise the hash keys */
+  librdf_iterator* (*keys)(void* context);
   /* flush any cached information to disk */
   int (*sync)(void* context);
   /* get the file descriptor for the hash, if it is file based (for locking) */
@@ -96,8 +96,9 @@ void librdf_init_hash(void);
 /* module terminate */
 void librdf_finish_hash(void);
 
-/* constructor */
-librdf_hash* librdf_new_hash(librdf_hash_factory* factory);
+/* constructors */
+librdf_hash* librdf_new_hash(char *name);
+librdf_hash* librdf_new_hash_from_factory(librdf_hash_factory* factory);
 
 /* destructor */
 void librdf_free_hash(librdf_hash *hash);
@@ -110,16 +111,19 @@ int librdf_hash_open(librdf_hash* hash, char *identifier, void *mode, librdf_has
 /* end hash association */
 int librdf_hash_close(librdf_hash* hash);
 
-/* retrieve / insert key/data pairs according to flags */
-int librdf_hash_get(librdf_hash* hash, void *key, size_t key_len, void **value, size_t *value_len, unsigned int flags);
+/* retrieve one value for a given hash key according to flags */
+librdf_hash_datum* librdf_hash_get(librdf_hash* hash, librdf_hash_datum *key, unsigned int flags);
+/* retrieve all values for a given hash key according to flags */
+librdf_iterator* librdf_hash_get_all(librdf_hash* hash, librdf_hash_datum *key, unsigned int flags);
+
+/* insert a key/value pair */
 int librdf_hash_put(librdf_hash* hash, void *key, size_t key_len, void *value, size_t value_len, unsigned int flags);
 
   /* returns true if key exists in hash, without returning value */
 int librdf_hash_exists(librdf_hash* hash, void *key, size_t key_len);
 
 int librdf_hash_delete(librdf_hash* hash, void *key, size_t key_len);
-/* retrieve a key/data pair via cursor-based/sequential access */
-int librdf_hash_get_seq(librdf_hash* hash, void **key, size_t* key_len, librdf_hash_sequence_type type);
+librdf_iterator* librdf_hash_keys(librdf_hash* hash);
 /* flush any cached information to disk */
 int librdf_hash_sync(librdf_hash* hash);
 /* get the file descriptor for the hash, if it is file based (for locking) */
@@ -135,6 +139,12 @@ int librdf_hash_from_string (librdf_hash* hash, char *string);
 
 /* import a hash from an array of strings */
 int librdf_hash_from_array_of_strings (librdf_hash* hash, char *array[]);
+
+/* lookup a hash key and decode value as a boolean */
+int librdf_hash_get_as_boolean (librdf_hash* hash, char *key);
+
+/* lookup a hash key and decode value as a long */
+long librdf_hash_get_as_long (librdf_hash* hash, char *key);
 
 
 #ifdef __cplusplus
