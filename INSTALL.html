@@ -72,11 +72,6 @@ tools not needed when building from snapshot releases - automake,
 autoconf and swig.  The <code>autogen.sh</code> script checks for the
 appropriate versions.</p>
 
-<p>(Aside: the current automake/conf system is using the "old"
-format configure.in with automake 1.4, autoconf 2.1x.  These will
-be switched to the "new" format configure.ac with automake 1.6+,
-autoconf 2.5+ from the next release.)</p>
-
 
 
 <h2>2. Configuring and building</h2>
@@ -125,7 +120,7 @@ such as <code>--prefix</code> etc.</p>
 <em>ROOT</em>.  That means <em>ROOT</em><code>/include</code> must
 contain the BDB header <code>db.h</code> and <em>ROOT</em><code>/lib</code>
 must contain the library <code>libdb.a</code> (or whatever shared library
-version you have).</p>
+version/name your system uses).</p>
 
 <p>Berkeley DB is now known as Sleepycat DB (after version 2) and
 distributed and supported by
@@ -136,9 +131,9 @@ not come installed with a working Berkeley/Sleepycat DB so on those
 systems, Redland will have no persistent storage unless BDB is built
 separately and enabled via this option.</p>
 
-<p><b>Note</b>: If you change installed versions of BDB (from 3.x to
-4.x) then you will need to re-configure Redland carefully to let it
-discover the features of the newer BDB as follows:</p>
+<p><b>Note</b>: If you change installed versions of BDB then you will
+need to re-configure Redland carefully to let it discover the
+features of the newer BDB as follows:</p>
 <pre>
   rm -f config.cache
   make clean
@@ -154,8 +149,11 @@ if this is required.)</p>
 <em>ROOT</em><code>/lib</code> (library) and
 <em>ROOT</em><code>/include</code> (header) or
 the library name is something that can't be worked out automatically,
-then you can use the following options to specify them.</p>
+then you can use the next ste of options to specify them.</p>
 
+<p>If all of the BDB options are omitted, Redland will do
+a best efforts guess to find the newest BDB installation but
+this may not work for all configurations.</p>
 </dd>
 
 <dt><code>--with-bdb-lib=</code><em>LIBDIR</em><br /></dt>
@@ -168,13 +166,37 @@ like <code>-l</code><em>NAME</em>.  This is relative to <em>LIBDIR</em>.
 All of these options can be omitted and <code>configure</code> will
 try to find or guess the values from the system.</p>
 
-<p>For example, to compile redland on OSX with <a href="http://fink.sourceforge.net/">fink</a> required a configure line something like this:</p>
+<p>For example, to compile redland on OSX with
+<a href="http://fink.sourceforge.net/">fink</a>
+might require a configure line something like this:</p>
 <pre>
-  ./configure  --with-bdb-lib=/sw/lib --with-bdb-include=/sw/include/db3
+  ./configure --with-bdb-lib=/sw/lib --with-bdb-include=/sw/include/db3
 </pre>
 <p>The name of the BDB library was correctly discovered for this
 configuration, as <code>db-3.3</code></p>
+
+<p>If all of the BDB options are omitted, Redland will do
+a best efforts guess to find the newest BDB installation but
+this may not work for all configurations.</p>
 </dd>
+
+<dt><code>--with-java</code>(=<em>JAVA</em>)<br /></dt>
+<dt><code>--with-perl</code>(=<em>PERL</em>)<br /></dt>
+<dt><code>--with-php</code>(=<em>PHP</em>)<br /></dt>
+<dt><code>--with-python</code>(=<em>PYTHON</em>)<br /></dt>
+<dt><code>--with-ruby</code>(=<em>RUBY</em>)<br /></dt>
+<dt><code>--with-tcl</code>(=<em>TCL</em>)<br /></dt>
+<dd><p>Enable the given language APIs - the default is to build
+none automatically.  If the optional argument is given, choose
+the command to use.  For example <code>--with-ruby=ruby1.8</code>
+will pick the ruby1.8 binary.
+</p></dd>
+
+<dt><code>--with-jdk=</code><em>DIR</em><br /></dt>
+<dd><p>Choose the location of the Java JDK to use for building
+the Java API with Java JNI.  If omitted, Redland will guess likely
+locations but this is not guaranteed to work.
+</p></dd>
 
 
 <dt><code>--with-libwww</code><br /></dt>
@@ -188,13 +210,43 @@ at present.
 
 <dt><code>--enable-parsers=LIST</code><br /></dt>
 <dd><p>Select the list of RDF parsers to be included if the are availble.  The
-valid list of RDF parsers are: <code>raptor repat</code> (the default).
-Even when selected these depend on the available XML parsers.  Raptor
-uses either of libxml2 (prefered) or expat and repat requires expat.
-Redland requires the Raptor parser for other functionality, so this
-cannot be disabled.  If no system-wide libxml2 or expat is available,
-Redland will compile an internal copy of expat and use that.
+valid list of RDF parsers is currently only <code>raptor</code> (the default)
+since the older repat parser has been removed.  Raptor uses either of
+libxml2 (prefered) or expat.  Redland requires the Raptor parser for
+other functionality, so it cannot be disabled.
 </p></dd>
+
+<dt><code>--with-openssl-digests</code><br /></dt>
+<dd><p>Enable digests provided by the
+<a href="http://www.openssl.org/">OpenSSL</a>
+libcrypto library (MD5, SHA1 and RIPEMD160) if the library is
+available. configure will automatically enable this unless disabled
+by setting this option to <em>no</em>.</p></dd>
+
+<dt><code>--with-raptor=</code> <code>system</code> or <code>internal</code><br /></dt>
+<dd><p>
+This option tells redland to use either the system installed version
+of raptor or the internal version.  If the option is omittted,
+redland will guess and choose either the system one, if new enough or
+the internal one (always present).  If <code>--with-raptor=system</code>
+is used and redland discovers that the system raptor is too old,
+a warning will be given but the configuration will continue.
+</p></dd>
+
+
+<dt><code>--with-xml-parser=NAME</code><br /></dt>
+<dd><p>Pick an XML parser to use for Raptor - either <code>libxml</code>
+(default) or <code>expat</code>.  If this option is not given,
+either will be used, with libxml preferred if both are present.
+libxml must be present as a system library but expat is always available
+since it is provided inside Redland.</p>
+
+<p>Raptor has been tested with various combinations of these libraries
+that are described further in the Raptor
+<a href="http://www.redland.opensource.ac.uk/raptor/INSTALL.html">install</a>
+documentation.
+</p>
+</dd>
 
 <dt><code>--enable-digests=LIST</code><br /></dt>
 <dd><p>Select the list of digests to be included if the are availble.  The
@@ -204,33 +256,6 @@ the <a href="http://www.openssl.org/">OpenSSL</a>
 libcrypto library or by provided portable
 versions (only MD5 supported in this release).</p></dd>
 
-<dt><code>--with-openssl-digests</code><br /></dt>
-<dd><p>Enable digests provided by the
-<a href="http://www.openssl.org/">OpenSSL</a>
-libcrypto library (MD5, SHA1 and RIPEMD160) if the library is
-available. configure will automatically enable this unless disabled
-by setting this option to <em>no</em>.</p></dd>
-
-<dt><code>--with-xml-parser=NAME</code><br /></dt>
-<dd><p>Pick an XML parser to use for Raptor - either <code>libxml</code>
-(default) or <code>expat</code>.  If this option is not given,
-either will be used, with libxml preferred if both are present.
-libxml must be present as a system library but expat is always available
-since it is provided inside Redland.</p>
-
-<p>If the <code>repat</code> RDF parser is also required (by default,
-yes) then since it always requires <code>expat</code>, then even if
-expat is not selected for this option, it will be compiled in.
-To prevent this, remove repat from the list of RDF parsers using
-<code>--enable-parsers=raptor</code>.</p>
-
-<p>Raptor has been tested with various combinations of these libraries
-that are described further in the Raptor
-<a href="http://www.redland.opensource.ac.uk/raptor/INSTALL.html">install</a>
-documentation.
-</p>
-</dd>
-
 </dl>
 
 
@@ -238,9 +263,10 @@ documentation.
 are installed in a non-default directory, when the final linking
 occurs, the libraries may not be found at run time.  To fix this you
 will need to use a system-specific method of passing this information
-to the run-time loader.  On Linux and Solaris you can set the
+to the run-time loader.  On most systems you can set the
 LD_LIBRARY_PATH environment variable to include the directory where
-the libwww libraries are found.  You can also configure it via a
+the libwww libraries are found. (On OSX this is DYLD_LIBRARY_PATH)
+You can also configure it via a
 system wide file - see the <code>ld</code>, <code>ld.so</code>
 or<code>ld.so.1</code> manual pages for details.  The alternative, to
 link libwww statically, works but is difficult to enable.</p>
@@ -275,7 +301,7 @@ adding or removing options, you may have to tidy up first with either of these:<
 
 <h2 id="sec-testing">2.5. Testing</h2>
 
-<p>You can build and run the built-in tests with:</p>
+<p>You can build and run the built-in tests for Redland with:</p>
 <pre>
     make check
 </pre>
@@ -284,18 +310,28 @@ conclude with something like:<br />
   <code>All </code><em>n</em><code> tests passed</code><br />
 if everything works correctly.</p>
 
+<p>If the language-specific <code>--with-perl</code> etc. arguments
+have been given to <code>configure</code>, the top-level
+<code>make check</code> will run these tests for the enabled languages
+in addition to the core tests.  These <em>may fail</em> if
+the main redland libraries (librdf and libraptor) are not
+installed. So in this case you should do:</p>
+<pre>
+   make install
+</pre>
+<p>before trying to run the language-specific tests.
+</p>
+
+<p>The language-specific tests can also be built and run with:</p>
+<pre>
+   cd language
+   make check
+</pre>
+
 <p>(If you have got all the required subsidiary development tools,
 you can also do <code>make distcheck</code> which does a longer
 check that the distribution installation, configuring and building
 works.  This does not perform any additional core testing).</p>
-
-<p>Each of the language APIs has it's own test and example
-code that can be run.  See the language-specific page for further
-details, however they can be build and tested with:</p>
-<pre>
-   cd language
-   make test-language
-</pre>
 
 
 
@@ -308,12 +344,14 @@ interface header (.h) files do:</p>
    make install
 </pre>
 
-<p>The language-specific interfaces are not installed in this
-step.  See the language-specific page for further details,
-however they can be be installed with:</p>
+<p>The language-specific interfaces are installed in this step when
+they are enabled with the <code>--with-perl</code> etc. arguments of
+<code>configure</code></p>
+
+<p>Otherwise, the language-specific installations can be made with:</p>
 <pre>
-   cd language
-   make install-language
+  cd language
+  make install
 </pre>
 
 
@@ -329,8 +367,9 @@ in the <code>examples</code> sub-directory and can be built with:</p>
 </pre>
 <p>(This may be done by the initial 'make' automatically).</p>
 
-<p>Examples for the other language interfaces are in the
-corresponding sub-directories such as <code>perl/example.pl</code>.</p>
+<p>There are many examples for all of the language interfaces in the
+corresponding sub-directories such as <code>perl/example.pl</code>
+which may be easier to modify.</p>
 
 <p>If no Berkeley DB was found by configure, some of the examples will fail
 since there is no on-disk storage system available.  To change them
@@ -367,45 +406,14 @@ multiple Berkeley DB hashes.</p>
 an RDF model, a statement, adds it to the model and stores it on
 disk.</p>
 
-<h3>3.4. <a href="example4.c">example4.c</a></h3>
 
-<p><code>example4</code> is a utility that allows the parsing, printing
-and querying of an existing on disk Berkeley DB-stored RDF model by
-statement; source, arc or target node and allows the addition and
-removal of statements.  To see a usage message type:</p>
-<pre>
-  example4
-</pre>
+<h3>3.4 rdfproc</h3>
 
-<p>For example, to parse some RDF/XML using the repat parser into a
-BerkeleyDB store, print it, do some queries, you could do the
-following (some lines broken for clarity)</p>
-<pre>
-$ cd examples
-$ example4 test parse file:../perl/dc.rdf repat
-example4: Parsing URI file:../perl/dc.rdf with repat parser
+<p>The <code>rdfproc</code> utility in the utils directory
+extensively exercises the Redland API and can demonstrate
+many ways to store, search and manipulate the graph from C.
+</p>
 
-$ example4 test print
-[[
-  {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
-  {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
-  {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page\
-of Dave Beckett."}
-]]
-
-$ example4 test targets http://purl.org/net/dajobe/ http://purl.org/dc/elements/1.1/title
-Matched node: Dave Beckett's Home Page
-example4: matching nodes: 1
-
-$ example4 test statements http://purl.org/net/dajobe/ - -
-Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Becke\
-tt's Home Page"}
-Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Bec\
-kett"}
-Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The \
-generic home page of Dave Beckett."}
-example4: matching statements: 3
-</pre>
 
 <h2>3. Using the Perl interface</h2>
 
@@ -441,7 +449,7 @@ full information on installing and using Redland from PHP.</p>
 
 <hr />
 
-<p>Copyright 2000-2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>

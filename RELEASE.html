@@ -21,6 +21,78 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<h2 id="rel0_9_14"><a name="rel0_9_14">Redland 0.9.14 Changes</a></h2>
+
+<p>This version of Redland is an update mostly to synchronise
+with the 
+<a href="http://www.redland.opensource.ac.uk/raptor/">Raptor</a> version 1.0.0 (RDF/XML and N-Triples parser) - see
+<a href="http://www.redland.opensource.ac.uk/raptor/NEWS.html">Raptor NEWS</a>
+for the changes since 0.9.12.</p>
+
+<p>New in this version is the <code>rdfproc</code> utility
+which allows command line creation of redland stores, parsing
+of syntaxes and manipulation of the model.</p>
+
+
+<h3>Configuration changes</h3>
+
+<p>Added <code>--with-raptor</code> to either choose the system
+or internal raptor library.  If omittted, redland will guess
+and choose either the system one, if new enough or the internal
+one (always present).</p>
+
+
+<h3>Hash Class changes</h3>
+
+<p>Added a librdf_hash_put_strings helper method to put a pair of
+string values into a hash.  Useful for making model or storage
+options.</p>
+
+<h3>Node Class changes</h3>
+
+<p>Resource (URI) / literal / blank nodes are now interned on
+construction so there is only one object for each distinct
+librdf_node object. This reduces memory and makes copying cheaper at
+the cost of an increase in construction cost.  Copying nodes is very
+common, since not only is it done for nodes but any time a statement
+is used or returned.  This interning was already done for the URI
+class but the change required librdf_node to be made immutable, which
+was done in 0.9.13.</p>
+
+<h3>Storage Class changes</h3>
+
+<p>Added librdf_storage_context_as_stream deprecating
+librdf_storage_context_serialise to be consistent with the
+*as_stream method name changes to model.</p>
+
+<p>Added librdf_new_storage_with_options taking an librdf_hash
+of options rather than the string of librdf_new_storage.</p>
+
+<p>Added new optional storage factory methods context_add_statements
+and context_remove_statements.  If omitted, the storage class
+implements them with context_add_statement and context_remove_statement.</p>
+
+
+<h3>Stream and Iterator Classes changes</h3>
+
+<p>Optimised the stream and iterator internals to do less factory
+method calls when looking for new items or the end of
+stream/iterator.  This should make them slightly faster.</p>
+
+
+<h3>Miscellaneous changes</h3>
+
+<p>Renamed Redland statics to be <code>librdf_*</code> rather than
+<code>redland_*</code>.  Added a one-line
+librdf_short_copyright_string.</p>
+
+
+<h3>Perl API Changes</h3>
+
+<p>Fixed the broken use of <tt>UNIVERSAL::isa</tt></p>
+
+
+
 <h2 id="rel0_9_13"><a name="rel0_9_13">Redland 0.9.13 Changes</a></h2>
 
 <p>This version of Redland is a major update to 0.9.12 changing the
@@ -93,7 +165,7 @@ all the librdf_node_get_type values):</p>
 <p>(These are reflected into the same methods on
 the Perl, Python and Java node classes)</p>
 
-<p><tt>LIBRDF_NODE_TYPE_LI</tt> as returned by librdf_node_get_type
+<p><code>LIBRDF_NODE_TYPE_LI</code> as returned by librdf_node_get_type
 was deleted, it was never used.</p>
 
 <p>To support datatyped literals, the following method was added:</p>
@@ -144,7 +216,7 @@ directly)</p>
 Redland URI objects and native perl URIs to be used in place of
 Redland Nodes where convienent (such as in making Statements).  All
 existing code should work but can be shortened.
-A new <tt>--with-perl</tt> configure argument to enable the perl
+A new <code>--with-perl</code> configure argument to enable the perl
 interface.
 </p>
 
@@ -153,7 +225,7 @@ interface.
 
 <p>A major update to use Python 2.2+ idioms and features by Edd
 Dumbill with help from Matt Biddulph for unit tests.  A new
-<tt>--with-python</tt> configure argument to enable the python
+<code>--with-python</code> configure argument to enable the python
 interface.  Edd wrote the following change log.</p>
 
 <p>General changes</p>
@@ -242,7 +314,7 @@ interface.  Edd wrote the following change log.</p>
 
 <p>Additions for the new API calls as outlined above (such
 as model/storage sync, parsing from strings etc.). New configure
-argument <tt>--with-jdk</tt> to pick the JDK in order to
+argument <code>--with-jdk</code> to pick the JDK in order to
 find the JNI headers.  See the <a href="docs/java">java API</a>
 page for details.</p>
 
@@ -250,7 +322,7 @@ page for details.</p>
 <h3>PHP, Ruby and Tcl Interfaces Changes</h3>
 
 <p>Updates in configuring and building these interfaces and new
-<tt>--with-php</tt>, <tt>--with-ruby</tt> and <tt>--with-tcl</tt>
+<code>--with-php</code>, <code>--with-ruby</code> and <code>--with-tcl</code>
 configure arguments.  See the corresponding API pages and
 installation documentation for details.  Tcl now tries to guess the
 includes directories.</p>
@@ -270,7 +342,7 @@ and implementation class (librdf_model_storage).</li>
 much newer or expat or libxml2 are very widespread.</li>
 
 <li>Added simple thread support from patches by Seth Ladd with
-configuration option <tt>--with-threads</tt> that locks key shared
+configuration option <code>--with-threads</code> that locks key shared
 classes to allow separate threads to work in the same memory
 space. The current locked classes are URI and World.</li>
 
