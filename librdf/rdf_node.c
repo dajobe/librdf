@@ -1039,7 +1039,7 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
     if(datatype_uri_string) {
       strncpy((char*)d, "^^<", 3);
       d+= 3;
-      strncpy((char*)d, datatype_uri_string, datatype_len);
+      strncpy((char*)d, (const char*)datatype_uri_string, datatype_len);
       d+= datatype_len;
       *d++='>';
     }

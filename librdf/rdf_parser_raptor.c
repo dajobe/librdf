@@ -864,7 +864,7 @@ librdf_parser_raptor_set_feature(void* context,
   if(!librdf_node_is_literal(value))
     return 1;
   
-  value_i=atoi(librdf_node_get_literal_value(value));
+  value_i=atoi((const char*)librdf_node_get_literal_value(value));
 
   return raptor_set_feature(pcontext->rdf_parser, feature_i, value_i);
 }

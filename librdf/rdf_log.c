@@ -86,7 +86,7 @@ librdf_log_simple(librdf_world* world, int code,
       world->log.level=level;
       world->log.facility=facility;
       world->log.message=message;
-      world->log.locator=locator;
+      world->log.locator=(raptor_locator*)locator;
 
       if(world->log_handler(world->log_user_data, &world->log))
         return;
@@ -116,12 +116,12 @@ librdf_log_simple(librdf_world* world, int code,
   fputs("librdf ", stderr);
   fputs(log_level_names[level], stderr);
   if(locator) {
-    int locator_len=raptor_format_locator(NULL, 0, locator);
+    int locator_len=raptor_format_locator(NULL, 0, (raptor_locator*)locator);
     char *buffer;
 
     buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+2);
     *buffer=' ';
-    raptor_format_locator(buffer+1, locator_len, locator);
+    raptor_format_locator(buffer+1, locator_len, (raptor_locator*)locator);
     fputs(buffer, stderr);
     LIBRDF_FREE(cstring, buffer);
   }
@@ -190,7 +190,8 @@ librdf_fatal(librdf_world* world, int facility,
   
   snprintf(buffer, length, "%s:%d:%s: fatal error: %s", 
            file, line, function, message);
-  librdf_log(world, 0, LIBRDF_LOG_FATAL, facility, NULL, buffer);
+  librdf_log(world, 0, LIBRDF_LOG_FATAL, (librdf_log_facility)facility, NULL,
+             buffer);
   LIBRDF_FREE(cstring, buffer);
   abort();
 }
