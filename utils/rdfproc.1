@@ -55,6 +55,12 @@ Set the output FORMAT for sequences of triples, such as from a search
 are  'simple' (the default one if this option is omitted), 'ntriples'
 or 'rdfxml'.
 .TP
+.B \-p, \-\-password
+Read the storage option 'password' from standard input.  Terminated
+by end of line ('\\n') or end of file.  This is equivalent
+to setting it using \-t or \-\-storage-options but does not
+require exposing the password in the argument list.
+.TP
 .B \-s, \-\-storage \fITYPE\fR
 Set the Redland storage type (default 'hashes').  Alternatives
 are 'memory' which is always present and '3store', 'mysql' when
