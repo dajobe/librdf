@@ -76,6 +76,7 @@ enum command_type {
   CMD_ARCS_OUT,
   CMD_HAS_ARC_IN,
   CMD_HAS_ARC_OUT,
+  CMD_QUERY_AS_BINDINGS,
   CMD_QUERY,
   CMD_SERIALIZE,
   CMD_REMOVE_CONTEXT,
@@ -113,6 +114,7 @@ static command commands[]={
   {CMD_HAS_ARC_OUT, "has-arc-out", 2, 2, 0},
   /* FIXME triples-match-query is deliberately not documented */
   {CMD_QUERY, "triples-match-query", 3, 3, 0},
+  {CMD_QUERY_AS_BINDINGS, "query", 1, 1, 0},
   {CMD_SERIALIZE, "serialize", 0, 3, 0},
   {CMD_REMOVE_CONTEXT, "remove-context", 1, 1, 0},
   {CMD_CONTEXTS, "contexts", 0, 0, 0},
@@ -430,9 +432,9 @@ main(int argc, char *argv[])
     puts("      with optional BASEURI, into the optional CONTEXT.");
     puts("  print                                     Print the graph triples.");
     puts("  serialize [SYNTAX [URI [MIME-TYPE]]]      Serializes to a syntax (RDF/XML).");
+    puts("  query NAME QUERY-STRING                   Query in syntax NAME for bindings");
 #if 0
-    /* FIXME Not a query -> results table query, so leave out for now */
-    puts("  query NAME URI|- QUERY-STRING             Query for matching triples");
+    puts("  triples-match-query NAME URI|- QUERY-STRING  Query for matching triples");
 #endif
     puts("  find SUBJECT|- PREDICATE|- OBJECT|- [CONTEXT] Find matching triples");
     puts("  contains SUBJECT PREDICATE OBJECT         Check if triple is in the graph.");
@@ -451,7 +453,7 @@ main(int argc, char *argv[])
     puts("    URIs like http://example.org otherwise are literal strings.");
     puts("    - matches any node when allowed.");
     puts("  triples are three nodes (subject, predicate, object)");
-    puts("    predicates cannot be blank node identifiers, only objects can be literals");
+    puts("    predicates can only be uris, only objects can be literals");
     puts("  source means subject of triples matching (?,  NODE1, NODE2)");
     puts("  target means object of triples matching (NODE1, NODE2, ?)");
     puts("  arc means predicate of triples matching (NODE1, ?, NODE2)");
@@ -702,6 +704,40 @@ main(int argc, char *argv[])
       goto printmatching;
       break;
 
+    case CMD_QUERY_AS_BINDINGS:
+      /* args are name and query_string */
+
+      query=librdf_new_query(world, argv[0], NULL, (const unsigned char *)argv[1]);
+      while(!librdf_query_results_finished(query)) {
+        const char **names;
+        librdf_node **values;
+        
+        if(librdf_query_get_result_bindings(query, &names, values))
+          break;
+        
+        if(!count) {
+          fputs("result: [", stdout);
+          if(names) {
+            for(i=0; names[i]; i++) {
+              fprintf(stdout, "%s=", names[i]);
+              if(values[i]) {
+                librdf_node_print(values[i], stdout);
+              } else
+                fputs("NULL", stdout);
+              if(names[i+1])
+                fputs(", ", stdout);
+            }
+          }
+          fputs("]\n", stdout);
+        }
+        
+        librdf_query_next_result(query);
+      }
+
+      fprintf(stdout, "%s: Query returned %d results\n", program, 
+              librdf_query_get_result_count(query));
+      break;
+      
     case CMD_CONTAINS:
     case CMD_FIND:
     case CMD_MATCH:
@@ -790,7 +826,7 @@ main(int argc, char *argv[])
             } else
               stream=librdf_model_find_statements(model, partial_statement);
           } else
-            stream=librdf_model_query(model, query);
+            stream=librdf_model_query_as_stream(model, query);
 
           if(!stream) {
             fprintf(stderr, "%s: %s returned no results (NULL stream)\n", program, commands[type].name);
