@@ -69,8 +69,8 @@ done
   
 
 if test "$echo_cflags" = "yes"; then
-  echo -I@abs_top_srcdir@  -I@abs_top_srcdir@/librdf -I@abs_top_srcdir@/raptor
+  echo -I@abs_top_srcdir@/librdf -I@abs_top_srcdir@/raptor
 fi
 if test "$echo_libs" = "yes"; then
-  echo -L@abs_top_builddir@/lib -lrdf -L@abs_top_builddir@/raptor/lib -lraptor @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@
+  echo -L@abs_top_builddir@/librdf/.libs -lrdf -L@abs_top_builddir@/raptor/.libs -lraptor @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@
 fi
