@@ -74,12 +74,16 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
     raptor_print_ntriples_string(stream, librdf_uri_as_string(librdf_node_get_uri(subject)), '\0');
     fputc('>', stream);
   } else {
-    LIBRDF_ERROR2(statement->world, "Do not know how to print triple subject type %d\n", librdf_node_get_type(subject));
+      librdf_log(statement->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
+                 "Do not know how to print triple subject type %d\n", librdf_node_get_type(subject));
     return;
   }
 
   if(!librdf_node_is_resource(predicate)) {
-    LIBRDF_ERROR2(statement->world, "Do not know how to print triple predicate type %d\n", librdf_node_get_type(predicate));
+    librdf_log(statement->world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
+               "Do not know how to print triple predicate type %d\n", librdf_node_get_type(predicate));
     return;
   }
 
@@ -116,7 +120,9 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
       fputc('>', stream);
       break;
     default:
-      LIBRDF_ERROR2(statement->world, "Do not know how to print triple object type %d\n", librdf_node_get_type(object));
+      librdf_log(statement->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
+                 "Do not know how to print triple object type %d\n", librdf_node_get_type(object));
       return;
   }
   fputs(" .", stream);

@@ -85,7 +85,8 @@ librdf_digest_register_factory(librdf_world *world, const char *name,
         
   for(d = world->digests; d; d = d->next ) {
     if(!strcmp(d->name, name_copy)) {
-      LIBRDF_ERROR2(world, "digest %s already registered", d->name);
+      librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_DIGEST, NULL,
+                 "digest %s already registered", d->name);
       return;
     }
   }

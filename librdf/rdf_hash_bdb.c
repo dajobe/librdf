@@ -547,7 +547,9 @@ librdf_hash_bdb_cursor_get(void* context,
       break;
       
     default:
-      LIBRDF_ERROR2(cursor->hash->hash->world, "Unknown hash method flag %d\n", flags);
+      librdf_log(cursor->hash->hash->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
+                 "Unknown hash method flag %d\n", flags);
       return 1;
   }
 

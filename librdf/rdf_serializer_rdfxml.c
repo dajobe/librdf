@@ -381,7 +381,9 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
       break;
       
     default:
-      LIBRDF_ERROR2(statement->world, "Do not know how to serialize node type %d\n", librdf_node_get_type(nodes[2]));
+      librdf_log(statement->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
+                 "Do not know how to serialize node type %d\n", librdf_node_get_type(nodes[2]));
       return;
   }
 

@@ -1049,7 +1049,9 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
     sprintf((char*)s, "(%s)", node->value.blank.identifier);
     break;
   default:
-    LIBRDF_ERROR2(node->world, "Do not know how to print node type %d\n", node->type);
+      librdf_log(node->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                 "Do not know how to print node type %d\n", node->type);
     return NULL;
   }
   return s;
@@ -1118,7 +1120,9 @@ librdf_node_get_digest(librdf_node* node)
       librdf_digest_final(d);
       break;
     default:
-      LIBRDF_ERROR2(world, "Do not know how to make digest for node type %d\n", node->type);
+      librdf_log(world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                 "Do not know how to make digest for node type %d\n", node->type);
       return NULL;
   }
   
@@ -1274,7 +1278,9 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       break;
       
     default:
-      LIBRDF_ERROR2(node->world, "Do not know how to encode node type %d\n", node->type);
+      librdf_log(node->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                 "Do not know how to encode node type %d\n", node->type);
       return 0;
   }
   
@@ -1397,7 +1403,9 @@ librdf_node_decode(librdf_world *world,
     break;
 
   default:
-    LIBRDF_ERROR2(world, "Illegal node encoding '%c' seen\n", buffer[0]);
+      librdf_log(world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                 "Illegal node encoding '%c' seen\n", buffer[0]);
     return NULL;
   }
   
@@ -1461,7 +1469,9 @@ librdf_node_static_iterator_get_method(void* iterator, int flags)
       return NULL;
 
     default:
-      LIBRDF_ERROR2(context->world, "Unknown iterator method flag %d\n", flags);
+      librdf_log(context->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                 "Unknown iterator method flag %d\n", flags);
       return NULL;
   }
 }

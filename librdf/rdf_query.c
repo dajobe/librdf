@@ -146,7 +146,9 @@ librdf_query_register_factory(librdf_world *world, const char *name,
     if(!strcmp(h->name, name_copy)) {
       LIBRDF_FREE(cstring, name_copy); 
       LIBRDF_FREE(librdf_query, query);
-      LIBRDF_ERROR2(NULL, "query language %s already registered\n", h->name);
+      librdf_log(world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+                 "query language %s already registered\n", h->name);
       return;
     }
   }

@@ -160,7 +160,9 @@ librdf_parser_raptor_new_statement_handler (void *context,
                                                     scontext->source_uri,
                                                     scontext->base_uri);
   } else {
-    LIBRDF_ERROR2(world, "Unknown Raptor subject identifier type %d", rstatement->subject_type);
+    librdf_log(world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+               "Unknown Raptor subject identifier type %d", rstatement->subject_type);
     librdf_free_statement(statement);
     return;
   }
@@ -183,7 +185,9 @@ librdf_parser_raptor_new_statement_handler (void *context,
                                                     scontext->source_uri,
                                                     scontext->base_uri);
   } else {
-    LIBRDF_ERROR2(world, "Unknown Raptor predicate identifier type %d", rstatement->predicate_type);
+    librdf_log(world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+               "Unknown Raptor predicate identifier type %d", rstatement->predicate_type);
     librdf_free_statement(statement);
     return;
   }
@@ -220,7 +224,9 @@ librdf_parser_raptor_new_statement_handler (void *context,
                                                     scontext->base_uri);
     librdf_statement_set_object(statement, node);
   } else {
-    LIBRDF_ERROR2(world, "Unknown Raptor object identifier type %d", rstatement->object_type);
+    librdf_log(world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+               "Unknown Raptor object identifier type %d", rstatement->object_type);
     librdf_free_statement(statement);
     return;
   }
@@ -760,7 +766,9 @@ librdf_parser_raptor_serialise_get_statement(void* context, int flags)
       return NULL;
       
     default:
-      LIBRDF_ERROR2(scontext->pcontext->parser->world, "Unknown iterator method flag %d\n", flags);
+      librdf_log(scontext->pcontext->parser->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+                 "Unknown iterator method flag %d\n", flags);
       return NULL;
   }
 

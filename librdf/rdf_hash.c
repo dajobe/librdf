@@ -220,7 +220,8 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
     if(!strcmp(h->name, name_copy)) {
       LIBRDF_FREE(cstring, name_copy); 
       LIBRDF_FREE(librdf_hash_factory, hash);
-      LIBRDF_ERROR2(world, "hash %s already registered", h->name);
+      librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
+                 "hash %s already registered", h->name);
       return;
     }
   }
@@ -688,7 +689,9 @@ librdf_hash_get_all_iterator_get_method(void* iterator, int flags)
       break;
 
     default:
-      LIBRDF_ERROR2(context->hash->world, "Unknown iterator method flag %d\n", flags);
+      librdf_log(context->hash->world, 
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
+                 "Unknown iterator method flag %d\n", flags);
       result=NULL;
       break;
   }
@@ -1290,7 +1293,9 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
         break;
         
       default:
-        LIBRDF_ERROR2(hash->world, "No such state %d", state);
+        librdf_log(hash->world, 
+                   0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
+                   "No such state %d", state);
         return 1;
     }
   }
@@ -1314,7 +1319,9 @@ librdf_hash_from_array_of_strings (librdf_hash* hash, char **array)
   for(i=0; (key.data=array[i]); i+=2) {
     value.data=array[i+1];
     if(!value.data) {
-      LIBRDF_ERROR2(hash->world, "Array contains an odd number of strings - %d", i);
+      librdf_log(hash->world, 
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
+                 "Array contains an odd number of strings - %d", i);
       return 1;
     }
     key.size=strlen((char*)key.data);

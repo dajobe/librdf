@@ -119,7 +119,9 @@ librdf_model_register_factory(librdf_world *world, const char *name,
   for(h = models; h; h = h->next ) {
     if(!strcmp(h->name, name_copy)) {
       LIBRDF_FREE(cstring, name_copy);
-      LIBRDF_ERROR2(world, "model %s already registered", h->name);
+      librdf_log(world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_MODEL, NULL,
+                 "model %s already registered", h->name);
       return;
     }
   }

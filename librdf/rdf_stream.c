@@ -434,7 +434,9 @@ librdf_stream_from_node_iterator_get_statement(void* context, int flags)
           librdf_statement_set_object(scontext->current, node);
           break;
         default:
-          LIBRDF_ERROR2(scontext->iterator->world, "Illegal statement field %d seen\n", scontext->field);
+          librdf_log(scontext->iterator->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STREAM, NULL,
+                     "Illegal statement field %d seen\n", scontext->field);
           return NULL;
       }
       
@@ -443,7 +445,9 @@ librdf_stream_from_node_iterator_get_statement(void* context, int flags)
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
       return (librdf_statement*)librdf_iterator_get_context(scontext->iterator);
     default:
-      LIBRDF_ERROR2(scontext->iterator->world, "Unknown iterator method flag %d\n", flags);
+      librdf_log(scontext->iterator->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STREAM, NULL,
+                 "Unknown iterator method flag %d\n", flags);
       return NULL;
   }
 
@@ -470,7 +474,9 @@ librdf_stream_from_node_iterator_finished(void* context)
         librdf_statement_set_object(scontext->current, NULL);
         break;
       default:
-        LIBRDF_ERROR2(scontext->iterator->world, "Illegal statement field %d seen\n", scontext->field);
+        librdf_log(scontext->iterator->world,
+                   0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STREAM, NULL, 
+                   "Illegal statement field %d seen\n", scontext->field);
     }
     librdf_free_statement(scontext->current);
   }
