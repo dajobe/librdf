@@ -387,26 +387,6 @@ librdf_storage_list_serialise_finished(void* context)
 }
 
 
-static librdf_statement*
-librdf_storage_list_find_map(librdf_stream *stream,
-                             void* context, librdf_statement* statement) 
-{
-  librdf_statement* partial_statement=(librdf_statement*)context;
-
-  /* any statement matches when no partial statement is given */
-  if(!partial_statement)
-    return statement;
-  
-  if (librdf_statement_match(statement, partial_statement)) {
-    return statement;
-  }
-
-  /* not suitable */
-  return NULL;
-}
-
-
-
 /**
  * librdf_storage_list_find_statements:
  * @storage: the storage
@@ -430,7 +410,7 @@ librdf_storage_list_find_statements(librdf_storage* storage, librdf_statement* s
   
   stream=librdf_storage_list_serialise(storage);
   if(stream)
-    librdf_stream_add_map(stream, &librdf_storage_list_find_map,
+    librdf_stream_add_map(stream, &librdf_stream_statement_find_map,
                           (librdf_stream_map_free_context_handler)&librdf_free_statement, (void*)statement);
   return stream;
 }
