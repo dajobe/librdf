@@ -49,6 +49,12 @@ Use a store with Redland contexts.
 .B \-n, \-\-new
 Make a new store, overwriting any existing one.
 .TP
+.B \-o, \-\-output \fIFORMAT\fR
+Set the output FORMAT for sequences of triples, such as from a search
+(find command) to a Redland serializer.  At present the alternatives
+are  'simple' (the default one if this option is omitted), 'ntriples'
+or 'rdfxml'.
+.TP
 .B \-s, \-\-storage \fITYPE\fR
 Set the Redland storage type (default 'hashes').  Alternatives
 are 'memory' which is always present and '3store', 'mysql' when
