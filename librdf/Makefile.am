@@ -101,7 +101,8 @@ PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \
 autogen.sh \
 redland.spec redland.spec.in \
-@RAPTOR_INCS@
+@RAPTOR_INCS@ \
+ex1.rdf ex2.rdf
 
 librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@
 
@@ -162,7 +163,7 @@ rdf_uri_test: rdf_uri.c librdf.a
 rdf_statement_test: rdf_statement.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c librdf.a $(LIBS)
 
-rdf_model_test: rdf_model.c librdf.a
+rdf_model_test: rdf_model.c librdf.a ex1.rdf ex2.rdf
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_model.c librdf.a $(LIBS)
 
 rdf_storage_test: rdf_storage.c librdf.a
