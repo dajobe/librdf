@@ -22,13 +22,14 @@ librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@
 librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@
 
 EXTRA_librdf_a_SOURCES = md5.c rdf_hash_gdbm.c rdf_digest_openssl.c \
-rdf_hash_bdb.c memcmp.c
+rdf_hash_bdb.c
 
 EXTRA_DIST=ChangeLog \
 README      NEWS \
 README.html NEWS.html \
 INSTALL.html LICENSE.html FAQS.html \
-librdf-config.in
+librdf-config.in \
+memcmp.c
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_statement_test \
 rdf_model_test
