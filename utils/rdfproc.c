@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -124,7 +124,7 @@ static command commands[]={
 #endif
 
 
-#define GETOPT_STRING "chns:t:v"
+#define GETOPT_STRING "chno:s:t:v"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_options[] =
@@ -133,6 +133,7 @@ static struct option long_options[] =
   {"contexts", 0, 0, 'c'},
   {"help", 0, 0, 'h'},
   {"new", 0, 0, 'n'},
+  {"output", 1, 0, 'o'},
   {"storage", 1, 0, 's'},
   {"storage-options", 1, 0, 't'},
   {"version", 0, 0, 'v'},
@@ -180,6 +181,9 @@ main(int argc, char *argv[])
   char *storage_options="hash-type='bdb',dir='.'";
   unsigned char *uri_string;
   int free_uri_string=0;
+  librdf_model* output_model=NULL;
+  librdf_storage* output_storage=NULL;
+  librdf_serializer* output_serializer=NULL;
 
   program=argv[0];
   if((p=strrchr(program, '/')))
@@ -220,6 +224,41 @@ main(int argc, char *argv[])
 
       case 'n':
         is_new=1;
+        break;
+
+      case 'o':
+        if(optarg) {
+          if(!strcmp(optarg, "simple"))
+            output_serializer=NULL;
+          else {
+            output_serializer=librdf_new_serializer(world, optarg, NULL, NULL);
+            if(!output_serializer) {
+              fprintf(stderr, "%s: unknown output serializer `%s' for `" HELP_ARG(o, output) "'\n",
+                      program, optarg);
+              fprintf(stderr, "Valid arguments are:\n  `simple'   for a simple format (default)\n  `ntriples' for N-Triples\n");
+              usage=1;
+            } else {
+              output_storage = librdf_new_storage(world, NULL, NULL, NULL);
+              if(output_storage) {
+                output_model = librdf_new_model(world, output_storage, NULL);
+                if(!output_model) {
+                  fprintf(stderr, "%s: Failed to create output model\n", 
+                          program);
+                  librdf_free_storage(output_storage);
+                  output_storage=NULL;
+                  librdf_free_serializer(output_serializer);
+                  output_serializer=NULL;
+                }
+              } else {
+                fprintf(stderr, "%s: Failed to create output storage\n", 
+                        program);
+                librdf_free_serializer(output_serializer);
+                output_serializer=NULL;
+              }
+            }
+            
+          }
+        }
         break;
 
       case 's':
@@ -299,7 +338,7 @@ main(int argc, char *argv[])
   }
 
   if(help) {
-    printf("Usage: %s [options] store command arg...\n", program);
+    printf("Usage: %s [options] store-name command arg...\n", program);
     printf(title_format_string, librdf_version_string);
     puts(librdf_short_copyright_string);
     puts("Utility for processing RDF using the Redland library.");
@@ -307,7 +346,10 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(c, "contexts        ", "Use Redland contexts"));
     puts(HELP_TEXT(h, "help            ", "Print this help, then exit"));
     puts(HELP_TEXT(n, "new             ", "Create a new store (default no)"));
-    printf(HELP_TEXT(s, "storage TYPE    ", "Storage type (default \"%s\")\n"), storage_name);
+    puts(HELP_TEXT(o, "output FORMAT   ", "Set the triple output format to one of:"));
+    puts("    'simple'                A simple format (default)\n    'ntriples'              N-Triples\n    'rdfxml'                RDF/XML");
+    puts(HELP_TEXT(s, "storage TYPE    ", "Set the graph storage type"));
+    puts("    'memory'                In memory\n    'hashes'                Indexed hashes (default)\n    'mysql'                 MySQL - when available\n    '3store'                AKT triplestore - when available");
     printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Storage options (default \"%s\")\n"), storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
@@ -613,20 +655,27 @@ main(int argc, char *argv[])
                 fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
                 break;
               }
-            
-              fputs("Matched triple: ", stdout);
-              librdf_statement_print(statement, stdout);
-              if(context_node) {
-                fputs(" with context ", stdout);
-                librdf_node_print(context_node, stdout);
+
+              if(output_model) {
+                librdf_model_add_statement(output_model,
+                      librdf_new_statement_from_statement(statement));
+              } else {
+                fputs("Matched triple: ", stdout);
+                librdf_statement_print(statement, stdout);
+                if(context_node) {
+                  fputs(" with context ", stdout);
+                  librdf_node_print(context_node, stdout);
+                }
+                fputc('\n', stdout);
               }
-              fputc('\n', stdout);
-            
+              
               count++;
               librdf_stream_next(stream);
-          }
+            }
             librdf_free_stream(stream);  
-            fprintf(stderr, "%s: matching triples: %d\n", program, count);
+
+            if(!output_model)
+              fprintf(stderr, "%s: matching triples: %d\n", program, count);
           }
           break;
           
@@ -915,6 +964,17 @@ main(int argc, char *argv[])
 
   if(free_uri_string)
     free(uri_string);
+
+  if(output_model) {
+    if(librdf_serializer_serialize_model(output_serializer, stdout, NULL,
+                                         output_model)) {
+      fprintf(stderr, "%s: Failed to serialize output model\n", program);
+    };
+    librdf_free_serializer(output_serializer);
+    librdf_free_model(output_model);
+    librdf_free_storage(output_storage);
+  }
+
   
   librdf_free_hash(options);
 
