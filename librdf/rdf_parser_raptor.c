@@ -393,7 +393,7 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   if(!scontext)
     return NULL;
 
-  rdf_parser=raptor_new_parser(pcontext->parser->factory->name);
+  rdf_parser=raptor_new_parser(pcontext->parser_name);
   if(!rdf_parser)
     return NULL;
 
@@ -955,7 +955,8 @@ librdf_parser_raptor_constructor(librdf_world *world)
 
   raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
 
-  for(i=0; 1; i++) {
+  /* enumerate from parser 1, so the default parser 0 is done last */
+  for(i=1; 1; i++) {
     const char *syntax_name=NULL;
     const char *mime_type=NULL;
     const unsigned char *uri_string=NULL;
@@ -968,14 +969,17 @@ librdf_parser_raptor_constructor(librdf_world *world)
                                  &mime_type, &uri_string))
       break;
 #else
-    if(raptor_parsers_enumerate(i, &syntax_name, NULL))
-      break;
+    if(raptor_parsers_enumerate(i, &syntax_name, NULL)) {
+      /* reached the end of the parsers, now register the default one */
+      i=0;
+      raptor_parsers_enumerate(i, &syntax_name, NULL);
+    }
 
     if(!strcmp(syntax_name, "rdfxml")) {
       mime_type="application/rdf+xml";
       uri_string=(const unsigned char*)"http://www.w3.org/TR/rdf-syntax-grammar";
       /* legacy name - see librdf_parser_raptor_init */
-      librdf_parser_register_factory(world, "raptor", NULL, NULL,
+      librdf_parser_register_factory(world, "raptor", mime_type, uri_string,
                                      &librdf_parser_raptor_register_factory);
     } else if (!strcmp(syntax_name, "ntriples")) {
       mime_type="text/plain";
@@ -987,6 +991,9 @@ librdf_parser_raptor_constructor(librdf_world *world)
 
     librdf_parser_register_factory(world, syntax_name, mime_type, uri_string,
                                    &librdf_parser_raptor_register_factory);
+
+    if(!i) /* registered default parser, end */
+      break;
   }
 }
 
