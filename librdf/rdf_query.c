@@ -418,6 +418,7 @@ main(int argc, char *argv[])
   /* initialise hash, model and query modules */
   librdf_init_hash(world);
   librdf_init_uri(world);
+  librdf_init_node(world);
   librdf_init_query(world);
   librdf_init_model(world);
   
@@ -448,6 +449,7 @@ main(int argc, char *argv[])
   /* finish model and query modules */
   librdf_finish_model(world);
   librdf_finish_query(world);
+  librdf_finish_node(world);
   librdf_finish_uri(world);
   librdf_finish_hash(world);
 

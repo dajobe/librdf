@@ -793,6 +793,7 @@ main(int argc, char *argv[])
   librdf_init_digest(world);
   librdf_init_hash(world);
   librdf_init_uri(world);
+  librdf_init_node(world);
   librdf_init_statement(world);
 
   fprintf(stderr, "%s: Creating statement\n", program);
@@ -843,6 +844,7 @@ main(int argc, char *argv[])
 
 
   librdf_finish_statement(world);
+  librdf_finish_node(world);
   librdf_finish_uri(world);
   librdf_finish_hash(world);
   librdf_finish_digest(world);
