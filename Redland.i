@@ -40,6 +40,9 @@
 #include <rdf_config.h>
 #include <redland.h>
 
+/* internal routines used to invoking errors/warnings upwards to user */
+void librdf_error(librdf_world* world, const char *message, ...);
+void librdf_warning(librdf_world* world, const char *message, ...);
 
 #ifdef SWIGPYTHON
 /* swig doesn't declare all prototypes */
@@ -52,6 +55,8 @@ static PyObject *_wrap_redland_version_release_get(void);
 
 
 static PyObject *librdf_python_callback = NULL;
+
+static PyObject * librdf_python_set_callback(PyObject *dummy, PyObject *args);
 
 /*
  * set the Python function object callback
@@ -213,11 +218,21 @@ librdf_perl_warning_handler(void *user_data,
   librdf_call_perl_message(1, message, arguments);
 }
 
+static librdf_world* librdf_perl_world=NULL;
+
 void
 librdf_perl_world_init(librdf_world *world)
 {
   librdf_world_set_error(world, NULL, librdf_perl_error_handler);
   librdf_world_set_warning(world,  NULL, librdf_perl_warning_handler);
+
+  librdf_perl_world=world;
+}
+
+void
+librdf_perl_world_finish(void)
+{
+  librdf_free_world(librdf_perl_world);
 }
 #endif
 
@@ -374,6 +389,7 @@ void librdf_python_world_init(librdf_world *world);
 #endif
 #ifdef SWIGPERL
 void librdf_perl_world_init(librdf_world *world);
+void librdf_perl_world_finish(void);
 #endif
 
 /* FOR TESTING ERRORS ONLY - NOT PART OF API */
