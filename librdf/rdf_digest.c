@@ -409,42 +409,64 @@ librdf_finish_digest(void)
 /* one more prototype */
 int main(int argc, char *argv[]);
 
+struct t
+{
+  char *type;
+  char *result;
+};
 
 int
 main(int argc, char *argv[]) 
 {
   librdf_digest* d;
   char *test_data="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
-  char *test_digest_types[]={"MD5", "SHA1", "RIPEMD160", NULL};
+  struct t test_data_answers[]={
+    {"MD5", "78f68989ea3ded775925a1a00fe49abe"},
+    {"SHA1", "0452bca820dfdaa707f0278216c598f185867993"},
+    {"RIPEMD160", "75c5de1d21e7e96400d5d9f42ccce6552bb685a5"},
+    {NULL, NULL},
+  };
+
   int i;
-  char *type;
+  struct t *answer=NULL;
   char *program=argv[0];
         
   
   /* initialise digest module */
   librdf_init_digest();
   
-  for(i=0; (type=test_digest_types[i]); i++) {
-    fprintf(stderr, "%s: Trying to create new %s digest\n", program, type);
-    d=librdf_new_digest(type);
+  for(i=0; ((answer= &test_data_answers[i]) && answer->type != NULL) ; i++) {
+    char *s;
+    
+    fprintf(stdout, "%s: Trying to create new %s digest\n", program, 
+            answer->type);
+    d=librdf_new_digest(answer->type);
     if(!d) {
-      fprintf(stderr, "%s: Failed to create new digest type %s\n", program, type);
+      fprintf(stderr, "%s: Failed to create new digest type %s\n", program, 
+              answer->type);
       continue;
     }
-    fprintf(stderr, "%s: Initialising digest type %s\n", program, type);
+    fprintf(stdout, "%s: Initialising digest type %s\n", program, answer->type);
     librdf_digest_init(d);
                 
-    fprintf(stderr, "%s: Writing data into digest\n", program);
+    fprintf(stdout, "%s: Writing data into digest\n", program);
     librdf_digest_update(d, (unsigned char*)test_data, strlen(test_data));
                 
-    fprintf(stderr, "%s: Finishing digesting\n", program);
+    fprintf(stdout, "%s: Finishing digesting\n", program);
     librdf_digest_final(d);
     
-    fprintf(stderr, "%s: %s digest of data is: ", program, type);
-    librdf_digest_print(d, stderr);
-    fprintf(stderr, "\n");
+    fprintf(stdout, "%s: %s digest of data is: ", program, answer->type);
+    librdf_digest_print(d, stdout);
+    fprintf(stdout, "\n");
+
+    s=librdf_digest_to_string(d);
+    if(strcmp(s, answer->result))
+      fprintf(stderr, "%s: %s digest is wrong - expected: %s\n", program, answer->type, answer->result);
+    else
+      fprintf(stderr, "%s: %s digest is correct\n", program, answer->type);
+    LIBRDF_FREE(cstring, s);
     
-    fprintf(stderr, "%s: Freeing digest\n", program);
+    fprintf(stdout, "%s: Freeing digest\n", program);
     librdf_free_digest(d);
   }
   
