@@ -339,22 +339,6 @@ on demand.
 </sect1>
 </chapter>
 
-<chapter id="list">
-<?dbhtml filename='list.html'>
-<title>Lists</title>
-<para>
-The list module provides a simple in-memory list.
-</para>
-<sect1>
-<title>List Class</title>
-<para>
-This class is implemented as a stack, new items are added to the front
-of the list.
-</para>
-@INCLUDE list.sgml
-</sect1>
-</chapter>
-
 <chapter id="uri">
 <?dbhtml filename='uri.html'>
 <title>URIs</title>
