@@ -546,8 +546,8 @@ log_handler(void *user_data, librdf_log_message *message)
 }
 
 
-#define EXPECTED_ERRORS 2
-#define EXPECTED_WARNINGS 1 
+#define EXPECTED_ERRORS 3
+#define EXPECTED_WARNINGS 0
 
 
 int
@@ -608,7 +608,7 @@ main(int argc, char *argv[])
   librdf_model_add_statement(model, statement);
   librdf_free_statement(statement);
 
-  /* WARNINGS: Predicate URI is not serializable */
+  /* ERROR: Predicate URI is not serializable */
   statement=librdf_new_statement_from_nodes(world,
     librdf_new_node_from_uri_string(world, "http://example.org/foo"),
     librdf_new_node_from_uri_string(world, "http://bad.example.org/"),
