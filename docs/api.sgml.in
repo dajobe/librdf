@@ -282,6 +282,16 @@ either via an adaptor class or direct by persistant storage.
 <title>RDF Query Class</title>
 @INCLUDE query.sgml
 </sect1>
+</chapter>
+
+<chapter id="query_results">
+<?dbhtml filename='query_results.html'>
+<title>RDF QueryResults</title>
+<para>
+This module provides an abstraction for query results that
+can be in the form of variable bindings or a librdf_stream of
+librdf_statement objects.
+</para>
 <sect1>
 <title>RDF QueryResults Class</title>
 @INCLUDE query_results.sgml
