@@ -15,6 +15,12 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>In RDF.py, parse_into_model, allow promotion of base_uri arg.
+<pre>
+if type(base_uri) is str:
+  base_uri = Uri(string=base_uri)
+</pre>
+like the other methods, and as documented (BUG)</li>
 <li>Check parser errors are still sent back to perl, python (BUG TBC)</li>
 <li>Docs: it was hard to find the legal (parser) feature URIs in
 the documentation, or what values to use.</li>
