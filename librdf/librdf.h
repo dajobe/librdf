@@ -51,6 +51,27 @@ typedef struct librdf_parser_s librdf_parser;
 #ifdef LIBRDF_DEBUG
 /* DEBUGGING TURNED ON */
 
+/* Debugging messages */
+#define LIBRDF_DEBUG1(function, msg) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function); } while(0)
+#define LIBRDF_DEBUG2(function, msg, arg1) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1);} while(0)
+#define LIBRDF_DEBUG3(function, msg, arg1, arg2) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2);} while(0)
+#define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2, arg3);} while(0)
+
+#else
+/* DEBUGGING TURNED OFF */
+
+/* No debugging messages */
+#define LIBRDF_DEBUG1(function, msg)
+#define LIBRDF_DEBUG2(function, msg, arg1)
+#define LIBRDF_DEBUG3(function, msg, arg1, arg2)
+#define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3)
+
+#endif
+
+
+#ifdef LIBRDF_MEMORY_DEBUG
+/* DEBUGGING MEMORY ALLOCATIONS */
+
 void* librdf_malloc(char *file, int line, char *type, size_t size);
 void* librdf_calloc(char *file, int line, char *type, size_t nmemb, size_t size);
 void librdf_free(char *file, int line, char *type, void *ptr);
@@ -61,31 +82,17 @@ void librdf_free(char *file, int line, char *type, void *ptr);
 
 void librdf_memory_report(FILE *fh);
 
-/* Debugging messages */
-#define LIBRDF_DEBUG1(function, msg) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function); } while(0)
-#define LIBRDF_DEBUG2(function, msg, arg1) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1);} while(0)
-#define LIBRDF_DEBUG3(function, msg, arg1, arg2) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2);} while(0)
-#define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, #function, arg1, arg2, arg3);} while(0)
-
 #else
+/* NOT DEBUGGING MEMORY ALLOCATIONS */
 
 /* for the memory allocation functions */
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 
-
-/* DEBUGGING TURNED OFF */
-
 #define LIBRDF_MALLOC(type, size) malloc(size)
 #define LIBRDF_CALLOC(type, size, count) calloc(size, count)
 #define LIBRDF_FREE(type, ptr)   free(ptr)
-
-/* Debugging messages */
-#define LIBRDF_DEBUG1(function, msg)
-#define LIBRDF_DEBUG2(function, msg, arg1)
-#define LIBRDF_DEBUG3(function, msg, arg1, arg2)
-#define LIBRDF_DEBUG4(function, msg, arg1, arg2, arg3)
 
 #endif
 
@@ -100,6 +107,9 @@ void librdf_memory_report(FILE *fh);
 /* from rdf_init.c */
 void librdf_init_world(char *digest_factory_name);
 void librdf_destroy_world(void);
+
+/* from rdf_heuristics.c */
+int librdf_heuristic_object_is_literal(char *object);
 
 
 /* the rest should be automatically pulled from rdf_*.h headers */
