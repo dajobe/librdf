@@ -22,10 +22,9 @@
 man_MANS=redland.3
 
 EXTRA_DIST=api.sgml.in api.sgml README.html README \
-csharp.html perl.html python.html tcl.html java.html ruby.html php.html \
 storage.html \
-build-docs fix-pod-xhtml fix-python-xhtml \
-api pod pydoc \
+build-docs \
+api \
 redland.pod kernel-doc \
 $(man_MANS)
 
@@ -33,17 +32,12 @@ DOC_CLASSES=init node statement model \
 storage stream parser query query_results serializer concepts uri \
 digest hash heuristics iterator utf8
 
-POD_MODULES=RDF/Redland RDF/Redland/Iterator RDF/Redland/Model RDF/Redland/Node RDF/Redland/Parser RDF/Redland/Query RDF/Redland/QueryResults RDF/Redland/RSS RDF/Redland/Serializer RDF/Redland/Statement RDF/Redland/Storage RDF/Redland/Stream RDF/Redland/URI
-
 DOC_C_FILES=$(DOC_CLASSES:%=$(srcdir)/../librdf/rdf_%.c)
 API_DOCBOOK_FILES=$(DOC_CLASSES:%=%.sgml)
 API_HTML_FILES=$(DOC_CLASSES:%=api_%.html)
 
-PERL_HTML_POD_FILES=$(POD_MODULES:%=pod/%.html)
-PYTHON_HTML_PYDOC_FILES=pydoc/RDF.html
-
 CLEANFILES=README
-MAINTAINERCLEANFILES=api.sgml api pod pydoc $(API_DOCBOOK_FILES) \
+MAINTAINERCLEANFILES=api.sgml api $(API_DOCBOOK_FILES) \
 $(API_HTML_FILES)
 
 PERL=perl
@@ -55,10 +49,6 @@ LYNXARGS=-dump -nolist
 SUFFIXES = .html .txt .sgml .ps .pdf .pm .pod .3
 
 api: api/index.html
-
-pod: $(PERL_HTML_POD_FILES)
-
-pydoc: $(PYTHON_HTML_PYDOC_FILES)
 
 # Generates a tree of HTML files, not 1 file
 api/index.html: api.sgml
@@ -93,20 +83,6 @@ api/index.html: api.sgml
 @MAINT@
 @MAINT@overview.pdf: overview.ps
 @MAINT@	ps2pdf overview.ps overview.pdf
-@MAINT@
-@MAINT@$(PERL_HTML_POD_FILES): pod/%.html: $(srcdir)/../perl/lib/%.pm $(srcdir)/fix-pod-xhtml
-@MAINT@	mkdir -p pod/RDF/Redland
-@MAINT@	-pod2html --noindex --htmlroot /docs/pod --infile=$< | tidy -asxml -wrap 1000 2>/dev/null | perl $(srcdir)/fix-pod-xhtml $@
-@MAINT@	rm -f pod2htm*
-@MAINT@
-@MAINT@$(srcdir)/../python/RDF.html: $(srcdir)/../python/RDF.py
-@MAINT@	cd $(srcdir)/../python && make RDF.html
-@MAINT@$(PYTHON_HTML_PYDOC_FILES): pydoc/%.html: $(srcdir)/../python/RDF.html $(srcdir)/fix-python-xhtml
-@MAINT@	mkdir -p pydoc
-@MAINT@	-tidy -asxml -wrap 1000 $< 2>/dev/null | perl $(srcdir)/fix-python-xhtml $@
-@MAINT@.pod.html: $(srcdir)/fix-pod-xhtml
-@MAINT@	-pod2html --noindex --htmlroot /docs/pod --infile=$< | tidy -asxml -wrap 1000 2>/dev/null | perl $(srcdir)/fix-pod-xhtml $@
-@MAINT@	rm -f pod2htm*
 
 
 if MAINTAINER_MODE
