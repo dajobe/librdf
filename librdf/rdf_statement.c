@@ -30,9 +30,7 @@
 /* class methods */
 
 /**
- * librdf_init_statement:
- * 
- * Initialise the rdf_statement module
+ * librdf_init_statement - Initialise the librdf_statement module
  **/
 void
 librdf_init_statement(void) 
@@ -41,9 +39,7 @@ librdf_init_statement(void)
 
 
 /**
- * librdf_finish_statement:
- * 
- * Close down the rdf_statement module
+ * librdf_finish_statement - Terminate the librdf_statement module
  **/
 void
 librdf_finish_statement(void) 
@@ -52,9 +48,7 @@ librdf_finish_statement(void)
 
 
 /**
- * librdf_new_statement:
- * 
- * Constructor - create a new empty Statement
+ * librdf_new_statement - Constructor - create a new empty librdf_statement
  * 
  * Return value: a new &librdf_statement or NULL on failure
  **/
@@ -72,10 +66,8 @@ librdf_new_statement(void)
 
 
 /**
- * librdf_new_statement_from_statement:
+ * librdf_new_statement_from_statement - Copy constructor - create a new librdf_statement from an existing librdf_statement
  * @statement: &librdf_statement to copy
- * 
- * Copy constructor - Create a new Statement from an existing Statement
  * 
  * Return value: a new &librdf_statement with copy or NULL on failure
  **/
@@ -102,10 +94,9 @@ librdf_new_statement_from_statement(librdf_statement* statement)
 
 
 /**
- * librdf_free_statement:
+ * librdf_free_statement - Destructor - destroy a librdf_statement
  * @statement: &librdf_statement object
  * 
- * Destructor - release the resources for the statement.
  **/
 void
 librdf_free_statement(librdf_statement* statement)
@@ -125,10 +116,8 @@ librdf_free_statement(librdf_statement* statement)
 /* methods */
 
 /**
- * librdf_statement_get_subject:
+ * librdf_statement_get_subject - Get the statement subject
  * @statement: &librdf_statement object
- * 
- * Get the statement subject
  * 
  * Return value: a pointer to the &librdf_node of the statement subject - 
  * NOTE this is a shared copy and must be copied if used by the caller.
@@ -141,11 +130,11 @@ librdf_statement_get_subject(librdf_statement *statement)
 
 
 /**
- * librdf_statement_set_subject:
+ * librdf_statement_set_subject - Set the statement subject
  * @statement: &librdf_statement object
  * @node: &librdf_node of subject
  * 
- * Set the statement subject.  The subject passed in becomes owned by
+ * The subject passed in becomes owned by
  * the statement object and must not be used by the caller after this call.
  **/
 void
@@ -156,10 +145,8 @@ librdf_statement_set_subject(librdf_statement *statement, librdf_node *node)
 
 
 /**
- * librdf_statement_get_predicate:
+ * librdf_statement_get_predicate - Get the statement predicate
  * @statement: &librdf_statement object
- * 
- * Get the statement predicate
  * 
  * Return value: a pointer to the &librdf_node of the statement predicate - 
  * NOTE this is a shared copy and must be copied if used by the caller.
@@ -172,11 +159,11 @@ librdf_statement_get_predicate(librdf_statement *statement)
 
 
 /**
- * librdf_statement_set_predicate:
+ * librdf_statement_set_predicate - Set the statement predicate
  * @statement: &librdf_statement object
  * @node: &librdf_node of predicate
  * 
- * Set the statement predicate.  The predicate passed in becomes owned by
+ * The predicate passed in becomes owned by
  * the statement object and must not be used by the caller after this call.
  **/
 void
@@ -187,10 +174,8 @@ librdf_statement_set_predicate(librdf_statement *statement, librdf_node *node)
 
 
 /**
- * librdf_statement_get_object:
+ * librdf_statement_get_object - Get the statement object
  * @statement: &librdf_statement object
- * 
- * Get the statement object
  * 
  * Return value: a pointer to the &librdf_node of the statement object - 
  * NOTE this is a shared copy and must be copied if used by the caller.
@@ -203,11 +188,11 @@ librdf_statement_get_object(librdf_statement *statement)
 
 
 /**
- * librdf_statement_set_object:
+ * librdf_statement_set_object - Set the statement object
  * @statement: &librdf_statement object
  * @node: &librdf_node of object
  * 
- * Set the statement object.  The object passed in becomes owned by
+ * The object passed in becomes owned by
  * the statement object and must not be used by the caller after this call.
  **/
 void
@@ -218,10 +203,10 @@ librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 
 
 /**
- * librdf_statement_get_context:
+ * librdf_statement_get_context - Get the statement context
  * @statement: &librdf_statement object
  * 
- * Get the statement context.  FIXME: This is not supported properly yet.
+ * FIXME: This is not supported properly yet.
  * 
  * Return value: A pointer to the context or NULL if no context is defined.
  **/
@@ -233,11 +218,11 @@ librdf_statement_get_context(librdf_statement *statement)
 
 
 /**
- * librdf_statement_get_context:
+ * librdf_statement_get_context - Set the statement context
  * @statement: &librdf_statement object
  * @context: &librdf_context statement context
  * 
- * Set the statement context.  FIXME: This is not supported properly yet.
+ * FIXME: This is not supported properly yet.
  **/
 void
 librdf_statement_set_context(librdf_statement *statement, 
@@ -248,11 +233,11 @@ librdf_statement_set_context(librdf_statement *statement,
 
 
 /**
- * librdf_statement_to_string:
+ * librdf_statement_to_string - Format the librdf_statement as a string
  * @statement: the statement
  * 
- * Formats the statement as a string from newly allocated memory
- * that must be freed by the caller.
+ * Formats the statement as a newly allocate string that must be freed by
+ * the caller.
  * 
  * Return value: the string or NULL on failure.
  **/
@@ -332,13 +317,11 @@ librdf_statement_to_string(librdf_statement *statement)
 
 
 /**
- * librdf_statement_equals:
+ * librdf_statement_equals - Check if two statements are equal
  * @statement1: first &librdf_statement
  * @statement2: second &librdf_statement
  * 
- * Check if two statements are identical.
- * 
- * Return value: non 0 if statements are identical.
+ * Return value: 0 if statements are different.
  **/
 int
 librdf_statement_equals(librdf_statement* statement1, 
@@ -362,14 +345,14 @@ librdf_statement_equals(librdf_statement* statement1,
 
 
 /**
- * librdf_statement_match:
+ * librdf_statement_match - Match a statement against a 'partial' statement
  * @statement: statement
  * @partial_statement: statement with possible empty parts
  * 
- * Match a statement against a 'partial' statement, where some
- * parts (subject, predicate, object) of the statement can be empty
- * (NULL).  Empty parts match against any value, parts with values
- * must match exactly.
+ * A partial statement is where some parts of the statement -
+ * subject, predicate or object can be empty (NULL).
+ * Empty parts match against any value, parts with values
+ * must match exactly.  Node matching is done via librdf_node_equals()
  * 
  * Return value: non 0 on match
  **/

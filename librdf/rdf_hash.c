@@ -41,10 +41,9 @@ static void librdf_delete_hash_factories(void);
 
 
 /**
- * librdf_init_hash:
- * @void: 
- * 
- * Initialise the librdf_hash module - initialises and registers all
+ * librdf_init_hash - Initialise the librdf_hash module
+ *
+ * Initialises and registers all
  * compiled hash modules.  Must be called before using any of the hash
  * factory functions such as librdf_get_hash_factory()
  **/
@@ -62,10 +61,7 @@ librdf_init_hash(void)
 }
 
 /**
- * librdf_finish_hash:
- * @void: 
- * 
- * Close down the rdf_hash module
+ * librdf_finish_hash - Terminate the librdf_hash module
  **/
 void
 librdf_finish_hash(void) 
@@ -97,11 +93,10 @@ librdf_delete_hash_factories(void)
 /* class methods */
 
 /**
- * librdf_hash_register_factory:
+ * librdf_hash_register_factory - Register a hash factory
  * @name: the hash factory name
  * @factory: pointer to function to call to register the factory
  * 
- * Register a hash factory
  **/
 void
 librdf_hash_register_factory(const char *name,
@@ -145,10 +140,8 @@ librdf_hash_register_factory(const char *name,
 
 
 /**
- * librdf_get_hash_factory:
+ * librdf_get_hash_factory - Get a hash factory by name
  * @name: the factory name or NULL for the default factory
- * 
- * Get a hash factory for a given hash name
  * 
  * Return value: the factory object or NULL if there is no such factory
  **/
@@ -185,10 +178,8 @@ librdf_get_hash_factory (const char *name)
 
 
 /**
- * librdf_new_hash:
+ * librdf_new_hash -  Constructor - create a new librdf_hash object
  * @factory: the factory to use to construct the hash
- *
- * Constructor: create a new &librdf_hash object
  *
  * Return value: a new &librdf_hash object or NULL on failure
  */
@@ -214,11 +205,9 @@ librdf_new_hash (librdf_hash_factory* factory) {
 
 
 /**
- * librdf_free_hash:
+ * librdf_free_hash - Destructor - destroy a librdf_hash object
+ *
  * @hash: hash object
- * 
- * Destructor: destroy &librdf_hash object
- * 
  **/
 void
 librdf_free_hash (librdf_hash* hash) 
@@ -232,15 +221,16 @@ librdf_free_hash (librdf_hash* hash)
 /* methods */
 
 /**
- * librdf_hash_open:
+ * librdf_hash_open - Start a hash association 
  * @hash: hash object
  * @identifier: indentifier for the hash factory - usually a URI or file name
  * @mode: hash access mode
  * @options: a hash of options for the hash factory or NULL if there are none.
  * 
- * Start hash association - open and/or create a new hash
+ * This method opens and/or creates a new hash with any resources it
+ * needs.
  * 
- * Return value: 
+ * Return value: non 0 on failure
  **/
 int
 librdf_hash_open(librdf_hash* hash, char *identifier, void *mode,
@@ -251,10 +241,8 @@ librdf_hash_open(librdf_hash* hash, char *identifier, void *mode,
 
 
 /**
- * librdf_hash_close:
+ * librdf_hash_close - End a hash association
  * @hash: hash object
- * 
- * End hash association
  * 
  * Return value: non 0 on failure
  **/
@@ -266,7 +254,7 @@ librdf_hash_close(librdf_hash* hash)
 
 
 /**
- * librdf_hash_get:
+ * librdf_hash_get - Retrieve data from hash given a key according to flags
  * @hash: hash object
  * @key: pointer to key
  * @key_len: key length in bytes
@@ -274,7 +262,6 @@ librdf_hash_close(librdf_hash* hash)
  * @value_len: pointer to variable to store value length
  * @flags: 0 at present
  * 
- * Retrieve data from hash given a key according to flags
  * The value returned is from newly allocated memory which the
  * caller must free.
  * 
@@ -298,7 +285,7 @@ librdf_hash_get(librdf_hash* hash, void *key, size_t key_len,
 
 
 /**
- * librdf_hash_put:
+ * librdf_hash_put - Insert key/value pairs into the hash according to flags
  * @hash: hash object
  * @key: pointer to key 
  * @key_len: length of key in bytes
@@ -306,7 +293,6 @@ librdf_hash_get(librdf_hash* hash, void *key, size_t key_len,
  * @value_len: length of the value in bytes
  * @flags: 0 at present
  * 
- * insert key/value pairs into hash according to flags
  * The key and values are copied into the hash; the original pointers
  * can be deleted.
  * 
@@ -328,12 +314,10 @@ librdf_hash_put(librdf_hash* hash, void *key, size_t key_len,
 
 
 /**
- * librdf_hash_exists:
+ * librdf_hash_exists - Check if a given key is in the hash
  * @hash: hash object
  * @key: pointer to the key
  * @key_len: length of key in bytes
- * 
- * Check if a given key is in the hash
  * 
  * Return value: non 0 if the key is present in the hash
  **/
@@ -349,14 +333,12 @@ librdf_hash_exists(librdf_hash* hash, void *key, size_t key_len)
 
 
 /**
- * librdf_hash_delete:
+ * librdf_hash_delete - Delete a key/value pair from the hash
  * @hash: hash object
  * @key: pointer to key
  * @key_len: length of key in bytes
  * 
- * Delete a key/value pair from the hash
- * 
- * Return value: 
+ * Return value: non 0 on failure (including pair not present)
  **/
 int
 librdf_hash_delete(librdf_hash* hash, void *key, size_t key_len)
@@ -371,16 +353,16 @@ librdf_hash_delete(librdf_hash* hash, void *key, size_t key_len)
 
 
 /**
- * librdf_hash_get_seq:
+ * librdf_hash_get_seq - Retrieve hash keys via sequential access
  * @hash: the hash 
  * @key: pointer to variable to store key pointer
  * @key_len: pointer to variable to store key length
  * @type: LIBRDF_HASH_SEQUENCE_FIRST to return first key, LIBRDF_HASH_SEQUENCE_NEXT to return next key, LIBRDF_HASH_SEQUENCE_CURRENT to return current key in sequence
  * 
- * retrieve keys via sequential access
  * Note; the key pointer will return newly allocated memory each time
+ * which must be freed by the caller.
  * 
- * Return value: 
+ * Return value: non 0 on failure
  **/
 int
 librdf_hash_get_seq(librdf_hash* hash, void **key, size_t* key_len,
@@ -396,10 +378,8 @@ librdf_hash_get_seq(librdf_hash* hash, void **key, size_t* key_len,
 
 
 /**
- * librdf_hash_sync:
+ * librdf_hash_sync - Flush any cached information to disk if appropriate
  * @hash: hash object
- * 
- * Flush any cached information to disk if appropriate
  * 
  * Return value: non 0 on failure
  **/
@@ -411,10 +391,11 @@ librdf_hash_sync(librdf_hash* hash)
 
 
 /**
- * librdf_hash_get_fd:
- * @hash: 
+ * librdf_hash_get_fd - Get the file descriptor for the hash
+ * @hash: hash object
  * 
- * Get the file descriptor for the hash, if it is file based (for locking)
+ * This returns the file descriptor if it is file based for
+ * use with file locking.
  * 
  * Return value: the file descriptor
  **/
@@ -426,13 +407,13 @@ librdf_hash_get_fd(librdf_hash* hash)
 
 
 /**
- * librdf_hash_first:
+ * librdf_hash_first - Return the 'first' hash key in a sequential access of the hash
  * @hash: hash object
  * @key: pointer to variable to store key pointer
  * @key_len: pointer to variable to store key length
  * 
- * return the 'first' hash key in a sequential access of the hash
- * Note: the key pointer will return newly allocated memory each time.
+ * Note: the key pointer will return newly allocated memory each time
+ * which must be freed by the caller.
  *
  * See also librdf_hash_next() and librdf_hash_get_seq()
  * 
@@ -446,14 +427,15 @@ librdf_hash_first(librdf_hash* hash, void** key, size_t* key_len)
 
 
 /**
- * librdf_hash_next:
+ * librdf_hash_next - Return the 'next' hash key in a sequential access of the hash
  * @hash: hash object
  * @key: pointer to variable to store key pointer
  * @key_len: pointer to variable to store key length
  * 
- * return the 'next' hash key in a sequential access of the hash as
- * started by librdf_hash_first
- * Note: the key pointer will return newly allocated memory each time.
+ * This depends on the sequence being started by calling librdf_hash_first().
+ *
+ * Note: the key pointer will return newly allocated memory each time which
+ * must be freed by the caller.
  *
  * See also librdf_hash_next() and librdf_hash_get_seq()
  * 
@@ -467,18 +449,10 @@ librdf_hash_next(librdf_hash* hash, void** key, size_t* key_len)
 
 
 
-/** pretty-print the has to a file descriptior.
- * @param hash hash object
- * @param fh   file descriptor
- */
-
-
 /**
- * librdf_hash_print:
+ * librdf_hash_print - pretty print the hash to a file descriptor
  * @hash: the hash
  * @fh: file handle
- * 
- * Print the digest on a C &FILE handle
  **/
 void
 librdf_hash_print (librdf_hash* hash, FILE *fh) 
@@ -518,11 +492,11 @@ typedef enum {
 } librdf_hfs_parse_state;
 
 /**
- * librdf_hash_from_string:
+ * librdf_hash_from_string - Initialise a hash from a string
  * @hash: hash object
  * @string: hash encoded as a string
  * 
- * Initialise a hash from a string of the format -
+ * The string format is something like:
  * key1='value1',key2='value2', key3='\'quoted value\''
  *
  * The 's are required and whitespace can appear around the = and ,s
@@ -672,11 +646,9 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
 
 
 /**
- * librdf_hash_from_array_of_strings:
+ * librdf_hash_from_array_of_strings - Initialise a hash from an array of strings
  * @hash: hash object
  * @array: address of the start of the array of char* pointers
- * 
- * Initialise a hash from an array of strings
  * 
  * Return value: 
  **/

@@ -69,21 +69,26 @@ typedef struct {
 
 
 
+/**
+ * librdf_parser_sirparc_init - Initialise the SiRPAC RDF parser
+ * @context: context
+
+ * Return value: non 0 on failure
+ **/
 static int
-librdf_parser_sirparc_init(void *context) {
-  /* always succeeds ? */
+librdf_parser_sirparc_init(void *context) 
+{
   return 0;
 }
   
 
 /**
- * librdf_parser_sirpac_get_next_statement
+ * librdf_parser_sirpac_parse_from_uri - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: serialisation context
  * @uri: URI of RDF content
  * 
- * Parse the RDF content at the given URI and return it as a stream of
- * &librdf_statement objects.
- * 
+ * FIXME: No error reporting provided 
+ *
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
 static librdf_stream*
@@ -147,14 +152,12 @@ librdf_parser_sirparc_parse_from_uri(void *context, librdf_uri *uri) {
 }
   
 
-/**
- * librdf_parser_sirpac_get_next_statement
+/*
+ * librdf_parser_sirpac_get_next_statement - helper function to decode the output of the Java command to get the next statement
  * @context: serialisation context
  * 
- * Decode the output of the Java command to get the next statement
- * 
  * Return value: the next &librdf_statement or NULL at end of stream.
- **/
+ */
 static librdf_statement*
 librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *context) {
   librdf_statement* statement=NULL;
@@ -243,11 +246,8 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
 
 
 /**
- * librdf_parser_sirpac_serialise_end_of_stream:
+ * librdf_parser_sirpac_serialise_end_of_stream - Check for the end of the stream of statements from the SiRPARC parser
  * @context: serialisation context
- * 
- * Test for the end of the stream of statements from the RDF SiRPAC
- * parser serialisation.
  * 
  * Return value: non 0 at end of stream.
  **/
@@ -272,10 +272,8 @@ librdf_parser_sirpac_serialise_end_of_stream(void* context)
 
 
 /**
- * librdf_parser_sirpac_serialise_next_statement:
+ * librdf_parser_sirpac_serialise_next_statement - Get the next librdf_statement from the stream of statements from the SiRPARC RDF parse
  * @context: serialisation context
- * 
- * Get next statement in RDF SiRPAC &librdf_stream serialisation
  * 
  * Return value: next &librdf_statement or NULL at end of stream.
  **/
@@ -305,10 +303,8 @@ librdf_parser_sirpac_serialise_next_statement(void* context)
 
 
 /**
- * librdf_parser_sirpac_serialise_finished:
+ * librdf_parser_sirpac_serialise_finished - Finish the serialisation of the statement stream from the SiRPAC RDF parse
  * @context: serialisation context
- * 
- * Finish SiRPAC RDF parser &librdf_stream serialisation
  **/
 static void
 librdf_parser_sirpac_serialise_finished(void* context)
@@ -335,10 +331,8 @@ librdf_parser_sirpac_serialise_finished(void* context)
 
 
 /**
- * librdf_parser_sirpac_register_factory:
+ * librdf_parser_sirpac_register_factory - Register the SiRPAC RDF parser with the RDF parser factory
  * @factory: prototype rdf parser factory
- * 
- * Register the SiRPAC RDF parser with the RDF parser factory.
  **/
 static void
 librdf_parser_sirpac_register_factory(librdf_parser_factory *factory) 
@@ -351,10 +345,7 @@ librdf_parser_sirpac_register_factory(librdf_parser_factory *factory)
 
 
 /**
- * librdf_parser_sirpac_constructor:
- * @void: 
- * 
- * Initialise the SiRPAC RDF parser module
+ * librdf_parser_sirpac_constructor - Initialise the SiRPAC RDF parser module
  **/
 void
 librdf_parser_sirpac_constructor(void)

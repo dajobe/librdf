@@ -32,13 +32,13 @@ static librdf_statement* librdf_stream_get_next_mapped_statement(librdf_stream* 
 
 
 /**
- * librdf_new_stream:
+ * librdf_new_stream - Constructor - create a new librdf_stream
  * @context: context to pass to the stream implementing objects
  * @end_of_stream: pointer to function to test for end of stream
  * @next_statement: pointer to function to get the next statement in stream
  * @finished: pointer to function to finish the stream.
  *
- * Create a new stream with an implementation based on the passed in
+ * Creates a new stream with an implementation based on the passed in
  * functions.  The functions next_statement and end_of_stream will be called
  * multiple times until either of them signify the end of stream by
  * returning NULL or non 0 respectively.  The finished function is called
@@ -78,10 +78,8 @@ librdf_new_stream(void* context,
 
 
 /**
- * librdf_free_stream:
+ * librdf_free_stream - Destructor - destroy an libdf_stream object
  * @stream: &librdf_stream object
- * 
- * Destructor for &libdf_stream object.
  **/
 void
 librdf_free_stream(librdf_stream* stream) 
@@ -91,15 +89,15 @@ librdf_free_stream(librdf_stream* stream)
 }
 
 
-/**
- * librdf_stream_get_next_mapped_element:
+/*
+ * librdf_stream_get_next_mapped_element - helper function to get the next element with map appled
  * @stream: &librdf_stream object
  * 
- * Internal helper function to get the next element subject to the user
- * defined  map function, as set by librdf_stream_set_map(),
+ * A helper function that gets the next element subject to the user
+ * defined map function, if set by librdf_stream_set_map(),
  * 
  * Return value: the next statement or NULL at end of stream
- **/
+ */
 static librdf_statement*
 librdf_stream_get_next_mapped_statement(librdf_stream* stream) 
 {
@@ -122,11 +120,9 @@ librdf_stream_get_next_mapped_statement(librdf_stream* stream)
 
 
 /**
- * librdf_stream_next:
+ * librdf_stream_next - Get the next librdf_statement in the stream
  * @stream: &librdf_stream object
- * 
- * Get the next &librdf_statement in the stream
- * 
+ *
  * Return value: a new &librdf_statement object or NULL at end of stream.
  **/
 librdf_statement*
@@ -160,10 +156,8 @@ librdf_stream_next(librdf_stream* stream)
 
 
 /**
- * librdf_stream_end:
+ * librdf_stream_end - Test if the stream has ended
  * @stream: &librdf_stream object
- * 
- * Test if the stream has ended
  * 
  * Return value: non 0 at end of stream.
  **/
@@ -194,12 +188,12 @@ librdf_stream_end(librdf_stream* stream)
 
 
 /**
- * librdf_stream_set_map:
+ * librdf_stream_set_map - Set the filtering/mapping function for the stream
  * @stream: &librdf_stream object
  * @map: mapping function.
  * @map_context: context
  * 
- * Set the filtering/mapping function for the stream.  The function 
+ * The function 
  * is called with the mapping context and the next statement.  The return
  * value of the mapping function is then passed on to the user, if not NULL.
  * If NULL is returned, that statement is not emitted.

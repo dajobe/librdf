@@ -35,9 +35,9 @@ static void librdf_delete_storage_factories(void);
 
 
 /**
- * librdf_init_storage:
+ * librdf_init_storage - Initialise the librdf_storage module
  * 
- * Initialise the rdf_storage module - initialises and registers all
+ * Initialises and registers all
  * compiled storage modules.  Must be called before using any of the storage
  * factory functions such as librdf_get_storage_factory()
  **/
@@ -50,9 +50,7 @@ librdf_init_storage(void)
 
 
 /**
- * librdf_finish_storage:
- * 
- * Close down the rdf_storage module
+ * librdf_finish_storage - Terminate the librdf_storage module
  **/
 void
 librdf_finish_storage(void) 
@@ -70,11 +68,9 @@ static librdf_storage_factory* storages;
 /* helper functions */
 
 
-/**
- * librdf_delete_storage_factories:
- * 
- * Delete all the registered storage factories
- **/
+/*
+ * librdf_delete_storage_factories - helper function to delete all the registered storage factories
+ */
 static void
 librdf_delete_storage_factories(void)
 {
@@ -91,11 +87,10 @@ librdf_delete_storage_factories(void)
 /* class methods */
 
 /**
- * librdf_storage_register_factory:
+ * librdf_storage_register_factory - Register a storage factory
  * @name: the storage factory name
  * @factory: pointer to function to call to register the factory
  * 
- * Register a storage factory
  **/
 void
 librdf_storage_register_factory(const char *name,
@@ -139,10 +134,8 @@ librdf_storage_register_factory(const char *name,
 
 
 /**
- * librdf_get_storage_factory:
+ * librdf_get_storage_factory - Get a storage factory by name
  * @name: the factory name or NULL for the default factory
- * 
- * Get a storage factory for a given storage name
  * 
  * Return value: the factory object or NULL if there is no such factory
  **/
@@ -180,11 +173,9 @@ librdf_get_storage_factory (const char *name)
 
 
 /**
- * librdf_new_storage:
+ * librdf_new_storage - Constructor - create a new librdf_storage object
  * @factory: the factory to use to construct the storage
  * @options: &librdf_hash of options to initialise storage
- *
- * Constructor: create a new &librdf_storage object
  *
  * Return value: a new &librdf_storage object or NULL on failure
  */
@@ -222,10 +213,8 @@ librdf_new_storage (librdf_storage_factory* factory,
 
 
 /**
- * librdf_free_storage:
+ * librdf_free_storage - Destructor - destroy a librdf_storage object
  * @storage: &librdf_storage object
- * 
- * Destructor: destroy &librdf_storage object
  * 
  **/
 void
@@ -240,11 +229,11 @@ librdf_free_storage (librdf_storage* storage)
 /* methods */
 
 /**
- * librdf_storage_open:
+ * librdf_storage_open - Start a model / storage association
  * @storage: &librdf_storage object
  * @model: model stored
  *
- * Start storage association, ended with librdf_storage_close()
+ * This is ended with librdf_storage_close()
  * 
  * Return value: non 0 on failure
  **/
@@ -256,10 +245,8 @@ librdf_storage_open(librdf_storage* storage, librdf_model* model)
 
 
 /**
- * librdf_storage_close:
+ * librdf_storage_close - End a model / storage association
  * @storage: &librdf_storage object
- * 
- * End storage association
  * 
  * Return value: non 0 on failure
  **/
@@ -271,10 +258,8 @@ librdf_storage_close(librdf_storage* storage)
 
 
 /**
- * librdf_storage_size:
+ * librdf_storage_size - Get the number of statements stored
  * @storage: &librdf_storage object
- * 
- * Get the number of statements in the storage.
  * 
  * Return value: The number of statements
  **/
@@ -286,11 +271,9 @@ librdf_storage_size(librdf_storage* storage)
 
 
 /**
- * librdf_storage_add_statement:
+ * librdf_storage_add_statement - Add a statement to a storage
  * @storage: &librdf_storage object
  * @statement: &librdf_statement statement to add
- * 
- * Add a statement to the storage.
  * 
  * Return value: non 0 on failure
  **/
@@ -303,11 +286,9 @@ librdf_storage_add_statement(librdf_storage* storage,
 
 
 /**
- * librdf_storage_add_statements:
+ * librdf_storage_add_statements - Add a stream of statements to the storage
  * @storage: &librdf_storage object
  * @statement_stream: &librdf_stream of statements
- * 
- * Add a stream of statements to the storage.
  * 
  * Return value: non 0 on failure
  **/
@@ -320,11 +301,9 @@ librdf_storage_add_statements(librdf_storage* storage,
 
 
 /**
- * librdf_storage_remove_statement:
+ * librdf_storage_remove_statement - Remove a statement from the storage
  * @storage: &librdf_storage object
  * @statement: &librdf_statement statement to remove
- * 
- * Remove a statement from the storage.
  * 
  * Return value: non 0 on failure
  **/
@@ -337,12 +316,10 @@ librdf_storage_remove_statement(librdf_storage* storage,
 
 
 /**
- * librdf_storage_contains_statement:
+ * librdf_storage_contains_statement - Test if a given statement is present in the storage
  * @storage: &librdf_storage object
  * @statement: &librdf_statement statement to check
- * 
- * Test if a given statement is present in the storage.
- * 
+ *
  * Return value: non 0 if the storage contains the statement
  **/
 int
@@ -354,10 +331,8 @@ librdf_storage_contains_statement(librdf_storage* storage,
 
 
 /**
- * librdf_storage_serialise:
+ * librdf_storage_serialise - Serialise the storage as a librdf_stream of statemetns
  * @storage: &librdf_storage object
- * 
- * Serialise the storage as a stream of &librdf_statements.
  * 
  * Return value: &librdf_stream of statements or NULL on failure
  **/
@@ -369,12 +344,11 @@ librdf_storage_serialise(librdf_storage* storage)
 
 
 /**
- * librdf_storage_find_statements:
+ * librdf_storage_find_statements - search the storage for matching statements
  * @storage: &librdf_storage object
  * @statement: &librdf_statement partial statement to find
  * 
- * Search the storage for a (partial) statement and return a stream
- * of matching &librdf_statement.
+ * Searches the storage for a (partial) statement - see librdf_statement_match() - and return a stream matching &librdf_statement.
  * 
  * Return value:  &librdf_stream of matching statements (may be empty) or NULL on failure
  **/

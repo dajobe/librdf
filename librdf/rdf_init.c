@@ -33,6 +33,14 @@
 #include <rdf_model.h>
 
 
+/**
+ * librdf_init_world - Initialise the librdf library
+ * @digest_factory_name: &librdf_digest_factory
+ * 
+ * Initialises various librdf classes and uses the digest factory
+ * for various modules that need to make digests of their objects.
+ *
+ **/
 void
 librdf_init_world(char *digest_factory_name) 
 {
@@ -53,6 +61,11 @@ librdf_init_world(char *digest_factory_name)
 }
 
 
+/**
+ * librdf_destroy_world - Terminate the librdf library
+ * 
+ * Terminates and frees the librdf resources.
+ **/
 void
 librdf_destroy_world(void)
 {

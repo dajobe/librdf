@@ -35,10 +35,8 @@
 static librdf_digest_factory *librdf_node_digest_factory=NULL;
 
 /**
- * librdf_init_node:
+ * librdf_init_node - Initialise the node module.
  * @factory: digest factory to use for digesting node content.
- * 
- * Initialise the node module.
  * 
  **/
 void
@@ -54,9 +52,7 @@ librdf_init_node(librdf_digest_factory* factory)
 /* constructors */
 
 /**
- * librdf_new_node:
- * 
- * Constructor: create a new &librdf_node object with a NULL URI.
+ * librdf_new_node - Constructor - create a new librdf_node object with a NULL URI.
  * 
  * Return value: a new &librdf_node object or NULL on failure
  **/
@@ -69,11 +65,10 @@ librdf_new_node(void)
     
 
 /**
- * librdf_new_node_from_uri_string:
- * @uri_string: string representing a URI or NULL
+ * librdf_new_node_from_uri_string - Constructor - create a new librdf_node object from a URI string
+ * @uri_string: string representing a URI
  * 
- * Constructor: create a new &librdf_node object with a given URI 
- * which can be NULL, and set later.
+ * The URI can be NULL, and can be set later.
  *
  * Return value: a new &librdf_node object or NULL on failure
  **/
@@ -114,10 +109,8 @@ librdf_new_node_from_uri_string(char *uri_string)
 /* Create a new Node and set the URI. */
 
 /**
- * librdf_new_node_from_uri:
+ * librdf_new_node_from_uri - Constructor - create a new librdf_node object with a given URI
  * @uri: &rdf_uri object
- * 
- * Constructor: create a new &librdf_node object with a given URI
  *
  * Return value: a new &librdf_node object or NULL on failure
  **/
@@ -135,13 +128,11 @@ librdf_new_node_from_uri(librdf_uri *uri)
 
 
 /**
- * librdf_new_node_from_literal:
+ * librdf_new_node_from_literal -  Constructor - create a new literal librdf_node object
  * @string: literal string value
  * @xml_language: literal XML language (or NULL)
  * @xml_space: XML space properties (0 if unknown)
  * @is_wf_xml: non 0 if literal is XML
- * 
- * Constructor: create a new literal &librdf_node object
  * 
  * Return value: new &librdf_node object or NULL on failure
  **/
@@ -170,11 +161,8 @@ librdf_new_node_from_literal(char *string, char *xml_language,
 
 
 /**
- * librdf_new_node_from_node:
+ * librdf_new_node_from_node - Copy constructor - create a new librdf_node object from an existing  librdf_node object
  * @node: &librdf_node object to copy
- * 
- * Clone Constructor: create a new &librdf_node object from an existing
- * &librdf_node object
  * 
  * Return value: a new &librdf_node object or NULL on failure
  **/
@@ -213,10 +201,9 @@ librdf_new_node_from_node(librdf_node *node)
 
 
 /**
- * librdf_free_node:
+ * librdf_free_node - Destructor - destroy an librdf_node object
  * @node: &librdf_node object
  * 
- * Destructor: destroy an &librdf_node object
  **/
 void
 librdf_free_node(librdf_node *node) 
@@ -237,10 +224,8 @@ librdf_free_node(librdf_node *node)
 /* functions / methods */
 
 /**
- * librdf_node_get_uri:
+ * librdf_node_get_uri - Get the URI for a node object
  * @node: the node object
- * 
- * Get the URI for a node object.
  *
  * Returns a pointer to the URI object held by the node, it must be
  * copied if it is wanted to be used by the caller.
@@ -255,11 +240,9 @@ librdf_node_get_uri(librdf_node* node)
 
 
 /**
- * librdf_node_set_uri:
+ * librdf_node_set_uri -  Set the URI of the node
  * @node: the node object
  * @uri: the uri object
- * 
- * Set the URI of the node
  *
  * The URI passed in becomes owned by the node object and will be freed by
  * the node on destruction.
@@ -283,10 +266,8 @@ librdf_node_set_uri(librdf_node* node, librdf_uri *uri)
 
 
 /**
- * librdf_node_get_type:
+ * librdf_node_get_type - Get the type of the node
  * @node: the node object
- * 
- * Get the type of the node
  * 
  * Return value: the node type
  **/
@@ -298,14 +279,12 @@ librdf_node_get_type(librdf_node* node)
 
 
 /**
- * librdf_node_set_type:
+ * librdf_node_set_type - Set the type of the node
  * @node: the node object
  * @type: the node type
  *
  * Presently the nodes can be of type LIBRDF_NODE_TYPE_RESOURCE or
  * LIBRDF_NODE_TYPE_LITERAL
- * 
- * Set the type of the node
  **/
 void
 librdf_node_set_type(librdf_node* node, librdf_node_type type)
@@ -315,10 +294,8 @@ librdf_node_set_type(librdf_node* node, librdf_node_type type)
 
 
 /**
- * librdf_node_get_literal_value:
+ * librdf_node_get_literal_value - Get the string literal value of the node
  * @node: the node object
- * 
- * Get the string literal value of the node
  * 
  * Returns a pointer to the literal value held by the node, it must be
  * copied if it is wanted to be used by the caller.
@@ -335,7 +312,7 @@ librdf_node_get_literal_value(librdf_node* node)
 
 
 /**
- * librdf_node_get_literal_value_language:
+ * librdf_node_get_literal_value_language - Get the XML language of the node
  * @node: the node object
  * 
  * Returns a pointer to the literal language value held by the node, it must
@@ -354,15 +331,15 @@ librdf_node_get_literal_value_language(librdf_node* node)
 
 
 /**
- * librdf_node_set_literal_value:
+ * librdf_node_set_literal_value - Set the node literal value with options
  * @node: the node object
  * @value: pointer to the literal string value
  * @xml_language: pointer to the literal language (or NULL if not defined)
  * @xml_space: XML space properties (0 if unknown)
  * @is_wf_xml: non 0 if the value is Well Formed XML
  * 
- * Set the node literal value, optional language and if the literal is
- * well formed XML.
+ * Sets the node literal value, optional language, XML space
+ * properties and if the literal is well formed XML.
  *
  * The space property can take three values: 0 - unknown, 1 - use default
  * method (xml:space="default") or 2 - preserve space (xml:space="preserve").
@@ -416,10 +393,10 @@ librdf_node_set_literal_value(librdf_node* node, char* value,
 
 
 /**
- * librdf_node_to_string:
+ * librdf_node_to_string - Format the node as a string
  * @node: the node object
  * 
- * Format the node as a string, which must be freed by the caller.
+ * Note a new string is allocated which must be freed by the caller.
  * 
  * Return value: a string value representing the node or NULL on failure
  **/
@@ -458,10 +435,10 @@ librdf_node_to_string(librdf_node* node)
 
 
 /**
- * librdf_node_get_digest:
+ * librdf_node_get_digest - Get a digest representing a librdf_node
  * @node: the node object
  * 
- * Get a new digest representing the node content.
+ * A new digest object is created which must be freed by the caller.
  * 
  * Return value: a new &librdf_digest object or NULL on failure
  **/
@@ -489,6 +466,16 @@ librdf_node_get_digest(librdf_node* node)
 }
 
 
+/**
+ * librdf_node_equals - Compare two librdf_node objects for equality
+ * @first_node: first &librdf_node node
+ * @second_node: second &librdf_node node
+ * 
+ * Note - for literal nodes, XML language, XML space and well-formness are 
+ * presently ignored in the comparison.
+ * 
+ * Return value: non 0 if nodes are different
+ **/
 int
 librdf_node_equals(librdf_node* first_node, librdf_node* second_node) 
 {

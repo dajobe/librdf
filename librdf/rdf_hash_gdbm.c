@@ -66,13 +66,11 @@ static void librdf_hash_gdbm_register_factory(librdf_hash_factory *factory);
 /* functions implementing hash api */
 
 /**
- * librdf_hash_gdbm_open:
+ * librdf_hash_gdbm_open - Open and maybe create a new GDBM hash
  * @context: GDBM hash context
  * @identifier: filename to use for GDBM file
  * @mode: GDBM access mode (currently unused)
  * @options:  librdf_hash of options (currently used)
- * 
- * Open and maybe create a new GDBM hash
  * 
  * Return value: non 0 on failure
  **/
@@ -102,7 +100,7 @@ librdf_hash_gdbm_open(void* context, char *identifier, void *mode,
 
 
 /**
- * librdf_hash_gdbm_close:
+ * librdf_hash_gdbm_close - Close the hash
  * @context: GDBM hash context
  * 
  * Finish the association between the rdf hash and the GDBM file (does
@@ -124,13 +122,11 @@ librdf_hash_gdbm_close(void* context)
 
 
 /**
- * librdf_hash_gdbm_get:
+ * librdf_hash_gdbm_get - Retrieve a hash value for the given key
  * @context: GDBM hash context
  * @key: pointer to key to use
  * @data: pointer to data to return value
  * @flags: flags (not used at present)
- * 
- * Retrieve a hash value for the given key
  * 
  * Return value: non 0 on failure
  **/
@@ -167,14 +163,12 @@ librdf_hash_gdbm_get(void* context, librdf_hash_data *key, librdf_hash_data *dat
 
 
 /**
- * librdf_hash_gdbm_put:
+ * librdf_hash_gdbm_put - Store a key/value pair in the hash
  * @context: GDBM hash context
  * @key: pointer to key to store
  * @value: pointer to value to store
  * @flags: flags (not used at present)
- * 
- * Store a key/value pair in the hash
- * 
+ *
  * Return value: non 0 on failure
  **/
 static int
@@ -199,11 +193,9 @@ librdf_hash_gdbm_put(void* context, librdf_hash_data *key, librdf_hash_data *val
 
 
 /**
- * librdf_hash_gdbm_exists:
+ * librdf_hash_gdbm_exists - Test the existence of a key in the hash
  * @context: GDBM hash context
  * @key: pointer to key to store
- * 
- * Test the existence of a key in the hash.
  * 
  * Return value: non 0 if the key exists in the hash
  **/
@@ -222,11 +214,9 @@ librdf_hash_gdbm_exists(void* context, librdf_hash_data *key)
 
 
 /**
- * librdf_hash_gdbm_delete:
+ * librdf_hash_gdbm_delete - Delete a key/value pair from the hash
  * @context: GDBM hash context
  * @key: pointer to key to delete
- * 
- * Delete a key and associate value from the hash.
  * 
  * Return value: non 0 on failure
  **/
@@ -245,6 +235,19 @@ librdf_hash_gdbm_delete(void* context, librdf_hash_data *key)
 }
 
 
+/**
+ * librdf_hash_gdbm_get_seq - Provide sequential access to the hash
+ * @context: GDBM hash context
+ * @key: pointer to the key
+ * @type: type of operation
+ * 
+ * Valid operations are
+ * LIBRDF_HASH_SEQUENCE_FIRST to get the first key in the sequence
+ * LIBRDF_HASH_SEQUENCE_NEXT to get the next in sequence and
+ * LIBRDF_HASH_SEQUENCE_CURRENT to get the current key (again).
+ * 
+ * Return value: non 0 on failure
+ **/
 static int
 librdf_hash_gdbm_get_seq(void* context, librdf_hash_data *key, librdf_hash_sequence_type type) 
 {
@@ -298,11 +301,10 @@ librdf_hash_gdbm_get_seq(void* context, librdf_hash_data *key, librdf_hash_seque
   return 0;
 }
 
+
 /**
- * librdf_hash_gdbm_sync:
+ * librdf_hash_gdbm_sync - Flush the hash to disk
  * @context: GDBM hash context
- * 
- * Synchronise the hash to a known state (e.g. on disk).
  * 
  * Return value: non 0 on failure
  **/
@@ -317,10 +319,8 @@ librdf_hash_gdbm_sync(void* context)
 
 
 /**
- * librdf_hash_gdbm_get_fd:
+ * librdf_hash_gdbm_get_fd - Get the file descriptor representing the hash
  * @context: GDBM hash context
- * 
- * Get the file descriptor associated with the file representing the hash.
  * 
  * Return value: file descriptor
  **/
@@ -338,10 +338,9 @@ librdf_hash_gdbm_get_fd(void* context)
 /* local function to register GDBM hash functions */
 
 /**
- * librdf_hash_gdbm_register_factory:
+ * librdf_hash_gdbm_register_factory - Register the GDBM hash module with the hash factory
  * @factory: hash factory to fill in with GDBM-specific values.
  * 
- * Register the GDBM hash module with the hash factory
  **/
 static void
 librdf_hash_gdbm_register_factory(librdf_hash_factory *factory) 
@@ -360,10 +359,8 @@ librdf_hash_gdbm_register_factory(librdf_hash_factory *factory)
 }
 
 /**
- * librdf_init_hash_gdbm:
- * @void: 
+ * librdf_init_hash_gdbm - Initialise the GDBM hash module
  * 
- * Initialise the GDBM hash module.
  **/
 void
 librdf_init_hash_gdbm(void)

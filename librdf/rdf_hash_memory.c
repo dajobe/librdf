@@ -329,13 +329,11 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
 /* functions implementing hash api */
 
 /**
- * librdf_hash_memory_open:
+ * librdf_hash_memory_open - Open a new memory hash
  * @context: memory hash contxt
  * @identifier: not used
  * @mode: access mode (currently unused)
  * @options: &librdf_hash of options (currently unused)
- * 
- * Open a new memory hash.
  * 
  * Return value: non 0 on failure
  **/
@@ -351,10 +349,8 @@ librdf_hash_memory_open(void* context, char *identifier, void *mode,
 
 
 /**
- * librdf_hash_memory_close:
+ * librdf_hash_memory_close - Close the hash
  * @context: memory hash context
- * 
- * Finish the association between the rdf hash and the memory hash.
  * 
  * Return value: non 0 on failure
  **/
@@ -387,13 +383,11 @@ librdf_hash_memory_close(void* context)
 
 
 /**
- * librdf_hash_memory_get:
+ * librdf_hash_memory_get - Retrieve a hash value for the given key
  * @context: memory hash context
  * @key: pointer to key to use
  * @data: pointer to data to return value
  * @flags: (not used at present)
- * 
- * Retrieve a hash value for the given key
  * 
  * Return value: non 0 on failure
  **/
@@ -425,13 +419,11 @@ librdf_hash_memory_get(void* context, librdf_hash_data *key,
 
 
 /**
- * librdf_hash_memory_put:
+ * librdf_hash_memory_put: - Store a key/value pair in the hash
  * @context: memory hash context
  * @key: pointer to key to store
  * @value: pointer to value to store
  * @flags: flags (not used at present)
- * 
- * Store a key/value pair in the hash
  * 
  * Return value: non 0 on failure
  **/
@@ -500,11 +492,9 @@ librdf_hash_memory_put(void* context, librdf_hash_data *key,
 
 
 /**
- * librdf_hash_memory_exists:
+ * librdf_hash_memory_exists - Test the existence of a key in the hash
  * @context: memory hash context
  * @key: pointer to key to store
- * 
- * Test the existence of a key in the hash.
  * 
  * Return value: non 0 if the key exists in the hash
  **/
@@ -523,11 +513,9 @@ librdf_hash_memory_exists(void* context, librdf_hash_data *key)
 
 
 /**
- * librdf_hash_memory_delete:
+ * librdf_hash_memory_delete: - Delete a key/value pair from the hash
  * @context: memory hash context
  * @key: pointer to key to delete
- * 
- * Delete a key and associated value from the hash.
  * 
  * Return value: non 0 on failure
  **/
@@ -559,12 +547,12 @@ librdf_hash_memory_delete(void* context, librdf_hash_data *key)
 
 
 /**
- * librdf_hash_memory_get_seq:
+ * librdf_hash_memory_get_seq - Provide sequential access to the hash
  * @context: memory hash context
  * @key: pointer to the key
  * @type: type of operation
  * 
- * Start/get keys in a sequence from the hash.  Valid operations are
+ * Valid operations are
  * LIBRDF_HASH_SEQUENCE_FIRST to get the first key in the sequence
  * LIBRDF_HASH_SEQUENCE_NEXT to get the next in sequence and
  * LIBRDF_HASH_SEQUENCE_CURRENT to get the current key (again).
@@ -619,7 +607,7 @@ librdf_hash_memory_get_seq(void* context, librdf_hash_data *key,
 
 
 /**
- * librdf_hash_memory_sync:
+ * librdf_hash_memory_sync - Flush the hash to disk
  * @context: memory hash context
  * 
  * Not used
@@ -635,28 +623,27 @@ librdf_hash_memory_sync(void* context)
 
 
 /**
- * librdf_hash_memory_get_fd:
+ * librdf_hash_memory_get_fd - Get the file descriptor representing the hash
  * @context: memory hash context
  * 
  * Not used
  * 
- * Return value: 0
+ * Return value: -1
  **/
 static int
 librdf_hash_memory_get_fd(void* context) 
 {
   /* Not applicable */
-  return 0;
+  return -1;
 }
 
 
 /* local function to register memory hash functions */
 
 /**
- * librdf_hash_memory_register_factory:
+ * librdf_hash_memory_register_factory - Register the memory hash module with the hash factory
  * @factory: hash factory prototype
  * 
- * Register the memory hash module with the hash factory
  **/
 static void
 librdf_hash_memory_register_factory(librdf_hash_factory *factory) 
@@ -675,12 +662,13 @@ librdf_hash_memory_register_factory(librdf_hash_factory *factory)
 }
 
 /**
- * librdf_init_hash_memory:
+ * librdf_init_hash_memory - Initialise the memory hash module
  * @default_load_factor: Default hash load factor (0-1000)
  * 
- * Initialise the memory hash module and set the default hash load factor.
- * The recommended and default value is 0.75, i.e. 750/1000.  If you want
- * to keep the default, use a value less than 0.
+ * Initialises the memory hash module and sets the default hash load factor.
+ *
+ * The recommended and current default value is 0.75, i.e. 750/1000.  
+ * To use the default value (whatever it is) use a value less than 0.
  **/
 void
 librdf_init_hash_memory(int default_load_factor)

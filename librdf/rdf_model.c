@@ -31,13 +31,19 @@
 #include <rdf_stream.h>
 
 
-/* class methods */
+/**
+ * librdf_init_model - Initialise librdf_model class
+ **/
 void
 librdf_init_model(void)
 {
   /* nothing to do here */
 }
 
+
+/**
+ * librdf_finish_model - Terminate librdf_model class
+ **/
 void
 librdf_finish_model(void)
 {
@@ -45,9 +51,15 @@ librdf_finish_model(void)
 }
 
 
-/* constructors */
-
-/* Create a new Model with storage */
+/**
+ * librdf_new_model - Constructor - Create a new librdf_model with storage
+ * @storage: &librdf_storage storage to use
+ * @options: &librdf_hash of options to use
+ * 
+ * Options are presently not used.
+ *
+ * Return value: a new &librdf_model object or NULL on failure
+ **/
 librdf_model*
 librdf_new_model(librdf_storage *storage, librdf_hash* options)
 {
@@ -55,7 +67,7 @@ librdf_new_model(librdf_storage *storage, librdf_hash* options)
   
   model=(librdf_model*)LIBRDF_CALLOC(librdf_model, 1, sizeof(librdf_model));
   if(!model)
-    return 0;
+    return NULL;
   
   if(storage && librdf_storage_open(storage, model)) {
     LIBRDF_FREE(librdf_model, model);
@@ -68,7 +80,14 @@ librdf_new_model(librdf_storage *storage, librdf_hash* options)
 }
 
 
-/* Create a new Model from an existing Model - CLONE */
+/**
+ * librdf_new_model_from_model - Copy constructor - create a new librdf_model from an existing one
+ * @model: the existing &librdf_model
+ * 
+ * FIXME: Not implemented yet
+ * 
+ * Return value: a new &librdf_model or NULL on failure
+ **/
 librdf_model*
 librdf_new_model_from_model(librdf_model* model)
 {
@@ -77,7 +96,15 @@ librdf_new_model_from_model(librdf_model* model)
 }
 
 
-/* Create a new Model from a stream */
+/**
+ * librdf_new_model_from_stream - Constructor - create a new librdf_model from a stream
+
+ * @stream: &librdf_stream to create from
+ *
+ * FIXME: Not implemented yet
+ * 
+ * Return value: a new &librdf_model or NULL on failure
+ **/
 librdf_model*
 librdf_new_model_from_stream(librdf_stream* stream)
 {
@@ -86,7 +113,11 @@ librdf_new_model_from_stream(librdf_stream* stream)
 }
 
 
-/* destructor */
+/**
+ * librdf_free_model - Destructor - Destroy a librdf_model object
+ * @model: &librdf_model model to destroy
+ * 
+ **/
 void
 librdf_free_model(librdf_model *model)
 {
@@ -113,7 +144,12 @@ librdf_free_model(librdf_model *model)
 
 
 
-/* functions / methods */
+/**
+ * librdf_model_size - get the number of statements in the model
+ * @model: &librdf_model object
+ * 
+ * Return value: the number of statements
+ **/
 int
 librdf_model_size(librdf_model* model)
 {
@@ -121,15 +157,12 @@ librdf_model_size(librdf_model* model)
 }
 
 
-/* add statements */
-
 /**
- * librdf_model_add_statement:
- * @model: model
- * @statement: statement
+ * librdf_model_add_statement - Add a statement to the model
+ * @model: model object
+ * @statement: statement object
  * 
- * Add a statement to the model - after this, the statement becomes owned by
- * the model
+ * After this method, the statement becomes owned by the model
  * 
  * Return value: non 0 on failure
  **/
@@ -140,6 +173,13 @@ librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 }
 
 
+/**
+ * librdf_model_add_statements - Add a stream of statements to the model
+ * @model: model object
+ * @statement_stream: stream of statements to use
+ * 
+ * Return value: non 0 on failure
+ **/
 int
 librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream)
 {
@@ -147,6 +187,17 @@ librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream
 }
 
 
+/**
+ * librdf_model_add - Create and add a new statement about a resource to the model
+ * @model: model object
+ * @subject: &librdf_node of subject
+ * @predicate: &librdf_node of predicate
+ * @object: &librdf_node of object (literal or resource)
+ * 
+ * After this method, the &librdf_node objects become owned by the model.
+ * 
+ * Return value: non 0 on failure
+ **/
 int
 librdf_model_add(librdf_model* model, librdf_node* subject, 
 		 librdf_node* predicate, librdf_node* object)
@@ -170,6 +221,23 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
 }
 
 
+/**
+ * librdf_model_add_string_literal_statement - Create and add a new statement about a literal to the model
+ * @model: model object
+ * @subject: &librdf_node of subject
+ * @predicate: &librdf_node of predicate
+ * @string: string literal conten
+ * @xml_language: language of literal
+ * @xml_space: XML space properties
+ * @is_wf_xml: literal is XML
+ * 
+ * The language can be set to NULL if not used.
+ *
+ * The XML space property can be set to three values: 0 - not known,
+ * 1 - default or 2 - preserve space.
+ * 
+ * Return value: non 0 on failure
+ **/
 int
 librdf_model_add_string_literal_statement(librdf_model* model, 
 					  librdf_node* subject, 
@@ -193,7 +261,13 @@ librdf_model_add_string_literal_statement(librdf_model* model,
 }
 
 
-/* remove statements */
+/**
+ * librdf_model_remove_statement - Remove a known statement from the model
+ * @model: the model object
+ * @statement: the statement
+ *
+ * Return value: non 0 on failure
+ **/
 int
 librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
 {
@@ -201,7 +275,13 @@ librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
 }
 
 
-/* containment */
+/**
+ * librdf_model_contains_statement - Check for a statement in the model
+ * @model: the model object
+ * @statement: the statement
+ * 
+ * Return value: non 0 if the model contains the statement
+ **/
 int
 librdf_model_contains_statement(librdf_model* model, librdf_statement* statement)
 {
@@ -209,7 +289,12 @@ librdf_model_contains_statement(librdf_model* model, librdf_statement* statement
 }
 
 
-/* serialise the entire model */
+/**
+ * librdf_model_serialise - serialise the entire model as a stream
+ * @model: the model object
+ * 
+ * Return value: a &librdf_stream or NULL on failure
+ **/
 librdf_stream*
 librdf_model_serialise(librdf_model* model)
 {
@@ -217,7 +302,18 @@ librdf_model_serialise(librdf_model* model)
 }
 
 
-/* queries */
+/**
+ * librdf_model_find_statements - find matching statements in the model
+ * @model: the model object
+ * @statement: the partial statement to match
+ * 
+ * The partial statement is a statement where the subject, predicate
+ * and/or object can take the value NULL which indicates a match with
+ * any value in the model
+ * 
+ * Return value: a &librdf_stream of statements (can be empty) or NULL
+ * on failure.
+ **/
 librdf_stream*
 librdf_model_find_statements(librdf_model* model, 
                              librdf_statement* statement)
@@ -228,7 +324,15 @@ librdf_model_find_statements(librdf_model* model,
 
 
 
-/* submodels */
+/**
+ * librdf_model_add_submodel - add a sub-model to the model
+ * @model: the model object
+ * @sub_model: the sub model to add
+ * 
+ * FIXME: Not tested
+ * 
+ * Return value: non 0 on failure
+ **/
 int
 librdf_model_add_submodel(librdf_model* model, librdf_model* sub_model)
 {
@@ -249,6 +353,15 @@ librdf_model_add_submodel(librdf_model* model, librdf_model* sub_model)
 
 
 
+/**
+ * librdf_model_remove_submodel - remove a sub-model from the model
+ * @model: the model object
+ * @sub_model: the sub model to remove
+ * 
+ * FIXME: Not tested
+ * 
+ * Return value: non 0 on failure
+ **/
 int
 librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model)
 {
@@ -263,6 +376,12 @@ librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model)
 }
 
 
+/**
+ * librdf_model_print - print the model
+ * @model: the model object
+ * @fh: the FILE stream to print to
+ * 
+ **/
 void
 librdf_model_print(librdf_model *model, FILE *fh)
 {

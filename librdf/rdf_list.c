@@ -65,6 +65,11 @@ librdf_list_find_node(librdf_list* list, void *data,
 }
 
 
+/**
+ * librdf_new_list - Constructor - create a new librdf_list
+ * 
+ * Return value: a new &librdf_list or NULL on failure
+ **/
 librdf_list*
 librdf_new_list(void)
 {
@@ -78,6 +83,11 @@ librdf_new_list(void)
 }
 
 
+/**
+ * librdf_free_list - Destructor - destroy a librdf_list object
+ * @list: &librdf_list object
+ * 
+ **/
 void
 librdf_free_list(librdf_list* list) 
 {
@@ -91,6 +101,16 @@ librdf_free_list(librdf_list* list)
 }
 
 
+/**
+ * librdf_list_add - add a data item to the start of a librdf_list
+ * @list: &librdf_list object
+ * @data: the data value
+ * 
+ * Equivalent to the list 'push' notion, thus if librdf_list_pop()
+ * is called after this, it will return the value added here.
+ *
+ * Return value: non 0 on failure
+ **/
 int
 librdf_list_add(librdf_list* list, void *data) 
 {
@@ -110,6 +130,17 @@ librdf_list_add(librdf_list* list, void *data)
 }
 
 
+/**
+ * librdf_list_remove - remove a data item from a librdf_list
+ * @list: &librdf_list object
+ * @data: the data item
+ * 
+ * The search is done using the 'equals' function which may be set
+ * by librdf_list_set_equals() or by straight comparison of pointers
+ * if not set.
+ * 
+ * Return value: non 0 on failure (not found or list empty)
+ **/
 int
 librdf_list_remove(librdf_list* list, void *data) 
 {
@@ -132,6 +163,12 @@ librdf_list_remove(librdf_list* list, void *data)
 }
 
 
+/**
+ * librdf_list_pop - remove and return the data from the start of the list
+ * @list: &librdf_list object
+ * 
+ * Return value: the data object or NULL if the list is empty
+ **/
 void*
 librdf_list_pop(librdf_list* list)
 {
@@ -154,6 +191,17 @@ librdf_list_pop(librdf_list* list)
 }
 
 
+/**
+ * librdf_list_contains - check for presence of data item in list
+ * @list: &librdf_list object
+ * @data: the data value
+ * 
+ * The search is done using the 'equals' function which may be set
+ * by librdf_list_set_equals() or by straight comparison of pointers
+ * if not set.
+ * 
+ * Return value: non 0 if item was found
+ **/
 int
 librdf_list_contains(librdf_list* list, void *data) 
 {
@@ -164,6 +212,12 @@ librdf_list_contains(librdf_list* list, void *data)
 }
 
 
+/**
+ * librdf_list_size - return the length of the list
+ * @list: &librdf_list object
+ * 
+ * Return value: length of the list
+ **/
 int
 librdf_list_size(librdf_list* list) 
 {
@@ -171,6 +225,16 @@ librdf_list_size(librdf_list* list)
 }
 
 
+/**
+ * librdf_list_set_equals - set the equals function for the list
+ * @list: &librdf_list object
+ * @equals: the equals function
+ * 
+ * The function given is used when comparing items in the list
+ * during searches such as those done in librdf_list_remove() or
+ * librdf_list_contains().
+ * 
+ **/
 void
 librdf_list_set_equals(librdf_list* list, 
                        int (*equals) (void* data1, void *data2)) 
@@ -180,6 +244,12 @@ librdf_list_set_equals(librdf_list* list,
 
 
 
+/**
+ * librdf_list_get_iterator - get an iterator for the list
+ * @list: &librdf_list object
+ * 
+ * Return value: a new &librdf_iterator object or NULL on failure
+ **/
 librdf_iterator*
 librdf_list_get_iterator(librdf_list* list)
 {

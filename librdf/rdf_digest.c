@@ -49,11 +49,10 @@ librdf_delete_digest_factories(void)
 
 
 /**
- * librdf_digest_register_factory:
+ * librdf_digest_register_factory - Register a hash factory
  * @name: the name of the hash
  * @factory: function to be called to register the factory parameters
  * 
- * Register a hash factory
  **/
 void
 librdf_digest_register_factory(const char *name,
@@ -103,10 +102,8 @@ librdf_digest_register_factory(const char *name,
 
 
 /**
- * librdf_get_digest_factory:
- * @name: the name of the factor
- * 
- * get a digest factory
+ * librdf_get_digest_factory - get a digest factory
+ * @name: the name of the factory
  * 
  * Return value: the factory or NULL if not found
  **/
@@ -141,10 +138,8 @@ librdf_get_digest_factory(const char *name)
 
 
 /**
- * librdf_new_digest:
+ * librdf_new_digest - Constructor - create a new librdf_digest object
  * @factory: the digest factory to use to create this digest
- * 
- * Constructor: create a new &librdf_digest object
  * 
  * Return value: new &librdf_digest object or NULL
  **/
@@ -177,10 +172,9 @@ librdf_new_digest(librdf_digest_factory *factory)
 
 
 /**
- * librdf_free_digest:
+ * librdf_free_digest - Destructor- destroy a librdf_digest object
  * @digest: the digest
  * 
- * Destructor: destroys a &librdf_digest object
  **/
 void
 librdf_free_digest(librdf_digest *digest) 
@@ -197,10 +191,9 @@ librdf_free_digest(librdf_digest *digest)
 /* methods */
 
 /**
- * librdf_digest_init:
+ * librdf_digest_init - (Re)initialise the librdf_digest object
  * @digest: the digest
  * 
- * initialise/reinitialise the digest object
  **/
 void
 librdf_digest_init(librdf_digest* digest) 
@@ -210,12 +203,11 @@ librdf_digest_init(librdf_digest* digest)
 
 
 /**
- * librdf_digest_update:
+ * librdf_digest_update - Add more data to the librdf_digest object
  * @digest: the digest
  * @buf: the data buffer
  * @length: the length of the data
  * 
- * Add more data to the digest
  **/
 void
 librdf_digest_update(librdf_digest* digest, unsigned char *buf, size_t length) 
@@ -225,11 +217,10 @@ librdf_digest_update(librdf_digest* digest, unsigned char *buf, size_t length)
 
 
 /**
- * librdf_digest_final:
+ * librdf_digest_final - Finish the digesting of data
  * @digest: the digest
  * 
- * Finish the digesting.  The digest can now be returned via the
- * &librdf_digest_get_digest method.
+ * The digest can now be returned via librdf_digest_get_digest().
  **/
 void
 librdf_digest_final(librdf_digest* digest) 
@@ -244,10 +235,8 @@ librdf_digest_final(librdf_digest* digest)
 
 
 /**
- * librdf_digest_get_digest:
+ * librdf_digest_get_digest - Get the calculated digested value.
  * @digest: the digest
- * 
- * Get the calculated digested value.
  * 
  * Return value: pointer to the memory containing the digest.  It will
  * be digest_factory->digest_length bytes in length.
@@ -261,10 +250,8 @@ librdf_digest_get_digest(librdf_digest* digest)
 
 
 /**
- * librdf_digest_to_string:
+ * librdf_digest_to_string - Get a string representation of the digest object
  * @digest: the digest
- * 
- * Format the digest object as a string representation
  * 
  * Return value: a newly allocated string that represents the digest.
  * This must be released by the caller using free() 
@@ -292,11 +279,10 @@ librdf_digest_to_string(librdf_digest* digest)
 
 
 /**
- * librdf_digest_print:
+ * librdf_digest_print - Print the digest to a FILE handle
  * @digest: the digest
  * @fh: file handle
- * 
- * Print the digest on a C FILE handle
+ *
  **/
 void
 librdf_digest_print(librdf_digest* digest, FILE* fh)
@@ -311,10 +297,7 @@ librdf_digest_print(librdf_digest* digest, FILE* fh)
 
 
 /**
- * librdf_init_digest:
- * @void: 
- * 
- * Initialise the librdf_digest class
+ * librdf_init_digest - Initialise the librdf_digest class
  **/
 void
 librdf_init_digest(void) 
@@ -334,6 +317,9 @@ librdf_init_digest(void)
 }
 
 
+/**
+ * librdf_finish_digest - Terminate the librdf_digest class
+ **/
 void
 librdf_finish_digest(void) 
 {

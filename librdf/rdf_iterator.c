@@ -31,13 +31,11 @@ static void* librdf_iterator_get_next_mapped_element(librdf_iterator* iterator);
 
 
 /**
- * librdf_new_iterator:
+ * librdf_new_iterator - Constructor - create a new librdf_iterator object
  * @context: context to pass to the iterator functions
  * @have_elements: function to call to see if there are more elements
  * @get_next: function to get the next element
  * @finished: function to destroy the iterator context (or NULL if not needed)
- * 
- * Constructor: create a new &librdf_iterator object.
  * 
  * Return value: a new &librdf_iterator object or NULL on failure
 **/
@@ -68,9 +66,8 @@ librdf_new_iterator(void* context,
 
 
 /**
- * librdf_free_iterator:
- * @iterator: 
- * 
+ * librdf_free_iterator - Destructor - destroy a librdf_iterator object
+ * @iterator: the &librdf_iterator object
  * 
  **/
 void
@@ -83,16 +80,16 @@ librdf_free_iterator(librdf_iterator* iterator)
 
 
 
-/**
- * librdf_iterator_get_next_mapped_element:
- * @iterator: 
+/*
+ * librdf_iterator_get_next_mapped_element - Get next element with filtering
+ * @iterator: the &librdf_iterator object
  * 
  * Helper function to get the next element subject to the user defined 
  * map function (as set by &librdf_iterator_set_map ) or NULL
  * if the iterator has ended.
  * 
  * Return value: the next element
- **/
+ */
 static void*
 librdf_iterator_get_next_mapped_element(librdf_iterator* iterator) 
 {
@@ -114,6 +111,12 @@ librdf_iterator_get_next_mapped_element(librdf_iterator* iterator)
 }
 
 
+/**
+ * librdf_iterator_have_elements - Test if the iterator has finished
+ * @iterator: the &librdf_iterator object
+ * 
+ * Return value: 0 if the iterator has finished
+ **/
 int
 librdf_iterator_have_elements(librdf_iterator* iterator) 
 {
@@ -141,10 +144,8 @@ librdf_iterator_have_elements(librdf_iterator* iterator)
 
 
 /**
- * librdf_iterator_get_next:
- * @iterator: the iterator
- * 
- * Get the next iterator element
+ * librdf_iterator_get_next - Get the next iterator element
+ * @iterator: the &librdf_iterator object
  *
  * Return value: The next element or NULL if the iterator has finished.
  **/
@@ -179,14 +180,17 @@ librdf_iterator_get_next(librdf_iterator* iterator)
 
 
 /**
- * librdf_iterator_set_map:
+ * librdf_iterator_set_map - Set the librdf_iterator mapping function
  * @iterator: the iterator
  * @map: the function to operate
  * @map_context: the context to pass to the map function
  * 
- * Set the iterator map mapping function to operate over the iterator.  The 
- * mapping function should return non 0 to return the element to the caller 
- * of the iterator.
+ * Sets the iterator mapping function which operates over the iterator to
+ * select which elements are returned; it will be applied as soon as
+ * this method is called.
+ *
+ * The mapping function should return non 0 to allow the element to be
+ * returned.
  **/
 void
 librdf_iterator_set_map(librdf_iterator* iterator, 

@@ -48,11 +48,10 @@ librdf_delete_parser_factories(void)
 
 
 /**
- * librdf_parser_register_factory:
- * @name: the name of the hash
+ * librdf_parser_register_factory - Register a parser factory
+ * @name: the name of the parser
  * @factory: function to be called to register the factor parameters
  * 
- * Register a hash factory
  **/
 void
 librdf_parser_register_factory(const char *name,
@@ -102,10 +101,8 @@ librdf_parser_register_factory(const char *name,
 
 
 /**
- * librdf_get_parser_factory:
- * @name: the name of the factor
- * 
- * get a parser factory
+ * librdf_get_parser_factory - Get a parser factory by name
+ * @name: the name of the factory
  * 
  * Return value: the factory or NULL if not found
  **/
@@ -140,10 +137,8 @@ librdf_get_parser_factory(const char *name)
 
 
 /**
- * librdf_new_parser:
+ * librdf_new_parser - Constructor - create a new librdf_parser object
  * @factory: the parser factory to use to create this parser
- * 
- * Constructor: create a new &librdf_parser object
  * 
  * Return value: new &librdf_parser object or NULL
  **/
@@ -171,10 +166,9 @@ librdf_new_parser(librdf_parser_factory *factory)
 
 
 /**
- * librdf_free_parser:
+ * librdf_free_parser - Destructor - destroys a librdf_parser object
  * @parser: the parser
  * 
- * Destructor: destroys a &librdf_parser object
  **/
 void
 librdf_free_parser(librdf_parser *parser) 
@@ -189,11 +183,9 @@ librdf_free_parser(librdf_parser *parser)
 /* methods */
 
 /**
- * librdf_parser_parse_from_uri:
+ * librdf_parser_parse_from_uri - Parse a URI to a librdf_stream of statements
  * @parser: the parser
  * @uri: the URI to read
- * 
- * Parse a URI to a stream of statements
  * 
  * Return value: &librdf_stream of statements or NULL
  **/
@@ -205,10 +197,7 @@ librdf_parser_parse_from_uri(librdf_parser* parser, librdf_uri* uri)
 
 
 /**
- * librdf_init_parser:
- * @void: 
- * 
- * Initialise the librdf_parser class
+ * librdf_init_parser - Initialise the librdf_parser class
  **/
 void
 librdf_init_parser(void) 
@@ -222,6 +211,9 @@ librdf_init_parser(void)
 }
 
 
+/**
+ * librdf_finish_parser - Terminate the librdf_parser class
+ **/
 void
 librdf_finish_parser(void) 
 {
