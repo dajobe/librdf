@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Redland - RDF Application Framework - Tcl Interface</title>
+</head>
+<body bgcolor="#ffffff" text="#000085">
+
+<h1 align="center">Redland - RDF Application Framework - Tcl Interface</h1>
+
+<h2>Installing the Redland Tcl interface</h2>
+
+<p>This is not automatically built or installed at present since this
+interface may not be required.  You can easily build it by hand as
+follows</p>
+
+<pre>
+  cd tcl
+  make build-tcl
+  make test-tcl   # optional
+</pre>
+
+<p>To install it system wide (this is optional) do this as <em>root</em>:</p>
+
+<pre>
+  root# make install-tcl
+</pre>
+
+<p>The Tcl interface has been tested with Tcl 8.0.5 only and
+is alpha quality.</p>
+
+
+<h2>Redland Tcl API Introduction</h2>
+
+<p>The Tcl API is an object-based API with the class names and method
+names flattended into Tcl procedure names like this:
+librdf_<em>class</em>_<em>method</em> - the same names as in the
+underlying C API.  The object references become Tcl variables.</p>
+
+<h2>Testing the Redland Tcl interface</h2>
+
+<p>The example program provided parses an RDF/XML source file into a
+model.  It should be run with two arguments - the URI of the content
+(as file:/path/to/content) and the parser name (say, repat):</p>
+<pre>
+   tcl example.tcl file:../perl/dc.rdf repat
+</pre>
+
+
+
+<hr />
+
+<p>Copyright 2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+<p><a href="http://www.mirror.ac.uk/services/validator/check/referer">Validate me</a></p>
+
+</body>
+</html>
