@@ -681,20 +681,20 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
  * Return value: 
  **/
 int
-librdf_hash_from_array_of_strings (librdf_hash* hash, char *array[]) 
+librdf_hash_from_array_of_strings (librdf_hash* hash, char **array) 
 {
-        int i;
-        char *key;
-        char *value;
-        
-        for(i=0; (key=array[i]); i+=2) {
-                value=array[i+1];
-                if(!value)
-                        LIBRDF_FATAL2(librdf_hash_from_array_of_strings,
-                                      "Array contains an odd number of strings - %d", i);
-                librdf_hash_put(hash, key, strlen(key), value, strlen(value), 0);
-        }
-        return 0;
+  int i;
+  char *key;
+  char *value;
+  
+  for(i=0; (key=array[i]); i+=2) {
+    value=array[i+1];
+    if(!value)
+      LIBRDF_FATAL2(librdf_hash_from_array_of_strings,
+                    "Array contains an odd number of strings - %d", i);
+    librdf_hash_put(hash, key, strlen(key), value, strlen(value), 0);
+  }
+  return 0;
 }
 
 
