@@ -431,9 +431,20 @@ if test "X$XML_CONFIG" != X; then
   else
     AC_MSG_RESULT(no)
   fi
-fi
 
-AC_CHECK_HEADERS(libxml/parser.h libxml/hash.h gnome-xml/parser.h gnome-xml/xmlmemory.h)
+  oCFLAGS="$CFLAGS"
+  CFLAGS="$CFLAGS `$XML_CONFIG --cflags`"
+
+  AC_CHECK_HEADERS(libxml/parser.h libxml/hash.h gnome-xml/parser.h gnome-xml/xmlmemory.h)
+  if test "$ac_cv_header_libxml_parser_h" = no -a
+     test "$ac_cv_header_gnome_xml_parser_h" = no; then
+    AC_MSG_WARN(libxml library found but not headers - disabling)
+    have_libxml_lib=0
+    have_libxml=0
+  fi
+  CFLAGS="$oCFLAGS"
+
+fi
 
 
 dnl Checks for RDF parsers
