@@ -160,7 +160,9 @@ int librdf_node_set_uri(librdf_node* node, librdf_uri *uri);
 librdf_node_type librdf_node_get_type(librdf_node* node);
 void librdf_node_set_type(librdf_node* node, librdf_node_type type);
 
+#ifdef LIBRDF_DEBUG
 const char* librdf_node_get_type_as_string(int type);
+#endif
 
 char* librdf_node_get_literal_value(librdf_node* node);
 char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
