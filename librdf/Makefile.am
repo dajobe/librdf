@@ -66,6 +66,10 @@ rdf_query.h \
 rdf_serializer.h \
 rdf_log.h
 
+if MEMCMP
+librdf_la_SOURCES += memcmp.c
+endif
+
 librdf_la_LIBADD = \
 @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ @STORAGE_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
@@ -81,7 +85,6 @@ rdf_storage_tstore.c rdf_storage_tstore.h \
 rdf_storage_mysql.c rdf_storage_mysql.h
 
 EXTRA_DIST=\
-memcmp.c \
 redland.spec redland.spec.in \
 redland.pc.in
 
