@@ -119,6 +119,8 @@ AC_CHECK_PROGS(CSCC, cscc)
 # Mono
 AC_CHECK_PROGS(MONO, mono)
 AC_CHECK_PROGS(MCS, mcs)
+# Gnome
+AC_CHECK_PROGS(PKG_CONFIG, pkg-config)
 
 if test "X$PERL" != "X"; then
   PERLINSTALLSITEARCH=`$PERL -MConfig -e 'print $Config{installsitearch};'`
@@ -454,6 +456,13 @@ AC_CHECK_SIZEOF(unsigned long, 4)
   
 dnl Checks for libraries.
 
+
+STORAGE_OBJS=
+
+store_modules="memory"
+persistent_store=no
+
+
 dnl Berkeley DB
 AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area (default=/usr)], bdb_prefix="$withval", bdb_prefix="none") 
 AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (default=/usr/lib)], bdb_lib_dir="$withval", bdb_lib_dir="none") 
@@ -481,7 +490,7 @@ if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_
   fi
 
   # Sigh!  And this still might not be good enough.
-  for bdbc_version in 4.1 4.0 4 3.3 3.2 3.1 3 2; do
+  for bdbc_version in 4.2 4.1 4.0 4 3.3 3.2 3.1 3 2; do
     for bdbc_prefix in $extraprefix /usr/local /usr; do
       bdbc_major=`echo $bdbc_version | sed -e 's/^\(.\).*$/\1/'`;
       bdbc_version2=`echo $bdbc_version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
@@ -517,7 +526,7 @@ AC_MSG_RESULT($bdb_lib_dir)
 AC_MSG_CHECKING(location of BDB includes)
 AC_MSG_RESULT($bdb_include_dir)
 
-bdb_available=
+bdb_available=Missing
 if test "$bdb_prefix" != no; then
   nLDFLAGS=$LDFLAGS
   nCPPFLAGS=
@@ -650,12 +659,6 @@ LDFLAGS="$LIBRDF_LDFLAGS"
 LIBS="$LIBRDF_LIBS"
 
 
-if test "$have_libdb" != yes; then
-  AC_MSG_WARN(No persistant storage configured)
-  bdb_available=Missing
-fi
-
-
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h getopt.h)
@@ -708,8 +711,10 @@ AC_ARG_WITH(xml-parser, [  --with-xml-parser=NAME  Use XML parser - expat, libxm
 
 
 dnl Checks for RDF parsers
-parser_modules="raptor"
+parser_modules=raptor
+rdf_parsers_available=
 
+# raptor is REQUIRED despite the checking here
 AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
 AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default auto)], with_raptor="$withval", with_raptor="auto")
 
@@ -738,17 +743,21 @@ fi
 AC_MSG_CHECKING(raptor library source)
 if test $with_raptor = system; then
   AC_MSG_RESULT(system $RAPTOR_VERSION)
+  rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
 else
-  RAPTOR_VERSION=internal
   AC_MSG_RESULT(internal)
+  rdf_parsers_available="$parser_available raptor(internal)"
 fi
 
 AC_MSG_CHECKING(RDF parsers required)
 AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [raptor]], parser_modules="$enableval") 
 if test "X$parser_modules" = Xno -o "X$parser_modules" = X; then
   parser_modules=
+  AC_MSG_RESULT($parser_modules)
+  AC_MSG_WARN(No parsers are enabled, however libraptor is still used internally)
+else
+  AC_MSG_RESULT($parser_modules)
 fi
-AC_MSG_RESULT($parser_modules)
 
 PARSER_OBJS=
 
@@ -766,7 +775,6 @@ have_raptor=1
 raptor_dir=raptor
 
 need_raptor=1
-rdf_parsers_available=
 for parser in $parser_modules; do
   uname=`echo $parser | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
   found=0
@@ -784,10 +792,6 @@ for parser in $parser_modules; do
       AC_MSG_ERROR(No such parser $parser)
   esac
 
-  if test $found = 1; then
-    rdf_parsers_available="$rdf_parsers_available $original_parser"
-  fi
-
   # Add objects, sources only if the parser was found
   if test $found = 1; then
     PARSER_OBJS="$PARSER_OBJS rdf_parser_$parser.lo"
@@ -798,11 +802,6 @@ for parser in $parser_modules; do
         LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_INTERNAL_LIBS"
       else
         LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$RAPTOR_CONFIG --cflags`"
-        # Work around broken raptor-config 0.9.12 and earlier
-        if test $RAPTOR_VERSION_DEC -lt 000913; then
-          rp=`$RAPTOR_CONFIG --prefix`
-          LIBRDF_LIBS="$LIBRDF_LIBS -L$rp/lib -lraptor"
-        fi
         LIBRDF_LIBS="$LIBRDF_LIBS `$RAPTOR_CONFIG --libs`"
         raptor_dir=
       fi
@@ -924,25 +923,38 @@ else
 fi
 
 
-STORAGE_OBJS=
+AC_ARG_WITH(threestore, [  --with-threestore=PATH  Location of AKT triplestore/3store 3store-config (default auto)], tstore_config="$withval", tstore_config="")
+if test "X$tstore_config" != "X" ; then
+  AC_MSG_CHECKING(for $tstore_config)
+  if test -f $tstore_config ; then
+    TSTORE_CONFIG=$tstore_config
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no - searching PATH)
+  fi
+fi
+if test "X$TSTORE_CONFIG" = "X"; then
+  AC_CHECK_PROGS(TSTORE_CONFIG, 3store-config)
+fi
 
-AC_ARG_WITH(threestore, [  --with-threestore=DIR          3store installation location], tstore="$withval", tstore="")
-AC_MSG_CHECKING(for 3store)
-if test "X$tstore" != "X" -a -r $tstore/include/rdfsql/rdfsql.h -a -r $tstore/lib/librdfsql.la ; then
-  # FIXME - this assumes glib-config exists
-  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS -I$tstore/include `glib-config --cflags`"
-  LIBRDF_LIBS="$LIBRDF_LIBS -L$tstore/lib -lrdfsql"
-
-  STORAGE_OBJS="$STORAGE_OBJS rdf_storage_tstore.lo"
+AC_MSG_CHECKING(for 3store library)
+if test "X$TSTORE_CONFIG" != X -a "X$PKG_CONFIG" != X ; then
+  tstore_version=`$TSTORE_CONFIG --version`
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
+  LIBRDF_LIBS="$LIBRDF_LIBS `$TSTORE_CONFIG --libs` `$PKG_CONFIG glib --libs`"
 
   AC_DEFINE(HAVE_TSTORE, 1, [Have 3store available])
+
+  STORAGE_OBJS="$STORAGE_OBJS rdf_storage_tstore.lo"
+  store_modules="$store_modules 3store($tstore_version)"
+  persistent_store=yes
 else
-  tstore=no
+  with_tstore=no
 fi
-AC_MSG_RESULT($tstore)
+AC_MSG_RESULT($with_tstore)
 
 
-AC_ARG_WITH(mysql-config, [  --with-mysql-config=PATH        Location of MySQL 4 mysql_config], mysql_config="$withval", mysql_config="")
+AC_ARG_WITH(mysql, [  --with-mysql=PATH  Location of MySQL 4 mysql_config (default auto)], mysql_config="$withval", mysql_config="")
 if test "X$mysql_config" != "X" ; then
   AC_MSG_CHECKING(for $mysql_config)
   if test -f $mysql_config ; then
@@ -959,8 +971,8 @@ fi
 libmysql_min_version=4.0.14
 
 if test "X$MYSQL_CONFIG" != X; then
-  LIBS="`$MYSQL_CONFIG --libs|sed -e "s/'//g"` $LIBRDF_LIBS"
-  CPPFLAGS="`$MYSQL_CONFIG --cflags|sed -e "s/'//g"` $LIBRDF_CPPFLAGS"
+  LIBS="$LIBRDF_LIBS `$MYSQL_CONFIG --libs|sed -e "s/'//g"`"
+  CPPFLAGS="$LIBRDF_CPPFLAGS `$MYSQL_CONFIG --cflags|sed -e "s/'//g"`"
   AC_MSG_CHECKING(for mysql library)
   LIBMYSQL_VERSION=`$MYSQL_CONFIG --version`
   libmysql_version_dec=`echo $LIBMYSQL_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
@@ -969,11 +981,15 @@ if test "X$MYSQL_CONFIG" != X; then
   if test $libmysql_version_dec -lt $libmysql_min_version_dec; then
     AC_MSG_WARN(Using libmysql $LIBMYSQL_VERSION is unsupported - $libmysql_min_version or newer recommended.)
   else
-    LIBRDF_LIBS="`$MYSQL_CONFIG --libs|sed -e "s/'//g"` $LIBRDF_LIBS"
-    LIBRDF_CPPFLAGS="`$MYSQL_CONFIG --cflags|sed -e "s/'//g"` $LIBRDF_CPPFLAGS"
-    STORAGE_OBJS="$STORAGE_OBJS rdf_storage_mysql.lo"
+    LIBRDF_LIBS="$LIBRDF_LIBS `$MYSQL_CONFIG --libs|sed -e "s/'//g"`"
+    LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$MYSQL_CONFIG --cflags|sed -e "s/'//g"`"
+
     AC_DEFINE(HAVE_MYSQL,1,[MySQL libraries are present])
     have_libmysql=yes
+
+    STORAGE_OBJS="$STORAGE_OBJS rdf_storage_mysql.lo"
+    store_modules="$store_modules mysql($libmysql_version)"
+    persistent_store=yes
   fi
 fi
 
@@ -1034,12 +1050,15 @@ AC_SUBST(DIGEST_SRCS)
 HASH_OBJS=
 HASH_SRCS=
 
+store_modules="$store_modules hashes(memory)"
 AC_MSG_CHECKING(for bdb hash support)
 if test "$have_libdb" = yes; then
   AC_MSG_RESULT(yes);
   AC_DEFINE(HAVE_BDB_HASH, 1, [Have BDB hash support])
   HASH_OBJS="$HASH_OBJS rdf_hash_bdb.lo"
   HASH_SRCS="$HASH_SRCS rdf_hash_bdb.c"
+  store_modules="$store_modules hashes(bdb $bdb_version)"
+  persistent_store=yes
 else
   AC_MSG_RESULT(no);
 fi
@@ -1047,6 +1066,11 @@ fi
 
 AC_SUBST(HASH_OBJS)
 AC_SUBST(HASH_SRCS)
+
+
+if test "$persistent_store" = no; then
+  AC_MSG_WARN(No persistant storage available)
+fi
 
 
 dnl Checks for building sub-packages in sub directories
@@ -1139,9 +1163,10 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 Redland build summary:
+  Berkeley/Sleepycat DB:  $bdb_available
   Languages available:   $languages_available
   Language APIs built:   $languages
+  Triple stores:          $store_modules
   RDF parsers:           $rdf_parsers_available
-  Hash digests:          $digest_modules_available
-  Berkeley/Sleepycat DB:  $bdb_available
+  Content digests:       $digest_modules_available
 ])
