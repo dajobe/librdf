@@ -1,7 +1,0 @@
-.cvsignore
-Makefile
-Makefile.in
-*.sgml
-overview.png
-overview.ps
-overview.pdf
