@@ -118,8 +118,9 @@ print <<"EOT";
 
 <p>This was written using
 <a href="http://www.redland.opensource.ac.uk/">Redland</a>
-and the <a href="/docs/pod/RDF/Redland/RSS.html">RDF::Redland::RSS</a> 
-<a href="/docs/perl.html">Perl</a> interface,
+and the
+<a href="http://www.redland.opensource.ac.uk/docs/pod/RDF/Redland/RSS.html">RDF::Redland::RSS</a> 
+<a href="http://www.redland.opensource.ac.uk/docs/perl.html">Perl</a> interface,
 interpreting the RSS 1.0 content as RDF using the
 <a href="http://www.redland.opensource.ac.uk/raptor/">Raptor RDF parser</a>.</p>
 <p>The source code of this demonstration is available in the Redland

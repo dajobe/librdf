@@ -78,8 +78,9 @@ print <<"EOT";
 
 <p>This was written using
 <a href="http://www.redland.opensource.ac.uk/">Redland</a>
-and the <a href="/docs/pod/RDF/Redland/Parser.html">RDF::Redland::Parser</a> 
-<a href="/docs/perl.html">Perl</a> interface
+and the
+<a href="http://www.redland.opensource.ac.uk/docs/pod/RDF/Redland/Parser.html">RDF::Redland::Parser</a> 
+<a href="http://www.redland.opensource.ac.uk/docs/perl.html">Perl</a> interface
 to the <a href="http://www.redland.opensource.ac.uk/raptor/">Raptor</a>
 N-Triples parser.</p>
 
