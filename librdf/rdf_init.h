@@ -102,6 +102,7 @@ int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, const cha
 #ifdef LIBRDF_INTERNAL
 /* internal routines used to invoking errors/warnings upwards to user */
 void librdf_error(librdf_world* world, const char *message, ...);
+void librdf_error_varargs(librdf_world* world, const char *message, va_list arguments);
 void librdf_warning(librdf_world* world, const char *message, ...);
 
 const unsigned char* librdf_world_get_genid(librdf_world* world);
