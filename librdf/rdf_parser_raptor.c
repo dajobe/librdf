@@ -108,6 +108,12 @@ librdf_parser_rapier_new_statement_handler (void *context,
 #endif
   librdf_world* world=scontext->pcontext->parser->world;
 
+  if(rstatement->predicate_type == RAPIER_PREDICATE_TYPE_XML_NAME)
+    return;
+
+  if(rstatement->object_type == RAPIER_OBJECT_TYPE_XML_NAME)
+    return;
+
   statement=librdf_new_statement(world);
   if(!statement)
     return;
@@ -247,6 +253,8 @@ librdf_parser_rapier_parse_common(void *context,
   
   rapier_set_statement_handler(rdf_parser, scontext, 
                                librdf_parser_rapier_new_statement_handler);
+
+  rapier_set_feature(rdf_parser, RAPIER_FEATURE_SCANNING, 1);
 
   scontext->rdf_parser=rdf_parser;
 
