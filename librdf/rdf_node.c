@@ -756,13 +756,13 @@ librdf_node_get_literal_value_as_counted_string(librdf_node* node,
  *
  * Return value: the literal string or NULL if node is not a literal
  **/
-unsigned char*
+char*
 librdf_node_get_literal_value_as_latin1(librdf_node* node) 
 {
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
     return NULL;
-  return librdf_utf8_to_latin1((const byte*)node->value.literal.string,
-                               node->value.literal.string_len, NULL);
+  return (char*)librdf_utf8_to_latin1((const byte*)node->value.literal.string,
+                                      node->value.literal.string_len, NULL);
 }
 
 
