@@ -589,8 +589,11 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
   if(librdf_stream_end(context->stream))
     return NULL;
 
-  if(!statement)
-    return NULL;
+  if(!statement) {
+    statement=context->current_statement=librdf_stream_next(context->stream);
+    if(!statement)
+      return NULL;
+  }
 
   switch(context->want) {
     case LIBRDF_STATEMENT_SUBJECT: /* SOURCES (subjects) */
