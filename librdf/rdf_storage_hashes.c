@@ -1648,7 +1648,7 @@ librdf_storage_hashes_context_serialise_finished(void* context)
 }
 
 
-static void
+static int
 librdf_storage_hashes_sync(librdf_storage *storage)
 {
   librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
@@ -1656,6 +1656,7 @@ librdf_storage_hashes_sync(librdf_storage *storage)
   
   for(i=0; i<context->hash_count; i++)
     librdf_hash_sync(context->hashes[i]);
+  return 0;
 }
 
 

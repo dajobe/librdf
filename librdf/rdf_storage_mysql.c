@@ -87,7 +87,7 @@ static void librdf_storage_mysql_terminate(librdf_storage* storage);
 static int librdf_storage_mysql_open(librdf_storage* storage,
                                      librdf_model* model);
 static int librdf_storage_mysql_close(librdf_storage* storage);
-static void librdf_storage_mysql_sync(librdf_storage* storage);
+static int librdf_storage_mysql_sync(librdf_storage* storage);
 static int librdf_storage_mysql_size(librdf_storage* storage);
 static int librdf_storage_mysql_add_statement(librdf_storage* storage,
                                               librdf_statement* statement);
@@ -528,17 +528,16 @@ librdf_storage_mysql_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_mysql_close(librdf_storage* storage)
 {
-  librdf_storage_mysql_sync(storage);
-  return 0;
+  return librdf_storage_mysql_sync(storage);
 }
 
 /**
  * librdf_storage_mysql_sync - Flush all tables, making sure they are saved on disk.
  * @storage: the storage
  *
- * Return value: N/A
+ * Return value: Non-zero on failure (negative values are MySQL errors).
  **/
-static void
+static int
 librdf_storage_mysql_sync(librdf_storage* storage)
 {
   librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
@@ -547,7 +546,7 @@ librdf_storage_mysql_sync(librdf_storage* storage)
   if(context->bulk)
     librdf_storage_mysql_stop_bulk(storage);
 
-  return;
+  return 0;
 }
 
 /**

@@ -76,7 +76,7 @@ static int librdf_storage_file_contains_statement(librdf_storage* storage, librd
 static librdf_stream* librdf_storage_file_serialise(librdf_storage* storage);
 static librdf_stream* librdf_storage_file_find_statements(librdf_storage* storage, librdf_statement* statement);
 
-static void librdf_storage_file_sync(librdf_storage *storage);
+static int librdf_storage_file_sync(librdf_storage *storage);
 
 static void librdf_storage_file_register_factory(librdf_storage_factory *factory);
 
@@ -165,8 +165,7 @@ librdf_storage_file_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_file_close(librdf_storage* storage)
 {
-  librdf_storage_file_sync(storage);
-  return 0;
+  return librdf_storage_file_sync(storage);
 }
 
 
@@ -230,7 +229,7 @@ librdf_storage_file_find_statements(librdf_storage* storage, librdf_statement* s
 }
 
 
-static void
+static int
 librdf_storage_file_sync(librdf_storage *storage)
 {
   librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
@@ -238,14 +237,15 @@ librdf_storage_file_sync(librdf_storage *storage)
   char *new_name;
   librdf_serializer* serializer;
   FILE *fh;
+  int rc=0;
 
   if(!context->changed)
-    return;
+    return 0;
 
   if(!context->name) {
     /* FIXME - URI cannot be written */
     context->changed=0;
-    return;
+    return 0;
   }
   
   backup_name=NULL;
@@ -254,7 +254,7 @@ librdf_storage_file_sync(librdf_storage *storage)
     /* name"~\0" */
     backup_name=(char*)LIBRDF_MALLOC(cstring, context->name_len+2);
     if(!backup_name)
-      return;
+      return 1;
     strcpy(backup_name, (const char*)context->name);
     backup_name[context->name_len]='~';
     backup_name[context->name_len+1]='\0';
@@ -264,14 +264,14 @@ librdf_storage_file_sync(librdf_storage *storage)
                  "rename of '%s' to '%s' failed - %s",
                  context->name, backup_name, strerror(errno));
       LIBRDF_FREE(cstring, backup_name);
-      return;
+      return 1;
     }
   }
   
   /* name".new\0" */
   new_name=(char*)LIBRDF_MALLOC(cstring, context->name_len+5);
   if(!new_name)
-    return;
+    return 1;
   strcpy(new_name, (const char*)context->name);
   strcpy(new_name+context->name_len, ".new");
 
@@ -280,15 +280,16 @@ librdf_storage_file_sync(librdf_storage *storage)
     LIBRDF_FREE(cstring, new_name);
     if(backup_name)
       LIBRDF_FREE(cstring, backup_name);
-    return;
+    return 1;
   }
   
   fh=fopen(new_name, "w+");
-  if(!fh)
+  if(!fh) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "failed to open file '%s' for writing - %s",
                new_name, strerror(errno));
-  else {
+    rc=1;
+  } else {
     librdf_serializer_serialize_model_to_file_handle(serializer, fh,
                                                      context->uri,
                                                      context->model);
@@ -301,20 +302,25 @@ librdf_storage_file_sync(librdf_storage *storage)
                "rename of '%s' to '%s' failed - %s (%d)",
                new_name, context->name, strerror(errno), errno);
     fh=NULL;
+    rc=1;
   }
 
   LIBRDF_FREE(cstring, new_name);
   
   /* restore backup on failure (fh=NULL) */
-  if(!fh && backup_name && rename(backup_name, context->name) < 0)
+  if(!fh && backup_name && rename(backup_name, context->name) < 0) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "rename of '%s' to '%s' failed - %s",
                backup_name, context->name, strerror(errno));
+    rc=1;
+  }
 
   if(backup_name)
     LIBRDF_FREE(cstring, backup_name);
 
   context->changed=0;
+
+  return rc;
 }
 
 
