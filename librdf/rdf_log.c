@@ -49,8 +49,7 @@
 #endif
 #endif
 
-#include <librdf.h>
-#include <raptor.h>
+#include <redland.h>
 
 
 static const char *log_level_names[LIBRDF_LOG_LAST+1]={
@@ -194,6 +193,80 @@ librdf_fatal(librdf_world* world, int facility,
   librdf_log(world, 0, LIBRDF_LOG_FATAL, facility, NULL, buffer);
   LIBRDF_FREE(cstring, buffer);
   abort();
+}
+
+
+/**
+ * librdf_log_message_code: retrieve error code from log message
+ * @message: log message
+ *
+ * Return value: int error code
+ **/
+int
+librdf_log_message_code(librdf_log_message *message)
+{
+  return message->code;
+}
+
+
+/**
+ * librdf_log_message_level: retrieve severity of log message
+ * @message: log message
+ *
+ * The log message severity level is defined in rdf_log.h as values
+ * of enum librdf_log_level.
+ *
+ * Return value: severity level
+ **/
+librdf_log_level
+librdf_log_message_level(librdf_log_message *message)
+{
+  return message->level;
+}
+
+
+/**
+ * librdf_log_message_facility: retrieve facility that generated the message
+ * @message: log message
+ *
+ * The log message facility is defined in rdf_log.h as values
+ * of enum librdf_log_facility.
+ *
+ * Return value: ID of Redland facility that generated the log message.
+ **/
+librdf_log_facility
+librdf_log_message_facility(librdf_log_message *message)
+{
+  return message->facility;
+}
+
+
+/**
+ * librdf_log_message_message: retrieve text message from log entry
+ * @message: log message
+ *
+ * The string returned is shared and must be copied by the caller
+ * if required to be retained.
+ *
+ * Return value: shared pointer to the log message string
+ **/
+const char *
+librdf_log_message_message(librdf_log_message *message)
+{
+  return message->message;
+}
+
+
+/**
+ * librdf_log_message_locator: retrieve locator of log entry
+ * @message: log message
+ *
+ * Return value: pointer to an appropriate raptor_locator* or NULL if not available
+ **/
+raptor_locator*
+librdf_log_message_locator(librdf_log_message *message)
+{
+  return message->locator;
 }
 
 
