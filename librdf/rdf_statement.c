@@ -414,7 +414,7 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Freeing statement\n", program);
   librdf_free_statement(statement);
   
-#ifdef LIBRDF_DEBUG 
+#ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);
 #endif
 	
