@@ -86,21 +86,24 @@ and \fIARC\fP as a predicate.
 Check that there is a triple with \fINODE\fP as a object
 and \fIARC\fP as a predicate.
 
-.IP "\fBparse \fIURI\fP \fIPARSER\fP \fI[BASE URI]\fP\fR"
-Parse syntax at \fIURI\fP intothe graph using PARSER
+.IP "\fBparse \fIURI\fP [\fISYNTAX|\fP \fI[BASE URI]\fP]\fR"
+Parse syntax at \fIURI\fP intothe graph using \fISYNTAX\fP which
+can be one of \fIrdfxml\fP (RDF/XML, default) or \fIntriples\fP.
 
-.IP "\fBparse-stream \fIURI\fP \fIPARSER\fP \fI[BASE URI]\fP\fR"
-Streaming parse syntax at URI into the graph using PARSER
+.IP "\fBparse-stream \fIURI\fP [\fISYNTAX\fP \fI[BASE URI]\fP]\fR"
+Streaming parse syntax at URI into the graph using \fISYNTAX\fP which
+can be one of \fIrdfxml\fP (RDF/XML, default) or \fIntriples\fP.
 
 .IP "\fBprint\fR"
-Print the graph triples.
+Print the graph triples in a simple format showing context nodes
+if present.
 
 .IP "\fBremove \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP \fI[CONTEXT]\fP\fR"
 Remove the given triple graph, in the optional Redland context
 if \fICONTEXT\fR is given.
 
-.IP "\fBserialize [\fINAME\fP [\fIURI\fP [\fIMIME-TYPE\fP]]]\fR"
-Serializes the graph to a syntax with a particular \INAME\fI
+.IP "\fBserialize [\fISYNTAX\fP [\fIURI\fP [\fIMIME-TYPE\fP]]]\fR"
+Serializes the graph to a syntax with a particular \ISYNTAX\fI
 \fIURI\fR or Internet Media Type/MIME Type.  The default is
 RDF/XML (\fINAME\fR "rdfxml", MIME Type "application/rdf/xml")
 if none of the above are given.  Other alternatives
