@@ -38,14 +38,14 @@
 #define BDB_CLOSE_2_ARGS ?
 #define BDB_FD_2_ARGS ?
 
-#endif
+#else
 
 /* BDB V2 */
 #ifdef HAVE_DB_OPEN
 #define BDB_CLOSE_2_ARGS 1
 #define BDB_FD_2_ARGS 1
 
-#endif
+#else
 
 /* BDB V1 - NOT WORKING */
 #ifdef HAVE_DBOPEN
@@ -53,6 +53,13 @@
 #include <fcntl.h>
 #undef BDB_CLOSE_2_ARGS
 #undef BDB_FD_2_ARGS
+
+#else
+
+ERROR - no idea how to use Berkeley DB
+
+#endif
+#endif
 #endif
 
 
