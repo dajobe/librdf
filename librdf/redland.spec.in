@@ -137,7 +137,7 @@ cd ..
 %files perl
 %defattr(-, bin, bin)
 
-%{perlinstallsitearch}/auto/RDF/Redland/CORE
+%{perlinstallsitearch}/auto
 %{perlinstallsitearch}/RDF/Redland
 %{perlinstallsitearch}/RDF/Redland.pm
 
