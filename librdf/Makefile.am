@@ -78,8 +78,7 @@ rdf_parser.h \
 rdf_heuristics.h rdf_files.h rdf_utf8.h \
 rdf_query.h \
 rdf_query_triples.h \
-rdf_serializer.h \
-rdf_serializer_raptor.h
+rdf_serializer.h
 
 librdf_la_LIBADD = @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @XML_OBJS@
