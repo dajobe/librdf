@@ -46,13 +46,15 @@
 #include <librdf.h>
 
 
-const char * const redland_copyright_string = "Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/ - Institute for Learning and Research Technology, University of Bristol.";
+const char * const librdf_copyright_string = "Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/ - Institute for Learning and Research Technology, University of Bristol.";
 
-const char * const redland_version_string = VERSION;
+const char * const librdf_version_string = VERSION;
 
-const int redland_version_major = LIBRDF_VERSION_MAJOR;
-const int redland_version_minor = LIBRDF_VERSION_MINOR;
-const int redland_version_release = LIBRDF_VERSION_RELEASE;
+const unsigned int librdf_version_major = LIBRDF_VERSION_MAJOR;
+const unsigned int librdf_version_minor = LIBRDF_VERSION_MINOR;
+const unsigned int librdf_version_release = LIBRDF_VERSION_RELEASE;
+
+const unsigned int librdf_version_decimal = (LIBRDF_VERSION_MAJOR * 10000)+(LIBRDF_VERSION_MINOR * 100) + LIBRDF_VERSION_RELEASE;
 
 
 
