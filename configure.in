@@ -233,7 +233,7 @@ if test "$bdb_prefix" != no; then
 
   if test "$bdb_name" != none; then
     # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
-    bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb*.a|sed -e 's/^lib//' -e 's/\.a$//' | head -1`
+    bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb*.a 2>/dev/null |sed -e 's/^lib//' -e 's/\.a$//' | head -1`
   fi
 
   AC_MSG_CHECKING(name of BDB library)
@@ -990,10 +990,13 @@ CFLAGS="-DLIBRDF_INTERNAL=1 $CFLAGS"
 MEM=
 MEM_LIBS=
 if test "$USE_MAINTAINER_MODE" = yes; then
-  #MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
-  #MEM_LIBS=-ldmalloc
-  MEM=-DLIBRDF_MEMORY_DEBUG=1
-  MEM_LIBS=
+  if test "$ac_cv_header_dmalloc_h" = yes; then
+    MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
+    MEM_LIBS=-ldmalloc
+  else
+    MEM=-DLIBRDF_MEMORY_DEBUG=1
+    MEM_LIBS=
+  fi
   CFLAGS="-DLIBRDF_DEBUG=1 $CFLAGS"
 fi
 STANDARD_CFLAGS="$STANDARD_CFLAGS $CFLAGS"
