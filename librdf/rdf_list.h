@@ -91,6 +91,7 @@ extern "C" {
 struct librdf_list_node_s
 {
   struct librdf_list_node_s* next;
+  struct librdf_list_node_s* prev;
   void *data;
 };
 typedef struct librdf_list_node_s librdf_list_node;
@@ -99,6 +100,7 @@ typedef struct librdf_list_node_s librdf_list_node;
 struct librdf_list_s
 {
   librdf_list_node* first;
+  librdf_list_node* last;
   librdf_list_node* current;
   int length;
   int (*equals) (void* data1, void *data2);
@@ -108,9 +110,15 @@ struct librdf_list_s
 librdf_list* librdf_new_list(void);
 void librdf_free_list(librdf_list* list);
 
+/* add to end of list (push) */
 int librdf_list_add(librdf_list* list, void *data);
-int librdf_list_remove(librdf_list* list, void *data);
+/* add to start of list */
+int librdf_list_unshift(librdf_list* list, void *data);
+/* remove from start of list */
+void* librdf_list_shift(librdf_list* list);
+/* remove from end of list (pop) */
 void* librdf_list_pop(librdf_list* list);
+int librdf_list_remove(librdf_list* list, void *data);
 int librdf_list_contains(librdf_list* list, void *data);
 int librdf_list_size(librdf_list* list);
 

@@ -91,7 +91,7 @@
 
 
 /* prototypes for local functions */
-static librdf_list_node* librdf_list_find_node(librdf_list* list, void *data, librdf_list_node** prev);
+static librdf_list_node* librdf_list_find_node(librdf_list* list, void *data);
 
 static int librdf_list_iterator_have_elements(void* iterator);
 static void* librdf_list_iterator_get_next(void* iterator);
@@ -100,13 +100,10 @@ static void* librdf_list_iterator_get_next(void* iterator);
 
 /* helper functions */
 static librdf_list_node*
-librdf_list_find_node(librdf_list* list, void *data,
-		      librdf_list_node** prev) 
+librdf_list_find_node(librdf_list* list, void *data)
 {
   librdf_list_node* node;
   
-  if(prev)
-    *prev=list->first;
   for(node=list->first; node; node=node->next) {
     if(list->equals) {
       if(list->equals(node->data, data))
@@ -115,9 +112,6 @@ librdf_list_find_node(librdf_list* list, void *data,
       if(node->data == data)
         break;
     }
-    
-    if(prev)
-      *prev=node;
   }
   return node;
 }
@@ -160,7 +154,7 @@ librdf_free_list(librdf_list* list)
 
 
 /**
- * librdf_list_add - add a data item to the start of a librdf_list
+ * librdf_list_add - add a data item to the end of a librdf_list
  * @list: &librdf_list object
  * @data: the data value
  * 
@@ -181,15 +175,72 @@ librdf_list_add(librdf_list* list, void *data)
     return 1;
   
   node->data=data;
-  node->next=list->first;
-  list->first=node;
+
+  /* if there is a list, connect the new node to the last node  */
+  if(list->last) {
+    node->prev=list->last;
+    list->last->next=node;
+  }
+
+  /* make this node the last node always */
+  list->last=node;
+  
+  /* if there is no list at all, make this the first to */
+  if(!list->first)
+    list->first=node;
+
+  /* node->next = NULL implicitly */
+
   list->length++;
   return 0;
 }
 
 
 /**
- * librdf_list_remove - remove a data item from a librdf_list
+ * librdf_list_unshift - add a data item to the start of a librdf_list
+ * @list: &librdf_list object
+ * @data: the data value
+ * 
+ * if librdf_list_shift() is called after this, it will return the value
+ * added here.
+ *
+ * Return value: non 0 on failure
+ **/
+int
+librdf_list_unshift(librdf_list* list, void *data) 
+{
+  librdf_list_node* node;
+  
+  /* need new node */
+  node=(librdf_list_node*)LIBRDF_CALLOC(librdf_list_node, 1,
+                                        sizeof(librdf_list_node));
+  if(!node)
+    return 1;
+  
+  node->data=data;
+
+  /* if there is a list, connect the new node to the first node  */
+  if(list->first) {
+    node->next=list->first;
+    list->first->prev=node;
+  }
+
+  /* make this node the first node always */
+  list->first=node;
+  
+  /* if there is no list at all, make this the last too */
+  if(!list->last)
+    list->last=node;
+
+  /* node->next = NULL implicitly */
+
+  list->length++;
+  return 0;
+}
+
+
+/**
+ * librdf_list_remove - remove a data item from an librdf_list
  * @list: &librdf_list object
  * @data: the data item
  * 
@@ -202,17 +253,23 @@ librdf_list_add(librdf_list* list, void *data)
 int
 librdf_list_remove(librdf_list* list, void *data) 
 {
-  librdf_list_node *node, *prev;
+  librdf_list_node *node;
   
-  node=librdf_list_find_node(list, data, &prev);
+  node=librdf_list_find_node(list, data);
   if(!node) {
     /* not found */
     return 1;
   }
   if(node == list->first)
     list->first=node->next;
-  else
-    prev->next=node->next;
+  if(node->prev)
+    node->prev->next=node->next;
+
+  if(node == list->last)
+    list->last=node->prev;
+  if(node->next)
+    node->next->prev=node->prev;
+  
   
   /* free node */
   LIBRDF_FREE(librdf_list_node, node);
@@ -222,7 +279,43 @@ librdf_list_remove(librdf_list* list, void *data)
 
 
 /**
- * librdf_list_pop - remove and return the data from the start of the list
+ * librdf_list_shift - remove and return the data at the start of the list
+ * @list: &librdf_list object
+ * 
+ * Return value: the data object or NULL if the list is empty
+ **/
+void*
+librdf_list_shift(librdf_list* list)
+{
+  librdf_list_node *node;
+  void *data;
+
+  node=list->first;
+  if(!node)
+    return NULL;
+     
+  list->first=node->next;
+
+  if(list->first)
+    /* if list not empty, fix pointers */
+    list->first->prev=NULL;
+  else
+    /* list is now empty, zap last pointer */
+    list->last=NULL;
+  
+  /* save data */
+  data=node->data;
+
+  /* free node */
+  LIBRDF_FREE(librdf_list_node, node);
+
+  list->length--;
+  return data;
+}
+
+
+/**
+ * librdf_list_pop - remove and return the data at the end of the list
  * @list: &librdf_list object
  * 
  * Return value: the data object or NULL if the list is empty
@@ -233,11 +326,19 @@ librdf_list_pop(librdf_list* list)
   librdf_list_node *node;
   void *data;
 
-  node=list->first;
+  node=list->last;
   if(!node)
     return NULL;
      
-  list->first=node->next;
+  list->last=node->prev;
+
+  if(list->last)
+    /* if list not empty, fix pointers */
+    list->last->next=NULL;
+  else
+    /* list is now empty, zap last pointer */
+    list->first=NULL;
+  
   /* save data */
   data=node->data;
 
@@ -263,9 +364,9 @@ librdf_list_pop(librdf_list* list)
 int
 librdf_list_contains(librdf_list* list, void *data) 
 {
-  librdf_list_node *node, *prev;
+  librdf_list_node *node;
   
-  node=librdf_list_find_node(list, data, &prev);
+  node=librdf_list_find_node(list, data);
   return (node != NULL);
 }
 
