@@ -814,7 +814,6 @@ if test "$USE_MAINTAINER_MODE" = yes; then
   else
     use_dmalloc=no
   fi
-  CFLAGS="-DLIBRDF_DEBUG=1 $CFLAGS"
 else
   use_dmalloc=no
 fi
