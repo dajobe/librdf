@@ -13,11 +13,6 @@
 	rdf_digest_md5.c, rdf_digest.c, rdf_concepts.c: Use redland.h in
 	all files not a selection of librdf.h, raptor.h and rasqal.h
 
-2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
-
-	* Use redland.h in all files not a selection of librdf.h, raptor.h
-	and rasqal.h
-
 2004-07-09  Edd Dumbill <edd@usefulinc.com>
 
 	* rdf_log.c: add accessors for components of the
