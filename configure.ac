@@ -944,7 +944,7 @@ MEM_LIBS=
 AC_ARG_WITH(dmalloc, [  --with-dmalloc          Use dmalloc debugging library (default=auto)], use_dmalloc="$withval", use_dmalloc="auto") 
 AC_MSG_CHECKING(using dmalloc library)
 if test "$USE_MAINTAINER_MODE" = yes; then
-  if test "$ac_cv_header_dmalloc_h"; then
+  if test "$ac_cv_header_dmalloc_h" = yes; then
     if test "X$use_dmalloc" = Xauto; then
       use_dmalloc=yes
     fi
