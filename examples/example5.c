@@ -48,9 +48,6 @@ main(int argc, char *argv[])
   world=librdf_new_world();
   librdf_world_open(world);
 
-  model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.'"), NULL);
-
-
   if(argc !=3) {
     fprintf(stderr, "USAGE: %s CONTENT-URI QUERY-STRING\n", program);
     return 1; 
@@ -59,6 +56,11 @@ main(int argc, char *argv[])
   uri=librdf_new_uri(world, argv[1]);
   query_string=argv[2];
   
+  model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "new='yes',hash-type='bdb',dir='.'"), NULL);
+  if(!model || !storage) {
+    fprintf(stderr, "%s: Failed to make model or storage\n", program);
+    return 1;
+  }
 
   parser_name=raptor_guess_parser_name(NULL, NULL, NULL, 0, librdf_uri_as_string(uri));
   parser=librdf_new_parser(world, parser_name, NULL, NULL);
