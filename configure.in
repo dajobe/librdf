@@ -402,7 +402,7 @@ fi
 
 LIBS="$oLIBS"
 
-AC_CHECK_PROG(XML_CONFIG, xml-config, xml-config)
+AC_CHECK_PROGS(XML_CONFIG, xml2-config xml-config)
 
 
 have_libxml=0
@@ -432,7 +432,8 @@ if test "X$XML_CONFIG" != X; then
     AC_MSG_RESULT(no)
   fi
 fi
-AC_CHECK_HEADERS(gnome-xml/parser.h)
+
+AC_CHECK_HEADERS(libxml/parser.h libxml/hash.h gnome-xml/parser.h gnome-xml/xmlmemory.h)
 
 
 dnl Checks for RDF parsers
@@ -591,26 +592,30 @@ for parser in $parser_modules; do
 
     raptor)
       if test $have_raptor = 1 ; then
-	if test $have_expat_lib = 1; then
-	  need_expat=1
-	  found=1
-	  AC_DEFINE(NEED_EXPAT)
-	elif test $have_expat_source = 1; then
-	  need_expat=1
-	  need_expat_source=1
-	  found=1
-	  AC_DEFINE(NEED_EXPAT)
-	elif test $have_libxml_lib = 1; then
+	if test $have_libxml_lib = 1; then
 	  need_libxml=1
 	  found=1
 	  AC_DEFINE(NEED_LIBXML)
+	  AC_DEFINE(RAPTOR_XML_LIBXML)
 	elif test $have_libxml_source = 1; then
 	  need_libxml=1
 	  need_libxml_source=1
 	  found=1
 	  AC_DEFINE(NEED_LIBXML)
-	fi
-	need_raptor=1
+	  AC_DEFINE(RAPTOR_XML_LIBXML)
+	elif test $have_expat_lib = 1; then
+	  need_expat=1
+	  found=1
+	  AC_DEFINE(NEED_EXPAT)
+	  AC_DEFINE(RAPTOR_XML_EXPAT)
+	elif test $have_expat_source = 1; then
+	  need_expat=1
+	  need_expat_source=1
+	  found=1
+	  AC_DEFINE(NEED_EXPAT)
+	  AC_DEFINE(RAPTOR_XML_EXPAT)
+       	fi
+       	need_raptor=1
       fi
         
       ;;
