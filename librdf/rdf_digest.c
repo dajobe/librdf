@@ -275,7 +275,7 @@ main(int argc, char *argv[])
   rdf_digest_factory* factory;
   rdf_digest* d;
   char *test_data="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
-  char *test_digest_types[]={"MD5", "MD5-OPENSSL", "SHA1", "SHA1-OPENSSL", "FAKE", "RIPEMD160", "RIPEMD160-OPENSSL", NULL};
+  char *test_digest_types[]={"MD5", "SHA1", "FAKE", "RIPEMD160", NULL};
   int i;
   char *type;
   char *program=argv[0];
