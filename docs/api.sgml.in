@@ -302,6 +302,19 @@ either via an adaptor class or direct by persistant storage.
 </sect1>
 </chapter>
 
+<chapter id="serializer">
+<?dbhtml filename='serializer.html'>
+<title>RDF Serializer</title>
+<para>
+This module provides RDF graph to syntax serialization support
+via factory classes providing one or more particular target syntaxes.
+</para>
+<sect1>
+<title>RDF Serializer Raptor Class</title>
+@INCLUDE serializer_raptor.sgml
+</sect1>
+</chapter>
+
 <chapter id="storage">
 <?dbhtml filename='storage.html'>
 <title>RDF Model Storage</title>
