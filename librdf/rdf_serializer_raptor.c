@@ -150,8 +150,8 @@ librdf_serializer_raptor_set_namespace(void* context,
                                        librdf_uri *uri, const char *prefix) 
 {
   librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
-  return raptor_serializer_set_namespace(scontext->rdf_serializer, 
-                                         (raptor_uri*)uri, prefix);
+  return raptor_serialize_set_namespace(scontext->rdf_serializer, 
+                                        (raptor_uri*)uri, prefix);
 }
   
 
