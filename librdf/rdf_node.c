@@ -331,6 +331,38 @@ librdf_node_get_literal_value_language(librdf_node* node)
 
 
 /**
+ * librdf_node_get_literal_value_is_wf_xml - Get the XML well-formness property of the node
+ * @node: the node object
+ * 
+ * Return value: 0 if the XML literal is NOT well formed XML content, or the node is not a literal
+ **/
+int
+librdf_node_get_literal_value_is_wf_xml(librdf_node* node) 
+{
+  if(node->type != LIBRDF_NODE_TYPE_LITERAL)
+    return 0;
+  return node->value.literal.is_wf_xml;
+}
+
+
+/**
+ * librdf_node_get_literal_value_xml_space - Get the XML space property of the node
+ * @node: the node object
+ * 
+ * See librdf_node_set_literal_value() for the legal xml:space values.
+ *
+ * Return value: the xml:space property of the literal or -1 if the node is not a literal
+ **/
+int
+librdf_node_get_literal_value_xml_space(librdf_node* node) 
+{
+  if(node->type != LIBRDF_NODE_TYPE_LITERAL)
+    return -1;
+  return node->value.literal.xml_space;
+}
+
+
+/**
  * librdf_node_set_literal_value - Set the node literal value with options
  * @node: the node object
  * @value: pointer to the literal string value
