@@ -303,7 +303,16 @@ if test "$bdb_prefix" != no; then
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
-    AC_MSG_CHECKING(for BDB V4.1+ DB->open)
+    AC_MSG_CHECKING(for BDB V4.0 DB->open with 6 arguments)
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, DB_BTREE, 0, 0);],
+		AC_DEFINE(HAVE_BDB_OPEN_6_ARGS, 1, [BDB has open method with 6 args])
+                bdb_available="Version 4.0+"
+                have_libdb=yes
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
+    AC_MSG_CHECKING(for BDB V4.1+ DB->open with 7 arguments)
     AC_TRY_LINK([#include <stdio.h>
                  #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);],
 		AC_DEFINE(HAVE_BDB_OPEN_7_ARGS, 1, [BDB has open method with 7 args])

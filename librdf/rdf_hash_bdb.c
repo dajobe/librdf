@@ -207,7 +207,23 @@ librdf_hash_bdb_open(void* context, char *identifier,
   if(is_new)
     flags |= DB_TRUNCATE;
 
+#ifdef HAVE_BDB_OPEN_6_ARGS  
+/* 
+ * int DB->open(DB *db, const char *file,
+ *              const char *database, DBTYPE type, u_int32_t flags, int mode);
+ */
+  if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
+    librdf_error(bdb_context->hash->world, "BDB V4.0+ open of '%s' failed - %s",
+                 file, db_strerror(ret));
+    LIBRDF_FREE(cstring, file);
+    return 1;
+  }
+#else
 #ifdef HAVE_BDB_OPEN_7_ARGS  
+/* 
+ * int DB->open(DB *db, DB_TXN *txnid, const char *file,
+ *              const char *database, DBTYPE type, u_int32_t flags, int mode);
+ */
   if((ret=bdb->open(bdb, NULL, file, NULL, DB_BTREE, flags, mode))) {
     librdf_error(bdb_context->hash->world, "BDB V4.1+ open of '%s' failed - %s",
                  file, db_strerror(ret));
@@ -221,6 +237,7 @@ librdf_hash_bdb_open(void* context, char *identifier,
     LIBRDF_FREE(cstring, file);
     return 1;
   }
+#endif
 #endif
 
 #else
