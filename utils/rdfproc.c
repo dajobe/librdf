@@ -274,32 +274,40 @@ main(int argc, char *argv[])
   }
 
   if(help) {
-    printf("Usage: %s [OPTIONS] <store> COMMANDS\n", program);
+    printf("Usage: %s [options] store command arg...\n", program);
     printf(title_format_string, librdf_version_string);
-    printf("Process RDF.\n");
+    printf("%s\n", librdf_short_copyright_string);
+    printf("Utility for processing RDF using the Redland library.\n");
     printf("\nMain options:\n");
     printf(HELP_TEXT(c, "contexts        ", "Use store with Redland contexts"));
     printf(HELP_TEXT(h, "help            ", "Print this help, then exit"));
     printf(HELP_TEXT(v, "version         ", "Print the Redland version"));
     printf("\nCommands:\n");
     printf("  parse URI PARSER [BASE URI]               Parse syntax at URI into\n");
-    printf("                                            the model using PARSER\n");
-    printf("  parse-stream URI PARSER [BASE URI]        Parse URI as stream using PARSER.\n");
-    printf("  print                                     Prints all the statements\n");
+    printf("                                            the graph using PARSER\n");
+    printf("  parse-stream URI PARSER [BASE URI]        Streaming parse syntax at URI\n");
+    printf("                                            into the graph using PARSER\n");
+    printf("  print                                     Print the graph triples.\n");
     printf("  serialize [NAME [URI [MIME-TYPE]]]        Serializes to a syntax (RDF/XML)\n");
 #if 0
     /* Not a query -> results table query, so leave out for now */
-    printf("  query NAME URI|- QUERY-STRING             Query for matching statements\n");
+    printf("  query NAME URI|- QUERY-STRING             Query for matching triples\n");
 #endif
-    printf("  find SUBJECT|- PREDICATE|- OBJECT|-       Find matching statements\n");
+    printf("  find SUBJECT|- PREDICATE|- OBJECT|-       Find matching triples\n");
     printf("                                            where - matches any node.\n");
-    printf("  contains SUBJECT PREDICATE OBJECT         Check if statement is in the model.\n");
-    printf("  add | remove SUBJECT PREDICATE OBJECT [CONTEXT] Add/remove statement to/from model.\n");
-    printf("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]  Add datatyped statement to model.\n");
-    printf("  sources | targets | arcs NODE1 NODE2      Query for matching nodes\n");
-    printf("  source | target | arc NODE1 NODE2         Query for 1 matching node\n");
+    printf("  contains SUBJECT PREDICATE OBJECT         Check if triple is in the graph.\n");
+    printf("  add SUBJECT PREDICATE OBJECT [CONTEXT]    Add triple to graph.\n");
+    printf("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]\n");
+    printf("                                            Add datatyped triple to graph.\n");
+    printf("  remove SUBJECT PREDICATE OBJECT [CONTEXT] Remove triple/from graph.\n");
+    printf("  sources | targets | arcs NODE1 NODE2      Show matching nodes.\n");
+    printf("  source | target | arc NODE1 NODE2         Show 1 matching node.\n");
     printf("  arcs-in | arcs-out NODE                   Show properties in/out of NODE\n");
-    printf("  has-arc-in | has-arc-out NODE ARC         Test for property in/out of NODE\n");
+    printf("  has-arc-in | has-arc-out NODE ARC         Check for property in/out of NODE\n");
+    printf("\nNotation:\n");
+    printf("    source means subject of triples matching (?,  NODE1, NODE2)\n");
+    printf("    target means object of triples matching (NODE1, NODE2, ?)\n");
+    printf("    arc means predicate of triples matching (NODE1, ?, NODE2)\n");
     printf("\nReport bugs to <redland-dev@lists.librdf.org>.\n");
     printf("Redland home page: http://www.redland.opensource.ac.uk/\n");
     exit(0);
