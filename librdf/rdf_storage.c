@@ -35,7 +35,9 @@
 #endif
 
 #include <librdf.h>
-
+#include <rdf_storage.h>
+#include <rdf_storage_hashes.h>
+#include <rdf_storage_list.h>
 
 /* prototypes for helper functions */
 static void librdf_delete_storage_factories(void);
