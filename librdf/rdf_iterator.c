@@ -182,6 +182,7 @@ librdf_iterator_get_next(librdf_iterator* iterator)
  * librdf_iterator_set_map:
  * @iterator: the iterator
  * @map: the function to operate
+ * @map_context: the context to pass to the map function
  * 
  * Set the iterator map mapping function to operate over the iterator.  The 
  * mapping function should return non 0 to return the element to the caller 
