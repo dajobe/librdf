@@ -38,37 +38,6 @@
 #include <db.h>
 #endif
 
-/* these three are alternatives: */
-/* BDB V3 */
-#ifdef HAVE_DB_CREATE
-#define BDB_CLOSE_2_ARGS 1
-#define BDB_FD_2_ARGS 1
-
-#else
-
-/* BDB V2 */
-#ifdef HAVE_DB_OPEN
-#define BDB_CLOSE_2_ARGS 1
-#define BDB_FD_2_ARGS 1
-
-#else
-
-/* BDB V1 - NOT WORKING */
-#ifdef HAVE_DBOPEN
-/* for O_ flags */
-#include <fcntl.h>
-#undef BDB_CLOSE_2_ARGS
-#undef BDB_FD_2_ARGS
-
-#else
-
-ERROR - no idea how to use Berkeley DB
-
-#endif
-#endif
-#endif
-
-
 #include <librdf.h>
 #include <rdf_hash.h>
 #include <rdf_hash_bdb.h>
@@ -304,7 +273,7 @@ librdf_hash_bdb_close(void* context)
   DB* db=bdb_context->db;
   int ret;
   
-#ifdef BDB_CLOSE_2_ARGS
+#ifdef HAVE_BDB_CLOSE_2_ARGS
   /* V2/V3 */
   ret=db->close(db, 0);
 #else
@@ -1000,7 +969,7 @@ librdf_hash_bdb_get_fd(void* context)
   int fd;
   int ret;
   
-#ifdef BDB_FD_2_ARGS
+#ifdef HAVE_BDB_FD_2_ARGS
   ret=db->fd(db, &fd);
 #else
   ret=0;
