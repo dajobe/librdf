@@ -438,8 +438,16 @@ librdf_query_results_finished(librdf_query *query)
  * @names: pointer to an array of binding names (or NULL)
  * @values: pointer to an array of binding value &librdf_node (or NULL)
  * 
- * If either of the pointers is not NULL, pointers to shared copies
- * of the binding names or values are returned.
+ * If names is not NULL, it is set to the address of a shared array
+ * of names of the bindings (an output parameter).  These names
+ * are shared and must not be freed by the caller
+ *
+ * If values is not NULL, it is used as an array to store pointers
+ * to the librdf_node* of the results.  These nodes must be freed
+ * by the caller.  The size of the array is determined by the
+ * number of names of bindings, returned by
+ * librdf_query_get_bindings_count dynamically or
+ * will be known in advanced if hard-coded into the query string.
  * 
  * Return value: non-0 if the assignment failed
  **/
