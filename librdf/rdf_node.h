@@ -120,6 +120,11 @@ int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_lang
 
 librdf_digest* librdf_node_get_digest(librdf_node* node);
 
+/* serialise / deserialise */
+size_t librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length);
+size_t librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length);
+
+
 /* convert to a string */
 char *librdf_node_to_string(librdf_node* node);
 

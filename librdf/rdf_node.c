@@ -576,19 +576,19 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
  * 
  * Return value: the number of bytes written or 0 on failure.
  **/
-int
-librdf_node_encode(librdf_node* node, char *buffer, size_t length)
+size_t
+librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
 {
-  int total_length=0;
-  char *string;
-  int string_length;
+  size_t total_length=0;
+  unsigned char *string;
+  size_t string_length;
   
   switch(node->type) {
   case LIBRDF_NODE_TYPE_RESOURCE:
     string=librdf_uri_as_string(node->value.resource.uri);
     string_length=strlen(string);
 
-    total_length=3 + string_length + 1; /* +1 for \0 at end */
+    total_length= 3 + string_length + 1; /* +1 for \0 at end */
 
     if(length && total_length > length)
       return 0;    
@@ -605,7 +605,7 @@ librdf_node_encode(librdf_node* node, char *buffer, size_t length)
     string=node->value.literal.string;
     string_length=node->value.literal.string_len;
 
-    total_length=6 + string_length + 1; /* +1 for \0 at end */
+    total_length= 6 + string_length + 1; /* +1 for \0 at end */
     
     if(length && total_length > length)
       return 0;    
@@ -641,39 +641,43 @@ librdf_node_encode(librdf_node* node, char *buffer, size_t length)
  * Decodes the serialised node (as created by librdf_node_encode() )
  * from the given buffer.
  * 
- * Return value: non 0 on failure (bad encoding, allocation failure)
+ * Return value: number of bytes used or 0 on failure (bad encoding, allocation failure)
  **/
-int
-librdf_node_decode(librdf_node* node, char *buffer, size_t length)
+size_t
+librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t length)
 {
   int is_wf_xml;
   int xml_space;
-  int string_length;
+  size_t string_length;
+  size_t total_length;
   librdf_uri* new_uri;
 
   /* absolute minimum - first byte is type */
   if (length < 1)
-    return 1;
+    return 0;
 
+  total_length=0;
   switch(buffer[0]) {
     case 'R': /* LIBRDF_NODE_TYPE_RESOURCE */
       /* min */
       if(length < 3)
-        return 1;
-      
+        return 0;
+
       string_length=(buffer[1] << 8) | buffer[2];
+
+      total_length = 3 + string_length + 1;
       
       /* Now initialise fields */
       node->type = LIBRDF_NODE_TYPE_RESOURCE;
       new_uri=librdf_new_uri(buffer+3);
       if (!new_uri)
-        return 1;
+        return 0;
       
       if(librdf_node_set_uri(node, new_uri)) {
         librdf_free_uri(new_uri);
-        return 1;
+        return 0;
       }
-      
+
       break;
 
     case 'L': /* LIBRDF_NODE_TYPE_LITERAL */
@@ -684,15 +688,17 @@ librdf_node_decode(librdf_node* node, char *buffer, size_t length)
       is_wf_xml=(buffer[1] & 0xf0)>>8;
       xml_space=(buffer[1] & 0x0f)>>8;
       string_length=(buffer[2] << 8) | buffer[3];
-      
+
       /* FIXME - xml:language length in 4, 5 */
+
+      total_length= 6 + string_length + 1; /* +1 for \0 at end */
       
       /* Now initialise fields */
       node->type = LIBRDF_NODE_TYPE_LITERAL;
       if (librdf_node_set_literal_value(node, buffer+6,
                                         NULL, /* xml:language */
                                         xml_space, is_wf_xml))
-        return 1;
+        return 0;
     
     break;
 
@@ -702,7 +708,7 @@ librdf_node_decode(librdf_node* node, char *buffer, size_t length)
 
   }
   
-  return 0;
+  return total_length;
 }
 
 
@@ -773,7 +779,7 @@ main(int argc, char *argv[])
   node2=librdf_new_node();
 
   fprintf(stdout, "%s: Decoding node from buffer\n", program);
-  if(librdf_node_decode(node2, buffer, size)) {
+  if(!librdf_node_decode(node2, buffer, size)) {
     fprintf(stderr, "%s: Decoding node failed\n", program);
     return(1);
   }
