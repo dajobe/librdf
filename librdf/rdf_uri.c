@@ -329,7 +329,8 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
   if(!*uri_string)
     return librdf_new_uri_from_uri(base_uri);
   
-  buffer_length=base_uri->string_length + strlen((const char*)uri_string) +1;
+  /* +2 is for \0 plus an extra 1 for adding any missing URI path '/' */
+  buffer_length=base_uri->string_length + strlen((const char*)uri_string) +2;
   buffer=(unsigned char*)LIBRDF_MALLOC(cstring, buffer_length);
   if(!buffer)
     return NULL;
