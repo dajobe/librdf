@@ -160,7 +160,8 @@ if test "$bdb_prefix" != no; then
       have_libdb=yes
     elif test "$ac_cv_lib_db_dbopen" = yes; then
       AC_DEFINE(HAVE_DBOPEN)
-      have_libdb=yes
+      AC_MSG_WARN(Berkeley DB version 1 found - this is not supported)
+      have_libdb=no
     fi
     AC_MSG_CHECKING(whether DB_TXN defined in db.h)
     dnl In BDB, DB_TXN is a pointer to a structure never defined
