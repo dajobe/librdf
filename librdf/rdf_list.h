@@ -67,7 +67,7 @@ int librdf_list_unshift(librdf_list* list, void *data);
 void* librdf_list_shift(librdf_list* list);
 /* remove from end of list (pop) */
 void* librdf_list_pop(librdf_list* list);
-int librdf_list_remove(librdf_list* list, void *data);
+void *librdf_list_remove(librdf_list* list, void *data);
 int librdf_list_contains(librdf_list* list, void *data);
 int librdf_list_size(librdf_list* list);
 
