@@ -76,6 +76,7 @@ librdf_new_world(void) {
 void
 librdf_free_world(librdf_world *world)
 {
+  librdf_finish_serializer(world);
   librdf_finish_parser(world);
   librdf_finish_storage(world);
   librdf_finish_query(world);
@@ -118,6 +119,7 @@ librdf_world_open(librdf_world *world)
   librdf_init_query(world);
   librdf_init_storage(world);
   librdf_init_parser(world);
+  librdf_init_serializer(world);
 }
 
 
