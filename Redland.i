@@ -443,6 +443,7 @@ int librdf_model_context_remove_statement(librdf_model* model, librdf_node* cont
 int librdf_model_context_remove_statements(librdf_model* model, librdf_node* context);
 librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* context);
 void librdf_model_sync(librdf_model* model);
+librdf_iterator* librdf_model_get_contexts(librdf_model* model);
 
 /* rdf_storage.h */
 librdf_storage* librdf_new_storage(librdf_world *world, char *storage_name, char *name, char *options_string);
