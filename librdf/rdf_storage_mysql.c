@@ -1336,10 +1336,9 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
             librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
             return 1;
           }
-        } else {
-          librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
-          return 1;
-        }
+        } else
+          /* no context */
+          node=NULL;
         sos->current_context=node;
       }
     }
