@@ -108,6 +108,9 @@ librdf_stream_get_next_mapped_statement(librdf_stream* stream)
   /* find next statement subject to map */
   while(!stream->end_of_stream(stream->context)) {
     statement=stream->next_statement(stream->context);
+    if(!statement)
+      break;
+    
     /* apply the map to the statement  */
     statement=stream->map(stream->map_context, statement);
     /* found something, return it */
