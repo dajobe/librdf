@@ -290,8 +290,8 @@ librdf_query_triples_register_factory(librdf_query_factory *factory)
 
 
 void
-librdf_init_query_triples(void)
+librdf_init_query_triples(librdf_world *world)
 {
-  librdf_query_register_factory("triples", NULL,
+  librdf_query_register_factory(world, "triples", NULL,
                                 &librdf_query_triples_register_factory);
 }

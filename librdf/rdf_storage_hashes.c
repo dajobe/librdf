@@ -1820,8 +1820,8 @@ librdf_storage_hashes_register_factory(librdf_storage_factory *factory)
 
 
 void
-librdf_init_storage_hashes(void)
+librdf_init_storage_hashes(librdf_world *world)
 {
-  librdf_storage_register_factory("hashes", "Indexed hashes",
+  librdf_storage_register_factory(world, "hashes", "Indexed hashes",
                                   &librdf_storage_hashes_register_factory);
 }

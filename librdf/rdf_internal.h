@@ -139,7 +139,7 @@ void librdf_system_free(void *ptr);
 
 
 /* Fatal errors - always happen */
-#define LIBRDF_FATAL1(world, msg) do {fprintf(stderr, "%s:%d:%s: fatal error: " msg "\n", __FILE__, __LINE__ , __func__); abort();} while(0)
+#define LIBRDF_FATAL1(world, facility, message) librdf_fatal(world, facility, __FILE__, __LINE__ , __func__, message)
 #include <rdf_list.h>
 #include <rdf_hash.h>
 #include <rdf_digest.h>

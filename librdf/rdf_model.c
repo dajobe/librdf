@@ -44,7 +44,7 @@ void
 librdf_init_model(librdf_world *world)
 {
   /* Always have model storage implementation available */
-  librdf_init_model_storage();
+  librdf_init_model_storage(world);
 }
 
 
@@ -91,7 +91,7 @@ librdf_delete_model_factories(void)
  * 
  **/
 void
-librdf_model_register_factory(const char *name,
+librdf_model_register_factory(librdf_world *world, const char *name,
                               void (*factory) (librdf_model_factory*)) 
 {
   librdf_model_factory *model, *h;
@@ -104,12 +104,12 @@ librdf_model_register_factory(const char *name,
   model=(librdf_model_factory*)LIBRDF_CALLOC(librdf_model_factory, 1,
                                              sizeof(librdf_model_factory));
   if(!model)
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
 
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_model, model);
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
   }
   strcpy(name_copy, name);
   model->name=name_copy;
@@ -117,7 +117,7 @@ librdf_model_register_factory(const char *name,
   for(h = models; h; h = h->next ) {
     if(!strcmp(h->name, name_copy)) {
       LIBRDF_FREE(cstring, name_copy);
-      LIBRDF_ERROR2(model->world, "model %s already registered", h->name);
+      LIBRDF_ERROR2(world, "model %s already registered", h->name);
       return;
     }
   }

@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 
-void librdf_init_storage_hashes(void);
+void librdf_init_storage_hashes(librdf_world *world);
 
 
 #ifdef __cplusplus

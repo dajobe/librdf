@@ -35,7 +35,7 @@ extern "C" {
 
 
 #ifdef HAVE_MYSQL
-void librdf_init_storage_mysql(void);
+void librdf_init_storage_mysql(librdf_world *world);
 #endif
 
 

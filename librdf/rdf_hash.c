@@ -206,12 +206,12 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
   hash=(librdf_hash_factory*)LIBRDF_CALLOC(librdf_hash_factory, 1,
                                            sizeof(librdf_hash_factory));
   if(!hash)
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_HASH, "Out of memory");
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_hash, hash);
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_HASH, "Out of memory");
   }
   strcpy(name_copy, name);
   hash->name=name_copy;

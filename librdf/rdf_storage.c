@@ -57,7 +57,6 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
 
 /**
  * librdf_init_storage - Initialise the librdf_storage module
- * @world: redland world object
  * 
  * Initialises and registers all
  * compiled storage modules.  Must be called before using any of the storage
@@ -67,15 +66,15 @@ void
 librdf_init_storage(librdf_world *world)
 {
 #ifdef HAVE_MYSQL
-  librdf_init_storage_mysql();
+  librdf_init_storage_mysql(world);
 #endif
 #ifdef HAVE_TSTORE
-  librdf_init_storage_tstore();
+  librdf_init_storage_tstore(world);
 #endif
   /* Always have storage list, hashes, file implementations available */
-  librdf_init_storage_file();
-  librdf_init_storage_hashes();
-  librdf_init_storage_list();
+  librdf_init_storage_file(world);
+  librdf_init_storage_hashes(world);
+  librdf_init_storage_list(world);
 }
 
 
@@ -121,13 +120,15 @@ librdf_delete_storage_factories(void)
 
 /**
  * librdf_storage_register_factory - Register a storage factory
+ * @world: redland world object
  * @name: the storage factory name
  * @label: the storage factory label
  * @factory: pointer to function to call to register the factory
  * 
  **/
 void
-librdf_storage_register_factory(const char *name, const char *label,
+librdf_storage_register_factory(librdf_world* world,
+                                const char *name, const char *label,
 				void (*factory) (librdf_storage_factory*)) 
 {
   librdf_storage_factory *storage, *h;
@@ -141,12 +142,12 @@ librdf_storage_register_factory(const char *name, const char *label,
   storage=(librdf_storage_factory*)LIBRDF_CALLOC(librdf_storage_factory, 1,
                                                  sizeof(librdf_storage_factory));
   if(!storage)
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
 
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_storage, storage);
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
   }
   strcpy(name_copy, name);
   storage->name=name_copy;
@@ -163,7 +164,7 @@ librdf_storage_register_factory(const char *name, const char *label,
   label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
   if(!label_copy) {
     LIBRDF_FREE(librdf_storage, storage);
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
   }
   strcpy(label_copy, label);
   storage->label=label_copy;

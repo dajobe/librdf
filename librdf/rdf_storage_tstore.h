@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 
-void librdf_init_storage_tstore(void);
+void librdf_init_storage_tstore(librdf_world *world);
 
 
 #ifdef __cplusplus

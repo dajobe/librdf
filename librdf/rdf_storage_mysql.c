@@ -1711,8 +1711,8 @@ librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
 
 
 void
-librdf_init_storage_mysql(void)
+librdf_init_storage_mysql(librdf_world *world)
 {
-  librdf_storage_register_factory("mysql", "MySQL database store",
+  librdf_storage_register_factory(world, "mysql", "MySQL database store",
                                   &librdf_storage_mysql_register_factory);
 }

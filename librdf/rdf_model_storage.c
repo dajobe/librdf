@@ -620,8 +620,8 @@ librdf_model_storage_register_factory(librdf_model_factory *factory)
 
 
 void
-librdf_init_model_storage(void)
+librdf_init_model_storage(librdf_world *world)
 {
-  librdf_model_register_factory("storage", 
+  librdf_model_register_factory(world, "storage", 
                                 &librdf_model_storage_register_factory);
 }

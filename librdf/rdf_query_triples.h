@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 
-void librdf_init_query_triples(void);
+void librdf_init_query_triples(librdf_world *world);
 
 
 #ifdef __cplusplus

@@ -337,10 +337,10 @@ librdf_storage_file_register_factory(librdf_storage_factory *factory)
 
 
 void
-librdf_init_storage_file(void)
+librdf_init_storage_file(librdf_world *world)
 {
-  librdf_storage_register_factory("file", "Local file based store",
+  librdf_storage_register_factory(world, "file", "Local file based store",
                                   &librdf_storage_file_register_factory);
-  librdf_storage_register_factory("uri",  "URI store (read-only)",
+  librdf_storage_register_factory(world, "uri",  "URI store (read-only)",
                                   &librdf_storage_file_register_factory);
 }

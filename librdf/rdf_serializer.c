@@ -90,12 +90,12 @@ librdf_serializer_register_factory(librdf_world *world,
   serializer_factory=(librdf_serializer_factory*)LIBRDF_CALLOC(librdf_serializer_factory, 1,
 					       sizeof(librdf_serializer_factory));
   if(!serializer_factory)
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
   if(!name_copy) {
     librdf_free_serializer_factory(serializer_factory);
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
   }
   strcpy(name_copy, name);
   serializer_factory->name=name_copy;
@@ -106,7 +106,7 @@ librdf_serializer_register_factory(librdf_world *world,
     mime_type_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
     if(!mime_type_copy) {
       librdf_free_serializer_factory(serializer_factory);
-      LIBRDF_FATAL1(world, "Out of memory");
+      LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
     }
     strcpy(mime_type_copy, mime_type);
     serializer_factory->mime_type=mime_type_copy;
@@ -119,7 +119,7 @@ librdf_serializer_register_factory(librdf_world *world,
     uri=librdf_new_uri(world, uri_string);
     if(!uri) {
       librdf_free_serializer_factory(serializer_factory);
-      LIBRDF_FATAL1(world, "Out of memory");
+      LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
     }
     serializer_factory->type_uri=uri;
   }

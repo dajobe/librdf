@@ -699,8 +699,8 @@ librdf_storage_tstore_register_factory(librdf_storage_factory *factory)
 
 
 void
-librdf_init_storage_tstore(void)
+librdf_init_storage_tstore(librdf_world *world)
 {
-  librdf_storage_register_factory("tstore", "AKT triplestore",
+  librdf_storage_register_factory(world, "tstore", "AKT triplestore",
                                   &librdf_storage_tstore_register_factory);
 }

@@ -73,12 +73,12 @@ librdf_digest_register_factory(librdf_world *world, const char *name,
   digest=(librdf_digest_factory*)LIBRDF_CALLOC(librdf_digest_factory, 1,
 					       sizeof(librdf_digest_factory));
   if(!digest)
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_DIGEST, "Out of memory");
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_digest, digest);
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_DIGEST, "Out of memory");
   }
   strcpy(name_copy, name);
   digest->name=name_copy;
@@ -176,6 +176,8 @@ librdf_new_digest_from_factory(librdf_world *world,
   d=(librdf_digest*)LIBRDF_CALLOC(librdf_digest, 1, sizeof(librdf_digest));
   if(!d)
     return NULL;
+
+  d->world=world;
         
   d->context=(char*)LIBRDF_CALLOC(digest_context, 1, factory->context_length);
   if(!d->context) {
@@ -291,7 +293,7 @@ librdf_digest_to_string(librdf_digest* digest)
         
   b=(char*)LIBRDF_MALLOC(cstring, 1+(mdlen<<1));
   if(!b)
-    LIBRDF_FATAL1(digest->world, "Out of memory");
+    LIBRDF_FATAL1(digest->world, LIBRDF_FROM_DIGEST, "Out of memory");
   
   for(i=0; i<mdlen; i++)
     sprintf(b+(i<<1), "%02x", (unsigned int)data[i]);

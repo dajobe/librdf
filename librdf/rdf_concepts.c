@@ -115,7 +115,7 @@ librdf_init_concepts(librdf_world *world)
 
     librdf_concept_resources[i]=librdf_new_node_from_uri_local_name(world, ns_uri, token);
     if(!librdf_concept_resources[i])
-      LIBRDF_FATAL1(world, "Failed to create Node from URI\n");
+      LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Failed to create Node from URI\n");
 
     /* keep shared copy of URI from node */
     librdf_concept_uris[i]=librdf_node_get_uri(librdf_concept_resources[i]);

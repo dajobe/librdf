@@ -89,7 +89,7 @@ librdf_query_factory* librdf_get_query_factory(const char *name, librdf_uri* uri
 #endif
 
 /* class methods */
-REDLAND_API void librdf_query_register_factory(const char *name, librdf_uri* uri, void (*factory) (librdf_query_factory*));
+REDLAND_API void librdf_query_register_factory(librdf_world *world, const char *name, librdf_uri* uri, void (*factory) (librdf_query_factory*));
 
 /* constructor */
 REDLAND_API librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string);

@@ -908,8 +908,8 @@ librdf_storage_list_register_factory(librdf_storage_factory *factory)
 
 
 void
-librdf_init_storage_list(void)
+librdf_init_storage_list(librdf_world *world)
 {
-  librdf_storage_register_factory("memory", "In memory",
+  librdf_storage_register_factory(world, "memory", "In memory",
                                   &librdf_storage_list_register_factory);
 }

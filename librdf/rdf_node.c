@@ -62,10 +62,10 @@ librdf_init_node(librdf_world* world)
   for(i=0; i<H_COUNT; i++) {
     world->nodes_hash[i]=librdf_new_hash(world, NULL);
     if(!world->nodes_hash[i])
-      LIBRDF_FATAL1(world, "Failed to create Nodes hash from factory");
+      LIBRDF_FATAL1(world, LIBRDF_FROM_NODE, "Failed to create Nodes hash from factory");
     
     if(librdf_hash_open(world->nodes_hash[i], NULL, 0, 1, 1, NULL))
-      LIBRDF_FATAL1(world, "Failed to open Nodes hash");
+      LIBRDF_FATAL1(world, LIBRDF_FROM_NODE, "Failed to open Nodes hash");
   }
 }
 
@@ -624,7 +624,7 @@ librdf_free_node(librdf_node *node)
       key.data=&node->value.resource.uri;
       key.size=sizeof(librdf_uri*);
       if(librdf_hash_delete_all(node->world->nodes_hash[H_RESOURCE], &key) )
-        LIBRDF_FATAL1(world, "Hash deletion failed");
+        LIBRDF_FATAL1(node->world, LIBRDF_FROM_NODE, "Hash deletion failed");
 
       librdf_free_uri(node->value.resource.uri);
       break;
@@ -634,7 +634,7 @@ librdf_free_node(librdf_node *node)
         key.data=node->value.literal.key;
         key.size=node->value.literal.size;
         if(librdf_hash_delete_all(node->world->nodes_hash[H_LITERAL], &key) )
-          LIBRDF_FATAL1(world, "Hash deletion failed");
+          LIBRDF_FATAL1(node->world, LIBRDF_FROM_NODE, "Hash deletion failed");
         LIBRDF_FREE(cstring, node->value.literal.key);
       }
       
@@ -650,7 +650,7 @@ librdf_free_node(librdf_node *node)
       key.data=node->value.blank.identifier;
       key.size=node->value.blank.identifier_len;
       if(librdf_hash_delete_all(node->world->nodes_hash[H_BLANK], &key) )
-        LIBRDF_FATAL1(world, "Hash deletion failed");
+        LIBRDF_FATAL1(node->world, LIBRDF_FROM_NODE, "Hash deletion failed");
 
       if(node->value.blank.identifier != NULL)
         LIBRDF_FREE(cstring, node->value.blank.identifier);

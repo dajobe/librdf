@@ -171,7 +171,7 @@ void librdf_init_model(librdf_world *world);
 void librdf_finish_model(librdf_world *world);
 
 /* class methods */
-void librdf_model_register_factory(const char *name, void (*factory) (librdf_model_factory*));
+void librdf_model_register_factory(librdf_world *world, const char *name, void (*factory) (librdf_model_factory*));
 librdf_model_factory* librdf_get_model_factory(const char *name);
 
 void librdf_model_add_reference(librdf_model *model);

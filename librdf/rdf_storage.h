@@ -164,7 +164,7 @@ struct librdf_storage_factory_s {
 
 #include <rdf_storage_list.h>
 #include <rdf_storage_hashes.h>
-void librdf_init_storage_file(void);
+void librdf_init_storage_file(librdf_world *world);
 
 #ifdef HAVE_MYSQL
 #include <rdf_storage_mysql.h>
@@ -191,7 +191,7 @@ void librdf_storage_remove_reference(librdf_storage *storage);
 
 
 /* class methods */
-REDLAND_API void librdf_storage_register_factory(const char *name, const char *label, void (*factory) (librdf_storage_factory*));
+REDLAND_API void librdf_storage_register_factory(librdf_world *world, const char *name, const char *label, void (*factory) (librdf_storage_factory*));
 
 REDLAND_API int librdf_storage_enumerate(const unsigned int counter, const char **name, const char **label);
 

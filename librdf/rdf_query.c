@@ -54,7 +54,7 @@ void
 librdf_init_query(librdf_world *world) 
 {
   /* Always have query triple implementations available */
-  librdf_init_query_triples();
+  librdf_init_query_triples(world);
 }
 
 
@@ -107,7 +107,7 @@ librdf_delete_query_factories(void)
  * 
  **/
 void
-librdf_query_register_factory(const char *name,
+librdf_query_register_factory(librdf_world *world, const char *name,
                               librdf_uri *uri,
                               void (*factory) (librdf_query_factory*)) 
 {
@@ -122,14 +122,14 @@ librdf_query_register_factory(const char *name,
   query=(librdf_query_factory*)LIBRDF_CALLOC(librdf_query_factory, 1,
                                              sizeof(librdf_query_factory));
   if(!query)
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
 
   name_length=strlen(name);
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, name_length+1, 1);
   if(!name_copy) {
     LIBRDF_FREE(librdf_query, query);
-    LIBRDF_FATAL1(world, "Out of memory");
+    LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
   }
   query->name=strcpy(name_copy, name);
   if(uri) {
@@ -137,7 +137,7 @@ librdf_query_register_factory(const char *name,
     if(!query->uri) {
       LIBRDF_FREE(cstring, name_copy); 
       LIBRDF_FREE(librdf_query, query);
-      LIBRDF_FATAL1(world, "Out of memory");
+      LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
     }
   }
         
@@ -241,7 +241,7 @@ librdf_new_query_from_query(librdf_query* old_query)
 
   /* FIXME: fail if clone is not supported by this query (factory) */
   if(!old_query->factory->clone) {
-    LIBRDF_FATAL1(world, "clone not implemented for query factory");
+    LIBRDF_FATAL1(old_query->world, LIBRDF_FROM_QUERY, "clone not implemented for query factory");
     return NULL;
   }
 
