@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+use Digest::MD5 qw(md5_hex);
+
 use strict;
 
 ## Copyright (c) 1998 Michael Zucchi, All Rights Reserved        ##
@@ -558,10 +560,7 @@ sub output_function_sgml(%) {
     my %args = %{$_[0]};
     my ($parameter, $section);
     my $count;
-    my $id;
-
-    $id = "API-".$args{'function'};
-    $id =~ s/[^A-Za-z0-9]/-/g;
+    my $id= "API-".md5_hex($args{'function'});
 
     print "<refentry>\n";
     print "<refmeta>\n";
