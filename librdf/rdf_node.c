@@ -1185,7 +1185,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
   unsigned char *string;
   size_t string_length;
   size_t language_length=0;
-  unsigned char *datatype_uri_string;
+  unsigned char *datatype_uri_string=NULL;
   size_t datatype_uri_length=0;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
