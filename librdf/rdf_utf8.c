@@ -80,7 +80,6 @@
 #include <stdio.h>
 #include <ctype.h> /* for isprint() */
 
-#define LIBRDF_INTERNAL 1
 #include <librdf.h>
 
 #include <rdf_types.h>

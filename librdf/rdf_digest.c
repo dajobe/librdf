@@ -79,7 +79,6 @@
 
 #include <stdio.h>
 
-#define LIBRDF_INTERNAL 1
 #include <librdf.h>
 #include <rdf_digest.h>
 #include <rdf_uri.h>

@@ -81,7 +81,6 @@
 #include <string.h> /* for strcat */
 #include <ctype.h> /* for isalnum */
 
-#define LIBRDF_INTERNAL 1
 #include <librdf.h>
 
 #include <rdf_uri.h>

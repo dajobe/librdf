@@ -79,7 +79,6 @@
 #ifdef LIBRDF_MEMORY_DEBUG
 #include <stdio.h>
 
-#define LIBRDF_INTERNAL
 #include <librdf.h>
 
 #ifdef HAVE_STDLIB_H

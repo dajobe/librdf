@@ -85,7 +85,6 @@
 #define LIBRDF_DEBUG 1
 #endif
 
-#define LIBRDF_INTERNAL 1
 #include <librdf.h>
 
 #include <rdf_parser.h>

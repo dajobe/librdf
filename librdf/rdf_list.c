@@ -84,7 +84,6 @@
 #include <string.h> /* for strncmp */
 #endif
 
-#define LIBRDF_INTERNAL 1
 #include <librdf.h>
 #include <rdf_list.h>
 #include <rdf_iterator.h>

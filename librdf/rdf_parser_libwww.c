@@ -80,7 +80,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define LIBRDF_INTERNAL 1
 #include <librdf.h>
 
 #include <rdf_parser.h>

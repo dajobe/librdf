@@ -84,7 +84,6 @@
 #include <string.h> /* for memcmp */
 #endif
 
-#define LIBRDF_INTERNAL 1
 #include <librdf.h>
 #include <rdf_hash.h>
 #include <rdf_hash_memory.h>
