@@ -3,8 +3,8 @@
 #
 # $Id$
 #
-# Copyright (C) 2001-2003 David Beckett - http://purl.org/net/dajobe/
-# Institute for Learning and Research Technology - http://www.ilrt.org/
+# Copyright (C) 2001-2004 David Beckett - http://purl.org/net/dajobe/
+# Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
 # University of Bristol - http://www.bristol.ac.uk/
 # 
 # This package is Free Software or Open Source available under the
