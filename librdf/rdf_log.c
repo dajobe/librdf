@@ -89,7 +89,7 @@ librdf_log_simple(librdf_world* world, int code,
       world->log.message=message;
       world->log.locator=locator;
 
-      if(world->log_handler(world->error_user_data, &world->log))
+      if(world->log_handler(world->log_user_data, &world->log))
         return;
 
     } else {
