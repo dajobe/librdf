@@ -198,11 +198,11 @@ fi
 
 # Externally linked libraries - appear in redland-config
 # -Dfoo -Idir
-LIBRDF_CPPFLAGS=
+LIBRDF_CPPFLAGS=$CPPFLAGS
 # -Ldir
-LIBRDF_LDFLAGS=
+LIBRDF_LDFLAGS=$LDFLAGS
 # -llib
-LIBRDF_LIBS=
+LIBRDF_LIBS=$LIBS
 
 # Internally linked libraries - never given to users
 # -Dfoo -Idir
