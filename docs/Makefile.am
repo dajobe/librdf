@@ -24,7 +24,7 @@ man_MANS=redland.3
 EXTRA_DIST=api.sgml.in api.sgml README.html README \
 perl.html python.html tcl.html java.html ruby.html \
 build-docs fix-pod-xhtml overview.png overview.ps overview.pdf api pod \
-redland.pod \
+redland.pod kernel-doc \
 $(man_MANS)
 
 DOC_CLASSES=node statement model storage storage_hashes storage_list stream parser parser_libwww parser_repat parser_raptor parser_sirpac query query_triples serializer serializer_raptor concepts init digest digest_md5 digest_openssl hash hash_bdb hash_cursor hash_memory heuristics iterator list uri utf8
@@ -67,8 +67,8 @@ api/index.html: api.sgml
 .sgml.pdf:
 	db2pdf $<
 
-@MAINT@$(API_DOCBOOK_FILES): %.sgml: $(srcdir)/../librdf/rdf_%.c
-@MAINT@	kernel-doc -docbook $< > $@
+@MAINT@$(API_DOCBOOK_FILES): %.sgml: $(srcdir)/../librdf/rdf_%.c $(srcdir)/kernel-doc
+@MAINT@	$(PERL) $(srcdir)/kernel-doc -docbook $< > $@
 @MAINT@
 @MAINT@api.sgml: $(srcdir)/build-docs api.sgml.in $(API_DOCBOOK_FILES)
 @MAINT@	$(PERL) $(srcdir)/build-docs api.sgml.in > api.sgml
