@@ -132,6 +132,7 @@ STANDARD_CFLAGS=@STANDARD_CFLAGS@ $(MEM)
 LDFLAGS=@LIBRDF_LDFLAGS@
 LIBS=@LIBRDF_LIBS@ $(MEM_LIBS)
 
+LOCAL_LIB_DIR=lib
 
 # Rules to construct test programs
 
@@ -189,8 +190,8 @@ rdf_serializer_test: rdf_serializer.c librdf.la
 $(top_builddir)/expat/xmlparse/xmlparse.lo $(top_builddir)/expat/xmlparse/hashtable.lo $(top_builddir)/expat/xmltok/xmlrole.lo $(top_builddir)/expat/xmltok/xmltok.lo:
 	cd $(srcdir)/../expat && $(MAKE) $(AM_MAKEFLAGS) all
 
-$(SRCDIR)/../raptor/libraptor.la:
-	cd $(srcdir)/../raptor && $(MAKE) $(AM_MAKEFLAGS) all
+$(top_builddir)/raptor/libraptor.la:
+	cd $(top_builddir)/raptor && $(MAKE) $(AM_MAKEFLAGS) all
 
 $(SRCDIR)/../repat/librepat.la:
 	cd $(srcdir)/../repat && $(MAKE) $(AM_MAKEFLAGS) all
@@ -211,3 +212,11 @@ dist-hook: redland.spec
 
 rpm: distcheck
 	rpm -ta $(distdir).tar.gz
+
+finish: librdf.la
+	rm -rf $(LOCAL_LIB_DIR)
+	mkdir $(LOCAL_LIB_DIR)
+	lib=`cd $(LOCAL_LIB_DIR); pwd`; \
+	$(LIBTOOL) --mode=install install librdf.la $$lib; \
+	$(LIBTOOL) --mode=finish $$lib
+
