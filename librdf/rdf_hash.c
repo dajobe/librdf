@@ -618,8 +618,8 @@ typedef struct {
  * @key: pointer to key
  * @value: pointer to value
  * 
- * The iterator returns &librdf_hash_datum objects containingvalue returned is from newly allocated memory which the
- * caller must free.
+ * The iterator returns &librdf_hash_datum objects containing the values.
+ * These are newly allocated memory which the caller must free.
  * 
  * Return value: non 0 on failure
  **/
