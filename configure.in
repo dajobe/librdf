@@ -79,7 +79,7 @@ if test "$bdb_prefix" != no; then
   oLIBS="$LIBS"
   if test "$bdb_prefix" != /usr; then
     nLIBS="-L$bdb_prefix/lib $LIBS";
-    CFLAGS="-I$bdb_prefix/include";
+    CFLAGS="-I$bdb_prefix/include $CFLAGS";
   else
     nLIBS="$LIBS"
   fi
