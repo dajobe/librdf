@@ -63,15 +63,35 @@ typedef struct {
 
 
 
+/**
+ * librdf_parser_libwww_init:
+ * @context: context
+ * 
+ * Initialise the libwww RDF parser
+ * 
+ * Return value: non 0 on failure
+ **/
 static int
-librdf_parser_libwww_init(void *context) {
+librdf_parser_libwww_init(void *context) 
+{
   /* always succeeds ? */
   return 0;
 }
   
 
+/**
+ * librdf_parser_libwww_new_triple_handler:
+ * @rdfp: libwww &HTRDF reference
+ * @t: libwww &HTTriple triple
+ * @context: context for callback
+ * 
+ * Callback function for libwww RDF when a new triple is asserted.
+ * Adds the statement to the list of statements *in core* - FIXME.
+ *
+ * Registered in librdf_parser_libwww_new_handler().
+ **/
 static void
-librdf_parser_libwwW_new_triple_handler (HTRDF *rdfp, HTTriple *t, 
+librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t, 
                                          void *context) 
 {
   librdf_parser_libwww_stream_context* scontext=(librdf_parser_libwww_stream_context*)context;
@@ -135,6 +155,20 @@ librdf_parser_libwwW_new_triple_handler (HTRDF *rdfp, HTTriple *t,
 }
 
 
+/**
+ * librdf_parser_libwww_new_handler:
+ * @me: libwww &HTStream that is being parsed
+ * @request: libwww &HTRequest that generated the call
+ * @target_format: libwww &HTFormat target output format
+ * @target_stream: libwww &HTStream target output stream
+ * @rdfparser: libwww &HTRDF parser
+ * @context: context for callback
+ * 
+ * Callback function for libwww RDF when a new parse is started
+ * on a libwww &HTStream.
+ *
+ * Registered in librdf_parser_libwww_parse_from_uri().
+ **/
 static void
 librdf_parser_libwww_new_handler (HTStream *		me,
                                   HTRequest *		request,
@@ -151,12 +185,24 @@ librdf_parser_libwww_new_handler (HTStream *		me,
     
     /* Register own triple callback just to follow what is going on */
     HTRDF_registerNewTripleCallback (rdfparser, 
-                                     librdf_parser_libwwW_new_triple_handler, 
+                                     librdf_parser_libwww_new_triple_handler, 
                                      scontext);
   }
 }
 
 
+/**
+ * librdf_parser_libwww_terminate_handler:
+ * @request: libwww &HTRequest that generated the call
+ * @response: libwww &HTResponse (ignored)
+ * @param: context for callback
+ * @status: status of termination (ignored)
+ * 
+ * Callback function for libwww when request terminates, so we
+ * can shut down things.
+ * 
+ * Return value: 0 (does not matter since at termination)
+ **/
 static int
 librdf_parser_libwww_terminate_handler (HTRequest * request,
 					HTResponse * response,
@@ -173,14 +219,20 @@ librdf_parser_libwww_terminate_handler (HTRequest * request,
 
 
 
-/* This is a copy of client_profile from HT_Profile.c with one
+/**
+ * librdf_parser_libwww_client_profile:
+ * @AppName: application name
+ * @AppVersion: application version
+ * 
+ * This is a copy of client_profile() from libwww HT_Profile.c with one
  * change so that the default type conversions are not
  * registered, and later on we can register something that assumes
  * the content is RDF.
  *
- * Probably don't need anywhere near all of this initialisation
-*/
-   
+ * FIXME: Probably don't need anywhere near all of this initialisation
+ *
+ * FIXME: this should be done once per use of libwww, not per libwww parser.
+ **/
 static void
 librdf_parser_libwww_client_profile (const char * AppName, 
                                      const char * AppVersion)
@@ -270,6 +322,17 @@ tracer (const char * fmt, va_list pArgs)
 #endif
 
 
+/**
+ * librdf_parser_libwww_parse_from_uri:
+ * @context: parser context
+ * @uri: &librdf_uri URI of RDF/XML content
+ * 
+ * Retrieve the URI which is RDF/XML content and parse it into a
+ * &librdf_stream of statements.
+ *
+ * FIXME: Implementation currently stores all statements in memory in
+ * a list and emits when the URI content has been exhausted.
+ **/
 static librdf_stream*
 librdf_parser_libwww_parse_from_uri(void *context, librdf_uri *uri) {
   /* Note: not yet used */
@@ -311,11 +374,11 @@ librdf_parser_libwww_parse_from_uri(void *context, librdf_uri *uri) {
 
   cwd= HTGetCurrentDirectoryURL();
 
-  scontext->uri = HTParse(uri, cwd, PARSE_ALL);
+  scontext->uri = HTParse(librdf_uri_as_string(uri), cwd, PARSE_ALL);
   HT_FREE(cwd);
   scontext->request = HTRequest_new();
 
-  anchor = HTAnchor_findAddress(uri);
+  anchor = HTAnchor_findAddress(librdf_uri_as_string(uri));
   if(!anchor) {
     librdf_parser_libwww_serialise_finished((void*)scontext);
     return NULL;
@@ -343,9 +406,22 @@ librdf_parser_libwww_parse_from_uri(void *context, librdf_uri *uri) {
 }
   
 
+/**
+ * librdf_parser_libwww_get_next_statement:
+ * @context: 
+ * 
+ * Utility function to get the next &librdf_statement from the stream
+ * constructed from the libwww RDF parser.
+ * 
+ * FIXME: Implementation currently stores all statements in memory in
+ * a list and emits when the URI content has been exhausted.
+ * 
+ * Return value: a new &librdf_statement or NULL on error or if no statements found.
+ *
+ **/
 static librdf_statement*
-librdf_parser_libwww_get_next_statement(librdf_parser_libwww_stream_context *context) {
-
+librdf_parser_libwww_get_next_statement(librdf_parser_libwww_stream_context *context)
+{
   if(!context->request_done) {
     context->statements=librdf_new_list();
     if(!context->statements)
@@ -363,6 +439,16 @@ librdf_parser_libwww_get_next_statement(librdf_parser_libwww_stream_context *con
 }
 
 
+/**
+ * librdf_parser_libwww_serialise_end_of_stream:
+ * @context: the context passed in by &librdf_stream
+ * 
+ * Check for the end of the stream of statements from the libwww RDF parse.
+ * Uses librdf_parser_libwww_get_next_statement() to try to get at
+ * least one statement, to check for end of stream.
+ * 
+ * Return value: non 0 at end of stream
+ **/
 static int
 librdf_parser_libwww_serialise_end_of_stream(void* context)
 {
@@ -383,6 +469,16 @@ librdf_parser_libwww_serialise_end_of_stream(void* context)
 }
 
 
+/**
+ * librdf_parser_libwww_serialise_next_statement:
+ * @context: the context passed in by &librdf_stream
+ * 
+ * Get the next &librdf_statement from the stream constructed from
+ * the libwww RDF parser.  Uses librdf_parser_libwww_get_next_statement()
+ * to do the work.
+ *
+ * Return value: a new &librdf_statement or NULL on error or if no statements found.
+ **/
 static librdf_statement*
 librdf_parser_libwww_serialise_next_statement(void* context)
 {
@@ -408,6 +504,12 @@ librdf_parser_libwww_serialise_next_statement(void* context)
 }
 
 
+/**
+ * librdf_parser_libwww_serialise_finished:
+ * @context: the context passed in by &librdf_stream
+ * 
+ * Finish the serialisation of the statement stream from the libwww RDF parse.
+ **/
 static void
 librdf_parser_libwww_serialise_finished(void* context)
 {
@@ -431,6 +533,12 @@ librdf_parser_libwww_serialise_finished(void* context)
 }
 
 
+/**
+ * librdf_parser_libwww_register_factory:
+ * @factory: factor
+ * 
+ * Register the libwww RDF parser with the RDF parse factory.
+ **/
 static void
 librdf_parser_libwww_register_factory(librdf_parser_factory *factory) 
 {
