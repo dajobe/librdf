@@ -1,9 +1,24 @@
+			     librdf 1.0
+
+
+TO BUILD:
+  automake --add-missing; aclocal; autoheader; autoconf; ./configure; make
+
+TO BUILD TESTS:
+  make check
+
+
+			    RANDOM NOTES
+
+
 Bits taken from GNUPG 1.0.1 (GPL license)
+-----------------------------------------
 bithelp.h types.h md5.c rmd.h rmd160.c sha1.c
 
 
 
 Interface Design for 'Classes'
+------------------------------
 
 Prototypes and structures (aka Interface) in rdf_foo.h
 
