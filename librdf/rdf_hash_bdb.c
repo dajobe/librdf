@@ -133,6 +133,11 @@ ERROR - no idea how to use Berkeley DB
 
 typedef struct 
 {
+  librdf_hash *hash;
+  int mode;
+  int is_writable;
+  int is_new;
+  /* for BerkeleyDB only */
   DB* db;
   char* file_name;
 } librdf_hash_bdb_context;
@@ -145,8 +150,11 @@ static void librdf_hash_bdb_cursor_finish(void* context);
 
 
 /* prototypes for local functions */
+static int librdf_hash_bdb_create(librdf_hash* hash, void* context);
+static int librdf_hash_bdb_destroy(void* context);
 static int librdf_hash_bdb_open(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 static int librdf_hash_bdb_close(void* context);
+static int librdf_hash_bdb_clone(librdf_hash* new_hash, void *new_context, char *new_identifier, void* old_context);
 static int librdf_hash_bdb_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 static int librdf_hash_bdb_exists(void* context, librdf_hash_datum *key);
 static int librdf_hash_bdb_delete(void* context, librdf_hash_datum *key);
@@ -157,6 +165,37 @@ static void librdf_hash_bdb_register_factory(librdf_hash_factory *factory);
 
 
 /* functions implementing hash api */
+
+/**
+ * librdf_hash_bdb_create - Create a BerkeleyDB hash
+ * @hash: &librdf_hash hash that this implements
+ * @context: BerkeleyDB hash context
+ * 
+ * Return value: non 0 on failure.
+ **/
+static int
+librdf_hash_bdb_create(librdf_hash* hash, void* context) 
+{
+  librdf_hash_bdb_context* hcontext=(librdf_hash_bdb_context*)context;
+
+  hcontext->hash=hash;
+  return 0;
+}
+
+
+/**
+ * librdf_hash_bdb_destroy - Destroy a BerkeleyDB hash
+ * @context: BerkeleyDB hash context
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_hash_bdb_destroy(void* context) 
+{
+  /* NOP */
+  return 0;
+}
+
 
 /**
  * librdf_hash_bdb_open - Open and maybe create a BerkeleyDB hash
@@ -179,10 +218,18 @@ librdf_hash_bdb_open(void* context, char *identifier,
   char *file;
   int ret;
   int flags;
-  
+
 #ifdef HAVE_DB_OPEN
   DB_INFO bdb_info;
 #endif
+  
+  /* NOTE: If the options parameter is ever used here, the data must be
+   * copied into a private part of the context so that the clone
+   * method can access them
+   */
+  bdb_context->mode=mode;
+  bdb_context->is_writable=is_writable;
+  bdb_context->is_new=is_new;
   
   file=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+4);
   if(!file)
@@ -290,6 +337,67 @@ librdf_hash_bdb_close(void* context)
   LIBRDF_FREE(cstring, bdb_context->file_name);
   return ret;
 }
+
+
+/**
+ * librdf_hash_bdb_clone - Clone the BerkeleyDB hash
+ * @hash: new &librdf_hash that this implements
+ * @context: new BerkeleyDB hash context
+ * @new_identifier: new identifier for this hash
+ * @old_context: old BerkeleyDB hash context
+ * 
+ * Clones the existing Berkeley DB hash into the new one with the
+ * new identifier.
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_hash_bdb_clone(librdf_hash *hash, void* context, char *new_identifier,
+                      void *old_context) 
+{
+  librdf_hash_bdb_context* hcontext=(librdf_hash_bdb_context*)context;
+  librdf_hash_bdb_context* old_hcontext=(librdf_hash_bdb_context*)old_context;
+  librdf_hash_datum *key, *value;
+  librdf_iterator *iterator;
+  int status=0;
+  
+  /* copy data fields that might change */
+  hcontext->hash=hash;
+
+  /* Note: The options are not used at present, so no need to make a copy 
+   */
+  if(librdf_hash_bdb_open(context, new_identifier,
+                          old_hcontext->mode, old_hcontext->is_writable,
+                          old_hcontext->is_new, NULL))
+    return 1;
+
+
+  /* Use higher level functions to iterator this data
+   * on the other hand, maybe this is a good idea since that
+   * code is tested and works
+   */
+
+  key=librdf_new_hash_datum(NULL, 0);
+  value=librdf_new_hash_datum(NULL, 0);
+
+  iterator=librdf_hash_get_all(old_hcontext->hash, key, value);
+  while(librdf_iterator_have_elements(iterator)) {
+    librdf_iterator_get_next(iterator);
+
+    if(librdf_hash_bdb_put(hcontext, key, value)) {
+      status=1;
+      break;
+    }
+  }
+  if(iterator)
+    librdf_free_iterator(iterator);
+
+  librdf_free_hash_datum(value);
+  librdf_free_hash_datum(key);
+
+  return status;
+}
+
 
 
 typedef struct {
@@ -735,8 +843,13 @@ librdf_hash_bdb_register_factory(librdf_hash_factory *factory)
   factory->context_length = sizeof(librdf_hash_bdb_context);
   factory->cursor_context_length = sizeof(librdf_hash_bdb_cursor_context);
   
+  factory->create  = librdf_hash_bdb_create;
+  factory->destroy = librdf_hash_bdb_destroy;
+
   factory->open    = librdf_hash_bdb_open;
   factory->close   = librdf_hash_bdb_close;
+  factory->clone   = librdf_hash_bdb_clone;
+
   factory->put     = librdf_hash_bdb_put;
   factory->exists  = librdf_hash_bdb_exists;
   factory->delete_key  = librdf_hash_bdb_delete;
