@@ -202,11 +202,10 @@ This module provides the elements of the RDF statement - resource (or subject o 
 <para>
 Nodes have two types - resource (used for subject, predicate and
 object) and literal (only used for object).  Resources have URIs,
-Literals have string content plus optional XML Language, XML space
-statement and a flag if the content is XML which is used for
-supporting RDF parseType="Literal".
+Literals have string content plus optional XML Language
+and a flag if the content is XML which is used for
+supporting XML Literals.
 </para>
-
 <sect1>
 <title>RDF Node Class</title>
 @INCLUDE node.sgml
