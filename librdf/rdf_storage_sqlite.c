@@ -50,7 +50,9 @@
 
 #if SQLITE_API == 3
 #include <sqlite3.h>
+#define sqlite_DB sqlite3
 #define sqlite_STATEMENT sqlite3_stmt
+
 #define sqlite_EXEC sqlite3_exec
 #define sqlite_CLOSE sqlite3_close
 #define sqlite_FREE sqlite3_free
@@ -60,7 +62,9 @@
 
 #if SQLITE_API == 2
 #include <sqlite.h>
+#define sqlite_DB sqlite
 #define sqlite_STATEMENT sqlite_vm
+
 #define sqlite_EXEC sqlite_exec
 #define sqlite_CLOSE sqlite_close
 #define sqlite_FREE free
@@ -71,12 +75,7 @@ typedef struct
 {
   librdf_storage *storage;
 
-#if SQLITE_API == 3
-  sqlite3 *db;
-#endif
-#if SQLITE_API == 2
-  sqlite *db;
-#endif
+  sqlite_DB *db;
 
   int is_new;
   
@@ -1016,7 +1015,7 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 #if SQLITE_API == 3
   status=sqlite3_prepare(context->db,
                          (const char*)request,
-                         strlen((const char*)request),
+                         raptor_stringbuffer_length(sb),
                          &scontext->vm,
                          &scontext->zTail);
   if(status != SQLITE_OK)
