@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Redland - RDF Application Framework - PHP Interface</title>
+</head>
+<body bgcolor="#ffffff" text="#000085">
+
+<h1 align="center">Redland - RDF Application Framework - PHP Interface</h1>
+
+<h2>Installing the Redland Php interface</h2>
+
+<p>This is the skeleton of a PHP interface for Redland. It is not in
+the Redland release and only available from CVS.  It is not
+automatically built or installed when Redland is compled.  You can
+build it by hand as follows</p>
+
+<pre>
+  cd php
+  make build-php
+  make test-php   # optional
+</pre>
+
+<p>To install it system wide (this is optional) do this as <em>root</em>:</p>
+
+<pre>
+  # THIS IS UNTESTED
+  root# make install-php
+</pre>
+
+<p>The PHP interface has NOT been tested at all and is is pre-alpha
+quality.</p>
+
+
+<h2>Redland PHP API Introduction</h2>
+
+<p>The PHP API is an object-based API with the class names and method
+names flattened into PHP procedure names like this:
+librdf_<em>class</em>_<em>method</em> - the same names as in the
+underlying <a href="api/index.html">C API</a>.  The object references
+become PHP variables.</p>
+
+<h2>Testing the Redland PHP interface</h2>
+
+<p>There should be an example program to test the PHP interface, but
+not yet.</p>
+
+
+
+<h2>Other RDF PHP APIs and applications</h2>
+
+<ul>
+
+<li><a href="http://www.wiwiss.fu-berlin.de/suhl/bizer/rdfapi/">PHP RDF API</a> by Chris Bizer based on the Stanford RDF API by Sergey Melnik.  GPL License.</li>
+
+<li><a href="http://www.semanticweb.gr/rdftp/">rdftp - PHP RDF Server</a> by Vangelis Vassiliadis providing query and update operations on RDF content in a relational database. </li>
+
+</ul>
+
+
+<hr />
+
+<p>Copyright 2002 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>
