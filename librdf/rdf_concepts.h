@@ -55,11 +55,11 @@ enum {
   LIBRDF_CONCEPT_MS_aboutEach,
   LIBRDF_CONCEPT_MS_aboutEachPrefix,
 
-  LIBRDF_CONCEPT_MS_nodeID,
-  LIBRDF_CONCEPT_MS_List,
-  LIBRDF_CONCEPT_MS_first,
-  LIBRDF_CONCEPT_MS_rest,
-  LIBRDF_CONCEPT_MS_nil,
+  LIBRDF_CONCEPT_RS_nodeID,
+  LIBRDF_CONCEPT_RS_List,
+  LIBRDF_CONCEPT_RS_first,
+  LIBRDF_CONCEPT_RS_rest,
+  LIBRDF_CONCEPT_RS_nil,
 
   /* RDF Schema concepts defined in prose at
    *   http://www.w3.org/TR/2000/CR-rdf-schema-20000327/
@@ -113,14 +113,14 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_MS_RDF librdf_concept_resources[LIBRDF_CONCEPT_MS_RDF]
 #define LIBRDF_MS_Description librdf_concept_resources[LIBRDF_CONCEPT_MS_Description]
 
-#define LIBRDF_MS_aboutEach librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_aboutEach]
-#define LIBRDF_MS_aboutEachPrefix librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_aboutEachPrefix]
+#define LIBRDF_MS_aboutEach librdf_concept_resources[LIBRDF_CONCEPT_MS_aboutEach]
+#define LIBRDF_MS_aboutEachPrefix librdf_concept_resources[LIBRDF_CONCEPT_MS_aboutEachPrefix]
 
-#define LIBRDF_MS_nodeID librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_nodeID]
-#define LIBRDF_MS_List librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_List]
-#define LIBRDF_MS_first librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_first]
-#define LIBRDF_MS_rest librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_rest]
-#define LIBRDF_MS_nil librdf_concept_resources[LIBRDF_CONCEPT_SYNTAX_nil]
+#define LIBRDF_RS_nodeID librdf_concept_resources[LIBRDF_CONCEPT_RS_nodeID]
+#define LIBRDF_RS_List librdf_concept_resources[LIBRDF_CONCEPT_RS_List]
+#define LIBRDF_RS_first librdf_concept_resources[LIBRDF_CONCEPT_RS_first]
+#define LIBRDF_RS_rest librdf_concept_resources[LIBRDF_CONCEPT_RS_rest]
+#define LIBRDF_RS_nil librdf_concept_resources[LIBRDF_CONCEPT_RS_nil]
 
 
 #define LIBRDF_S_Class librdf_concept_resources[LIBRDF_CONCEPT_S_Class]
@@ -160,6 +160,12 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 
 #define LIBRDF_MS_aboutEach_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_aboutEach]
 #define LIBRDF_MS_aboutEachPrefix_URI librdf_concept_uris[LIBRDF_CONCEPT_MS_aboutEachPrefix]
+
+#define LIBRDF_RS_nodeID_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_nodeID]
+#define LIBRDF_RS_List_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_List]
+#define LIBRDF_RS_first_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_first]
+#define LIBRDF_RS_rest_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_rest]
+#define LIBRDF_RS_nil_URI librdf_concept_uris[LIBRDF_CONCEPT_RS_nil]
 
 
 #define LIBRDF_S_subPropertyOf_URI librdf_concept_uris[LIBRDF_CONCEPT_S_subPropertyOf]
