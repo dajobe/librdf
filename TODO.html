@@ -19,8 +19,8 @@
 <li>PHP may need to include php_config.h not config.h for new php versions</li>
 <li>RFE: return serialized models to syntax as strings</li>
 <li>RFE: model.parseString(format, "string"), model.parseURI(format, URI, baseURI=URI) creating and destroying temporary parser objects for <em>format</em>.
-Means need to care about parser class if you just want simple things.  Similarly
-for model.serialize() and Serializer class, however take care with serialise() method.</li>
+Means no need to care about parser class if you just want simple things.  Similarly
+for model.serialize() and Serializer class, however take care with serialise() method.  Better as model.load(), model.save() or write()?</li>
 <li>Update the RDF/RDFS terms/labels for the latest RDF Schema revision</li>
 <li>in-memory storage uses more memory than needed</li>
 <li>defensive code - check object types are correct by adding magic fields to start of all objects</li>
