@@ -999,33 +999,19 @@ librdf_parser_raptor_constructor(librdf_world *world)
     const char *mime_type=NULL;
     const unsigned char *uri_string=NULL;
 
-    /* FIXME - after redland 0.9.15, depend on raptor 1.2.0 with
-     * function raptor_syntaxes_enumerate available
-     */
-#if 0
     if(raptor_syntaxes_enumerate(i, &syntax_name, NULL, 
-                                 &mime_type, &uri_string))
-      break;
-#else
-    if(raptor_parsers_enumerate(i, &syntax_name, NULL)) {
+                                 &mime_type, &uri_string)) {
       /* reached the end of the parsers, now register the default one */
       i=0;
-      raptor_parsers_enumerate(i, &syntax_name, NULL);
+      raptor_syntaxes_enumerate(i, &syntax_name, NULL,
+                                &mime_type, &uri_string);
     }
 
     if(!strcmp(syntax_name, "rdfxml")) {
-      mime_type="application/rdf+xml";
-      uri_string=(const unsigned char*)"http://www.w3.org/TR/rdf-syntax-grammar";
       /* legacy name - see librdf_parser_raptor_init */
       librdf_parser_register_factory(world, "raptor", mime_type, uri_string,
                                      &librdf_parser_raptor_register_factory);
-    } else if (!strcmp(syntax_name, "ntriples")) {
-      mime_type="text/plain";
-      uri_string=(const unsigned char*)"http://www.w3.org/TR/rdf-testcases/#ntriples";
-    } else if (!strcmp(syntax_name, "ntriples-plus")) {
-      uri_string=(const unsigned char*)"http://www.ilrt.bristol.ac.uk/discovery/2003/11/ntriplesplus/";
     }
-#endif
 
     librdf_parser_register_factory(world, syntax_name, mime_type, uri_string,
                                    &librdf_parser_raptor_register_factory);
