@@ -1,5 +1,28 @@
 2004-12-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_open): Auto-set new
+	if file is missing.
+
+	* rdf_storage_sqlite.c: Revert over EXEC named change.
+
+	* rdf_storage_sqlite.c: Add macros sqlite_STATEMENT, sqlite_EXEC,
+	sqlite_CLOSE, sqlite_FREE to hide more V2/V3 differences.
+	(librdf_storage_sqlite_open): For V2 open failing, set rc.
+
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_get_next_common):
+	Free temporary datatype uri
+
+	* rdf_node.c (librdf_node_to_counted_string): Free temporary
+	datatype_uri_string.
+
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_serialise_finished):
+	Free any statement, context node.
+	librdf_storage_sqlite_find_statements_stream_context add to store
+	query_statement
+	(librdf_storage_sqlite_find_statements): Store query statement.
+	(librdf_storage_sqlite_find_statements_finished): Free any query
+	statement, statement or context node.
+
 	* rdf_storage_sqlite.c: Change context parts pzTail, ppVm to
 	zTail, vm and for sqlite V2 use vm not vm & ppVm.
 
