@@ -80,6 +80,10 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h> /* for strtol */
+#endif
+
 #define LIBRDF_INTERNAL 1
 #include <librdf.h>
 
@@ -121,3 +125,101 @@ librdf_heuristic_object_is_literal(char *object)
   return object_is_literal;
  
 }
+
+
+/**
+ * librdf_heuristic_gen_name - Generate a new name from an existing name
+ * @name: the name
+ * 
+ * Adds an integer or increases the integer at the end of the name
+ * in order to generate a new one
+ * 
+ * Return value: a new name or NULL on failure
+ **/
+char *
+librdf_heuristic_gen_name(char *name) 
+{
+  char *new_name;
+  char *p=name;
+  size_t len;
+  int offset;
+  long l=-1L;
+
+  /* Move to last character of name */
+  len=strlen(name);
+  offset=len-1;
+  p=name+offset;
+
+  /* Move p to last non number char */
+  if(isdigit(*p)) {
+    while(isdigit(*p))
+      p--;
+    l=strtol(p+1, (char**)NULL, 10);
+    offset=p-name;
+  }
+   
+  if(l<0)
+    l=0;
+  l++;
+
+  /* +1 to length if an extra digit was added (number now ends in 0) */
+  if((l % 10) ==0) 
+    len++;
+
+  new_name=(char*)LIBRDF_MALLOC(cstring, len+1);
+  strncpy(new_name, name, offset+2);
+  sprintf(new_name+offset+1, "%ld", l);
+  return new_name;
+}
+
+
+#ifdef STANDALONE
+
+/* one more prototype */
+int main(int argc, char *argv[]);
+
+
+int
+main(int argc, char *argv[]) 
+{
+  char *test_names[]={"test", "abc123", "99997", NULL};
+  char *name;
+  int n;
+  
+  char *program=argv[0];
+
+  for(n=0; (name=test_names[n]); n++) {
+    int i;
+    
+    fprintf(stdout, "%s: Generating 11 new names from '%s'\n", program, name);
+  
+    for(i=0; i<11; i++) {
+      char *new_name;
+      
+      fprintf(stdout, "%s: Generated name from '%s' is ", program, name);
+      new_name=librdf_heuristic_gen_name(name);
+      if(!new_name) {
+        fputs("failed\n", stderr);
+        break;
+      }
+      fprintf(stdout, "'%s'\n", new_name);
+      
+      if(name != test_names[n])
+        LIBRDF_FREE(cstring, name);
+      /* copy them over */
+      name=new_name;
+    }
+
+    if(name != test_names[n])
+      LIBRDF_FREE(cstring, name);
+  }
+
+#ifdef LIBRDF_MEMORY_DEBUG 
+  librdf_memory_report(stderr);
+#endif
+ 
+  /* keep gcc -Wall happy */
+  return(0);
+}
+
+#endif
