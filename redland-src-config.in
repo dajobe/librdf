@@ -62,17 +62,18 @@ while test $# -gt 0; do
       usage 0 1>&2
       ;;
     --run)
-      LD_LIBRARY_PATH=@abs_top_builddir@/librdf/.libs
+      lpath=@abs_top_builddir@/librdf/.libs
       if test -d .libs; then
-        LD_LIBRARY_PATH=".libs:$LD_LIBRARY_PATH"
+        lpath=".libs:$lpath"
       fi
       if test @with_raptor@ = internal; then
-        LD_LIBRARY_PATH="$LD_LIBRARY_PATH:@abs_top_builddir@/raptor/.libs"
+        lpath="lpath:@abs_top_builddir@/raptor/.libs"
       fi
       if test `uname` = Darwin; then
-        DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
+        DYLD_LIBRARY_PATH=$lpath:$DYLD_LIBRARY_PATH
         export DYLD_LIBRARY_PATH
       else
+        LD_LIBRARY_PATH=$lpath:$LD_LIBRARY_PATH
         export LD_LIBRARY_PATH
       fi
       shift
