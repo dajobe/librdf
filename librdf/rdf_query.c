@@ -240,6 +240,8 @@ librdf_new_query_from_query(librdf_query* old_query)
 {
   librdf_query* new_query;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(old_query, librdf_query, NULL);
+
   /* FIXME: fail if clone is not supported by this query (factory) */
   if(!old_query->factory->clone) {
     LIBRDF_FATAL1(old_query->world, LIBRDF_FROM_QUERY, "clone not implemented for query factory");
@@ -294,6 +296,8 @@ librdf_new_query_from_factory (librdf_world *world,
                                const unsigned char *query_string) {
   librdf_query* query;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_query_factory, NULL);
+
   if(!factory) {
     LIBRDF_DEBUG1("No query factory given\n");
     return NULL;
@@ -331,6 +335,8 @@ librdf_new_query_from_factory (librdf_world *world,
 void
 librdf_free_query (librdf_query* query) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(query, librdf_query);
+
   if(query->factory)
     query->factory->terminate(query);
 
@@ -357,6 +363,9 @@ librdf_free_query (librdf_query* query)
 librdf_stream*
 librdf_query_run_as_stream(librdf_query* query, librdf_model* model)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_model, NULL);
+
   if(query->factory->run_as_stream)
     return query->factory->run_as_stream(query, model);
   else
@@ -376,6 +385,9 @@ librdf_query_run_as_stream(librdf_query* query, librdf_model* model)
 int
 librdf_query_run_as_bindings(librdf_query* query, librdf_model* model)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_model, 1);
+
   if(query->factory->run_as_bindings)
     return query->factory->run_as_bindings(query, model);
   else
@@ -392,6 +404,8 @@ librdf_query_run_as_bindings(librdf_query* query, librdf_model* model)
 int
 librdf_query_get_result_count(librdf_query *query)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+
   if(query->factory->get_result_count)
     return query->factory->get_result_count(query);
   else
@@ -408,6 +422,8 @@ librdf_query_get_result_count(librdf_query *query)
 int
 librdf_query_results_finished(librdf_query *query)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+
   if(query->factory->results_finished)
     return query->factory->results_finished(query);
   else
@@ -430,6 +446,8 @@ int
 librdf_query_get_result_bindings(librdf_query *query, 
                                  const char ***names, librdf_node **values)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+
   if(query->factory->get_result_bindings)
     return query->factory->get_result_bindings(query, names, values);
   else
@@ -447,6 +465,8 @@ librdf_query_get_result_bindings(librdf_query *query,
 librdf_node*
 librdf_query_get_result_binding_value(librdf_query *query, int offset)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
+
   if(query->factory->get_result_binding_value)
     return query->factory->get_result_binding_value(query, offset);
   else
@@ -464,6 +484,8 @@ librdf_query_get_result_binding_value(librdf_query *query, int offset)
 const char*
 librdf_query_get_result_binding_name(librdf_query *query, int offset)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
+
   if(query->factory->get_result_binding_name)
     return query->factory->get_result_binding_name(query, offset);
   else
@@ -481,6 +503,8 @@ librdf_query_get_result_binding_name(librdf_query *query, int offset)
 librdf_node*
 librdf_query_get_result_binding_by_name(librdf_query *query, const char *name)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
+
   if(query->factory->get_result_binding_by_name)
     return query->factory->get_result_binding_by_name(query, name);
   else
@@ -497,6 +521,8 @@ librdf_query_get_result_binding_by_name(librdf_query *query, const char *name)
 int
 librdf_query_next_result(librdf_query *query)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+
   if(query->factory->next_result)
     return query->factory->next_result(query);
   else
