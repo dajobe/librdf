@@ -26,8 +26,8 @@ follows</p>
   root# make install-tcl
 </pre>
 
-<p>The Tcl interface has been tested with Tcl 8.0.5 only and
-is alpha quality.</p>
+<p>The Tcl interface has been tested with Tcl 8.0.5, 8.3 and is alpha
+quality - the test and examples work.</p>
 
 
 <h2>Redland Tcl API Introduction</h2>
@@ -43,12 +43,11 @@ become Tcl variables.</p>
 <p>The example program provided parses an RDF/XML source file into a
 model.  It should be run with two arguments - the URI of the content
 (as <tt>file:</tt><em>/path/to/content</em>) and the parser name
-(say, repat):</p>
+(say, raptor):</p>
 <pre>
-   tcl example.tcl file:../perl/dc.rdf repat
+   tcl example.tcl file:../perl/dc.rdf raptor
 </pre>
-<p>NOTE: ONLY <tt>file:</tt> URIs will work with repat, other parsers such as
-sirpac-w3c, sirpac-stanford and libwww can fetch general (http) URIs</p>
+<p>NOTE: ONLY <tt>file:</tt> URIs work at present.</p>
 
 
 

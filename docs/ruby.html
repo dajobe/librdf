@@ -26,7 +26,7 @@ follows</p>
   root# make install-ruby
 </pre>
 
-<p>The Ruby interface has been tested with Ruby 1.6.4 only and
+<p>The Ruby interface has been tested with Ruby 1.6.4 and 1.6.7 and
 is alpha quality - it is the first version and may change a lot.
 Thanks to Dan Brickley for his Ruby help in getting this first
 version working.
@@ -46,12 +46,11 @@ become Ruby variables.</p>
 <p>The example program provided parses an RDF/XML source file into a
 model.  It should be run with two arguments - the URI of the content
 (as <tt>file:</tt><em>/path/to/content</em>) and the parser name
-(say, repat):</p>
+(say, raptor):</p>
 <pre>
-   ruby example.ruby file:../perl/dc.rdf repat
+   ruby example.ruby file:../perl/dc.rdf raptor
 </pre>
-<p>NOTE: ONLY <tt>file:</tt> URIs will work with repat, other parsers such as
-sirpac-w3c, sirpac-stanford and libwww can fetch general (http) URIs</p>
+<p>NOTE: ONLY <tt>file:</tt> URIs will work with at present.</p>
 
 
 
