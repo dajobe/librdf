@@ -15,25 +15,21 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>RFE: New method for syncing of models to store - model.sync()</li>
 <li>Update the RDF/RDFS terms/labels for the latest RDF Schema revision</li>
 <li>RFE: alias methods *_serialize as *_to_stream in order to
 reduce confusion versus serializer class</li>
 <li>BUG: Blank nodes with illegal nodeIDs (as far as RDf/XML are concerned)
 can be serialized - fix in node creation?  statement creation?  serializing?</li>
-<li>BUG: BDB 4.1 causes include problems in rdf_node.c</li>
 <li>in-memory storage uses more memory than needed</li>
 <li>defensive code - check for NULL object parameters, wrong use
 of polymorphic objects such as getting URI of a non-resource node.
 Compile some as debug checks with aborts?.</li>
-<li>BUG: perl - if you didn't clone a node before trying to re-use it the whole thing would segfault</li>
 <li>example2.c is rather useless, consider replacing or removing</li>
 <li>RFE: Consider adding a librdf_model_get_storage() method so storage
 object needn't be kept around when dealing with model.</li>
 <li>Consider an AVL-tree in-memory store (<a href="http://www.msu.edu/user/pfaffben/avl/">libavl</a>)</li>
-<li>swig 1.3.14 may fail to work for some languages (perl,python ok)</li>
 <li>Docs: note that compiling redland also builds raptor, if both are wanted</li>
-<li>Allow base URIs in Perl parser methods to be undef</li>
+<li>RFE: Allow base URIs in Perl parser methods to be undef</li>
 <li>Document the storage constructor hash options under the main class</li>
 <li>RFE: make add_statement method on model take URIs</li>
 <li>Add arcs_in/arcs_out model methods</li>
@@ -64,6 +60,10 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>BDB 4.1 causes problems - now supported (0.9.13)</li>
+<li>perl - if you didn't clone a node before trying to re-use it the whole thing would segfault (0.9.13)</li>
+<li>swig 1.3.14 may fail to work for some languages (perl,python ok) (0.9.13)</li>
+<li>New method for syncing of models to store - librdf_model_sync (0.9.13)</li>
 <li>Add proper error/warning reporting - world class has this now (0.9.13)</li>
 <li>Ensure non-file: URIs do not cause crashes - fixed by Raptor URI class (0.9.13)</li>
 <li>Add URI retrieval via external www libraries - done via raptor for retrieving URI content for parsing.  Not by a new module. (0.9.13)</li>
