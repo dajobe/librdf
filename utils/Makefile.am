@@ -2,7 +2,7 @@ noinst_SCRIPTS=update-api-0912.pl
 
 bin_PROGRAMS=redland-db-upgrade rdfproc
 
-man_MANS = redland-db-upgrade.1
+man_MANS = redland-db-upgrade.1 rdfproc.1
 
 EXTRA_DIST=update-api-0912.pl $(man_MANS)
 
