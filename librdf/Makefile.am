@@ -55,7 +55,7 @@ rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
 rdf_query.c \
 rdf_query_triples.c \
 rdf_serializer.c \
-rdf_serializer_raptor.c \
+rdf_serializer_raptor.c rdf_serializer_rdfxml.c \
 redland.h librdf.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
