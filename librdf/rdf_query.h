@@ -132,7 +132,7 @@ void librdf_query_remove_query_result(librdf_query *query, librdf_query_results*
 #endif
 
 /* class methods */
-REDLAND_API void librdf_query_register_factory(librdf_world *world, const char *name, librdf_uri* uri, void (*factory) (librdf_query_factory*));
+REDLAND_API void librdf_query_register_factory(librdf_world *world, const char *name, const unsigned char *uri_string, void (*factory) (librdf_query_factory*));
 
 /* constructor */
 REDLAND_API librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string);
