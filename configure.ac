@@ -253,7 +253,7 @@ if test "X$with_tcl" != Xno ; then
 fi
 
 changequote(<<, >>)dnl
-TCL_VERSION=`echo 'puts [info tclversion]' | $TCL 2>/dev/null`
+TCL_VERSION=`echo 'puts -nonewline [info tclversion]' | $TCL 2>/dev/null`
 changequote([, ])dnl
 if test "X$TCL_VERSION" != X; then
   languages_available="$languages_available tcl($TCL_VERSION)"
