@@ -711,9 +711,6 @@ if test "$USE_MAINTAINER_MODE" = yes; then
   if test "$ac_cv_header_dmalloc_h" = yes; then
     MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
     MEM_LIBS=-ldmalloc
-  else
-    MEM=-DLIBRDF_MEMORY_DEBUG=1
-    MEM_LIBS=
   fi
   CFLAGS="-DLIBRDF_DEBUG=1 $CFLAGS"
 fi
