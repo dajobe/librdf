@@ -159,10 +159,12 @@ librdf_hash_bdb_open(void* context, char *identifier,
     return 1;
   }
   
+#ifdef HAVE_BDB_SET_FLAGS
   if((ret=bdb->set_flags(bdb, DB_DUP))) {
     LIBRDF_DEBUG2(librdf_hash_bdb_open, "Failed to set BDB duplicate flag - %d\n", ret);
     return 1;
   }
+#endif
   
   /* V3 prototype:
    * int DB->open(DB *db, const char *file, const char *database,
