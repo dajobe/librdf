@@ -42,8 +42,8 @@
 #define SWIG_prefix
 #endif
 
-#ifdef SWIGRUBY
-/* Ruby pollutes the #define space with these names */
+#if defined(SWIGRUBY) || defined (PHP_VERSION)
+/* Ruby and PHP pollute the #define space with these names */
 #undef PACKAGE_NAME
 #undef PACKAGE_STRING
 #undef PACKAGE_TARNAME
