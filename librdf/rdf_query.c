@@ -505,7 +505,7 @@ ex:fido a ex:Dog ;\
 #define DATA_BASE_URI "http://example.org/"
 #define QUERY_STRING "select ?x where (?x rdf:type ?y)";
 #define QUERY_LANGUAGE "rdql"
-
+#define VARIABLES_COUNT 1
 
 int
 main(int argc, char *argv[]) 
@@ -561,7 +561,7 @@ main(int argc, char *argv[])
   /* print the results */
   while(!librdf_query_results_finished(query)) {
     const char **names;
-    librdf_node* values[10];
+    librdf_node* values[VARIABLES_COUNT];
     
     if(librdf_query_get_result_bindings(query, &names, values))
       break;
