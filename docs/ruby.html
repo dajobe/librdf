@@ -10,26 +10,28 @@
 
 <h2>Installing the Redland Ruby interface</h2>
 
-<p>This is not automatically built or installed at present since this
-interface may not be required.  You can easily build it by hand as
-follows</p>
+<p>This is built if <tt>--with-ruby</tt> is given to the configure
+line, or <tt>--with-ruby=ruby1.8</tt> to use a particular Ruby
+version/program.  The standard 'make' at the top level will build it.</p>
+
+<p>You can also compile the Ruby interface by hand as follows:</p>
 
 <pre>
   cd ruby
-  make build-ruby
-  make test-ruby   # optional
+  make
+  make check # optional
 </pre>
 
 <p>To install it system wide (this is optional) do this as <em>root</em>:</p>
 
 <pre>
-  root# make install-ruby
+  root# make install
 </pre>
 
-<p>The Ruby interface has been tested with Ruby 1.6.4 and 1.6.7 and
-is alpha quality - it is the first version and may change a lot.
-Thanks to Dan Brickley for his Ruby help in getting this first
-version working.
+<p>The Ruby interface has been tested with Ruby 1.8, 1.6.7 and 1.6.4
+and is alpha quality - it is a bare API and may change a lot.  Thanks
+to Dan Brickley for his Ruby help in getting this first version
+working.
 </p>
 
 
@@ -64,7 +66,7 @@ model.  It should be run with two arguments - the URI of the content
 
 <hr />
 
-<p>Copyright 2002 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2002-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>

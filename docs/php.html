@@ -10,24 +10,26 @@
 
 <h2>Installing the Redland PHP interface</h2>
 
-<p>This is not automatically built or installed when Redland is
-compled.  You can build it by hand as follows</p>
+<p>This is built if <tt>--with-php</tt> is given to the configure
+line.  The standard 'make' at the top level will build it.</p>
+
+<p>You can also compile the PHP interface by hand as follows:</p>
 
 <pre>
   cd php
-  make build-php
-  make test-php   # optional
+  make
+  make check   # optional
 </pre>
 
 <p>To install it system wide (this is optional) do this as <em>root</em>:</p>
 
 <pre>
   # THIS IS UNTESTED
-  root# make install-php
+  root# make install
 </pre>
 
-<p>The PHP interface has been lightly tested with PHP 4.1.2 and is
-alpha quality - will crash and likely to change a lot.</p>
+<p>The PHP interface has been lightly tested with PHP 4.3.3, 4.1.2
+and is alpha quality - will crash and likely to change a lot.</p>
 
 
 <h2>Redland PHP API Introduction</h2>
