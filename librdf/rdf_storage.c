@@ -27,6 +27,7 @@
 #include <librdf.h>
 
 #include <rdf_storage.h>
+#include <rdf_storage_hashes.h>
 #include <rdf_storage_list.h>
 
 
@@ -52,7 +53,8 @@ static void librdf_storage_stream_to_node_iterator_finished(void* iterator);
 void
 librdf_init_storage(void) 
 {
-  /* Always have storage list implementation available */
+  /* Always have storage list, hashes implementations available */
+  librdf_init_storage_hashes();
   librdf_init_storage_list();
 }
 
@@ -186,7 +188,8 @@ librdf_get_storage_factory (const char *name)
 
 /**
  * librdf_new_storage - Constructor - create a new librdf_storage object
- * @name: the factory name
+ * @storage_name: the storage factory name
+ * @name: an identifier for the storage
  * @options_string: options to initialise storage
  *
  * The options are encoded as described in librdf_hash_from_string()
@@ -195,63 +198,77 @@ librdf_get_storage_factory (const char *name)
  * Return value: a new &librdf_storage object or NULL on failure
  */
 librdf_storage*
-librdf_new_storage (char *name, char *options_string) {
+librdf_new_storage (char *storage_name, char *name, 
+                    char *options_string) {
   librdf_storage_factory* factory;
   librdf_hash* options_hash;
-  librdf_storage *storage;
   
-  factory=librdf_get_storage_factory(name);
+  factory=librdf_get_storage_factory(storage_name);
   if(!factory)
     return NULL;
 
   options_hash=librdf_new_hash(NULL);
   if(!options_hash)
     return NULL;
+
+  if(librdf_hash_open(options_hash, NULL, 0, 1, 1, NULL)) {
+    librdf_free_hash(options_hash);
+    return NULL;
+  }
   
   if(librdf_hash_from_string(options_hash, options_string)) {
     librdf_free_hash(options_hash);
     return NULL;
   }
 
-  storage=librdf_new_storage_from_factory(factory, options_hash);
-  librdf_free_hash(options_hash);
-  return storage;
+  return librdf_new_storage_from_factory(factory, name, options_hash);
 }
 
 
 /**
  * librdf_new_storage_from_factory - Constructor - create a new librdf_storage object
  * @factory: the factory to use to construct the storage
+ * @name: name to use for storage
  * @options: &librdf_hash of options to initialise storage
+ *
+ * If the options are present, they become owned by the storage
+ * and should no longer be used.
  *
  * Return value: a new &librdf_storage object or NULL on failure
  */
 librdf_storage*
 librdf_new_storage_from_factory (librdf_storage_factory* factory,
+                                 char *name,
                                  librdf_hash* options) {
   librdf_storage* storage;
 
   if(!factory) {
     LIBRDF_DEBUG1(librdf_new_storage, "No factory given\n");
+    librdf_free_hash(options);
     return NULL;
   }
   
   storage=(librdf_storage*)LIBRDF_CALLOC(librdf_storage, 1,
                                          sizeof(librdf_storage));
-  if(!storage)
+  if(!storage) {
+    librdf_free_hash(options);
     return NULL;
+  }
+  
   
   storage->context=(char*)LIBRDF_CALLOC(librdf_storage_context, 1,
                                         factory->context_length);
   if(!storage->context) {
+    librdf_free_hash(options);
     librdf_free_storage(storage);
     return NULL;
   }
   
   storage->factory=factory;
   
-  if(factory->init(storage, options)) {
-    librdf_free_storage (storage);
+  if(factory->init(storage, name, options)) {
+    librdf_free_hash(options);
+    librdf_free_storage(storage);
     return NULL;
   }
   
@@ -267,6 +284,9 @@ librdf_new_storage_from_factory (librdf_storage_factory* factory,
 void
 librdf_free_storage (librdf_storage* storage) 
 {
+  if(storage->factory)
+    storage->factory->terminate(storage);
+
   if(storage->context)
     LIBRDF_FREE(librdf_storage_context, storage->context);
   LIBRDF_FREE(librdf_storage, storage);
@@ -470,13 +490,16 @@ librdf_storage_stream_to_node_iterator_finished(void* iterator)
   librdf_statement *partial_statement=context->partial_statement;
 
   /* make sure librdf_free_statement() doesn't free anything here */
-  librdf_statement_set_subject(partial_statement, NULL);
-  librdf_statement_set_predicate(partial_statement, NULL);
-  librdf_statement_set_object(partial_statement, NULL);
+  if(partial_statement) {
+    librdf_statement_set_subject(partial_statement, NULL);
+    librdf_statement_set_predicate(partial_statement, NULL);
+    librdf_statement_set_object(partial_statement, NULL);
 
-  librdf_free_statement(partial_statement);
+    librdf_free_statement(partial_statement);
+  }
 
-  librdf_free_stream(context->stream);
+  if(context->stream)
+    librdf_free_stream(context->stream);
 
   LIBRDF_FREE(librdf_storage_stream_to_node_iterator_context, context);
 }
@@ -679,15 +702,15 @@ main(int argc, char *argv[])
   librdf_init_storage();
   librdf_init_model();
   
-  fprintf(stderr, "%s: Creating storage\n", program);
-  storage=librdf_new_storage(NULL, NULL);
+  fprintf(stdout, "%s: Creating storage\n", program);
+  storage=librdf_new_storage(NULL, "test", NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
   }
 
   
-  fprintf(stderr, "%s: Opening storage\n", program);
+  fprintf(stdout, "%s: Opening storage\n", program);
   if(librdf_storage_open(storage, NULL)) {
     fprintf(stderr, "%s: Failed to open storage\n", program);
     return(1);
@@ -696,10 +719,10 @@ main(int argc, char *argv[])
 
   /* Can do nothing here since need model and storage working */
 
-  fprintf(stderr, "%s: Closing storage\n", program);
+  fprintf(stdout, "%s: Closing storage\n", program);
   librdf_storage_close(storage);
 
-  fprintf(stderr, "%s: Freeing storage\n", program);
+  fprintf(stdout, "%s: Freeing storage\n", program);
   librdf_free_storage(storage);
   
 
