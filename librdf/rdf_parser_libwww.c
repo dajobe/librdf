@@ -45,6 +45,10 @@ static librdf_statement* librdf_parser_libwww_serialise_next_statement(void* con
 static void librdf_parser_libwww_serialise_finished(void* context);
 
 
+/* implements parsing into stream or model */
+static librdf_stream* librdf_parser_libwww_parse_common(void *context, librdf_uri *uri, librdf_model *model);
+
+
 /* not used at present */
 typedef struct {
   char *dummy;
@@ -107,10 +111,10 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
     return;
   
   librdf_statement_set_subject(statement, 
-                               librdf_new_node_as_stream_string(HTTriple_subject(t)));
+                               librdf_new_node_from_uri_string(HTTriple_subject(t)));
   
   librdf_statement_set_predicate(statement,
-                                 librdf_new_node_as_stream_string(HTTriple_predicate(t)));
+                                 librdf_new_node_from_uri_string(HTTriple_predicate(t)));
 
 
   object=HTTriple_object(t);
@@ -119,7 +123,7 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
                                 librdf_new_node_from_literal(object, NULL, 0, 0));
    else
     librdf_statement_set_object(statement, 
-                                librdf_new_node_as_stream_string(object));
+                                librdf_new_node_from_uri_string(object));
 
 
 #ifdef LIBRDF_DEBUG
@@ -131,7 +135,7 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
 #endif
 
   if(scontext->model) {
-    librdf_model_add(scontext->model, statement);
+    librdf_model_add_statement(scontext->model, statement);
   } else {
     librdf_list_add(scontext->statements, statement);
   }
@@ -314,7 +318,7 @@ tracer (const char * fmt, va_list pArgs)
 static librdf_stream*
 librdf_parser_libwww_parse_as_stream(void *context, librdf_uri *uri)
 {
-  return librdf_parser_libwww_parse_as_stream2(context, uri, NULL);
+  return librdf_parser_libwww_parse_common(context, uri, NULL);
 }
 
 
@@ -325,6 +329,8 @@ librdf_parser_libwww_parse_as_stream(void *context, librdf_uri *uri)
  * @model: &librdf_model of model
  *
  * Retrieves all statements and stores them in the given model.
+ *
+ * Return value: non 0 on failure
  **/
 static int
 librdf_parser_libwww_parse_into_model(void *context, librdf_uri *uri, 
@@ -332,9 +338,9 @@ librdf_parser_libwww_parse_into_model(void *context, librdf_uri *uri,
 {
   void *status;
 
-  status=(void*)librdf_parser_libwww_parse_as_stream2(context, uri, NULL);
+  status=(void*)librdf_parser_libwww_parse_common(context, uri, model);
   
-  return (status != NULL);
+  return (status == NULL);
 }
 
 
@@ -347,7 +353,8 @@ librdf_parser_libwww_parse_into_model(void *context, librdf_uri *uri,
  * a list and emits when the URI content has been exhausted.
  **/
 static librdf_stream*
-librdf_parser_libwww_parse_as_stream2(void *context, librdf_uri *uri)
+librdf_parser_libwww_parse_common(void *context, librdf_uri *uri,
+                                  librdf_model* model)
 {
   /* Note: not yet used:
   librdf_parser_libwww_context* pcontext=(librdf_parser_libwww_context*)context;
@@ -407,9 +414,12 @@ librdf_parser_libwww_parse_as_stream2(void *context, librdf_uri *uri)
     return NULL;
   }
 
+  scontext->model=model;
+  
   if(model) {
-    HTEventList_loop(context->request);
-    context->request_done=1;
+    HTEventList_loop(scontext->request);
+    scontext->request_done=1;
+    librdf_parser_libwww_serialise_finished((void*)scontext);
     return (librdf_stream*)1;
   }
   
@@ -541,7 +551,10 @@ librdf_parser_libwww_serialise_finished(void* context)
     if(scontext->statements)
       librdf_free_list(scontext->statements);
 
-    /* Terminate libwww */
+    if(scontext->next)
+      librdf_free_statement(scontext->next);
+    
+    /* terminate libwww */
     HTProfile_delete();
 
     LIBRDF_FREE(librdf_parser_libwww_context, scontext);
