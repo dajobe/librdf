@@ -1,14 +1,12 @@
 MYSQL_UTILS=rdf-digest rdf-load rdf-tree
 
-noinst_SCRIPTS=update-api-0912.pl
-
 bin_PROGRAMS=redland-db-upgrade rdfproc
 
 EXTRA_PROGRAMS=$(MYSQL_UTILS)
 
 man_MANS = redland-db-upgrade.1 rdfproc.1
 
-EXTRA_DIST=update-api-0912.pl $(man_MANS)
+EXTRA_DIST=$(man_MANS)
 
 CLEANFILES=*.db $(EXTRA_PROGRAMS)
 
