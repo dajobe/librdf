@@ -86,15 +86,10 @@ rdf_parser_raptor.c \
 rdf_parser_repat.c
 
 EXTRA_DIST=\
-README      NEWS      TODO      LICENSE.txt \
-README.html NEWS.html TODO.html LICENSE.html \
-INSTALL.html FAQS.html MPL.html \
 redland-config.in \
-memcmp.c Redland.i \
+memcmp.c \
 PrintConsumer.java PrintParser.java \
 $(JAVA_CLASSES) \
-autogen.sh \
-Makefile.PL \
 redland.spec redland.spec.in \
 ex1.rdf ex2.rdf
 
