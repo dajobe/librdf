@@ -340,6 +340,7 @@ librdf_serializer_serialize_model_to_file_handle(librdf_serializer* serializer,
                                                  librdf_model* model) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(handle, FILE*, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
 
   return serializer->factory->serialize_model_to_file_handle(serializer->context,
