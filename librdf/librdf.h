@@ -106,7 +106,7 @@ void librdf_memory_report(FILE *fh);
 /* public interfaces */
 
 /* from rdf_init.c */
-void librdf_init_world(char *digest_factory_name);
+void librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash);
 void librdf_destroy_world(void);
 
 /* from rdf_heuristics.c */
