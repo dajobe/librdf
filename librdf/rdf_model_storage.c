@@ -492,13 +492,14 @@ librdf_model_storage_query_execute(librdf_model* model,
 /**
  * librdf_model_storage_sync - Synchronise the model to the storage
  * @model: &librdf_model object
- * 
+ *
+ * Return-value: Non-0 on failure
  **/
-static void
+static int
 librdf_model_storage_sync(librdf_model* model) 
 {
   librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
-  librdf_storage_sync(context->storage);
+  return librdf_storage_sync(context->storage);
 }
 
 
