@@ -8,7 +8,7 @@
 .\" Institute for Learning and Research Technology - http://www.ilrt.org/
 .\" University of Bristol - http://www.bristol.ac.uk/
 .\"
-.TH rdfproc 1 "2004-01-09"
+.TH rdfproc 1 "2004-01-11"
 .\" Please adjust this date whenever revising the manpage.
 .SH NAME
 rdfproc \- Redland RDF processor utility
@@ -104,9 +104,13 @@ Show all properties of triples with \fINODE\fP as an object.
 .IP "\fBcontains \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP\fR"
 Check if the given triple is in the graph.
 
-.IP "\fBfind \fISUBJECT\fP|- \fIPREDICATE\fP|- \fIOBJECT\fP|-\fR"
+.IP "\fBcontexts\fR"
+List all the contexts in the graph (if contexts are enabled).
+
+.IP "\fBfind \fISUBJECT\fP|- \fIPREDICATE\fP|- \fIOBJECT\fP|- [\fICONTEXT\fP]\fR"
 Find matching triples to the given statement
-where - stands for a blank that matches any node.
+where - stands for a blank that matches any node.  If \fICONTEXT\fP
+is given, only search for triples in that context node.
 
 .IP "\fBhas-arc-in \fINODE\fP \fIARC\fP\fR"
 Check that there is a triple with \fINODE\fP as a subject
@@ -116,17 +120,18 @@ and \fIARC\fP as a predicate.
 Check that there is a triple with \fINODE\fP as a object
 and \fIARC\fP as a predicate.
 
-.IP "\fBparse \fIURI|FILENAME\fP [\fISYNTAX|\fP \fI[BASE URI]\fP]\fR"
+.IP "\fBparse \fIURI|FILENAME\fP [\fISYNTAX|\fP [\fIBASE URI\fP]]\fR"
 Parse syntax at \fIURI\fP intothe graph using \fISYNTAX\fP which
 can be one of \fIrdfxml\fP (RDF/XML, default) or \fIntriples\fP.
 If \fIFILENAME\fP is a existing file, the appropriate URI will be
 generated for it.
 
-.IP "\fBparse-stream \fIURI|FILENAME\fP [\fISYNTAX\fP \fI[BASE URI]\fP]\fR"
+.IP "\fBparse-stream \fIURI|FILENAME\fP [\fISYNTAX\fP [\fIBASE URI\fP [\fICONTEXT\fP]]\fR"
 Streaming parse syntax at URI into the graph using \fISYNTAX\fP which
 can be one of \fIrdfxml\fP (RDF/XML, default) or \fIntriples\fP.
 If \fIFILENAME\fP is an existing file, the appropriate URI will be
-generated for it.
+generated for it.  If the optional \fICONTEXT\fI URI is given,
+the triples are added to that context.
 
 .IP "\fBprint\fR"
 Print the graph triples in a simple format showing context nodes
