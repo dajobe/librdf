@@ -54,30 +54,7 @@ void librdf_system_free(void *ptr);
 #define SYSTEM_FREE(ptr)   free(ptr)
 #endif
 
-#define LIBRDF_ASSERT_RETURN(condition, msg, ret) do { \
-  if(condition) { \
-    fprintf(stderr, "%s:%d:%s: Assertion failed - " msg "\n", __FILE__, __LINE__, __func__); \
-    abort(); \
-    return(ret); \
-  } \
-} while(0)
-
-#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, type) do { \
-  if(!pointer) { \
-    fprintf(stderr, "%s:%d:%s: Assertion failed - object pointer of type " #type " is NULL.\n", __FILE__, __LINE__, __func__); \
-    abort(); \
-    return; \
-  } \
-} while(0)
-
-#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(pointer, type, ret) do { \
-  if(!pointer) { \
-    fprintf(stderr, "%s:%d:%s: Assertion failed - object pointer of type " #type " is NULL.\n", __FILE__, __LINE__, __func__); \
-    abort(); \
-    return(ret); \
-  } \
-} while(0)
-
+#define LIBRDF_ASSERT_DIE abort();
 
 #else
 /* DEBUGGING TURNED OFF */
@@ -95,10 +72,49 @@ void librdf_system_free(void *ptr);
 #define SYSTEM_MALLOC(size)   malloc(size)
 #define SYSTEM_FREE(ptr)   free(ptr)
 
-#define LIBRDF_ASSERT_RETURN(condition, msg, ret)
+#define LIBRDF_ASSERT_DIE
+
+#endif
+
+
+#ifdef LIBRDF_DISABLE_ASSERT_MESSAGES
+#define LIBRDF_ASSERT_REPORT(line)
+#else
+#define LIBRDF_ASSERT_REPORT(msg) fprintf(stderr, "%s:%d: (%s) assertion failed: " msg "\n", __FILE__, __LINE__, __func__);
+#endif
+
+
+#ifdef LIBRDF_DISABLE_ASSERT
+
+#define LIBRDF_ASSERT_RETURN(condition, msg, ret) 
 #define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, type)
 #define LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(pointer, type, ret)
 
+#else
+
+#define LIBRDF_ASSERT_RETURN(condition, msg, ret) do { \
+  if(condition) { \
+    LIBRDF_ASSERT_REPORT(msg) \
+    LIBRDF_ASSERT_DIE \
+    return(ret); \
+  } \
+} while(0)
+
+#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, type) do { \
+  if(!pointer) { \
+    LIBRDF_ASSERT_REPORT("object pointer of type " #type " is NULL.") \
+    LIBRDF_ASSERT_DIE \
+    return; \
+  } \
+} while(0)
+
+#define LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(pointer, type, ret) do { \
+  if(!pointer) { \
+    LIBRDF_ASSERT_REPORT("object pointer of type " #type " is NULL.") \
+    LIBRDF_ASSERT_DIE \
+    return(ret); \
+  } \
+} while(0)
 
 #endif
 
