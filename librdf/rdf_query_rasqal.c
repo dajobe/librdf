@@ -103,7 +103,8 @@ librdf_query_rasqal_warning_handler(void *data, raptor_locator *locator,
 static int
 librdf_query_rasqal_init(librdf_query* query, 
                          const char *name, librdf_uri* uri,
-                         const unsigned char* query_string)
+                         const unsigned char* query_string,
+                         librdf_uri *base_uri)
 {
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   int len;
@@ -131,8 +132,8 @@ librdf_query_rasqal_init(librdf_query* query,
   strcpy((char*)query_string_copy, (const char*)query_string);
 
   context->query_string=query_string_copy;
-  if(uri)
-    context->uri=librdf_new_uri_from_uri(uri);
+  if(base_uri)
+    context->uri=librdf_new_uri_from_uri(base_uri);
 
   return 0;
 }
