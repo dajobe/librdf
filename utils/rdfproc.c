@@ -475,12 +475,12 @@ main(int argc, char *argv[])
   }
 
 
-  uri=librdf_new_uri(world, LIBRDF_MODEL_FEATURE_CONTEXTS);
+  uri=librdf_new_uri(world, (const unsigned char*)LIBRDF_MODEL_FEATURE_CONTEXTS);
   contexts=0;
   if(uri) {
     node=librdf_model_get_feature(model, uri);
     if(node) {
-      contexts=atoi(librdf_node_get_literal_value(node));
+      contexts=atoi((const char*)librdf_node_get_literal_value(node));
       librdf_free_node(node);
     }
     librdf_free_uri(uri);
@@ -546,8 +546,9 @@ main(int argc, char *argv[])
                 argv[3]);
       } else
         base_uri=librdf_new_uri_from_uri(uri);
-      
-      
+
+      rc=0;
+
       if (type == CMD_PARSE_MODEL) {
         if(librdf_parser_parse_into_model(parser, uri, base_uri, model)) {
           fprintf(stderr, "%s: Failed to parse into the graph\n", program);
@@ -576,35 +577,35 @@ main(int argc, char *argv[])
           librdf_stream_next(stream);
         }
         librdf_free_stream(stream);  
-
+        
         if(target) {
           librdf_free_node(target);
           target=NULL;
         }
-
+        
         fprintf(stderr, "%s: Added %d triples\n", program, count);
         rc=1;
       }
 
       if(rc) {
-        librdf_uri* error_count_uri=librdf_new_uri(world, LIBRDF_PARSER_FEATURE_ERROR_COUNT);
-        librdf_uri* warning_count_uri=librdf_new_uri(world, LIBRDF_PARSER_FEATURE_WARNING_COUNT);
+        librdf_uri* error_count_uri=librdf_new_uri(world, (const unsigned char*)LIBRDF_PARSER_FEATURE_ERROR_COUNT);
+        librdf_uri* warning_count_uri=librdf_new_uri(world, (const unsigned char*)LIBRDF_PARSER_FEATURE_WARNING_COUNT);
         librdf_node* error_count_node;
         librdf_node* warning_count_node;
         int error_count, warning_count;
-        
+
         error_count_node =librdf_parser_get_feature(parser, error_count_uri);
         if(error_count_node) {
-          error_count= atoi(librdf_node_get_literal_value(error_count_node));
+          error_count= atoi((const char*)librdf_node_get_literal_value(error_count_node));
           librdf_free_node(error_count_node);
         } else {
           fprintf(stderr, "%s: Could not get parsing error count\n", program);
           error_count= (-1);
         }
-        
+
         warning_count_node =librdf_parser_get_feature(parser, warning_count_uri);
         if(warning_count_node) {
-          warning_count =atoi(librdf_node_get_literal_value(error_count_node));
+          warning_count =atoi((const char*)librdf_node_get_literal_value(error_count_node));
           librdf_free_node(warning_count_node);
         } else {
           fprintf(stderr, "%s: Could not get parsing warning count\n", program);
@@ -616,7 +617,7 @@ main(int argc, char *argv[])
           fprintf(stderr,
                   "%s: The parsing returned %d errors and %d warnings\n", 
                   program, error_count, warning_count);
-        
+         
         librdf_free_uri(error_count_uri);
         librdf_free_uri(warning_count_uri);
       }
@@ -627,50 +628,50 @@ main(int argc, char *argv[])
       break;
 
     case CMD_SERIALIZE:
-      /* args are name (optional), uri (may be NULL), mime_type (optional) */
+        /* args are name (optional), uri (may be NULL), mime_type (optional) */
 
-      uri=NULL;
-      name=NULL;
-      mime_type=NULL;
+        uri=NULL;
+        name=NULL;
+        mime_type=NULL;
 
-      if(!argc)
-        goto serialize;
-      
-      if(strcmp(argv[0], "-"))
-        name=argv[0];
-        
-      if(argc < 2)
-        goto serialize;
+        if(!argc)
+          goto serialize;
 
-      if(strcmp(argv[1], "-")) {
-        uri=librdf_new_uri(world, (const unsigned char *)argv[1]);
-        if(!uri) {
-          fprintf(stderr, "%s: Failed to create URI from %s\n", program, argv[1]);
+        if(strcmp(argv[0], "-"))
+          name=argv[0];
+
+        if(argc < 2)
+          goto serialize;
+
+        if(strcmp(argv[1], "-")) {
+          uri=librdf_new_uri(world, (const unsigned char *)argv[1]);
+          if(!uri) {
+            fprintf(stderr, "%s: Failed to create URI from %s\n", program, argv[1]);
+            break;
+          }
+        }
+
+        if(argc ==3) {
+          if(strcmp(argv[2], "-"))
+            mime_type=argv[2];
+        }
+
+      serialize:
+        serializer=librdf_new_serializer(world, name, mime_type, uri);
+        if(!serializer) {
+          fprintf(stderr, "%s: Failed to create new serializer name %s, uri %s, mime type %s\n", program, argv[0], argv[1], argv[2]);
+          if(uri)
+            librdf_free_uri(uri);
           break;
         }
-      }
-  
-      if(argc ==3) {
-        if(strcmp(argv[2], "-"))
-          mime_type=argv[2];
-      }
 
-    serialize:
-      serializer=librdf_new_serializer(world, name, mime_type, uri);
-      if(!serializer) {
-        fprintf(stderr, "%s: Failed to create new serializer name %s, uri %s, mime type %s\n", program, argv[0], argv[1], argv[2]);
+        librdf_serializer_serialize_model(serializer, stdout, NULL, model);
+
+        librdf_free_serializer(serializer);
         if(uri)
           librdf_free_uri(uri);
+
         break;
-      }
-
-      librdf_serializer_serialize_model(serializer, stdout, NULL, model);
-
-      librdf_free_serializer(serializer);
-      if(uri)
-        librdf_free_uri(uri);
-
-      break;
       
     case CMD_QUERY:
       /* args are name, uri (may be NULL), query_string/mime_type */
