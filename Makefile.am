@@ -36,6 +36,9 @@ rdf_model_test
 
 CLEANFILES=$(TESTS) test.gdbm test.db
 
+# Why is this not in the default makefile?
+CC=@CC@
+
 CFLAGS=-Wall
 @MAINT@ CFLAGS=-DLIBRDF_DEBUG=1 -g -Wall -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
 
