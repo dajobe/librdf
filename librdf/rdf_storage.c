@@ -317,6 +317,7 @@ librdf_new_storage_from_factory (librdf_world *world,
                                  char *name,
                                  librdf_hash* options) {
   librdf_storage* storage;
+  int index_contexts=0;
 
   if(!factory) {
     LIBRDF_DEBUG1(librdf_new_storage, "No factory given\n");
@@ -343,6 +344,12 @@ librdf_new_storage_from_factory (librdf_world *world,
   }
   
   storage->factory=factory;
+
+  if((index_contexts=librdf_hash_get_as_boolean(options, "contexts"))<0)
+    index_contexts=0; /* default is no contexts */
+
+  storage->index_contexts=index_contexts;
+
   
   if(factory->init(storage, name, options)) {
     librdf_free_storage(storage);
