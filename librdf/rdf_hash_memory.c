@@ -166,8 +166,9 @@ static int librdf_hash_memory_open(void* context, char *identifier, int mode, in
 static int librdf_hash_memory_close(void* context);
 static int librdf_hash_memory_clone(librdf_hash* new_hash, void *new_context, char *new_identifier, void* old_context);
 static int librdf_hash_memory_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
-static int librdf_hash_memory_exists(void* context, librdf_hash_datum *key);
-static int librdf_hash_memory_delete(void* context, librdf_hash_datum *key);
+static int librdf_hash_memory_exists(void* context, librdf_hash_datum *key, librdf_hash_datum *value);
+static int librdf_hash_memory_delete_key(void* context, librdf_hash_datum *key);
+static int librdf_hash_memory_delete_key_value(void* context, librdf_hash_datum *key, librdf_hash_datum *value);
 static int librdf_hash_memory_sync(void* context);
 static int librdf_hash_memory_get_fd(void* context);
 
@@ -193,6 +194,22 @@ librdf_hash_memory_crc32 (const unsigned char *s, unsigned int len)
 
 
 
+/**
+ * librdf_hash_memory_find_node - Find the node for the given key or value
+ * @hash: the memory hash context
+ * @key: key string
+ * @key_len: key string length
+ * @user_bucket: pointer to store bucket
+ * @prev: pointer to store previous node
+ * 
+ * If value is not NULL and value_len is non 0, the value will also be
+ * compared in the search.
+ *
+ * If user_bucket is not NULL, the bucket used will be returned.  if
+ * prev is no NULL, the previous node in the list will be returned.
+ * 
+ * Return value: &librdf_hash_memory_node of content or NULL on failure
+ **/
 static librdf_hash_memory_node*
 librdf_hash_memory_find_node(librdf_hash_memory_context* hash, 
 			     char *key, size_t key_len,
@@ -792,28 +809,142 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
  * Return value: non 0 if the key exists in the hash
  **/
 static int
-librdf_hash_memory_exists(void* context, librdf_hash_datum *key) 
+librdf_hash_memory_exists(void* context, 
+                          librdf_hash_datum *key, librdf_hash_datum *value)
 {
   librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
   librdf_hash_memory_node* node;
+  librdf_hash_memory_node_value *vnode;
   
   node=librdf_hash_memory_find_node(hash,
 				    (char*)key->data, key->size,
 				    NULL, NULL);
-  return (node != NULL);
+  /* key not found */
+  if(!node)
+    return 0;
+  
+  /* no value wanted */
+  if(!value)
+    return 1;
+
+  /* search for value in list of values */
+  for(vnode=node->values; vnode; vnode=vnode->next) {
+    if(value->size == vnode->value_len && 
+       !memcmp(value->data, vnode->value, value->size))
+      break;
+  }
+
+  return (vnode != NULL);
 }
 
 
 
 /**
- * librdf_hash_memory_delete: - Delete a key and all its values from the hash
+ * librdf_hash_memory_delete_key_value: - Delete a key/value pair from the hash
+ * @context: memory hash context
+ * @key: pointer to key to delete
+ * @value: pointer to value to delete
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_hash_memory_delete_key_value(void* context, librdf_hash_datum *key,
+                                    librdf_hash_datum *value)
+{
+  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
+  librdf_hash_memory_node *node, *prev, *next;
+  librdf_hash_memory_node_value *vnode, *vprev;
+  int bucket;
+  
+  node=librdf_hash_memory_find_node(hash, 
+				    (char*)key->data, key->size,
+				    &bucket, &prev);
+  /* key not found anywhere */
+  if(!node)
+    return 1;
+
+  /* search for value in list of values */
+  vnode=node->values;
+  vprev=NULL;
+  while(vnode) {
+    if(value->size == vnode->value_len && 
+       !memcmp(value->data, vnode->value, value->size))
+      break;
+    vprev=vnode;
+    vnode=vnode->next;
+  }
+
+  /* key/value combination not found */
+  if(!vnode)
+    return 1;
+
+  /* found - delete it from list */
+  if(!vprev) {
+    /* at start of list so delete from there */
+    node->values=vnode->next;
+  } else
+    vprev->next=vnode->next;
+
+  /* free value node */
+  LIBRDF_FREE(librdf_hash_memory_node_value, vnode);
+
+  /* update hash counts */
+  hash->values--;
+
+  /* check if last value was removed */
+  if(node->values)
+    /* no, so return success */
+    return 0;
+  
+
+  /* yes - all values gone so need to delete entire key node */
+
+  if(!prev) {
+    /* is at start of list, so delete from there */
+    if(!(hash->nodes[bucket]=node->next))
+      /* hash bucket occupancy is one less if bucket is now empty */
+      hash->size--;
+    next=NULL;
+  } else
+    next=prev->next=node->next;
+  
+  /* free node */
+  librdf_free_hash_memory_node(node);
+  
+  /* see if there are remaining values for this key */
+  if(!next) {
+    /* no - so was last value for that key, reduce key count */
+    hash->keys--;
+  } else {
+    int found=0;
+    
+    node=next;
+    while(node) {
+      if(key->size == node->key_len && !memcmp(key, node->key, key->size)){
+        found=1;
+        break;
+      }
+      node=node->next;
+    }
+    
+    /* no further key values found - so was last value for that key */
+    if(!found)
+      hash->keys--;
+  }
+
+  return 0;
+}
+
+
+/**
+ * librdf_hash_memory_delete_key: - Delete a key and all its values from the hash
  * @context: memory hash context
  * @key: pointer to key to delete
  * 
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_memory_delete(void* context, librdf_hash_datum *key) 
+librdf_hash_memory_delete_key(void* context, librdf_hash_datum *key) 
 {
   librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
   librdf_hash_memory_node *node, *prev;
@@ -899,7 +1030,8 @@ librdf_hash_memory_register_factory(librdf_hash_factory *factory)
 
   factory->put     = librdf_hash_memory_put;
   factory->exists  = librdf_hash_memory_exists;
-  factory->delete_key  = librdf_hash_memory_delete;
+  factory->delete_key  = librdf_hash_memory_delete_key;
+  factory->delete_key_value  = librdf_hash_memory_delete_key_value;
   factory->sync    = librdf_hash_memory_sync;
   factory->get_fd  = librdf_hash_memory_get_fd;
 

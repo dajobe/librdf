@@ -137,9 +137,10 @@ struct librdf_hash_factory_s {
   int (*put)(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 
   /* returns true if key exists in hash, without returning value */
-  int (*exists)(void* context, librdf_hash_datum *key);
+  int (*exists)(void* context, librdf_hash_datum *key, librdf_hash_datum *value);
 
   int (*delete_key)(void* context, librdf_hash_datum *key);
+  int (*delete_key_value)(void* context, librdf_hash_datum *key, librdf_hash_datum *value);
 
   /* flush any cached information to disk */
   int (*sync)(void* context);
@@ -192,17 +193,20 @@ int librdf_hash_close(librdf_hash* hash);
 char* librdf_hash_get(librdf_hash* hash, char *key);
 librdf_hash_datum* librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key);
 
+/* retrieve one value for key and delete from hash all other values */
+char* librdf_hash_get_del(librdf_hash* hash, char *key);
 
 /* retrieve all values for a given hash key according to flags */
 librdf_iterator* librdf_hash_get_all(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
 
 /* insert a key/value pair */
-int librdf_hash_put(librdf_hash* hash, void *key, size_t key_len, void *value, size_t value_len);
+int librdf_hash_put(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
 
   /* returns true if key exists in hash, without returning value */
-int librdf_hash_exists(librdf_hash* hash, void *key, size_t key_len);
+int librdf_hash_exists(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
 
-int librdf_hash_delete(librdf_hash* hash, void *key, size_t key_len);
+int librdf_hash_delete(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
+int librdf_hash_delete_all(librdf_hash* hash, librdf_hash_datum *key);
 librdf_iterator* librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key);
 /* flush any cached information to disk */
 int librdf_hash_sync(librdf_hash* hash);

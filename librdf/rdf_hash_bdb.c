@@ -156,8 +156,9 @@ static int librdf_hash_bdb_open(void* context, char *identifier, int mode, int i
 static int librdf_hash_bdb_close(void* context);
 static int librdf_hash_bdb_clone(librdf_hash* new_hash, void *new_context, char *new_identifier, void* old_context);
 static int librdf_hash_bdb_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
-static int librdf_hash_bdb_exists(void* context, librdf_hash_datum *key);
-static int librdf_hash_bdb_delete(void* context, librdf_hash_datum *key);
+static int librdf_hash_bdb_exists(void* context, librdf_hash_datum *key, librdf_hash_datum *value);
+static int librdf_hash_bdb_delete_key(void* context, librdf_hash_datum *key);
+static int librdf_hash_bdb_delete_key_value(void* context, librdf_hash_datum *key, librdf_hash_datum *value);
 static int librdf_hash_bdb_sync(void* context);
 static int librdf_hash_bdb_get_fd(void* context);
 
@@ -236,9 +237,6 @@ librdf_hash_bdb_open(void* context, char *identifier,
     return 1;
   sprintf(file, "%s.db", identifier);
 
-  if(is_new)
-    remove(file);
-
 #ifdef HAVE_DB_CREATE
   /* V3 prototype:
    * int db_create(DB **dbp, DB_ENV *dbenv, u_int32_t flags);
@@ -257,11 +255,12 @@ librdf_hash_bdb_open(void* context, char *identifier,
    * int DB->open(DB *db, const char *file, const char *database,
    *              DBTYPE type, u_int32_t flags, int mode);
    */
-  flags=DB_CREATE;
-  if(!is_writable)
-    flags|=DB_RDONLY;
+  flags=is_writable ? DB_CREATE : DB_RDONLY;
+  if(is_new)
+    flags |= DB_TRUNCATE;
   
   if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
+    LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB V3 open failed - %s\n", db_strerror(ret));
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -274,13 +273,13 @@ librdf_hash_bdb_open(void* context, char *identifier,
 
   memset(&bdb_info, 0, sizeof(DB_INFO));
   bdb_info.flags=DB_DUP;
-
-  flags=DB_CREATE;
-  if(!is_writable)
-    flags|=DB_RDONLY;
+ 
+  flags=is_writable ? DB_CREATE : DB_RDONLY;
+  if(is_new)
+    flags |= DB_TRUNCATE;
 
   if((ret=db_open(file, DB_BTREE, flags, mode, NULL, &bdb_info, &bdb))) {
-    LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB db_open failed - %d\n", ret);
+    LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB V2 db_open failed - %d\n", ret);
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -289,11 +288,15 @@ librdf_hash_bdb_open(void* context, char *identifier,
   /* V1 prototype:
     const char *file, int flags, int mode, DBTYPE, const void *openinfo
   */
-  flags=O_CREAT;
-  if(is_writable)
-    flags|=O_RDWR;
+  flags=is_writable ? O_RDWR|O_CREAT : O_RDONLY
 
-  if((bdb=dbopen(file, O_CREAT | R_DUP, mode, DB_BTREE, NULL)) == 0) {
+  flags|=R_DUP;
+
+  /* There does not seem to be a V1 flag for truncate */ 
+  if(is_new)
+    remove(file);
+
+  if((bdb=dbopen(file, flags, mode, DB_BTREE, NULL)) == 0) {
     LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB dbopen failed - %d\n", ret);
     LIBRDF_FREE(cstring, file);
     return 1;
@@ -713,21 +716,27 @@ librdf_hash_bdb_put(void* context, librdf_hash_datum *key,
 
 
 /**
- * librdf_hash_bdb_exists - Test the existence of a key in the hash
+ * librdf_hash_bdb_exists - Test the existence of a key/value in the hash
  * @context: BerkeleyDB hash context
- * @key: pointer to key to store
+ * @key: pointer to key
+ * @value: pointer to value (optional)
  * 
- * Return value: non 0 if the key exists in the hash
+ * The value can be NULL in which case the check will just be
+ * for the key.
+ *
+ * Return value: non 0 if the key/value exists in the hash
  **/
 static int
-librdf_hash_bdb_exists(void* context, librdf_hash_datum *key) 
+librdf_hash_bdb_exists(void* context, librdf_hash_datum *key,
+                       librdf_hash_datum *value) 
 {
   librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* db=bdb_context->db;
   DBT bdb_key;
   DBT bdb_value;
   int ret;
-
+  int flags;
+  
   /* docs say you must zero DBT's before use */
   memset(&bdb_key, 0, sizeof(DBT));
   memset(&bdb_value, 0, sizeof(DBT));
@@ -735,34 +744,40 @@ librdf_hash_bdb_exists(void* context, librdf_hash_datum *key)
   /* Initialise BDB version of key */
   bdb_key.data = (char*)key->data;
   bdb_key.size = key->size;
+
+  flags=0;
+  
+  if(value) {
+    bdb_value.data = (char*)value->data;
+    bdb_value.size = value->size;
+
+    flags=DB_GET_BOTH;
+  }
 	
 #ifdef HAVE_BDB_DB_TXN
   /* V2/V3 */
-  if((ret=db->get(db, NULL, &bdb_key, &bdb_value, 0)) == DB_NOTFOUND) {
+  if((ret=db->get(db, NULL, &bdb_key, &bdb_value, flags)) == DB_NOTFOUND) {
 #else
   /* V1 */
-  if((ret=db->get(db, &bdb_key, &bdb_value, 0)) != 0) {
+  if((ret=db->get(db, &bdb_key, &bdb_value, flags)) != 0) {
 #endif
     /* not found */
     return 0;
   }
   
-  /* always allocated by BDB using system malloc */
-  free(bdb_value.data);
-
   return 1;
 }
 
 
 /**
- * librdf_hash_bdb_delete - Delete a key/value pair from the hash
+ * librdf_hash_bdb_delete_key - Delete all values for given key from the hash
  * @context: BerkeleyDB hash context
- * @key: pointer to key to delete
+ * @key: key
  * 
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_bdb_delete(void* context, librdf_hash_datum *key) 
+librdf_hash_bdb_delete_key(void* context, librdf_hash_datum *key) 
 {
   librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
   DB* bdb=bdb_context->db;
@@ -782,6 +797,85 @@ librdf_hash_bdb_delete(void* context, librdf_hash_datum *key)
   /* V1 */
   ret=bdb->del(bdb, &bdb_key, 0);
 #endif
+  if(ret)
+    LIBRDF_DEBUG2(librdf_hash_bdb_delete, "BDB del failed - %d\n", ret);
+
+  return (ret != 0);
+}
+
+
+/**
+ * librdf_hash_bdb_delete_key_value - Delete given key/value from the hash
+ * @context: BerkeleyDB hash context
+ * @key: key
+ * @value: value
+ * 
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_hash_bdb_delete_key_value(void* context, 
+                                 librdf_hash_datum *key, librdf_hash_datum *value)
+{
+  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
+  DB* bdb=bdb_context->db;
+  DBT bdb_key, bdb_value;
+  int ret;
+#ifdef HAVE_BDB_CURSOR
+  DBC* dbc;
+#endif
+
+  memset(&bdb_key, 0, sizeof(DBT));
+  memset(&bdb_value, 0, sizeof(DBT));
+
+  /* Initialise BDB version of key */
+  bdb_key.data = (char*)key->data;
+  bdb_key.size = key->size;
+  
+  bdb_value.data = (char*)value->data;
+  bdb_value.size = value->size;
+  
+#ifdef HAVE_BDB_CURSOR
+#ifdef HAVE_BDB_CURSOR_4_ARGS
+  /* V3 prototype:
+   * int DB->cursor(DB *db, DB_TXN *txnid, DBC **cursorp, u_int32_t flags);
+   */
+  if(bdb->cursor(bdb, NULL, &dbc, 0))
+    return 1;
+#else
+  /* V2 prototype:
+   * int DB->cursor(DB *db, DB_TXN *txnid, DBC **cursorp);
+   */
+  if(bdb->cursor(bdb, NULL, &dbc))
+    return 1;
+#endif
+  
+  /* V2/V3 prototype:
+   * int DBcursor->c_get(DBC *cursor, DBT *key, DBT *data, u_int32_t flags);
+   */
+  ret=dbc->c_get(dbc, &bdb_key, &bdb_value, DB_SET);
+  if(ret) {
+    dbc->c_close(dbc);
+    return 1;
+  }
+  
+  /* finally - delete the sucker */
+  ret=dbc->c_del(dbc, 0);
+
+  dbc->c_close(dbc);
+#else
+  /* V1 prototype:
+   * int db->seq(DB* db, DBT *key, DBT *data, u_int flags);
+   */
+  ret=bdb->seq(bdb, &bdb_key, &bdb_value, 0);
+  if(ret)
+    return 1;
+  
+  /* V1 prototype:
+   * int db->del(DB* db, DBT *key, u_int flags);
+   */
+  ret=bdb->del(bdb, &bdb_key, R_CURSOR);
+#endif
+
   if(ret)
     LIBRDF_DEBUG2(librdf_hash_bdb_delete, "BDB del failed - %d\n", ret);
 
@@ -852,7 +946,8 @@ librdf_hash_bdb_register_factory(librdf_hash_factory *factory)
 
   factory->put     = librdf_hash_bdb_put;
   factory->exists  = librdf_hash_bdb_exists;
-  factory->delete_key  = librdf_hash_bdb_delete;
+  factory->delete_key  = librdf_hash_bdb_delete_key;
+  factory->delete_key_value  = librdf_hash_bdb_delete_key_value;
   factory->sync    = librdf_hash_bdb_sync;
   factory->get_fd  = librdf_hash_bdb_get_fd;
 

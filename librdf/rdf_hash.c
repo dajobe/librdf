@@ -782,12 +782,40 @@ librdf_hash_get_all_iterator_finished(void* iterator)
 
 
 /**
+ * librdf_hash_get_del - Retrieve one value from hash for a given key as string and remove all values with that key
+ * @hash: hash object
+ * @key: pointer to key
+ * 
+ * The value returned is from newly allocated memory which the
+ * caller must free.
+ * 
+ * Return value: the value or NULL on failure
+ **/
+char*
+librdf_hash_get_del(librdf_hash* hash, char *key)
+{
+  librdf_hash_datum hd_key;
+  char *s;
+  
+  s=librdf_hash_get(hash, key);
+  if(!s)
+    return NULL;
+
+  hd_key.data=key;
+  hd_key.size=strlen(key);
+  
+  librdf_hash_delete_all(hash, &hd_key);
+
+  return s;
+}
+
+
+
+/**
  * librdf_hash_put - Insert key/value pairs into the hash according to flags
  * @hash: hash object
- * @key: pointer to key 
- * @key_len: length of key in bytes
- * @value: pointer to the value
- * @value_len: length of the value in bytes
+ * @key: key 
+ * @value: value
  * 
  * The key and values are copied into the hash; the original pointers
  * can be deleted.
@@ -795,56 +823,56 @@ librdf_hash_get_all_iterator_finished(void* iterator)
  * Return value: non 0 on failure
  **/
 int
-librdf_hash_put(librdf_hash* hash, void *key, size_t key_len,
-                void *value, size_t value_len)
+librdf_hash_put(librdf_hash* hash, librdf_hash_datum *key, 
+                librdf_hash_datum *value)
 {
-  librdf_hash_datum hd_key, hd_value;
-        
-  /* copy pointers and lengths into librdf_hash_datum structures */
-  hd_key.data=key; hd_key.size=key_len;
-  hd_value.data=value; hd_value.size=value_len;
-        
-  /* call generic routine using librdf_hash_datum structs */
-  return hash->factory->put(hash->context, &hd_key, &hd_value);
+  return hash->factory->put(hash->context, key, value);
 }
 
 
 /**
- * librdf_hash_exists - Check if a given key is in the hash
+ * librdf_hash_exists - Check if a given key/value is in the hash
  * @hash: hash object
- * @key: pointer to the key
- * @key_len: length of key in bytes
+ * @key: key
+ * @value: value
  * 
  * Return value: non 0 if the key is present in the hash
  **/
 int
-librdf_hash_exists(librdf_hash* hash, void *key, size_t key_len) 
+librdf_hash_exists(librdf_hash* hash, librdf_hash_datum *key,
+                   librdf_hash_datum *value)
 {
-  librdf_hash_datum hd_key;
-  /* copy key pointers and lengths into librdf_hash_datum structures */
-  hd_key.data=key; hd_key.size=key_len;
-        
-  return hash->factory->exists(hash->context, &hd_key);
+  return hash->factory->exists(hash->context, key, value);
 }
 
 
 /**
  * librdf_hash_delete - Delete a key/value pair from the hash
  * @hash: hash object
- * @key: pointer to key
- * @key_len: length of key in bytes
+ * @key: key
+ * @value: value
  * 
  * Return value: non 0 on failure (including pair not present)
  **/
 int
-librdf_hash_delete(librdf_hash* hash, void *key, size_t key_len)
+librdf_hash_delete(librdf_hash* hash, librdf_hash_datum *key,
+                   librdf_hash_datum *value)
 {
-  librdf_hash_datum hd_key;
+  return hash->factory->delete_key_value(hash->context, key, value);
+}
 
-  /* copy key pointers and lengths into librdf_hash_datum structures */
-  hd_key.data=key; hd_key.size=key_len;
 
-  return hash->factory->delete_key(hash->context, &hd_key);
+/**
+ * librdf_hash_delete_all - Delete a key and all values from the hash
+ * @hash: hash object
+ * @key: key
+ * 
+ * Return value: non 0 on failure (including pair not present)
+ **/
+int
+librdf_hash_delete_all(librdf_hash* hash, librdf_hash_datum *key)
+{
+  return hash->factory->delete_key(hash->context, key);
 }
 
 
@@ -1139,6 +1167,7 @@ int
 librdf_hash_from_string (librdf_hash* hash, char *string) 
 {
   char *p;
+  librdf_hash_datum hd_key, hd_value; /* on stack */
   char *key;
   size_t key_len;
   char *value;
@@ -1285,7 +1314,10 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
                       "decoded key >>%s<< (true) value >>%s<<\n", key, new_value);
 #endif
         
-        librdf_hash_put(hash, key, key_len, new_value, real_value_len);
+        hd_key.data=key; hd_key.size=key_len;
+        hd_value.data=value; hd_value.size=real_value_len;
+        
+        librdf_hash_put(hash, &hd_key, &hd_value);
         
         LIBRDF_FREE(cstring, new_value);
         
@@ -1318,16 +1350,17 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
 int
 librdf_hash_from_array_of_strings (librdf_hash* hash, char **array) 
 {
+  librdf_hash_datum key, value; /* on stack */
   int i;
-  char *key;
-  char *value;
   
-  for(i=0; (key=array[i]); i+=2) {
-    value=array[i+1];
-    if(!value)
+  for(i=0; (key.data=array[i]); i+=2) {
+    value.data=array[i+1];
+    if(!value.data)
       LIBRDF_FATAL2(librdf_hash_from_array_of_strings,
                     "Array contains an odd number of strings - %d", i);
-    librdf_hash_put(hash, key, strlen(key), value, strlen(value));
+    key.size=strlen(key.data);
+    value.size=strlen(value.data);
+    librdf_hash_put(hash, &key, &value);
   }
   return 0;
 }
@@ -1439,7 +1472,7 @@ main(int argc, char *argv[])
   char *test_hash_delete_key="size";
   int i,j;
   char *type;
-  char *key, *value;
+  librdf_hash_datum hd_key, hd_value; /* on stack */
   char *program=argv[0];
   int b;
   long l;
@@ -1482,12 +1515,14 @@ main(int argc, char *argv[])
     
     
     for(j=0; test_hash_values[j]; j+=2) {
-      key=test_hash_values[j];
-      value=test_hash_values[j+1];
+      hd_key.data=test_hash_values[j];
+      hd_value.data=test_hash_values[j+1];
       fprintf(stdout, "%s: Adding key/value pair: %s=%s\n", program,
-	      key, value);
+	      (char*)hd_key.data, (char*)hd_value.data);
       
-      librdf_hash_put(h, key, strlen(key), value, strlen(value));
+      hd_key.size=strlen(hd_key.data);
+      hd_value.size=strlen(hd_value.data); 
+      librdf_hash_put(h, &hd_key, &hd_value);
       
       fprintf(stdout, "%s: resulting ", program);
       librdf_hash_print(h, stdout);
@@ -1495,7 +1530,9 @@ main(int argc, char *argv[])
     }
     
     fprintf(stdout, "%s: Deleting key '%s'\n", program, test_hash_delete_key);
-    librdf_hash_delete(h, test_hash_delete_key, strlen(test_hash_delete_key));
+    hd_key.data=test_hash_delete_key;
+    hd_key.size=strlen(hd_key.data);
+    librdf_hash_delete_all(h, &hd_key);
     
     fprintf(stdout, "%s: resulting ", program);
     librdf_hash_print(h, stdout);
