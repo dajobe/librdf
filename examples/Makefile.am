@@ -28,8 +28,8 @@ example4_SOURCES = example4.c
 
 redland_dbus_SOURCES = redland_dbus.c
 redland_dbus_LDADD=$(top_builddir)/librdf/librdf.la @LIBRDF_EXTERNAL_LIBS@
-redland_dbus_CFLAGS=$(shell pkg-config --cflags dbus-1 glib-2.0 dbus-glib-1 gthread)
-redland_dbus_LDFLAGS=$(shell pkg-config --libs dbus-1 glib-2.0 dbus-glib-1 gthread)
+redland_dbus_CFLAGS=`pkg-config --cflags dbus-1 glib-2.0 dbus-glib-1 gthread`
+redland_dbus_LDFLAGS=`pkg-config --libs dbus-1 glib-2.0 dbus-glib-1 gthread`
 redland_dbus_DEPENDENCIES = $(top_builddir)/librdf/librdf.la
 
 
