@@ -835,6 +835,10 @@ librdf_node_to_string(librdf_node* node)
  * librdf_node_print - pretty print the node to a file descriptor
  * @node: the node
  * @fh: file handle
+ * 
+ * This method is for debugging and the format of the output should
+ * not be relied on.
+ * 
  **/
 void
 librdf_node_print(librdf_node* node, FILE *fh)
