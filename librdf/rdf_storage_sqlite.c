@@ -50,8 +50,9 @@
 
 #if SQLITE_API == 3
 #include <sqlite3.h>
-#define sqlite_exec sqlite3_exec
-#define sqlite_close sqlite3_close
+#define sqlite_STATEMENT sqlite3_stmt
+#define sqlite_EXEC sqlite3_exec
+#define sqlite_CLOSE sqlite3_close
 #define sqlite_freemem sqlite3_free
 #define sqlite_callback sqlite3_callback
 #define sqlite_last_insert_rowid sqlite3_last_insert_rowid
@@ -59,6 +60,10 @@
 
 #if SQLITE_API == 2
 #include <sqlite.h>
+#define sqlite_STATEMENT sqlite_vm
+#define sqlite_EXEC sqlite_exec
+#define sqlite_CLOSE sqlite_close
+#define sqlite_FREE free
 #endif
 
 
@@ -288,7 +293,7 @@ sqlite_string_escape(const unsigned char *raw, size_t raw_len, size_t *len_p)
 
 
 static int
-librdf_storage_sqlite_exec(librdf_storage* storage, 
+librdf_storage_sqlite_EXEC(librdf_storage* storage, 
                            unsigned char *request,
                            sqlite_callback callback, void *arg,
                            int fail_ok)
@@ -299,7 +304,7 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
 
   LIBRDF_DEBUG2("SQLite exec '%s'\n", request);
   
-  status=sqlite_exec(context->db, (const char*)request, callback, arg, &errmsg);
+  status=sqlite_EXEC(context->db, (const char*)request, callback, arg, &errmsg);
   if(fail_ok)
     status=SQLITE_OK;
   
@@ -307,7 +312,7 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "SQLite database %s SQL exec '%s' failed - %s (%d)", 
                context->name, request, errmsg, status);
-    sqlite_close(context->db);
+    sqlite_CLOSE(context->db);
     context->db=NULL;
   }
 
@@ -341,7 +346,7 @@ librdf_storage_sqlite_set_helper(librdf_storage *storage,
                                             (const unsigned char*)");", 2, 1);
   request=raptor_stringbuffer_as_string(sb);
 
-  rc=librdf_storage_sqlite_exec(storage,
+  rc=librdf_storage_sqlite_EXEC(storage,
                                 request,
                                 NULL, /* no callback */
                                 NULL, /* arg */
@@ -378,7 +383,7 @@ librdf_storage_sqlite_get_helper(librdf_storage *storage,
                                             (const unsigned char*)";", 1, 1);
   request=raptor_stringbuffer_as_string(sb);
 
-  rc=librdf_storage_sqlite_exec(storage,
+  rc=librdf_storage_sqlite_EXEC(storage,
                                 request,
                                 librdf_storage_sqlite_get_1int_callback,
                                 &id,
@@ -634,17 +639,16 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 #endif
 #if SQLITE_API == 2
   context->db=sqlite_open(context->name, mode, &errmsg);
+  if(context->db == NULL)
+    rc=SQLITE_ERROR;
 #endif
   if(rc != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "SQLite database %s open failed - %s", 
                context->name, errmsg);
+    sqlite_FREE(errmsg);
 #if SQLITE_API == 3
-    sqlite_freemem(errmsg);
-    sqlite3_close(context->db);
-#endif
-#if SQLITE_API == 2
-    free(errmsg);
+    sqlite_CLOSE(context->db);
 #endif
     return 1;
   }
@@ -657,7 +661,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 
 #if 0
       sprintf((char*)request, "DROP TABLE %s;", sqlite_tables[i].name);
-      librdf_storage_sqlite_exec(storage,
+      librdf_storage_sqlite_EXEC(storage,
                                  request,
                                  NULL, /* no callback */
                                  NULL, /* arg */
@@ -667,7 +671,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
       sprintf((char*)request, "CREATE TABLE %s (%s);",
               sqlite_tables[i].name, sqlite_tables[i].schema);
       
-      if(librdf_storage_sqlite_exec(storage,
+      if(librdf_storage_sqlite_EXEC(storage,
                                     request,
                                     NULL, /* no callback */
                                     NULL, /* arg */
@@ -679,7 +683,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 
     strcpy((char*)request, 
            "CREATE INDEX spindex ON triples (subjectUri, subjectBlank, predicateUri);");
-    if(librdf_storage_sqlite_exec(storage,
+    if(librdf_storage_sqlite_EXEC(storage,
                                   request,
                                   NULL, /* no callback */
                                   NULL, /* arg */
@@ -688,7 +692,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
     
     strcpy((char*)request, 
            "CREATE INDEX uriindex ON uris (uri);");
-    if(librdf_storage_sqlite_exec(storage,
+    if(librdf_storage_sqlite_EXEC(storage,
                                   request,
                                   NULL, /* no callback */
                                   NULL, /* arg */
@@ -715,7 +719,7 @@ librdf_storage_sqlite_close(librdf_storage* storage)
   int status=0;
   
   if(context->db) {
-    sqlite_close(context->db);
+    sqlite_CLOSE(context->db);
     context->db=NULL;
   }
 
@@ -728,7 +732,7 @@ librdf_storage_sqlite_size(librdf_storage* storage)
 {
   int count=0;
   
-  if(librdf_storage_sqlite_exec(storage,
+  if(librdf_storage_sqlite_EXEC(storage,
                                 (unsigned char*)"SELECT COUNT(*) FROM triples;",
                                 librdf_storage_sqlite_get_1int_callback,
                                 &count,
@@ -813,7 +817,7 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
     
     request=raptor_stringbuffer_as_string(sb);
 
-    rc=librdf_storage_sqlite_exec(storage,
+    rc=librdf_storage_sqlite_EXEC(storage,
                                   request,
                                   NULL, /* no callback */
                                   NULL, /* arg */
@@ -879,7 +883,7 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_stateme
           fields[TRIPLE_PREDICATE], node_ids[TRIPLE_PREDICATE],
           fields[TRIPLE_OBJECT], node_ids[TRIPLE_OBJECT]);
   
-  if(librdf_storage_sqlite_exec(storage,
+  if(librdf_storage_sqlite_EXEC(storage,
                                 request,
                                 librdf_storage_sqlite_get_1int_callback,
                                 &count,
@@ -943,16 +947,9 @@ typedef struct {
   librdf_statement *statement;
   librdf_node* context;
 
-#if SQLITE_API == 3
-  /* OUT from sqlite3_prepare: */
-  sqlite3_stmt *vm;
+  /* OUT from sqlite3_prepare (V3) or sqlite_compile (V2) */
+  sqlite_STATEMENT *vm;
   const char *zTail;
-#endif
-#if SQLITE_API == 2
-  /* OUT from vm: */
-  sqlite_vm *vm;
-  const char *zTail;
-#endif
 } librdf_storage_sqlite_serialise_stream_context;
 
 
@@ -1027,20 +1024,11 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 }
 
 
-#if SQLITE_API == 3
 static int
 librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
-                                      sqlite3_stmt *vm,
+                                      sqlite_STATEMENT *vm,
                                       librdf_statement **statement,
                                       librdf_node **context_node) {
-#endif
-#if SQLITE_API == 2
-static int
-librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
-                                      sqlite_vm *vm,
-                                      librdf_statement **statement,
-                                      librdf_node **context_node) {
-#endif
   int status=SQLITE_BUSY;
 #if SQLITE_API == 2
   int pN;
@@ -1196,9 +1184,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->name, errmsg, status);
-#if SQLITE_API == 2
-      sqlite_freemem(errmsg);
-#endif
+      sqlite_FREE(errmsg);
     }
     result= -1;
   }
@@ -1294,9 +1280,7 @@ librdf_storage_sqlite_serialise_finished(void* context)
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
-#if SQLITE_API == 2
-      sqlite_freemem(errmsg);
-#endif
+      sqlite_FREE(errmsg);
     }
   }
 
@@ -1326,16 +1310,9 @@ typedef struct {
   librdf_statement *statement;
   librdf_node* context;
 
-#if SQLITE_API == 3
-  /* OUT from sqlite3_prepare: */
-  sqlite3_stmt *vm;
+  /* OUT from sqlite3_prepare (V3) or sqlite_compile (V2) */
+  sqlite_STATEMENT *vm;
   const char *zTail;
-#endif
-#if SQLITE_API == 2
-  /* OUT from vm: */
-  sqlite_vm *vm;
-  const char *zTail;
-#endif
 } librdf_storage_sqlite_find_statements_stream_context;
 
 
@@ -1552,9 +1529,7 @@ librdf_storage_sqlite_find_statements_finished(void* context)
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
-#if SQLITE_API == 2
-      sqlite_freemem(errmsg);
-#endif
+      sqlite_FREE(errmsg);
     }
   }
 
@@ -1639,7 +1614,7 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   
   request=raptor_stringbuffer_as_string(sb);
   
-  rc=librdf_storage_sqlite_exec(storage,
+  rc=librdf_storage_sqlite_EXEC(storage,
                                 request,
                                 NULL, /* no callback */
                                 NULL, /* arg */
