@@ -427,70 +427,19 @@ librdf_finish_parser(librdf_world *world)
 }
 
 
-/*
- * librdf_parser_error - Error from a parser - Internal
- **/
-void
-librdf_parser_error(librdf_parser* parser, const char *message, ...)
-{
-  va_list arguments;
-
-  if(parser->error_fn) {
-    parser->error_fn(parser->error_user_data, message);
-    return;
-  }
-  
-  va_start(arguments, message);
-
-  fprintf(stderr, "%s parser error - ", parser->factory->name);
-  vfprintf(stderr, message, arguments);
-  fputc('\n', stderr);
-
-  va_end(arguments);
-}
-
-
-/*
- * librdf_parser_warning - Warning from a parser - Internal
- **/
-void
-librdf_parser_warning(librdf_parser* parser, const char *message, ...)
-{
-  va_list arguments;
-
-  if(parser->warning_fn) {
-    parser->warning_fn(parser->warning_user_data, message);
-    return;
-  }
-  
-  va_start(arguments, message);
-
-  fprintf(stderr, "%s parser warning - ", parser->factory->name);
-  vfprintf(stderr, message, arguments);
-  fputc('\n', stderr);
-
-  va_end(arguments);
-}
-
-
 /**
  * librdf_parser_set_error - Set the parser error handling function
  * @parser: the parser
  * @user_data: user data to pass to function
  * @error_fn: pointer to the function
  * 
- * The function will receive callbacks when the parser fails.
+ * DEPRECATED: Does nothing
  * 
  **/
 void
 librdf_parser_set_error(librdf_parser* parser, void *user_data,
                         void (*error_fn)(void *user_data, const char *msg, ...))
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(parser, librdf_parser);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(error_fn, error handler);
-
-  parser->error_user_data=user_data;
-  parser->error_fn=error_fn;
 }
 
 
@@ -500,18 +449,13 @@ librdf_parser_set_error(librdf_parser* parser, void *user_data,
  * @user_data: user data to pass to function
  * @warning_fn: pointer to the function
  * 
- * The function will receive callbacks when the parser gives a warning.
- * 
+ * DEPRECATED: Does nothing.
+ *
  **/
 void
 librdf_parser_set_warning(librdf_parser* parser, void *user_data,
                           void (*warning_fn)(void *user_data, const char *msg, ...))
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(parser, librdf_parser);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(warning_fn, warning handler);
-
-  parser->warning_user_data=user_data;
-  parser->warning_fn=warning_fn;
 }
 
 
