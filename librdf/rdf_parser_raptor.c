@@ -381,11 +381,13 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   if(!scontext->fh) {
     LIBRDF_DEBUG3(librdf_parser_raptor_parse_uri_as_stream, "Failed to open file '%s' - %s\n",
                   filename, strerror(errno));
-    free(filename);
+    /* FIXME if have raptor in sources, otherwise SYSTEM_FREE */
+    LIBRDF_FREE(cstring, filename);
     librdf_parser_raptor_serialise_finished((void*)scontext);
     return(NULL);
   }
-  free(filename); /* free since it is actually malloc()ed by libraptor */
+  /* FIXME Only if have raptor in sources, otherwise SYSTEM_FREE */
+  LIBRDF_FREE(cstring, filename);
 
   /* Start the parse */
   rc=raptor_start_parse(rdf_parser, (raptor_uri*)base_uri);
