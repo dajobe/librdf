@@ -555,6 +555,10 @@ librdf_query_rasqal_results_next(librdf_query_results *query_results)
 {
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+
+  if(!context->results)
+    return 1;
+  
   return rasqal_query_results_next(context->results);
 }
 
@@ -564,6 +568,10 @@ librdf_query_rasqal_results_finished(librdf_query_results *query_results)
 {
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+
+  if(!context->results)
+    return 1;
+  
   return rasqal_query_results_finished(context->results);
 }
 
@@ -579,6 +587,9 @@ librdf_query_rasqal_results_get_bindings(librdf_query_results *query_results,
   int rc;
   int i;
 
+  if(!context->results)
+    return 1;
+  
   if(values) {
     rc=rasqal_query_results_get_bindings(context->results, (const unsigned char ***)names, &literals);
   } else
@@ -612,6 +623,10 @@ librdf_query_rasqal_results_get_binding_name(librdf_query_results *query_results
 {
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+
+  if(!context->results)
+    return NULL;
+  
   return (const char*)rasqal_query_results_get_binding_name(context->results, offset);
 }
 
@@ -623,6 +638,9 @@ librdf_query_rasqal_results_get_binding_value_by_name(librdf_query_results *quer
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   rasqal_literal* literal;
 
+  if(!context->results)
+    return NULL;
+  
   literal=rasqal_query_results_get_binding_value_by_name(context->results, (const unsigned char*)name);
 
   return rasqal_literal_to_redland_node(query->world, literal);
@@ -635,6 +653,9 @@ librdf_query_rasqal_results_get_bindings_count(librdf_query_results *query_resul
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
 
+  if(!context->results)
+    return 1;
+  
   return rasqal_query_results_get_bindings_count(context->results);
 }
 
@@ -644,6 +665,10 @@ librdf_query_rasqal_free_results(librdf_query_results* query_results)
 {
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+
+  if(!context->results)
+    return;
+  
   rasqal_free_query_results(context->results);
 }
 
@@ -660,6 +685,9 @@ librdf_query_rasqal_results_to_counted_string(librdf_query_results *query_result
   size_t string_length=0;
   raptor_iostream *iostr;
 
+  if(!context->results)
+    return NULL;
+  
   iostr=raptor_new_iostream_to_string((void**)&string, &string_length, malloc);
   if(!iostr)
     return NULL;
@@ -685,6 +713,9 @@ librdf_query_rasqal_results_to_file_handle(librdf_query_results *query_results,
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   raptor_iostream *iostr;
 
+  if(!context->results)
+    return 1;
+  
   iostr=raptor_new_iostream_to_file_handle(handle);
   if(!iostr)
     return 1;
@@ -698,45 +729,251 @@ librdf_query_rasqal_results_to_file_handle(librdf_query_results *query_results,
 }
 
 
-int
+static int
 librdf_query_rasqal_results_is_bindings(librdf_query_results* query_results) {
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
 
+  if(!context->results)
+    return 1;
+  
   return rasqal_query_results_is_bindings(context->results);
 }
   
 
-int
+static int
 librdf_query_rasqal_results_is_boolean(librdf_query_results* query_results) {
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
 
+  if(!context->results)
+    return 1;
+  
   return rasqal_query_results_is_boolean(context->results);
 }
 
 
-int
+static int
 librdf_query_rasqal_results_is_graph(librdf_query_results* query_results) {
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
 
+  if(!context->results)
+    return 1;
+  
   return rasqal_query_results_is_graph(context->results);
 }
 
 
-int
+static int
 librdf_query_rasqal_results_get_boolean(librdf_query_results* query_results) {
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
 
+  if(!context->results)
+    return -1;
+  
   return rasqal_query_results_get_boolean(context->results);
 }
 
 
-librdf_stream*
+typedef struct {
+  librdf_query *query;
+  
+  librdf_query_rasqal_context* qcontext; /* query context */
+
+  librdf_statement* statement; /* current statement */
+  int finished;
+} librdf_query_rasqal_stream_context;
+
+
+static int
+librdf_query_rasqal_query_results_end_of_stream(void* context) {
+  librdf_query_rasqal_stream_context* scontext=(librdf_query_rasqal_stream_context*)context;
+
+  return scontext->finished;
+}
+
+static int
+librdf_query_rasqal_query_results_update_statement(void* context)
+{
+  librdf_query_rasqal_stream_context* scontext=(librdf_query_rasqal_stream_context*)context;
+  librdf_world* world=scontext->query->world;
+  librdf_node* node;
+  
+  raptor_statement *rstatement=rasqal_query_results_get_triple(scontext->qcontext->results);
+  
+  scontext->statement=librdf_new_statement(world);
+  if(!scontext->statement)
+    return 1;
+  
+  if(rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
+    node=librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->subject);
+  } else if (rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
+    node=librdf_new_node_from_uri_string(world,
+                                         librdf_uri_as_string((librdf_uri*)rstatement->subject));
+  } else {
+    librdf_log(world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+               "Unknown Raptor subject identifier type %d",
+               rstatement->subject_type);
+    librdf_free_statement(scontext->statement);
+    scontext->statement=NULL;
+    return 1;
+  }
+  
+  librdf_statement_set_subject(scontext->statement, node);
+  
+  if(rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_ORDINAL) {
+    /* FIXME - but only a little
+     * Do I really need to do log10(ordinal) [or /10 and count] + 1 ? 
+     * See also librdf_heuristic_gen_name for some code to repurpose.
+     */
+    static char ordinal_buffer[100]; 
+    int ordinal=*(int*)rstatement->predicate;
+    sprintf(ordinal_buffer, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_%d", ordinal);
+    
+    node=librdf_new_node_from_uri_string(world, (const unsigned char*)ordinal_buffer);
+  } else if (rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_PREDICATE ||
+             rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
+    node=librdf_new_node_from_uri_string(world,
+                                         librdf_uri_as_string((librdf_uri*)rstatement->predicate));
+  } else {
+    librdf_log(world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+               "Unknown Raptor predicate identifier type %d", rstatement->predicate_type);
+    librdf_free_statement(scontext->statement);
+    scontext->statement=NULL;
+    return 1;
+  }
+  
+  librdf_statement_set_predicate(scontext->statement, node);
+  
+  
+  if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_LITERAL ||
+     rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL) {
+    int is_xml_literal = (rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL);
+    librdf_uri *datatype_uri=(librdf_uri*)rstatement->object_literal_datatype;
+    
+    if(is_xml_literal)
+      librdf_statement_set_object(scontext->statement,
+                                  librdf_new_node_from_literal(world,
+                                                               (const unsigned char*)rstatement->object,
+                                                               (const char*)rstatement->object_literal_language,
+                                                               is_xml_literal));
+    else
+      librdf_statement_set_object(scontext->statement,
+                                  librdf_new_node_from_typed_literal(world,
+                                                                     (const unsigned char*)rstatement->object,
+                                                                     (const char*)rstatement->object_literal_language,
+                                                                     datatype_uri));
+    
+  } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
+    node=librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->object);
+    librdf_statement_set_object(scontext->statement, node);
+  } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
+    node=librdf_new_node_from_uri_string(world,
+                                         librdf_uri_as_string((librdf_uri*)rstatement->object));
+    librdf_statement_set_object(scontext->statement, node);
+  } else {
+    librdf_log(world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+               "Unknown Raptor object identifier type %d", rstatement->object_type);
+    librdf_free_statement(scontext->statement);
+    scontext->statement=NULL;
+    return 1;
+  }
+}
+
+
+static int
+librdf_query_rasqal_query_results_next_statement(void* context)
+{
+  librdf_query_rasqal_stream_context* scontext=(librdf_query_rasqal_stream_context*)context;
+  librdf_world* world=scontext->query->world;
+  librdf_node* node;
+
+  if(scontext->finished)
+    return 1;
+  
+  if(scontext->statement) {
+    librdf_free_statement(scontext->statement);
+    scontext->statement=NULL;
+  }
+
+  scontext->finished=rasqal_query_results_next_triple(scontext->qcontext->results);
+  if(!scontext->finished)
+    librdf_query_rasqal_query_results_update_statement(scontext);
+  
+  return scontext->finished;
+}
+
+
+static void*
+librdf_query_rasqal_query_results_get_statement(void* context, int flags) {
+  librdf_query_rasqal_stream_context* scontext=(librdf_query_rasqal_stream_context*)context;
+
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      return scontext->statement;
+
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      return NULL;
+      
+    default:
+      librdf_log(scontext->query->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+                 "Unknown iterator method flag %d\n", flags);
+      return NULL;
+  }
+
+}
+
+
+static void
+librdf_query_rasqal_query_results_finished(void* context) {
+  librdf_query_rasqal_stream_context* scontext=(librdf_query_rasqal_stream_context*)context;
+
+  if(scontext) {
+    if(scontext->statement)
+      librdf_free_statement(scontext->statement);
+
+    LIBRDF_FREE(librdf_query_rasqal_context, scontext);
+  }
+}
+
+
+static librdf_stream*
 librdf_query_rasqal_results_as_stream(librdf_query_results* query_results) {
-  return NULL;
+  librdf_query *query=query_results->query;
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  librdf_query_rasqal_stream_context* scontext;
+  librdf_stream *stream;
+
+  if(!context->results)
+    return NULL;
+  
+  scontext=(librdf_query_rasqal_stream_context*)LIBRDF_CALLOC(librdf_query_rasqal_stream_context, 1, sizeof(librdf_query_rasqal_stream_context));
+  if(!scontext)
+    return NULL;
+
+  scontext->query=query;
+  scontext->qcontext=context;
+
+  librdf_query_rasqal_query_results_update_statement(scontext);
+  
+  stream=librdf_new_stream(query->world,
+                           (void*)scontext,
+                           &librdf_query_rasqal_query_results_end_of_stream,
+                           &librdf_query_rasqal_query_results_next_statement,
+                           &librdf_query_rasqal_query_results_get_statement,
+                           &librdf_query_rasqal_query_results_finished);
+  if(!stream) {
+    librdf_query_rasqal_query_results_finished((void*)scontext);
+    return NULL;
+  }
+
+  return stream;  
 }
 
 
