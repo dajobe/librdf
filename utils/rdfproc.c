@@ -308,7 +308,7 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(h, "help            ", "Print this help, then exit"));
     puts(HELP_TEXT(n, "new             ", "Create a new store (default no)"));
     printf(HELP_TEXT(s, "storage TYPE    ", "Storage type (default \"%s\")\n"), storage_name);
-    printf(HELP_TEXT(t, "storage-options OPTIONS\n          ", "Set storage options (default \"%s\")\n"), storage_options);
+    printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Set storage options (default \"%s\")\n"), storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
     puts("  parse FILE|URI [SYNTAX [BASE URI]]        Parse syntax in FILE or URI");
@@ -346,7 +346,6 @@ main(int argc, char *argv[])
   options=librdf_new_hash(world, NULL);
   librdf_hash_open(options, NULL, 0, 1, 1, NULL);
 
-  librdf_hash_from_string(options, storage_options);
   if(contexts)
     librdf_hash_put_strings(options, "contexts", "yes");
 
@@ -356,6 +355,9 @@ main(int argc, char *argv[])
       librdf_hash_put_strings(options, "new", "yes");
   }
   
+  librdf_hash_from_string(options, storage_options);
+
+
   storage=librdf_new_storage_with_options(world, storage_name, identifier, 
                                           options);
 
