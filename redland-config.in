@@ -70,7 +70,7 @@ while test $# -gt 0; do
       exit 0
       ;;
     --version-decimal)
-      echo @REDLAND_VERSION_DECIMAL@
+      echo @LIBRDF_VERSION_DECIMAL@
       exit 0
       ;;
     --cflags)
