@@ -47,7 +47,7 @@ main(int argc, char *argv[])
   librdf_model_add_statement(model, 
                              statement=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, "http://purl.org/net/dajobe/"),
                                                              librdf_new_node_from_uri_string(world, "http://purl.org/dc/elements/1.1/creator"),
-                                                             librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0, 0)
+                                                             librdf_new_node_from_literal(world, "Dave Beckett", NULL, 0)
                                                              )
                              );
 

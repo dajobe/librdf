@@ -140,7 +140,7 @@ main(int argc, char *argv[])
 
     if(librdf_heuristic_object_is_literal(o))
       librdf_statement_set_object(statement,
-                                  librdf_new_node_from_literal(world, o, NULL, 0, 0));
+                                  librdf_new_node_from_literal(world, o, NULL, 0));
     else
       librdf_statement_set_object(statement, 
                                   librdf_new_node_from_uri_string(world, o));

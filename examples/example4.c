@@ -369,7 +369,7 @@ main(int argc, char *argv[])
         target=NULL;
       else {
       if(librdf_heuristic_object_is_literal(argv[2]))
-        target=librdf_new_node_from_literal(world, argv[2], NULL, 0, 0);
+        target=librdf_new_node_from_literal(world, argv[2], NULL, 0);
       else
         target=librdf_new_node_from_uri_string(world, argv[2]);
       }
@@ -454,7 +454,7 @@ main(int argc, char *argv[])
     case CMD_SOURCES:
       arc=librdf_new_node_from_uri_string(world, argv[0]);
       if(librdf_heuristic_object_is_literal(argv[1]))
-        target=librdf_new_node_from_literal(world, argv[1], NULL, 0, 0);
+        target=librdf_new_node_from_literal(world, argv[1], NULL, 0);
       else
         target=librdf_new_node_from_uri_string(world, argv[1]);
       
@@ -469,7 +469,7 @@ main(int argc, char *argv[])
       if(!iterator) {
         source=librdf_new_node_from_uri_string(world, argv[0]);
         if(librdf_heuristic_object_is_literal(argv[1]))
-          target=librdf_new_node_from_literal(world, argv[1], NULL, 0, 0);
+          target=librdf_new_node_from_literal(world, argv[1], NULL, 0);
         else
           target=librdf_new_node_from_uri_string(world, argv[1]);
         iterator=librdf_model_get_arcs(model, source, target);
@@ -522,7 +522,7 @@ main(int argc, char *argv[])
     case CMD_SOURCE:
       arc=librdf_new_node_from_uri_string(world, argv[0]);
       if(librdf_heuristic_object_is_literal(argv[1]))
-        target=librdf_new_node_from_literal(world, argv[1], NULL, 0, 0);
+        target=librdf_new_node_from_literal(world, argv[1], NULL, 0);
       else
         target=librdf_new_node_from_uri_string(world, argv[1]);
 
@@ -537,7 +537,7 @@ main(int argc, char *argv[])
       if(!node) {
         source=librdf_new_node_from_uri_string(world, argv[0]);
         if(librdf_heuristic_object_is_literal(argv[1]))
-          target=librdf_new_node_from_literal(world, argv[1], NULL, 0, 0);
+          target=librdf_new_node_from_literal(world, argv[1], NULL, 0);
       else
         target=librdf_new_node_from_uri_string(world, argv[1]);
         node=librdf_model_get_arc(model, source, target);
