@@ -52,7 +52,7 @@ static void* librdf_storage_stream_to_node_iterator_get_method(void* iterator, i
 static void librdf_storage_stream_to_node_iterator_finished(void* iterator);
 
 /* helper function for creating iterators for get sources, targets, arcs */
-static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage* storage, librdf_node* node1, librdf_node *node2, int want, int duplicates_allowed);
+static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage* storage, librdf_node* node1, librdf_node *node2, int want);
 
 
 /**
@@ -619,7 +619,6 @@ typedef struct {
   librdf_stream *stream;
   librdf_statement *partial_statement;
   int want;
-  int duplicates_allowed;
 } librdf_storage_stream_to_node_iterator_context;
 
 
@@ -725,8 +724,7 @@ static librdf_iterator*
 librdf_storage_node_stream_to_node_create(librdf_storage* storage,
                                           librdf_node *node1,
                                           librdf_node *node2,
-                                          int want,
-                                          int duplicates_allowed)
+                                          int want)
 {
   librdf_statement *partial_statement;
   librdf_stream *stream;
@@ -742,7 +740,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
     librdf_free_statement(partial_statement);
     return NULL;
   }
-  
+
   switch(want) {
     case LIBRDF_STATEMENT_SUBJECT:
       librdf_statement_set_predicate(partial_statement, node1);
@@ -773,8 +771,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   context->partial_statement=partial_statement;
   context->stream=stream;
   context->want=want;
-  context->duplicates_allowed=duplicates_allowed;
-  
+
   iterator=librdf_new_iterator(storage->world,
                                (void*)context,
                                librdf_storage_stream_to_node_iterator_is_end,
@@ -783,15 +780,6 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
                                librdf_storage_stream_to_node_iterator_finished);
   if(!iterator)
     librdf_storage_stream_to_node_iterator_finished(context);
-
-  if(!duplicates_allowed) {
-    /* FIXME - need to add code to make iterator remove duplicate nodes */
-    /* was: librdf_iterator_add_map(iterator,
-                            librdf_iterator_map_remove_duplicate_nodes,
-                            NULL);
-    */
-  }
-
 
   return iterator;
 }
@@ -816,8 +804,7 @@ librdf_storage_get_sources(librdf_storage *storage,
     return storage->factory->find_sources(storage, arc, target);
 
   return librdf_storage_node_stream_to_node_create(storage, arc, target,
-                                                   LIBRDF_STATEMENT_SUBJECT,
-                                                   1);
+                                                   LIBRDF_STATEMENT_SUBJECT);
 }
 
 
@@ -840,8 +827,7 @@ librdf_storage_get_arcs(librdf_storage *storage,
     return storage->factory->find_arcs(storage, source, target);
 
   return librdf_storage_node_stream_to_node_create(storage, source, target,
-                                                   LIBRDF_STATEMENT_PREDICATE,
-                                                   0);
+                                                   LIBRDF_STATEMENT_PREDICATE);
 }
 
 
@@ -864,8 +850,7 @@ librdf_storage_get_targets(librdf_storage *storage,
     return storage->factory->find_targets(storage, source, arc);
 
   return librdf_storage_node_stream_to_node_create(storage, source, arc,
-                                                   LIBRDF_STATEMENT_OBJECT,
-                                                   0);
+                                                   LIBRDF_STATEMENT_OBJECT);
 }
 
 
@@ -883,8 +868,7 @@ librdf_storage_get_arcs_in(librdf_storage *storage, librdf_node *node)
     return storage->factory->get_arcs_in(storage, node);
 
   return librdf_storage_node_stream_to_node_create(storage, NULL, node,
-                                                   LIBRDF_STATEMENT_PREDICATE,
-                                                   0);
+                                                   LIBRDF_STATEMENT_PREDICATE);
 }
 
 
@@ -901,8 +885,7 @@ librdf_storage_get_arcs_out(librdf_storage *storage, librdf_node *node)
   if (storage->factory->get_arcs_out)
     return storage->factory->get_arcs_out(storage, node);
   return librdf_storage_node_stream_to_node_create(storage, node, NULL,
-                                                   LIBRDF_STATEMENT_PREDICATE,
-                                                   0);
+                                                   LIBRDF_STATEMENT_PREDICATE);
 }
 
 
