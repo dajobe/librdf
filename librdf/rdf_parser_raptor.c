@@ -858,7 +858,7 @@ librdf_parser_raptor_serialise_finished(void* context)
 }
 
 
-static const char *
+static librdf_node*
 librdf_parser_raptor_get_feature(void* context, librdf_uri *feature) 
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
@@ -875,12 +875,16 @@ librdf_parser_raptor_get_feature(void* context, librdf_uri *feature)
     static unsigned char count[20]; /* FIXME */
 
     sprintf((char*)count, "%d", pcontext->errors);
-    return (const char*)count;
+    return librdf_new_node_from_typed_literal(pcontext->parser->world,
+                                              (const char*)count,
+                                              NULL, NULL);
   } else if(!strcmp(uri_string, LIBRDF_PARSER_FEATURE_WARNING_COUNT)) {
     static unsigned char count[20]; /* FIXME */
 
     sprintf((char*)count, "%d", pcontext->warnings);
-    return (const char*)count;
+    return librdf_new_node_from_typed_literal(pcontext->parser->world,
+                                              (const char*)count,
+                                              NULL, NULL);
   }
 
   return NULL;

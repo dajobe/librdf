@@ -493,15 +493,15 @@ librdf_parser_set_warning(librdf_parser* parser, void *user_data,
 
 
 /**
- * librdf_parser_get_feature - Get the value of a parser feature
- * @parser: parser object
- * @feature: URI of feature
+ * librdf_parser_get_feature - get the value of a parser feature
+ * @parser: &librdf_parser object
+ * @feature: &librdf_Uuri feature property
  * 
  * Return value: the value of the feature or NULL if no such feature
  * exists or the value is empty.
  **/
-const char *
-librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature) 
+librdf_node*
+librdf_parser_get_feature(librdf_parser* parser, librdf_uri* feature) 
 {
   if(parser->factory->get_feature)
     return parser->factory->get_feature(parser->context, feature);
@@ -510,17 +510,17 @@ librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature)
 }
 
 /**
- * librdf_parser_set_feature - Set the value of a parser feature
- * @parser: parser object
- * @feature: URI of feature
- * @value: value to set
+ * librdf_parser_set_feature - set the value of a parser feature
+ * @parser: &librdf_parser object
+ * @feature: &librdf_uri feature property
+ * @value: &librdf_node feature property value
  * 
  * Return value: non 0 on failure (negative if no such feature)
  **/
   
 int
-librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, 
-                          const char *value) 
+librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature, 
+                          librdf_node* value) 
 {
   if(parser->factory->set_feature)
     return parser->factory->set_feature(parser->context, feature, value);

@@ -53,8 +53,8 @@ struct librdf_parser_factory_s
   void (*terminate)(void *_context);
 
   /* get/set features of parser (think of Java properties) */
-  const char * (*get_feature)(void *_context, librdf_uri *feature);
-  int (*set_feature)(void *_context, librdf_uri *feature, const char *value);
+  librdf_node* (*get_feature)(void *_context, librdf_uri *feature);
+  int (*set_feature)(void *_context, librdf_uri *feature, librdf_node *value);
   
   librdf_stream* (*parse_uri_as_stream)(void *_context, librdf_uri *uri, librdf_uri* base_uri);
   int (*parse_uri_into_model)(void *_context, librdf_uri *uri, librdf_uri* base_uri, librdf_model *model);
@@ -122,8 +122,8 @@ REDLAND_API void librdf_parser_set_warning(librdf_parser* parser, void *user_dat
 #define LIBRDF_PARSER_FEATURE_ERROR_COUNT "http://feature.librdf.org/parser-error-count"
 #define LIBRDF_PARSER_FEATURE_WARNING_COUNT "http://feature.librdf.org/parser-warning-count"
 
-REDLAND_API const char *librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
-REDLAND_API int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, const char *value);
+REDLAND_API librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
+REDLAND_API int librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature, librdf_node* value);
 
 #ifdef __cplusplus
 }
