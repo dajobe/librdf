@@ -25,6 +25,9 @@
 /* defined if have W3C libwww available */
 #undef HAVE_LIBWWW
 
+/* defined if W3C libwww has RDF support */
+#undef HAVE_LIBWWW_RDF
+
 /* defined if specific hashes are available */
 #undef HAVE_GDBM_HASH
 #undef HAVE_BDB_HASH
@@ -44,5 +47,7 @@
 /* location of RDF java API jar file */
 #undef RDF_JAVA_API_JAR
 
-#undef HAVE_SIRPAC_PARSER
+/* RDF parsers */
+#undef HAVE_SIRPAC_RDF_PARSER
+#undef HAVE_LIBWWW_RDF_PARSER
 
