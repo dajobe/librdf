@@ -15,7 +15,6 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>The serializer code crashes when called from PHP.</li>
 <li>RFE: Add node.as_sha1 easy digest methods for literal nodes</li>
 <li>PHP may need to include php_config.h not config.h for new php versions</li>
 <li>RFE: return serialized models to syntax as strings</li>
@@ -24,9 +23,7 @@ Means need to care about parser class if you just want simple things.  Similarly
 for model.serialize() and Serializer class, however take care with serialise() method.</li>
 <li>Update the RDF/RDFS terms/labels for the latest RDF Schema revision</li>
 <li>in-memory storage uses more memory than needed</li>
-<li>defensive code - check for NULL object parameters, wrong use
-of polymorphic objects such as getting URI of a non-resource node.
-Compile some as debug checks with aborts?.</li>
+<li>defensive code - check object types are correct by adding magic fields to start of all objects</li>
 <li>Consider an AVL-tree in-memory store (<a href="http://www.msu.edu/user/pfaffben/avl/">libavl</a>)</li>
 <li>Docs: note that compiling redland also builds raptor, if both are wanted</li>
 <li>RFE: Allow base URIs in Perl parser methods to be undef</li>
@@ -59,6 +56,9 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Added some defensive code checks for NULL object parameters and
+abort when debugging.</li>
+<li>The serializer code crashed in PHP (0.9.15)</li>
 <li>raptor-uri-test in redland when compiled against
 system raptor failed to find raptor.h; fixed in raptor 1.1.0.</li>
 <li>Added <code>librdf_model_get_storage</code> method so storage
