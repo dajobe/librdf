@@ -31,10 +31,11 @@ void init_rdf_model(void)
 /* constructors */
 
 /* Create a new Model */
-rdf_model* new_rdf_model()
+rdf_model* new_rdf_model(void)
 {
   return NULL;
 }
+
 
 /* Create a new Model from an existing Model - CLONE */
 rdf_model* new_rdf_model_from_model(rdf_model* model)
