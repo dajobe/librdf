@@ -49,7 +49,8 @@ enum command_type {
   CMD_ARCS_OUT,
   CMD_HAS_ARC_IN,
   CMD_HAS_ARC_OUT,
-  CMD_QUERY
+  CMD_QUERY,
+  CMD_SERIALIZE
 };
 
 typedef struct
@@ -80,6 +81,7 @@ static command commands[]={
   {CMD_HAS_ARC_IN, "has-arc-in", 2, 2, 0},
   {CMD_HAS_ARC_OUT, "has-arc-out", 2, 2, 0},
   {CMD_QUERY, "query", 3, 3, 0},
+  {CMD_SERIALIZE, "serialize", 3, 3, 0},
   {(enum command_type)-1, NULL}  
 };
  
@@ -93,6 +95,7 @@ main(int argc, char *argv[])
   librdf_world* world;
   char *program=argv[0];
   librdf_parser* parser;
+  librdf_serializer* serializer;
   librdf_storage *storage;
   librdf_model* model;
   librdf_statement* partial_statement;
@@ -105,6 +108,8 @@ main(int argc, char *argv[])
   int usage;
   char *identifier;
   char *cmd;
+  char *name;
+  char *mime_type;
   int cmd_index;
   int count;
   int type;
@@ -174,6 +179,7 @@ main(int argc, char *argv[])
     fprintf(stdout, "  parse URI PARSER [BASE URI]               Parse the RDF/XML at URI into\n");
     fprintf(stdout, "                                            the model using PARSER\n");
     fprintf(stdout, "  print                                     Prints all the statements\n");
+    fprintf(stdout, "  serialize SYN-NAME SYN-URI SYN-MIME-TYPE  Serializes model to a syntax\n");
     fprintf(stdout, "  query QL-NAME QL-URI|- QUERY-STRING       Query (language) search\n");
     fprintf(stdout, "  statements SUBJECT|- PREDICATE|- OBJECT|- Find matching statements\n");
     fprintf(stdout, "                                            where - matches any node.\n");
@@ -213,6 +219,7 @@ main(int argc, char *argv[])
   stream=NULL;
   iterator=NULL;
   parser=NULL;
+  serializer=NULL;
   source=NULL;
   arc=NULL;
   target=NULL;
@@ -301,7 +308,8 @@ main(int argc, char *argv[])
       librdf_free_uri(base_uri);
       break;
     case CMD_QUERY:
-      /* args are name, uri (may be NULL), query_string */
+    case CMD_SERIALIZE:
+      /* args are name, uri (may be NULL), query_string/mime_type */
       
       if(!strcmp(argv[1], "-"))
         uri=NULL;
@@ -313,9 +321,33 @@ main(int argc, char *argv[])
         }
       }
 
-      query=librdf_new_query(world, argv[0], uri, argv[2]);
+      if(type == CMD_QUERY) {
+        query=librdf_new_query(world, argv[0], uri, argv[2]);
 
-      goto printmatching;
+        goto printmatching;
+      }
+
+      name=argv[0];
+      if(!strcmp(name, "-"))
+        name=NULL;
+      
+      mime_type=argv[2];
+      if(!strcmp(mime_type, "-"))
+        mime_type=NULL;
+      
+      serializer=librdf_new_serializer(world, name, mime_type, uri);
+      if(!serializer) {
+        fprintf(stderr, "%s: Failed to create new serializer name %s, uri %s, mime type %s\n", program, argv[0], argv[1], argv[2]);
+        librdf_free_uri(uri);
+        break;
+      }
+
+      librdf_serializer_serialize_model(serializer, stdout, NULL, model);
+
+      librdf_free_serializer(serializer);
+      if(uri)
+        librdf_free_uri(uri);
+
       break;
       
     case CMD_CONTAINS:
