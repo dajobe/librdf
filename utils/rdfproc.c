@@ -200,7 +200,6 @@ main(int argc, char *argv[])
   librdf_serializer* serializer;
   librdf_storage *storage;
   librdf_model* model;
-  librdf_statement* partial_statement;
   librdf_node *source, *arc, *target, *node;
   librdf_node* context_node=NULL;
   librdf_stream* stream;
@@ -227,7 +226,8 @@ main(int argc, char *argv[])
   char *storage_name=(char*)default_storage_name;
   char *storage_options=(char*)default_storage_options;
   char *storage_password=NULL;
-  unsigned char *uri_string;
+  librdf_statement* partial_statement=NULL;
+  unsigned char *uri_string=NULL;
   int free_uri_string=0;
   librdf_model* output_model=NULL;
   librdf_storage* output_storage=NULL;
