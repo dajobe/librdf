@@ -156,6 +156,37 @@ static const char *default_storage_name="hashes";
 static const char *default_storage_options="hash-type='bdb',dir='.'";
 
 
+static int
+log_handler(void *user_data, librdf_log_message *message) 
+{
+  /* int code=message->code; */ /* The error code */
+  raptor_locator *locator=(raptor_locator*)(message->locator);
+
+  /* Do not handle messages below warning*/
+  if(message->level < LIBRDF_LOG_WARN)
+    return 0;
+
+  if(message->level == LIBRDF_LOG_WARN)
+    fprintf(stderr, "%s: Warning - ", program);
+  else
+    fprintf(stderr, "%s: Error - ", program);
+
+  if(locator) { /* && message->facility == LIBRDF_FROM_PARSER) */
+    raptor_print_locator(stderr, locator); 
+    fputc(':', stderr);
+    fputc(' ', stderr);
+ }
+  fputs(message->message, stderr);
+  fputc('\n', stderr);
+  if(message->facility >= LIBRDF_LOG_FATAL)
+    exit(1);
+
+  /* Handled */
+  return 1;
+}
+
+  
+
 int
 main(int argc, char *argv[]) 
 {
@@ -207,6 +238,9 @@ main(int argc, char *argv[])
   argv[0]=program;
 
   world=librdf_new_world();
+
+  librdf_world_set_logger(world, NULL, log_handler);
+
   librdf_world_open(world);
 
   options=librdf_new_hash(world, NULL);
