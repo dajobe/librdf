@@ -367,6 +367,11 @@ Tcl_PkgProvide(interp, PACKAGE, (char*)librdf_version_string);
 #endif
 %}
 
+/* optional input strings - can be NULL, need special conversions */
+%typemap(ruby,in) const char *inStrOrNull {
+  $1 = ($input == Qnil) ? NULL : STR2CSTR($input);
+}
+
 
 typedef struct librdf_world_s librdf_world;
 typedef struct librdf_hash_s librdf_hash;
@@ -419,10 +424,10 @@ int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
 librdf_node* librdf_new_node(librdf_world *world);
 librdf_node* librdf_new_node_from_uri_string(librdf_world *world, const char *string);
 librdf_node* librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri);
-librdf_node* librdf_new_node_from_literal(librdf_world *world, const char *string, const char *xml_language, int is_wf_xml);
-librdf_node* librdf_new_node_from_typed_literal(librdf_world *world, const char *string, const char *xml_language, librdf_uri* datatype_uri);
+librdf_node* librdf_new_node_from_literal(librdf_world *world, const char *string, const char *inStrOrNull=NULL, int is_wf_xml=0);
+librdf_node* librdf_new_node_from_typed_literal(librdf_world *world, const char *string, const char *inStrOrNull=NULL, librdf_uri* datatype_uri=NULL);
 librdf_node* librdf_new_node_from_node(librdf_node *node);
-librdf_node* librdf_new_node_from_blank_identifier(librdf_world *world, const char *identifier);
+librdf_node* librdf_new_node_from_blank_identifier(librdf_world *world, const char *inStrOrNull=NULL);
 void librdf_free_node(librdf_node *r);
 librdf_uri* librdf_node_get_uri(librdf_node* node);
 int librdf_node_get_type(librdf_node* node);
