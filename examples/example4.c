@@ -195,14 +195,17 @@ main(int argc, char *argv[])
 
   type=commands[cmd_index].type;
   
-
+#ifdef NOT_TESTING_CONTEXTS
   if(commands[cmd_index].write)
     if (type == CMD_PARSE_MODEL || type == CMD_PARSE_STREAM)
-      storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='yes',new='yes'");
+      storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
     else
-      storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='yes'");
+      storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='yes',contexts='yes'");
   else
-    storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='no'");
+    storage=librdf_new_storage(world, "hashes", identifier, "hash-type='bdb',dir='.',write='no',contexts='yes'");
+#else
+  storage=librdf_new_storage(world, "memory", identifier, "contexts='yes'");
+#endif
 
   if(!storage) {
     fprintf(stderr, "%s: Failed to open BDB storage\n", program);
@@ -411,6 +414,7 @@ main(int argc, char *argv[])
             count=0;
             while(!librdf_stream_end(stream)) {
               librdf_statement *statement=librdf_stream_get_object(stream);
+              librdf_node *context_node=librdf_stream_get_context(stream);
               if(!statement) {
                 fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
                 break;
@@ -418,6 +422,10 @@ main(int argc, char *argv[])
             
               fputs("Matched statement: ", stdout);
               librdf_statement_print(statement, stdout);
+              if(context_node) {
+                fputs(" with context ", stdout);
+                librdf_node_print(context_node, stdout);
+              }
               fputc('\n', stdout);
             
               count++;
@@ -494,6 +502,7 @@ main(int argc, char *argv[])
       /* (Common code) Print out nodes */
       count=0;
       while(!librdf_iterator_end(iterator)) {
+        librdf_node *context_node=librdf_iterator_get_context(iterator);
         node=(librdf_node*)librdf_iterator_get_object(iterator);
         if(!node) {
           fprintf(stderr, "%s: librdf_iterator_get_object returned NULL\n",
@@ -503,6 +512,10 @@ main(int argc, char *argv[])
         
         fputs("Matched node: ", stdout);
         librdf_node_print(node, stdout);
+        if(context_node) {
+          fputs(" with context ", stdout);
+          librdf_node_print(context_node, stdout);
+        }
         fputc('\n', stdout);
         
         count++;
@@ -554,8 +567,8 @@ main(int argc, char *argv[])
         arc=librdf_new_node_from_uri_string(world, argv[1]);
         node=librdf_model_get_target(model, source, arc);
         if(!node) {
-        fprintf(stderr, "%s: Failed to get target\n", program);
-        break;
+          fprintf(stderr, "%s: Failed to get target\n", program);
+          break;
         }
       }
       
@@ -590,6 +603,7 @@ main(int argc, char *argv[])
 
       count=0;
       while(!librdf_iterator_end(iterator)) {
+        librdf_node *context_node=librdf_iterator_get_context(iterator);
         node=(librdf_node*)librdf_iterator_get_object(iterator);
         if(!node) {
           fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
@@ -599,6 +613,10 @@ main(int argc, char *argv[])
         
         fputs("Matched arc: ", stdout);
         librdf_node_print(node, stdout);
+        if(context_node) {
+          fputs(" with context ", stdout);
+          librdf_node_print(context_node, stdout);
+        }
         fputc('\n', stdout);
         
         librdf_free_node(node);
