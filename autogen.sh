@@ -153,6 +153,8 @@ if test -d $CONFIG_DIR; then
 fi
 
 
+rm -f config.cache
+
 conf_flags=
 
 echo "$program: Running ./configure $conf_flags $@"
