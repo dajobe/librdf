@@ -63,3 +63,6 @@
 /* XML parsers */
 #undef NEED_EXPAT
 #undef NEED_LIBXML
+
+/* location of installed local java classes */
+#undef JAVA_CLASS_DIR
