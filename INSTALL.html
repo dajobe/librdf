@@ -187,7 +187,8 @@ try to find or guess the values from the system.</p>
 <a href="http://fink.sourceforge.net/">fink</a>
 might require a configure line something like this:</p>
 <pre>
-  ./configure --with-bdb-lib=/sw/lib --with-bdb-include=/sw/include/db3
+  ./configure --with-bdb-lib=/sw/lib \
+              --with-bdb-include=/sw/include/db3
 </pre>
 <p>The name of the BDB library was correctly discovered for this
 configuration, as <code>db-3.3</code>.</p>
@@ -398,11 +399,15 @@ which may be easier to modify.</p>
 since there is no on-disk storage system available.  To change them
 to use the in-memory hashes, edit the lines reading something like</p>
 <pre>
-  storage=librdf_new_storage("hashes", "test", "hash_type='bdb',dir='.'");
+  storage=librdf_new_storage("hashes",
+                             "test", 
+                             "hash_type='bdb',dir='.'");
 </pre>
 <p>to read</p>
 <pre>
-  storage=librdf_new_storage("hashes", "test", "hash_type='memory',dir='.'");
+  storage=librdf_new_storage("hashes", 
+                             "test",
+                             "hash_type='memory',dir='.'");
 </pre>
 
 
