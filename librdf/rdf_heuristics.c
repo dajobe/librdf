@@ -100,7 +100,7 @@ librdf_heuristic_gen_name(char *name)
 
   /* Move p to last non number char */
   if(isdigit(*p)) {
-    while(isdigit(*p))
+    while(p>name && isdigit(*p))
       p--;
     l=strtol(p+1, (char**)NULL, 10);
     offset=p-name;
