@@ -292,6 +292,7 @@ librdf_free_serializer(librdf_serializer *serializer)
 /**
  * librdf_serializer_serialize_model - Turn a librdf_model into a serialized form
  * @serializer: the serializer
+ * @handle: file handle to serialize to
  * @base_uri: the base URI to use
  * @model: the &librdf_model model to use
  * 
