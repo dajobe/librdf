@@ -17,6 +17,7 @@
 #include <config.h>
 
 #include <stdio.h>
+#include <ctype.h>
 #include <sys/types.h>
 
 #include <rdf_config.h>
@@ -52,8 +53,10 @@ void rdf_hash_register_factory(const char *name,
   rdf_hash_factory *hash, *h;
   char *name_copy;
 
+#if 0
   RDF_DEBUG2(rdf_hash_register_factory,
              "Received registration for hash %s\n", name);
+#endif
 
   hash=(rdf_hash_factory*)RDF_CALLOC(rdf_hash_factory, sizeof(rdf_hash_factory), 1);
   if(!hash)
@@ -76,9 +79,10 @@ void rdf_hash_register_factory(const char *name,
   /* Call the hash registration function on the new object */
   (*factory)(hash);
 
-
+#if 0
   RDF_DEBUG3(rdf_hash_register_factory, "%s has context size %d\n", name, hash->context_length);
-
+#endif
+  
   hash->next = hashes;
   hashes = hash;
 }
@@ -298,6 +302,148 @@ rdf_hash_print (rdf_hash* hash, FILE *fh)
 }
 
 
+/** initialise a hash from a string
+ * @param hash the hash
+ * @param string flat hash
+ */
+void
+rdf_hash_from_string (rdf_hash* hash, char *string) 
+{
+  char *p;
+  char *key;
+  size_t key_len;
+  char *value;
+  size_t value_len;
+  int backslashes;
+#define RHS_STATE_INIT 0
+#define RHS_STATE_KEY 1
+#define RHS_STATE_SEP 2
+#define RHS_STATE_EQ 3
+#define RHS_STATE_VALUE 4
+#define RHS_STATE_VALUE_BQ 5
+  int state;
+  int real_value_len;
+  char *new_value;
+  int i;
+  char *to;
+
+  
+  RDF_DEBUG2(rdf_hash_from_string, "Parsing >>%s<<\n", string);
+
+  p=string;
+  state=RHS_STATE_INIT;
+  while(*p) {
+    switch(state){
+      /* start of config - before key */
+      case RHS_STATE_INIT:
+        while(*p && (isspace(*p) || *p == ','))
+          p++;
+        if(!*p)
+          break;
+        key=p;
+        /* fall through to next state */
+        state=RHS_STATE_KEY;
+
+      /* collecting key characters */
+      case RHS_STATE_KEY:
+        while(*p && isalnum(*p))
+          p++;
+        if(!*p)
+          break;
+        key_len=p-key;
+
+        /* if 1st char is not space or alpha, move on */
+        if(!key_len) {
+          p++;
+          state=RHS_STATE_INIT;
+          break;
+        }
+
+        state=RHS_STATE_SEP;
+        /* fall through to next state */
+
+      /* got key, now skipping spaces */
+      case RHS_STATE_SEP:
+        while(*p && isspace(*p))
+          p++;
+        if(!*p)
+          break;
+        /* expecting = now */
+        if(*p != '=') {
+          p++;
+          state=RHS_STATE_INIT;
+          break;
+        }
+        p++;
+        state=RHS_STATE_EQ;
+        /* fall through to next state */
+
+      /* got key\s+= now skipping spaces " */
+      case RHS_STATE_EQ:
+        while(*p && isspace(*p))
+          p++;
+        if(!*p)
+          break;
+        /* expecting ' now */
+        if(*p != '\'') {
+          p++;
+          state=RHS_STATE_INIT;
+          break;
+        }
+        p++;
+        value=p;
+        backslashes=0;
+        state=RHS_STATE_VALUE;
+        /* fall through to next state */
+
+      /* got key\s+=\s+" now reading value */
+      case RHS_STATE_VALUE:
+        while(*p) {
+          if(*p == '\\') {
+            /* backslashes are removed during value copy later */
+            state=RHS_STATE_VALUE_BQ;
+            p++;
+            break;
+          } else if (*p == '\'') {
+            /* end of value found */
+            value_len=p-value;
+            real_value_len=value_len-backslashes;
+            new_value=(char*)RDF_MALLOC(cstring, real_value_len);
+            if(!new_value)
+              return;
+            for(i=0, to=new_value; i<(int)value_len; i++){
+              if(value[i]=='\\')
+                i++;
+              *to=value[i];
+            }
+
+            rdf_hash_put(hash, key, key_len, new_value, real_value_len, 0);
+            fprintf(stderr, "rdf_hash_from_string: after decoding ");
+            rdf_hash_print (hash, stderr) ;
+            fputc('\n', stderr);
+            state=RHS_STATE_INIT;
+            p++;
+            break;
+          }
+          p++;
+        }
+        break;
+        
+      case RHS_STATE_VALUE_BQ:
+        if(!*p)
+          break;
+        backslashes++; /* reduces real length */
+        p++;
+        state=RHS_STATE_VALUE;
+        break;
+
+      default:
+        RDF_FATAL2(rdf_hash_from_string, "No such state %d", state);
+    }
+  }
+}
+
+
 
 
 
@@ -327,6 +473,31 @@ main(int argc, char *argv[])
   
   /* initialise hash module */
   init_rdf_hash();
+
+  if(argc ==2) {
+    factory=get_rdf_hash_factory(NULL);
+    if(!factory) {
+      fprintf(stderr, "%s: No hash factory called %s\n", program, type);
+      return(0);
+    }
+    
+    h=new_rdf_hash(factory);
+    if(!h) {
+      fprintf(stderr, "%s: Failed to create new hash type %s\n", program, type);
+      return(0);
+    }
+
+    rdf_hash_open(h, "test.gdbm", "mode", "options");
+    rdf_hash_from_string(h, argv[1]);
+    fprintf(stderr, "%s: resulting ", program);    
+    rdf_hash_print(h, stderr);
+    fprintf(stderr, "\n");
+    rdf_hash_close(h);
+    free_rdf_hash(h);
+    return(0);
+    
+  }
+    
 
   for(i=0; (type=test_hash_types[i]); i++) {
     fprintf(stderr, "%s: Trying to create new %s hash\n", program, type);
