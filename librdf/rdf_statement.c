@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_statement.c - RDF Statement implementation
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -17,7 +17,7 @@
  */
 
 
-#include <config.h>
+#include <rdf_config.h>
 
 #include <stdio.h>
 
@@ -26,7 +26,7 @@
 #endif
 
 #define LIBRDF_INTERNAL 1
-#include <rdf_config.h>
+#include <librdf.h>
 #include <rdf_node.h>
 #include <rdf_statement.h>
 
@@ -108,16 +108,10 @@ librdf_statement_get_subject(librdf_statement *statement)
 }
 
 
-int
+void
 librdf_statement_set_subject(librdf_statement *statement, librdf_node *node)
 {
-  /*
-  if(statement->subject)
-    librdf_free_node(statement->subject);
-  return (statement->subject=librdf_new_node_from_node(node)) != NULL;
-  */
   statement->subject=node;
-  return 0;
 }
 
 
@@ -128,16 +122,10 @@ librdf_statement_get_predicate(librdf_statement *statement)
 }
 
 
-int
+void
 librdf_statement_set_predicate(librdf_statement *statement, librdf_node *node)
 {
-  /*
-  if(statement->predicate)
-    librdf_free_node(statement->predicate);
-  return (statement->predicate=librdf_new_node_from_node(node)) != NULL;
-  */
   statement->predicate=node;
-  return 0;
 }
 
 
@@ -148,16 +136,10 @@ librdf_statement_get_object(librdf_statement *statement)
 }
 
 
-int
+void
 librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 {
-  /*
-  if(statement->object)
-    librdf_free_node(statement->object);
-  return (statement->object=librdf_new_node_from_node(node)) != NULL;
-  */
   statement->object=node;
-  return 0;
 }
 
 
@@ -168,15 +150,23 @@ librdf_statement_get_context(librdf_statement *statement)
 }
 
 
-int
-librdf_statement_set_context(librdf_statement *statement, librdf_context *context)
+void
+librdf_statement_set_context(librdf_statement *statement, 
+                             librdf_context *context)
 {
   statement->context=context;
-  return 0;
 }
 
 
-/* allocates a new string since this is a _to_ method */
+/**
+ * librdf_statement_to_string:
+ * @statement: the statement
+ * 
+ * Formats the statement as a string from newly allocated memory
+ * that must be freed by the caller.
+ * 
+ * Return value: the string or NULL on failure.
+ **/
 char *
 librdf_statement_to_string(librdf_statement *statement)
 {
@@ -184,31 +174,52 @@ librdf_statement_to_string(librdf_statement *statement)
   char *s;
   int statement_string_len;
   char *format;
+  static char *null_string="(null)";
 
-  subject_string=librdf_node_to_string(statement->subject);
-  if(!subject_string)
-    return NULL;
+  if(statement->subject) {
+    subject_string=librdf_node_to_string(statement->subject);
+    if(!subject_string)
+      return NULL;
+  } else {
+    subject_string=null_string;
+  }
+
   
-  predicate_string=librdf_node_to_string(statement->predicate);
-  if(!predicate_string) {
-    LIBRDF_FREE(cstring, subject_string);
-    return NULL;
+  if(statement->predicate) {
+    predicate_string=librdf_node_to_string(statement->predicate);
+    if(!predicate_string) {
+      if(subject_string != null_string)
+        LIBRDF_FREE(cstring, subject_string);
+      return NULL;
+    }
+  } else {
+    predicate_string=null_string;
   }
+  
 
-  object_string=librdf_node_to_string(statement->object);
-  if(!object_string) {
-    LIBRDF_FREE(cstring, subject_string);
-    LIBRDF_FREE(cstring, predicate_string);
-    return NULL;
+  if(statement->object) {
+    object_string=librdf_node_to_string(statement->object);
+    if(!object_string) {
+      if(subject_string != null_string)
+        LIBRDF_FREE(cstring, subject_string);
+      if(predicate_string != null_string)
+        LIBRDF_FREE(cstring, predicate_string);
+      return NULL;
+    }
+  } else {
+    object_string=null_string;
   }
+  
 
-#define LIBRDF_STATEMENT_FORMAT_STRING_LITERAL "{%s ,%s, \"%s\"}"
-#define LIBRDF_STATEMENT_FORMAT_RESOURCE_LITERAL "{%s ,%s, %s}"
+
+#define LIBRDF_STATEMENT_FORMAT_STRING_LITERAL "{%s, %s, \"%s\"}"
+#define LIBRDF_STATEMENT_FORMAT_RESOURCE_LITERAL "{%s, %s, %s}"
   statement_string_len=1 + strlen(subject_string) +   /* "{%s" */
-                       2 + strlen(predicate_string) + /* " ,%s" */
-                       2 + strlen(object_string) +    /* " ,%s" */
+                       2 + strlen(predicate_string) + /* ", %s" */
+                       2 + strlen(object_string) +    /* ", %s" */
                        1 + 1;                         /* "}\0" */
-  if(librdf_node_get_type(statement->object) == LIBRDF_NODE_TYPE_LITERAL) {
+  if(statement->object &&
+     librdf_node_get_type(statement->object) == LIBRDF_NODE_TYPE_LITERAL) {
     format=LIBRDF_STATEMENT_FORMAT_STRING_LITERAL;
     statement_string_len+=2; /* Extra "" around literal */
   } else {
@@ -219,12 +230,79 @@ librdf_statement_to_string(librdf_statement *statement)
   if(s)
     sprintf(s, format, predicate_string, subject_string, object_string);
 
-  /* always free intermediate strings */
-  LIBRDF_FREE(cstring, subject_string);
-  LIBRDF_FREE(cstring, predicate_string);
-  LIBRDF_FREE(cstring, object_string);
+  /* always free allocated intermediate strings */
+  if(subject_string != null_string)
+    LIBRDF_FREE(cstring, subject_string);
+  if(predicate_string != null_string)
+    LIBRDF_FREE(cstring, predicate_string);
+  if(object_string != null_string)
+    LIBRDF_FREE(cstring, object_string);
 
   return s;
+}
+
+
+/**
+ * librdf_statement_equals:
+ * @statement1: first &librdf_statement
+ * @statement2: second &librdf_statement
+ * 
+ * Check if two statements are identical.
+ * 
+ * Return value: non 0 if statements are identical.
+ **/
+int
+librdf_statement_equals(librdf_statement* statement1, 
+                        librdf_statement* statement2)
+{
+  /* FIXME: use digests? */
+
+  if(!librdf_node_equals(statement1->subject, statement2->subject))
+      return 0;
+
+  if(!librdf_node_equals(statement1->predicate, statement2->predicate))
+      return 0;
+
+  if(!librdf_node_equals(statement1->object, statement2->object))
+      return 0;
+
+  /* FIXME: what about context? */
+
+  return 1;
+}
+
+
+/**
+ * librdf_statement_match:
+ * @statement: statement
+ * @partial_statement: statement with possible empty parts
+ * 
+ * Match a statement against a 'partial' statement, where some
+ * parts (subject, predicate, object) of the statement can be empty
+ * (NULL).  Empty parts match against any value, parts with values
+ * must match exactly.
+ * 
+ * Return value: non 0 on match
+ **/
+int
+librdf_statement_match(librdf_statement* statement, 
+                       librdf_statement* partial_statement)
+{
+  if(partial_statement->subject &&
+     !librdf_node_equals(statement->subject, partial_statement->subject))
+      return 0;
+
+  if(partial_statement->predicate &&
+     !librdf_node_equals(statement->predicate, partial_statement->predicate))
+      return 0;
+
+  if(partial_statement->object &&
+     !librdf_node_equals(statement->object, partial_statement->object))
+      return 0;
+
+  /* FIXME: what about context? */
+
+  return 1;
 }
 
 
@@ -248,6 +326,10 @@ main(int argc, char *argv[])
 
   fprintf(stderr, "%s: Creating statement\n", program);
   statement=librdf_new_statement();
+
+  s=librdf_statement_to_string(statement);
+  fprintf(stderr, "%s: Empty statement: %s\n", program, s);
+  LIBRDF_FREE(cstring, s);
 
   librdf_statement_set_subject(statement, librdf_new_node_from_uri_string("http://www.ilrt.bris.ac.uk/people/cmdjb/"));
   librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/#Creator"));
