@@ -28,6 +28,8 @@ DIST_SUBDIRS=docs perl python tcl java expat repat debian
 bin_SCRIPTS = redland-config
 lib_LIBRARIES = librdf.a
 
+lib_LTLIBRARIES = librdf.la
+
 include_HEADERS = redland.h librdf.h \
 rdf_init.h \
 rdf_hash.h \
@@ -67,11 +69,17 @@ rdf_stream.h \
 rdf_parser.h \
 rdf_heuristics.h rdf_files.h rdf_utf8.h
 
+librdf_la_SOURCES = $(librdf_a_SOURCES)
 
 librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @XML_OBJS@
 librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @XML_OBJS@
+
+librdf_la_LIBADD = @LIBSOBJS@ @DIGEST_SOBJS@ @HASH_SOBJS@ @PARSER_SOBJS@ \
+@XML_SOBJS@
+librdf_la_DEPENDENCIES = @DIGEST_SOBJS@ @HASH_SOBJS@ @PARSER_SOBJS@ \
+@XML_SOBJS@
 
 EXTRA_librdf_a_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
@@ -80,6 +88,8 @@ rdf_parser_raptor.c \
 rdf_parser_repat.c \
 example1.c example2.c example3.c example4.c \
 @RAPTOR_SRCS@
+
+EXTRA_librdf_la_SOURCES = $(EXTRA_librdf_a_SOURCES)
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      TODO      LICENSE.txt \

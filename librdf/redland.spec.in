@@ -10,7 +10,7 @@ Version:   %{version}
 Release:   %{release}
 Prefix:    %{prefix}
 Copyright: LGPL/MPL
-Group:     System Environment/Libraries
+Group:     Development/Libraries
 Source:    http://www.redland.opensource.ac.uk/dist/source/%{name}-%{version}.tar.gz
 URL:       http://www.redland.opensource.ac.uk/
 BuildRoot: /tmp/%{name}-%{version}
@@ -81,6 +81,7 @@ cd ..
 %defattr(0555, bin, bin)
 %{prefix}/bin/redland-config
 %{prefix}/lib/librdf.a
+%{prefix}/lib/librdf.so.*
 
 %defattr (0444, bin, bin, 0555)
 %{prefix}/include/redland.h
@@ -99,6 +100,8 @@ cd ..
 %{prefix}/include/rdf_types.h
 %{prefix}/include/rdf_uri.h
 %{prefix}/include/rdf_utf8.h
+%{prefix}/lib/librdf.la
+%{prefix}/lib/librdf.so
 
 %doc AUTHORS COPYING COPYING.LIB ChangeLog LICENSE.txt NEWS README TODO
 %doc *.html
@@ -126,4 +129,12 @@ cd ..
 
 %doc %{prefix}/lib/perl5/man/man3/*
 
+%post
+/sbin/ldconfig
+
+%postun
+/sbin/ldconfig
+
 %changelog
+* Fri Sep 14 2001 Dave Beckett <dave.beckett@bristol.ac.uk>
+- Added shared libraries
