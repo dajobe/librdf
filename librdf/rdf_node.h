@@ -43,13 +43,9 @@ typedef enum {
   LIBRDF_NODE_TYPE_PROPERTY  = LIBRDF_NODE_TYPE_RESOURCE,
   LIBRDF_NODE_TYPE_LITERAL   = 2,  /* rdf:Literal - has an XML string, language, XML space */
   LIBRDF_NODE_TYPE_STATEMENT = 3,  /* rdf:Statement - has a subject, predicate, object, is_stated */
-  LIBRDF_NODE_TYPE_BAG       = 4,  /* rdf:Bag */
-  LIBRDF_NODE_TYPE_SEQ       = 5,  /* rdf:Seq */
-  LIBRDF_NODE_TYPE_ALT       = 6,  /* rdf:Alt */
-  LIBRDF_NODE_TYPE_LI        = 7,  /* rdf:li and rdf:_ forms - has an integer */
-  LIBRDF_NODE_TYPE_MODEL     = 8,  /* FIXME: no RDF M&S or Schema concept */
-
-  LIBRDF_NODE_TYPE_LAST      = LIBRDF_NODE_TYPE_MODEL
+  LIBRDF_NODE_TYPE_LI        = 4,  /* rdf:li (a rdf:Property) - has an integer */
+  LIBRDF_NODE_TYPE_BLANK     = 5,  /* blank node has an identifier string */
+  LIBRDF_NODE_TYPE_LAST      = LIBRDF_NODE_TYPE_BLANK
 } librdf_node_type;
 
 
@@ -108,6 +104,12 @@ struct librdf_node_s
       /* rdf:li and rdf:_-s have an ordinal */ 
       int ordinal;
     } li;
+    struct 
+    {
+      /* blank nodes have an identifier */
+      char *identifier;
+      int identifier_len;
+    } blank;
   } value;
 };
 
@@ -177,6 +179,9 @@ int librdf_node_set_literal_value(librdf_node* node, const char* value, const ch
 
 int librdf_node_get_li_ordinal(librdf_node* node);
 void librdf_node_set_li_ordinal(librdf_node* node, int ordinal);
+
+char *librdf_node_get_blank_identifier(librdf_node* node);
+char *librdf_node_set_blank_identifier(librdf_node* node, char *identifier);
 
 librdf_digest* librdf_node_get_digest(librdf_node* node);
 
