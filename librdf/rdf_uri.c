@@ -91,7 +91,8 @@ librdf_finish_uri(librdf_world *world)
  * @world: redland world object
  * @uri_string: URI in string form
  * 
- * A new URI is constructed from a copy of the string.
+ * A new URI is constructed from a copy of the string.  If the
+ * string is a NULL pointer or empty (0 length) then the result is NULL.
  *
  * Return value: a new &librdf_uri object or NULL on failure
  **/
@@ -105,7 +106,7 @@ librdf_new_uri (librdf_world *world,
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
 
-  if(!uri_string)
+  if(!uri_string || !*uri_string)
     return NULL;
 
 #ifdef WITH_THREADS
