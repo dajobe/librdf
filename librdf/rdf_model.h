@@ -128,7 +128,10 @@ struct librdf_model_factory_s {
   librdf_stream* (*context_serialize)(librdf_model* model, librdf_node* context);
 
   /* query the model */
-  librdf_stream* (*query)(librdf_model* model, librdf_query* query);
+  librdf_stream* (*query_as_stream)(librdf_model* model, librdf_query* query);
+
+  /* query the model */
+  int (*query_as_bindings)(librdf_model* model, librdf_query* query);
 
   /* sync the model to the storage - OPTIONAL */
   void (*sync)(librdf_model* model);
@@ -256,8 +259,10 @@ REDLAND_API librdf_stream* librdf_model_context_as_stream(librdf_model* model, l
 REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* context);
 
 /* query language */
-REDLAND_API librdf_stream* librdf_model_query(librdf_model* model, librdf_query* query);
-REDLAND_API librdf_stream* librdf_model_query_string(librdf_model* model, const char *name, librdf_uri* uri, const unsigned char *query_string);
+REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_model_query(librdf_model* model, librdf_query* query);
+REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_model_query_string(librdf_model* model, const char *name, librdf_uri* uri, const unsigned char *query_string);
+REDLAND_API librdf_stream* librdf_model_query_as_stream(librdf_model* model, librdf_query* query);
+REDLAND_API int librdf_model_query_as_bindings(librdf_model* model, librdf_query* query);
 
 REDLAND_API void librdf_model_sync(librdf_model* model);
 
