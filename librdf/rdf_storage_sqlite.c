@@ -1165,6 +1165,9 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
                                               literal, 
                                               (const char*)language,
                                               datatype);
+      if(datatype)
+        librdf_free_uri(datatype);
+      
     }
     librdf_statement_set_object(*statement, node);
 
