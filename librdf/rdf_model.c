@@ -1185,84 +1185,22 @@ librdf_model_context_serialize(librdf_model* model, librdf_node* context)
 
 
 /**
- * librdf_model_query - Run a query against the model returning matching statements
+ * librdf_model_query_execute - Execute a query against the model
  * @model: &librdf_model object
  * @query: &librdf_query object
  * 
  * Run the given query against the model and return a &librdf_stream of
  * matching &librdf_statement objects
  * 
- * Return value: &librdf_stream of matching statements (may be empty) or NULL on failure
+ * Return value: &librdf_query_results or NULL on failure
  **/
-librdf_stream*
-librdf_model_query(librdf_model* model, librdf_query* query) 
+librdf_query_results*
+librdf_model_query_execute(librdf_model* model, librdf_query* query) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
 
-  return librdf_model_query_as_stream(model, query);
-}
-
-
-/**
- * librdf_model_query_as_stream - Run a query against the model returning matching statements
- * @model: &librdf_model object
- * @query: &librdf_query object
- * 
- * Run the given query against the model and return a &librdf_stream of
- * matching &librdf_statement objects
- * 
- * Return value: &librdf_stream of matching statements (may be empty) or NULL on failure
- **/
-librdf_stream*
-librdf_model_query_as_stream(librdf_model* model, librdf_query* query) 
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
-
-  return model->factory->query_as_stream(model, query);
-}
-
-
-/**
- * librdf_model_query_as_bindings - Run a query against the model returning bindings
- * @model: &librdf_model object
- * @query: &librdf_query object
- * 
- * Run the given query on the model returning bindings.  Use
- * methods of the &librdf_query if the result is success such
- * as librdf_query_get_result_bindings, librdf_query_next_result
- * and librdf_query_get_result_count.
- * 
- * Return value: non-0 on failure
- **/
-int
-librdf_model_query_as_bindings(librdf_model* model, librdf_query* query) 
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
-
-  return model->factory->query_as_bindings(model, query);
-}
-
-
-/**
- * librdf_model_query_string - Run a query string against the model returning matching statements
- * @model: &librdf_model object
- * @name: query language name
- * @uri: query language URI (or NULL)
- * @query_string: string in query language
- * 
- * Deprecated, always fails
- * 
- * Return value: NULL
- **/
-librdf_stream*
-librdf_model_query_string(librdf_model* model,
-                          const char *name, librdf_uri *uri,
-                          const unsigned char *query_string)
-{
-  return NULL;
+  return model->factory->query_execute(model, query);
 }
 
 
