@@ -548,6 +548,9 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
   LIBRDF_DEBUG2(librdf_hash_from_string, "Parsing >>%s<<\n", string);
 
   p=string;
+  key=NULL; key_len=0;
+  value=NULL; value_len=0;
+  backslashes=0;
   state=HFS_PARSE_STATE_INIT;
   while(*p) {
     switch(state){
