@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 
-void librdf_init_hash_memory(int default_ratio);
+void librdf_init_hash_memory(int default_load_factor);
 
 
 #ifdef __cplusplus
