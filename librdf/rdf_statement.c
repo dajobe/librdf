@@ -141,15 +141,28 @@ librdf_new_statement_from_statement(librdf_statement* statement)
   if(!new_statement)
     return NULL;
 
-  new_statement->subject=librdf_new_node_from_node(statement->subject);
-  new_statement->predicate=librdf_new_node_from_node(statement->predicate);
-  new_statement->object=librdf_new_node_from_node(statement->object);
-
-  if(!new_statement->subject || !new_statement->predicate || 
-     !new_statement->object) {
-	  librdf_free_statement(new_statement);
-	  return NULL;
+  if(statement->subject) {
+    new_statement->subject=librdf_new_node_from_node(statement->subject);
+    if(!new_statement->subject) {
+      librdf_free_statement(new_statement);
+      return NULL;
+    }
   }
+  if(statement->predicate) {
+    new_statement->predicate=librdf_new_node_from_node(statement->predicate);
+    if(!new_statement->predicate) {
+      librdf_free_statement(new_statement);
+      return NULL;
+    }
+  }
+  if(statement->object) {
+    new_statement->object=librdf_new_node_from_node(statement->object);
+    if(!new_statement->object) {
+      librdf_free_statement(new_statement);
+      return NULL;
+    }
+  }
+
   return new_statement;
 }
 
