@@ -181,3 +181,37 @@ librdf_finish_concepts(void)
     /* deleted associated URI too */
     librdf_free_node(librdf_concept_resources[i]);
 }
+
+
+
+
+
+#ifdef STANDALONE
+
+/* one more prototype */
+int main(int argc, char *argv[]);
+
+
+int
+main(int argc, char *argv[]) 
+{
+  librdf_init_digest();
+  librdf_init_hash();
+  librdf_init_uri(librdf_get_digest_factory(NULL), NULL);
+  librdf_init_concepts();
+  
+  librdf_finish_concepts();
+  librdf_finish_uri();
+  librdf_finish_hash();
+  librdf_finish_digest();
+
+
+#ifdef LIBRDF_MEMORY_DEBUG
+  librdf_memory_report(stderr);
+#endif
+	
+  /* keep gcc -Wall happy */
+  return(0);
+}
+
+#endif
