@@ -122,8 +122,6 @@ main(int argc, char *argv[])
     /* zap end */
     *e='\0';
 
-    fprintf(stderr,"%d: Found statement\n", line);
-
     /* FIXME: I have no idea if the object points to a literal or a resource */
   
     object_is_literal=1; /* assume the worst */
