@@ -25,8 +25,6 @@
 #ifndef LIBRDF_URI_H
 #define LIBRDF_URI_H
 
-#include <rdf_digest.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,6 +47,9 @@ struct librdf_uri_s
 void librdf_init_uri(librdf_world *world);
 void librdf_finish_uri(librdf_world *world);
 
+/* exported public in error but never usable */
+librdf_digest* librdf_uri_get_digest (librdf_uri *uri);
+
 #endif
 
 /* constructors */
@@ -64,7 +65,6 @@ REDLAND_API void librdf_free_uri(librdf_uri *uri);
 /* methods */
 REDLAND_API unsigned char* librdf_uri_as_string (librdf_uri *uri);
 REDLAND_API unsigned char* librdf_uri_as_counted_string (librdf_uri *uri, size_t *len_p);
-REDLAND_API librdf_digest* librdf_uri_get_digest (librdf_uri *uri);
 REDLAND_API void librdf_uri_print (librdf_uri* uri, FILE *fh);
 REDLAND_API unsigned char* librdf_uri_to_string (librdf_uri* uri);
 REDLAND_API unsigned char* librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p);
