@@ -1,3 +1,48 @@
+2004-11-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_mysql.c, rdf_storage_hashes.c, rdf_storage_file.c:
+	Changed sync methods to return an int status.
+
+	* rdf_storage.c (librdf_storage_sync): Changed to return an int.
+	API change but most C won't care much.
+
+	* rdf_storage.h: sync factory method returns a status int
+	API CHANGE: librdf_storage_sync returns an int
+
+	* rdf_model_storage.c (librdf_model_storage_sync):
+	Changed to return an int.
+
+	* rdf_model.c (librdf_model_sync): Changed to return an int.  API
+	change but most C won't care much.
+
+	* rdf_model.h: sync factory method returns a status int
+	API CHANGE: librdf_model_sync returns an int
+
+2004-11-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_triples.c (librdf_query_triples_init): Add new
+	base_uri argument, not used.
+
+	* rdf_query_rasqal.c (librdf_query_rasqal_init): Use new base_uri
+	argument and store that, not language URI.
+
+	* rdf_query.h: Update query factory init method to add base_uri
+	argument.  API CHANGE: Add base_uri argument to librdf_new_query
+	and librdf_new_query_from_factory
+
+	* rdf_query.c (librdf_new_query, librdf_new_query_from_factory):
+	Add optional base_uri argument.  Stop overloading query language
+	identifier URI and base URI.
+	(main): Update test to match.
+
+	* rdf_query.c (librdf_get_query_factory): librdf_uri_equals test
+	was negated
+
+2004-11-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_mysql.c (librdf_storage_mysql_init): Return failure
+	early if connection failed.
+
 2004-11-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_storage_mysql.c
