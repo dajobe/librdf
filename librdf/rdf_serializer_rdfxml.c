@@ -72,9 +72,63 @@ rdf_serializer_rdfxml_ok_xml_name(char *name)
 
 
 static void
+rdf_serializer_rdfxml_print_as_xml_content(char *p, FILE *handle) 
+{
+  while(*p) {
+    if(*p == '&')
+      fputs("&amp;", handle);
+    else if (*p == '<')
+      fputs("&lt;", handle);
+    else if (*p == '>')
+      fputs("&gt;", handle);
+    else if (*p > 0x7e)
+      fprintf(handle, "&#%d;", *p);
+    else
+      fputc(*p, handle);
+    p++;
+  }
+}
+
+static void
+rdf_serializer_rdfxml_print_as_xml_attribute(char *p, char quote, 
+                                             FILE *handle) 
+{
+  while(*p) {
+    if(*p == '&')
+      fputs("&amp;", handle);
+    else if (*p == '<')
+      fputs("&lt;", handle);
+    else if (*p == '>')
+      fputs("&gt;", handle);
+    else if (*p == '"' && *p == quote)
+      fputs("&quot;", handle);
+    else if (*p == '\'' && *p == quote)
+      fputs("&apos;", handle);
+    else if (*p > 0x7e)
+      fprintf(handle, "&#%d;", *p);
+    else
+      fputc(*p, handle);
+    p++;
+  }
+}
+
+static void
+rdf_serializer_rdfxml_print_xml_attribute(char *attr, char *value,
+                                          FILE *handle) 
+{
+  fputc(' ', handle);
+  fputs(attr, handle);
+  fputc('=', handle);
+  fputc('"', handle);
+  rdf_serializer_rdfxml_print_as_xml_attribute(value, '"', handle);
+  fputc('"', handle);
+}
+
+
+static void
 librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *context,
                                             librdf_statement * statement,
-                                            FILE *stream) 
+                                            FILE *handle) 
 {
   librdf_node* nodes[3];
   char* uris[3];
@@ -84,7 +138,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   int name_is_rdf_ns=0;
   int i;
   char* nsprefix="ns0";
-  librdf_uri *duri;
+  char *content;
   
   nodes[0]=librdf_statement_get_subject(statement);
   nodes[1]=librdf_statement_get_predicate(statement);
@@ -103,7 +157,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
           name=uris[i] + rdf_ns_uri_len;
           name_is_rdf_ns=1;
           nsprefix="rdf";
-          break;
+          continue;
         }
         
         p= uris[i] + strlen(uris[i])-1;
@@ -124,63 +178,88 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   }
 
 
-  fputs("  <rdf:Description", stream);
+  fputs("  <rdf:Description", handle);
 
   /* subject */
   if(librdf_node_get_type(nodes[0]) == LIBRDF_NODE_TYPE_BLANK)
-    fprintf(stream, " rdf:nodeID=\"%s\"",
-            librdf_node_get_blank_identifier(nodes[0]));
+    rdf_serializer_rdfxml_print_xml_attribute("rdf:nodeID", 
+                                              librdf_node_get_blank_identifier(nodes[0]),
+                                              handle);
   else
-    fprintf(stream, " rdf:about=\"%s\"", uris[0]);
+    rdf_serializer_rdfxml_print_xml_attribute("rdf:about", uris[0], handle);
 
-  fputs(">\n", stream);
+  fputs(">\n", handle);
 
-  fputs("    <", stream);
-  fputs(nsprefix, stream);
-  fputc(':', stream);
-  fputs(name, stream);
+  fputs("    <", handle);
+  fputs(nsprefix, handle);
+  fputc(':', handle);
+  fputs(name, handle);
 
   if(!name_is_rdf_ns) {
-    fputs(" xmlns:", stream);
-    fputs(nsprefix, stream);
-    fputs("=\"", stream);
-    fwrite(uris[1], 1, (name-uris[1]), stream);
-    fputc('"', stream);
+    char c=*name;
+    fputs(" xmlns:", handle);
+    fputs(nsprefix, handle);
+    fputs("=\"", handle);
+    *name='\0';
+    rdf_serializer_rdfxml_print_as_xml_attribute(uris[1], '"', handle);
+    *name=c;
+    fputc('"', handle);
   }
-  fputc('>', stream);
 
   switch(librdf_node_get_type(nodes[2])) {
     case LIBRDF_NODE_TYPE_LITERAL:
       if(librdf_node_get_literal_value_language(nodes[2]))
-        fprintf(stream, " xml:lang=\"%s\"",
-                librdf_node_get_literal_value_language(nodes[2]));
-      duri=librdf_node_get_literal_value_datatype_uri(nodes[2]);
-      if(duri)
-        fprintf(stream, " rdf:datatype=\"%s\"", librdf_uri_as_string(duri));
-      if(librdf_node_get_literal_value_is_wf_xml(nodes[2]))
-        fputs(" rdf:parseType=\"Literal\"", stream);
+        rdf_serializer_rdfxml_print_xml_attribute("xml:lang",
+                                                  librdf_node_get_literal_value_language(nodes[2]),
+                                                  handle);
 
-      fputs(librdf_node_get_literal_value(nodes[2]), stream);
+      content=librdf_node_get_literal_value(nodes[2]);
+      
+      if(librdf_node_get_literal_value_is_wf_xml(nodes[2])) {
+        fputs(" rdf:parseType=\"Literal\">", handle);
+        /* Print without escaping XML */
+        fputs(content, handle);
+      } else {
+        librdf_uri *duri=librdf_node_get_literal_value_datatype_uri(nodes[2]);
+        if(duri)
+          rdf_serializer_rdfxml_print_xml_attribute("rdf:datatype",
+                                                    librdf_uri_as_string(duri),
+                                                    handle);
 
-      fputs("</", stream);
-      fputs(nsprefix, stream);
-      fputc(':', stream);
-      fputs(name, stream);
-      fputc('>', stream);
+        fputc('>', handle);
+
+        rdf_serializer_rdfxml_print_as_xml_content(content, handle);
+      }
+
+      fputs("</", handle);
+      fputs(nsprefix, handle);
+      fputc(':', handle);
+      fputs(name, handle);
+      fputc('>', handle);
       break;
     case LIBRDF_NODE_TYPE_BLANK:
-      fputs(" rdf:nodeID=\"", stream);
-      fputs(librdf_node_get_blank_identifier(nodes[2]), stream);
-      fputs("/>", stream);
+      rdf_serializer_rdfxml_print_xml_attribute("rdf:nodeID",
+                                                librdf_node_get_blank_identifier(nodes[2]), handle);
+      fputs("/>", handle);
       break;
-    default:
+
+    case LIBRDF_NODE_TYPE_RESOURCE:
       /* must be URI */
-      fprintf(stream, " rdf:resource=\"%s\"/>", uris[2]);
+      rdf_serializer_rdfxml_print_xml_attribute("rdf:resource",
+                                                uris[2], handle);
+      fputs("/>", handle);
+      break;
+      
+    default:
+      LIBRDF_FATAL2(librdf_serializer_print_statement_as_rdfxml,
+                    "Do not know how to serialize node type %d\n", librdf_node_get_type(nodes[2]));
+      abort();
+        
   }
 
-  fputc('\n', stream);
+  fputc('\n', handle);
 
-  fputs("  </rdf:Description>\n", stream);
+  fputs("  </rdf:Description>\n", handle);
 }
 
 
