@@ -35,16 +35,20 @@ is alpha quality.</p>
 <p>The Tcl API is an object-based API with the class names and method
 names flattended into Tcl procedure names like this:
 librdf_<em>class</em>_<em>method</em> - the same names as in the
-underlying C API.  The object references become Tcl variables.</p>
+underlying <a href="api/index.html">C API</a>.  The object references
+become Tcl variables.</p>
 
 <h2>Testing the Redland Tcl interface</h2>
 
 <p>The example program provided parses an RDF/XML source file into a
 model.  It should be run with two arguments - the URI of the content
-(as file:/path/to/content) and the parser name (say, repat):</p>
+(as <tt>file:</tt><em>/path/to/content</em>) and the parser name
+(say, repat):</p>
 <pre>
    tcl example.tcl file:../perl/dc.rdf repat
 </pre>
+<p>NOTE: ONLY <tt>file:</tt> URIs will work with repat, other parsers such as
+sirpac-w3c, sirpac-stanford and libwww can fetch general (http) URIs</p>
 
 
 
