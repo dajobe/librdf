@@ -243,11 +243,6 @@ librdf_parser_raptor_error_handler(void *data, raptor_locator *locator,
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)data;
   librdf_parser_raptor_context* pcontext;
   librdf_parser* parser;
-  static const char *message_prefix=" - Raptor error - ";
-  int prefix_len=strlen(message_prefix);
-  int message_len=strlen(message);
-  int locator_len=raptor_format_locator(NULL, 0, locator);
-  char *buffer;
 
   pcontext=scontext->pcontext;
   parser=pcontext->parser;
@@ -255,17 +250,7 @@ librdf_parser_raptor_error_handler(void *data, raptor_locator *locator,
   pcontext->errors++;
   raptor_parse_abort(scontext->rdf_parser);
 
-  buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+prefix_len+message_len+1);
-  if(!buffer) {
-    fprintf(stderr, "librdf_raptor_error_handler: Out of memory\n");
-    return;
-  }
-  raptor_format_locator(buffer, locator_len, locator);
-  strncpy(buffer+locator_len, message_prefix, prefix_len);
-  strcpy(buffer+prefix_len+locator_len, message); /* want extra \0 - using strcpy */
-
-  librdf_error(parser->world, "%s", buffer);
-  LIBRDF_FREE(cstring, buffer);
+  librdf_log_simple(pcontext->parser->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, locator, message);
 }
 
 
@@ -275,29 +260,11 @@ librdf_parser_raptor_warning_handler(void *data, raptor_locator *locator,
 {
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)data;
   librdf_parser_raptor_context* pcontext;
-  librdf_parser* parser;
-  static const char *message_prefix=" - Raptor warning - ";
-  int prefix_len=strlen(message_prefix);
-  int message_len=strlen(message);
-  int locator_len=raptor_format_locator(NULL, 0, locator);
-  char *buffer;
 
   pcontext=scontext->pcontext;
-  parser=pcontext->parser;
-
   pcontext->warnings++;
 
-  buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+prefix_len+message_len+1);
-  if(!buffer) {
-    fprintf(stderr, "librdf_raptor_warning_handler: Out of memory\n");
-    return;
-  }
-  raptor_format_locator(buffer, locator_len, locator);
-  strncpy(buffer+locator_len, message_prefix, prefix_len);
-  strcpy(buffer+prefix_len+locator_len, message); /* want extra \0 - using strcpy */
-
-  librdf_warning(parser->world, "%s", message);
-  LIBRDF_FREE(cstring, buffer);
+  librdf_log_simple(pcontext->parser->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_PARSER, locator, message);
 }
 
 
