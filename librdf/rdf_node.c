@@ -551,6 +551,10 @@ main(int argc, char *argv[])
   
   char *program=argv[0];
 	
+  librdf_init_digest();
+  librdf_init_hash();
+  librdf_init_uri(librdf_get_digest_factory(NULL), NULL);
+
   fprintf(stderr, "%s: Creating home page node from string\n", program);
   node=librdf_new_node_from_uri_string(hp_string1);
   
@@ -577,6 +581,10 @@ main(int argc, char *argv[])
   fprintf(stderr, "%s: Freeing node\n", program);
   librdf_free_node(node);
   
+  librdf_finish_uri();
+  librdf_finish_hash();
+  librdf_finish_digest();
+
 #ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);
 #endif

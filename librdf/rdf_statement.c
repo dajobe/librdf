@@ -393,7 +393,10 @@ main(int argc, char *argv[])
   char *program=argv[0];
   char *s;
   
-  /* initialise statement module */
+  /* initialise dependent modules */
+  librdf_init_digest();
+  librdf_init_hash();
+  librdf_init_uri(librdf_get_digest_factory(NULL), NULL);
   librdf_init_statement();
 
   fprintf(stderr, "%s: Creating statement\n", program);
@@ -413,6 +416,11 @@ main(int argc, char *argv[])
 
   fprintf(stderr, "%s: Freeing statement\n", program);
   librdf_free_statement(statement);
+
+  librdf_finish_statement();
+  librdf_finish_uri();
+  librdf_finish_hash();
+  librdf_finish_digest();
   
 #ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);
