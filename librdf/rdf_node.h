@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
+ * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -105,7 +105,6 @@ void librdf_finish_node(librdf_world* world);
 const char* librdf_node_get_type_as_string(int type);
 #endif
 
-/* exported public in error but never usable */
 librdf_digest* librdf_node_get_digest(librdf_node* node);
 
 #endif

@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
+
 #ifdef WIN32
 #  ifdef REDLAND_INTERNAL
 #    define REDLAND_API _declspec(dllexport)

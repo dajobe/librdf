@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
+ * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -47,9 +47,7 @@ struct librdf_uri_s
 void librdf_init_uri(librdf_world *world);
 void librdf_finish_uri(librdf_world *world);
 
-/* exported public in error but never usable */
 librdf_digest* librdf_uri_get_digest (librdf_uri *uri);
-
 #endif
 
 /* constructors */
