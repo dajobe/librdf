@@ -131,6 +131,7 @@ REDLAND_API librdf_node* librdf_query_get_result_binding_value(librdf_query *que
 REDLAND_API const char* librdf_query_get_result_binding_name(librdf_query *query, int offset);
 REDLAND_API librdf_node* librdf_query_get_result_binding_by_name(librdf_query *query, const char *name);
 REDLAND_API int librdf_query_next_result(librdf_query *query);
+REDLAND_API int librdf_query_get_bindings_count(librdf_query *query);
 
 #ifdef __cplusplus
 }
