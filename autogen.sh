@@ -89,17 +89,6 @@ fi
 # (indirectly via automake)
 rm -f libtool ltmain.sh ltconfig
 
-if test -d $CONFIG_DIR; then
-  for file in config.guess config.sub; do
-    cfile=$CONFIG_DIR/$file
-    if test -f $cfile; then
-      rm -f $file
-      cp -p $cfile $file
-    fi
-  done
-fi
-
-
 if test -z "$*"; then
   echo "$program: WARNING: Running \`configure' with no arguments."
   echo "If you wish to pass any to it, please specify them on the"
@@ -130,6 +119,20 @@ do
     )
   fi
 done
+
+
+# automake --add-missing or libtool may add older versions, so do this
+# afterwards.
+if test -d $CONFIG_DIR; then
+  for file in config.guess config.sub; do
+    cfile=$CONFIG_DIR/$file
+    if test -f $cfile; then
+      rm -f $file
+      cp -p $cfile $file
+    fi
+  done
+fi
+
 
 conf_flags=
 
