@@ -27,3 +27,12 @@
 
 /* defined if specific hashes are available */
 #undef HAVE_GDBM_HASH
+#undef HAVE_BDB_HASH
+
+/* Berkeley DB complexities */
+/* V3 */
+#undef HAVE_DB_CREATE
+/* V2 (V1???) */
+#undef HAVE_DB_OPEN
+#undef HAVE_BDB_DB_TXN
+#undef HAVE_BDB_CURSOR
