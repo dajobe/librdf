@@ -319,7 +319,7 @@ librdf_statement_to_string(librdf_statement *statement)
 {
   char *subject_string, *predicate_string, *object_string;
   char *s;
-  int statement_string_len;
+  int statement_string_len=0;
   char *format;
   static char *null_string="(null)";
   size_t len;
