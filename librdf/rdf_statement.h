@@ -85,14 +85,7 @@ extern "C" {
 #endif
 
 
-struct librdf_statement_s
-{
-  librdf_node* subject;
-  librdf_node* predicate;
-  librdf_node* object;
-  librdf_context *context;
-};
-
+/* a librdf_statement (RDF:Statement) ISA librdf_node (RDF:Resource) */
 
 
 /* class methods */
@@ -125,9 +118,6 @@ void librdf_statement_set_predicate(librdf_statement *statement, librdf_node *pr
 librdf_node* librdf_statement_get_object(librdf_statement *statement);
 void librdf_statement_set_object(librdf_statement *statement, librdf_node *object);
 
-librdf_context* librdf_statement_get_context(librdf_statement *statement);
-void librdf_statement_set_context(librdf_statement *statement, librdf_context *context);
-
 /* convert to a string */
 char *librdf_statement_to_string(librdf_statement *statement);
 /* print it prettily */
@@ -150,12 +140,14 @@ size_t librdf_statement_decode(librdf_statement* statement, unsigned char *buffe
  *   librdf_statement_encode() 
  *   librdf_new_stream_from_node_iterator()
  */
-#define LIBRDF_STATEMENT_SUBJECT 1
+#define LIBRDF_STATEMENT_SUBJECT   1
 #define LIBRDF_STATEMENT_PREDICATE 2
-#define LIBRDF_STATEMENT_OBJECT 4
-#define LIBRDF_STATEMENT_CONTEXT 8
+#define LIBRDF_STATEMENT_OBJECT    4
+#define LIBRDF_STATEMENT_ID        8
+#define LIBRDF_STATEMENT_FLAGS    16
 
-#define LIBRDF_STATEMENT_ALL 15 /* must be or of all of the above */
+/* FIXME: Not encoding ID or FLAGS */
+#define LIBRDF_STATEMENT_ALL 7 /* must be or of all of the above */
 
 #endif
 
