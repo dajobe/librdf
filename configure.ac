@@ -982,7 +982,7 @@ if test "X$MYSQL_CONFIG" != X; then
     have_libmysql=yes
 
     STORAGE_OBJS="$STORAGE_OBJS rdf_storage_mysql.lo"
-    store_modules="$store_modules mysql($libmysql_version)"
+    store_modules="$store_modules mysql($LIBMYSQL_VERSION)"
     persistent_store=yes
   fi
 fi
