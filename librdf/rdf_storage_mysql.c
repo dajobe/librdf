@@ -1494,7 +1494,7 @@ librdf_storage_mysql_get_contexts_next_context(void* context)
   librdf_node *node;
 
   /* Get next statement */
-  row==mysql_fetch_row(gccontext->results);
+  row=mysql_fetch_row(gccontext->results);
   if(row) {
     /* Free old context node, if allocated */
     if(gccontext->current_context)
