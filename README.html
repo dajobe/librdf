@@ -24,6 +24,19 @@ and the <a href="FAQS.html">FAQS</a> for more information.  Changes
 can be found in the <a href="NEWS.html">NEWS</a> file or more
 detailed changes in the <a href="ChangeLog">ChangeLog</a>.</p>
 
+<p>Redland provides:</p>
+<ul>
+<li>A modular, object based library (or application framework) written in C</li>
+<li>APIs for manipulating the RDF <a href="docs/api/model.html">Model</a> and parts - <a href="docs/api/statement.html">Statements</a>, <a href="docs/api/node.html">Resources and Literals</a></li>
+<li><a href="docs/api/parser.html">Parsers</a> for importing the model from RDF/XML syntax (both parsers external)</li>
+<li><a href="docs/api/storage.html">Storage</a> for models in memory and persistant, via Berkeley DB</li>
+<li>Query APIs for the model by Statement or by Nodes and Arcs</li>
+<li><a href="docs/api/stream.html">Statement Streams</a> can be used as well as static APIs for construction, parsing, (de-)serialisation of models</li>
+<li>Internal utility classes such as <a href="docs/api/list.html">Lists</a>, <a href="docs/api/hash.html">Hashes</a>, <a href="docs/api/digest.html">Digests</a>, <a href="docs/api/uri.html">URI</a>, <a href="docs/api/iterator.html">Iterators</a></li>
+<li>The parsers, storage, hashes and digests are all modules that can be removed or added to at run time.</li>
+<li>No memory leaks so far.</li>
+</ul>
+
 <h2>SOURCES</h2>
 
 <p>The sources are available from
