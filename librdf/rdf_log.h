@@ -95,8 +95,10 @@ typedef struct
  *
  * Handler for one log level, for the warning and error levels ONLY.
  * Used by librdf_world_set_warning and librdf_world_set_error.
+ *
+ * Return value: non-zero to indicate log message has been handled 
  */
-typedef void (*librdf_log_level_func)(void *user_data, const char *message, va_list arguments);
+typedef int (*librdf_log_level_func)(void *user_data, const char *message, va_list arguments);
 
 /**
  * librdf_log_func:
