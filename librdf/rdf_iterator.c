@@ -101,6 +101,9 @@ librdf_iterator_get_next_mapped_element(librdf_iterator* iterator)
   /* find next element subject to map */
   while(iterator->have_elements(iterator->context)) {
     element=iterator->get_next(iterator->context);
+    if(!element)
+      break;
+    
     /* apply the map to the element  */
     element=iterator->map(iterator->map_context, element);
     /* found something, return it */
