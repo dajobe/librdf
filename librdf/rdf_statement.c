@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -77,7 +77,8 @@ librdf_new_statement(librdf_world *world)
     return NULL;
 
   new_statement->world=world;
-
+  new_statement->usage=1;
+  
   return new_statement;
 }
 
@@ -92,40 +93,10 @@ librdf_new_statement(librdf_world *world)
 librdf_statement*
 librdf_new_statement_from_statement(librdf_statement* statement)
 {
-  librdf_statement* new_statement;
-
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
-  if(!statement)
-    return NULL;
-  
-  new_statement = librdf_new_statement(statement->world);
-  if(!new_statement)
-    return NULL;
-
-  if(LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
-    LIBRDF_NODE_STATEMENT_SUBJECT(new_statement)=librdf_new_node_from_node(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
-    if(!LIBRDF_NODE_STATEMENT_SUBJECT(new_statement)) {
-      librdf_free_statement(new_statement);
-      return NULL;
-    }
-  }
-  if(LIBRDF_NODE_STATEMENT_PREDICATE(statement)) {
-    LIBRDF_NODE_STATEMENT_PREDICATE(new_statement)=librdf_new_node_from_node(LIBRDF_NODE_STATEMENT_PREDICATE(statement));
-    if(!LIBRDF_NODE_STATEMENT_PREDICATE(new_statement)) {
-      librdf_free_statement(new_statement);
-      return NULL;
-    }
-  }
-  if(LIBRDF_NODE_STATEMENT_OBJECT(statement)) {
-    LIBRDF_NODE_STATEMENT_OBJECT(new_statement)=librdf_new_node_from_node(LIBRDF_NODE_STATEMENT_OBJECT(statement));
-    if(!LIBRDF_NODE_STATEMENT_OBJECT(new_statement)) {
-      librdf_free_statement(new_statement);
-      return NULL;
-    }
-  }
-
-  return new_statement;
+  statement->usage++;
+  return statement;
 }
 
 
@@ -159,9 +130,9 @@ librdf_new_statement_from_nodes(librdf_world *world,
     return NULL;
   }
   
-  LIBRDF_NODE_STATEMENT_SUBJECT(new_statement)=subject;
-  LIBRDF_NODE_STATEMENT_PREDICATE(new_statement)=predicate;
-  LIBRDF_NODE_STATEMENT_OBJECT(new_statement)=object;
+  new_statement->subject=subject;
+  new_statement->predicate=predicate;
+  new_statement->object=object;
 
   return new_statement;
 }
@@ -201,17 +172,17 @@ librdf_statement_clear(librdf_statement *statement)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
-  if(LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
-    librdf_free_node(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
-    LIBRDF_NODE_STATEMENT_SUBJECT(statement)=NULL;
+  if(statement->subject) {
+    librdf_free_node(statement->subject);
+    statement->subject=NULL;
   }
-  if(LIBRDF_NODE_STATEMENT_PREDICATE(statement)) {
-    librdf_free_node(LIBRDF_NODE_STATEMENT_PREDICATE(statement));
-    LIBRDF_NODE_STATEMENT_PREDICATE(statement)=NULL;
+  if(statement->predicate) {
+    librdf_free_node(statement->predicate);
+    statement->predicate=NULL;
   }
-  if(LIBRDF_NODE_STATEMENT_OBJECT(statement)) {
-    librdf_free_node(LIBRDF_NODE_STATEMENT_OBJECT(statement));
-    LIBRDF_NODE_STATEMENT_OBJECT(statement)=NULL;
+  if(statement->object) {
+    librdf_free_node(statement->object);
+    statement->object=NULL;
   }
 }
 
@@ -224,9 +195,33 @@ librdf_statement_clear(librdf_statement *statement)
 void
 librdf_free_statement(librdf_statement* statement)
 {
+#ifdef WITH_THREADS
+  librdf_world *world;
+#endif
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
+#ifdef WITH_THREADS
+  world = node->world;
+  pthread_mutex_lock(world->statements_mutex);
+#endif
+
+  statement->usage--;
+  
+  /* decrement usage, don't free if not 0 yet*/
+  if(statement->usage) {
+#ifdef WITH_THREADS
+    pthread_mutex_unlock(world->statements_mutex);
+#endif
+    return;
+  }
+
   librdf_statement_clear(statement);
+
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(world->statements_mutex);
+#endif
+
   LIBRDF_FREE(librdf_statement, statement);
 }
 
@@ -248,7 +243,7 @@ librdf_statement_get_subject(librdf_statement *statement)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
-  return LIBRDF_NODE_STATEMENT_SUBJECT(statement);
+  return statement->subject;
 }
 
 
@@ -265,7 +260,7 @@ librdf_statement_set_subject(librdf_statement *statement, librdf_node *node)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
-  LIBRDF_NODE_STATEMENT_SUBJECT(statement)=node;
+  statement->subject=node;
 }
 
 
@@ -283,7 +278,7 @@ librdf_statement_get_predicate(librdf_statement *statement)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
-  return LIBRDF_NODE_STATEMENT_PREDICATE(statement);
+  return statement->predicate;
 }
 
 
@@ -291,7 +286,7 @@ librdf_statement_get_predicate(librdf_statement *statement)
  * librdf_statement_set_predicate - Set the statement predicate
  * @statement: &librdf_statement object
  * @node: &librdf_node of predicate
- * 
+ *
  * The predicate passed in becomes owned by
  * the statement object and must not be used by the caller after this call.
  **/
@@ -300,7 +295,7 @@ librdf_statement_set_predicate(librdf_statement *statement, librdf_node *node)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
-  LIBRDF_NODE_STATEMENT_PREDICATE(statement)=node;
+  statement->predicate=node;
 }
 
 
@@ -318,7 +313,7 @@ librdf_statement_get_object(librdf_statement *statement)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
-  return LIBRDF_NODE_STATEMENT_OBJECT(statement);
+  return statement->object;
 }
 
 
@@ -335,7 +330,7 @@ librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
-  LIBRDF_NODE_STATEMENT_OBJECT(statement)=node;
+  statement->object=node;
 }
 
 
@@ -350,9 +345,7 @@ librdf_statement_is_complete(librdf_statement *statement)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
-  return (LIBRDF_NODE_STATEMENT_SUBJECT(statement) &&
-          LIBRDF_NODE_STATEMENT_PREDICATE(statement) &&
-          LIBRDF_NODE_STATEMENT_OBJECT(statement));
+  return (statement->subject && statement->predicate && statement->object);
 }
 
 
@@ -378,8 +371,8 @@ librdf_statement_to_string(librdf_statement *statement)
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
-  if(LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
-    subject_string=librdf_node_to_counted_string(LIBRDF_NODE_STATEMENT_SUBJECT(statement), &len);
+  if(statement->subject) {
+    subject_string=librdf_node_to_counted_string(statement->subject, &len);
     if(!subject_string)
       return NULL;
     statement_string_len += len;
@@ -389,8 +382,8 @@ librdf_statement_to_string(librdf_statement *statement)
   }
 
   
-  if(LIBRDF_NODE_STATEMENT_PREDICATE(statement)) {
-    predicate_string=librdf_node_to_counted_string(LIBRDF_NODE_STATEMENT_PREDICATE(statement), &len);
+  if(statement->predicate) {
+    predicate_string=librdf_node_to_counted_string(statement->predicate, &len);
     if(!predicate_string) {
       if(subject_string != null_string)
         LIBRDF_FREE(cstring, subject_string);
@@ -403,8 +396,8 @@ librdf_statement_to_string(librdf_statement *statement)
   }
   
 
-  if(LIBRDF_NODE_STATEMENT_OBJECT(statement)) {
-    object_string=librdf_node_to_counted_string(LIBRDF_NODE_STATEMENT_OBJECT(statement), &len);
+  if(statement->object) {
+    object_string=librdf_node_to_counted_string(statement->object, &len);
     if(!object_string) {
       if(subject_string != null_string)
         LIBRDF_FREE(cstring, subject_string);
@@ -426,8 +419,8 @@ librdf_statement_to_string(librdf_statement *statement)
                             2 + /* ", " %s */
                             2 + /* ", " %s */
                             1; /* "}" */
-  if(LIBRDF_NODE_STATEMENT_OBJECT(statement) &&
-     librdf_node_get_type(LIBRDF_NODE_STATEMENT_OBJECT(statement)) == LIBRDF_NODE_TYPE_LITERAL) {
+  if(statement->object &&
+     librdf_node_get_type(statement->object) == LIBRDF_NODE_TYPE_LITERAL) {
     format=LIBRDF_STATEMENT_FORMAT_STRING_LITERAL;
     statement_string_len+=2; /* Extra "" around literal */
   } else {
@@ -494,17 +487,14 @@ librdf_statement_equals(librdf_statement* statement1,
   if(!statement1 || !statement2)
     return 0;
   
-  if(!librdf_node_equals(LIBRDF_NODE_STATEMENT_SUBJECT(statement1), 
-                         LIBRDF_NODE_STATEMENT_SUBJECT(statement2)))
-      return 0;
-
-  if(!librdf_node_equals(LIBRDF_NODE_STATEMENT_PREDICATE(statement1),
-                         LIBRDF_NODE_STATEMENT_PREDICATE(statement2)))
-      return 0;
-
-  if(!librdf_node_equals(LIBRDF_NODE_STATEMENT_OBJECT(statement1),
-                         LIBRDF_NODE_STATEMENT_OBJECT(statement2)))
-      return 0;
+  if(!librdf_node_equals(statement1->subject, statement2->subject))
+    return 0;
+  
+  if(!librdf_node_equals(statement1->predicate, statement2->predicate))
+    return 0;
+  
+  if(!librdf_node_equals(statement1->object, statement2->object))
+    return 0;
 
   return 1;
 }
@@ -529,19 +519,16 @@ librdf_statement_match(librdf_statement* statement,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(partial_statement, librdf_statement, 0);
 
-  if(LIBRDF_NODE_STATEMENT_SUBJECT(partial_statement) &&
-     !librdf_node_equals(LIBRDF_NODE_STATEMENT_SUBJECT(statement), 
-                         LIBRDF_NODE_STATEMENT_SUBJECT(partial_statement)))
+  if(partial_statement->subject &&
+     !librdf_node_equals(statement->subject, partial_statement->subject))
       return 0;
 
-  if(LIBRDF_NODE_STATEMENT_PREDICATE(partial_statement) &&
-     !librdf_node_equals(LIBRDF_NODE_STATEMENT_PREDICATE(statement),
-                         LIBRDF_NODE_STATEMENT_PREDICATE(partial_statement)))
+  if(partial_statement->predicate &&
+     !librdf_node_equals(statement->predicate, partial_statement->predicate))
       return 0;
 
-  if(LIBRDF_NODE_STATEMENT_OBJECT(partial_statement) &&
-     !librdf_node_equals(LIBRDF_NODE_STATEMENT_OBJECT(statement),
-                         LIBRDF_NODE_STATEMENT_OBJECT(partial_statement)))
+  if(partial_statement->object &&
+     !librdf_node_equals(statement->object, partial_statement->object))
       return 0;
 
   return 1;
@@ -618,7 +605,7 @@ librdf_statement_encode_parts(librdf_statement* statement,
   }
   total_length++;
 
-  if((fields & LIBRDF_STATEMENT_SUBJECT) && LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
+  if((fields & LIBRDF_STATEMENT_SUBJECT) && statement->subject) {
     /* 's' + subject */
     if(p) {
       *p++='s';
@@ -626,7 +613,7 @@ librdf_statement_encode_parts(librdf_statement* statement,
     }
     total_length++;
 
-    node_len=librdf_node_encode(LIBRDF_NODE_STATEMENT_SUBJECT(statement), p, length);
+    node_len=librdf_node_encode(statement->subject, p, length);
     if(!node_len)
       return 0;
     if(p) {
@@ -639,7 +626,7 @@ librdf_statement_encode_parts(librdf_statement* statement,
   }
   
   
-  if((fields & LIBRDF_STATEMENT_PREDICATE) && LIBRDF_NODE_STATEMENT_PREDICATE(statement)) {
+  if((fields & LIBRDF_STATEMENT_PREDICATE) && statement->predicate) {
     /* 'p' + predicate */
     if(p) {
       *p++='p';
@@ -647,7 +634,7 @@ librdf_statement_encode_parts(librdf_statement* statement,
     }
     total_length++;
 
-    node_len=librdf_node_encode(LIBRDF_NODE_STATEMENT_PREDICATE(statement), p, length);
+    node_len=librdf_node_encode(statement->predicate, p, length);
     if(!node_len)
       return 0;
     if(p) {
@@ -658,7 +645,7 @@ librdf_statement_encode_parts(librdf_statement* statement,
     total_length += node_len;
   }
   
-  if((fields & LIBRDF_STATEMENT_OBJECT) && LIBRDF_NODE_STATEMENT_OBJECT(statement)) {
+  if((fields & LIBRDF_STATEMENT_OBJECT) && statement->object) {
     /* 'o' object */
     if(p) {
       *p++='o';
@@ -666,7 +653,7 @@ librdf_statement_encode_parts(librdf_statement* statement,
     }
     total_length++;
 
-    node_len= librdf_node_encode(LIBRDF_NODE_STATEMENT_OBJECT(statement), p, length);
+    node_len= librdf_node_encode(statement->object, p, length);
     if(!node_len)
       return 0;
     if(p) {
@@ -785,15 +772,15 @@ librdf_statement_decode_parts(librdf_statement* statement,
   
     switch(type) {
     case 's': /* subject */
-      LIBRDF_NODE_STATEMENT_SUBJECT(statement)=node;
+      statement->subject=node;
       break;
       
     case 'p': /* predicate */
-      LIBRDF_NODE_STATEMENT_PREDICATE(statement)=node;
+      statement->predicate=node;
       break;
       
     case 'o': /* object */
-      LIBRDF_NODE_STATEMENT_OBJECT(statement)=node;
+      statement->object=node;
       break;
 
     case 'c': /* context */
