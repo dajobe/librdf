@@ -456,11 +456,12 @@ LIBRDF_EXTERNAL_CPPFLAGS=
 LIBRDF_EXTERNAL_LIBS=
 
 # do these first because somehow they get messed up by bdb checks
-AC_CHECK_TYPE([byte u32])
+AC_CHECK_TYPE([byte u32 u64])
 
 AC_CHECK_SIZEOF(unsigned char, 1)
 AC_CHECK_SIZEOF(unsigned int, 4)
 AC_CHECK_SIZEOF(unsigned long, 4)
+AC_CHECK_SIZEOF(unsigned long long, 8)
   
 dnl Checks for libraries.
 
