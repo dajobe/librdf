@@ -547,7 +547,7 @@ librdf_query_rasqal_get_result_binding_name(librdf_query *query, int offset)
 
 
 static librdf_node*
-librdf_query_rasqal_get_result_binding_by_name(librdf_query *query, const char *name)
+librdf_query_rasqal_get_result_binding_value_by_name(librdf_query *query, const char *name)
 {
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   rasqal_literal* literal;
@@ -590,7 +590,7 @@ librdf_query_rasqal_register_factory(librdf_query_factory *factory)
   factory->get_result_bindings        = librdf_query_rasqal_get_result_bindings;
   factory->get_result_binding_value   = librdf_query_rasqal_get_result_binding_value;
   factory->get_result_binding_name    = librdf_query_rasqal_get_result_binding_name;
-  factory->get_result_binding_by_name = librdf_query_rasqal_get_result_binding_by_name;
+  factory->get_result_binding_value_by_name = librdf_query_rasqal_get_result_binding_value_by_name;
   factory->next_result                = librdf_query_rasqal_next_result;
   factory->get_bindings_count         = librdf_query_rasqal_get_bindings_count;
 }
