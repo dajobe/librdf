@@ -193,6 +193,8 @@ librdf_new_model (librdf_world *world,
   librdf_hash* options_hash;
   librdf_model *model;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
+
   if(!storage)
     return NULL;
   
@@ -227,6 +229,8 @@ librdf_new_model_with_options(librdf_world *world,
 {
   librdf_model *model;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
+
   if(!storage)
     return NULL;
   
@@ -266,6 +270,8 @@ librdf_new_model_with_options(librdf_world *world,
 librdf_model*
 librdf_new_model_from_model(librdf_model* model)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+
   return model->factory->clone(model);
 }
 
@@ -280,6 +286,8 @@ librdf_free_model(librdf_model *model)
 {
   librdf_iterator* iterator;
   librdf_model* m;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(model, librdf_model);
 
   if(model->sub_models) {
     iterator=librdf_list_get_iterator(model->sub_models);
@@ -315,6 +323,8 @@ librdf_free_model(librdf_model *model)
 int
 librdf_model_size(librdf_model* model)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, -1);
+
   return model->factory->size(model);
 }
 
@@ -333,6 +343,9 @@ librdf_model_size(librdf_model* model)
 int
 librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
+
   if(!librdf_statement_is_complete(statement))
     return 1;
   
@@ -350,6 +363,9 @@ librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 int
 librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement_stream, librdf_statement, 1);
+
   return model->factory->add_statements(model, statement_stream);
 }
 
@@ -372,7 +388,12 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
 {
   librdf_statement *statement;
   int result;
-  
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(subject, librdf_node, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(predicate, librdf_node, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(object, librdf_node, 1);
+
   if(!subject || !predicate || !object)
     return 1;
 
@@ -418,6 +439,11 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
 {
   librdf_node* object;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(subject, librdf_node, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(predicate, librdf_node, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(literal, string, 1);
+
   if(!subject || !predicate || !literal)
     return 1;
 
@@ -458,6 +484,11 @@ librdf_model_add_string_literal_statement(librdf_model* model,
   librdf_node* object;
   int result;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(subject, librdf_node, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(predicate, librdf_node, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(literal, string, 1);
+
   if(!subject || !predicate || !literal)
     return 1;
 
@@ -488,6 +519,9 @@ librdf_model_add_string_literal_statement(librdf_model* model,
 int
 librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
+
   if(!librdf_statement_is_complete(statement))
     return 1;
 
@@ -514,6 +548,9 @@ librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
 int
 librdf_model_contains_statement(librdf_model* model, librdf_statement* statement)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
+
   if(!librdf_statement_is_complete(statement))
     return 1;
 
@@ -530,6 +567,8 @@ librdf_model_contains_statement(librdf_model* model, librdf_statement* statement
 librdf_stream*
 librdf_model_as_stream(librdf_model* model)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+
   return model->factory->serialise(model);
 }
 
@@ -546,6 +585,8 @@ librdf_model_as_stream(librdf_model* model)
 librdf_stream*
 librdf_model_serialise(librdf_model* model)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+
   return model->factory->serialise(model);
 }
 
@@ -566,6 +607,9 @@ librdf_stream*
 librdf_model_find_statements(librdf_model* model, 
                              librdf_statement* statement)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   return model->factory->find_statements(model, statement);
 }
 
@@ -585,6 +629,10 @@ librdf_iterator*
 librdf_model_get_sources(librdf_model *model,
                          librdf_node *arc, librdf_node *target) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(arc, librdf_node, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(target, librdf_node, NULL);
+
   return model->factory->get_sources(model, arc, target);
 }
 
@@ -604,6 +652,10 @@ librdf_iterator*
 librdf_model_get_arcs(librdf_model *model,
                       librdf_node *source, librdf_node *target) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(source, librdf_node, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(target, librdf_node, NULL);
+
   return model->factory->get_arcs(model, source, target);
 }
 
@@ -623,6 +675,10 @@ librdf_iterator*
 librdf_model_get_targets(librdf_model *model,
                          librdf_node *source, librdf_node *arc) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(source, librdf_node, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(arc, librdf_node, NULL);
+
   return model->factory->get_targets(model, source, arc);
 }
 
@@ -642,8 +698,15 @@ librdf_node*
 librdf_model_get_source(librdf_model *model,
                         librdf_node *arc, librdf_node *target) 
 {
-  librdf_iterator *iterator=librdf_model_get_sources(model, arc, target);
-  librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
+  librdf_iterator *iterator;
+  librdf_node *node;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(arc, librdf_node, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(target, librdf_node, NULL);
+
+  iterator=librdf_model_get_sources(model, arc, target);
+  node=(librdf_node*)librdf_iterator_get_object(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
   librdf_free_iterator(iterator);
@@ -666,8 +729,15 @@ librdf_node*
 librdf_model_get_arc(librdf_model *model,
                      librdf_node *source, librdf_node *target) 
 {
-  librdf_iterator *iterator=librdf_model_get_arcs(model, source, target);
-  librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
+  librdf_iterator *iterator;
+  librdf_node *node;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(source, librdf_node, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(target, librdf_node, NULL);
+
+  iterator=librdf_model_get_arcs(model, source, target);
+  node=(librdf_node*)librdf_iterator_get_object(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
   librdf_free_iterator(iterator);
@@ -690,8 +760,15 @@ librdf_node*
 librdf_model_get_target(librdf_model *model,
                         librdf_node *source, librdf_node *arc) 
 {
-  librdf_iterator *iterator=librdf_model_get_targets(model, source, arc);
-  librdf_node *node=(librdf_node*)librdf_iterator_get_object(iterator);
+  librdf_iterator *iterator;
+  librdf_node *node;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(source, librdf_node, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(arc, librdf_node, NULL);
+
+  iterator=librdf_model_get_targets(model, source, arc);
+  node=(librdf_node*)librdf_iterator_get_object(iterator);
   if(node)
     node=librdf_new_node_from_node(node);
   librdf_free_iterator(iterator);
@@ -713,6 +790,9 @@ librdf_model_add_submodel(librdf_model* model, librdf_model* sub_model)
 {
   librdf_list *l=model->sub_models;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(sub_model, librdf_model, 1);
+
   if(!l) {
     l=librdf_new_list(model->world);
     if(!l)
@@ -742,6 +822,9 @@ librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model)
 {
   librdf_list *l=model->sub_models;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(sub_model, librdf_model, 1);
+
   if(!l)
     return 1;
   if(!librdf_list_remove(l, sub_model))
@@ -762,6 +845,9 @@ librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model)
 librdf_iterator*
 librdf_model_get_arcs_in(librdf_model *model, librdf_node *node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+
   return model->factory->get_arcs_in(model, node);
 }
 
@@ -776,6 +862,9 @@ librdf_model_get_arcs_in(librdf_model *model, librdf_node *node)
 librdf_iterator*
 librdf_model_get_arcs_out(librdf_model *model, librdf_node *node) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+
   return model->factory->get_arcs_out(model, node);
 }
 
@@ -792,6 +881,10 @@ int
 librdf_model_has_arc_in(librdf_model *model, librdf_node *node, 
                         librdf_node *property) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(property, librdf_node, 0);
+
   return model->factory->has_arc_in(model, node, property);
 }
 
@@ -808,6 +901,10 @@ int
 librdf_model_has_arc_out(librdf_model *model, librdf_node *node,
                          librdf_node *property) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(property, librdf_node, 0);
+
   return model->factory->has_arc_out(model, node, property);
 }
 
@@ -827,6 +924,9 @@ librdf_model_print(librdf_model *model, FILE *fh)
 {
   librdf_stream* stream;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(model, librdf_model);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(fh, FILE*);
+
   stream=librdf_model_as_stream(model);
   if(!stream)
     return;
@@ -855,6 +955,9 @@ librdf_model_context_add_statement(librdf_model* model,
                                    librdf_node* context,
                                    librdf_statement* statement) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
+
   if(!librdf_statement_is_complete(statement))
     return 1;
 
@@ -880,6 +983,9 @@ librdf_model_context_add_statements(librdf_model* model,
 {
   int status=0;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(stream, librdf_stream, 1);
+
   if(!stream)
     return 1;
 
@@ -919,6 +1025,9 @@ librdf_model_context_remove_statement(librdf_model* model,
                                       librdf_node* context,
                                       librdf_statement* statement) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
+
   if(!librdf_statement_is_complete(statement))
     return 1;
 
@@ -938,6 +1047,10 @@ librdf_model_context_remove_statements(librdf_model* model,
                                        librdf_node* context) 
 {
   librdf_stream *stream;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_node, 1);
+
   if(model->factory->context_remove_statements)
     return model->factory->context_remove_statements(model, context);
 
@@ -967,6 +1080,9 @@ librdf_model_context_remove_statements(librdf_model* model,
 librdf_stream*
 librdf_model_context_as_stream(librdf_model* model, librdf_node* context) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_node, NULL);
+
   return model->factory->context_serialize(model, context);
 }
 
@@ -984,6 +1100,9 @@ librdf_model_context_as_stream(librdf_model* model, librdf_node* context)
 librdf_stream*
 librdf_model_context_serialize(librdf_model* model, librdf_node* context) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_node, NULL);
+
   return model->factory->context_serialize(model, context);
 }
 
@@ -1001,6 +1120,9 @@ librdf_model_context_serialize(librdf_model* model, librdf_node* context)
 librdf_stream*
 librdf_model_query(librdf_model* model, librdf_query* query) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
+
   return model->factory->query(model, query);
 }
 
@@ -1025,6 +1147,9 @@ librdf_model_query_string(librdf_model* model,
   librdf_query *query;
   librdf_stream *stream;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_string, string, NULL);
+
   query=librdf_new_query(model->world, name, uri, query_string);
   if(!query)
     return NULL;
@@ -1045,6 +1170,8 @@ librdf_model_query_string(librdf_model* model,
 void
 librdf_model_sync(librdf_model* model) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(model, librdf_model);
+
   if(model->factory->sync)
     model->factory->sync(model);
 }
@@ -1063,6 +1190,8 @@ librdf_model_sync(librdf_model* model)
 librdf_storage*
 librdf_model_get_storage(librdf_model *model)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+
   if(model->factory->get_storage)
     return model->factory->get_storage(model);
   else
@@ -1087,6 +1216,10 @@ librdf_stream*
 librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* statement, librdf_node* context_node) 
 {
   librdf_stream *stream;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
 
   if(model->factory->find_statements_in_context)
     return model->factory->find_statements_in_context(model, statement, context_node);
@@ -1115,6 +1248,8 @@ librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* s
 librdf_iterator*
 librdf_model_get_contexts(librdf_model* model) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+
   if(model->factory->get_contexts)
     return model->factory->get_contexts(model);
   else
@@ -1133,6 +1268,9 @@ librdf_model_get_contexts(librdf_model* model)
 librdf_node*
 librdf_model_get_feature(librdf_model* model, librdf_uri* feature)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(feature, librdf_uri, NULL);
+
   if(model->factory->get_feature)
     return model->factory->get_feature(model, feature);
   return NULL;
@@ -1151,6 +1289,10 @@ int
 librdf_model_set_feature(librdf_model* model, librdf_uri* feature,
                          librdf_node* value)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, -1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(feature, librdf_uri, -1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(value, librdf_node, -1);
+
   if(model->factory->set_feature)
     return model->factory->set_feature(model, feature, value);
   return -1;
