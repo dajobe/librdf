@@ -339,6 +339,5 @@ AC_SUBST(STANDARD_CFLAGS)
 
 AC_OUTPUT(Makefile
 docs/Makefile
-expat/Makefile expat/xmlparse/Makefile expat/xmltok/Makefile
 librdf-config,
 [chmod +x librdf-config])
