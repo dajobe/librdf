@@ -27,7 +27,8 @@ rdf_hash_bdb.c
 EXTRA_DIST=ChangeLog \
 README      NEWS \
 README.html NEWS.html \
-INSTALL.html LICENSE.html FAQS.html
+INSTALL.html LICENSE.html FAQS.html \
+librdf-config.in
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_statement_test \
 rdf_model_test
