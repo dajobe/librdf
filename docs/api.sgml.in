@@ -225,12 +225,8 @@ RDF/XML parser and can be used without one.
 @INCLUDE parser.sgml
 </sect1>
 <sect1>
-<title>W3C LibWWW RDF Parser Implementation Class</title>
-@INCLUDE parser_libwww.sgml
-</sect1>
-<sect1>
-<title>SiRPAC RDF Parser Implementation Class</title>
-@INCLUDE parser_sirpac.sgml
+<title>Raptor RDF Parser Implementation Class</title>
+@INCLUDE parser_raptor.sgml
 </sect1>
 <sect1>
 <title>Repat RDF Parser Implementation Class</title>

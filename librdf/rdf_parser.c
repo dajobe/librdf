@@ -348,12 +348,6 @@ librdf_init_parser(librdf_world *world)
 #ifdef HAVE_RAPTOR_RDF_PARSER
   librdf_parser_raptor_constructor(world);
 #endif
-#ifdef HAVE_SIRPAC_RDF_PARSER
-  librdf_parser_sirpac_constructor(world);
-#endif
-#ifdef HAVE_LIBWWW_RDF_PARSER
-  librdf_parser_libwww_constructor(world);
-#endif
 #ifdef HAVE_REPAT_RDF_PARSER
   librdf_parser_repat_constructor(world);
 #endif

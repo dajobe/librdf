@@ -111,13 +111,6 @@ int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, const 
 void librdf_parser_error(librdf_parser* parser, const char *message, ...);
 void librdf_parser_warning(librdf_parser* parser, const char *message, ...);
 
-/* in librdf_parser_sirpac.c */
-#ifdef HAVE_SIRPAC_RDF_PARSER
-void librdf_parser_sirpac_constructor(librdf_world* world);
-#endif
-#ifdef HAVE_LIBWWW_RDF_PARSER
-void librdf_parser_libwww_constructor(librdf_world* world);
-#endif
 #ifdef HAVE_RAPTOR_RDF_PARSER
 void librdf_parser_raptor_constructor(librdf_world* world);
 void librdf_parser_raptor_destructor(void);

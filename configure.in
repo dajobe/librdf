@@ -374,7 +374,7 @@ AC_FUNC_MEMCMP
 AC_CHECK_FUNCS(mkstemp mktemp tmpnam)
 
 dnl Checks for URI resolvers
-AC_ARG_WITH(libwww, [  --with-libwww           Use libwww [yes]], enable_libwww="$withval", enable_libwww="yes") 
+AC_ARG_WITH(libwww, [  --with-libwww           Use libwww [yes]], enable_libwww="$withval", enable_libwww="no") 
 
 have_libwww=
 AC_MSG_CHECKING(whether have working libwww)
@@ -543,10 +543,10 @@ fi
 
 
 dnl Checks for RDF parsers
-parser_modules="raptor repat sirpac-stanford sirpac-w3c libwww"
+parser_modules="raptor repat"
 
 AC_MSG_CHECKING(RDF parsers required)
-AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [raptor repat sirpac-stanford sirpac-w3c libwww]], parser_modules="$enableval") 
+AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [raptor repat]], parser_modules="$enableval") 
 if test "X$parser_modules" = "Xno" -o "X$parser_modules" = X; then
   parser_modules=
 fi
@@ -554,11 +554,6 @@ AC_MSG_RESULT($parser_modules)
 
 PARSER_OBJS=
 PARSER_SRCS=
-JAVA_SIRPACSTANFORD_JAR=
-JAVA_SIRPACW3C_JAR=
-JAVA_SAX_JAR=
-JAVA_SAX_CLASS=
-JAVA_CLASSES=
 
 
 # This is needed because autoheader can't work out which computed
@@ -566,78 +561,7 @@ JAVA_CLASSES=
 if test "x" = "y"; then
   AC_DEFINE(HAVE_RAPTOR_RDF_PARSER)
   AC_DEFINE(HAVE_REPAT_RDF_PARSER)
-  AC_DEFINE(HAVE_SIRPAC_RDF_PARSER)
-  AC_DEFINE(HAVE_LIBWWW_RDF_PARSER)
 fi
-
-
-AC_ARG_WITH(java-sirpac-stanford-jar, [  --with-java-sirpac-stanford-jar=JAR Use the SiRPAC (Stanford version) jar file [no]], java_sirpac_stanford_jar="$withval", java_sirpac_stanford_jar="no") 
-
-AC_ARG_WITH(java-sirpac-w3c-jar, [  --with-java-sirpac-w3c-jar=JAR Use the SiRPAC (W3C version) jar file [no]], java_sirpac_w3c_jar="$withval", java_sirpac_w3c_jar="no") 
-
-AC_ARG_WITH(java-sax-jar, [  --with-java-sax-jar=JAR Use the Java SAX implementation in the given jar file [no]], java_sax_jar="$withval", java_sax_jar="no") 
-AC_ARG_WITH(java-sax-class, [  --with-java-sax-class=CLASS  Give the Java SAX class name for the SAX jar file [no]], java_sax_class="$withval", java_sax_class="no") 
-
-have_sirpac=0
-
-have_sirpac_stanford=0
-AC_MSG_CHECKING(whether using Java SiRPAC - Stanford version)
-if test "$java_sirpac_stanford_jar" != no ; then
-  AC_DEFINE_UNQUOTED(JAVA_SIRPACSTANFORD_JAR, "$java_sirpac_stanford_jar")
-  if test -r $java_sirpac_stanford_jar; then
-    AC_MSG_RESULT(yes)
-    if test "X$java_sax_class" = no ; then
-      # was: com.microstar.xml.SAXDriver
-      java_sax_class=org.brownell.xml.aelfred2.SAXDriver
-    fi
-    have_sirpac_stanford=1
-    have_sirpac=1
-  else
-    AC_MSG_RESULT(no - JAR file $java_sirpac_stanford_jar does not exist)
-  fi
-else
-  AC_MSG_RESULT(no)
-fi
-
-
-have_sirpac_w3c=0
-AC_MSG_CHECKING(whether using Java SiRPAC - W3C version)
-if test "$java_sirpac_w3c_jar" != no ; then
-  AC_DEFINE_UNQUOTED(JAVA_SIRPACW3C_JAR, "$java_sirpac_w3c_jar")
-  if test -r $java_sirpac_w3c_jar; then
-    AC_MSG_RESULT(yes)
-    have_sirpac_w3c=1
-    have_sirpac=1
-  else
-    AC_MSG_RESULT(no - JAR file $java_sirpac_w3c_jar does not exist)
-  fi
-else
-  AC_MSG_RESULT(no)
-fi
-
-
-
-have_sax=0
-AC_MSG_CHECKING(whether using Java SAX)
-if test "$java_sax_jar" != no ; then
-  AC_DEFINE_UNQUOTED(JAVA_SAX_JAR, "$java_sax_jar")
-  if test -r $java_sax_jar; then
-    if test "$java_sax_class" != no ; then
-      AC_MSG_RESULT(yes)
-      JAVA_SAX_JAR=$java_sax_jar
-      JAVA_SAX_CLASS=$java_sax_class
-      have_sax=1
-    else
-      AC_MSG_RESULT(no - SAX class must given with --with-java-sax-class)
-    fi
-  else
-    AC_MSG_RESULT(no - JAR file $java_sax_jar does not exist)
-  fi
-else
-  AC_MSG_RESULT(no)
-fi
-AC_DEFINE_UNQUOTED(JAVA_SAX_JAR, "$java_sax_jar")
-AC_DEFINE_UNQUOTED(JAVA_SAX_CLASS, "$java_sax_class")
 
 
 # Always have these
@@ -645,7 +569,6 @@ have_raptor=1
 have_repat=1
 
 
-seen_sirpac=0
 need_repat=0
 need_raptor=0
 rdf_parsers_available=
@@ -655,39 +578,6 @@ for parser in $parser_modules; do
   original_parser=$parser
 
   case $parser in
-    sirpac-stanford)
-      if test $have_sirpac_stanford = 1 ; then
-	found=1
-        parser=sirpac
-      fi
-    ;;
-
-    sirpac-w3c)
-      if test $have_sirpac_w3c = 1 ; then
-        if test $have_sax = 1 ; then
-  	  found=1
-          parser=sirpac
-        else
-          AC_MSG_WARN(Cannot use SiRPAC W3C version - no SAX jar and class given)
-        fi
-      fi
-    ;;
-  
-    libwww)
-      AC_MSG_CHECKING(whether libwww has RDF support)
-      if test "$have_libwww" = yes ; then
-	AC_TRY_LINK([#undef PACKAGE
-		     #undef VERSION
-		     #include <WWWXML.h>], [HTRDF* rdfp=HTRDF_new();],
-		    AC_DEFINE(HAVE_LIBWWW_RDF)
-                    found=1
-		    AC_MSG_RESULT(yes),
-		    AC_MSG_RESULT(no))
-      else
-	AC_MSG_RESULT(no)
-      fi
-    ;;
-
     raptor)
       if test $have_raptor = 1 ; then
 	if test $xml_parser = "libxml"; then
@@ -734,17 +624,6 @@ for parser in $parser_modules; do
     rdf_parsers_available="$rdf_parsers_available $original_parser"
   fi
 
-  # Only add sirpac parser module once even if many sirpac-* parsers are used
-  if test $parser = sirpac; then
-    uname=`echo $parser | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
-    if test $seen_sirpac = 1; then
-      found=0
-    else
-      seen_sirpac=1
-      JAVA_CLASSES="$JAVA_CLASSES PrintConsumer.class PrintParser.class"
-    fi
-  fi
-
   # Add objects, sources only if the parser was found
   if test $found = 1; then
     PARSER_OBJS="$PARSER_OBJS rdf_parser_$parser.lo"
@@ -763,7 +642,6 @@ done
 
 
 dnl Checks for languages
-AC_SUBST(JAVA_CLASSES)
 AC_DEFINE_UNQUOTED(JAVA_CLASS_DIR, "$prefix/share/$PACKAGE")
 
 AC_CHECK_PROG(PHP_CONFIG, php-config, php-config)

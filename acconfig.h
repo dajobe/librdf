@@ -57,17 +57,7 @@
 /* directory where local java files will be installed */
 #undef JAVA_CLASS_DIR
 
-/* location of Java RDF SiRPAC jar files */
-#undef JAVA_SIRPACSTANFORD_JAR
-#undef JAVA_SIRPACW3C_JAR
-/* location of Java SAX jar files */
-#undef JAVA_SAX_JAR
-/* SAX class in above jar file */
-#undef JAVA_SAX_CLASS
-
 /* RDF parsers */
-#undef HAVE_SIRPAC_RDF_PARSER
-#undef HAVE_LIBWWW_RDF_PARSER
 #undef HAVE_RAPTOR_RDF_PARSER
 #undef HAVE_REPAT_RDF_PARSER
 

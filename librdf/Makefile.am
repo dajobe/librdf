@@ -41,9 +41,6 @@ rdf_query.h \
 rdf_query_triples.h \
 rdf_serializer.h
 
-JAVA_CLASSES=@JAVA_CLASSES@
-pkgdata_DATA = $(JAVA_CLASSES)
-
 librdf_la_SOURCES = rdf_init.c \
 rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
@@ -82,14 +79,11 @@ librdf_la_DEPENDENCIES = \
 
 EXTRA_librdf_la_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
-rdf_parser_sirpac.c rdf_parser_libwww.c \
 rdf_parser_raptor.c \
 rdf_parser_repat.c
 
 EXTRA_DIST=\
 memcmp.c \
-PrintConsumer.java PrintParser.java \
-PrintConsumer.class PrintParser.class \
 redland.spec redland.spec.in \
 ex1.rdf ex2.rdf
 
@@ -101,7 +95,6 @@ rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
 rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test
 
 CLEANFILES=$(TESTS) test.db test1.db
-MAINTAINERCLEANFILES=$(JAVA_CLASSES)
 
 # Memory debugging alternatives
 MEM=@MEM@
@@ -187,10 +180,6 @@ rdf_stream_test: rdf_stream.c librdf.la
 rdf_iterator_test: rdf_iterator.c librdf.la
 	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_iterator.c librdf.la $(LIBS)
 
-# The action is the COMPILE definition but always using least warning CFLAGS
-@MAINT@rdf_parser_libwww.o: rdf_parser_libwww.c
-@MAINT@	$(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(STANDARD_CFLAGS) -c $<
-
 @SET_MAKE@
 
 $(top_builddir)/expat/xmlparse/xmlparse.lo $(top_builddir)/expat/xmlparse/hashtable.lo $(top_builddir)/expat/xmltok/xmlrole.lo $(top_builddir)/expat/xmltok/xmltok.lo:
@@ -201,10 +190,3 @@ $(top_builddir)/raptor/libraptor.la:
 
 $(SRCDIR)/../repat/librepat.la:
 	cd $(srcdir)/../repat && $(MAKE) $(AM_MAKEFLAGS) all
-
-@MAINT@
-@MAINT@PrintParser.class: PrintParser.java
-@MAINT@	javac -classpath .:$(JAVA_SIRPACW3C_JAR):$(JAVA_SIRPACSTANFORD_JAR):$(JAVA_SAX_JAR) $<
-@MAINT@
-@MAINT@PrintConsumer.class: PrintConsumer.java
-@MAINT@	javac -classpath .:$(JAVA_SIRPACW3C_JAR):$(JAVA_SIRPACSTANFORD_JAR):$(JAVA_SAX_JAR) $<
