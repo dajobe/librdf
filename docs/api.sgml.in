@@ -3,7 +3,7 @@
   <?dbhtml filename='index.html'>
   <bookinfo>
     <date>2004-01-03</date>
-    <title>Redland RDF Library API Reference Manual</title>
+    <title>Redland RDF Application Framework API Reference Manual</title>
     <authorgroup>
       <author>
 	<firstname>Dave</firstname>

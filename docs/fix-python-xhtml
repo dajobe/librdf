@@ -15,7 +15,7 @@ use File::Basename;
 
 my $progname=basename $0;
 
-my $main_title="Redland RDF Library";
+my $main_title="Redland RDF Application Framework";
 
 my $doc_title="Python API Reference";
 

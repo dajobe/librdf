@@ -2,11 +2,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-  <title>Redland RDF Library - Ruby Interface</title>
+  <title>Redland RDF Application Framework - Ruby Interface</title>
 </head>
 <body>
 
-<h1 style="text-align:center">Redland RDF Library - Ruby Interface</h1>
+<h1 style="text-align:center">Redland RDF Application Framework - Ruby Interface</h1>
 
 <h2>Installing the Redland Ruby interface</h2>
 
@@ -19,10 +19,15 @@ version/program.  The standard 'make' at the top level will build it.</p>
 <pre>
   cd ruby
   make
-  make check # optional
+
+  # optional, but it may require a top-level 'make install
+  # first depending on the operating system and how it
+  # handles shared libraries
+  make check
 </pre>
 
-<p>To install it system wide (this is optional) do this as <em>root</em>:</p>
+<p>To install it system wide do this as <em>root</em> (or maybe via
+sudo make install):</p>
 
 <pre>
   root# make install
@@ -52,8 +57,6 @@ model.  It should be run with two arguments - the URI of the content
 <pre>
    ruby example.ruby file:../perl/dc.rdf raptor
 </pre>
-<p>NOTE: ONLY <tt>file:</tt> URIs will work with at present.</p>
-
 
 
 <h2>Other RDF Ruby APIs and applications</h2>
@@ -66,7 +69,7 @@ model.  It should be run with two arguments - the URI of the content
 
 <hr />
 
-<p>Copyright 2002-2004 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2002-2004 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bris.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>

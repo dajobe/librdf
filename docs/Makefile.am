@@ -5,7 +5,7 @@
 # $Id$
 #
 # Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
-# Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
+# Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
 # University of Bristol - http://www.bristol.ac.uk/
 # 
 # This package is Free Software or Open Source available under the
@@ -108,7 +108,7 @@ api/index.html: api.sgml
 
 if MAINTAINER_MODE
 redland.3: redland.pod
-	pod2man --section=3 --center="Redland RDF Library" \
+	pod2man --section=3 --center="Redland RDF Application Framework" \
 	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @PACKAGE_VERSION@" $< | \
 	sed -e "s;REDLAND_VERSION_STRING;@PACKAGE_VERSION@;" > $@
 	rm -f pod2htm*

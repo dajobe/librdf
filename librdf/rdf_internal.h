@@ -1,11 +1,11 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_internal.h - Redland RDF Library internal API (header never shipped)
+ * rdf_internal.h - Redland RDF Application Framework internal API (header never shipped)
  *
  * $Id$
  *
  * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the

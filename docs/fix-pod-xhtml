@@ -6,8 +6,9 @@
 #
 # Usage: pod2html ... MODULE.pm | tidy ... | fix-pod-xhtml OUTPUT-FILE
 #
-# (C) Copyright 2001-2002 Dave Beckett <Dave.Beckett@bristol.ac.uk>
-# University of Bristol
+# Copyright (C) 2001-2004 David Beckett - http://purl.org/net/dajobe/
+# Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
+# University of Bristol - http://www.bristol.ac.uk/
 #
 
 use strict;
@@ -15,7 +16,7 @@ use File::Basename;
 
 my $progname=basename $0;
 
-my $main_title="Redland RDF Library";
+my $main_title="Redland RDF Application Framework";
 
 die "USAGE: $progname OUTPUT-FILE\n" if @ARGV < 1;
 
@@ -54,7 +55,7 @@ while(<IN>) {
   print OUT <<"EOT" if m%^</body>%;
 <hr />
 
-<p>Copyright 2000-$year <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-$year <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bris.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 EOT
   print OUT;

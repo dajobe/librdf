@@ -6,7 +6,7 @@ dnl
 dnl $Id$
 dnl
 dnl Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
-dnl Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
+dnl Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
 dnl University of Bristol - http://www.bristol.ac.uk/
 dnl 
 dnl This package is Free Software or Open Source available under the
@@ -21,7 +21,7 @@ dnl
 dnl 
 
 
-AC_INIT([Redland RDF Library], 0.9.15, redland-dev@lists.librdf.org, redland)
+AC_INIT([Redland RDF Application Framework], 0.9.15, redland-dev@lists.librdf.org, redland)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR(librdf/rdf_node.c)
 AC_REVISION($Revision$)dnl
