@@ -165,7 +165,8 @@ librdf_query_triples_init(librdf_query* query,
       return 0;
     }
     librdf_statement_set_subject(&context->statement, subject);
-  }
+  } else
+   subject=NULL;
   cur=p;
   
   /* predicate - NULL or URI */
@@ -190,7 +191,8 @@ librdf_query_triples_init(librdf_query* query,
       return 0;
     }
     librdf_statement_set_predicate(&context->statement, predicate);
-  }
+  } else
+   predicate=NULL;
   cur=p;
   
   /* object - NULL, literal or URI */
@@ -199,8 +201,10 @@ librdf_query_triples_init(librdf_query* query,
     librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
                "Bad triples query language syntax - bad object in '%s'", cur);
     LIBRDF_FREE(cstring, query_string_copy);
-    librdf_free_node(subject);
-    librdf_free_node(predicate);
+    if(subject)
+      librdf_free_node(subject);
+    if(predicate)
+      librdf_free_node(predicate);
     return 0;
   }
   *p='\0';
@@ -215,8 +219,10 @@ librdf_query_triples_init(librdf_query* query,
       object=librdf_new_node_from_uri_string(query->world, cur);
     if(!object) {
       LIBRDF_FREE(cstring, query_string_copy);
-      librdf_free_node(subject);
-      librdf_free_node(predicate);
+      if(subject)
+        librdf_free_node(subject);
+      if(predicate)
+        librdf_free_node(predicate);
       return 0;
     }
     librdf_statement_set_object(&context->statement, object);
