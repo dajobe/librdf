@@ -1,3 +1,15 @@
+2004-08-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Makefile.am: Add srcdir for Redland.i install
+
+	* Makefile.am: Preserve the Redland.i timestamp on an install, so
+	that redland-bindings can build against it reliably, not
+	necessarily requiring SWIG to compile.
+
+2004-08-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/libraptor.3: Document check_rdf_id feature
+
 2004-08-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* configure.ac: Bumped version to 0.9.19
