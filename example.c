@@ -35,10 +35,13 @@ main(int argc, char *argv[])
   librdf_parser* parser;
   librdf_model* model;
   librdf_stream* stream;
+  librdf_node *subject, *predicate;
+  librdf_iterator* iterator;
+  librdf_statement *partial_statement;
   char *program=argv[0];
   librdf_uri *uri;
   char *parser_name=NULL;
-
+  int count;
 
   if(argc <2 || argc >3) {
     fprintf(stderr, "USAGE: %s: <RDF source URI> [rdf parser name]\n", program);
@@ -76,7 +79,9 @@ main(int argc, char *argv[])
     return(1);
   }
 
-  fprintf(stderr, "%s: Parsing URI %s\n", program, librdf_uri_as_string(uri));
+
+  /* PARSE the URI as RDF/XML*/
+  fprintf(stdout, "%s: Parsing URI %s\n", program, librdf_uri_as_string(uri));
   stream=librdf_parser_parse_from_uri(parser, uri);
   if(!stream) {
     fprintf(stderr, "%s: Failed to create parser stream\n", program);
@@ -87,17 +92,86 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Failed to add statements to model\n", program);
     return(1);
   }
-
-
   librdf_free_stream(stream);
-
   librdf_free_parser(parser);
 
 
-  fprintf(stderr, "%s: Resulting model is:\n", program);
-  librdf_model_print(model, stderr);
+  /* Print out the model*/
 
-  
+  fprintf(stdout, "%s: Resulting model is:\n", program);
+  librdf_model_print(model, stdout);
+
+
+  /* Construct the query predicate (arc) and object (target) 
+   * and partial statement bits
+   */
+  subject=librdf_new_node_from_uri_string("http://www.ilrt.bristol.ac.uk/people/cmdjb/");
+  predicate=librdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/title");
+  if(!subject || !predicate) {
+    fprintf(stderr, "%s: Failed to create nodes for searching\n", program);
+    return(1);
+  }
+  partial_statement=librdf_new_statement();
+  librdf_statement_set_subject(partial_statement, subject);
+  librdf_statement_set_predicate(partial_statement, predicate);
+
+
+  /* QUERY TEST 1 - use find_statements to match */
+
+  fprintf(stdout, "%s: Trying to find_statements\n", program);
+  stream=librdf_model_find_statements(model, partial_statement);
+  count=0;
+  while(!librdf_stream_end(stream)) {
+    librdf_statement *statement=librdf_stream_next(stream);
+    if(!statement) {
+      fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
+      break;
+    }
+
+    fputs("  Matched statement: ", stdout);
+    librdf_statement_print(statement, stdout);
+    fputc('\n', stdout);
+
+    librdf_free_statement(statement);
+    count++;
+  }
+  librdf_free_stream(stream);  
+  fprintf(stderr, "%s: got %d matching statements\n", program, count);
+
+
+  /* QUERY TEST 2 - use get_targets to do match */
+  fprintf(stdout, "%s: Trying to get targets\n", program);
+  iterator=librdf_model_get_targets(model, subject, predicate);
+  if(!iterator)  {
+    fprintf(stderr, "%s: librdf_model_get_targets failed to return iterator for searching\n", program);
+    return(1);
+  }
+
+  count=0;
+  while(librdf_iterator_have_elements(iterator)) {
+    librdf_node *target;
+    
+    target=librdf_iterator_get_next(iterator);
+    if(!target) {
+      fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n", program);
+      break;
+    }
+
+    fputs("  Matched target: ", stdout);
+    librdf_node_print(target, stdout);
+    fputc('\n', stdout);
+
+    librdf_free_node(target);
+    count++;
+  }
+  librdf_free_iterator(iterator);
+  fprintf(stderr, "%s: got %d target nodes\n", program, count);
+
+  librdf_free_statement(partial_statement);
+  /* the above does this since they are still attached */
+  /* librdf_free_node(predicate); */
+  /* librdf_free_node(object); */
+
   librdf_free_model(model);
 
   librdf_free_storage(storage);
