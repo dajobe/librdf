@@ -188,13 +188,13 @@ librdf_statement_to_string(librdf_statement *statement)
   }
     
   s=(char*)LIBRDF_MALLOC(cstring, statement_string_len);
-  if(!s) {
-    LIBRDF_FREE(cstring, subject_string);
-    LIBRDF_FREE(cstring, predicate_string);
-    LIBRDF_FREE(cstring, object_string);
-    return NULL;
-  }
-  sprintf(s, format, predicate_string, subject_string, object_string);
+  if(s)
+    sprintf(s, format, predicate_string, subject_string, object_string);
+
+  /* always free intermediate strings */
+  LIBRDF_FREE(cstring, subject_string);
+  LIBRDF_FREE(cstring, predicate_string);
+  LIBRDF_FREE(cstring, object_string);
 
   return s;
 }
@@ -227,11 +227,13 @@ main(int argc, char *argv[])
 
   s=librdf_statement_to_string(statement);
   fprintf(stderr, "%s: Resulting statement: %s\n", program, s);
-  free(s);
+  LIBRDF_FREE(cstring, s);
 
   fprintf(stderr, "%s: Freeing statement\n", program);
   librdf_free_statement(statement);
   
+  librdf_memory_report(stderr);
+	
   /* keep gcc -Wall happy */
   return(0);
 }
