@@ -1,4 +1,4 @@
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V3.1//EN"[]>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V3.1//EN"[]> <!-- -*- DocBook -*- -->
 <book id="redlandAPI">
   <?dbhtml filename='index.html'>
   <bookinfo>
@@ -48,25 +48,103 @@
     <pubdate role="CVS">$Date$</pubdate>
 
     <abstract>
+      <title>Abstract</title>
       <para>
 This document describes the APIs provided by Redland to use the RDF
 model; manipulate statements, resources, predicates and objects in the model;
 parse RDF/XML syntax, query and store the models.
       </para>
+<para>
+See also the <ulink url="http://www.redland.opensource.ac.uk/">Home Page</ulink>
+and the <ulink url="../">main document area</ulink>.
+</para>
+
     </abstract>
 
    </bookinfo>
 
 <toc></toc>
 
+<chapter id="objects">
+<?dbhtml filename='objects.html'>
+<title>Introduction to Objects in C</title>
+<para>
+Redland uses objects and is written in C, which has no built in support for
+object construction, destruction, copying etc.  This library thus uses
+conventions for the names of the routines providing the
+constructor, destructor and copy constructor functionality for a class as
+well as conventions for the general methods.
+</para>
+<para>
+A class FOO is defined as a C typedef <literal>librdf_foo</literal>,
+and its a public interface defined in <filename>rdf_foo.h</filename>
+along with any public or private types, enumerations or constants.
+The private definitions are not exposed to library users, only
+internally when the library is built.  The implementation of the
+class is defined in file <filename>rdf_foo.c</filename> and may
+include private (static) functions either for internal
+implementations or to satisfy part of a factory API.
+</para>
+<para>Each class may have a class initialiser / termination pair
+of functions which must be called before any object in the class is created,
+and after the last object has been freed. These are defined with signatures
+like:
+<programlisting>
+  void init_librdf_foo (...)
+  void terminate_librdf_foo (void)
+</programlisting>
+The arguments to the initialisation vary since there are sometimes
+some class wide options that can be set at initialisation time.
+</para>
+<para>
+The object constructor(s) are defined with signatures like:
+<programlisting>
+  librdf_foo* librdf_new_foo(void)
+</programlisting>
+which takes no parameters.  Additional constructors can be defined
+with parameters, and are named in a similar way with an extra part
+appropriate for the name for example:
+<programlisting>
+  librdf_foo* librdf_new_foo_with_options(char *options)
+</programlisting>
+</para>
+<para>A copy constructor may be defined which will have the signature:
+<programlisting>
+  librdf_foo* librdf_new_foo_from_foo(librdf_foo* old_foo)
+</programlisting>
+</para>
+<para>A destructor must be defined and has the signature:
+<programlisting>
+  void librdf_free_foo(librdf_foo* foo)
+</programlisting>
+</para>
+<para>Methods of the class have names starting with <literal>librdf_foo_</literal> and
+examples could be:
+<programlisting>
+  /* accessor functions to object part 'thing' */
+  int librdf_foo_set_thing(librdf_foo* foo, char *thing)
+  char *librdf_foo_get_thing(librdf_foo* foo)
+</programlisting>
+</para>
+<para>It is often convienent to get a string representation of an
+object for further processing, debugging or serialisation.  There are
+two conventions for methods that provide this functionality - the
+first is when a pointer is returned to a <emphasis>shared</emphasis>
+copy of the string and in that case the method ends
+<literal>_as_string</literal>.  The second is when a pointer is
+returned to a <emphasis>newly allocated</emphasis> string in which
+case the method ends <literal>_to_string</literal>.</para>
+</chapter>
 
 <chapter id="model">
+<?dbhtml filename='model.html'>
 <title>RDF Model</title>
 <para>
 This module provides the RDF model support which is a bag of statements
 (duplicates are allowed).  Models can have statements added and removed,
 be queries and stored which is implemented by the storage classes.
 </para>
+
 <sect1>
 <title>RDF Model Class</title>
 @INCLUDE model.sgml
@@ -74,6 +152,7 @@ be queries and stored which is implemented by the storage classes.
 </chapter>
 
 <chapter id="statement">
+<?dbhtml filename='statement.html'>
 <title>RDF Statement / Assertion / Triple</title>
 <para>
 This module provides the RDF statement functionality, and contains
@@ -93,6 +172,7 @@ to models, including transactions and provenance.
 </chapter>
 
 <chapter id="node">
+<?dbhtml filename='node.html'>
 <title>RDF Resource / Predicate / Literal</title>
 <para>
 This module provides the elements of the RDF statement - resource (or subject o source), predicate (or property or arc) and object (or target): resource / literal.  These make up parts of the statement object.
@@ -113,6 +193,7 @@ supporting RDF parseType="Literal".
 </chapter>
 
 <chapter id="parser">
+<?dbhtml filename='parser.html'>
 <title>RDF Parsers</title>
 <para>
 These modules parse RDF/XML syntax and construct models, maybe via
@@ -134,6 +215,7 @@ RDF/XML parser and can be used without one.
 </chapter>
 
 <chapter id="digest">
+<?dbhtml filename='digest.html'>
 <title>Content Digests</title>
 <para>
 This module provides digests, which are algorithms that operate over
@@ -157,6 +239,7 @@ for hashes and identifiers based on content.
 </chapter>
 
 <chapter id="hash">
+<?dbhtml filename='hash.html'>
 <title>Hashes</title>
 <para>
 A hash in this library is a bag of key/value pairs (with duplicates allowed)
@@ -177,35 +260,8 @@ memory or with persistant storage.
 </sect1>
 </chapter>
 
-<chapter id="iterator">
-<title>Data Iterators</title>
-<para>
-The iterator provides a generic way to receive a sequence of values
-(order may or may not be import) from objects, usually generated
-on demand.
-</para>
-<sect1>
-<title>Iterator Class</title>
-@INCLUDE iterator.sgml
-</sect1>
-</chapter>
-
-<chapter id="list">
-<title>Lists</title>
-<para>
-The list module provides a simple in-memory list.
-</para>
-<sect1>
-<title>List Class</title>
-<para>
-This class is implemented as a stack, new items are added to the front
-of the list.
-</para>
-@INCLUDE list.sgml
-</sect1>
-</chapter>
-
 <chapter id="storage">
+<?dbhtml filename='storage.html'>
 <title>RDF Model Storage</title>
 <para>
 This module provides storage for RDF models either in memory or
@@ -222,6 +278,7 @@ persistant storage.
 </chapter>
 
 <chapter id="stream">
+<?dbhtml filename='stream.html'>
 <title>RDF Model Serialisation</title>
 <para>
 This module provides a method to generate a stream of statements,
@@ -235,7 +292,38 @@ them or transform into another syntax.
 </sect1>
 </chapter>
 
+<chapter id="iterator">
+<?dbhtml filename='iterator.html'>
+<title>Data Iterators</title>
+<para>
+The iterator provides a generic way to receive a sequence of values
+(order may or may not be import) from objects, usually generated
+on demand.
+</para>
+<sect1>
+<title>Iterator Class</title>
+@INCLUDE iterator.sgml
+</sect1>
+</chapter>
+
+<chapter id="list">
+<?dbhtml filename='list.html'>
+<title>Lists</title>
+<para>
+The list module provides a simple in-memory list.
+</para>
+<sect1>
+<title>List Class</title>
+<para>
+This class is implemented as a stack, new items are added to the front
+of the list.
+</para>
+@INCLUDE list.sgml
+</sect1>
+</chapter>
+
 <chapter id="uri">
+<?dbhtml filename='uri.html'>
 <title>URIs</title>
 <para>
 This class provides very simple URI functionality - mostly just storage
@@ -249,6 +337,7 @@ and comparison.
 
 
 <appendix id="licenses">
+<?dbhtml filename='licenses.html'>
 <title>GNU Free Documentation License</title>
 
 <para>
