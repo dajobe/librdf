@@ -1,4 +1,5 @@
 *.class
+*.db
 *.gz
 *.out
 *.rdf
