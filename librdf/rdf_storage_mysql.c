@@ -1014,7 +1014,7 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
 
 
 /**
-+ * librdf_storage_mysql_contains_statement - Test if a given complete statement is present in the model
+ * librdf_storage_mysql_contains_statement - Test if a given complete statement is present in the model
  * @storage: the storage
  * @statement: a complete statement
  *
@@ -1776,7 +1776,7 @@ L.Value AS CoV, L.Language AS CoL, L.Datatype AS CoD \
 FROM Statements%llu as S \
 LEFT JOIN Resources AS R ON S.Context=R.ID \
 LEFT JOIN Bnodes AS B ON S.Context=B.ID \
-+LEFT JOIN Literals AS L ON S.Context=L.ID";
+LEFT JOIN Literals AS L ON S.Context=L.ID";
   char *query;
   librdf_iterator *iterator;
 
