@@ -76,8 +76,11 @@ typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 
 /* for the memory allocation functions */
 #if defined(HAVE_DMALLOC_H) && defined(LIBRDF_MEMORY_DEBUG_DMALLOC)
-#include <dmalloc.h>
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
 #undef HAVE_STDLIB_H
+#endif
+#include <dmalloc.h>
 #endif
 
 
