@@ -47,6 +47,10 @@ an interface to Perl.
 %setup
 
 %build
+# Force use of default python even if 2.0 is present
+PYTHON=python
+export PYTHON
+
 if [ ! -f configure ]; then
   CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --sysconfdir=/etc
 else
@@ -120,6 +124,6 @@ cd ..
 %{prefix}/lib/perl5/site_perl/*/*/Redland.pm
 %{prefix}/lib/perl5/site_perl/*/*/RDF
 
-%doc {prefix}/lib/perl5/man/man3/*
+%doc %{prefix}/lib/perl5/man/man3/*
 
 %changelog
