@@ -315,7 +315,8 @@ const char* librdf_query_results_get_binding_name(librdf_query_results* query_re
 %newobject librdf_query_results_get_binding_value_by_name;
 librdf_node* librdf_query_results_get_binding_value_by_name(librdf_query_results* query_results, const char *name);
 int librdf_query_results_get_bindings_count(librdf_query_results* query_results);
-unsigned char* librdf_query_results_to_file(librdf_query_results *query_results, const char *name, librdf_uri *format_uri, librdf_uri *base_uri);
+int librdf_query_results_to_file(librdf_query_results *query_results, const char *name, librdf_uri *format_uri, librdf_uri *base_uri);
+%newobject librdf_query_results_to_string;
 unsigned char* librdf_query_results_to_string(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri);
 
 void librdf_free_query_results(librdf_query_results* query_results);
