@@ -31,10 +31,14 @@ extern "C" {
 #include <stdio.h>
 
 #ifdef WIN32
-#  ifdef REDLAND_INTERNAL
-#    define REDLAND_API _declspec(dllexport)
+#  ifdef REDLAND_STATIC
+#    define REDLAND_API
 #  else
-#    define REDLAND_API _declspec(dllimport)
+#    ifdef REDLAND_INTERNAL
+#      define REDLAND_API _declspec(dllexport)
+#    else
+#      define REDLAND_API _declspec(dllimport)
+#    endif
 #  endif
 #else
 #  define REDLAND_API
