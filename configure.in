@@ -30,17 +30,41 @@ AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
 
 
 dnl Checks for libraries.
+dnl GNU GDBM
 AC_CHECK_HEADERS(gdbm.h)
 if test "$ac_cv_header_gdbm_h" = yes ; then
   AC_CHECK_LIB(gdbm,gdbm_firstkey)
 fi
 
+dnl Berkeley DB
+AC_CHECK_HEADERS(db.h)
+if test "$ac_cv_header_db_h" = yes ; then
+  AC_CHECK_LIB(db, db_create)
+  AC_CHECK_LIB(db, db_open)
+  if test "$ac_cv_lib_db_db_create" = yes; then
+    AC_DEFINE(HAVE_DB_CREATE)
+  fi
+  if test "$ac_cv_lib_db_db_open" = yes; then
+    AC_DEFINE(HAVE_DB_OPEN)
+  fi
+  AC_MSG_CHECKING(whether DB_TXN defined in db.h)
+  dnl In BDB, DB_TXN is a pointer to a structure never defined
+  AC_TRY_LINK([#include <db.h>], [DB_TXN* ptr=(DB_TXN*)NULL],
+              AC_DEFINE(HAVE_BDB_DB_TXN)
+	      AC_MSG_RESULT(yes),
+	      AC_MSG_RESULT(no))
+  AC_MSG_CHECKING(whether DBC defined in db.h)
+  AC_TRY_LINK([#include <db.h>], [size_t len=sizeof(DBC)],
+              AC_DEFINE(HAVE_BDB_CURSOR)
+	      AC_MSG_RESULT(yes),
+	      AC_MSG_RESULT(no))
+fi
 
 
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h unistd.h string.h)
+AC_CHECK_HEADERS(stdlib.h unistd.h string.h fcntl.h)
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -189,6 +213,18 @@ if test "$ac_cv_lib_gdbm_gdbm_firstkey" = yes ; then
 else
   AC_MSG_RESULT(no);
 fi
+
+AC_MSG_CHECKING(for libdb support)
+if test "$ac_cv_lib_db_db_open" = yes ; then
+  AC_MSG_RESULT(yes);
+  AC_DEFINE(HAVE_BDB_HASH)
+  HASH_OBJS="$HASH_OBJS rdf_hash_bdb.o"
+  HASH_SRCS="$HASH_SRCS rdf_hash_bdb.o"
+else
+  AC_MSG_RESULT(no);
+fi
+
+
 AC_SUBST(HASH_OBJS)
 AC_SUBST(HASH_SRCS)
 
