@@ -551,7 +551,7 @@ if test -r $srcdir/raptor.h -a -r $srcdir/raptor_parse.c -a -r $srcdir/ntriples.
   have_raptor=1;
   RAPTOR_INCS="raptor.h ntriples.h"
   AC_SUBST(RAPTOR_INCS)
-  RAPTOR_SRCS="raptor_parse.c ntriples_parse.c"
+  RAPTOR_SRCS="raptor_parse.c ntriples_parse.c raptor_uri.c"
   AC_SUBST(RAPTOR_SRCS)
 fi
 
@@ -671,8 +671,8 @@ for parser in $parser_modules; do
     PARSER_SRCS="$PARSER_SRCS rdf_parser_$parser.c"
 
     if test $parser = raptor; then
-      PARSER_OBJS="$PARSER_OBJS raptor_parse.lo ntriples_parse.lo"
-      PARSER_SRCS="$PARSER_SRCS raptor_parse.c ntriples_parse.c"
+      PARSER_OBJS="$PARSER_OBJS raptor_parse.lo ntriples_parse.lo raptor_uri.lo"
+      PARSER_SRCS="$PARSER_SRCS raptor_parse.c ntriples_parse.c raptor_uri.c"
     fi
 
     n=HAVE_${uname}_RDF_PARSER
