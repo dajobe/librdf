@@ -138,6 +138,7 @@ librdf_new_node_from_uri(librdf_uri *uri)
  * librdf_new_node_from_literal:
  * @string: literal string value
  * @xml_language: literal XML language (or NULL)
+ * @xml_space: XML space properties (0 if unknown)
  * @is_wf_xml: non 0 if literal is XML
  * 
  * Constructor: create a new literal &librdf_node object
@@ -145,7 +146,8 @@ librdf_new_node_from_uri(librdf_uri *uri)
  * Return value: new &librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_literal(char *string, char *xml_language, int is_wf_xml) 
+librdf_new_node_from_literal(char *string, char *xml_language, 
+                             int xml_space, int is_wf_xml) 
 {
   librdf_node* new_node;
   
@@ -158,7 +160,7 @@ librdf_new_node_from_literal(char *string, char *xml_language, int is_wf_xml)
   new_node->type=LIBRDF_NODE_TYPE_LITERAL;
   
   if (librdf_node_set_literal_value(new_node, string, xml_language,
-                                    is_wf_xml)) {
+                                    xml_space, is_wf_xml)) {
     librdf_free_node(new_node);
     return NULL;
   }
@@ -199,6 +201,7 @@ librdf_new_node_from_node(librdf_node *node)
     if (librdf_node_set_literal_value(node,
                                       node->value.literal.string,
                                       node->value.literal.xml_language,
+                                      node->value.literal.xml_space,
                                       node->value.literal.is_wf_xml)) {
       LIBRDF_FREE(librdf_node, new_node);
       return NULL;
@@ -355,17 +358,21 @@ librdf_node_get_literal_value_language(librdf_node* node)
  * @node: the node object
  * @value: pointer to the literal string value
  * @xml_language: pointer to the literal language (or NULL if not defined)
+ * @xml_space: XML space properties (0 if unknown)
  * @is_wf_xml: non 0 if the value is Well Formed XML
  * 
  * Set the node literal value, optional language and if the literal is
  * well formed XML.
+ *
+ * The space property can take three values: 0 - unknown, 1 - use default
+ * method (xml:space="default") or 2 - preserve space (xml:space="preserve").
  * 
  * Return value: non 0 on failure
  **/
 int
 librdf_node_set_literal_value(librdf_node* node, char* value,
-			      char *xml_language,
-                           int is_wf_xml) 
+			      char *xml_language, int xml_space,
+                              int is_wf_xml) 
 {
   int value_len;
   char *new_value;
@@ -395,7 +402,13 @@ librdf_node_set_literal_value(librdf_node* node, char* value,
   if(node->value.literal.xml_language)
     LIBRDF_FREE(cstring, node->value.literal.xml_language);
   node->value.literal.xml_language=new_xml_language;
+
+  /* FIXME: whatever next, parameter validation? */
+  if(xml_space < LIBRDF_NODE_LITERAL_XML_SPACE_DEFAULT ||
+     xml_space > LIBRDF_NODE_LITERAL_XML_SPACE_PRESERVE )
+    xml_space=LIBRDF_NODE_LITERAL_XML_SPACE_UNKNOWN;
   
+  node->value.literal.xml_space=xml_space;
   node->value.literal.is_wf_xml=is_wf_xml;
   
   return 0;
@@ -495,7 +508,7 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
     if(status)
       return 1;
 
-    /* FIXME: compare xml_language and is_wf_xml ? */
+    /* FIXME: compare xml_language, xml_space and is_wf_xml ?  Probably not */
   }
 
   return 0;

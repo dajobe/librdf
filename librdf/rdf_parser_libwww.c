@@ -137,7 +137,7 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
 
   if(object_is_literal) {
     librdf_statement_set_object(statement,
-                                librdf_new_node_from_literal(HTTriple_object(t), NULL, 0));
+                                librdf_new_node_from_literal(HTTriple_object(t), NULL, 0, 0));
   } else {
     librdf_statement_set_object(statement, 
                                 librdf_new_node_from_uri_string(HTTriple_object(t)));

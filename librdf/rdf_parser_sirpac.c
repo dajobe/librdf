@@ -228,7 +228,7 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
 
     if(object_is_literal) {
       librdf_statement_set_object(statement,
-                                  librdf_new_node_from_literal(o, NULL, 0));
+                                  librdf_new_node_from_literal(o, NULL, 0, 0));
     } else {
       librdf_statement_set_object(statement, 
                                   librdf_new_node_from_uri_string(o));

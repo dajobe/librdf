@@ -174,12 +174,14 @@ int
 librdf_model_add_string_literal_statement(librdf_model* model, 
 					  librdf_node* subject, 
 					  librdf_node* predicate, char* string,
-					  char *xml_language, int is_wf_xml)
+					  char *xml_language, int xml_space,
+                                          int is_wf_xml)
 {
   librdf_node* object;
   int result;
   
-  object=librdf_new_node_from_literal(string, xml_language, is_wf_xml);
+  object=librdf_new_node_from_literal(string, xml_language, xml_space, 
+                                      is_wf_xml);
   if(!object)
     return 1;
   
@@ -329,7 +331,7 @@ main(int argc, char *argv[])
   statement=librdf_new_statement();
   librdf_statement_set_subject(statement, librdf_new_node_from_uri_string("http://www.ilrt.bris.ac.uk/people/cmdjb/"));
   librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/#Creator"));
-  librdf_statement_set_object(statement, librdf_new_node_from_literal("Dave Beckett", NULL, 0));
+  librdf_statement_set_object(statement, librdf_new_node_from_literal("Dave Beckett", NULL, 0, 0));
 
   /* after this, statement becomes owned by model */
   librdf_model_add_statement(model, statement);
