@@ -125,6 +125,7 @@ librdf_a_DEPENDENCIES = @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 EXTRA_librdf_a_SOURCES = rdf_hash_gdbm.c rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_openssl.c \
 rdf_parser_sirpac.c rdf_parser_libwww.c rdf_parser_redland.c \
+rdf_parser_repat.c \
 example1.c example2.c example3.c example4.c
 
 EXTRA_DIST=ChangeLog \
@@ -251,3 +252,9 @@ TODO: TODO.html
 @MAINT@	javac -classpath .:$(RDF_JAVA_API_JAR) $<
 
 @SET_MAKE@
+
+$(top_builddir)/expat/xmlparse/xmlparse.o $(top_builddir)/expat/xmlparse/hashtable.o $(top_builddir)/expat/xmltok/xmlrole.o $(top_builddir)/expat/xmltok/xmltok.o:
+	cd expat && $(MAKE) $(AM_MAKEFLAGS) all
+
+$(top_builddir)/repat/rdfparse.o: $(top_builddir)/expat/xmlparse/xmlparse.o $(top_builddir)/expat/xmlparse/hashtable.o $(top_builddir)/expat/xmltok/xmlrole.o $(top_builddir)/expat/xmltok/xmltok.o
+	cd repat && $(MAKE) $(AM_MAKEFLAGS) all
