@@ -98,7 +98,7 @@ static const char *redland_version_string = VERSION;
 /* FIXME - should be derived from VERSION */
 static const int redland_version_major = 0;
 static const int redland_version_minor = 9;
-static const int redland_version_release = 0;
+static const int redland_version_release = 1;
 
 
 /**
