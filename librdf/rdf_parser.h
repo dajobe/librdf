@@ -70,11 +70,6 @@ struct librdf_parser_s {
   
   void *context;
 
-  void *error_user_data;
-  void *warning_user_data;
-  void (*error_fn)(void *user_data, const char *msg, ...);
-  void (*warning_fn)(void *user_data, const char *msg, ...);
-
   librdf_parser_factory* factory;
 };
 
@@ -87,10 +82,6 @@ void librdf_init_parser(librdf_world *world);
 /* module finish */
 void librdf_finish_parser(librdf_world *world);
                     
-/* internal callbacks used by parsers invoking errors/warnings upwards to user */
-void librdf_parser_error(librdf_parser* parser, const char *message, ...);
-void librdf_parser_warning(librdf_parser* parser, const char *message, ...);
-
 #ifdef HAVE_RAPTOR_RDF_PARSER
 void librdf_parser_raptor_constructor(librdf_world* world);
 void librdf_parser_raptor_destructor(void);
@@ -116,8 +107,8 @@ REDLAND_API librdf_stream* librdf_parser_parse_as_stream(librdf_parser* parser, 
 REDLAND_API int librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri, librdf_model* model);
 REDLAND_API librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const unsigned char* string, librdf_uri* base_uri);
 REDLAND_API int librdf_parser_parse_string_into_model(librdf_parser* parser, const unsigned char *string, librdf_uri* base_uri, librdf_model* model);
-REDLAND_API void librdf_parser_set_error(librdf_parser* parser, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
-REDLAND_API void librdf_parser_set_warning(librdf_parser* parser, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
+REDLAND_API REDLAND_DEPRECATED void librdf_parser_set_error(librdf_parser* parser, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
+REDLAND_API REDLAND_DEPRECATED void librdf_parser_set_warning(librdf_parser* parser, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
 
 #define LIBRDF_PARSER_FEATURE_ERROR_COUNT "http://feature.librdf.org/parser-error-count"
 #define LIBRDF_PARSER_FEATURE_WARNING_COUNT "http://feature.librdf.org/parser-warning-count"
