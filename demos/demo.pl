@@ -439,7 +439,7 @@ if($command eq 'add') {
 my $temp_file;
 
 if($command eq 'print') {
-  $stream=$model->serialise;
+  $stream=$model->as_stream;
   log_action($host, $db, "Printing database");
 } elsif ($command eq 'query') {
   $stream=$model->find_statements($statement);
@@ -534,7 +534,7 @@ if($command eq 'print') {
     $parser->parse_into_model($redland_source_uri, $redland_base_uri, $model);
     print "\n\n<p>$uri_label parsed as RDF into model with $parser_string parser OK</p>\n";
     #unlink $temp_file if $temp_file;
-    $stream=$model->serialise;
+    $stream=$model->as_stream;
   }
 }
 
