@@ -303,13 +303,17 @@ against the source tree.  However, if you choose to install, do:</p>
 
 <h2>3. Using the library</h2>
 
-<p>There are several example programs included in Redland which can
-be compiled with:</p>
+<p>Once the library has been configured and built, there are 
+several C example programs that can be used.  They are 
+in the <code>examples</code> sub-directory and can be built with:</p>
 <pre>
-   make examples
+   cd examples
+   make
 </pre>
-<p>once the library has been configured and built.  These are
-compiled in the <code>examples</code> sub-directory.</p>
+<p>(This may be done by the initial 'make' automatically).</p>
+
+<p>Examples for the other language interfaces are in the
+corresponding sub-directories such as <code>perl/example.pl</code>.</p>
 
 <p>If no Berkeley DB was found by configure, some of the examples will fail
 since there is no on-disk storage system available.  To change them
