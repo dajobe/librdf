@@ -206,6 +206,8 @@ dnl need to change quotes to allow square brackets
 changequote(<<, >>)dnl
 PYTHON_VERSION=`$PYTHON -c 'import sys; print sys.version[:3]' 2>/dev/null`
 python_prefix=`$PYTHON -c 'import sys; print sys.prefix' 2>/dev/null`
+python_include=`$PYTHON -c 'import sys, os; print os.path.join(sys.prefix, "include", "python"+sys.version[:3])'`
+python_lib=`$PYTHON -c 'import sys, os; print os.path.join(sys.prefix, "lib", "python"+sys.version[:3], "site-packages")'`
 changequote([, ])dnl
 if test "X$PYTHON_VERSION" != X; then
   languages_available="$languages_available python($PYTHON_VERSION)"
@@ -848,8 +850,10 @@ fi
 if test "X$PYTHON" != X; then
 
   # What a crock
-  PYTHON_INCLUDES="-I$python_prefix/include/python$PYTHON_VERSION"
-  AC_SUBST(PYTHON_INCLUDES)
+  PYTHON_INCLUDE=$python_include
+  AC_SUBST(PYTHON_INCLUDE)
+  PYTHON_LIB=$python_lib
+  AC_SUBST(PYTHON_LIB)
 else
   # This allows 'make clean' in the python directory to work when
   # python isn't available
