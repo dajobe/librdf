@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -85,12 +85,12 @@ void librdf_perl_world_finish(void);
 
 #ifdef SWIGPYTHON
 /* swig doesn't declare all prototypes */
-static PyObject *_wrap_redland_copyright_string_get(void);
-static PyObject *_wrap_redland_version_string_get(void);
+static PyObject *_wrap_librdf_copyright_string_get(void);
+static PyObject *_wrap_librdf_version_string_get(void);
 
-static PyObject *_wrap_redland_version_major_get(void);
-static PyObject *_wrap_redland_version_minor_get(void);
-static PyObject *_wrap_redland_version_release_get(void);
+static PyObject *_wrap_librdf_version_major_get(void);
+static PyObject *_wrap_librdf_version_minor_get(void);
+static PyObject *_wrap_librdf_version_release_get(void);
 
 
 static PyObject *librdf_python_callback = NULL;
@@ -323,7 +323,7 @@ librdf_internal_test_warning(librdf_world *world)
 
 %init %{
 #ifdef TCL_MAJOR_VERSION
-Tcl_PkgProvide(interp, PACKAGE, (char*)redland_version_string);
+Tcl_PkgProvide(interp, PACKAGE, (char*)librdf_version_string);
 #endif
 %}
   
@@ -485,11 +485,12 @@ void librdf_internal_test_warning(librdf_world *world);
 /* SWIG world - declare variables wanted from rdf_init.h */
 
 %immutable;
-/* Note: most consts lost for SWIG to remain happy */
-extern const char * redland_copyright_string;
-extern const char * redland_version_string;
-extern int redland_version_major;
-extern int redland_version_minor;
-extern int redland_version_release;
+extern const char * const librdf_short_copyright_string;
+extern const char * const librdf_copyright_string;
+extern const char * const librdf_version_string;
+extern const unsigned int librdf_version_major;
+extern const unsigned int librdf_version_minor;
+extern const unsigned int librdf_version_release;
+extern const unsigned int librdf_version_decimal;
 %mutable;
 
