@@ -1,7 +1,0 @@
-2000-06-21  Dave Beckett  <cmdjb@jarjar.ilrt.bris.ac.uk>
-
-	* It compiles and builds as a GNU automake/conf suite with 
-	'make distcheck' and 'make check'
-
-
-
