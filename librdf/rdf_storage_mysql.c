@@ -1291,7 +1291,7 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
 {
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
   librdf_storage_mysql_sos_context* sos;
-  librdf_node *subject, *predicate, *object;
+  librdf_node *subject=NULL, *predicate=NULL, *object=NULL;
   char *query;
   char tmp[64];
   char where[256];
