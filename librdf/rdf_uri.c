@@ -59,7 +59,7 @@ librdf_init_uri(librdf_digest_factory* digest_factory, librdf_hash* hash)
     if(!hash)
       LIBRDF_FATAL1(librdf_init_uri, "Failed to create URI hash from factory");
     
-    if(librdf_hash_open(hash, NULL, 0, NULL))
+    if(librdf_hash_open(hash, NULL, 0, 1, 1, NULL))
       LIBRDF_FATAL1(librdf_init_uri, "Failed to open URI hash");
 
     /* remember to free it later */
@@ -117,7 +117,6 @@ librdf_new_uri (char *uri_string)
 
     key->data=NULL;
     librdf_free_hash_datum(key);
-    value->data=NULL;
     librdf_free_hash_datum(value);
     new_uri->usage++;
 
