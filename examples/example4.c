@@ -431,7 +431,7 @@ main(int argc, char *argv[])
 
     /* (Common code) Print out nodes */
     count=0;
-    while(librdf_iterator_have_elements(iterator)) {
+    while(!librdf_iterator_end(iterator)) {
       node=(librdf_node*)librdf_iterator_get_next(iterator);
       if(!node) {
         fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
@@ -527,7 +527,7 @@ main(int argc, char *argv[])
     }
 
     count=0;
-    while(librdf_iterator_have_elements(iterator)) {
+    while(!librdf_iterator_end(iterator)) {
       node=(librdf_node*)librdf_iterator_get_next(iterator);
       if(!node) {
         fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",

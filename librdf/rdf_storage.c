@@ -41,7 +41,7 @@ static void librdf_delete_storage_factories(void);
 /* prototypes for functions implementing get_sources, arcs, targets
  * librdf_iterator via conversion from a librdf_stream of librdf_statement
  */
-static int librdf_storage_stream_to_node_iterator_have_elements(void* iterator);
+static int librdf_storage_stream_to_node_iterator_is_end(void* iterator);
 static void* librdf_storage_stream_to_node_iterator_get_next(void* iterator);
 static void librdf_storage_stream_to_node_iterator_finished(void* iterator);
 
@@ -542,11 +542,11 @@ typedef struct {
 
 
 static int
-librdf_storage_stream_to_node_iterator_have_elements(void* iterator)
+librdf_storage_stream_to_node_iterator_is_end(void* iterator)
 {
   librdf_storage_stream_to_node_iterator_context* context=(librdf_storage_stream_to_node_iterator_context*)iterator;
 
-  return !librdf_stream_end(context->stream);
+  return librdf_stream_end(context->stream);
 }
 
 
@@ -672,7 +672,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   
   iterator=librdf_new_iterator(storage->world,
                                (void*)context,
-                               librdf_storage_stream_to_node_iterator_have_elements,
+                               librdf_storage_stream_to_node_iterator_is_end,
                                librdf_storage_stream_to_node_iterator_get_next,
                                librdf_storage_stream_to_node_iterator_finished);
   if(!iterator)
@@ -823,7 +823,7 @@ librdf_storage_has_arc_in(librdf_storage *storage, librdf_node *node,
     return 0;
 
   /* a non-empty list of sources is success */
-  status=librdf_iterator_have_elements(iterator);
+  status=!librdf_iterator_end(iterator);
   librdf_free_iterator(iterator);
 
   return status;
@@ -853,7 +853,7 @@ librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node,
     return 0;
 
   /* a non-empty list of targets is success */
-  status=librdf_iterator_have_elements(iterator);
+  status=!librdf_iterator_end(iterator);
   librdf_free_iterator(iterator);
 
   return status;

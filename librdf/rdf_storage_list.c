@@ -124,7 +124,7 @@ librdf_storage_list_close(librdf_storage* storage)
     iterator=librdf_list_get_iterator(context->list);
     status=(iterator != 0);
     if(iterator) {
-      while(librdf_iterator_have_elements(iterator)) {
+      while(!librdf_iterator_end(iterator)) {
         statement=(librdf_statement*)librdf_iterator_get_next(iterator);
         if(statement)
           librdf_free_statement(statement);
@@ -238,7 +238,7 @@ librdf_storage_list_serialise_end_of_stream(void* context)
 {
   librdf_iterator* iterator=(librdf_iterator*)context;
 
-  return !librdf_iterator_have_elements(iterator);
+  return librdf_iterator_end(iterator);
 
 }
 

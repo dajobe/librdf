@@ -38,7 +38,7 @@
 /* prototypes for local functions */
 static librdf_list_node* librdf_list_find_node(librdf_list* list, void *data);
 
-static int librdf_list_iterator_have_elements(void* iterator);
+static int librdf_list_iterator_is_end(void* iterator);
 static void* librdf_list_iterator_get_next(void* iterator);
 
 
@@ -376,7 +376,7 @@ librdf_list_get_iterator(librdf_list* list)
   
   return librdf_new_iterator(list->world, 
                              (void*)list,
-                             librdf_list_iterator_have_elements,
+                             librdf_list_iterator_is_end,
                              librdf_list_iterator_get_next,
                              NULL);
   
@@ -384,16 +384,16 @@ librdf_list_get_iterator(librdf_list* list)
 
 
 static int
-librdf_list_iterator_have_elements(void* iterator) 
+librdf_list_iterator_is_end(void* iterator) 
 {
   librdf_list *list=(librdf_list*)iterator;
   librdf_list_node *node;
   
   if(!list)
-    return 0;
+    return 1;
   node=list->current;
   
-  return (node != NULL);
+  return (node == NULL);
 }
 
 

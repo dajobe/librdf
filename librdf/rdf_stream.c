@@ -283,7 +283,7 @@ librdf_stream_from_node_iterator_end_of_stream(void* context)
 {
   librdf_stream_from_node_iterator_stream_context* scontext=(librdf_stream_from_node_iterator_stream_context*)context;
 
-  return !librdf_iterator_have_elements(scontext->iterator);
+  return librdf_iterator_end(scontext->iterator);
 }
 
 

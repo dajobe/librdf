@@ -329,7 +329,7 @@ librdf_hash_bdb_clone(librdf_hash *hash, void* context, char *new_identifier,
   value=librdf_new_hash_datum(hash->world, NULL, 0);
 
   iterator=librdf_hash_get_all(old_hcontext->hash, key, value);
-  while(librdf_iterator_have_elements(iterator)) {
+  while(!librdf_iterator_end(iterator)) {
     librdf_iterator_get_next(iterator);
 
     if(librdf_hash_bdb_put(hcontext, key, value)) {

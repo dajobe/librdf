@@ -152,7 +152,7 @@ main(int argc, char *argv[])
   }
 
   count=0;
-  while(librdf_iterator_have_elements(iterator)) {
+  while(!librdf_iterator_end(iterator)) {
     librdf_node *target;
     
     target=(librdf_node*)librdf_iterator_get_next(iterator);

@@ -120,7 +120,7 @@ static void librdf_storage_hashes_register_factory(librdf_storage_factory *facto
 
 
 /* node iterator implementing functions for get sources, targets, arcs methods */
-static int librdf_storage_hashes_node_iterator_have_elements(void* iterator);
+static int librdf_storage_hashes_node_iterator_is_end(void* iterator);
 static void* librdf_storage_hashes_node_iterator_get_next(void* iterator);
 static void librdf_storage_hashes_node_iterator_finished(void* iterator);
 /* common initialisation code for creating get sources, targets, arcs iterators */
@@ -640,7 +640,7 @@ librdf_storage_hashes_serialise_end_of_stream(void* context)
 {
   librdf_storage_hashes_serialise_stream_context* scontext=(librdf_storage_hashes_serialise_stream_context*)context;
 
-  return !librdf_iterator_have_elements(scontext->iterator);
+  return librdf_iterator_end(scontext->iterator);
 }
 
 
@@ -754,11 +754,11 @@ typedef struct {
 
 
 static int
-librdf_storage_hashes_node_iterator_have_elements(void* iterator)
+librdf_storage_hashes_node_iterator_is_end(void* iterator)
 {
   librdf_storage_hashes_node_iterator_context* context=(librdf_storage_hashes_node_iterator_context*)iterator;
 
-  return librdf_iterator_have_elements(context->iterator);
+  return librdf_iterator_end(context->iterator);
 }
 
 
@@ -768,7 +768,7 @@ librdf_storage_hashes_node_iterator_get_next(void* iterator)
   librdf_storage_hashes_node_iterator_context* context=(librdf_storage_hashes_node_iterator_context*)iterator;
   librdf_node* node;
 
-  if(!librdf_iterator_have_elements(context->iterator))
+  if(librdf_iterator_end(context->iterator))
     return NULL;
 
   /* this side effects the already initialised librdf_hash_datum
@@ -914,7 +914,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
 
   iterator=librdf_new_iterator(storage->world,
                                (void*)icontext,
-                               librdf_storage_hashes_node_iterator_have_elements,
+                               librdf_storage_hashes_node_iterator_is_end,
                                librdf_storage_hashes_node_iterator_get_next,
                                librdf_storage_hashes_node_iterator_finished);
   if(!iterator)

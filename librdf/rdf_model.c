@@ -164,7 +164,7 @@ librdf_free_model(librdf_model *model)
   if(model->sub_models) {
     iterator=librdf_list_get_iterator(model->sub_models);
     if(iterator) {
-      while(librdf_iterator_have_elements(iterator)) {
+      while(!librdf_iterator_end(iterator)) {
         m=(librdf_model*)librdf_iterator_get_next(iterator);
         if(m)
           librdf_free_model(m);
