@@ -81,7 +81,7 @@
 #include <ctype.h>
 #include <sys/types.h>
 
-#include <librdf.h>
+#include <redland.h>
 
 #include <rdf_hash.h>
 

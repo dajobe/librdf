@@ -80,7 +80,7 @@
 #include <stdio.h>
 
 #define LIBRDF_INTERNAL
-#include <librdf.h>
+#include <redland.h>
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>

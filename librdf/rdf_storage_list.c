@@ -85,7 +85,7 @@
 #endif
 
 #define LIBRDF_INTERNAL 1
-#include <librdf.h>
+#include <redland.h>
 #include <rdf_storage.h>
 #include <rdf_storage_list.h>
 #include <rdf_list.h>

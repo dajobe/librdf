@@ -82,7 +82,7 @@
 #include <sys/types.h>
 
 #define LIBRDF_INTERNAL 1
-#include <librdf.h>
+#include <redland.h>
 
 #include <rdf_storage.h>
 #include <rdf_storage_hashes.h>

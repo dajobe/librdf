@@ -79,7 +79,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include <librdf.h>
+#include <redland.h>
 
 /* one prototype needed */
 int main(int argc, char *argv[]);

@@ -78,7 +78,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <librdf.h>
+#include <redland.h>
 
 
 /* one prototype needed */
