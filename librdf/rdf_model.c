@@ -988,6 +988,17 @@ librdf_model_query_string(librdf_model* model,
 }
 
 
+/**
+ * librdf_model_sync - Synchronise the model to the storage
+ * @model: &librdf_model object
+ * 
+ **/
+void
+librdf_model_sync(librdf_model* model) 
+{
+  if(model->factory->sync)
+    model->factory->sync(model);
+}
 
 
 
@@ -1124,6 +1135,10 @@ main(int argc, char *argv[])
 
   fprintf(stderr, "%s: Freeing Parser\n", program);
   librdf_free_parser(parser);
+
+
+  /* sync - probably a NOP */
+  librdf_model_sync(model);
 
 
   /* sources */
