@@ -1,4 +1,18 @@
+2004-10-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_serializer_raptor.c (librdf_serializer_raptor_serialize_statement):
+	Convert statement object URI correctly.
+	(librdf_serializer_raptor_serialize_model_to_counted_string): Zap
+	string, string_length before starting.
+
+	* rdf_parser_raptor.c
+	(librdf_parser_raptor_new_statement_handler): Copy datatype URIs
+	for new statements.
+
 2004-10-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_rasqal.c: Update redland support to rasqal changes
+	after addition of origin.
 
 	* rdf_model.h: Change librdf_model_to_counted_string and
 	librdf_model_to_string to return unsigned char*
