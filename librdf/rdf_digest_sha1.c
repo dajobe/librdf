@@ -81,7 +81,13 @@ A million repetitions of "a"
   34AA973C D4C4DAA4 F61EEB2B DBAD2731 6534016F
 */
 
+#ifdef HAVE_CONFIG_H
 #include <rdf_config.h>
+#endif
+
+#ifdef WIN32
+#include <win32_rdf_config.h>
+#endif
 
 #include <stdio.h>
 #include <string.h>

@@ -21,7 +21,13 @@
  */
 
 
+#ifdef HAVE_CONFIG_H
 #include <rdf_config.h>
+#endif
+
+#ifdef WIN32
+#include <win32_rdf_config.h>
+#endif
 
 #include <stdio.h>
 #include <string.h>
