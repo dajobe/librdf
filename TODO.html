@@ -15,11 +15,8 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
-<li>Crash when contexts are attempted to be used when not enabled with
-contexts='yes'</li>
 <li>BDB 4.1 causes include problems in rdf_node.c</li>
-<li>repat still compiles even when disabled</li>
-<li>a report that parsing 370K triples into in-memory hash (storage type hashes, hash type memory) took many hours</li>
+<li>in-memory storage uses more memory than needed</li>
 <li>defensive code - check for NULL object parameters, wrong use
 of polymorphic objects such as getting URI of a non-resource node.
 Compile some as debug checks with aborts?.</li>
@@ -48,7 +45,6 @@ object needn't be kept around when dealing with model.</li>
 part of librdf.h automatically to make a 1-header file system.</li>
 <li>Make API docbook sgml generate decent PostScript / PDF output</li>
 <li>Fix the URI hash mechanism - currently stores URI/pointer pairs in hash - wrong</li>
-<li>Make the library thread safe</li>
 <li>The library does not do file locking on e.g. DB files</li>
 <li>Provide a way to represent reified statements with instantiated statements</li>
 <li>Add proper error/warning reporting in general</li>
@@ -67,6 +63,10 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Initial thread support (0.9.13)</li>
+<li>Repat removed - not up-to-date, maintained (0.9.13)</li>
+<li>Crashed when contexts are attempted to be used when not enabled with
+contexts='yes' (0.9.13)</li>
 <li>parse_as_stream methods assumed the URI object lived throughout the
 parsing.  They may not, and had to be copied on the first call - fixed for raptor only (0.9.13)</li>
 <li>make librdf_statement_set_subject* free any existing node before setting (0.9.12)</li>
