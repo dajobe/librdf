@@ -86,10 +86,6 @@ struct librdf_world_s
 #endif
 };
 
-/* internal routines used to invoking errors/warnings upwards to user */
-REDLAND_DEPRECATED void librdf_error(librdf_world* world, const char *message, ...);
-REDLAND_DEPRECATED void librdf_warning(librdf_world* world, const char *message, ...);
-
 unsigned char* librdf_world_get_genid(librdf_world* world);
 
 #endif
