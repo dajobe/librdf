@@ -327,8 +327,7 @@ librdf_storage_list_find_map(void* context, librdf_statement* statement)
     return statement;
   }
 
-  /* discard */
-  librdf_free_statement(statement);
+  /* not suitable */
   return NULL;
 }
 
