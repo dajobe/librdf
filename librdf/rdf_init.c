@@ -30,6 +30,10 @@
 #include <rdf_model.h>
 
 
+/* prototype that should really be elsewhere */
+void rdf_init_world(char *digest_factory_name);
+
+
 void rdf_init_world(char *digest_factory_name) 
 {
   rdf_digest_factory* digest_factory;
