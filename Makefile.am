@@ -23,7 +23,7 @@
 # Subdirectories to build/install etc.
 SUBDIRS=@SD@
 # Subdirectories to use for distribution
-DIST_SUBDIRS=docs perl python tcl java expat repat debian
+DIST_SUBDIRS=docs perl python tcl java ruby expat repat debian
 
 bin_SCRIPTS = redland-config
 lib_LTLIBRARIES = librdf.la

@@ -110,6 +110,7 @@ AC_DEFINE_UNQUOTED(JAVA_COMMAND, "$JAVA")
 AC_CHECK_PROGS(PYTHON, python2.2 python2.1 python2.0 python2 python)
 AC_CHECK_PROGS(PERL, perl5.6.1 perl5.6.0 perl5 perl)
 AC_CHECK_PROGS(TCL, tcl)
+AC_CHECK_PROGS(RUBY, ruby)
 AC_CHECK_PROGS(SWIG, swig)
 
 if test "X$PERL" != "X"; then
@@ -685,6 +686,19 @@ else
   PYTHON=:
 fi
 
+if test "X$RUBY" != X; then
+
+  #ruby_version=`$RUBY --version | sed -e 's/ .*$//'
+  ruby_prefix=`$RUBY -e 'print "/usr/lib/ruby/1.6/i386-linux-gnu\n"'`
+
+  RUBY_INCLUDES="-I$ruby_prefix"
+  AC_SUBST(RUBY_INCLUDES)
+else
+  # This allows 'make clean' in the python directory to work when
+  # python isn't available
+  RUBY=:
+fi
+
 AC_SUBST(PARSER_OBJS)
 AC_SUBST(PARSER_SRCS)
 
@@ -943,6 +957,7 @@ java/Makefile
 java/org/Makefile
 java/org/librdf/Makefile
 java/org/librdf/redland/Makefile
+ruby/Makefile
 repat/Makefile
 debian/Makefile
 debian/rules
