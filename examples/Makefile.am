@@ -10,7 +10,7 @@ EXAMPLES=example1 example2 example3 example4
 # Need this so that automake doesn't moan
 noinst_PROGRAMS = $(EXAMPLES)
 
-CLEANFILES=$(TESTS) $(EXAMPLES) test.db test1.db
+CLEANFILES=$(TESTS) $(EXAMPLES) test*db
 
 examples: $(EXAMPLES)
 
