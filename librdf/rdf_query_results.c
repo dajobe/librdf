@@ -260,3 +260,124 @@ librdf_free_query_results(librdf_query_results* query_results)
 
   LIBRDF_FREE(librdf_query_results, query_results);
 }
+
+
+/**
+ * librdf_query_results_to_counted_string - Turn a query results into a string
+ * @query_results: &librdf_query_results object
+ * @format_uri: URI of syntax to format to
+ * @base_uri: Base URI of output formatted syntax  or NULL
+ * @length_p: Pointer to where to store length of string or NULL
+ * 
+ * Values of format_uri currently supported (via Rasqal) are:
+ *  http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/
+ *
+ * The base URI may be used for the generated syntax, depending
+ * on the format.
+ *
+ * The returned string must be freed by the caller
+ *
+ * Return value: new string value or NULL on failure
+ **/
+unsigned char*
+librdf_query_results_to_counted_string(librdf_query_results *query_results,
+                                       librdf_uri *format_uri,
+                                       librdf_uri *base_uri,
+                                       size_t *length_p) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
+
+  if(query_results->query->factory->results_to_counted_string)
+    return query_results->query->factory->results_to_counted_string(query_results, format_uri, base_uri, length_p);
+  else
+    return NULL;
+}
+
+
+/**
+ * librdf_query_results_to_string - Turn a query results into a string
+ * @query_results: &librdf_query_results object
+ * @format_uri: URI of syntax to format to
+ * @base_uri: Base URI of output formatted syntax 
+ * 
+ * See librdf_query_results_to_counted_string for information on the
+ * format_uri and base_uri parameters.
+ *
+ * The returned string must be freed by the caller
+ *
+ * Return value: new string value or NULL on failure
+ **/
+unsigned char*
+librdf_query_results_to_string(librdf_query_results *query_results,
+                               librdf_uri *format_uri,
+                               librdf_uri *base_uri) {
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
+
+  return librdf_query_results_to_counted_string(query_results, 
+                                                format_uri, base_uri, NULL);
+}
+
+
+/**
+ * librdf_query_results_to_file_handle - Write a query results to a FILE*
+ * @query_results: &librdf_query_results object
+ * @handle: file handle to write to
+ * @format_uri: URI of syntax to format to
+ * @base_uri: Base URI of output formatted syntax 
+ * 
+ * See librdf_query_results_to_counted_string for information on the
+ * format_uri and base_uri parameters.
+ *
+ * Return value: non 0 on failure
+ **/
+int
+librdf_query_results_to_file_handle(librdf_query_results *query_results, 
+                                    FILE *handle, 
+                                    librdf_uri *format_uri,
+                                    librdf_uri *base_uri) {
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(handle, FILE*, 1);
+
+  if(query_results->query->factory->results_to_file_handle)
+    return query_results->query->factory->results_to_file_handle(query_results,
+                                                                 handle,
+                                                                 format_uri, 
+                                                                 base_uri);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_query_results_to_file_handle - Write a query results to a file
+ * @query_results: &librdf_query_results object
+ * @name: filename to write to
+ * @format_uri: URI of syntax to format to
+ * @base_uri: Base URI of output formatted syntax 
+ * 
+ * See librdf_query_results_to_counted_string for information on the
+ * format_uri and base_uri parameters.
+ *
+ * Return value: non 0 on failure
+ **/
+int
+librdf_query_results_to_file(librdf_query_results *query_results, 
+                             const char *name,
+                             librdf_uri *format_uri,
+                             librdf_uri *base_uri) {
+  FILE* fh;
+  int status;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, string, 1);
+
+  fh=fopen(name, "w+");
+  if(!fh)
+    return 1;
+
+  status=librdf_query_results_to_file_handle(query_results, fh, 
+                                             format_uri, base_uri);
+  fclose(fh);
+  return status;
+}
