@@ -348,7 +348,7 @@ librdf_uri_as_string (librdf_uri *uri)
 
 
 /**
- * librdf_uri_as_string - Get a pointer to the string representation of the URI
+ * librdf_uri_as_counted_string - Get a pointer to the string representation of the URI with length
  * @uri: &librdf_uri object
  * @len_p: pointer to location to store length
  * 
