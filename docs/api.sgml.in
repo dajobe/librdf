@@ -350,6 +350,20 @@ and comparison.
 </chapter>
 
 
+<chapter id="utf8">
+<?dbhtml filename='utf8.html'>
+<title>UTF-8</title>
+<para>
+This utility class provides some functions for UTF-8 to/from ISO Latin-1
+de/encoding.
+</para>
+<sect1>
+<title>UTF8 Class</title>
+@INCLUDE utf8.sgml
+</sect1>
+</chapter>
+
+
 <chapter id="heuristics">
 <?dbhtml filename='heuristics.html'>
 <title>Heuristics</title>
