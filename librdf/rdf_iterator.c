@@ -122,6 +122,9 @@ static void*
 librdf_iterator_update_current_element(librdf_iterator* iterator) 
 {
   void *element=NULL;
+
+  if(iterator->is_updated)
+    return iterator->current;
   
   /* find next element subject to map */
   while(!iterator->is_end_method(iterator->context)) {
@@ -161,6 +164,8 @@ librdf_iterator_update_current_element(librdf_iterator* iterator)
   iterator->current=element;
   if(!iterator->current)
     iterator->is_finished=1;
+
+  iterator->is_updated=1;
 
   return element;
 }
@@ -215,9 +220,10 @@ librdf_iterator_next(librdf_iterator* iterator)
     iterator->is_finished=1;
     return 1;
   }
-  
-  librdf_iterator_update_current_element(iterator);
 
+  iterator->is_updated=0;
+  librdf_iterator_update_current_element(iterator);
+  
   return iterator->is_finished;
 }
 
@@ -234,11 +240,7 @@ librdf_iterator_get_object(librdf_iterator* iterator)
   if(iterator->is_finished)
     return NULL;
 
-  if(!librdf_iterator_update_current_element(iterator))
-    return NULL;
-
-  return iterator->get_method(iterator->context, 
-                              LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT);
+  return librdf_iterator_update_current_element(iterator);
 }
 
 
