@@ -248,7 +248,7 @@ librdf_storage_mysql_init(librdf_storage* storage, char *name,
   context->host=librdf_hash_get_del(options, "host");
   context->port=librdf_hash_get_as_long(options, "port");
   if(context->port < 0)
-    port=3306; /* default mysql port */
+    context->port=3306; /* default mysql port */
   
   context->database=librdf_hash_get_del(options, "database");
   context->user=librdf_hash_get_del(options, "user");
