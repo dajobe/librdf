@@ -950,6 +950,13 @@ librdf_storage_query(librdf_storage* storage, librdf_query *query)
 }
 
 
+void
+librdf_storage_sync(librdf_storage* storage) 
+{
+  if(storage->factory->sync)
+    storage->factory->sync(storage);
+}
+
 
 
 
