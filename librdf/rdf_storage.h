@@ -111,9 +111,11 @@ struct librdf_storage_factory_s {
 
 
   /* add a statement to the storage from the context - OPTIONAL */
+  /* NOTE: if context is NULL, this MUST be equivalent to add_statement */
   int (*context_add_statement)(librdf_storage* storage, librdf_node* context, librdf_statement *statement);
   
   /* remove a statement from the context - OPTIONAL */
+  /* NOTE: if context is NULL, this MUST be equivalent to remove_statement */
   int (*context_remove_statement)(librdf_storage* storage, librdf_node* context, librdf_statement *statement);
 
   /* list statements in a context - OPTIONAL */
@@ -124,6 +126,7 @@ struct librdf_storage_factory_s {
 
   /* add statements to the context - OPTIONAL (rdf_storage will do it
    * using context_add_statement if missing)
+   * NOTE: if context is NULL, this MUST be equivalent to add_statements
   */
   int (*context_add_statements)(librdf_storage* storage, librdf_node* context, librdf_stream *stream);
 

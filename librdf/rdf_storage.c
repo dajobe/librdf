@@ -956,6 +956,8 @@ librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node,
  * @context: &librdf_node context node
  * @statement: &librdf_statement statement to add
  * 
+ * If @context is NULL, this is equivalent to librdf_storage_add_statement
+ *
  * Return value: non 0 on failure
  **/
 int
@@ -975,6 +977,8 @@ librdf_storage_context_add_statement(librdf_storage* storage,
  * @context: &librdf_node context
  * @stream: &librdf_stream stream object
  * 
+ * If @context is NULL, this is equivalent to librdf_storage_add_statements
+ *
  * Return value: Non 0 on failure
  **/
 int
@@ -1014,6 +1018,8 @@ librdf_storage_context_add_statements(librdf_storage* storage,
  * @context: &librdf_node context node
  * @statement: &librdf_statement statement to remove
  * 
+ * If @context is NULL, this is equivalent to librdf_storage_remove_statement
+ *
  * Return value: non 0 on failure
  **/
 int
@@ -1033,6 +1039,8 @@ librdf_storage_context_remove_statement(librdf_storage* storage,
  * @storage: &librdf_storage object
  * @context: &librdf_uri context
  * 
+ * If @context is NULL, this is equivalent to librdf_storage_remove_statements
+ *
  * Return value: Non 0 on failure
  **/
 int

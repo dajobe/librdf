@@ -846,6 +846,8 @@ librdf_model_print(librdf_model *model, FILE *fh)
  * It must be a complete statement - all
  * of subject, predicate, object parts must be present.
  *
+ * If @context is NULL, this is equivalent to librdf_model_add_statement
+ *
  * Return value: Non 0 on failure
  **/
 int
@@ -867,6 +869,8 @@ librdf_model_context_add_statement(librdf_model* model,
  * @context: &librdf_node context
  * @stream: &librdf_stream stream object
  * 
+ * If @context is NULL, this is equivalent to librdf_model_add_statements
+ *
  * Return value: Non 0 on failure
  **/
 int
@@ -905,6 +909,8 @@ librdf_model_context_add_statements(librdf_model* model,
  * 
  * It must be a complete statement - all of subject, predicate, object
  * parts must be present.
+ *
+ * If @context is NULL, this is equivalent to librdf_model_remove_statement
  *
  * Return value: Non 0 on failure
  **/
