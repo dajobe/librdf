@@ -1,7 +1,10 @@
+MYSQL_UTILS=rdf-digest rdf-load rdf-tree
+
 noinst_SCRIPTS=update-api-0912.pl
 
 bin_PROGRAMS=redland-db-upgrade rdfproc
-noinst_PROGRAMS=rdf-digest rdf-load rdf-tree
+
+EXTRA_PROGRAMS=$(MYSQL_UTILS)
 
 man_MANS = redland-db-upgrade.1 rdfproc.1
 
@@ -19,3 +22,5 @@ rdfproc_SOURCES = rdfproc.c rdfproc_getopt.h
 rdfproc_LDADD = @RDFPROC_EXTRA_OBJS@
 rdfproc_DEPENDENCIES = @RDFPROC_EXTRA_OBJS@
 EXTRA_rdfproc_SOURCES = getopt.c
+
+mysql-utils: $(MYSQL_UTILS)
