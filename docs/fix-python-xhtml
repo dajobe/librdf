@@ -67,8 +67,6 @@ while(<IN>) {
   s%<a id="([^"]+)" name="[^"]+">%my $a=$1; $a =~ s/^-//; $a=~ s/ /-/g; qq{<a id="$a" name="$a">}%ge;
   s%<a href="#-[^"+]">%<a href="#$1">%g;
 
-  s%(?:\&nbsp;| )\&lt;mb.picdiary.com\&gt;%%;
-			    
   if(m%^<body.*>%) {
     print OUT qq{<body bgcolor="#ffffff" text="#000085">\n\n<h1 align="center">$main_title - $doc_title</h1>\n\n};
     next;
