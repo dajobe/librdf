@@ -48,7 +48,7 @@ rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
 rdf_model.c rdf_model_storage.c \
 rdf_iterator.c rdf_concepts.c \
 rdf_list.c \
-rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c rdf_storage_file.c \
+rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
 rdf_query.c rdf_query_results.c \
@@ -77,20 +77,33 @@ if MEMCMP
 librdf_la_SOURCES += memcmp.c
 endif
 
+if STORAGE_FILE
+librdf_la_SOURCES += rdf_storage_file.c
+endif
+
+if STORAGE_TSTORE
+librdf_la_SOURCES += rdf_storage_tstore.c rdf_storage_tstore.h
+endif
+
+if STORAGE_MYSQL
+librdf_la_SOURCES += rdf_storage_mysql.c rdf_storage_mysql.h
+endif
+
+if STORAGE_SQLITE
+librdf_la_SOURCES += rdf_storage_sqlite.c
+endif
+
 librdf_la_LIBADD = \
-@LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ @STORAGE_OBJS@ \
+@LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 
 librdf_la_DEPENDENCIES = \
-@DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ @STORAGE_OBJS@ \
+@DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 
 EXTRA_librdf_la_SOURCES = rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_sha1.c rdf_digest_openssl.c \
-rdf_parser_raptor.c \
-rdf_storage_tstore.c rdf_storage_tstore.h \
-rdf_storage_mysql.c rdf_storage_mysql.h \
-rdf_storage_sqlite.c
+rdf_parser_raptor.c
 
 EXTRA_DIST=\
 redland.spec redland.spec.in \
