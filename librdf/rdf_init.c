@@ -184,93 +184,21 @@ librdf_world_open(librdf_world *world)
 }
 
 
-/*
- * librdf_error - Error - Internal
- * @world: redland world object or NULL
- * @message: message arguments
- *
- * If world is NULL, the error ocurred in redland startup before
- * the world was created.
- **/
-void
-librdf_error(librdf_world* world, const char *message, ...)
-{
-  va_list arguments;
-
-  va_start(arguments, message);
-  librdf_error_varargs(world, message, arguments);
-  va_end(arguments);
-}
-
-
-/*
- * librdf_error_varargs - Error - Internal
- * @world: redland world object or NULL
- * @message: error message or format string
- * @arguments: va_alist arguments
- *
- * If world is NULL, the error ocurred in redland startup before
- * the world was created.
- **/
-void
-librdf_error_varargs(librdf_world* world, const char *message,
-                     va_list arguments)
-{
-  if(world && world->error_fn) {
-    world->error_fn(world->error_user_data, message, arguments);
-    return;
-  }
-  
-  fputs("librdf error - ", stderr);
-  vfprintf(stderr, message, arguments);
-  fputc('\n', stderr);
-}
-
-
-/*
- * librdf_warning - Warning - Internal
- * @world: redland world object or NULL
- * @message: message arguments
- *
- * If world is NULL, the warning happened in redland startup
- * before the world was created
- **/
-void
-librdf_warning(librdf_world* world, const char *message, ...)
-{
-  va_list arguments;
-
-  va_start(arguments, message);
-
-  if(world && world->warning_fn) {
-    world->warning_fn(world->warning_user_data, message, arguments);
-    va_end(arguments);
-    return;
-  }
-  
-  fputs("librdf warning - ", stderr);
-  vfprintf(stderr, message, arguments);
-  fputc('\n', stderr);
-
-  va_end(arguments);
-}
-
-
 /**
  * librdf_world_set_error - Set the world error handling function
  * @world: redland world object
  * @user_data: user data to pass to function
- * @error_fn: pointer to the function
+ * @error_handler: pointer to the function
  * 
  * The function will receive callbacks when the world fails.
  * 
  **/
 void
 librdf_world_set_error(librdf_world* world, void *user_data,
-                       void (*error_fn)(void *user_data, const char *message, va_list arguments))
+                       librdf_log_level_func error_handler)
 {
   world->error_user_data=user_data;
-  world->error_fn=error_fn;
+  world->error_handler=error_handler;
 }
 
 
@@ -278,17 +206,36 @@ librdf_world_set_error(librdf_world* world, void *user_data,
  * librdf_world_set_warning - Set the world warning handling function
  * @world: redland world object
  * @user_data: user data to pass to function
- * @warning_fn: pointer to the function
+ * @warning_handler: pointer to the function
  * 
  * The function will receive callbacks when the world gives a warning.
  * 
  **/
 void
 librdf_world_set_warning(librdf_world* world, void *user_data,
-                         void (*warning_fn)(void *user_data, const char *message, va_list arguments))
+                         librdf_log_level_func warning_handler)
 {
   world->warning_user_data=user_data;
-  world->warning_fn=warning_fn;
+  world->warning_handler=warning_handler;
+}
+
+
+
+/**
+ * librdf_world_set_logger - Set the world log handling function
+ * @world: redland world object
+ * @user_data: user data to pass to function
+ * @log_handler: pointer to the function
+ * 
+ * The function will receive callbacks when redland generates a log message
+ * 
+ **/
+void
+librdf_world_set_logger(librdf_world* world, void *user_data,
+                        librdf_log_func log_handler)
+{
+  world->log_user_data=user_data;
+  world->log_handler=log_handler;
 }
 
 
