@@ -135,8 +135,6 @@ rdf_serializer_rdfxml_print_as_xml_content(unsigned char *p, FILE *handle)
       fputs("&lt;", handle);
     else if (*p == '>')
       fputs("&gt;", handle);
-    else if (*p > 0x7e)
-      fprintf(handle, "&#%d;", *p);
     else
       fputc(*p, handle);
     p++;
