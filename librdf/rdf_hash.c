@@ -300,6 +300,7 @@ librdf_hash_get(librdf_hash* hash, void *key, size_t key_len,
   return result;
 }
 
+
 /**
  * librdf_hash_put:
  * @hash: hash object
@@ -771,6 +772,9 @@ main(int argc, char *argv[])
       fprintf(stderr, "%s: Failed to create new hash type '%s'\n", program, type);
       continue;
     }
+
+    /* delete DB file */
+    remove("test");
     
     if(librdf_hash_open(h, "test", "mode", NULL)) {
       fprintf(stderr, "%s: Failed to open new hash type '%s'\n", program, type);
