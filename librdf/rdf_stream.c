@@ -25,6 +25,9 @@
 
 #include <stdio.h>
 #include <sys/types.h>
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h> /* for abort() as used in errors */
+#endif
 
 #include <librdf.h>
 #include <rdf_stream.h>

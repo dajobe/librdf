@@ -27,6 +27,9 @@
 #ifdef HAVE_STDARG_H
 #include <stdarg.h>
 #endif
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h> /* for abort() as used in errors */
+#endif
 
 #include <librdf.h>
 #include <rdf_hash.h>
