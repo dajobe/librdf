@@ -105,7 +105,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/include/rdf_types.h
 %{prefix}/include/rdf_storage_list.h
 %{prefix}/include/rdf_storage_hashes.h
-%doc docs/README.html docs/api
+%doc docs/README.html docs/perl.html docs/python.html docs/api
 
 %files perl
 %defattr(-, root, root)
