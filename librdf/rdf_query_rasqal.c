@@ -314,9 +314,12 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
 {
   rasqal_redland_triples_match_context* rtmc=(rasqal_redland_triples_match_context*)rtm->user_data;
   rasqal_literal* l;
-  librdf_statement* statement=librdf_stream_get_object(rtmc->stream);
+  librdf_statement* statement;
+  rasqal_triple_parts result=(rasqal_triple_parts)0;
+
+  statement=librdf_stream_get_object(rtmc->stream);
   if(!statement)
-    return 0;
+    return (rasqal_triple_parts)0;
   
 #ifdef RASQAL_DEBUG
   LIBRDF_DEBUG1("  matched statement ");
@@ -331,19 +334,21 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     l=redland_node_to_rasqal_literal(librdf_statement_get_subject(statement));
     rasqal_variable_set_value(bindings[0], rasqal_literal_as_node(l));
     rasqal_free_literal(l);
+    result= RASQAL_TRIPLE_SUBJECT;
   }
 
   if(bindings[1] && (parts & RASQAL_TRIPLE_PREDICATE)) {
     if(bindings[0] == bindings[1]) {
       if(!librdf_node_equals(librdf_statement_get_subject(statement),
                              librdf_statement_get_predicate(statement)))
-        return 0;
+        return (rasqal_triple_parts)0;
       LIBRDF_DEBUG1("subject and predicate values match\n");
     } else {
       LIBRDF_DEBUG1("binding predicate to variable\n");
       l=redland_node_to_rasqal_literal(librdf_statement_get_predicate(statement));
       rasqal_variable_set_value(bindings[1], rasqal_literal_as_node(l));
       rasqal_free_literal(l);
+      result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_PREDICATE);
     }
   }
 
@@ -353,7 +358,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     if(bindings[0] == bindings[2]) {
       if(!librdf_node_equals(librdf_statement_get_subject(statement),
                              librdf_statement_get_object(statement)))
-        return 0;
+        return (rasqal_triple_parts)0;
       bind=0;
       LIBRDF_DEBUG1("subject and object values match\n");
     }
@@ -362,7 +367,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
        ) {
       if(!librdf_node_equals(librdf_statement_get_predicate(statement),
                              librdf_statement_get_object(statement)))
-        return 0;
+        return (rasqal_triple_parts)0;
       bind=0;
       LIBRDF_DEBUG1("predicate and object values match\n");
     }
@@ -372,17 +377,22 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
       l=redland_node_to_rasqal_literal(librdf_statement_get_object(statement));
       rasqal_variable_set_value(bindings[2], rasqal_literal_as_node(l));
       rasqal_free_literal(l);
+      result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_OBJECT);
     }
   }
 
   /* FIXME contexts */
   /*
   if(bindings[3] && (parts & RASQAL_TRIPLE_ORIGIN)) {
-    ...
+    l=redland_node_to_rasqal_literal((librdf_node*)librdf_stream_get_context(rtmc->stream));
+    LIBRDF_DEBUG1("binding origin to variable\n");
+    rasqal_variable_set_value(bindings[3], rasqal_literal_as_node(l));
+    rasqal_free_literal(l);
+    result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_ORIGIN);
   }
   */
 
-  return 1;
+  return result;
 }
 
 
@@ -521,13 +531,6 @@ librdf_query_rasqal_execute(librdf_query* query, librdf_model* model)
   if(rasqal_query_prepare(context->rq, context->query_string, 
                           (raptor_uri*)context->uri))
     return NULL;
-
-  if(rasqal_version_decimal < 904) { 
-    /* FIXME: Remove this when Rasqal 0.9.4 is out */
-    /* This ensures query->sources is not NULL but contains no sources */
-    rasqal_query_add_source(context->rq, NULL);
-    raptor_sequence_unshift(rasqal_query_get_source_sequence(context->rq));
-  }
 
   context->results=rasqal_query_execute(context->rq);
   
