@@ -97,10 +97,10 @@ librdf_finish_uri(librdf_world *world)
  **/
 librdf_uri*
 librdf_new_uri (librdf_world *world, 
-                const char *uri_string)
+                const unsigned char *uri_string)
 {
   librdf_uri* new_uri;
-  char *new_string;
+  unsigned char *new_string;
   int length;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
@@ -150,7 +150,7 @@ librdf_new_uri (librdf_world *world,
   new_uri->world=world;
   new_uri->string_length=length;
 
-  new_string=(char*)LIBRDF_MALLOC(librdf_uri, length+1);
+  new_string=(unsigned char*)LIBRDF_MALLOC(librdf_uri, length+1);
   if(!new_string) {
     LIBRDF_FREE(librdf_uri, new_uri);
     new_uri=NULL;
@@ -204,15 +204,16 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
  * Return value: a new &librdf_uri object or NULL on failure
  **/
 librdf_uri*
-librdf_new_uri_from_uri_local_name (librdf_uri* old_uri, const char *local_name) {
+librdf_new_uri_from_uri_local_name (librdf_uri* old_uri, 
+                                    const unsigned char *local_name) {
   int len=old_uri->string_length + strlen(local_name) +1 ; /* +1 for \0 */
-  char *new_string;
+  unsigned char *new_string;
   librdf_uri* new_uri;
 
   if(!old_uri)
     return NULL;
   
-  new_string=(char*)LIBRDF_CALLOC(cstring, 1, len);
+  new_string=(unsigned char*)LIBRDF_CALLOC(cstring, 1, len);
   if(!new_string)
     return NULL;
 
@@ -235,13 +236,13 @@ librdf_new_uri_from_uri_local_name (librdf_uri* old_uri, const char *local_name)
  * Return value: a new &librdf_uri object or NULL on failure
  **/
 librdf_uri*
-librdf_new_uri_normalised_to_base(const char *uri_string,
+librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
                                   librdf_uri* source_uri,
                                   librdf_uri* base_uri) 
 {
   int uri_string_len;
   int len;
-  char *new_uri_string;
+  unsigned char *new_uri_string;
   librdf_uri *new_uri;
   librdf_world *world=source_uri->world;
                                     
@@ -272,7 +273,7 @@ librdf_new_uri_normalised_to_base(const char *uri_string,
   /* total bytes */
   len=uri_string_len + 1 + base_uri->string_length;
 
-  new_uri_string=(char*)LIBRDF_MALLOC(cstring, len);
+  new_uri_string=(unsigned char*)LIBRDF_MALLOC(cstring, len);
   if(!new_uri_string)
     return NULL;
   strncpy(new_uri_string, base_uri->string, base_uri->string_length);
@@ -299,8 +300,8 @@ librdf_new_uri_normalised_to_base(const char *uri_string,
  **/
 librdf_uri*
 librdf_new_uri_relative_to_base(librdf_uri* base_uri,
-                                const char *uri_string) {
-  char *buffer;
+                                const unsigned char *uri_string) {
+  unsigned char *buffer;
   int buffer_length;
   librdf_uri* new_uri;
   librdf_world *world=base_uri->world;
@@ -313,7 +314,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
     return librdf_new_uri_from_uri(base_uri);
   
   buffer_length=base_uri->string_length + strlen(uri_string) +1;
-  buffer=(char*)LIBRDF_MALLOC(cstring, buffer_length);
+  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, buffer_length);
   if(!buffer)
     return NULL;
   
@@ -412,7 +413,7 @@ librdf_free_uri (librdf_uri* uri)
  * 
  * Return value: string representation of URI
  **/
-char*
+unsigned char*
 librdf_uri_as_string (librdf_uri *uri) 
 {
   return uri->string;
@@ -429,7 +430,7 @@ librdf_uri_as_string (librdf_uri *uri)
  * 
  * Return value: string representation of URI
  **/
-char*
+unsigned char*
 librdf_uri_as_counted_string(librdf_uri *uri, size_t* len_p) 
 {
   if(len_p)

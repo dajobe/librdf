@@ -852,7 +852,7 @@ librdf_parser_raptor_serialise_finished(void* context)
 
 
 static raptor_uri*
-librdf_raptor_new_uri(void *context, const char *uri_string) 
+librdf_raptor_new_uri(void *context, const unsigned char *uri_string) 
 {
   return (raptor_uri*)librdf_new_uri((librdf_world*)context, uri_string);
 }
@@ -860,7 +860,7 @@ librdf_raptor_new_uri(void *context, const char *uri_string)
 static raptor_uri*
 librdf_raptor_new_uri_from_uri_local_name(void *context,
                                           raptor_uri *uri,
-                                          const char *local_name)
+                                          const unsigned char *local_name)
 {
    return (raptor_uri*)librdf_new_uri_from_uri_local_name((librdf_uri*)uri, local_name);
 }
@@ -868,7 +868,7 @@ librdf_raptor_new_uri_from_uri_local_name(void *context,
 static raptor_uri*
 librdf_raptor_new_uri_relative_to_base(void *context,
                                        raptor_uri *base_uri,
-                                       const char *uri_string) 
+                                       const unsigned char *uri_string) 
 {
   return (raptor_uri*)librdf_new_uri_relative_to_base((librdf_uri*)base_uri, uri_string);
 }
@@ -903,14 +903,14 @@ librdf_raptor_uri_copy(void *context, raptor_uri *uri)
 }
 
 
-static char*
+static unsigned char*
 librdf_raptor_uri_as_string(void *context, raptor_uri *uri)
 {
   return librdf_uri_as_string((librdf_uri*)uri);
 }
 
 
-static char*
+static unsigned char*
 librdf_raptor_uri_as_counted_string(void *context, raptor_uri *uri, size_t *len_p)
 {
   return librdf_uri_as_counted_string((librdf_uri*)uri, len_p);
