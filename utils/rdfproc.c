@@ -311,10 +311,10 @@ main(int argc, char *argv[])
     printf(HELP_TEXT(t, "storage-options OPTIONS", "\n                Set storage options (default \"%s\")\n"), storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
-    puts("  parse URI [SYNTAX [BASE URI]]             Parse syntax at URI into");
-    puts("                                            the graph (RDF/XML)");
-    puts("  parse-stream URI [SYNTAX [BASE URI]       Streaming parse syntax at URI");
+    puts("  parse FILE|URI [SYNTAX [BASE URI]]        Parse syntax in FILE or URI");
     puts("                                            into the graph (RDF/XML)");
+    puts("  parse-stream FILE|URI [SYNTAX [BASE URI]  Streaming parse syntax in FILE or");
+    puts("                                            URI into the graph (RDF/XML)");
     puts("  print                                     Print the graph triples.");
     puts("  serialize [SYNTAX [URI [MIME-TYPE]]]      Serializes to a syntax (RDF/XML)");
 #if 0
