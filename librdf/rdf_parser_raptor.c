@@ -461,6 +461,6 @@ librdf_parser_raptor_constructor(librdf_world *world)
   librdf_parser_register_factory(world, "raptor", NULL, NULL,
                                  &librdf_parser_raptor_register_factory);
   librdf_parser_register_factory(world, "ntriples", "text/plain",
-                                 "http://purl.org/net/dajobe/2001/06/ntriples/",
+                                 "http://www.w3.org/2001/sw/RDFCore/ntriples/",
                                  &librdf_parser_raptor_register_factory);
 }
