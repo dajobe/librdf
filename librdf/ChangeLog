@@ -1,3 +1,12 @@
+2005-01-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_sqlite.c: Casts for C++
+
+	* rdf_query_rasqal.c (rasqal_redland_bind_match): Casts for C++
+	and calculate, return the matched parts.
+	Updated untested origin code.
+	(librdf_query_rasqal_execute): Remove code for rasqal < 0.9.4 fixes.
+
 2005-01-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_model.h: Added librdf_model_contains_context

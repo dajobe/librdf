@@ -1,3 +1,24 @@
+2005-01-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_sqlite.c: Casts for C++
+
+	* librdf/rdf_query_rasqal.c (rasqal_redland_bind_match): Casts for C++
+	and calculate, return the matched parts.
+	Updated untested origin code.
+	(librdf_query_rasqal_execute): Remove code for rasqal < 0.9.4 fixes.
+
+	* rasqal/rasqal_xsd_datatypes.c: Casts for C++
+
+	* rasqal/rasqal_redland.c (rasqal_redland_bind_match):
+	Updated untested redland origin code.
+
+	* rasqal/rasqal_query.c: Casts for C++
+
+	* rasqal/rasqal_engine.c (rasqal_graph_pattern_get_next_match):
+	int parts
+
+	* rasqal/librasqal.3: Updates for API changes to 2005-01-30
+
 2005-01-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rasqal/roqet.1: Document -f/--format.  Reference -o xml spec
