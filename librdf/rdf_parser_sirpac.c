@@ -158,7 +158,10 @@ librdf_parser_sirpac_parse_as_stream(void *context, librdf_uri *uri) {
   int command_len;
   char *command;
   FILE *fh;
+  static const char *command_format_string="%s -classpath .:%s -Dorg.xml.sax.parser=com.microstar.xml.SAXDriver PrintParser %s";
+#if 0
   static const char *command_format_string="%s -classpath %s -Dorg.xml.sax.parser=com.microstar.xml.SAXDriver org.w3c.rdf.examples.ListStatements %s";
+#endif
   char *uri_string;
 
   scontext=(librdf_parser_sirpac_stream_context*)LIBRDF_CALLOC(librdf_parser_sirpac_stream_context, 1, sizeof(librdf_parser_sirpac_stream_context));
