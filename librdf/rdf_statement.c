@@ -133,15 +133,15 @@ librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 }
 
 
-librdf_assertion_context*
-librdf_statement_remove_assertion_context(librdf_statement *statement) 
+librdf_context*
+librdf_statement_get_context(librdf_statement *statement) 
 {
   return statement->context;
 }
 
 
 int
-librdf_statement_add_assertion_context(librdf_statement *statement, librdf_assertion_context *context)
+librdf_statement_set_context(librdf_statement *statement, librdf_context *context)
 {
   statement->context=context;
   return 0;

@@ -23,7 +23,7 @@
 
 #include <rdf_node.h>
 #include <rdf_uri.h>
-#include <rdf_assertion_context.h>
+#include <rdf_context.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +37,7 @@ typedef struct
   librdf_node* object;
   librdf_uri*  provenance; /* ha ha */
   int       count;
-  librdf_assertion_context *context;
+  librdf_context *context;
 }
 librdf_statement;
 
@@ -65,8 +65,8 @@ int librdf_statement_set_predicate(librdf_statement *statement, librdf_node *pre
 librdf_node* librdf_statement_get_object(librdf_statement *statement);
 int librdf_statement_set_object(librdf_statement *statement, librdf_node *object);
 
-int librdf_statement_add_assertion_context(librdf_statement *statement, librdf_assertion_context *context);
-librdf_assertion_context* librdf_statement_remove_assertion_context(librdf_statement *statement);
+int librdf_statement_set_context(librdf_statement *statement, librdf_context *context);
+librdf_context* librdf_statement_get_context(librdf_statement *statement);
 
 /* convert to a string */
 char *librdf_statement_to_string(librdf_statement *statement);
