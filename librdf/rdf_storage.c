@@ -83,6 +83,9 @@ librdf_init_storage(librdf_world *world)
 #ifdef HAVE_TSTORE
   librdf_init_storage_tstore(world);
 #endif
+#ifdef HAVE_SQLITE
+  librdf_init_storage_sqlite(world);
+#endif
   /* Always have storage list, hashes, file implementations available */
   librdf_init_storage_file(world);
   librdf_init_storage_hashes(world);
