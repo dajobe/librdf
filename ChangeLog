@@ -1,4 +1,212 @@
-2005-01-31  cmdjb  <cmdjb@hedwig.dajobe.org>
+2005-02-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_lexer.l (sparql_copy_string_token):
+	Fix wrong length on checking qname.
+
+	* rasqal/sparql_lexer.l ({QNAME}):
+	Now assigns a uri using sparql_copy_qname.
+	(sparql_copy_qname): expands and returns a raptor_uri* here.
+	When running standalone as rasqal_lexer_test, ignore unexpanded
+	qnames.
+	(sparql_copy_string_token): When running standalone as
+	rasqal_lexer_test, ignore unexpanded qnames.
+
+	* rasqal/sparql_lexer.l (sparql_copy_string_token):
+	Check and expand datatype qnames here,
+	since prefixes are always defined before qname use..
+
+	* rasqal/rasqal_expr.c: Added support for expressions:
+	STR, LANG, DATATYPE, ISURI, ISBLANK and ISLITERAL
+	(rasqal_free_expression, rasqal_expression_foreach,
+	rasqal_expression_print_op, rasqal_expression_print):  Updated to
+	handle the expression types above.
+	(rasqal_expression_evaluate): Print evaluation before and after debug
+	messages.  Edit main body to not return in cases.
+	Implement the expressions above.
+
+	* rasqal/sparql_parser.y:
+	Added tokens STR, LANG, DATATYPE, ISURI, ISBLANK and ISLITERAL
+	(BuiltinExpression): Use the tokens above to implement built in
+	functions of the same names.
+
+	* rasqal/sparql_lexer.l:
+	Added keywords STR, LANG, DATATYPE, ISURI, ISBLANK and ISLITERAL
+
+	* rasqal/rasqal.h: Added rasqal_op RASQAL_EXPR_STR, RASQAL_EXPR_LANG,
+	RASQAL_EXPR_DATATYPE, RASQAL_EXPR_ISURI, RASQAL_EXPR_ISBLANK,
+	RASQAL_EXPR_ISLITERAL,
+
+	* rasqal/librasqal.3, rasqal/rasqal_literal.c: Updates for 0.9.6
+
+	* raptor/raptor_libxml.c:
+	Use RAPTOR_LIBXML_XMLSAX2INTERNALSUBSET test for a function rather
+	than HAVE_LIBXML_SAX2_H test for a header to work on OSX 10.3.x which
+	has inconsistent system libxml shared library/headers.
+
+	* raptor/configure.ac:
+	Test for xmlSAX2InternalSubset so that it checks for the broken OSX
+	10.3.x libxml features in the shared library rather than the ones
+	declared in the inconsistent header.
+
+2005-02-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal.rdf.in: Updates for schema
+
+	* configure.ac, Makefile.am: Added redland.rdf.in DOAP
+
+	* redland.rdf.in: Redland DOAP
+
+	* raptor/raptor.rdf.in: Updates for schema
+
+	* configure.ac: need rasqal 0.9.6
+
+	* configure.ac: Sleepycat/BDB 4.3
+
+	* raptor/tests/Makefile.am (check-rdfxmla):
+	rdfdiff should read $name-rdfxmla.rdf from builddir
+
+2005-02-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/rdfdiff.c: C style
+	Move more declarations to start of blocks.
+
+	* raptor/rdfdiff.c (rdfdiff_free_file): Restore what I broke.
+
+	* raptor/rdfdiff.c: C style
+	Move more declarations to start of blocks.
+
+	* raptor/raptor_xml_writer.c (raptor_xml_writer_end_element):
+	Move int decl to start of block.
+
+	* raptor/raptor_serialize_rdfxmla.c (raptor_unique_id):
+	Terminate string right.
+
+	* raptor/rdfdiff.c, raptor/raptor_serialize_rdfxmla.c: Casts for C++
+
+	* raptor/raptor_serialize_rdfxmla.c: C style
+	(raptor_rdfxmla_emit_subject_list_items,
+	raptor_rdfxmla_emit_subject_properties): Declare i at start of block.
+
+	* raptor/rdfdiff.c, raptor/raptor_serialize_rdfxmla.c: Import
+	rdf/xml with abbreviations serializer 'rdfxml-abbrev' written by
+	Steve Shepard
+
+	* raptor/rapper.1: rdfxml-abbrev
+
+	* raptor/rdfdump.c: Widen help formatting for longer serializer name
+
+	* raptor/raptor_xml_writer.c: Various C style fixes.
+	Make an enum for raptor_xml_writer_flags.
+	Added XML_WRITER_ prefixes to macro and defines.
+	Moved spaces_buffer to module static.
+	Noted struct nsd and namespaces sorting are duplicated code.
+	Docucomments for several methods (not yet used by doc system) noting
+	use of the flags.
+
+	* raptor/Makefile.am: clean rdfdiff
+
+	* raptor/Makefile.am: rdfdiff to EXTRA_PROGRAMS for now
+
+	* raptor/ChangeLog, raptor/Makefile.am, raptor/raptor.h,
+	raptor/raptor_feature.c, raptor/raptor_general.c,
+	raptor/raptor_internal.h, raptor/raptor_xml_writer.c,
+	raptor/tests/Makefile.am: Import rdf/xml with abbreviations
+	serializer 'rdfxml-abbrev' written by Steve Shepard
+
+	* rasqal/rasqal_engine.c (rasqal_engine_do_optional_step):
+	When the constraint fails, zero the
+	new_bindings_count since none matter now.
+
+	* rasqal/sparql_lexer.l: Added BNAME token
+	({BNAME}): Added to just do a blank node.
+
+	* rasqal/configure.ac: Added dir tests/sparql/bound
+
+	* rasqal/tests/sparql/syntax/Makefile.am,
+	rasqal/tests/sparql/syntax/construct2.rq: Construct with bnodes in
+	construct2.rq
+
+	* rasqal/tests/sparql/bound/.cvsignore,
+	rasqal/tests/sparql/bound/Makefile.am,
+	rasqal/tests/sparql/bound/bound1-result.n3,
+	rasqal/tests/sparql/bound/bound1.rq,
+	rasqal/tests/sparql/bound/data.n3,
+	rasqal/tests/sparql/bound/manifest.n3: DAWG BOUND tests
+
+	* rasqal/tests/sparql/Makefile.am: added bound
+
+	* rasqal/sparql_lexer.l ({QNAME}): If it starts _:, make a
+	BLANK_LITERAL
+	(sparql_token_print, sparql_token_free): Added BLANK_LITERAL
+	support.
+
+	* rasqal/sparql_parser.y:
+	Added tokens BLANK_LITERAL ConstructPattern (rq23) BNode (rq23),
+	TripleTemplate (rq23) and VarOrLiteralOrBNode VarOrURIOrBNode
+	(ConstructClause): Now using ConstructPattern
+	(ConstructPattern): Added from rq23, using TripleTemplate
+	(TripleTemplate): Added from rq23, using VarOrURIOrBNode for subject
+	and VarOrLiteralOrBNode for object.
+	(VarOrURIOrBNode): Added, using BNode
+	(VarOrLiteralOrBNode): Added, using BNode
+	(BNode): Added from rq23
+
+	* rasqal/rasqal_expr.c (rasqal_free_expression,
+	rasqal_expression_evaluate, rasqal_expression_print_op): Added
+	RASQAL_EXPR_BOUND support.
+
+	* rasqal/rasqal.h: Added RASQAL_EXPR_BOUND
+
+	* rasqal/sparql_parser.y:
+	Updates from http://www.w3.org/2001/sw/DataAccess/rq23/
+	$Revision: 1.187 $ of $Date: 2005/02/01 10:56:24 $
+	Added tokens BASE LOAD BOUND
+	Renumbered some of comments to rq23 above.
+	(ReportFormat) Moved big () inside Query here
+	(SelectClause, DescribeClause, ConstructClause): Note now in rq23
+	(AskClause): Added from rq23.
+	(LoadClauseOpt): Added from rq23.
+	(LimitCaluseOpt): Added from rq23.
+	(PatternElementForms OPTIONAL GraphPattern1): Mark the graph pattern
+	as optional in the flags.
+	(BaseDeclOpt): Added from rq23.
+	(UnaryExpression): Call BuiltinExpression
+	(BuiltinExpression): Added from rq23 just with BOUND
+
+	* rasqal/sparql_lexer.l: Added OPTIONAL, BASE, LOAD and BOUND
+	tokens and keywords
+
+	* librdf/rdf_query_rasqal.c
+	(librdf_query_rasqal_query_results_update_statement): Handle empty
+	rstatement right away.
+	(librdf_query_rasqal_results_as_stream): If no statements at all,
+	return NULL.
+
+	* librdf/rdf_query_rasqal.c:
+	(librdf_query_rasqal_query_results_next_statement) Remove unused
+	vars.
+
+	* utils/rdfproc.c: Handle bindings, boolean and RDF graph query
+	results.
+
+	* librdf/rdf_query_rasqal.c
+	(librdf_query_rasqal_query_results_update_statement): Return 0
+
+	* librdf/rdf_query_rasqal.c:
+	Protect all query results from NULL pointers.
+	(librdf_query_rasqal_query_results_end_of_stream,
+	librdf_query_rasqal_query_results_update_statement,
+	librdf_query_rasqal_query_results_next_statement,
+	librdf_query_rasqal_query_results_get_statement
+	librdf_query_rasqal_query_results_finished): Added, implementing
+	RDF graph query results.
+	(librdf_query_rasqal_results_as_stream): Updated to use the above.
+
+2005-01-31  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Redland.i: Added librdf_query_results_is_bindings,
+	librdf_query_results_is_boolean, librdf_query_results_is_graph,
+	and librdf_query_results_get_boolean
 
 	* librdf/rdf_query_rasqal.c
 	(librdf_query_rasqal_results_is_bindings,
