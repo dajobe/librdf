@@ -44,12 +44,15 @@ struct librdf_storage_factory_s {
   size_t context_length;
   
   /* create a new storage */
-  int (*init)(librdf_storage* storage, librdf_hash* options);
+  int (*init)(librdf_storage* storage, char *name, librdf_hash* options);
+
+  /* destroy a storage */
+  void (*terminate)(librdf_storage* storage);
   
-  /* open a new storage associated with model */
+  /* make storage be associated with model */
   int (*open)(librdf_storage* storage, librdf_model* model);
   
-  /* close a storage context inside the storage */
+  /* close storage/model context */
   int (*close)(librdf_storage* storage);
   
   /* return the number of statements in the storage for model */
@@ -98,8 +101,8 @@ void librdf_storage_register_factory(const char *name, void (*factory) (librdf_s
 librdf_storage_factory* librdf_get_storage_factory(const char *name);
 
 /* constructor */
-librdf_storage* librdf_new_storage(char* name, char* options_string);
-librdf_storage* librdf_new_storage_from_factory(librdf_storage_factory* factory, librdf_hash* options);
+librdf_storage* librdf_new_storage(char *storage_name, char *name, char *options_string);
+librdf_storage* librdf_new_storage_from_factory(librdf_storage_factory* factory, char *name, librdf_hash* options);
 
 /* destructor */
 void librdf_free_storage(librdf_storage *storage);
