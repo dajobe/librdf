@@ -1118,12 +1118,12 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
 */
 
 #if SQLITE_API == 3
-  #define GET_COLUMN_VALUE_TEXT(col) sqlite3_column_text(vm, col)
-  #define GET_COLUMN_VALUE_INT(col) sqlite3_column_int(vm, col)
+  #define GET_COLUMN_VALUE_TEXT(vm, col) sqlite3_column_text(vm, col)
+  #define GET_COLUMN_VALUE_INT(vm, col) sqlite3_column_int(vm, col)
 #endif
 #if SQLITE_API == 2
-  #define GET_COLUMN_VALUE_TEXT(col) (unsigned char*)pazValue[col]
-  #define GET_COLUMN_VALUE_INT(col) atoi(pazValue[col])
+  #define GET_COLUMN_VALUE_TEXT(vm, col) (unsigned char*)pazValue[col]
+  #define GET_COLUMN_VALUE_INT(vm, col) atoi(pazValue[col])
 #endif
 
 
@@ -1149,25 +1149,25 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
     librdf_statement_clear(*statement);
 
     /* subject */
-    uri_string=GET_COLUMN_VALUE_TEXT(0);
+    uri_string=GET_COLUMN_VALUE_TEXT(vm, 0);
     if(uri_string)
       node=librdf_new_node_from_uri_string(scontext->storage->world,
                                            uri_string);
     else {
-      blank=GET_COLUMN_VALUE_TEXT(1);
+      blank=GET_COLUMN_VALUE_TEXT(vm, 1);
       node=librdf_new_node_from_blank_identifier(scontext->storage->world,
                                                  blank);
     }
     librdf_statement_set_subject(*statement, node);
 
 
-    uri_string=GET_COLUMN_VALUE_TEXT(2);
+    uri_string=GET_COLUMN_VALUE_TEXT(vm, 2);
     node=librdf_new_node_from_uri_string(scontext->storage->world,
                                          uri_string);
     librdf_statement_set_predicate(*statement, node);
 
-    uri_string=GET_COLUMN_VALUE_TEXT(3);
-    blank=GET_COLUMN_VALUE_TEXT(4);
+    uri_string=GET_COLUMN_VALUE_TEXT(vm, 3);
+    blank=GET_COLUMN_VALUE_TEXT(vm, 4);
     if(uri_string)
       node=librdf_new_node_from_uri_string(scontext->storage->world,
                                            uri_string);
@@ -1175,12 +1175,12 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
       node=librdf_new_node_from_blank_identifier(scontext->storage->world,
                                                  blank);
     else {
-      const unsigned char *literal=GET_COLUMN_VALUE_TEXT(5);
-      const unsigned char *language=GET_COLUMN_VALUE_TEXT(6);
+      const unsigned char *literal=GET_COLUMN_VALUE_TEXT(vm, 5);
+      const unsigned char *language=GET_COLUMN_VALUE_TEXT(vm, 6);
       librdf_uri *datatype=NULL;
       
-      /* int datatype_id= GET_COLUMN_VALUE_INT(7); */
-      uri_string=GET_COLUMN_VALUE_TEXT(8);
+      /* int datatype_id= GET_COLUMN_VALUE_INT(vm, 7); */
+      uri_string=GET_COLUMN_VALUE_TEXT(vm, 8);
       if(uri_string)
         datatype=librdf_new_uri(scontext->storage->world, uri_string);
       
@@ -1194,7 +1194,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
     }
     librdf_statement_set_object(*statement, node);
 
-    uri_string=GET_COLUMN_VALUE_TEXT(9);
+    uri_string=GET_COLUMN_VALUE_TEXT(vm, 9);
     if(uri_string)
       *context_node=librdf_new_node_from_uri_string(scontext->storage->world,
                                                     uri_string);
