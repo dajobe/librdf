@@ -109,14 +109,14 @@ struct librdf_storage_factory_s {
   librdf_iterator* (*get_arcs_out)(librdf_storage *storage, librdf_node *node);
 
 
-  /* add a statement to the storage from the group */
-  int (*group_add_statement)(librdf_storage* storage, librdf_uri* group, librdf_statement *statement);
+  /* add a statement to the storage from the context */
+  int (*context_add_statement)(librdf_storage* storage, librdf_node* context, librdf_statement *statement);
   
-  /* remove a statement from the group  */
-  int (*group_remove_statement)(librdf_storage* storage, librdf_uri* group, librdf_statement *statement);
+  /* remove a statement from the context  */
+  int (*context_remove_statement)(librdf_storage* storage, librdf_node* context, librdf_statement *statement);
 
-  /* list statements in the group  */
-  librdf_stream* (*group_serialise)(librdf_storage* storage, librdf_uri* group);
+  /* list statements in a context  */
+  librdf_stream* (*context_serialise)(librdf_storage* storage, librdf_node* context);
 
 };
 
@@ -171,10 +171,10 @@ int librdf_storage_has_arc_in(librdf_storage *storage, librdf_node *node, librdf
 /* check for [?, property, node] */
 int librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node, librdf_node *property);
 
-/* group methods */
-int librdf_storage_group_add_statement(librdf_storage* storage, librdf_uri* group_uri, librdf_statement* statement);
-int librdf_storage_group_remove_statement(librdf_storage* storage, librdf_uri* group_uri, librdf_statement* statement);
-librdf_stream* librdf_storage_group_serialise(librdf_storage* storage, librdf_uri* group_uri);
+/* context methods */
+int librdf_storage_context_add_statement(librdf_storage* storage, librdf_node* context, librdf_statement* statement);
+int librdf_storage_context_remove_statement(librdf_storage* storage, librdf_node* context, librdf_statement* statement);
+librdf_stream* librdf_storage_context_serialise(librdf_storage* storage, librdf_node* context);
 
 /* querying methods */
 int librdf_storage_supports_query(librdf_storage* storage, librdf_query *query);

@@ -877,51 +877,51 @@ librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node,
 
 
 /**
- * librdf_storage_group_add_statement - Add a statement to a storage group
+ * librdf_storage_context_add_statement - Add a statement to a storage in a context
  * @storage: &librdf_storage object
- * @group_uri: &librdf_uri group URI
+ * @context: &librdf_node context node
  * @statement: &librdf_statement statement to add
  * 
  * Return value: non 0 on failure
  **/
 int
-librdf_storage_group_add_statement(librdf_storage* storage,
-                                   librdf_uri* group_uri,
-                                   librdf_statement* statement) 
+librdf_storage_context_add_statement(librdf_storage* storage,
+                                     librdf_node* context,
+                                     librdf_statement* statement) 
 {
-  return storage->factory->group_add_statement(storage, group_uri, statement);
+  return storage->factory->context_add_statement(storage, context, statement);
 }
 
 
 /**
- * librdf_storage_group_remove_statement - Remove a statement from a storage group
+ * librdf_storage_context_remove_statement - Remove a statement from a storage in a context
  * @storage: &librdf_storage object
- * @group_uri: &librdf_uri group URI
+ * @context: &librdf_node context node
  * @statement: &librdf_statement statement to remove
  * 
  * Return value: non 0 on failure
  **/
 int
-librdf_storage_group_remove_statement(librdf_storage* storage, 
-                                      librdf_uri* group_uri,
-                                      librdf_statement* statement) 
+librdf_storage_context_remove_statement(librdf_storage* storage, 
+                                        librdf_node* context,
+                                        librdf_statement* statement) 
 {
-  return storage->factory->group_remove_statement(storage, group_uri, statement);
+  return storage->factory->context_remove_statement(storage, context, statement);
 }
 
 
 /**
- * librdf_storage_group_serialise - List all statements in a storage group
+ * librdf_storage_context_serialise - List all statements in a storage context
  * @storage: &librdf_storage object
- * @group_uri: &librdf_uri group URI
+ * @context: &librdf_node context node
  * 
- * Return value: &librdf_stream of statements or NULL on failure or group is empty
+ * Return value: &librdf_stream of statements or NULL on failure or context is empty
  **/
 librdf_stream*
-librdf_storage_group_serialise(librdf_storage* storage,
-                               librdf_uri* group_uri) 
+librdf_storage_context_serialise(librdf_storage* storage,
+                                 librdf_node* context)
 {
-  return storage->factory->group_serialise(storage, group_uri);
+  return storage->factory->context_serialise(storage, context);
 }
 
 
