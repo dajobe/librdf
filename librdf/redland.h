@@ -1,10 +1,10 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * redland.h - Redland RDF Application Framework main header
+ * redland.h - Redland RDF Library main header
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
