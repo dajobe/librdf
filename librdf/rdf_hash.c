@@ -836,7 +836,7 @@ librdf_hash_put(librdf_hash* hash, librdf_hash_datum *key,
  * @key: key
  * @value: value
  * 
- * Return value: non 0 if the key is present in the hash
+ * Return value: >0 if the key/value exists in the hash, 0 if not, <0 on failure
  **/
 int
 librdf_hash_exists(librdf_hash* hash, librdf_hash_datum *key,
