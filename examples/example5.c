@@ -1,10 +1,10 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * example4.c - Redland example code using the serializing
+ * example5.c - Redland example code using quering
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2004 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
