@@ -1,4 +1,4 @@
-dnl -*- Mode: sh -*-
+dnl -*- Mode: autoconf -*-
 dnl
 dnl configure.in - top level autoconf file for Redland
 dnl (Process this file with autoconf to produce a configure script.)
