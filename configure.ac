@@ -339,12 +339,16 @@ AC_MSG_CHECKING(ECMA CLI implementations to use)
 with_ecma_cli=no
 CLIRUN=
 CSHARPC=
+CSHARPCFLAGS=
+CLI_PREFIX=
 for name in $ecma_cli_name mono dotgnu no; do
   case $name in
     mono)
       if test "X$MONO" != X -a "X$MCS" != X; then
         CLIRUN=$MONO
         CSHARPC=$MCS
+        CSHARPCFLAGS="-debug+"
+        CLI_PREFIX=`$(PKG_CONFIG) mono --variable=prefix`
         ecma_cli=Mono
       fi
       ;;
@@ -353,6 +357,8 @@ for name in $ecma_cli_name mono dotgnu no; do
       if test "X$ILRUN" != X -a "X$CSCC" != X; then
         CLIRUN=$ILRUN
         CSHARPC=$CSCC
+        CSHARPCFLAGS="-g"
+        CLI_PREFIX=/usr
         ecma_cli=dotGNU
       fi
       ;;
@@ -367,6 +373,8 @@ done
 AC_MSG_RESULT($ecma_cli)
 AC_SUBST(CLIRUN)
 AC_SUBST(CSHARPC)
+AC_SUBST(CSHARPCFLAGS)
+AC_SUBST(CLI_PREFIX)
 
 if test "$with_ecma_cli" != no; then
   languages="$languages csharp"
