@@ -206,7 +206,13 @@ librdf_hash_bdb_open(void* context, char *identifier,
     flags |= DB_TRUNCATE;
   
   if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
-    LIBRDF_DEBUG2(librdf_hash_bdb_open, "BDB V3 open failed - %s\n", db_strerror(ret));
+#ifdef LIBRDF_DEBUG
+    LIBRDF_DEBUG3(librdf_hash_bdb_open, "BDB V3 open of '%s' failed - %s", 
+                  file, db_strerror(ret));
+#else
+    librdf_error(bdb_context->hash->world, "BDB V3 open of '%s' failed - %s",
+                 file, db_strerror(ret));
+#endif
     LIBRDF_FREE(cstring, file);
     return 1;
   }
