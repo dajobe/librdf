@@ -679,7 +679,7 @@ AC_C_BIGENDIAN
 
 dnl Checks for library functions.
 AC_FUNC_MEMCMP
-AC_CHECK_FUNCS(getopt getopt_long mkstemp mktemp tmpnam gettimeofday)
+AC_CHECK_FUNCS(getopt getopt_long mkstemp mktemp tmpnam gettimeofday getenv)
 
 RDFPROC_EXTRA_OBJS=
 if test $ac_cv_func_getopt = no -a $ac_cv_func_getopt_long = no; then
