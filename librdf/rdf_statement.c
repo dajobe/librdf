@@ -240,6 +240,8 @@ librdf_statement_get_subject(librdf_statement *statement)
 void
 librdf_statement_set_subject(librdf_statement *statement, librdf_node *node)
 {
+  if(LIBRDF_NODE_STATEMENT_SUBJECT(statement))
+    librdf_free_node(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
   LIBRDF_NODE_STATEMENT_SUBJECT(statement)=node;
 }
 
@@ -269,6 +271,8 @@ librdf_statement_get_predicate(librdf_statement *statement)
 void
 librdf_statement_set_predicate(librdf_statement *statement, librdf_node *node)
 {
+  if(LIBRDF_NODE_STATEMENT_PREDICATE(statement))
+    librdf_free_node(LIBRDF_NODE_STATEMENT_PREDICATE(statement));
   LIBRDF_NODE_STATEMENT_PREDICATE(statement)=node;
 }
 
@@ -298,6 +302,8 @@ librdf_statement_get_object(librdf_statement *statement)
 void
 librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 {
+  if(LIBRDF_NODE_STATEMENT_OBJECT(statement))
+    librdf_free_node(LIBRDF_NODE_STATEMENT_OBJECT(statement));
   LIBRDF_NODE_STATEMENT_OBJECT(statement)=node;
 }
 
