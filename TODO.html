@@ -15,6 +15,9 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>swig 1.3.14 may fail to work for some languages (perl,python ok)</li>
+<li>--with-xml-parser=expat seems to be required not optional</li>
+<li>repat test programs fail fresh out of CVS</li>
 <li>make librdf_statement_set_subject* free any existing node before setting</li>
 <li>Docs: note that compiling redland also builds raptor, if both are wanted</li>
 <li>RFE: Add is_literal etc. methods to perl etc. Node class</li>
@@ -66,6 +69,9 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Add a swig test in autogen.sh, abort if it is too old</li>
+<li>swig 1.3.14 changed its default to shadow and failed to work out
+of the box.  Add -noproxy to the swig line for 1.3.14+</li>
 <li>Hacked around repat parser failing to pass bnode ids when as statement objects</li>
 <li>Added relative URI parsing code from Repat (via raptor)</li>
 <li>Handle xml:lang when the rdf parsers provide it</li>
