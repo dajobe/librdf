@@ -295,8 +295,17 @@ librdf_parser_repat_end_parse_type_literal_handler( void* user_data )
     librdf_node* object;
 
     /* create XML content literal string */
+
+    /* FIXME: This does not care about namespaced-elements or
+     * attributes which will appear in the literal string like this:
+     *   'URI-of-element-namespace '^' qname
+     * i.e. the literal is NOT legal an XML document or XML fragment.
+     */
     object=librdf_new_node_from_literal(scontext->literal, NULL, 0, 1);
     LIBRDF_FREE(cstring, scontext->literal);
+    scontext->literal=NULL;
+    scontext->literal_length=0;
+ 
     librdf_statement_set_object(statement,object);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
