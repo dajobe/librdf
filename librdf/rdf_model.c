@@ -1476,7 +1476,7 @@ main(int argc, char *argv[])
   librdf_statement *statement;
   librdf_parser* parser;
   librdf_stream* stream;
-  const char *parser_name="raptor";
+  const char *parser_name="rdfxml";
   #define URI_STRING_COUNT 2
   const unsigned char *file_uri_strings[URI_STRING_COUNT]={(const unsigned char*)"http://example.org/test1.rdf", (const unsigned char*)"http://example.org/test2.rdf"};
   const unsigned char *file_content[URI_STRING_COUNT]={(const unsigned char*)EX1_CONTENT, (const unsigned char*)EX2_CONTENT};

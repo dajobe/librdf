@@ -524,7 +524,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_parser* d;
-  char *test_parser_types[]={"ntriples", "raptor", NULL};
+  char *test_parser_types[]={"ntriples", "rdfxml", NULL};
   int i;
   char *type;
   char *program=argv[0];
