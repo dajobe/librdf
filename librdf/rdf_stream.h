@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2001 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -58,7 +58,7 @@ struct librdf_stream_s {
 /* constructor */
 
 REDLAND_API librdf_stream* librdf_new_stream(librdf_world *world, void* context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
-REDLAND_API librdf_stream* librdf_new_stream_from_node_iterator(librdf_iterator* iterator, librdf_statement* statement, unsigned int field);
+REDLAND_API librdf_stream* librdf_new_stream_from_node_iterator(librdf_iterator* iterator, librdf_statement* statement, librdf_statement_part field);
 
 /* destructor */
 
