@@ -182,6 +182,7 @@ librdf_get_storage_factory (const char *name)
 /**
  * librdf_new_storage:
  * @factory: the factory to use to construct the storage
+ * @options: &librdf_hash of options to initialise storage
  *
  * Constructor: create a new &librdf_storage object
  *
