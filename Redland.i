@@ -213,11 +213,11 @@ librdf_statement* librdf_stream_next(librdf_stream* stream);
 
 /* SWIG world - declare variables wanted from rdf_init.h */
 
-%immutable;
+%readonly
 /* Note: most consts lost for SWIG to remain happy */
 extern const char * redland_copyright_string;
 extern const char * redland_version_string;
 extern int redland_version_major;
 extern int redland_version_minor;
 extern int redland_version_release;
-%mutable;
+%readwrite
