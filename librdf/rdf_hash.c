@@ -58,7 +58,7 @@ librdf_init_hash(void)
   librdf_init_hash_bdb();
 #endif
   /* Always have hash in memory implementation available */
-  librdf_init_hash_memory(7000);
+  librdf_init_hash_memory(-1); /* use default load factor */
 }
 
 /**
