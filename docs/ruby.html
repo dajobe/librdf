@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Redland - RDF Application Framework - Ruby Interface</title>
+</head>
+<body bgcolor="#ffffff" text="#000085">
+
+<h1 align="center">Redland - RDF Application Framework - Ruby Interface</h1>
+
+<h2>Installing the Redland Ruby interface</h2>
+
+<p>This is not automatically built or installed at present since this
+interface may not be required.  You can easily build it by hand as
+follows</p>
+
+<pre>
+  cd ruby
+  make build-ruby
+  make test-ruby   # optional
+</pre>
+
+<p>To install it system wide (this is optional) do this as <em>root</em>:</p>
+
+<pre>
+  root# make install-ruby
+</pre>
+
+<p>The Ruby interface has been tested with Ruby 1.6.4 only and
+is alpha quality - it is the first version and may change a lot.</p>
+
+
+<h2>Redland Ruby API Introduction</h2>
+
+<p>The Ruby API is an object-based API with the class names and method
+names flattened into Ruby procedure names like this:
+librdf_<em>class</em>_<em>method</em> - the same names as in the
+underlying <a href="api/index.html">C API</a>.  The object references
+become Ruby variables.</p>
+
+<h2>Testing the Redland Ruby interface</h2>
+
+<p>The example program provided parses an RDF/XML source file into a
+model.  It should be run with two arguments - the URI of the content
+(as <tt>file:</tt><em>/path/to/content</em>) and the parser name
+(say, repat):</p>
+<pre>
+   ruby example.ruby file:../perl/dc.rdf repat
+</pre>
+<p>NOTE: ONLY <tt>file:</tt> URIs will work with repat, other parsers such as
+sirpac-w3c, sirpac-stanford and libwww can fetch general (http) URIs</p>
+
+
+
+<h2>Other RDF Ruby APIs and applications</h2>
+
+<ul>
+<li>RubyRDF by Dan Brickley</li>
+</ul>
+
+
+<hr />
+
+<p>Copyright 2002 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+</body>
+</html>
