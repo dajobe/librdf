@@ -35,7 +35,7 @@ extern "C" {
 struct librdf_parser_factory_s 
 {
   struct librdf_parser_factory_s* next;
-  /* factory name - required */
+  /* syntax name - required */
   char *name;
   /* handle this MIME type/ Internet Media Type - optional */
   char *mime_type;
