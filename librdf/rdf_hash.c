@@ -376,6 +376,9 @@ librdf_new_hash_from_factory (librdf_hash_factory* factory) {
   }
   
   h->factory=factory;
+
+  /* call factory constructor */
+  h->factory->create(h, h->context);
   
   return h;
 }
@@ -388,7 +391,7 @@ librdf_new_hash_from_factory (librdf_hash_factory* factory) {
  * Return value: a new &librdf_hash object or NULL on failure
  */
 librdf_hash*
-librdf_new_hash_from_hash (librdf_hash* old_hash) {
+librdf_new_hash_from_hash(librdf_hash* old_hash) {
   librdf_hash* hash;
   
   hash=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
@@ -404,13 +407,23 @@ librdf_new_hash_from_hash (librdf_hash* old_hash) {
     return NULL;
   }
 
-  /* FIXME: fail if clone operation not supported */
-  if(!hash->factory->clone ||
-     (hash->factory->clone(hash->context, old_hash->context))) {
-    librdf_free_hash(hash);
-    hash=NULL;
+  if(old_hash->identifier) {
+    hash->identifier=librdf_heuristic_gen_name(old_hash->identifier);
+    if(!hash->identifier) {
+      librdf_free_hash(hash);
+      LIBRDF_FREE(librdf_hash_context, hash->identifier);
+      return NULL;
+    }
   }
-  
+
+  if(hash->factory->clone(hash, hash->context, hash->identifier,
+                          old_hash->context)) {
+    librdf_free_hash(hash);
+    if(hash->identifier)
+      LIBRDF_FREE(cstring, hash->identifier);
+    return NULL;
+  }
+
   return hash;
 }
 
@@ -421,11 +434,12 @@ librdf_new_hash_from_hash (librdf_hash* old_hash) {
  * @hash: hash object
  **/
 void
-librdf_free_hash (librdf_hash* hash) 
+librdf_free_hash(librdf_hash* hash) 
 {
   if(hash->context) {
     if(hash->is_open)
       hash->factory->close(hash->context);
+    hash->factory->destroy(hash->context);
     LIBRDF_FREE(librdf_hash_context, hash->context);
   }
   LIBRDF_FREE(librdf_hash, hash);
@@ -455,6 +469,12 @@ librdf_hash_open(librdf_hash* hash, char *identifier,
 {
   int status;
 
+  if(identifier) {
+    hash->identifier=LIBRDF_MALLOC(cstring, strlen(identifier)+1);
+    if(!hash->identifier)
+      return 1;
+    strcpy(hash->identifier, identifier);
+  }
   status=hash->factory->open(hash->context, identifier, 
                              mode, is_writable, is_new, 
                              options);
@@ -474,6 +494,10 @@ int
 librdf_hash_close(librdf_hash* hash)
 {
   hash->is_open=0;
+  if(hash->identifier) {
+    LIBRDF_FREE(cstring,hash->identifier);
+    hash->identifier=NULL;
+  }
   return hash->factory->close(hash->context);
 }
 
@@ -1395,7 +1419,7 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_hash *h, *h2;
+  librdf_hash *h, *h2, *ch;
   char *test_hash_types[]={"gdbm", "bdb", "memory", NULL};
   char *test_hash_values[]={"colour","yellow", /* Made in UK, can you guess? */
 			    "age", "new",
@@ -1406,7 +1430,8 @@ main(int argc, char *argv[])
 			    NULL, NULL};
   char *test_duplicate_key="colour";
   char *test_hash_array[]={"shape", "cube",
-			   "sides", "six",
+			   "sides", "6", /* for testing get as long */
+                           "3d", "yes", /* testing bool */
 			   "colours", "red",
 			   "colours", "yellow",
 			   "creator", "rubik",
@@ -1416,7 +1441,8 @@ main(int argc, char *argv[])
   char *type;
   char *key, *value;
   char *program=argv[0];
-  
+  int b;
+  long l;
   
   /* initialise hash module */
   librdf_init_hash();
@@ -1432,7 +1458,7 @@ main(int argc, char *argv[])
     
     librdf_hash_open(h, "test", 0644, 1, 1, NULL);
     librdf_hash_from_string(h, argv[1]);
-    fprintf(stdout, "%s: resulting ", program);    
+    fprintf(stdout, "%s: resulting ", program);
     librdf_hash_print(h, stdout);
     fprintf(stdout, "\n");
     librdf_hash_close(h);
@@ -1463,7 +1489,7 @@ main(int argc, char *argv[])
       
       librdf_hash_put(h, key, strlen(key), value, strlen(value));
       
-      fprintf(stdout, "%s: resulting ", program);    
+      fprintf(stdout, "%s: resulting ", program);
       librdf_hash_print(h, stdout);
       fprintf(stdout, "\n");
     }
@@ -1471,7 +1497,7 @@ main(int argc, char *argv[])
     fprintf(stdout, "%s: Deleting key '%s'\n", program, test_hash_delete_key);
     librdf_hash_delete(h, test_hash_delete_key, strlen(test_hash_delete_key));
     
-    fprintf(stdout, "%s: resulting ", program);    
+    fprintf(stdout, "%s: resulting ", program);
     librdf_hash_print(h, stdout);
     fprintf(stdout, "\n");
     
@@ -1483,6 +1509,19 @@ main(int argc, char *argv[])
     librdf_hash_print_values(h, test_duplicate_key, stdout);
     fprintf(stdout, "\n");
 
+    fprintf(stdout, "%s: cloning %s hash\n", program, type);
+    ch=librdf_new_hash_from_hash(h);
+    if(ch) {
+      fprintf(stdout, "%s: resulting cloned ", program);
+      librdf_hash_print(ch, stdout);
+      fprintf(stdout, "\n");
+      
+      librdf_hash_close(ch);
+      librdf_free_hash(ch);
+    } else {
+      fprintf(stderr, "%s: Failed to clone %s hash\n", program, type);
+    }
+
     librdf_hash_close(h);
       
     fprintf(stdout, "%s: Freeing hash\n", program);
@@ -1492,26 +1531,65 @@ main(int argc, char *argv[])
   h2=librdf_new_hash(NULL);
   if(!h2) {
     fprintf(stderr, "%s: Failed to create new hash from default factory\n", program);
-    return(0);
+    return(1);
   }
 
   fprintf(stdout, "%s: Initialising hash from array of strings\n", program);
   if(librdf_hash_from_array_of_strings(h2, test_hash_array)) {
     fprintf(stderr, "%s: Failed to init hash from array of strings\n", program);
-    return(0);
+    return(1);
   }
   
-  fprintf(stdout, "%s: resulting hash ", program);    
+  fprintf(stdout, "%s: resulting hash ", program);
   librdf_hash_print(h2, stdout);
   fprintf(stdout, "\n");
 
-  fprintf(stdout, "%s: resulting hash keys: ", program);    
+  fprintf(stdout, "%s: resulting hash keys: ", program);
   librdf_hash_print_keys(h2, stdout);
   fprintf(stdout, "\n");
 
-  librdf_hash_close(h2);
   
+  /* test get as boolean and long functions */
+  {
+    librdf_iterator* iterator;
+    librdf_hash_datum *key_hd;
+    
+    key_hd=librdf_new_hash_datum(NULL, 0);
+    
+    iterator=librdf_hash_keys(h2, key_hd);
+    while(librdf_iterator_have_elements(iterator)) {
+      char *key_string;
+      
+      librdf_iterator_get_next(iterator);
+      
+      key_string=(char*)LIBRDF_MALLOC(cstring, key_hd->size+1);
+      if(!key_string)
+        break;
+      strncpy(key_string, key_hd->data, key_hd->size);
+      key_string[key_hd->size]='\0';
+      
+      fprintf(stdout, "%s: boolean value of key '%s' is ", program,
+              key_string);
+      b=librdf_hash_get_as_boolean(h2, key_string);
+      fprintf(stdout, "%d (0 F, -1 Bad, else T)\n", b);
+      
+      fprintf(stdout, "%s: long value of key '%s' is ", program,
+              key_string);
+      l=librdf_hash_get_as_long(h2, key_string);
+      fprintf(stdout, "%ld (decimal, -1 Bad)\n", l);
+      
+      LIBRDF_FREE(cstring, key_string);
+    }
+    if(iterator)
+      librdf_free_iterator(iterator);
+    
+    librdf_free_hash_datum(key_hd);
+  }
+
+
   fprintf(stdout, "%s: Freeing hash\n", program);
+  /* close() done automatically by free so not required */
+  /* librdf_hash_close(h2); */
   librdf_free_hash(h2);
   
   /* finish hash module */
