@@ -56,7 +56,7 @@ const unsigned int librdf_version_major = LIBRDF_VERSION_MAJOR;
 const unsigned int librdf_version_minor = LIBRDF_VERSION_MINOR;
 const unsigned int librdf_version_release = LIBRDF_VERSION_RELEASE;
 
-const unsigned int librdf_version_decimal = (LIBRDF_VERSION_MAJOR * 10000)+(LIBRDF_VERSION_MINOR * 100) + LIBRDF_VERSION_RELEASE;
+const unsigned int librdf_version_decimal = LIBRDF_VERSION_DECIMAL;
 
 
 
