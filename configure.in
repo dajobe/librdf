@@ -22,7 +22,8 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-dnl AM_PROG_LIBTOOL
+AC_CHECK_PROGS(JAVA, java jre)
+AC_DEFINE_UNQUOTED(JAVA_COMMAND, "$JAVA")
 
 AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
 AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
@@ -107,7 +108,7 @@ dnl Checks for library functions.
 AC_FUNC_MEMCMP
 
 dnl Checks for URI resolvers
-AC_ARG_WITH(libwww, [  --with-libww  Use libwww [yes]], enable_libwww="$withval", enable_libwww="no") 
+AC_ARG_WITH(libwww, [  --with-libww            Use libwww [yes]], enable_libwww="$withval", enable_libwww="no") 
 
 AC_MSG_CHECKING(whether to use libwww)
 if test "$enable_libwww" = yes ; then
@@ -121,6 +122,31 @@ if test "$enable_libwww" = yes ; then
 else
   AC_MSG_RESULT(no)
 fi
+
+
+dnl Checks for RDF parsers
+
+PARSER_OBJS=
+PARSER_SRCS=
+AC_ARG_WITH(rdf-java-api, [  --with-rdf-java-api=JAR  Use the Java RDF API in the given jar file [no]], rdf_java_api_jar="$withval", rdf_java_api_jar="no") 
+AC_MSG_CHECKING(whether to use Java RDF API)
+if test "$rdf_java_api_jar" != no ; then
+  AC_DEFINE_UNQUOTED(RDF_JAVA_API_JAR, "$rdf_java_api_jar")
+  if test -r $rdf_java_api_jar; then
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(HAVE_SIRPAC_PARSER)
+    PARSER_OBJS="$PARSER_OBJS rdf_parser_sirpac.o"
+    PARSER_SRCS="$PARSER_SRCS rdf_parser_sirpac.c"
+  else
+    AC_MSG_RESULT(no - JAR file $rdf_java_api_jar does not exist)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
+
+AC_SUBST(PARSER_OBJS)
+AC_SUBST(PARSER_SRCS)
+
 
 
 dnl Checks for modules
