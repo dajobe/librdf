@@ -182,11 +182,8 @@ rdf_iterator_test: rdf_iterator.c librdf.la
 
 @SET_MAKE@
 
-$(top_builddir)/expat/xmlparse/xmlparse.lo $(top_builddir)/expat/xmlparse/hashtable.lo $(top_builddir)/expat/xmltok/xmlrole.lo $(top_builddir)/expat/xmltok/xmltok.lo:
-	cd $(srcdir)/../expat && $(MAKE) $(AM_MAKEFLAGS) all
-
 $(top_builddir)/raptor/libraptor.la:
-	cd $(top_builddir)/raptor && $(MAKE) $(AM_MAKEFLAGS) all
+	cd $(top_builddir)/raptor && $(MAKE) $(AM_MAKEFLAGS) libraptor.la
 
-$(SRCDIR)/../repat/librepat.la:
-	cd $(srcdir)/../repat && $(MAKE) $(AM_MAKEFLAGS) all
+$(top_builddir)/repat/librepat.la:
+	cd $(top_builddir)/repat && $(MAKE) $(AM_MAKEFLAGS) librepat.la
