@@ -527,6 +527,9 @@ librdf_iterator* librdf_model_get_contexts(librdf_model* model);
 librdf_node* librdf_model_get_feature(librdf_model* model, librdf_uri* feature);
 int librdf_model_set_feature(librdf_model* model, librdf_uri* feature, librdf_node* value);
 int librdf_model_load(librdf_model* model, librdf_uri *uri, const char *inStrOrNull=NULL, const char *inStrOrNull=NULL, librdf_uri *type_uri=NULL);
+%newobject librdf_model_query_as_stream;
+librdf_stream* librdf_model_query_as_stream(librdf_model* model, librdf_query* query);
+int librdf_model_query_as_bindings(librdf_model* model, librdf_query* query);
 
 
 /* rdf_storage.h */
@@ -551,6 +554,30 @@ librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const
 int librdf_parser_parse_string_into_model(librdf_parser* parser, const char *string, librdf_uri* base_uri, librdf_model* model);
 librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
 int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, librdf_node* value);
+
+
+/* rdf_query.h */
+%newobject librdf_new_query;
+%newobject librdf_new_query_from_query;
+
+librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string);
+librdf_query* librdf_new_query_from_query (librdf_query* old_query);
+void librdf_free_query(librdf_query *query);
+
+/* methods */
+%newobject librdf_query_run_as_stream;
+librdf_stream* librdf_query_run_as_stream(librdf_query* query, librdf_model *model);
+int librdf_query_run_as_bindings(librdf_query* query, librdf_model *model);
+int librdf_query_get_result_count(librdf_query *query);
+int librdf_query_results_finished(librdf_query *query);
+%newobject librdf_query_get_result_binding_value;
+librdf_node* librdf_query_get_result_binding_value(librdf_query *query, int offset);
+const char* librdf_query_get_result_binding_name(librdf_query *query, int offset);
+%newobject librdf_query_get_result_binding_value_by_name;
+librdf_node* librdf_query_get_result_binding_value_by_name(librdf_query *query, const char *name);
+int librdf_query_next_result(librdf_query *query);
+int librdf_query_get_bindings_count(librdf_query *query);
+
 
 /* rdf_serializer.h */
 %newobject librdf_new_serializer;
