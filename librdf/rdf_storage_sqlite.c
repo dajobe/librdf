@@ -1640,8 +1640,6 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
     return 1;
   }
   
-  /* FIXME Store statement + node in the storage_sqlite */
-
   if(librdf_storage_sqlite_statement_helper(storage,
                                             statement,
                                             context_node,
