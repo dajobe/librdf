@@ -236,7 +236,7 @@ main(int argc, char *argv[])
   librdf_serializer* output_serializer=NULL;
   size_t capacity;
   size_t size;
-  const unsigned char *query_graph_serializer_syntax_name="rdfxml";
+  const char *query_graph_serializer_syntax_name="rdfxml";
 
   program=argv[0];
   if((p=strrchr(program, '/')))
