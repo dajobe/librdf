@@ -40,12 +40,9 @@
 
 /* serialising implementing functions */
 static int librdf_parser_raptor_serialise_end_of_stream(void* context);
-static librdf_statement* librdf_parser_raptor_serialise_next_statement(void* context);
+static int librdf_parser_raptor_serialise_next_statement(void* context);
+static void* librdf_parser_raptor_serialise_get_statement(void* context, int flags);
 static void librdf_parser_raptor_serialise_finished(void* context);
-
-
-/* implements parsing into stream or model */
-static librdf_stream* librdf_parser_raptor_parse_common(void *context, librdf_uri *uri, librdf_uri* base_uri, librdf_model *model);
 
 
 typedef struct {
@@ -57,13 +54,19 @@ typedef struct {
 typedef struct {
   librdf_parser_raptor_context* pcontext; /* parser context */
   raptor_parser *rdf_parser;      /* source URI string (for raptor) */
-  raptor_ntriples_parser *ntriples_parser; /* source URI string (for raptor) */
-  librdf_statement* next;   /* next statement */
-  librdf_model *model;      /* model to store in */
-  librdf_list statements;  /* OR list to store statements (STATIC) */
+
+  FILE *fh;
+  
   librdf_uri *source_uri;   /* source URI */
   librdf_uri *base_uri;     /* base URI */
-  int end_of_stream;        /* non 0 if stream finished */
+
+  /* The set of statements pending is a sequence, with 'current'
+   * as the first entry and any remaining ones held in 'statements'.
+   * The latter are filled by the repat parser
+   * sequence is empty := current=NULL and librdf_list_size(statements)=0
+   */
+  librdf_statement* current; /* current statement */
+  librdf_list statements;   /* STATIC following statements after current */
 } librdf_parser_raptor_stream_context;
 
 
@@ -94,8 +97,7 @@ librdf_parser_raptor_init(librdf_parser *parser, void *context)
  * @context: context for callback
  * @statement: raptor_statement
  * 
- * Adds the statement to the list of statements *in core* OR
- * to the model given during initialisation
+ * Adds the statement to the list of statements.
  */
 static void
 librdf_parser_raptor_new_statement_handler (void *context,
@@ -178,57 +180,7 @@ librdf_parser_raptor_new_statement_handler (void *context,
 #endif
 #endif
 
-  if(scontext->model) {
-    librdf_model_add_statement(scontext->model, statement);
-    librdf_free_statement(statement);
-  } else {
-    librdf_list_add(&scontext->statements, statement);
-  }
-}
-
-
-
-/**
- * librdf_parser_raptor_parse_uri_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
- * @context: parser context
- * @uri: &librdf_uri URI of RDF/XML content source
- * @base_uri: &librdf_uri URI of the content location or NULL if the same
- *
- * Retrieves all statements into memory in a list and emits them
- * when the URI content has been exhausted.  Use 
- * librdf_parser_raptor_parse_uri_into_model to update a model without
- * such a memory overhead.
- **/
-static librdf_stream*
-librdf_parser_raptor_parse_uri_as_stream(void *context, librdf_uri *uri,
-                                         librdf_uri *base_uri)
-{
-  return librdf_parser_raptor_parse_common(context, uri, base_uri, NULL);
-}
-
-
-/**
- * librdf_parser_raptor_parse_uri_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
- * @context: parser context
- * @uri: &librdf_uri URI of RDF/XML content source
- * @base_uri: &librdf_uri URI of the content location
- * @model: &librdf_model of model
- *
- * Retrieves all statements and stores them in the given model.
- *
- * Return value: non 0 on failure
- **/
-static int
-librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri, 
-                                          librdf_uri *base_uri,
-                                          librdf_model* model)
-{
-  void *status;
-
-  status=(void*)librdf_parser_raptor_parse_common(context, 
-                                                  uri, base_uri, model);
-  
-  return (status != NULL);
+  librdf_list_add(&scontext->statements, statement);
 }
 
 
@@ -282,28 +234,70 @@ librdf_parser_raptor_warning_handler(void *data, raptor_locator *locator,
 }
 
 
+/* FIXME: Yeah?  What about it? */
+#define RAPTOR_IO_BUFFER_LEN 1024
+
+
+/*
+v * librdf_parser_raptor_get_next_statement - helper function to get the next statement
+ * @context: serialisation context
+ * 
+ * Return value: >0 if a statement found, 0 at end of file, or <0 on error
+ */
+static int
+librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *context) {
+  char buffer[RAPTOR_IO_BUFFER_LEN];
+  int status=0;
+  
+  if(!context->fh)
+    return 0;
+  
+  context->current=NULL;
+  while(!feof(context->fh)) {
+    int len=fread(buffer, 1, RAPTOR_IO_BUFFER_LEN, context->fh);
+    int ret=raptor_parse_chunk(context->rdf_parser, buffer, len, 
+                               (len < RAPTOR_IO_BUFFER_LEN));
+    if(ret) {
+      status=(-1);
+      break; /* failed and done */
+    }
+
+    /* parsing found at least 1 statement, return */
+    if(librdf_list_size(&context->statements)) {
+      context->current=(librdf_statement*)librdf_list_pop(&context->statements);
+      status=1;
+      break;
+    }
+
+    if(len < RAPTOR_IO_BUFFER_LEN)
+      break;
+  }
+
+  if(feof(context->fh) || status <1) {
+    fclose(context->fh);
+    context->fh=NULL;
+  }
+  
+  return status;
+}
+
+
 /**
- * librdf_parser_raptor_parse_common - Retrieve the RDF/XML content at URI and parse it into a librdf_stream or model
+ * librdf_parser_raptor_parse_file_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: parser context
  * @uri: &librdf_uri URI of RDF/XML content source
- * @base_uri: &librdf_uri URI of the content location or NULL if same as uri
- * @model: &librdf_model of model
+ * @base_uri: &librdf_uri URI of the content location or NULL if the same
  *
- * Uses the raptor RDF routines to resolve RDF/XML content at a URI
- * and store it. If the model argument is not NULL, that is used
- * to store the data otherwise the data will be returned as a stream
  *
- * Return value:  If a model is given, the return value is NULL on success.
- * Otherwise the return value is a &librdf_stream or NULL on failure.
  **/
 static librdf_stream*
-librdf_parser_raptor_parse_common(void *context,
-                                  librdf_uri *uri, librdf_uri *base_uri,
-                                  librdf_model* model)
+librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
+                                         librdf_uri *base_uri)
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
   librdf_stream *stream;
+  char* filename;
   raptor_parser *rdf_parser;
   int rc;
   librdf_world *world=uri->world;
@@ -319,7 +313,7 @@ librdf_parser_raptor_parse_common(void *context,
 
   if(!rdf_parser)
     return NULL;
-  
+
   raptor_set_statement_handler(rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
   
@@ -338,62 +332,74 @@ librdf_parser_raptor_parse_common(void *context,
     base_uri=uri;
   scontext->base_uri = base_uri;
 
-  scontext->model=model;
+  filename=(char*)librdf_uri_to_filename(uri);
+  if(!filename)
+    return NULL;
+  
+  scontext->fh=fopen(filename, "r");
+  if(!scontext->fh) {
+#ifndef WIN32
+    extern int errno;
+#endif
+    
+    LIBRDF_DEBUG3(librdf_new_parser_repat, "Failed to open file '%s' - %s\n",
+                  filename, strerror(errno));
+    free(filename);
+    librdf_parser_raptor_serialise_finished((void*)scontext);
+    return(NULL);
+  }
+  free(filename); /* free since it is actually malloc()ed by libraptor */
+
+  /* Start the parse */
+  rc=raptor_start_parse(rdf_parser, (raptor_uri*)base_uri);
+
+  /* start parsing; initialises scontext->statements, scontext->current */
+  librdf_parser_raptor_get_next_statement(scontext);
 
   stream=librdf_new_stream(world,
                            (void*)scontext,
                            &librdf_parser_raptor_serialise_end_of_stream,
                            &librdf_parser_raptor_serialise_next_statement,
+                           &librdf_parser_raptor_serialise_get_statement,
                            &librdf_parser_raptor_serialise_finished);
   if(!stream) {
     librdf_parser_raptor_serialise_finished((void*)scontext);
     return NULL;
   }
 
-  /* Do the work all in one go - should do incrementally - FIXME */
-  rc=raptor_parse_file(rdf_parser, (raptor_uri*)uri, (raptor_uri*)base_uri);
-
-  /* Above line does it all for adding to model */
-  if(model) {
-    librdf_free_stream(stream);
-    return (librdf_stream*)rc;
-  }
-  
   return stream;  
 }
-  
 
-/*
- * librdf_parser_raptor_get_next_statement - helper function to get the next librdf_statement
- * @context: 
- * 
- * Gets the next &librdf_statement from the raptor stream constructed from the
- * raptor RDF parser.
- * 
- * FIXME: Implementation currently stores all statements in memory in
- * a list and emits when the URI content has been exhausted.
- * 
- * Return value: a new &librdf_statement or NULL on error or if no statements found.
+
+/**
+ * librdf_parser_raptor_parse_file_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
+ * @context: parser context
+ * @uri: &librdf_uri URI of RDF/XML content source
+ * @base_uri: &librdf_uri URI of the content location
+ * @model: &librdf_model of model
  *
- */
-static librdf_statement*
-librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *context)
+ * Retrieves all statements and stores them in the given model.
+ *
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_parser_raptor_parse_file_into_model(void *context, librdf_uri *uri, 
+                                          librdf_uri *base_uri,
+                                          librdf_model* model)
 {
-  context->next=(librdf_statement*)librdf_list_pop(&context->statements);
+  librdf_stream* stream;
+  
+  stream=librdf_parser_raptor_parse_file_as_stream(context, uri, base_uri);
+  if(!stream)
+    return 1;
 
-  if(!context->next)
-    context->end_of_stream=1;
-
-  return context->next;
+  return librdf_model_add_statements(model, stream);
 }
 
 
 /**
  * librdf_parser_raptor_serialise_end_of_stream - Check for the end of the stream of statements from the raptor RDF parser
  * @context: the context passed in by &librdf_stream
- * 
- * Uses helper function librdf_parser_raptor_get_next_statement() to try to
- * get at least one statement, to check for end of stream.
  * 
  * Return value: non 0 at end of stream
  **/
@@ -402,52 +408,63 @@ librdf_parser_raptor_serialise_end_of_stream(void* context)
 {
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)context;
 
-  if(scontext->end_of_stream)
-    return 1;
-
-  /* already have 1 stored item - not end yet */
-  if(scontext->next)
-    return 0;
-
-  scontext->next=librdf_parser_raptor_get_next_statement(scontext);
-  if(!scontext->next)
-    scontext->end_of_stream=1;
-
-  return (scontext->next == NULL);
+  return (!scontext->current && !librdf_list_size(&scontext->statements));
 }
 
 
 /**
- * librdf_parser_raptor_serialise_next_statement - Get the next librdf_statement from the stream of statements from the raptor RDF parse
+ * librdf_parser_raptor_serialise_next_statement - Move to the next librdf_statement in the stream of statements from the raptor RDF parse
  * @context: the context passed in by &librdf_stream
  * 
- * Uses helper function librdf_parser_raptor_get_next_statement() to do the
- * work.
- *
- * Return value: a new &librdf_statement or NULL on error or if no statements found.
+ * Return value: non 0 at end of stream
  **/
-static librdf_statement*
+static int
 librdf_parser_raptor_serialise_next_statement(void* context)
 {
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)context;
-  librdf_statement* statement;
 
-  if(scontext->end_of_stream)
-    return NULL;
+  librdf_free_statement(scontext->current);
+  scontext->current=NULL;
 
-  /* return stored statement if there is one */
-  if(scontext->next) {
-    statement=scontext->next;
-    scontext->next=NULL;
-    return statement;
-  }
+  /* get another statement if there is one */
+  while(!scontext->current) {
+    scontext->current=(librdf_statement*)librdf_list_pop(&scontext->statements);
+    if(scontext->current)
+      break;
   
-  /* else get a new one or NULL at end */
-  scontext->next=librdf_parser_raptor_get_next_statement(scontext);
-  if(!scontext->next)
-    scontext->end_of_stream=1;
+    /* else get a new one */
 
-  return scontext->next;
+    /* 0 is end, <0 is error.  Either way stop */
+    if(librdf_parser_raptor_get_next_statement(scontext) <=0)
+      break;
+  }
+
+  return (scontext->current == NULL);
+}
+
+
+/**
+ * librdf_parser_raptor_serialise_get_statement - Get the current librdf_statement from the stream of statements from the raptor RDF parse
+ * @context: the context passed in by &librdf_stream
+ * 
+ * Return value: a new &librdf_statement or NULL on error or if no statements found.
+ **/
+static void*
+librdf_parser_raptor_serialise_get_statement(void* context, int flags)
+{
+  librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)context;
+
+  switch(flags) {
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      return scontext->current;
+
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      return NULL;
+      
+    default:
+      abort();
+  }
+
 }
 
 
@@ -466,17 +483,13 @@ librdf_parser_raptor_serialise_finished(void* context)
     if(scontext->rdf_parser)
       raptor_free(scontext->rdf_parser);
 
-    if(scontext->ntriples_parser)
-      raptor_ntriples_free(scontext->ntriples_parser);
-
-    /* Empty static list of any remaining things */
+    if(scontext->current)
+      librdf_free_statement(scontext->current);
+  
     while((statement=(librdf_statement*)librdf_list_pop(&scontext->statements)))
       librdf_free_statement(statement);
     librdf_list_clear(&scontext->statements);
 
-    if(scontext->next)
-      librdf_free_statement(scontext->next);
-    
     LIBRDF_FREE(librdf_parser_raptor_context, scontext);
   }
 }
@@ -565,8 +578,8 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
   factory->context_length = sizeof(librdf_parser_raptor_context);
   
   factory->init  = librdf_parser_raptor_init;
-  factory->parse_uri_as_stream = librdf_parser_raptor_parse_uri_as_stream;
-  factory->parse_uri_into_model = librdf_parser_raptor_parse_uri_into_model;
+  factory->parse_file_as_stream = librdf_parser_raptor_parse_file_as_stream;
+  factory->parse_file_into_model = librdf_parser_raptor_parse_file_into_model;
 }
 
 
@@ -586,4 +599,15 @@ librdf_parser_raptor_constructor(librdf_world *world)
   librdf_parser_register_factory(world, "ntriples", "text/plain",
                                  "http://www.w3.org/TR/rdf-testcases/#ntriples",
                                  &librdf_parser_raptor_register_factory);
+}
+
+
+/**
+ * librdf_parser_raptor_destructor - Terminate the raptor RDF parser module
+ * @world: redland world object
+ **/
+void
+librdf_parser_raptor_destructor(void)
+{
+  raptor_finish();
 }
