@@ -642,29 +642,23 @@ for parser in $parser_modules; do
 
     raptor)
       if test $have_raptor = 1 ; then
-	if test $have_libxml_lib = 1; then
+	if test $xml_parser="libxml"; then
 	  need_libxml=1
 	  found=1
 	  AC_DEFINE(NEED_LIBXML)
 	  AC_DEFINE(RAPTOR_XML_LIBXML)
-	elif test $have_libxml_source = 1; then
-	  need_libxml=1
-	  need_libxml_source=1
-	  found=1
-	  AC_DEFINE(NEED_LIBXML)
-	  AC_DEFINE(RAPTOR_XML_LIBXML)
-	elif test $have_expat_lib = 1; then
+	  if test $have_libxml_source = 1; then
+	    need_libxml_source=1
+          fi
+	else # expat
 	  need_expat=1
 	  found=1
 	  AC_DEFINE(NEED_EXPAT)
 	  AC_DEFINE(RAPTOR_XML_EXPAT)
-	elif test $have_expat_source = 1; then
-	  need_expat=1
-	  need_expat_source=1
-	  found=1
-	  AC_DEFINE(NEED_EXPAT)
-	  AC_DEFINE(RAPTOR_XML_EXPAT)
-       	fi
+	  if test $have_expat_source = 1; then
+  	    need_expat_source=1
+	  fi
+        fi
        	need_raptor=1
       fi
         
