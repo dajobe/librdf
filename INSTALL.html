@@ -36,15 +36,15 @@ below in <em>create the configure program</em>.</p>
 <h3>2.1. Create <tt>configure</tt> program</h3>
 
 <p>If there is no <tt>configure</tt> program, you can create it 
-using the
+using the <tt>autogen.sh</tt> script, as long as you have the
 <a href="http://www.gnu.org/software/automake/automake.html">automake</a> and
 <a href="http://www.gnu.org/software/autoconf/autoconf.html">autoconf</a>
-tools with:</p>
+tools.  Alternatively you can run them by hand with:</p>
 <pre>
-  automake --add-missing; aclocal; autoheader; autoconf; autoheader
+  aclocal; autoheader; automake --add-missing; autoconf
 </pre>
-<p>(Yes autoheader twice)</p>
-
+<p>(Ignore any warnings from autoconf about AC_TRY_RUN, it is caused
+by an autoconf macro and IMHO is an autoconf bug.)</p>
 
 <h3>2.2. Options for <tt>configure</tt></h3>
 
