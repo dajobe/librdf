@@ -29,6 +29,9 @@
 #ifdef HAVE_STRING_H
 #include <string.h> /* for memcmp */
 #endif
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h> /* for abort() as used in errors */
+#endif
 
 #include <librdf.h>
 #include <rdf_hash.h>
