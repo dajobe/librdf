@@ -166,6 +166,7 @@ main(int argc, char *argv[])
   librdf_model* model;
   librdf_statement* partial_statement;
   librdf_node *source, *arc, *target, *node;
+  librdf_node* context_node=NULL;
   librdf_stream* stream;
   librdf_iterator* iterator;
   librdf_uri *uri;
@@ -175,7 +176,6 @@ main(int argc, char *argv[])
   int usage=0;
   int help=0;
   int is_new=0;
-  int contexts=0;
   char *identifier=NULL;
   char *cmd=NULL;
   char *name;
@@ -489,18 +489,6 @@ main(int argc, char *argv[])
   }
 
 
-  uri=librdf_new_uri(world, (const unsigned char*)LIBRDF_MODEL_FEATURE_CONTEXTS);
-  contexts=0;
-  if(uri) {
-    node=librdf_model_get_feature(model, uri);
-    if(node) {
-      contexts=atoi((const char*)librdf_node_get_literal_value(node));
-      librdf_free_node(node);
-    }
-    librdf_free_uri(uri);
-  }
-
-
   /* Do this or gcc moans */
   stream=NULL;
   iterator=NULL;
@@ -804,8 +792,6 @@ main(int argc, char *argv[])
           /* Print out matching statements */
           if(type==CMD_FIND || type==CMD_MATCH) {
             if(argc == 4 || type==CMD_MATCH) {
-              librdf_node *context_node=NULL;
-              
               if(argc == 4) {
                 if (librdf_heuristic_is_blank_node(argv[3]))
                   context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
@@ -835,7 +821,7 @@ main(int argc, char *argv[])
             count=0;
             while(!librdf_stream_end(stream)) {
               librdf_statement *statement=librdf_stream_get_object(stream);
-              librdf_node *context_node=(librdf_node*)librdf_stream_get_context(stream);
+              context_node=(librdf_node*)librdf_stream_get_context(stream);
               if(!statement) {
                 fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
                 break;
@@ -866,9 +852,7 @@ main(int argc, char *argv[])
           
         case CMD_ADD:
         case CMD_ADD_TYPED:
-          if(argv[3] && contexts) {
-            librdf_node* context_node;
-
+          if(argv[3]) {
             if (librdf_heuristic_is_blank_node(argv[3]))
               context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
             else
@@ -889,9 +873,7 @@ main(int argc, char *argv[])
           break;
           
         case CMD_REMOVE:
-          if(argv[3] && contexts) {
-            librdf_node* context_node;
-
+          if(argv[3]) {
             if (librdf_heuristic_is_blank_node(argv[3]))
               context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
             else
@@ -900,11 +882,8 @@ main(int argc, char *argv[])
             rc=librdf_model_context_remove_statement(model, context_node,
                                                      partial_statement);
             librdf_free_node(context_node);
-          } else {
-            if(argv[3])
-              fprintf(stderr, "%s: ERROR: Cannot remove triple in context - model does not support contexts\n", program);
+          } else
             rc=librdf_model_remove_statement(model, partial_statement);
-          }
           if(rc)
             fprintf(stdout, "%s: failed to remove triple from the graph\n", program);
           else
@@ -973,7 +952,7 @@ main(int argc, char *argv[])
       /* (Common code) Print out nodes */
       count=0;
       while(!librdf_iterator_end(iterator)) {
-        librdf_node *context_node=(librdf_node*)librdf_iterator_get_context(iterator);
+        context_node=(librdf_node*)librdf_iterator_get_context(iterator);
         node=(librdf_node*)librdf_iterator_get_object(iterator);
         if(!node) {
           fprintf(stderr, "%s: librdf_iterator_get_object returned NULL\n",
@@ -1093,7 +1072,7 @@ main(int argc, char *argv[])
 
       count=0;
       while(!librdf_iterator_end(iterator)) {
-        librdf_node *context_node=(librdf_node*)librdf_iterator_get_context(iterator);
+        context_node=(librdf_node*)librdf_iterator_get_context(iterator);
         node=(librdf_node*)librdf_iterator_get_object(iterator);
         if(!node) {
           fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
@@ -1139,56 +1118,47 @@ main(int argc, char *argv[])
       break;
 
     case CMD_REMOVE_CONTEXT:
-      if(contexts) {
-        librdf_node* context_node;
-
-        if (librdf_heuristic_is_blank_node(argv[0]))
-          context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
-        else
-          context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
+      if (librdf_heuristic_is_blank_node(argv[0]))
+        context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
+      else
+        context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
       
-        rc=librdf_model_context_remove_statements(model, context_node);
-        librdf_free_node(context_node);
-        
-        if(rc)
-          fprintf(stdout, "%s: failed to remove context triples from the graph\n", program);
-        else
-          fprintf(stdout, "%s: removed context triples from the graph\n", program);
-      } else
-        fprintf(stderr, "%s: ERROR: Cannot remove contexts - model does not support contexts\n", program);
-
+      rc=librdf_model_context_remove_statements(model, context_node);
+      librdf_free_node(context_node);
+      
+      if(rc)
+        fprintf(stdout, "%s: failed to remove context triples from the graph\n", program);
+      else
+        fprintf(stdout, "%s: removed context triples from the graph\n", program);
       break;
 
 
     case CMD_CONTEXTS:
-      if(contexts) {
-        iterator=librdf_model_get_contexts(model);
-        if(!iterator) {
-          fprintf(stderr, "%s: Failed to get contexts\n", program);
+      iterator=librdf_model_get_contexts(model);
+      if(!iterator) {
+        fprintf(stderr, "%s: Failed to get contexts\n", program);
+        break;
+      }
+      
+      count=0;
+      while(!librdf_iterator_end(iterator)) {
+        node=(librdf_node*)librdf_iterator_get_object(iterator);
+        if(!node) {
+          fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
+                  program);
           break;
         }
-
-        count=0;
-        while(!librdf_iterator_end(iterator)) {
-          node=(librdf_node*)librdf_iterator_get_object(iterator);
-          if(!node) {
-            fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
-                    program);
-            break;
-          }
-          
-          fputs("Context: ", stdout);
-          librdf_node_print(node, stdout);
-          fputc('\n', stdout);
-          
-          librdf_free_node(node);
-          count++;
-          librdf_iterator_next(iterator);
-        }
-        librdf_free_iterator(iterator);
-        fprintf(stderr, "%s: contexts: %d\n", program, count);
-} else
-        fprintf(stderr, "%s: ERROR: Cannot list contexts - model does not support contexts\n", program);
+        
+        fputs("Context: ", stdout);
+        librdf_node_print(node, stdout);
+        fputc('\n', stdout);
+        
+        librdf_free_node(node);
+        count++;
+        librdf_iterator_next(iterator);
+      }
+      librdf_free_iterator(iterator);
+      fprintf(stderr, "%s: contexts: %d\n", program, count);
       break;
 
 
