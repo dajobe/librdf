@@ -146,7 +146,7 @@ rdf_uri_test: rdf_uri.c librdf.la
 rdf_statement_test: rdf_statement.c librdf.la
 	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la $(LIBS)
 
-rdf_model_test: rdf_model.c librdf.la ex1.rdf ex2.rdf
+rdf_model_test: rdf_model.c librdf.la
 	$(LINK) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_model.c librdf.la $(LIBS)
 
 rdf_storage_test: rdf_storage.c librdf.la
