@@ -77,8 +77,7 @@ librdf_new_statement(librdf_world *world)
     return NULL;
 
   new_statement->world=world;
-  new_statement->usage=1;
-  
+
   return new_statement;
 }
 
@@ -93,10 +92,40 @@ librdf_new_statement(librdf_world *world)
 librdf_statement*
 librdf_new_statement_from_statement(librdf_statement* statement)
 {
+  librdf_statement* new_statement;
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
-  statement->usage++;
-  return statement;
+  if(!statement)
+    return NULL;
+  
+  new_statement = librdf_new_statement(statement->world);
+  if(!new_statement)
+    return NULL;
+
+  if(statement->subject) {
+    new_statement->subject=librdf_new_node_from_node(statement->subject);
+    if(!new_statement->subject) {
+      librdf_free_statement(new_statement);
+      return NULL;
+    }
+  }
+  if(statement->predicate) {
+    new_statement->predicate=librdf_new_node_from_node(statement->predicate);
+    if(!new_statement->predicate) {
+      librdf_free_statement(new_statement);
+      return NULL;
+    }
+  }
+  if(statement->object) {
+    new_statement->object=librdf_new_node_from_node(statement->object);
+    if(!new_statement->object) {
+      librdf_free_statement(new_statement);
+      return NULL;
+    }
+  }
+
+  return new_statement;
 }
 
 
@@ -205,16 +234,6 @@ librdf_free_statement(librdf_statement* statement)
   world = node->world;
   pthread_mutex_lock(world->statements_mutex);
 #endif
-
-  statement->usage--;
-  
-  /* decrement usage, don't free if not 0 yet*/
-  if(statement->usage) {
-#ifdef WITH_THREADS
-    pthread_mutex_unlock(world->statements_mutex);
-#endif
-    return;
-  }
 
   librdf_statement_clear(statement);
 

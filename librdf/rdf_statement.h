@@ -36,7 +36,6 @@ extern "C" {
 struct librdf_statement_s
 {
   librdf_world* world;
-  int usage;
   librdf_node* subject;
   librdf_node* predicate;
   librdf_node* object;
