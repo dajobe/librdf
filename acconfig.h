@@ -37,7 +37,7 @@
 #undef HAVE_BDB_DB_TXN
 #undef HAVE_BDB_CURSOR
 /* V2 versiosn differ / V3 */
-#define HAVE_BDB_CURSOR_4_ARGS
+#undef HAVE_BDB_CURSOR_4_ARGS
 /* V3 */
 #undef HAVE_DB_CREATE
 /* V2 */
