@@ -270,8 +270,11 @@ static int
 librdf_storage_list_contains_statement(librdf_storage* storage, librdf_statement* statement)
 {
   librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_node sln; /* STATIC */
+  sln.statement=statement;
+  sln.context=NULL;
 
-  return librdf_list_contains(context->list, statement);
+  return librdf_list_contains(context->list, &sln);
 }
 
 
