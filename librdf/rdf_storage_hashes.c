@@ -532,7 +532,7 @@ librdf_storage_hashes_grow_buffer(unsigned char **buffer, size_t *len,
   *buffer=(unsigned char*)LIBRDF_MALLOC(data, *len);
   if(!*buffer)
     *len=0;
-  return (*len >= required_len);
+  return (*len < required_len);
 }
 
 
@@ -614,8 +614,8 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
 #endif
 
     /* Finally, store / remove the sucker */
-    hd_key.data=context->key_buffer; hd_key.size=context->key_buffer_len;
-    hd_value.data=context->value_buffer; hd_value.size=context->value_buffer_len;
+    hd_key.data=context->key_buffer; hd_key.size=key_len;
+    hd_value.data=context->value_buffer; hd_value.size=value_len;
     
     if(is_addition)
       status=librdf_hash_put(context->hashes[i], &hd_key, &hd_value);
@@ -1341,10 +1341,13 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
   int size;
   int status;
   
+  if(context->contexts_index <0)
+    return 1;
+  
   if(librdf_storage_hashes_add_remove_statement(storage, 
                                                 statement, context_node, 1))
     return 1;
-  
+
   size=librdf_node_encode(context_node, NULL, 0);
   key.data=(char*)LIBRDF_MALLOC(cstring, size);
   key.size=librdf_node_encode(context_node, (unsigned char*)key.data, size);
