@@ -1,3 +1,10 @@
+2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* configure.ac:
+	Do not configure raptor, rasqal directories unless compiling and
+	using them.
+	That should save a lot of configure time.
+
 2004-07-26  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* AUTHORS: Merged out csharp/AUTHORS
