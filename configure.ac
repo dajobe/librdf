@@ -348,7 +348,7 @@ for name in $ecma_cli_name mono dotgnu no; do
         CLIRUN=$MONO
         CSHARPC=$MCS
         CSHARPCFLAGS="-debug+"
-        CLI_PREFIX=`$(PKG_CONFIG) mono --variable=prefix`
+        CLI_PREFIX=`$PKG_CONFIG mono --variable=prefix`
         ecma_cli=Mono
       fi
       ;;
