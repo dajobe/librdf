@@ -210,6 +210,7 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
 
   if(scontext->model) {
     librdf_model_add_statement(scontext->model, statement);
+    librdf_free_statement(statement);
   } else {
     librdf_list_add(scontext->statements, statement);
   }
@@ -637,8 +638,12 @@ librdf_parser_libwww_serialise_finished(void* context)
     if(scontext->parser)
       HTRDF_delete(scontext->parser);
 
-    if(scontext->statements)
+    if(scontext->statements) {
+      librdf_statement* statement;
+      while((statement=(librdf_statement*)librdf_list_pop(scontext->statements)))
+        librdf_free_statement(statement);
       librdf_free_list(scontext->statements);
+    }
 
     if(scontext->next)
       librdf_free_statement(scontext->next);
