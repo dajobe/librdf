@@ -192,14 +192,21 @@ librdf_get_serializer_factory(librdf_world *world,
 	continue;
 
       /* MIME type may need to match */
-      if(mime_type && factory->mime_type &&
-         strcmp(factory->mime_type, mime_type))
-        continue;
+      if(mime_type) {
+        if(!factory->mime_type)
+          continue;
+        if(strcmp(factory->mime_type, mime_type))
+          continue;
+      }
       
       /* URI may need to match */
-      if(type_uri && factory->type_uri &&
-         ! librdf_uri_equals(factory->type_uri, type_uri))
-        continue;
+      if(type_uri) {
+        if(!factory->type_uri)
+          continue;
+        
+        if(librdf_uri_equals(factory->type_uri, type_uri))
+          continue;
+      }
 
       /* found it */
       break;
