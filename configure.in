@@ -1040,6 +1040,7 @@ ruby/Makefile
 repat/Makefile
 debian/Makefile
 debian/rules
+aux/Makefile
 librdf/redland.spec,
 [chmod +x redland-config redland-src-config debian/rules])
 
