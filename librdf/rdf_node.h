@@ -87,10 +87,25 @@ extern "C" {
 
 
 /* Node types */
+
+/* DEPENDENCY: If this list is changed, the librdf_node_type_names definition in rdf_node.c
+ * must be updated to match 
+*/
 typedef enum {
-  LIBRDF_NODE_TYPE_RESOURCE, /* A resource (& property) - has a URI */
-  LIBRDF_NODE_TYPE_LITERAL   /* A literal - an XML string + language */
+  LIBRDF_NODE_TYPE_UNKNOWN   = 0,  /* To catch uninitialised nodes */
+  LIBRDF_NODE_TYPE_RESOURCE  = 1,  /* rdf:Resource (& rdf:Property) - has a URI */
+  LIBRDF_NODE_TYPE_PROPERTY  = LIBRDF_NODE_TYPE_RESOURCE,
+  LIBRDF_NODE_TYPE_LITERAL   = 2,  /* rdf:Literal - has an XML string, language, XML space */
+  LIBRDF_NODE_TYPE_STATEMENT = 3,  /* rdf:Statement - has a subject, predicate, object, is_stated */
+  LIBRDF_NODE_TYPE_BAG       = 4,  /* rdf:Bag */
+  LIBRDF_NODE_TYPE_SEQ       = 5,  /* rdf:Seq */
+  LIBRDF_NODE_TYPE_ALT       = 6,  /* rdf:Alt */
+  LIBRDF_NODE_TYPE_LI        = 7,  /* rdf:li and rdf:_ forms - has an integer */
+  LIBRDF_NODE_TYPE_MODEL     = 8,  /* FIXME: no RDF M&S or Schema concept */
+
+  LIBRDF_NODE_TYPE_LAST      = LIBRDF_NODE_TYPE_MODEL
 } librdf_node_type;
+
 
 
 /* literal xml:space values as defined in
@@ -112,7 +127,7 @@ struct librdf_node_s
   {
     struct
     {
-      /* resources have URIs */
+      /* rdf:Resource and rdf:Property-s have URIs */
       librdf_uri *uri;
     } resource;
     struct
@@ -132,12 +147,35 @@ struct librdf_node_s
       /* XML space preserving properties (xml:space) */
       librdf_node_literal_xml_space xml_space;
     } literal;
+    struct 
+    {
+      /* rdf:Statement-s have s,p and o */
+      librdf_node* subject;
+      librdf_node* predicate;
+      librdf_node* object;
+    } statement;
+    struct 
+    {
+      /* rdf:li and rdf:_-s have an ordinal */ 
+      int ordinal;
+    } li;
   } value;
 };
 
 
+#ifdef LIBRDF_INTERNAL
+
+/* convienience macros - internal */
+#define LIBRDF_NODE_STATEMENT_SUBJECT(s)   ((s)->value.statement.subject)
+#define LIBRDF_NODE_STATEMENT_PREDICATE(s) ((s)->value.statement.predicate)
+#define LIBRDF_NODE_STATEMENT_OBJECT(s)    ((s)->value.statement.object)
+
+#endif
+
+
 /* class methods */
 void librdf_init_node(librdf_digest_factory* factory);
+void librdf_finish_node(void);
 
 
 /* initialising functions / constructors */
@@ -146,13 +184,16 @@ void librdf_init_node(librdf_digest_factory* factory);
 librdf_node* librdf_new_node(void);
 
 /* Create a new resource Node from URI string. */
-librdf_node* librdf_new_node_from_uri_string(char *string);
+librdf_node* librdf_new_node_from_uri_string(const char *string);
 
 /* Create a new resource Node from URI object. */
 librdf_node* librdf_new_node_from_uri(librdf_uri *uri);
 
+/* Create a new resource Node from URI object with a qname */
+librdf_node* librdf_new_node_from_uri_qname(librdf_uri *uri, const char *qname);
+
 /* Create a new Node from literal string / language. */
-librdf_node* librdf_new_node_from_literal(char *string, char *xml_language, int xml_space, int is_wf_xml);
+librdf_node* librdf_new_node_from_literal(const char *string, const char *xml_language, int xml_space, int is_wf_xml);
 
 /* Create a new Node from an existing Node - CLONE */
 librdf_node* librdf_new_node_from_node(librdf_node *node);
@@ -170,11 +211,16 @@ int librdf_node_set_uri(librdf_node* node, librdf_uri *uri);
 librdf_node_type librdf_node_get_type(librdf_node* node);
 void librdf_node_set_type(librdf_node* node, librdf_node_type type);
 
+const char* librdf_node_get_type_as_string(int type);
+
 char* librdf_node_get_literal_value(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 int librdf_node_get_literal_value_xml_space(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
-int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_language, int xml_space, int is_wf_xml);
+int librdf_node_set_literal_value(librdf_node* node, const char* value, const char *xml_language, int xml_space, int is_wf_xml);
+
+int librdf_node_get_li_ordinal(librdf_node* node);
+void librdf_node_set_li_ordinal(librdf_node* node, int ordinal);
 
 librdf_digest* librdf_node_get_digest(librdf_node* node);
 
