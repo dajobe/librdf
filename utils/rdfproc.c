@@ -105,7 +105,7 @@ static command commands[]={
   {CMD_REMOVE, "remove", 3, 4, 1},
   {CMD_ADD_TYPED, "add-typed", 5, 6, 1},
   {CMD_PARSE_MODEL, "parse", 1, 3, 1},
-  {CMD_PARSE_STREAM, "parse-stream", 1, 3, 1},
+  {CMD_PARSE_STREAM, "parse-stream", 1, 4, 1},
   {CMD_ARCS_IN, "arcs-in", 1, 1, 0},
   {CMD_ARCS_OUT, "arcs-out", 1, 1, 0},
   {CMD_HAS_ARC_IN, "has-arc-in", 2, 2, 0},
@@ -394,10 +394,10 @@ main(int argc, char *argv[])
     printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Storage options (default \"%s\")\n"), storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
-    puts("  parse FILE|URI [SYNTAX [BASE URI]]        Parse syntax in FILE or URI");
-    puts("                                            into the graph (RDF/XML).");
-    puts("  parse-stream FILE|URI [SYNTAX [BASE URI]  Streaming parse syntax in FILE or");
-    puts("                                            URI into the graph (RDF/XML).");
+    puts("  parse FILE|URI [SYNTAX [BASEURI]]");
+    puts("  parse-stream FILE|URI [SYNTAX [BASEURI [CONTEXT]]]");
+    puts("      Parse RDF syntax (default RDF/XML) in FILE or URI into the graph");
+    puts("      with optional BASEURI, into the optional CONTEXT.");
     puts("  print                                     Print the graph triples.");
     puts("  serialize [SYNTAX [URI [MIME-TYPE]]]      Serializes to a syntax (RDF/XML).");
 #if 0
@@ -507,7 +507,7 @@ main(int argc, char *argv[])
               librdf_uri_as_string(uri), 
               (argc > 1) ? argv[1] : "default");
       
-      if(argc == 3 && argv[2]) {
+      if(argc >= 3 && argv[2]) {
         base_uri=librdf_new_uri(world, (const unsigned char *)argv[2]);
         if(!base_uri) {
           fprintf(stderr, "%s: Failed to create base URI from %s\n", program, argv[2]);
@@ -515,6 +515,16 @@ main(int argc, char *argv[])
         }
         fprintf(stderr, "%s: Using base URI %s\n", program,
                 librdf_uri_as_string(base_uri));
+
+        target=NULL; /* context node */
+        if(argc >= 4 && argv[3]) {
+          if (librdf_heuristic_is_blank_node(argv[3]))
+            target=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
+          else
+            target=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
+        }
+        fprintf(stderr, "%s: Using context node %s\n", program,
+                argv[3]);
       } else
         base_uri=librdf_new_uri_from_uri(uri);
       
@@ -539,11 +549,19 @@ main(int argc, char *argv[])
             break;
           }
           
-          librdf_model_add_statement(model, statement);
+          if(target)  /* context node */
+            librdf_model_context_add_statement(model, target, statement);
+          else
+            librdf_model_add_statement(model, statement);
           count++;
           librdf_stream_next(stream);
         }
         librdf_free_stream(stream);  
+
+        if(target) {
+          librdf_free_node(target);
+          target=NULL;
+        }
 
         fprintf(stderr, "%s: Added %d triples\n", program, count);
         rc=1;
@@ -1048,6 +1066,12 @@ main(int argc, char *argv[])
 
     case CMD_CONTEXTS:
       if(contexts) {
+        iterator=librdf_model_get_contexts(model);
+        if(!iterator) {
+          fprintf(stderr, "%s: Failed to get contexts\n", program);
+          break;
+        }
+
         count=0;
         while(!librdf_iterator_end(iterator)) {
           node=(librdf_node*)librdf_iterator_get_object(iterator);
