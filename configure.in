@@ -235,7 +235,7 @@ AC_MSG_RESULT($bdb_include_dir)
 
 bdb_available=
 if test "$bdb_prefix" != no; then
-  nLDFLAGS=
+  nLDFLAGS=$LDFLAGS
   nCPPFLAGS=
 
   if test "$bdb_lib_dir" != /usr/lib; then
