@@ -173,18 +173,6 @@ void librdf_system_free(void *ptr);
 #include <rdf_files.h>
 #include <rdf_heuristics.h>
 
-#ifdef NEED_EXPAT_SOURCE
-/* Define correct header define for internal expat sources since this
- * is determined after configure has done a header hunt
- */
-#undef HAVE_EXPAT_H
-#undef HAVE_XMLPARSE_H
-/* Must change this when expat in source tree is changed to be newer one */
-#define HAVE_XMLPARSE_H 1
-#endif
-
-#endif
-
 /* public interfaces */
 #include <rdf_init.h>
 #include <rdf_iterator.h>
