@@ -48,7 +48,7 @@
 #include <rdf_storage.h>
 
 
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
 #include <sqlite3.h>
 #define sqlite_exec sqlite3_exec
 #define sqlite_close sqlite3_close
@@ -57,7 +57,7 @@
 #define sqlite_last_insert_rowid sqlite3_last_insert_rowid
 #endif
 
-#ifdef HAVE_SQLITE_H
+#if SQLITE_API == 2
 #include <sqlite.h>
 #endif
 
@@ -66,9 +66,10 @@ typedef struct
 {
   librdf_storage *storage;
 
-#ifdef HAVE_SQLITE3_H  
+#if SQLITE_API == 3
   sqlite3 *db;
-#else
+#endif
+#if SQLITE_API == 2
   sqlite *db;
 #endif
 
@@ -614,8 +615,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
   librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
   int rc=SQLITE_OK;
   char *errmsg=NULL;
-#ifdef HAVE_SQLITE3_H
-#else
+#if SQLITE_API == 2
   int mode=0;
 #endif
   int db_file_exists=0;
@@ -626,22 +626,24 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
   if(context->is_new && db_file_exists)
     unlink(context->name);
 
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
   context->db=NULL;
   rc=sqlite3_open(context->name, &context->db);
   if(rc != SQLITE_OK)
     errmsg=(char*)sqlite3_errmsg(context->db);
-#else
+#endif
+#if SQLITE_API == 2
   context->db=sqlite_open(context->name, mode, &errmsg);
 #endif
   if(rc != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "SQLite database %s open failed - %s", 
                context->name, errmsg);
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
     sqlite_freemem(errmsg);
     sqlite3_close(context->db);
-#else
+#endif
+#if SQLITE_API == 2
     free(errmsg);
 #endif
     return 1;
@@ -941,11 +943,12 @@ typedef struct {
   librdf_statement *statement;
   librdf_node* context;
 
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
   /* OUT from sqlite3_prepare: */
   sqlite3_stmt *vm;
   const char *pzTail;
-#else
+#endif
+#if SQLITE_API == 2
   sqlite_vm *vm;
   /* OUT from vm: */
   const char *pzTail;
@@ -979,7 +982,7 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 
   request=raptor_stringbuffer_as_string(sb);
 
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
   status=sqlite3_prepare(context->db,
                          (const char*)request,
                          strlen((const char*)request),
@@ -987,7 +990,8 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
                          &scontext->pzTail);
   if(status != SQLITE_OK)
     errmsg=(char*)sqlite3_errmsg(context->db);
-#else  
+#endif
+#if SQLITE_API == 2  
   status=sqlite_compile(context->db,
                         request,
                         &scontext->pzTail, &scontext->ppVm,
@@ -1023,13 +1027,14 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 }
 
 
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
 static int
 librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
                                       sqlite3_stmt *vm,
                                       librdf_statement **statement,
                                       librdf_node **context_node) {
-#else
+#endif
+#if SQLITE_API == 2
 static int
 librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
                                       sqlite_vm *vm,
@@ -1037,8 +1042,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
                                       librdf_node **context_node) {
 #endif
   int status=SQLITE_BUSY;
-#ifdef HAVE_SQLITE3_H
-#else
+#if SQLITE_API == 2
   int pN;
   const char **pazValue;   /* Column data */
   const char **pazColName; /* Column names and datatypes */
@@ -1052,9 +1056,10 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
    * SQLITE_MISUSE.
   */
   do {
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
     status=sqlite3_step(vm);
-#else
+#endif
+#if SQLITE_API == 2
     status=sqlite_step(vm, &pN, &pazValue, &pazColName);
 #endif
     if(status == SQLITE_BUSY) {
@@ -1089,6 +1094,16 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
  9  contextUri
 */
 
+#if SQLITE_API == 3
+  #define GET_COLUMN_VALUE_TEXT(col) sqlite3_column_text(col)
+  #define GET_COLUMN_VALUE_INT(col) sqlite3_column_int(col)
+#endif
+#if SQLITE_API == 2
+  #define GET_COLUMN_VALUE_TEXT(col) (unsigned char*)pazValue[col]
+  #define GET_COLUMN_VALUE_INT(col) atoi(pazValue[col])
+#endif
+
+
 #if LIBRDF_DEBUG > 2
     for(i=0; i<sqlite3_column_count(vm); i++)
       fprintf(stderr, "%s, ", sqlite3_column_name(vm, i));
@@ -1111,25 +1126,25 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
     librdf_statement_clear(*statement);
 
     /* subject */
-    uri_string=sqlite3_column_text(vm, 0);
+    uri_string=GET_COLUMN_VALUE_TEXT(0);
     if(uri_string)
       node=librdf_new_node_from_uri_string(scontext->storage->world,
                                            uri_string);
     else {
-      blank=sqlite3_column_text(vm, 1);
+      blank=GET_COLUMN_VALUE_TEXT(1);
       node=librdf_new_node_from_blank_identifier(scontext->storage->world,
                                                  blank);
     }
     librdf_statement_set_subject(*statement, node);
 
 
-    uri_string=sqlite3_column_text(vm, 2);
+    uri_string=GET_COLUMN_VALUE_TEXT(2);
     node=librdf_new_node_from_uri_string(scontext->storage->world,
                                          uri_string);
     librdf_statement_set_predicate(*statement, node);
 
-    uri_string=sqlite3_column_text(vm, 3);
-    blank=sqlite3_column_text(vm, 4);
+    uri_string=GET_COLUMN_VALUE_TEXT(3);
+    blank=GET_COLUMN_VALUE_TEXT(4);
     if(uri_string)
       node=librdf_new_node_from_uri_string(scontext->storage->world,
                                            uri_string);
@@ -1137,12 +1152,12 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
       node=librdf_new_node_from_blank_identifier(scontext->storage->world,
                                                  blank);
     else {
-      const unsigned char *literal=sqlite3_column_text(vm, 5);
-      const unsigned char *language=sqlite3_column_text(vm, 6);
+      const unsigned char *literal=GET_COLUMN_VALUE_TEXT(5);
+      const unsigned char *language=GET_COLUMN_VALUE_TEXT(6);
       librdf_uri *datatype=NULL;
       
-      /* int datatype_id= sqlite3_column_int(vm, 7); */
-      uri_string=sqlite3_column_text(vm, 8);
+      /* int datatype_id= GET_COLUMN_VALUE_INT(7); */
+      uri_string=GET_COLUMN_VALUE_TEXT(8);
       if(uri_string)
         datatype=librdf_new_uri(scontext->storage->world, uri_string);
       
@@ -1153,7 +1168,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
     }
     librdf_statement_set_object(*statement, node);
 
-    uri_string=sqlite3_column_text(vm, 9);
+    uri_string=GET_COLUMN_VALUE_TEXT(9);
     if(uri_string)
       *context_node=librdf_new_node_from_uri_string(scontext->storage->world,
                                                     uri_string);
@@ -1165,11 +1180,12 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
   if(status == SQLITE_ERROR) {
     char *errmsg=NULL;
 
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
     status=sqlite3_finalize(vm);
     if(status != SQLITE_OK)
       errmsg=(char*)sqlite3_errmsg(scontext->db);
-#else
+#endif
+#if SQLITE_API == 2
     status=sqlite_finalize(vm, &errmsg);
 #endif
     if(status != SQLITE_OK) {
@@ -1177,8 +1193,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->name, errmsg, status);
-#ifdef HAVE_SQLITE3_H
-#else
+#if SQLITE_API == 2
       sqlite_freemem(errmsg);
 #endif
     }
@@ -1263,20 +1278,20 @@ librdf_storage_sqlite_serialise_finished(void* context)
     char *errmsg=NULL;
     int status;
     
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
     status=sqlite3_finalize(scontext->vm);
     if(status != SQLITE_OK)
       errmsg=(char*)sqlite3_errmsg(scontext->sqlite_context->db);
-#else
-    status=sqlite_finalize(vm, &errmsg);
+#endif
+#if SQLITE_API == 2
+    status=sqlite_finalize(scontext->vm, &errmsg);
 #endif
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
-#ifdef HAVE_SQLITE3_H
-#else
+#if SQLITE_API == 2
       sqlite_freemem(errmsg);
 #endif
     }
@@ -1300,11 +1315,12 @@ typedef struct {
   librdf_statement *statement;
   librdf_node* context;
 
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
   /* OUT from sqlite3_prepare: */
   sqlite3_stmt *vm;
   const char *pzTail;
-#else
+#endif
+#if SQLITE_API == 2
   sqlite_vm *vm;
   /* OUT from vm: */
   const char *pzTail;
@@ -1394,7 +1410,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
   status=sqlite3_prepare(context->db,
                          (const char*)request,
                          raptor_stringbuffer_length(sb),
@@ -1402,7 +1418,8 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
                          &scontext->pzTail);
   if(status != SQLITE_OK)
     errmsg=(char*)sqlite3_errmsg(context->db);
-#else  
+#endif
+#if SQLITE_API == 2  
   status=sqlite_compile(context->db,
                         request,
                         &scontext->pzTail, &scontext->ppVm,
@@ -1511,20 +1528,20 @@ librdf_storage_sqlite_find_statements_finished(void* context)
     char *errmsg=NULL;
     int status;
     
-#ifdef HAVE_SQLITE3_H
+#if SQLITE_API == 3
     status=sqlite3_finalize(scontext->vm);
     if(status != SQLITE_OK)
       errmsg=(char*)sqlite3_errmsg(scontext->sqlite_context->db);
-#else
-    status=sqlite_finalize(vm, &errmsg);
+#endif
+#if SQLITE_API == 2
+    status=sqlite_finalize(scontext->vm, &errmsg);
 #endif
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
-#ifdef HAVE_SQLITE3_H
-#else
+#if SQLITE_API == 2
       sqlite_freemem(errmsg);
 #endif
     }
