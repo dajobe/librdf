@@ -627,6 +627,8 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
   
   if(!access((const char*)context->name, F_OK))
     db_file_exists=1;
+  else
+    context->is_new=1;
 
   if(context->is_new && db_file_exists)
     unlink(context->name);
