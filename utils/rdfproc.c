@@ -336,6 +336,8 @@ main(int argc, char *argv[])
     puts("    source means subject of triples matching (?,  NODE1, NODE2)");
     puts("    target means object of triples matching (NODE1, NODE2, ?)");
     puts("    arc means predicate of triples matching (NODE1, ?, NODE2)");
+    puts("\nIf a node (URI or literal or blank node) can be given, blank nodes");
+    puts("are like _:ABC, URIs like http://example.org, otherwise lierals.");
     puts("\nReport bugs to <redland-dev@lists.librdf.org>.");
     puts("Redland home page: http://www.redland.opensource.ac.uk/");
     exit(0);
@@ -459,7 +461,7 @@ main(int argc, char *argv[])
         librdf_free_parser(parser);
         librdf_free_uri(uri);
         librdf_free_uri(base_uri);
-        fprintf(stderr, "%s: Added %d statements\n", program, count);
+        fprintf(stderr, "%s: Added %d triples\n", program, count);
         break;
         
       }
@@ -539,6 +541,8 @@ main(int argc, char *argv[])
     case CMD_ADD_TYPED:
       if(!strcmp(argv[0], "-"))
         source=NULL;
+      else if (!strncmp(argv[0], "_:", 2))
+        source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)argv[0]+2);
       else
         source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
       
@@ -556,7 +560,9 @@ main(int argc, char *argv[])
         if(!strcmp(argv[2], "-"))
           target=NULL;
         else {
-          if(librdf_heuristic_object_is_literal(argv[2]))
+          if (!strncmp(argv[2], "_:", 2))
+            target=librdf_new_node_from_blank_identifier(world, (const unsigned char *)argv[2]+2);
+          else if(librdf_heuristic_object_is_literal(argv[2]))
             target=librdf_new_node_from_literal(world, (const unsigned char *)argv[2], NULL, 0);
           else
             target=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[2]);
@@ -571,7 +577,7 @@ main(int argc, char *argv[])
       
       if(type != CMD_FIND) {
         if(!source || !arc || !target) {
-          fprintf(stderr, "%s: cannot have missing statement parts for %s\n", program, cmd);
+          fprintf(stderr, "%s: cannot have missing triple parts for %s\n", program, cmd);
           librdf_free_statement(partial_statement);
         break;
         }
@@ -581,9 +587,9 @@ main(int argc, char *argv[])
       switch(type) {
         case CMD_CONTAINS:
           if(librdf_model_contains_statement(model, partial_statement))
-            fprintf(stdout, "%s: the model contains the statement\n", program);
+            fprintf(stdout, "%s: the model contains the triple\n", program);
         else
-          fprintf(stdout, "%s: the model does not contain the statement\n", program);
+          fprintf(stdout, "%s: the model does not contain the triple\n", program);
           break;
           
         case CMD_FIND:
@@ -606,7 +612,7 @@ main(int argc, char *argv[])
                 break;
               }
             
-              fputs("Matched statement: ", stdout);
+              fputs("Matched triple: ", stdout);
               librdf_statement_print(statement, stdout);
               if(context_node) {
                 fputs(" with context ", stdout);
@@ -618,7 +624,7 @@ main(int argc, char *argv[])
               librdf_stream_next(stream);
           }
             librdf_free_stream(stream);  
-            fprintf(stderr, "%s: matching statements: %d\n", program, count);
+            fprintf(stderr, "%s: matching triples: %d\n", program, count);
           }
           break;
           
@@ -635,9 +641,9 @@ main(int argc, char *argv[])
             rc=librdf_model_add_statement(model, partial_statement);
           }
           if(rc)
-            fprintf(stdout, "%s: failed to add statement to model\n", program);
+            fprintf(stdout, "%s: failed to add triple to model\n", program);
           else
-            fprintf(stdout, "%s: added statement to model\n", program);
+            fprintf(stdout, "%s: added triple to model\n", program);
           break;
           
         case CMD_REMOVE:
@@ -652,9 +658,9 @@ main(int argc, char *argv[])
             rc=librdf_model_remove_statement(model, partial_statement);
           }
           if(rc)
-            fprintf(stdout, "%s: failed to remove statement from model\n", program);
+            fprintf(stdout, "%s: failed to remove triple from model\n", program);
           else
-            fprintf(stdout, "%s: removed statement from model\n", program);
+            fprintf(stdout, "%s: removed triple from model\n", program);
         break;
         
         default:
