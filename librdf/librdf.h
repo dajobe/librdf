@@ -121,6 +121,7 @@ void librdf_memory_report(FILE *fh);
 #include <rdf_hash.h>
 #include <rdf_digest.h>
 #include <rdf_files.h>
+#include <rdf_heuristics.h>
 
 #ifdef NEED_EXPAT_SOURCE
 /* Define correct header define for internal expat sources since this
@@ -135,7 +136,6 @@ void librdf_memory_report(FILE *fh);
 #endif
 
 /* public interfaces */
-#include <rdf_heuristics.h>
 #include <rdf_init.h>
 #include <rdf_iterator.h>
 #include <rdf_uri.h>
