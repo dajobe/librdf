@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: Redland
+Description: Redland RDF Application Framework
+Requires: raptor
+Version: @VERSION@
+Libs: -L${libdir} -llibrdf
+Cflags: -I${includedir}
+
