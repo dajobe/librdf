@@ -1,5 +1,12 @@
 2004-10-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_model.h: Change librdf_model_to_counted_string and
+	librdf_model_to_string to return unsigned char*
+
+	* rdf_model.c
+	(librdf_model_to_counted_string,librdf_model_to_string): Return
+	unsigned char*
+
 	* rdf_model.c (librdf_model_to_counted_string, librdf_model_to_string):
 	Added.
 	(main): Added test for above.
