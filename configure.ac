@@ -745,9 +745,11 @@ if test $with_raptor = system; then
   AC_MSG_RESULT(system $RAPTOR_VERSION)
   rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
 else
+  with_raptor=internal
   AC_MSG_RESULT(internal)
   rdf_parsers_available="$parser_available raptor(internal)"
 fi
+AC_SUBST(with_raptor)
 
 AC_MSG_CHECKING(RDF parsers required)
 AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [raptor]], parser_modules="$enableval") 
