@@ -31,7 +31,7 @@ CONFIG_SUBDIRS=raptor
 DIST_SUBDIRS=librdf docs examples \
 perl php python tcl java ruby \
 raptor \
-debian utils demos
+utils demos
 
 EXTRA_DIST=ChangeLog \
 README      NEWS      LICENSE.txt  \
