@@ -48,8 +48,8 @@ typedef struct
 } librdf_hash_descriptor;
 
 
-/* FIXME: STATIC */
-#define NUMBER_OF_HASHES 4
+/* FIXME: STATIC - FIXME, can be 3 or 4 too. */
+#define NUMBER_OF_HASHES 3
 
 static const char *librdf_storage_default_indexes="sp2o,po2s,so2p,p2so";
 
