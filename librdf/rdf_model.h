@@ -141,8 +141,6 @@ struct librdf_model_factory_s {
 
 #include <rdf_model_storage.h>
 
-#endif
-
 /* module init */
 void librdf_init_model(librdf_world *world);
 
@@ -153,85 +151,88 @@ void librdf_finish_model(librdf_world *world);
 void librdf_model_register_factory(const char *name, void (*factory) (librdf_model_factory*));
 librdf_model_factory* librdf_get_model_factory(const char *name);
 
+#endif
+
 
 /* constructors */
 
 /* Create a new Model */
-librdf_model* librdf_new_model(librdf_world *world, librdf_storage *storage, char* options_string);
-librdf_model* librdf_new_model_with_options(librdf_world *world, librdf_storage *storage, librdf_hash* options);
+REDLAND_API librdf_model* librdf_new_model(librdf_world *world, librdf_storage *storage, char* options_string);
+REDLAND_API librdf_model* librdf_new_model_with_options(librdf_world *world, librdf_storage *storage, librdf_hash* options);
 
 /* Create a new Model from an existing Model - CLONE */
-librdf_model* librdf_new_model_from_model(librdf_model* model);
+REDLAND_API librdf_model* librdf_new_model_from_model(librdf_model* model);
 
 /* destructor */
-void librdf_free_model(librdf_model *model);
+REDLAND_API void librdf_free_model(librdf_model *model);
 
 
 /* functions / methods */
-int librdf_model_size(librdf_model* model);
+REDLAND_API int librdf_model_size(librdf_model* model);
 
 /* add statements */
-int librdf_model_add(librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
-int librdf_model_add_string_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* string, char *xml_language, int is_wf_xml);
-int librdf_model_add_typed_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* string, char *xml_language, librdf_uri *datatype_uri);
-int librdf_model_add_statement(librdf_model* model, librdf_statement* statement);
-int librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream);
+REDLAND_API int librdf_model_add(librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
+REDLAND_API int librdf_model_add_string_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* string, char *xml_language, int is_wf_xml);
+REDLAND_API int librdf_model_add_typed_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* string, char *xml_language, librdf_uri *datatype_uri);
+REDLAND_API int librdf_model_add_statement(librdf_model* model, librdf_statement* statement);
+REDLAND_API int librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream);
 
 /* remove statements */
-int librdf_model_remove_statement(librdf_model* model, librdf_statement* statement);
+REDLAND_API int librdf_model_remove_statement(librdf_model* model, librdf_statement* statement);
 
 /* containment */
 /* check for exact statement match */
-int librdf_model_contains_statement(librdf_model* model, librdf_statement* statement);
+REDLAND_API int librdf_model_contains_statement(librdf_model* model, librdf_statement* statement);
 /* check for [node, property, ?] */
-int librdf_model_has_arc_in(librdf_model *model, librdf_node *node, librdf_node *property);
+REDLAND_API int librdf_model_has_arc_in(librdf_model *model, librdf_node *node, librdf_node *property);
 /* check for [?, property, node] */
-int librdf_model_has_arc_out(librdf_model *model, librdf_node *node, librdf_node *property);
+REDLAND_API int librdf_model_has_arc_out(librdf_model *model, librdf_node *node, librdf_node *property);
 
 
 /* list the entire model as a stream of statements */
-librdf_stream* librdf_model_as_stream(librdf_model* model);
+REDLAND_API librdf_stream* librdf_model_as_stream(librdf_model* model);
 /* DEPRECATED serialise the entire model */
-librdf_stream* librdf_model_serialise(librdf_model* model);
+REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_model_serialise(librdf_model* model);
 
 /* queries */
 
-librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
+REDLAND_API librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
 
-librdf_iterator* librdf_model_get_sources(librdf_model *model, librdf_node *arc, librdf_node *target);
-librdf_iterator* librdf_model_get_arcs(librdf_model *model, librdf_node *source, librdf_node *target);
-librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *source, librdf_node *arc);
-librdf_node* librdf_model_get_source(librdf_model *model, librdf_node *arc, librdf_node *target);
-librdf_node* librdf_model_get_arc(librdf_model *model, librdf_node *source, librdf_node *target);
-librdf_node* librdf_model_get_target(librdf_model *model, librdf_node *source, librdf_node *arc);
+REDLAND_API librdf_iterator* librdf_model_get_sources(librdf_model *model, librdf_node *arc, librdf_node *target);
+REDLAND_API librdf_iterator* librdf_model_get_arcs(librdf_model *model, librdf_node *source, librdf_node *target);
+REDLAND_API librdf_iterator* librdf_model_get_targets(librdf_model *model, librdf_node *source, librdf_node *arc);
+REDLAND_API librdf_node* librdf_model_get_source(librdf_model *model, librdf_node *arc, librdf_node *target);
+REDLAND_API librdf_node* librdf_model_get_arc(librdf_model *model, librdf_node *source, librdf_node *target);
+REDLAND_API librdf_node* librdf_model_get_target(librdf_model *model, librdf_node *source, librdf_node *arc);
 
 /* return list of properties to/from a node */
-librdf_iterator* librdf_model_get_arcs_in(librdf_model *model, librdf_node *node);
-librdf_iterator* librdf_model_get_arcs_out(librdf_model *model, librdf_node *node);
+REDLAND_API librdf_iterator* librdf_model_get_arcs_in(librdf_model *model, librdf_node *node);
+REDLAND_API librdf_iterator* librdf_model_get_arcs_out(librdf_model *model, librdf_node *node);
 
 
 
 /* submodels */
-int librdf_model_add_submodel(librdf_model* model, librdf_model* sub_model);
-int librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model);
+REDLAND_API int librdf_model_add_submodel(librdf_model* model, librdf_model* sub_model);
+REDLAND_API int librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model);
 
 
-void librdf_model_print(librdf_model *model, FILE *fh);
+REDLAND_API void librdf_model_print(librdf_model *model, FILE *fh);
 
 /* statement contexts */
-int librdf_model_context_add_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
-int librdf_model_context_add_statements(librdf_model* model, librdf_node* context, librdf_stream* stream);
-int librdf_model_context_remove_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
-int librdf_model_context_remove_statements(librdf_model* model, librdf_node* context);
-librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* context);
-/* DEPRECATED */ librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* context);
+REDLAND_API int librdf_model_context_add_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
+REDLAND_API int librdf_model_context_add_statements(librdf_model* model, librdf_node* context, librdf_stream* stream);
+REDLAND_API int librdf_model_context_remove_statement(librdf_model* model, librdf_node* context, librdf_statement* statement);
+REDLAND_API int librdf_model_context_remove_statements(librdf_model* model, librdf_node* context);
+REDLAND_API librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* context);
+REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* context);
 
 /* query language */
-librdf_stream* librdf_model_query(librdf_model* model, librdf_query* query);
-librdf_stream* librdf_model_query_string(librdf_model* model, const char *name, librdf_uri* uri, const unsigned char *query_string);
+REDLAND_API librdf_stream* librdf_model_query(librdf_model* model, librdf_query* query);
+REDLAND_API librdf_stream* librdf_model_query_string(librdf_model* model, const char *name, librdf_uri* uri, const unsigned char *query_string);
 
-void librdf_model_sync(librdf_model* model);
+REDLAND_API void librdf_model_sync(librdf_model* model);
 
+REDLAND_API librdf_storage* librdf_model_get_storage(librdf_model *model);
 
 #ifdef __cplusplus
 }

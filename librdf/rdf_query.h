@@ -77,9 +77,6 @@ struct librdf_query_factory_s {
 
 #include <rdf_query_triples.h>
 
-#endif
-
-
 /* module init */
 void librdf_init_query(librdf_world *world);
 
@@ -87,23 +84,27 @@ void librdf_init_query(librdf_world *world);
 void librdf_finish_query(librdf_world *world);
 
 /* class methods */
-void librdf_query_register_factory(const char *name, librdf_uri* uri, void (*factory) (librdf_query_factory*));
 librdf_query_factory* librdf_get_query_factory(const char *name, librdf_uri* uri);
 
+#endif
+
+/* class methods */
+REDLAND_API void librdf_query_register_factory(const char *name, librdf_uri* uri, void (*factory) (librdf_query_factory*));
+
 /* constructor */
-librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string);
-librdf_query* librdf_new_query_from_query (librdf_query* old_query);
-librdf_query* librdf_new_query_from_factory(librdf_world* world, librdf_query_factory* factory, const char *name, librdf_uri* uri, const unsigned char* query_string);
+REDLAND_API librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string);
+REDLAND_API librdf_query* librdf_new_query_from_query (librdf_query* old_query);
+REDLAND_API librdf_query* librdf_new_query_from_factory(librdf_world* world, librdf_query_factory* factory, const char *name, librdf_uri* uri, const unsigned char* query_string);
 
 /* destructor */
-void librdf_free_query(librdf_query *query);
+REDLAND_API void librdf_free_query(librdf_query *query);
 
 
 /* methods */
-int librdf_query_open(librdf_query* query);
-int librdf_query_close(librdf_query* query);
+REDLAND_API int librdf_query_open(librdf_query* query);
+REDLAND_API int librdf_query_close(librdf_query* query);
 
-librdf_stream* librdf_query_run(librdf_query* query, librdf_model *model);
+REDLAND_API librdf_stream* librdf_query_run(librdf_query* query, librdf_model *model);
 
 #ifdef __cplusplus
 }

@@ -78,11 +78,7 @@ struct librdf_serializer_s {
   librdf_serializer_factory* factory;
 };
 
-#endif
-
-/* factory static methods */
-void librdf_serializer_register_factory(librdf_world *world, const char *name, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_serializer_factory*));
-
+/* class methods */
 librdf_serializer_factory* librdf_get_serializer_factory(librdf_world *world, const char *name, const char *mime_type, librdf_uri *type_uri);
 
 
@@ -91,32 +87,36 @@ void librdf_init_serializer(librdf_world *world);
 /* module finish */
 void librdf_finish_serializer(librdf_world *world);
                     
-
-/* constructor */
-librdf_serializer* librdf_new_serializer(librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri);
-librdf_serializer* librdf_new_serializer_from_factory(librdf_world* world, librdf_serializer_factory *factory);
-
-/* destructor */
-void librdf_free_serializer(librdf_serializer *serializer);
-
-
-/* methods */
-int librdf_serializer_serialize_model(librdf_serializer* serializer, FILE *handle, librdf_uri* base_uri, librdf_model* model);
-int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer, const char *name, librdf_uri* base_uri, librdf_model* model);
-void librdf_serializer_set_error(librdf_serializer* serializer, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
-void librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
-
-const char *librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
-int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, const char *value);
-int librdf_serializer_set_namespace(librdf_serializer* serializer, librdf_uri *uri, const char *prefix);
-
-
 /* internal callbacks used by serializers invoking errors/warnings upwards to user */
 void librdf_serializer_error(librdf_serializer* serializer, const char *message, ...);
 void librdf_serializer_warning(librdf_serializer* serializer, const char *message, ...);
 
 void librdf_serializer_raptor_constructor(librdf_world* world);
 void librdf_serializer_rdfxml_constructor(librdf_world* world);
+
+#endif
+
+
+/* class methods */
+REDLAND_API void librdf_serializer_register_factory(librdf_world *world, const char *name, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_serializer_factory*));
+
+/* constructor */
+REDLAND_API librdf_serializer* librdf_new_serializer(librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri);
+REDLAND_API librdf_serializer* librdf_new_serializer_from_factory(librdf_world* world, librdf_serializer_factory *factory);
+
+/* destructor */
+REDLAND_API void librdf_free_serializer(librdf_serializer *serializer);
+
+
+/* methods */
+REDLAND_API int librdf_serializer_serialize_model(librdf_serializer* serializer, FILE *handle, librdf_uri* base_uri, librdf_model* model);
+REDLAND_API int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer, const char *name, librdf_uri* base_uri, librdf_model* model);
+REDLAND_API void librdf_serializer_set_error(librdf_serializer* serializer, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
+REDLAND_API void librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
+
+REDLAND_API const char *librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
+REDLAND_API int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, const char *value);
+REDLAND_API int librdf_serializer_set_namespace(librdf_serializer* serializer, librdf_uri *uri, const char *prefix);
 
 
 #ifdef __cplusplus

@@ -266,7 +266,7 @@ static void librdf_stream_from_node_iterator_finished(void* context);
 typedef struct {
   librdf_iterator *iterator;
   librdf_statement *current; /* shared statement */
-  unsigned int field;
+  librdf_statement_part field;
 } librdf_stream_from_node_iterator_stream_context;
 
 
@@ -287,7 +287,7 @@ typedef struct {
 librdf_stream*
 librdf_new_stream_from_node_iterator(librdf_iterator* iterator,
                                      librdf_statement* statement,
-                                     unsigned int field)
+                                     librdf_statement_part field)
 {
   librdf_stream_from_node_iterator_stream_context *scontext;
   librdf_stream *stream;

@@ -187,15 +187,16 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 #define LIBRDF_S_ConstraintProperty_URI librdf_concept_uris[LIBRDF_CONCEPT_S_ConstraintProperty]
 #define LIBRDF_S_Class_URI librdf_concept_uris[LIBRDF_CONCEPT_S_Class]
 
+/* public macros */
+#define LIBRDF_URI_RDF_MS (&librdf_concept_ms_namespace_uri)
+#define LIBRDF_URI_RDF_SCHEMA (&librdf_concept_schema_namespace_uri)
 
 /* private implementation */
 extern librdf_uri* librdf_concept_ms_namespace_uri;
 extern librdf_uri* librdf_concept_schema_namespace_uri;
 
-/* public macros */
-#define LIBRDF_URI_RDF_MS (&librdf_concept_ms_namespace_uri)
-#define LIBRDF_URI_RDF_SCHEMA (&librdf_concept_schema_namespace_uri)
 
+#ifdef LIBRDF_INTERNAL
 
 /* class methods */
 void librdf_init_concepts(librdf_world *world);
@@ -203,7 +204,7 @@ void librdf_finish_concepts(librdf_world *world);
 
 void librdf_get_concept_by_name(librdf_world *world, int is_ms, const char *name, librdf_uri **uri_p, librdf_node **node_p);
 
-
+#endif
 
 
 #ifdef __cplusplus

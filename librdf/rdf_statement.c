@@ -554,7 +554,7 @@ size_t
 librdf_statement_encode_parts(librdf_statement* statement, 
                               librdf_node* context_node,
                               unsigned char *buffer, size_t length,
-                              int fields)
+                              librdf_statement_part fields)
 {
   size_t total_length=0;
   size_t node_len;

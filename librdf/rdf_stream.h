@@ -52,32 +52,30 @@ struct librdf_stream_s {
 /* FIXME - should all short lists be enums */
 #define LIBRDF_STREAM_GET_METHOD_GET_OBJECT  LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  
 #define LIBRDF_STREAM_GET_METHOD_GET_CONTEXT LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT
+
 #endif
 
 /* constructor */
 
-librdf_stream* librdf_new_stream(librdf_world *world, void* context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
+REDLAND_API librdf_stream* librdf_new_stream(librdf_world *world, void* context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
+REDLAND_API librdf_stream* librdf_new_stream_from_node_iterator(librdf_iterator* iterator, librdf_statement* statement, unsigned int field);
 
 /* destructor */
 
-void librdf_free_stream(librdf_stream* stream);
+REDLAND_API void librdf_free_stream(librdf_stream* stream);
 
 /* methods */
-int librdf_stream_end(librdf_stream* stream);
+REDLAND_API int librdf_stream_end(librdf_stream* stream);
 
-int librdf_stream_next(librdf_stream* stream);
-librdf_statement* librdf_stream_get_object(librdf_stream* stream);
-void* librdf_stream_get_context(librdf_stream* stream);
+REDLAND_API int librdf_stream_next(librdf_stream* stream);
+REDLAND_API librdf_statement* librdf_stream_get_object(librdf_stream* stream);
+REDLAND_API void* librdf_stream_get_context(librdf_stream* stream);
 
 typedef void (*librdf_stream_map_free_context_handler)(void *map_context);
 
-void librdf_stream_set_map(librdf_stream* stream, librdf_statement* (*map)(void* context, librdf_statement* statement), librdf_stream_map_free_context_handler free_context, void* map_context);
+REDLAND_API void librdf_stream_set_map(librdf_stream* stream, librdf_statement* (*map)(void* context, librdf_statement* statement), librdf_stream_map_free_context_handler free_context, void* map_context);
 
-#ifdef LIBRDF_INTERNAL
-librdf_stream* librdf_new_stream_from_node_iterator(librdf_iterator* iterator, librdf_statement* statement, unsigned int field);
-#endif
-
-void librdf_stream_print(librdf_stream *stream, FILE *fh);
+REDLAND_API void librdf_stream_print(librdf_stream *stream, FILE *fh);
 
 #ifdef __cplusplus
 }

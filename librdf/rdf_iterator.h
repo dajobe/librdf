@@ -61,24 +61,22 @@ struct librdf_iterator_s {
 
 #endif
 
-librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
+REDLAND_API librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
 
-void librdf_free_iterator(librdf_iterator*);
+REDLAND_API void librdf_free_iterator(librdf_iterator*);
 
-int librdf_iterator_end(librdf_iterator* iterator);
-int librdf_iterator_have_elements(librdf_iterator* iterator);
+REDLAND_API int librdf_iterator_end(librdf_iterator* iterator);
+REDLAND_API int librdf_iterator_have_elements(librdf_iterator* iterator);
 
-int librdf_iterator_finished(librdf_iterator* iterator);
+REDLAND_API int librdf_iterator_finished(librdf_iterator* iterator);
 
-int librdf_iterator_next(librdf_iterator* iterator);
-void* librdf_iterator_get_object(librdf_iterator* iterator);
-void* librdf_iterator_get_context(librdf_iterator* iterator);
-void* librdf_iterator_get_key(librdf_iterator* iterator);
-void* librdf_iterator_get_value(librdf_iterator* iterator);
+REDLAND_API int librdf_iterator_next(librdf_iterator* iterator);
+REDLAND_API void* librdf_iterator_get_object(librdf_iterator* iterator);
+REDLAND_API void* librdf_iterator_get_context(librdf_iterator* iterator);
+REDLAND_API void* librdf_iterator_get_key(librdf_iterator* iterator);
+REDLAND_API void* librdf_iterator_get_value(librdf_iterator* iterator);
 
-int librdf_iterator_add_map(librdf_iterator* iterator, void* (*fn)(void *context, void *item), void *context);
-
-void* librdf_iterator_map_remove_duplicate_nodes(void *item, void *user_data);
+REDLAND_API int librdf_iterator_add_map(librdf_iterator* iterator, void* (*fn)(void *context, void *item), void *context);
 
 #ifdef __cplusplus
 }

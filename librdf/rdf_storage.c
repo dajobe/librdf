@@ -52,7 +52,7 @@ static void* librdf_storage_stream_to_node_iterator_get_method(void* iterator, i
 static void librdf_storage_stream_to_node_iterator_finished(void* iterator);
 
 /* helper function for creating iterators for get sources, targets, arcs */
-static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage* storage, librdf_node* node1, librdf_node *node2, int want);
+static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage* storage, librdf_node* node1, librdf_node *node2, librdf_statement_part want);
 
 
 /**
@@ -618,7 +618,7 @@ librdf_storage_find_statements(librdf_storage* storage,
 typedef struct {
   librdf_stream *stream;
   librdf_statement *partial_statement;
-  int want;
+  librdf_statement_part want;
 } librdf_storage_stream_to_node_iterator_context;
 
 
@@ -724,7 +724,7 @@ static librdf_iterator*
 librdf_storage_node_stream_to_node_create(librdf_storage* storage,
                                           librdf_node *node1,
                                           librdf_node *node2,
-                                          int want)
+                                          librdf_statement_part want)
 {
   librdf_statement *partial_statement;
   librdf_stream *stream;

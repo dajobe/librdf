@@ -78,39 +78,38 @@ struct librdf_world_s
   pthread_mutex_t* nodes_mutex;
 #endif
 };
-#endif
 
-librdf_world* librdf_new_world(void);
-void librdf_free_world(librdf_world *world);
-void librdf_world_open(librdf_world *world);
-
-void librdf_world_init_mutex(librdf_world *world);
-  
-void librdf_world_set_error(librdf_world* world, void *user_data, void (*error_fn)(void *user_data, const char *message, va_list arguments));
-void librdf_world_set_warning(librdf_world* world, void *user_data, void (*warning_fn)(void *user_data, const char *message, va_list arguments));
-
-void librdf_world_set_digest(librdf_world*, const char *name);
-void librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash);
-
-
-#define LIBRDF_WORLD_FEATURE_GENID_BASE "http://feature.librdf.org/genid-base"
-#define LIBRDF_WORLD_FEATURE_GENID_COUNTER "http://feature.librdf.org/genid-counter"
-
-const char *librdf_world_get_feature(librdf_world* world, librdf_uri *feature);
-int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, const char *value);
-
-#ifdef LIBRDF_INTERNAL
 /* internal routines used to invoking errors/warnings upwards to user */
 void librdf_error(librdf_world* world, const char *message, ...);
 void librdf_error_varargs(librdf_world* world, const char *message, va_list arguments);
 void librdf_warning(librdf_world* world, const char *message, ...);
 
 unsigned char* librdf_world_get_genid(librdf_world* world);
+
 #endif
 
+REDLAND_API librdf_world* librdf_new_world(void);
+REDLAND_API void librdf_free_world(librdf_world *world);
+REDLAND_API void librdf_world_open(librdf_world *world);
+
+REDLAND_API void librdf_world_init_mutex(librdf_world *world);
+  
+REDLAND_API void librdf_world_set_error(librdf_world* world, void *user_data, void (*error_fn)(void *user_data, const char *message, va_list arguments));
+REDLAND_API void librdf_world_set_warning(librdf_world* world, void *user_data, void (*warning_fn)(void *user_data, const char *message, va_list arguments));
+
+REDLAND_API void librdf_world_set_digest(librdf_world*, const char *name);
+REDLAND_API void librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash);
+
+
+#define LIBRDF_WORLD_FEATURE_GENID_BASE "http://feature.librdf.org/genid-base"
+#define LIBRDF_WORLD_FEATURE_GENID_COUNTER "http://feature.librdf.org/genid-counter"
+
+REDLAND_API const char *librdf_world_get_feature(librdf_world* world, librdf_uri *feature);
+REDLAND_API int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, const char *value);
+
 /* OLD INTERFACES */
-void librdf_init_world(char *digest_factory_name, void* not_used2);
-void librdf_destroy_world(void);
+REDLAND_API REDLAND_DEPRECATED void librdf_init_world(char *digest_factory_name, void* not_used2);
+REDLAND_API REDLAND_DEPRECATED void librdf_destroy_world(void);
 
 #ifdef __cplusplus
 }

@@ -137,16 +137,12 @@ struct librdf_storage_factory_s {
 #include <rdf_storage_list.h>
 #include <rdf_storage_hashes.h>
 
-/* in librdf_storage_mysql.c */
 #ifdef HAVE_MYSQL
-void librdf_init_storage_mysql(void);
+#include <rdf_storage_mysql.h>
 #endif
 
-/* in librdf_storage_tstore.c */
 #ifdef HAVE_TSTORE
-void librdf_init_storage_tstore(void);
-#endif
-
+#include <rdf_storage_tstore.h>
 #endif
 
 
@@ -157,61 +153,65 @@ void librdf_init_storage(librdf_world *world);
 void librdf_finish_storage(librdf_world *world);
 
 /* class methods */
-void librdf_storage_register_factory(const char *name, void (*factory) (librdf_storage_factory*));
 librdf_storage_factory* librdf_get_storage_factory(const char *name);
 
+#endif
+
+
+/* class methods */
+REDLAND_API void librdf_storage_register_factory(const char *name, void (*factory) (librdf_storage_factory*));
+
 /* constructor */
-librdf_storage* librdf_new_storage(librdf_world *world, char *storage_name, char *name, char *options_string);
-librdf_storage* librdf_new_storage_with_options(librdf_world *world, char *storage_name, char *name, librdf_hash *options);
-librdf_storage* librdf_new_storage_from_storage(librdf_storage* old_storage);
-librdf_storage* librdf_new_storage_from_factory(librdf_world *world, librdf_storage_factory* factory, char *name, librdf_hash* options);
+REDLAND_API librdf_storage* librdf_new_storage(librdf_world *world, char *storage_name, char *name, char *options_string);
+REDLAND_API librdf_storage* librdf_new_storage_with_options(librdf_world *world, char *storage_name, char *name, librdf_hash *options);
+REDLAND_API librdf_storage* librdf_new_storage_from_storage(librdf_storage* old_storage);
+REDLAND_API librdf_storage* librdf_new_storage_from_factory(librdf_world *world, librdf_storage_factory* factory, char *name, librdf_hash* options);
 
 /* destructor */
-void librdf_free_storage(librdf_storage *storage);
+REDLAND_API void librdf_free_storage(librdf_storage *storage);
 
 
 /* methods */
-int librdf_storage_open(librdf_storage* storage, librdf_model *model);
-int librdf_storage_close(librdf_storage* storage);
-int librdf_storage_get(librdf_storage* storage, void *key, size_t key_len, void **value, size_t* value_len, unsigned int flags);
+REDLAND_API int librdf_storage_open(librdf_storage* storage, librdf_model *model);
+REDLAND_API int librdf_storage_close(librdf_storage* storage);
+REDLAND_API int librdf_storage_get(librdf_storage* storage, void *key, size_t key_len, void **value, size_t* value_len, unsigned int flags);
 
-int librdf_storage_size(librdf_storage* storage);
+REDLAND_API int librdf_storage_size(librdf_storage* storage);
 
-int librdf_storage_add_statement(librdf_storage* storage, librdf_statement* statement);
-int librdf_storage_add_statements(librdf_storage* storage, librdf_stream* statement_stream);
-int librdf_storage_remove_statement(librdf_storage* storage, librdf_statement* statement);
-int librdf_storage_contains_statement(librdf_storage* storage, librdf_statement* statement);
-librdf_stream* librdf_storage_serialise(librdf_storage* storage);
-librdf_stream* librdf_storage_find_statements(librdf_storage* storage, librdf_statement* statement);
-librdf_iterator* librdf_storage_get_sources(librdf_storage *storage, librdf_node *arc, librdf_node *target);
-librdf_iterator* librdf_storage_get_arcs(librdf_storage *storage, librdf_node *source, librdf_node *target);
-librdf_iterator* librdf_storage_get_targets(librdf_storage *storage, librdf_node *source, librdf_node *arc);
+REDLAND_API int librdf_storage_add_statement(librdf_storage* storage, librdf_statement* statement);
+REDLAND_API int librdf_storage_add_statements(librdf_storage* storage, librdf_stream* statement_stream);
+REDLAND_API int librdf_storage_remove_statement(librdf_storage* storage, librdf_statement* statement);
+REDLAND_API int librdf_storage_contains_statement(librdf_storage* storage, librdf_statement* statement);
+REDLAND_API librdf_stream* librdf_storage_serialise(librdf_storage* storage);
+REDLAND_API librdf_stream* librdf_storage_find_statements(librdf_storage* storage, librdf_statement* statement);
+REDLAND_API librdf_iterator* librdf_storage_get_sources(librdf_storage *storage, librdf_node *arc, librdf_node *target);
+REDLAND_API librdf_iterator* librdf_storage_get_arcs(librdf_storage *storage, librdf_node *source, librdf_node *target);
+REDLAND_API librdf_iterator* librdf_storage_get_targets(librdf_storage *storage, librdf_node *source, librdf_node *arc);
 
 
 /* return list of properties to/from a node */
-librdf_iterator* librdf_storage_get_arcs_in(librdf_storage *storage, librdf_node *node);
-librdf_iterator* librdf_storage_get_arcs_out(librdf_storage *storage, librdf_node *node);
+REDLAND_API librdf_iterator* librdf_storage_get_arcs_in(librdf_storage *storage, librdf_node *node);
+REDLAND_API librdf_iterator* librdf_storage_get_arcs_out(librdf_storage *storage, librdf_node *node);
 
 /* check for [node, property, ?] */
-int librdf_storage_has_arc_in(librdf_storage *storage, librdf_node *node, librdf_node *property);
+REDLAND_API int librdf_storage_has_arc_in(librdf_storage *storage, librdf_node *node, librdf_node *property);
 /* check for [?, property, node] */
-int librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node, librdf_node *property);
+REDLAND_API int librdf_storage_has_arc_out(librdf_storage *storage, librdf_node *node, librdf_node *property);
 
 /* context methods */
-int librdf_storage_context_add_statement(librdf_storage* storage, librdf_node* context, librdf_statement* statement);
-int librdf_storage_context_add_statements(librdf_storage* storage, librdf_node* context, librdf_stream* stream);
-int librdf_storage_context_remove_statement(librdf_storage* storage, librdf_node* context, librdf_statement* statement);
-int librdf_storage_context_remove_statements(librdf_storage* storage, librdf_node* context);
-librdf_stream* librdf_storage_context_as_stream(librdf_storage* storage, librdf_node* context);
-/* DEPRECATED */
-librdf_stream* librdf_storage_context_serialise(librdf_storage* storage, librdf_node* context);
+REDLAND_API int librdf_storage_context_add_statement(librdf_storage* storage, librdf_node* context, librdf_statement* statement);
+REDLAND_API int librdf_storage_context_add_statements(librdf_storage* storage, librdf_node* context, librdf_stream* stream);
+REDLAND_API int librdf_storage_context_remove_statement(librdf_storage* storage, librdf_node* context, librdf_statement* statement);
+REDLAND_API int librdf_storage_context_remove_statements(librdf_storage* storage, librdf_node* context);
+REDLAND_API librdf_stream* librdf_storage_context_as_stream(librdf_storage* storage, librdf_node* context);
+REDLAND_API REDLAND_DEPRECATED librdf_stream* librdf_storage_context_serialise(librdf_storage* storage, librdf_node* context);
   
 /* querying methods */
-int librdf_storage_supports_query(librdf_storage* storage, librdf_query *query);
-librdf_stream* librdf_storage_query(librdf_storage* storage, librdf_query *query);
+REDLAND_API int librdf_storage_supports_query(librdf_storage* storage, librdf_query *query);
+REDLAND_API librdf_stream* librdf_storage_query(librdf_storage* storage, librdf_query *query);
 
 /* synchronise a storage to the backing store */
-void librdf_storage_sync(librdf_storage *storage);
+REDLAND_API void librdf_storage_sync(librdf_storage *storage);
 
 
 #ifdef __cplusplus
