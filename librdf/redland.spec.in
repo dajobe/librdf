@@ -25,12 +25,21 @@ applications developers to provide RDF support in their applications
 as well as for RDF developers to experiment with the technology.
 
 %package devel
-Summary: Libraries and header files for programs that use libwww.
+Summary: Libraries and header files for programs that use Redland.
 Group: Development/Libraries
 Requires: redland
 
 %description devel
 Header files for development with redland
+
+%package perl
+Summary: Perl modules for the Redland RDF system
+Group: Development/Libraries
+Requires: redland
+
+%description perl
+The redland-perl package contains the parts of Redland that provide
+an interface to Perl.
 
 %prep
 %setup
@@ -53,6 +62,13 @@ fi
 rm -rf $RPM_BUILD_ROOT
 
 make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc install
+
+cd perl
+
+PACKAGE=%{name} VERSION=%{version} TOP_SRCDIR=.. perl Makefile.PL PREFIX=$RPM_BUILD_ROOT%{prefix}
+make -f Makefile.perl install
+
+cd ..
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -89,6 +105,14 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/include/rdf_types.h
 %{prefix}/include/rdf_storage_list.h
 %{prefix}/include/rdf_storage_hashes.h
-%doc docs/README.html docs/api/*
+%doc docs/README.html docs/api
+
+%files perl
+%defattr(-, root, root)
+
+%{prefix}/lib/perl5/site_perl/*/*/auto/redland
+%{prefix}/lib/perl5/site_perl/*/*/auto/redland/*
+%{prefix}/lib/perl5/site_perl/*/*/Redland.pm
+%{prefix}/lib/perl5/site_perl/*/*/RDF
 
 %changelog
