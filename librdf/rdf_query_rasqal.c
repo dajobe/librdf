@@ -49,6 +49,8 @@ typedef struct
   char *query_string;
   librdf_uri *uri;           /* base URI or NULL */
 
+  int errors;
+  int warnings;
 } librdf_query_rasqal_context;
 
 
@@ -56,6 +58,33 @@ typedef struct
 static rasqal_triples_match* rasqal_redland_new_triples_match(rasqal_triples_source *rts, void *user_data, rasqal_triple_meta *m, rasqal_triple *t);
 static int rasqal_redland_triple_present(rasqal_triples_source *rts, void *user_data, rasqal_triple *t);
 static void rasqal_redland_free_triples_source(void *user_data);
+
+
+static void
+librdf_query_rasqal_error_handler(void *data, raptor_locator *locator,
+                                  const char *message) 
+{
+  librdf_query* query=data;
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+
+  context->errors++;
+
+  librdf_log_simple(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, locator, message);
+}
+
+
+static void
+librdf_query_rasqal_warning_handler(void *data, raptor_locator *locator,
+                                    const char *message) 
+{
+  librdf_query* query=data;
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+
+  context->warnings++;
+
+  librdf_log_simple(query->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_QUERY, locator, message);
+}
+
 
 
 /* functions implementing query api */
@@ -78,6 +107,12 @@ librdf_query_rasqal_init(librdf_query* query,
     return 1;
 
   rasqal_query_set_user_data(context->rq, query);
+
+  rasqal_set_error_handler(context->rq, query,
+                           librdf_query_rasqal_error_handler);
+  rasqal_set_warning_handler(context->rq, query,
+                             librdf_query_rasqal_warning_handler);
+
 
   len=strlen((const char*)query_string);
   query_string_copy=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
