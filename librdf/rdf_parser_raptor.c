@@ -155,7 +155,6 @@ librdf_parser_rapier_new_statement_handler (void *context,
   librdf_parser_rapier_stream_context* scontext=(librdf_parser_rapier_stream_context*)context;
   librdf_node* node;
   librdf_statement* statement;
-  char *object;
 #ifdef LIBRDF_DEBUG
 #if LIBRDF_DEBUG > 1
   char *s;
@@ -287,7 +286,7 @@ librdf_parser_rapier_parse_common(void *context,
   if(!scontext)
     return NULL;
 
-  rdf_parser=rapier_new(base_uri);
+  rdf_parser=rapier_new();
   if(!rdf_parser)
     return NULL;
   
@@ -312,9 +311,7 @@ librdf_parser_rapier_parse_common(void *context,
   }
 
   /* Do the work all in one go - should do incrementally - FIXME */
-  rc=rapier_parse_file(rdf_parser,
-                       librdf_uri_as_string(uri),
-                       librdf_uri_as_string(base_uri));
+  rc=rapier_parse_file(rdf_parser, uri, base_uri);
 
   /* Above line does it all for adding to model */
   if(model) {
@@ -422,7 +419,6 @@ static void
 librdf_parser_rapier_serialise_finished(void* context)
 {
   librdf_parser_rapier_stream_context* scontext=(librdf_parser_rapier_stream_context*)context;
-  librdf_parser_rapier_context* pcontext=scontext->pcontext;
 
   if(scontext) {
     librdf_statement* statement;
