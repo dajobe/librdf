@@ -1,4 +1,313 @@
+2004-10-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_serializer_rdfxml.c: Deleted. raptor does all this now
+
+	* librdf/Makefile.am: Remove rdf_serializer_rdfxml.c
+
+	* librdf/rdf_serializer.h:
+	Renamed factory method serialize_model to
+	serialize_model_to_file_handle.
+	Added factory method serialize_model_to_string.
+	Deprecated librdf_serializer_serialize_model
+	Added librdf_serializer_serialize_model_to_file_handle as new name
+	Added librdf_serializer_serialize_model_to_string
+
+	* librdf/rdf_serializer.c (librdf_serializer_serialize_model):
+	Deprecate name.
+	(librdf_serializer_serialize_model_to_file_handle): Added, new name
+	for above.
+	(librdf_serializer_serialize_model_to_string): Added.
+	(librdf_init_serializer): Let raptor make all
+
+	* librdf/rdf_storage_file.c (librdf_storage_file_sync): Use
+	librdf_serializer_serialize_model_to_file_handle not deprecated
+	librdf_serializer_serialize_model
+
+	* librdf/rdf_serializer_raptor.c: Converted to use raptor_serializer.
+	(librdf_serializer_raptor_serialize_model_to_file_handle): Renamed
+	from librdf_serializer_raptor_serialize_model.
+	(librdf_serializer_raptor_serialize_model_to_string): Added.
+	(librdf_serializer_raptor_constructor): Register from raptor's
+	enumeration of serializers.
+
+	* raptor/raptor_serialize.c (raptor_rdfxml_serialize_statement):
+	Handle URI subject, object right.
+
+	* raptor/raptor_serialize.c (raptor_serialize_start_to_filename,
+	raptor_serialize_start_to_string,
+	raptor_serialize_start_to_file_handle): Don't enforce base URI is
+	required.
+
+2004-10-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor.h:
+	Updated raptor_new_iostream_to_string with malloc_handler argument
+
+	* raptor/raptor_serialize.c (raptor_serialize_start_to_string): Update
+	raptor_new_iostream_to_string for malloc_handler argument
+
+	* raptor/raptor_iostream.c (raptor_string_iostream_finish):
+	Use passed-in malloc_handler to
+	make string, raptor_stringbuffer_copy_to_string to copy directly in.
+	(raptor_new_iostream_to_string): Add optional malloc_handler argument
+	so caller can control allocation.
+	(main): Update tests for above.
+
+	* raptor/raptor.h: Added raptor_stringbuffer_copy_to_string
+
+	* raptor/raptor_stringbuffer.c (raptor_stringbuffer_copy_to_string):
+	Added to allow exporting to
+	externally alloced buffers - handy for cross-library/heap work.
+	(main): Added test for above.
+
+	* raptor/raptor_general.c (raptor_init): Don't register 'simple' type.
+
+	* configure.ac: Raptor minimum version 1.3.4 for serializer
+
+	* redland-src-config.in: pick up raptor libs for --libs
+
+	* raptor/raptor_iostream.c, raptor/raptor_namespace.c,
+	raptor/raptor_serialize.c, raptor/raptor_iostream.c: Casts for C++
+
+	* raptor/tests/Makefile.am, raptor/tests/turtle/Makefile.am:
+	Replace direct dependency on $(top_builddir)/rapper with build-rapper
+	so re-compile check is forced before testing.
+
+	* raptor/raptor.h, raptor/raptor_namespace.c,
+	raptor/raptor_serialize.c: Fix a bunch of constitency typos in
+	namespace URIs
+
+	* raptor/raptor_internal.h:
+	Add locator, error_user_data and error_handler to raptor_serializer.
+	Add raptor_init_serializer_rdfxml, raptor_serializer_error,
+	raptor_serializer_simple_error and raptor_serializer_error_varargs.
+
+	* raptor/raptor_namespace.c:
+	Export raptor_xml_namespace_uri, raptor_rdf_namespace_ms_uri,
+	raptor_rdf_namespace_schema_uri,
+	raptor_xmlschema_datatypes_namespace_uri, raptor_owl_namespace_uri,
+	raptor_rdf_namespace_ms_uri_len
+
+	* raptor/raptor_general.c (raptor_init):
+	Call raptor_init_serializer_rdfxml
+
+	* raptor/raptor.h:
+	Export raptor_xml_namespace_uri, raptor_rdf_namespace_ms_uri,
+	raptor_rdf_namespace_schema_uri,
+	raptor_xmlschema_datatypes_namespace_uri, raptor_owl_namespace_uri,
+	raptor_rdf_namespace_ms_uri_len
+	Add raptor_serializer_set_error_handler,
+	raptor_serializer_get_locator
+
+	* raptor/raptor_serialize.c: Added RDF/XML serializer.
+	Added locator to serializer.
+	(raptor_serializer_error, raptor_serializer_simple_error,
+	raptor_serializer_error_varargs): Added internal support for errors.
+	(raptor_serializer_set_error_handler, raptor_serializer_get_locator):
+	Added public methods
+
+2004-10-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_iostream.c: (main) casts for fprintf
+
+	* raptor/rdfdump.c:
+	Remove ad-hoc serializing code and use raptor_serializer.
+	Update help and usage messages to use raptor_serializers_enumerate
+
+	* raptor/raptor_internal.h:
+	Added raptor_serializer_factory and declarations for factories
+	raptor_init_serializer_ntriples, raptor_init_serializer_simple and
+	raptor_delete_serializer_factories
+
+	* raptor/raptor_general.c (raptor_init):
+	Call raptor_init_serializer_ntriples and
+	raptor_init_serializer_simple
+
+	* raptor/raptor.h: Added raptor_serializer class and methods:
+	raptor_serializers_enumerate, raptor_serializer_syntax_name_check,
+	raptor_new_serializer, raptor_free_serializer,
+	raptor_serialize_start, raptor_serialize_start_to_filename,
+	raptor_serialize_start_to_string,
+	raptor_serialize_start_to_file_handle,
+	raptor_serialize_statement, raptor_serialize_end,
+	raptor_serializer_get_iostream.
+	Added new raptor_iostream class constructor raptor_new_iostream_to_sink
+	and methods: raptor_iostream_write_end, raptor_iostream_write_string,
+	raptor_iostream_write_counted_string,
+	raptor_iostream_get_bytes_written_count,
+	raptor_iostream_write_decimal, raptor_iostream_format_hexadecimal
+
+	* raptor/Makefile.am: Added raptor_serialize.c
+	Added $(LIBS) to rfc2396 tests for -ldmalloc when present
+
+	* raptor/raptor_serialize.c: Serializers
+
+	* raptor/raptor_iostream.c (raptor_iostream_write_counted_string):
+	Added as a wrapper.
+
+	* raptor/raptor_iostream.c (raptor_iostream_format_hexadecimal):
+	Added for writing
+	field-formatted hex.
+
+	* raptor/raptor_iostream.c (raptor_iostream_get_bytes_written_count):
+	Renamed from raptor_get_bytes_written_count
+	(raptor_iostream_write_decimal): Added to print a decimal to the
+	iostream.
+
+	* raptor/raptor_iostream.c (raptor_new_iostream_to_file_handle):
+	Do not fclose at end.
+	(raptor_string_iostream_finish): Free malloced context.
+	(raptor_iostream_write_string): Helper to write C string.
+
+	* raptor/raptor_iostream.c: Added sink iostream
+	(raptor_sink_iostream_write_byte, raptor_sink_iostream_write_bytes):
+	Added.
+	(raptor_new_iostream_to_sink): Added to create a throwaway data
+	iostream.
+	(raptor_free_iostream): Ensure write_end is always called once only.
+	(main): Test sink.
+
+	* raptor/raptor_iostream.c:
+	Added ended flag, once write_end is done, all further calls fail.
+	(raptor_filename_iostream_finish): Removed; write_end does this.
+	(raptor_filename_iostream_write_end): Added to fclose() on end
+	(raptor_string_iostream_finish): More checks when stringbuffer is
+	empty.
+	(raptor_new_iostream_to_string): Handle error tidy up better.
+	(raptor_iostream_write_end): Added.
+	(main): Code tidy.
+
+	* raptor/raptor_iostream.c: casts for c++
+
+	* raptor/raptor.h: Added raptor_iostream class and methods.
+
+	* raptor/Makefile.am: Added raptor_iostream.c and raptor_iostream_test
+
+	* raptor/raptor_iostream.c: Raptor I/O stream class
+
+	* raptor/n3_lexer.l, raptor/n3_parser.y, raptor/turtle_lexer.l,
+	raptor/turtle_parser.y, rasqal/rdql_lexer.l, rasqal/rdql_parser.y,
+	rasqal/sparql_lexer.l, rasqal/sparql_parser.y: Rename rather
+	generic define ERROR to ERROR_TOKEN to help win32.
+
+	* rasqal/rdql_lexer.l, rasqal/sparql_lexer.l: words
+
+	* rasqal/rasqal_engine.c (rasqal_set_triples_source_factory):
+	Export this, to match rasqal.h
+	and add docs.
+
+2004-10-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c: Tidy some #defines
+	(main): Don't print all of huge query_string on errors.
+
+	* rasqal/roqet.1: formatting
+
+2004-10-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/check-sparql:
+	Destroy duff relative file: URIs only
+
+	* rasqal/tests/sparql/check-sparql: validate $roqet path
+	No Data::Dumper
+
+	* rasqal/roqet.c: Remove extra print of query URI
+
+	* rasqal/roqet.c (roqet_get_www_content): Remove goto
+
+	* rasqal/roqet.1: Update for options changes.  Note SPARQL support.
+
+	* raptor/rapper.1: die .UE
+
+	* rasqal/roqet.c (roqet_error_handler): Added, used by www fetching.
+	(roqet_get_www_write_bytes): Added, used by roqet_get_www_content
+	(roqet_get_www_content): Added, creates a big string of a URI
+	content using the raptor_www class routines to retrieve it
+	and raptor_stringbuffer to assemble it.
+	(main): Use roqet_get_www_content to retrieve queries from URIs.
+
+	* rasqal/sparql_lexer.l, rasqal/sparql_parser.y:
+	Deleted FOR and USING tokens
+
+	* rasqal/sparql_parser.y: Remove PatternLiteral
+
+	* rasqal/tests/sparql/examples/Makefile.am,
+	rasqal/tests/sparql/examples/ex2-1a-result.n3,
+	rasqal/tests/sparql/examples/ex2-1a.n3,
+	rasqal/tests/sparql/examples/ex2-1a.rq,
+	rasqal/tests/sparql/examples/ex2-1b.rq,
+	rasqal/tests/sparql/examples/ex2-1c.rq,
+	rasqal/tests/sparql/examples/ex2-1d.n3,
+	rasqal/tests/sparql/examples/ex2-1e.rq,
+	rasqal/tests/sparql/examples/ex2-1f.n3,
+	rasqal/tests/sparql/examples/ex2-2a-result.n3,
+	rasqal/tests/sparql/examples/ex2-2a.n3,
+	rasqal/tests/sparql/examples/ex2-2a.rq,
+	rasqal/tests/sparql/examples/ex2-3a-result.n3,
+	rasqal/tests/sparql/examples/ex2-3a.n3,
+	rasqal/tests/sparql/examples/ex2-3a.rq,
+	rasqal/tests/sparql/examples/ex2-4a-result.n3,
+	rasqal/tests/sparql/examples/ex2-4a.n3,
+	rasqal/tests/sparql/examples/ex2-4a.rq,
+	rasqal/tests/sparql/examples/ex3-result.n3,
+	rasqal/tests/sparql/examples/ex3.n3,
+	rasqal/tests/sparql/examples/ex3.rq,
+	rasqal/tests/sparql/examples/manifest.n3: SPARQL examples from
+	query WD
+
+	* rasqal/tests/rdql/Makefile.am,
+	rasqal/tests/rdql/testsuite/Makefile.am,
+	rasqal/tests/sparql/Makefile.am,
+	rasqal/tests/sparql/part1/Makefile.am,
+	rasqal/tests/sparql/simple/Makefile.am: Use indirect rules for the
+	lexer, parser tests for rdql, sparql and roqet
+
+	* rasqal/configure.ac: Added tests/sparql/examples/Makefile
+
+	* rasqal/sparql_parser.y:
+	Added SPARQL URI token replacing URI_LITERAL | QNAME_LITERAL for
+	clarity.
+	Makes several List tokens shorter
+
+	* rasqal/sparql_parser.y (VarOrURIList, VarList): Made left recursive.
+	(VarOrURI): Don't allow a QName.
+
+	* rasqal/rdql_parser.y (TriplePatternList): rewrite as left recursive
+
+	* rasqal/rdql_parser.y (VarList): rewrite as left recursive
+
+	* rasqal/roqet.c (main):
+	When adding source_uri as a triple source, URI is now
+	managed by the query, so drop the source_uri pointer.
+
 2004-10-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y (PrefixDeclOpt):
+	Actually use query->prefixes list.
+
+	* rasqal/sparql_parser.y (PrefixDeclOpt):
+	Add new prefix to existing prefixes list.
+	(main): Update test code to initialise/free static query.prefixes.
+
+	* rasqal/rdql_parser.y (Query): Do not initialise query->prefixes.
+	(PrefixDeclList): Shift new prefixes to existing prefixes list.
+	(main): Update test code to initialise/free static query.prefixes.
+
+	* rasqal/rasqal_query.c (rasqal_new_query):
+	Init query->prefixes here rather than in each QL
+	implementation.
+
+	* rasqal/sparql_parser.y: Remove prefix from %union - not needed
+
+	* rasqal/rasqal_internal.h, rasqal/sparql_lexer.l,
+	rasqal/sparql_parser.y: Updated SPARQL parser to approximately
+	http://www.w3.org/TR/2004/WD-rdf-sparql-query-20041012/#grammar
+
+	* librdf/rdf_serializer.c (main):
+	Add serializer error and warning report tests
+
+	* librdf/rdf_query_rasqal.c (librdf_query_rasqal_results_get_bindings):
+	Casts for variable names array.
 
 	* librdf/rdf_serializer_rdfxml.c
 	(rdf_serializer_rdfxml_print_xml_attribute): Take serializer arg.
