@@ -8,7 +8,7 @@ body {
 }
 
 /* NS 4 needs this */
-th, td, p, ol, ul, li, dl, dt, dt { font-family: Verdana, Arial, Helvetica, sans-serif; }
+th, td, p, ol, ul, li, dl, dt, dt, blockquote { font-family: Verdana, Arial, Helvetica, sans-serif; }
 
 h1, h2, h3, h4, h5 { text-align: left; color: #880000; }
 
