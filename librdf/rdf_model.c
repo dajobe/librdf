@@ -24,18 +24,13 @@
 #include <rdf_config.h>
 
 #include <stdio.h>
+#include <stdarg.h>
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for exit()  */
 #endif
 
 #include <librdf.h>
-#include <rdf_list.h>
-#include <rdf_node.h>
-#include <rdf_statement.h>
-#include <rdf_model.h>
-#include <rdf_storage.h>
-#include <rdf_stream.h>
 
 
 /**

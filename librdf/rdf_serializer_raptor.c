@@ -25,9 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#ifdef HAVE_STDARG_H
-#include <stdarg.h> /* for raptor.h use of va_list */
-#endif
+#include <stdarg.h>
 
 #include <librdf.h>
 

@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for strtol */

@@ -25,11 +25,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
+
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
-#endif
-#ifdef HAVE_STDARG_H
-#include <stdarg.h> /* for raptor.h use of va_list */
 #endif
 
 #include <librdf.h>

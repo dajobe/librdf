@@ -25,18 +25,19 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #ifdef STANDALONE
 #define LIBRDF_DEBUG 1
 #endif
 
 #include <librdf.h>
-
 #include <rdf_parser.h>
 #include <rdf_node.h>
 #include <rdf_stream.h>
 #include <rdf_statement.h>
 #include <rdf_concepts.h>
+
 
 
 
@@ -377,7 +378,7 @@ librdf_parser_sirpac_get_next_statement(librdf_parser_sirpac_stream_context *con
       if(literal_buffer)
         o=literal_buffer;
       librdf_statement_set_object(statement,
-                                  librdf_new_node_from_literal(world, o, NULL, 0, 0));
+                                  librdf_new_node_from_literal(world, o, NULL, 0));
       if(literal_buffer)
         LIBRDF_FREE(cstring, literal_buffer);
     } else {
