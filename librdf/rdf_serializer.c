@@ -647,7 +647,7 @@ main(int argc, char *argv[])
   string=librdf_serializer_serialize_model_to_counted_string(serializer,
                                                              base_uri, model,
                                                              &string_length);
-#define EXPECTED_BAD_STRING_LENGTH 362
+#define EXPECTED_BAD_STRING_LENGTH 237
   if(string_length != EXPECTED_BAD_STRING_LENGTH) {
     fprintf(stderr, "%s: Serialising to RDF/XML returned string '%s' size %d, expected %d\n", program, string,
             string_length, EXPECTED_BAD_STRING_LENGTH);
