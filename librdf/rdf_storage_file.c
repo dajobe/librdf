@@ -88,7 +88,7 @@ librdf_storage_file_init(librdf_storage* storage, char *name,
     LIBRDF_FREE(cstring, contexts);
   
   if(is_uri)
-    context->uri=librdf_new_uri(storage->world, name);
+    context->uri=librdf_new_uri(storage->world, (const unsigned char*)name);
   else {
     context->name_len=strlen(name);
     name_copy=(char*)LIBRDF_MALLOC(cstring, context->name_len+1);
