@@ -21,6 +21,120 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<h2 id="rel0_9_17"><a name="rel0_9_17">Redland 0.9.17 Changes</a></h2>
+
+<p>This is Redland 1.0 Release Candidate 1.</p>
+
+<p>Moved language bindings into the new
+<a href="http://www.redland.opensource.ac.uk//bindings/">Redland Bindings</a>
+package.</p>
+
+<p>Added Query (<code>librdf_query</code>) and Query Results
+(<code>librdf_query_results</code>) classes
+to provide RDF query support using Rasqal 0.9.1, now included
+in the Redland distribution.</p>
+
+<p>The Query class has the following new functions and methods:</p>
+<ul>
+<li><code>librdf_new_query</code> (constructor)</li>
+<li><code>librdf_new_query_from_query</code> (constructor)</li>
+<li><code>librdf_new_query_from_factory</code> (factory constructor)</li>
+<li><code>librdf_free_query</code> (destructor)</li>
+<li><code>librdf_query_execute</code></li>
+</ul>
+
+<p>The Query Results class has the following methods:</p>
+<ul>
+<li><code>librdf_query_results_as_stream</code></li>
+<li><code>librdf_query_results_get_count</code></li>
+<li><code>librdf_query_results_next</code></li>
+<li><code>librdf_query_results_finished</code></li>
+<li><code>librdf_query_results_get_bindings</code></li>
+<li><code>librdf_query_results_get_binding_value</code></li>
+<li><code>librdf_query_results_get_binding_name</code></li>
+<li><code>librdf_query_results_get_binding_value_by_name</code></li>
+<li><code>librdf_query_results_get_bindings_count</code></li>
+<li><code>librdf_free_query_results</code> (destructor)</li>
+</ul>
+
+<p>Added example5.c to use the news query classes.</p>
+
+<p>Export the SWIG interface to Redland by installing the Redland.i
+in <code>/usr/share/redland/Redland.i</code>, for use by
+the Redland Bindings package</p>
+
+<p>Update the logging API to provide structured information
+returned including message level, facility, line, column, byte offset
+filename and/or URI of the activity.  Returns a
+<code>librdf_log_message</code>.</p>
+
+<p>Added <code>librdf_model_load</code> method to the model class
+that uses Raptor parser guessing to load content from a URI into a
+model.</p>
+
+<p>Fix assert bug in <code>librdf_node_get_blank_identifier</code>
+that caused it to always fail.</p>
+
+<p>Deprecated methods <code>librdf_parser_set_error</code> and 
+<code>librdf_parser_set_warning</code> which never worked.  The
+new logging API works correctly with this code.</p>
+
+<p>The contexts methods of the Model class now give
+a run time warning if called and the model does not support
+contexts.  The methods affected are:</p>
+<ul>
+<li><code>librdf_model_context_add_statement</code></li>
+<li><code>librdf_model_context_add_statements</code></li>
+<li><code>librdf_model_context_as_stream</code></li>
+<li><code>librdf_model_context_remove_statement</code></li>
+<li><code>librdf_model_context_remove_statements</code></li>
+<li><code>librdf_model_context_serialize</code></li>
+<li><code>librdf_model_find_statements_in_context</code></li>
+<li><code>librdf_model_get_contexts</code></li>
+</ul>
+
+<p>Storage class context methods will give a run time warning
+if called and contexts are not supported or enabled.  The
+methods affected are:</p>
+<ul>
+<li><code>librdf_storage_context_add_statement</code></li>
+<li><code>librdf_storage_context_remove_statement</code></li>
+<li><code>librdf_storage_context_serialise</code></li>
+<li><code>librdf_storage_get_contexts</code></li>
+</ul>
+
+<p>Node class, <code>librdf_node_get_li_ordinal</code>
+bug fix, do not always return -1</p>
+
+<p>Storage class, <code>librdf_storage_find_statements_in_context</code>
+and Model class <code>librdf_model_find_statements_in_context</code>
+When applying map, copy the statement so it can be freed later.
+</p>
+
+<p>Win32 building patches from Jose Kahan<br />
+Added win32_rdf_config.h hard-coded config<br />
+Added <code>#include win32_rdf_config.h</code> when WIN32 defined.<br />
+Use <code>REDLAND_STATIC</code> in librdf.h for statically linked Win32 builds.
+</p>
+
+<p>Storage class method
+<code>librdf_storage_node_stream_to_node_create</code> allow second
+node to be NULL, so that methods
+<code>librdf_storage_get_arcs_out</code> and
+<code>librdf_storage_get_arcs_in</code> that can use it, will now
+work.</p>
+
+<p>Updated RPM spec file to remove build of redland-perl and redland-python
+which are now done by redland-bindings</p>
+
+<p>Added -lrdf to redland.pc (Curtis Hovey)</p>
+
+<p>Update to Raptor 1.3.2</p>
+
+<p>Require automake 1.7 and autoconf 2.54</p>
+
+
+
 <h2 id="rel0_9_16"><a name="rel0_9_16">Redland 0.9.16 Changes</a></h2>
 
 <p>A small but important fix to make the installed C headers work
