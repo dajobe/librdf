@@ -204,7 +204,7 @@ main(int argc, char *argv[])
 
   
   if(usage) {
-    fprintf(stdout, "USAGE: %s: <BDB name> COMMANDS\n", program);
+    fprintf(stdout, "USAGE: %s: <storage name> COMMANDS\n", program);
     fprintf(stdout, "  parse URI PARSER [BASE URI]               Parse the RDF/XML at URI into\n");
     fprintf(stdout, "                                            the model using PARSER\n");
     fprintf(stdout, "  print                                     Prints all the statements\n");
@@ -228,7 +228,7 @@ main(int argc, char *argv[])
     storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='no'");
 
   if(!storage) {
-    fprintf(stderr, "%s: Failed to open storage\n", program);
+    fprintf(stderr, "%s: Failed to open BDB storage\n", program);
     return(1);
   }
 
@@ -263,6 +263,7 @@ main(int argc, char *argv[])
     parser=librdf_new_parser(argv[1], NULL, NULL);
     if(!parser) {
       fprintf(stderr, "%s: Failed to create new parser %s\n", program, argv[1]);
+      librdf_free_uri(uri);
       break;
     }
     fprintf(stdout, "%s: Parsing URI %s with %s parser\n", program,
