@@ -299,7 +299,7 @@ main(int argc, char *argv[])
     printf("  add SUBJECT PREDICATE OBJECT [CONTEXT]    Add triple to graph.\n");
     printf("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]\n");
     printf("                                            Add datatyped triple to graph.\n");
-    printf("  remove SUBJECT PREDICATE OBJECT [CONTEXT] Remove triple/from graph.\n");
+    printf("  remove SUBJECT PREDICATE OBJECT [CONTEXT] Remove triple from graph.\n");
     printf("  sources | targets | arcs NODE1 NODE2      Show matching nodes.\n");
     printf("  source | target | arc NODE1 NODE2         Show 1 matching node.\n");
     printf("  arcs-in | arcs-out NODE                   Show properties in/out of NODE\n");
