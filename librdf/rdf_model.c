@@ -1242,14 +1242,17 @@ librdf_model_query_execute(librdf_model* model, librdf_query* query)
  * librdf_model_sync - Synchronise the model to the model implementation
  * @model: &librdf_model object
  * 
+ * Return value: non-0 on failure
  **/
-void
+int
 librdf_model_sync(librdf_model* model) 
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(model, librdf_model);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
 
   if(model->factory->sync)
-    model->factory->sync(model);
+    return model->factory->sync(model);
+
+  return 0;
 }
 
 
