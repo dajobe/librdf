@@ -58,6 +58,8 @@ struct librdf_serializer_factory_s
   /* get/set features of serializer (think of Java properties) */
   const char * (*get_feature)(void *c, librdf_uri *feature);
   int (*set_feature)(void *c, librdf_uri *feature, const char *value);
+
+  int (*set_namespace)(void *c, librdf_uri *uri, const char *prefix);
   
   int (*serialize_model)(void *c, FILE *handle, librdf_uri* base_uri, librdf_model *model);
 };
@@ -105,6 +107,8 @@ void librdf_serializer_set_warning(librdf_serializer* serializer, void *user_dat
 
 const char *librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
 int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, const char *value);
+int librdf_serializer_set_namespace(librdf_serializer* serializer, librdf_uri *uri, const char *prefix);
+
 
 /* internal callbacks used by serializers invoking errors/warnings upwards to user */
 void librdf_serializer_error(librdf_serializer* serializer, const char *message, ...);
