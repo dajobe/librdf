@@ -364,3 +364,115 @@ librdf_iterator_map_remove_duplicate_nodes(void *item, void *user_data)
     LIBRDF_FREE(cstring, s);
   return item;
 }
+
+
+#ifdef STANDALONE
+
+/* one more prototype */
+int main(int argc, char *argv[]);
+
+
+#define ITERATOR_NODES_COUNT 6
+#define NODE_URI_PREFIX "http://example.org/node"
+
+int
+main(int argc, char *argv[]) 
+{
+  librdf_world *world;
+  librdf_uri* prefix_uri;
+  librdf_node* nodes[ITERATOR_NODES_COUNT];
+  int i;
+  librdf_iterator* iterator;
+  int count;
+  
+  char *program=argv[0];
+	
+  world=librdf_new_world();
+
+  librdf_init_hash(world);
+  librdf_init_uri(world);
+  librdf_init_node(world);
+
+  prefix_uri=librdf_new_uri(world, NODE_URI_PREFIX);
+  if(!prefix_uri) {
+    fprintf(stderr, "%s: Failed to create prefix URI\n", program);
+    return(1);
+  }
+
+  for(i=0; i < ITERATOR_NODES_COUNT; i++) {
+    char buf[2];
+    buf[0]='a'+i;
+    buf[1]='\0';
+    nodes[i]=librdf_new_node_from_uri_local_name(world, prefix_uri, buf);
+    if(!nodes[i]) {
+      fprintf(stderr, "%s: Failed to create node %i (%s)\n", program, i, buf);
+      return(1);
+    }
+  }
+  
+  fprintf(stdout, "%s: Creating static node iterator\n", program);
+  iterator=librdf_node_static_iterator_create(nodes, ITERATOR_NODES_COUNT);
+  if(!iterator) {
+    fprintf(stderr, "%s: Failed to createstatic  node iterator\n", program);
+    return(1);
+  }
+  
+  fprintf(stdout, "%s: Listing static node iterator\n", program);
+  count=0;
+  while(!librdf_iterator_end(iterator)) {
+    librdf_node* i_node=(librdf_node*)librdf_iterator_get_object(iterator);
+    if(!i_node) {
+      fprintf(stderr, "%s: librdf_iterator_current return NULL when not end o fiterator\n", program);
+      return(1);
+    }
+
+    fprintf(stdout, "%s: node %d is: ", program, count);
+    librdf_node_print(i_node, stdout);
+    fputc('\n', stdout);
+
+    if(!librdf_node_equals(i_node, nodes[count])) {
+      fprintf(stderr, "%s: static node iterator node %i returned unexpected node\n", program, count);
+      librdf_node_print(i_node, stderr);
+      fputs(" rather than ", stdout);
+      librdf_node_print(nodes[count], stderr);
+      fputc('\n', stdout);
+      return(1);
+    }
+    
+    librdf_iterator_next(iterator);
+    count++;
+  }
+
+  librdf_free_iterator(iterator);
+
+  if(count != ITERATOR_NODES_COUNT) {
+    fprintf(stderr, "%s: Iterator returned %d nodes, expected %d\n", program,
+            count, ITERATOR_NODES_COUNT);
+    return(1);
+  }
+
+  fprintf(stdout, "%s: Static node iterator worked ok\n", program);
+
+
+  fprintf(stdout, "%s: Freeing nodes\n", program);
+  for (i=0; i<ITERATOR_NODES_COUNT; i++) {
+    librdf_free_node(nodes[i]);
+  }
+
+  librdf_free_uri(prefix_uri);
+  
+  librdf_finish_node(world);
+  librdf_finish_uri(world);
+  librdf_finish_hash(world);
+
+  LIBRDF_FREE(librdf_world, world);
+
+#ifdef LIBRDF_MEMORY_DEBUG 
+  librdf_memory_report(stderr);
+#endif
+ 
+  /* keep gcc -Wall happy */
+  return(0);
+}
+
+#endif
