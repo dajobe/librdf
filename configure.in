@@ -420,6 +420,7 @@ fi
 
 if test "X$XML_CONFIG" != X; then
   oLIBS="$LIBS"
+  oCPPFLAGS="$CPPFLAGS"
   LIBS="$LIBS `$XML_CONFIG --libs`"
   AC_CHECK_LIB(xml, xmlParseFile)
   LIBS="$oLIBS"
@@ -428,21 +429,22 @@ if test "X$XML_CONFIG" != X; then
     have_libxml_lib=1
     have_libxml=1
     AC_MSG_RESULT(yes)
+
+
+    CPPFLAGS="$CPPFLAGS `$XML_CONFIG --cflags`"
+
+    AC_CHECK_HEADERS(libxml/parser.h libxml/hash.h gnome-xml/parser.h)
+    if test "$ac_cv_header_libxml_parser_h" = no -a "$ac_cv_header_gnome_xml_parser_h" = no; then
+      AC_MSG_WARN(libxml library found but not headers - disabling)
+      have_libxml_lib=0
+      have_libxml=0
+    fi
+
+    CFLAGS="$oCPPFLAGS"
+
   else
     AC_MSG_RESULT(no)
   fi
-
-  oCFLAGS="$CFLAGS"
-  CFLAGS="$CFLAGS `$XML_CONFIG --cflags`"
-
-  AC_CHECK_HEADERS(libxml/parser.h libxml/hash.h gnome-xml/parser.h gnome-xml/xmlmemory.h)
-  if test "$ac_cv_header_libxml_parser_h" = no -a "$ac_cv_header_gnome_xml_parser_h" = no; then
-    AC_MSG_WARN(libxml library found but not headers - disabling)
-    have_libxml_lib=0
-    have_libxml=0
-  fi
-  CFLAGS="$oCFLAGS"
-
 fi
 
 
