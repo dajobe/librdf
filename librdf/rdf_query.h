@@ -89,7 +89,9 @@ struct librdf_query_factory_s {
 
   /* get next result - OPTIONAL */
   int (*next_result)(librdf_query *query);
-  
+
+  /* get number of bound variables in the result - OPTIONAL */
+  int (*get_bindings_count)(librdf_query *query);
 };
 
 
