@@ -299,14 +299,11 @@ librdf_stream*
 librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
                               librdf_uri* base_uri) 
 {
-  const char *filename;
-  
   if(parser->factory->parse_uri_as_stream)
     return parser->factory->parse_uri_as_stream(parser->context,
                                                 uri, base_uri);
 
-  filename=librdf_uri_as_filename(uri);
-  if(!filename) {
+  if(!librdf_uri_is_file_uri(uri)) {
     LIBRDF_DEBUG2(librdf_parser_parse_as_stream, "%s parser can only handle file: URIs\n", parser->factory->name);
     return NULL;
   }
@@ -328,14 +325,11 @@ int
 librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
                                librdf_uri* base_uri, librdf_model* model) 
 {
-  const char *filename;
-  
   if(parser->factory->parse_uri_into_model)
     return parser->factory->parse_uri_into_model(parser->context,
                                                  uri, base_uri, model);
   
-  filename=librdf_uri_as_filename(uri);
-  if(!filename) {
+  if(!librdf_uri_is_file_uri(uri)) {
     LIBRDF_DEBUG2(librdf_parser_parse_into_stream, "%s parser can only handle file: URIs\n", parser->factory->name);
     return 1;
   }
