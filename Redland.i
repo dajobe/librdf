@@ -393,7 +393,7 @@ librdf_parser* librdf_new_parser(librdf_world *world, const char *name, const ch
 void librdf_free_parser(librdf_parser *parser);
 librdf_stream* librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri);
 int librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri, librdf_model* model);
-librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, consr char *string, librdf_uri* base_uri);
+librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const char *string, librdf_uri* base_uri);
 int librdf_parser_parse_string_into_model(librdf_parser* parser, const char *string, librdf_uri* base_uri, librdf_model* model);
 const char *librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
 int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, const char *value);
