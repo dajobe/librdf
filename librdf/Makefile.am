@@ -72,5 +72,7 @@ README: README.html
 NEWS: NEWS.html
 	$(LYNX) $(LYNXARGS) $< > $@
 
+LICENSE.h: LICENSE.txt
+	(echo '/*'; echo ' * file.c - Description'; echo ' *'; echo ' * $$Source$$'; echo ' * $$Id$$'; sed -e '1,/librdf - License/d' -e 's/^/ \* /' LICENSE.txt; echo ' */') > LICENSE.h
 
 @SET_MAKE@
