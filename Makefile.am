@@ -37,9 +37,9 @@ librdf-config.in \
 memcmp.c
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_statement_test \
-rdf_model_test rdf_storage_test
+rdf_model_test rdf_storage_test example
 
-CLEANFILES=$(TESTS) test.gdbm test.db
+CLEANFILES=$(TESTS) test
 
 # Why is this not in the default makefile?
 CC=@CC@
