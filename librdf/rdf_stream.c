@@ -340,6 +340,13 @@ librdf_stream_from_node_iterator_finished(void* context)
  * librdf_stream_print - print the stream
  * @stream: the stream object
  * @fh: the FILE stream to print to
+ *
+ * This prints the remaining statements of the stream to the given
+ * file handle.  Note that after this method is called the stream
+ * will be empty so that librdf_stream_end() will always be true
+ * and librdf_stream_next() will always return NULL.  The only
+ * useful operation is to dispose of the stream with the
+ * librdf_free_stream() destructor.
  * 
  **/
 void
@@ -356,9 +363,9 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
 
     s=librdf_statement_to_string(statement);
     if(s) {
-      fputs("  ", stdout);
-      fputs(s, stdout);
-      fputs("\n", stdout);
+      fputs("  ", fh);
+      fputs(s, fh);
+      fputs("\n", fh);
       LIBRDF_FREE(cstring, s);
     }
     librdf_free_statement(statement);
