@@ -320,6 +320,7 @@ main(int argc, char *argv[])
         }
           
         librdf_model_add_statement(model, statement);
+        librdf_free_statement(statement);
         count++;
       }
       librdf_free_stream(stream);  
