@@ -303,7 +303,10 @@ librdf_free_model(librdf_model *model)
  * librdf_model_size - get the number of statements in the model
  * @model: &librdf_model object
  * 
- * Return value: the number of statements
+ * WARNING: Not all underlying stores can return the size of the graph
+ * In which case the return value will be negative.
+ *
+ * Return value: the number of statements or <0 if not possible
  **/
 int
 librdf_model_size(librdf_model* model)
@@ -318,13 +321,17 @@ librdf_model_size(librdf_model* model)
  * @statement: statement object
  * 
  * The passed-in statement is copied when added to the model, not
- * shared with the model.
+ * shared with the model.  It must be a complete statement - all
+ * of subject, predicate, object parts must be present.
  *
  * Return value: non 0 on failure
  **/
 int
 librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 {
+  if(!librdf_statement_is_complete(statement))
+    return 1;
+  
   return model->factory->add_statement(model, statement);
 }
 
@@ -351,6 +358,7 @@ librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream
  * @object: &librdf_node of object (literal or resource)
  * 
  * After this method, the &librdf_node objects become owned by the model.
+ * All of subject, predicate and object must be non-NULL.
  * 
  * Return value: non 0 on failure
  **/
@@ -361,6 +369,9 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
   librdf_statement *statement;
   int result;
   
+  if(!subject || !predicate || !object)
+    return 1;
+
   statement=librdf_new_statement(model->world);
   if(!statement)
     return 1;
@@ -381,7 +392,7 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
  * @model: model object
  * @subject: &librdf_node of subject
  * @predicate: &librdf_node of predicate
- * @string: string literal conten
+ * @literal: string literal content
  * @xml_language: language of literal
  * @datatype: datatype librdf_uri
  * 
@@ -389,19 +400,24 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
  * owned by the model.
  * 
  * The language can be set to NULL if not used.
+ * All of subject, predicate and literal must be non-NULL.
  *
  * Return value: non 0 on failure
  **/
 int
 librdf_model_add_typed_literal_statement(librdf_model* model, 
                                          librdf_node* subject, 
-                                         librdf_node* predicate, char* string,
+                                         librdf_node* predicate, char* literal,
                                          char *xml_language,
                                          librdf_uri *datatype_uri)
 {
   librdf_node* object;
+
+  if(!subject || !predicate || !literal)
+    return 1;
+
   object=librdf_new_node_from_typed_literal(model->world,
-                                            string, xml_language, 
+                                            literal, xml_language, 
                                             datatype_uri);
   if(!object)
     return 1;
@@ -415,11 +431,12 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
  * @model: model object
  * @subject: &librdf_node of subject
  * @predicate: &librdf_node of predicate
- * @string: string literal conten
+ * @literal: string literal conten
  * @xml_language: language of literal
  * @is_wf_xml: literal is XML
  * 
  * The language can be set to NULL if not used.
+ * All of subject, predicate and literal must be non-NULL.
  *
  * 0.9.12: xml_space argument deleted
  *
@@ -428,15 +445,18 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
 int
 librdf_model_add_string_literal_statement(librdf_model* model, 
 					  librdf_node* subject, 
-					  librdf_node* predicate, char* string,
+					  librdf_node* predicate, char* literal,
 					  char *xml_language,
                                           int is_wf_xml)
 {
   librdf_node* object;
   int result;
   
+  if(!subject || !predicate || !literal)
+    return 1;
+
   object=librdf_new_node_from_literal(model->world,
-                                      string, xml_language, 
+                                      literal, xml_language, 
                                       is_wf_xml);
   if(!object)
     return 1;
@@ -454,11 +474,17 @@ librdf_model_add_string_literal_statement(librdf_model* model,
  * @model: the model object
  * @statement: the statement
  *
+ * It must be a complete statement - all of subject, predicate, object
+ * parts must be present.
+ *
  * Return value: non 0 on failure
  **/
 int
 librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
 {
+  if(!librdf_statement_is_complete(statement))
+    return 1;
+
   return model->factory->remove_statement(model, statement);
 }
 
@@ -468,11 +494,23 @@ librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
  * @model: the model object
  * @statement: the statement
  * 
+ * It must be a complete statement - all of subject, predicate, object
+ * parts must be present.  Use librdf_model_find_statements to search
+ * for partial statement matches.
+ *
+ * WARNING: librdf_model_contains_statement may not work correctly
+ * with stores using contexts.  In this case, a search using
+ * librdf_model_find_statements for a non-empty list will
+ * return the correct result.
+ *
  * Return value: non 0 if the model contains the statement
  **/
 int
 librdf_model_contains_statement(librdf_model* model, librdf_statement* statement)
 {
+  if(!librdf_statement_is_complete(statement))
+    return 1;
+
   return model->factory->contains_statement(model, statement);
 }
 
@@ -783,6 +821,9 @@ librdf_model_print(librdf_model *model, FILE *fh)
  * @context: &librdf_node context
  * @statement: &librdf_statement statement object
  * 
+ * It must be a complete statement - all
+ * of subject, predicate, object parts must be present.
+ *
  * Return value: Non 0 on failure
  **/
 int
@@ -790,6 +831,9 @@ librdf_model_context_add_statement(librdf_model* model,
                                    librdf_node* context,
                                    librdf_statement* statement) 
 {
+  if(!librdf_statement_is_complete(statement))
+    return 1;
+
   return model->factory->context_add_statement(model, context, statement);
 }
 
@@ -834,6 +878,9 @@ librdf_model_context_add_statements(librdf_model* model,
  * @context: &librdf_uri context
  * @statement: &librdf_statement statement
  * 
+ * It must be a complete statement - all of subject, predicate, object
+ * parts must be present.
+ *
  * Return value: Non 0 on failure
  **/
 int
@@ -841,6 +888,9 @@ librdf_model_context_remove_statement(librdf_model* model,
                                       librdf_node* context,
                                       librdf_statement* statement) 
 {
+  if(!librdf_statement_is_complete(statement))
+    return 1;
+
   return model->factory->context_remove_statement(model, context, statement);
 }
 
