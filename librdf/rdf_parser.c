@@ -310,7 +310,7 @@ librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
 
 
 /**
- * librdf_parser_parse_into_model - Parse a URI of RDF/XML content into an librdf_model
+ * librdf_parser_parse_into_model - Parse a URI of content into an librdf_model
  * @parser: the parser
  * @uri: the URI to read the content
  * @base_uri: the base URI to use (or NULL if the same)
@@ -333,6 +333,49 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
   return parser->factory->parse_file_into_model(parser->context,
                                                 uri, base_uri, model);
 }
+
+
+/**
+ * librdf_parser_parse_string_as_stream - Parse a string of content to a librdf_stream of statements
+ * @parser: the parser
+ * @string: the string to parse
+ * @base_uri: the base URI to use (or NULL if the same)
+ * 
+ * Return value: &librdf_stream of statements or NULL
+ **/
+librdf_stream*
+librdf_parser_parse_string_as_stream(librdf_parser* parser, const char *string,
+                                     librdf_uri* base_uri) 
+{
+  if(parser->factory->parse_string_as_stream)
+    return parser->factory->parse_string_as_stream(parser->context,
+                                                   string, base_uri);
+
+  return NULL;
+}
+
+
+/**
+ * librdf_parser_parse_string_into_model - Parse a string of content into an librdf_model
+ * @parser: the parser
+ * @uri: the URI to read the content
+ * @base_uri: the base URI to use (or NULL if the same)
+ * @model: the model to use
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_parser_parse_string_into_model(librdf_parser* parser, 
+                                      const char *string,
+                                      librdf_uri* base_uri, librdf_model* model) 
+{
+  if(parser->factory->parse_string_into_model)
+    return parser->factory->parse_string_into_model(parser->context,
+                                                    string, base_uri, model);
+  
+  return 1;
+}
+
 
 
 
