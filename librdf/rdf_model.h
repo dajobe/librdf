@@ -122,8 +122,18 @@ struct librdf_model_factory_s {
   /* query the model */
   librdf_stream* (*query)(librdf_model* model, librdf_query* query);
 
-  /* sync the model to the storage */
+  /* sync the model to the storage - OPTIONAL */
   void (*sync)(librdf_model* model);
+
+  /* add a statement from the context - OPTIONAL (librdf_model will
+   * implement using context_add_statement if missing) 
+   */
+  int (*context_add_statements)(librdf_model* model, librdf_node* context, librdf_stream *stream);
+
+  /* remove a statement from the context - OPTIONAL (librdf_model will
+   * implement using context_remove_statement if missing) 
+   */
+  int (*context_remove_statements)(librdf_model* model, librdf_node* context);
 
 };
 
