@@ -166,7 +166,7 @@ librdf_serializer_rdfxml_raptor_error_handler(void *data,
  * Return value: non-0 on failure
  **/
 static int
-rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
+rdf_serializer_rdfxml_print_xml_attribute(librdf_serializer *serializer,
                                           unsigned char *attr,
                                           unsigned char *value,
                                           FILE *handle) 
@@ -181,10 +181,14 @@ rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
   len=strlen((const char*)value);
 
   escaped_len=raptor_xml_escape_string(value, len,
-                                       NULL, 0, '"',
-                                       librdf_serializer_rdfxml_raptor_error_handler, world);
-  if(!escaped_len)
+                                       NULL, 0, '"', 
+                                       NULL, NULL);
+  if(!escaped_len) {
+    librdf_log(serializer->world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
+               "Bad UTF-8 encoding found while XML escaping attribute '%s' value '%s'", attr, value);
     return 1;
+  }
 
   buffer=(unsigned char*)LIBRDF_MALLOC(cstring, 1 + attr_len + 2 + escaped_len + 1 +1);
   if(!buffer)
@@ -196,9 +200,9 @@ rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
   p+= attr_len;
   *p++='=';
   *p++='"';
-  raptor_xml_escape_string(value, len,
-                           p, escaped_len, '"',
-                           librdf_serializer_rdfxml_raptor_error_handler, world);
+  raptor_xml_escape_string(value, len, 
+                           p, escaped_len, '"', 
+                           NULL, NULL);
   p+= escaped_len;
   *p++='"';
   *p++='\0';
@@ -221,9 +225,8 @@ rdf_serializer_rdfxml_print_xml_attribute(librdf_world *world,
 static int
 librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *context,
                                             librdf_statement * statement,
-                                            FILE *handle) 
+                                            FILE *handle)
 {
-  librdf_world* world=statement->world;
   librdf_node* nodes[3];
   unsigned char* uris[3];
   size_t uris_lens[3];
@@ -273,7 +276,9 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
         }
 
         if(!name) {
-          librdf_serializer_warning(context->serializer, "Cannot split predicate URI %s into an XML qname - skipping statement", uris[1]);
+          librdf_log(context->serializer->world,
+                     0, LIBRDF_LOG_WARN, LIBRDF_FROM_SERIALIZER, NULL,
+                     "Cannot split predicate URI %s into an XML qname - skipping statement", uris[1]);
           return 1;
         }
 
@@ -287,12 +292,12 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   rc=0;
   /* subject */
   if(librdf_node_get_type(nodes[0]) == LIBRDF_NODE_TYPE_BLANK)
-    rc=rdf_serializer_rdfxml_print_xml_attribute(world, 
+    rc=rdf_serializer_rdfxml_print_xml_attribute(context->serializer, 
                                                  (unsigned char*)"rdf:nodeID", 
                                                  librdf_node_get_blank_identifier(nodes[0]),
                                                  handle);
   else
-    rc=rdf_serializer_rdfxml_print_xml_attribute(world,
+    rc=rdf_serializer_rdfxml_print_xml_attribute(context->serializer,
                                                  (unsigned char*)"rdf:about", 
                                                  uris[0], handle);
   if(rc) {
@@ -320,10 +325,14 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
     fputc('=', handle);
 
     escaped_len=raptor_xml_escape_string(uris[1], len,
-                                         NULL, 0, '"', 
-                                         librdf_serializer_rdfxml_raptor_error_handler, world);
-    if(!escaped_len)
+                                         NULL, 0, '"',
+                                         NULL, NULL);
+    if(!escaped_len) {
+      librdf_log(context->serializer->world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
+                 "Bad UTF-8 encoding found while XML escaping namespace URI '%s'", uris[1]);
       return 1;
+    }
 
     /* " + string + " + \0 */
     buffer=(unsigned char*)LIBRDF_MALLOC(cstring, 1 + escaped_len + 1 + 1);
@@ -332,9 +341,9 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 
     p=buffer;
     *p++='"';
-    raptor_xml_escape_string(uris[1], len, 
-                             p, escaped_len, '"', 
-                             librdf_serializer_rdfxml_raptor_error_handler, world);
+    raptor_xml_escape_string(uris[1], len,
+                             p, escaped_len, '"',
+                             NULL, NULL);
     p+= escaped_len;
     *p++='"';
     *p='\0';
@@ -346,7 +355,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
   switch(librdf_node_get_type(nodes[2])) {
     case LIBRDF_NODE_TYPE_LITERAL:
       if(librdf_node_get_literal_value_language(nodes[2])) {
-        if(rdf_serializer_rdfxml_print_xml_attribute(world,
+        if(rdf_serializer_rdfxml_print_xml_attribute(context->serializer,
                                                      (unsigned char*)"xml:lang",
                                                      (unsigned char*)librdf_node_get_literal_value_language(nodes[2]),
                                                      handle))
@@ -364,7 +373,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 
         librdf_uri *duri=librdf_node_get_literal_value_datatype_uri(nodes[2]);
         if(duri) {
-          if(rdf_serializer_rdfxml_print_xml_attribute(world, 
+          if(rdf_serializer_rdfxml_print_xml_attribute(context->serializer, 
                                                        (unsigned char*)"rdf:datatype",
                                                        librdf_uri_as_string(duri),
                                                        handle))
@@ -374,10 +383,14 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
         fputc('>', handle);
 
         xml_string_len=raptor_xml_escape_string(content, len,
-                                                NULL, 0, 0,
-                                                librdf_serializer_rdfxml_raptor_error_handler, world);
-        if(!xml_string_len)
+                                                NULL, 0, 0, 
+                                                NULL, NULL);
+        if(!xml_string_len) {
+          librdf_log(context->serializer->world,
+                     0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
+                     "Bad UTF-8 encoding found while XML escaping element content '%s'", content);
           return 1;
+        }
         
         if(xml_string_len == (int)len)
           fputs(content, handle);
@@ -387,7 +400,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
           xml_string=(unsigned char*)LIBRDF_MALLOC(cstring, xml_string_len+1);
           xml_string_len=raptor_xml_escape_string(content, len,
                                                   xml_string, xml_string_len, 0,
-                                                  librdf_serializer_rdfxml_raptor_error_handler, world);
+                                                  NULL, NULL);
           fputs(xml_string, handle);
           LIBRDF_FREE(cstring, xml_string);
         }
@@ -400,7 +413,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
       fputc('>', handle);
       break;
     case LIBRDF_NODE_TYPE_BLANK:
-      if(rdf_serializer_rdfxml_print_xml_attribute(world, 
+      if(rdf_serializer_rdfxml_print_xml_attribute(context->serializer, 
                                                    (unsigned char*)"rdf:nodeID",
                                                    librdf_node_get_blank_identifier(nodes[2]), handle))
         return 1;
@@ -409,7 +422,7 @@ librdf_serializer_print_statement_as_rdfxml(librdf_serializer_rdfxml_context *co
 
     case LIBRDF_NODE_TYPE_RESOURCE:
       /* must be URI */
-      if(rdf_serializer_rdfxml_print_xml_attribute(world,
+      if(rdf_serializer_rdfxml_print_xml_attribute(context->serializer,
                                                    (unsigned char*)"rdf:resource",
                                                    uris[2], handle))
         return 1;
