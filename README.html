@@ -21,22 +21,23 @@ Perl, PHP, Python, Ruby and Tcl.  Some of the classes providing the
 parsers, storage mechanisms and other elements are built as modules
 that can be added or removed as required.</p>
 
-<p>This library is mature and has been used in large systems.  See the
-<a href="TODO.html">todo list</a> or the <a href="http://www.redland.opensource.ac.uk/TODO.html">website version</a> for an up-to-date copy,
-and the <a href="FAQS.html">FAQS</a> for more information.  Changes
-can be found in the <a href="NEWS.html">NEWS</a> file or more
-detailed changes in the <a href="ChangeLog">ChangeLog</a>.</p>
+<p>This is a mature and stable RDF library developed since 2000.
+See the <a href="TODO.html">todo list</a> and the
+<a href="FAQS.html">FAQS</a> for more information.  Changes
+can be found in the <a href="NEWS.html">NEWS</a> file,
+detailed API changes in the <a href="RELEASE.html">release notes</a>
+and file-by-file changes in the CVS <a href="ChangeLog">ChangeLog</a>.</p>
 
 <p>Redland provides:</p>
 <ul>
 <li>A modular, <a href="docs/api/objects.html">object based</a> library written in C</li>
 <li><a href="docs/java.html">Java</a>, <a href="docs/perl.html">Perl</a>, <a href="docs/php.html">PHP</a>, <a href="docs/python.html">Python</a>, <a href="docs/ruby.html">Ruby</a> and <a href="docs/tcl.html">Tcl</a> interfaces for manipulating the RDF <a href="docs/api/model.html">graph</a> and parts - <a href="docs/api/statement.html">Statements</a>, <a href="docs/api/node.html">Resources and Literals</a></li>
 <li><a href="docs/api/parser.html">Parsers</a> and <a href="docs/api/serializer.html">Serializers</a> for reading and writing RDF as syntax.</li>
-<li><a href="docs/api/storage.html">Storage</a> for graphs in memory and on disk via Sleepcat / Berkeley DB.</li>
+<li><a href="docs/api/storage.html">Storage</a> for graphs in memory and on disk with Sleepycat/Berkeley DB, MySQL 4 or the AKT Triplestore library.</li>
 <li>Query APIs for the graph by Statement (triples) or by Nodes and Arcs</li>
 <li><a href="docs/api/stream.html">Statement Streams</a> for construction, parsing, de/serialisation of graphs</li>
 <li>Start of <a href="docs/api/query.html">query language</a> support.</li>
-<li>No memory leaks so far.</li>
+<li>No memory leaks.</li>
 </ul>
 
 
@@ -62,8 +63,8 @@ under the LGPL or MPL licenses.  See
 
 <p>See <a href="INSTALL.html">INSTALL.html</a> for general
 installation and configuration information and the
-language specific documents for installing the
-interfaces in 
+language specific documents for installing the interfaces in
+the current available APIs:
 <a href="docs/java.html">Java</a>,
 <a href="docs/perl.html">Perl</a>,
 <a href="docs/php.html">PHP</a>,
@@ -74,7 +75,7 @@ or
 
 <p>Further documentation is available in the
 <a href="docs/README.html">documents area</a> including the
-<a href="docs/api/index.html">API document.</a>
+<a href="docs/api/index.html">API reference document.</a>
 </p>
 
 
@@ -85,15 +86,6 @@ or
 discuss the development and use of Redland and Raptor as well as
 future plans and announcement of releases.</p>
 
-
-<h2>See Also</h2>
-
-<p>If you want to know more about RDF and related work, 
-try some of these sites:</p>
-<ul>
-<li><a href="http://www.w3.org/RDF/">W3C Resource Description Framework (RDF) </a> activity page (official home page)</li>
-<li><a href="http://www.ilrt.bristol.ac.uk/discovery/rdf/resources/">Dave Beckett's Resource Description Framework (RDF) Resource Guide</a> (yes that's me)</li>
-</ul>
 
 <hr />
 
