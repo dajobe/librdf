@@ -33,12 +33,6 @@
 
 #include <librdf.h>
 #include <rdf_storage.h>
-#ifdef HAVE_MYSQL
-#include <rdf_storage_mysql.h>
-#endif
-#ifdef HAVE_TSTORE
-#include <rdf_storage_tstore.h>
-#endif
 #include <rdf_storage_hashes.h>
 #include <rdf_storage_list.h>
 
