@@ -60,6 +60,8 @@ struct librdf_parser_factory_s
   int (*parse_uri_into_model)(void *c, librdf_uri *uri, librdf_uri* base_uri, librdf_model *model);
   librdf_stream* (*parse_file_as_stream)(void *c, librdf_uri *uri, librdf_uri *base_uri);
   int (*parse_file_into_model)(void *c, librdf_uri *uri, librdf_uri *base_uri, librdf_model *model);
+  int (*parse_string_into_model)(void *c, const char *string, librdf_uri* base_uri, librdf_model *model);
+  librdf_stream* (*parse_string_as_stream)(void *c, const char *string, librdf_uri *base_uri);
 };
 
 
@@ -101,6 +103,8 @@ void librdf_free_parser(librdf_parser *parser);
 /* methods */
 librdf_stream* librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri);
 int librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri, librdf_model* model);
+librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const char* string, librdf_uri* base_uri);
+int librdf_parser_parse_string_into_model(librdf_parser* parser, const char *string, librdf_uri* base_uri, librdf_model* model);
 void librdf_parser_set_error(librdf_parser* parser, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
 void librdf_parser_set_warning(librdf_parser* parser, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
 
