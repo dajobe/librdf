@@ -54,4 +54,7 @@ int rdf_statement_set_predicate(rdf_statement *statement, rdf_node *predicate);
 rdf_node* rdf_statement_get_object(rdf_statement *statement);
 int rdf_statement_set_object(rdf_statement *statement, rdf_node *object);
 
+/* convert to a string */
+char *rdf_statement_to_string(rdf_statement *statement);
+
 #endif
