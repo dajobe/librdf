@@ -1,5 +1,19 @@
 2004-07-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* csharp/Serializer.cs:
+	(Serializer (World world, string name, string mime_type, Uri
+	type_uri)): Replace cast to Object with use of Uri.operator==
+
+	* csharp/Uri.cs (Equals, operator ==, operator !=, GetHashCode): Added.
+
+	* csharp/Statement.cs:
+	(Statement (World world, Node subject, Node predicate, Node obj)):
+	Removed casts to Object and allow calls to Node.operator!=
+
+	* csharp/Node.cs (operator ==, operator !=):
+	Added tests for null using Object.Equals
+	written by Edd Dumbill.
+
 	* csharp/Redland.cs, csharp/MemoryStorage.cs, csharp/Iterator.cs,
 	csharp/IWrapper.cs, csharp/HashStorage.cs, csharp/URI.cs: Added
 	CVS IDs to the header.
