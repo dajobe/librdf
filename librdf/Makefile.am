@@ -218,3 +218,10 @@ finish: librdf.la
 	$(LIBTOOL) --mode=install install librdf.la $$lib; \
 	$(LIBTOOL) --mode=finish $$lib
 
+
+@MAINT@
+@MAINT@PrintParser.class: PrintParser.java
+@MAINT@	javac -classpath .:$(JAVA_SIRPACW3C_JAR):$(JAVA_SIRPACSTANFORD_JAR):$(JAVA_SAX_JAR) $<
+@MAINT@
+@MAINT@PrintConsumer.class: PrintConsumer.java
+@MAINT@	javac -classpath .:$(JAVA_SIRPACW3C_JAR):$(JAVA_SIRPACSTANFORD_JAR):$(JAVA_SAX_JAR) $<
