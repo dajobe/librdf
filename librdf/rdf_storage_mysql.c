@@ -11,7 +11,7 @@
  * and
  *
  * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  *
  * This package is Free Software or Open Source available under the
@@ -1617,6 +1617,6 @@ librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
 void
 librdf_init_storage_mysql(void)
 {
-  librdf_storage_register_factory("mysql",
+  librdf_storage_register_factory("mysql", "MySQL database store",
                                   &librdf_storage_mysql_register_factory);
 }

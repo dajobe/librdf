@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -891,6 +891,6 @@ librdf_storage_list_register_factory(librdf_storage_factory *factory)
 void
 librdf_init_storage_list(void)
 {
-  librdf_storage_register_factory("memory",
+  librdf_storage_register_factory("memory", "In memory",
                                   &librdf_storage_list_register_factory);
 }
