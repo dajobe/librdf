@@ -100,6 +100,7 @@ static int librdf_hash_bdb_destroy(void* context);
 static int librdf_hash_bdb_open(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 static int librdf_hash_bdb_close(void* context);
 static int librdf_hash_bdb_clone(librdf_hash* new_hash, void *new_context, char *new_identifier, void* old_context);
+static int librdf_hash_bdb_values_count(void *context);
 static int librdf_hash_bdb_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 static int librdf_hash_bdb_exists(void* context, librdf_hash_datum *key, librdf_hash_datum *value);
 static int librdf_hash_bdb_delete_key(void* context, librdf_hash_datum *key);
@@ -344,6 +345,19 @@ librdf_hash_bdb_clone(librdf_hash *hash, void* context, char *new_identifier,
   librdf_free_hash_datum(key);
 
   return status;
+}
+
+
+/**
+ * librdf_hash_bdb_values_count - Get the number of values in the hash
+ * @context: BerkeleyDB hash context
+ * 
+ * Return value: number of values in the hash or <0 if not available
+ **/
+static int
+librdf_hash_bdb_values_count(void *context) 
+{
+  return -1;
 }
 
 
@@ -976,6 +990,8 @@ librdf_hash_bdb_register_factory(librdf_hash_factory *factory)
   factory->open    = librdf_hash_bdb_open;
   factory->close   = librdf_hash_bdb_close;
   factory->clone   = librdf_hash_bdb_clone;
+
+  factory->values_count = librdf_hash_bdb_values_count;
 
   factory->put     = librdf_hash_bdb_put;
   factory->exists  = librdf_hash_bdb_exists;
