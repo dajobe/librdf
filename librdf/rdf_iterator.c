@@ -237,6 +237,11 @@ librdf_iterator_next(librdf_iterator* iterator)
  * librdf_iterator_get_object - Get the current object from the iterator
  * @iterator: the &librdf_iterator object
  *
+ * This method returns a SHARED pointer to the current iterator object
+ * which should be copied by the caller to preserve it if the iterator
+ * is moved on librdf_iterator_next or if it should last after the
+ * iterator is closed.
+ * 
  * Return value: The next element or NULL if the iterator has finished.
  **/
 void*
@@ -253,6 +258,11 @@ librdf_iterator_get_object(librdf_iterator* iterator)
  * librdf_iterator_get_context - Get the context of the current object on the iterator
  * @iterator: the &librdf_iterator object
  *
+ * This method returns a SHARED pointer to the current context node object
+ * which should be copied by the caller to preserve it if the iterator
+ * is moved on librdf_iterator_next or if it should last after the
+ * iterator is closed.
+ * 
  * Return value: The context or NULL if the iterator has finished.
  **/
 void*

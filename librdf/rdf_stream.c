@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -232,6 +232,11 @@ librdf_stream_next(librdf_stream* stream)
  * librdf_stream_get_object - Get the current librdf_statement in the stream
  * @stream: &librdf_stream object
  *
+ * This method returns a SHARED pointer to the current statement object
+ * which should be copied by the caller to preserve it if the stream
+ * is moved on librdf_stream_next or if it should last after the
+ * stream is closed.
+ * 
  * Return value: the current &librdf_statement object or NULL at end of stream.
  **/
 librdf_statement*
@@ -248,7 +253,12 @@ librdf_stream_get_object(librdf_stream* stream)
  * librdf_stream_get_context - Get the context of the current object on the stream
  * @stream: the &librdf_stream object
  *
- * Return value: The context or NULL if the stream has finished.
+ * This method returns a SHARED pointer to the current context node object
+ * which should be copied by the caller to preserve it if the stream
+ * is moved on librdf_stream_next or if it should last after the
+ * stream is closed.
+ * 
+ * Return value: The context node or NULL if the stream has finished.
  **/
 void*
 librdf_stream_get_context(librdf_stream* stream) 

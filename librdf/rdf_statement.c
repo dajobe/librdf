@@ -232,8 +232,10 @@ librdf_free_statement(librdf_statement* statement)
  * librdf_statement_get_subject - Get the statement subject
  * @statement: &librdf_statement object
  * 
+ * This method returns a SHARED pointer to the subject which must
+ * be copied by the caller if needed.
+ * 
  * Return value: a pointer to the &librdf_node of the statement subject - 
- * NOTE this is a shared copy and must be copied if used by the caller.
  **/
 librdf_node*
 librdf_statement_get_subject(librdf_statement *statement) 
@@ -265,8 +267,10 @@ librdf_statement_set_subject(librdf_statement *statement, librdf_node *node)
  * librdf_statement_get_predicate - Get the statement predicate
  * @statement: &librdf_statement object
  * 
+ * This method returns a SHARED pointer to the predicate which must
+ * be copied by the caller if needed.
+ * 
  * Return value: a pointer to the &librdf_node of the statement predicate - 
- * NOTE this is a shared copy and must be copied if used by the caller.
  **/
 librdf_node*
 librdf_statement_get_predicate(librdf_statement *statement) 
@@ -298,8 +302,10 @@ librdf_statement_set_predicate(librdf_statement *statement, librdf_node *node)
  * librdf_statement_get_object - Get the statement object
  * @statement: &librdf_statement object
  * 
+ * This method returns a SHARED pointer to the object which must
+ * be copied by the caller if needed.
+ * 
  * Return value: a pointer to the &librdf_node of the statement object - 
- * NOTE this is a shared copy and must be copied if used by the caller.
  **/
 librdf_node*
 librdf_statement_get_object(librdf_statement *statement) 
