@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -319,7 +319,7 @@ librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
  * librdf_parser_parse_into_model - Parse a URI of content into an librdf_model
  * @parser: the parser
  * @uri: the URI to read the content
- * @base_uri: the base URI to use (or NULL if the same)
+ * @base_uri: the base URI to use (or NULL if the same as @uri)
  * @model: the model to use
  * 
  * Return value: non 0 on failure

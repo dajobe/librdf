@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -706,7 +706,7 @@ librdf_parser_raptor_parse_into_model_common(void *context,
  * librdf_parser_raptor_parse_uri_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
  * @context: parser context
  * @uri: &librdf_uri URI of RDF/XML content source
- * @base_uri: &librdf_uri URI of the content location
+ * @base_uri: &librdf_uri URI of the content location (or NULL if the same as @uri)
  * @model: &librdf_model of model
  *
  * Retrieves all statements and stores them in the given model.
