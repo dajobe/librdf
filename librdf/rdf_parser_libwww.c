@@ -56,7 +56,8 @@ typedef struct {
   HTRDF* parser;            /* libwww RDF parser */
   HTRequest* request;       /* request for URI */
   librdf_statement* next;   /* next statement */
-  librdf_list *statements;  /* list containing all statements */
+  librdf_model *model;      /* model to store in */
+  librdf_list *statements;  /* OR list to store statements */
   int request_done;         /* non 0 if request done */
   int end_of_stream;        /* non 0 if stream finished */
 } librdf_parser_libwww_stream_context;
@@ -83,7 +84,8 @@ librdf_parser_libwww_init(void *context)
  * @t: libwww &HTTriple triple
  * @context: context for callback
  * 
- * Adds the statement to the list of statements *in core* - FIXME.
+ * Adds the statement to the list of statements *in core* OR
+ * to the model given during initialisation
  *
  * Registered in librdf_parser_libwww_new_handler().
  */
@@ -105,10 +107,10 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
     return;
   
   librdf_statement_set_subject(statement, 
-                               librdf_new_node_from_uri_string(HTTriple_subject(t)));
+                               librdf_new_node_as_stream_string(HTTriple_subject(t)));
   
   librdf_statement_set_predicate(statement,
-                                 librdf_new_node_from_uri_string(HTTriple_predicate(t)));
+                                 librdf_new_node_as_stream_string(HTTriple_predicate(t)));
 
 
   object=HTTriple_object(t);
@@ -117,7 +119,7 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
                                 librdf_new_node_from_literal(object, NULL, 0, 0));
    else
     librdf_statement_set_object(statement, 
-                                librdf_new_node_from_uri_string(object));
+                                librdf_new_node_as_stream_string(object));
 
 
 #ifdef LIBRDF_DEBUG
@@ -128,7 +130,11 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
 #endif
 #endif
 
-  librdf_list_add(scontext->statements, statement);
+  if(scontext->model) {
+    librdf_model_add(scontext->model, statement);
+  } else {
+    librdf_list_add(scontext->statements, statement);
+  }
 }
 
 
@@ -141,7 +147,7 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
  * @rdfparser: libwww &HTRDF parser
  * @context: context for callback
  *
- * Registered in librdf_parser_libwww_parse_from_uri().
+ * Registered in librdf_parser_libwww_parse_as_stream().
  */
 static void
 librdf_parser_libwww_new_handler (HTStream *		me,
@@ -296,7 +302,44 @@ tracer (const char * fmt, va_list pArgs)
 
 
 /**
- * librdf_parser_libwww_parse_from_uri - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
+ * librdf_parser_libwww_parse_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
+ * @context: parser context
+ * @uri: &librdf_uri URI of RDF/XML content
+ *
+ * Retrieves all statements into memory in a list and emits them
+ * when the URI content has been exhausted.  Use 
+ * librdf_parser_libwww_parse_into_model to update a model without
+ * such a memory overhead.
+ **/
+static librdf_stream*
+librdf_parser_libwww_parse_as_stream(void *context, librdf_uri *uri)
+{
+  return librdf_parser_libwww_parse_as_stream2(context, uri, NULL);
+}
+
+
+/**
+ * librdf_parser_libwww_parse_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
+ * @context: parser context
+ * @uri: &librdf_uri URI of RDF/XML content
+ * @model: &librdf_model of model
+ *
+ * Retrieves all statements and stores them in the given model.
+ **/
+static int
+librdf_parser_libwww_parse_into_model(void *context, librdf_uri *uri, 
+                                      librdf_model* model)
+{
+  void *status;
+
+  status=(void*)librdf_parser_libwww_parse_as_stream2(context, uri, NULL);
+  
+  return (status != NULL);
+}
+
+
+/**
+ * librdf_parser_libwww_parse_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: parser context
  * @uri: &librdf_uri URI of RDF/XML content
  *
@@ -304,7 +347,7 @@ tracer (const char * fmt, va_list pArgs)
  * a list and emits when the URI content has been exhausted.
  **/
 static librdf_stream*
-librdf_parser_libwww_parse_from_uri(void *context, librdf_uri *uri)
+librdf_parser_libwww_parse_as_stream2(void *context, librdf_uri *uri)
 {
   /* Note: not yet used:
   librdf_parser_libwww_context* pcontext=(librdf_parser_libwww_context*)context;
@@ -364,6 +407,11 @@ librdf_parser_libwww_parse_from_uri(void *context, librdf_uri *uri)
     return NULL;
   }
 
+  if(model) {
+    HTEventList_loop(context->request);
+    context->request_done=1;
+    return (librdf_stream*)1;
+  }
   
   stream=librdf_new_stream((void*)scontext,
                            &librdf_parser_libwww_serialise_end_of_stream,
@@ -512,7 +560,8 @@ librdf_parser_libwww_register_factory(librdf_parser_factory *factory)
   factory->context_length = sizeof(librdf_parser_libwww_context);
   
   factory->init  = librdf_parser_libwww_init;
-  factory->parse_from_uri = librdf_parser_libwww_parse_from_uri;
+  factory->parse_as_stream = librdf_parser_libwww_parse_as_stream;
+  factory->parse_into_model = librdf_parser_libwww_parse_into_model;
 }
 
 

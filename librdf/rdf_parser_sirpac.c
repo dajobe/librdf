@@ -83,7 +83,7 @@ librdf_parser_sirparc_init(void *context)
   
 
 /**
- * librdf_parser_sirpac_parse_from_uri - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
+ * librdf_parser_sirpac_parse_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: serialisation context
  * @uri: URI of RDF content
  * 
@@ -92,7 +92,7 @@ librdf_parser_sirparc_init(void *context)
  * Return value: a new &librdf_stream or NULL if the parse failed.
  **/
 static librdf_stream*
-librdf_parser_sirparc_parse_from_uri(void *context, librdf_uri *uri) {
+librdf_parser_sirparc_parse_as_stream(void *context, librdf_uri *uri) {
   /* Note: not yet used */
 /*  librdf_parser_sirpac_context* pcontext=(librdf_parser_sirpac_context*)context; */
   librdf_parser_sirpac_stream_context* scontext;
@@ -129,7 +129,7 @@ librdf_parser_sirparc_parse_from_uri(void *context, librdf_uri *uri) {
   scontext->command=command;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2(librdf_parser_sirparc_parse_from_uri, "Running command '%s'\n", command);
+  LIBRDF_DEBUG2(librdf_parser_sirparc_parse_as_stream, "Running command '%s'\n", command);
 #endif
 
   fh=popen(command, "r");
@@ -152,7 +152,34 @@ librdf_parser_sirparc_parse_from_uri(void *context, librdf_uri *uri) {
   
   return stream;  
 }
+
+
+/**
+ * librdf_parser_sirpac_parse_into_model - Retrieve the RDF/XML content at URI and store in a librdf_model
+ * @context: serialisation context
+ * @uri: URI of RDF content
+ * @model: &librdf_model
+ * 
+ * FIXME: No error reporting provided 
+ * FIXME: Maybe should use lower level code directly.
+ *
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_parser_sirparc_parse_into_model(void *context, librdf_uri *uri,
+                                       librdf_model *model) {
+  librdf_stream* stream;
+  int status;
   
+  stream=librdf_parser_sirparc_parse_as_stream(context, uri);
+  if(!stream)
+    return 1;
+
+  status=librdf_model_add_statements(model, stream);
+  librdf_free_stream(stream);
+  return status;
+}
+
 
 /*
  * librdf_parser_sirpac_get_next_statement - helper function to decode the output of the Java command to get the next statement
@@ -342,7 +369,8 @@ librdf_parser_sirpac_register_factory(librdf_parser_factory *factory)
   factory->context_length = sizeof(librdf_parser_sirpac_context);
   
   factory->init  = librdf_parser_sirparc_init;
-  factory->parse_from_uri = librdf_parser_sirparc_parse_from_uri;
+  factory->parse_as_stream = librdf_parser_sirparc_parse_as_stream;
+  factory->parse_into_model = librdf_parser_sirparc_parse_into_model;
 }
 
 

@@ -206,16 +206,35 @@ librdf_free_parser(librdf_parser *parser)
 /* methods */
 
 /**
- * librdf_parser_parse_from_uri - Parse a URI to a librdf_stream of statements
+ * librdf_parser_parse_as_stream - Parse a URI to a librdf_stream of statements
  * @parser: the parser
  * @uri: the URI to read
  * 
  * Return value: &librdf_stream of statements or NULL
  **/
 librdf_stream*
-librdf_parser_parse_from_uri(librdf_parser* parser, librdf_uri* uri) 
+librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri) 
 {
-  return parser->factory->parse_from_uri(parser->context, uri);
+  return parser->factory->parse_as_stream(parser->context, uri);
+}
+
+
+/**
+ * librdf_parser_parse_into_model - Parse a URI of RDF/XML content into an librdf_model
+ * @parser: the parser
+ * @uri: the URI to read
+ * @model: the model to use
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
+                               librdf_model* model) 
+{
+  if(!parser->factory->parse_into_model)
+    return 1;
+  
+  return parser->factory->parse_into_model(parser->context, uri, model);
 }
 
 

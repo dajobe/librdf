@@ -37,7 +37,9 @@ struct librdf_parser_factory_s
   size_t  context_length;
 
   int (*init)(void *c);
-  librdf_stream* (*parse_from_uri)(void *c, librdf_uri *uri);
+  librdf_stream* (*parse_as_stream)(void *c, librdf_uri *uri);
+
+  int (*parse_into_model)(void *c, librdf_uri *uri, librdf_model *model);
 };
 typedef struct librdf_parser_factory_s librdf_parser_factory;
 
@@ -69,7 +71,8 @@ void librdf_free_parser(librdf_parser *parser);
 
 
 /* methods */
-librdf_stream* librdf_parser_parse_from_uri(librdf_parser* parser, librdf_uri* uri);
+librdf_stream* librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri);
+int librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri, librdf_model* model);
 
 
 /* in librdf_parser_sirpac.c */
