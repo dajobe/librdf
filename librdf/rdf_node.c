@@ -54,29 +54,29 @@ new_rdf_node(void)
 rdf_node*
 new_rdf_node_from_uri_string(char *uri_string) 
 {
-  rdf_node* new_rdf_node;
+  rdf_node* new_node;
   rdf_uri *new_uri;
   
-  new_rdf_node = (rdf_node*)RDF_CALLOC(rdf_node, 1, sizeof(rdf_node));
-  if(!new_rdf_node)
+  new_node = (rdf_node*)RDF_CALLOC(rdf_node, 1, sizeof(rdf_node));
+  if(!new_node)
     return NULL;
 
   /* set type (actually not needed since calloc above sets type to 0) */
-  new_rdf_node->type = RDF_NODE_TYPE_RESOURCE;
+  new_node->type = RDF_NODE_TYPE_RESOURCE;
   
-  new_rdf_node->value.resource.uri = NULL;
+  new_node->value.resource.uri = NULL;
   if(uri_string != NULL) {
     new_uri=new_rdf_uri(uri_string);
     if (!new_uri) {
-      free_rdf_node(new_rdf_node);
+      free_rdf_node(new_node);
       return NULL;
     }
-    if(!rdf_node_set_uri(new_rdf_node, new_uri)) {
-      free_rdf_node(new_rdf_node);
+    if(!rdf_node_set_uri(new_node, new_uri)) {
+      free_rdf_node(new_node);
       return NULL;
     }
   }
-  return new_rdf_node;
+  return new_node;
 }
 
     
