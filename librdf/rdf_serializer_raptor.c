@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2002 David Beckett - http://purl.org/net/dajobe/
+ * Copyright (C) 2002-2004 David Beckett - http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology - http://www.ilrt.org/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
@@ -37,6 +37,8 @@
 
 typedef struct {
   librdf_serializer *serializer;        /* librdf serializer object */
+  raptor_serializer *rdf_serializer;    /* raptor serializer object */
+  char *serializer_name;                /* raptor serializer name to use */
 } librdf_serializer_raptor_context;
 
 
@@ -50,105 +52,174 @@ typedef struct {
 static int
 librdf_serializer_raptor_init(librdf_serializer *serializer, void *context) 
 {
-  librdf_serializer_raptor_context* pcontext=(librdf_serializer_raptor_context*)context;
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
 
-  pcontext->serializer = serializer;
+  scontext->serializer = serializer;
+  scontext->serializer_name=scontext->serializer->factory->name;
+
+  scontext->rdf_serializer=raptor_new_serializer(scontext->serializer_name);
+  if(!scontext->rdf_serializer)
+    return 1;
 
   return 0;
 }
 
 
+/**
+ * librdf_serializer_raptor_terminate - Terminate the raptor RDF serializer
+ * @context: context
+ **/
 static void
-librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
-                                             FILE *stream) 
+librdf_serializer_raptor_terminate(void *context) 
 {
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
+  
+  if(scontext->rdf_serializer)
+    raptor_free_serializer(scontext->rdf_serializer);
+}
+  
+
+static int
+librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
+                                             librdf_statement* statement)
+{
+  raptor_statement rstatement;
   librdf_node *subject=librdf_statement_get_subject(statement);
   librdf_node *predicate=librdf_statement_get_predicate(statement);
   librdf_node *object=librdf_statement_get_object(statement);
-  char *lang=NULL;
-  librdf_uri *dt_uri=NULL;
-  
-  if(librdf_node_is_blank(subject))
-    fprintf(stream, "_:%s", librdf_node_get_blank_identifier(subject));
-  else if(librdf_node_is_resource(subject)) {
-    /* Must be a URI */
-    fputc('<', stream);
-    raptor_print_ntriples_string(stream, librdf_uri_as_string(librdf_node_get_uri(subject)), '\0');
-    fputc('>', stream);
+
+  if(librdf_node_is_blank(subject)) {
+    rstatement.subject=librdf_node_get_blank_identifier(subject);
+    rstatement.subject_type=RAPTOR_IDENTIFIER_TYPE_ANONYMOUS;
+  } else if(librdf_node_is_resource(subject)) {
+    rstatement.subject=(raptor_uri*)librdf_node_get_uri(subject);
+    rstatement.subject_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
+    /* or  RAPTOR_IDENTIFIER_TYPE_ORDINAL ? */
   } else {
-      librdf_log(statement->world,
-                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
-                 "Do not know how to print triple subject type %d\n", librdf_node_get_type(subject));
-    return;
+    librdf_log(statement->world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
+               "Do not know how to serialize triple subject type %d\n", librdf_node_get_type(subject));
+    return 1;
   }
 
   if(!librdf_node_is_resource(predicate)) {
     librdf_log(statement->world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
                "Do not know how to print triple predicate type %d\n", librdf_node_get_type(predicate));
-    return;
+    return 1;
   }
 
-  fputc(' ', stream);
-  fputc('<', stream);
-  raptor_print_ntriples_string(stream, librdf_uri_as_string(librdf_node_get_uri(predicate)), '\0');
-  fputc('>', stream);
-  fputc(' ', stream);
+  rstatement.predicate=(raptor_uri*)librdf_node_get_uri(predicate);
+  rstatement.predicate_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
 
+  rstatement.object_literal_language=NULL;
+  rstatement.object_literal_datatype=NULL;
   switch(librdf_node_get_type(object)) {
     case LIBRDF_NODE_TYPE_LITERAL:
-      fputc('"', stream);
-      raptor_print_ntriples_string(stream, librdf_node_get_literal_value(object), '"');
-      fputc('"', stream);
-      lang=librdf_node_get_literal_value_language(object);
-      dt_uri=librdf_node_get_literal_value_datatype_uri(object);
-      if(lang) {
-        fputc('@', stream);
-        fputs(lang, stream);
-      }
-      if(dt_uri) {
-        fputs("^^<", stream); 
-        raptor_print_ntriples_string(stream, librdf_uri_as_string(dt_uri), '\0');
-        fputc('>', stream);
-      }
+      rstatement.object=librdf_node_get_literal_value(object);
+      rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_LITERAL;
+      
+      /* or RAPTOR_IDENTIFIER_TYPE_XML_LITERAL ? */
+      rstatement.object_literal_language=librdf_node_get_literal_value_language(object);
+      rstatement.object_literal_datatype=(raptor_uri*)librdf_node_get_literal_value_datatype_uri(object);
       break;
+
     case LIBRDF_NODE_TYPE_BLANK:
-      fputs("_:", stream);
-      fputs((const char*)librdf_node_get_blank_identifier(object), stream);
+      rstatement.object=librdf_node_get_blank_identifier(object);
+      rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_ANONYMOUS;
       break;
+
     case LIBRDF_NODE_TYPE_RESOURCE:
-      fputc('<', stream);
-      raptor_print_ntriples_string(stream, librdf_uri_as_string(librdf_node_get_uri(object)), '\0');
-      fputc('>', stream);
+      /* or  RAPTOR_IDENTIFIER_TYPE_ORDINAL ? */
+      rstatement.object=librdf_uri_as_string(librdf_node_get_uri(predicate));
+      rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
       break;
     default:
       librdf_log(statement->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
                  "Do not know how to print triple object type %d\n", librdf_node_get_type(object));
-      return;
+      return 1;
   }
-  fputs(" .", stream);
+
+  return raptor_serialize_statement(rserializer, &rstatement);
 }
 
 
 static int
-librdf_serializer_raptor_serialize_model(void *context,
-                                         FILE *handle, librdf_uri* base_uri,
-                                         librdf_model *model) 
+librdf_serializer_raptor_serialize_model_to_file_handle(void *context,
+                                                        FILE *handle, 
+                                                        librdf_uri* base_uri,
+                                                        librdf_model *model) 
 {
-  /* librdf_serializer_raptor_context* pcontext=(librdf_serializer_raptor_context*)context; */
-
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
+  int rc=0;
+  
   librdf_stream *stream=librdf_model_as_stream(model);
   if(!stream)
     return 1;
+
+  /* start the serialize */
+  rc=raptor_serialize_start_to_file_handle(scontext->rdf_serializer, 
+                                           (raptor_uri*)base_uri, handle);
+  if(rc)
+    return 1;
+    
   while(!librdf_stream_end(stream)) {
     librdf_statement *statement=librdf_stream_get_object(stream);
-    librdf_serializer_print_statement_as_ntriple(statement, handle);
-    fputc('\n', handle);
+    librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
+                                                 statement);
     librdf_stream_next(stream);
   }
   librdf_free_stream(stream);
+  raptor_serialize_end(scontext->rdf_serializer);
+
   return 0;
+}
+
+
+
+static unsigned char*
+librdf_serializer_raptor_serialize_model_to_string(void *context,
+                                                   librdf_uri* base_uri,
+                                                   librdf_model *model) 
+{
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
+  raptor_iostream *iostr;
+  unsigned char *string;
+  size_t string_length;
+  int rc=0;
+  
+  librdf_stream *stream=librdf_model_as_stream(model);
+  if(!stream)
+    return NULL;
+
+  /* start the serialize */
+  iostr=raptor_new_iostream_to_string((void**)&string, &string_length,
+                                      malloc);
+  if(!iostr) {
+    librdf_free_stream(stream);    
+    return NULL;
+  }
+    
+  rc=raptor_serialize_start(scontext->rdf_serializer, 
+                            (raptor_uri*)base_uri, iostr);
+
+  if(rc) {
+    librdf_free_stream(stream);    
+    raptor_free_iostream(iostr);
+    return NULL;
+  }
+    
+  while(!librdf_stream_end(stream)) {
+    librdf_statement *statement=librdf_stream_get_object(stream);
+    librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
+                                                 statement);
+    librdf_stream_next(stream);
+  }
+  librdf_free_stream(stream);
+  raptor_serialize_end(scontext->rdf_serializer);
+
+  return string;
 }
 
 
@@ -164,7 +235,10 @@ librdf_serializer_raptor_register_factory(librdf_serializer_factory *factory)
   factory->context_length = sizeof(librdf_serializer_raptor_context);
   
   factory->init  = librdf_serializer_raptor_init;
-  factory->serialize_model = librdf_serializer_raptor_serialize_model;
+  factory->terminate = librdf_serializer_raptor_terminate;
+
+  factory->serialize_model_to_file_handle = librdf_serializer_raptor_serialize_model_to_file_handle;
+  factory->serialize_model_to_string = librdf_serializer_raptor_serialize_model_to_string;
 }
 
 
@@ -175,7 +249,27 @@ librdf_serializer_raptor_register_factory(librdf_serializer_factory *factory)
 void
 librdf_serializer_raptor_constructor(librdf_world *world)
 {
-  librdf_serializer_register_factory(world, "ntriples", "text/plain",
-                                     (const unsigned char*)"http://www.w3.org/TR/rdf-testcases/#ntriples",
-                                     &librdf_serializer_raptor_register_factory);
+  int i;
+  
+  /* enumerate from serializer 1, so the default serializer 0 is done last */
+  for(i=1; 1; i++) {
+    const char *syntax_name=NULL;
+    const char *mime_type=NULL;
+    const unsigned char *uri_string=NULL;
+
+    if(raptor_serializers_enumerate(i, &syntax_name, NULL, 
+                                    &mime_type, &uri_string)) {
+      /* reached the end of the serializers, now register the default one */
+      i=0;
+      raptor_serializers_enumerate(i, &syntax_name, NULL,
+                                   &mime_type, &uri_string);
+    }
+    
+    librdf_serializer_register_factory(world, syntax_name, mime_type, 
+                                       uri_string,
+                                       &librdf_serializer_raptor_register_factory);
+
+    if(!i) /* registered default serializer, end */
+      break;
+  }
 }
