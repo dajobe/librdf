@@ -535,6 +535,69 @@ librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model)
 }
 
 
+
+/**
+ * librdf_model_get_arcs_in - return the properties pointing to the given resource
+ * @model: &librdf_model object
+ * @node: &librdf_node resource node
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_model_get_arcs_in(librdf_model *model, librdf_node *node) 
+{
+  return librdf_storage_get_arcs_in(model->storage, node);
+}
+
+
+/**
+ * librdf_model_get_arcs_out - return the properties pointing from the given resource
+ * @model: &librdf_model object
+ * @node: &librdf_node resource node
+ * 
+ * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ **/
+librdf_iterator*
+librdf_model_get_arcs_out(librdf_model *model, librdf_node *node) 
+{
+  return librdf_storage_get_arcs_out(model->storage, node);
+}
+
+
+/**
+ * librdf_model_has_arc_in - check if a node has a given property pointing to it
+ * @model: &librdf_model object
+ * @node: &librdf_node resource node
+ * @property: &librdf_node property node
+ * 
+ * Return value: non 0 if arc property does point to the resource node
+ **/
+int
+librdf_model_has_arc_in(librdf_model *model, librdf_node *node, 
+                        librdf_node *property) 
+{
+  return librdf_storage_has_arc_in(model->storage, node, property);
+}
+
+
+/**
+ * librdf_model_has_arc_out - check if a node has a given property pointing from it
+ * @model: &librdf_model object
+ * @node: &librdf_node resource node
+ * @property: &librdf_node property node
+ * 
+ * Return value: non 0 if arc property does point from the resource node
+ **/
+int
+librdf_model_has_arc_out(librdf_model *model, librdf_node *node,
+                         librdf_node *property) 
+{
+  return librdf_storage_has_arc_out(model->storage, node, property);
+}
+
+
+
+
 /**
  * librdf_model_print - print the model
  * @model: the model object
