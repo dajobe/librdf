@@ -457,7 +457,7 @@ librdf_model_storage_context_serialize(librdf_model* model,
 
 
 /**
- * librdf_model_storage_query - Run a query against the model returning matching statements
+ * librdf_model_storage_query_as_stream - Run a query against the model returning matching statements
  * @model: &librdf_model object
  * @query: &librdf_query object
  * 
@@ -467,21 +467,38 @@ librdf_model_storage_context_serialize(librdf_model* model,
  * Return value: &librdf_stream of matching statements (may be empty) or NULL on failure
  **/
 static librdf_stream*
-librdf_model_storage_query(librdf_model* model, librdf_query* query) 
+librdf_model_storage_query_as_stream(librdf_model* model,
+                                     librdf_query *query) 
 {
-  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
-  librdf_stream *stream;
-  
-  librdf_query_open(query);
-
-  if(librdf_storage_supports_query(context->storage, query))
-    stream=librdf_storage_query(context->storage, query);
+  librdf_model_storage_context *mcontext=(librdf_model_storage_context *)model->context;
+  if(librdf_storage_supports_query(mcontext->storage, query))
+    return librdf_storage_query_as_stream(mcontext->storage, query);
   else
-    stream=librdf_query_run(query,model);
+    return librdf_query_run_as_stream(query,model);
+}
 
-  librdf_query_close(query);
 
-  return stream;
+/**
+ * librdf_model_storage_query_as_bindings - Run a query against the model returning bindings
+ * @model: &librdf_model object
+ * @query: &librdf_query object
+ * 
+ * Run the given query against the model returning bindings.  Use
+ * methods of the &librdf_query if the result is success such
+ * as librdf_query_get_result_bindings, librdf_query_next_result
+ * and librdf_query_get_result_count.
+ * 
+ * Return value: non-0 on failure
+ **/
+static int
+librdf_model_storage_query_as_bindings(librdf_model* model,
+                                       librdf_query* query) 
+{
+  librdf_model_storage_context *mcontext=(librdf_model_storage_context *)model->context;
+  if(librdf_storage_supports_query(mcontext->storage, query))
+    return librdf_storage_query_as_bindings(mcontext->storage, query);
+  else
+    return librdf_query_run_as_bindings(query,model);
 }
 
 
@@ -609,7 +626,8 @@ librdf_model_storage_register_factory(librdf_model_factory *factory)
   factory->context_serialize        = librdf_model_storage_context_serialize;
 
 
-  factory->query              = librdf_model_storage_query;
+  factory->query_as_stream    = librdf_model_storage_query_as_stream;
+  factory->query_as_bindings  = librdf_model_storage_query_as_bindings;
   factory->sync               = librdf_model_storage_sync;
   factory->get_storage        = librdf_model_storage_get_storage;
   factory->get_contexts       = librdf_model_storage_get_contexts;
