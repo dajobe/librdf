@@ -57,7 +57,7 @@ main(int argc, char *argv[])
     return(1);
   }
 
-  storage=librdf_new_storage(NULL, NULL);
+  storage=librdf_new_storage("hashes", "test", "hash_type='bdb',dir='.'");
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
@@ -113,23 +113,27 @@ main(int argc, char *argv[])
 
   fprintf(stdout, "%s: Trying to find_statements\n", program);
   stream=librdf_model_find_statements(model, partial_statement);
-  count=0;
-  while(!librdf_stream_end(stream)) {
-    librdf_statement *statement=librdf_stream_next(stream);
-    if(!statement) {
-      fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
-      break;
+  if(!stream) {
+    fprintf(stderr, "%s: librdf_model_find_statements returned NULL stream\n", program);
+  } else {
+    count=0;
+    while(!librdf_stream_end(stream)) {
+      librdf_statement *statement=librdf_stream_next(stream);
+      if(!statement) {
+        fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
+        break;
+      }
+      
+      fputs("  Matched statement: ", stdout);
+      librdf_statement_print(statement, stdout);
+      fputc('\n', stdout);
+      
+      librdf_free_statement(statement);
+      count++;
     }
-
-    fputs("  Matched statement: ", stdout);
-    librdf_statement_print(statement, stdout);
-    fputc('\n', stdout);
-
-    librdf_free_statement(statement);
-    count++;
+    librdf_free_stream(stream);  
+    fprintf(stderr, "%s: got %d matching statements\n", program, count);
   }
-  librdf_free_stream(stream);  
-  fprintf(stderr, "%s: got %d matching statements\n", program, count);
 
 
   /* QUERY TEST 2 - use get_targets to do match */
