@@ -115,9 +115,7 @@ void librdf_serializer_error(librdf_serializer* serializer, const char *message,
 void librdf_serializer_warning(librdf_serializer* serializer, const char *message, ...);
 
 void librdf_serializer_raptor_constructor(librdf_world* world);
-#ifdef HAVE_RAPTOR_RDFXML_SERIALIZER
-void librdf_serializer_raptor_constructor(librdf_world* world);
-#endif
+void librdf_serializer_rdfxml_constructor(librdf_world* world);
 
 
 #ifdef __cplusplus
