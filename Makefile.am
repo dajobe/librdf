@@ -25,7 +25,7 @@ noinst_SCRIPTS = redland-src-config
 man_MANS = redland-config.1
 
 # Subdirectories to build/install etc.
-SUBDIRS=@SD_PRE@ librdf examples utils @SD_POST@ demos docs
+SUBDIRS=@SD_PRE@ librdf examples utils @SD_POST@ demos docs data
 CONFIG_SUBDIRS=raptor rasqal
 # Subdirectories to use for distribution
 DIST_SUBDIRS=librdf docs examples \

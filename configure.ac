@@ -1259,6 +1259,7 @@ ruby/lib/rdfs/Makefile
 csharp/Makefile
 utils/Makefile
 demos/Makefile
+data/Makefile
 librdf/redland.pc])
 AC_CONFIG_FILES([librdf/redland.spec])
 AC_CONFIG_FILES([redland-config], [chmod +x redland-config])
