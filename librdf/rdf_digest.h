@@ -28,7 +28,6 @@ struct rdf_digest_factory_s
 
   /* the rest of this structure is populated by the
      digest-specific register function */
-  const char * version;
   size_t  context_length;
   size_t  digest_length;
 
