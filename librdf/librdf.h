@@ -168,26 +168,16 @@ void librdf_memory_report(FILE *fh);
 /* internal interfaces  */
 #ifdef LIBRDF_INTERNAL
 #include <rdf_list.h>
-#include <rdf_uri.h>
 #include <rdf_hash.h>
 #include <rdf_digest.h>
 #include <rdf_files.h>
-
-/* from rdf_heuristics.c - internal */
-char* librdf_heuristic_gen_name(char *name);
-
 #endif
 
 /* public interfaces */
-
-/* from rdf_init.c */
-void librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash);
-void librdf_destroy_world(void);
-
-/* From rdf_heuristics.c - useful for user code */
-int librdf_heuristic_object_is_literal(char *object);
-
+#include <rdf_heuristics.h>
+#include <rdf_init.h>
 #include <rdf_iterator.h>
+#include <rdf_uri.h>
 #include <rdf_node.h>
 #include <rdf_context.h>
 #include <rdf_statement.h>
