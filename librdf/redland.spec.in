@@ -150,6 +150,9 @@ cd ..
 /sbin/ldconfig
 
 %changelog
+* Thu Aug 28 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
+- patches added post 0.9.13 to fix broken perl UNIVERSAL::isa
+ 
 * Thu Aug 21 2003 Dave Beckett <dave.beckett@bristol.ac.uk>
 - Add redland-db-upgrade.1
 - Removed duplicate perl CORE shared objects
