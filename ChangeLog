@@ -1,5 +1,11 @@
 2004-10-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* librdf/rdf_query_rasqal.c:
+	Update redland support to rasqal changes after addition of origin.
+
+	* rasqal/rasqal_redland.c (rasqal_redland_bind_match):
+	Take array of 4 bindings.
+
 	* rasqal/rasqal_redland.c:
 	Update redland support to changes after addition of origin.
 
