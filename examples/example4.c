@@ -44,6 +44,7 @@ enum command_type {
   CMD_TARGET,
   CMD_ADD,
   CMD_REMOVE,
+  CMD_ADD_TYPED,
   CMD_PARSE_MODEL,
   CMD_PARSE_STREAM,
   CMD_ARCS_IN,
@@ -75,6 +76,7 @@ static command commands[]={
   {CMD_TARGET, "target", 2, 2, 0},
   {CMD_ADD, "add", 3, 3, 1},
   {CMD_REMOVE, "remove", 3, 3, 1},
+  {CMD_ADD_TYPED, "add-typed", 5, 5, 1},
   {CMD_PARSE_MODEL, "parse", 2, 3, 1},
   {CMD_PARSE_STREAM, "parse-stream", 2, 3, 1},
   {CMD_ARCS_IN, "arcs-in", 1, 1, 0},
@@ -186,6 +188,7 @@ main(int argc, char *argv[])
     fprintf(stdout, "                                            where - matches any node.\n");
     fprintf(stdout, "  contains SUBJECT PREDICATE OBJECT         Check if statement is in the model.\n");
     fprintf(stdout, "  add | remove SUBJECT PREDICATE OBJECT     Add/remove statement to/from model.\n");
+    fprintf(stdout, "  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI  Add datatyped statement to model.\n");
     fprintf(stdout, "  sources | targets | arcs NODE1 NODE2      Query for matching nodes\n");
     fprintf(stdout, "  source | target | arc NODE1 NODE2         Query for 1 matching node\n");
     fprintf(stdout, "  arcs-in | arcs-out NODE                   Show properties in/out of node\n");
@@ -365,6 +368,7 @@ main(int argc, char *argv[])
     case CMD_STATEMENTS:
     case CMD_ADD:
     case CMD_REMOVE:
+    case CMD_ADD_TYPED:
       if(!strcmp(argv[0], "-"))
         source=NULL;
       else
@@ -374,15 +378,23 @@ main(int argc, char *argv[])
         arc=NULL;
       else
         arc=librdf_new_node_from_uri_string(world, argv[1]);
-      
-      if(!strcmp(argv[2], "-"))
-        target=NULL;
-      else {
-      if(librdf_heuristic_object_is_literal(argv[2]))
-        target=librdf_new_node_from_literal(world, argv[2], NULL, 0);
-      else
-        target=librdf_new_node_from_uri_string(world, argv[2]);
+
+      if(type == CMD_ADD_TYPED) {
+        char *lang=(strcmp(argv[3], "-")) ? argv[3] : NULL;
+        librdf_uri* dt_uri=librdf_new_uri(world, argv[4]);
+        target=librdf_new_node_from_typed_literal(world, argv[2], lang, dt_uri);
+        librdf_free_uri(dt_uri);
+      } else {
+        if(!strcmp(argv[2], "-"))
+          target=NULL;
+        else {
+          if(librdf_heuristic_object_is_literal(argv[2]))
+            target=librdf_new_node_from_literal(world, argv[2], NULL, 0);
+          else
+            target=librdf_new_node_from_uri_string(world, argv[2]);
+        }
       }
+      
       
       partial_statement=librdf_new_statement(world);
       librdf_statement_set_subject(partial_statement, source);
@@ -443,6 +455,7 @@ main(int argc, char *argv[])
           break;
           
         case CMD_ADD:
+        case CMD_ADD_TYPED:
           if(librdf_model_add_statement(model, partial_statement))
             fprintf(stdout, "%s: failed to add statement to model\n", program);
           else
