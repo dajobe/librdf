@@ -992,7 +992,8 @@ librdf_hash_print(librdf_hash* hash, FILE *fh)
   librdf_iterator* iterator;
   librdf_hash_datum *key, *value;
   
-  fprintf(fh, "%s hash: {\n", hash->factory->name);
+  fputs(hash->factory->name, fh);
+  fputs(" hash: {\n", fh);
 
   key=librdf_new_hash_datum(hash->world, NULL, 0);
   value=librdf_new_hash_datum(hash->world, NULL, 0);
