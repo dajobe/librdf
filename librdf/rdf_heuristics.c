@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_heuristics.c - Heuristic routines used by librdf to guess things
+ * rdf_heuristics.c - Heuristic routines to guess things about RDF
  *
  * $Id$
  *

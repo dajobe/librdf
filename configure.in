@@ -434,5 +434,5 @@ AC_SUBST(STANDARD_CFLAGS)
 
 AC_OUTPUT(Makefile
 docs/Makefile
-librdf-config,
-[chmod +x librdf-config])
+redland-config,
+[chmod +x redland-config])

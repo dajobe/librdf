@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_init.c - Overall librdf initialisation / termination
+ * rdf_init.c - Overall library initialisation / termination
  *
  * $Id$
  *
@@ -92,10 +92,10 @@
 
 
 /**
- * librdf_init_world - Initialise the librdf library
+ * librdf_init_world - Initialise the library
  * @digest_factory_name: &librdf_digest_factory
  * 
- * Initialises various librdf classes and uses the digest factory
+ * Initialises various classes and uses the digest factory
  * for various modules that need to make digests of their objects.
  *
  **/
@@ -123,9 +123,9 @@ librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash)
 
 
 /**
- * librdf_destroy_world - Terminate the librdf library
+ * librdf_destroy_world - Terminate the library
  * 
- * Terminates and frees the librdf resources.
+ * Terminates and frees the resources.
  **/
 void
 librdf_destroy_world(void)
