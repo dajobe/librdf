@@ -90,17 +90,20 @@ main(int argc, char *argv[])
 {
   librdf_storage *storage;
   librdf_model* model;
+  librdf_statement* statement;
   
   librdf_init_world(NULL, NULL);
 
   model=librdf_new_model(storage=librdf_new_storage("hashes", "test", "hash-type='bdb',dir='.'"), NULL);
 
   librdf_model_add_statement(model, 
-                             librdf_new_statement_from_nodes(librdf_new_node_from_uri_string("http://purl.org/net/dajobe/"),
+                             statement=librdf_new_statement_from_nodes(librdf_new_node_from_uri_string("http://purl.org/net/dajobe/"),
                                                              librdf_new_node_from_uri_string("http://purl.org/dc/elements/1.1/creator"),
                                                              librdf_new_node_from_literal("Dave Beckett", NULL, 0, 0)
                                                              )
                              );
+
+  librdf_free_statement(statement);
 
   librdf_model_print(model, stdout);
   
