@@ -116,6 +116,17 @@ void librdf_memory_report(FILE *fh);
 #include <rdf_hash.h>
 #include <rdf_digest.h>
 #include <rdf_files.h>
+
+#ifdef NEED_EXPAT_SOURCE
+/* Define correct header define for internal expat sources since this
+ * is determined after configure has done a header hunt
+ */
+#undef HAVE_EXPAT_H
+#undef HAVE_XMLPARSE_H
+/* Must change this when expat in source tree is changed to be newer one */
+#define HAVE_XMLPARSE_H 1
+#endif
+
 #endif
 
 /* public interfaces */
