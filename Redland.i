@@ -119,7 +119,8 @@ void librdf_destroy_world(void);
 void librdf_free_iterator(librdf_iterator*);
 int librdf_iterator_have_elements(librdf_iterator* iterator);
 int librdf_iterator_end(librdf_iterator* iterator);
-librdf_node* librdf_iterator_get_next(librdf_iterator* iterator);
+librdf_node* librdf_iterator_get_object(librdf_iterator* iterator);
+int librdf_iterator_next(librdf_iterator* iterator);
 
 /* rdf_uri.h */
 librdf_uri* librdf_new_uri (librdf_world *world, char *string);
