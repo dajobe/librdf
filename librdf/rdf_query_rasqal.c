@@ -892,8 +892,6 @@ static int
 librdf_query_rasqal_query_results_next_statement(void* context)
 {
   librdf_query_rasqal_stream_context* scontext=(librdf_query_rasqal_stream_context*)context;
-  librdf_world* world=scontext->query->world;
-  librdf_node* node;
 
   if(scontext->finished)
     return 1;
