@@ -1024,7 +1024,7 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 #endif
 #if SQLITE_API == 2  
   status=sqlite_compile(context->db,
-                        request,
+                        (const char*)request,
                         &scontext->zTail,
                         &scontext->vm,
                         &errmsg);
@@ -1442,7 +1442,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
 #endif
 #if SQLITE_API == 2  
   status=sqlite_compile(context->db,
-                        request,
+                        (const char*)request,
                         &scontext->zTail, 
                         &scontext->vm,
                         &errmsg);
