@@ -228,12 +228,14 @@ librdf_hash_gdbm_clone(librdf_hash *hash, void* context, char *new_identifier,
 
   iterator=librdf_hash_get_all(old_hcontext->hash, key, value);
   while(!librdf_iterator_end(iterator)) {
-    librdf_iterator_get_next(iterator);
+    librdf_hash_datum* k= librdf_iterator_get_key(iterator);
+    librdf_hash_datum* v= librdf_iterator_get_value(iterator);
 
-    if(librdf_hash_gdbm_put(hcontext, key, value)) {
+    if(librdf_hash_gdbm_put(hcontext, k, v)) {
       status=1;
       break;
     }
+    librdf_iterator_next(iterator);
   }
   if(iterator)
     librdf_free_iterator(iterator);
