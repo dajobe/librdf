@@ -553,6 +553,8 @@ librdf_storage_list_group_serialise_finished(void* context)
     librdf_free_hash_datum(scontext->value);
   }
 
+  librdf_statement_clear(&scontext->current);
+
   LIBRDF_FREE(librdf_storage_list_group_serialise_stream_context, scontext);
 }
 
