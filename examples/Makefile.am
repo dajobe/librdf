@@ -14,8 +14,8 @@ CLEANFILES=$(TESTS) $(EXAMPLES) test*db
 
 examples: $(EXAMPLES)
 
-CPPFLAGS=-I$(top_srcdir)/librdf
-LDFLAGS=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la $(top_builddir)/raptor/libraptor.la
+AM_CPPFLAGS=-I$(top_srcdir)/librdf
+AM_LDFLAGS=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la $(top_builddir)/raptor/libraptor.la
 LIBS=@LIBRDF_LIBS@
 
 example1_SOURCES = example1.c
