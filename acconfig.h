@@ -72,3 +72,6 @@
 /* XML parsers */
 #undef NEED_EXPAT
 #undef NEED_LIBXML
+
+/* for Repat */
+#undef RDFPARSE_INCLUDE_XMLPARSE
