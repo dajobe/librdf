@@ -89,6 +89,9 @@ rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
 rdf_stream.h \
 rdf_parser.h
 
+JAVA_CLASSES=@JAVA_CLASSES@
+pkgdata_DATA = $(JAVA_CLASSES)
+
 librdf_a_SOURCES = rdf_init.c \
 rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
@@ -120,7 +123,9 @@ README      NEWS      TODO \
 README.html NEWS.html TODO.html \
 INSTALL.html LICENSE.html FAQS.html MPL.html \
 redland-config.in \
-memcmp.c
+memcmp.c \
+PrintConsumer.java PrintParser.java \
+$(JAVA_CLASSES)
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
@@ -129,6 +134,7 @@ rdf_files_test rdf_heuristics_test
 EXAMPLES=example1 example2 example3 example4
 
 CLEANFILES=$(TESTS) $(EXAMPLES) test.db test1.db
+MAINTAINERCLEANFILES=$(JAVA_CLASSES)
 
 # Memory debugging alternatives
 MEM=@MEM@
@@ -227,5 +233,11 @@ TODO: TODO.html
 # The action is the COMPILE definition but always using least warning CFLAGS
 @MAINT@rdf_parser_libwww.o: rdf_parser_libwww.c
 @MAINT@	$(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(STANDARD_CFLAGS) -c $<
+@MAINT@
+@MAINT@PrintParser.class: PrintParser.java
+@MAINT@	javac -classpath .:$(RDF_JAVA_API_JAR) $<
+@MAINT@
+@MAINT@PrintConsumer.class: PrintConsumer.java
+@MAINT@	javac -classpath .:$(RDF_JAVA_API_JAR) $<
 
 @SET_MAKE@
