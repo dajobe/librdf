@@ -18,4 +18,4 @@
 # full license terms.
 # 
 # 
-EXTRA_DIST=dc.nt dc.rdf dc.turtle
+EXTRA_DIST=dc.nt dc.rdf dc.ttl
