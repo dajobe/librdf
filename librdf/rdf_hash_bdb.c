@@ -150,33 +150,6 @@ librdf_hash_bdb_open(void* context, char *identifier,
     return 1;
   sprintf(file, "%s.db", identifier);
 
-#ifdef HAVE_DB_CREATE
-  /* V3 prototype:
-   * int db_create(DB **dbp, DB_ENV *dbenv, u_int32_t flags);
-   */
-  if((ret=db_create(&bdb, NULL, 0))) {
-    LIBRDF_DEBUG2(librdf_hash_bdb_open, "Failed to create BDB context - %d\n", ret);
-    return 1;
-  }
-  
-  if((ret=bdb->set_flags(bdb, DB_DUP))) {
-    LIBRDF_DEBUG2(librdf_hash_bdb_open, "Failed to set BDB duplicate flag - %d\n", ret);
-    return 1;
-  }
-  
-  /* V3 prototype:
-   * int DB->open(DB *db, const char *file, const char *database,
-   *              DBTYPE type, u_int32_t flags, int mode);
-   *
-   * V4.1+ prototype:
-   * int DB->open(DB *db, DB_TXN *txnid, const char *file, 
-   *              const char *database, DBTYPE type, u_int32_t flags, int mode);
-   */
-  flags=is_writable ? DB_CREATE : DB_RDONLY;
-  if(is_new)
-    flags |= DB_TRUNCATE;
-#endif
-
 #if defined(HAVE_BDB_OPEN_6_ARGS) || defined(HAVE_BDB_OPEN_7_ARGS)
 
 #ifdef HAVE_BDB_OPEN_6_ARGS  
@@ -246,7 +219,30 @@ librdf_hash_bdb_open(void* context, char *identifier,
   }
   ret=0;
 #else
+#ifdef HAVE_DB_CREATE
+  /* V3 prototype:
+   * int db_create(DB **dbp, DB_ENV *dbenv, u_int32_t flags);
+   */
+  if((ret=db_create(&bdb, NULL, 0))) {
+    LIBRDF_DEBUG2(librdf_hash_bdb_open, "Failed to create BDB context - %d\n", ret);
+    return 1;
+  }
+  
+  if((ret=bdb->set_flags(bdb, DB_DUP))) {
+    LIBRDF_DEBUG2(librdf_hash_bdb_open, "Failed to set BDB duplicate flag - %d\n", ret);
+    return 1;
+  }
+  
+  /* V3 prototype:
+   * int DB->open(DB *db, const char *file, const char *database,
+   *              DBTYPE type, u_int32_t flags, int mode);
+   */
+  flags=is_writable ? DB_CREATE : DB_RDONLY;
+  if(is_new)
+    flags |= DB_TRUNCATE;
+#else
 ERROR - no idea how to use Berkeley DB
+#endif
 #endif
 #endif
 #endif
