@@ -251,6 +251,10 @@ memory or with persistant storage.
 @INCLUDE hash.sgml
 </sect1>
 <sect1>
+<title>Hash Cursor Implementation Class</title>
+@INCLUDE hash_cursor.sgml
+</sect1>
+<sect1>
 <title>Berkeley DB Hash Implementation Class</title>
 @INCLUDE hash_bdb.sgml
 </sect1>
@@ -274,6 +278,10 @@ persistant storage.
 <sect1>
 <title>In Memory List RDF Model Storage Implementation Class</title>
 @INCLUDE storage_list.sgml
+</sect1>
+<sect1>
+<title>Multiple Hashes RDF Model Storage Implementation Class</title>
+@INCLUDE storage_hashes.sgml
 </sect1>
 </chapter>
 
@@ -332,6 +340,19 @@ and comparison.
 <sect1>
 <title>URI Class</title>
 @INCLUDE uri.sgml
+</sect1>
+</chapter>
+
+
+<chapter id="heuristics">
+<?dbhtml filename='heuristics.html'>
+<title>Heuristics</title>
+<para>
+This module provides utility functions that cross other modules and classes.
+</para>
+<sect1>
+<title>Heuristic functions</title>
+@INCLUDE heuristics.sgml
 </sect1>
 </chapter>
 
