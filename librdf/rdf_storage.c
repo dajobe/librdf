@@ -431,7 +431,9 @@ int
 librdf_storage_add_statement(librdf_storage* storage,
                              librdf_statement* statement) 
 {
-  return storage->factory->add_statement(storage, statement);
+  if(storage->factory->add_statement)
+    return storage->factory->add_statement(storage, statement);
+  return 1;
 }
 
 
@@ -446,7 +448,9 @@ int
 librdf_storage_add_statements(librdf_storage* storage,
                               librdf_stream* statement_stream) 
 {
-  return storage->factory->add_statements(storage, statement_stream);
+  if(storage->factory->add_statements)
+    return storage->factory->add_statements(storage, statement_stream);
+  return 1;
 }
 
 
@@ -461,7 +465,9 @@ int
 librdf_storage_remove_statement(librdf_storage* storage, 
                                 librdf_statement* statement) 
 {
-  return storage->factory->remove_statement(storage, statement);
+  if(storage->factory->remove_statement)
+    return storage->factory->remove_statement(storage, statement);
+  return 1;
 }
 
 
@@ -916,8 +922,49 @@ librdf_storage_context_add_statement(librdf_storage* storage,
                                      librdf_node* context,
                                      librdf_statement* statement) 
 {
-  return storage->factory->context_add_statement(storage, context, statement);
+  if(storage->factory->context_add_statement)
+    return storage->factory->context_add_statement(storage, context, statement);
+  return 1;
 }
+
+
+/**
+ * librdf_storage_context_add_statements - Add statements to a storage with a context
+ * @storage: &librdf_storage object
+ * @context: &librdf_node context
+ * @stream: &librdf_stream stream object
+ * 
+ * Return value: Non 0 on failure
+ **/
+int
+librdf_storage_context_add_statements(librdf_storage* storage, 
+                                      librdf_node* context,
+                                      librdf_stream* stream) 
+{
+  int status=0;
+  
+  if(storage->factory->context_add_statements)
+    return storage->factory->context_add_statements(storage, context, stream);
+
+  if(!storage->factory->context_add_statement)
+    return 1;
+  
+  if(!stream)
+    return 1;
+
+  while(!librdf_stream_end(stream)) {
+    librdf_statement* statement=librdf_stream_get_object(stream);
+    if(!statement)
+      break;
+    status=librdf_storage_context_add_statement(storage, context, statement);
+    if(status)
+      break;
+    librdf_stream_next(stream);
+  }
+
+  return status;
+}
+
 
 
 /**
@@ -933,22 +980,76 @@ librdf_storage_context_remove_statement(librdf_storage* storage,
                                         librdf_node* context,
                                         librdf_statement* statement) 
 {
+  if(!storage->factory->context_remove_statement)
+    return 1;
+  
   return storage->factory->context_remove_statement(storage, context, statement);
 }
 
 
 /**
- * librdf_storage_context_serialise - List all statements in a storage context
+ * librdf_storage_context_remove_statements - Remove statements from a storage with the given context
+ * @storage: &librdf_storage object
+ * @context: &librdf_uri context
+ * 
+ * Return value: Non 0 on failure
+ **/
+int
+librdf_storage_context_remove_statements(librdf_storage* storage,
+                                         librdf_node* context) 
+{
+  librdf_stream *stream;
+  if(storage->factory->context_remove_statements)
+    return storage->factory->context_remove_statements(storage, context);
+  
+  if(!storage->factory->context_remove_statement)
+    return 1;
+  
+  stream=librdf_storage_context_as_stream(storage, context);
+  if(!stream)
+    return 1;
+
+  while(!librdf_stream_end(stream)) {
+    librdf_statement *statement=librdf_stream_get_object(stream);
+    if(!statement)
+      break;
+    librdf_storage_context_remove_statement(storage, context, statement);
+    librdf_stream_next(stream);
+  }
+  librdf_free_stream(stream);  
+  return 0;
+}
+
+
+/**
+ * librdf_storage_context_as_stream - List all statements in a storage context
  * @storage: &librdf_storage object
  * @context: &librdf_node context node
  * 
  * Return value: &librdf_stream of statements or NULL on failure or context is empty
  **/
 librdf_stream*
+librdf_storage_context_as_stream(librdf_storage* storage, librdf_node* context)
+{
+  return storage->factory->context_serialise(storage, context);
+}
+
+
+/**
+ * librdf_storage_context_serialise - List all statements in a storage context (DEPRECATED)
+ * @storage: &librdf_storage object
+ * @context: &librdf_node context node
+ * 
+ * DEPRECATED to reduce confusion with the librdf_serializer class.
+ * Please use librdf_storage_context_as_stream.
+ *
+ * Return value: &librdf_stream of statements or NULL on failure or context is empty
+ **/
+librdf_stream*
 librdf_storage_context_serialise(librdf_storage* storage,
                                  librdf_node* context)
 {
-  return storage->factory->context_serialise(storage, context);
+  return librdf_storage_context_as_stream(storage, context);
 }
 
 
