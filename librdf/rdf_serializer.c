@@ -441,7 +441,7 @@ librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data,
  * Return value: the value of the feature or NULL if no such feature
  * exists or the value is empty.
  **/
-const char *
+librdf_node*
 librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature) 
 {
   if(serializer->factory->get_feature)
@@ -461,7 +461,7 @@ librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature
   
 int
 librdf_serializer_set_feature(librdf_serializer* serializer,
-                              librdf_uri *feature, const char *value) 
+                              librdf_uri *feature, librdf_node* value) 
 {
   if(serializer->factory->set_feature)
     return serializer->factory->set_feature(serializer->context, feature, value);

@@ -55,9 +55,9 @@ struct librdf_serializer_factory_s
   /* destroy a serializer */
   void (*terminate)(void *_context);
 
-  /* get/set features of serializer (think of Java properties) */
-  const char * (*get_feature)(void *_context, librdf_uri *feature);
-  int (*set_feature)(void *_context, librdf_uri *feature, const char *value);
+  /* get/set features of serializer */
+  librdf_node* (*get_feature)(void *_context, librdf_uri* feature);
+  int (*set_feature)(void *_context, librdf_uri *feature, librdf_node* value);
 
   int (*set_namespace)(void *_context, librdf_uri *uri, const char *prefix);
   
@@ -114,8 +114,8 @@ REDLAND_API int librdf_serializer_serialize_model_to_file(librdf_serializer* ser
 REDLAND_API void librdf_serializer_set_error(librdf_serializer* serializer, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
 REDLAND_API void librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
 
-REDLAND_API const char *librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
-REDLAND_API int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, const char *value);
+REDLAND_API librdf_node* librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
+REDLAND_API int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, librdf_node* value);
 REDLAND_API int librdf_serializer_set_namespace(librdf_serializer* serializer, librdf_uri *uri, const char *prefix);
 
 
