@@ -167,6 +167,10 @@ librdf_stream_next(librdf_stream* stream)
 int
 librdf_stream_end(librdf_stream* stream) 
 {
+  /* always end of NULL stream */
+  if(!stream)
+    return 1;
+  
   if(stream->is_end_stream)
     return 1;
 
