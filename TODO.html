@@ -15,8 +15,8 @@
 <p>In no real order.  Help wanted.</p>
 
 <ul>
+<li>Docs: note that compiling redland also builds raptor, if both are wanted</li>
 <li>RFE: Add is_literal etc. methods to perl etc. Node class</li>
-<li>Deprecate node types beyond simple resource, literal</li>
 <li>Allow base URIs in Perl parser methods to be undef</li>
 <li>Ensure non-file: URIs do not cause crashes (seen in Perl)</li>
 <li>Add URI parsing code from Repat</li>
@@ -35,7 +35,6 @@ Nodes to take URI OR URI or Literal as appropriate.</li>
 <li>Add module - URI retrieval via (GNOME) ghttp, (W3C) libwww, nano ftp/http in libxml</li>
 <li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build</li>
 <li>If LGPL/MPL license, include compatible code OR add separate package?</li>
-<li>Deal with anonymous resources / blank graph nodes</li>
 <li>Write a C++ interface</li>
 <li>Provide any necessary support for RDF Schema (fast rdf:type lookups)</li>
 <li>Add query language interfaces</li>
@@ -73,6 +72,8 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Add support for blank nodes (were anonymous resources)</li>
+<li>Removed all node types except for resource, literal, blank, li (statement)</li>
 <li>Link XML Libraries (-lexpat etc.) before libwww libraries to
 ensure correct XML library is used (0.9.11)</li>
 <li>Python interface to parsers now works (0.9.11)</li>
