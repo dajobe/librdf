@@ -578,7 +578,7 @@ librdf_free_node(librdf_node *node)
   node->usage--;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_free_node, "Node %s usage count now %d\n", node->string, node->usage);
+  LIBRDF_DEBUG3(librdf_free_node, "Node %p usage count now %d\n", node, node->usage);
 #endif
 
   /* decrement usage, don't free if not 0 yet*/
@@ -590,7 +590,7 @@ librdf_free_node(librdf_node *node)
   }
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3(librdf_free_node, "Deleting NODE %s from hash, max usage was %d\n", node->string, node->max_usage);
+  LIBRDF_DEBUG2(librdf_free_node, "Deleting Node %p from hash\n", node);
 #endif
 
   switch(node->type) {
