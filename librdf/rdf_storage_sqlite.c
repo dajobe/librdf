@@ -229,6 +229,7 @@ typedef enum {
   TRIPLE_URI    =0,
   TRIPLE_BLANK  =1,
   TRIPLE_LITERAL=2,
+  TRIPLE_NONE   =3,
 } triple_node_type;
 
 static const char * triples_fields[4][3] = {
@@ -444,12 +445,12 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
     language_e=sqlite_string_escape((unsigned const char*)language, len, NULL);
     if(!language_e)
       return -1;
-    sprintf(expression+strlen(expression), "AND language = '%s'", language_e);
+    sprintf(expression+strlen(expression), " AND language = '%s'", language_e);
   }
 
   if(datatype) {
     datatype_id=librdf_storage_sqlite_uri_helper(storage, datatype);
-    sprintf(expression+strlen(expression), "AND datatype = %d", datatype_id);
+    sprintf(expression+strlen(expression), " AND datatype = %d", datatype_id);
   }
   
   id=librdf_storage_sqlite_get_helper(storage, TABLE_LITERALS, expression);
@@ -493,6 +494,9 @@ librdf_storage_sqlite_node_helper(librdf_storage* storage,
   unsigned char *value;
   size_t value_len;
 
+  if(!node)
+    return 1;
+  
   switch(librdf_node_get_type(node)) {
     case LIBRDF_NODE_TYPE_RESOURCE:
       id=librdf_storage_sqlite_uri_helper(storage,
@@ -555,6 +559,13 @@ librdf_storage_sqlite_statement_helper(librdf_storage* storage,
   nodes[3]=context_node;
     
   for(i=0; i<3; i++) {
+    if(!nodes[i]) {
+      fields[i]=NULL;
+      node_ids[i]= -1;
+      node_types[i]= TRIPLE_NONE;
+      continue;
+    }
+    
     if(librdf_storage_sqlite_node_helper(storage,
                                          nodes[i],
                                          &node_ids[i],
@@ -762,62 +773,6 @@ librdf_storage_sqlite_remove_statement(librdf_storage* storage, librdf_statement
 }
 
 
-static const char* sqlite_node_types[3]={"r", "l", "c"};
-
-static char*
-librdf_node_to_sqlite_string(librdf_node *node, size_t *output_len,
-                             const char **type) {
-  size_t len;
-  unsigned char *s;
-
-  switch(librdf_node_get_type(node)) {
-    case LIBRDF_NODE_TYPE_RESOURCE:
-      s=librdf_uri_as_counted_string(librdf_node_get_uri(node), &len);
-      if(!s)
-        return NULL;
-
-      s=sqlite_string_escape(s, len, output_len);
-      *type=sqlite_node_types[0];
-      break;
-
-    case LIBRDF_NODE_TYPE_LITERAL:
-      s=librdf_node_get_literal_value_as_counted_string(node, &len);
-      if(!s)
-        return NULL;
-
-#if 0
-      if(node->value.literal.xml_language) {
-        language_len=strlen(node->value.literal.xml_language);
-        len+=1+language_len;
-      }
-
-      if(node->value.literal.datatype_uri) {
-        datatype_uri_string=librdf_uri_to_counted_string(node->value.literal.datatype_uri, &datatype_len);
-        len+=4+datatype_len;
-      }
-#endif
-
-      s=sqlite_string_escape(s, len, output_len);
-      *type=sqlite_node_types[1];
-      break;
-
-    case LIBRDF_NODE_TYPE_BLANK:
-      s=librdf_node_get_blank_identifier(node);
-      s=sqlite_string_escape(s, len, output_len);
-      *type=sqlite_node_types[2];
-      break;
-
-    default:
-      librdf_log(node->world,
-                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Do not know how to encode node type %d\n", node->type);
-    return NULL;
-  }
-
-  return s;
-}
-
-
 static int
 librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_statement* statement)
 {
@@ -854,7 +809,7 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage, librdf_stateme
     return -1;
   
   sprintf(request,
-          "SELECT COUNT(*) FROM %s WHERE %s='%d' and %s='%d' and %s='%d';",
+          "SELECT COUNT(*) FROM %s WHERE %s=%d and %s=%d and %s=%d;",
           sqlite_tables[TABLE_TRIPLES].name, 
           fields[TRIPLE_SUBJECT], node_ids[TRIPLE_SUBJECT],
           fields[TRIPLE_PREDICATE], node_ids[TRIPLE_PREDICATE],
@@ -1167,11 +1122,15 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
   librdf_storage_sqlite_find_statements_stream_context* scontext;
   librdf_stream* stream;
-  char query[2000];
+  char* request;
   int status;
-  char *subject_string, *predicate_string, *object_string, *context_string;
-  const char *subject_type, *object_type;
+  triple_node_type node_types[4];
+  int node_ids[4];
+  const char* fields[4];
   char *errmsg=NULL;
+  raptor_stringbuffer *sb;
+  int need_and=0;
+  int i;
   
   scontext=(librdf_storage_sqlite_find_statements_stream_context*)LIBRDF_CALLOC(librdf_storage_sqlite_find_statements_stream_context, 1, sizeof(librdf_storage_sqlite_find_statements_stream_context));
   if(!scontext)
@@ -1185,47 +1144,61 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage, librdf_statement*
   if(!statement)
     return NULL;
 
-  subject_string=librdf_node_to_sqlite_string(statement->subject, NULL,
-                                              &subject_type);
-  predicate_string=librdf_node_to_sqlite_string(statement->object, NULL,
-                                                NULL);
-  object_string=librdf_node_to_sqlite_string(statement->object, NULL,
-                                             &object_type);
-  context_string="c";
-  
-  sprintf(query, "SELECT subject, subjectType, predicate, object, objectType, context FROM triples WHERE subject='%s' AND subjectType='%s' AND predicate='%s' AND object='%s' AND objectType='%s' AND context='%s';",
-          subject_string, subject_type,
-          predicate_string,
-          object_string, object_type,
-          context_string);
+  if(librdf_storage_sqlite_statement_helper(storage,
+                                            statement,
+                                            NULL, 
+                                            node_types, node_ids, fields))
+    return NULL;
 
-  LIBRDF_FREE(cstring, subject_string);
-  LIBRDF_FREE(cstring, predicate_string);
-  LIBRDF_FREE(cstring, object_string);
+  /* FIXME contexts and NULL nodes */
+  sb=raptor_new_stringbuffer();
+  raptor_stringbuffer_append_string(sb, "SELECT * FROM ", 1);
+  raptor_stringbuffer_append_string(sb, sqlite_tables[TABLE_TRIPLES].name, 1);
+  raptor_stringbuffer_append_counted_string(sb, " WHERE ", 7, 1);
+
+  for(i=0; i<3; i++) {
+    if(node_ids[i] < 0)
+      continue;
+    
+    if(need_and)
+      raptor_stringbuffer_append_counted_string(sb, " AND ", 5, 1);
+    raptor_stringbuffer_append_string(sb, fields[i], 1);
+    raptor_stringbuffer_append_counted_string(sb, "=", 1, 1);
+    raptor_stringbuffer_append_decimal(sb, node_ids[i]);
+    need_and=1;
+  }
+  raptor_stringbuffer_append_counted_string(sb, ";", 1, 1);
   
+  request=raptor_stringbuffer_as_string(sb);
+  
+  fprintf(stderr, "SQLite prepare '%s'\n", request);
+
 #ifdef HAVE_SQLITE3_H
   status=sqlite3_prepare(context->db,
-                         query,
-                         strlen(query),
+                         request,
+                         raptor_stringbuffer_length(sb),
                          &scontext->vm,
                          &scontext->pzTail);
   if(status != SQLITE_OK)
     errmsg=(char*)sqlite3_errmsg(context->db);
 #else  
   status=sqlite_compile(context->db,
-                        query,
+                        request,
                         &scontext->pzTail, &scontext->ppVm,
                         &errmsg);
 #endif
   if(status != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "SQLite database %s SQL compile failed - %s (%d)", 
-               context->name, errmsg, status);
+               "SQLite database %s SQL compile '%s' failed - %s (%d)", 
+               context->name, request, errmsg, status);
 
     librdf_storage_sqlite_serialise_finished((void*)scontext);
     return NULL;
   }
     
+
+  raptor_free_memory(request);
+  raptor_free_stringbuffer(sb);
   
   scontext->storage=storage;
   librdf_storage_add_reference(scontext->storage);
