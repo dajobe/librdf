@@ -80,7 +80,7 @@ while test $# -gt 0; do
         export LD_LIBRARY_PATH
       fi
       shift
-      exec $*
+      exec ${1+"$@"}
       ;;
 
     *)
