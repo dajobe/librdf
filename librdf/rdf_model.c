@@ -203,6 +203,9 @@ librdf_model_size(librdf_model* model)
  * @model: model object
  * @statement: statement object
  * 
+ * The passed-in statement is copied when added to the model, not
+ * shared with the model.
+ *
  * Return value: non 0 on failure
  **/
 int
@@ -640,15 +643,15 @@ librdf_model_add_statements_group(librdf_model* model,
     return 1;
 
   while(!librdf_stream_end(stream)) {
-    librdf_statement* statement=librdf_stream_next(stream);
+    librdf_statement* statement=librdf_stream_get_object(stream);
     if(!statement)
       break;
     status=librdf_storage_group_add_statement(model->storage,
                                               group_uri, statement);
     librdf_model_add_statement(model, statement);
-    librdf_free_statement(statement);
     if(status)
       break;
+    librdf_stream_next(stream);
   }
   librdf_free_stream(stream);
 
@@ -674,13 +677,13 @@ librdf_model_remove_statements_group(librdf_model* model,
     return 1;
 
   while(!librdf_stream_end(stream)) {
-    librdf_statement *statement=librdf_stream_next(stream);
+    librdf_statement *statement=librdf_stream_get_object(stream);
     if(!statement)
       break;
     librdf_storage_group_remove_statement(model->storage,
                                           group_uri, statement);
     librdf_model_remove_statement(model, statement);
-    librdf_free_statement(statement);
+    librdf_stream_next(stream);
   }
   librdf_free_stream(stream);  
   return 0;
