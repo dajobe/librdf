@@ -293,6 +293,7 @@ rasqal_redland_register_triples_source_factory(rasqal_triples_source_factory *fa
 
 typedef struct {
   librdf_node* nodes[3];
+  librdf_node* origin;
   /* query statement, made from the nodes above (even when exact) */
   librdf_statement *qstatement;
   librdf_stream *stream;
@@ -302,7 +303,7 @@ typedef struct {
 static int
 rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
                           void *user_data,
-                          rasqal_variable* bindings[3]) 
+                          rasqal_variable* bindings[4]) 
 {
   rasqal_redland_triples_match_context* rtmc=(rasqal_redland_triples_match_context*)rtm->user_data;
   rasqal_literal* l;
@@ -366,6 +367,8 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
       rasqal_free_literal(l);
     }
   }
+
+  /* FIXME contexts */
 
   return 0;
 }
@@ -462,6 +465,16 @@ rasqal_redland_new_triples_match(rasqal_triples_source *rts, void *user_data,
 
   m->bindings[2]=var;
   
+
+  if(t->origin) {
+    if((var=rasqal_literal_as_variable(t->origin))) {
+      if(var->value)
+        rtmc->origin=rasqal_literal_to_redland_node(rtsc->world, var->value);
+    } else
+      rtmc->origin=rasqal_literal_to_redland_node(rtsc->world, t->origin);
+    m->bindings[3]=var;
+  }
+
 
   rtmc->qstatement=librdf_new_statement_from_nodes(rtsc->world, 
                                                    rtmc->nodes[0],
