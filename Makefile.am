@@ -32,13 +32,14 @@ dist_pkgdata_DATA = Redland.i
 # when raptor and rasqal are installed system wide, since then the
 # subdirs are not configured or included in the build tree, when it
 # is separate from the source tree.
-# Summary: always make the tarball from the top level
+#
+# always make the release tarball from the top level and
+# use configure --with-raptor=internal and --with-rasqal=internal
+# OR --enable-maintainer-mode
+# to ensure that the raptor and rasqal subdirectories are called
+# as CONFIG_SUBDIR directories.
+#
 SUBDIRS=@LOCAL_SUBDIRS@ librdf examples utils demos docs data
-
-if MAINTAINER_MODE
-# Use ALL subdirectories when making distribution as maintainer
-DIST_SUBDIRS=raptor rasqal librdf examples utils demos docs data
-endif
 
 EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
 README      NEWS      LICENSE.txt  TODO \
