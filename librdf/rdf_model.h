@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_model.h - RDF Model definition
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -22,10 +22,6 @@
 #define LIBRDF_MODEL_H
 
 #include <rdf_uri.h>
-#include <rdf_node.h>
-#include <rdf_statement.h>
-#include <rdf_storage.h>
-#include <rdf_iterator.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,23 +29,32 @@ extern "C" {
 
 
 struct librdf_model_s {
+  /* these two are alternatives (probably should be a union) */
+
+  /* 1. model is stored here */
   librdf_storage*  storage;
-  struct librdf_model_s* sub_models;
+  
+  /* 2. model is built from a list of sub models */
+  librdf_list*     sub_models;
 };
-typedef struct librdf_model_s librdf_model;
+
 
 
 /* class methods */
 void librdf_init_model(void);
+void librdf_finish_model(void);
 
 
 /* constructors */
 
 /* Create a new Model */
-librdf_model* librdf_new_model(void);
+librdf_model* librdf_new_model(librdf_storage *storage, librdf_hash* options);
 
 /* Create a new Model from an existing Model - CLONE */
 librdf_model* librdf_new_model_from_model(librdf_model* model);
+
+/* Create a new Model from a stream */
+librdf_model* librdf_new_model_from_stream(librdf_stream* stream);
 
 /* destructor */
 void librdf_free_model(librdf_model *model);
@@ -58,27 +63,42 @@ void librdf_free_model(librdf_model *model);
 /* functions / methods */
 int librdf_model_size(librdf_model* model);
 
-int librdf_model_add(librdf_model* model, librdf_node* subject, librdf_node* property, librdf_node* object);
-int librdf_model_add_string_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* property, char* string);
+/* add statements */
+int librdf_model_add(librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
+int librdf_model_add_string_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, char* string, char *xml_language, int is_wf_xml);
 int librdf_model_add_statement(librdf_model* model, librdf_statement* statement);
+int librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream);
+
+/* remove statements */
 int librdf_model_remove_statement(librdf_model* model, librdf_statement* statement);
+
+/* containment */
 int librdf_model_contains_statement(librdf_model* model, librdf_statement* statement);
-/* returns an interator that returns all statements */
-librdf_iterator* librdf_model_get_all_statements(librdf_model* model);
 
-/* any of subject, property or object can be NULL */
-/* returns count of number of matching statements */
-int librdf_model_find(librdf_model* model, librdf_node* subject, librdf_node* property, librdf_node* object);
-/* returns iterator object that returns matching librdf_statements */
-librdf_iterator* librdf_model_find_(librdf_model* model, librdf_node* subject, librdf_node* property, librdf_node* object);
+/* serialise the entire model */
+librdf_stream* librdf_model_serialise(librdf_model* model);
 
-/* get/set the model source URI */
-librdf_uri* librdf_model_get_source_uri(librdf_model* model);
-int librdf_model_set_source_uri(librdf_model* model, librdf_uri *uri);
+/* queries */
 
+/* NOT YET USED
+int librdf_model_find_statements_as_count(librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
+*/
+
+librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
+
+/* S, P, O Node versions - NOT YET USED:
+int librdf_model_find_statements(librdf_model* input_model, librdf_model* output_model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
+
+librdf_stream* librdf_model_find_statements_as_stream(librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
+*/
+
+
+/* submodels */
 int librdf_model_add_submodel(librdf_model* model, librdf_model* sub_model);
 int librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model);
 
+
+void librdf_model_print(librdf_model *model, FILE *fh);
 
 #ifdef __cplusplus
 }
