@@ -56,7 +56,7 @@
       <title>Abstract</title>
       <para>
 This document describes the APIs provided by
-<ulink url="http://purl.org/net/redland/">Redland</ulink> to use the RDF
+<ulink url="http://www.librdf.org/">Redland</ulink> to use the RDF
 model; manipulate statements, resources, predicates and objects in the model;
 parse RDF/XML syntax, query and store the models.
       </para>
@@ -332,6 +332,14 @@ persistant storage.
 <sect1>
 <title>Multiple Hashes RDF Model Storage Implementation Class</title>
 @INCLUDE storage_hashes.sgml
+</sect1>
+<sect1>
+<title>MySQL RDF Model Storage Implementation Class</title>
+@INCLUDE storage_mysql.sgml
+</sect1>
+<sect1>
+<title>3store RDF Model Storage Implementation Class</title>
+@INCLUDE storage_tstore.sgml
 </sect1>
 </chapter>
 
