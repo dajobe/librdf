@@ -1,5 +1,16 @@
 2005-02-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* configure.ac, librdf/win32_rdf_config.h:
+	Bumped version to 1.0.1
+
+	* rasqal/configure.ac, rasqal/win32_rasqal_config.h:
+	Bumped version to 0.9.7
+
+	* raptor/configure.ac, raptor/win32_raptor_config.h:
+	Bumped version to 1.4.6
+
+	* librdf/win32_rdf_config.h, configure.ac: 1.0.0
+
 	* Snapshotted redland_1_0_0 for 1.0.0 release
 
 2005-02-04  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
