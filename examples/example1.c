@@ -155,9 +155,9 @@ main(int argc, char *argv[])
   while(!librdf_iterator_end(iterator)) {
     librdf_node *target;
     
-    target=(librdf_node*)librdf_iterator_get_next(iterator);
+    target=(librdf_node*)librdf_iterator_get_object(iterator);
     if(!target) {
-      fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n", program);
+      fprintf(stderr, "%s: librdf_iterator_get_object returned NULL\n", program);
       break;
     }
 
@@ -167,6 +167,7 @@ main(int argc, char *argv[])
 
     librdf_free_node(target);
     count++;
+    librdf_iterator_next(iterator);
   }
   librdf_free_iterator(iterator);
   fprintf(stderr, "%s: got %d target nodes\n", program, count);

@@ -494,9 +494,9 @@ main(int argc, char *argv[])
       /* (Common code) Print out nodes */
       count=0;
       while(!librdf_iterator_end(iterator)) {
-        node=(librdf_node*)librdf_iterator_get_next(iterator);
+        node=(librdf_node*)librdf_iterator_get_object(iterator);
         if(!node) {
-          fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
+          fprintf(stderr, "%s: librdf_iterator_get_object returned NULL\n",
                   program);
           break;
         }
@@ -507,6 +507,7 @@ main(int argc, char *argv[])
         
         librdf_free_node(node);
         count++;
+        librdf_iterator_next(iterator);
       }
       librdf_free_iterator(iterator);
       fprintf(stderr, "%s: matching nodes: %d\n", program, count);
@@ -590,7 +591,7 @@ main(int argc, char *argv[])
 
       count=0;
       while(!librdf_iterator_end(iterator)) {
-        node=(librdf_node*)librdf_iterator_get_next(iterator);
+        node=(librdf_node*)librdf_iterator_get_object(iterator);
         if(!node) {
           fprintf(stderr, "%s: librdf_iterator_get_next returned NULL\n",
                   program);
@@ -603,6 +604,7 @@ main(int argc, char *argv[])
         
         librdf_free_node(node);
         count++;
+        librdf_iterator_next(iterator);
       }
       librdf_free_iterator(iterator);
       fprintf(stderr, "%s: matching arcs: %d\n", program, count);
