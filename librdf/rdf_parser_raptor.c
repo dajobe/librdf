@@ -337,10 +337,10 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   scontext->rdf_parser=rdf_parser;
 
   scontext->pcontext=pcontext;
-  scontext->source_uri = uri;
+  scontext->source_uri = librdf_new_uri_from_uri(uri);
   if(!base_uri)
     base_uri=uri;
-  scontext->base_uri = base_uri;
+  scontext->base_uri = librdf_new_uri_from_uri(base_uri);
 
   filename=(char*)librdf_uri_to_filename(uri);
   if(!filename)
@@ -493,7 +493,13 @@ librdf_parser_raptor_serialise_finished(void* context)
 
     if(scontext->current)
       librdf_free_statement(scontext->current);
-  
+
+    if(scontext->source_uri)
+      librdf_free_uri(scontext->source_uri); 
+ 
+    if(scontext->base_uri)
+      librdf_free_uri(scontext->base_uri); 
+ 
     while((statement=(librdf_statement*)librdf_list_pop(&scontext->statements)))
       librdf_free_statement(statement);
     librdf_list_clear(&scontext->statements);
