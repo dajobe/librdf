@@ -112,6 +112,8 @@ librdf_parser_repat_statement_handler(void* user_data,
   librdf_node *subject=NULL, *predicate=NULL, *object=NULL;
   librdf_world *world=scontext->pcontext->parser->world;
   const XML_Char *c;
+  char *base_uri_string;
+  int base_uri_string_len;
   
   /* got all statement parts now */
   statement=librdf_new_statement(world);
@@ -182,10 +184,21 @@ librdf_parser_repat_statement_handler(void* user_data,
   switch( object_type )
   {
     case RDF_OBJECT_TYPE_RESOURCE:
-      object=librdf_new_node_from_normalised_uri_string(world, 
-                                                        object_string,
-                                                        scontext->source_uri,
-                                                        scontext->base_uri);
+      /* repat doesn't return anon resources as objects so look for
+       * them by hunting for BASE_URI#genid and then making a new
+       # blank node from the ID after the '#'.  Yes this is a HACK.
+       */
+      base_uri_string=librdf_uri_as_string(scontext->base_uri);
+      base_uri_string_len=strlen(base_uri_string);
+      if(!strncmp(object_string, base_uri_string, base_uri_string_len) &&
+         !strncmp(object_string+base_uri_string_len, "#genid", 6)) {
+        object=librdf_new_node_from_blank_identifier(world, 
+                                                     object_string+base_uri_string_len+1);
+      } else
+        object=librdf_new_node_from_normalised_uri_string(world, 
+                                                          object_string,
+                                                          scontext->source_uri,
+                                                          scontext->base_uri);
       break;
     case RDF_OBJECT_TYPE_LITERAL:
       if(scontext->literal) {
