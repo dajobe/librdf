@@ -84,10 +84,10 @@ librdf_hash_gdbm_open(void* context, char *identifier, void *mode,
   GDBM_FILE gdbm;
   char *file;
   
-  file=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+6);
+  file=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+1);
   if(!file)
     return 1;
-  sprintf(file, "%s.gdbm", identifier);
+  strcpy(file, identifier);
   
   gdbm=gdbm_open(file, 512, GDBM_WRCREAT, 0644, 0);
   if(!gdbm) {
