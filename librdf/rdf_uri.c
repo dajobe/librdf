@@ -39,6 +39,15 @@ librdf_init_uri(librdf_digest_factory* factory)
 }
 
 
+
+void
+librdf_finish_uri(void)
+{
+  /* nothing */
+}
+
+
+
 /* constructors */
 librdf_uri*
 librdf_new_uri (char *uri_string) {
@@ -72,7 +81,7 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
   char *new_string;
 
   new_uri = (librdf_uri*)LIBRDF_CALLOC(librdf_uri, 1, 
-                                         sizeof(librdf_uri));
+				       sizeof(librdf_uri));
   if(!new_uri)
     return NULL;
 
@@ -82,7 +91,9 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
     return 0;
   }
 
-  strcpy(new_uri->string, old_uri->string);
+  strcpy(new_string, old_uri->string);
+  new_uri->string=new_string;
+
   return new_uri;
 }
 
@@ -150,3 +161,52 @@ librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri) {
     return 0;
   return !strcmp(first_uri->string, second_uri->string);
 }
+
+
+
+#ifdef STANDALONE
+
+/* one more prototype */
+int main(int argc, char *argv[]);
+
+
+int
+main(int argc, char *argv[]) 
+{
+  char *hp_string="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
+  librdf_uri *uri1, *uri2;
+  
+  char *program=argv[0];
+	
+  librdf_init_uri(NULL);
+
+  fprintf(stderr, "%s: Creating new URI from string\n", program);
+  uri1=librdf_new_uri(hp_string);
+  
+  fprintf(stderr, "%s: Home page URI is ", program);
+  librdf_uri_print(uri1, stderr);
+  fputs("\n", stderr);
+  
+  fprintf(stderr, "%s: Creating URI from URI\n", program);
+  uri2=librdf_new_uri_from_uri(uri1);
+
+  fprintf(stderr, "%s: New URI is ", program);
+  librdf_uri_print(uri2, stderr);
+  fputs("\n", stderr);
+
+
+  fprintf(stderr, "%s: Freeing URIs\n", program);
+  librdf_free_uri(uri1);
+  librdf_free_uri(uri2);
+  
+  librdf_finish_uri();
+
+#ifdef LIBRDF_DEBUG 
+  librdf_memory_report(stderr);
+#endif
+ 
+  /* keep gcc -Wall happy */
+  return(0);
+}
+
+#endif
