@@ -470,6 +470,7 @@ void librdf_statement_set_predicate(librdf_statement *statement, librdf_node *pr
 librdf_node* librdf_statement_get_object(librdf_statement *statement);
 void librdf_statement_set_object(librdf_statement *statement, librdf_node *object);
 int librdf_statement_equals(librdf_statement* statement1, librdf_statement* statement2);
+int librdf_statement_match(librdf_statement* statement, librdf_statement* partial_statement);
 
 %newobject librdf_statement_to_string;
 char *librdf_statement_to_string(librdf_statement *statement);
