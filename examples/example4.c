@@ -94,6 +94,7 @@ enum command_type {
   CMD_TARGETS,
   CMD_ADD,
   CMD_REMOVE,
+  CMD_PARSE,
 };
 
 typedef struct
@@ -113,6 +114,7 @@ static command commands[]={
   {CMD_TARGETS, "targets", 2, 0},
   {CMD_ADD, "add", 3, 1},
   {CMD_REMOVE, "remove", 3, 1},
+  {CMD_PARSE, "parse", 2, 1},
   {-1, NULL}  
 };
  
@@ -124,12 +126,14 @@ int
 main(int argc, char *argv[]) 
 {
   char *program=argv[0];
+  librdf_parser* parser;
   librdf_storage *storage;
   librdf_model* model;
   librdf_statement* partial_statement;
   librdf_node *source, *arc, *target;
   librdf_stream* stream;
   librdf_iterator* iterator;
+  librdf_uri *uri;
   int usage;
   char *identifier;
   char *cmd;
@@ -197,6 +201,8 @@ main(int argc, char *argv[])
   
   if(usage) {
     fprintf(stdout, "USAGE: %s: <BDB name> COMMANDS\n", program);
+    fprintf(stdout, "  parse URI PARSER                          Parse the RDF/XML at URI into\n");
+    fprintf(stdout, "                                            the model using PARSER\n");
     fprintf(stdout, "  print                                     Prints all the statements\n");
     fprintf(stdout, "  statements SUBJECT|- PREDICATE|- OBJECT|- Query for matching statements\n");
     fprintf(stdout, "                                            where - matches any node.\n");
@@ -206,9 +212,14 @@ main(int argc, char *argv[])
     return(1);
   }
 
+  type=commands[cmd_index].type;
+  
 
   if(commands[cmd_index].write)
-    storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='yes'");
+    if (type == CMD_PARSE)
+      storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='yes',new='yes'");
+    else
+      storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='yes'");
   else
     storage=librdf_new_storage("hashes", identifier, "hash-type='bdb',dir='.',write='no'");
 
@@ -227,15 +238,37 @@ main(int argc, char *argv[])
   /* Do this or gcc moans */
   stream=NULL;
   iterator=NULL;
+  parser=NULL;
   source=NULL;
   arc=NULL;
   target=NULL;
+  uri=NULL;
 
-  type=commands[cmd_index].type;
-  
   switch(type) {
   case CMD_PRINT:
     librdf_model_print(model, stdout);
+    break;
+  case CMD_PARSE:
+    uri=librdf_new_uri(argv[0]);
+    if(!uri) {
+      fprintf(stderr, "%s: Failed to create URI from %s\n", program, argv[0]);
+      break;
+    }
+
+    parser=librdf_new_parser(argv[1]);
+    if(!parser) {
+      fprintf(stderr, "%s: Failed to create new parser %s\n", program, argv[1]);
+      break;
+    }
+    fprintf(stdout, "%s: Parsing URI %s\n", program, librdf_uri_as_string(uri));
+    if(librdf_parser_parse_into_model(parser, uri, model)) {
+      fprintf(stderr, "%s: Failed to parse RDF into model\n", program);
+      librdf_free_parser(parser);
+      librdf_new_uri(uri);
+      break;
+    }
+    librdf_free_parser(parser);
+    librdf_new_uri(uri);
     break;
   case CMD_CONTAINS:
   case CMD_STATEMENTS:
@@ -303,7 +336,7 @@ main(int argc, char *argv[])
           count++;
         }
         librdf_free_stream(stream);  
-        fprintf(stderr, "%s: got %d matching statements\n", program, count);
+        fprintf(stderr, "%s: matching statements: %d\n", program, count);
       }
       break;
       
@@ -391,7 +424,7 @@ main(int argc, char *argv[])
       count++;
     }
     librdf_free_iterator(iterator);
-    fprintf(stderr, "%s: got %d matching nodes\n", program, count);
+    fprintf(stderr, "%s: matching nodes: %d\n", program, count);
 
     if(source)
       librdf_free_node(source);
