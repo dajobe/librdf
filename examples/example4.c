@@ -92,6 +92,9 @@ enum command_type {
   CMD_SOURCES,
   CMD_ARCS,
   CMD_TARGETS,
+  CMD_SOURCE,
+  CMD_ARC,
+  CMD_TARGET,
   CMD_ADD,
   CMD_REMOVE,
   CMD_PARSE_MODEL,
@@ -114,6 +117,9 @@ static command commands[]={
   {CMD_SOURCES, "sources", 2, 2, 0},
   {CMD_ARCS, "arcs", 2, 2, 0},
   {CMD_TARGETS, "targets", 2, 2, 0},
+  {CMD_SOURCE, "source", 2, 2, 0},
+  {CMD_ARC, "arc", 2, 2, 0},
+  {CMD_TARGET, "target", 2, 2, 0},
   {CMD_ADD, "add", 3, 3, 1},
   {CMD_REMOVE, "remove", 3, 3, 1},
   {CMD_PARSE_MODEL, "parse", 2, 3, 1},
@@ -133,7 +139,7 @@ main(int argc, char *argv[])
   librdf_storage *storage;
   librdf_model* model;
   librdf_statement* partial_statement;
-  librdf_node *source, *arc, *target;
+  librdf_node *source, *arc, *target, *node;
   librdf_stream* stream;
   librdf_iterator* iterator;
   librdf_uri *uri;
@@ -213,6 +219,7 @@ main(int argc, char *argv[])
     fprintf(stdout, "  contains SUBJECT PREDICATE OBJECT         Check if statement is in the model.\n");
     fprintf(stdout, "  add | remove SUBJECT PREDICATE OBJECT     Add/remove statement to/from model.\n");
     fprintf(stdout, "  sources | targets | arcs NODE1 NODE2      Query for matching nodes\n");
+    fprintf(stdout, "  source | target | arc NODE1 NODE2         Query for 1 matching node\n");
     return(1);
   }
 
@@ -247,6 +254,7 @@ main(int argc, char *argv[])
   arc=NULL;
   target=NULL;
   uri=NULL;
+  node=NULL;
 
   switch(type) {
   case CMD_PRINT:
@@ -483,6 +491,62 @@ main(int argc, char *argv[])
     librdf_free_iterator(iterator);
     fprintf(stderr, "%s: matching nodes: %d\n", program, count);
 
+    if(source)
+      librdf_free_node(source);
+    if(arc)
+      librdf_free_node(arc);
+    if(target)
+      librdf_free_node(target);
+    break;
+
+  case CMD_SOURCE:
+    arc=librdf_new_node_from_uri_string(argv[0]);
+    if(librdf_heuristic_object_is_literal(argv[1]))
+      target=librdf_new_node_from_literal(argv[1], NULL, 0, 0);
+    else
+      target=librdf_new_node_from_uri_string(argv[1]);
+
+    node=librdf_model_get_source(model, arc, target);
+    if(!node) {
+      fprintf(stderr, "%s: Failed to get source\n", program);
+      break;
+    }
+
+    /* FALLTHROUGH */
+  case CMD_ARC:
+    if(!node) {
+      source=librdf_new_node_from_uri_string(argv[0]);
+      if(librdf_heuristic_object_is_literal(argv[1]))
+        target=librdf_new_node_from_literal(argv[1], NULL, 0, 0);
+      else
+        target=librdf_new_node_from_uri_string(argv[1]);
+      node=librdf_model_get_arc(model, source, target);
+      if(!node) {
+        fprintf(stderr, "Failed to get arc\n");
+        break;
+      }
+    }
+    
+    /* FALLTHROUGH */
+  case CMD_TARGET:
+    if(!node) {
+      source=librdf_new_node_from_uri_string(argv[0]);
+      arc=librdf_new_node_from_uri_string(argv[1]);
+      node=librdf_model_get_target(model, source, arc);
+      if(!node) {
+        fprintf(stderr, "%s: Failed to get target\n", program);
+        break;
+      }
+    }
+
+    /* (Common code) Print out node */
+    if(node) {
+      fputs("Matched node: ", stdout);
+      librdf_node_print(node, stdout);
+      fputc('\n', stdout);
+      
+      librdf_free_node(node);
+    }
     if(source)
       librdf_free_node(source);
     if(arc)
