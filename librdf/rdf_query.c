@@ -351,8 +351,31 @@ librdf_free_query (librdf_query* query)
 
 
 /**
- * librdf_query_run_as_stream - Run the query on a model giving matching statements
+ * librdf_query_execute - Run the query on a model
  * @query: &librdf_query object
+ * @model: model to operate query on
+ * 
+ * Runs the query against the (previously registered) model
+ * and returns a &librdf_query_results for the result objects.
+ * 
+ * Return value:  &librdf_query_results or NULL on failure
+ **/
+librdf_query_results*
+librdf_query_execute(librdf_query* query, librdf_model* model)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_model, NULL);
+
+  if(query->factory->execute)
+    return query->factory->execute(query, model);
+  else
+    return NULL;
+}
+
+
+/**
+ * librdf_query_results_as_stream - Return the query results as statements
+ * @query_results: &librdf_query_results object
  * @model: model to operate query on
  * 
  * Runs the query against the (previously registered) model
@@ -362,38 +385,17 @@ librdf_free_query (librdf_query* query)
  * Return value:  &librdf_stream of matching statements (may be empty) or NULL on failure
  **/
 librdf_stream*
-librdf_query_run_as_stream(librdf_query* query, librdf_model* model)
+librdf_query_results_as_stream(librdf_query_results* query_results)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
-  if(query->factory->run_as_stream)
-    return query->factory->run_as_stream(query, model);
+  if(query_results->query->factory->results_as_stream)
+    return query_results->query->factory->results_as_stream(query_results);
   else
     return NULL;
 }
 
 
-/**
- * librdf_query_run_as_bindings - Run the query on a model giving variable bindings
- * @query: &librdf_query object
- * @model: model to operate query on
- * 
- * Runs the query against the (previously registered) model
- * 
- * Return value:  non-0 on failure
- **/
-int
-librdf_query_run_as_bindings(librdf_query* query, librdf_model* model)
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_model, 1);
-
-  if(query->factory->run_as_bindings)
-    return query->factory->run_as_bindings(query, model);
-  else
-    return 1;
-}
 
 
 /**
@@ -403,12 +405,30 @@ librdf_query_run_as_bindings(librdf_query* query, librdf_model* model)
  * Return value: number of bindings found so far
  **/
 int
-librdf_query_get_result_count(librdf_query *query)
+librdf_query_results_get_count(librdf_query_results *query_results)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, 1);
 
-  if(query->factory->get_result_count)
-    return query->factory->get_result_count(query);
+  if(query_results->query->factory->results_get_count)
+    return query_results->query->factory->results_get_count(query_results);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_query_results_next - Move to the next result
+ * @query: &librdf_query query
+ * 
+ * Return value: non-0 if failed or results exhausted
+ **/
+int
+librdf_query_results_next(librdf_query_results *query_results)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, 1);
+
+  if(query_results->query->factory->results_next)
+    return query_results->query->factory->results_next(query_results);
   else
     return 1;
 }
@@ -416,17 +436,17 @@ librdf_query_get_result_count(librdf_query *query)
 
 /**
  * librdf_query_results_finished - Find out if binding results are exhausted
- * @query: &librdf_query query
+ * @query_results: &librdf_query_results query
  * 
  * Return value: non-0 if results are finished or query failed
  **/
 int
-librdf_query_results_finished(librdf_query *query)
+librdf_query_results_finished(librdf_query_results *query_results)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, 1);
 
-  if(query->factory->results_finished)
-    return query->factory->results_finished(query);
+  if(query_results->query->factory->results_finished)
+    return query_results->query->factory->results_finished(query_results);
   else
     return 1;
 }
@@ -434,7 +454,7 @@ librdf_query_results_finished(librdf_query *query)
 
 /**
  * librdf_query_get_result_bindings - Get all binding names, values for current result
- * @query: &librdf_query query
+ * @query_results: &librdf_query_results query results
  * @names: pointer to an array of binding names (or NULL)
  * @values: pointer to an array of binding value &librdf_node (or NULL)
  * 
@@ -452,109 +472,102 @@ librdf_query_results_finished(librdf_query *query)
  * Return value: non-0 if the assignment failed
  **/
 int
-librdf_query_get_result_bindings(librdf_query *query, 
-                                 const char ***names, librdf_node **values)
+librdf_query_results_get_bindings(librdf_query_results *query_results, 
+                                  const char ***names, librdf_node **values)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, 1);
 
-  if(query->factory->get_result_bindings)
-    return query->factory->get_result_bindings(query, names, values);
+  if(query_results->query->factory->results_get_bindings)
+    return query_results->query->factory->results_get_bindings(query_results, names, values);
   else
     return 1;
 }
 
 
 /**
- * librdf_query_get_result_binding_value - Get one binding value for the current result
- * @query: &librdf_query query
+ * librdf_query_results_get_binding_value - Get one binding value for the current result
+ * @query_results: &librdf_query_results query results
  * @offset: offset of binding name into array of known names
  * 
  * Return value: a new &librdf_node binding value or NULL on failure
  **/
 librdf_node*
-librdf_query_get_result_binding_value(librdf_query *query, int offset)
+librdf_query_results_get_binding_value(librdf_query_results *query_results,
+                                       int offset)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
-  if(query->factory->get_result_binding_value)
-    return query->factory->get_result_binding_value(query, offset);
+  if(query_results->query->factory->results_get_binding_value)
+    return query_results->query->factory->results_get_binding_value(query_results, offset);
   else
     return NULL;
 }
 
 
 /**
- * librdf_query_get_result_binding_name - Get binding name for the current result
- * @query: &librdf_query query
+ * librdf_query_results_get_binding_name - Get binding name for the current result
+ * @query_results: &librdf_query_results query results
  * @offset: offset of binding name into array of known names
  * 
  * Return value: a pointer to a shared copy of the binding name or NULL on failure
  **/
 const char*
-librdf_query_get_result_binding_name(librdf_query *query, int offset)
+librdf_query_results_get_binding_name(librdf_query_results *query_results, int offset)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
-  if(query->factory->get_result_binding_name)
-    return query->factory->get_result_binding_name(query, offset);
+  if(query_results->query->factory->results_get_binding_name)
+    return query_results->query->factory->results_get_binding_name(query_results, offset);
   else
     return NULL;
 }
 
 
 /**
- * librdf_query_get_result_binding_value_by_name - Get one binding value for a given name in the current result
- * @query: &librdf_query query
+ * librdf_query_results_get_binding_value_by_name - Get one binding value for a given name in the current result
+ * @query_results: &librdf_query_results query results
  * @name: variable name
  * 
  * Return value: a new &librdf_node binding value or NULL on failure
  **/
 librdf_node*
-librdf_query_get_result_binding_value_by_name(librdf_query *query, const char *name)
+librdf_query_results_get_binding_value_by_name(librdf_query_results *query_results, const char *name)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
-  if(query->factory->get_result_binding_value_by_name)
-    return query->factory->get_result_binding_value_by_name(query, name);
+  if(query_results->query->factory->results_get_binding_value_by_name)
+    return query_results->query->factory->results_get_binding_value_by_name(query_results, name);
   else
     return NULL;
 }
 
 
 /**
- * librdf_query_next_result - Move to the next result
- * @query: &librdf_query query
- * 
- * Return value: non-0 if failed or results exhausted
- **/
-int
-librdf_query_next_result(librdf_query *query)
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
-
-  if(query->factory->next_result)
-    return query->factory->next_result(query);
-  else
-    return 1;
-}
-
-
-/**
- * librdf_query_get_bindings_count - Get the number of bound variables in the result
- * @query: &librdf_query query
+ * librdf_query_results_get_bindings_count - Get the number of bound variables in the result
+ * @query_results: &librdf_query_results query results
  * 
  * Return value: <0 if failed or results exhausted
  **/
 int
-librdf_query_get_bindings_count(librdf_query *query)
+librdf_query_results_get_bindings_count(librdf_query_results *query_results)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, 1);
 
-  if(query->factory->get_bindings_count)
-    return query->factory->get_bindings_count(query);
+  if(query_results->query->factory->results_get_bindings_count)
+    return query_results->query->factory->results_get_bindings_count(query_results);
   else
     return -1;
 }
+
+
+void
+librdf_free_query_results(librdf_query_results* query_results)
+{
+  if(query_results->query->factory->free_results)
+    return query_results->query->factory->free_results(query_results);
+  LIBRDF_FREE(librdf_query_results, query_results);
+}
+
 
 #endif
 
@@ -583,6 +596,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_query* query;
+  librdf_query_results* results;
   librdf_model* model;
   librdf_storage* storage;
   librdf_parser* parser;
@@ -624,18 +638,18 @@ main(int argc, char *argv[])
   }
 
   /* do the query */
-  if(librdf_model_query_as_bindings(model, query)) {
+  if(!(results=librdf_model_query_execute(model, query))) {
     fprintf(stderr, "%s: Query of model with '%s' failed\n", 
             program, query_string);
     return 1;
   }
 
   /* print the results */
-  while(!librdf_query_results_finished(query)) {
+  while(!librdf_query_results_finished(results)) {
     const char **names=NULL;
     librdf_node* values[VARIABLES_COUNT];
     
-    if(librdf_query_get_result_bindings(query, &names, values))
+    if(librdf_query_results_get_bindings(results, &names, values))
       break;
     
     fputs("result: [", stdout);
@@ -655,11 +669,13 @@ main(int argc, char *argv[])
     }
     fputs("]\n", stdout);
     
-    librdf_query_next_result(query);
+    librdf_query_results_next(results);
   }
   
   fprintf(stdout, "%s: Query returned %d results\n", program, 
-          librdf_query_get_result_count(query));
+          librdf_query_results_get_count(results));
+
+  librdf_free_query_results(results);
 
   fprintf(stdout, "%s: Freeing query\n", program);
   librdf_free_query(query);

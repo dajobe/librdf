@@ -172,6 +172,7 @@ main(int argc, char *argv[])
   librdf_uri *uri;
   librdf_uri *base_uri;
   librdf_query *query;
+  librdf_query_results *results;
   librdf_hash *options;
   int usage=0;
   int help=0;
@@ -719,7 +720,7 @@ main(int argc, char *argv[])
         break;
       }
 
-      if(librdf_model_query_as_bindings(model, query)) {
+      if(!(results=librdf_model_query_execute(model, query))) {
         fprintf(stderr, "%s: Query of model with '%s' failed\n", 
                 program, argv[2]);
         if(uri)
@@ -728,11 +729,11 @@ main(int argc, char *argv[])
         break;
       }
 
-      while(!librdf_query_results_finished(query)) {
+      while(!librdf_query_results_finished(results)) {
         fputs("result: [", stdout);
-        for(i=0; i<librdf_query_get_bindings_count(query); i++) {
-          librdf_node *value=librdf_query_get_result_binding_value(query, i);
-          name=(char*)librdf_query_get_result_binding_name(query, i);
+        for(i=0; i<librdf_query_results_get_bindings_count(results); i++) {
+          librdf_node *value=librdf_query_results_get_binding_value(results, i);
+          name=(char*)librdf_query_results_get_binding_name(results, i);
 
           if(i>0)
             fputs(", ", stdout);
@@ -745,13 +746,14 @@ main(int argc, char *argv[])
         }
         fputs("]\n", stdout);
         
-        librdf_query_next_result(query);
+        librdf_query_results_next(results);
       }
 
       fprintf(stdout, "%s: Query returned %d results\n", program, 
-              librdf_query_get_result_count(query));
+              librdf_query_results_get_count(results));
       if(uri)
         librdf_free_uri(uri);
+      librdf_free_query_results(results);
       break;
       
     case CMD_CONTAINS:
@@ -839,8 +841,15 @@ main(int argc, char *argv[])
                 librdf_free_node(context_node);
             } else
               stream=librdf_model_find_statements(model, partial_statement);
-          } else
-            stream=librdf_model_query_as_stream(model, query);
+          } else {
+            if(!(results=librdf_model_query_execute(model, query))) {
+              fprintf(stderr, "%s: Query of model with '%s' failed\n", 
+                      program, argv[2]);
+              librdf_free_query(query);
+              break;
+            }
+            stream=librdf_query_results_as_stream(results);
+          }
 
           if(!stream) {
             fprintf(stderr, "%s: %s returned no results (NULL stream)\n", program, commands[type].name);
@@ -874,6 +883,9 @@ main(int argc, char *argv[])
 
             if(!output_model)
               fprintf(stderr, "%s: matching triples: %d\n", program, count);
+
+            if(results)
+              librdf_free_query_results(results);
           }
           break;
           

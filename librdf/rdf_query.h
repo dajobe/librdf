@@ -39,6 +39,12 @@ struct librdf_query_s
 };
 
 
+struct librdf_query_results_s
+{
+  librdf_query* query;
+};
+
+
 /** A Query Factory */
 struct librdf_query_factory_s {
   librdf_world *world;
@@ -63,35 +69,38 @@ struct librdf_query_factory_s {
   /* destroy a query */
   void (*terminate)(librdf_query* query);
   
-  /* perform the query on a model, returning results as a stream - OPTIONAL */
-  librdf_stream* (*run_as_stream)(librdf_query* query, librdf_model* model);
+  /* perform the query on a model */
+  librdf_query_results* (*execute)(librdf_query* query, librdf_model* model);
 
-  /* perform the query on a model, returning results as bindings  - OPTIONAL */
-  int (*run_as_bindings)(librdf_query* query, librdf_model* model);
+  /* get the query results as a stream - OPTIONAL */
+  librdf_stream* (*results_as_stream)(librdf_query_results* query_results);
 
   /* get number of results (so far) - OPTIONAL */
-  int (*get_result_count)(librdf_query *query);
-
-  /* find out if binding results are exhausted - OPTIONAL */
-  int (*results_finished)(librdf_query *query);
-
-  /* get all binding names, values for current result - OPTIONAL */
-  int (*get_result_bindings)(librdf_query *query, const char ***names, librdf_node **values);
-
-  /* get one value for current result - OPTIONAL */
-  librdf_node* (*get_result_binding_value)(librdf_query *query, int offset);
-
-  /* get one name for current result - OPTIONAL */
-  const char* (*get_result_binding_name)(librdf_query *query, int offset);
-
-  /* get one value by name for current result - OPTIONAL */
-  librdf_node* (*get_result_binding_value_by_name)(librdf_query *query, const char *name);
+  int (*results_get_count)(librdf_query_results* query_results);
 
   /* get next result - OPTIONAL */
-  int (*next_result)(librdf_query *query);
+  int (*results_next)(librdf_query_results* query_results);
+
+  /* find out if binding results are exhausted - OPTIONAL */
+  int (*results_finished)(librdf_query_results* query_results);
+
+  /* get all binding names, values for current result - OPTIONAL */
+  int (*results_get_bindings)(librdf_query_results* query_results, const char ***names, librdf_node **values);
+
+  /* get one value for current result - OPTIONAL */
+  librdf_node* (*results_get_binding_value)(librdf_query_results* query_results, int offset);
+
+  /* get one name for current result - OPTIONAL */
+  const char* (*results_get_binding_name)(librdf_query_results* query_results, int offset);
+
+  /* get one value by name for current result - OPTIONAL */
+  librdf_node* (*results_get_binding_value_by_name)(librdf_query_results* query_results, const char *name);
 
   /* get number of bound variables in the result - OPTIONAL */
-  int (*get_bindings_count)(librdf_query *query);
+  int (*results_get_bindings_count)(librdf_query_results* query_results);
+
+  /* tidy up query results - OPTIONAL */
+  int (*free_results)(librdf_query_results* query_results);
 };
 
 
@@ -124,16 +133,21 @@ REDLAND_API void librdf_free_query(librdf_query *query);
 
 
 /* methods */
-REDLAND_API librdf_stream* librdf_query_run_as_stream(librdf_query* query, librdf_model *model);
-REDLAND_API int librdf_query_run_as_bindings(librdf_query* query, librdf_model *model);
-REDLAND_API int librdf_query_get_result_count(librdf_query *query);
-REDLAND_API int librdf_query_results_finished(librdf_query *query);
-REDLAND_API int librdf_query_get_result_bindings(librdf_query *query, const char ***names, librdf_node **values);
-REDLAND_API librdf_node* librdf_query_get_result_binding_value(librdf_query *query, int offset);
-REDLAND_API const char* librdf_query_get_result_binding_name(librdf_query *query, int offset);
-REDLAND_API librdf_node* librdf_query_get_result_binding_value_by_name(librdf_query *query, const char *name);
-REDLAND_API int librdf_query_next_result(librdf_query *query);
-REDLAND_API int librdf_query_get_bindings_count(librdf_query *query);
+REDLAND_API librdf_query_results* librdf_query_execute(librdf_query* query, librdf_model *model);
+
+REDLAND_API librdf_stream* librdf_query_results_as_stream(librdf_query_results* query_results);
+
+REDLAND_API int librdf_query_results_get_count(librdf_query_results* query_results);
+REDLAND_API int librdf_query_results_next(librdf_query_results* query_results);
+REDLAND_API int librdf_query_results_finished(librdf_query_results* query_results);
+
+REDLAND_API int librdf_query_results_get_bindings(librdf_query_results* query_results, const char ***names, librdf_node **values);
+REDLAND_API librdf_node* librdf_query_results_get_binding_value(librdf_query_results* query_results, int offset);
+REDLAND_API const char* librdf_query_results_get_binding_name(librdf_query_results* query_results, int offset);
+REDLAND_API librdf_node* librdf_query_results_get_binding_value_by_name(librdf_query_results* query_results, const char *name);
+REDLAND_API int librdf_query_results_get_bindings_count(librdf_query_results* query_results);
+
+REDLAND_API void librdf_free_query_results(librdf_query_results* query_results);
 
 #ifdef __cplusplus
 }

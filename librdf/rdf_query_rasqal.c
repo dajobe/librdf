@@ -45,6 +45,7 @@ typedef struct
   librdf_query *query;        /* librdf query object */
   librdf_model *model;
   rasqal_query *rq;
+  rasqal_query_results *results;
   char *language;            /* rasqal query language name to use */
   char *query_string;
   librdf_uri *uri;           /* base URI or NULL */
@@ -471,55 +472,75 @@ rasqal_redland_new_triples_match(rasqal_triples_source *rts, void *user_data,
 }
 
 
-static int
-librdf_query_rasqal_run_as_bindings(librdf_query* query, librdf_model* model)
+static librdf_query_results*
+librdf_query_rasqal_execute(librdf_query* query, librdf_model* model)
 {
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  librdf_query_results* results;
+
   context->model = model;
 
   /* This assumes raptor's URI implementation is librdf_uri */
   if(rasqal_query_prepare(context->rq, context->query_string, 
                           (raptor_uri*)context->uri))
-    return 1;
+    return NULL;
 
-  return rasqal_query_execute(context->rq);
+  context->results=rasqal_query_execute(context->rq);
+  
+  results=(librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, sizeof(librdf_query_results));
+  results->query=query;
+  
+  return results;
 }
 
 
 static int
-librdf_query_rasqal_get_result_count(librdf_query *query)
+librdf_query_rasqal_results_get_count(librdf_query_results *query_results)
 {
+  librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
-  return rasqal_query_get_result_count(context->rq);
+  return rasqal_query_results_get_count(context->results);
 }
 
 
 static int
-librdf_query_rasqal_results_finished(librdf_query *query)
+librdf_query_rasqal_results_next(librdf_query_results *query_results)
 {
+  librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
-  return rasqal_query_results_finished(context->rq);
+  return rasqal_query_results_next(context->results);
 }
 
 
 static int
-librdf_query_rasqal_get_result_bindings(librdf_query *query, 
-                                        const char ***names, 
-                                        librdf_node **values)
+librdf_query_rasqal_results_finished(librdf_query_results *query_results)
 {
+  librdf_query *query=query_results->query;
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  return rasqal_query_results_finished(context->results);
+}
+
+
+static int
+librdf_query_rasqal_results_get_bindings(librdf_query_results *query_results, 
+                                         const char ***names, 
+                                         librdf_node **values)
+{
+  librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   rasqal_literal **literals;
   int rc;
   int i;
+
   if(values) {
-    rc=rasqal_query_get_result_bindings(context->rq, names, &literals);
+    rc=rasqal_query_results_get_bindings(context->results, names, &literals);
   } else
-    rc=rasqal_query_get_result_bindings(context->rq, names, NULL);
+    rc=rasqal_query_results_get_bindings(context->results, names, NULL);
 
   if(rc || !values)
     return rc;
 
-  for(i=0; i<rasqal_query_get_bindings_count(context->rq); i++)
+  for(i=0; i<rasqal_query_results_get_bindings_count(context->results); i++)
     values[i]=rasqal_literal_to_redland_node(query->world, literals[i]);
 
   return 0;
@@ -527,52 +548,57 @@ librdf_query_rasqal_get_result_bindings(librdf_query *query,
 
 
 static librdf_node*
-librdf_query_rasqal_get_result_binding_value(librdf_query *query, int offset)
+librdf_query_rasqal_results_get_binding_value(librdf_query_results *query_results, int offset)
 {
+  librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   rasqal_literal* literal;
 
-  literal=rasqal_query_get_result_binding_value(context->rq, offset);
+  literal=rasqal_query_results_get_binding_value(context->results, offset);
 
   return rasqal_literal_to_redland_node(query->world, literal);
 }
 
 
 static const char*
-librdf_query_rasqal_get_result_binding_name(librdf_query *query, int offset)
+librdf_query_rasqal_results_get_binding_name(librdf_query_results *query_results, int offset)
 {
+  librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
-  return rasqal_query_get_result_binding_name(context->rq, offset);
+  return rasqal_query_results_get_binding_name(context->results, offset);
 }
 
 
 static librdf_node*
-librdf_query_rasqal_get_result_binding_value_by_name(librdf_query *query, const char *name)
+librdf_query_rasqal_results_get_binding_value_by_name(librdf_query_results *query_results, const char *name)
 {
+  librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   rasqal_literal* literal;
 
-  literal=rasqal_query_get_result_binding_by_name(context->rq, name);
+  literal=rasqal_query_results_get_binding_value_by_name(context->results, name);
 
   return rasqal_literal_to_redland_node(query->world, literal);
 }
 
 
 static int
-librdf_query_rasqal_next_result(librdf_query *query)
+librdf_query_rasqal_results_get_bindings_count(librdf_query_results *query_results)
 {
+  librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
-  return rasqal_query_next_result(context->rq);
+
+  return rasqal_query_results_get_bindings_count(context->results);
 }
 
 
-static int
-librdf_query_rasqal_get_bindings_count(librdf_query *query)
+static void
+librdf_query_rasqal_free_results(librdf_query_results* query_results)
 {
+  librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
-  return rasqal_query_get_bindings_count(context->rq);
+  rasqal_free_query_results(context->results);
 }
-
 
 
 /* local function to register list query functions */
@@ -584,15 +610,16 @@ librdf_query_rasqal_register_factory(librdf_query_factory *factory)
   
   factory->init               = librdf_query_rasqal_init;
   factory->terminate          = librdf_query_rasqal_terminate;
-  factory->run_as_bindings            = librdf_query_rasqal_run_as_bindings;
-  factory->get_result_count           = librdf_query_rasqal_get_result_count;
-  factory->results_finished           = librdf_query_rasqal_results_finished;
-  factory->get_result_bindings        = librdf_query_rasqal_get_result_bindings;
-  factory->get_result_binding_value   = librdf_query_rasqal_get_result_binding_value;
-  factory->get_result_binding_name    = librdf_query_rasqal_get_result_binding_name;
-  factory->get_result_binding_value_by_name = librdf_query_rasqal_get_result_binding_value_by_name;
-  factory->next_result                = librdf_query_rasqal_next_result;
-  factory->get_bindings_count         = librdf_query_rasqal_get_bindings_count;
+  factory->execute            = librdf_query_rasqal_execute;
+  factory->results_get_count           = librdf_query_rasqal_results_get_count;
+  factory->results_next                = librdf_query_rasqal_results_next;
+  factory->results_finished            = librdf_query_rasqal_results_finished;
+  factory->results_get_bindings        = librdf_query_rasqal_results_get_bindings;
+  factory->results_get_binding_value   = librdf_query_rasqal_results_get_binding_value;
+  factory->results_get_binding_name    = librdf_query_rasqal_results_get_binding_name;
+  factory->results_get_binding_value_by_name = librdf_query_rasqal_results_get_binding_value_by_name;
+  factory->results_get_bindings_count         = librdf_query_rasqal_results_get_bindings_count;
+  factory->free_results                       = librdf_query_rasqal_free_results;
 }
 
 

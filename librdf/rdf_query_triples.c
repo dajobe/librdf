@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2002 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2002-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bris.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -33,13 +33,14 @@
 typedef struct
 {
   librdf_statement statement; /* statement to match */
-  
+  librdf_model *model;
 } librdf_query_triples_context;
 
 
 /* prototypes for local functions */
 static int librdf_query_triples_init(librdf_query* query, const char *name, librdf_uri* uri, const unsigned char *query_string);
-static librdf_stream* librdf_query_triples_run_as_stream(librdf_query* query, librdf_model* mode);
+static librdf_query_results* librdf_query_triples_query_execute(librdf_query* query, librdf_model* model);
+static librdf_stream* librdf_query_triples_results_as_stream(librdf_query_results* query_results);
 
 
 static void librdf_query_triples_register_factory(librdf_query_factory *factory);
@@ -237,13 +238,29 @@ librdf_query_triples_terminate(librdf_query* query)
 }
 
 
-static librdf_stream*
-librdf_query_triples_run_as_stream(librdf_query* query, librdf_model* model)
+static librdf_query_results*
+librdf_query_triples_query_execute(librdf_query* query, librdf_model* model)
 {
   librdf_query_triples_context* context=(librdf_query_triples_context*)query->context;
+  librdf_query_results* results;
 
-  return librdf_model_find_statements(model, &context->statement);
+  results=(librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, sizeof(librdf_query_results));
+  results->query=query;
+  
+  context->model=model;
+  
+  return results;
 }
+
+
+static librdf_stream*
+librdf_query_triples_results_as_stream(librdf_query_results* query_results)
+{
+  librdf_query_triples_context* context=(librdf_query_triples_context*)query_results->query->context;
+
+  return librdf_model_find_statements(context->model, &context->statement);
+}
+
 
 /* local function to register list query functions */
 
@@ -254,7 +271,8 @@ librdf_query_triples_register_factory(librdf_query_factory *factory)
   
   factory->init               = librdf_query_triples_init;
   factory->terminate          = librdf_query_triples_terminate;
-  factory->run_as_stream      = librdf_query_triples_run_as_stream;
+  factory->execute            = librdf_query_triples_query_execute;
+  factory->results_as_stream  = librdf_query_triples_results_as_stream;
 }
 
 
