@@ -223,7 +223,7 @@ extern "C" {
 /* #undef LIBRDF_DISABLE_ASSERT_MESSAGES */
 
 /* Release version as a decimal */
-#define LIBRDF_VERSION_DECIMAL 917
+#define LIBRDF_VERSION_DECIMAL 919
 
 /* Major version number */
 #define LIBRDF_VERSION_MAJOR 0
@@ -232,25 +232,7 @@ extern "C" {
 #define LIBRDF_VERSION_MINOR 9
 
 /* Release version number */
-#define LIBRDF_VERSION_RELEASE 17
-
-/* Name of package */
-#define PACKAGE "redland"
-
-/* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "redland-dev@lists.librdf.org"
-
-/* Define to the full name of this package. */
-#define PACKAGE_NAME "Redland RDF Application Framework"
-
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING "Redland RDF Application Framework 0.9.17"
-
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "redland"
-
-/* Define to the version of this package. */
-#define PACKAGE_VERSION "0.9.17"
+#define LIBRDF_VERSION_RELEASE 19
 
 /* The size of a `unsigned char', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_CHAR 1
@@ -271,7 +253,7 @@ extern "C" {
 /* #define TIME_WITH_SYS_TIME*/
 
 /* Version number of package */
-#define VERSION "0.9.17"
+#define VERSION "0.9.19"
 
 /* Use POSIX threads */
 /* #undef WITH_THREADS */
