@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "blah">
+<html>
+<head>
+  <title>Redland - RDF Application Framework - Perl Interface</title>
+  <stylesheet type="text/css" src="../docs/stylesheet.css" />
+</head>
+<body bgcolor="#ffffff" text="#000085">
+
+<h1 align="center">Redland - An RDF Application Framework - Perl Interface</h1>
+
+<h2>Installing the Perl interface</h2>
+
+<p>This is not automatically built or installed at present, since the
+installation system isn't quite finished.  You can easily build it by
+hand as follows</p>
+
+<pre>
+  cd perl
+  make build-perl
+  make test-perl   # optional
+</pre>
+
+<p>You can ignore any compiling warnings about discarding 'const'.
+To install it system wide (this is optional) do this as <em>root</em>:</p>
+
+<pre>
+  root# make install-perl
+</pre>
+
+<p>The Redland interface has been tested with Perl 5.005.</p>
+
+
+<h2>Testing the Perl interface</h2>
+
+<p>If you did the optional install above, run the perl example
+program with:</p>
+<pre>
+  perl ./example.pl  # ./example.pl might work if your perl is in /usr/bin/perl
+</pre>
+
+<p>Otherwise, to run in the source tree do:</p>
+<pre>
+  perl -Iblib/arch -Iblib/lib ./example.pl
+</pre>
+
+<p>and the result should be:</p>
+<pre>
+  Statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+  Subject: [http://purl.org/net/dajobe/]
+  Predicate: [http://purl.org/dc/elements/1.1/creator]
+  Object: Dave Beckett
+</pre>
+
+
+<h2>Perl API Introduction</h2>
+
+<p>The Perl API is an object-based API reflecting the same structure
+of the Redland objects with simple mappings between them:
+
+<center>
+<table align="center" border="1">
+<tr>
+<th>Concept</th><th>Redland Class</th><th>Perl Class</th><th>Purpose</th>
+</tr>
+<tr>
+<td>Resource / Literal</td><td><a href="api/node.html">librdf_node</a></td><td><tt>RDF::Node</tt></td>
+<td>RDF Model &amp; Syntax nodes</td>
+</tr>
+<tr>
+<td>Statement / Triple</td><td><a href="api/statement.html">librdf_statement</a></td><td><tt>RDF::Statement</tt></td>
+<td>RDF Model &amp; Syntax arcs (statements, triples) [isa Resource]</td>
+</tr>
+<tr>
+<td>Model</td><td><a href="api/model.html">librdf_model</a></td><td><tt>RDF::Model</tt></td>
+<td>Set of <em>Statement</em>s usually held in one <em>Storage</em>.</td>
+</tr>
+<tr>
+<td>Storage</td><td><a href="api/storage.html">librdf_storage</a></td><td><tt>RDF::Storage</tt></td>
+<td>Storage for <em>Model</em>s either persistant or in-memory.</td>
+</tr>
+<tr>
+<td>Stream</td><td><a href="api/stream.html">librdf_stream</a></td><td><tt>RDF::Stream</tt></td>
+<td>Providing sequences of <em>Statement</em>s from <em>Parser</em>s, queries.</td>
+</tr>
+<tr>
+<td>Parser</td><td><a href="api/parser.html">librdf_parser</a></td><td><tt>RDF::Parser</tt></td>
+<td>Syntaxes parsers delivering <em>Stream</em> of <em>Statement</em>s or writing to a <em>Model</em></td>
+</tr>
+<tr>
+<td>Iterator</th><td><a href="api/iterator.html">librdf_iterator</a></td><td><tt>RDF::Iterator</tt></td>
+<td>Enumerating lists (of <em>Node</em>) from queries.</td>
+</tr>
+<tr>
+<td>URI</td><td><a href="api/uri.html">librdf_uri</a></td><td><tt>RDF::URI</tt></td>
+<td>Provides URIs for <em>Resource</em>s, <em>Parser</em>s, ...</td>
+</tr>
+<tr>
+<td>Digest</td><td><a href="api/digest.html">librdf_digest</a></td><td>&nbsp;</td>
+<td>Internal content digest class</td>
+</tr>
+<tr>
+<td>Hash</td><td><a href="api/hash.html">librdf_hash</a></td><td>&nbsp;</td>
+<td>Internal key:value maps class</td>
+</tr>
+<tr>
+<td>List</td><td><a href="api/list.html">librdf_list</a></td><td>&nbsp;</td>
+<td>Internal list class</td>
+</tr>
+</table>
+</center>
+
+
+<hr />
+
+<p>Copyright 2000 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+
+<p><a href="http://www.mirror.ac.uk/services/validator/check/referer">Validate me</a></p>
+
+</body>
+</html>
