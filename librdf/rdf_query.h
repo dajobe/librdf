@@ -114,6 +114,12 @@ struct librdf_query_factory_s {
 
   /* tidy up query results - OPTIONAL */
   void (*free_results)(librdf_query_results* query_results);
+
+  /* turn the query results into a new string */
+  unsigned char* (*results_to_counted_string)(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri, size_t *length_p);
+
+  /* write the query results to an existing file handle */
+  int (*results_to_file_handle)(librdf_query_results *query_results, FILE *handle, librdf_uri *format_uri, librdf_uri *base_uri);
 };
 
 
@@ -162,6 +168,10 @@ REDLAND_API librdf_node* librdf_query_results_get_binding_value(librdf_query_res
 REDLAND_API const char* librdf_query_results_get_binding_name(librdf_query_results* query_results, int offset);
 REDLAND_API librdf_node* librdf_query_results_get_binding_value_by_name(librdf_query_results* query_results, const char *name);
 REDLAND_API int librdf_query_results_get_bindings_count(librdf_query_results* query_results);
+REDLAND_API unsigned char* librdf_query_results_to_counted_string(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri, size_t *length_p);
+REDLAND_API unsigned char* librdf_query_results_to_string(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri);
+REDLAND_API int librdf_query_results_to_file_handle(librdf_query_results *query_results, FILE *handle, librdf_uri *format_uri, librdf_uri *base_uri);
+REDLAND_API int librdf_query_results_to_file(librdf_query_results *query_results, const char *name, librdf_uri *format_uri, librdf_uri *base_uri);
 
 REDLAND_API void librdf_free_query_results(librdf_query_results* query_results);
 
