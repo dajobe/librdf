@@ -497,55 +497,102 @@ librdf_query_next_result(librdf_query *query)
 int main(int argc, char *argv[]);
 
 
+#define DATA "@prefix ex: <http://example.org/> .\
+ex:fido a ex:Dog ;\
+        ex:label \"Fido\" .\
+"
+#define DATA_LANGUAGE "turtle"
+#define DATA_BASE_URI "http://example.org/"
+#define QUERY_STRING "select ?x where (?x rdf:type ?y)";
+#define QUERY_LANGUAGE "rdql"
+
+
 int
 main(int argc, char *argv[]) 
 {
   librdf_query* query;
+  librdf_model* model;
+  librdf_storage* storage;
+  librdf_parser* parser;
+  librdf_uri *uri;
   char *program=argv[0];
   librdf_world *world;
-  
+
+  char *query_string=QUERY_STRING;
+
   world=librdf_new_world();
-  librdf_world_init_mutex(world);
-  
-  /* initialise hash, model and query modules */
-  librdf_init_hash(world);
-  librdf_init_uri(world);
-  librdf_init_node(world);
-  librdf_init_query(world);
-  librdf_init_model(world);
-  
+  librdf_world_open(world);
+
+  /* create model and storage */
+  storage=librdf_new_storage(world, NULL, NULL, NULL);
+  if(!storage) {
+    fprintf(stderr, "%s: Failed to create new storage\n", program);
+    return(1);
+  }
+  fprintf(stderr, "%s: Creating model\n", program);
+  model=librdf_new_model(world, storage, NULL);
+  if(!model) {
+    fprintf(stderr, "%s: Failed to create new model\n", program);
+    return(1);
+  }
+
+  /* read the example data in */
+  uri=librdf_new_uri(world, DATA_BASE_URI);
+  parser=librdf_new_parser(world, DATA_LANGUAGE, NULL, NULL);
+  librdf_parser_parse_string_into_model(parser, DATA, uri, model);
+  librdf_free_parser(parser);
+  librdf_free_uri(uri);
+
+
   fprintf(stdout, "%s: Creating query\n", program);
-  query=librdf_new_query(world, "triples", NULL, (const unsigned char*)"[http://example.org] \"literal\" -");
+  query=librdf_new_query(world, QUERY_LANGUAGE, NULL, query_string);
   if(!query) {
     fprintf(stderr, "%s: Failed to create new query\n", program);
     return(1);
   }
 
-  
-  fprintf(stdout, "%s: Opening query\n", program);
-  if(librdf_query_open(query)) {
-    fprintf(stderr, "%s: Failed to open query\n", program);
-    return(1);
+  /* do the query */
+  if(librdf_model_query_as_bindings(model, query)) {
+    fprintf(stderr, "%s: Query of model with '%s' failed\n", 
+            program, query_string);
+    return 1;
   }
 
-
-  /* Can do nothing here since need model and query working */
-
-  fprintf(stdout, "%s: Closing query\n", program);
-  librdf_query_close(query);
+  /* print the results */
+  while(!librdf_query_results_finished(query)) {
+    const char **names;
+    librdf_node* values[10];
+    
+    if(librdf_query_get_result_bindings(query, &names, values))
+      break;
+    
+    fputs("result: [", stdout);
+    if(names) {
+      int i;
+      
+      for(i=0; names[i]; i++) {
+        fprintf(stdout, "%s=", names[i]);
+        if(values[i]) {
+          librdf_node_print(values[i], stdout);
+        } else
+          fputs("NULL", stdout);
+        if(names[i+1])
+          fputs(", ", stdout);
+      }
+    }
+    fputs("]\n", stdout);
+    
+    librdf_query_next_result(query);
+  }
+  
+  fprintf(stdout, "%s: Query returned %d results\n", program, 
+          librdf_query_get_result_count(query));
 
   fprintf(stdout, "%s: Freeing query\n", program);
   librdf_free_query(query);
   
 
-  /* finish model and query modules */
-  librdf_finish_model(world);
-  librdf_finish_query(world);
-  librdf_finish_node(world);
-  librdf_finish_uri(world);
-  librdf_finish_hash(world);
-
-  LIBRDF_FREE(librdf_world, world);
+  librdf_free_world(world);
   
   /* keep gcc -Wall happy */
   return(0);
