@@ -74,7 +74,10 @@
 #      under either the MPL or the LGPL License.
 
 
+# Subdirectories to build/install etc.
 SUBDIRS=@SD@
+# Subdirectories to use for distribution
+DIST_SUBDIRS=docs perl python expat repat
 
 bin_SCRIPTS = redland-config
 lib_LIBRARIES = librdf.a
@@ -156,11 +159,11 @@ MEM_LIBS=@MEM_LIBS@
 #MEM_LIBS=
 
 # 2) Use internal memory debug
-#MEM=-DLIBREDLAND_MEMORY_DEBUG=1
+#MEM=-DLIBRDF_MEMORY_DEBUG=1
 #MEM_LIBS=
 
 # 3) Use dmalloc library
-#MEM=-DLIBREDLAND_MEMORY_DEBUG_DMALLOC=1
+#MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
 #MEM_LIBS=-ldmalloc
 
 
