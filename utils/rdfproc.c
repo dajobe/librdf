@@ -245,7 +245,12 @@ main(int argc, char *argv[])
               usage=1;
             } else {
               output_storage = librdf_new_storage(world, NULL, NULL, NULL);
-              if(output_storage) {
+              if(!output_storage) {
+                fprintf(stderr, "%s: Failed to create output storage\n", 
+                        program);
+                librdf_free_serializer(output_serializer);
+                output_serializer=NULL;
+              } else {
                 output_model = librdf_new_model(world, output_storage, NULL);
                 if(!output_model) {
                   fprintf(stderr, "%s: Failed to create output storage model\n", 
@@ -255,12 +260,6 @@ main(int argc, char *argv[])
                   librdf_free_serializer(output_serializer);
                   output_serializer=NULL;
                 }
-              } else {
-                fprintf(stderr, "%s: Failed to create output storage\n", 
-                        program);
-                librdf_free_serializer(output_serializer);
-                output_serializer=NULL;
-              }
             }
             
           }
