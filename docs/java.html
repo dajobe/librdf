@@ -45,13 +45,25 @@ to PREFIX/lib.  This is not a standard location between systems so
 might have to be done by hand.
 </p>
 
-<p>The Redland Java interface has been tested with JD2SDK 1.4.2,
- J2SDK 1.4.1_01 and J2SDK 1.3.1 on Linux/x86 only.  The JNI header
- and library files are in different places on all systems so the
- <tt>--with-jdk</tt> MUST be used to give the location of the root
- of the full JDK installation.  This should then find the header
- files in the <tt>include</tt> and <tt>include/</tt><em>system</em>
- sub-directories (such as "solaris" or "linux").</p>
+<p>The Redland Java interface is beta quality - the object based API
+is present but not been used extensively.  The API has been has been
+tested with the following versions:</p>
+
+<blockquote>
+1.2.1 on Solaris/Sparc<br />
+1.4.1 on OSX/PPC<br />
+1.4.1_01 on Linux/x86<br />
+1.4.2 on Linux/x86<br />
+1.4.2-p5 on FreeBSD/x86<br />
+</blockquote>
+
+<p>The JNI header and library files are in different places on all
+systems so the <tt>--with-jdk</tt> may need to be used to give the
+location of the root of the full JDK installation if it cannot be
+found by the paths that the configure program knows of.  This should
+then find the JNI header files in the <tt>include</tt> and
+<tt>include/</tt><em>system</em> sub-directories (such as "solaris"
+or "linux").</p>
 
 
 <h2>Testing the Redland Java interface</h2>
