@@ -546,8 +546,7 @@ librdf_storage_hashes_add_statements(librdf_storage* storage,
 
     if(statement) {
       status=librdf_storage_hashes_add_statement(storage, statement);
-      if(status)
-        librdf_free_statement(statement);
+      librdf_free_statement(statement);
     } else
       status=1;
 
