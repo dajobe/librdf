@@ -261,6 +261,43 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
 
 
 /**
+ * librdf_model_add_typed_literal_statement - Create and add a new statement about a typed literal to the model
+ * @model: model object
+ * @subject: &librdf_node of subject
+ * @predicate: &librdf_node of predicate
+ * @string: string literal conten
+ * @xml_language: language of literal
+ * @datatype: datatype librdf_uri
+ * 
+ * The language can be set to NULL if not used.
+ *
+ * Return value: non 0 on failure
+ **/
+int
+librdf_model_add_typed_literal_statement(librdf_model* model, 
+                                         librdf_node* subject, 
+                                         librdf_node* predicate, char* string,
+                                         char *xml_language,
+                                         librdf_uri *datatype_uri)
+{
+  librdf_node* object;
+  int result;
+  
+  object=librdf_new_node_from_typed_literal(model->world,
+                                            string, xml_language, 
+                                            datatype_uri);
+  if(!object)
+    return 1;
+  
+  result=librdf_model_add(model, subject, predicate, object);
+  if(result)
+    librdf_free_node(object);
+  
+  return result;
+}
+
+
+/**
  * librdf_model_add_string_literal_statement - Create and add a new statement about a literal to the model
  * @model: model object
  * @subject: &librdf_node of subject
