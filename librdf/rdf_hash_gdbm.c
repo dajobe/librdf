@@ -37,6 +37,7 @@
 #include <rdf_hash_gdbm.h>
 
 
+
 typedef struct 
 {
   GDBM_FILE gdbm_file;
@@ -49,14 +50,12 @@ typedef struct
 static int librdf_hash_gdbm_open(void* context, char *identifier, void *mode,
                                  librdf_hash* options);
 static int librdf_hash_gdbm_close(void* context);
-static int librdf_hash_gdbm_get(void* context, librdf_hash_data *key,
-                                librdf_hash_data *data, unsigned int flags);
-static int librdf_hash_gdbm_put(void* context, librdf_hash_data *key,
-                                librdf_hash_data *data, unsigned int flags);
-static int librdf_hash_gdbm_exists(void* context, librdf_hash_data *key);
-static int librdf_hash_gdbm_delete(void* context, librdf_hash_data *key);
-static int librdf_hash_gdbm_get_seq(void* context, librdf_hash_data *key,
-                                    librdf_hash_sequence_type type);
+static librdf_iterator* librdf_hash_gdbm_get(void* context, librdf_hash_datum *key, unsigned int flags);
+static int librdf_hash_gdbm_put(void* context, librdf_hash_datum *key,
+                                librdf_hash_datum *data, unsigned int flags);
+static int librdf_hash_gdbm_exists(void* context, librdf_hash_datum *key);
+static int librdf_hash_gdbm_delete(void* context, librdf_hash_datum *key);
+static librdf_iterator* librdf_hash_gdbm_keys(void* context);
 static int librdf_hash_gdbm_sync(void* context);
 static int librdf_hash_gdbm_get_fd(void* context);
 
@@ -89,6 +88,9 @@ librdf_hash_gdbm_open(void* context, char *identifier, void *mode,
   
   gdbm=gdbm_open(file, 512, GDBM_WRCREAT, 0644, 0);
   if(!gdbm) {
+    LIBRDF_DEBUG3(librdf_hash_gdbm_open,
+		"GBDM open of %s failed - %s\n", file, 
+                  gdbm_strerror(gdbm_errno));
     LIBRDF_FREE(cstring, file);
     return 1;
   }
@@ -122,17 +124,12 @@ librdf_hash_gdbm_close(void* context)
 
 
 /**
- * librdf_hash_gdbm_get - Retrieve a hash value for the given key
- * @context: GDBM hash context
- * @key: pointer to key to use
- * @data: pointer to data to return value
- * @flags: flags (not used at present)
- * 
- * Return value: non 0 on failure
+ * librdf_hash_gdbm_get - 
  **/
-static int
-librdf_hash_gdbm_get(void* context, librdf_hash_data *key, librdf_hash_data *data, unsigned int flags) 
+static librdf_iterator*
+librdf_hash_gdbm_get(void* context, librdf_hash_datum *key, unsigned int flags) 
 {
+#if 0
   librdf_hash_gdbm_context* gdbm_context=(librdf_hash_gdbm_context*)context;
   datum gdbm_data;
   datum gdbm_key;
@@ -158,6 +155,8 @@ librdf_hash_gdbm_get(void* context, librdf_hash_data *key, librdf_hash_data *dat
   
   /* always allocated by GDBM using system malloc */
   free(gdbm_data.dptr);
+#endif
+  abort();
   return 0;
 }
 
@@ -172,7 +171,7 @@ librdf_hash_gdbm_get(void* context, librdf_hash_data *key, librdf_hash_data *dat
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_gdbm_put(void* context, librdf_hash_data *key, librdf_hash_data *value, unsigned int flags) 
+librdf_hash_gdbm_put(void* context, librdf_hash_datum *key, librdf_hash_datum *value, unsigned int flags) 
 {
   librdf_hash_gdbm_context* gdbm_context=(librdf_hash_gdbm_context*)context;
   datum gdbm_data;
@@ -200,7 +199,7 @@ librdf_hash_gdbm_put(void* context, librdf_hash_data *key, librdf_hash_data *val
  * Return value: non 0 if the key exists in the hash
  **/
 static int
-librdf_hash_gdbm_exists(void* context, librdf_hash_data *key) 
+librdf_hash_gdbm_exists(void* context, librdf_hash_datum *key) 
 {
   librdf_hash_gdbm_context* gdbm_context=(librdf_hash_gdbm_context*)context;
   datum gdbm_key;
@@ -221,7 +220,7 @@ librdf_hash_gdbm_exists(void* context, librdf_hash_data *key)
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_gdbm_delete(void* context, librdf_hash_data *key) 
+librdf_hash_gdbm_delete(void* context, librdf_hash_datum *key) 
 {
   librdf_hash_gdbm_context* gdbm_context=(librdf_hash_gdbm_context*)context;
   datum gdbm_key;
@@ -236,21 +235,12 @@ librdf_hash_gdbm_delete(void* context, librdf_hash_data *key)
 
 
 /**
- * librdf_hash_gdbm_get_seq - Provide sequential access to the hash
- * @context: GDBM hash context
- * @key: pointer to the key
- * @type: type of operation
- * 
- * Valid operations are
- * LIBRDF_HASH_SEQUENCE_FIRST to get the first key in the sequence
- * LIBRDF_HASH_SEQUENCE_NEXT to get the next in sequence and
- * LIBRDF_HASH_SEQUENCE_CURRENT to get the current key (again).
- * 
- * Return value: non 0 on failure
+ * librdf_hash_gdbm_keys - 
  **/
-static int
-librdf_hash_gdbm_get_seq(void* context, librdf_hash_data *key, librdf_hash_sequence_type type) 
+static librdf_iterator*
+librdf_hash_gdbm_keys(void* context) 
 {
+#if 0
   librdf_hash_gdbm_context* gdbm_context=(librdf_hash_gdbm_context*)context;
   datum gdbm_key;
   
@@ -299,6 +289,9 @@ librdf_hash_gdbm_get_seq(void* context, librdf_hash_data *key, librdf_hash_seque
   }
   
   return 0;
+#endif
+  abort();
+  return NULL;
 }
 
 
@@ -353,7 +346,7 @@ librdf_hash_gdbm_register_factory(librdf_hash_factory *factory)
   factory->put     = librdf_hash_gdbm_put;
   factory->exists  = librdf_hash_gdbm_exists;
   factory->delete_key  = librdf_hash_gdbm_delete;
-  factory->get_seq = librdf_hash_gdbm_get_seq;
+  factory->keys    = librdf_hash_gdbm_keys;
   factory->sync    = librdf_hash_gdbm_sync;
   factory->get_fd  = librdf_hash_gdbm_get_fd;
 }
@@ -365,5 +358,5 @@ librdf_hash_gdbm_register_factory(librdf_hash_factory *factory)
 void
 librdf_init_hash_gdbm(void)
 {
-  librdf_hash_register_factory("GDBM", &librdf_hash_gdbm_register_factory);
+  librdf_hash_register_factory("gdbm", &librdf_hash_gdbm_register_factory);
 }
