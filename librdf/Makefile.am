@@ -104,7 +104,7 @@ rdf_model.c rdf_iterator.c rdf_concepts.c \
 rdf_list.c rdf_memory.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_stream.c \
-rdf_parser.c rdf_heuristics.c rdf_files.c \
+rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
 redland.h librdf.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
@@ -114,7 +114,7 @@ rdf_model.h rdf_iterator.h \
 rdf_list.h \
 rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
 rdf_stream.h \
-rdf_parser.h rdf_heuristics.h rdf_files.h
+rdf_parser.h rdf_heuristics.h rdf_files.h rdf_utf8.h
 
 
 librdf_a_LIBADD = @LIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
@@ -140,7 +140,7 @@ autogen.sh
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
-rdf_files_test rdf_heuristics_test
+rdf_files_test rdf_heuristics_test rdf_utf8_test
 
 EXAMPLES=example1 example2 example3 example4
 
@@ -206,6 +206,9 @@ rdf_files_test: rdf_files.c librdf.a
 
 rdf_heuristics_test: rdf_heuristics.c librdf.a
 	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_heuristics.c librdf.a $(LIBS)
+
+rdf_utf8_test: rdf_utf8.c librdf.a
+	$(LINK) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_utf8.c librdf.a $(LIBS)
 
 examples: $(EXAMPLES)
 
