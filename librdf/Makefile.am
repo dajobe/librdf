@@ -196,31 +196,6 @@ $(top_builddir)/raptor/libraptor.la:
 $(SRCDIR)/../repat/librepat.la:
 	cd $(srcdir)/../repat && $(MAKE) $(AM_MAKEFLAGS) all
 
-# Copy these by hand since they are symlinks to the latest versions
-# in the home raptor source tree and the default rule just copies the
-# (broken) links into the distribution which then fails to work.
-#
-# Note: this can't be protected with @MAINT@ since automake only
-# activates this rule if it is normally in the Makefile.am
-dist-hook: redland.spec
-	@for file in @RAPTOR_SRCS@ @RAPTOR_INCS@ fake.c; do \
-          if test -r $(srcdir)/$$file; then \
-	    rm -f $(distdir)/$$file; \
-	    cp -p $(srcdir)/$$file $(distdir)/$$file; \
-	  fi; \
-	done
-
-rpm: distcheck
-	rpm -ta $(distdir).tar.gz
-
-finish: librdf.la
-	rm -rf $(LOCAL_LIB_DIR)
-	mkdir $(LOCAL_LIB_DIR)
-	lib=`cd $(LOCAL_LIB_DIR); pwd`; \
-	$(LIBTOOL) --mode=install install librdf.la $$lib; \
-	$(LIBTOOL) --mode=finish $$lib
-
-
 @MAINT@
 @MAINT@PrintParser.class: PrintParser.java
 @MAINT@	javac -classpath .:$(JAVA_SIRPACW3C_JAR):$(JAVA_SIRPACSTANFORD_JAR):$(JAVA_SAX_JAR) $<
