@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: Redland
-Description: Redland RDF Application Framework
+Description: Redland RDF Library
 Requires: raptor
 Version: @VERSION@
 Libs: -L${libdir} -llibrdf @LIBRDF_LDFLAGS@ @LIBRDF_LIBS@

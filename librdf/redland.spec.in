@@ -8,7 +8,7 @@
 %define perlinstallsitearch @PERLINSTALLSITEARCH@
 %define perlman3dir @PERLMAN3DIR@
 
-Summary:   Redland RDF Application Framework
+Summary:   Redland RDF Library
 Name:      %{name}
 Version:   %{version}
 Release:   %{release}
