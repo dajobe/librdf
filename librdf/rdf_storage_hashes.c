@@ -587,8 +587,6 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
       break;
   }
 
-  librdf_free_statement(statement);
-
   return status;
 }
 
@@ -610,13 +608,6 @@ librdf_storage_hashes_add_statements(librdf_storage* storage,
     librdf_statement* statement=librdf_stream_get_object(statement_stream);
 
     if(statement) {
-      /* copy shared statement */
-      statement=librdf_new_statement_from_statement(statement);
-      if(!statement) {
-        status=1;
-        break;
-      }
-
       status=librdf_storage_hashes_add_statement(storage, statement);
     } else
       status=1;
