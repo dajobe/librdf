@@ -306,6 +306,21 @@ librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 
 
 /**
+ * librdf_statement_is_complete - Check if statement has all subject, predicate, object fields present
+ * @statement: &librdf_statement object
+ * 
+ * Return value: non 0 if the statement has subject, predicate and object.
+ **/
+int
+librdf_statement_is_complete(librdf_statement *statement)
+{
+  return (LIBRDF_NODE_STATEMENT_SUBJECT(statement) &&
+          LIBRDF_NODE_STATEMENT_PREDICATE(statement) &&
+          LIBRDF_NODE_STATEMENT_OBJECT(statement));
+}
+
+
+/**
  * librdf_statement_to_string - Format the librdf_statement as a string
  * @statement: the statement
  * 
