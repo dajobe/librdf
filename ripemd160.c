@@ -25,7 +25,7 @@
 
 #include "types.h"
 
-#include "rmd.h"
+#include "ripemd160.h"
 /* taken from GNUPG cipher.h */
 void rmd160_hash_buffer( char *outbuf, const char *buffer, size_t length );
 
@@ -559,5 +559,5 @@ rmd160_register_factory(rdf_digest_factory *factory)
 void
 rmd160_constructor(void)
 {
-  rdf_digest_register_factory("RIPEM160", &rmd160_register_factory);
+  rdf_digest_register_factory("RIPEMD160", &rmd160_register_factory);
 }
