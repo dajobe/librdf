@@ -921,6 +921,24 @@ librdf_storage_group_serialise(librdf_storage* storage,
 }
 
 
+int
+librdf_storage_supports_query(librdf_storage* storage, librdf_query *query)
+{
+  /* FIXME - no storage system supports a query language at present */
+  return 0;
+}
+
+
+librdf_stream*
+librdf_storage_query(librdf_storage* storage, librdf_query *query) 
+{
+  /* FIXME - no storage system supports querying yet */
+  return NULL;
+}
+
+
+
+
 
 #ifdef STANDALONE
 
