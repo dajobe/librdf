@@ -37,12 +37,14 @@
 #undef HAVE_BDB_HASH
 
 /* Berkeley DB complexities */
+/* V4.1+ */
+#undef HAVE_BDB_OPEN_7_ARGS
 /* V2/V3 */
 #undef HAVE_BDB_DB_TXN
 #undef HAVE_BDB_CURSOR
-/* V2 versiosn differ / V3 */
+/* V2 versions differ / V3 */
 #undef HAVE_BDB_CURSOR_4_ARGS
-/* V3 */
+/* V3/V4 */
 #undef HAVE_DB_CREATE
 /* V2 */
 #undef HAVE_DB_OPEN

@@ -273,12 +273,15 @@ if test "$bdb_prefix" != no; then
   AC_CHECK_HEADERS(db.h)
   if test "$ac_cv_header_db_h" = yes ; then
     have_libdb=no
-    AC_MSG_CHECKING(for BDB V3 db_create)
+
+    AC_MSG_CHECKING(for BDB V1 dbopen)
     AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [db_create(NULL, NULL, 0);],
-		AC_DEFINE(HAVE_DB_CREATE)
-                bdb_available="Version 3.x"
-                have_libdb=yes
+                 #include <db.h>], [dbopen(NULL, 0, 0, DB_BTREE, NULL);],
+		AC_DEFINE(HAVE_DBOPEN)
+                if test $have_libdb = no; then
+                  bdb_available="Version 1.x - not supported"
+                  have_libdb=no
+                fi
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
@@ -293,14 +296,21 @@ if test "$bdb_prefix" != no; then
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
-    AC_MSG_CHECKING(for BDB V1 dbopen)
+    AC_MSG_CHECKING(for BDB V3/V4.x db_create)
     AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [dbopen(NULL, 0, 0, DB_BTREE, NULL);],
-		AC_DEFINE(HAVE_DBOPEN)
-                if test $have_libdb = no; then
-                  bdb_available="Version 1.x - not supported"
-                  have_libdb=no
-                fi
+                 #include <db.h>], [db_create(NULL, NULL, 0);],
+		AC_DEFINE(HAVE_DB_CREATE)
+                bdb_available="Version 3.x/4.x"
+                have_libdb=yes
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
+    AC_MSG_CHECKING(for BDB V4.1+ DB->open)
+    AC_TRY_LINK([#include <stdio.h>
+                 #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);],
+		AC_DEFINE(HAVE_BDB_OPEN_7_ARGS)
+                bdb_available="Version 4.1+"
+                have_libdb=yes
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 

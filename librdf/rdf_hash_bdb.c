@@ -198,11 +198,28 @@ librdf_hash_bdb_open(void* context, char *identifier,
   /* V3 prototype:
    * int DB->open(DB *db, const char *file, const char *database,
    *              DBTYPE type, u_int32_t flags, int mode);
+   *
+   * V4.1+ prototype:
+   * int DB->open(DB *db, DB_TXN *txnid, const char *file, 
+   *              const char *database, DBTYPE type, u_int32_t flags, int mode);
    */
   flags=is_writable ? DB_CREATE : DB_RDONLY;
   if(is_new)
     flags |= DB_TRUNCATE;
-  
+
+#ifdef HAVE_BDB_OPEN_7_ARGS  
+  if((ret=bdb->open(bdb, NULL, file, NULL, DB_BTREE, flags, mode))) {
+#ifdef LIBRDF_DEBUG
+    LIBRDF_DEBUG3(librdf_hash_bdb_open, "BDB V4.1+ open of '%s' failed - %s", 
+                  file, db_strerror(ret));
+#else
+    librdf_error(bdb_context->hash->world, "BDB V4.1+ open of '%s' failed - %s",
+                 file, db_strerror(ret));
+#endif
+    LIBRDF_FREE(cstring, file);
+    return 1;
+  }
+#else
   if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
 #ifdef LIBRDF_DEBUG
     LIBRDF_DEBUG3(librdf_hash_bdb_open, "BDB V3 open of '%s' failed - %s", 
@@ -214,6 +231,8 @@ librdf_hash_bdb_open(void* context, char *identifier,
     LIBRDF_FREE(cstring, file);
     return 1;
   }
+#endif
+
 #else
 #ifdef HAVE_DB_OPEN
   /* V2 prototype:
