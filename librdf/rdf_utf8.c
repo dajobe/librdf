@@ -391,7 +391,7 @@ librdf_utf8_print(const byte *input, int length, FILE *stream)
 {
   int i=0;
   
-  while(*input && i<length) {
+  while(i<length && *input) {
     librdf_unichar c;
     int size=librdf_utf8_to_unicode_char(&c, input, length-i);
     if(size <= 0)
