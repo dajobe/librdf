@@ -850,13 +850,12 @@ librdf_storage_list_get_feature(librdf_storage* storage, librdf_uri* feature)
   if(!uri_string)
     return NULL;
   
-  if(!strcmp(uri_string, LIBRDF_MODEL_FEATURE_CONTEXTS)) {
-    char value[2];
+  if(!strcmp((const char*)uri_string, LIBRDF_MODEL_FEATURE_CONTEXTS)) {
+    unsigned char value[2];
 
     sprintf((char*)value, "%d", (scontext->index_contexts != 0));
     return librdf_new_node_from_typed_literal(storage->world,
-                                              (const char*)value,
-                                              NULL, NULL);
+                                              value, NULL, NULL);
   }
 
   return NULL;

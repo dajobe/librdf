@@ -168,8 +168,8 @@ librdf_storage_mysql_hash(librdf_storage* storage, char *type,
     return 0;
   librdf_digest_init(digest);
   if(type)
-    librdf_digest_update(digest, type, 1);
-  librdf_digest_update(digest, string, length);
+    librdf_digest_update(digest, (unsigned char*)type, 1);
+  librdf_digest_update(digest, (unsigned char*)string, length);
   librdf_digest_final(digest);
   memcpy(&hash, librdf_digest_get_digest(digest), sizeof(hash));
   librdf_free_digest(digest);
@@ -518,7 +518,7 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
   if(type==LIBRDF_NODE_TYPE_RESOURCE) {
     /* Get hash */
     unsigned char *uri=librdf_uri_as_counted_string(librdf_node_get_uri(node), &nodelen);
-    hash=librdf_storage_mysql_hash(storage, "R", uri, nodelen);
+    hash=librdf_storage_mysql_hash(storage, "R", (char*)uri, nodelen);
 
     if(add) {
       /* Escape URI for db query */
@@ -548,8 +548,10 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
 
   } else if(type==LIBRDF_NODE_TYPE_LITERAL) {
     /* Get hash */
-    unsigned char *value, *lang, *datatype=0, *nodestring;
+    unsigned char *value, *datatype=0, *nodestring;
+    char *lang;
     size_t valuelen, langlen=0, datatypelen=0;
+
     value=librdf_node_get_literal_value_as_counted_string(node,&valuelen);
     lang=librdf_node_get_literal_value_language(node);
     if(lang)
@@ -558,17 +560,17 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       datatype=librdf_uri_as_counted_string(librdf_node_get_literal_value_datatype_uri(node),&datatypelen);
 
     /* Create composite node string for hash generation */
-    if(!(nodestring=(char*)LIBRDF_MALLOC(cstring, valuelen+langlen+datatypelen+3)))
+    if(!(nodestring=(unsigned char*)LIBRDF_MALLOC(cstring, valuelen+langlen+datatypelen+3)))
       return 0;
-    strcpy(nodestring, value);
-    strcat(nodestring, "<");
+    strcpy((char*)nodestring, (const char*)value);
+    strcat((char*)nodestring, "<");
     if(lang)
-      strcat(nodestring, lang);
-    strcat(nodestring, ">");
+      strcat((char*)nodestring, lang);
+    strcat((char*)nodestring, ">");
     if(datatype)
-      strcat(nodestring, datatype);
-    nodelen=strlen(nodestring);
-    hash=librdf_storage_mysql_hash(storage, "L", nodestring, nodelen);
+      strcat((char*)nodestring, (const char*)datatype);
+    nodelen=strlen((const char*)nodestring);
+    hash=librdf_storage_mysql_hash(storage, "L", (char*)nodestring, nodelen);
     LIBRDF_FREE(cstring,nodestring);
 
     if(add) {
@@ -618,8 +620,8 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
   } else if(type==LIBRDF_NODE_TYPE_BLANK) {
     /* Get hash */
     unsigned char *name=librdf_node_get_blank_identifier(node);
-    nodelen=strlen(name);
-    hash=librdf_storage_mysql_hash(storage, "B", name, nodelen);
+    nodelen=strlen((const char*)name);
+    hash=librdf_storage_mysql_hash(storage, "B", (char*)name, nodelen);
 
     if(add) {
       /* Escape name for db query */
@@ -1272,7 +1274,7 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
                                     (const unsigned char*)row[part+4]);
           if(!(node=librdf_new_node_from_typed_literal(sos->storage->world,
                                                         (const unsigned char*)row[part+2],
-                                                        (const unsigned char*)row[part+3],
+                                                        row[part+3],
                                                         datatype))) {
             librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
             return 1;
@@ -1309,7 +1311,7 @@ librdf_storage_mysql_find_statements_in_context_next_statement(void* context)
                                     (const unsigned char*)row[part+4]);
           if(!(node=librdf_new_node_from_typed_literal(sos->storage->world,
                                                         (const unsigned char*)row[part+2],
-                                                        (const unsigned char*)row[part+3],
+                                                        row[part+3],
                                                         datatype))) {
             librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
             return 1;
@@ -1502,7 +1504,7 @@ librdf_storage_mysql_get_contexts_next_context(void* context)
                                 (const unsigned char*)row[4]);
       if(!(node=librdf_new_node_from_typed_literal(gccontext->storage->world,
                                                     (const unsigned char*)row[2],
-                                                    (const unsigned char*)row[3],
+                                                    row[3],
                                                     datatype))) {
         librdf_storage_mysql_get_contexts_finished((void*)gccontext);
         return 1;
@@ -1570,9 +1572,9 @@ librdf_storage_mysql_get_feature(librdf_storage* storage, librdf_uri* feature)
   if(!uri_string)
     return NULL;
   
-  if(!strcmp(uri_string, LIBRDF_MODEL_FEATURE_CONTEXTS)) {
+  if(!strcmp((const char*)uri_string, (const char*)LIBRDF_MODEL_FEATURE_CONTEXTS)) {
     /* Always have contexts */
-    static const char value[2]="1";
+    static const unsigned char value[2]="1";
 
     return librdf_new_node_from_typed_literal(storage->world,
                                               value,
