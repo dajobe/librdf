@@ -114,8 +114,11 @@ fi
 dnl Berkeley DB
 AC_ARG_WITH(bdb, [  --with-bdb=ROOT            Berkeley DB install area [/usr]], bdb_prefix="$withval", bdb_prefix="/usr") 
 
+
 AC_MSG_CHECKING(location of BDB)
 AC_MSG_RESULT($bdb_prefix)
+
+bdb_available=
 if test "$bdb_prefix" != no; then
   oCFLAGS="$CFLAGS"
   oLDFLAGS="$LDFLAGS"
@@ -140,13 +143,16 @@ if test "$bdb_prefix" != no; then
     have_libdb=no
     if test "$ac_cv_lib_db_db_create" = yes; then
       AC_DEFINE(HAVE_DB_CREATE)
+      bdb_available="Version 3.x"
       have_libdb=yes
     elif test "$ac_cv_lib_db_db_open" = yes; then
       AC_DEFINE(HAVE_DB_OPEN)
+      bdb_available="Version 2.x"
       have_libdb=yes
     elif test "$ac_cv_lib_db_dbopen" = yes; then
       AC_DEFINE(HAVE_DBOPEN)
       AC_MSG_WARN(Berkeley DB version 1 found - this is not supported)
+      bdb_available="Version 1.x - not supported"
       have_libdb=no
     fi
     AC_MSG_CHECKING(whether DB_TXN defined in db.h)
@@ -179,6 +185,7 @@ fi
 
 if test "$have_libdb" != yes; then
   AC_MSG_WARN(No persistant storage configured)
+  bdb_available=Missing
 fi
 
 
@@ -255,32 +262,52 @@ AC_CHECK_LIB(xmlparse, XML_ParserCreateNS, xmlp=1, xmlp=0, -lxmltok)
 
 LIBS="$oLIBS"
 
+# Remove any expat lurking around from, say, w3c libwww
+LIBS=`echo $LIBS | sed -e 's/-lxmlparse//' -e 's/-lxmltok//'`
+
 AC_CHECK_LIB(expat, XML_SetNamespaceDeclHandler, libexpat=1, libexpat=0)
+
+LIBS="$oLIBS"
 
 REPAT_FLAGS=
 
-LIBS="$oLIBS"
-AC_MSG_CHECKING(for system expat library)
+AC_MSG_CHECKING(for working expat in libxmlparse and libxmltok)
 if test $xmlp = 1 -a $xmlt = 1 -a  $ac_cv_header_xmlparse_h = yes; then
-  # Old expat
-  have_expat_lib=1
-  have_expat=1
-  expat_libs="-lxmlparse -lxmltok"
+  AC_TRY_RUN([main() {XML_SetNamespaceDeclHandler();}], worked=yes, worked=no, worked=no)
+  if test $worked = yes; then
+    # Old expat
+    have_expat_lib=1
+    have_expat=1
+    expat_libs="-lxmlparse -lxmltok"
 
-  AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
-  REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
+    AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
+    REPAT_FLAGS="$REPAT_FLAGS -DRDFPARSE_INCLUDE_XMLPARSE=1"
 
-  AC_MSG_RESULT(yes - libxmlparse and libxmltok)
-elif test $libexpat = 1 -a $ac_cv_header_expat_h = yes ; then
-  # New expat - expat-1.95.0 or later
-  have_expat_lib=1
-  have_expat=1
-  expat_libs="-lexpat"
-
-  AC_MSG_RESULT(yes - libexpat)
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi
 else
   AC_MSG_RESULT(no)
 fi
+
+AC_MSG_CHECKING(for working expat in libexpat)
+if test $libexpat = 1 -a $ac_cv_header_expat_h = yes ; then
+  AC_TRY_RUN([main() {XML_SetNamespaceDeclHandler();}], worked=yes, worked=no, worked=no)
+  if test $worked = yes; then
+    # New expat - expat-1.95.0 or later
+    have_expat_lib=1
+    have_expat=1
+    expat_libs="-lexpat"
+
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
+
 
 AC_CHECK_PROG(XML_CONFIG, xml-config, xml-config)
 
@@ -343,8 +370,6 @@ if test "x" = "y"; then
   AC_DEFINE(HAVE_LIBWWW_RDF_PARSER)
 fi
 
-# old:
-# AC_ARG_WITH(rdf-java-api, [  --with-rdf-java-api=JAR Use the Java RDF API in the given jar file [no]], java_rdf_jar="$withval", java_rdf_jar="no") 
 
 AC_ARG_WITH(java-sirpac-stanford-jar, [  --with-java-sirpac-stanford-jar=JAR Use the SiRPAC (Stanford version) jar file [no]], java_sirpac_stanford_jar="$withval", java_sirpac_stanford_jar="no") 
 
@@ -415,8 +440,19 @@ AC_DEFINE_UNQUOTED(JAVA_SAX_JAR, "$java_sax_jar")
 AC_DEFINE_UNQUOTED(JAVA_SAX_CLASS, "$java_sax_class")
 
 
+have_rapier=
+if test -r $srcdir/rapier.h -a -r $srcdir/rapier_parse.c; then
+  have_rapier=1;
+fi
+
+# Always have it
+have_repat=1
+
+
 seen_sirpac=0
-parsers_available=
+need_repat=0
+need_rapier=0
+rdf_parsers_available=
 for parser in $parser_modules; do
   uname=`echo $parser | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
   found=0
@@ -457,46 +493,51 @@ for parser in $parser_modules; do
     ;;
 
     rapier)
-      if test $have_expat_lib = 1; then
-        need_expat=1
-        found=1
-        AC_DEFINE(NEED_EXPAT)
-      elif test $have_expat_source = 1; then
-        need_expat=1
-        need_expat_source=1
-        found=1
-        AC_DEFINE(NEED_EXPAT)
-      elif test $have_libxml_lib = 1; then
-        need_libxml=1
-	found=1
-        AC_DEFINE(NEED_LIBXML)
-      elif test $have_libxml_source = 1; then
-        need_libxml=1
-        need_libxml_source=1
-        found=1
-        AC_DEFINE(NEED_LIBXML)
+      if test $have_rapier = 1 ; then
+	if test $have_expat_lib = 1; then
+	  need_expat=1
+	  found=1
+	  AC_DEFINE(NEED_EXPAT)
+	elif test $have_expat_source = 1; then
+	  need_expat=1
+	  need_expat_source=1
+	  found=1
+	  AC_DEFINE(NEED_EXPAT)
+	elif test $have_libxml_lib = 1; then
+	  need_libxml=1
+	  found=1
+	  AC_DEFINE(NEED_LIBXML)
+	elif test $have_libxml_source = 1; then
+	  need_libxml=1
+	  need_libxml_source=1
+	  found=1
+	  AC_DEFINE(NEED_LIBXML)
+	fi
+	need_rapier=1
       fi
         
       ;;
     repat)
-      if test $have_expat_lib = 1; then
-        need_expat=1
-        found=1
-        AC_DEFINE(NEED_EXPAT)
-      elif test $have_expat_source = 1; then
-        need_expat=1
-        need_expat_source=1
-        found=1
-        AC_DEFINE(NEED_EXPAT)
+      if test $have_repat = 1 ; then
+	if test $have_expat_lib = 1; then
+	  need_expat=1
+	  found=1
+	  AC_DEFINE(NEED_EXPAT)
+	elif test $have_expat_source = 1; then
+	  need_expat=1
+	  need_expat_source=1
+	  found=1
+	  AC_DEFINE(NEED_EXPAT)
+	fi
+	need_repat=1
       fi
-      need_repat=1
       ;;
     *)
       AC_MSG_ERROR(No such parser $parser)
   esac
 
   if test $found = 1; then
-    parsers_available="$parsers_available $original_parser"
+    rdf_parsers_available="$rdf_parsers_available $original_parser"
   fi
 
   # Only add sirpac parser module once even if many sirpac-* parsers are used
@@ -524,8 +565,6 @@ for parser in $parser_modules; do
     AC_DEFINE_UNQUOTED($n)
   fi
 done
-AC_MSG_CHECKING(RDF parsers available)
-AC_MSG_RESULT($parsers_available)
 
 
 
@@ -559,23 +598,25 @@ fi
 
 
 
-AC_MSG_CHECKING(XML parsers required)
-result=
+xml_parsers_available=
 if test $need_libxml = 1; then
   if test $need_libxml_source = 1; then
-    result="$result libxml(source)"
+    xml_parsers_available="$xml_parsers_available libxml(source)"
   else
-    result="$result libxml(system)"
+    xml_parsers_available="$xml_parsers_available libxml(system)"
   fi
 fi
 if test $need_expat = 1; then
   if test $need_expat_source = 1; then
-    result="$result expat(source)"
+    xml_parsers_available="$xml_parsers_available expat(source)"
   else
-    result="$result expat(system)"
+    if $libexpat = 1; then
+      xml_parsers_available="$xml_parsers_available expat(system libexpat)"
+    else
+      xml_parsers_available="$xml_parsers_available expat(system libxmlparse,libxmltok)"
+    fi
   fi
 fi
-AC_MSG_RESULT($result)
 
 
 
@@ -599,6 +640,7 @@ if test "x" = "y"; then
   AC_DEFINE(HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST)
 fi
 
+digest_modules_available=
 AC_MSG_CHECKING(whether to use openssl digests)
 if test "$enable_openssl_digests" = yes ; then
   AC_MSG_RESULT(yes)
@@ -623,6 +665,7 @@ if test "$enable_openssl_digests" = yes ; then
 	n=HAVE_OPENSSL_CRYPTO_${func}_DIGEST
 	AC_DEFINE_UNQUOTED($n)
         have_libcrypto=yes
+        digest_modules_available="$digest_modules_available $module(openssl)"
       else
 	AC_MSG_RESULT(no)
 	new_digest_modules="${new_digest_modules} $module"
@@ -661,6 +704,7 @@ for module in $digest_modules; do
 
     DIGEST_OBJS="$DIGEST_OBJS $base.o"
     DIGEST_SRCS="$DIGEST_SRCS $base.c"
+   digest_modules_available="$digest_modules_available $module"
   else
     AC_MSG_RESULT(no);
   fi
@@ -785,3 +829,11 @@ debian/rules
 redland.spec
 redland-config,
 [chmod +x redland-config debian/rules])
+
+AC_MSG_RESULT([
+Redland build summary:
+  XML parsers:           $xml_parsers_available
+  RDF parsers:           $rdf_parsers_available
+  Hash digests:          $digest_modules_available
+  Berkeley/Sleepycat DB:  $bdb_available
+])
