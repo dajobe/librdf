@@ -264,7 +264,11 @@ librdf_hash_gdbm_get_seq(void* context, librdf_hash_data *key, librdf_hash_seque
   } else
     LIBRDF_FATAL2(librdf_hash_gdbm_get_seq, "Unknown type %d", type);
   
-  
+  if(!gdbm_key.dptr) {
+    key->data=NULL;
+    return 1;
+  }
+
   key->data = LIBRDF_MALLOC(gdbm_data, gdbm_key.dsize);
   if(!key->data) {
     /* always allocated by GDBM using system malloc */
