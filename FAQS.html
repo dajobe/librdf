@@ -100,31 +100,43 @@ yourself relatively easily, following the existing scheme.</p>
 
 </li>
 
-<li>Does it support a query language?<br />
+<li>Does it support an RDF query language?<br />
 
-<p>Not yet, but if it did, it would probably be
-<a href="http://www.hpl.hp.com/semweb/rdql.html">RDQL RDF Data Query Language
-</a>
+<p>This is work in progress initially targetted at
+the functionality in the SquishQL /
+<a href="http://www.hpl.hp.com/semweb/rdql.htm">RDQL RDF Data Query Language</a>
+and will be delivered as a separate library 
+<a href="http://www.redland.opensource.ac.uk/rasqal/">Rasqal</a>
+which Redland will then use.
 </p>
 
 </li>
 
 <li>Does it run on MS Windows?<br />
 
-<p>I don't know since I don't use it.  I've had reports it builds under the
-<a href="http://cygwin.com/">Cygwin</a> environment relatively
-easily.  As far as portability and "unix"-isms in the code, they are
-flagged in comments and only related to file name handling, maybe in
-creating temporary files.</p>
+<p>Yes, from reports others have had success compiling Redland
+and Raptor for that system.  As of Raptor 1.1.0 and Redland 0.9.15
+the C++ compilation should be a lot easier which should help this.
+</p>
+
+<p>With respect to portability and "unix"-isms in the code, they are
+flagged in comments and only related to file name handling and maybe in
+creating temporary files.  Raptor's URI module handles some Win32
+file URI combinations that it knows of.</p>
+
+<p>Redland and Raptor build under the <a
+href="http://cygwin.com/">Cygwin</a> environment relatively easily.
+</p>
 </li>
 
 <li>Does it run on Apple OSX?<br />
-<p>Yes - mentioned above.  This was done with the
+<p>Yes.  The most recent version of this operation system has most of the
+basic requirements for using Redland and Raptor - an XML parser.  The
 <a href="http://fink.sourceforge.net/">Fink</a> environment
-to get some of the GNU toolchain (GNU make, others if you are
-building from CVS).  It probably can be done without Fink, since the
-external requirements are low - Berkeley/Sleepycat DB required and
-libxml2 recommended but not required.
+provides the GNU toolchain, GNU make, autotools and others needed
+if building from CVS.  It also provides Berkeley/Sleepcat DB
+needed for a persistent store.  Redland and Raptor can probably
+be used without Fink but with much reduced functionality.
 </p>
 </li>
 
@@ -143,6 +155,13 @@ syntaxes (more eventually) into RDF triples.  It is an entirely
 standalone and separate library from Redland, developed and released
 on a different schedule.</p>
 </li>
+
+<li>Rasqal?<br />
+<p>The <strong>R</strong>DF <strong>s</strong>yntax and <strong>q</strong>uery <strong>a</strong>pplication <strong>l</strong>ibrary for Redland,
+pronounced "rascal".  Blame <a href="http://pirates.movies.com/">Pirates of the Caribbean -- The Curse of The Black Pearl</em>.  Arrrr!
+</p>
+</li>
+
 
 </ol>
 
