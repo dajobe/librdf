@@ -49,10 +49,11 @@ typedef struct
 static rdf_hash_list_node* rdf_hash_list_find_node(rdf_hash_list_node* list, char *key, size_t key_len, rdf_hash_list_node** prev);
 static void rdf_free_hash_list_node(rdf_hash_list_node* node);
 
-static int rdf_hash_list_open(void* context, char *identifier, void *mode, void *options);
+static int rdf_hash_list_open(void* context, char *identifier, void *mode, rdf_hash* options);
 static int rdf_hash_list_close(void* context);
 static int rdf_hash_list_get(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigned int flags);
 static int rdf_hash_list_put(void* context, rdf_hash_data *key, rdf_hash_data *data, unsigned int flags);
+static int rdf_hash_list_exists(void* context, rdf_hash_data *key);
 static int rdf_hash_list_delete(void* context, rdf_hash_data *key);
 static int rdf_hash_list_get_seq(void* context, rdf_hash_data *key, unsigned int flags);
 static int rdf_hash_list_sync(void* context);
@@ -93,7 +94,7 @@ rdf_free_hash_list_node(rdf_hash_list_node* node)
 /* functions implementing hash api */
 
 static int
-rdf_hash_list_open(void* context, char *identifier, void *mode, void *options) 
+rdf_hash_list_open(void* context, char *identifier, void *mode, rdf_hash* options) 
 {
   /* nop */
   return 0;
@@ -197,6 +198,18 @@ rdf_hash_list_put(void* context, rdf_hash_data *key, rdf_hash_data *value, unsig
 
 
 static int
+rdf_hash_list_exists(void* context, rdf_hash_data *key) 
+{
+  rdf_hash_list_context* list_context=(rdf_hash_list_context*)context;
+  rdf_hash_list_node* node;
+
+  node=rdf_hash_list_find_node(list_context->first, (char*)key->data, key->size, NULL);
+  return (node != NULL);
+}
+
+
+
+static int
 rdf_hash_list_delete(void* context, rdf_hash_data *key) 
 {
   rdf_hash_list_context* list_context=(rdf_hash_list_context*)context;
@@ -274,6 +287,7 @@ rdf_hash_list_register_factory(rdf_hash_factory *factory)
   factory->close   = rdf_hash_list_close;
   factory->get     = rdf_hash_list_get;
   factory->put     = rdf_hash_list_put;
+  factory->exists  = rdf_hash_list_exists;
   factory->delete_key  = rdf_hash_list_delete;
   factory->get_seq = rdf_hash_list_get_seq;
   factory->sync    = rdf_hash_list_sync;
