@@ -525,7 +525,7 @@ main(int argc, char *argv[])
   librdf_init_world(NULL, NULL);
   
   fprintf(stderr, "%s: Creating storage\n", program);
-  storage=librdf_new_storage(NULL, NULL);
+  storage=librdf_new_storage(NULL, NULL, NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
