@@ -1,3 +1,17 @@
+2004-11-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_serializer.c (main): Update expected result length.
+
+	* rdf_serializer_raptor.c, rdf_serializer.c, rdf_query_rasqal.c,
+	rdf_query.c, rdf_parser.c, rdf_model.c, rdf_init.c: Casts for C++
+
+2004-10-25  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_rasqal.c (librdf_query_rasqal_execute):
+	Fix for rasqal bug in
+	rasqal_new_triples_source that refuses to run if query->sources is
+	NULL.  Remove this when rasqal 0.9.4 is out.
+
 2004-10-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_query.c (librdf_query_register_factory):
