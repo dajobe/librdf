@@ -272,3 +272,116 @@ librdf_stream_set_map(librdf_stream* stream,
   stream->map_context=map_context;
 }
 
+
+
+static int librdf_stream_from_node_iterator_end_of_stream(void* context);
+static librdf_statement* librdf_stream_from_node_iterator_next_statement(void* context);
+static void librdf_stream_from_node_iterator_finished(void* context);
+
+typedef struct {
+  librdf_iterator *iterator;
+  librdf_statement* statement;
+  unsigned int field;
+} librdf_stream_from_node_iterator_stream_context;
+
+
+
+/**
+ * librdf_new_stream_from_node_iterator - Constructor - create a new librdf_stream from an iterator of nodes
+ * @iterator: &librdf_iterator of &librdf_node objects
+ * @statement: &librdf_statement prototype with one NULL node space
+ * @field: node part of statement
+ *
+ * Creates a new &librdf_stream using the passed in &librdf_iterator
+ * which generates a series of &librdf_node objects.  The resulting
+ * nodes are then inserted into the given statement and returned.
+ * The field attribute indicates which statement node is being generated.
+ *
+ * Return value: a new &librdf_stream object or NULL on failure
+ **/
+librdf_stream*
+librdf_new_stream_from_node_iterator(librdf_iterator* iterator,
+                                     librdf_statement* statement,
+                                     unsigned int field)
+{
+  librdf_stream_from_node_iterator_stream_context *scontext;
+  librdf_stream *stream;
+
+  scontext=(librdf_stream_from_node_iterator_stream_context*)LIBRDF_CALLOC(librdf_stream_from_node_iterator_stream_context, 1, sizeof(librdf_stream_from_node_iterator_stream_context));
+  if(!scontext)
+    return NULL;
+
+  scontext->iterator=iterator;
+  scontext->statement=statement;
+  scontext->field=field;
+  
+  stream=librdf_new_stream((void*)scontext,
+                           &librdf_stream_from_node_iterator_end_of_stream,
+                           &librdf_stream_from_node_iterator_next_statement,
+                           &librdf_stream_from_node_iterator_finished);
+  if(!stream) {
+    librdf_stream_from_node_iterator_finished((void*)scontext);
+    return NULL;
+  }
+  
+  return stream;  
+}
+
+
+static int
+librdf_stream_from_node_iterator_end_of_stream(void* context)
+{
+  librdf_stream_from_node_iterator_stream_context* scontext=(librdf_stream_from_node_iterator_stream_context*)context;
+
+  return !librdf_iterator_have_elements(scontext->iterator);
+}
+
+
+static librdf_statement*
+librdf_stream_from_node_iterator_next_statement(void* context)
+{
+  librdf_stream_from_node_iterator_stream_context* scontext=(librdf_stream_from_node_iterator_stream_context*)context;
+  librdf_node* node;
+  librdf_statement* statement;
+  
+  if(!(node=librdf_iterator_get_next(scontext->iterator)))
+    return NULL;
+
+  statement=librdf_new_statement_from_statement(scontext->statement);
+  if(!statement) {
+    librdf_free_node(node);
+    return NULL;
+  }
+
+  switch(scontext->field) {
+    case LIBRDF_STATEMENT_SUBJECT:
+      librdf_statement_set_subject(statement, node);
+      break;
+    case LIBRDF_STATEMENT_PREDICATE:
+      librdf_statement_set_predicate(statement, node);
+      break;
+    case LIBRDF_STATEMENT_OBJECT:
+      librdf_statement_set_object(statement, node);
+      break;
+    default:
+      LIBRDF_FATAL2(librdf_stream_from_node_iterator_next_statement,
+                    "Illegal statement field %d seen\n", scontext->field);
+
+  }
+
+  return statement;
+}
+
+
+static void
+librdf_stream_from_node_iterator_finished(void* context)
+{
+  librdf_stream_from_node_iterator_stream_context* scontext=(librdf_stream_from_node_iterator_stream_context*)context;
+  
+  if(scontext->iterator)
+    librdf_free_iterator(scontext->iterator);
+
+  LIBRDF_FREE(librdf_stream_from_node_iterator_stream_context, scontext);
+}
+
+
