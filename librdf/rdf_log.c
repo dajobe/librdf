@@ -30,6 +30,7 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #ifdef WITH_THREADS
 #include <pthread.h>
 #endif
@@ -92,17 +93,20 @@ librdf_log_simple(librdf_world* world, int code,
         return;
 
     } else {
+      va_list null_valist;
+      memset(&null_valist, '\0', sizeof(va_list));
+
       switch(level) {
         case LIBRDF_LOG_ERROR:
           if(world->error_handler) {
-            if(world->error_handler(world->error_user_data, message, NULL))
+            if(world->error_handler(world->error_user_data, message, null_valist))
                return;
           }
           break;
 
         case LIBRDF_LOG_WARN:
           if(world->warning_handler) {
-            if(world->warning_handler(world->warning_user_data, message, NULL))
+            if(world->warning_handler(world->warning_user_data, message, null_valist))
               return;
           }
           break;
