@@ -1,17 +1,19 @@
-/* CSS from many places, styled after 2002 ILRT style */
+/* CSS from many places, styled after 2002/2003 ILRT style */
 
 body {
-  margin: 0em 1em 1em 1em;
+  margin: 0em;
   font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
   background: #ffffff;
   color: black;
-  font-size: 12px;
 }
 
 /* NS 4 needs this */
-th, td, p, ol, ul, li, dl, dt, blockquote { 
+th, td, p, li, dl, dt, blockquote { 
   font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
+  font-size: 80%;
 }
+
+ol,ul { font-size: 100% }
 
 h1, h2, h3, h4 { text-align: left; }
 
@@ -22,8 +24,14 @@ h4 { font-weight: bold; font-size: 100%; font-family: Verdana, Arial, Helvetica,
 
 
 pre {
-  margin-left: 2em
+  margin: 1em 4em 1em 4em;
+  background-color: #eee;
+  padding: 0.5em;
+  border-color: #006;
+  border-width: 1px;
+  border-style: dotted;
 }
+
 
 /* NS 4 needs this */
 pre, code, tt {
@@ -32,50 +40,55 @@ pre, code, tt {
 }
 
 @media screen {  /* hide from IE3 */
-  a:hover { color: red; background: #ffffff; } 
-  h2.catheader a:hover { color: red; background: #0b479d; } 
-}
-
-.category {
-  margin: 0em 0.5em 0.5em 0em;
-}
-
-.catheader {
-  background: #0b479d;
-  color: #ffffff;
-
-  margin: 1px;
-  font-size: 80%;
-  padding: 1px;
-}
-
-h2.catheader { color: white; background: #0b479d; }
-h2.catheader a { color: white; background: #0b479d; }
-
-
-.catitems {
-  font-size: 75%;
-  margin-left: 6pt;
-  padding: 0px;
+  a { color: #003399; font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif }
+  a:hover { color: #3F7AF0; font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif }
+  a:visited { color: #4B0360; font-family: Verdana, Arial, Helvetica, Geneva, SunSans-Regular, sans-serif }
+  a:visited:hover {color: #3F7AF0 }
 }
 
 .logo {
-  font-size: 75%;
+  font-size: 80%;
+}
+
+.headingbox {
+  background-color: #286097;
+  color: white;
+  margin: 0em 0em 1em 0em;
+  padding: 0em 1em 0em 1em;
+  border: bottom solid black 1px;
 }
 
 .heading {
-  margin: 0px;
-}
-
-h1.heading {
-  margin: 0px;
+  background-color: #286097;
+  color: white;
+  margin: 0em;
 }
 
 .author {
-  margin: 0px;
+  background-color: #286097;
+  color: white;
 }
 
 a.author:link { text-decoration: none; }
+
+
+.category {
+  margin: 0em 0.5em 0.5em 1em;
+}
+
+.catheader {
+  color: #555;
+
+  margin: 1px;
+  font-size: 140%;
+  padding: 1px;
+}
+
+.catitems {
+  font-size: 80%;
+  margin-left: 1em;
+  padding: 0px;
+}
 
 .footer {
   font-size: 75%;
@@ -83,3 +96,19 @@ a.author:link { text-decoration: none; }
   color : #808080;
 }
 
+td.heading small a {
+  color: white;
+  text-decoration: none;
+}
+
+td.heading small a {
+  color: white;
+  text-decoration: none;
+}
+
+div.logo a {
+  color: white;
+  text-decoration: none;
+}
+
+  
