@@ -721,6 +721,8 @@ if test $need_expat = 1; then
     CFLAGS="-I\$(top_srcdir)/expat/xmlparse $CFLAGS"
     XML_OBJS="\$(top_builddir)/expat/xmlparse/xmlparse.o \$(top_builddir)/expat/xmlparse/hashtable.o \$(top_builddir)/expat/xmltok/xmlrole.o \$(top_builddir)/expat/xmltok/xmltok.o"
     REPAT_FLAGS="$REPAT_FLAGS -I\$(top_srcdir)/expat/xmlparse"
+
+    AC_DEFINE(NEED_EXPAT_SOURCE)
     # FIXME - when expat in source tree is updated to new (sourceforge)
     # version then need to remove these two lines:
     AC_DEFINE(RDFPARSE_INCLUDE_XMLPARSE)
