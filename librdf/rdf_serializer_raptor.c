@@ -81,17 +81,13 @@ librdf_serializer_print_statement_as_ntriple(librdf_statement * statement,
 
   switch(librdf_node_get_type(object)) {
     case LIBRDF_NODE_TYPE_LITERAL:
-      if(!librdf_node_get_literal_value_is_wf_xml(object)) {
-        fputc('"', stream);
-        raptor_print_ntriples_string(stream, librdf_node_get_literal_value(object), '"');
-        fputc('"', stream);
-      } else {
-        fputs("xml\"", stream);
-        raptor_print_ntriples_string(stream, librdf_node_get_literal_value(object), '"');
-        fputc('"', stream);
-      }
+      fputc('"', stream);
+      raptor_print_ntriples_string(stream, librdf_node_get_literal_value(object), '"');
+      fputc('"', stream);
       if(librdf_node_get_literal_value_language(object))
-        fprintf(stream, "-%s", librdf_node_get_literal_value_language(object));
+        fprintf(stream, "@%s", librdf_node_get_literal_value_language(object));
+      if(librdf_node_get_literal_value_is_wf_xml(object))
+        fputs("^^<http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral>", stream);
       break;
     case LIBRDF_NODE_TYPE_BLANK:
       fprintf(stream, "_:%s", librdf_node_get_blank_identifier(object));
@@ -117,10 +113,10 @@ librdf_serializer_raptor_serialize_model(void *context,
   if(!stream)
     return 1;
   while(!librdf_stream_end(stream)) {
-    librdf_statement *statement=librdf_stream_next(stream);
+    librdf_statement *statement=librdf_stream_get_object(stream);
     librdf_serializer_print_statement_as_ntriple(statement, handle);
     fputc('\n', handle);
-    librdf_free_statement(statement);
+    librdf_stream_next(stream);
   }
   librdf_free_stream(stream);
   return 0;
