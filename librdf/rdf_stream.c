@@ -519,6 +519,27 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
   }
 }
 
+
+librdf_statement*
+librdf_stream_statement_find_map(librdf_stream *stream,
+                                 void* context, librdf_statement* statement) 
+{
+  librdf_statement* partial_statement=(librdf_statement*)context;
+
+  /* any statement matches when no partial statement is given */
+  if(!partial_statement)
+    return statement;
+  
+  if (librdf_statement_match(statement, partial_statement)) {
+    return statement;
+  }
+
+  /* not suitable */
+  return NULL;
+}
+
+
+
 #endif
 
 
