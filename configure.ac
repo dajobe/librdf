@@ -323,7 +323,7 @@ AC_SUBST(RUBY_VERSION)
 
 with_ecma_cla=
 dnl Pick an ECMA CLI implementation
-AC_ARG_WITH(ecma-cli, [  --with-ecma-cli=SYSTEM  Enable ECMA CLI interface - mono, dotgnu (default no)], ecma_cli_name="$withval", ecma_cli_name="no")
+AC_ARG_WITH(ecma-cli, [  --with-ecma-cli=SYSTEM  Enable ECMA CLI interface - mono, dotgnu (default=no)], ecma_cli_name="$withval", ecma_cli_name="no")
 
 
 AC_MSG_CHECKING(ECMA CLI implementations available)
@@ -375,7 +375,7 @@ fi
 
 
 
-AC_ARG_WITH(jdk, [  --with-jdk=DIR          Java JDK location (default auto)], jdk="$withval", jdk="")
+AC_ARG_WITH(jdk, [  --with-jdk=DIR          Java JDK location (default=auto)], jdk="$withval", jdk="")
 AC_MSG_CHECKING(Java JDK includes)
 if test "X$JAVA_VERSION" != X; then
   if test "X$jdk" = X ; then
@@ -473,9 +473,9 @@ persistent_store=no
 
 
 dnl Berkeley DB
-AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area (default /usr)], bdb_prefix="$withval", bdb_prefix="none") 
-AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (default /usr/lib)], bdb_lib_dir="$withval", bdb_lib_dir="none") 
-AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory (default /usr/include)], bdb_include_dir="$withval", bdb_include_dir="none") 
+AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area (default=/usr)], bdb_prefix="$withval", bdb_prefix="none") 
+AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (default=/usr/lib)], bdb_lib_dir="$withval", bdb_lib_dir="none") 
+AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory (default=/usr/include)], bdb_include_dir="$withval", bdb_include_dir="none") 
 AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Berkeley DB library name (auto)], bdb_dbname="$withval", bdb_dbname="none")
 
 bdb_version=unknown
@@ -688,7 +688,7 @@ if test $ac_cv_func_getopt = no -a $ac_cv_func_getopt_long = no; then
 fi
 
 dnl Checks for URI resolvers
-AC_ARG_WITH(libwww, [  --with-libwww           Use libwww (default auto)], enable_libwww="$withval", enable_libwww="no") 
+AC_ARG_WITH(libwww, [  --with-libwww           Use libwww (default=auto)], enable_libwww="$withval", enable_libwww="no") 
 
 have_libwww=
 AC_MSG_CHECKING(whether have working libwww)
@@ -714,7 +714,7 @@ LIBS="$LIBRDF_LIBS"
 dnl Checks for XML parsers
 
 # At present this is for passing on to raptor and not used here
-AC_ARG_WITH(xml-parser, [  --with-xml-parser=NAME  Use XML parser - expat, libxml (default libxml)], xml_parser="$withval", xml_parser="libxml") 
+AC_ARG_WITH(xml-parser, [  --with-xml-parser=NAME  Use XML parser - expat, libxml (default=libxml)], xml_parser="$withval", xml_parser="libxml") 
 
 
 
@@ -725,7 +725,7 @@ rdf_parsers_available=
 
 # raptor is REQUIRED despite the checking here
 AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
-AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default auto)], with_raptor="$withval", with_raptor="auto")
+AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default=auto)], with_raptor="$withval", with_raptor="auto")
 
 RAPTOR_VERSION=`$RAPTOR_CONFIG --version 2>/dev/null`
 RAPTOR_MIN_VERSION=1.1.0
@@ -761,7 +761,7 @@ fi
 AC_SUBST(with_raptor)
 
 AC_MSG_CHECKING(RDF parsers required)
-AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers (default raptor)], parser_modules="$enableval") 
+AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers (default=raptor)], parser_modules="$enableval") 
 if test "X$parser_modules" = Xno -o "X$parser_modules" = X; then
   parser_modules=
   AC_MSG_RESULT($parser_modules)
@@ -882,7 +882,7 @@ AC_MSG_RESULT($digest_modules)
 DIGEST_OBJS=
 DIGEST_SRCS=
 
-AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests (default yes)], enable_openssl_digests="$withval", enable_openssl_digests="yes") 
+AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests (default=yes)], enable_openssl_digests="$withval", enable_openssl_digests="yes") 
 
 # This is needed because autoheader can't work out which computed
 # symbols must be pulled from acconfig.h into config.h.in
@@ -934,7 +934,7 @@ else
 fi
 
 
-AC_ARG_WITH(threestore, [  --with-threestore(=CONFIG|yes|no)  Location of 3store-config (default auto)], tstore_config="$withval", tstore_config="")
+AC_ARG_WITH(threestore, [  --with-threestore(=CONFIG|yes|no)  Location of 3store-config (default=auto)], tstore_config="$withval", tstore_config="")
 if test "X$tstore_config" != "Xno"; then
   if test "X$tstore_config" != "Xyes" ; then
     TSTORE_CONFIG=$tstore_config
@@ -962,7 +962,7 @@ else
 fi
 
 
-AC_ARG_WITH(mysql, [  --with-mysql(=CONFIG|yes|no) Location of MySQL 4 mysql_config (default auto)], mysql_config="$withval", mysql_config="")
+AC_ARG_WITH(mysql, [  --with-mysql(=CONFIG|yes|no) Location of MySQL 4 mysql_config (default=auto)], mysql_config="$withval", mysql_config="")
 if test "X$mysql_config" != "Xno"; then
   if test "X$mysql_config" != "Xyes" ; then
     MYSQL_CONFIG=$mysql_config
@@ -1009,7 +1009,7 @@ LIBS="$LIBRDF_LIBS"
 
 dnl Check for use of threads
 
-AC_ARG_WITH(threads, [  --with-threads          With POSIX thread support (default no)], with_threads="yes", with_threads="no")
+AC_ARG_WITH(threads, [  --with-threads          With POSIX thread support (default=no)], with_threads="yes", with_threads="no")
 
 AC_CHECK_HEADERS(pthread.h)
 
@@ -1101,7 +1101,7 @@ AC_SUBST(SD_POST)
 CFLAGS="-DLIBRDF_INTERNAL=1 $CFLAGS"
 MEM=
 MEM_LIBS=
-AC_ARG_WITH(dmalloc, [  --with-dmalloc          Use dmalloc debugging library (default auto)], use_dmalloc="$withval", use_dmalloc="auto") 
+AC_ARG_WITH(dmalloc, [  --with-dmalloc          Use dmalloc debugging library (default=auto)], use_dmalloc="$withval", use_dmalloc="auto") 
 AC_MSG_CHECKING(using dmalloc library)
 if test "$USE_MAINTAINER_MODE" = yes; then
   if test "$ac_cv_header_dmalloc_h" = yes; then
