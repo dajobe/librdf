@@ -109,6 +109,7 @@ static int librdf_hash_memory_destroy(void* context);
 static int librdf_hash_memory_open(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 static int librdf_hash_memory_close(void* context);
 static int librdf_hash_memory_clone(librdf_hash* new_hash, void *new_context, char *new_identifier, void* old_context);
+static int librdf_hash_memory_values_count(void *context);
 static int librdf_hash_memory_put(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 static int librdf_hash_memory_exists(void* context, librdf_hash_datum *key, librdf_hash_datum *value);
 static int librdf_hash_memory_delete_key(void* context, librdf_hash_datum *key);
@@ -409,6 +410,21 @@ librdf_hash_memory_clone(librdf_hash *hash, void* context, char *new_identifer,
   librdf_free_hash_datum(key);
 
   return status;
+}
+
+
+/**
+ * librdf_hash_memory_values_count - Get the number of values in the hash
+ * @context: memory hash cursor context
+ * 
+ * Return value: number of values in the hash or <0 on failure
+ **/
+static int
+librdf_hash_memory_values_count(void *context) 
+{
+  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
+
+  return hash->values;
 }
 
 
@@ -972,6 +988,8 @@ librdf_hash_memory_register_factory(librdf_hash_factory *factory)
   factory->open    = librdf_hash_memory_open;
   factory->close   = librdf_hash_memory_close;
   factory->clone   = librdf_hash_memory_clone;
+
+  factory->values_count = librdf_hash_memory_values_count;
 
   factory->put     = librdf_hash_memory_put;
   factory->exists  = librdf_hash_memory_exists;
