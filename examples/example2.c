@@ -33,13 +33,14 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_storage_factory* sfactory;
   librdf_storage* storage;
   librdf_model* model;
   char *program=argv[0];
   librdf_uri *uri;
   char buffer[LINE_BUFFER_LEN];
   FILE *fh;
+  FILE *output=stdout;
+  
   int line;
 
   if(argc !=2) {
@@ -56,13 +57,7 @@ main(int argc, char *argv[])
     return(1);
   }
 
-  sfactory=librdf_get_storage_factory(NULL);
-  if(!sfactory) {
-    fprintf(stderr, "%s: Failed to get any storage factory\n", program);
-    return(1);
-  }
-
-  storage=librdf_new_storage(sfactory, NULL);
+  storage=librdf_new_storage(NULL, NULL);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
@@ -84,7 +79,6 @@ main(int argc, char *argv[])
 
   for(line=0; !feof(fh); line++) {
     char *p, *s, *o, *e, *ptr;
-    int object_is_literal;
     librdf_statement* statement=NULL;
 
 
@@ -122,30 +116,10 @@ main(int argc, char *argv[])
     /* zap end */
     *e='\0';
 
-    /* FIXME: I have no idea if the object points to a literal or a resource */
-  
-    object_is_literal=1; /* assume the worst */
+    /* trim trailing spaces at end of object */
+    for(ptr=e-1; isspace(*ptr); ptr--)
+      *ptr='\0';
     
-    /* Try to guess if resource / literal from string by assuming it 
-     * is a URL if it matches ^[isalnum()]+:[^isblank()]+$
-     * This will be fooled by literals of form 'thing:non-blank-thing'
-     */
-    for(ptr=o; *ptr; ptr++) {
-      /* Find first non alphanumeric */
-      if(!isalnum(*ptr)) {
-	/* Better be a ':' */
-	if(*ptr == ':') {
-	  /* check rest of string has no spaces */
-	  for(;*ptr; ptr++)
-	    if(isspace(*ptr))
-	      break;
-	  /* reached end, thus probably not a literal */
-	  if(!*ptr)
-	    object_is_literal=0;
-	  break;
-	}
-      }
-    }
 
     /* got all statement parts now */
     statement=librdf_new_statement();
@@ -158,13 +132,12 @@ main(int argc, char *argv[])
     librdf_statement_set_predicate(statement,
                                    librdf_new_node_from_uri_string(p));
 
-    if(object_is_literal) {
+    if(librdf_heuristic_object_is_literal(o))
       librdf_statement_set_object(statement,
                                   librdf_new_node_from_literal(o, NULL, 0, 0));
-    } else {
+    else
       librdf_statement_set_object(statement, 
                                   librdf_new_node_from_uri_string(o));
-    }
 
 
     librdf_model_add_statement(model, statement);
@@ -172,8 +145,8 @@ main(int argc, char *argv[])
   fclose(fh);
 
 
-  fprintf(stderr, "%s: Resulting model is:\n", program);
-  librdf_model_print(model, stderr);
+  fprintf(output, "%s: Resulting model is:\n", program);
+  librdf_model_print(model, output);
 
   
   librdf_free_model(model);
@@ -184,7 +157,7 @@ main(int argc, char *argv[])
 
   librdf_destroy_world();
 
-#ifdef LIBRDF_DEBUG
+#ifdef LIBRDF_MEMORY_DEBUG
   librdf_memory_report(stderr);
 #endif
 	
