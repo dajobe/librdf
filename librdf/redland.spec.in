@@ -120,7 +120,7 @@ cd ..
 %files perl
 %defattr(-, bin, bin)
 
-%{prefix}/lib/perl5/site_perl/*/*/auto/redland/*
+%{prefix}/lib/perl5/site_perl/*/*/auto/Redland
 %{prefix}/lib/perl5/site_perl/*/*/Redland.pm
 %{prefix}/lib/perl5/site_perl/*/*/RDF
 %{prefix}/lib/perl5/site_perl/*/*/RDF.pm
