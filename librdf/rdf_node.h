@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_node.h - RDF Node definition
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -22,42 +22,41 @@
 #define LIBRDF_NODE_H
 
 #include <rdf_uri.h>
-#include <rdf_digest.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 /* Node types */
 typedef enum {
-	LIBRDF_NODE_TYPE_RESOURCE, /* A resource (& property) - has a URI */
-	LIBRDF_NODE_TYPE_LITERAL   /* A literal - an XML string + language */
+  LIBRDF_NODE_TYPE_RESOURCE, /* A resource (& property) - has a URI */
+  LIBRDF_NODE_TYPE_LITERAL   /* A literal - an XML string + language */
 } librdf_node_type;
 
 
-typedef struct 
+struct librdf_node_s
 {
-	librdf_node_type type;
-	union
-	{
-		union
-		{
-			/* resources have URIs */
-			librdf_uri *uri;
-		} resource;
-		struct
-		{
-			/* literals have string values ... */
-			char *string;
-			int string_len;
-			/* .. and optional XML Language */
-			char *xml_language;
-			/* and may be "Well Formed XML" */
-			int is_wf_xml;
-		} literal;
-	} value;
-}
-librdf_node;
+  librdf_node_type type;
+  union 
+  {
+    union
+    {
+      /* resources have URIs */
+      librdf_uri *uri;
+    } resource;
+    struct
+    {
+      /* literals have string values ... */
+      char *string;
+      int string_len;
+      /* .. and optional XML Language */
+      char *xml_language;
+      /* and may be "Well Formed XML" */
+      int is_wf_xml;
+    } literal;
+  } value;
+};
 
 
 /* class methods */

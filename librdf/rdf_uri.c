@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_uri.c - RDF URI Implementation
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -17,12 +17,12 @@
  */
 
 
-#include <config.h>
+#include <rdf_config.h>
 
 #include <stdio.h>
 
 #define LIBRDF_INTERNAL 1
-#include <rdf_config.h>
+#include <librdf.h>
 
 /* This define tells librdf_uri.h not to include this file again */
 #define LIBRDF_INSIDE_LIBRDF_URI_C
@@ -37,7 +37,7 @@ static librdf_digest_factory* librdf_uri_digest_factory;
 void
 librdf_init_uri(librdf_digest_factory* factory) 
 {
-	librdf_uri_digest_factory=factory;
+  librdf_uri_digest_factory=factory;
 }
 
 
@@ -46,22 +46,23 @@ librdf_init_uri(librdf_digest_factory* factory)
 /* constructors */
 INLINE librdf_uri*
 librdf_new_uri (char *uri_string) {
-	char *new_uri=(char*)LIBRDF_MALLOC(librdf_uri, strlen(uri_string)+1);
-	if(!new_uri)
-		return 0;
-
-	strcpy(new_uri, uri_string);
-	return (librdf_uri*)new_uri;
+  char *new_uri=(char*)LIBRDF_MALLOC(librdf_uri, strlen(uri_string)+1);
+  if(!new_uri)
+    return 0;
+  
+  strcpy(new_uri, uri_string);
+  return (librdf_uri*)new_uri;
 }
+
 
 INLINE librdf_uri*
 librdf_new_uri_from_uri (librdf_uri* old_uri) {
-	char *new_uri=(char*)LIBRDF_MALLOC(librdf_uri, strlen(old_uri)+1);
-	if(!new_uri)
-		return 0;
-	
-	strcpy(new_uri, old_uri);
-	return (librdf_uri*)new_uri;
+  char *new_uri=(char*)LIBRDF_MALLOC(librdf_uri, strlen(old_uri)+1);
+  if(!new_uri)
+    return 0;
+  
+  strcpy(new_uri, old_uri);
+  return (librdf_uri*)new_uri;
 }
 
 
@@ -69,7 +70,7 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 INLINE void
 librdf_free_uri (librdf_uri* uri) 
 {
-	LIBRDF_FREE(librdf_uri, uri);
+  LIBRDF_FREE(librdf_uri, uri);
 }
 
 
@@ -79,30 +80,31 @@ librdf_free_uri (librdf_uri* uri)
 INLINE char*
 librdf_uri_as_string (librdf_uri *uri) 
 {
-	return (char*)uri;
+  return (char*)uri;
 }
+
 
 librdf_digest*
 librdf_uri_get_digest (librdf_uri* uri) 
 {
-	librdf_digest* d;
-
-	d=librdf_new_digest(librdf_uri_digest_factory);
-	if(!d)
-		return NULL;
-	
-	librdf_digest_init(d);
-	librdf_digest_update(d, (unsigned char*)uri, strlen(uri));
-	librdf_digest_final(d);
+  librdf_digest* d;
   
-	return d;
+  d=librdf_new_digest(librdf_uri_digest_factory);
+  if(!d)
+    return NULL;
+  
+  librdf_digest_init(d);
+  librdf_digest_update(d, (unsigned char*)uri, strlen(uri));
+  librdf_digest_final(d);
+  
+  return d;
 }
 
 
 void
 librdf_uri_print (librdf_uri* uri, FILE *fh) 
 {
-	fputs(uri, fh);
+  fputs(uri, fh);
 }
 
 
@@ -110,12 +112,20 @@ librdf_uri_print (librdf_uri* uri, FILE *fh)
 char*
 librdf_uri_to_string (librdf_uri* uri)
 {
-	char *s=(char*)LIBRDF_MALLOC(cstring, strlen(uri)+1);
-	if(!s)
-		return NULL;
-	strcpy(s, uri);
-	return s;
+  char *s=(char*)LIBRDF_MALLOC(cstring, strlen(uri)+1);
+  if(!s)
+    return NULL;
+
+  strcpy(s, uri);
+  return s;
 }
+
+
+int
+librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri) {
+  return !strcmp((char*)first_uri, (char*)second_uri);
+}
+
 
 
 #endif
