@@ -376,6 +376,8 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
     return NULL;
   }
 
+  new_storage->usage=1;
+  
   return new_storage;
 }
 
@@ -431,6 +433,8 @@ librdf_new_storage_from_factory (librdf_world *world,
     return NULL;
   }
   
+  storage->usage=1;
+  
   return storage;
 }
 
@@ -445,12 +449,28 @@ librdf_free_storage (librdf_storage* storage)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(storage, librdf_storage);
 
+  if(--storage->usage)
+    return;
+
   if(storage->factory)
     storage->factory->terminate(storage);
 
   if(storage->context)
     LIBRDF_FREE(librdf_storage_context, storage->context);
   LIBRDF_FREE(librdf_storage, storage);
+}
+
+
+void
+librdf_storage_add_reference(librdf_storage *storage)
+{
+  storage->usage++;
+}
+
+void
+librdf_storage_remove_reference(librdf_storage *storage)
+{
+  storage->usage--;
 }
 
 
@@ -677,6 +697,7 @@ librdf_storage_find_statements(librdf_storage* storage,
 
 
 typedef struct {
+  librdf_storage *storage;
   librdf_stream *stream;
   librdf_statement *partial_statement;
   librdf_statement_part want;
@@ -764,6 +785,9 @@ librdf_storage_stream_to_node_iterator_finished(void* iterator)
   if(context->stream)
     librdf_free_stream(context->stream);
 
+  if(context->storage)
+    librdf_storage_remove_reference(context->storage);
+  
   LIBRDF_FREE(librdf_storage_stream_to_node_iterator_context, context);
 }
 
@@ -831,6 +855,9 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   context->partial_statement=partial_statement;
   context->stream=stream;
   context->want=want;
+
+  context->storage=storage;
+  librdf_storage_add_reference(context->storage);
 
   iterator=librdf_new_iterator(storage->world,
                                (void*)context,
