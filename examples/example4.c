@@ -448,8 +448,7 @@ main(int argc, char *argv[])
       } /* end inner switch */
       
       /* also frees the nodes */
-      if(type != CMD_ADD && type != CMD_QUERY)
-        librdf_free_statement(partial_statement);
+      librdf_free_statement(partial_statement);
       break;
       
     case CMD_SOURCES:
@@ -506,7 +505,6 @@ main(int argc, char *argv[])
         librdf_node_print(node, stdout);
         fputc('\n', stdout);
         
-        librdf_free_node(node);
         count++;
         librdf_iterator_next(iterator);
       }
