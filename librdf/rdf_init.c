@@ -152,6 +152,7 @@ librdf_world_open(librdf_world *world)
   librdf_init_hash(world);
 
   librdf_init_uri(world);
+  librdf_init_node(world);
 
   librdf_init_concepts(world);
 
@@ -272,22 +273,6 @@ librdf_world_set_digest(librdf_world* world, const char *name) {
 }
 
 
-/**
- * librdf_world_set_uris_hash - Set the hash object to use for URI class
- * @world: redland world object
- * @uris_hash: librdf_hash* hash
- *
- * If a uris_hash is given, that is passed to the URIs class
- * initialisation and used to store hashes rather than the default
- * one, currently an in memory hash.  See librdf_init_uri() for details.
- */
-void 
-librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash)
-{
-  world->uris_hash=uris_hash;
-}
-
-
 const char *
 librdf_world_get_feature(librdf_world* world, librdf_uri *feature) 
 {
@@ -377,7 +362,7 @@ static librdf_world* RDF_World;
 /**
  * librdf_init_world - Initialise the library (DEPRECATED)
  * @digest_factory_name: Name of digest factory to use
- * @uris_hash: Hash to store URIs in
+ * @not_used2: Not used
  *
  * Use librdf_new_world and librdf_world_open on librdf_world object
  * 
@@ -385,14 +370,13 @@ static librdf_world* RDF_World;
  * librdf_world_set_uris_hash for documentation on arguments.
  **/
 void
-librdf_init_world(char *digest_factory_name, librdf_hash* uris_hash)
+librdf_init_world(char *digest_factory_name, void* not_used2)
 {
   RDF_World=librdf_new_world();
   if(!RDF_World)
     return;
   if(digest_factory_name)
     librdf_world_set_digest(RDF_World, digest_factory_name);
-  librdf_world_set_uris_hash(RDF_World, uris_hash);
   librdf_world_open(RDF_World);
 }
 
