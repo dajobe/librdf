@@ -20,6 +20,7 @@
 
 #include <rdf_node.h>
 #include <rdf_uri.h>
+#include <rdf_assertion_context.h>
 
 typedef struct 
 {
@@ -27,6 +28,8 @@ typedef struct
   rdf_node* predicate;
   rdf_node* object;
   rdf_uri*  provenance; /* ha ha */
+  int       count;
+  rdf_assertion_context *context;
 }
 rdf_statement;
 
@@ -53,6 +56,9 @@ int rdf_statement_set_predicate(rdf_statement *statement, rdf_node *predicate);
 
 rdf_node* rdf_statement_get_object(rdf_statement *statement);
 int rdf_statement_set_object(rdf_statement *statement, rdf_node *object);
+
+int rdf_statement_add_assertion_context(rdf_statement *statement, rdf_assertion_context *context);
+rdf_assertion_context* rdf_statement_remove_assertion_context(rdf_statement *statement);
 
 /* convert to a string */
 char *rdf_statement_to_string(rdf_statement *statement);

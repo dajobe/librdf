@@ -57,6 +57,7 @@ free_rdf_statement(rdf_statement* statement)
     free_rdf_node(statement->predicate);
   if(statement->object)
     free_rdf_node(statement->object);
+  /* context NOT freed, it is not owned by this object */
   RDF_FREE(rdf_statement, statement);
 }
 
@@ -120,6 +121,21 @@ rdf_statement_set_object(rdf_statement *statement, rdf_node *node)
   return (statement->object=new_rdf_node_from_node(node)) != NULL;
   */
   statement->object=node;
+  return 0;
+}
+
+
+rdf_assertion_context*
+rdf_statement_remove_assertion_context(rdf_statement *statement) 
+{
+  return statement->context;
+}
+
+
+int
+rdf_statement_add_assertion_context(rdf_statement *statement, rdf_assertion_context *context)
+{
+  statement->context=context;
   return 0;
 }
 
