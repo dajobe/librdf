@@ -246,7 +246,8 @@ be compiled with:</p>
 <pre>
    make examples
 </pre>
-<p>once the library has been configured and built.</p>
+<p>once the library has been configured and built.  These are
+compiled in the <tt>examples</tt> sub-directory.</p>
 
 <p>If no Berkeley DB was found by configure, some of the examples will fail
 since there is no on-disk storage system available.  To change them
@@ -307,35 +308,23 @@ removal of statements.  To see a usage message type:</p>
 parser) into a BerkeleyDB store, print it, do some queries, you could
 do the following:</p>
 <pre>
-  linux$ example4 test parse http://www.ilrt.bristol.ac.uk/people/cmdjb/webwho.xrdf sirpac-w3c
-  example4: Parsing URI http://www.ilrt.bristol.ac.uk/people/cmdjb/webwho.xrdf
-  linux$ example4 test print
-  [[
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/img], [http://www.ilrt.bris.ac.uk/people/cmdjb/face.png]}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/mbox], [mailto:dave.beckett@bristol.ac.uk]}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/name], "Dave Beckett"}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/friend], [genid:danbri]}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/friend], [genid:emiller]}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/homepage], [http://purl.org/net/dajobe/]}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/depiction], [http://www.ilrt.bris.ac.uk/people/cmdjb/face.png]}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/knowsWell], [genid:martinh]}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/worksWith], [genid:danbri]}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/worksWith], [genid:libby]}
-    {[genid:dajobe], [http://xmlns.com/foaf/0.1/workplaceHomePage], [http://www.ilrt.bris.ac.uk/]}
-    {[genid:martinh], [http://xmlns.com/foaf/0.1/mbox], [mailto:martinh@gnu.org]}
-    {[genid:martinh], [http://xmlns.com/foaf/0.1/name], "Martin Hamilton"}
-    {[genid:martinh], [http://xmlns.com/foaf/0.1/homepage], [http://www.net.lut.ac.uk/~martin/]}
-    {[http://www.ilrt.bris.ac.uk/people/cmdjb/face.png], [http://purl.org/dc/elements/1.1/title], "Dave around mid 1998"}
-    {[http://www.ilrt.bris.ac.uk/people/cmdjb/face.png], [http://purl.org/dc/elements/1.1/format], "image/png"}
-  ]]
-  linux$ example4 test targets genid:dajobe http://xmlns.com/foaf/0.1/friend
-  Matched node: [genid:danbri]
-  Matched node: [genid:emiller]
-  example4: matching nodes: 2
-  linux$ example4 test statements http://www.ilrt.bris.ac.uk/people/cmdjb/face.png - -
-  Matched statement: {[http://www.ilrt.bris.ac.uk/people/cmdjb/face.png], [http://purl.org/dc/elements/1.1/title], "Dave around mid 1998"}
-  Matched statement: {[http://www.ilrt.bris.ac.uk/people/cmdjb/face.png], [http://purl.org/dc/elements/1.1/format], "image/png"}
-  example4: matching statements: 2
+$ cd examples
+$ example4 test parse file:../perl/dc.rdf repat
+example4: Parsing URI file:../perl/dc.rdf with repat parser
+$ example4 test print
+[[
+  {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
+  {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+  {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page of Dave Beckett."}
+]]
+$ example4 test targets http://purl.org/net/dajobe/ http://purl.org/dc/elements/1.1/title
+Matched node: Dave Beckett's Home Page
+example4: matching nodes: 1
+$ example4 test statements http://purl.org/net/dajobe/ - -
+Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/title], "Dave Beckett's Home Page"}
+Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/creator], "Dave Beckett"}
+Matched statement: {[http://purl.org/net/dajobe/], [http://purl.org/dc/elements/1.1/description], "The generic home page of Dave Beckett."}
+example4: matching statements: 3
 </pre>
 
 <h2>3. Using the Perl interface</h2>
