@@ -82,6 +82,9 @@ struct librdf_hash_factory_s {
   /* end hash association */
   int (*close)(void* context);
 
+  /* hoe many values? */
+  int (*values_count)(void* context);
+
   /* insert key/value pairs according to flags */
   int (*put)(void* context, librdf_hash_datum *key, librdf_hash_datum *data);
 
@@ -139,6 +142,9 @@ void librdf_free_hash(librdf_hash *hash);
 int librdf_hash_open(librdf_hash* hash, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 /* end hash association */
 int librdf_hash_close(librdf_hash* hash);
+
+/* how many values */
+int librdf_hash_values_count(librdf_hash* hash);
 
 /* retrieve one value for a given hash key either as char or hash datum */
 char* librdf_hash_get(librdf_hash* hash, char *key);
