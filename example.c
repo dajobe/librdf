@@ -42,10 +42,11 @@ main(int argc, char *argv[])
   librdf_stream* stream;
   char *program=argv[0];
   librdf_uri *uri;
+  char *parser_factory_name=NULL;
 
 
-  if(argc !=2) {
-    fprintf(stderr, "USAGE: %s: <RDF source URI>\n", program);
+  if(argc <2 || argc >3) {
+    fprintf(stderr, "USAGE: %s: <RDF source URI> [rdf parser name]\n", program);
     return(1);
   }
 
@@ -77,7 +78,9 @@ main(int argc, char *argv[])
   }
   
       
-  pfactory=librdf_get_parser_factory(NULL);
+  if(argc==3)
+    parser_factory_name=argv[2];
+  pfactory=librdf_get_parser_factory(parser_factory_name);
   if(!pfactory) {
     fprintf(stderr, "%s: Failed to get any parser factory\n", program);
     return(1);
