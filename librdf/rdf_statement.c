@@ -88,6 +88,8 @@ librdf_new_statement_from_statement(librdf_statement* statement)
 {
   librdf_statement* new_statement;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   if(!statement)
     return NULL;
   
@@ -174,6 +176,8 @@ librdf_new_statement_from_nodes(librdf_world *world,
 void
 librdf_statement_init(librdf_world *world, librdf_statement *statement)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   statement->world=world;
   statement->subject=NULL;
   statement->predicate=NULL;
@@ -189,6 +193,8 @@ librdf_statement_init(librdf_world *world, librdf_statement *statement)
 void
 librdf_statement_clear(librdf_statement *statement)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   if(LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
     librdf_free_node(LIBRDF_NODE_STATEMENT_SUBJECT(statement));
     LIBRDF_NODE_STATEMENT_SUBJECT(statement)=NULL;
@@ -212,6 +218,8 @@ librdf_statement_clear(librdf_statement *statement)
 void
 librdf_free_statement(librdf_statement* statement)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   librdf_statement_clear(statement);
   LIBRDF_FREE(librdf_statement, statement);
 }
@@ -230,6 +238,8 @@ librdf_free_statement(librdf_statement* statement)
 librdf_node*
 librdf_statement_get_subject(librdf_statement *statement) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   return LIBRDF_NODE_STATEMENT_SUBJECT(statement);
 }
 
@@ -245,6 +255,8 @@ librdf_statement_get_subject(librdf_statement *statement)
 void
 librdf_statement_set_subject(librdf_statement *statement, librdf_node *node)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   LIBRDF_NODE_STATEMENT_SUBJECT(statement)=node;
 }
 
@@ -259,6 +271,8 @@ librdf_statement_set_subject(librdf_statement *statement, librdf_node *node)
 librdf_node*
 librdf_statement_get_predicate(librdf_statement *statement) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   return LIBRDF_NODE_STATEMENT_PREDICATE(statement);
 }
 
@@ -274,6 +288,8 @@ librdf_statement_get_predicate(librdf_statement *statement)
 void
 librdf_statement_set_predicate(librdf_statement *statement, librdf_node *node)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   LIBRDF_NODE_STATEMENT_PREDICATE(statement)=node;
 }
 
@@ -288,6 +304,8 @@ librdf_statement_set_predicate(librdf_statement *statement, librdf_node *node)
 librdf_node*
 librdf_statement_get_object(librdf_statement *statement) 
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   return LIBRDF_NODE_STATEMENT_OBJECT(statement);
 }
 
@@ -303,6 +321,8 @@ librdf_statement_get_object(librdf_statement *statement)
 void
 librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   LIBRDF_NODE_STATEMENT_OBJECT(statement)=node;
 }
 
@@ -316,6 +336,8 @@ librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 int
 librdf_statement_is_complete(librdf_statement *statement)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   return (LIBRDF_NODE_STATEMENT_SUBJECT(statement) &&
           LIBRDF_NODE_STATEMENT_PREDICATE(statement) &&
           LIBRDF_NODE_STATEMENT_OBJECT(statement));
@@ -341,6 +363,8 @@ librdf_statement_to_string(librdf_statement *statement)
 #define NULL_STRING_LENGTH 6
   static const unsigned char *null_string=(const unsigned char *)"(null)";
   size_t len;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
   if(LIBRDF_NODE_STATEMENT_SUBJECT(statement)) {
     subject_string=librdf_node_to_counted_string(LIBRDF_NODE_STATEMENT_SUBJECT(statement), &len);
@@ -427,6 +451,8 @@ librdf_statement_print(librdf_statement *statement, FILE *fh)
 {
   unsigned char *s;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   if(!statement)
     return;
   
@@ -450,7 +476,8 @@ int
 librdf_statement_equals(librdf_statement* statement1, 
                         librdf_statement* statement2)
 {
-  /* FIXME: use digests? */
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement1, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement2, librdf_statement, NULL);
 
   if(!statement1 || !statement2)
     return 0;
@@ -487,6 +514,9 @@ int
 librdf_statement_match(librdf_statement* statement, 
                        librdf_statement* partial_statement)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(partial_statement, librdf_statement, NULL);
+
   if(LIBRDF_NODE_STATEMENT_SUBJECT(partial_statement) &&
      !librdf_node_equals(LIBRDF_NODE_STATEMENT_SUBJECT(statement), 
                          LIBRDF_NODE_STATEMENT_SUBJECT(partial_statement)))
@@ -523,6 +553,7 @@ librdf_statement_encode(librdf_statement* statement,
                         unsigned char *buffer, 
                         size_t length)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
   return librdf_statement_encode_parts(statement, NULL,
                                        buffer, length,
@@ -533,6 +564,7 @@ librdf_statement_encode(librdf_statement* statement,
 /**
  * librdf_statement_encode_parts - Serialise parts of a statement into a buffer
  * @statement: statement to serialise
+ * @context_node: &librdf_node context node (can be NULL)
  * @buffer: the buffer to use
  * @length: buffer size
  * @fields: fields to encode
@@ -559,6 +591,8 @@ librdf_statement_encode_parts(librdf_statement* statement,
   size_t total_length=0;
   size_t node_len;
   unsigned char *p;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
   /* min size */
   if(buffer && length < 1)
@@ -669,6 +703,8 @@ size_t
 librdf_statement_decode(librdf_statement* statement, 
                         unsigned char *buffer, size_t length)
 {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
   return librdf_statement_decode_parts(statement, NULL, buffer, length);
 }
 
@@ -696,6 +732,8 @@ librdf_statement_decode_parts(librdf_statement* statement,
   unsigned char type;
   size_t total_length=0;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG2(librdf_statement_decode_parts,
                   "Decoding buffer of %d bytes\n", length);
