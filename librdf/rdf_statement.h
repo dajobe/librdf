@@ -146,7 +146,10 @@ size_t librdf_statement_decode(librdf_statement* statement, unsigned char *buffe
 
 #ifdef LIBRDF_INTERNAL
 
-/* Or-ed to provide fields argument to librdf_statement_encode() */
+/* Or-ed to indicate statement parts via fields arguments to
+ *   librdf_statement_encode() 
+ *   librdf_new_stream_from_node_iterator()
+ */
 #define LIBRDF_STATEMENT_SUBJECT 1
 #define LIBRDF_STATEMENT_PREDICATE 2
 #define LIBRDF_STATEMENT_OBJECT 4
