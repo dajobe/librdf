@@ -378,7 +378,7 @@ fi
 
 
 
-AC_ARG_WITH(jdk, [  --with-jdk=DIR          Java JDK location []], jdk="$withval", jdk="")
+AC_ARG_WITH(jdk, [  --with-jdk=DIR          Java JDK location (default auto)], jdk="$withval", jdk="")
 AC_MSG_CHECKING(Java JDK includes)
 if test "X$JAVA_VERSION" != X; then
   if test "X$jdk" = X ; then
@@ -686,13 +686,45 @@ LIBS="$LIBRDF_LIBS"
 dnl Checks for XML parsers
 
 # At present this is for passing on to raptor and not used here
-AC_ARG_WITH(xml-parser, [  --with-xml-parser=NAME  Use XML parser - expat, libxml [expat]], xml_parser="$withval", xml_parser="libxml") 
+AC_ARG_WITH(xml-parser, [  --with-xml-parser=NAME  Use XML parser - expat, libxml (default libxml)], xml_parser="$withval", xml_parser="libxml") 
 
 
 
 
 dnl Checks for RDF parsers
 parser_modules="raptor"
+
+AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
+AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default auto)], with_raptor="$withval", with_raptor="auto")
+
+RAPTOR_VERSION=`$RAPTOR_CONFIG --version 2>/dev/null`
+RAPTOR_MIN_VERSION=0.9.13
+
+RAPTOR_VERSION_DEC=`echo $RAPTOR_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+RAPTOR_MIN_VERSION_DEC=`echo $RAPTOR_MIN_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+
+if test "X$with_raptor" = Xauto; then
+  if test "X$RAPTOR_VERSION" -a $RAPTOR_VERSION_DEC -ge $RAPTOR_MIN_VERSION_DEC; then
+    with_raptor=system
+  else
+    with_raptor=internal
+  fi
+elif test $with_raptor = system; then
+  if test $RAPTOR_VERSION_DEC -lt $RAPTOR_MIN_VERSION_DEC; then
+    AC_MSG_WARN(System raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
+    AC_MSG_WARN(Proceeding anyway since --with-raptor=system was given)
+    AC_MSG_WARN(To use the internal raptor use --with-raptor=internal)
+    AC_MSG_WARN(or omit any --with-raptor argument.)
+  fi
+fi
+
+AC_MSG_CHECKING(raptor library source)
+if test $with_raptor = system; then
+  AC_MSG_RESULT(system $RAPTOR_VERSION)
+else
+  RAPTOR_VERSION=internal
+  AC_MSG_RESULT(internal)
+fi
 
 AC_MSG_CHECKING(RDF parsers required)
 AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers [raptor]], parser_modules="$enableval") 
@@ -715,6 +747,7 @@ fi
 # Always have these
 have_raptor=1
 
+raptor_dir=raptor
 
 need_raptor=1
 rdf_parsers_available=
@@ -745,8 +778,19 @@ for parser in $parser_modules; do
     PARSER_SRCS="$PARSER_SRCS rdf_parser_$parser.c"
 
     if test $parser = raptor; then
-      LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor $LIBRDF_INTERNAL_CPPFLAGS"
-      LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_INTERNAL_LIBS"
+      if test $with_raptor = internal; then
+        LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor $LIBRDF_INTERNAL_CPPFLAGS"
+        LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_INTERNAL_LIBS"
+      else
+        LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$RAPTOR_CONFIG --cflags`"
+        # Work around broken raptor-config 0.9.12 and earlier
+        if test $RAPTOR_VERSION_DEC -lt 000913; then
+          rp=`$RAPTOR_CONFIG --prefix`
+          LIBRDF_LIBS="$LIBRDF_LIBS -L$rp/lib -lraptor"
+        fi
+        LIBRDF_LIBS="$LIBRDF_LIBS `$RAPTOR_CONFIG --libs`"
+        raptor_dir=
+      fi
     fi
 
     n=HAVE_${uname}_RDF_PARSER
@@ -814,7 +858,7 @@ AC_MSG_RESULT($digest_modules)
 DIGEST_OBJS=
 DIGEST_SRCS=
 
-AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests [yes]], enable_openssl_digests="$withval", enable_openssl_digests="yes") 
+AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests (default yes)], enable_openssl_digests="$withval", enable_openssl_digests="yes") 
 
 # This is needed because autoheader can't work out which computed
 # symbols must be pulled from acconfig.h into config.h.in
@@ -868,7 +912,7 @@ fi
 
 dnl Check for use of threads
 
-AC_ARG_WITH(threads, [  --with-threads          With POSIX thread support. default=no], with_threads="yes", with_threads="no")
+AC_ARG_WITH(threads, [  --with-threads          With POSIX thread support (default=no)], with_threads="yes", with_threads="no")
 
 AC_CHECK_HEADERS(pthread.h)
 
@@ -931,7 +975,7 @@ AC_SUBST(HASH_SRCS)
 
 
 dnl Checks for building sub-packages in sub directories
-SD="docs $languages"
+SD="docs $raptor_dir $languages"
 
 
 AC_SUBST(SD)
