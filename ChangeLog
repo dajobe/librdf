@@ -1,5 +1,18 @@
 2004-12-08  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 
+	* librdf/rdf_uri.c (librdf_new_uri_relative_to_base): Ask for 1
+	more char for new URI buffer for raptor_uri_resolve_uri_reference
+	to allow inserting of a missing "/" path.
+
+	* raptor/raptor_uri.c (raptor_default_new_uri_relative_to_base):
+	Ask for 1 more char for new URI to allow inserting of a missing
+	"/" path.
+
+	* raptor/raptor_rfc2396.c (raptor_uri_resolve_uri_reference): Add
+	debug message.  When adding a missing path "/", set the path_len
+	and the uri_len to match.
+	(main): Added test when a missing abs / path is added.
+
 	* rasqal/tests/rdql/testsuite/Makefile.am (check-rdql-correct):
 	Set PATH then use -s $(srcdir) rather than
 	lots of envariable passing.

@@ -1,3 +1,9 @@
+2004-12-08  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_uri.c (librdf_new_uri_relative_to_base): Ask for 1 more char for
+	new URI buffer for raptor_uri_resolve_uri_reference to allow
+	inserting of a missing "/" path.
+
 2004-11-26  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 
 	* Makefile.am: Remove rdf_storage_tstore.h rdf_storage_mysql.h
