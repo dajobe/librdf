@@ -1,5 +1,7 @@
 2004-07-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* configre.ac.: Added DIST_SUBDIRS for maintainer mode
+
 	* configure.ac, Makefile.am:
 	Replace SD_PRE with LOCAL_SUBDIRS to enable make distcheck to work.
 	Note that this will create a smaller tarball while doing the 'make
