@@ -255,6 +255,7 @@ librdf_stream* librdf_model_context_as_stream(librdf_model* model, librdf_node* 
 void librdf_model_sync(librdf_model* model);
 %newobject librdf_model_get_contexts;
 librdf_iterator* librdf_model_get_contexts(librdf_model* model);
+int librdf_model_contains_context(librdf_model* model, librdf_node* context);
 %newobject librdf_model_get_feature;
 librdf_node* librdf_model_get_feature(librdf_model* model, librdf_uri* feature);
 int librdf_model_set_feature(librdf_model* model, librdf_uri* feature, librdf_node* value);
