@@ -512,10 +512,10 @@ librdf_parser_sirpac_get_feature(void *context, librdf_uri *feature)
   if(!feature)
     return NULL;
 
-  if(!librdf_uri_equals(feature, LIBRDF_MS_aboutEach_URI))
+  if(librdf_uri_equals(feature, LIBRDF_MS_aboutEach_URI))
     return pcontext->feature_aboutEach ? "yes" : "no";
 
-  if(!librdf_uri_equals(feature, LIBRDF_MS_aboutEachPrefix_URI))
+  if(librdf_uri_equals(feature, LIBRDF_MS_aboutEachPrefix_URI))
     return pcontext->feature_aboutEachPrefix ? "yes" : "no";
   
   return NULL;
@@ -542,13 +542,13 @@ librdf_parser_sirpac_set_feature(void *context, librdf_uri *feature,
   if(!value)
     return -1;
   
-  if(!librdf_uri_equals(feature, LIBRDF_MS_aboutEach_URI)) {
+  if(librdf_uri_equals(feature, LIBRDF_MS_aboutEach_URI)) {
     pcontext->feature_aboutEach=(strcmp(value, "yes") == 0);
     pcontext->feature_aboutEachPrefix = pcontext->feature_aboutEach;
     return 0;
   }
 
-  if(!librdf_uri_equals(feature, LIBRDF_MS_aboutEachPrefix_URI)) {
+  if(librdf_uri_equals(feature, LIBRDF_MS_aboutEachPrefix_URI)) {
     pcontext->feature_aboutEachPrefix=(strcmp(value, "yes") == 0);
     pcontext->feature_aboutEach = pcontext->feature_aboutEachPrefix;
     return 0;
