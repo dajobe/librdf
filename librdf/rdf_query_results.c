@@ -137,6 +137,14 @@ librdf_query_results_finished(librdf_query_results *query_results)
  * librdf_query_get_bindings_count dynamically or
  * will be known in advanced if hard-coded into the query string.
  * 
+ * Example:
+ *
+ * const char **names=NULL;
+ * librdf_node* values[10];
+ * 
+ * if(librdf_query_results_get_bindings(results, &names, values))
+ *   ...
+ *
  * Return value: non-0 if the assignment failed
  **/
 int
