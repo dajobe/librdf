@@ -497,6 +497,69 @@ librdf_parser_raptor_serialise_finished(void* context)
 }
 
 
+static raptor_uri*
+librdf_raptor_uri_new_uri(void *context, const char *uri_string) 
+{
+  return librdf_new_uri((librdf_world*)context, uri_string);
+}
+
+static raptor_uri*
+librdf_raptor_new_uri_from_uri_local_name(void *context,
+                                          raptor_uri *uri,
+                                          const char *local_name)
+{
+   return librdf_new_uri_from_uri_local_name(uri, local_name);
+}
+
+static raptor_uri*
+librdf_raptor_new_uri_relative_to_base(void *context,
+                                       raptor_uri *base_uri,
+                                       const char *uri_string) 
+{
+  return librdf_new_uri_relative_to_base(base_uri, uri_string);
+}
+
+
+static raptor_uri*
+librdf_raptor_new_uri_for_rdf_concept(void *context, const char *name) 
+{
+  librdf_uri *uri;
+  librdf_get_concept_by_name((librdf_world*)context,, 1, name, &uri, NULL);
+  return librdf_new_uri_from_uri(uri);
+}
+
+static void
+librdf_raptor_free_uri(void *context, raptor_uri *uri) 
+{
+  return librdf_free_uri(uri);
+}
+
+
+static int
+librdf_raptor_uri_equals(void *context, raptor_uri* uri1, raptor_uri* uri2)
+{
+  return librdf_uri_equals(uri1, uri2);
+}
+
+
+static raptor_uri*
+librdf_raptor_uri_copy(void *context, raptor_uri *uri)
+{
+  return librdf_new_uri_from_uri(uri);
+}
+
+static raptor_uri_handler librdf_raptor_uri_handler = {
+  librdf_raptor_new_uri,
+  librdf_raptor_new_uri_from_uri_local_name,
+  librdf_raptor_new_uri_relative_to_base,
+  librdf_raptor_new_uri_for_rdf_concept,
+  librdf_raptor_free_uri,
+  librdf_raptor_uri_equals,
+  librdf_raptor_uri_copy,
+  1
+};
+
+
 /**
  * librdf_parser_raptor_register_factory - Register the raptor RDF parser with the RDF parser factory
  * @factory: factory
@@ -520,6 +583,8 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_raptor_constructor(librdf_world *world)
 {
+  raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
+
   librdf_parser_register_factory(world, "raptor", "application/rdf+xml", NULL,
                                  &librdf_parser_raptor_register_factory);
   librdf_parser_register_factory(world, "ntriples", "text/plain",
