@@ -188,7 +188,7 @@ for module in $digest_modules; do
   if test -r $srcdir/$module.c; then
     AC_MSG_RESULT(yes);
 
-    n=HAVE_$module_u
+    n=HAVE_LOCAL_${module_u}_DIGEST
     AC_DEFINE_UNQUOTED($n)
 
     DIGEST_OBJS="$DIGEST_OBJS $module.o"
