@@ -1272,6 +1272,7 @@ main(int argc, char *argv[])
   fprintf(stdout, "%s: Setting node URI to new URI ", program);
   librdf_uri_print(uri, stdout);
   fputc('\n', stdout);
+  librdf_free_uri(uri);
   
   fprintf(stdout, "%s: Node is: ", program);
   librdf_node_print(node, stdout);
