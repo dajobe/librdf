@@ -95,15 +95,16 @@ typedef struct librdf_hash_datum_s librdf_hash_datum;
 
 /* constructor / destructor for above */
 librdf_hash_datum* librdf_new_hash_datum(void *data, size_t size);
-void librdf_free_hash_datum(librdf_hash_datum *datum) ;
+void librdf_free_hash_datum(librdf_hash_datum *ptr);
   
 
 
 /** A hash object */
 struct librdf_hash_s
 {
-  void *context;
-  int is_open;
+  char* identifier; /* as passed in during open(), used by clone() */
+  void* context;
+  int   is_open;
   struct librdf_hash_factory_s* factory;
 };
 
@@ -121,7 +122,11 @@ struct librdf_hash_factory_s {
   size_t cursor_context_length;
 
   /* clone an existing storage */
-  int (*clone)(void* context, void* old_context);
+  int (*clone)(librdf_hash* new_hash, void* new_context, char* new_name, void* old_context);
+
+  /* create / destroy a hash implementation */
+  int (*create)(librdf_hash* hash, void* context);
+  int (*destroy)(void* context);
 
   /* open/create hash with identifier and options  */
   int (*open)(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
