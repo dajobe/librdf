@@ -1099,7 +1099,10 @@ librdf_storage_context_add_statement(librdf_storage* storage,
                                      librdf_statement* statement) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_statement, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
+
+  if(!context)
+    return librdf_storage_add_statement(storage, statement);
 
   if(storage->factory->context_add_statement)
     return storage->factory->context_add_statement(storage, context, statement);
@@ -1125,7 +1128,10 @@ librdf_storage_context_add_statements(librdf_storage* storage,
   int status=0;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_statement, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(stream, librdf_stream, 1);
+
+  if(!context)
+    return librdf_storage_add_statements(storage, stream);
 
   if(storage->factory->context_add_statements)
     return storage->factory->context_add_statements(storage, context, stream);
