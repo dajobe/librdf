@@ -40,6 +40,10 @@
 #include <rdf_hash_list.h>
 
 
+/* prototypes for helper functions */
+static void librdf_delete_hash_factories(void);
+
+
 /**
  * librdf_init_hash:
  * @void: 
@@ -61,8 +65,31 @@ librdf_init_hash(void)
         librdf_init_hash_list();
 }
 
-/** list of hash factories */
+void
+librdf_finish_hash(void) 
+{
+	librdf_delete_hash_factories();
+}
+
+
+/* statics */
+
+/* list of hash factories */
 static librdf_hash_factory* hashes;
+
+
+/* helper functions */
+static void
+librdf_delete_hash_factories(void)
+{
+	librdf_hash_factory *factory, *next;
+	
+	for(factory=hashes; factory; factory=next) {
+		next=factory->next;
+		LIBRDF_FREE(librdf_hash_factory, factory->name);
+		LIBRDF_FREE(librdf_hash_factory, factory);
+	}
+}
 
 
 /* class methods */
@@ -172,7 +199,7 @@ librdf_new_hash (librdf_hash_factory* factory) {
         if(!h)
                 return NULL;
 
-        h->context=(char*)LIBRDF_CALLOC(hash_context,
+        h->context=(char*)LIBRDF_CALLOC(librdf_hash_context,
                                         factory->context_length, 1);
         if(!h->context) {
                 librdf_free_hash(h);
@@ -195,6 +222,8 @@ librdf_new_hash (librdf_hash_factory* factory) {
 void
 librdf_free_hash (librdf_hash* hash) 
 {
+        if(hash->context)
+		LIBRDF_FREE(librdf_hash_context, hash->context);
         LIBRDF_FREE(librdf_hash, hash);
 }
 
@@ -470,8 +499,9 @@ librdf_hash_print (librdf_hash* hash, FILE *fh)
                 fwrite(value, value_len, 1, fh);
                 fputs("'\n", fh);
                 
-                /* key points to new data each time */
+                /* key and value point to new memory each time */
                 LIBRDF_FREE(cstring, key);
+                LIBRDF_FREE(cstring, value);
         }
         fputc('}', fh);
 }
@@ -802,8 +832,12 @@ main(int argc, char *argv[])
         fprintf(stderr, "%s: Freeing hash\n", program);
         librdf_free_hash(h2);
         
+        /* finish hash module */
+        librdf_finish_hash();
+        
   
-    
+	librdf_memory_report(stderr);
+	
         /* keep gcc -Wall happy */
         return(0);
 }
