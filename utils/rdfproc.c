@@ -77,7 +77,8 @@ enum command_type {
   CMD_HAS_ARC_IN,
   CMD_HAS_ARC_OUT,
   CMD_QUERY,
-  CMD_SERIALIZE
+  CMD_SERIALIZE,
+  CMD_REMOVE_CONTEXT
 };
 
 typedef struct
@@ -111,6 +112,7 @@ static command commands[]={
   /* FIXME triples-match-query is deliberately not documented */
   {CMD_QUERY, "triples-match-query", 3, 3, 0},
   {CMD_SERIALIZE, "serialize", 0, 3, 0},
+  {CMD_REMOVE_CONTEXT, "remove-context", 1, 1, 0},
   {(enum command_type)-1, NULL}  
 };
  
@@ -246,7 +248,7 @@ main(int argc, char *argv[])
               if(output_storage) {
                 output_model = librdf_new_model(world, output_storage, NULL);
                 if(!output_model) {
-                  fprintf(stderr, "%s: Failed to create output model\n", 
+                  fprintf(stderr, "%s: Failed to create output storage model\n", 
                           program);
                   librdf_free_storage(output_storage);
                   output_storage=NULL;
@@ -389,11 +391,11 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
     puts("  parse FILE|URI [SYNTAX [BASE URI]]        Parse syntax in FILE or URI");
-    puts("                                            into the graph (RDF/XML)");
+    puts("                                            into the graph (RDF/XML).");
     puts("  parse-stream FILE|URI [SYNTAX [BASE URI]  Streaming parse syntax in FILE or");
-    puts("                                            URI into the graph (RDF/XML)");
+    puts("                                            URI into the graph (RDF/XML).");
     puts("  print                                     Print the graph triples.");
-    puts("  serialize [SYNTAX [URI [MIME-TYPE]]]      Serializes to a syntax (RDF/XML)");
+    puts("  serialize [SYNTAX [URI [MIME-TYPE]]]      Serializes to a syntax (RDF/XML).");
 #if 0
     /* FIXME Not a query -> results table query, so leave out for now */
     puts("  query NAME URI|- QUERY-STRING             Query for matching triples");
@@ -405,10 +407,11 @@ main(int argc, char *argv[])
     puts("  add-typed SUBJECT PREDICATE OBJECT OBJECT-LANG OBJECT-URI [CONTEXT]");
     puts("                                            Add datatyped triple to graph.");
     puts("  remove SUBJECT PREDICATE OBJECT [CONTEXT] Remove triple from graph.");
+    puts("  remove-context CONTEXT                    Remove all triples with CONTEXT.");
     puts("  sources | targets | arcs NODE1 NODE2      Show matching nodes.");
     puts("  source | target | arc NODE1 NODE2         Show 1 matching node.");
     puts("  arcs-in | arcs-out NODE                   Show properties in/out of NODE");
-    puts("  has-arc-in | has-arc-out NODE ARC         Check for property in/out of NODE");
+    puts("  has-arc-in | has-arc-out NODE ARC         Check for property in/out of NODE.");
     puts("\nNotation:");
     puts("  nodes are either blank node identifiers like _:ABC,");
     puts("    URIs like http://example.org otherwise are literal strings.");
@@ -513,7 +516,7 @@ main(int argc, char *argv[])
       
       if (type == CMD_PARSE_MODEL) {
         if(librdf_parser_parse_into_model(parser, uri, base_uri, model)) {
-          fprintf(stderr, "%s: Failed to parse RDF into model\n", program);
+          fprintf(stderr, "%s: Failed to parse into the graph\n", program);
           librdf_free_parser(parser);
           librdf_free_uri(uri);
           librdf_free_uri(base_uri);
@@ -671,9 +674,9 @@ main(int argc, char *argv[])
       switch(type) {
         case CMD_CONTAINS:
           if(librdf_model_contains_statement(model, partial_statement))
-            fprintf(stdout, "%s: the model contains the triple\n", program);
+            fprintf(stdout, "%s: the graph contains the triple\n", program);
         else
-          fprintf(stdout, "%s: the model does not contain the triple\n", program);
+          fprintf(stdout, "%s: the graph does not contain the triple\n", program);
           break;
           
         case CMD_FIND:
@@ -738,9 +741,9 @@ main(int argc, char *argv[])
             rc=librdf_model_add_statement(model, partial_statement);
           }
           if(rc)
-            fprintf(stdout, "%s: failed to add triple to model\n", program);
+            fprintf(stdout, "%s: failed to add triple to the graph\n", program);
           else
-            fprintf(stdout, "%s: added triple to model\n", program);
+            fprintf(stdout, "%s: added triple to the graph\n", program);
           break;
           
         case CMD_REMOVE:
@@ -761,9 +764,9 @@ main(int argc, char *argv[])
             rc=librdf_model_remove_statement(model, partial_statement);
           }
           if(rc)
-            fprintf(stdout, "%s: failed to remove triple from model\n", program);
+            fprintf(stdout, "%s: failed to remove triple from the graph\n", program);
           else
-            fprintf(stdout, "%s: removed triple from model\n", program);
+            fprintf(stdout, "%s: removed triple from the graph\n", program);
         break;
         
         default:
@@ -985,12 +988,33 @@ main(int argc, char *argv[])
       result=(type == CMD_HAS_ARC_IN) ? librdf_model_has_arc_in(model, arc, source) :
                                         librdf_model_has_arc_out(model, source, arc);
       if(result)
-        fprintf(stdout, "%s: the model contains the arc\n", program);
+        fprintf(stdout, "%s: the graph contains the arc\n", program);
       else
-        fprintf(stdout, "%s: the model does not contain the arc\n", program);
+        fprintf(stdout, "%s: the graph does not contain the arc\n", program);
       
       librdf_free_node(source);
       librdf_free_node(arc);
+      break;
+
+    case CMD_REMOVE_CONTEXT:
+      if(contexts) {
+        librdf_node* context_node;
+
+        if (librdf_heuristic_is_blank_node(argv[0]))
+          context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
+        else
+          context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
+      
+        rc=librdf_model_context_remove_statements(model, context_node);
+        librdf_free_node(context_node);
+        
+        if(rc)
+          fprintf(stdout, "%s: failed to remove context triples from the graph\n", program);
+        else
+          fprintf(stdout, "%s: removed context triples from the graph\n", program);
+
+      } else
+        fprintf(stderr, "%s: WARNING: Cannot remove context with contexts not enabled (-c)\n", program);
       break;
 
 
