@@ -170,12 +170,23 @@ work in the source tree.</p>
 <p><tt>example</tt> uses a RDF parser, if you have one, to parse a
 URI of RDF/XML content, store it in multple Berkeley DB hashes on the
 disk and run queries against them.  It takes two arguments, the first
-the URI of the RDF/XML content (or <tt>file:</tt><em>filename</tt>)
+the URI of the RDF/XML content (or <tt>file:</tt><em>filename</em>)
 and the second, optional one, is the name of the RDF parser to use.  At
 present these can be <tt>sirpac</tt> or <tt>libwww</tt></p>
 
 <p><tt>example2</tt> does not use a RDF parser, but reads from a simple
 triple dump format and again stores the data on disk.</p>
+
+<p>If no Berkeley DB was found by configure, the programs will fail
+since there is no on-disk storage system available.  To change them
+to use the in-memory hashes, edit the lines reading something like</p>
+<pre>
+  storage=librdf_new_storage("hashes", "test", "hash_type='bdb',dir='.'");
+</pre>
+<p>to read</p>
+<pre>
+  storage=librdf_new_storage("hashes", "test", "hash_type='memory',dir='.'");
+</pre>
 
 <p>Note: there is very poor error reporting support at present from
 the RDF parsers.  Generally if the results are just an empty model
