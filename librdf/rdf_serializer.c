@@ -294,7 +294,7 @@ librdf_free_serializer(librdf_serializer *serializer)
  * librdf_serializer_serialize_model - Write a serialized librdf_mode to a FILE*
  * @serializer: the serializer
  * @handle: file handle to serialize to
- * @base_uri: the base URI to use or NULL
+ * @base_uri: the base URI to use (or NULL)
  * @model: the &librdf_model model to use
  * 
  * DEPRECATED: Use librdf_serializer_serialize_model_to_file_handle
@@ -316,7 +316,7 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
  * librdf_serializer_serialize_model_to_file_handle - Write a serialized librdf_model to a FILE*
  * @serializer: the serializer
  * @handle: file handle to serialize to
- * @base_uri: the base URI to use or NULL
+ * @base_uri: the base URI to use (or NULL)
  * @model: the &librdf_model model to use
  * 
  * Return value: non 0 on failure
@@ -339,7 +339,7 @@ librdf_serializer_serialize_model_to_file_handle(librdf_serializer* serializer,
  * librdf_serializer_serialize_model_to_file - Write a serialized librdf_model to a file
  * @serializer: the serializer
  * @name: filename to serialize to
- * @base_uri: the base URI to use or NULL
+ * @base_uri: the base URI to use (or NULL)
  * @model: the &librdf_model model to use
  * 
  * Return value: non 0 on failure
@@ -370,7 +370,7 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
 /**
  * librdf_serializer_serialize_model_to_counted_string - Write a serialized librdf_model to a counted string
  * @serializer: the serializer
- * @base_uri: the base URI to use
+ * @base_uri: the base URI to use (or NULL)
  * @model: the &librdf_model model to use
  * @length_p: pointer to store length or NULL
  * 
@@ -383,7 +383,6 @@ librdf_serializer_serialize_model_to_counted_string(librdf_serializer* serialize
                                                     size_t* length_p) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, NULL);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
 
   if(length_p)
@@ -398,7 +397,7 @@ librdf_serializer_serialize_model_to_counted_string(librdf_serializer* serialize
 /**
  * librdf_serializer_serialize_model_to_string - Write a serialized librdf_model to a string
  * @serializer: the serializer
- * @base_uri: the base URI to use
+ * @base_uri: the base URI to use (or NULL)
  * @model: the &librdf_model model to use
  * 
  * Return value: non 0 on failure
@@ -409,7 +408,6 @@ librdf_serializer_serialize_model_to_string(librdf_serializer* serializer,
                                             librdf_model* model) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, NULL);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
 
   return serializer->factory->serialize_model_to_counted_string(serializer->context,
