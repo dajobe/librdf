@@ -454,7 +454,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
 
   for(i=0; i<context->hash_count; i++) {
     librdf_hash_datum hd_key, hd_value; /* on stack */
-    char *key_buffer, *value_buffer;
+    unsigned char *key_buffer, *value_buffer;
     int key_len, value_len;
 
     /* ENCODE KEY */
@@ -464,7 +464,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     key_len=librdf_statement_encode_parts(statement, NULL, 0, fields);
     if(!key_len)
       return 1;
-    if(!(key_buffer=(char*)LIBRDF_MALLOC(data, key_len))) {
+    if(!(key_buffer=(unsigned char*)LIBRDF_MALLOC(data, key_len))) {
       status=1;
       break;
     }
@@ -488,7 +488,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
       break;
     }
     
-    if(!(value_buffer=(char*)LIBRDF_MALLOC(data, value_len))) {
+    if(!(value_buffer=(unsigned char*)LIBRDF_MALLOC(data, value_len))) {
       LIBRDF_FREE(data, key_buffer);
       status=1;
       break;
@@ -583,7 +583,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
 {
   librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
   librdf_hash_datum hd_key, hd_value; /* on stack */
-  char *key_buffer, *value_buffer;
+  unsigned char *key_buffer, *value_buffer;
   int key_len, value_len;
   int hash_index=ANY_OLD_HASH_INDEX;
   int fields;
@@ -594,7 +594,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   key_len=librdf_statement_encode_parts(statement, NULL, 0, fields);
   if(!key_len)
     return 1;
-  if(!(key_buffer=(char*)LIBRDF_MALLOC(data, key_len)))
+  if(!(key_buffer=(unsigned char*)LIBRDF_MALLOC(data, key_len)))
     return 1;
        
   if(!librdf_statement_encode_parts(statement, key_buffer, key_len,
@@ -611,7 +611,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
     return 1;
   }
     
-  if(!(value_buffer=(char*)LIBRDF_MALLOC(data, value_len))) {
+  if(!(value_buffer=(unsigned char*)LIBRDF_MALLOC(data, value_len))) {
     LIBRDF_FREE(data, key_buffer);
     return 1;
   }
@@ -724,14 +724,16 @@ librdf_storage_hashes_serialise_next_statement(void* context)
 
   /* decode key content */
   if(!librdf_statement_decode(statement, 
-                              scontext->key->data, scontext->key->size)) {
+                              (unsigned char*)scontext->key->data, 
+                              scontext->key->size)) {
     librdf_free_statement(statement);
     return NULL;
   }
 
   /* decode value content */
   if(!librdf_statement_decode(statement, 
-                              scontext->value->data, scontext->value->size)) {
+                              (unsigned char*)scontext->value->data,
+                              scontext->value->size)) {
     librdf_free_statement(statement);
     return NULL;
   }
@@ -841,7 +843,8 @@ librdf_storage_storage_hashes_node_iterator_get_next(void* iterator)
   librdf_iterator_get_next(context->iterator);
 
   if(!librdf_statement_decode(&context->statement, 
-                              context->value.data, context->value.size))
+                              (unsigned char*)context->value.data,
+                              context->value.size))
     return NULL;
 
   switch(context->want) {
@@ -903,7 +906,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
   librdf_iterator *iterator;
   librdf_hash *hash;
   int fields;
-  char *key_buffer;
+  unsigned char *key_buffer;
   
   icontext=(librdf_storage_storage_hashes_node_iterator_context*)LIBRDF_CALLOC(librdf_storage_storage_hashes_node_iterator_context, 1, sizeof(librdf_storage_storage_hashes_node_iterator_context));
   if(!icontext)
@@ -946,7 +949,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
     LIBRDF_FREE(librdf_storage_storage_hashes_node_iterator_context, icontext);
     return NULL;
   }
-  if(!(key_buffer=(char*)LIBRDF_MALLOC(data, icontext->key.size))) {
+  if(!(key_buffer=(unsigned char*)LIBRDF_MALLOC(data, icontext->key.size))) {
     LIBRDF_FREE(librdf_storage_storage_hashes_node_iterator_context, icontext);
     return NULL;
   }
