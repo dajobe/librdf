@@ -18,6 +18,10 @@
 
 #include <stdio.h>
 
+#ifdef STANDALONE
+#define RDF_DEBUG 1
+#endif
+
 #include <rdf_config.h>
 #include <rdf_digest.h>
 #include <rdf_uri.h>
@@ -44,12 +48,12 @@ rdf_digest_register_factory(const char *name,
 
   digest=(rdf_digest_factory*)RDF_CALLOC(rdf_digest_factory, sizeof(rdf_digest_factory), 1);
   if(!digest)
-    RDF_FATAL(rdf_digest_register_factory, "Out of memory\n");
+    RDF_FATAL1(rdf_digest_register_factory, "Out of memory\n");
 
   name_copy=(char*)RDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     RDF_FREE(rdf_digest, digest);
-    RDF_FATAL(rdf_digest_register_factory, "Out of memory\n");
+    RDF_FATAL1(rdf_digest_register_factory, "Out of memory\n");
   }
   strcpy(name_copy, name);
   digest->name=name_copy;
@@ -86,7 +90,7 @@ get_rdf_digest_factory(const char *name)
   if(!name) {
     factory=digests;
     if(!factory) {
-      RDF_DEBUG(get_rdf_digest_factory, "No (default) digests registered\n");
+      RDF_DEBUG1(get_rdf_digest_factory, "No (default) digests registered\n");
       return NULL;
     }
   } else {
@@ -217,7 +221,7 @@ rdf_digest_to_string(rdf_digest* digest)
   
   b=(char*)RDF_MALLOC(cstring, 1+(mdlen<<1));
   if(!b) {
-    RDF_DEBUG(rdf_digest_to_string, "Out of memory\n");
+    RDF_DEBUG1(rdf_digest_to_string, "Out of memory\n");
     return NULL;
   }
   
@@ -263,7 +267,7 @@ rdf_init_digest(void)
 
 
 
-#ifdef RDF_DIGEST_TEST
+#ifdef STANDALONE
 
 /* one more prototype */
 int main(int argc, char *argv[]);

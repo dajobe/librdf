@@ -18,6 +18,10 @@
 
 #include <stdio.h>
 
+#ifdef STANDALONE
+#define RDF_DEBUG 1
+#endif
+
 #include <rdf_config.h>
 #include <rdf_model.h>
 
@@ -157,7 +161,7 @@ rdf_model_remove_submodel(rdf_model* model, rdf_model* sub_model)
 
 
 
-#ifdef RDF_MODEL_TEST
+#ifdef STANDALONE
 
 /* one more prototype */
 int main(int argc, char *argv[]);

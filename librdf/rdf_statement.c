@@ -18,6 +18,10 @@
 
 #include <stdio.h>
 
+#ifdef STANDALONE
+#define RDF_DEBUG 1
+#endif
+
 #include <rdf_config.h>
 #include <rdf_node.h>
 #include <rdf_statement.h>
@@ -194,7 +198,7 @@ rdf_statement_to_string(rdf_statement *statement)
 
 
 
-#ifdef RDF_STATEMENT_TEST
+#ifdef STANDALONE
 
 /* one more prototype */
 int main(int argc, char *argv[]);

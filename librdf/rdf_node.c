@@ -21,6 +21,10 @@
 
 #include <stdio.h>
 
+#ifdef STANDALONE
+#define RDF_DEBUG 1
+#endif
+
 #include <rdf_config.h>
 #include <rdf_uri.h>
 #include <rdf_node.h>
@@ -297,7 +301,7 @@ rdf_node_get_digest(rdf_node* node)
 
 
 
-#ifdef RDF_NODE_TEST
+#ifdef STANDALONE
 
 /* one more prototype */
 int main(int argc, char *argv[]);

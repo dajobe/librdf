@@ -20,6 +20,10 @@
 #include <ctype.h>
 #include <sys/types.h>
 
+#ifdef STANDALONE
+#define RDF_DEBUG 1
+#endif
+
 #include <rdf_config.h>
 
 #include <rdf_hash.h>
@@ -60,12 +64,12 @@ void rdf_hash_register_factory(const char *name,
 
   hash=(rdf_hash_factory*)RDF_CALLOC(rdf_hash_factory, sizeof(rdf_hash_factory), 1);
   if(!hash)
-    RDF_FATAL(rdf_hash_register_factory, "Out of memory\n");
+    RDF_FATAL1(rdf_hash_register_factory, "Out of memory\n");
 
   name_copy=(char*)RDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
     RDF_FREE(rdf_hash, hash);
-    RDF_FATAL(rdf_hash_register_factory, "Out of memory\n");
+    RDF_FATAL1(rdf_hash_register_factory, "Out of memory\n");
   }
   strcpy(name_copy, name);
   hash->name=name_copy;
@@ -98,7 +102,7 @@ get_rdf_hash_factory (const char *name)
   if(!name) {
     factory=hashes;
     if(!factory) {
-      RDF_DEBUG(get_rdf_hash_factory, "No (default) hashes registered\n");
+      RDF_DEBUG1(get_rdf_hash_factory, "No (default) hashes registered\n");
       return NULL;
     }
   } else {
@@ -447,7 +451,7 @@ rdf_hash_from_string (rdf_hash* hash, char *string)
 
 
 
-#ifdef RDF_HASH_TEST
+#ifdef STANDALONE
 
 /* one more prototype */
 int main(int argc, char *argv[]);
