@@ -1,0 +1,94 @@
+# Note that this is NOT a relocatable package
+%define name    @PACKAGE@
+%define version @VERSION@
+%define release 1
+%define prefix  /usr
+
+Summary:   Redland - An RDF Application Framework
+Name:      %{name}
+Version:   %{version}
+Release:   %{release}
+Prefix:    %{prefix}
+Copyright: LGPL/MPL
+Group:     System Environment/Libraries
+Source:    http://www.redland.opensource.ac.uk/dist/source/%{name}-%{version}.tar.gz
+URL:       http://www.redland.opensource.ac.uk/
+BuildRoot: /tmp/%{name}-%{version}
+Packager:  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+Docdir: %{prefix}/docs
+
+%description
+Redland is a library for RDF (Resource Description Framework) that
+allows plugging in of modules to support different RDF/XML parsers,
+storage mechanisms, or other internals. Redland is designed for
+applications developers to provide RDF support in their applications
+as well as for RDF developers to experiment with the technology.
+
+%package devel
+Summary: Libraries and header files for programs that use libwww.
+Group: Development/Libraries
+Requires: redland
+
+%description devel
+Header files for development with redland
+
+%prep
+%setup
+
+%build
+if [ ! -f configure ]; then
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --sysconfdir=/etc
+else
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --sysconfdir=/etc
+fi
+
+if [ "$SMP" != "" ]; then
+  (make "MAKE=make -k -j $SMP"; exit 0)
+  make
+else
+  make
+fi
+
+%install
+rm -rf $RPM_BUILD_ROOT
+
+make prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-, root, root)
+
+%{prefix}/bin/*
+%{prefix}/lib/*
+%{prefix}/include/redland.h
+%{prefix}/include/librdf.h 
+%{prefix}/include/rdf_hash.h 
+%{prefix}/include/rdf_digest.h
+%{prefix}/include/rdf_uri.h
+%{prefix}/include/rdf_node.h
+%{prefix}/include/rdf_statement.h
+%{prefix}/include/rdf_context.h
+%{prefix}/include/rdf_model.h
+%{prefix}/include/rdf_iterator.h
+%{prefix}/include/rdf_storage.h
+%{prefix}/include/rdf_stream.h
+%{prefix}/include/rdf_parser.h
+
+%doc AUTHORS COPYING COPYING.LIB ChangeLog LICENSE.txt NEWS README TODO
+%doc *.html
+
+%files devel
+%defattr(-, root, root)
+
+%{prefix}/include/rdf_list.h
+%{prefix}/include/rdf_hash_bdb.h 
+%{prefix}/include/rdf_hash_gdbm.h
+%{prefix}/include/rdf_hash_memory.h
+%{prefix}/include/rdf_types.h
+%{prefix}/include/rdf_storage_list.h
+%{prefix}/include/rdf_storage_hashes.h
+%doc docs/README.html docs/api/*
+
+%changelog
