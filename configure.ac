@@ -454,7 +454,7 @@ LIBRDF_INTERNAL_CPPFLAGS=
 LIBRDF_INTERNAL_LIBS=
 
 # Libraries linked externally also may be internal - presently just
-# raptor but in future will include rasqal.
+# raptor and rasqal but in future may include others
 # Currently only substituted into redland-src-config.
 # -Dfoo -Idir
 LIBRDF_EXTERNAL_CPPFLAGS=
@@ -733,25 +733,29 @@ rdf_parsers_available=
 AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
 AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default=auto)], with_raptor="$withval", with_raptor="auto")
 
-RAPTOR_VERSION=`$RAPTOR_CONFIG --version 2>/dev/null`
-RAPTOR_MIN_VERSION=1.3.0
+if test "X$RAPTOR_CONFIG" == "X"; then
+  with_raptor=internal
+else
+  RAPTOR_VERSION=`$RAPTOR_CONFIG --version 2>/dev/null`
+  RAPTOR_MIN_VERSION=1.3.0
 
-# FIXME - could use raptor-config --decimal-version at some point
-RAPTOR_VERSION_DEC=`echo $RAPTOR_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
-RAPTOR_MIN_VERSION_DEC=`echo $RAPTOR_MIN_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  # FIXME - could use raptor-config --decimal-version at some point
+  RAPTOR_VERSION_DEC=`echo $RAPTOR_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  RAPTOR_MIN_VERSION_DEC=`echo $RAPTOR_MIN_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
 
-if test "X$with_raptor" = Xauto; then
-  if test "X$RAPTOR_VERSION" -a $RAPTOR_VERSION_DEC -ge $RAPTOR_MIN_VERSION_DEC; then
-    with_raptor=system
-  else
-    with_raptor=internal
-  fi
-elif test $with_raptor = system; then
-  if test $RAPTOR_VERSION_DEC -lt $RAPTOR_MIN_VERSION_DEC; then
-    AC_MSG_WARN(System raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
-    AC_MSG_WARN(Proceeding anyway since --with-raptor=system was given)
-    AC_MSG_WARN(To use the internal raptor use --with-raptor=internal)
-    AC_MSG_WARN(or omit any --with-raptor argument.)
+  if test "X$with_raptor" = Xauto; then
+    if test "X$RAPTOR_VERSION" -a $RAPTOR_VERSION_DEC -ge $RAPTOR_MIN_VERSION_DEC; then
+      with_raptor=system
+    else
+      with_raptor=internal
+    fi
+  elif test $with_raptor = system; then
+    if test $RAPTOR_VERSION_DEC -lt $RAPTOR_MIN_VERSION_DEC; then
+      AC_MSG_WARN(System raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
+      AC_MSG_WARN(Proceeding anyway since --with-raptor=system was given)
+      AC_MSG_WARN(To use the internal raptor use --with-raptor=internal)
+      AC_MSG_WARN(or omit any --with-raptor argument.)
+    fi
   fi
 fi
 
@@ -787,8 +791,6 @@ fi
 
 
 # Always have these
-have_raptor=1
-
 raptor_dir=raptor
 
 need_raptor=1
@@ -799,11 +801,8 @@ for parser in $parser_modules; do
 
   case $parser in
     raptor)
-      if test $have_raptor = 1 ; then
-       	need_raptor=1
-	found=1
-      fi
-        
+      need_raptor=1
+      found=1
       ;;
     *)
       AC_MSG_ERROR(No such parser $parser)
@@ -830,6 +829,34 @@ for parser in $parser_modules; do
 done
 
 
+# rasqal is REQUIRED despite the checking here
+AC_CHECK_PROG(RASQAL_CONFIG, rasqal-config, rasqal-config)
+AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/internal (default=auto)], with_rasqal="$withval", with_rasqal="auto")
+
+if test "X$RAPTOR_CONFIG" == "X"; then
+  with_rasqal=internal
+else
+  RASQAL_VERSION=`$RASQAL_CONFIG --version 2>/dev/null`
+  RASQAL_MIN_VERSION=0.2.0
+
+  RASQAL_VERSION_DEC=`$RASQAL_CONFIG --version-decimal`
+  RASQAL_MIN_VERSION_DEC=`echo $RASQAL_MIN_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+
+  if test "X$with_rasqal" = Xauto; then
+    if test "X$RASQAL_VERSION" -a $RASQAL_VERSION_DEC -ge $RASQAL_MIN_VERSION_DEC; then
+      with_rasqal=system
+    else
+      with_rasqal=internal
+    fi
+  elif test $with_rasqal = system; then
+    if test $RASQAL_VERSION_DEC -lt $RASQAL_MIN_VERSION_DEC; then
+      AC_MSG_WARN(System rasqal $RASQAL_VERSION is too old - need $RASQAL_MIN_VERSION)
+      AC_MSG_WARN(Proceeding anyway since --with-rasqal=system was given)
+      AC_MSG_WARN(To use the internal rasqal use --with-rasqal=internal)
+      AC_MSG_WARN(or omit any --with-rasqal argument.)
+    fi
+  fi
+fi
 
 dnl Checks for languages
 AC_CHECK_PROG(PHP_CONFIG, php-config, php-config)
@@ -1103,9 +1130,21 @@ if test "$persistent_store" = no; then
 fi
 
 
+dnl RDF query
+if test $with_rasqal = internal; then
+  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/rasqal $LIBRDF_INTERNAL_CPPFLAGS"
+  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/rasqal/librasqal.la $LIBRDF_INTERNAL_LIBS"
+else
+  LIBRDF_EXTERNAL_CPPFLAGS="`$RASQAL_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+  LIBRDF_EXTERNAL_LIBS="`$RASQAL_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
+  rasqal_dir=
+fi
+
+
+
 dnl Checks for building sub-packages in sub directories
 dnl before librdf (pre-requisites)
-SD_PRE="$raptor_dir"
+SD_PRE="$raptor_dir $rasqal_dir"
 dnl after librdf (use it)
 SD_POST="$languages"
 
@@ -1179,7 +1218,7 @@ AC_SUBST(abs_top_srcdir)
 abs_top_builddir=`pwd`
 AC_SUBST(abs_top_builddir)
 
-AC_CONFIG_SUBDIRS(raptor)
+AC_CONFIG_SUBDIRS([raptor rasqal])
 
 AC_CONFIG_FILES([Makefile
 docs/Makefile
