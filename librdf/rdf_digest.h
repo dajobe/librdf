@@ -88,19 +88,19 @@ void librdf_digest_print(librdf_digest* digest, FILE* fh);
 void librdf_digest_openssl_constructor(void);
 #endif
 
-/* in sha1.c */
-#ifdef HAVE_LOCAL_SHA1_DIGEST
-void sha1_constructor(void);
-#endif
-
-/* in md5.c */
+/* in librdf_digest_md5.c */
 #ifdef HAVE_LOCAL_MD5_DIGEST
-void md5_constructor(void);
+void librdf_digest_md5_constructor(void);
 #endif
 
-/* in ripemd160.c */
+/* in librdf_digest_sha1.c */
+#ifdef HAVE_LOCAL_SHA1_DIGEST
+void librdf_digest_sha1_constructor(void);
+#endif
+
+/* in librdf_digest_ripemd160.c */
 #ifdef HAVE_LOCAL_RIPEMD160_DIGEST
-void rmd160_constructor(void);
+void librdf_digest_rmd160_constructor(void);
 #endif
 
 

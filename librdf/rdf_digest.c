@@ -306,13 +306,13 @@ librdf_init_digest(void)
   librdf_digest_openssl_constructor();
 #endif
 #ifdef HAVE_LOCAL_MD5_DIGEST
-  md5_constructor();
+  librdf_digest_md5_constructor();
 #endif
 #ifdef HAVE_LOCAL_RIPEMD160_DIGEST
-  rmd160_constructor();
+  librdf_digest_rmd160_constructor();
 #endif
 #ifdef HAVE_LOCAL_SHA1_DIGEST
-  sha1_constructor();
+  librdf_digest_sha1_constructor();
 #endif
 }
 
