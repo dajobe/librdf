@@ -189,21 +189,21 @@ example4: example4.c librdf.a
 
 # Create some text files from HTML sources
 LYNX=lynx
-LYNXARGS=-dump -nolist
+HTML_TO_TEXT=TERM=vt100 $(LYNX) -dump -nolist
 
 SUFFIXES = .html .txt
 
 .html.txt:
-	$(LYNX) $(LYNXARGS) $< > $@
+	$(HTML_TO_TEXT) $< > $@
 
 README: README.html
-	$(LYNX) $(LYNXARGS) $< > $@
+	$(HTML_TO_TEXT) $< > $@
 
 NEWS: NEWS.html
-	$(LYNX) $(LYNXARGS) $< > $@
+	$(HTML_TO_TEXT) $< > $@
 
 TODO: TODO.html
-	$(LYNX) $(LYNXARGS) $< > $@
+	$(HTML_TO_TEXT) $< > $@
 
 # The action is the COMPILE definition but always using least warning CFLAGS
 @MAINT@rdf_parser_libwww.o: rdf_parser_libwww.c
