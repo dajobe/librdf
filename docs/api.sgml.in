@@ -99,10 +99,6 @@ memory or with persistant storage.
 @INCLUDE hash_bdb.sgml
 </sect1>
 <sect1>
-<title>GDBM Hash Implementation Class</title>
-@INCLUDE hash_gdbm.sgml
-</sect1>
-<sect1>
 <title>In Memory Hash Implementation Class</title>
 @INCLUDE hash_memory.sgml
 </sect1>
