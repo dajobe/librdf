@@ -1,7 +1,23 @@
+2004-07-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Redland.i, python/Makefile.am, ruby/Makefile.am,
+	ruby/redland-pre.i, ruby/redland-types.i, tcl/Makefile.am,
+	tcl/redland-init.i, tcl/redland-pre.i, php/Makefile.am,
+	php/redland-decl.i, php/redland-init.i, php/redland-post.i,
+	php/redland-pre.i, php/redland_wrap.c.patch,
+	python/redland-decl.i, python/redland-post.i, perl/Makefile.am,
+	perl/redland-decl.i, perl/redland-post.i, perl/redland-pre.i:
+	Split SWIG bits into general and language-specific parts
+
+	* librdf/rdf_query_results.c (librdf_query_results_get_bindings):
+	Fix docucomment so jade works again
+
+	* docs/api.sgml.in: id="query-results"
+
 2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* docs/Makefile.am:
-	Dont ship old pictures overview.png overview.ps overview.pdf
+	Don't ship old pictures overview.png overview.ps overview.pdf
 
 	* csharp/ChangeLog: ChangeLog in CVS now
 

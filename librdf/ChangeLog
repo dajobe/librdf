@@ -1,3 +1,8 @@
+2004-07-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_results.c (librdf_query_results_get_bindings):
+	Fix docucomment so jade works again
+
 2004-07-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_log.c: Replace librdf.h, raptor.h with redland.h.
