@@ -115,7 +115,7 @@ static command commands[]={
   /* FIXME triples-match-query is deliberately not documented */
   {CMD_QUERY, "triples-match-query", 3, 3, 0},
   {CMD_QUERY_AS_BINDINGS, "query", 3, 3, 0},
-  {CMD_SERIALIZE, "serialize", 0, 3, 0},
+  {CMD_SERIALIZE, "serialize", 0, 4, 0},
   {CMD_REMOVE_CONTEXT, "remove-context", 1, 1, 0},
   {CMD_CONTEXTS, "contexts", 0, 0, 0},
   {CMD_MATCH, "match", 3, 4, 0},
@@ -666,11 +666,12 @@ main(int argc, char *argv[])
       break;
 
     case CMD_SERIALIZE:
-        /* args are name (optional), uri (may be NULL), mime_type (optional) */
+        /* args are name (optional), uri (may be NULL), mime_type (optional), base URI (optional) */
 
         uri=NULL;
         name=NULL;
         mime_type=NULL;
+        base_uri=NULL;
 
         if(!argc)
           goto serialize;
@@ -694,6 +695,16 @@ main(int argc, char *argv[])
             mime_type=argv[2];
         }
 
+	if(argc ==4) {
+          if(strcmp(argv[3], "-")) {
+            base_uri=librdf_new_uri(world, (const unsigned char *)argv[3]);
+            if(!base_uri) {
+              fprintf(stderr, "%s: Failed to create base URI from %s\n", program, argv[3]);
+              break;
+            }
+          }
+        }
+
       serialize:
         serializer=librdf_new_serializer(world, name, mime_type, uri);
         if(!serializer) {
@@ -703,7 +714,7 @@ main(int argc, char *argv[])
           break;
         }
 
-        librdf_serializer_serialize_model(serializer, stdout, NULL, model);
+        librdf_serializer_serialize_model_to_file_handle(serializer, stdout, NULL, model);
 
         librdf_free_serializer(serializer);
         if(uri)
@@ -1250,8 +1261,9 @@ main(int argc, char *argv[])
     SYSTEM_FREE(uri_string);
 
   if(output_model) {
-    if(librdf_serializer_serialize_model(output_serializer, stdout, NULL,
-                                         output_model)) {
+    if(librdf_serializer_serialize_model_to_file_handle(output_serializer, 
+                                                        stdout, NULL,
+                                                        output_model)) {
       fprintf(stderr, "%s: Failed to serialize output model\n", program);
     };
     librdf_free_serializer(output_serializer);
