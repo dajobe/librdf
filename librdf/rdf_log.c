@@ -121,12 +121,8 @@ librdf_log_simple(librdf_world* world, int code,
   fputs(message, stderr);
   fputc('\n', stderr);
 
-  if(level == LIBRDF_LOG_FATAL)
+  if(level >= LIBRDF_LOG_FATAL)
     abort();
-#ifdef LIBRDF_DEBUG
-  if(level >= LIBRDF_LOG_ERROR)
-    abort();
-#endif
 }
 
 
