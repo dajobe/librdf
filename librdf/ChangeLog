@@ -1,5 +1,19 @@
 2004-11-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_serializer.c (librdf_serializer_set_namespace):
+	Note may not be implemented.
+
+	* rdf_query_results.c (librdf_query_results_as_stream):
+	Docs, note implemented.
+
+	* rdf_serializer_raptor.c (librdf_serializer_raptor_get_feature,
+	librdf_serializer_raptor_set_feature): Added to use new serializer
+	features.
+	(librdf_serializer_raptor_set_namespace): Added calling
+	raptor_serializer_set_namespace which should work sometime.
+
+	* rdf_query_results.c (librdf_free_query_results): Add docs.
+
 	* redland.h, rdf_utf8.h, rdf_node.h, rdf_model.h, rdf_list.h, librdf.h:
 	Applied patch from René Puls to allow for Redland public headers to
 	be in a different directory structure. If LIBRDF_OBJC_FRAMEWORK
