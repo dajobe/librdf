@@ -447,6 +447,23 @@ librdf_serializer_set_feature(librdf_serializer* serializer,
   return (-1);
 }
 
+/**
+ * librdf_serializer_set_namespace - Set a namespace URI/prefix mapping
+ * @serializer: serializer object
+ * @uri: URI of namespace
+ * @prefix: prefix to use
+ * 
+ * Return value: non 0 on failure
+ **/
+  
+int
+librdf_serializer_set_namespace(librdf_serializer* serializer,
+                                librdf_uri *uri, const char *prefix) 
+{
+  if(serializer->factory->set_namespace)
+    return serializer->factory->set_namespace(serializer->context, uri, prefix);
+  return 1;
+}
 
 
 
