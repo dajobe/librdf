@@ -945,6 +945,10 @@ if test "$assert_messages" = "yes"; then
   AC_DEFINE(LIBRDF_ASSERT_MESSAGES, 1, [Print run time assertion check failure messages.])
 fi
 
+if test "$USE_MAINTAINER_MODE" = yes; then
+  LIBRDF_CPPFLAGS="-g -DLIBRDF_DEBUG=1 $LIBRDF_CPPFLAGS"
+fi
+
 STANDARD_CFLAGS="$STANDARD_CFLAGS $CFLAGS"
 if test "$USE_MAINTAINER_MODE" = yes; then
   CFLAGS="$MAINTAINER_CFLAGS $CFLAGS"
