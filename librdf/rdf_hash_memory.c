@@ -265,27 +265,23 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
     return 0;
   }
   
-  /* Copy all old bucket pointers into first half */
-  memcpy(new_nodes, hash->nodes, hash->capacity * sizeof(librdf_hash_memory_node*));
-  /* second half is empty from calloc above - correctly */
-
 
   for(i=0; i<hash->capacity; i++) {
     librdf_hash_memory_node *node=hash->nodes[i];
-    librdf_hash_memory_node **next_ptr=&hash->nodes[i];
       
-    /* walk all attached nodes, see if they need to move bucket */
-    for(;node; node = *next_ptr) {
-      int bucket=node->hash_key & (required_capacity - 1);
-      if(bucket != i) {
-        /* needs to move */
-        *next_ptr=node->next;
-        node->next=new_nodes[bucket];
-        new_nodes[bucket]=node;
-      } else
-        next_ptr=&node->next;
-    }
+    /* walk all attached nodes */
+    while(node) {
+      librdf_hash_memory_node *next;
+      int bucket;
 
+      next=node->next;
+      /* find slot in new table */
+      bucket=node->hash_key & (required_capacity - 1);
+      node->next=new_nodes[bucket];
+      new_nodes[bucket]=node;
+
+      node=next;
+    }
   }
 
   /* now free old table */
