@@ -20,7 +20,7 @@ PACKAGE=redland
 # Where raptor may be found, in an adjacent directory
 RAPTOR_DIR=../raptor
 RAPTOR_INCS="raptor.h ntriples.h"
-RAPTOR_SRCS="raptor_parse.c ntriples_parse.c"
+RAPTOR_SRCS="raptor_parse.c ntriples_parse.c raptor_uri.c"
 
 DIE=
 
