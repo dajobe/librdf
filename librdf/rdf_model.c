@@ -276,6 +276,7 @@ librdf_model_print(librdf_model *model, FILE *fh)
   if(!stream)
     return;
   
+  fputs("[[\n", fh);
   while(!librdf_stream_end(stream)) {
     statement=librdf_stream_next(stream);
     if(!statement)
