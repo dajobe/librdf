@@ -221,8 +221,9 @@ librdf_get_query_factory(librdf_world *world,
 /**
  * librdf_new_query - Constructor - create a new librdf_query object
  * @world: redland world object
- * @name: the query language name
- * @uri: the query language URI (or NULL)
+ * @name: the name identifying the query language
+ * @uri: the URI identifying the query language (or NULL)
+ * @base_uri: the base URI of the query string (or NULL)
  * @query_string: the query string
  *
  * Return value: a new &librdf_query object or NULL on failure
@@ -230,14 +231,16 @@ librdf_get_query_factory(librdf_world *world,
 librdf_query*
 librdf_new_query (librdf_world *world,
                   const char *name, librdf_uri *uri,
-                  const unsigned char *query_string) {
+                  const unsigned char *query_string,
+                  librdf_uri* base_uri) {
   librdf_query_factory* factory;
 
   factory=librdf_get_query_factory(world, name, uri);
   if(!factory)
     return NULL;
 
-  return librdf_new_query_from_factory(world, factory, name, uri, query_string);
+  return librdf_new_query_from_factory(world, factory, name, uri, 
+                                       query_string, base_uri);
 }
 
 
@@ -310,7 +313,8 @@ librdf_query*
 librdf_new_query_from_factory(librdf_world *world,
                               librdf_query_factory* factory,
                               const char *name, librdf_uri *uri,
-                              const unsigned char *query_string) {
+                              const unsigned char *query_string,
+                              librdf_uri *base_uri) {
   librdf_query* query;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_query_factory, NULL);
@@ -337,7 +341,7 @@ librdf_new_query_from_factory(librdf_world *world,
   
   query->factory=factory;
   
-  if(factory->init(query, name, uri, query_string)) {
+  if(factory->init(query, name, uri, query_string, base_uri)) {
     librdf_free_query(query);
     return NULL;
   }
@@ -493,7 +497,7 @@ main(int argc, char *argv[])
 
   fprintf(stdout, "%s: Creating query\n", program);
   query=librdf_new_query(world, QUERY_LANGUAGE,
-                         NULL, (const unsigned char*)query_string);
+                         NULL, (const unsigned char*)query_string, NULL);
   if(!query) {
     fprintf(stderr, "%s: Failed to create new query\n", program);
     return(1);
