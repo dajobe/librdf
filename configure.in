@@ -202,20 +202,11 @@ AC_C_CONST
 AC_C_BIGENDIAN
 
 AC_CHECK_TYPE(byte, MISSING)
-AC_CHECK_TYPE(u16, MISSING)
 AC_CHECK_TYPE(u32, MISSING)
 
 AC_CHECK_SIZEOF(unsigned char, 1)
-AC_CHECK_SIZEOF(unsigned short, 2)
 AC_CHECK_SIZEOF(unsigned int, 4)
 AC_CHECK_SIZEOF(unsigned long, 4)
-AC_CHECK_SIZEOF(unsigned long long, 8)
-
-if test "$ac_cv_sizeof_unsigned_short" = "0" \
-   || test "$ac_cv_sizeof_unsigned_int" = "0" \
-   || test "$ac_cv_sizeof_unsigned_long" = "0"; then
-    AC_MSG_WARN([Hmmm, something is wrong with the sizes - using defaults]);
-fi
 
 dnl Checks for library functions.
 AC_FUNC_MEMCMP
