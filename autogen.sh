@@ -91,7 +91,7 @@ if test -d $RAPTOR_DIR; then
     rfile=$RAPTOR_DIR/$file
     if test -r $rfile; then   
       rm -f $file
-      ln -s $file .
+      ln -s $file
     else
       failed=yes
     fi
