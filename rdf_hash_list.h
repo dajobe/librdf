@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_hash_list.h - RDF Hash List Interface definition
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -25,7 +25,9 @@
 extern "C" {
 #endif
 
+
 void librdf_init_hash_list(void);
+
 
 #ifdef __cplusplus
 }

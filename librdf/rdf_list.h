@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_list.h - RDF List Interface definition
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -27,6 +27,9 @@
 extern "C" {
 #endif
 
+
+
+/* private structure */
 struct librdf_list_node_s
 {
   struct librdf_list_node_s* next;
@@ -35,19 +38,25 @@ struct librdf_list_node_s
 typedef struct librdf_list_node_s librdf_list_node;
 
 
-typedef struct
+struct librdf_list_s
 {
   librdf_list_node* first;
   librdf_list_node* current;
   int length;
-} librdf_list;
+  int (*equals) (void* data1, void *data2);
+};
 
 
 librdf_list* librdf_new_list(void);
-int librdf_free_list(librdf_list* list);
+void librdf_free_list(librdf_list* list);
 
 int librdf_list_add(librdf_list* list, void *data);
 int librdf_list_remove(librdf_list* list, void *data);
+int librdf_list_contains(librdf_list* list, void *data);
+int librdf_list_size(librdf_list* list);
+
+void librdf_list_set_equals(librdf_list* list, int (*equals) (void* data1, void *data2));
+
 librdf_iterator* librdf_list_get_iterator(librdf_list* list);
 
 

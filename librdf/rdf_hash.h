@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_hash.h - RDF Hash Factory and Hash interfaces and definitions
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -24,7 +24,8 @@
 extern "C" {
 #endif
 
-/** data type used to describe hash key and data */
+
+/** private data type used to describe hash key and data */
 typedef struct 
 {
   void *data;
@@ -43,11 +44,11 @@ typedef enum {
 
   
 /** A hash object */
-typedef struct
+struct librdf_hash_s
 {
   char *context;
   struct librdf_hash_factory_s* factory;
-} librdf_hash;
+};
 
 
 /** A Hash Factory */
@@ -84,17 +85,16 @@ typedef struct librdf_hash_factory_s librdf_hash_factory;
 
 
 
+/* factory class methods */
+void librdf_hash_register_factory(const char *name, void (*factory) (librdf_hash_factory*));
+librdf_hash_factory* librdf_get_hash_factory(const char *name);
+
+
 /* module init */
 void librdf_init_hash(void);
 
 /* module terminate */
 void librdf_finish_hash(void);
-
-/* class methods */
-void librdf_hash_register_factory(const char *name,
-                               void (*factory) (librdf_hash_factory*)
-                               );
-librdf_hash_factory* librdf_get_hash_factory(const char *name);
 
 /* constructor */
 librdf_hash* librdf_new_hash(librdf_hash_factory* factory);

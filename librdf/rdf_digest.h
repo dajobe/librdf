@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_digest.h - RDF Digest Factory / Digest interfaces and definition
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -25,6 +25,7 @@
 extern "C" {
 #endif
 
+
 typedef void* LIBRDF_DIGEST;
 
 /* based on the GNUPG cipher/digest registration stuff */
@@ -47,21 +48,17 @@ struct librdf_digest_factory_s
 typedef struct librdf_digest_factory_s librdf_digest_factory;
 
 
-typedef struct
-{
+struct librdf_digest_s {
   char *context;
   unsigned char *digest;
   librdf_digest_factory* factory;
-} librdf_digest;
+};
 
 
-void
-librdf_digest_register_factory(const char *name,
-                            void (*factory) (librdf_digest_factory*)
-                            );
+/* factory static methods */
+void librdf_digest_register_factory(const char *name, void (*factory) (librdf_digest_factory*));
 
-librdf_digest_factory*
-librdf_get_digest_factory(const char *name);
+librdf_digest_factory* librdf_get_digest_factory(const char *name);
 
 
 /* module init */

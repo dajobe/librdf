@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * md5.c - MD5 Message Digest Algorithm
  *
- * $Source$
  * $Id$
  *
  *                                       
@@ -32,14 +32,15 @@
  * don't need to include two pages of legalese with every copy.
  */
 
-#include <config.h>
+#include <rdf_config.h>
+
 #include <stdio.h>
 #ifdef HAVE_STRING_H
 #include <string.h>		/* for memcpy() */
 #endif
 
 #define LIBRDF_INTERNAL 1
-#include <rdf_config.h>
+#include <librdf.h>
 #include <rdf_digest.h>
 #include <rdf_types.h>
 

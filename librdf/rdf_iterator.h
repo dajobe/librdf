@@ -1,7 +1,7 @@
-/*
+/* -*- Mode: c; c-basic-offset: 2 -*-
+ *
  * rdf_iterator.h - RDF Iterator definition
  *
- * $Source$
  * $Id$
  *
  * (C) Dave Beckett 2000 ILRT, University of Bristol
@@ -25,24 +25,30 @@
 extern "C" {
 #endif
 
-typedef struct {
-	void *context;
-	int (*have_elements)(void*);
-	void* (*get_next)(void*);
-	void (*finished)(void*);
-} librdf_iterator;
+struct librdf_iterator_s {
+  void *context;
+  int have_more_elements; /* 0 when have no more elements */
+
+  /* Used when mapping */
+  void *next;        /* stores next element */
+  void *map_context; /* context to pass on to map */
+  
+  int (*have_elements)(void*);
+  void* (*get_next)(void*);
+  void (*finished)(void*);
+  int (*map)(void *context, void *element);
+};
 
 
-librdf_iterator* librdf_new_iterator(void *datum,
-				     int (*have_elements)(void*),
-				     void* (*get_next)(void*),
-				     void (*finished)(void*));
+librdf_iterator* librdf_new_iterator(void *context, int (*have_elements)(void*), void* (*get_next)(void*), void (*finished)(void*));
+
 void librdf_free_iterator(librdf_iterator*);
 
 int librdf_iterator_have_elements(librdf_iterator* iterator);
 
 void* librdf_iterator_get_next(librdf_iterator* iterator);
 
+void librdf_iterator_set_map(librdf_iterator* iterator, int (*map)(void *context, void *item), void *map_context);
 
 #ifdef __cplusplus
 }
