@@ -84,7 +84,7 @@ api/index.html: api.sgml
 @MAINT@	ps2pdf overview.ps overview.pdf
 @MAINT@
 @MAINT@api-big.html: api.sgml
-@MAINT@	-jade -t sgml -ihtml -d /usr/lib/sgml/stylesheets/cygnus-both.dsl -V nochunks $? > $@
+@MAINT@	-jade -t sgml -ihtml -d /usr/lib/sgml/stylesheets/cygnus-both.dsl -V nochunks $< > $@
 @MAINT@
 @MAINT@$(PERL_HTML_POD_FILES): pod/%.html: $(srcdir)/../perl/lib/%.pm $(srcdir)/fix-pod-xhtml
 @MAINT@	mkdir -p pod/RDF/Redland
@@ -100,7 +100,7 @@ api/index.html: api.sgml
 if MAINTAINER_MODE
 redland.3: redland.pod
 	pod2man --section=3 --center="Redland RDF Library" \
-	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @LIBRDF_VERSION@" $? | \
+	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @LIBRDF_VERSION@" $< | \
 	sed -e "s;REDLAND_VERSION_STRING;@LIBRDF_VERSION@;" > $@
 	rm -f pod2htm*
 
@@ -113,7 +113,7 @@ distclean-local:
 else
 # This is the best that can be done without pod2man
 redland.3: redland.pod
-	cp $? $@
+	cp $< $@
 
 clean-local:
 	rm -rf $(API_DOCBOOK_FILES) api.junk DBTOHTML* pod2htm*
