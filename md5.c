@@ -39,9 +39,9 @@
 #endif
 
 #define LIBRDF_INTERNAL 1
-#include <librdf_config.h>
-#include <librdf_digest.h>
-#include <librdf_types.h>
+#include <rdf_config.h>
+#include <rdf_digest.h>
+#include <rdf_types.h>
 
 
 /* original code from header - function names have changed */
