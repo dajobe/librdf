@@ -13,18 +13,20 @@
 <h2>Overview</h2>
 
 <p><a href="http://www.redland.opensource.ac.uk/">Redland</a> is a
-library that provides a high-level interface for RDF allowing the RDF
+library that provides a high-level interface for
+the Resource Description Framework (RDF) allowing the RDF
 graph to be parsed from XML, stored, queried and manipulated.
 Redland implements each of the RDF concepts in its own class via an
-object based API, reflected into the other language APIs - Java,
-Perl, PHP, Python, Ruby and Tcl.  Some of the classes providing the
-parsers, storage mechanisms and other elements are built as modules
-that can be added or removed as required.</p>
+object based API, reflected into the language APIs, currently Java,
+Perl, PHP, Python, Ruby and Tcl.  Several classes providing functionality
+such as for parsers, storage are built as modules that can be loaded
+at compile or run-time as required.</p>
 
-<p>This is a mature and stable RDF library developed since 2000.
+<p>This is a mature and stable RDF library developed since 2000
+<a href="using.html">used in multiple projects</a>.
 See the <a href="TODO.html">todo list</a> and the
-<a href="FAQS.html">FAQS</a> for more information.  Changes
-can be found in the <a href="NEWS.html">NEWS</a> file,
+<a href="FAQS.html">FAQS</a> for general information.  A summary
+of the changes can be found in the <a href="NEWS.html">NEWS</a> file,
 detailed API changes in the <a href="RELEASE.html">release notes</a>
 and file-by-file changes in the CVS <a href="ChangeLog">ChangeLog</a>.</p>
 
@@ -33,7 +35,7 @@ and file-by-file changes in the CVS <a href="ChangeLog">ChangeLog</a>.</p>
 <li>A modular, <a href="docs/api/objects.html">object based</a> library written in C</li>
 <li><a href="docs/java.html">Java</a>, <a href="docs/perl.html">Perl</a>, <a href="docs/php.html">PHP</a>, <a href="docs/python.html">Python</a>, <a href="docs/ruby.html">Ruby</a> and <a href="docs/tcl.html">Tcl</a> interfaces for manipulating the RDF <a href="docs/api/model.html">graph</a> and parts - <a href="docs/api/statement.html">Statements</a>, <a href="docs/api/node.html">Resources and Literals</a></li>
 <li><a href="docs/api/parser.html">Parsers</a> and <a href="docs/api/serializer.html">Serializers</a> for reading and writing RDF as syntax.</li>
-<li><a href="docs/api/storage.html">Storage</a> for graphs in memory and on disk with Sleepycat/Berkeley DB, MySQL 4 or the AKT Triplestore library.</li>
+<li><a href="docs/api/storage.html">Storage</a> for graphs in memory and on disk with Sleepycat/Berkeley DB, MySQL 4 or the <a href="http://triplestore.aktors.org/">AKT Triplestore</a> library.</li>
 <li>Query APIs for the graph by Statement (triples) or by Nodes and Arcs</li>
 <li><a href="docs/api/stream.html">Statement Streams</a> for construction, parsing, de/serialisation of graphs</li>
 <li>Start of <a href="docs/api/query.html">query language</a> support.</li>
@@ -41,7 +43,7 @@ and file-by-file changes in the CVS <a href="ChangeLog">ChangeLog</a>.</p>
 </ul>
 
 
-<h2>Sources</h2>
+<h2>Sources and Binaries</h2>
 
 <p>The packaged sources are available from
 <a href="http://www.redland.opensource.ac.uk/dist/source/">http://www.redland.opensource.ac.uk/dist/source/</a> (master site) and also from the
@@ -49,6 +51,8 @@ and file-by-file changes in the CVS <a href="ChangeLog">ChangeLog</a>.</p>
 There are 
 <a href="http://www.redland.opensource.ac.uk/dist/snapshots/source/">nightly snapshots</a> of the development version which is can also be browsed via
 <a href="http://cvs.ilrt.org/cvsweb/redland/librdf/">CVSweb</a>.
+Binary packages of redland and related libraries are available from the
+<a href="http://www.redland.opensource.ac.uk/dist/">download area</a>.
 </p>
 
 
@@ -59,7 +63,7 @@ under the LGPL or MPL licenses.  See
 <a href="LICENSE.html">LICENSE.html</a> for full details.</p>
 
 
-<h2>Installation</h2>
+<h2>Installation and Documentation</h2>
 
 <p>See <a href="INSTALL.html">INSTALL.html</a> for general
 installation and configuration information and the
