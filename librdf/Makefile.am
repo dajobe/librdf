@@ -213,7 +213,7 @@ $(top_builddir)/repat/rdfparse.o: $(top_builddir)/expat/xmlparse/xmlparse.o $(to
 	cd repat && $(MAKE) $(AM_MAKEFLAGS) all
 
 # Copy these by hand since they are symlinks to the latest versions
-# in the hom erapier source tree and the default rule just copies the
+# in the home rapier source tree and the default rule just copies the
 # (broken) links into the distribution which then fails to work.
 #
 # Note: this can't be protected with @MAINT@ since automake only
