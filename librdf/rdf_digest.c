@@ -80,7 +80,7 @@
 #include <stdio.h>
 
 #define LIBRDF_INTERNAL 1
-#include <redland.h>
+#include <librdf.h>
 #include <rdf_digest.h>
 #include <rdf_uri.h>
 

@@ -126,7 +126,7 @@ ERROR - no idea how to use Berkeley DB
 
 
 #define LIBRDF_INTERNAL 1
-#include <redland.h>
+#include <librdf.h>
 #include <rdf_hash.h>
 #include <rdf_hash_bdb.h>
 

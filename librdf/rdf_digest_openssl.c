@@ -80,7 +80,7 @@
 #include <openssl/crypto.h>
 
 #define LIBRDF_INTERNAL 1
-#include <redland.h>
+#include <librdf.h>
 #include <rdf_digest.h>
 
 #ifdef HAVE_OPENSSL_CRYPTO_MD5_DIGEST

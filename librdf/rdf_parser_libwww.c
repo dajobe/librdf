@@ -81,7 +81,7 @@
 #include <string.h>
 
 #define LIBRDF_INTERNAL 1
-#include <redland.h>
+#include <librdf.h>
 
 #include <rdf_parser.h>
 #include <rdf_node.h>
