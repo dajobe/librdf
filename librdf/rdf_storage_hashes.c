@@ -373,9 +373,13 @@ librdf_storage_hashes_close(librdf_storage* storage)
 static int
 librdf_storage_hashes_size(librdf_storage* storage)
 {
-  /* FIXME - is this possbile to get cheaply from any disk hash ? */
-  LIBRDF_FATAL1(librdf_storage_hashes_size, "Not implemented\n");
-  return -1;
+  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_hash* any_hash=context->hashes[ANY_OLD_HASH_INDEX];
+
+  if(!any_hash)
+    return -1;
+
+  return librdf_hash_values_count(any_hash);
 }
 
 
