@@ -42,8 +42,7 @@ Redland.i \
 autogen.sh \
 Makefile.PL \
 redland-config.in \
-redland-src-config.in \
-acconfig.h
+redland-src-config.in
 
 # Create some text files from HTML sources
 LYNX=lynx
