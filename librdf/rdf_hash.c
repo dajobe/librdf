@@ -1099,7 +1099,6 @@ typedef enum {
 } librdf_hfs_parse_state;
 
 
-
 /**
  * librdf_hash_from_string - Initialise a hash from a string
  * @hash: hash object
@@ -1113,15 +1112,16 @@ typedef enum {
  * Return value: non 0 on failure
  **/
 int
-librdf_hash_from_string (librdf_hash* hash, char *string) 
+librdf_hash_from_string (librdf_hash* hash, const char *string) 
 {
-  char *p;
+  const char * p;
   librdf_hash_datum hd_key, hd_value; /* on stack */
-  char *key;
+  const char *key;
   size_t key_len;
-  char *value;
+  const char *value;
   size_t value_len;
   int backslashes;
+  int saw_backslash;
   librdf_hfs_parse_state state;
   int real_value_len;
   char *new_value;
@@ -1233,13 +1233,18 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
       case HFS_PARSE_STATE_VALUE:
         value=p;
         backslashes=0;
+        saw_backslash=0;
         while(*p) {
-          if(*p == '\\')
+          if(!saw_backslash && *p == '\\') {
             /* backslashes are removed during value copy later */
             backslashes++; /* reduces real length */
-          else if (*p == '\'')
-            break;
-
+            saw_backslash=1;
+          } else {
+            if (!saw_backslash && *p == '\'')
+              break;
+            saw_backslash=0;
+          }
+          
           p++;
         }
         if(!*p)
@@ -1263,8 +1268,8 @@ librdf_hash_from_string (librdf_hash* hash, char *string)
                       "decoded key >>%s<< (true) value >>%s<<\n", key, new_value);
 #endif
         
-        hd_key.data=key; hd_key.size=key_len;
-        hd_value.data=value; hd_value.size=real_value_len;
+        hd_key.data=(void*)key; hd_key.size=key_len;
+        hd_value.data=(void*)new_value; hd_value.size=real_value_len;
         
         librdf_hash_put(hash, &hd_key, &hd_value);
         
@@ -1418,6 +1423,7 @@ main(int argc, char *argv[])
 			   "colours", "yellow",
 			   "creator", "rubik",
 			   NULL};
+  const char * const test_hash_string="field1='value1', field2='\\'value2', field3='\\\\', field4='\\\\\\'', field5 = 'a' ";
   char *test_hash_delete_key="size";
   int i,j;
   char *type;
@@ -1580,7 +1586,19 @@ main(int argc, char *argv[])
   /* close() done automatically by free so not required */
   /* librdf_hash_close(h2); */
   librdf_free_hash(h2);
-  
+
+
+  h2=librdf_new_hash(world, NULL);
+  fprintf(stdout, "%s: Initialising hash from string >>%s<<\n", program, 
+          test_hash_string);
+  librdf_hash_from_string (h2, test_hash_string);
+  fprintf(stdout, "%s: resulting ", program);
+  librdf_hash_print(h2, stdout);
+  fprintf(stdout, "\n");
+
+  librdf_free_hash(h2);
+
+   
   /* finish hash module */
   librdf_finish_hash(world);
 
