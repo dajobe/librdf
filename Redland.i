@@ -297,6 +297,8 @@ char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
 int librdf_node_set_literal_value(librdf_node* node, char* value, char *xml_language, int is_wf_xml);
+int librdf_node_set_typed_literal_value(librdf_node* node, const char* value, const char *xml_language, librdf_uri* datatype_uri);
+
 char *librdf_node_to_string(librdf_node* node);
 char *librdf_node_get_blank_identifier(librdf_node* node);
 int librdf_node_set_blank_identifier(librdf_node* node, const char *identifier);
@@ -363,7 +365,8 @@ int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *fea
 /* rdf_stream.h */
 void librdf_free_stream(librdf_stream* stream);
 int librdf_stream_end(librdf_stream* stream);
-librdf_statement* librdf_stream_next(librdf_stream* stream);
+int librdf_stream_next(librdf_stream* stream);
+librdf_statement* librdf_stream_get_object(librdf_stream* stream);
 
 /* here */
 #ifdef SWIGPYTHON
