@@ -33,6 +33,15 @@ static librdf_digest_factory* librdf_uri_digest_factory;
 
 
 /* class methods */
+
+
+/**
+ * librdf_init_uri:
+ * @factory: &librdf_digest_factory
+ * 
+ * Initialise the librdf_uri class using the given
+ * digest factory when calculating URI digests in librdf_uri_get_digest().
+ **/
 void
 librdf_init_uri(librdf_digest_factory* factory) 
 {
@@ -41,6 +50,11 @@ librdf_init_uri(librdf_digest_factory* factory)
 
 
 
+/**
+ * librdf_finish_uri:
+ * 
+ * Terminate the &librdf_uri class.
+ **/
 void
 librdf_finish_uri(void)
 {
@@ -49,9 +63,17 @@ librdf_finish_uri(void)
 
 
 
-/* constructors */
+/**
+ * librdf_new_uri:
+ * @uri_string: URI in string form
+ * 
+ * Constructor: create a new &librdf_uri object from a URI string
+ * 
+ * Return value: a new &librdf_uri object or NULL on failure
+ **/
 librdf_uri*
-librdf_new_uri (char *uri_string) {
+librdf_new_uri (char *uri_string)
+{
   librdf_uri* new_uri;
   char *new_string;
   int length;
@@ -76,6 +98,15 @@ librdf_new_uri (char *uri_string) {
 }
 
 
+/**
+ * librdf_new_uri_from_uri:
+ * @uri: &librdf_uri object
+ * 
+ * Copy constructor: create a new &librdf_uri object from an existing
+ * &librdf_uri object
+ * 
+ * Return value: a new &librdf_uri object or NULL on failure
+ **/
 librdf_uri*
 librdf_new_uri_from_uri (librdf_uri* old_uri) {
   librdf_uri* new_uri;
@@ -100,7 +131,12 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 }
 
 
-/* destructor */
+/**
+ * librdf_free_uri:
+ * @uri: &librdf_uri object
+ * 
+ * Destructor: destroy &librdf_uri object
+ **/
 void
 librdf_free_uri (librdf_uri* uri) 
 {
@@ -110,9 +146,15 @@ librdf_free_uri (librdf_uri* uri)
 }
 
 
-/* methods */
-
-/* note: does not allocate a new string */
+/**
+ * librdf_uri_as_string:
+ * @uri: &librdf_uri object
+ * 
+ * Returns a shared pointer to the URI string representation. 
+ * Note: does not allocate a new string so the caller must not free it.
+ * 
+ * Return value: string representation of URI
+ **/
 char*
 librdf_uri_as_string (librdf_uri *uri) 
 {
@@ -120,6 +162,15 @@ librdf_uri_as_string (librdf_uri *uri)
 }
 
 
+/**
+ * librdf_uri_get_digest:
+ * @uri: &librdf_uri object
+ * 
+ * Generate a digest for the URI.  The digest factory used is
+ * determined at class initialisation time by librdf_init_uri().
+ * 
+ * Return value: new &librdf_digest object or NULL on failure.
+ **/
 librdf_digest*
 librdf_uri_get_digest (librdf_uri* uri) 
 {
@@ -137,6 +188,13 @@ librdf_uri_get_digest (librdf_uri* uri)
 }
 
 
+/**
+ * librdf_uri_print:
+ * @uri: &librdf_uri object
+ * @fh: &FILE handle
+ * 
+ * Print the URI to the given file handle
+ **/
 void
 librdf_uri_print (librdf_uri* uri, FILE *fh) 
 {
@@ -144,7 +202,16 @@ librdf_uri_print (librdf_uri* uri, FILE *fh)
 }
 
 
-/* allocates a new string since this is a _to_ method */
+/**
+ * librdf_uri_to_string:
+ * @uri: &librdf_uri object
+ * 
+ * Returns a new string representing the URI object. 
+ * Note: this method allocates a new string since this is a _to_ method
+ * and the caller must free the resulting memory.
+ *
+ * Return value: string representation of the URI or NULL on failure
+ **/
 char*
 librdf_uri_to_string (librdf_uri* uri)
 {
@@ -157,8 +224,18 @@ librdf_uri_to_string (librdf_uri* uri)
 }
 
 
+/**
+ * librdf_uri_equals:
+ * @first_uri: &librdf_uri object 1
+ * @second_uri: &librdf_uri object 2
+ * 
+ * Compare two &librdf_uri objects for equality.
+ * 
+ * Return value: 0 if the objects are equal
+ **/
 int
-librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri) {
+librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri) 
+{
   if(first_uri->string_length != second_uri->string_length)
     return 0;
   return !strcmp(first_uri->string, second_uri->string);
