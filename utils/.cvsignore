@@ -4,4 +4,5 @@ Makefile
 Makefile.in
 dmalloc*
 rdfproc
+rdfproc.html
 redland-db-upgrade
