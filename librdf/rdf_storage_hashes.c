@@ -903,9 +903,14 @@ librdf_stream* librdf_storage_hashes_find_statements(librdf_storage* storage, li
                                                   librdf_statement_get_predicate(statement),
                                                   LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_OBJECT);
   } else {
+    statement=librdf_new_statement_from_statement(statement);
+    if(!statement)
+      return NULL;
+
     stream=librdf_storage_hashes_serialise(storage);
     if(stream)
-      librdf_stream_set_map(stream, &librdf_storage_hashes_find_map, (void*)statement);
+      librdf_stream_set_map(stream, &librdf_storage_hashes_find_map, 
+                            &librdf_free_statement, (void*)statement);
   }
   
   return stream;
