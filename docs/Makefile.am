@@ -19,14 +19,17 @@
 # 
 # 
 
+man_MANS=redland.3
 
 EXTRA_DIST=api.sgml.in api.sgml README.html README \
 perl.html python.html tcl.html java.html \
-build-docs fix-pod-xhtml overview.png overview.ps overview.pdf api pod
+build-docs fix-pod-xhtml overview.png overview.ps overview.pdf api pod \
+redland.pod \
+$(man_MANS)
 
 DOC_CLASSES=node statement model storage storage_hashes storage_list stream parser parser_libwww parser_repat parser_raptor parser_sirpac concepts init digest digest_md5 digest_openssl hash hash_bdb hash_cursor hash_memory heuristics iterator list uri utf8
 
-POD_MODULES=RDF RDF/Iterator RDF/Model RDF/Node RDF/Parser RDF/RSS RDF/Statement RDF/Storage RDF/Stream RDF/URI
+POD_MODULES=RDF/Redland RDF/Redland/Iterator RDF/Redland/Model RDF/Redland/Node RDF/Redland/Parser RDF/Redland/RSS RDF/Redland/Statement RDF/Redland/Storage RDF/Redland/Stream RDF/Redland/URI
 
 DOC_C_FILES=$(DOC_CLASSES:%=$(srcdir)/../rdf_%.c)
 API_DOCBOOK_FILES=$(DOC_CLASSES:%=%.sgml)
@@ -42,11 +45,11 @@ PERL=perl
 LYNX=lynx
 LYNXARGS=-dump -nolist
 
-SUFFIXES = .html .txt .sgml .ps .pdf .pm
+SUFFIXES = .html .txt .sgml .ps .pdf .pm .pod .3
 
 api: api/index.html
 
-pod: pod/RDF.html
+pod: $(PERL_HTML_POD_FILES)
 
 # Generates a tree of HTML files, not 1 file
 api/index.html: api.sgml
@@ -79,16 +82,19 @@ api/index.html: api.sgml
 @MAINT@api-big.html: api.sgml
 @MAINT@	-jade -t sgml -ihtml -d /usr/lib/sgml/stylesheets/cygnus-both.dsl -V nochunks $? > $@
 @MAINT@
-@MAINT@pod/RDF.html: $(PERL_HTML_POD_FILES)
-@MAINT@
 @MAINT@$(PERL_HTML_POD_FILES): pod/%.html: $(srcdir)/../perl/lib/%.pm $(srcdir)/fix-pod-xhtml
-@MAINT@	mkdir -p pod/RDF
-@MAINT@	-pod2html --noindex --htmlroot /docs/pod --infile=$< | tidy -asxml 2>/dev/null | perl $(srcdir)/fix-pod-xhtml $@
-@MAINT@	rm -f pod2html*
+@MAINT@	mkdir -p pod/RDF/Redland
+@MAINT@	-pod2html --noindex --htmlroot /docs/pod --infile=$< | tidy -asxml -wrap 1000 2>/dev/null | perl $(srcdir)/fix-pod-xhtml $@
+@MAINT@	rm -f pod2htm*
+@MAINT@
+@MAINT@redland.3: redland.pod
+@MAINT@	pod2man --section=3 --center="Redland RDF Library" \
+@MAINT@	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @LIBRDF_VERSION@" $? | \
+@MAINT@	sed -e "s;REDLAND_VERSION_STRING;@LIBRDF_VERSION@;" > $@
 @MAINT@
 
 clean-local:
-	rm -rf $(API_DOCBOOK_FILES) api.junk DBTOHTML* pod2html*
+	rm -rf $(API_DOCBOOK_FILES) api.junk DBTOHTML* pod2htm*
 
 README: README.html
 	$(LYNX) $(LYNXARGS) $< > $@
