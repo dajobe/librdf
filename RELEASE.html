@@ -143,6 +143,12 @@ that are described in
 
 <h3>Model Class changes</h3>
 
+<p>Check that duplicate statements are not added to models with the
+<code>librdf_model_add_statement</code> and
+<code>librdf_model_add_statements</code> methods.  The methods for
+adding statements with a context do not check.
+</p>
+
 <p>Added <code>librdf_model_query_execute</code> method to execute a
 <code>librdf_query</code> against a model, returning an
 <code>librdf_query_results</code></p>
@@ -185,6 +191,12 @@ to not always fail, returning -1</p>
 new logging API works correctly with this code.</p>
 
 <h3>Storage Class changes</h3>
+
+<p>Where possible, check that duplicate statements are not added to
+stores with the <code>librdf_storage_add_statement</code> and
+<code>librdf_storage_add_statements</code> methods.  The methods for
+adding statements with a context do not check.
+</p>
 
 <p>The "mysql" storage was updated by
 <a href="http://purl.org/net/morten/">Morten Frederiksen</a>
