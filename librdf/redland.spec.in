@@ -120,4 +120,6 @@ cd ..
 %{prefix}/lib/perl5/site_perl/*/*/Redland.pm
 %{prefix}/lib/perl5/site_perl/*/*/RDF
 
+%doc {prefix}/lib/perl5/man/man3/*
+
 %changelog
