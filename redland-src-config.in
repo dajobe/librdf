@@ -69,8 +69,8 @@ while test $# -gt 0; do
       if test @with_raptor@ = internal; then
         lpath="$lpath:@abs_top_builddir@/raptor/.libs"
       else
-        lpath=`raptor-config --prefix`
-        lpath="$lpath/lib"
+        raptor_prefix=`raptor-config --prefix`
+        lpath="$lpath:$raptor_prefix/lib"
       fi
       if test `uname` = Darwin; then
         DYLD_LIBRARY_PATH=$lpath:$DYLD_LIBRARY_PATH
