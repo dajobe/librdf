@@ -61,15 +61,19 @@ librdf_finish_node(librdf_world *world)
 /* constructors */
 
 /**
- * librdf_new_node - Constructor - create a new librdf_node object with a NULL URI.
+ * librdf_new_node - Constructor - create a new librdf_node object with a private identifier
  * @world: redland world object
  * 
+ * Calls librdf_new_node_from_blank_identifier(world, NULL) to
+ * construct a new redland blank node identifier and make a
+ * new librdf_node object for it.
+ *
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node(librdf_world *world)
 {
-  return librdf_new_node_from_uri_string(world, (char*)NULL);
+  return librdf_new_node_from_blank_identifier(world, (char*)NULL);
 }
 
     
@@ -292,7 +296,10 @@ librdf_new_node_from_typed_literal(librdf_world *world,
 /**
  * librdf_new_node_from_blank_identifier -  Constructor - create a new literal librdf_node object from a blank node identifier
  * @world: redland world object
- * @identifier: blank node identifier
+ * @identifier: blank node identifier or NULL
+ *
+ * If no identifier string is given, creates a new internal identifier
+ * and assigns it.
  * 
  * Return value: new &librdf_node object or NULL on failure
  **/
