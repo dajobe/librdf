@@ -113,6 +113,7 @@ void librdf_destroy_world(void);
 #include <rdf_uri.h>
 #include <rdf_hash.h>
 #include <rdf_digest.h>
+#include <rdf_node.h>
 #include <rdf_statement.h>
 #include <rdf_model.h>
 #include <rdf_storage.h>
