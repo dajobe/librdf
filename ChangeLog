@@ -1,3 +1,128 @@
+2004-07-14  Edd Dumbill  <edd@usefulinc.com>
+
+	* csharp/examples/example2.cs:
+	write to console when Exiting: helpswith debugging GC snafus.
+
+	* csharp/Makefile.am:
+	ensure MONO_PATH=. for running the test prog
+
+	* csharp/Uri.cs:
+	general indenting fixes.
+	uri: initialise to IntPtr.Zero
+	(Dispose): added, implemented IDisposable.
+
+	* csharp/Stream.cs:
+	general indenting fixes.
+	Implement IDisposable.
+	stream: init to IntPtr.Zero.
+	(Current): remove tmp var, add FIXME note.
+	(MoveNext): remove tmp var dance.
+	(End): remove tmp var.
+	(CurrentStatement): Added, which is (Statement) Current.
+
+	* csharp/Storage.cs:
+	general indenting fixes.
+	Implement IDisposable.
+	storage: init to IntPtr.Zero
+
+	* csharp/Statement.cs:
+	general indenting fixes.
+	stm: intialise to IntPtr.Zero
+	(Subject, Predicate, Object properties): added get accessors.
+	(Statement (IntPtr)): copy underlying statement with
+	librdf_statement_new_from_statement
+	(~Statement): test for IntPtr.Zero
+	(Dispose): Renamed from ~Statement(). Implement IDisposable.
+
+	* csharp/Serializer.cs:
+	Implement IDisposable.
+	serializer: init to IntPtr.Zero.
+
+	* csharp/QueryResults.cs:
+	general indenting fixes.
+	query_results: init to IntPtr.Zero;
+	Implement IDisposable.
+	(MoveNext): remove tmp var.
+	(End): remove tmp var.
+	(AsStream): remove tmp var, add FIXME note.
+	(BindingValue): remove tmp var.
+	(BindingValueByName): remove tmp var.
+	Implement IEnumerable.
+	(QueryResults): remove need to pass original query, make
+	constructor internal.
+
+	* csharp/Query.cs:
+	general indenting fixes.
+	Implement IDisposable.
+	query: init to IntPtr.Zero.
+	(Query (Word, string, Object, string)): init iuri to IntPtr.Zero,
+	not null.  Change third parameter to Uri type, not Object.
+	(Query (string)): use constified name for RDQL.
+	(Execute): adjust to new form of QueryResults ctor.
+
+	* csharp/Parser.cs:
+	general indenting fixes.
+	Implement IDisposable.
+	parser: init to IntPtr.Zero
+	(Parser (World, string, string, Uri)): remove ability to construct
+	with null World.
+	(ParseIntoModel): add FIXME note.
+	(ParseAsStream): add FIXME note.
+	(ParseStringAsStream): add FIXME note.
+
+	* csharp/Model.cs:
+	general indenting fixes.
+	model: initialize to IntPtr.Zero.
+	(Dispose). Renamed from ~Model. Implement IDisposable, test for
+	IntPtr.Zero.
+	(FindStatements): remove unneeded temp var.
+	(GetSources): add FIXME item.
+	(GetTarget): drop exception and make look like GetPredicate, GetSource.
+	(GetTargets): make look like GetSources, GetPredicates. Add FIXME.
+	(ToStream): add FIXME note.
+	(GetFeature): return null on failure, like GetSource and friends.
+	(QueryResults): add FIXME note.
+	(Model (World, Storage, string)): keep a reference around to the
+	storage, as we must not be GC'd before it is. Future thought: do
+	we really need Model and Storage to be separate classes?
+	(Execute): adjust to new form of QueryResults ctor (see ChangeLog)
+
+	* csharp/Node.cs:
+	general indenting fixes.
+	node: initialise to IntPtr.Zero
+	(~Node): test for IntPtr.Zero, not == null
+	(Node (IntPtr)): use librdf_new_node_from_node to copy underlying
+	node.
+	(Dispose): Renamed from Move ~Node. Implement IDisposable.
+
+	* csharp/Iterator.cs:
+	general indenting fixes.
+	Implement IDisposable.
+	iterator: init to IntPtr.Zero.
+	(Current): remove tmp var, add FIXME note.
+	(MoveNext()): remove tmp var, add explanatory comment.
+	(End): remove tmp var.
+	Remove unused field pos.
+	(CurrentNode): Added, which is (Node) Current.
+
+2004-07-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+	
+	* raptor/tests/Makefile.am, raptor/tests/bad-22.rdf:
+	bad-22.rdf testing rdf:li forbidden as a
+	property attribute (Graham Klyne)
+
+2004-07-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/redland.spec.in:
+	Use MAKE_PL_OPTS along with "make Makefile.perl" to ensure that the
+	right flags get passed in, rather than invoking perl Makefile.PL
+	directly
+
+	* perl/Makefile.am: Added MAKE_PL_OPTS for "perl Makefile.PL" target
+
+	* docs/Makefile.am:
+	Added RDF::Redland::Query and QueryResults perl docs
+
 2004-07-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/redland.spec.in:
