@@ -86,7 +86,8 @@ enum command_type {
   CMD_SERIALIZE,
   CMD_REMOVE_CONTEXT,
   CMD_CONTEXTS,
-  CMD_MATCH
+  CMD_MATCH,
+  CMD_SIZE
 };
 
 typedef struct
@@ -124,6 +125,7 @@ static command commands[]={
   {CMD_REMOVE_CONTEXT, "remove-context", 1, 1, 0},
   {CMD_CONTEXTS, "contexts", 0, 0, 0},
   {CMD_MATCH, "match", 3, 4, 0},
+  {CMD_SIZE, "size", 0, 0, 0},
   {(enum command_type)-1, NULL}  
 };
  
@@ -488,6 +490,7 @@ main(int argc, char *argv[])
     puts("  source | target | arc NODE1 NODE2         Show 1 matching node.");
     puts("  arcs-in | arcs-out NODE                   Show properties in/out of NODE");
     puts("  has-arc-in | has-arc-out NODE ARC         Check for property in/out of NODE.");
+    puts("  size                                      Print the number of triples in the graph.");
     puts("\nNotation:");
     puts("  nodes are either blank node identifiers like _:ABC,");
     puts("    URIs like http://example.org otherwise are literal strings.");
@@ -1256,6 +1259,14 @@ main(int argc, char *argv[])
       fprintf(stderr, "%s: contexts: %d\n", program, count);
       break;
 
+
+    case CMD_SIZE:
+      count=librdf_model_size(model);
+      if(count >= 0)
+        fprintf(stderr, "%s: graph has %d triples\n", program, count);
+      else
+        fprintf(stderr, "%s: graph has unknown number of triples\n", program);
+      break;
 
     default:
       fprintf(stderr, "%s: Unknown command %d\n", program, type);
