@@ -1257,6 +1257,7 @@ ruby/lib/Makefile
 ruby/lib/rdf/Makefile
 ruby/lib/rdfs/Makefile
 csharp/Makefile
+csharp/examples/Makefile
 utils/Makefile
 demos/Makefile
 data/Makefile
