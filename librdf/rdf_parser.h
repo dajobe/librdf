@@ -120,6 +120,7 @@ void librdf_parser_libwww_constructor(librdf_world* world);
 #endif
 #ifdef HAVE_RAPTOR_RDF_PARSER
 void librdf_parser_raptor_constructor(librdf_world* world);
+void librdf_parser_raptor_destructor(void);
 #endif
 #ifdef HAVE_REPAT_RDF_PARSER
 void librdf_parser_repat_constructor(librdf_world* world);
