@@ -517,7 +517,7 @@ librdf_hash_gdbm_register_factory(librdf_hash_factory *factory)
 
 /**
  * librdf_init_hash_gdbm - Initialise the GDBM hash module
- * 
+ * @world: redland world object
  **/
 void
 librdf_init_hash_gdbm(librdf_world *world)

@@ -80,7 +80,7 @@ librdf_uri* librdf_concept_schema_namespace_uri = NULL;
 
 /**
  * librdf_init_concepts - Initialise the concepts module.
- * @factory: digest factory to use for digesting concepts content.
+ * @world: redland world object
  * 
  **/
 void
@@ -99,7 +99,7 @@ librdf_init_concepts(librdf_world *world)
       librdf_concept_schema_namespace_uri;
     const char * token=librdf_concept_tokens[i];
 
-    librdf_concept_resources[i]=librdf_new_node_from_uri_qname(world, ns_uri, token);
+    librdf_concept_resources[i]=librdf_new_node_from_uri_local_name(world, ns_uri, token);
     if(!librdf_concept_resources[i])
       LIBRDF_FATAL1(librdf_init_concepts, "Failed to create Node from URI\n");
 
@@ -111,6 +111,7 @@ librdf_init_concepts(librdf_world *world)
 
 /**
  * librdf_finish_concepts - Terminate the librdf_concepts module
+ * @world: redland world object
  **/
 void
 librdf_finish_concepts(librdf_world *world)

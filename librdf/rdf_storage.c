@@ -51,6 +51,7 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
 
 /**
  * librdf_init_storage - Initialise the librdf_storage module
+ * @world: redland world object
  * 
  * Initialises and registers all
  * compiled storage modules.  Must be called before using any of the storage
@@ -67,6 +68,7 @@ librdf_init_storage(librdf_world *world)
 
 /**
  * librdf_finish_storage - Terminate the librdf_storage module
+ * @world: redland world object
  **/
 void
 librdf_finish_storage(librdf_world *world) 
@@ -194,6 +196,7 @@ librdf_get_storage_factory (const char *name)
 
 /**
  * librdf_new_storage - Constructor - create a new librdf_storage object
+ * @world: redland world object
  * @storage_name: the storage factory name
  * @name: an identifier for the storage
  * @options_string: options to initialise storage
@@ -290,6 +293,7 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
 
 /**
  * librdf_new_storage_from_factory - Constructor - create a new librdf_storage object
+ * @world: redland world object
  * @factory: the factory to use to construct the storage
  * @name: name to use for storage
  * @options: &librdf_hash of options to initialise storage

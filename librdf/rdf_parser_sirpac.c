@@ -597,6 +597,7 @@ librdf_parser_sirpac_w3c_register_factory(librdf_parser_factory *factory)
 
 /**
  * librdf_parser_sirpac_constructor - Initialise the SiRPAC RDF parser module
+ * @world: redland world object
  **/
 void
 librdf_parser_sirpac_constructor(librdf_world *world)

@@ -136,8 +136,8 @@ librdf_node* librdf_new_node_from_uri_string(librdf_world* world, const char *st
 /* Create a new resource Node from URI object. */
 librdf_node* librdf_new_node_from_uri(librdf_world* world, librdf_uri *uri);
 
-/* Create a new resource Node from URI object with a qname */
-librdf_node* librdf_new_node_from_uri_qname(librdf_world* world, librdf_uri *uri, const char *qname);
+/* Create a new resource Node from URI object with a local_name */
+librdf_node* librdf_new_node_from_uri_local_name(librdf_world* world, librdf_uri *uri, const char *local_name);
 
 /* Create a new resource Node from URI string renormalised to a new base */
 librdf_node* librdf_new_node_from_normalised_uri_string(librdf_world* world, const char *uri_string, librdf_uri *source_uri, librdf_uri *base_uri);

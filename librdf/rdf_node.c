@@ -36,7 +36,7 @@
 
 /**
  * librdf_init_node - Initialise the node module.
- * @factory: digest factory to use for digesting node content.
+ * @world: redland world object
  * 
  **/
 void
@@ -47,6 +47,7 @@ librdf_init_node(librdf_world* world)
 
 /**
  * librdf_finish_node - Terminate the librdf_node module
+ * @world: redland world object
  **/
 void
 librdf_finish_node(librdf_world *world)
@@ -59,6 +60,7 @@ librdf_finish_node(librdf_world *world)
 
 /**
  * librdf_new_node - Constructor - create a new librdf_node object with a NULL URI.
+ * @world: redland world object
  * 
  * Return value: a new &librdf_node object or NULL on failure
  **/
@@ -72,6 +74,7 @@ librdf_new_node(librdf_world *world)
 
 /**
  * librdf_new_node_from_uri_string - Constructor - create a new librdf_node object from a URI string
+ * @world: redland world object
  * @uri_string: string representing a URI
  * 
  * The URI can be NULL, and can be set later.
@@ -119,6 +122,7 @@ librdf_new_node_from_uri_string(librdf_world *world, const char *uri_string)
 
 /**
  * librdf_new_node_from_uri - Constructor - create a new resource librdf_node object with a given URI
+ * @world: redland world object
  * @uri: &rdf_uri object
  *
  * Return value: a new &librdf_node object or NULL on failure
@@ -137,15 +141,16 @@ librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
 
 
 /**
- * librdf_new_node_from_uri_qname - Constructor - create a new resource librdf_node object with a given URI and qualified name
+ * librdf_new_node_from_uri_local_name - Constructor - create a new resource librdf_node object with a given URI and local name
+ * @world: redland world object
  * @uri: &rdf_uri object
- * @qname: qualfied name to append to URI
+ * @local_name: local name to append to URI
  *
  * Return value: a new &librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_uri_qname(librdf_world *world, 
-                               librdf_uri *uri, const char *qname) 
+librdf_new_node_from_uri_local_name(librdf_world *world, 
+                                    librdf_uri *uri, const char *local_name) 
 {
   librdf_node* new_node;
   librdf_uri *new_uri;
@@ -161,7 +166,7 @@ librdf_new_node_from_uri_qname(librdf_world *world,
   /* not needed thanks to calloc */
   /* new_node->value.resource.uri = NULL; */
   
-  new_uri=librdf_new_uri_from_uri_qname(uri, qname);
+  new_uri=librdf_new_uri_from_uri_local_name(uri, local_name);
   if (!new_uri) {
     librdf_free_node(new_node);
     return NULL;
@@ -178,6 +183,7 @@ librdf_new_node_from_uri_qname(librdf_world *world,
 
 /**
  * librdf_new_node_from_normalised_uri_string - Constructor - create a new librdf_node object from a URI string normalised to a new base URI
+ * @world: redland world object
  * @uri_string: string representing a URI
  * @source_uri: source URI
  * @base_uri: base URI
@@ -206,6 +212,7 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
 
 /**
  * librdf_new_node_from_literal -  Constructor - create a new literal librdf_node object
+ * @world: redland world object
  * @string: literal string value
  * @xml_language: literal XML language (or NULL)
  * @xml_space: XML space properties (0 if unknown)
@@ -300,6 +307,8 @@ librdf_new_node_from_node(librdf_node *node)
 
 /**
  * librdf_node_init - initialise a statically declared librdf_node
+ * @world: redland world object
+ * @node: &librdf_node object
  * 
  * Return value: a new &librdf_node or NULL on failure
  **/

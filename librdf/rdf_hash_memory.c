@@ -987,7 +987,7 @@ librdf_hash_memory_register_factory(librdf_hash_factory *factory)
 
 /**
  * librdf_init_hash_memory - Initialise the memory hash module
- * @default_load_factor: Default hash load factor (0-1000)
+ * @world: redland world object
  * 
  * Initialises the memory hash module and sets the default hash load factor.
  *

@@ -64,7 +64,8 @@ librdf_delete_parser_factories(librdf_world *world)
 
 
 /**
- * librdf_parser_register_factory - Register a parser factory
+ * librdf_parser_register_factory - Register a parser factory 
+ * @world: redland world object
  * @name: the name of the parser
  * @mime_type: MIME type of the syntax (optional)
  * @uri_string: URI of the syntax (optional)
@@ -142,6 +143,7 @@ librdf_parser_register_factory(librdf_world *world,
 
 /**
  * librdf_get_parser_factory - Get a parser factory by name
+ * @world: redland world object
  * @name: the name of the factory
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI of syntax (NULL if not used)
@@ -192,6 +194,7 @@ librdf_get_parser_factory(librdf_world *world,
 
 /**
  * librdf_new_parser - Constructor - create a new librdf_parser object
+ * @world: redland world object
  * @name: the parser factory name
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI of syntax (NULL if not used)
@@ -215,6 +218,7 @@ librdf_new_parser(librdf_world *world,
 
 /**
  * librdf_new_parser_from_factory - Constructor - create a new librdf_parser object
+ * @world: redland world object
  * @factory: the parser factory to use to create this parser
  * 
  * Return value: new &librdf_parser object or NULL
@@ -327,6 +331,7 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
 
 /**
  * librdf_init_parser - Initialise the librdf_parser class
+ * @world: redland world object
  **/
 void
 librdf_init_parser(librdf_world *world) 
@@ -348,6 +353,7 @@ librdf_init_parser(librdf_world *world)
 
 /**
  * librdf_finish_parser - Terminate the librdf_parser class
+ * @world: redland world object
  **/
 void
 librdf_finish_parser(librdf_world *world) 

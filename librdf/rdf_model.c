@@ -36,6 +36,7 @@
 
 /**
  * librdf_init_model - Initialise librdf_model class
+ * @world: redland world object
  **/
 void
 librdf_init_model(librdf_world *world)
@@ -46,6 +47,7 @@ librdf_init_model(librdf_world *world)
 
 /**
  * librdf_finish_model - Terminate librdf_model class
+ * @world: redland world object
  **/
 void
 librdf_finish_model(librdf_world *world)
@@ -56,6 +58,7 @@ librdf_finish_model(librdf_world *world)
 
 /**
  * librdf_new_model - Constructor - create a new librdf_storage object
+ * @world: redland world object
  * @storage: &librdf_storage to use
  * @options_string: options to initialise model
  *
@@ -90,6 +93,7 @@ librdf_new_model (librdf_world *world,
 
 /**
  * librdf_new_model - Constructor - Create a new librdf_model with storage
+ * @world: redland world object
  * @storage: &librdf_storage storage to use
  * @options: &librdf_hash of options to use
  * 

@@ -36,6 +36,7 @@ static librdf_statement* librdf_stream_get_next_mapped_statement(librdf_stream* 
 
 /**
  * librdf_new_stream - Constructor - create a new librdf_stream
+ * @world: redland world object
  * @context: context to pass to the stream implementing objects
  * @end_of_stream: pointer to function to test for end of stream
  * @next_statement: pointer to function to get the next statement in stream

@@ -34,6 +34,7 @@
 
 /**
  * librdf_init_statement - Initialise the librdf_statement module
+ * @world: redland world object
  **/
 void
 librdf_init_statement(librdf_world *world) 
@@ -43,6 +44,7 @@ librdf_init_statement(librdf_world *world)
 
 /**
  * librdf_finish_statement - Terminate the librdf_statement module
+ * @world: redland world object
  **/
 void
 librdf_finish_statement(librdf_world *world) 
@@ -52,6 +54,7 @@ librdf_finish_statement(librdf_world *world)
 
 /**
  * librdf_new_statement - Constructor - create a new empty librdf_statement
+ * @world: redland world object
  * 
  * Return value: a new &librdf_statement or NULL on failure
  **/
@@ -70,6 +73,7 @@ librdf_new_statement(librdf_world *world)
 
 /**
  * librdf_new_statement_from_statement - Copy constructor - create a new librdf_statement from an existing librdf_statement
+ * @world: redland world object
  * @statement: &librdf_statement to copy
  * 
  * Return value: a new &librdf_statement with copy or NULL on failure
@@ -114,6 +118,7 @@ librdf_new_statement_from_statement(librdf_statement* statement)
 
 /**
  * librdf_new_statement_from_nodes - Constructor - create a new librdf_statement from existing librdf_node objects
+ * @world: redland world object
  * @subject: &librdf_node
  * @predicate: &librdf_node
  * @object: &librdf_node
@@ -151,6 +156,8 @@ librdf_new_statement_from_nodes(librdf_world *world,
 
 /**
  * librdf_statement_init - initialise a statically declared librdf_statement
+ * @world: redland world object
+ * @statement: &librdf_statement object
  * 
  * Return value: a new &librdf_statement or NULL on failure
  **/

@@ -66,6 +66,7 @@ librdf_new_world(void) {
 
 /**
  * librdf_free_world - Terminate the library
+ * @world: redland world object
  * 
  * Terminates and frees the resources.
  **/
@@ -92,6 +93,7 @@ librdf_free_world(librdf_world *world)
 
 /**
  * librdf_world_open - Open an environment
+ * @world: redland world object
  * 
  **/
 void
@@ -116,6 +118,8 @@ librdf_world_open(librdf_world *world)
 
 /*
  * librdf_error - Error - Internal
+ * @world: redland world object
+ * @message: message arguments
  **/
 void
 librdf_error(librdf_world* world, const char *message, ...)
@@ -139,6 +143,8 @@ librdf_error(librdf_world* world, const char *message, ...)
 
 /*
  * librdf_warning - Warning - Internal
+ * @world: redland world object
+ * @message: message arguments
  **/
 void
 librdf_warning(librdf_world* world, const char *message, ...)
@@ -162,7 +168,7 @@ librdf_warning(librdf_world* world, const char *message, ...)
 
 /**
  * librdf_world_set_error - Set the world error handling function
- * @world: the world
+ * @world: redland world object
  * @user_data: user data to pass to function
  * @error_fn: pointer to the function
  * 
@@ -180,7 +186,7 @@ librdf_world_set_error(librdf_world* world, void *user_data,
 
 /**
  * librdf_world_set_warning - Set the world warning handling function
- * @world: the world
+ * @world: redland world object
  * @user_data: user data to pass to function
  * @warning_fn: pointer to the function
  * 
@@ -199,7 +205,7 @@ librdf_world_set_warning(librdf_world* world, void *user_data,
 
 /**
  * librdf_world_set_digest - Set the default digest name
- * @world: the world
+ * @world: redland world object
  * @name: Digest factory name
  *
  * Sets the digest factory for various modules that need to make
@@ -214,7 +220,7 @@ librdf_world_set_digest(librdf_world* world, const char *name) {
 
 /**
  * librdf_world_set_uris_hash - Set the hash object to use for URI class
- * @world: the world
+ * @world: redland world object
  * @uris_hash: librdf_hash* hash
  *
  * If a uris_hash is given, that is passed to the URIs class
@@ -250,6 +256,8 @@ static librdf_world* RDF_World;
 
 /**
  * librdf_init_world - Initialise the library (DEPRECATED)
+ * @digest_factory_name: Name of digest factory to use
+ * @uris_hash: Hash to store URIs in
  *
  * Use librdf_new_world and librdf_world_open on librdf_world object
  * 

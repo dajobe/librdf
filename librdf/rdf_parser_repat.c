@@ -728,6 +728,7 @@ librdf_parser_repat_register_factory(librdf_parser_factory *factory)
 
 /**
  * librdf_parser_repat_constructor - Initialise the Repat RDF parser module
+ * @world: redland world object
  **/
 void
 librdf_parser_repat_constructor(librdf_world *world)

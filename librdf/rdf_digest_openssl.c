@@ -151,6 +151,7 @@ librdf_openssl_ripemd160_register_factory(librdf_digest_factory *factory)
 
 /**
  * librdf_digest_openssl_constructor - Initialise the OpenSSL digest module
+ * @world: redland world object
  * 
  **/
 void

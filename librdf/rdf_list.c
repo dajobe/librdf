@@ -64,6 +64,7 @@ librdf_list_find_node(librdf_list* list, void *data)
 
 /**
  * librdf_new_list - Constructor - create a new librdf_list
+ * @world: redland world object
  * 
  * Return value: a new &librdf_list or NULL on failure
  **/

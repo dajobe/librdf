@@ -51,6 +51,7 @@ librdf_delete_digest_factories(librdf_world *world)
 
 /**
  * librdf_digest_register_factory - Register a hash factory
+ * @world: redland world object
  * @name: the name of the hash
  * @factory: function to be called to register the factory parameters
  * 
@@ -107,6 +108,7 @@ librdf_digest_register_factory(librdf_world *world, const char *name,
 
 /**
  * librdf_get_digest_factory - get a digest factory
+ * @world: redland world object
  * @name: the name of the factory
  * 
  * Return value: the factory or NULL if not found
@@ -140,6 +142,7 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
 
 /**
  * librdf_new_digest - Constructor - create a new librdf_digest object
+ * @world: redland world object
  * @name: the digest name to use to create this digest
  * 
  * Return value: new &librdf_digest object or NULL
@@ -159,6 +162,7 @@ librdf_new_digest(librdf_world *world, char *name)
 
 /**
  * librdf_new_digest_from_factory - Constructor - create a new librdf_digest object
+ * @world: redland world object
  * @factory: the digest factory to use to create this digest
  * 
  * Return value: new &librdf_digest object or NULL
@@ -319,6 +323,7 @@ librdf_digest_print(librdf_digest* digest, FILE* fh)
 
 /**
  * librdf_init_digest - Initialise the librdf_digest class
+ * @world: redland world object
  **/
 void
 librdf_init_digest(librdf_world *world) 
@@ -345,6 +350,7 @@ librdf_init_digest(librdf_world *world)
 
 /**
  * librdf_finish_digest - Terminate the librdf_digest class
+ * @world: redland world object
  **/
 void
 librdf_finish_digest(librdf_world *world) 

@@ -992,6 +992,7 @@ librdf_hash_bdb_register_factory(librdf_hash_factory *factory)
 
 /**
  * librdf_init_hash_bdb - Initialise the BerkeleyDB hash module
+ * @world: redland world object
  **/
 void
 librdf_init_hash_bdb(librdf_world *world)

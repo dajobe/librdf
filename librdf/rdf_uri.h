@@ -55,8 +55,8 @@ void librdf_finish_uri(librdf_world *world);
 librdf_uri* librdf_new_uri (librdf_world *world, const char *string);
 /* Create a new URI from an existing URI - CLONE */
 librdf_uri* librdf_new_uri_from_uri (librdf_uri* uri);
-/* Create a new URI from an existing URI and qname */
-librdf_uri* librdf_new_uri_from_uri_qname (librdf_uri* uri, const char *qname);
+/* Create a new URI from an existing URI and local name */
+librdf_uri* librdf_new_uri_from_uri_local_name (librdf_uri* uri, const char *local_name);
 
 /* destructor */
 void librdf_free_uri(librdf_uri *uri);

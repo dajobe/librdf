@@ -75,6 +75,7 @@ static void librdf_hash_keys_iterator_finished(void* iterator);
  * Initialises and registers all
  * compiled hash modules.  Must be called before using any of the hash
  * factory functions such as librdf_get_hash_factory()
+ * @world: redland world object
  **/
 void
 librdf_init_hash(librdf_world *world) 
@@ -96,6 +97,7 @@ librdf_init_hash(librdf_world *world)
 
 /**
  * librdf_finish_hash - Terminate the librdf_hash module
+ * @world: redland world object
  **/
 void
 librdf_finish_hash(librdf_world *world) 
@@ -147,6 +149,7 @@ librdf_free_hash_datums(librdf_world *world)
 
 /**
  * librdf_new_hash_datum - Constructor - Create a new hash datum object
+ * @world: redland world object
  * @data: data to store
  * @size: size of data
  * 
@@ -192,6 +195,7 @@ librdf_free_hash_datum(librdf_hash_datum *datum)
 
 /**
  * librdf_hash_register_factory - Register a hash factory
+ * @world: redland world object
  * @name: the hash factory name
  * @factory: pointer to function to call to register the factory
  * 
@@ -243,6 +247,7 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
 
 /**
  * librdf_get_hash_factory - Get a hash factory by name
+ * @world: redland world object
  * @name: the factory name or NULL for the default factory
  * 
  * FIXME: several bits of code assume the default hash factory is
@@ -281,6 +286,7 @@ librdf_get_hash_factory(librdf_world *world, const char *name)
 
 /**
  * librdf_new_hash -  Constructor - create a new librdf_hash object
+ * @world: redland world object
  * @name: factory name
  *
  * Return value: a new &librdf_hash object or NULL on failure
@@ -299,6 +305,7 @@ librdf_new_hash(librdf_world *world, char* name) {
 
 /**
  * librdf_new_hash_from_factory -  Constructor - create a new librdf_hash object from a factory
+ * @world: redland world object
  * @factory: the factory to use to construct the hash
  *
  * Return value: a new &librdf_hash object or NULL on failure

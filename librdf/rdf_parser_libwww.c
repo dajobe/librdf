@@ -627,6 +627,7 @@ librdf_parser_libwww_register_factory(librdf_parser_factory *factory)
 
 /**
  * librdf_parser_libwww_constructor - Initialise the libwww RDF parser module
+ * @world: redland world object
  **/
 void
 librdf_parser_libwww_constructor(librdf_world *world)

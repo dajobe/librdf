@@ -35,6 +35,7 @@ static void* librdf_iterator_get_next_mapped_element(librdf_iterator* iterator);
 
 /**
  * librdf_new_iterator - Constructor - create a new librdf_iterator object
+ * @world: redland world object
  * @context: context to pass to the iterator functions
  * @is_end: function to call to see if the iteration has ended
  * @get_next: function to get the next element
@@ -241,8 +242,8 @@ librdf_iterator_get_next(librdf_iterator* iterator)
 /**
  * librdf_iterator_add_map - Add a librdf_iterator mapping function
  * @iterator: the iterator
- * @map: the function to operate
- * @map_context: the context to pass to the map function
+ * @fn: the function to operate
+ * @context: the context to pass to the map function
  * 
  * Adds an iterator mapping function which operates over the iterator to
  * select which elements are returned; it will be applied as soon as

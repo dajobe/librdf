@@ -38,7 +38,7 @@
 
 /**
  * librdf_init_uri - Initialise the librdf_uri class
- * @world: &librdf_world
+ * @world: redland world object
  *
  **/
 void
@@ -62,6 +62,7 @@ librdf_init_uri(librdf_world *world)
 
 /**
  * librdf_finish_uri - Terminate the librdf_uri class
+ * @world: redland world object
  **/
 void
 librdf_finish_uri(librdf_world *world)
@@ -76,6 +77,7 @@ librdf_finish_uri(librdf_world *world)
 
 /**
  * librdf_new_uri - Constructor - create a new librdf_uri object from a URI string
+ * @world: redland world object
  * @uri_string: URI in string form
  * 
  * A new URI is constructed from a copy of the string.
@@ -168,15 +170,15 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 
 
 /**
- * librdf_new_uri_from_uri_qname - Copy constructor - create a new librdf_uri object from an existing librdf_uri object and a qname
+ * librdf_new_uri_from_uri_local_name - Copy constructor - create a new librdf_uri object from an existing librdf_uri object and a local name
  * @old_uri: &librdf_uri object
- * @qname: qualfiied name to append to URI
+ * @local_name: local name to append to URI
  * 
  * Return value: a new &librdf_uri object or NULL on failure
  **/
 librdf_uri*
-librdf_new_uri_from_uri_qname (librdf_uri* old_uri, const char *qname) {
-  int len=old_uri->string_length + strlen(qname) +1 ; /* +1 for \0 */
+librdf_new_uri_from_uri_local_name (librdf_uri* old_uri, const char *local_name) {
+  int len=old_uri->string_length + strlen(local_name) +1 ; /* +1 for \0 */
   char *new_string;
   librdf_uri* new_uri;
   
@@ -185,7 +187,7 @@ librdf_new_uri_from_uri_qname (librdf_uri* old_uri, const char *qname) {
     return NULL;
 
   strcpy(new_string, old_uri->string);
-  strcat(new_string, qname);
+  strcat(new_string, local_name);
 
   new_uri=librdf_new_uri (old_uri->world, new_string);
   LIBRDF_FREE(cstring, new_string);
@@ -288,7 +290,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
 
     /* just append to base URI if it has no fragment */
     if(!*p)
-      return librdf_new_uri_from_uri_qname(base_uri, uri_string);
+      return librdf_new_uri_from_uri_local_name(base_uri, uri_string);
 
     /* otherwise, take the prefix of base URI and add the fragment part */
     new_uri_string=(char*)LIBRDF_MALLOC(cstring, (p-base_uri->string) + uri_string_length + 1);
