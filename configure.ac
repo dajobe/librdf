@@ -735,7 +735,7 @@ AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/inter
 
 RAPTOR_MIN_VERSION=1.3.0
 AC_SUBST(RAPTOR_MIN_VERSION)
-if test "X$RAPTOR_CONFIG" == "X"; then
+if test "X$RAPTOR_CONFIG" = "X"; then
   with_raptor=internal
 else
   RAPTOR_VERSION=`$RAPTOR_CONFIG --version 2>/dev/null`
@@ -836,7 +836,7 @@ AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/inter
 
 RASQAL_MIN_VERSION=0.2.0
 AC_SUBST(RASQAL_MIN_VERSION)
-if test "X$RAPTOR_CONFIG" == "X"; then
+if test "X$RAPTOR_CONFIG" = "X"; then
   with_rasqal=internal
 else
   RASQAL_VERSION=`$RASQAL_CONFIG --version 2>/dev/null`
