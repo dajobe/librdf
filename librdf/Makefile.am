@@ -28,7 +28,8 @@ rdf_hash.h \
 rdf_digest.h \
 rdf_types.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
-rdf_model.h rdf_iterator.h \
+rdf_model.h rdf_model_storage.h \
+rdf_iterator.h \
 rdf_storage.h \
 rdf_stream.h \
 rdf_parser.h \
