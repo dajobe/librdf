@@ -33,7 +33,7 @@
 
 
 /* prototypes of local helper functions */
-static librdf_statement* librdf_stream_get_next_mapped_statement(librdf_stream* stream);
+static librdf_statement* librdf_stream_update_current_statement(librdf_stream* stream);
 
 
 /**
@@ -82,6 +82,7 @@ librdf_new_stream(librdf_world *world,
   new_stream->finished_method=finished_method;
 
   new_stream->is_finished=0;
+  new_stream->current=NULL;
   
   return new_stream;
 }
@@ -110,7 +111,7 @@ librdf_free_stream(librdf_stream* stream)
  * Return value: the next statement or NULL at end of stream
  */
 static librdf_statement*
-librdf_stream_get_next_mapped_statement(librdf_stream* stream) 
+librdf_stream_update_current_statement(librdf_stream* stream) 
 {
   librdf_statement* statement=NULL;
   
@@ -120,16 +121,24 @@ librdf_stream_get_next_mapped_statement(librdf_stream* stream)
                                  LIBRDF_STREAM_GET_METHOD_GET_OBJECT);
     if(!statement)
       break;
+
+    if(!stream->map)
+      break;
     
     /* apply the map to the statement  */
-    if(stream->map)
-      statement=stream->map(stream->map_context, statement);
+    statement=stream->map(stream->map_context, statement);
+
     /* found something, return it */
     if(statement)
       break;
 
     stream->next_method(stream->context);
   }
+
+  stream->current=statement;
+  if(!stream->current)
+    stream->is_finished=1;
+
   return statement;
 }
 
@@ -144,29 +153,12 @@ int
 librdf_stream_end(librdf_stream* stream) 
 {
   /* always end of NULL stream */
-  if(!stream)
+  if(!stream || stream->is_finished)
     return 1;
   
-  if(stream->is_finished)
-    return 1;
+  librdf_stream_update_current_statement(stream);
 
-  /* simple case, no mapping so pass on */
-  if(!stream->map)
-    return (stream->is_finished=stream->is_end_method(stream->context));
-
-
-  /* mapping from here */
-
-  /* already have 1 stored item */
-  if(stream->current)
-    return 0;
-
-  /* get next item subject to map or NULL if list ended */
-  stream->current=librdf_stream_get_next_mapped_statement(stream);
-  if(!stream->current)
-    stream->is_finished=1;
-  
-  return (stream->current == NULL);
+  return stream->is_finished;
 }
 
 
@@ -179,18 +171,15 @@ librdf_stream_end(librdf_stream* stream)
 int
 librdf_stream_next(librdf_stream* stream) 
 {
-  if(stream->is_finished)
+  if(!stream || stream->is_finished)
     return 1;
 
-  stream->is_finished=stream->next_method(stream->context);
-
-  /* simple case, no mapping so pass on */
-  if(!stream->is_finished) {
-    stream->current=librdf_stream_get_next_mapped_statement(stream);
-
-    if(!stream->current)
-      stream->is_finished=1;
+  if(stream->next_method(stream->context)) {
+    stream->is_finished=1;
+    return 1;
   }
+  
+  librdf_stream_update_current_statement(stream);
 
   return stream->is_finished;
 }
@@ -208,6 +197,9 @@ librdf_stream_get_object(librdf_stream* stream)
   if(stream->is_finished)
     return NULL;
 
+  if(!librdf_stream_update_current_statement(stream))
+    return NULL;
+
   return stream->get_method(stream->context, 
                             LIBRDF_STREAM_GET_METHOD_GET_OBJECT);
 }
@@ -223,6 +215,9 @@ void*
 librdf_stream_get_context(librdf_stream* stream) 
 {
   if(stream->is_finished)
+    return NULL;
+
+  if(!librdf_stream_update_current_statement(stream))
     return NULL;
 
   return stream->get_method(stream->context, 
