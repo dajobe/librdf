@@ -220,9 +220,6 @@ rm -f missing depcomp
 # automake junk
 rm -rf autom4te.cache
 
-echo "$program: Running libtoolize --copy --automake"
-$DRYRUN libtoolize --copy --automake
-
 if test -d $CONFIG_DIR; then
   for file in config.guess config.sub; do
     cfile=$CONFIG_DIR/$file
@@ -242,6 +239,9 @@ do
     echo $program: Processing directory $dir
     ( cd $dir
       aclocalinclude="$ACLOCAL_FLAGS"
+      echo "$program: Running libtoolize --copy --automake"
+      $DRYRUN libtoolize --copy --automake
+
       echo "$program: Running aclocal $aclocalinclude"
       $DRYRUN $aclocal $aclocal_args
       if grep "^AM_CONFIG_HEADER" configure.ac >/dev/null; then
