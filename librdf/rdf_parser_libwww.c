@@ -93,8 +93,12 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
 {
   librdf_parser_libwww_stream_context* scontext=(librdf_parser_libwww_stream_context*)context;
   librdf_statement* statement;
-  int object_is_literal;
+  char *object;
+#ifdef LIBRDF_DEBUG
+#if LIBRDF_DEBUG > 1
   char *s;
+#endif
+#endif
 
   statement=librdf_new_statement();
   if(!statement)
@@ -107,38 +111,14 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
                                  librdf_new_node_from_uri_string(HTTriple_predicate(t)));
 
 
-  /* FIXME: I have no idea if the object points to a literal or a resource */
-  
-  object_is_literal=1; /* assume the worst */
-
-  /* Try to guess if resource / literal from string by assuming it 
-   * is a URL if it matches ^[isalnum()]+:[^isblank()]+$
-   * This will be fooled by literals of form 'thing:non-blank-thing'
-   */
-  for(s=HTTriple_object(t); *s; s++) {
-    /* Find first non alphanumeric */
-    if(!isalnum(*s)) {
-      /* Better be a ':' */
-      if(*s == ':') {
-	/* check rest of string has no spaces */
-	for(;*s; s++)
-	  if(isblank(*s))
-	    break;
-	/* reached end, thus probably not a literal */
-	if(!*s)
-	  object_is_literal=0;
-	break;
-      }
-    }
-  }
-
-  if(object_is_literal) {
+  object=HTTriple_object(t);
+  if(librdf_heuristic_object_is_literal(object))
     librdf_statement_set_object(statement,
-                                librdf_new_node_from_literal(HTTriple_object(t), NULL, 0, 0));
-  } else {
+                                librdf_new_node_from_literal(object, NULL, 0, 0));
+   else
     librdf_statement_set_object(statement, 
-                                librdf_new_node_from_uri_string(HTTriple_object(t)));
-  }
+                                librdf_new_node_from_uri_string(object));
+
 
 #ifdef LIBRDF_DEBUG
 #if LIBRDF_DEBUG > 1
