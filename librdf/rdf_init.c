@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology - http://www.ilrt.org/
+ * Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/
+ * Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
  * University of Bristol - http://www.bristol.ac.uk/
  * 
  * This package is Free Software or Open Source available under the
@@ -46,9 +46,9 @@
 #include <librdf.h>
 
 
-const char * const librdf_short_copyright_string = "Copyright (C) 2000-2003 David Beckett, ILRT, University of Bristol";
+const char * const librdf_short_copyright_string = "Copyright (C) 2000-2004 David Beckett, ILRT, University of Bristol";
 
-const char * const librdf_copyright_string = "Copyright (C) 2000-2003 David Beckett - http://purl.org/net/dajobe/\nInstitute for Learning and Research Technology - http://ilrt.org,\nUniversity of Bristol - http://www.bristol.ac.uk/";
+const char * const librdf_copyright_string = "Copyright (C) 2000-2004 David Beckett - http://purl.org/net/dajobe/\nInstitute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/,\nUniversity of Bristol - http://www.bristol.ac.uk/";
 
 const char * const librdf_version_string = VERSION;
 
