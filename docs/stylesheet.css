@@ -2,37 +2,31 @@
 
 body {
   margin: 2em 1em 2em 1em;
-  font-family: sans-serif;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
   color: #000085;
   background: white;
 }
 
 /* NS 4 needs this */
-th, td { font-family: sans-serif; }
+th, td, p, ol, ul, li, dl, dt, dt { font-family: Verdana, Arial, Helvetica, sans-serif; }
 
-h1, h2, h3, h4, h5, h6 { text-align: left; color: #880000; }
+h1, h2, h3, h4, h5 { text-align: left; color: #880000; }
 
-h1 { font: 170% sans-serif; }
-h2 { font: 140% sans-serif; }
-h3 { font: 120% sans-serif; }
-h4 { font: bold 100% sans-serif; }
-h5 { font: italic 100% sans-serif; }
+h1 { font-weight: normal; font-size: 170%; font-family: Verdana, Arial, Helvetica, sans-serif; }
+h2 { font-weight: normal; font-size: 140%; font-family: Verdana, Arial, Helvetica, sans-serif; }
+h3 { font-weight: normal; font-size: 120%; font-family: Verdana, Arial, Helvetica, sans-serif; }
+h4 { font-weight: bold; font-size: 100%; font-family: Verdana, Arial, Helvetica, sans-serif; }
+h5 { font-weight: italic; font-size: 100%; font-family: Verdana, Arial, Helvetica, sans-serif; }
 
 
 pre { margin-left: 2em }
 
 /* NS 4 needs this */
-pre, code { font-family: monospace; }
+pre, code { font-size: 100%; font-family: monospace; }
 
-tt {
-  font-family: monospace
-}
+tt { font-size: 100%; font-family: monospace; }
 
 
-a:link  {
-  color : #000099;
-}
+a:link  { color : #000099; }
 
-a:hover  {
-  color : red;
-}
+a:hover  { color : red; }
