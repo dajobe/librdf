@@ -688,8 +688,10 @@ fi
 
 if test "X$RUBY" != X; then
 
-  #ruby_version=`$RUBY --version | sed -e 's/ .*$//'
-  ruby_prefix=`$RUBY -e 'print "/usr/lib/ruby/1.6/i386-linux-gnu\n"'`
+  dnl need to change quotes to allow square brackets
+  changequote(<<, >>)dnl
+  ruby_prefix=`$RUBY -rrbconfig -e "print Config::CONFIG['archdir']"`
+  changequote([, ])dnl
 
   RUBY_INCLUDES="-I$ruby_prefix"
   AC_SUBST(RUBY_INCLUDES)
