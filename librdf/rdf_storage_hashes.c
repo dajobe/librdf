@@ -1183,13 +1183,14 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
     LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
     return NULL;
   }
-  node2=librdf_new_node_from_node(node2);
-  if(!node2) {
-    librdf_free_node(node2);
-    LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
-    return NULL;
+  if(node2) {
+    node2=librdf_new_node_from_node(node2);
+    if(!node2) {
+      librdf_free_node(node2);
+      LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
+      return NULL;
+    }
   }
-  
 
   librdf_statement_init(storage->world, &icontext->statement);
   librdf_statement_init(storage->world, &icontext->statement2);
