@@ -1,3 +1,47 @@
+2004-12-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_sqlite.c (sqlite_string_escape): Escape ' as '' not \'
+	(librdf_storage_sqlite_uri_helper): Renamed from
+	librdf_storage_sqlite_store_uri_helper
+	(librdf_storage_sqlite_blank_helper): Renamed from
+	librdf_storage_sqlite_store_blank_helper
+	(librdf_storage_sqlite_literal_helper): Added
+	(librdf_storage_sqlite_node_helper): Use
+	librdf_storage_sqlite_literal_helper.
+	(librdf_storage_sqlite_open): If new, unlink the file so no need to
+	do DROP TABLE.
+
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_init):
+	is_new flag set right, really really.
+	Added data-driven table descriptions - table_info, NTABLES,
+	sqlite_table_numbers, sqlite_tables, triple_part, triple_node_type,
+	triples_fields.
+	Reorder helper functions.
+	(sqlite_string_escape): Now always obeys raw_len and nul-terminates
+	the output.
+	(librdf_storage_sqlite_exec): Debug print all SQL exec
+	(librdf_storage_sqlite_set_helper,
+	librdf_storage_sqlite_get_helper): Added, using table info.
+	(librdf_storage_sqlite_store_uri_helper): Added, returns or makes an
+	ID for the given URI.
+	(librdf_storage_sqlite_store_blank_helper): Added, returns or makes an
+	ID for the given blank node ID.
+	(librdf_storage_sqlite_node_helper): Added, turns a librdf_node into
+	appropriate table IDs, node type and returns to user.
+	(librdf_storage_sqlite_statement_helper): Uses
+	librdf_storage_sqlite_node_helper to get node ids, types and field
+	names for all of a statement.
+	(librdf_storage_sqlite_open): Use data tables for DROP TABLE,
+	CREATE TABLE
+	(librdf_storage_sqlite_size): Use librdf_storage_sqlite_exec only.
+	(librdf_storage_sqlite_add_statements): Updated dummy INSERT for
+	new schema.
+	(librdf_storage_sqlite_contains_statement): Use
+	librdf_storage_sqlite_statement_helper to build query.
+	(librdf_storage_sqlite_context_add_statement): Use
+	librdf_storage_sqlite_statement_helper to build INSERT.  Ignores
+	context fields for now.
+
 2004-12-26  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_storage_sqlite.c: Handle sqlite3 and sqlite2
