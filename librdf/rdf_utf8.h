@@ -34,7 +34,7 @@ extern "C" {
 
 typedef u32 librdf_unichar;
 
-int librdf_unicode_char_to_utf8(const librdf_unichar c, byte *output, int length);
+int librdf_unicode_char_to_utf8(librdf_unichar c, byte *output, int length);
 int librdf_utf8_to_unicode_char(librdf_unichar *output, const byte *input, int length);
 byte* librdf_utf8_to_latin1(const byte *input, int length, int *output_length);
 byte* librdf_latin1_to_utf8(const byte *input, int length, int *output_length);
