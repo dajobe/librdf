@@ -157,10 +157,10 @@ librdf_parser_libwww_new_triple_handler (HTRDF *rdfp, HTTriple *t,
 
 /**
  * librdf_parser_libwww_new_handler:
- * @me: libwww &HTStream that is being parsed
- * @request: libwww &HTRequest that generated the call
- * @target_format: libwww &HTFormat target output format
- * @target_stream: libwww &HTStream target output stream
+ * @me: libwww &HTStream that is being parsed (ignored)
+ * @request: libwww &HTRequest that generated the call (ignored)
+ * @target_format: libwww &HTFormat target output format (ignored)
+ * @target_stream: libwww &HTStream target output stream (ignored)
  * @rdfparser: libwww &HTRDF parser
  * @context: context for callback
  * 
@@ -334,9 +334,11 @@ tracer (const char * fmt, va_list pArgs)
  * a list and emits when the URI content has been exhausted.
  **/
 static librdf_stream*
-librdf_parser_libwww_parse_from_uri(void *context, librdf_uri *uri) {
-  /* Note: not yet used */
-/*  librdf_parser_libwww_context* pcontext=(librdf_parser_libwww_context*)context; */
+librdf_parser_libwww_parse_from_uri(void *context, librdf_uri *uri)
+{
+  /* Note: not yet used:
+  librdf_parser_libwww_context* pcontext=(librdf_parser_libwww_context*)context;
+  */
   librdf_parser_libwww_stream_context* scontext;
   char * cwd;
   HTAnchor *anchor;
@@ -558,5 +560,5 @@ librdf_parser_libwww_register_factory(librdf_parser_factory *factory)
 void
 librdf_parser_libwww_constructor(void)
 {
-  librdf_parser_register_factory("Libwww", &librdf_parser_libwww_register_factory);
+  librdf_parser_register_factory("libwww", &librdf_parser_libwww_register_factory);
 }
