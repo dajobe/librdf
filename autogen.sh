@@ -36,7 +36,6 @@ automake_min_vers=1.7
 aclocal_min_vers=$automake_min_vers
 autoconf_min_vers=2.54
 libtoolize_min_vers=1.4
-swig_min_vers=1.3.14
 
 
 automake_args=--add-missing
@@ -59,6 +58,8 @@ automake=automake
 automake_vers=0
 aclocal=aclocal
 aclocal_vers=0
+libtoolize=libtoolize
+libtoolize_vers=0
 
 here=`pwd`
 while [ $# -ne 0 ] ; do
@@ -109,6 +110,19 @@ while [ $# -ne 0 ] ; do
       fi
     done
   fi
+  progs=`ls libtoolize* 2>/dev/null`
+  if [ "X$progs" != "X" ]; then
+    for prog in $progs; do
+      vers=`$prog --version | sed -ne '1s/^.* //p'`
+      if [ "X$vers" = "X" ]; then
+        continue
+      fi
+      if expr $vers '>' $libtoolize_vers >/dev/null; then
+        libtoolize=$prog
+        libtoolize_vers=$vers
+      fi
+    done
+  fi
 done
 cd $here
 
@@ -119,6 +133,7 @@ set - $save_args
 echo "$program: Found autoconf $autoconf version $autoconf_vers" 1>&2
 echo "$program: Found automake $automake version $automake_vers" 1>&2
 echo "$program: Found aclocal $aclocal version $aclocal_vers" 1>&2
+echo "$program: Found libtoolize $libtoolize version $libtoolize_vers" 1>&2
 
 
 if ($autoconf --version) < /dev/null > /dev/null 2>&1 ; then
@@ -165,11 +180,11 @@ else
     DIE="yes"
 fi
 
-if (libtoolize --version) < /dev/null > /dev/null 2>&1 ; then
-    if (libtoolize --version | awk 'NR==1 { if( $4 >= '$libtoolize_min_vers') \
+if ($libtoolize --version) < /dev/null > /dev/null 2>&1 ; then
+    if ($libtoolize --version | awk 'NR==1 { if( $4 >= '$libtoolize_min_vers') \
 			       exit 1; exit 0; }');
     then
-       echo "$program: ERROR: \`libtoolize' is too old."
+       echo "$program: ERROR: \`$libtoolize' is too old."
        echo "           (version $libtoolize_min_vers or newer is required)"
        DIE="yes"
     fi
@@ -177,24 +192,6 @@ else
     echo
     echo "$program: ERROR: You must have \`libtoolize' installed to compile $PACKAGE."
     echo "           (version $libtoolize_min_vers or newer is required)"
-    DIE="yes"
-fi
-
-
-if (swig -help) </dev/null >/dev/null 2>&1; then 
-  swig_version=`swig -version 2>&1 |sed -ne 's/^SWIG Version //p'`
-  swig_version_dec=`echo $swig_version | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
-  swig_min_version_dec=`echo $swig_min_vers | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
-
-  if test $swig_version_dec -lt $swig_min_version_dec; then
-    echo "$program: ERROR: \`swig' is too old."
-    echo "           (version $swig_min_vers or newer is required)"
-    DIE="yes"
-  fi
-else
-    echo
-    echo "$program: ERROR: You must have \`swig' installed to compile $PACKAGE."
-    echo "           (version $swig_min_vers or newer is required)"
     DIE="yes"
 fi
 
@@ -245,9 +242,9 @@ do
 	done
       fi
 
-      echo "$program: Running libtoolize --copy --automake"
+      echo "$program: Running $libtoolize --copy --automake"
       $DRYRUN rm -f ltmain.sh libtool
-      $DRYRUN libtoolize --copy --automake
+      $DRYRUN $libtoolize --copy --automake
 
       aclocalinclude="$ACLOCAL_FLAGS"
       echo "$program: Running aclocal $aclocalinclude"
