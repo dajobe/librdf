@@ -437,6 +437,8 @@ librdf_parser_libwww_parse_common(void *context,
   HT_FREE(cwd);
   scontext->request = HTRequest_new();
 
+  if(!base_uri)
+    base_uri=uri;
   scontext->base_uri = base_uri;
 
   anchor = HTAnchor_findAddress(librdf_uri_as_string(uri));

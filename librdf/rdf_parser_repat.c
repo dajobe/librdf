@@ -489,6 +489,8 @@ librdf_parser_repat_parse_file_as_stream(void *context,
   }
 
   scontext->source_uri=uri;
+  if(!base_uri)
+    base_uri=uri;
   scontext->base_uri=base_uri;
 
   filename=librdf_uri_as_filename(uri);

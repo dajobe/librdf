@@ -221,7 +221,7 @@ librdf_parser_raptor_new_statement_handler (void *context,
  * librdf_parser_raptor_parse_uri_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: parser context
  * @uri: &librdf_uri URI of RDF/XML content source
- * @base_uri: &librdf_uri URI of the content location
+ * @base_uri: &librdf_uri URI of the content location or NULL if the same
  *
  * Retrieves all statements into memory in a list and emits them
  * when the URI content has been exhausted.  Use 
@@ -265,7 +265,7 @@ librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri,
  * librdf_parser_raptor_parse_common - Retrieve the RDF/XML content at URI and parse it into a librdf_stream or model
  * @context: parser context
  * @uri: &librdf_uri URI of RDF/XML content source
- * @base_uri: &librdf_uri URI of the content location
+ * @base_uri: &librdf_uri URI of the content location or NULL if same as uri
  * @model: &librdf_model of model
  *
  * Uses the raptor RDF routines to resolve RDF/XML content at a URI
@@ -317,6 +317,8 @@ librdf_parser_raptor_parse_common(void *context,
 
   scontext->pcontext=pcontext;
   scontext->source_uri = uri;
+  if(!base_uri)
+    base_uri=uri;
   scontext->base_uri = base_uri;
 
   scontext->model=model;

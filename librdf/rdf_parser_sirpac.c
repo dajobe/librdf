@@ -156,6 +156,8 @@ librdf_parser_sirpac_parse_uri_as_stream(void *context, librdf_uri *uri,
   scontext->pcontext=pcontext;
 
   scontext->uri=uri;
+  if(!base_uri)
+    base_uri=uri;
   scontext->base_uri=base_uri;
   
   uri_string=librdf_uri_as_string(uri);
