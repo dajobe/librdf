@@ -37,15 +37,15 @@ as the (L)GPL.</p>
 
 <li>Can I link this library with code under license XXX?
 
-<p>Firstly,  
-<a href="http://www.tuxedo.org/~esr/jargon/html/entry/IANAL.html">IANAL</a>
-however here is an overview of how you can use this software:</p>
+<p>Firstly, I am not a lawyer, so seek your own legal advice if you
+care about it seriously.  However, here is an overview of how you
+can use this software:</p>
 
 <ul>
 <li>If you choose the LGPL/GPL licenses, the <a href="http://www.gnu.org/philosophy/license-list.html">GNU project list of licenses page</a> says that you can link the following licensed software with the code:<br />
-GPLed, LGPLed, Guile, GNU Ada, X11, Cryptix, modified BSD, zlib, W3C, Berkeley Database, Python 1.6a2 earlier, Perl (as GPL), ncftp Artistic, Netscape JavaScript<br />
+GPLed, LGPLed, Guile, GNU Ada, X11, Expat, Standard ML of NJ, Cryptix, modified BSD, zlib,iMatrix, W3C, Berkeley/Sleepycat Database, OpenLDAP, Python 1.6a2 earlier, Python 2.0.1,2.1.1 and later, Perl (as GPL), Clarified Artistic, Artistic 2.0, Zope 2.0, Intel OSL, Netscape JavaScript, eCOS 2.0, Eiffel V2<br />
 and <b>not</b> these types:<br />
-Arphic, original BSD, Apache 1.0, Apache 1.1, Zope, Python 1.6b1 or later, OpenLDAP V2.3, IBM PL 1.0, Phorum, LaTeX (LPPL), MPL, NOSL 1.0, Interbase 1.0, Sun PL, NPL, Jabber OSL 1.0, Sun ISSL 1.0, QPL (without notice), Open Compatibility, PHP 2.02, Artistic, APPL, Sun CSL, Plan 9, Open Public License, Sun SSC(FR) 11<br />
+Affero, Arphic, original BSD, Original BSD, AFL 1.1, OSL 1.0, Apache 1.0, Apache 1.1, Zope V1, xinetd, Python 1.6b1+ and 2.0 and 2.1, OpenLDAP V2.3, Vim 5.7, IBM PL 1.0, Phorum V1.2, LaTeX (LPPL), MPL, NOSL 1.0, Interbase 1.0, Sun PL, Nokia OSL, Netscape PL, Jabber OSL 1.0, Sun ISSL 1.0, QPL 1.0, Freetype License, PHP License, Zend License<br />
 check the link above for updates, since the above is not a definitive
 list.</li>
 
@@ -64,8 +64,11 @@ C libraries or calling of C functions.</p>
 
 <p>C is also more "portable" (subject to the usual C problems) and
 should be compilable on many different systems.  I have access to
-Linux 2.2.x, Solaris 2.5 (Sparc), Solaris 7 (Sparc) and HP-UX 10 and
-it configured, built and tested out of the box on all of these.</p>
+and have built it on (at various times):</p>
+
+<p>Linux 2.x (x86), Solaris 2.5, 7, 8 (Sparc), OSX (PPC), DEC Alpha, FreeBSD 4.7 (x86) and HP-UX 10.</p>
+
+<p>it configured, built and tested out of the box on all of these.</p>
 
 <p>See also the W3C Library note on
 <a href="http://www.w3.org/Library/User/Style/Cpp.html">C++ in C</a>
@@ -88,29 +91,48 @@ in it.</p>
 State, USA home to an illegal monopolist.</p>
 </li>
 
-<li>Where is the Java interface?
+<li>Where is the <em>LANG</em> higher-level language interface?
 
-<p>As of 2001-08-28 it is now added - see the
-<a href="docs/java.html">java API</a></p>
+<p>Redland provides 6 language interfaces (at 2003-02-13)
+via <a href="http://www.swig.org/">SWIG</a>.  If SWIG does another
+language you want and supports it, you should be able to build one
+yourself relatively easily, following the existing scheme.</p>
 
 </li>
 
 <li>Does it support a query language?<br />
 
-<p>Not yet, but if it did, it would look like the
-<a href="http://swordfish.rdfweb.org/rdfquery/">Squish Query language</a>
-or the
-<a href="http://www.hpl.hp.co.uk/people/afs/RDQL/">RDQL RDF Data Query Language
+<p>Not yet, but if it did, it would probably be
+<a href="http://www.hpl.hp.com/semweb/rdql.html">RDQL RDF Data Query Language
 </a>
 </p>
 
+</li>
+
+<li>Does it run on MS Windows?<br />
+
+<p>I don't know since I don't use it.  I've had reports it builds under the
+<a href="http://cygwin.com/">Cygwin</a> environment relatively
+easily.  As far as portability and "unix"-isms in the code, they are
+flagged in comments and only related to file name handling, maybe in
+creating temporary files.</p>
+</li>
+
+<li>Does it run on Apple OSX?<br />
+<p>Yes - mentioned above.  This was done with the
+<a href="http://fink.sourceforge.net/">Fink</a> environment
+to get some of the GNU toolchain (GNU make, others if you are
+building from CVS).  It probably can be done without Fink, since the
+external requirements are low - Berkeley/Sleepycat DB required and
+libxml2 recommended but not required.
+</p>
 </li>
 
 </ol>
 
 <hr />
 
-<p>Copyright 2000-2001 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright 2000-2003 <a href="http://purl.org/net/dajobe/">Dave Beckett</a>, <a href="http://www.ilrt.bristol.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
