@@ -170,7 +170,7 @@ librdf_uri_get_digest (librdf_uri* uri)
 {
   librdf_digest* d;
   
-  d=librdf_new_digest(librdf_uri_digest_factory);
+  d=librdf_new_digest_from_factory(librdf_uri_digest_factory);
   if(!d)
     return NULL;
   
@@ -296,7 +296,7 @@ main(int argc, char *argv[])
   librdf_finish_digest();
   librdf_finish_uri();
 
-#ifdef LIBRDF_DEBUG 
+#ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);
 #endif
  
