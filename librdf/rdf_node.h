@@ -175,6 +175,7 @@ size_t librdf_node_decode(librdf_node* node, unsigned char *buffer, size_t lengt
 
 /* convert to a string */
 char *librdf_node_to_string(librdf_node* node);
+char* librdf_node_to_counted_string(librdf_node* node, size_t* len_p);
 
 /* pretty print it */
 void librdf_node_print(librdf_node* node, FILE *fh);
