@@ -1057,7 +1057,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
         strcpy((char*)buffer, (const char*)string);
         buffer += string_length+1;
         if(datatype_uri_length) {
-          strcpy((char*)buffer, (const char*)node->value.literal.datatype_uri);
+          strcpy((char*)buffer, datatype_uri_string);
           buffer += datatype_uri_length+1;
         }
         if(language_length)
@@ -1345,12 +1345,12 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  librdf_node *node, *node2, *node3, *node4, *node5;
+  librdf_node *node, *node2, *node3, *node4, *node5, *node6;
   char *hp_string1="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
   char *hp_string2="http://purl.org/net/dajobe/";
   char *lit_string="Dave Beckett";
   char *genid="genid42";
-  librdf_uri *uri, *uri2;
+  librdf_uri *uri, *uri2, *uri3;
   int size, size2;
   char *buffer;
   librdf_world *world;
@@ -1469,7 +1469,15 @@ main(int argc, char *argv[])
     return(1);
   }
   fprintf(stdout, "%s: Copied node identifier is: '%s'\n", program, buffer);
+
+
+  uri3=librdf_new_uri(world, "http://example.org/subj");
+  node6=librdf_new_node_from_typed_literal(world, "Datatyped literal value",
+                                           "en-GB", uri3);
+  librdf_free_uri(uri3);
+
   fprintf(stdout, "%s: Freeing nodes\n", program);
+  librdf_free_node(node6);
   librdf_free_node(node5);
   librdf_free_node(node4);
   librdf_free_node(node3);
