@@ -666,7 +666,8 @@ librdf_free_node(librdf_node *node)
       if(node->value.blank.identifier != NULL)
         LIBRDF_FREE(cstring, node->value.blank.identifier);
       break;
-      
+
+    case LIBRDF_NODE_TYPE_UNKNOWN:
     default:
       break;
   }
@@ -720,7 +721,7 @@ librdf_node_get_type(librdf_node* node)
 #ifdef LIBRDF_DEBUG
 /* FIXME: For debugging purposes only */
 static const char* const librdf_node_type_names[] =
-{"Unknown", "Resource", "Literal", "<Reserved1>", "Blank"};
+{"Unknown", "Resource", "Literal", "<Unused1>", "Blank"};
 
 
 /*
@@ -1060,6 +1061,8 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
       return NULL;
     sprintf((char*)s, "(%s)", node->value.blank.identifier);
     break;
+
+  case LIBRDF_NODE_TYPE_UNKNOWN:
   default:
       librdf_log(node->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
@@ -1131,6 +1134,9 @@ librdf_node_get_digest(librdf_node* node)
       librdf_digest_update(d, (unsigned char*)s, node->value.literal.string_len);
       librdf_digest_final(d);
       break;
+
+    case LIBRDF_NODE_TYPE_BLANK:
+    case LIBRDF_NODE_TYPE_UNKNOWN:
     default:
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
@@ -1289,6 +1295,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       }
       break;
       
+    case LIBRDF_NODE_TYPE_UNKNOWN:
     default:
       librdf_log(node->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,

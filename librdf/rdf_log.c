@@ -116,6 +116,11 @@ librdf_log_simple(librdf_world* world, int code,
           }
           break;
 
+        case LIBRDF_LOG_NONE:
+        case LIBRDF_LOG_DEBUG:
+        case LIBRDF_LOG_INFO:
+        case LIBRDF_LOG_FATAL:
+
         default:
           break;
       }

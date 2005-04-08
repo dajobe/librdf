@@ -210,6 +210,8 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
       rstatement.object=librdf_node_get_uri(object);
       rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
       break;
+
+    case LIBRDF_NODE_TYPE_UNKNOWN:
     default:
       librdf_log(statement->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,

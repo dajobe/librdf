@@ -593,6 +593,7 @@ librdf_storage_sqlite_node_helper(librdf_storage* storage,
       node_type=TRIPLE_BLANK;
       break;
 
+    case LIBRDF_NODE_TYPE_UNKNOWN:
     default:
       librdf_log(node->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,

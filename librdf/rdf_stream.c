@@ -444,6 +444,8 @@ librdf_stream_from_node_iterator_get_statement(void* context, int flags)
         case LIBRDF_STATEMENT_OBJECT:
           librdf_statement_set_object(scontext->current, node);
           break;
+
+        case LIBRDF_STATEMENT_ALL:
         default:
           librdf_log(scontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STREAM, NULL,
@@ -484,6 +486,8 @@ librdf_stream_from_node_iterator_finished(void* context)
       case LIBRDF_STATEMENT_OBJECT:
         librdf_statement_set_object(scontext->current, NULL);
         break;
+
+      case LIBRDF_STATEMENT_ALL:
       default:
         librdf_log(scontext->iterator->world,
                    0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STREAM, NULL, 

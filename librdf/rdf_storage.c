@@ -775,6 +775,7 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
           node=librdf_statement_get_object(statement);
           break;
 
+        case LIBRDF_STATEMENT_ALL:
         default: /* error */
           librdf_log(statement->world,
                      0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
@@ -871,6 +872,8 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
       librdf_statement_set_subject(partial_statement, node1);
       librdf_statement_set_predicate(partial_statement, node2);
       break;
+
+    case LIBRDF_STATEMENT_ALL:
     default:
       librdf_free_statement(partial_statement);
       librdf_log(storage->world,
