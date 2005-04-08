@@ -1,4 +1,109 @@
+2005-04-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_xml_writer.c, raptor/raptor_serialize_rdfxmla.c,
+	raptor/raptor_serialize.c, raptor/raptor_rdfxml.c,
+	raptor/raptor_parse.c, raptor/raptor_general.c: Add missing switch
+	cases to make -Wswitch-enum happy.
+
+	* raptor/configure.ac: More gcc -W flags in maintainer mode.
+
+	* raptor/raptor_xslt.c: Casts for C++
+
+	* rasqal/configure.ac: More gcc -W flags in maintainer mode.
+
+	* rasqal/rasqal_literal.c, rasqal/rasqal_general.c: Casts for C++
+
+2005-04-07  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_xslt.c (raptor_init_parser_grddl): Expand grddl
+	parser description.
+
+	* raptor/libraptor.3: Added missing 1.4.5 API changes, adding XML
+	writer features and support functions as used by the
+	rdf/xml-abbrev serializer.
+
+	* raptor/tests/Makefile.am: test should use = not == for string
+	compare portability
+
+2005-04-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_xslt.c: Added a list of XPaths to try, fixed
+	searching for a profile.  Now handles 2 XHTML forms and XML.
+	(raptor_xslt_parse_chunk): Walk through the list of XPaths.  Do
+	not give an error if no GRDDL is found, 0 triples are ok.
+
+	* raptor/raptor_libxml.c (raptor_libxml_error_common): Added,
+	passing in prefix and is_fatal flag.  Handle NULL ctx and hence
+	NULL parser.
+	(raptor_libxml_error, raptor_libxml_generic_error,
+	raptor_libxml_fatal_error, raptor_libxml_validation_error): Use
+	the new function, share very common code.
+
+	* raptor/raptor_parse.c (raptor_parser_error_varargs): Survive a
+	NULL parser.
+
+	* raptor/raptor_rdfxml.c (raptor_get_libxml_context,
+	 raptor_set_libxml_document_locator,
+	 raptor_get_libxml_document_locator): Survive NULL rdf_parser
+	 calls.
+
+	* raptor/raptor_internal.h: Added
+	raptor_libxml_init_generic_error_handlers prototype
+
+	* raptor/raptor_xslt.c (raptor_xslt_parse_start): Init column,
+	byte to -1
+	(raptor_xslt_xmlStructuredErrorFunc): Added, not tested.
+	(raptor_xslt_parse_chunk): Ensure last chunk with is_end is always
+	run.  Report error if no XML DOM made.  Set xslt context
+	structured error handler to raptor_xslt_xmlStructuredErrorFunc.
+
+2005-04-04  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_xslt.c (raptor_xslt_parse_chunk): Declare 'nodes'
+	at top of block.  Init doc_txt/doc_txt_len earlier so do not free
+	junk.  Get the base URI string from the XML doc if it exists.
+
+2005-03-25  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/configure.ac: Added --with-xslt-config Added grddl parser
+	and checking.  Added simple search for libxslt needed by grddl.
+
+	* raptor/Makefile.am: Added grddl if RAPTOR_PARSER_GRDDL
+
+	* raptor/raptor_general.c (raptor_init): Added grddl
+
+	* raptor/raptor_libxml.c (raptor_libxml_init_sax_error_handlers):
+	Added to just init the static error handlers for libxml for grddl.
+
+	* raptor/raptor_internal.h: Export
+	raptor_libxml_init_sax_error_handlers for grddl.  Added
+	raptor_init_parser_grddl
+
+	* raptor/raptor_xslt.c: Generates triples via in internal rdf/xml
+	parser.
+	(raptor_xslt_parse_start): Copy any user-set handlers to the
+	internal rdf/xml parser.
+	(main): Deleted, experimental code merged.
+
+	* raptor/raptor_xslt.c: Reformed test code into parser named
+	'grddl'
+	(raptor_xslt_parse_init, raptor_xslt_parse_terminate,
+	raptor_xslt_parse_start, raptor_xslt_parse_chunk,
+	raptor_xslt_parse_recognise_syntax,
+	raptor_xslt_parser_register_factory, raptor_init_parser_xslt):
+	Added
+
 2005-03-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_xslt.c: Fix memory leaks.
+
+	* raptor/raptor_xslt.c: Remove commented out standalone xslt
+
+	* raptor/Makefile.am: Added bodge raptor_xslt_test
+
+	* raptor/raptor_xslt.c: Raptor GRDDL XSLT
+
+	* raptor/raptor_parse.c (raptor_parse_chunk): docs
 
 	* librdf/rdf_storage.c
 	(librdf_storage_node_stream_to_node_create): node1 or node2 can be
