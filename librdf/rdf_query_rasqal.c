@@ -239,7 +239,7 @@ rasqal_redland_new_triples_source(rasqal_query* rdf_query,
   raptor_sequence *seq;
   librdf_query_rasqal_context *context;
 
-  seq=rasqal_query_get_source_sequence(rdf_query);
+  seq=rasqal_query_get_data_graph_sequence(rdf_query);
   
   /* FIXME: queries with triple sources are actively discarded */
   if(seq && raptor_sequence_size(seq))
