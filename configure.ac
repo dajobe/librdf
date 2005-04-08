@@ -134,7 +134,7 @@ dnl compiler checks
 # if using gcc...
 if test "$ac_cv_prog_gcc" = yes; then
   STANDARD_CFLAGS=
-  MAINTAINER_CFLAGS="-Wall -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls"
+  MAINTAINER_CFLAGS="-Wall -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Wredundant-decls -Wswitch-enum"
 else
   STANDARD_CFLAGS=
   MAINTAINER_CFLAGS=
@@ -515,7 +515,7 @@ done
 AC_CHECK_PROG(RASQAL_CONFIG, rasqal-config, rasqal-config)
 AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/internal (default=auto)], with_rasqal="$withval", with_rasqal="auto")
 
-RASQAL_MIN_VERSION=0.9.6
+RASQAL_MIN_VERSION=0.9.8
 AC_SUBST(RASQAL_MIN_VERSION)
 if test "X$RASQAL_CONFIG" = "X"; then
   with_rasqal=internal
