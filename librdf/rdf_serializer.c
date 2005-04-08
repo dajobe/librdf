@@ -580,6 +580,11 @@ log_handler(void *user_data, librdf_log_message *message)
     case LIBRDF_LOG_WARN:
       ld->warnings++;
       break;
+
+    case LIBRDF_LOG_NONE:
+    case LIBRDF_LOG_DEBUG:
+    case LIBRDF_LOG_INFO:
+    case LIBRDF_LOG_FATAL:
     default:
       break;
   }
