@@ -1,5 +1,22 @@
 2005-04-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* librdf/rdf_serializer.c: Add missing switch cases to make
+	-Wswitch-enum happy.
+
+	* configure.ac: More gcc -W flags in maintainer mode.  Require
+	rasqal 0.9.8
+
+	* librdf/rdf_stream.c, librdf/rdf_storage_sqlite.c,
+	librdf/rdf_storage.c, librdf/rdf_serializer_raptor.c,
+	librdf/rdf_node.c, librdf/rdf_log.c: Add missing switch cases to
+	make -Wswitch-enum happy.
+
+	* librdf/rdf_query_rasqal.c (rasqal_redland_new_triples_source):
+	Use new rasqal 0.9.8+ rasqal_query_get_data_graph_sequence
+
+	* librdf/rdf_node.h: Remove unused LIBRDF_NODE_TYPE_RESERVED1 (#3)
+	from librdf_node_type enum
+
 	* raptor/raptor_xml_writer.c, raptor/raptor_serialize_rdfxmla.c,
 	raptor/raptor_serialize.c, raptor/raptor_rdfxml.c,
 	raptor/raptor_parse.c, raptor/raptor_general.c: Add missing switch
