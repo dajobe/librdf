@@ -354,7 +354,7 @@ int librdf_log_message_level(librdf_log_message *message);
 int librdf_log_message_facility(librdf_log_message *message);
 const char * librdf_log_message_message(librdf_log_message *message);
 raptor_locator* librdf_log_message_locator(librdf_log_message *message);
-int fraptor_locator_line(raptor_locator *locator);
+int raptor_locator_line(raptor_locator *locator);
 int raptor_locator_column(raptor_locator *locator);
 int raptor_locator_byte(raptor_locator *locator);
 const char* raptor_locator_file(raptor_locator *locator);
