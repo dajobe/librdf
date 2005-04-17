@@ -63,8 +63,8 @@ static const char *log_level_names[LIBRDF_LOG_LAST+1]={
 };
 
 
-/*
- * librdf_log_simple - Log a message - Internal
+/**
+ * librdf_log_simple - INTERNAL - Log a message
  * @world: redland world object or NULL
  * @code: error code
  * @level: &librdf_log_level log level
@@ -149,8 +149,8 @@ librdf_log_simple(librdf_world* world, int code,
 }
 
 
-/*
- * librdf_log - Log a message - Internal
+/**
+ * librdf_log - INTERNAL - Log a message
  * @world: redland world object or NULL
  * @code: error code
  * @level: &librdf_log_level log level
@@ -178,8 +178,9 @@ librdf_log(librdf_world* world, int code,
   va_end(arguments);
 }
 
-/*
- * librdf_fatal - Fatal error - Internal
+
+/**
+ * librdf_fatal - INTERNAL - Fatal error
  * @world: redland world object or NULL
  * @message: message arguments
  *
@@ -226,7 +227,7 @@ librdf_log_message_code(librdf_log_message *message)
 
 
 /**
- * librdf_log_message_level: retrieve severity of log message
+ * librdf_log_message_level - retrieve severity of log message
  * @message: log message
  *
  * The log message severity level is defined in rdf_log.h as values
@@ -242,7 +243,7 @@ librdf_log_message_level(librdf_log_message *message)
 
 
 /**
- * librdf_log_message_facility: retrieve facility that generated the message
+ * librdf_log_message_facility - retrieve facility that generated the message
  * @message: log message
  *
  * The log message facility is defined in rdf_log.h as values
@@ -258,7 +259,7 @@ librdf_log_message_facility(librdf_log_message *message)
 
 
 /**
- * librdf_log_message_message: retrieve text message from log entry
+ * librdf_log_message_message - retrieve text message from log entry
  * @message: log message
  *
  * The string returned is shared and must be copied by the caller
@@ -274,7 +275,7 @@ librdf_log_message_message(librdf_log_message *message)
 
 
 /**
- * librdf_log_message_locator: retrieve locator of log entry
+ * librdf_log_message_locator - retrieve locator of log entry
  * @message: log message
  *
  * Return value: pointer to an appropriate raptor_locator* or NULL if not available
