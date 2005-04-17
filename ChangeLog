@@ -1,3 +1,170 @@
+2005-04-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_serializer.c, librdf/rdf_storage.c, librdf/rdf_uri.c,
+	librdf/rdf_init.c, librdf/rdf_model.c, librdf/rdf_parser.c,
+	librdf/rdf_digest.c, librdf/rdf_hash.c, librdf/rdf_concepts.c:
+	Mark class librdf_init/finish_FOO as INTERNAL.  Tidy head doc,
+	2005.
+
+	* autogen.sh, raptor/autogen.sh, rasqal/autogen.sh: allow
+	envariables to override the programs
+
+2005-04-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_iostream.c: (raptor_string_iostream_finish): Fixes
+	bug 0000021: the output of to_string for an empty model should
+	always be parsable and result in an empty model
+	http://bugs.librdf.org/mantis/view.php?id=21
+
+	* Redland.i: Typo: fraptor_locator_line -> raptor_locator_line
+
+	* raptor/raptor_iostream.c (raptor_string_iostream_finish): Return
+	an empty string "" (aka 1 byte, \0) when the stringbuffer is NULL,
+	do not return the NULL.
+
+2005-04-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y: First set of sparql turtle syntax
+	changes Added %token: ORDER, BY, REGEX Added %type:
+	OrderClauseOpt, PatternElementList, DotOptional,
+	ConstructTemplate, Triples, PropertyList, ObjectList, ItemList
+	Collection, Subject, Predicate Object, TriplesNode, GraphPattern,
+	GraphGraphPattern, UnionGraphPattern (based on rq23) Removed
+	%type: VarOrURIOrBNode as turtle syntax rules cover it Many terms
+	renamed to match rq23 terms, updated to use formula.  Other
+	changes:
+	(Query): Added OrderClauseOpt
+	(BaseDeclOpt, PrefixDeclOpt): moved in source, no change.
+	(WhereClauseOpt): Just assign GraphPattern value
+	(OrderClauseOpt): Skeletal and incomplete.
+	(GraphPattern): Take a list of .-separated triples, with optional
+	.  or an empty {}
+	(DotOptional): Added
+	(Triples, PropertyList, ObjectList, ItemList, Subject, Predicate,
+	Object, Collection): imported for turtle and updated to pass
+	around rasqal_formula and use them to store triples + literal
+	value.
+	(TriplesNode): Imported from rq23 partially.
+	(BuiltinExpression): Added REGEX
+
+	* rasqal/sparql_lexer.l: Added tokens: ORDER, By, REGEX, ., ; for
+	rq23 sparql Noted FIXME to remove old comparison ops EQ/eq, NE/ne,
+	==, !=
+
+	* rasqal/rasqal.h: Added rasqal_generate_bnodeid_handler typedef.
+	Added prototypes for
+	rasqal_query_set_default_generate_bnodeid_parameters and
+	rasqal_query_set_generate_bnodeid_handler
+
+	* rasqal/rasqal_graph_pattern.c: docs
+
+	* rasqal/rasqal_internal.h: Added bnodeid handler params to query.
+	Added prototype for rasqal_query_set_generate_bnodeid_handler.
+	Added extern references for rasqal_rdf_namespace_uri,
+	rasqal_rdf_first_uri, rasqal_rdf_rest_uri and rasqal_rdf_nil_uri
+
+	* rasqal/rasqal_general.c: Add rdf uris for namespace, rdf:first,
+	rdf:rest, rdf:nul
+	(rasqal_uri_init, rasqal_uri_finish): Init and tidy up above.
+	(rasqal_query_set_default_generate_bnodeid_parameters,
+	rasqal_query_set_generate_bnodeid_handler,
+	rasqal_default_generate_bnodeid_handler,
+	rasqal_query_generate_bnodeid): Added, import from raptor.
+
+	* raptor/raptor_parse.c: docs typo
+
+	* rasqal/rasqal_literal.c: Added rasqal_formula for sparql parser.
+	(rasqal_new_formula): Added constructor
+	(rasqal_free_formula): Added destructor
+	(rasqal_formula_print): Added print method, for sequences of
+	formulas
+
+	* rasqal/rasqal_internal.h: Added rasqal_formula for sparql
+	parser.  Added prototypes for rasqal_new_formula,
+	rasqal_free_formula and rasqal_formula_print
+
+	* rasqal/tests/sparql/syntax/cast0.rq,
+	rasqal/tests/sparql/syntax/cast1.rq: AND to FILTER
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Added offset0.rq
+
+	* rasqal/sparql_parser.y: Added tokens FILTER OFFSET A Now up to
+	expecting 3 shift/reduce (filter + offset can both be missing)
+	Added LimitClauseOpt OffsetClauseOpt types
+	(Query): Added OffsetClause
+	(OffsetClauseOpt): Added, not in 2005-02-17 SPARQL WD
+	(PatternElementConstraint): Deprecate AND (removed 2005-04-19
+	SPARQL WD) and add FILTER.
+
+	* rasqal/roqet.c (roqet_query_walk): Print any result offset
+	(main): Fix help message
+
+	* rasqal/tests/sparql/syntax/offset0.rq: LIMIT and OFFSET test
+
+	* rasqal/rasqal_engine.c
+	(rasqal_engine_query_constraints_has_qname): Handle no
+	query_graph_pattern present.
+
+	* rasqal/sparql_lexer.l: Added FILTER, OFFSET, A tokens
+
+	* rasqal/rasqal_query.c (rasqal_query_get_offset): Added,
+	returning the query results offset.
+	(rasqal_query_print): Print query results offset
+
+	* rasqal/rasqal.h: Added rasqal_query_get_offset prototype.
+
+	* rasqal/rasqal_internal.h: Added offset to query structure
+
+2005-04-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_lexer.l: Deleted keyword LOAD
+
+	* rasqal/sparql_parser.y (LoadClauseOpt): Deleted, along with old
+	keyword LOAD
+
+	* rasqal/sparql_parser.y: Removed deprecated [ ... ] syntax for
+	optionals
+
+	* rasqal/sparql_lexer.l, rasqal/sparql_parser.y: Removed
+	deprecated SOURCE keyword
+
+	* rasqal/configure.ac: Added tests/sparql/survey/Makefile
+
+	* rasqal/tests/sparql/Makefile.am: Added survey dir
+
+	* rasqal/tests/sparql/survey/.cvsignore,
+	rasqal/tests/sparql/survey/Makefile.am,
+	rasqal/tests/sparql/survey/query-survey-1.rq,
+	rasqal/tests/sparql/survey/query-survey-10.rq,
+	rasqal/tests/sparql/survey/query-survey-11.rq,
+	rasqal/tests/sparql/survey/query-survey-12.rq,
+	rasqal/tests/sparql/survey/query-survey-13.rq,
+	rasqal/tests/sparql/survey/query-survey-2.rq,
+	rasqal/tests/sparql/survey/query-survey-3.rq,
+	rasqal/tests/sparql/survey/query-survey-8.rq,
+	rasqal/tests/sparql/survey/query-survey-9.rq,
+	rasqal/tests/sparql/survey/result-survey-1.ttl,
+	rasqal/tests/sparql/survey/result-survey-10.ttl,
+	rasqal/tests/sparql/survey/result-survey-11.ttl,
+	rasqal/tests/sparql/survey/result-survey-12.ttl,
+	rasqal/tests/sparql/survey/result-survey-13.ttl,
+	rasqal/tests/sparql/survey/result-survey-2.ttl,
+	rasqal/tests/sparql/survey/result-survey-3.ttl,
+	rasqal/tests/sparql/survey/result-survey-8.ttl,
+	rasqal/tests/sparql/survey/result-survey-9.ttl,
+	rasqal/tests/sparql/survey/survey-sample.ttl: dawg suvey tests
+
+	* raptor/tests/Makefile.am, raptor/tests/ex-56.out,
+	raptor/tests/ex-56.rdf: Added ex-56 test that relative URIs in
+	datatypes work (Graham Klyne)
+
+2005-04-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/configure.ac, rasqal/win32_rasqal_config.h: Bumped
+	version to 0.9.9
+
+	* rasqal: Snapshotted rasqal_0_9_8 for 0.9.8 release
+
 2005-04-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_serializer.c: Add missing switch cases to make

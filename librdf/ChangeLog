@@ -1,3 +1,31 @@
+2005-04-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_serializer.c, rdf_storage.c, rdf_uri.c, rdf_init.c,
+	rdf_model.c, rdf_parser.c, rdf_digest.c, rdf_hash.c,
+	rdf_concepts.c: Mark class librdf_init/finish_FOO as INTERNAL.
+	Tidy head doc, 2005.
+
+2005-04-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_serializer.c, rdf_serializer_raptor.c, rdf_storage.c,
+	rdf_storage_sqlite.c, rdf_stream.c, rdf_log.c, rdf_node.c: Add
+	missing switch cases to make -Wswitch-enum happy.
+
+	* rdf_query_rasqal.c (rasqal_redland_new_triples_source): Use new
+	rasqal 0.9.8+ rasqal_query_get_data_graph_sequence
+
+	* rdf_node.h: Remove unused LIBRDF_NODE_TYPE_RESERVED1 (#3) from
+	librdf_node_type enum
+
+2005-03-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage.c (librdf_storage_node_stream_to_node_create): node1
+	or node2 can be NULL but not both - edit docs and assertion.
+
+2005-02-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_statement.c (librdf_free_statement): with threads fix
+
 2005-02-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_query_rasqal.c (librdf_query_rasqal_execute): Free any
