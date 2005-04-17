@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_query.c - RDF Query Adaptors Implementation
+ * rdf_query.c - RDF Query Language/Syntax and Execution Interface
  *
  * $Id$
  *
@@ -53,7 +53,7 @@ static void librdf_delete_query_factories(librdf_world *world);
 
 
 /**
- * librdf_init_query - Initialise the librdf_query module
+ * librdf_init_query - INTERNAL - Initialise the librdf_query module
  * @world: redland world object
  * 
  * Initialises and registers all
@@ -70,7 +70,7 @@ librdf_init_query(librdf_world *world)
 
 
 /**
- * librdf_finish_query - Terminate the librdf_query module
+ * librdf_finish_query - INTERNAL - Terminate the librdf_query module
  * @world: redland world object
  **/
 void
