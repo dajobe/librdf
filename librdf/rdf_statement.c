@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_statement.c - RDF Statement implementation
+ * rdf_statement.c - RDF Triple (Statement) interface
  *
  * $Id$
  *
@@ -48,7 +48,7 @@
 /* class methods */
 
 /**
- * librdf_init_statement - Initialise the librdf_statement module
+ * librdf_init_statement - INTERNAL - Initialise the librdf_statement module
  * @world: redland world object
  **/
 void
@@ -58,7 +58,7 @@ librdf_init_statement(librdf_world *world)
 
 
 /**
- * librdf_finish_statement - Terminate the librdf_statement module
+ * librdf_finish_statement - INTERNAL - Terminate the librdf_statement module
  * @world: redland world object
  **/
 void

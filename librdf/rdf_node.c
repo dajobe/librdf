@@ -1,10 +1,10 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_node.c - RDF Node (Resource / Literal) Implementation
+ * rdf_node.c - RDF Node (RDF URI, Literal, Blank Node) Interface
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -61,7 +61,7 @@ enum {
 /* class functions */
 
 /**
- * librdf_init_node - Initialise the node module.
+ * librdf_init_node - INTERNAL - Initialise the node module.
  * @world: redland world object
  * 
  **/
@@ -82,7 +82,7 @@ librdf_init_node(librdf_world* world)
 
 
 /**
- * librdf_finish_node - Terminate the librdf_node module
+ * librdf_finish_node - INTERNAL - Terminate the librdf_node module
  * @world: redland world object
  **/
 void
@@ -120,7 +120,7 @@ librdf_new_node(librdf_world *world)
 
     
 
-/*
+/**
  * librdf_new_node_from_uri_string_or_uri - INTERNAL - Constructor - create a new librdf_node object from a URI string or URI object
  * @world: redland world object
  * @uri_string: string representing a URI
