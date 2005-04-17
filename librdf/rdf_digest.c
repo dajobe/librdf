@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -334,7 +334,7 @@ librdf_digest_print(librdf_digest* digest, FILE* fh)
 
 
 /**
- * librdf_init_digest - Initialise the librdf_digest class
+ * librdf_init_digest - INTERNAL - Initialise the librdf_digest class
  * @world: redland world object
  **/
 void
@@ -361,7 +361,7 @@ librdf_init_digest(librdf_world *world)
 
 
 /**
- * librdf_finish_digest - Terminate the librdf_digest class
+ * librdf_finish_digest - INTERNAL - Terminate the librdf_digest class
  * @world: redland world object
  **/
 void

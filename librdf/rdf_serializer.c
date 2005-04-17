@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_serializer.c - RDF Serializer Factory implementation
+ * rdf_serializer.c - RDF Serializer (RDF triples to syntax) interface
  *
  * $Id$
  *
@@ -430,7 +430,7 @@ librdf_serializer_serialize_model_to_string(librdf_serializer* serializer,
 
 
 /**
- * librdf_init_serializer - Initialise the librdf_serializer class
+ * librdf_init_serializer - INTERNAL - Initialise the librdf_serializer class
  * @world: redland world object
  **/
 void
@@ -441,7 +441,7 @@ librdf_init_serializer(librdf_world *world)
 
 
 /**
- * librdf_finish_serializer - Terminate the librdf_serializer class
+ * librdf_finish_serializer - INTERNAL - Terminate the librdf_serializer class
  * @world: redland world object
  **/
 void

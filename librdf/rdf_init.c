@@ -1,10 +1,10 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_init.c - Overall library initialisation / termination
+ * rdf_init.c - Redland library initialisation / termination
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -151,10 +151,8 @@ librdf_free_world(librdf_world *world)
 
 
 /**
- * librdf_world_init_mutex - Create the world mutex
+ * librdf_world_init_mutex - INTERNAL - Create the world mutex
  * @world: redland world object
- *
- * Internal
  */
 void
 librdf_world_init_mutex(librdf_world* world)

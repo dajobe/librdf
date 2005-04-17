@@ -1,10 +1,10 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_hash.c - RDF Hash Implementation
+ * rdf_hash.c - RDF Hash interface - set of (key: value) pairs with dups
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -78,7 +78,7 @@ static void librdf_hash_keys_iterator_finished(void* iterator);
 
 
 /**
- * librdf_init_hash - Initialise the librdf_hash module
+ * librdf_init_hash - INTERNAL - Initialise the librdf_hash module
  *
  * Initialises and registers all
  * compiled hash modules.  Must be called before using any of the hash
@@ -99,7 +99,7 @@ librdf_init_hash(librdf_world *world)
 
 
 /**
- * librdf_finish_hash - Terminate the librdf_hash module
+ * librdf_finish_hash - INTERNAL - Terminate the librdf_hash module
  * @world: redland world object
  **/
 void

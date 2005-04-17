@@ -1,10 +1,10 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_concepts.c - Nodes representing concepts from RDF Model and Syntax 
+ * rdf_concepts.c - Nodes representing concepts from the RDF Model
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -86,7 +86,7 @@ librdf_uri* librdf_concept_schema_namespace_uri = NULL;
 
 
 /**
- * librdf_init_concepts - Initialise the concepts module.
+ * librdf_init_concepts - INTERNAL - Initialise the concepts module.
  * @world: redland world object
  * 
  **/
@@ -148,7 +148,7 @@ librdf_get_concept_by_name(librdf_world *world, int is_ms,
 
 
 /**
- * librdf_finish_concepts - Terminate the librdf_concepts module
+ * librdf_finish_concepts - INTERNAL - Terminate the librdf_concepts module
  * @world: redland world object
  **/
 void

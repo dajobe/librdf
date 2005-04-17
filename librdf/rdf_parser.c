@@ -1,10 +1,10 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_parser.c - RDF Parser Factory implementation
+ * rdf_parser.c - RDF Parser (syntax to RDF triples) interface
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -477,7 +477,7 @@ librdf_parser_parse_counted_string_into_model(librdf_parser* parser,
 
 
 /**
- * librdf_init_parser - Initialise the librdf_parser class
+ * librdf_init_parser - INTERNAL - Initialise the librdf_parser class
  * @world: redland world object
  **/
 void
@@ -490,7 +490,7 @@ librdf_init_parser(librdf_world *world)
 
 
 /**
- * librdf_finish_parser - Terminate the librdf_parser class
+ * librdf_finish_parser - INTERNAL - Terminate the librdf_parser class
  * @world: redland world object
  **/
 void

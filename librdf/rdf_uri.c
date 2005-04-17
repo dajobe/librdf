@@ -1,10 +1,10 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_uri.c - RDF URI Implementation
+ * rdf_uri.c - RDF URI interface
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -53,7 +53,7 @@
 
 
 /**
- * librdf_init_uri - Initialise the librdf_uri class
+ * librdf_init_uri - INTERNAL - Initialise the librdf_uri class
  * @world: redland world object
  *
  **/
@@ -77,7 +77,7 @@ librdf_init_uri(librdf_world *world)
 
 
 /**
- * librdf_finish_uri - Terminate the librdf_uri class
+ * librdf_finish_uri - INTERNAL - Terminate the librdf_uri class
  * @world: redland world object
  **/
 void

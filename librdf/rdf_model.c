@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_model.c - RDF Model implementation
+ * rdf_model.c - RDF Graph (Model) interface
  *
  * $Id$
  *
@@ -48,7 +48,7 @@ static void librdf_delete_model_factories(void);
 
 
 /**
- * librdf_init_model - Initialise librdf_model class
+ * librdf_init_model - INTERNAL - Initialise librdf_model class
  * @world: redland world object
  **/
 void
@@ -60,7 +60,7 @@ librdf_init_model(librdf_world *world)
 
 
 /**
- * librdf_finish_model - Terminate librdf_model class
+ * librdf_finish_model - INTERNAL - Terminate librdf_model class
  * @world: redland world object
  **/
 void

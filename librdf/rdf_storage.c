@@ -1,10 +1,10 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_storage.c - RDF Storage Implementation
+ * rdf_storage.c - RDF Storage (Triple store) interface
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -65,7 +65,7 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
 
 
 /**
- * librdf_init_storage - Initialise the librdf_storage module
+ * librdf_init_storage - INTERNAL - Initialise the librdf_storage module
  * @world: redland world object
  * 
  * Initialises and registers all
@@ -95,7 +95,7 @@ librdf_init_storage(librdf_world *world)
 
 
 /**
- * librdf_finish_storage - Terminate the librdf_storage module
+ * librdf_finish_storage - INTERNAL - Terminate the librdf_storage module
  * @world: redland world object
  **/
 void
