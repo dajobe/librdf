@@ -194,14 +194,28 @@ librdf_storage_mysql_hash(librdf_storage* storage, char *type,
 {
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
   u64 hash;
+  byte* digest;
+  uint i;
 
   /* (Re)initialize digest object */
   librdf_digest_init(context->digest);
+  
+  /* Update digest with data */
   if(type)
     librdf_digest_update(context->digest, (unsigned char*)type, 1);
   librdf_digest_update(context->digest, (unsigned char*)string, length);
   librdf_digest_final(context->digest);
-  memcpy(&hash, librdf_digest_get_digest(context->digest), sizeof(hash));
+  
+  /* Copy first 8 bytes of digest into unsigned 64bit hash
+   * using a method portable across big/little endianness
+   *
+   * Fixes Issue#0000023 - http://bugs.librdf.org/mantis/view.php?id=23
+   */
+  digest = (byte*) librdf_digest_get_digest(context->digest);
+  hash = 0;
+  for(i=0; i<8; i++)
+    hash += ((u64) digest[i]) << (i*8);
+  
   return hash;
 }
 
