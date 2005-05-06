@@ -1,4 +1,684 @@
+2005-05-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_mysql.c (librdf_storage_mysql_hash): Copy the
+	first 8 bytes of digest into unsigned 64bit hash using a method
+	portable across big/little endianness. Fixes Issue#0000023 -
+	http://bugs.librdf.org/mantis/view.php?id=23
+	(Morten Frederiksen)
+
+	* rasqal/librasqal.3: Updated for 0.9.9
+
+	* rasqal/rasqal_query.c: typo
+
+2005-05-05  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_query.c (rasqal_query_get_wildcard): Added
+
+	* rasqal/rasqal.h: Added prototype for rasqal_query_get_wildcard
+
+	* rasqal/rasqal.h: Added prototypes for
+	rasqal_query_get_order_conditions_sequence
+	rasqal_query_get_order_condition
+
+	* rasqal/rasqal_query.c:
+	(rasqal_query_get_order_conditions_sequence,
+	rasqal_query_get_order_condition): Added to return query order
+	conditions.
+
+2005-05-04  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_lexer.l (VARNAME): Use NCCHARV to allow vars to
+	start with _, [0-9] too.
+
+	* rasqal/tests/sparql/SyntaxFull/.cvsignore: ignore autostuff
+
+	* raptor/win32_raptor_config.h: Added SIZEOF_UNSIGNED_SHORT
+
+2005-05-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/configure.ac: Added tests/sparql/sort dir
+
+	* rasqal/tests/sparql/Makefile.am: Added sort dir
+
+	* rasqal/tests/sparql/sort/result-sort-3.rdf,
+	rasqal/tests/sparql/sort/result-sort-4.rdf,
+	rasqal/tests/sparql/sort/result-sort-5.rdf,
+	rasqal/tests/sparql/sort/result-sort-6.rdf,
+	rasqal/tests/sparql/sort/result-sort-7.rdf,
+	rasqal/tests/sparql/sort/result-sort-8.rdf,
+	rasqal/tests/sparql/sort/.cvsignore,
+	rasqal/tests/sparql/sort/Makefile.am,
+	rasqal/tests/sparql/sort/data-sort-1.ttl,
+	rasqal/tests/sparql/sort/data-sort-3.ttl,
+	rasqal/tests/sparql/sort/data-sort-4.ttl,
+	rasqal/tests/sparql/sort/data-sort-6.ttl,
+	rasqal/tests/sparql/sort/data-sort-7.ttl,
+	rasqal/tests/sparql/sort/data-sort-8.ttl,
+	rasqal/tests/sparql/sort/manifest.ttl,
+	rasqal/tests/sparql/sort/query-sort-1.rq,
+	rasqal/tests/sparql/sort/query-sort-2.rq,
+	rasqal/tests/sparql/sort/query-sort-3.rq,
+	rasqal/tests/sparql/sort/query-sort-4.rq,
+	rasqal/tests/sparql/sort/query-sort-5.rq,
+	rasqal/tests/sparql/sort/query-sort-6.rq,
+	rasqal/tests/sparql/sort/result-sort-1.rdf,
+	rasqal/tests/sparql/sort/result-sort-2.rdf: added dawg sort tests
+
+2005-05-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/survey/Makefile.am: More diagnosis of
+	failures
+
+	* rasqal/rasqal_engine.c (rasqal_engine_assign_variables): Add
+	anonymous variables to the variables/variables_declared_in arrays.
+	(rasqal_query_graph_pattern_build_declared_in_variable): Added
+	helper.
+	(rasqal_query_graph_pattern_build_declared_in): Use above
+	(rasqal_engine_do_optional_step): Check any outermost constraint
+	expression if there is a match.
+	(rasqal_engine_make_basic_graph_pattern): Use
+	rasqal_graph_pattern_add_constraint when moving constraints.
+	Rebuild constraints expression after moving constraints.
+
+	* rasqal/tests/sparql/survey/Makefile.am: 5 failures now
+
+	* rasqal/roqet.c (roqet_query_walk): Start from top graph pattern,
+	not contents of it.
+
+	* rasqal/rasqal_query.c (rasqal_query_get_query_graph_pattern):
+	Added to get the top graph pattern.
+
+	* rasqal/rasqal.h: Added prototype for
+	rasqal_query_get_query_graph_pattern
+
+	* rasqal/rasqal_engine.c (rasqal_engine_assign_variables): Use the
+	wildcard flag for SELECT * and CONSTRUCT *
+
+	* rasqal/rasqal_query.c: Added rasqal_query_verb_labels for debug
+	printing.
+	(rasqal_query_print): Print out the query verb.
+	(rasqal_query_results_is_bindings,
+	rasqal_query_results_is_boolean, rasqal_query_results_is_graph):
+	Use the query verb to decide this.
+	(rasqal_query_get_verb): Added.
+
+	* rasqal/sparql_parser.y (Report): Set the query verb to SELECT,
+	CONSTRUCT, DESCRIBE or ASK.  Do not use select_is_describe or ask.
+	(SelectClause): Set wildcard flag with SELECT (DISTINCT) *
+	(ConstructClause): Set the wildcard flag with CONSTRUCT *
+
+	* rasqal/rdql_parser.y (Query): Set query verb to SELECT.
+	(SelectClause): Set wildcard flag with SELECT *
+
+	* rasqal/rasqal_internal.h: rasqal_query gains a verb and wildcard
+	fields replacing select_all, select_is_describe, construct_all and
+	ask
+
+	* rasqal/rasqal.h: Added rasqal_query_verb enum.  Added prototype
+	for rasqal_query_get_verb
+
+	* rasqal/sparql_parser.y (OptionalGraphPattern): Do not set
+	optional flags on triples.
+
+	* rasqal/rasqal_graph_pattern.c (rasqal_graph_pattern_init):
+	Record triple_meta is_exact field.
+
+	* rasqal/rasqal_expr.c: Removed rasqal_triple_flag_strings
+	(rasqal_triple_print): Removed printing flags.
+	(rasqal_triple_set_flags, rasqal_triple_get_flags): Note
+	deprecated.
+
+	* rasqal/rasqal_engine.c (rasqal_graph_pattern_get_next_match):
+	Use triple_meta file is_exact instead of rasqal_triple flag field
+	(rasqal_engine_prepare): No longer init triple flags.
+
+	* rasqal/rasqal.h: Deprecated rasqal_triple flags field. - the
+	value EXACT was only used in the execution engine and properly
+	lives in rasqal_triple_meta. The value OPTIONAL was never used.
+	Added is_exact file to rasqal_triple_meta.  Deprecated
+	rasqal_triple_set_flags and rasqal_triple_get_flags.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_execute_init): Transform
+	the query graph pattern for execution purposes - make basic graph
+	patterns and make sure the top is always a sequence of graph
+	patterns, for now.
+
+	* rasqal/sparql_parser.y (rasqal_sparql_query_engine_prepare):
+	Remove the building of basic graph patterns from here. Just build
+	the simplest graph pattern and let the execution engine change it
+	if it needs to.
+
+	* rasqal/rdql_parser.y (rasqal_rdql_query_engine_prepare): Just
+	build the simplest graph pattern here, let the executionengine
+	change it if it needs to.
+
+2005-05-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/SyntaxFull/Makefile.am: Updated for tests
+	updates, removals for required top level graph pattern.
+
+	* rasqal/tests/sparql/SyntaxFull/syntax-bnodes-06.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-07.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-08.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-09.rq: Removed
+	renamed syntax-bnodes tests
+
+	* rasqal/tests/sparql/SyntaxFull/syntax-query-pat-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-query-pat-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-query-pat-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-query-pat-04.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-query-pat-05.rq: Removed
+	WHERE no {} tests
+
+2005-04-27  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/examples/Makefile.am:
+	sparql-query-example-Testing-Values-str works with right data
+
+	* rasqal/tests/sparql/examples/Makefile.am:
+	sparql-query-example-Testing-Values-str fails
+
+	* rasqal/sparql_parser.y (CallExpression): use nflags for pattern
+	expression flags
+
+	* rasqal/tests/sparql/SyntaxFull/Makefile.am: fix dup terms
+
+	* rasqal/tests/sparql/SyntaxFull/Makefile.am: Added empty.nt
+
+	* rasqal/tests/sparql/SyntaxFull/empty.nt: empty.nt
+
+	* rasqal/tests/sparql/SyntaxFull/syntax-bnodes-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-04.rq,
+	rasqal/tests/sparql/SyntaxFull/manifest.ttl,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-02.rq,
+	rasqal/tests/sparql/SyntaxFull/Makefile.am: Added
+	syntax-bnodes-01,02,03 and 04
+
+	* rasqal/tests/sparql/check-sparql: Handle no result in manifest
+
+	* rasqal/rasqal_engine.c
+	(rasqal_engine_convert_blank_node_to_anonymous_variable): Helper
+	added.
+	(rasqal_engine_build_anonymous_variables): Added to turn bnodes
+	inside graph pattern triples into variables.  ISSUE: should not do
+	this with construct triples
+
+	* rasqal/rasqal_query.c (rasqal_new_query, rasqal_free_query):
+	init/free anon_variables_sequence
+	(rasqal_query_print): Print anonymous variables
+
+	* rasqal/rasqal_expr.c (rasqal_new_variable_typed): Added with
+	type parameter.
+	(rasqal_new_variable): Changed to use it.
+	(rasqal_variable_print): Print variable type.
+
+	* rasqal/rasqal_internal.h: Added anon_variables_sequence and
+	anon_variables_count
+
+	* rasqal/rasqal.h: typoo
+
+	* rasqal/rasqal.h: Added rasqal_variable_type enum.
+	rasqal_variable gained field 'type' Added prototypes for
+	rasqal_query_set_distinct, rasqal_query_set_limit,
+	rasqal_query_set_offset and rasqal_new_variable_typed
+
+	* rasqal/rasqal_query.c (rasqal_query_set_distinct,
+	rasqal_query_set_limit, rasqal_query_set_offset): Added.
+
+	* rasqal/sparql_lexer.l, rasqal/sparql_parser.y: Removed unused
+	tokens PATTERN_LITERAL and '&'.
+
+	* rasqal/tests/sparql/survey/Makefile.am: fix failure count
+
+	* rasqal/tests/sparql/syntax/cast1.rq: no == operator
+
+	* rasqal/tests/sparql/bound/Makefile.am,
+	rasqal/tests/sparql/part1/Makefile.am,
+	rasqal/tests/sparql/simple/Makefile.am,
+	rasqal/tests/sparql/survey/Makefile.am: Remove check-sparql-works
+	targets - check-sparql-correct does it better and using manifest
+
+	* rasqal/tests/sparql/examples/ex11.2.3.5_0-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.5_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.6_0-result.n3: Fix what I
+	think are test query/data bugs
+
+	* rasqal/tests/sparql/examples/Makefile.am: Added ex11_1.rq
+	ex11_1-result.n3 Note which query files have the failing query.
+
+	* rasqal/tests/sparql/examples/ex11_1-result.n3,
+	rasqal/tests/sparql/examples/ex11_1.rq: example ex11_1
+
+	* rasqal/tests/sparql/examples/ex11.2.3.6_0-result.n3,
+	rasqal/tests/sparql/examples/ex11_0-result.n3,
+	rasqal/tests/sparql/examples/manifest.n3: Sync tests to dawg
+
+2005-04-26  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/rdql/testsuite/check-rdql,
+	rasqal/tests/sparql/check-sparql (toDebug): Handle no value.
+
+	* rasqal/tests/sparql/survey/Makefile.am: Added expected failures
+
+	* rasqal/sparql_lexer.l: Remove == token
+
+	* rasqal/sparql_lexer.l: Align name tokens with rq23 post WD
+	2005-04-19 CVS 1.326
+
+	* rasqal/tests/sparql/bound/bound1.rq: new turtley syntax
+
+	* rasqal/tests/sparql/examples/Makefile.am: Annotate failures.
+
+	* rasqal/sparql_parser.y: less super-debuggy
+
+	* rasqal/sparql_parser.y:
+	(CallExpression) Copy the string from rasqal_literal_as_string
+	when making pattern literals or flags. Free the unused literal
+	args.
+
+	* rasqal/rasqal_expr.c:
+	(rasqal_expression_evaluate) For the RASQAL_EXPR_STR operation,
+	copy the string from rasqal_literal_as_string.
+
+	* rasqal/sparql_parser.y (rasqal_sparql_query_engine_prepare):
+	Restore hack to build an outer list of GPs if the folding made it
+	all into one.
+
+	* rasqal/sparql_parser.y (rasqal_sparql_query_engine_prepare):
+	Just call rasqal_engine_make_basic_graph_pattern on the query
+	graph pattern.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_make_basic_graph_pattern):
+	More debug messages.  Always merge a GP with a GP of size 1
+	inside.  Ignore any inner OPTIONAL GPs Merge sequences of triples
+	if seen.
+
+	* rasqal/tests/sparql/SyntaxFull/Makefile.am: syntax-struct-01.rq
+	no longer crashes
+
+	* rasqal/sparql_parser.y (OptionalGraphPattern): Don't die if no
+	GraphPattern.
+
+	* rasqal/sparql_parser.y: Debug messages
+
+	* rasqal/rasqal_graph_pattern.c (rasqal_graph_pattern_print):
+	Print graph pattern/triple sequence sizes.
+
+	* rasqal/rasqal_query.c (rasqal_new_query): Set initial offset to
+	unset (<0)
+
+	* rasqal/rasqal_engine.c (rasqal_query_build_declared_in): warning
+	wording
+
+	* rasqal/rasqal_engine.c (rasqal_query_build_declared_in): No \n
+	in warning.
+
+	* rasqal/sparql_parser.y (UnionGraphPatternList): Added.
+	(UnionGraphPattern): Make a graph pattern with the contained union
+	graphs.  Renamed from OptionalGraphPatternList.
+
+	* rasqal/tests/sparql/SyntaxFull/Makefile.am: Fixed
+	syntax-union-02.rq
+
+	* rasqal/sparql_parser.y (OptionalGraphPatternList): Require UNION
+	between GPs
+
+	* rasqal/tests/sparql/SyntaxFull/Makefile.am: Typo
+
+	* rasqal/rasqal_expr.c (rasqal_expression_evaluate): Warn and then
+	return false for function expressions - not implemented.
+
+	* rasqal/sparql_parser.y: Removed string operators STR_EQ STR_NE
+	STR_MATCH STR_NMATCH
+	(OptionalGraphPatternList): List cannnot be empty Lots of renaming
+	of grammar terms to match rq23 / WD 19 April 2005
+	(RelationalExpression): Renamed from ValueLogical and merged with
+	former RelationalExpression.
+	(CallExpression): Renamed from BuiltinExpression and reordered to
+	match rq23
+
+	* rasqal/sparql_lexer.l: Removed regex pattern literals, PATTERN
+	state, sparql_copy_regex_token, EQ/eq, NE/NE, =~, ~~, !~
+
+	* rasqal/sparql_parser.y (OptionalGraphPatternList): Added, to
+	allow GraphPattern UNION GraphPattern*
+
+	* rasqal/rasqal_engine.c (rasqal_engine_make_basic_graph_pattern):
+	Verbose debugging if RASQAL_DEBUG > 1
+
+2005-04-25  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/SyntaxFull/Makefile.am: Note failures so far
+
+	* rasqal/sparql_parser.y (BuiltinExpression): Move URIBrace work
+	into FunctionCall
+	(FunctionCall): Pick cast or function, I choose function
+
+	* rasqal/sparql_lexer.l: Widen QUOTEDURI and include <>
+
+	* rasqal/sparql_parser.y (WhereClauseOpt): Warn WHERE omitted.
+	(BuiltinExpression): Call FunctionCall
+	(PrimaryExpression): Add '(' Expression ')'
+	(FunctionCall): Add URI name.
+	(ArgList): Now a list of expressions
+
+	* rasqal/sparql_parser.y (OrderClauseOpt): Use OrderConditionList
+	and store it in query field order_conditions_seequence.
+	(OrderConditionList): Added, making a raptor_sequence of
+	expressions
+	(OrderCondition): Implemented ASC/DESC/none
+	(OrderExpression): Added, using FunctionCall or Var
+	(ItemList): Init $$->triples and set formula.
+	(PrimaryExpression): Use FunctionCall
+	(FunctionCall): Restored, now it's used twice.
+
+	* rasqal/rasqal.h: Added RASQAL_EXPR_ORDER_COND_ASC,
+	RASQAL_EXPR_ORDER_COND_DESC and RASQAL_EXPR_ORDER_COND_NONE
+
+	* rasqal/rasqal_internal.h: Added order_conditions_sequence to
+	query
+
+	* rasqal/rasqal_query.c (rasqal_query_print): Print order
+	conditions.
+
+	* rasqal/rasqal_query.c (rasqal_new_query,rasqal_free_query): Init
+	and free order_conditions_sequence
+
+	* rasqal/rasqal_expr.c (rasqal_free_expression,
+	rasqal_expression_foreach, rasqal_expression_evaluate,
+	rasqal_expression_print): Added cases for
+	RASQAL_EXPR_ORDER_COND_ASC, RASQAL_EXPR_ORDER_COND_DESC and
+	RASQAL_EXPR_ORDER_COND_NONE
+
+	* rasqal/sparql_lexer.l: ASC, DESC take following [ too
+	(sparql_token_print): Added ASC, DESC
+
+	* rasqal/sparql_parser.y, rasqal/sparql_lexer.l: Added ASC, DESC
+
+	* rasqal/sparql_lexer.l (PREFIX, NAME): Allow . after first char
+
+	* rasqal/sparql_lexer.l: Added '''strings''' (not in Turtle)
+
+	* rasqal/sparql_lexer.l: Added """string""" literals
+
+	* rasqal/tests/sparql/SyntaxFull/syntax-union-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-union-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-09.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-10.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-07.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-08.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-06.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-04.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-05.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-query-pat-04.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-query-pat-05.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-14.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-query-pat-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-query-pat-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-query-pat-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-12.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-13.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-11.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-09.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-10.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-07.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-08.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-pat-04.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-pat-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-pat-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-pat-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-order-04.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-order-05.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-order-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-order-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-order-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-14.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-13.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-12.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-11.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-10.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-09.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-07.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-08.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-06.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-05.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-04.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lists-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lists-04.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lists-05.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lit-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lists-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-lists-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-forms-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-forms-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-forms-03.arq,
+	rasqal/tests/sparql/SyntaxFull/syntax-expr-04.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-expr-05.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-expr-06.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-expr-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-expr-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-expr-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-07.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-08.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-09.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-basic-05.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-basic-06.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-bnodes-06.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-basic-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-basic-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-basic-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-basic-04.rq,
+	rasqal/tests/sparql/Makefile.am,
+	rasqal/tests/sparql/SyntaxFull/Makefile.am,
+	rasqal/tests/sparql/SyntaxFull/manifest.ttl, rasqal/configure.ac:
+	Added SyntaxFull tests from dawg
+
+2005-04-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/survey/Makefile.am: data is
+	survey-sample.ttl
+
+2005-04-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_expr.c (rasqal_expression_evaluate): Handle
+	unbound variable values in RASQAL_EXPR_DATATYPE,
+	RASQAL_EXPR_ISURI, RASQAL_EXPR_ISBLANK, RASQAL_EXPR_ISLITERAL
+
+	* rasqal/sparql_lexer.l: Make keyword tokens case independent not
+	just upper or lowercase.
+
+	* rasqal/tests/sparql/examples/Makefile.am: Update for new example
+	files
+
+	* rasqal/sparql_parser.y: No conflicts
+
+	* rasqal/tests/sparql/examples/ex11.2.3.1_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.1_0.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.1_1.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.1_1.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.2_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.2_0.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.2_1.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.3_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.3_0.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.4_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.4_0.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.5_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.5_0.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.6_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.6_0.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.7_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.7_0.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.8_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.8_0.rq,
+	rasqal/tests/sparql/examples/ex11_0.n3,
+	rasqal/tests/sparql/examples/ex11_0.rq,
+	rasqal/tests/sparql/examples/ex3.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.1_0-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.1_1-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.2_0-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.2_1-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.3_0-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.4_0-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.5_0-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.6_0-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.7_0-result.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.8_0-result.n3,
+	rasqal/tests/sparql/examples/ex11_0-result.n3,
+	rasqal/tests/sparql/examples/manifest.n3: Imported updated
+	examples
+
+	* rasqal/tests/sparql/check-sparql: remove debug print
+
+	* rasqal/sparql_parser.y: Make construct work again.  Now %type
+	<seq>: TriplesList ConstructTemplate
+	(ConstructClause): Take triples from seq ConstructTemplate
+	(ConstructTemplate): Use TriplesList
+	(TriplesList): Added, making a raptor_sequence of triples from
+	triples in Triples formulas.
+
+	* rasqal/rasqal_graph_pattern.c (rasqal_new_graph_pattern): Init
+	columns to defaults here.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_make_basic_graph_pattern):
+	Added.
+
+	* rasqal/rasqal_internal.h: Added
+	rasqal_engine_make_basic_graph_pattern prototype.
+
+	* rasqal/sparql_parser.y (rasqal_sparql_query_engine_prepare):
+	Call rasqal_engine_make_basic_graph_pattern on the top level
+	subgraph patterns.
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Print failure summaries
+
+	* rasqal/tests/sparql/syntax/offset0.rq,
+	rasqal/tests/sparql/syntax/cast0.rq,
+	rasqal/tests/sparql/syntax/cast1.rq: updates for turtle sparql
+	syntax
+
+	* rasqal/tests/sparql/check-sparql: Read manfiest.ttl or
+	manifest.n3
+
+	* rasqal/tests/rdql/testsuite/check-rdql,
+	rasqal/tests/sparql/check-sparql: Emit failing roqet line when
+	roqet returns errors.
+
+	* rasqal/tests/rdql/testsuite/check-rdql,
+	rasqal/tests/sparql/check-sparql: Emit failing roqet line on
+	FAILURE
+
+2005-04-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_list.c (librdf_storage_list_node_equals): Not
+	equal if only one context is NULL.
+
 2005-04-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y: Updates to SPARQL rq23 around $Revision:
+	1.303 $ of $Date: 2005/04/16 17:13:51 $ Removed AND, WITH.  Added
+	NAMED.  Removed many %type that were used with NULL value or none.
+	(DatasetClauseOpt, DefaultGraphClause): Added after rq23
+	(NamedGraphClauseList): Added
+	(PatternElementsList): Renamed from PatternElementList and now in
+	rq23, returns a graph pattern.  FILTER handled here, not in older
+	PatternElementConstraint.
+	(PatternElementConstraint): Deleted.
+	(ItemList): Moved adjacent to Collection which it serves.
+	(URIList): Deleted, no longer used.
+
+	* rasqal/rasqal_engine.c
+	(rasqal_engine_build_constraints_expression): Handle no graph
+	pattern.
+	(rasqal_engine_execute_init): Handle no graph pattern.
+
+	* rasqal/tests/sparql/syntax/describe1.rq,
+	rasqal/tests/sparql/syntax/groups.rq,
+	rasqal/tests/sparql/syntax/construct1.rq,
+	rasqal/tests/sparql/syntax/limit0.rq,
+	rasqal/tests/sparql/syntax/construct0.rq,
+	rasqal/tests/sparql/syntax/construct2.rq,
+	rasqal/tests/sparql/syntax/distinct0.rq,
+	rasqal/tests/sparql/syntax/ask0.rq: Update to turtle query syntax
+
+	* rasqal/rasqal_graph_pattern.c
+	(rasqal_new_graph_pattern_from_sequence): Do not flatten gps.
+
+	* rasqal/tests/sparql/part1/Makefile.am,
+	rasqal/tests/sparql/part1/dawg-query-001,
+	rasqal/tests/sparql/part1/dawg-query-001.rq,
+	rasqal/tests/sparql/part1/dawg-query-002,
+	rasqal/tests/sparql/part1/dawg-query-002.rq,
+	rasqal/tests/sparql/part1/dawg-query-003,
+	rasqal/tests/sparql/part1/dawg-query-003.rq,
+	rasqal/tests/sparql/part1/dawg-query-004,
+	rasqal/tests/sparql/part1/dawg-query-004.rq,
+	rasqal/tests/sparql/part1/manifest.n3: Updated to turtle query
+	syntax and renamed dawg-query-001.rq dawg-query-002.rq
+	dawg-query-003.rq dawg-query-004.rq
+
+	* rasqal/tests/sparql/examples/ex2-1a.rq,
+	rasqal/tests/sparql/examples/ex2-1b.rq,
+	rasqal/tests/sparql/examples/ex2-1c.rq,
+	rasqal/tests/sparql/examples/ex2-1e.rq,
+	rasqal/tests/sparql/examples/ex2-2a.rq,
+	rasqal/tests/sparql/examples/ex2-3a.rq,
+	rasqal/tests/sparql/examples/ex2-4a.rq,
+	rasqal/tests/sparql/examples/manifest.n3: update to turtle syntax
+	queries, latest naming
+
+	* rasqal/tests/sparql/simple/data-03.n3,
+	rasqal/tests/sparql/simple/dawg-tp-05.rq: import from dawg
+
+	* rasqal/tests/sparql/simple/dawg-tp-01.rq,
+	rasqal/tests/sparql/simple/dawg-tp-02.rq,
+	rasqal/tests/sparql/simple/dawg-tp-03.rq,
+	rasqal/tests/sparql/simple/dawg-tp-04.rq,
+	rasqal/tests/sparql/simple/manifest.n3: update to turtle syntax
+	queries
+
+	* rasqal/rdql_parser.y (rasqal_rdql_query_engine_prepare): Init
+	query graph pattern.
+
+	* rasqal/rasqal_query.c (rasqal_new_query): Start with a NULL
+	query graph pattern.
+
+	* rasqal/sparql_lexer.l: -AND
+
+	* rasqal/sparql_lexer.l: -WITH, +NAMED
+
+	* rasqal/tests/sparql/survey/manifest.ttl: Added manifest.ttl
+
+	* rasqal/tests/sparql/survey/query-survey-1.rq,
+	rasqal/tests/sparql/survey/query-survey-10.rq,
+	rasqal/tests/sparql/survey/query-survey-11.rq,
+	rasqal/tests/sparql/survey/query-survey-12.rq,
+	rasqal/tests/sparql/survey/query-survey-13.rq,
+	rasqal/tests/sparql/survey/query-survey-2.rq,
+	rasqal/tests/sparql/survey/query-survey-3.rq,
+	rasqal/tests/sparql/survey/query-survey-8.rq,
+	rasqal/tests/sparql/survey/query-survey-9.rq,
+	rasqal/tests/sparql/survey/result-survey-10.ttl,
+	rasqal/tests/sparql/survey/result-survey-3.ttl,
+	rasqal/tests/sparql/survey/survey-sample.ttl: Update to latest
+	DAWG versions of test
+
+	* rasqal/tests/sparql/survey/Makefile.am: manifest file is
+	manifest.ttl
+
+	* ChangeLog, ChangeLog.5, Makefile.am: Added ChangeLog.5 for 2004
+
+	* librdf/rdf_query.c: Mark class librdf_init/finish_FOO as INTERNAL.
+	Tidy head doc
+
+	* librdf/rdf_log.c:
+	Export several useful internal documented functions marked INTERNAL.
 
 	* librdf/rdf_serializer.c, librdf/rdf_storage.c, librdf/rdf_uri.c,
 	librdf/rdf_init.c, librdf/rdf_model.c, librdf/rdf_parser.c,
