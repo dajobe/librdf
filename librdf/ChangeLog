@@ -1,4 +1,23 @@
+2005-05-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_mysql.c (librdf_storage_mysql_hash): Copy the first
+	8 bytes of digest into unsigned 64bit hash using a method portable
+	across big/little endianness. Fixes Issue#0000023 -
+	http://bugs.librdf.org/mantis/view.php?id=23
+	(Morten Frederiksen)
+
+2005-04-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_list.c (librdf_storage_list_node_equals): Not equal
+	if only one context is NULL.
+
 2005-04-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query.c: Mark class librdf_init/finish_FOO as INTERNAL.
+	Tidy head doc
+
+	* rdf_log.c: Export several useful internal documented functions
+	marked INTERNAL.
 
 	* rdf_serializer.c, rdf_storage.c, rdf_uri.c, rdf_init.c,
 	rdf_model.c, rdf_parser.c, rdf_digest.c, rdf_hash.c,
