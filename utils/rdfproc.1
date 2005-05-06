@@ -4,11 +4,11 @@
 .\"
 .\" $Id$
 .\"
-.\" Copyright (C) 2003-2004 David Beckett - http://purl.org/net/dajobe/
+.\" Copyright (C) 2003-2005 David Beckett - http://purl.org/net/dajobe/
 .\" Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
 .\" University of Bristol - http://www.bristol.ac.uk/
 .\"
-.TH rdfproc 1 "2004-01-30"
+.TH rdfproc 1 "2005-05-06"
 .\" Please adjust this date whenever revising the manpage.
 .SH NAME
 rdfproc \- Redland RDF processor utility
@@ -140,6 +140,10 @@ the triples are added to that context.
 .IP "\fBprint\fR"
 Print the graph triples in a simple format showing context nodes
 if present.
+
+.IP "\fBquery \fINAME\fP|- \fIURI\fP|- \fIQUERY-STRING\fP\fR"
+Run \fIQUERY-STRING\fI query in language \fINAME\fR returning
+variable bindings, a boolean or RDF graph depending on the query.
 
 .IP "\fBremove \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP \fI[CONTEXT]\fP\fR"
 Remove the given triple graph, in the optional Redland context
