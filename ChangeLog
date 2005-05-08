@@ -1,3 +1,52 @@
+2005-05-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_mysql.c:
+	Added MySQL connection handle pooling by Morten Frederiksen.
+	Added librdf_storage_mysql_connection_status enum and
+	staruct librdf_storage_mysql_connection to store used/opened
+	connections.
+	(librdf_storage_mysql_init_connections,
+	librdf_storage_mysql_finish_connections): Added to init/finish
+	connections
+	(librdf_storage_mysql_get_handle): Added helper to get a connection
+	handle either from the pool or make a new one.
+	(librdf_storage_mysql_release_handle): Release a connection handle
+	back to the pool.
+	(librdf_storage_mysql_*): Use the connection pool to get handles
+	using librdf_storage_mysql_get_handle.
+	No longer return 0-mysql_errno(&context->connection) error codes,
+	just -1 as the connection is strictly no longer available.
+
+	Fixes Issue#0000027 - http://bugs.librdf.org/mantis/view.php?id=27
+
+2005-05-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* utils/rdfproc.1: Document query command
+	Fixes Issue#0000024 - http://bugs.librdf.org/mantis/view.php?id=24
+
+	* librdf/rdf_storage_mysql.c (librdf_storage_mysql_hash):
+	Copy the first 8 bytes of digest into
+	unsigned 64bit hash using a method portable across big/little
+	endianness. 
+	Fixes Issue#0000023 - http://bugs.librdf.org/mantis/view.php?id=23
+
+	* rasqal/librasqal.3: Updated for 0.9.9
+
+	* rasqal/rasqal_query.c: typo
+
+2005-05-05  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal.h: Added prototype for rasqal_query_get_wildcard
+
+	* rasqal/rasqal_query.c (rasqal_query_get_wildcard): Added
+
+	* rasqal/rasqal.h:
+	Added prototypes for rasqal_query_get_order_conditions_sequence
+	rasqal_query_get_order_condition
+
+	* rasqal/rasqal_query.c (rasqal_query_get_order_conditions_sequence,rasqal_query_get_order_condition):
+	Added to return query order conditions.
+
 2005-05-06  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_storage_mysql.c (librdf_storage_mysql_hash): Copy the
