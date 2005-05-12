@@ -1,3 +1,23 @@
+2005-05-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_query_rasqal.c (librdf_query_rasqal_get_limit,
+	librdf_query_rasqal_set_limit, librdf_query_rasqal_get_offset,
+	librdf_query_rasqal_set_offset): Added to implement factory
+	methods for get/setting of query results limit and offsets.
+	(librdf_query_rasqal_register_factory): Register the above
+	methods.
+
+	* rdf_query.c (librdf_query_get_limit, librdf_query_set_limit,
+	librdf_query_get_offset, librdf_query_set_offset): Added to
+	provide access to new factory methods for get/setting of query
+	results limit - max results to return and offset - initial results
+	to skip.
+
+	* rdf_query.h: Added factory methods: get_limit, set_limit,
+	get_offset and set_offset.  Added prototypes for
+	librdf_query_get_limit, librdf_query_set_limit,
+	librdf_query_get_offset and librdf_query_set_offset
+
 2005-05-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_storage_mysql.c:

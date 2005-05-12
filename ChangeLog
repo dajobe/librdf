@@ -1,4 +1,107 @@
+2005-05-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_query_rasqal.c (librdf_query_rasqal_get_limit,
+	librdf_query_rasqal_set_limit, librdf_query_rasqal_get_offset,
+	librdf_query_rasqal_set_offset): Added to implement factory
+	methods for get/setting of query results limit and offsets.
+	(librdf_query_rasqal_register_factory): Register the above
+	methods.
+
+	* librdf/rdf_query.c (librdf_query_get_limit,
+	librdf_query_set_limit, librdf_query_get_offset,
+	librdf_query_set_offset): Added to provide access to new factory
+	methods for get/setting of query results limit - max results to
+	return and offset - initial results to skip.
+
+	* librdf/rdf_query.h: Added factory methods: get_limit, set_limit,
+	get_offset and set_offset.  Added prototypes for
+	librdf_query_get_limit, librdf_query_set_limit,
+	librdf_query_get_offset and librdf_query_set_offset
+
+	* configure.ac: require rasqal 0.9.9
+
+	* rasqal/roqet.c: Make -c/--count work properly.
+	Print count to stdout.
+	Tidy result format wording.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_get_count):
+	Adjust the returned count by any offset.
+	(rasqal_query_results_next): Implement limit and offset.
+	Addresses Issue#0000005 - http://bugs.librdf.org/mantis/view.php?id=5
+
+	* rasqal/rasqal_query.c (rasqal_query_results_next):
+	Adjust result_count here.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_get_next_result): Move
+	result_count to rasqal_query_results_next.
+
+2005-05-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/configure.ac: Change quotes around bison test
+
+	* raptor/configure.ac: Try to work for older bison version styles
+
 2005-05-08  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c:
+	Update from Suzan Foster to reflect the latest status of the
+	enclosure vocabulary and allow multiple common items and fields.
+	Fields in items are now a linked list of raptor_rss_field items.
+	(raptor_rss_context_init): Empty common area.
+	(raptor_enclosure_free): Use raptor_enclosure_free to empty enclosure
+	list.
+	(raptor_rss_field_free): Added to free a list of rss fields.
+	(raptor_clear_rss_item): Use raptor_rss_field_free for freeing
+	duplicate fields.
+	(raptor_clear_rss_common_items): added to empty common item field
+	lists.
+	(raptor_rss_context_terminate): Empty common item fields with
+	raptor_clear_rss_common_items.
+	(raptor_rss_new_field): Added.
+	(raptor_rss_enclosure_add): Added.
+	(raptor_rss_field_add): Added to add a new field value to the list of
+	values for one field item.
+	(raptor_rss_common_add): Added to add a new common item to the list
+	of common items for the current type.
+	(raptor_rss_common_get): Added to get the last common item for the
+	current type.
+	(raptor_rss_parser_processNode): Updates for new fields structure.
+	(raptor_rss_insert_enclosure_identifiers): Update for handling uris
+	and bnodes.
+	(raptor_rss_insert_identifiers): Update for lists for common items
+	and lists of ields.
+	(raptor_rss_emit_enclosure): Update for handling uris and bnodes.
+	(raptor_rss_emit_item, raptor_rss_emit, raptor_rss10_move_statements,
+	raptor_rss10_store_statement, raptor_rss10_serialize_statement,
+	raptor_rss10_build_xml_names): Updates for lists of common items and
+	lists of fields.
+	(raptor_rss10_emit_item): Added fix for moving fields to the item
+	when they got stuck on the enclosure when the enclosure uri = the guid.
+	Updates for lists of common items and lists of fields.
+	(raptor_rss10_serialize_end): Updates for lists of common items and
+	lists of fields.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write_xml_20041221):
+	Check only variable bindings are asked for.
+	(rasqal_query_results_write_xml_result2): Check only variable
+	bindings or boolean are asked for.  Add boolean results format.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write_xml_result2):
+	Write <binding> with name attribute.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write_xml_result2):
+	Write out bnode strings right.
+
+	* rasqal/roqet.c:
+	Default to unpublished version2 of the XML results format.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write_xml_20041221):
+	Added, renamed from
+	rasqal_query_results_write contents to emit the 2004-12-21 XML format
+	(rasqal_query_results_write_xml_result2): Added, to emit the
+	unpublished version2 of the XML format.
+	(rasqal_query_results_write): Call above functions depending on the
+	format_uri.
 
 	* librdf/rdf_storage_mysql.c:
 	Added MySQL connection handle pooling by Morten Frederiksen.
