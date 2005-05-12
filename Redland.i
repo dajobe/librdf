@@ -303,6 +303,10 @@ void librdf_free_query(librdf_query *query);
 /* methods */
 %newobject librdf_query_execute;
 librdf_query_results* librdf_query_execute(librdf_query* query, librdf_model *model);
+int librdf_query_get_limit(librdf_query *query);
+int librdf_query_set_limit(librdf_query *query, int limit);
+int librdf_query_get_offset(librdf_query *query);
+int librdf_query_set_offset(librdf_query *query, int offset);
 
 %newobject librdf_query_results_as_stream;
 librdf_stream* librdf_query_results_as_stream(librdf_query_results* query_results);
