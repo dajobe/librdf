@@ -434,6 +434,84 @@ librdf_query_execute(librdf_query* query, librdf_model* model)
   return results;
 }
 
+
+/**
+ * librdf_query_get_limit - Get the query-specified limit on results
+ * @query: &librdf_query query object
+ *
+ * This is the limit given in the query on the number of results allowed.
+ *
+ * Return value: integer >=0 if a limit is given, otherwise <0
+ **/
+int
+librdf_query_get_limit(librdf_query *query)
+{
+  if(query->factory->get_limit)
+    return query->factory->get_limit(query);
+  
+  return -1;
+}
+
+
+/**
+ * librdf_query_set_limit - Set the query-specified limit on results
+ * @query: &librdf_query query object
+ * @limit: the limit on results, >=0 to set a limit, <0 to have no limit
+ *
+ * This is the limit given in the query on the number of results allowed.
+ *
+ * Return value: non-0 on failure
+ **/
+int
+librdf_query_set_limit(librdf_query *query, int limit)
+{
+  if(query->factory->set_limit) {
+    query->factory->set_limit(query, limit);
+    return 0;
+  }
+
+  return -1;
+}
+
+
+/**
+ * librdf_query_get_offset - Get the query-specified offset on results
+ * @query: &librdf_query query object
+ *
+ * This is the offset given in the query on the number of results allowed.
+ *
+ * Return value: integer >=0 if a offset is given, otherwise <0
+ **/
+int
+librdf_query_get_offset(librdf_query *query)
+{
+  if(query->factory->get_offset)
+    return query->factory->get_offset(query);
+  
+  return -1;
+}
+
+
+/**
+ * librdf_query_set_offset - Set the query-specified offset on results
+ * @query: &librdf_query query object
+ * @offset: offset for results, >=0 to set an offset, <0 to have no offset
+ *
+ * This is the offset given in the query on the number of results allowed.
+ *
+ * Return value: non-0 on failure
+ **/
+int
+librdf_query_set_offset(librdf_query *query, int offset)
+{
+  if(query->factory->set_offset) {
+    query->factory->set_offset(query, offset);
+    return 0;
+  }
+
+  return -1;
+}
+
 #endif
 
 
