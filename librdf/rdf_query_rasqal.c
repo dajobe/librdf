@@ -545,6 +545,40 @@ librdf_query_rasqal_execute(librdf_query* query, librdf_model* model)
 
 
 static int
+librdf_query_rasqal_get_limit(librdf_query* query)
+{
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  return rasqal_query_get_limit(context->rq);
+}
+
+
+static int
+librdf_query_rasqal_set_limit(librdf_query* query, int limit)
+{
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  rasqal_query_set_limit(context->rq, limit);
+  return 0;
+}
+
+
+static int
+librdf_query_rasqal_get_offset(librdf_query* query)
+{
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  return rasqal_query_get_offset(context->rq);
+}
+
+
+static int
+librdf_query_rasqal_set_offset(librdf_query* query, int offset)
+{
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  rasqal_query_set_offset(context->rq, offset);
+  return 0;
+}
+
+
+static int
 librdf_query_rasqal_results_get_count(librdf_query_results *query_results)
 {
   librdf_query *query=query_results->query;
@@ -997,6 +1031,11 @@ librdf_query_rasqal_register_factory(librdf_query_factory *factory)
   factory->init               = librdf_query_rasqal_init;
   factory->terminate          = librdf_query_rasqal_terminate;
   factory->execute            = librdf_query_rasqal_execute;
+  factory->get_limit          = librdf_query_rasqal_get_limit;
+  factory->set_limit          = librdf_query_rasqal_set_limit;
+  factory->get_offset         = librdf_query_rasqal_get_offset;
+  factory->set_offset         = librdf_query_rasqal_set_offset;
+
   factory->results_get_count           = librdf_query_rasqal_results_get_count;
   factory->results_next                = librdf_query_rasqal_results_next;
   factory->results_finished            = librdf_query_rasqal_results_finished;
@@ -1013,7 +1052,6 @@ librdf_query_rasqal_register_factory(librdf_query_factory *factory)
   factory->results_is_graph                   = librdf_query_rasqal_results_is_graph;
   factory->results_get_boolean                = librdf_query_rasqal_results_get_boolean;
   factory->results_as_stream                  = librdf_query_rasqal_results_as_stream;
-
 }
 
 
