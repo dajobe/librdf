@@ -85,6 +85,13 @@ struct librdf_query_factory_s {
   /* perform the query on a model */
   librdf_query_results* (*execute)(librdf_query* query, librdf_model* model);
 
+  /* get/set query results limit (max results to return) */
+  int (*get_limit)(librdf_query *query);
+  int (*set_limit)(librdf_query *query, int limit);
+  /* get/set query results offset (results to skip) */
+  int (*get_offset)(librdf_query *query);
+  int (*set_offset)(librdf_query *query, int offset);
+
   /* get the query results as a stream - OPTIONAL */
   librdf_stream* (*results_as_stream)(librdf_query_results* query_results);
 
@@ -164,6 +171,10 @@ REDLAND_API void librdf_free_query(librdf_query *query);
 
 /* methods */
 REDLAND_API librdf_query_results* librdf_query_execute(librdf_query* query, librdf_model *model);
+REDLAND_API int librdf_query_get_limit(librdf_query *query);
+REDLAND_API int librdf_query_set_limit(librdf_query *query, int limit);
+REDLAND_API int librdf_query_get_offset(librdf_query *query);
+REDLAND_API int librdf_query_set_offset(librdf_query *query, int offset);
 
 REDLAND_API librdf_stream* librdf_query_results_as_stream(librdf_query_results* query_results);
 
