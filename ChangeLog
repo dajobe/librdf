@@ -1,4 +1,174 @@
+2005-05-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_init.c (librdf_world_open): Init query after parser
+	and explain why.
+
+	* librdf/rdf_query_rasqal.c (rasqal_redland_init_triples_match):
+	Renamed from rasqal_redland_new_triples_match.  Update for rasqal
+	0.9.9.  Takes an existing rasqal_triples_match structure and
+	returns non-0 on failure.
+
+	* rasqal/rasqal_redland.c (rasqal_redland_init_triples_match):
+	Renamed from rasqal_redland_new_triples_match.  Takes an existing
+	rasqal_triples_match structure and returns non-0 on failure.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_init_triples_match):
+	Renamed from rasqal_raptor_new_triples_match.  Takes an existing
+	rasqal_triples_match structure and returns non-0 on failure.
+
+	* rasqal/rasqal_engine.c (rasqal_new_triples_match): Call
+	init_triples_match factory method with an already alloced
+	rasqal_triples_match structure.  Free it here on error.
+
+	* rasqal/rasqal.h: rasqal_triples_source factory method
+	new_triples_match changed to init_triples_match, taking an
+	initialised rtm field, returning a status.
+
+	* rasqal/rasqal_general.c, rasqal/rasqal_literal.c,
+	rasqal/rasqal.h, rasqal/rasqal_engine.c, rasqal/rasqal_expr.c:
+	Casts for RASQAL_FREE.
+
+	* raptor/configure.ac: usage message formatting
+
+	* rasqal/rdql_lexer.l, rasqal/sparql_lexer.l: Use
+	RASQAL_MALLOC/CALLOC/FREE
+
+	* rasqal/configure.ac: Added --with-memory-signing rasqal signing
+	memory debugging
+
+	* raptor/raptor_general.c (raptor_free_statement): Casts for
+	RAPTOR_FREE
+
+	* rasqal/rasqal_general.c (rasqal_sign_malloc, rasqal_sign_calloc,
+	rasqal_sign_realloc, rasqal_sign_free): Added rasqal signing
+	memory debugging trigged by RASQAL_MEMORY_SIGN.
+
+	* rasqal/rasqal_internal.h: Added rasqal signing memory debugging
+	trigged by RASQAL_MEMORY_SIGN
+
+	* rasqal/rasqal_query_test.c (main): Use RASQAL_MALLOC/FREE
+
+	* raptor/configure.ac: Added --with-memory-signing raptor signing
+	memory debugging Reformatted some other --with help messages.
+
+	* raptor/raptor_general.c (raptor_sign_malloc, raptor_sign_calloc,
+	raptor_sign_realloc, raptor_sign_free): Added raptor signing
+	memory debugging trigged by RAPTOR_MEMORY_SIGN.
+
+	* raptor/raptor_internal.h: Added raptor signing memory debugging
+	trigged by RAPTOR_MEMORY_SIGN
+
+	* raptor/n3_lexer.l: Use RAPTOR_MALLOC, RAPTOR_FREE
+
+	* raptor/n3_parser.y, raptor/turtle_parser.y (directive,
+	resource): Use RAPTOR_MALLOC, RAPTOR_FREE
+
+	* raptor/turtle_lexer.l: Use RAPTOR_MALLOC, RAPTOR_FREE
+
+	* raptor/rdfdiff.c:
+	(rdfdiff_new_file, rdfdiff_new_blank) Use RAPTOR_MALLOC rather
+	than strdup.
+
+	* raptor/raptor_www_curl.c (raptor_www_curl_header_callback): Use
+	RAPTOR_MALLOC on type field data.
+
+	* raptor/rdfdump.c: Add raptor_finish() before usage exit
+
+2005-05-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y (TriplesList): Do not lose triples
+	sequence after sequence join.
+
+	* rasqal/rasqal_expr.c: docs
+
+2005-05-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c, rasqal/rasqal_query.c, rasqal/roqet.c,
+	rasqal/sparql_parser.y, rasqal/rasqal_expr.c: Casts for C++
+
+	* rasqal/sparql_parser.y (DefaultGraphClause, NamedGraphClause):
+	Free URI literal
+
+	* rasqal/sparql_parser.y: ItemList is now a raptor_sequence of
+	rasqal_formula.
+	(ItemList): Update to do that, copy over any underlying triples
+	(Collection): Walk the list of formula to create the RDF
+	collection triples.
+
+	* raptor/raptor_serialize_rdfxmla.c:
+	(raptor_rdfxmla_serialize_init,
+	raptor_rdfxmla_serialize_terminate): Init/free rdf_xml_literal_uri
+	for the rdf:XMLLiteral URI.
+	(raptor_rdfxmla_serialize_statement): Turn datatyped literals that
+	are rdf:XMLLiteral into inline XML, not escaped.
+
 2005-05-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_serialize.c:
+	(raptor_rdfxml_serialize_init, raptor_rdfxml_serialize_terminate):
+	Init/free rdf_xml_literal_uri for the rdf:XMLLiteral URI.
+	(raptor_rdfxml_serialize_statement): Turn datatyped literals that
+	are rdf:XMLLiteral into inline XML, not escaped.
+
+	* rasqal/tests/sparql/survey/Makefile.am: survey-11 works
+
+	* rasqal/rasqal_engine.c (rasqal_engine_assign_variables): adjust
+	anon variables offsets to point to absolute index in full list of
+	variables (rasqal_query field variables)
+
+	* rasqal/sparql_parser.y (Triples): When predicate list is empty,
+	return subject formula.
+
+	* rasqal/sparql_parser.y (Triples): Protect when list is empty
+
+	* rasqal/sparql_parser.y (Triples): Copy along any triples from
+	subject formula.
+
+	* rasqal/rasqal_engine.c, rasqal/rasqal_query.c
+	(rasqal_query_prepare, rasqal_engine_execute_init): Move
+	rasqal_engine_make_basic_graph_pattern call to
+	rasqal_query_prepare after factory has prepared (parsed)
+
+	* rasqal/roqet.c: Really make sparql the default
+
+	* rasqal/roqet.c (roqet_graph_pattern_walk): space
+
+	* rasqal/roqet.c (roqet_graph_pattern_walk): Add {}s around
+	constraints
+
+	* rasqal/roqet.c (roqet_query_walk): Print bound variables.
+
+	* rasqal/roqet.1: Updates for 0.9.9 Do not mention deprecated
+	-f/--format and -o/--output.  Merge -f and -o into in -r/--results
+	and complete the list.  Added V1 and V2 of sparql query results
+	xml format.  For -i, note sparql is default query language.
+
+	* rasqal/rasqal_general.c (rasqal_init): sparql is now the default
+	query language.
+
+	* rasqal/roqet.c: Deprecated -f/--format and -o/--output both now
+	in -r/--results.  Add V1 and V2 xml results formats.  Deleted
+	invalid argument help for -r, see usage instead.
+
+	* rasqal/roqet.c (roqet_write_indent): Added.
+	(roqet_graph_pattern_walk): Add lots of {...}s around blocks.  use
+	#number for gps, triples.  Change to use roqet_write_indent.
+	(roqet_query_walk): Take indent arg, use it with
+	roqet_write_indent.  Walk constructed triples.
+
+	* rasqal/rasqal_query.c
+	(rasqal_query_get_construct_triples_sequence,
+	rasqal_query_get_construct_triple): Added, to get access to
+	construct triples via API.
+	(rasqal_query_verb_as_string): Added to get a string for a verb.
+	(rasqal_query_print): Use the above.
+
+	* rasqal/rasqal.h: Added prototypes for
+	rasqal_query_get_construct_triples_sequence and
+	rasqal_query_get_construct_triple
+
+	* Redland.i: Added librdf_query_get_limit, librdf_query_set_limit,
+	librdf_query_get_offset and librdf_query_set_offset
 
 	* librdf/rdf_query_rasqal.c (librdf_query_rasqal_get_limit,
 	librdf_query_rasqal_set_limit, librdf_query_rasqal_get_offset,

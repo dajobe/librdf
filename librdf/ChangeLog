@@ -1,3 +1,13 @@
+2005-05-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_init.c (librdf_world_open):
+	Init query after parser and explain why.
+
+	* rdf_query_rasqal.c (rasqal_redland_init_triples_match): Renamed from
+	rasqal_redland_new_triples_match.  Update for rasqal 0.9.9.
+	Takes an existing rasqal_triples_match structure and returns non-0 on
+	failure.
+
 2005-05-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_query_rasqal.c (librdf_query_rasqal_get_limit,
