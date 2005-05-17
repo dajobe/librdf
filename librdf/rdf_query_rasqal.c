@@ -65,7 +65,7 @@ typedef struct
 
 
 /* prototypes for local functions */
-static rasqal_triples_match* rasqal_redland_new_triples_match(rasqal_triples_source *rts, void *user_data, rasqal_triple_meta *m, rasqal_triple *t);
+static int rasqal_redland_init_triples_match(rasqal_triples_match* rtm, rasqal_triples_source *rts, void *user_data, rasqal_triple_meta *m, rasqal_triple *t);
 static int rasqal_redland_triple_present(rasqal_triples_source *rts, void *user_data, rasqal_triple *t);
 static void rasqal_redland_free_triples_source(void *user_data);
 
@@ -251,7 +251,7 @@ rasqal_redland_new_triples_source(rasqal_query* rdf_query,
   context=(librdf_query_rasqal_context*)rtsc->query->context;
   rtsc->model=context->model;
 
-  rts->new_triples_match=rasqal_redland_new_triples_match;
+  rts->init_triples_match=rasqal_redland_init_triples_match;
   rts->triple_present=rasqal_redland_triple_present;
   rts->free_triples_source=rasqal_redland_free_triples_source;
 
@@ -429,15 +429,14 @@ rasqal_redland_finish_triples_match(struct rasqal_triples_match_s* rtm,
 }
 
 
-static rasqal_triples_match*
-rasqal_redland_new_triples_match(rasqal_triples_source *rts, void *user_data,
-                                 rasqal_triple_meta *m, rasqal_triple *t) {
+static int
+rasqal_redland_init_triples_match(rasqal_triples_match* rtm,
+                                  rasqal_triples_source *rts, void *user_data,
+                                  rasqal_triple_meta *m, rasqal_triple *t) {
   rasqal_redland_triples_source_user_data* rtsc=(rasqal_redland_triples_source_user_data*)user_data;
-  rasqal_triples_match *rtm;
   rasqal_redland_triples_match_context* rtmc;
   rasqal_variable* var;
 
-  rtm=(rasqal_triples_match *)LIBRDF_CALLOC(rasqal_triples_match, sizeof(rasqal_triples_match), 1);
   rtm->bind_match=rasqal_redland_bind_match;
   rtm->next_match=rasqal_redland_next_match;
   rtm->is_end=rasqal_redland_is_end;
@@ -503,7 +502,7 @@ rasqal_redland_new_triples_match(rasqal_triples_source *rts, void *user_data,
                                                    rtmc->nodes[1], 
                                                    rtmc->nodes[2]);
   if(!rtmc->qstatement)
-    return NULL;
+    return 1;
 
 #ifdef RASQAL_DEBUG
   LIBRDF_DEBUG1("query statement: ");
@@ -513,9 +512,9 @@ rasqal_redland_new_triples_match(rasqal_triples_source *rts, void *user_data,
   
   rtmc->stream=librdf_model_find_statements(rtsc->model, rtmc->qstatement);
 
-  LIBRDF_DEBUG1("rasqal_new_triples_match done\n");
+  LIBRDF_DEBUG1("rasqal_init_triples_match done\n");
 
-  return rtm;
+  return 0;
 }
 
 
