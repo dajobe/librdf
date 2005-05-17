@@ -194,7 +194,6 @@ librdf_world_open(librdf_world *world)
 
   librdf_init_statement(world);
   librdf_init_model(world);
-  librdf_init_query(world);
   librdf_init_storage(world);
 
   /* NOTE: raptor is always initialised as a parser and may
@@ -204,6 +203,18 @@ librdf_world_open(librdf_world *world)
    */
   librdf_init_parser(world);
   librdf_init_serializer(world);
+
+  /* NOTE: Since initialising rasqal calls raptor to create URIs,
+   * rasqal must be initialised after raptor so that the raptor URI
+   * implementation is changed with raptor_uri_set_handler() in
+   * librdf_parser_raptor_constructor() before rasqal tries to create
+   * URIs.
+   *
+   * Otherwise URIs would be allocated with raptor as char* strings
+   * and then attempted to be freed later as librdf_uri*.  Which
+   * would be bad.
+   */
+  librdf_init_query(world);
 }
 
 
