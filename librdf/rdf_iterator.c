@@ -383,6 +383,33 @@ librdf_iterator_add_map(librdf_iterator* iterator,
   return 0;
 }
 
+/**
+ * librdf_new_empty_iterator - Constructor - create a new librdf_iterator with no content
+ * @world: redland world object
+ * 
+ * Return value: a new &librdf_iterator object or NULL on failure
+**/
+librdf_iterator*
+librdf_new_empty_iterator(librdf_world *world)
+{
+  librdf_iterator* new_iterator;
+  
+  new_iterator=(librdf_iterator*)LIBRDF_CALLOC(librdf_iterator, 1, 
+                                               sizeof(librdf_iterator));
+  if(!new_iterator)
+    return NULL;
+  
+  new_iterator->world=world;
+
+  /* This ensures end, next, get_object, get_context factory methods
+   * never get called and the methods always return finished.
+   */
+  new_iterator->is_finished=1;
+
+  return new_iterator;
+}
+
+
 
 #endif
 
