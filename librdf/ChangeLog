@@ -1,5 +1,13 @@
 2005-05-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_log.h: Added LIBRDF_FROM_MEMORY
+
+	* rdf_init.c (librdf_sign_malloc, librdf_sign_calloc,
+	librdf_sign_realloc, librdf_sign_free): Added for signed memory
+	checking.
+
+	* rdf_internal.h: Added signed memory functions
+
 	* rdf_storage_sqlite.c, rdf_storage_mysql.c, rdf_storage_list.c,
 	rdf_storage_hashes.c, rdf_storage.c: Revert returning an empty
 	iterator on failure to create an inner iterator, which is caused
