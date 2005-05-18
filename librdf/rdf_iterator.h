@@ -87,6 +87,8 @@ REDLAND_API void* librdf_iterator_get_value(librdf_iterator* iterator);
 
 REDLAND_API int librdf_iterator_add_map(librdf_iterator* iterator, librdf_iterator_map_handler map_function, librdf_iterator_map_free_context_handler free_context, void *map_context);
 
+REDLAND_API librdf_iterator* librdf_new_empty_iterator(librdf_world *world);
+
 #ifdef __cplusplus
 }
 #endif
