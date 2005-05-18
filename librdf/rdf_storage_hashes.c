@@ -827,7 +827,7 @@ librdf_storage_hashes_serialise_common(librdf_storage* storage, int hash_index,
   }
   if(!scontext->iterator) {
     librdf_storage_hashes_serialise_finished((void*)scontext);
-    return NULL;
+    return librdf_new_empty_stream(storage->world);
   }
 
   scontext->storage=storage;
@@ -1523,10 +1523,8 @@ librdf_storage_hashes_context_serialise(librdf_storage* storage,
 
   scontext->iterator=librdf_hash_get_all(context->hashes[context->contexts_index], 
                                          scontext->key, scontext->value);
-  if(!scontext->iterator) {
-    librdf_storage_hashes_context_serialise_finished(scontext);
-    return NULL;
-  }
+  if(!scontext->iterator)
+    return librdf_new_empty_stream(storage->world);
 
 
   scontext->storage=storage;
