@@ -198,12 +198,12 @@ redland_node_to_rasqal_literal(librdf_node *node) {
     size_t len;
 
     string=librdf_node_get_literal_value_as_counted_string(node, &len);
-    new_string=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
+    new_string=(unsigned char*)rasqal_alloc_memory(len+1);
     strcpy((char*)new_string, (const char*)string);
 
     string=(unsigned char*)librdf_node_get_literal_value_language(node);
     if(string) {
-      new_language=(char*)LIBRDF_MALLOC(cstring, strlen((const char*)string)+1);
+      new_language=(char*)rasqal_alloc_memory(strlen((const char*)string)+1);
       strcpy((char*)new_language, (const char*)string);
     }
     uri=librdf_node_get_literal_value_datatype_uri(node);
@@ -212,7 +212,7 @@ redland_node_to_rasqal_literal(librdf_node *node) {
     l=rasqal_new_string_literal((const unsigned char*)new_string, new_language, new_datatype, NULL);
   } else {
     unsigned char *blank=librdf_node_get_blank_identifier(node);
-    unsigned char *new_blank=(unsigned char*)LIBRDF_MALLOC(cstring, strlen((const char*)blank)+1);
+    unsigned char *new_blank=(unsigned char*)rasqal_alloc_memory(strlen((const char*)blank)+1);
     strcpy((char*)new_blank, (const char*)blank);
     l=rasqal_new_simple_literal(RASQAL_LITERAL_BLANK, (const unsigned char*)new_blank);
   }
