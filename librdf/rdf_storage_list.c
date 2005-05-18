@@ -850,7 +850,7 @@ librdf_storage_list_get_contexts(librdf_storage* storage)
 {
   librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
   librdf_storage_list_get_contexts_iterator_context* icontext;
-  librdf_iterator* iterator=NULL;
+  librdf_iterator* iterator;
 
   if(!context->index_contexts) {
     librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
@@ -872,7 +872,7 @@ librdf_storage_list_get_contexts(librdf_storage* storage)
   icontext->iterator=librdf_hash_keys(context->contexts, icontext->key);
   if(!icontext->iterator) {
     librdf_storage_list_get_contexts_finished(icontext);
-    goto finish;
+    return librdf_new_empty_iterator(storage->world);
   }
 
 
@@ -885,10 +885,6 @@ librdf_storage_list_get_contexts(librdf_storage* storage)
   if(!iterator)
     librdf_storage_list_get_contexts_finished((void*)icontext);
 
-  finish:
-  if(!iterator)
-    iterator=librdf_new_empty_iterator(storage->world);
-  
   return iterator;  
 }
 

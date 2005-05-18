@@ -2222,10 +2222,8 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
                                &librdf_storage_sqlite_get_contexts_next_method,
                                &librdf_storage_sqlite_get_contexts_get_method,
                                &librdf_storage_sqlite_get_contexts_finished);
-  if(!iterator) {
+  if(!iterator)
     librdf_storage_sqlite_get_contexts_finished((void*)icontext);
-    iterator=librdf_new_empty_iterator(storage->world);
-  }
   
   return iterator;  
 }

@@ -1319,7 +1319,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
   if(!icontext->iterator) {
     LIBRDF_FREE(data, key_buffer);
     librdf_storage_hashes_node_iterator_finished(icontext);
-    return NULL;
+    return librdf_new_empty_iterator(storage->world);
   }
 
   LIBRDF_FREE(data, key_buffer);
@@ -1331,10 +1331,8 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
                                librdf_storage_hashes_node_iterator_next_method,
                                librdf_storage_hashes_node_iterator_get_method,
                                librdf_storage_hashes_node_iterator_finished);
-  if(!iterator) {
+  if(!iterator)
     librdf_storage_hashes_node_iterator_finished(icontext);
-    iterator=librdf_new_empty_iterator(storage->world);
-  }
 
   return iterator;
 }
