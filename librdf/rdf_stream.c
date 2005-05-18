@@ -564,6 +564,32 @@ librdf_stream_statement_find_map(librdf_stream *stream,
 }
 
 
+/**
+ * librdf_new_empty_stream - Constructor - create a new librdf_stream with no content
+ * @world: redland world object
+ * 
+ * Return value: a new &librdf_stream object or NULL on failure
+**/
+librdf_stream*
+librdf_new_empty_stream(librdf_world *world)
+{
+  librdf_stream* new_stream;
+  
+  new_stream=(librdf_stream*)LIBRDF_CALLOC(librdf_stream, 1, 
+                                               sizeof(librdf_stream));
+  if(!new_stream)
+    return NULL;
+  
+  new_stream->world=world;
+
+  /* This ensures end, next, get_object, get_context factory methods
+   * never get called and the methods always return finished.
+   */
+  new_stream->is_finished=1;
+
+  return new_stream;
+}
+
 
 #endif
 
