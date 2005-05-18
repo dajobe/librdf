@@ -1,3 +1,55 @@
+2005-05-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_sqlite.c, rdf_storage_mysql.c, rdf_storage_list.c,
+	rdf_storage_hashes.c, rdf_storage.c: Revert returning an empty
+	iterator on failure to create an inner iterator, which is caused
+	only by out of memory.
+
+	* rdf_storage_list.c (librdf_storage_list_serialise): Return empty
+	stream if list iterator ends.
+	(librdf_storage_list_context_serialise): Return empty stream if
+	contexts hash iterator ends.
+
+	* rdf_storage_hashes.c (librdf_storage_hashes_serialise_common):
+	Return empty stream if hash iterator ends.
+	(librdf_storage_hashes_context_serialise): Return empty stream if
+	contexts hash iterator ends.
+
+	* rdf_model.c (librdf_model_find_statements_in_context): Return
+	empty stream if context_as_stream returns nULL
+
+	* rdf_stream.c (librdf_new_empty_stream): Added helper for empty
+	stream.
+
+	* rdf_stream.h: Added prototype for librdf_new_empty_stream
+
+	* rdf_storage_sqlite.c (librdf_storage_sqlite_get_contexts):
+	Return an empty iterator when the iterator fails to be
+	constructed.
+
+	* rdf_storage_mysql.c (librdf_storage_mysql_get_context): Return
+	an empty iterator when the contexts returns NULL immediately or
+	the iterator fails to be constructed.
+
+	* rdf_storage_list.c (librdf_storage_list_get_contexts): Return an
+	empty iterator when the hashes keys iterator returns NULL or the
+	hashes iterator fails to be constructed.
+
+	* rdf_storage_hashes.c
+	(librdf_storage_hashes_node_iterator_create): Return an empty
+	iterator when the hahes node iterator returns NULL.
+
+	* rdf_storage.c (librdf_storage_node_stream_to_node_create):
+	Return an empty iterator when find_statements returns NULL.
+
+	* rdf_iterator.c (librdf_new_empty_iterator): Added helper to make
+	an always-empty iterator.
+
+	* rdf_iterator.h: Added prototype for librdf_new_empty_iterator
+
+	* rdf_query_rasqal.c (redland_node_to_rasqal_literal): Use
+	rasqal_alloc_memory to make things for inside rasqal.
+
 2005-05-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_init.c (librdf_world_open):
