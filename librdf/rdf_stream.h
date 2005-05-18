@@ -89,6 +89,8 @@ REDLAND_API int librdf_stream_add_map(librdf_stream* stream, librdf_stream_map_h
 
 REDLAND_API void librdf_stream_print(librdf_stream *stream, FILE *fh);
 
+REDLAND_API librdf_stream* librdf_new_empty_stream(librdf_world *world);
+
 #ifdef __cplusplus
 }
 #endif
