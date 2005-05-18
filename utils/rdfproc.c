@@ -501,7 +501,7 @@ main(int argc, char *argv[])
     puts("  source means subject of triples matching (?,  NODE1, NODE2)");
     puts("  target means object of triples matching (NODE1, NODE2, ?)");
     puts("  arc means predicate of triples matching (NODE1, ?, NODE2)");
-    puts("\nReport bugs to <redland-dev@lists.librdf.org>.");
+    puts("\nReport bugs to http://bugs.librdf.org/");
     puts("Redland home page: http://librdf.org/");
     exit(0);
   }
