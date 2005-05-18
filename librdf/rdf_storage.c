@@ -844,7 +844,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   librdf_statement *partial_statement;
   librdf_stream *stream;
   librdf_storage_stream_to_node_iterator_context* context;
-  librdf_iterator *iterator;
+  librdf_iterator *iterator=NULL;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
   LIBRDF_ASSERT_RETURN(node1 == NULL && node2 == NULL, "both node objects are NULL", NULL);
@@ -885,7 +885,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   stream=storage->factory->find_statements(storage, partial_statement);
   if(!stream) {
     librdf_storage_stream_to_node_iterator_finished(context);
-    return NULL;
+    goto finish;
   }
   
   /* initialise context */
@@ -904,6 +904,10 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
                                librdf_storage_stream_to_node_iterator_finished);
   if(!iterator)
     librdf_storage_stream_to_node_iterator_finished(context);
+
+  finish:
+  if(!iterator)
+    iterator=librdf_new_empty_iterator(storage->world);
 
   return iterator;
 }
