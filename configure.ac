@@ -954,6 +954,13 @@ if test $use_dmalloc = yes; then
   MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
   MEM_LIBS=-ldmalloc
 fi
+AC_ARG_WITH(memory-sign, [  --with-memory-signing     Sign allocated memory (default=no)], use_memory_signing="$withval", use_memory_signing="no") 
+AC_MSG_CHECKING(using memory signing)
+AC_MSG_RESULT($use_memory_signing);
+if test $use_memory_signing = yes; then
+  MEM=-DLIBRDF_MEMORY_SIGN=1
+  MEM_LIBS=
+fi
 
 assert=yes
 AC_ARG_ENABLE(assertions, [  --enable-assertions    Perform run time assertion checks (default yes).  ], assert=$enableval)
