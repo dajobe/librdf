@@ -2043,7 +2043,7 @@ LEFT JOIN Resources AS R ON S.Context=R.ID \
 LEFT JOIN Bnodes AS B ON S.Context=B.ID \
 LEFT JOIN Literals AS L ON S.Context=L.ID";
   char *query;
-  librdf_iterator *iterator;
+  librdf_iterator *iterator=NULL;
 
   /* Initialize get_contexts context */
   if(!(gccontext=(librdf_storage_mysql_get_contexts_context*)
@@ -2085,18 +2085,20 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   if(librdf_storage_mysql_get_contexts_next_context(gccontext) ||
       !gccontext->current_context) {
     librdf_storage_mysql_get_contexts_finished((void*)gccontext);
-    return NULL;
+    goto finish;
   }
 
   iterator=librdf_new_iterator(storage->world,(void*)gccontext,
-                           &librdf_storage_mysql_get_contexts_end_of_iterator,
-                           &librdf_storage_mysql_get_contexts_next_context,
-                           &librdf_storage_mysql_get_contexts_get_context,
-                           &librdf_storage_mysql_get_contexts_finished);
-  if(!iterator) {
+                               &librdf_storage_mysql_get_contexts_end_of_iterator,
+                               &librdf_storage_mysql_get_contexts_next_context,
+                               &librdf_storage_mysql_get_contexts_get_context,
+                               &librdf_storage_mysql_get_contexts_finished);
+  if(!iterator)
     librdf_storage_mysql_get_contexts_finished((void*)gccontext);
-    return NULL;
-  }
+
+  finish:
+  if(!iterator)
+    iterator=librdf_new_empty_iterator(storage->world);
 
   return iterator;
 }
