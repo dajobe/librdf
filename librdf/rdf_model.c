@@ -1315,7 +1315,7 @@ librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* s
   stream=librdf_model_context_as_stream(model, context_node);
   if(!stream) {
     librdf_free_statement(statement);
-    return NULL;
+    return librdf_new_empty_stream(model->world);
   }
 
   librdf_stream_add_map(stream,
