@@ -130,10 +130,24 @@ void librdf_system_free(void *ptr);
 #undef HAVE_STDLIB_H
 #endif
 
+#if defined(LIBRDF_MEMORY_SIGN)
+#define LIBRDF_SIGN_KEY 0x04Ed1A7D
+void* librdf_sign_malloc(size_t size);
+void* librdf_sign_calloc(size_t nmemb, size_t size);
+void* librdf_sign_realloc(void *ptr, size_t size);
+void librdf_sign_free(void *ptr);
+  
+#define LIBRDF_MALLOC(type, size)   librdf_sign_malloc(size)
+#define LIBRDF_CALLOC(type, nmemb, size) librdf_sign_calloc(nmemb, size)
+#define LIBRDF_REALLOC(type, ptr, size) librdf_sign_realloc(ptr, size)
+#define LIBRDF_FREE(type, ptr)   librdf_sign_free(ptr)
+
+#else
 #define LIBRDF_MALLOC(type, size) malloc(size)
 #define LIBRDF_CALLOC(type, size, count) calloc(size, count)
 #define LIBRDF_FREE(type, ptr)   free(ptr)
 
+#endif
 
 /* Fatal errors - always happen */
 #define LIBRDF_FATAL1(world, facility, message) librdf_fatal(world, facility, __FILE__, __LINE__ , __func__, message)
