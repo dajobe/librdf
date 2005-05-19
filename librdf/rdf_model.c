@@ -96,7 +96,7 @@ librdf_delete_model_factories(void)
 /*
  * librdf_model_supports_contexts - helper function to determine if this model supports contexts
  **/
-static inline int
+static REDLAND_INLINE int
 librdf_model_supports_contexts(librdf_model* model) {
   return model->supports_contexts;
 }
