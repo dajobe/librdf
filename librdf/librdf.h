@@ -89,13 +89,13 @@ typedef struct librdf_serializer_s librdf_serializer;
 typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 
 /* Public statics */
-extern const char * const librdf_short_copyright_string;
-extern const char * const librdf_copyright_string;
-extern const char * const librdf_version_string;
-extern const unsigned int librdf_version_major;
-extern const unsigned int librdf_version_minor;
-extern const unsigned int librdf_version_release;
-extern const unsigned int librdf_version_decimal;
+REDLAND_API extern const char * const librdf_short_copyright_string;
+REDLAND_API extern const char * const librdf_copyright_string;
+REDLAND_API extern const char * const librdf_version_string;
+REDLAND_API extern const unsigned int librdf_version_major;
+REDLAND_API extern const unsigned int librdf_version_minor;
+REDLAND_API extern const unsigned int librdf_version_release;
+REDLAND_API extern const unsigned int librdf_version_decimal;
 
 /* Required for va_list in error handler function registrations
  * which are in the public API
