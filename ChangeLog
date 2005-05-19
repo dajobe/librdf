@@ -1,4 +1,156 @@
+2005-05-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Makefile.am: added redland.sln
+
+	* redland.sln: Import configuration from John Barstow
+
+	* configure.ac: Added librdf/win32 subdir
+
+	* librdf/Makefile.am: Added win32 subdir
+
+	* librdf/win32/msvc.def, librdf/win32/Makefile.am,
+	librdf/win32/librdf.vcproj, raptor/win32/Makefile.am,
+	rasqal/win32/README.txt, rasqal/win32/Makefile.am,
+	rasqal/win32/rasqal.vcproj, raptor/win32/rapper.vcproj,
+	raptor/win32/raptor.sln, raptor/win32/raptor.vcproj,
+	raptor/win32/raptortest.vcproj: Import configuration from John
+	Barstow
+
+	* raptor/win32/README.txt: updates
+
+	* librdf/rdf_internal.h: Added REDLAND_INLINE
+
+	* librdf/librdf.h: REDLAND_API before public statics
+
+	* librdf/win32_rdf_config.h: Added REDLAND_INLINE Defines updated
+	for win32 (John Barstow)
+
+	* librdf/rdf_model.c (librdf_model_supports_contexts): Use
+	REDLAND_INLINE
+
+	* raptor/win32_raptor_config.h: Switch to libxml
+
+	* rasqal/rasqal.h: RASQAL_API before public statics
+
+	* rasqal/win32_rasqal_config.h: Added #define YY_NO_UNISTD_H
+
+	* raptor/win32_raptor_config.h: Spelling: RAPTOR_INLINE
+
+	* raptor/raptor_general.c (raptor_init): Added conditionals around
+	serializers: RAPTOR_SERIALIZER_RDFXML/NTRIPLES/RDFXML_ABBREV
+
+	* raptor/Makefile.am: Added conditionally included
+	RAPTOR_SERIALIZER_RDFXML_ABBREV
+
+	* raptor/configure.ac: Added --enable-serializers=LIST and
+	serializers to summary.  Reformat other help messages to match.
+
+2005-05-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/turtle_parser.y: (main) Move filename here
+
+	* raptor/configure.ac: Add proper check for libxslt
+
+	* rasqal/sparql_parser.y: Add print handler to all sequences, not
+	conditional on debugging.
+
+	* configure.ac, rasqal/configure.ac, raptor/configure.ac: default
+	memory-signing no
+
+	* configure.ac: usage formatting
+
+	* configure.ac: Added --with-memory-sign default no.  DANGER: When
+	enabled, memory returned to bindings which is freed, such as the
+	node/uri/.._to_string() memory is off by 4 bytes from the pointer
+	that free() expects.  Typically causes crashes.
+
+	* librdf/rdf_log.h: Added LIBRDF_FROM_MEMORY
+
+	* librdf/rdf_init.c (librdf_sign_malloc, librdf_sign_calloc,
+	librdf_sign_realloc, librdf_sign_free): Added for signed memory
+	checking.
+
+	* librdf/rdf_internal.h: Added signed memory functions
+
+	* librdf/rdf_storage_sqlite.c, librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_list.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage.c: Revert returning an empty iterator on
+	failure to create an inner iterator, which is caused only by out
+	of memory.
+
+	* librdf/rdf_storage_list.c (librdf_storage_list_serialise):
+	Return empty stream if list iterator ends.
+	(librdf_storage_list_context_serialise): Return empty stream if
+	contexts hash iterator ends.
+
+	* librdf/rdf_storage_hashes.c
+	(librdf_storage_hashes_serialise_common): Return empty stream if
+	hash iterator ends.
+	(librdf_storage_hashes_context_serialise): Return empty stream if
+	contexts hash iterator ends.
+
+	* librdf/rdf_model.c (librdf_model_find_statements_in_context):
+	Return empty stream if context_as_stream returns nULL
+
+	* librdf/rdf_stream.c (librdf_new_empty_stream): Added helper for
+	empty stream.
+
+	* librdf/rdf_stream.h: Added prototype for librdf_new_empty_stream
+
+	* librdf/rdf_storage_sqlite.c
+	(librdf_storage_sqlite_get_contexts): Return an empty iterator
+	when the iterator fails to be constructed.
+
+	* librdf/rdf_storage_mysql.c (librdf_storage_mysql_get_context):
+	Return an empty iterator when the contexts returns NULL
+	immediately or the iterator fails to be constructed.
+
+	* librdf/rdf_storage_list.c (librdf_storage_list_get_contexts):
+	Return an empty iterator when the hashes keys iterator returns
+	NULL or the hashes iterator fails to be constructed.
+
+	* librdf/rdf_storage_hashes.c
+	(librdf_storage_hashes_node_iterator_create): Return an empty
+	iterator when the hahes node iterator returns NULL.
+
+	* librdf/rdf_storage.c
+	(librdf_storage_node_stream_to_node_create): Return an empty
+	iterator when find_statements returns NULL.
+
+	* librdf/rdf_iterator.c (librdf_new_empty_iterator): Added helper
+	to make an always-empty iterator.
+
+	* librdf/rdf_iterator.h: Added prototype for
+	librdf_new_empty_iterator
+
+	* librdf/rdf_query_rasqal.c (redland_node_to_rasqal_literal): Use
+	rasqal_alloc_memory to make things for inside rasqal.
+
+	* rasqal/rasqal_general.c:
+	(rasqal_free_memory, rasqal_alloc_memory, rasqal_calloc_memory):
+	Added, for allocating and freeingmemory inside rasqal.
+
+	* rasqal/rasqal.h: Added prototypes for rasqal_free_memory,
+	rasqal_alloc_memory and rasqal_calloc_memory
+
+	* rasqal/librasqal.3: Updates for 0.9.9
+
+	* rasqal/rasqal_query.c: thethe
+
+	* utils/rdfproc.c, configure.ac, rasqal/roqet.c,
+	rasqal/configure.ac, raptor/rdfdump.c, raptor/configure.ac: Bugs
+	to http://bugs.librdf.org/
+
+	* rasqal/sparql_lexer.l (NCCHAR): Add _ which the comment says but
+	wasn't actually done.
+	(NCCHARV): Adjust comment to match regex
+
 2005-05-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_identifier.c, raptor/raptor_parse.c,
+	raptor/raptor_serialize_rdfxmla.c, raptor/raptor_serialize.c,
+	raptor/raptor_sax2.c, raptor/raptor_rdfxml.c: Casts for
+	RAPTOR_FREE
 
 	* librdf/rdf_init.c (librdf_world_open): Init query after parser
 	and explain why.
