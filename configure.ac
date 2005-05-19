@@ -1014,6 +1014,7 @@ redland.rdf
 librdf/redland.spec
 docs/Makefile
 librdf/Makefile
+librdf/win32/Makefile
 examples/Makefile
 utils/Makefile
 demos/Makefile
