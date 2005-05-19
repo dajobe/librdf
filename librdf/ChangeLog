@@ -185,6 +185,8 @@
 
 	* win32_rdf_config.h: 1.0.0
 
+	* Snapshotted redland_1_0_0 for 1.0.0 release
+
 2005-02-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_query_rasqal.c
