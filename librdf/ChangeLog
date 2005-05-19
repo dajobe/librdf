@@ -1,3 +1,14 @@
+2005-05-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_internal.h: Added REDLAND_INLINE
+
+	* librdf.h: REDLAND_API before public statics
+
+	* win32_rdf_config.h: Added REDLAND_INLINE
+	Defines updated for win32 (John Barstow)
+
+	* rdf_model.c (librdf_model_supports_contexts): Use REDLAND_INLINE
+
 2005-05-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_log.h: Added LIBRDF_FROM_MEMORY
