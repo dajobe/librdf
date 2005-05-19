@@ -21,6 +21,108 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<h2 id="rel1_0_1"><a name="rel1_0_1">Redland 1.0.1 Changes</a></h2>
+
+<p>Not yet released</p>
+
+
+<p>The main changes in this release are to update to use 
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.9
+to provide improved SPARQL query support for the revised syntax
+<a href="http://librdf.org/raptor/">Raptor</a> 1.4.6 to
+provide updated RSS enclosures support with the RSS tag soup parser and
+RSS 1.0 serializer and new GRDDL parser.
+</p>
+
+
+<h3>Configuration changes</h3>
+
+<p>Added <code>--with-memory-signing</code> to check when memory is
+allocated / freed across Redland libraries.
+</p>
+
+
+<h3>Portability Fixes</h3>
+
+<p>Added Win32 portability fixes and build configuration (John Barstow)</p>
+
+
+<h3>Iterator Class changes</h3>
+
+<p>Added a <code>librdf_new_empty_iterator</code> helper to make an
+always-empty iterator.</p>
+
+
+<h3>Log Class changes</h3>
+
+<p>Added <code>LIBRDF_FROM_MEMORY</code> facility.</p>
+
+
+<h3>Model Class changes</h3>
+
+<p>All methods returning an <code>librdf_iterator</code> or
+<code>librdf_stream</code> now return an empty iterator/stream rather
+than NULL when returning an empty result sequence.  Errors are still
+returned as NULL.</p>
+
+
+<h3>Node Class changes</h3>
+
+<p>Removed unused <code>LIBRDF_NODE_TYPE_RESERVED1</code> (#3) from
+<code>librdf_node_type</code> enum.</p>
+
+
+<h3>Query Class changes</h3>
+
+<p>Update to use Rasqal 0.9.9 API.  Redland 1.0.1 will not build with
+older Rasqal releases.</p>
+
+<p>The query API gains methods <code>librdf_query_get_limit</code>,
+<code>librdf_query_set_limit</code>,
+<code>librdf_query_get_offset</code> and
+<code>librdf_query_set_offset</code> for setting and getting query
+result limit (max results) and offsets (result to start from).</p>
+
+<p>Fixed some across-library memory allocation/frees between redland
+and rasqal that caused problems on win32. Requires rasqal 0.9.9 or
+newer.</p>
+
+
+<h3>Stream Class changes</h3>
+
+<p>Added a <code>librdf_new_empty_strea</code> helper to make an
+always-empty strea.</p>
+
+
+<h3>Storage Class changes</h3>
+
+<p>The MySQL store now uses a portable method across endiannesses to
+create a 64bit key.  This fixes 
+<a href="http://bugs.librdf.org/mantis/view.php?id=23">Issue #0000023</a>
+(Morten Frederiksen)</p>
+
+<blockquote><strong>NOTE: This matches the algorithm used for
+little-endian systems but big-endian stores will need to serialize
+the store before upgrading and reload afterwards.</strong></blockquote>
+
+<p>The MySQL store now uses connection pooling to prevent making a new
+connection to the database for each request.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=27">Issue #0000027</a>
+(Morten Frederiksen)
+</p>
+
+<p>All store methods that return an <code>librdf_iterator</code> or
+<code>librdf_stream</code> now return an empty iterator/stream rather
+than NULL when returning an empty result sequence.  Errors are still
+returned as NULL.</p>
+
+
+<h3>Other changes</h3>
+
+<p>Added <code>REDLAND_INLINE</code> macro, which can be overridden if
+inline is not wanted.</p>
+
+
 <h2 id="rel1_0_0"><a name="rel1_0_0">Redland 1.0.0 Changes</a></h2>
 
 <p>This is Redland 1.0.0.</p>
