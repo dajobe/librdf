@@ -35,6 +35,11 @@
 #ifndef RDF_INTERNAL_H
 #define RDF_INTERNAL_H
 
+/* Can be over-ridden or undefined in a config.h file or -Ddefine */
+#ifndef REDLAND_INLINE
+#define REDLAND_INLINE inline
+#endif
+
 /* error handling */
 #ifdef LIBRDF_DEBUG
 /* DEBUGGING TURNED ON */
