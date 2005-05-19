@@ -57,7 +57,8 @@ autogen.sh \
 Makefile.PL \
 redland-config.in \
 redland-src-config.in \
-$(man_MANS)
+$(man_MANS) \
+redland.sln
 
 if MAINTAINER_MODE
 # Create some text files from HTML sources
