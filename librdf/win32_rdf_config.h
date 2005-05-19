@@ -66,6 +66,10 @@ extern "C" {
 /* __func__ doesn't exist in Visual Studio 6 */
 #define __func__ ""
 
+#undef REDLAND_INLINE
+#define REDLAND_INLINE __inline
+
+
 /* 
  * Defines that come from rdf_config.h
  */
@@ -110,7 +114,7 @@ extern "C" {
 /* #undef HAVE_DB_OPEN */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-#define HAVE_DLFCN_H 1
+/* undef HAVE_DLFCN_H */
 
 /* Define to 1 if you have the <dmalloc.h> header file. */
 /* #undef HAVE_DMALLOC_H */
@@ -134,7 +138,7 @@ extern "C" {
 #define HAVE_GETOPT_LONG 1
 
 /* Define to 1 if you have the `gettimeofday' function. */
-/*#define HAVE_GETTIMEOFDAY*/
+/* #undef HAVE_GETTIMEOFDAY */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
@@ -155,7 +159,7 @@ extern "C" {
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `mkstemp' function. */
-/*#define HAVE_MKSTEMP*/
+/* #undef HAVE_MKSTEMP */
 
 /* Define to 1 if you have the `mktemp' function. */
 #define HAVE_MKTEMP 1
@@ -179,7 +183,7 @@ extern "C" {
 /* #undef HAVE_OPENSSL_DIGESTS */
 
 /* Define to 1 if you have the <pthread.h> header file. */
-#define HAVE_PTHREAD_H 1
+/* #undef HAVE_PTHREAD_H */
 
 /* Have Raptor RDF parser */
 #define HAVE_RAPTOR_RDF_PARSER 1
@@ -237,6 +241,9 @@ extern "C" {
 
 /* The size of a `unsigned char', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_CHAR 1
+
+/* The size of a `unsigned short', as computed by sizeof. */
+#define SIZEOF_UNSIGNED_SHORT 2
 
 /* The size of a `unsigned int', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_INT 4
