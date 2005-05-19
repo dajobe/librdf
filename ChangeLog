@@ -1,5 +1,12 @@
 2005-05-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rasqal/rasqal_engine.c (rasqal_new_triples_match): Restore but
+	deprecate rasqal_triples_source factory method new_triples_match
+	for now.
+
+	* rasqal/rasqal.h: Restore rasqal_triples_source factory method
+	new_triples_match for now.
+
 	* Makefile.am: added redland.sln
 
 	* redland.sln: Import configuration from John Barstow
