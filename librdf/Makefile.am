@@ -24,6 +24,7 @@
 # 
 # 
 
+SUBDIRS=win32
 
 lib_LTLIBRARIES = librdf.la
 
