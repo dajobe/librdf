@@ -1062,17 +1062,18 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
                         &scontext->vm,
                         &errmsg);
 #endif
-  raptor_free_stringbuffer(sb);
 
   if(status != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "SQLite database %s SQL compile failed - %s (%d)", 
                context->name, errmsg, status);
 
+    raptor_free_stringbuffer(sb);
     librdf_storage_sqlite_serialise_finished((void*)scontext);
     return NULL;
   }
-    
+  raptor_free_stringbuffer(sb);
+  
   scontext->storage=storage;
   librdf_storage_add_reference(scontext->storage);
 
@@ -1284,6 +1285,9 @@ librdf_storage_sqlite_serialise_next_statement(void* context)
   librdf_storage_sqlite_serialise_stream_context* scontext=(librdf_storage_sqlite_serialise_stream_context*)context;
   int result;
   
+  if(scontext->finished)
+    return 1;
+  
   result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
                                                scontext->vm,
                                                &scontext->statement,
@@ -1432,10 +1436,10 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
       raptor_stringbuffer_append_counted_string(sb, 
                                                 (unsigned char*)" WHERE ", 7, 1);
       need_where=0;
-    }
-    if(need_and)
+      need_and=1;
+    } else if(need_and)
       raptor_stringbuffer_append_counted_string(sb, 
-                                                (unsigned char*)"AND ", 5, 1);
+                                                (unsigned char*)" AND ", 5, 1);
     raptor_stringbuffer_append_counted_string(sb, 
                                               (unsigned char*)"T.", 2, 1);
     raptor_stringbuffer_append_string(sb, fields[i], 1);
@@ -1444,7 +1448,6 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
     raptor_stringbuffer_append_decimal(sb, node_ids[i]);
     raptor_stringbuffer_append_counted_string(sb, 
                                               (unsigned char*)"\n", 1, 1);
-    need_and=1;
   }
   raptor_stringbuffer_append_counted_string(sb, 
                                             (unsigned char*)";", 1, 1);
@@ -1469,16 +1472,17 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
                         &scontext->vm,
                         &errmsg);
 #endif
-  raptor_free_stringbuffer(sb);
 
   if(status != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "SQLite database %s SQL compile '%s' failed - %s (%d)", 
                context->name, request, errmsg, status);
 
+    raptor_free_stringbuffer(sb);
     librdf_storage_sqlite_serialise_finished((void*)scontext);
     return NULL;
   }
+  raptor_free_stringbuffer(sb);
   
   scontext->storage=storage;
   librdf_storage_add_reference(scontext->storage);
@@ -1502,21 +1506,24 @@ static int
 librdf_storage_sqlite_find_statements_end_of_stream(void* context)
 {
   librdf_storage_sqlite_find_statements_stream_context* scontext=(librdf_storage_sqlite_find_statements_stream_context*)context;
-  int result;
   
   if(scontext->finished)
     return 1;
   
-  result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
-                                               scontext->vm,
-                                               &scontext->statement,
-                                               &scontext->context);
-  if(result) {
-    /* error or finished */
-    if(result<0)
-      scontext->vm=NULL;
-    scontext->finished=1;
+  if(scontext->statement == NULL) {
+    int result;
+    result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
+                                                 scontext->vm,
+                                                 &scontext->statement,
+                                                 &scontext->context);
+    if(result) {
+      /* error or finished */
+      if(result<0)
+        scontext->vm=NULL;
+      scontext->finished=1;
+    }
   }
+  
 
   return scontext->finished;
 }
@@ -1527,6 +1534,9 @@ librdf_storage_sqlite_find_statements_next_statement(void* context)
 {
   librdf_storage_sqlite_find_statements_stream_context* scontext=(librdf_storage_sqlite_find_statements_stream_context*)context;
   int result;
+  
+  if(scontext->finished)
+    return 1;
   
   result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
                                                scontext->vm,
@@ -1804,16 +1814,17 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
                         &scontext->vm,
                         &errmsg);
 #endif
-  raptor_free_stringbuffer(sb);
 
   if(status != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "SQLite database %s SQL compile failed - %s (%d)", 
                context->name, errmsg, status);
 
+    raptor_free_stringbuffer(sb);
     librdf_storage_sqlite_serialise_finished((void*)scontext);
     return NULL;
   }
+  raptor_free_stringbuffer(sb);
 
   scontext->storage=storage;
   librdf_storage_add_reference(scontext->storage);
@@ -1837,21 +1848,25 @@ static int
 librdf_storage_sqlite_context_serialise_end_of_stream(void* context)
 {
   librdf_storage_sqlite_context_serialise_stream_context* scontext=(librdf_storage_sqlite_context_serialise_stream_context*)context;
-  int result;
   
   if(scontext->finished)
     return 1;
   
-  result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
-                                               scontext->vm,
-                                               &scontext->statement,
-                                               &scontext->context);
-  if(result) {
-    /* error or finished */
-    if(result < 0)
-      scontext->vm=NULL;
-    scontext->finished=1;
+  if(scontext->statement == NULL) {
+    int result;
+
+    result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
+                                                 scontext->vm,
+                                                 &scontext->statement,
+                                                 &scontext->context);
+    if(result) {
+      /* error or finished */
+      if(result < 0)
+        scontext->vm=NULL;
+      scontext->finished=1;
+    }
   }
+  
 
   return scontext->finished;
 }
@@ -1862,6 +1877,9 @@ librdf_storage_sqlite_context_serialise_next_statement(void* context)
 {
   librdf_storage_sqlite_context_serialise_stream_context* scontext=(librdf_storage_sqlite_context_serialise_stream_context*)context;
   int result;
+  
+  if(scontext->finished)
+    return 1;
   
   result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
                                                scontext->vm,
@@ -2048,20 +2066,24 @@ static int
 librdf_storage_sqlite_get_contexts_is_end(void* iterator)
 {
   librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator;
-  int result;
   
   if(icontext->finished)
     return 1;
-  
-  result=librdf_storage_sqlite_get_next_context_common(icontext->sqlite_context,
-                                                       icontext->vm,
-                                                       &icontext->current);
-  if(result) {
-    /* error or finished */
-    if(result < 0)
-      icontext->vm=NULL;
-    icontext->finished=1;
+
+  if(!icontext->current) {
+    int result;
+    
+    result=librdf_storage_sqlite_get_next_context_common(icontext->sqlite_context,
+                                                         icontext->vm,
+                                                         &icontext->current);
+    if(result) {
+      /* error or finished */
+      if(result < 0)
+        icontext->vm=NULL;
+      icontext->finished=1;
+    }
   }
+  
 
   return icontext->finished;
 }
@@ -2073,6 +2095,9 @@ librdf_storage_sqlite_get_contexts_next_method(void* iterator)
   librdf_storage_sqlite_get_contexts_iterator_context* icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)iterator;
   int result;
   
+  if(icontext->finished)
+    return 1;
+
   result=librdf_storage_sqlite_get_next_context_common(icontext->sqlite_context,
                                                        icontext->vm,
                                                        &icontext->current);
@@ -2205,16 +2230,17 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
                         &icontext->vm,
                         &errmsg);
 #endif
-  raptor_free_stringbuffer(sb);
 
   if(status != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "SQLite database %s SQL compile failed - %s (%d)", 
                context->name, errmsg, status);
 
+    raptor_free_stringbuffer(sb);
     librdf_storage_sqlite_get_contexts_finished((void*)icontext);
     return NULL;
   }
+  raptor_free_stringbuffer(sb);
     
   icontext->storage=storage;
   librdf_storage_add_reference(icontext->storage);
