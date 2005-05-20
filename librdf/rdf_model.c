@@ -1624,10 +1624,10 @@ main(int argc, char *argv[])
   
   fprintf(stderr, "%s: Creating storage\n", program);
   if(1) {
-    /* test contexts in memory */
+    /* test in memory */
     storage=librdf_new_storage(world, NULL, NULL, "contexts='yes'");
   } else {
-    /* test contexts on disk */
+    /* test on disk */
     storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
   }
   if(!storage) {
