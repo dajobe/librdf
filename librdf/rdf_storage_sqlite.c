@@ -1255,20 +1255,23 @@ static int
 librdf_storage_sqlite_serialise_end_of_stream(void* context)
 {
   librdf_storage_sqlite_serialise_stream_context* scontext=(librdf_storage_sqlite_serialise_stream_context*)context;
-  int result;
   
   if(scontext->finished)
     return 1;
   
-  result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
-                                               scontext->vm,
-                                               &scontext->statement,
-                                               &scontext->context);
-  if(result) {
-    /* error or finished */
-    if(result < 0)
-      scontext->vm=NULL;
-    scontext->finished=1;
+  if(scontext->statement == NULL) {
+    int result;
+
+    result=librdf_storage_sqlite_get_next_common(scontext->sqlite_context,
+                                                 scontext->vm,
+                                                 &scontext->statement,
+                                                 &scontext->context);
+    if(result) {
+      /* error or finished */
+      if(result < 0)
+        scontext->vm=NULL;
+      scontext->finished=1;
+    }
   }
 
   return scontext->finished;
