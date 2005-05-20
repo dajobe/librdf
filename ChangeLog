@@ -7,6 +7,9 @@
 
 	* librdf/Makefile.am: clean any sqlite test file
 
+	* librdf/rdf_storage_sqlite.c: The change below
+	fixes Issue #0000006 - http://bugs.librdf.org/mantis/view.php?id=6
+
 	* librdf/rdf_storage_sqlite.c (librdf_storage_sqlite_serialise):
 	Do not free query stringbuffer before reporting error.
 	(librdf_storage_sqlite_serialise_next_statement): Finish if
