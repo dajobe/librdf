@@ -555,7 +555,13 @@ main(int argc, char *argv[])
   librdf_world_open(world);
 
   /* create model and storage */
-  storage=librdf_new_storage(world, NULL, NULL, NULL);
+  if(1) {
+    /* test in memory */
+    storage=librdf_new_storage(world, NULL, NULL, NULL);
+  } else {
+    /* test on disk */
+    storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
+  }
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
     return(1);
