@@ -112,15 +112,6 @@ struct librdf_hash_factory_s {
 };
 typedef struct librdf_hash_factory_s librdf_hash_factory;
 
-#endif
-
-/* hash cursor_get method flags */
-#define LIBRDF_HASH_CURSOR_SET 0
-#define LIBRDF_HASH_CURSOR_NEXT_VALUE 1
-#define LIBRDF_HASH_CURSOR_FIRST 2
-#define LIBRDF_HASH_CURSOR_NEXT 3
-
-
 /* factory class methods */
 void librdf_hash_register_factory(librdf_world *world, const char *name, void (*factory) (librdf_hash_factory*));
 librdf_hash_factory* librdf_get_hash_factory(librdf_world *world, const char *name);
@@ -131,6 +122,16 @@ void librdf_init_hash(librdf_world *world);
 
 /* module terminate */
 void librdf_finish_hash(librdf_world *world);
+
+#endif
+
+
+/* hash cursor_get method flags */
+#define LIBRDF_HASH_CURSOR_SET 0
+#define LIBRDF_HASH_CURSOR_NEXT_VALUE 1
+#define LIBRDF_HASH_CURSOR_FIRST 2
+#define LIBRDF_HASH_CURSOR_NEXT 3
+
 
 /* constructors */
 librdf_hash* librdf_new_hash(librdf_world *world, char *name);

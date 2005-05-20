@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -63,6 +63,11 @@ struct librdf_digest_s {
   librdf_digest_factory* factory;
 };
 
+/* module init */
+void librdf_init_digest(librdf_world *world);
+/* module finish */
+void librdf_finish_digest(librdf_world *world);
+                    
 #endif
 
 
@@ -72,11 +77,6 @@ void librdf_digest_register_factory(librdf_world *world, const char *name, void 
 librdf_digest_factory* librdf_get_digest_factory(librdf_world *world, const char *name);
 
 
-/* module init */
-void librdf_init_digest(librdf_world *world);
-/* module finish */
-void librdf_finish_digest(librdf_world *world);
-                    
 /* constructor */
 librdf_digest* librdf_new_digest(librdf_world *world, char *name);
 librdf_digest* librdf_new_digest_from_factory(librdf_world *world, librdf_digest_factory *factory);
