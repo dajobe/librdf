@@ -1,3 +1,47 @@
+2005-05-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_query.c: (main) option of memory/disk test and
+	comments
+
+	* librdf/rdf_model.c: (main) comments
+
+	* librdf/Makefile.am: clean any sqlite test file
+
+	* librdf/rdf_storage_sqlite.c (librdf_storage_sqlite_serialise):
+	Do not free query stringbuffer before reporting error.
+	(librdf_storage_sqlite_serialise_next_statement): Finish if
+	failed.
+	(librdf_storage_sqlite_find_statements): Restructure need_and code
+	and fix AND string count.  Do not free query stringbuffer before
+	reporting error.
+	(librdf_storage_sqlite_find_statements_end_of_stream): Do not read
+	an extra statement when testing for end, only if there is no
+	current statement.
+	(librdf_storage_sqlite_find_statements_next_statement): Finish if
+	failed.
+	(librdf_storage_sqlite_context_serialise): Do not free query
+	stringbuffer before reporting error.
+	(librdf_storage_sqlite_context_serialise_end_of_stream): Do not
+	read an extra context when testing for end, only if there is no
+	current context.
+	(librdf_storage_sqlite_context_serialise_next_statement): Finish
+	if failed.
+	(librdf_storage_sqlite_get_contexts_is_end): Do not read an extra
+	context when testing for end, only if there is no current context.
+	(librdf_storage_sqlite_get_contexts_next_method): Finish if
+	failed.
+	(librdf_storage_sqlite_get_contexts): Do not free query
+	stringbuffer before reporting error.
+
+	* librdf/rdf_storage_sqlite.c
+	(librdf_storage_sqlite_serialise_end_of_stream): Do not read an
+	extra statement when testing for end, only if there is no current
+	statement.
+
+	* configure.ac: Edit mysql_config --cflags output to prevent it
+	defining -O<n> Edit *CFLAGS and *CPPFLAGS to delete -O options
+	just before writing files.
+
 2005-05-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rasqal/rasqal_engine.c (rasqal_new_triples_match): Restore but
