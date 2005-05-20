@@ -67,33 +67,6 @@ struct librdf_digest_s {
 void librdf_init_digest(librdf_world *world);
 /* module finish */
 void librdf_finish_digest(librdf_world *world);
-                    
-#endif
-
-
-/* factory static methods */
-void librdf_digest_register_factory(librdf_world *world, const char *name, void (*factory) (librdf_digest_factory*));
-
-librdf_digest_factory* librdf_get_digest_factory(librdf_world *world, const char *name);
-
-
-/* constructor */
-librdf_digest* librdf_new_digest(librdf_world *world, char *name);
-librdf_digest* librdf_new_digest_from_factory(librdf_world *world, librdf_digest_factory *factory);
-
-/* destructor */
-void librdf_free_digest(librdf_digest *digest);
-
-
-/* methods */
-void librdf_digest_init(librdf_digest* digest);
-void librdf_digest_update(librdf_digest* digest, unsigned char *buf, size_t length);
-void librdf_digest_final(librdf_digest* digest);
-void* librdf_digest_get_digest(librdf_digest* digest);
-
-char* librdf_digest_to_string(librdf_digest* digest);
-void librdf_digest_print(librdf_digest* digest, FILE* fh);
-
 
 /* in librdf_digest_openssl.c */
 #ifdef HAVE_OPENSSL_DIGESTS
@@ -115,6 +88,31 @@ void librdf_digest_sha1_constructor(librdf_world *world);
 void librdf_digest_rmd160_constructor(librdf_world *world);
 #endif
 
+#endif
+
+
+/* factory static methods */
+REDLAND_API void librdf_digest_register_factory(librdf_world *world, const char *name, void (*factory) (librdf_digest_factory*));
+
+REDLAND_API librdf_digest_factory* librdf_get_digest_factory(librdf_world *world, const char *name);
+
+
+/* constructor */
+REDLAND_API librdf_digest* librdf_new_digest(librdf_world *world, char *name);
+REDLAND_API librdf_digest* librdf_new_digest_from_factory(librdf_world *world, librdf_digest_factory *factory);
+
+/* destructor */
+REDLAND_API void librdf_free_digest(librdf_digest *digest);
+
+
+/* methods */
+REDLAND_API void librdf_digest_init(librdf_digest* digest);
+REDLAND_API void librdf_digest_update(librdf_digest* digest, unsigned char *buf, size_t length);
+REDLAND_API void librdf_digest_final(librdf_digest* digest);
+REDLAND_API void* librdf_digest_get_digest(librdf_digest* digest);
+
+REDLAND_API char* librdf_digest_to_string(librdf_digest* digest);
+REDLAND_API void librdf_digest_print(librdf_digest* digest, FILE* fh);
 
 #ifdef __cplusplus
 }
