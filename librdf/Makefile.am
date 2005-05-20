@@ -39,7 +39,9 @@ rdf_parser.h \
 rdf_utf8.h \
 rdf_query.h \
 rdf_serializer.h \
-rdf_log.h
+rdf_log.h \
+rdf_digest.h \
+rdf_hash.h
 
 noinst_HEADERS = win32_rdf_config.h
 

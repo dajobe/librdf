@@ -116,6 +116,8 @@ REDLAND_API extern const unsigned int librdf_version_decimal;
  
 #ifndef LIBRDF_OBJC_FRAMEWORK
 #include <rdf_log.h>
+#include <rdf_digest.h>
+#include <rdf_hash.h>
 #include <rdf_init.h>
 #include <rdf_iterator.h>
 #include <rdf_uri.h>
@@ -130,6 +132,8 @@ REDLAND_API extern const unsigned int librdf_version_decimal;
 #include <rdf_query.h>
 #else
 #include <Redland/rdf_log.h>
+#include <Redland/rdf_digest.h>
+#include <Redland/rdf_hash.h>
 #include <Redland/rdf_init.h>
 #include <Redland/rdf_iterator.h>
 #include <Redland/rdf_uri.h>
