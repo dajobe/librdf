@@ -122,14 +122,6 @@ AC_ARG_ENABLE(release, [  --enable-release        Turn on optimizations (for mai
 	  release_version=yes
 fi;)	
 
-if test "$USE_MAINTAINER_MODE" = yes -a $release_version = no; then 
-  CFLAGS=`echo $CFLAGS | sed s/-O2//`
-  CXXFLAGS=`echo $CXXFLAGS | sed s/-O2//`
-  CPPFLAGS=`echo $CPPFLAGS | sed s/-O2//`
-fi
-
-
-
 dnl compiler checks
 # if using gcc...
 if test "$ac_cv_prog_gcc" = yes; then
@@ -817,7 +809,12 @@ AM_CONDITIONAL(STORAGE_TSTORE, test $tstore_storage = yes)
 
 if test $mysql_storage  = yes; then
   LIBRDF_LIBS="$LIBRDF_LIBS `$MYSQL_CONFIG --libs|sed -e "s/'//g"`"
-  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$MYSQL_CONFIG --cflags|sed -e "s/'//g"`"
+  dnl need to change quotes to allow square brackets
+  changequote(<<, >>)dnl
+  # Stop the MySQL config program adding -O<n> options to CFLAGS
+  mysql_cflags=`$MYSQL_CONFIG --cflags | sed -e "s/'//g" -e "s/-O[1-9]*//" `
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $mysql_cflags"
+  changequote([, ])dnl
 fi
 if test $sqlite_storage  = yes; then
   LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$SQLITE_CONFIG --cflags`"
@@ -982,6 +979,19 @@ STANDARD_CFLAGS="$STANDARD_CFLAGS $CFLAGS"
 if test "$USE_MAINTAINER_MODE" = yes; then
   CFLAGS="$MAINTAINER_CFLAGS $CFLAGS"
 fi
+
+if test "$USE_MAINTAINER_MODE" = yes -a $release_version = no; then 
+  dnl need to change quotes to allow square brackets
+  changequote(<<, >>)dnl
+  CFLAGS=`echo $CFLAGS | sed s/-O[1-9]*//`
+  CXXFLAGS=`echo $CXXFLAGS | sed s/-O[1-9]*//`
+  STANDARD_CFLAGS=`echo $STANDARD_CFLAGS | sed s/-O[1-9]*//`
+  LIBRDF_CPPFLAGS=`echo $LIBRDF_CPPFLAGS | sed s/-O[1-9]*//`
+  LIBRDF_EXTERNAL_CPPFLAGS=`echo $LIBRDF_EXTERNAL_CPPFLAGS | sed s/-O[1-9]*//`
+  LIBRDF_INTERNAL_CPPFLAGS=`echo $LIBRDF_INTERNAL_CPPFLAGS | sed s/-O[1-9]*//`
+  changequote([, ])dnl
+fi
+
 
 LIBS=
 CPPFLAGS=
