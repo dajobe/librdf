@@ -111,6 +111,12 @@ Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=27">Issue #0000027</a>
 (Morten Frederiksen)
 </p>
 
+<p>The SQLite store now does not skip items with the factory methods
+for serializing, finding statements, serializing contexts and getting
+context statements.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=6">Issue #0000006</a>
+</p>
+
 <p>All store methods that return an <code>librdf_iterator</code> or
 <code>librdf_stream</code> now return an empty iterator/stream rather
 than NULL when returning an empty result sequence.  Errors are still
