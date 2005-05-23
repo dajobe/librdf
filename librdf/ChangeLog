@@ -1,5 +1,10 @@
 2005-05-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_hash.c:
+	(librdf_new_hash_from_string,
+	librdf_new_hash_from_array_of_strings): return NULL if inner
+	constructor fails.
+
 	* rdf_hash.h: Make public API smaller; do not mention
 	librdf_hash_factory or librdf_hash_datum.  Added prototypes for
 	new public constructors librdf_new_hash_from_string and
