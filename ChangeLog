@@ -1,7 +1,70 @@
+2005-05-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Redland.i: Added digest and hash classes to API emphasising
+	methods for creating hex-strings digests of strings and making
+	hashes for model options.
+
+	* librdf/rdf_uri.c (librdf_uri_get_digest): No need to call
+	librdf_digest_init as the constructor does that.
+
+	* librdf/rdf_digest.c: Docs.
+	(librdf_new_digest_from_factory): Call init factory method here.
+	(librdf_digest_init): Note this is a re-init.
+
+	* librdf/rdf_digest.c (librdf_digest_update_string): Added.
+
+	* librdf/rdf_digest.h: Added prototype for
+	librdf_digest_update_string
+
+	* librdf/rdf_digest_sha1.c, librdf/rdf_digest_openssl.c,
+	librdf/rdf_digest_md5.c: Update the factory method to take a const
+	buffer.
+
+	* librdf/rdf_digest.c (librdf_digest_get_digest_length): Added.
+
+	* librdf/rdf_digest.h: Factory method update takes const buffer.
+	Reduced public API removing methods mentioning
+	librdf_digest_factory.  Added prototype for
+	librdf_digest_get_digest_length
+
+	* librdf/rdf_hash.c (librdf_hash_get_as_boolean,
+	librdf_hash_get_as_long librdf_hash_get_del): Take const key args
+
+	* librdf/rdf_hash.h: Make librdf_hash_get_as_boolean,
+	librdf_hash_get_as_long and librdf_hash_get_del take const key
+	args
+
+	* librdf/rdf_hash.c:
+	(librdf_new_hash_from_string,
+	librdf_new_hash_from_array_of_strings): return NULL if inner
+	constructor fails.
+
+	* librdf/rdf_hash.h: Make public API smaller; do not mention
+	librdf_hash_factory or librdf_hash_datum.  Added prototypes for
+	new public constructors librdf_new_hash_from_string and
+	librdf_new_hash_from_array_of_strings
+
+	* librdf/rdf_hash.c:
+	(librdf_new_hash_from_string,
+	librdf_new_hash_from_array_of_strings): Added constructors around
+	internal functions for use by public API.
+	(librdf_hash_from_array_of_strings): Take const array.
+	(main): Update for const args.
+
+	* librdf/win32/README.txt: Add win32 README.txt
+
 2005-05-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
-	* librdf/rdf_query.c: (main) option of memory/disk test and
-	comments
+	* librdf/Makefile.am, librdf/rdf_internal.h, librdf/librdf.h:
+	Add rdf_digest.h and rdf_hash.h to public includes.
+
+	* librdf/rdf_digest.h, librdf/rdf_hash.h:
+	Make API public, declare with REDLAND_API
+
+	* librdf/rdf_digest.h, librdf/rdf_hash.h:
+	Moved class init/finish methods into internal
+
+	* librdf/rdf_query.c: (main) option of memory/disk test and comments
 
 	* librdf/rdf_model.c: (main) comments
 
