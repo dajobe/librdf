@@ -257,6 +257,20 @@ librdf_digest_update(librdf_digest* digest,
 
 
 /**
+ * librdf_digest_update_string - Add a string to the librdf_digest object
+ * @digest: the digest
+ * @string: string to add
+ * 
+ **/
+void
+librdf_digest_update_string(librdf_digest* digest, 
+                            const unsigned char *string)
+{
+  digest->factory->update(digest->context, string, strlen((const char*)string));
+}
+
+
+/**
  * librdf_digest_final - Finish the digesting of data
  * @digest: the digest
  * 
@@ -299,7 +313,7 @@ librdf_digest_get_digest(librdf_digest* digest)
 size_t
 librdf_digest_get_digest_length(librdf_digest* digest)
 {
-  return digest->digest_length;
+  return digest->factory->digest_length;
 }
 
 
