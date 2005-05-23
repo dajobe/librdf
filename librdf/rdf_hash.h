@@ -123,9 +123,6 @@ void librdf_init_hash(librdf_world *world);
 /* module terminate */
 void librdf_finish_hash(librdf_world *world);
 
-#endif
-
-
 /* hash cursor_get method flags */
 #define LIBRDF_HASH_CURSOR_SET 0
 #define LIBRDF_HASH_CURSOR_NEXT_VALUE 1
@@ -134,77 +131,89 @@ void librdf_finish_hash(librdf_world *world);
 
 
 /* constructors */
-REDLAND_API librdf_hash* librdf_new_hash(librdf_world *world, char *name);
-REDLAND_API librdf_hash* librdf_new_hash_from_factory(librdf_world *world, librdf_hash_factory* factory);
-REDLAND_API librdf_hash* librdf_new_hash_from_hash (librdf_hash* old_hash);
-
-/* destructor */
-REDLAND_API void librdf_free_hash(librdf_hash *hash);
-
+librdf_hash* librdf_new_hash(librdf_world *world, const char *name);
+librdf_hash* librdf_new_hash_from_factory(librdf_world *world, librdf_hash_factory* factory);
 
 /* methods */
 
 /* open/create hash with identifier and options  */
-REDLAND_API int librdf_hash_open(librdf_hash* hash, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
+int librdf_hash_open(librdf_hash* hash, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 /* end hash association */
-REDLAND_API int librdf_hash_close(librdf_hash* hash);
+int librdf_hash_close(librdf_hash* hash);
 
 /* how many values */
-REDLAND_API int librdf_hash_values_count(librdf_hash* hash);
+int librdf_hash_values_count(librdf_hash* hash);
 
-/* retrieve one value for a given hash key either as char or hash datum */
-REDLAND_API char* librdf_hash_get(librdf_hash* hash, const char *key);
-REDLAND_API librdf_hash_datum* librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key);
-
-/* retrieve one value for key and delete from hash all other values */
-REDLAND_API char* librdf_hash_get_del(librdf_hash* hash, char *key);
+/* retrieve one value for a given hash key as a hash datum */
+librdf_hash_datum* librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key);
 
 /* retrieve all values for a given hash key according to flags */
-REDLAND_API librdf_iterator* librdf_hash_get_all(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
+librdf_iterator* librdf_hash_get_all(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
 
 /* insert a key/value pair */
-REDLAND_API int librdf_hash_put(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
-REDLAND_API int librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value);
+int librdf_hash_put(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
 
   /* returns true if key exists in hash, without returning value */
-REDLAND_API int librdf_hash_exists(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
+int librdf_hash_exists(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
 
-REDLAND_API int librdf_hash_delete(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
-REDLAND_API int librdf_hash_delete_all(librdf_hash* hash, librdf_hash_datum *key);
-REDLAND_API librdf_iterator* librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key);
+int librdf_hash_delete(librdf_hash* hash, librdf_hash_datum *key, librdf_hash_datum *value);
+int librdf_hash_delete_all(librdf_hash* hash, librdf_hash_datum *key);
+librdf_iterator* librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key);
+
 /* flush any cached information to disk */
-REDLAND_API int librdf_hash_sync(librdf_hash* hash);
+int librdf_hash_sync(librdf_hash* hash);
 /* get the file descriptor for the hash, if it is file based (for locking) */
-REDLAND_API int librdf_hash_get_fd(librdf_hash* hash);
+int librdf_hash_get_fd(librdf_hash* hash);
 
-/* extra methods */
-REDLAND_API void librdf_hash_print(librdf_hash* hash, FILE *fh);
-REDLAND_API void librdf_hash_print_keys(librdf_hash* hash, FILE *fh);
-REDLAND_API void librdf_hash_print_values(librdf_hash* hash, char *key, FILE *fh);
+/* init a hash from a string representation */
+int librdf_hash_from_string(librdf_hash* hash, const char *string);
 
-/* import a hash from a string representation */
-REDLAND_API int librdf_hash_from_string (librdf_hash* hash, const char *string);
-
-/* import a hash from an array of strings */
-REDLAND_API int librdf_hash_from_array_of_strings (librdf_hash* hash, char *array[]);
-
-/* lookup a hash key and decode value as a boolean */
-REDLAND_API int librdf_hash_get_as_boolean (librdf_hash* hash, char *key);
-
-/* lookup a hash key and decode value as a long */
-REDLAND_API long librdf_hash_get_as_long (librdf_hash* hash, char *key);
+/* init a hash from an array of strings */
+int librdf_hash_from_array_of_strings(librdf_hash* hash, const char *array[]);
 
 
 /* cursor methods from rdf_hash_cursor.c */
 
-REDLAND_API librdf_hash_cursor* librdf_new_hash_cursor (librdf_hash* hash);
-REDLAND_API void librdf_free_hash_cursor (librdf_hash_cursor* cursor);
-REDLAND_API int librdf_hash_cursor_set(librdf_hash_cursor *cursor, librdf_hash_datum *key,librdf_hash_datum *value);
-REDLAND_API int librdf_hash_cursor_get_next_value(librdf_hash_cursor *cursor, librdf_hash_datum *key,librdf_hash_datum *value);
-REDLAND_API int librdf_hash_cursor_get_first(librdf_hash_cursor *cursor, librdf_hash_datum *key, librdf_hash_datum *value);
-REDLAND_API int librdf_hash_cursor_get_next(librdf_hash_cursor *cursor, librdf_hash_datum *key, librdf_hash_datum *value);
+librdf_hash_cursor* librdf_new_hash_cursor (librdf_hash* hash);
+void librdf_free_hash_cursor (librdf_hash_cursor* cursor);
+int librdf_hash_cursor_set(librdf_hash_cursor *cursor, librdf_hash_datum *key,librdf_hash_datum *value);
+int librdf_hash_cursor_get_next_value(librdf_hash_cursor *cursor, librdf_hash_datum *key,librdf_hash_datum *value);
+int librdf_hash_cursor_get_first(librdf_hash_cursor *cursor, librdf_hash_datum *key, librdf_hash_datum *value);
+int librdf_hash_cursor_get_next(librdf_hash_cursor *cursor, librdf_hash_datum *key, librdf_hash_datum *value);
+
+#endif
 
 
+/* public constructors */
+REDLAND_API librdf_hash* librdf_new_hash_from_string(librdf_world *world, const char *name, const char *string);
+REDLAND_API librdf_hash* librdf_new_hash_from_array_of_strings(librdf_world *world, const char *name, const char **string);
+
+/* public copy constructor */
+REDLAND_API librdf_hash* librdf_new_hash_from_hash (librdf_hash* old_hash);
+
+/* public destructor */
+REDLAND_API void librdf_free_hash(librdf_hash *hash);
+
+/* public methods */
+
+/* retrieve one value for a given hash key */
+REDLAND_API char* librdf_hash_get(librdf_hash* hash, const char *key);
+
+/* lookup a hash key and decode value as a boolean */
+REDLAND_API int librdf_hash_get_as_boolean(librdf_hash* hash, char *key);
+
+/* lookup a hash key and decode value as a long */
+REDLAND_API long librdf_hash_get_as_long(librdf_hash* hash, char *key);
+
+/* retrieve one value for key and delete from hash all other values */
+REDLAND_API char* librdf_hash_get_del(librdf_hash* hash, char *key);
+
+/* insert a key/value pair */
+REDLAND_API int librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value);
+
+REDLAND_API void librdf_hash_print(librdf_hash* hash, FILE *fh);
+REDLAND_API void librdf_hash_print_keys(librdf_hash* hash, FILE *fh);
+REDLAND_API void librdf_hash_print_values(librdf_hash* hash, char *key, FILE *fh);
 
 
 #ifdef __cplusplus
