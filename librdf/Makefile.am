@@ -160,54 +160,56 @@ LOCAL_LIB_DIR=lib
 # Some people need a little help ;-)
 test: check
 
+# rule for building tests in one step
+COMPILE_LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
 rdf_node_test: rdf_node.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_node.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_node.c librdf.la
 
 rdf_digest_test: rdf_digest.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_digest.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_digest.c librdf.la
 
 rdf_hash_test: rdf_hash.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_hash.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_hash.c librdf.la
 
-# This needs raptor.h
 rdf_uri_test: rdf_uri.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE @LIBRDF_INTERNAL_CPPFLAGS@ @LIBRDF_EXTERNAL_CPPFLAGS@ $(srcdir)/rdf_uri.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_uri.c librdf.la
 
 rdf_statement_test: rdf_statement.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la
 
 rdf_model_test: rdf_model.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_model.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_model.c librdf.la
 
 rdf_storage_test: rdf_storage.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_storage.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_storage.c librdf.la
 
 rdf_parser_test: rdf_parser.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_parser.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_parser.c librdf.la
 
 rdf_files_test: rdf_files.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_files.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_files.c librdf.la
 
 rdf_heuristics_test: rdf_heuristics.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_heuristics.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_heuristics.c librdf.la
 
 rdf_utf8_test: rdf_utf8.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_utf8.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_utf8.c librdf.la
 
 rdf_concepts_test: rdf_concepts.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_concepts.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_concepts.c librdf.la
 
 rdf_query_test: rdf_query.c rdf_query_results.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_query.c $(srcdir)/rdf_query_results.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_query.c $(srcdir)/rdf_query_results.c librdf.la
 
 rdf_serializer_test: rdf_serializer.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_serializer.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_serializer.c librdf.la
 
 rdf_stream_test: rdf_stream.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_stream.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_stream.c librdf.la
 
 rdf_iterator_test: rdf_iterator.c librdf.la
-	$(LINK) $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. -DSTANDALONE $(srcdir)/rdf_iterator.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_iterator.c librdf.la
 
 @SET_MAKE@
 
@@ -216,6 +218,3 @@ $(top_builddir)/raptor/libraptor.la:
 
 $(top_builddir)/rasqal/librasqal.la:
 	cd $(top_builddir)/rasqal && $(MAKE) $(AM_MAKEFLAGS) librasqal.la
-
-newman-bug: newman-bug.c librdf.la
-	$(LINK) -o newman-bug $(DEFS) $(CPPFLAGS) -I$(srcdir) -I. $(srcdir)/newman-bug.c librdf.la
