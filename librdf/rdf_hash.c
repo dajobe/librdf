@@ -798,7 +798,7 @@ librdf_hash_get_all_iterator_finished(void* iterator)
  * Return value: the value or NULL on failure
  **/
 char*
-librdf_hash_get_del(librdf_hash* hash, char *key)
+librdf_hash_get_del(librdf_hash* hash, const char *key)
 {
   librdf_hash_datum hd_key;
   char *s;
@@ -807,7 +807,7 @@ librdf_hash_get_del(librdf_hash* hash, char *key)
   if(!s)
     return NULL;
 
-  hd_key.data=key;
+  hd_key.data=(char*)key;
   hd_key.size=strlen(key);
   
   librdf_hash_delete_all(hash, &hd_key);
@@ -1410,7 +1410,7 @@ librdf_hash_from_array_of_strings(librdf_hash* hash, const char **array)
  * Return value: >0 (for true), 0 (for false) or <0 (for key not found or not known boolean value)
  **/
 int
-librdf_hash_get_as_boolean (librdf_hash* hash, char *key) 
+librdf_hash_get_as_boolean (librdf_hash* hash, const char *key) 
 {
   int bvalue= (-1);
   char *value;
@@ -1454,7 +1454,7 @@ librdf_hash_get_as_boolean (librdf_hash* hash, char *key)
  * Return value: >0 (for success), <0 (for key not found or not known boolean value)
  **/
 long
-librdf_hash_get_as_long (librdf_hash* hash, char *key) 
+librdf_hash_get_as_long (librdf_hash* hash, const char *key) 
 {
   int lvalue;
   char *value;
