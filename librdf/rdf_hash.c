@@ -295,7 +295,8 @@ librdf_get_hash_factory(librdf_world *world, const char *name)
  * Return value: a new &librdf_hash object or NULL on failure
  */
 librdf_hash*
-librdf_new_hash(librdf_world *world, char* name) {
+librdf_new_hash(librdf_world *world, const char* name)
+{
   librdf_hash_factory *factory;
 
   factory=librdf_get_hash_factory(world, name);
@@ -315,7 +316,8 @@ librdf_new_hash(librdf_world *world, char* name) {
  */
 librdf_hash*
 librdf_new_hash_from_factory (librdf_world *world,
-                              librdf_hash_factory* factory) {
+                              librdf_hash_factory* factory)
+{
   librdf_hash* h;
 
   h=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
@@ -341,13 +343,64 @@ librdf_new_hash_from_factory (librdf_world *world,
 
 
 /**
+ * librdf_new_hash_from_string -  Constructor - create a new librdf_hash object from a string
+ * @hash: hash object
+ * @name: hash name
+ * @string: hash encoded as a string
+ * 
+ * See &librdf_hash_from_string for the string format.
+ * 
+ * Return value: a new &librdf_hash object or NULL on failure
+ */
+librdf_hash*
+librdf_new_hash_from_string(librdf_world *world, const char *name,
+                            const char *string)
+{
+  librdf_hash* hash;
+
+  hash=librdf_new_hash(world, name);
+  if(librdf_hash_from_string(hash, string)) {
+    librdf_free_hash(hash);
+    return NULL;
+  }
+
+  return hash;
+}
+
+
+/**
+ * librdf_new_hash_from_array_of_strings -  Constructor - create a new librdf_hash object from an array of strings
+ * @hash: hash object
+ * @name: hash name
+ * @array: address of the start of the array of char* pointers
+ *
+ * Return value: a new &librdf_hash object or NULL on failure
+ */
+librdf_hash*
+librdf_new_hash_from_array_of_strings(librdf_world *world, const char *name,
+                                      const char **array)
+{
+  librdf_hash* hash;
+
+  hash=librdf_new_hash(world, name);
+  if(librdf_hash_from_array_of_strings(hash, array)) {
+    librdf_free_hash(hash);
+    return NULL;
+  }
+
+  return hash;
+}
+
+
+/**
  * librdf_new_hash_from_hash -  Copy Constructor - create a new librdf_hash object from an existing one
  * @old_hash: the hash to use to construct the hash
  *
  * Return value: a new &librdf_hash object or NULL on failure
  */
 librdf_hash*
-librdf_new_hash_from_hash(librdf_hash* old_hash) {
+librdf_new_hash_from_hash(librdf_hash* old_hash)
+{
   librdf_hash* hash;
   
   hash=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
@@ -1136,7 +1189,7 @@ typedef enum {
  * Return value: non 0 on failure
  **/
 int
-librdf_hash_from_string (librdf_hash* hash, const char *string) 
+librdf_hash_from_string(librdf_hash* hash, const char *string) 
 {
   const char * p;
   librdf_hash_datum hd_key, hd_value; /* on stack */
@@ -1322,13 +1375,13 @@ librdf_hash_from_string (librdf_hash* hash, const char *string)
  * Return value:  non 0 on failure
  **/
 int
-librdf_hash_from_array_of_strings (librdf_hash* hash, char **array) 
+librdf_hash_from_array_of_strings(librdf_hash* hash, const char **array)
 {
   librdf_hash_datum key, value; /* on stack */
   int i;
   
-  for(i=0; (key.data=array[i]); i+=2) {
-    value.data=array[i+1];
+  for(i=0; (key.data=(char*)array[i]); i+=2) {
+    value.data=(char*)array[i+1];
     if(!value.data) {
       librdf_log(hash->world, 
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
@@ -1428,7 +1481,8 @@ librdf_hash_get_as_long (librdf_hash* hash, char *key)
  * Return value: non 0 on failure
  **/
 int
-librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value) {
+librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value)
+{
   librdf_hash_datum key_hd; /* static */
   librdf_hash_datum value_hd;
 
@@ -1469,13 +1523,13 @@ main(int argc, char *argv[])
                             "colour", "yellow",
 			    NULL, NULL};
   char *test_duplicate_key="colour";
-  char *test_hash_array[]={"shape", "cube",
-			   "sides", "6", /* for testing get as long */
-                           "3d", "yes", /* testing bool */
-			   "colours", "red",
-			   "colours", "yellow",
-			   "creator", "rubik",
-			   NULL};
+  const char *test_hash_array[]={"shape", "cube",
+                                 "sides", "6", /* for testing get as long */
+                                 "3d", "yes", /* testing bool */
+                                 "colours", "red",
+                                 "colours", "yellow",
+                                 "creator", "rubik",
+                                 NULL};
   const char * const test_hash_string="field1='value1', field2='\\'value2', field3='\\\\', field4='\\\\\\'', field5 = 'a' ";
   char *test_hash_delete_key="size";
   int i,j;
