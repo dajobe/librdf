@@ -1,5 +1,25 @@
 2005-05-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_digest.c (librdf_digest_update_string): Added.
+
+	* rdf_digest.h: Added prototype for librdf_digest_update_string
+
+	* rdf_digest_sha1.c, rdf_digest_openssl.c, rdf_digest_md5.c:
+	Update the factory method to take a const buffer.
+
+	* rdf_digest.c (librdf_digest_get_digest_length): Added.
+
+	* rdf_digest.h: Factory method update takes const buffer.  Reduced
+	public API removing methods mentioning librdf_digest_factory.
+	Added prototype for librdf_digest_get_digest_length
+
+	* rdf_hash.c (librdf_hash_get_as_boolean, librdf_hash_get_as_long
+	librdf_hash_get_del): Take const key args
+
+	* rdf_hash.h: Make librdf_hash_get_as_boolean,
+	librdf_hash_get_as_long and librdf_hash_get_del take const key
+	args
+
 	* rdf_hash.c:
 	(librdf_new_hash_from_string,
 	librdf_new_hash_from_array_of_strings): return NULL if inner
