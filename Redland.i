@@ -105,6 +105,7 @@ librdf_internal_test_warning(librdf_world *world)
 #endif
 
 typedef struct librdf_world_s librdf_world;
+typedef struct librdf_digest_s librdf_digest;
 typedef struct librdf_hash_s librdf_hash;
 typedef struct librdf_uri_s librdf_uri;
 typedef struct librdf_iterator_s librdf_iterator;
@@ -115,6 +116,25 @@ typedef struct librdf_storage_s librdf_storage;
 typedef struct librdf_stream_s librdf_stream;
 typedef struct librdf_parser_s librdf_parser;
 typedef struct librdf_serializer_s librdf_serializer;
+
+
+/* rdf_digest.h */
+%newobject librdf_new_digest;
+librdf_digest* librdf_new_digest(librdf_world *world, char *name);
+void librdf_free_digest(librdf_digest *digest);
+void librdf_digest_init(librdf_digest* digest);
+void librdf_digest_update(librdf_digest* digest, const char *buf, size_t length);
+void librdf_digest_update_string(librdf_digest* digest, const char *string);
+void librdf_digest_final(librdf_digest* digest);
+%newobject librdf_digest_to_string;
+char* librdf_digest_to_string(librdf_digest* digest);
+
+/* rdf_hash.h */
+%newobject librdf_new_hash_from_string;
+%newobject librdf_new_hash_from_array_of_strings;
+librdf_hash* librdf_new_hash_from_string(librdf_world *world, const char *name, const char *string);
+librdf_hash* librdf_new_hash_from_array_of_strings(librdf_world *world, const char *name, const char **string);
+void librdf_free_hash(librdf_hash *hash);
 
 /* rdf_init.h */
 %newobject librdf_new_world;
