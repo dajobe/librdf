@@ -55,8 +55,7 @@ allocated / freed across Redland libraries.
 <p>The following changes were made to the bindings API as
 exported by the SWIG interface file <code>Redland.i</code>:</p>
 
-<ul>
-<li>The digest class was added:
+<p>The digest class was added:
 constructor <code>librdf_new_digest</code>, 
 destructor <code>librdf_free_digest</code>
 and methods <code>librdf_digest_init</code>, 
@@ -64,14 +63,22 @@ and methods <code>librdf_digest_init</code>,
 <code>librdf_digest_update_string</code>, 
 <code>librdf_digest_final</code> and
 <code>librdf_digest_to_string</code>,.
-</li>
-<li>The hash class was added as selected functions:
+</p>
+
+<p>The hash class was added as selected functions:
 constructors <code>librdf_new_hash_from_string</code> and
 <code>librdf_new_hash_from_array_of_strings</code> and destructor
 <code>librdf_free_hash</code>.
-</li>
-<li>The query class methods get_limit, set_limit, get_offset and set_offset were added.</li>
-<li>Functions were added for accessing parts of structured log messages
+</p>
+
+<p>The query class methods
+<code>librdf_query_get_limit</code>,
+<code>librdf_query_set_limit</code>,
+<code>librdf_query_get_offset</code> and
+<code>librdf_query_set_offset</code> were added.
+</p>
+
+<p>Functions were added for accessing parts of structured log messages
 as <code>librdf_log_message</code> objects:
 <code>librdf_log_message_code</code>, 
 <code>librdf_log_message_level</code>, 
@@ -85,8 +92,7 @@ objects:
 <code>raptor_locator_byte</code>, 
 <code>raptor_locator_file</code> and
 <code>raptor_locator_uri</code>.
-</li>
-</ul>
+</p>
 
 
 <h3>Digest Class changes</h3>
