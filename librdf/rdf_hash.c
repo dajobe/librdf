@@ -344,7 +344,7 @@ librdf_new_hash_from_factory (librdf_world *world,
 
 /**
  * librdf_new_hash_from_string -  Constructor - create a new librdf_hash object from a string
- * @hash: hash object
+ * @world: redland world object
  * @name: hash name
  * @string: hash encoded as a string
  * 
@@ -373,7 +373,7 @@ librdf_new_hash_from_string(librdf_world *world, const char *name,
 
 /**
  * librdf_new_hash_from_array_of_strings -  Constructor - create a new librdf_hash object from an array of strings
- * @hash: hash object
+ * @world: redland world object
  * @name: hash name
  * @array: address of the start of the array of char* pointers
  *
