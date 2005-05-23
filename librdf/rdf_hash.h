@@ -200,13 +200,13 @@ REDLAND_API void librdf_free_hash(librdf_hash *hash);
 REDLAND_API char* librdf_hash_get(librdf_hash* hash, const char *key);
 
 /* lookup a hash key and decode value as a boolean */
-REDLAND_API int librdf_hash_get_as_boolean(librdf_hash* hash, char *key);
+REDLAND_API int librdf_hash_get_as_boolean(librdf_hash* hash, const char *key);
 
 /* lookup a hash key and decode value as a long */
-REDLAND_API long librdf_hash_get_as_long(librdf_hash* hash, char *key);
+REDLAND_API long librdf_hash_get_as_long(librdf_hash* hash, const char *key);
 
 /* retrieve one value for key and delete from hash all other values */
-REDLAND_API char* librdf_hash_get_del(librdf_hash* hash, char *key);
+REDLAND_API char* librdf_hash_get_del(librdf_hash* hash, const char *key);
 
 /* insert a key/value pair */
 REDLAND_API int librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value);
