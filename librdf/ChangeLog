@@ -1,3 +1,18 @@
+2005-05-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_hash.h: Make public API smaller; do not mention
+	librdf_hash_factory or librdf_hash_datum.  Added prototypes for
+	new public constructors librdf_new_hash_from_string and
+	librdf_new_hash_from_array_of_strings
+
+	* rdf_hash.c: (librdf_new_hash_from_string,
+	librdf_new_hash_from_array_of_strings): Added constructors around
+	internal functions for use by public API.
+	(librdf_hash_from_array_of_strings): Take const array.
+	(main): Update for const args.
+
+	* win32/README.txt: Add win32 README.txt
+
 2005-05-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_digest.h, rdf_hash.h, rdf_internal.h, librdf.h: The changes
