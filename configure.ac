@@ -617,12 +617,12 @@ HASH_SRCS=
 
 AC_MSG_CHECKING(for bdb hash support)
 if test "$have_libdb" = yes; then
-  AC_MSG_RESULT(yes);
+  AC_MSG_RESULT(yes)
   AC_DEFINE(HAVE_BDB_HASH, 1, [Have BDB hash support])
   HASH_OBJS="$HASH_OBJS rdf_hash_bdb.lo"
   HASH_SRCS="$HASH_SRCS rdf_hash_bdb.c"
 else
-  AC_MSG_RESULT(no);
+  AC_MSG_RESULT(no)
 fi
 
 
@@ -866,7 +866,7 @@ for module in $digest_modules; do
   AC_MSG_CHECKING(for local $module digest module)
   base=rdf_digest_$module
   if test -r $srcdir/librdf/$base.c; then
-    AC_MSG_RESULT(yes);
+    AC_MSG_RESULT(yes)
 
     n=HAVE_LOCAL_${module_u}_DIGEST
     AC_DEFINE_UNQUOTED($n)
@@ -875,7 +875,7 @@ for module in $digest_modules; do
     DIGEST_SRCS="$DIGEST_SRCS $base.c"
     digest_modules_available="$digest_modules_available $module"
   else
-    AC_MSG_RESULT(no);
+    AC_MSG_RESULT(no)
   fi
 done
 
@@ -946,14 +946,14 @@ if test "$USE_MAINTAINER_MODE" = yes; then
 else
   use_dmalloc=no
 fi
-AC_MSG_RESULT($use_dmalloc);
+AC_MSG_RESULT($use_dmalloc)
 if test $use_dmalloc = yes; then
   MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
   MEM_LIBS=-ldmalloc
 fi
-AC_ARG_WITH(memory-signing, [  --with-memory-signing   Sign allocated memory (default=no)], use_memory_signing="$withval", use_memory_signing="no") 
+AC_ARG_WITH(memory-signing, [  --with-memory-signing   Sign allocated memory (default=no)], use_memory_signing="$withval", use_memory_signing="no")
 AC_MSG_CHECKING(using memory signing)
-AC_MSG_RESULT($use_memory_signing);
+AC_MSG_RESULT($use_memory_signing)
 if test $use_memory_signing = yes; then
   MEM=-DLIBRDF_MEMORY_SIGN=1
   MEM_LIBS=
