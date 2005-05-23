@@ -473,7 +473,7 @@ librdf_uri_as_counted_string(librdf_uri *uri, size_t* len_p)
  * Return value: new &librdf_digest object or NULL on failure.
  **/
 librdf_digest*
-librdf_uri_get_digest (librdf_uri* uri) 
+librdf_uri_get_digest(librdf_uri* uri) 
 {
   librdf_world *world=uri->world;
   librdf_digest* d;
@@ -484,7 +484,6 @@ librdf_uri_get_digest (librdf_uri* uri)
   if(!d)
     return NULL;
   
-  librdf_digest_init(d);
   librdf_digest_update(d, (unsigned char*)uri->string, uri->string_length);
   librdf_digest_final(d);
   
