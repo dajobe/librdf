@@ -34,6 +34,9 @@ provide updated RSS enclosures support with the RSS tag soup parser and
 RSS 1.0 serializer and new GRDDL parser.
 </p>
 
+<p>The digest and hash classes now expose public API constructors,
+destructors and methods via their header files.</p>
+
 
 <h3>Configuration changes</h3>
 
@@ -45,6 +48,84 @@ allocated / freed across Redland libraries.
 <h3>Portability Fixes</h3>
 
 <p>Added Win32 portability fixes and build configuration (John Barstow)</p>
+
+
+<h3>Binding API changes</h3>
+
+<p>The following changes were made to the bindings API as
+exported by the SWIG interface file <code>Redland.i</code>:</p>
+
+<ul>
+<li>The digest class was added:
+constructor <code>librdf_new_digest</code>, 
+destructor <code>librdf_free_digest</code>
+and methods <code>librdf_digest_init</code>, 
+<code>librdf_digest_update</code>, 
+<code>librdf_digest_update_string</code>, 
+<code>librdf_digest_final</code> and
+<code>librdf_digest_to_string</code>,.
+</li>
+<li>The hash class was added as selected functions:
+constructors <code>librdf_new_hash_from_string</code> and
+<code>librdf_new_hash_from_array_of_strings</code> and destructor
+<code>librdf_free_hash</code>.
+</li>
+<li>The query class methods get_limit, set_limit, get_offset and set_offset were added.</li>
+<li>Functions were added for accessing parts of structured log messages
+as <code>librdf_log_message</code> objects:
+<code>librdf_log_message_code</code>, 
+<code>librdf_log_message_level</code>, 
+<code>librdf_log_message_facility</code>, 
+<code>librdf_log_message_message</code>, 
+<code>librdf_log_message_locator</code>
+and <a href="http://librdf.org/raptor/">Raptor</a> <code>raptor_locator</code>
+objects:
+<code>raptor_locator_line</code>, 
+<code>raptor_locator_column</code>, 
+<code>raptor_locator_byte</code>, 
+<code>raptor_locator_file</code> and
+<code>raptor_locator_uri</code>.
+</li>
+</ul>
+
+
+<h3>Digest Class changes</h3>
+
+<p>This class was added to the public API in this release adding
+constructor <code>librdf_new_digest</code>,
+destructor <code>librdf_free_digest</code>
+and methods
+<code>librdf_digest_init</code>,
+<code>librdf_digest_update</code>,
+<code>librdf_digest_update_string</code>,
+<code>librdf_digest_final</code>,
+<code>librdf_digest_get_digest</code>,
+<code>librdf_digest_get_digest_length</code>,
+
+<code>librdf_digest_to_string</code> and
+<code>librdf_digest_print</code>
+</p>
+
+
+<h3>Hash Class changes</h3>
+
+<p>This class was added to the public API in this release adding
+constructors
+<code>librdf_new_hash_from_string</code>, 
+<code>librdf_new_hash_from_array_of_strings</code> and
+<code>librdf_new_hash_from_hash</code>;
+destructor
+<code>librdf_free_hash</code>;
+and methods
+<code>librdf_hash_get</code>, 
+<code>librdf_hash_get_as_boolean</code>, 
+<code>librdf_hash_get_as_long</code>, 
+<code>librdf_hash_get_del</code>, 
+<code>librdf_hash_put_strings</code>, 
+<code>librdf_hash_print</code>, 
+<code>librdf_hash_print_keys</code> and
+<code>librdf_hash_print_values</code>.
+</p>
 
 
 <h3>Iterator Class changes</h3>
