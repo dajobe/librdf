@@ -359,6 +359,9 @@ librdf_new_hash_from_string(librdf_world *world, const char *name,
   librdf_hash* hash;
 
   hash=librdf_new_hash(world, name);
+  if(!hash)
+    return NULL;
+  
   if(librdf_hash_from_string(hash, string)) {
     librdf_free_hash(hash);
     return NULL;
@@ -383,6 +386,9 @@ librdf_new_hash_from_array_of_strings(librdf_world *world, const char *name,
   librdf_hash* hash;
 
   hash=librdf_new_hash(world, name);
+  if(!hash)
+    return NULL;
+  
   if(librdf_hash_from_array_of_strings(hash, array)) {
     librdf_free_hash(hash);
     return NULL;
