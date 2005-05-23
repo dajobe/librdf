@@ -157,6 +157,14 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
  * @world: redland world object
  * @name: the digest name to use to create this digest
  * 
+ * After construction, data should be added to the digest using
+ * &librdf_digest_update or &librdf_digest_update_string with
+ * &librdf_digest_final to signify finishing.  Then the digest
+ * value can be returned directly with &librdf_digest_get_digest
+ * of &librdf_digest_get_digest_length bytes or as a hex encoded
+ * string with &librdf_digest_to_string.  The digest can be
+ * re-initialised for new data with &librdf_digest_init.
+ *
  * Return value: new &librdf_digest object or NULL
  **/
 librdf_digest*
@@ -177,6 +185,14 @@ librdf_new_digest(librdf_world *world, char *name)
  * @world: redland world object
  * @factory: the digest factory to use to create this digest
  * 
+ * After construction, data should be added to the digest using
+ * &librdf_digest_update or &librdf_digest_update_string with
+ * &librdf_digest_final to signify finishing.  Then the digest
+ * value can be returned directly with &librdf_digest_get_digest
+ * of &librdf_digest_get_digest_length bytes or as a hex encoded
+ * string with &librdf_digest_to_string.  The digest can be
+ * re-initialised for new data with &librdf_digest_init.
+ *
  * Return value: new &librdf_digest object or NULL
  **/
 librdf_digest*
@@ -203,9 +219,11 @@ librdf_new_digest_from_factory(librdf_world *world,
     librdf_free_digest(d);
     return NULL;
   }
-  
+
   d->factory=factory;
   
+  d->factory->init(d->context);
+
   return d;
 }
 
@@ -233,6 +251,9 @@ librdf_free_digest(librdf_digest *digest)
  * librdf_digest_init - (Re)initialise the librdf_digest object
  * @digest: the digest
  * 
+ * This is automatically called on construction but can be used to
+ * re-initialise the digest to the initial state for digesting new
+ * data.
  **/
 void
 librdf_digest_init(librdf_digest* digest) 
@@ -266,7 +287,8 @@ void
 librdf_digest_update_string(librdf_digest* digest, 
                             const unsigned char *string)
 {
-  digest->factory->update(digest->context, string, strlen((const char*)string));
+  digest->factory->update(digest->context, string,
+                          strlen((const char*)string));
 }
 
 
@@ -304,7 +326,7 @@ librdf_digest_get_digest(librdf_digest* digest)
 
 
 /**
- * librdf_digest_get_digest - Get length of the calculated digested
+ * librdf_digest_get_digest_length - Get length of the calculated digested
  * @digest: the digest
  * 
  * Return value: size of the digest in bytes
