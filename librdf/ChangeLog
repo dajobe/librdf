@@ -1,5 +1,9 @@
 2005-05-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_digest_sha1.c (SHA1Transform): Take const buffer
+
+	* rdf_digest_md5.c: duplicate const
+
 	* rdf_hash.c: docs
 
 	* rdf_uri.c (librdf_uri_get_digest): No need to call
