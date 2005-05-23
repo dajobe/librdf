@@ -78,7 +78,7 @@ librdf_openssl_md5_register_factory(librdf_digest_factory *factory)
   factory->digest_length = MD5_DIGEST_LENGTH;
         
   factory->init  = (void (*)(void *))MD5_Init;
-  factory->update = (void (*)(void *, unsigned char*, size_t))MD5_Update;
+  factory->update = (void (*)(void *, const unsigned char*, size_t))MD5_Update;
   factory->final = (void (*)(void *))md5_final;
   factory->get_digest  = (unsigned char *(*)(void *))md5_get_digest;
 }
@@ -118,7 +118,7 @@ librdf_openssl_sha1_register_factory(librdf_digest_factory *factory)
   factory->digest_length = SHA_DIGEST_LENGTH;
   
   factory->init  = (void (*)(void *))SHA1_Init;
-  factory->update = (void (*)(void *, unsigned char*, size_t))SHA1_Update;
+  factory->update = (void (*)(void *, const unsigned char*, size_t))SHA1_Update;
   factory->final = (void (*)(void *))sha1_final;
   factory->get_digest  = (unsigned char *(*)(void *))sha1_get_digest;
 }
@@ -158,7 +158,7 @@ librdf_openssl_ripemd160_register_factory(librdf_digest_factory *factory)
   factory->digest_length = SHA_DIGEST_LENGTH;
   
   factory->init  = (void (*)(void *))RIPEMD160_Init;
-  factory->update = (void (*)(void *, unsigned char*, size_t))RIPEMD160_Update;
+  factory->update = (void (*)(void *, const unsigned char*, size_t))RIPEMD160_Update;
   factory->final = (void (*)(void *))ripemd160_final;
   factory->get_digest  = (unsigned char *(*)(void *))ripemd160_get_digest;
 }

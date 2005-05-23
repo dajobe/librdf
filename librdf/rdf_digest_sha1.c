@@ -119,7 +119,7 @@ typedef struct {
 
 static void SHA1Transform(u32 state[5], unsigned char buffer[64]);
 static void SHA1Init(SHA1Context* context);
-static void SHA1Update(SHA1Context* context, unsigned char* data, size_t len);	/* JHB */
+static void SHA1Update(SHA1Context* context, const unsigned char* data, size_t len);	/* JHB */
 static void SHA1Final(SHA1Context* context);
 
 
@@ -221,7 +221,7 @@ SHA1Init(SHA1Context* context)
 /* Run your data through this. */
 
 static void
-SHA1Update(SHA1Context* context, unsigned char* data, size_t len)	/* JHB */
+SHA1Update(SHA1Context* context, const unsigned char* data, size_t len)	/* JHB */
 {
   u32 i, j;	/* JHB */
 
@@ -257,9 +257,9 @@ SHA1Final(SHA1Context* context)
     finalcount[i] = (unsigned char)((context->count[(i >= 4 ? 0 : 1)]
                                      >> ((3-(i & 3)) * 8) ) & 255);  /* Endian independent */
   }
-  SHA1Update(context, (unsigned char*)"\200", 1);
+  SHA1Update(context, (const unsigned char*)"\200", 1);
   while ((context->count[0] & 504) != 448) {
-    SHA1Update(context, (unsigned char*)"\0", 1);
+    SHA1Update(context, (const unsigned char*)"\0", 1);
   }
   SHA1Update(context, finalcount, 8);  /* Should cause a SHA1Transform() */
   for (i = 0; i < SHA1_DIGEST_LENGTH; i++) {
@@ -294,7 +294,7 @@ librdf_digest_sha1_register_factory(librdf_digest_factory *factory)
   factory->digest_length = SHA1_DIGEST_LENGTH;
 
   factory->init  = (void (*)(void *))SHA1Init;
-  factory->update = (void (*)(void *, unsigned char*, size_t))SHA1Update;
+  factory->update = (void (*)(void *, const unsigned char*, size_t))SHA1Update;
   factory->final = (void (*)(void *))SHA1Final;
   factory->get_digest  = (unsigned char *(*)(void *))librdf_digest_sha1_get_digest;
 }

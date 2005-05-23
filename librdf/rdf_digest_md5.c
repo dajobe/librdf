@@ -72,7 +72,7 @@ struct MD5Context {
 
 static void MD5Init(struct MD5Context *context);
 static void MD5Update(struct MD5Context *context, 
-                      unsigned char const *buf,
+                      const unsigned char const *buf,
                       unsigned len);
 static void MD5Final(struct MD5Context *context);
 static void MD5Transform (u32 buf[4], u32 const in[16]);
@@ -123,7 +123,7 @@ static void MD5Init(struct MD5Context *ctx)
  * of bytes.
  */
 static void MD5Update(struct MD5Context *ctx,
-                      unsigned char const *buf,
+                      const unsigned char* buf,
                       unsigned len)
 {
   u32 t;
@@ -333,7 +333,7 @@ librdf_digest_md5_register_factory(librdf_digest_factory *factory)
   factory->digest_length = 16;
 
   factory->init  = (void (*)(void *))MD5Init;
-  factory->update = (void (*)(void *, unsigned char*, size_t))MD5Update;
+  factory->update = (void (*)(void *, const unsigned char*, size_t))MD5Update;
   factory->final = (void (*)(void *))MD5Final;
   factory->get_digest  = (unsigned char *(*)(void *))librdf_digest_md5_get_digest;
 }
