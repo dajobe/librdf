@@ -117,7 +117,7 @@ typedef struct {
 } SHA1Context;
 
 
-static void SHA1Transform(u32 state[5], unsigned char buffer[64]);
+static void SHA1Transform(u32 state[5], const unsigned char buffer[64]);
 static void SHA1Init(SHA1Context* context);
 static void SHA1Update(SHA1Context* context, const unsigned char* data, size_t len);	/* JHB */
 static void SHA1Final(SHA1Context* context);
@@ -148,7 +148,7 @@ static void SHA1Final(SHA1Context* context);
 /* Hash a single 512-bit block. This is the core of the algorithm. */
 
 static void
-SHA1Transform(u32 state[5], unsigned char buffer[64])
+SHA1Transform(u32 state[5], const unsigned char buffer[64])
 {
   u32 a, b, c, d, e;
   typedef union {
