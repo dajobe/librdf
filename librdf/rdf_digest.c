@@ -249,7 +249,8 @@ librdf_digest_init(librdf_digest* digest)
  * 
  **/
 void
-librdf_digest_update(librdf_digest* digest, unsigned char *buf, size_t length) 
+librdf_digest_update(librdf_digest* digest, 
+                     const unsigned char *buf, size_t length) 
 {
   digest->factory->update(digest->context, buf, length);
 }
@@ -278,13 +279,27 @@ librdf_digest_final(librdf_digest* digest)
  * @digest: the digest
  * 
  * Return value: pointer to the memory containing the digest.  It will
- * be digest_factory->digest_length bytes in length.
+ * be &librdf_digest_get_digest_length bytes in length.
  *
  **/
 void*
 librdf_digest_get_digest(librdf_digest* digest)
 {
   return digest->digest;
+}
+
+
+/**
+ * librdf_digest_get_digest - Get length of the calculated digested
+ * @digest: the digest
+ * 
+ * Return value: size of the digest in bytes
+ *
+ **/
+size_t
+librdf_digest_get_digest_length(librdf_digest* digest)
+{
+  return digest->digest_length;
 }
 
 
