@@ -1,5 +1,14 @@
 2005-05-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* rdf_hash.c: docs
+
+	* rdf_uri.c (librdf_uri_get_digest): No need to call
+	librdf_digest_init as the constructor does that.
+
+	* rdf_digest.c: Docs.
+	(librdf_new_digest_from_factory): Call init factory method here.
+	(librdf_digest_init): Note this is a re-init.
+
 	* rdf_digest.c (librdf_digest_update_string): Added.
 
 	* rdf_digest.h: Added prototype for librdf_digest_update_string
