@@ -109,6 +109,7 @@ REDLAND_API void librdf_free_digest(librdf_digest *digest);
 /* methods */
 REDLAND_API void librdf_digest_init(librdf_digest* digest);
 REDLAND_API void librdf_digest_update(librdf_digest* digest, const unsigned char *buf, size_t length);
+REDLAND_API void librdf_digest_update_string(librdf_digest* digest, const unsigned char *string);
 REDLAND_API void librdf_digest_final(librdf_digest* digest);
 REDLAND_API void* librdf_digest_get_digest(librdf_digest* digest);
 REDLAND_API size_t librdf_digest_get_digest_length(librdf_digest* digest);
