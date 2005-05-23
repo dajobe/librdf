@@ -50,7 +50,7 @@ struct librdf_digest_factory_s
 
   /* functions (over context) */
   void (*init)( void *_context );
-  void (*update)( void *_context, unsigned char *buf, size_t nbytes );
+  void (*update)( void *_context, const unsigned char *buf, size_t nbytes );
   void (*final)( void *_context );
   unsigned char *(*get_digest)( void *_context );
 };
@@ -88,18 +88,19 @@ void librdf_digest_sha1_constructor(librdf_world *world);
 void librdf_digest_rmd160_constructor(librdf_world *world);
 #endif
 
+/* factory static methods */
+void librdf_digest_register_factory(librdf_world *world, const char *name, void (*factory) (librdf_digest_factory*));
+
+librdf_digest_factory* librdf_get_digest_factory(librdf_world *world, const char *name);
+
+/* constructor */
+librdf_digest* librdf_new_digest_from_factory(librdf_world *world, librdf_digest_factory *factory);
+
 #endif
 
 
-/* factory static methods */
-REDLAND_API void librdf_digest_register_factory(librdf_world *world, const char *name, void (*factory) (librdf_digest_factory*));
-
-REDLAND_API librdf_digest_factory* librdf_get_digest_factory(librdf_world *world, const char *name);
-
-
-/* constructor */
+/* public constructor */
 REDLAND_API librdf_digest* librdf_new_digest(librdf_world *world, char *name);
-REDLAND_API librdf_digest* librdf_new_digest_from_factory(librdf_world *world, librdf_digest_factory *factory);
 
 /* destructor */
 REDLAND_API void librdf_free_digest(librdf_digest *digest);
@@ -107,9 +108,10 @@ REDLAND_API void librdf_free_digest(librdf_digest *digest);
 
 /* methods */
 REDLAND_API void librdf_digest_init(librdf_digest* digest);
-REDLAND_API void librdf_digest_update(librdf_digest* digest, unsigned char *buf, size_t length);
+REDLAND_API void librdf_digest_update(librdf_digest* digest, const unsigned char *buf, size_t length);
 REDLAND_API void librdf_digest_final(librdf_digest* digest);
 REDLAND_API void* librdf_digest_get_digest(librdf_digest* digest);
+REDLAND_API size_t librdf_digest_get_digest_length(librdf_digest* digest);
 
 REDLAND_API char* librdf_digest_to_string(librdf_digest* digest);
 REDLAND_API void librdf_digest_print(librdf_digest* digest, FILE* fh);
