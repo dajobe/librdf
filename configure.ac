@@ -187,9 +187,11 @@ if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_
   bdb_include_dir="/usr/include"
 
   extraprefix=
-  # OSX fink
+  # OSX fink area added if found and /sw/bin is in the PATH
   if test -d /sw/include -a -d /sw/lib ; then
-    extraprefix=/sw
+    if echo $PATH |grep /sw/bin >/dev/null; then
+      extraprefix=/sw
+    fi
   fi
 
   # Sigh!  And this still might not be good enough.
