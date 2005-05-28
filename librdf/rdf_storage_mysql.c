@@ -2257,3 +2257,8 @@ librdf_init_storage_mysql(librdf_world *world)
   librdf_storage_register_factory(world, "mysql", "MySQL database store",
                                   &librdf_storage_mysql_register_factory);
 }
+
+
+#ifdef NEED_MYSQL_ERRBUFF
+char **errbuff=NULL;
+#endif
