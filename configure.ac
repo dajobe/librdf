@@ -706,18 +706,6 @@ if test "X$MYSQL_CONFIG" != X; then
     storages_available="$storages_available mysql($LIBMYSQL_VERSION)"
     mysql_storage_available=yes
   fi
-
-  AC_MSG_CHECKING(if need to define mysql errbuff common symbol)
-  mysql_need_errbuff=no
-  if echo "X$lt_prog_compiler_pic" | grep 'X.*-fno-common' >/dev/null; then
-    mysql_need_errbuff=yes
-  fi
-
-  if test $mysql_need_errbuff = yes; then
-    AC_DEFINE(NEED_MYSQL_ERRBUFF, 1, [Need to define external mysql errbuff])
-  fi
-  AC_MSG_RESULT($mysql_need_errbuff)
-
   LIBS="$LIBRDF_LIBS"
   CPPFLAGS="$LIBRDF_CPPFLAGS"
 fi
