@@ -8,9 +8,22 @@
 
   <h1>Redland RDF Application Framework - News</h1>
 
-<h2>2005-??-?? Version 1.0.1 Released</h2>
+<h2>2005-05-29 Version 1.0.1 Released</h2>
 
-<p>Not yet released.
+<p>Updated to use <a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.9
+to provide improved SPARQL query support for the revised syntax
+(<a href="http://librdf.org/rasqal/RELEASE.html#rel0_9_9">release notes</a>)
+<br />
+Updated to use <a href="http://librdf.org/raptor/">Raptor</a> 1.4.6 to
+provide a new GRDDL parser as well as updated RSS enclosures support
+(<a href="http://librdf.org/raptor/RELEASE.html#rel1_4_6">relase notes</a>)
+<br />
+MySQL store has changed key algorithm: <strong>NOTE</strong>: may require a store save and reload<br />
+SQLite store now returns correct query results<br />
+Digest and Hash classes are now public and available to bindings<br />
+Empty iterators and streams now always return an object<br />
+Win32 portability fixes and build configuration (John Barstow)<br />
+Several other API additions were made.
 </p>
 
 <p>See the <a href="RELEASE.html#rel1_0_1">1.0.1 Release Notes</a>
