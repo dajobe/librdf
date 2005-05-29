@@ -1,3 +1,7 @@
+2005-05-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Snapshotted redland_1_0_1 for 1.0.1 release
+
 2005-05-28  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_storage_mysql.c: Define mysql common symbol errbuff
