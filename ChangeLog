@@ -1,5 +1,7 @@
 2005-05-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* configure.ac, librdf/win32_rdf_config.h: Bumped version to 1.0.2
+
 	* Snapshotted redland_1_0_1 for 1.0.1 release
 
 	* librdf/rdf_storage_mysql.c: remove errbuff
@@ -16,6 +18,53 @@
 
 	* configure.ac: Only look for BDB in /sw (fink) if /sw/bin is in
 	the path.
+
+2005-05-25  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_xslt.c: docs
+
+2005-05-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/roqet.c: Removed deprecated flags -f and -o
+
+	* rasqal/rasqal_expr.c (rasqal_triple_set_flags,
+	rasqal_triple_get_flags): Removed deprecated functions.
+
+	* rasqal/rasqal_engine.c (rasqal_new_triples_match): Removed
+	rasqal_triples_source deprecated factory method new_triples_match.
+
+	* rasqal/rasqal_query.c:
+	(rasqal_new_query, rasqal_free_query,
+	rasqal_query_add_data_graph): Removed rasqal_query deprecated list
+	sources.
+	(rasqal_query_add_source, rasqal_query_get_source_sequence,
+	rasqal_query_get_source, rasqal_query_add_constraint,
+	rasqal_query_get_constraint_sequence,
+	rasqal_query_get_constraint): Removed deprecated functions.
+
+	* rasqal/rasqal_internal.h: Removed rasqal_query deprecated list
+	sources.
+
+	* rasqal/rasqal.h: Removed deprecated functions:
+	rasqal_query_add_source, rasqal_query_get_source_sequence,
+	rasqal_query_get_source, rasqal_query_add_constraint,
+	rasqal_query_get_constraint_sequence, rasqal_query_get_constraint,
+	rasqal_triple_set_flags and rasqal_triple_get_flags.  Removed
+	rasqal_triples_source deprecated factory method new_triples_match
+
+	* rasqal/rasqal_engine.c (rasqal_set_triples_source_factory): Does
+	not need RASQAL_API in the C
+
+	* rasqal/rasqal_engine.c (rasqal_reset_triple_meta): Removed code
+	that will never be called, freeing triples_match field for the
+	second time
+
+	* rasqal/rasqal_engine.c (rasqal_engine_expand_wildcards): Added,
+	containing code from rasqal_engine_assign_variables to handle
+	wildcard *.  Handle remaining query verbs.
+	(rasqal_engine_assign_variables): Moved wildcard handling code
+	above.
+	(rasqal_engine_prepare): Call rasqal_engine_expand_wildcards.
 
 2005-05-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
@@ -83,6 +132,11 @@
 
 	* librdf/win32/README.txt: Add win32 README.txt
 
+2005-05-22  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/configure.ac: Test for libxslt/xslt.h as well as library,
+	and disable if missing.
+
 2005-05-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/Makefile.am, librdf/rdf_internal.h, librdf/librdf.h:
@@ -139,6 +193,11 @@
 	just before writing files.
 
 2005-05-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/win32_rasqal_config.h, rasqal/configure.ac:
+	Bumped version to 0.9.10
+
+	* Snapshotted rasqal_0_9_9 for 0.9.9 release
 
 	* rasqal/rasqal_engine.c (rasqal_new_triples_match): Restore but
 	deprecate rasqal_triples_source factory method new_triples_match
