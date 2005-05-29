@@ -30,21 +30,18 @@ redland parser API</li>
 <li>RFE: The parser should be able to adjust error and warning
 actions, stopping immediately or ignoring them by features. Document
 the defaults.</li>
-<li>RFE: Add node.as_sha1 easy digest methods for literal nodes</li>
-<li>RFE: return serialized models to syntax as strings</li>
 <li>RFE: model.parseString(format, "string"), model.parseURI(format, URI, baseURI=URI) creating and destroying temporary parser objects for <em>format</em>.
 Means no need to care about parser class if you just want simple things.  Similarly
 for model.serialize() and Serializer class, however take care with serialise() method.  Better as model.load(), model.save() or write()?</li>
 <li>Update the RDF/RDFS terms/labels for the latest RDF Schema revision</li>
-<li>in-memory storage uses more memory than needed</li>
-<li>defensive code - check object types are correct by adding magic fields to start of all objects</li>
+<li>In-memory storage uses more memory than needed</li>
+<li>Defensive code - check object types are correct by adding magic fields to start of all objects</li>
 <li>Consider an AVL-tree in-memory store (<a href="http://www.msu.edu/user/pfaffben/avl/">libavl</a>)</li>
 <li>Docs: note that compiling redland may also build raptor and rasqal, if they are needed</li>
 <li>Document the storage constructor hash options under the main class</li>
 <li>RFE: make add_statement method on model take URIs</li>
 <li>Add arcs_in/arcs_out model methods</li>
 <li>Add container class for manipulating RDF containers - Seq, Bag, Alt, ...</li>
-<li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build</li>
 <li>If LGPL/Apache license, include compatible code OR add separate package?</li>
 <li>Write a C++ interface</li>
 <li>Provide any necessary support for RDF Schema (fast rdf:type lookups)</li>
@@ -69,6 +66,9 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build (1.0.1 - third party)</li>
+<li>RFE: Add node.as_sha1 easy digest methods for literal nodes (1.0.1)</li>
+<li>RFE: return serialized models to syntax as strings (1.0.0)</li>
 <li>Removed the useless parser error/warning callbacks with a proper
 logging API that can be accessed by the application to and dealt with
 as desired. (0.9.17)</li>
