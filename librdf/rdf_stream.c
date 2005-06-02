@@ -120,7 +120,8 @@ librdf_stream_free_stream_map(void *list_data, void *user_data)
 void
 librdf_free_stream(librdf_stream* stream) 
 {
-  stream->finished_method(stream->context);
+  if(stream->finished_method)
+    stream->finished_method(stream->context);
 
   if(stream->map_list) {
     librdf_list_foreach(stream->map_list,
