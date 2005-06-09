@@ -1,4 +1,11 @@
+2005-06-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_stream.c (librdf_free_stream): Only call finished_method if
+	it exists.  This likely caused crashes with empty iterators
+
 2005-05-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* win32_rdf_config.h: Bumped version to 1.0.2
 
 	* rdf_storage_mysql.c: remove errbuff
 
