@@ -1,3 +1,7 @@
+2005-06-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Snapshotted redland_1_0_2 for 1.0.2 release
+
 2005-06-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* configure.ac: raptor min 1.4.4 (same as rasqal) rasqal min
