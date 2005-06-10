@@ -1,6 +1,10 @@
 2005-06-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
+	* librdf/win32_rdf_config.h, configure.ac: Bumped version to 1.0.3
+
 	* Snapshotted redland_1_0_2 for 1.0.2 release
+
+	* raptor/raptor_rss.c: Added Suzan Foster to copyright
 
 2005-06-09  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
