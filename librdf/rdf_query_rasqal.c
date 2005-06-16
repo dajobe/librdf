@@ -962,7 +962,7 @@ librdf_query_rasqal_query_results_get_statement(void* context, int flags) {
     default:
       librdf_log(scontext->query->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 

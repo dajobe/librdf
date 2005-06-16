@@ -174,7 +174,7 @@ librdf_storage_register_factory(librdf_world* world,
       LIBRDF_FREE(librdf_storage, storage);
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "storage %s already registered\n", h->name);
+                 "storage %s already registered", h->name);
       return;
     }
   }
@@ -364,8 +364,9 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
 
   if(!old_storage->factory->clone) {
     librdf_log(old_storage->world,
-                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "clone method not implemented for storage factory %s", old_storage->factory->name);
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "clone method not implemented for storage factory %s", 
+               old_storage->factory->name);
     return NULL;
   }
 
@@ -779,7 +780,7 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
         default: /* error */
           librdf_log(statement->world,
                      0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "Unknown statement part %d\n", context->want);
+                     "Unknown statement part %d", context->want);
           node=NULL;
       }
       break;
@@ -791,7 +792,7 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
     default:
       librdf_log(statement->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       node=NULL;
   }
   
@@ -878,7 +879,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
       librdf_free_statement(partial_statement);
       librdf_log(storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Illegal statement part %d seen\n", want);
+                 "Illegal statement part %d seen", want);
       return NULL;
   }
   

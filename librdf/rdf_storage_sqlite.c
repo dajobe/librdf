@@ -597,7 +597,7 @@ librdf_storage_sqlite_node_helper(librdf_storage* storage,
     default:
       librdf_log(node->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Do not know how to store node type %d\n", node->type);
+                 "Do not know how to store node type %d", node->type);
     return 1;
   }
 
@@ -1316,7 +1316,7 @@ librdf_storage_sqlite_serialise_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 }
@@ -1566,7 +1566,7 @@ librdf_storage_sqlite_find_statements_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 }
@@ -1909,7 +1909,7 @@ librdf_storage_sqlite_context_serialise_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 }
@@ -2131,7 +2131,7 @@ librdf_storage_sqlite_get_contexts_get_method(void* iterator, int flags)
     default:
       librdf_log(icontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       result=NULL;
       break;
   }

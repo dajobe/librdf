@@ -563,7 +563,7 @@ librdf_hash_memory_cursor_get(void* context,
     default:
       librdf_log(cursor->hash->hash->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
-                 "Unknown hash method flag %d\n", flags);
+                 "Unknown hash method flag %d", flags);
       return 1;
   }
   
@@ -631,7 +631,7 @@ librdf_hash_memory_cursor_get(void* context,
     default:
       librdf_log(cursor->hash->hash->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
-                 "Unknown hash method flag %d\n", flags);
+                 "Unknown hash method flag %d", flags);
       return 1;
   }
   

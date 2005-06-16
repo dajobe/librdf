@@ -894,7 +894,7 @@ librdf_storage_hashes_serialise_get_statement(void* context, int flags)
       default:
         librdf_log(scontext->iterator->world,
                    0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "Unimplemented flags %d seen\n", flags);
+                   "Unimplemented flags %d seen", flags);
         return NULL;
     }
   }
@@ -946,7 +946,7 @@ librdf_storage_hashes_serialise_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unimplemented flags %d seen\n", flags);
+                 "Unimplemented flags %d seen", flags);
       return NULL;
   }
 }
@@ -1095,7 +1095,7 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
   if(flags != LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT) {
     librdf_log(context->iterator->world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Unimplemented iterator method %d\n", flags);
+               "Unimplemented iterator method %d", flags);
     return NULL;
   }
 
@@ -1127,7 +1127,7 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
     default: /* error */
       librdf_log(context->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Illegal statement part %d seen\n", context->want);
+                 "Illegal statement part %d seen", context->want);
       return NULL;
   }
 
@@ -1168,7 +1168,7 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
     default: /* error */
       librdf_log(context->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Illegal statement part %d seen\n", context->want);
+                 "Illegal statement part %d seen", context->want);
       return NULL;
   }
   
@@ -1282,7 +1282,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
       LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
       librdf_log(storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Illegal statement part %d seen\n", want);
+                 "Illegal statement part %d seen", want);
       return NULL;
   }
 
@@ -1399,7 +1399,8 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
 
   size=librdf_node_encode(context_node, NULL, 0);
   key.data=(char*)LIBRDF_MALLOC(cstring, size);
-  key.size=librdf_node_encode(context_node, (unsigned char*)key.data, size);
+  key.size=librdf_node_encode(context_node, 
+                               (unsigned char*)key.data, size);
 
   size=librdf_statement_encode(statement, NULL, 0);
 
@@ -1443,7 +1444,8 @@ librdf_storage_hashes_context_remove_statement(librdf_storage* storage,
   
   size=librdf_node_encode(context_node, NULL, 0);
   key.data=(char*)LIBRDF_MALLOC(cstring, size);
-  key.size=librdf_node_encode(context_node, (unsigned char*)key.data, size);
+  key.size=librdf_node_encode(context_node,
+                               (unsigned char*)key.data, size);
 
   size=librdf_statement_encode(statement, NULL, 0);
 
@@ -1608,7 +1610,7 @@ librdf_storage_hashes_context_serialise_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unimplemented flags %d seen\n", flags);
+                 "Unimplemented flags %d seen", flags);
       return NULL;
   }
 
@@ -1714,7 +1716,7 @@ librdf_storage_hashes_get_contexts_get_method(void* iterator, int flags)
     default:
       librdf_log(icontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       result=NULL;
       break;
   }

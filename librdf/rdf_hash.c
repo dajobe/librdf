@@ -761,7 +761,7 @@ librdf_hash_get_all_iterator_get_method(void* iterator, int flags)
     default:
       librdf_log(context->hash->world, 
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       result=NULL;
       break;
   }

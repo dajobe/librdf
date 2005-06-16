@@ -865,7 +865,8 @@ librdf_storage_mysql_node_hash(librdf_storage* storage,
       if(mysql_real_query(handle, query, strlen(query)) &&
          mysql_errno(handle) != ER_DUP_ENTRY) {
         librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "MySQL insert into Resources failed with error %s", mysql_error(handle));
+                   "MySQL insert into Resources failed with error %s",
+                   mysql_error(handle));
         LIBRDF_FREE(cstring,query);
         librdf_storage_mysql_release_handle(storage, handle);
         return 0;

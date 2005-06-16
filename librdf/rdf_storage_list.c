@@ -405,7 +405,7 @@ librdf_storage_list_serialise_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 }
@@ -513,9 +513,10 @@ librdf_storage_list_context_add_statement(librdf_storage* storage,
     return 0;
   
   /* Store (context => statement) in the context hash */
-  size=librdf_node_encode(context_node, NULL, 0);
+  size=librdf_node_encode2(storage->world, context_node, NULL, 0);
   key.data=(char*)LIBRDF_MALLOC(cstring, size);
-  key.size=librdf_node_encode(context_node, (unsigned char*)key.data, size);
+  key.size=librdf_node_encode2(storage->world, context_node,
+                               (unsigned char*)key.data, size);
 
   size=librdf_statement_encode(statement, NULL, 0);
   value.data=(char*)LIBRDF_MALLOC(cstring, size);
@@ -572,9 +573,10 @@ librdf_storage_list_context_remove_statement(librdf_storage* storage,
     return 0;
   
   /* Remove (context => statement) in the context hash */
-  size=librdf_node_encode(context_node, NULL, 0);
+  size=librdf_node_encode2(storage->world, context_node, NULL, 0);
   key.data=(char*)LIBRDF_MALLOC(cstring, size);
-  key.size=librdf_node_encode(context_node, (unsigned char*)key.data, size);
+  key.size=librdf_node_encode2(storage->world, context_node, 
+                               (unsigned char*)key.data, size);
 
   size=librdf_statement_encode(statement, NULL, 0);
   value.data=(char*)LIBRDF_MALLOC(cstring, size);
@@ -639,11 +641,12 @@ librdf_storage_list_context_serialise(librdf_storage* storage,
 
   scontext->context_node=librdf_new_node_from_node(context_node);
 
-  size=librdf_node_encode(scontext->context_node, NULL, 0);
+  size=librdf_node_encode2(storage->world, scontext->context_node, NULL, 0);
   scontext->key->data=scontext->context_node_data=(char*)LIBRDF_MALLOC(cstring, size);
-  scontext->key->size=librdf_node_encode(scontext->context_node,
-                                         (unsigned char*)scontext->key->data,
-                                         size);
+  scontext->key->size=librdf_node_encode2(storage->world,
+                                          scontext->context_node,
+                                          (unsigned char*)scontext->key->data,
+                                          size);
 
   scontext->iterator=librdf_hash_get_all(context->contexts, 
                                          scontext->key, scontext->value);
@@ -713,7 +716,7 @@ librdf_storage_list_context_serialise_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
   
@@ -810,7 +813,7 @@ librdf_storage_list_get_contexts_get_method(void* iterator, int flags)
     default:
       librdf_log(icontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       result=NULL;
       break;
   }

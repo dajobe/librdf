@@ -374,7 +374,7 @@ librdf_storage_tstore_serialise_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 }
@@ -523,7 +523,7 @@ librdf_storage_tstore_find_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 }

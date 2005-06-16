@@ -817,7 +817,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
     default:
       librdf_log(statement->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STATEMENT, NULL,
-                 "Illegal statement encoding '%c' seen\n", p[-1]);
+                 "Illegal statement encoding '%c' seen", p[-1]);
       return 0;
     }
   }

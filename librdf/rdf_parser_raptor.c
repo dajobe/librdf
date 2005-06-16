@@ -830,7 +830,7 @@ librdf_parser_raptor_serialise_get_statement(void* context, int flags)
     default:
       librdf_log(scontext->pcontext->parser->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 

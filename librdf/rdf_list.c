@@ -447,7 +447,7 @@ librdf_list_iterator_get_method(void* iterator, int flags)
 
   librdf_log(context->list->world,
              0, LIBRDF_LOG_ERROR, LIBRDF_FROM_LIST, NULL,
-             "Unsupported iterator method flag %d\n", flags);
+             "Unsupported iterator method flag %d", flags);
   return NULL;
 }
 
