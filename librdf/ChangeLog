@@ -1,3 +1,21 @@
+2005-06-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_stream.c, rdf_storage_tstore.c, rdf_storage_sqlite.c,
+	rdf_storage_mysql.c, rdf_storage_list.c, rdf_storage_hashes.c,
+	rdf_storage.c, rdf_statement.c, rdf_serializer_raptor.c,
+	rdf_query_rasqal.c, rdf_query.c, rdf_parser_raptor.c, rdf_list.c,
+	rdf_hash_memory.c, rdf_hash_bdb.c, rdf_hash.c: Remove \n from the
+	end of log messages.
+
+	* rdf_node.c (librdf_node_encode): Give an error when a node
+	cannot be encoded due to string data being too long.  Remove
+	legacy 0.9.12+ #if-defed out encoding code.  It remains in
+	librdf_node_decode.
+
+2005-06-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* win32_rdf_config.h: Bumped version to 1.0.3
+
 2005-06-02  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_stream.c (librdf_free_stream): Only call finished_method if
