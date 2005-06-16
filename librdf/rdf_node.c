@@ -1066,7 +1066,7 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
   default:
       librdf_log(node->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
-                 "Do not know how to print node type %d\n", node->type);
+                 "Do not know how to print node type %d", node->type);
     return NULL;
   }
   return s;
@@ -1140,7 +1140,8 @@ librdf_node_get_digest(librdf_node* node)
     default:
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
-                 "Do not know how to make digest for node type %d\n", node->type);
+                 "Do not know how to make digest for node type %d",
+                 node->type);
       return NULL;
   }
   
@@ -1182,6 +1183,9 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
  * size.  If buffer is NULL, no work is done but the size of buffer
  * required is returned.
  * 
+ * If the node cannot be encoded due to restrictions of the encoding
+ * format, a redland error is generated
+ *
  * Return value: the number of bytes written or 0 on failure.
  **/
 size_t
@@ -1204,7 +1208,15 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       
       if(length && total_length > length)
         return 0;    
-      
+
+      if(string_length > 0xFFFF) {
+          librdf_log(node->world,
+                     0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                     "Cannot encode a URI string of %d bytes length",
+                     string_length);
+        return 0;
+      }
+
       if(buffer) {
         buffer[0]='R';
         buffer[1]=(string_length & 0xff00) >> 8;
@@ -1214,34 +1226,6 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       break;
       
     case LIBRDF_NODE_TYPE_LITERAL:
-#if 0
-      /* old encoding before 0.9.12 */
-      string=(unsigned char*)node->value.literal.string;
-      string_length=node->value.literal.string_len;
-      if(node->value.literal.xml_language)
-        language_length=strlen(node->value.literal.xml_language);
-      
-      total_length= 6 + string_length + 1; /* +1 for \0 at end */
-      if(language_length)
-        total_length += language_length+1;
-      
-      if(length && total_length > length)
-        return 0;    
-      
-      if(buffer) {
-        buffer[0]='L';
-        buffer[1]=(node->value.literal.is_wf_xml & 0xf) << 8;
-        buffer[2]=(string_length & 0xff00) >> 8;
-        buffer[3]=(string_length & 0x00ff);
-        buffer[4]='\0'; /* unused */
-        buffer[5]=(language_length & 0x00ff);
-        strcpy((char*)buffer+6, (const char*)string);
-        if(language_length)
-          strcpy((char*)buffer+string_length+7, (const char*)node->value.literal.xml_language);
-      }
-      break;
-      
-#endif
       string=(unsigned char*)node->value.literal.string;
       string_length=node->value.literal.string_len;
       if(node->value.literal.xml_language)
@@ -1258,6 +1242,31 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       
       if(length && total_length > length)
         return 0;    
+
+      if(string_length > 0xFFFF) {
+        librdf_log(node->world,
+                   0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                   "Cannot encode a literal string of %d bytes length",
+                   string_length);
+        return 0;
+      }
+
+      if(datatype_uri_length > 0xFFFF) {
+        librdf_log(node->world,
+                   0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                   "Cannot encode a datatype URI string of %d bytes length",
+                   datatype_uri_length);
+        return 0;
+      }
+
+      if(language_length > 0xFF) {
+        librdf_log(node->world,
+                   0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                   "Cannot encode a language string of %d bytes length",
+                   language_length);
+        return 0;
+      }
+
       
       if(buffer) {
         buffer[0]='M';
@@ -1287,6 +1296,14 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       if(length && total_length > length)
         return 0;    
       
+      if(string_length > 0xFFFF) {
+        librdf_log(node->world,
+                   0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
+                   "Cannot encode a blank node identifier string of %d bytes length",
+                   string_length);
+        return 0;
+      }
+
       if(buffer) {
         buffer[0]='B';
         buffer[1]=(string_length & 0xff00) >> 8;
@@ -1299,7 +1316,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
     default:
       librdf_log(node->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
-                 "Do not know how to encode node type %d\n", node->type);
+                 "Do not know how to encode node type %d", node->type);
       return 0;
   }
   
@@ -1424,7 +1441,7 @@ librdf_node_decode(librdf_world *world,
   default:
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
-                 "Illegal node encoding '%c' seen\n", buffer[0]);
+                 "Illegal node encoding '%c' seen", buffer[0]);
     return NULL;
   }
   
@@ -1490,7 +1507,7 @@ librdf_node_static_iterator_get_method(void* iterator, int flags)
     default:
       librdf_log(context->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
-                 "Unknown iterator method flag %d\n", flags);
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 }
