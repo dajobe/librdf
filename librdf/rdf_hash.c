@@ -1073,9 +1073,9 @@ librdf_hash_print(librdf_hash* hash, FILE *fh)
     v=(librdf_hash_datum *)librdf_iterator_get_value(iterator);
     
     fputs("  '", fh);
-    fwrite(k->data, k->size, 1, fh);
+    (void)fwrite(k->data, k->size, 1, fh);
     fputs("'=>'", fh);
-    fwrite(v->data, v->size, 1, fh);
+    (void)fwrite(v->data, v->size, 1, fh);
     fputs("'\n", fh);
 
     librdf_iterator_next(iterator);
@@ -1110,7 +1110,7 @@ librdf_hash_print_keys(librdf_hash* hash, FILE *fh)
     librdf_hash_datum *k=(librdf_hash_datum *)librdf_iterator_get_key(iterator);
 
     fputs("  '", fh);
-    fwrite(k->data, k->size, 1, fh);
+    (void)fwrite(k->data, k->size, 1, fh);
     fputs("'\n", fh);
 
     librdf_iterator_next(iterator);
@@ -1156,7 +1156,7 @@ librdf_hash_print_values(librdf_hash* hash, char *key_string, FILE *fh)
       fputs(", ", fh);
       
     fputc('\'', fh);
-    fwrite(v->data, v->size, 1, fh);
+    (void)fwrite(v->data, v->size, 1, fh);
     fputc('\'', fh);
     first=0;
     librdf_iterator_next(iterator);
