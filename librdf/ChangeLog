@@ -1,3 +1,12 @@
+2005-06-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_hash.c: Ignore fwrite return values (gcc4 warning).  It's
+	not like anyone ever checks fprintf, fputs either...
+
+	* rdf_storage_list.c: remove librdf_node_encode2
+
+	* redland.spec.in: License not Copyright header
+
 2005-06-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_stream.c, rdf_storage_tstore.c, rdf_storage_sqlite.c,
