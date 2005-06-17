@@ -1,3 +1,188 @@
+2005-06-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/check-sparql: updated messages
+
+	* rasqal/tests/sparql/regex/Makefile.am: 1 failure
+
+	* rasqal/tests/sparql/ExprEquals/Makefile.am: 4 failures.  Add
+	explicit count.
+
+	* rasqal/tests/sparql/ExprBuiltins/Makefile.am: 4 failures
+
+	* rasqal/tests/sparql/Expr2/Makefile.am: 6 failures.  Add explict
+	count.
+
+	* rasqal/tests/sparql/Expr1/Makefile.am: 2 failures.  Add explict
+	count.
+
+	* rasqal/tests/sparql/ExprBuiltins/Makefile.am: manifest.ttl
+
+	* rasqal/configure.ac: Add tests/sparql regex, Expr1, Expr2,
+	ExprBuiltins, ExprEquals dirs
+
+	* rasqal/tests/sparql/ExprEquals/data-eq.ttl,
+	rasqal/tests/sparql/ExprEquals/manifest.n3,
+	rasqal/tests/sparql/ExprEquals/query-eq-1.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-2.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-3.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-4.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-5.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq2-1.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq2-2.rq,
+	rasqal/tests/sparql/ExprEquals/result-eq-1.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq-2.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq-3.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq-4.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq-5.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq2-1.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq2-2.ttl,
+	rasqal/tests/sparql/regex/Makefile.am,
+	rasqal/tests/sparql/regex/manifest.n3,
+	rasqal/tests/sparql/regex/regex-data-01.n3,
+	rasqal/tests/sparql/regex/regex-query-001.rq,
+	rasqal/tests/sparql/regex/regex-query-002.rq,
+	rasqal/tests/sparql/regex/regex-query-003.rq,
+	rasqal/tests/sparql/regex/regex-query-004.rq,
+	rasqal/tests/sparql/regex/regex-result-001.n3,
+	rasqal/tests/sparql/regex/regex-result-002.n3,
+	rasqal/tests/sparql/regex/regex-result-003.n3,
+	rasqal/tests/sparql/regex/regex-result-004.n3,
+	rasqal/tests/sparql/Expr2/data-1.ttl,
+	rasqal/tests/sparql/Expr2/data-2.ttl,
+	rasqal/tests/sparql/Expr2/manifest.n3,
+	rasqal/tests/sparql/Expr2/query-bev-1.rq,
+	rasqal/tests/sparql/Expr2/query-bev-2.rq,
+	rasqal/tests/sparql/Expr2/query-bev-3.rq,
+	rasqal/tests/sparql/Expr2/query-bev-4.rq,
+	rasqal/tests/sparql/Expr2/query-bev-5.rq,
+	rasqal/tests/sparql/Expr2/query-bev-6.rq,
+	rasqal/tests/sparql/Expr2/result-bev-1.ttl,
+	rasqal/tests/sparql/Expr2/result-bev-2.ttl,
+	rasqal/tests/sparql/Expr2/result-bev-3.ttl,
+	rasqal/tests/sparql/Expr2/result-bev-4.ttl,
+	rasqal/tests/sparql/Expr2/result-bev-5.ttl,
+	rasqal/tests/sparql/Expr2/result-bev-6.ttl,
+	rasqal/tests/sparql/ExprBuiltins/Makefile.am,
+	rasqal/tests/sparql/ExprBuiltins/data-builtin-1.ttl,
+	rasqal/tests/sparql/ExprBuiltins/manifest.ttl,
+	rasqal/tests/sparql/ExprBuiltins/q-blank-1.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-datatype-1.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-str-1.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-str-2.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-str-3.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-str-4.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-uri-1.rq,
+	rasqal/tests/sparql/ExprBuiltins/result-blank-1.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-datatype-1.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-str-1.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-str-2.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-str-3.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-str-4.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-uri-1.ttl,
+	rasqal/tests/sparql/ExprEquals/Makefile.am,
+	rasqal/tests/sparql/Expr1/Makefile.am,
+	rasqal/tests/sparql/Expr1/data-1.ttl,
+	rasqal/tests/sparql/Expr1/expr-1-result.ttl,
+	rasqal/tests/sparql/Expr1/expr-1.rq,
+	rasqal/tests/sparql/Expr1/expr-2-result.ttl,
+	rasqal/tests/sparql/Expr1/expr-2.rq,
+	rasqal/tests/sparql/Expr1/expr-3-result.ttl,
+	rasqal/tests/sparql/Expr1/expr-3.rq,
+	rasqal/tests/sparql/Expr1/manifest.n3,
+	rasqal/tests/sparql/Expr2/Makefile.am,
+	rasqal/tests/sparql/Makefile.am: Import Expr1 Expr2 ExprBuiltins
+	ExprEquals regex from DAWG tests
+
+2005-06-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c (rasqal_select_NULL_last_compare): Added
+	helper for removing duplicate select variables.
+	(rasqal_engine_assign_variables): Look for duplicate select
+	variables, warn about them and remove them by sorting and then
+	deleting NULL variables.
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Added select-dup.rq
+
+	* rasqal/tests/sparql/syntax/select-dup.rq: Test for duplicates in
+	select
+
+2005-06-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/examples/Makefile.am:
+	sparql-query-example-Testing-Values-isBlank now works
+
+	* rasqal/tests/sparql/survey/Makefile.am: survey-2 now works.
+
+	* rasqal/rasqal_query.c (rasqal_query_prepare): Call
+	rasqal_engine_merge_basic_graph_patterns
+
+	* rasqal/rasqal_engine.c
+	(rasqal_engine_join_basic_graph_patterns): Move the triples and
+	constraints from a source to a destination graph pattern.
+	(rasqal_engine_make_basic_graph_pattern): Use
+	rasqal_engine_join_basic_graph_patterns to merge: 1) a group of
+	all basic graph patterns 2) an optional group of all basic graph
+	patterns 3) a graph pattern with 1 sub-graph pattern Have to play
+	some games with graph pattern operators.
+	(rasqal_engine_merge_basic_graph_patterns): Use
+	rasqal_engine_join_basic_graph_patterns to merge all basic graph
+	patterns in a group into group of a single basic graph pattern of
+	all the triples and constraints.
+
+	* rasqal/rasqal_internal.h: Added prototypes for
+	rasqal_engine_join_basic_graph_patterns and
+	rasqal_engine_merge_basic_graph_patterns
+
+	* rasqal/rasqal_query.c (rasqal_query_execute): For ordering
+	results, directly use rasqal_engine_get_next_result to avoid doing
+	limit and offset checks too early.  Start off from result_count 1.
+	(rasqal_query_results_next): For ordered results, handle limit and
+	offset with a loop and a check with
+	rasqal_engine_check_limit_offset.  For streaming results, move
+	check code to rasqal_engine_check_limit_offset and use it.
+	(rasqal_query_results_get_bindings,
+	rasqal_query_results_get_binding_value,
+	rasqal_query_results_get_binding_value_by_name): For ordered
+	results, use result_count-1 as an index.
+
+	* rasqal/rasqal_engine.c (rasqal_engine_check_limit_offset): Added
+	to check the current query result is in the range specified by
+	limit and offset
+
+	* rasqal/rasqal_internal.h: Added prototype for
+	rasqal_engine_check_limit_offset
+
+2005-06-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/raptor_rss.c: update for INN parsedate
+
+	* raptor/configure.ac: Look for parsedate in libINN
+
+2005-06-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* raptor/Makefile.am: Add parsedate.y to EXTRA_DIST
+
+	* raptor/configure.ac: Better check for parsedate function
+
+	* raptor/raptor_rss.c: Add the time includes for AC_HEADER_TIME
+
+	* raptor/configure.ac: Add the standard AC_HEADER_TIME checks.
+
+	* raptor/raptor_rss.c: Turn rss091:date into dc:date using a date
+	parsing function PARSEDATE_FUNCTION to decode it and strftiem to
+	make the new ISO format.
+
+	* raptor/configure.ac: Get date parsing code from parsedate, curl
+	curl_getdate or raptor parsedate if neither is available.
+
+	* raptor/Makefile.am: Add parsedate.c if PARSEDATE defined Build
+	parsedate.c from parsedate.y
+
+	* raptor/parsedate.y: Fixes to build in raptor
+
+	* raptor/parsedate.y: Imported from
+	http://cvs.php.net/php-src/ext/standard/parsedate.y
+
 2005-06-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/win32_rdf_config.h, configure.ac: Bumped version to 1.0.3
@@ -114,7 +299,6 @@
 	* rasqal/configure.ac: Added tests/sparql/ValueTesting
 
 	* rasqal/tests/sparql/Makefile.am,
-	rasqal/tests/sparql/ValueTesting/.cvsignore,
 	rasqal/tests/sparql/ValueTesting/Makefile.am,
 	rasqal/tests/sparql/ValueTesting/extendedType-0.n3,
 	rasqal/tests/sparql/ValueTesting/extendedType-eq-pass-result.n3,
@@ -298,8 +482,6 @@
 
 	* rasqal/sparql_parser.y (VarOrBnodeOrURI): Added, used for
 	Predicate and allows explicit bnode or []
-
-	* rasqal/.cvsignore: Ignore COPYING
 
 	* rasqal/rasqal_graph_pattern.c (rasqal_graph_pattern_init): Add
 	init of current_graph_pattern field when there are sub-graph
@@ -1129,8 +1311,6 @@
 	* rasqal/sparql_lexer.l (VARNAME): Use NCCHARV to allow vars to
 	start with _, [0-9] too.
 
-	* rasqal/tests/sparql/SyntaxFull/.cvsignore: ignore autostuff
-
 	* raptor/win32_raptor_config.h: Added SIZEOF_UNSIGNED_SHORT
 
 2005-05-03  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
@@ -1145,7 +1325,6 @@
 	rasqal/tests/sparql/sort/result-sort-6.rdf,
 	rasqal/tests/sparql/sort/result-sort-7.rdf,
 	rasqal/tests/sparql/sort/result-sort-8.rdf,
-	rasqal/tests/sparql/sort/.cvsignore,
 	rasqal/tests/sparql/sort/Makefile.am,
 	rasqal/tests/sparql/sort/data-sort-1.ttl,
 	rasqal/tests/sparql/sort/data-sort-3.ttl,
@@ -1911,8 +2090,7 @@
 
 	* rasqal/tests/sparql/Makefile.am: Added survey dir
 
-	* rasqal/tests/sparql/survey/.cvsignore,
-	rasqal/tests/sparql/survey/Makefile.am,
+	* rasqal/tests/sparql/survey/Makefile.am,
 	rasqal/tests/sparql/survey/query-survey-1.rq,
 	rasqal/tests/sparql/survey/query-survey-10.rq,
 	rasqal/tests/sparql/survey/query-survey-11.rq,
@@ -2960,8 +3138,7 @@
 	rasqal/tests/sparql/syntax/construct2.rq: Construct with bnodes in
 	construct2.rq
 
-	* rasqal/tests/sparql/bound/.cvsignore,
-	rasqal/tests/sparql/bound/Makefile.am,
+	* rasqal/tests/sparql/bound/Makefile.am,
 	rasqal/tests/sparql/bound/bound1-result.n3,
 	rasqal/tests/sparql/bound/bound1.rq,
 	rasqal/tests/sparql/bound/data.n3,
