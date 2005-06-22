@@ -37,6 +37,9 @@
 
 #ifdef WIN32
 #include <win32_rdf_config.h>
+#include <config-win.h>
+#include <winsock.h>
+#include <assert.h>
 #endif
 
 #include <stdio.h>
