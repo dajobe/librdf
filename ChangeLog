@@ -1,3 +1,53 @@
+2005-06-22  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_mysql.c, rasqal/win32_rasqal_config.h: win32
+	fixes from John Barstow.
+
+2005-06-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_hash.c: Ignore fwrite return values (gcc4 warning).
+	It's not like anyone ever checks fprintf, fputs either...
+
+	* rasqal/sparql_lexer.l, rasqal/rdql_lexer.l: Check for sscanf
+	failure and return errors for hex, floating, \u and \U constants.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_string_to_native): Add
+	error handler and data args.  Use it if sscanf fails on converting
+	a float string.
+	(rasqal_new_string_literal): If rasqal_literal_string_to_native
+	fails, tidy up and return NULL.
+	(rasqal_literal_expand_qname): if rasqal_literal_string_to_native
+	fails, tidy up and return 1.
+
+	* rasqal/rasqal_internal.h: Update rasqal_literal_string_to_native
+	prototype to take an error handler and data.
+
+	* rasqal/rasqal_general.c (rasqal_escaped_name_to_utf8_string):
+	Check for sscanf failure with \u and \U such as \uGHIJ which isn't
+	hex.
+
+	* librdf/rdf_storage_list.c: remove librdf_node_encode2
+
+	* librdf/redland.spec.in, rasqal/rasqal.spec.in,
+	raptor/raptor.spec.in: License not Copyright header
+
+2005-06-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_list.c, librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_sqlite.c, librdf/rdf_storage_tstore.c,
+	librdf/rdf_stream.c, librdf/rdf_hash_bdb.c,
+	librdf/rdf_hash_memory.c, librdf/rdf_list.c,
+	librdf/rdf_parser_raptor.c, librdf/rdf_query.c,
+	librdf/rdf_query_rasqal.c, librdf/rdf_serializer_raptor.c,
+	librdf/rdf_statement.c, librdf/rdf_hash.c: Remove \n from the end
+	of log messages.
+
+	* librdf/rdf_node.c (librdf_node_encode): Give an error when a
+	node cannot be encoded due to string data being too long.  Remove
+	legacy 0.9.12+ #if-defed out encoding code.  It remains in
+	librdf_node_decode.
+
 2005-06-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rasqal/tests/sparql/check-sparql: updated messages
