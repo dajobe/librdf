@@ -212,9 +212,11 @@ librdf_storage_tstore_statement_from_rs_triple(librdf_world* world,
 
   if(triple->subject) {
     if(!strncmp(triple->subject, "_:",2))
-      subject_node=librdf_new_node_from_blank_identifier(world, triple->subject+2);
+      subject_node=librdf_new_node_from_blank_identifier(world, 
+                                                         (const unsigned char *)triple->subject+2);
     else
-      subject_node=librdf_new_node_from_uri_string(world, triple->subject);
+      subject_node=librdf_new_node_from_uri_string(world, 
+                                                   (const unsigned char *)triple->subject);
 
     if(!subject_node)
       return NULL;
@@ -223,7 +225,8 @@ librdf_storage_tstore_statement_from_rs_triple(librdf_world* world,
     subject_node=NULL;
   
   if(triple->predicate) {
-    predicate_node=librdf_new_node_from_uri_string(world, triple->predicate);
+    predicate_node=librdf_new_node_from_uri_string(world,
+                                                   (const unsigned char *)triple->predicate);
 
     if(!predicate_node) {
       librdf_free_node(subject_node);
@@ -234,11 +237,15 @@ librdf_storage_tstore_statement_from_rs_triple(librdf_world* world,
   
   if(triple->object) {
     if(triple->literal)
-      object_node=librdf_new_node_from_typed_literal(world, triple->object, NULL, NULL);
+      object_node=librdf_new_node_from_typed_literal(world, 
+                                                     (const unsigned char *)triple->object,
+                                                     NULL, NULL);
     else if(!strncmp(triple->object, ":", 2))
-      object_node=librdf_new_node_from_blank_identifier(world, triple->object+2);
+      object_node=librdf_new_node_from_blank_identifier(world, 
+                                                        (const unsigned char *)triple->object+2);
     else
-      object_node=librdf_new_node_from_uri_string(world, triple->object);
+      object_node=librdf_new_node_from_uri_string(world, 
+                                                  (const unsigned char *)triple->object);
 
     if(!object_node) {
       librdf_free_node(subject_node);
@@ -256,21 +263,21 @@ librdf_storage_tstore_statement_from_rs_triple(librdf_world* world,
 static rs_triple*
 librdf_storage_tstore_statement_as_rs_triple(librdf_statement *statement)
 {
-  librdf_node *subject_node=LIBRDF_NODE_STATEMENT_SUBJECT(statement);
-  librdf_node *predicate_node=LIBRDF_NODE_STATEMENT_PREDICATE(statement);
-  librdf_node *object_node=LIBRDF_NODE_STATEMENT_OBJECT(statement);
+  librdf_node *subject_node=statement->subject;
+  librdf_node *predicate_node=statement->predicate;
+  librdf_node *object_node=statement->object;
   rs_triple* triple=LIBRDF_MALLOC(rs_triple, sizeof(rs_triple));
 
   if(subject_node) {
     if(librdf_node_is_blank(subject_node))
-      triple->subject=librdf_node_get_blank_identifier(subject_node);
+      triple->subject=(char*)librdf_node_get_blank_identifier(subject_node);
     else
-      triple->subject=librdf_uri_as_string(librdf_node_get_uri(subject_node));
+      triple->subject=(char*)librdf_uri_as_string(librdf_node_get_uri(subject_node));
   } else
     triple->subject=NULL;
 
   if(predicate_node)
-    triple->predicate=librdf_uri_as_string(librdf_node_get_uri(predicate_node));
+    triple->predicate=(char*)librdf_uri_as_string(librdf_node_get_uri(predicate_node));
   else
     triple->predicate=NULL;
   
@@ -278,12 +285,12 @@ librdf_storage_tstore_statement_as_rs_triple(librdf_statement *statement)
   triple->literal = 0;
   if(object_node) {
     if(librdf_node_is_literal(object_node)) {
-      triple->object=librdf_node_get_literal_value(object_node);
+      triple->object=(char*)librdf_node_get_literal_value(object_node);
       triple->literal = 1;
     } else if(librdf_node_is_blank(object_node)) {
-      triple->object=librdf_node_get_blank_identifier(object_node);
+      triple->object=(char*)librdf_node_get_blank_identifier(object_node);
     } else {
-      triple->object=librdf_uri_as_string(librdf_node_get_uri(object_node));
+      triple->object=(char*)librdf_uri_as_string(librdf_node_get_uri(object_node));
     }
   } else
     triple->object=NULL;
@@ -372,7 +379,7 @@ librdf_storage_tstore_serialise_get_statement(void* context, int flags)
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
       return NULL;
     default:
-      librdf_log(scontext->iterator->world,
+      librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "Unknown iterator method flag %d", flags);
       return NULL;
@@ -521,7 +528,7 @@ librdf_storage_tstore_find_get_statement(void* context, int flags)
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
       return NULL;
     default:
-      librdf_log(scontext->iterator->world,
+      librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "Unknown iterator method flag %d", flags);
       return NULL;
@@ -573,9 +580,9 @@ librdf_storage_tstore_context_add_statement(librdf_storage* storage,
                                             librdf_statement* statement) 
 {
   librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context;
-  librdf_node *subject_node=LIBRDF_NODE_STATEMENT_SUBJECT(statement);
-  librdf_node *predicate_node=LIBRDF_NODE_STATEMENT_PREDICATE(statement);
-  librdf_node *object_node=LIBRDF_NODE_STATEMENT_OBJECT(statement);
+  librdf_node *subject_node=statement->subject;
+  librdf_node *predicate_node=statement->predicate;
+  librdf_node *object_node=statement->object;
   char *subject;
   char *predicate;
   char *object;
@@ -583,22 +590,22 @@ librdf_storage_tstore_context_add_statement(librdf_storage* storage,
 
   
   if(librdf_node_is_blank(subject_node)) {
-    subject=librdf_node_get_blank_identifier(subject_node);
+    subject=(char*)librdf_node_get_blank_identifier(subject_node);
   } else
-    subject=librdf_uri_as_string(librdf_node_get_uri(subject_node));
+    subject=(char*)librdf_uri_as_string(librdf_node_get_uri(subject_node));
   
 
-  predicate=librdf_uri_as_string(librdf_node_get_uri(predicate_node));
+  predicate=(char*)librdf_uri_as_string(librdf_node_get_uri(predicate_node));
   
   /* Assumptions - FIXME */
   if(librdf_node_is_literal(object_node)) {
-    object=librdf_node_get_literal_value(object_node);
+    object=(char*)librdf_node_get_literal_value(object_node);
     type = ObjLiteral;
   } else if(librdf_node_is_blank(object_node)) {
-    object=librdf_node_get_blank_identifier(object_node);
+    object=(char*)librdf_node_get_blank_identifier(object_node);
     type = ObjURI;
   } else {
-    object=librdf_uri_as_string(librdf_node_get_uri(object_node));
+    object=(char*)librdf_uri_as_string(librdf_node_get_uri(object_node));
     type = ObjURI;
   }
   
