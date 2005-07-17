@@ -1,3 +1,412 @@
+2005-07-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_storage_tstore.c: Unbreak 3store backend from not
+	compiling.
+
+2005-07-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_parser.y: Update to rq23 CVS 1.423 2005/07/14
+	12:04:17
+
+	* rasqal/Makefile.am: rasqal_skiplist_test is in TESTS
+
+	* rasqal/rasqal_internal.h, rasqal/rasqal_skiplist.c: Moved
+	internal struct rasqal_skiplist_node into rasqal_skiplist.c again.
+
+	* rasqal/rasqal_internal.h: words
+
+	* rasqal/rasqal_internal.h, rasqal/rasqal_skiplist.c: Moved
+	rasqal_skiplist headers into rasqal_internal.h for now.
+
+	* rasqal/rasqal_skiplist.c: Skip list implememntation
+
+	* rasqal/Makefile.am: Added rasqal_skiplist.c and
+	rasqal_skiplist_test
+
+2005-07-13  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write_xml_result3):
+	Indent <boolean> by 2
+
+	* rasqal/roqet.c: Added new xml format with URI
+	http://www.w3.org/2005/06/sparqlResults and made old one available
+	via xml-v2
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write): comments
+	docs for URI http://www.w3.org/2005/06/sparqlResults.
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write): Allow NULL
+	URI for default format.  Add format V3 with URi
+	http://www.w3.org/2005/06/sparqlResults.
+	(rasqal_query_results_write_xml_result3): Added for latest format
+	and new namespace.
+
+	* rasqal/sparql_lexer.l (// comment rule, # comment rule): Use
+	better grab-till-newline form.
+
+	* raptor/turtle_lexer.l: Switch qname, blank node and prefix
+	definitions to SPARQL ones.
+	(main): Fixes for gcc4
+
+	* raptor/turtle_parser.y (main): Fix for gcc4
+
+	* rasqal/tests/sparql/SyntaxFull/manifest.ttl,
+	rasqal/tests/sparql/ValueTesting/extendedType-0.n3,
+	rasqal/tests/sparql/ValueTesting/extendedType-eq-pass.rq,
+	rasqal/tests/sparql/regex/regex-query-003.rq,
+	rasqal/tests/sparql/regex/regex-query-004.rq: Update tests from
+	DAWG CVS
+
+	* raptor/raptor_utf8.c (raptor_unicode_is_xml11_namechar): Call
+	raptor_unicode_is_xml11_namestartchar.
+
+	* rasqal/sparql_lexer.l (rasqal_sparql_name_check): Ignore 0
+	length names - checked in parser.  Make all name problems into
+	errors rather than warnings.
+
+2005-07-12  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/sparql_lexer.l: Reference rq23 Added
+	sparql_name_check_flags enum for sparql name checking.  Updated
+	SPARQL name tokens to match latest rq23 - lots of comments.
+	(// C++ comment rule): Use pattern to find end of line with
+	multiple line endings.  Count line.
+	(/* C comment block rule): Use returned lines to bump the current
+	line number.
+	(<ID>{VARNAME} rule): Check varnames.
+	(<PREF>{NCNAME_PREFIX}":" rule): Check prefix.
+	({BNAME} rule): Check ncname.
+	(rasqal_sparql_name_check): Added to do XML Name 1.1 check and
+	others.
+	(sparql_copy_name): Add check_flag and use it with
+	rasqal_sparql_name_check instead of raptor_xml_name_check.
+	(sparql_copy_qname, sparql_copy_string_token): Use
+	rasqal_sparql_name_check instead of raptor_xml_name_check.
+	(sparql_skip_cpp_comment): Deleted.
+
+	* rasqal/rdql_lexer.l (// C++ comment rule): Use pattern to find
+	end of line with multiple line endings.  Count line.
+	(/* C comment block rule): Use returned lines to bump the current
+	line number.
+	(rdql_skip_cpp_comment): Deleted.
+
+	* rasqal/tests/sparql/SyntaxFull/manifest.ttl,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-08.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-14.rq: Updates from
+	DAWG tests
+
+2005-07-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/configure.ac: time headers
+
+	* rasqal/configure.ac: Test for srandomdev
+
+	* raptor/configure.ac: Check for isascii, for parsedate.y
+
+	* raptor/parsedate.y: Update source links
+
+2005-06-29  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_query.c (rasqal_query_execute): Do the result
+	making outside #ifdef RASQAL_DEBUG ... #endif Oops!
+
+	* rasqal/rasqal_expr.c (main): Add flags arg to
+	rasqal_expression_evaluate
+
+	* rasqal/tests/sparql/survey/Makefile.am: survey-10 works.  now 1
+	failure
+
+	* rasqal/rasqal_query.c: Added alternate results sorting using
+	RASQAL_TREE define trigger to merge into a b-tree.
+	(rasqal_query_result_row_update): Pass query compare_flags
+	argument to rasqal_expression_evaluate.
+	(rasqal_query_result_literal_sequence_compare): Added with main
+	contant from rasqal_engine_query_results_compare.  Operates over
+	arrays of values of the given size.
+	(rasqal_query_results_row_compare): Call above for order
+	conditions or row values to handle ORDER BY(with/without DISTINCT)
+	or DISTINCT alone.
+	(rasqal_query_results_compare): Added.
+	(rasqal_new_tree_node, rasqal_free_tree_node, rasqal_new_tree,
+	rasqal_free_tree, rasqal_tree_node_add_row, rasqal_tree_add_row,
+	rasqal_tree_node_write_indent, rasqal_tree_node_print_internal,
+	rasqal_tree_print, rasqal_tree_node_visit, rasqal_tree_visit,
+	rasqal_tree_add_to_sequence): Added to implement tree of rows
+	sorted on add with optional distinct results.
+	(rasqal_query_execute): Add alternate tree results collation
+	enabled by RASQAL_TREE implementing distinct.
+
+	* rasqal/tests/sparql/sort/Makefile.am: sort-6 now passes.  no
+	sort failures
+
+	* rasqal/tests/sparql/ExprEquals/Makefile.am: "Equality 1-1" and
+	"Equality 1-2" now pass.  down to 2 failures
+
+	* rasqal/rasqal_engine.c (rasqal_engine_check_constraint,
+	rasqal_engine_expression_foreach_fold): Use flags argument
+	in. rasqal_expression_evaluate taken from query compare_flags
+	field.
+
+	* rasqal/sparql_parser.y (rasqal_sparql_query_engine_init): Set
+	query compare_flags to RASQAL_COMPARE_XQUERY enabling XQuery
+	comparison and promotions.
+
+	* rasqal/rasqal_expr.c (rasqal_expression_evaluate): Added flags
+	argument, to pass down to rasqal_literal_compare.  Pass it down to
+	internal uses of rasqal_expression_evaluate also.
+
+	* rasqal/rasqal_literal.c: rasqal_literal_type_labels reordered to
+	match changes to rasqal_literal_type in rasqal.h
+	(rasqal_literal_compare): Added RASQAL_COMPARE_XQUERY to use
+	XQuery comparison and type promotions.  When the above flag is
+	set, only promote numeric types and otherwise compare different
+	types using the order in rasqal_literal_type enum.
+
+	* rasqal/rasqal_internal.h: rasqal_query gains compare_flags
+	structure
+
+	* rasqal/roqet.c: spaces 80
+
+	* rasqal/rasqal.h: Reordered the types in rasqal_literal_type to
+	make them useful for sparql type promotion.  Added define
+	RASQAL_COMPARE_XQUERY Added flags argument to
+	rasqal_expression_evaluate prototype.
+
+	* rasqal/roqet.c (roqet_write_indent): Handle any depth indenting.
+
+	* raptor/raptor_rss.c (raptor_rss_uplift_fields): Fix valid
+	condition.
+
+	* raptor/raptor_rss.c: raptor_rss_uplift_map - added,
+	rss091:pubDate -> dc:date in ISO format
+	(raptor_rss_uplift_fields): Added, to search for fields to uplift.
+	(raptor_rss_uplift_items): Added, to scan items to uplift.
+	(raptor_rss_parse_chunk): Call raptor_rss_uplift_items.
+
+2005-06-28  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c: Fixes for C++.
+
+	* rasqal/tests/sparql/check-sparql: Warn short form of cmd lines
+
+2005-06-26  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_engine.c (rasqal_engine_prepare): Call
+	rasqal_engine_query_fold_expressions.
+	(rasqal_engine_expression_foreach_fold): Added to use with
+	rasqal_expression_foreach.
+	(rasqal_engine_expression_fold): Added, to fold an expression tree
+	until no changes are made.
+	(rasqal_engine_graph_pattern_fold_expressions): Added, to fold
+	expressions inside a graph pattern - in sub graph patterns and in
+	constraint expression.
+	(rasqal_engine_query_fold_expressions): Added, to fold expressions
+	inside a graph - in graph patterns and order conditions.
+
+	* rasqal/rasqal_expr.c (rasqal_expression_clear): Added, to
+	deallocate a static rasqal_expression.
+	(rasqal_free_expression): Use above.
+	(rasqal_expression_foreach): Do current node explicitly first,
+	before op check is done so that the user function could change the
+	op potentially.  Handle op LITERAL and op FUNCTION correctly.
+	(rasqal_expression_is_constant): Added to check if the expression
+	tree is a constant expression.
+	(rasqal_expression_convert_to_literal): Convert an expression tree
+	into a literal in-situ.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_is_constant): Added
+	returning non-0 if literal is a constant i.e. not a variable.
+
+	* rasqal/rasqal_internal.h: Added prototypes for
+	rasqal_engine_expression_fold,
+	rasqal_engine_graph_pattern_fold_expressions,
+	rasqal_engine_query_fold_expressions, rasqal_literal_is_constant,
+	rasqal_expression_is_constant, rasqal_expression_clear and
+	rasqal_expression_convert_to_literal.
+
+	* rasqal/tests/sparql/examples/Makefile.am:
+	sparql-query-example-Testing-Values-isLiteral works.  3 fail now.
+
+	* rasqal/tests/sparql/examples/ex11.2.3.1_1.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.2_0.n3,
+	rasqal/tests/sparql/examples/ex11.2.3.5_0.n3,
+	rasqal/tests/sparql/examples/ex11_0.n3: Date fixes from DAWG CVS
+
+	* rasqal/tests/sparql/examples/ex11.2.3.1_1.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.2_0.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.2_1.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.7_0.rq,
+	rasqal/tests/sparql/examples/ex11_0.rq,
+	rasqal/tests/sparql/examples/ex11_1.rq,
+	rasqal/tests/sparql/examples/ex11.2.3.1_0.rq: Update for FILTER()
+
+	* rasqal/tests/sparql/examples/Makefile.am: Correct test failures,
+	count remains same
+
+2005-06-25  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/survey/Makefile.am: survey-13 now passes.
+	now 2 failures
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write_xml_20041221,
+	rasqal_query_results_write_xml_result2): Use string_len rather
+	than strlen().
+
+	* rasqal/rasqal_internal.h: Added prototype for
+	rasqal_literal_ebv.  Added constants rasqal_xsd_decimal_uri,
+	rasqal_xsd_datetime_uri and rasqal_xsd_string_uri.
+
+	* rasqal/rasqal_literal.c (rasqal_new_integer_literal,
+	rasqal_new_double_literal, rasqal_new_pattern_literal,
+	rasqal_new_string_literal, rasqal_new_simple_literal,
+	rasqal_new_boolean_literal): Initialise the string_len field.
+	(rasqal_literal_string_to_native): Initialise string_len field
+	when turning into a boolean.
+	(rasqal_literal_expand_qname): Use string_len field to initialise
+	raptor_qname_string_to_uri.
+	(rasqal_literal_as_node): When making a new typed literal,
+	initialise string_len field.
+	(rasqal_literal_ebv): Added, to return the Effective Boolean Value
+	(EBV) of a literal.
+
+	* rasqal/rasqal.h: rasqal_literal gains string_len field.
+
+	* rasqal/sparql_parser.y (sparql_is_builtin_xsd_datatype): Added
+	to check for the types that sparql supports.
+	(FunctionCall): Use sparql_is_builtin_xsd_datatype to distinguish
+	a cast from a function - name is the datatype URI, has 1 arg.
+
+	* rasqal/rasqal_general.c: Added constants rasqal_xsd_decimal_uri,
+	rasqal_xsd_datetime_uri and rasqal_xsd_string_uri constants.
+	(rasqal_uri_init, rasqal_uri_finish): Init and free
+	rasqal_xsd_decimal_uri, rasqal_xsd_datetime_uri and
+	rasqal_xsd_string_uri.
+
+2005-06-24  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/tests/sparql/Expr1/expr-1.rq,
+	rasqal/tests/sparql/Expr1/expr-2.rq,
+	rasqal/tests/sparql/Expr1/expr-3.rq,
+	rasqal/tests/sparql/Expr2/query-bev-1.rq,
+	rasqal/tests/sparql/Expr2/query-bev-3.rq,
+	rasqal/tests/sparql/Expr2/query-bev-4.rq,
+	rasqal/tests/sparql/Expr2/query-bev-5.rq,
+	rasqal/tests/sparql/Expr2/query-bev-6.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-datatype-1.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-str-1.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-str-2.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-str-3.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-str-4.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-1.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-2.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-3.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-4.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-5.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq2-1.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq2-2.rq,
+	rasqal/tests/sparql/SyntaxFull/manifest.ttl,
+	rasqal/tests/sparql/SyntaxFull/syntax-expr-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-expr-05.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-expr-06.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-07.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-08.rq,
+	rasqal/tests/sparql/ValueTesting/extendedType-0.n3,
+	rasqal/tests/sparql/regex/regex-query-001.rq,
+	rasqal/tests/sparql/regex/regex-query-002.rq,
+	rasqal/tests/sparql/regex/regex-query-003.rq,
+	rasqal/tests/sparql/regex/regex-query-004.rq: Updates from DAWG
+	CVS
+
+	* rasqal/rasqal_query.c: Moved rasqal_query_result_row to
+	rasqal-internal.h
+	(rasqal_new_query_result_row): Handle no order_conditions_sequence
+	present.  Set NULL literal values when they appear, as from
+	OPTIONAL.
+	(rasqal_query_results_update): Added, based on core of
+	rasqal_query_results_next to get next result from query engine,
+	including offsets.
+	(rasqal_query_execute): Use rasqal_query_results_update when not
+	sorting and make a query_results->row
+	(rasqal_free_query_results): Free any row field used.
+	(rasqal_query_results_get_bindings,
+	rasqal_query_results_get_binding_value,
+	rasqal_query_results_get_binding_value_by_name): Return row
+	values, using query_results row field for stream results.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_bind_match): Use
+	rasqal_new_literal_from_literal when binding literal values, do
+	not turn them into nodes this early.
+
+	* rasqal/tests/sparql/sort/Makefile.am: sort-4 sort-7 pass now
+	only fail sort-6
+
+	* rasqal/rasqal_expr.c (rasqal_expression_evaluate): For case
+	RASQAL_EXPR_LT, RASQAL_EXPR_GT, RASQAL_EXPR_LE, RASQAL_EXPR_GE -
+	invert the test for the result of rasqal_literal_compare test as
+	it was totally backwards for ints and doubles.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_compare): Return correct
+	<0, 0, >0 for integers and doubles.  It was formerly negative the
+	right result.
+
+	* rasqal/rasqal_internal.h: Added struct rasqal_query_result_row
+	internal for now.  rasqal_query_results gains field row for use as
+	the current result row when streaming results.
+
+	* rasqal/tests/sparql/check-sparql: tidy messages
+
+	* rasqal/rasqal_query.c (rasqal_new_query_result_row): Just do
+	allocations here, and use rasqal_query_result_row_update to update
+	the contents from the current query engine result.
+	(rasqal_query_result_row_update): Added, updating the given row
+	with the current query engine result.
+
+2005-06-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rasqal/rasqal_literal.c (rasqal_literal_print): Fix formats for
+	decimal, datetime
+
+	* rasqal/rasqal_query.c (rasqal_query_results_write_xml_20041221,
+	rasqal_query_results_write_xml_result2,
+	rasqal_query_results_get_triple): Handle RASQAL_LITERAL_FLOAT (as
+	a double), RASQAL_LITERAL_DECIMAL (as a string) and
+	RASQAL_LITERAL_DATETIME (as a string).
+
+	* rasqal/rasqal_literal.c (rasqal_new_double_literal): Added,
+	based on rasqal_new_floating_literal.
+	(rasqal_new_floating_literal): Now a wrapper around the above.
+	(rasqal_literal_string_to_native): Promote xsd:float too.
+	(rasqal_free_literal, rasqal_literal_print,
+	rasqal_literal_as_boolean, rasqal_literal_as_integer,
+	rasqal_literal_as_floating, rasqal_literal_as_string,
+	rasqal_literal_compare, rasqal_literal_equals,
+	rasqal_literal_as_node): Handle RASQAL_LITERAL_FLOAT (as a
+	double), RASQAL_LITERAL_DECIMAL (as a string) and
+	RASQAL_LITERAL_DATETIME (as a string).
+
+	* rasqal/rasqal_redland.c: Use RASQAL_LITERAL_DOUBLE instead of
+	RASQAL_LITERAL_FLOATING
+
+	* rasqal/sparql_lexer.l, rasqal/rdql_lexer.l,
+	rasqal/rasqal_expr.c: Replace rasqal_new_floating_literal with
+	rasqal_new_double_literal
+
+	* rasqal/rasqal_general.c: Added rasqal_xsd_float_uri URI
+	constant.
+	(rasqal_uri_init, rasqal_uri_finish): Init/free it.
+
+	* rasqal/rasqal_internal.h: Added rasqal_xsd_float_uri.
+
+	* rasqal/rasqal.h: Added RASQAL_LITERAL_DOUBLE (formerly
+	RASQAL_LITERAL_FLOATING), RASQAL_LITERAL_FLOAT,
+	RASQAL_LITERAL_DECIMAL and RASQAL_LITERAL_DATETIME.  float uses
+	the 'double floating' field.  decimal and datetime use the string
+	field, for now.  Deprecated rasqal_new_floating_literal Added
+	prototype for rasqal_new_double_literal
+
+	* rasqal/roqet.c: Added a -e/--exec option to execute a query
+	string directly.  Usage updated to show the two forms.
+
 2005-06-22  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_storage_mysql.c, rasqal/win32_rasqal_config.h: win32
