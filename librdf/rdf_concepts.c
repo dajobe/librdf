@@ -119,13 +119,13 @@ librdf_init_concepts(librdf_world *world)
 /**
  * librdf_get_concept_by_name - get Redland uri and/or node objects for RDF concepts
  * @world: redland world object
- * @is_ms: non zero if name is a RDF M&S concept (else is RDF schema)
+ * @is_ms: non zero if name is a RDF namespace concept (else is RDF schema)
  * @name: the name to look up
  * @uri_p: pointer to variable to hold &librdf_uri of concept or NULL if not required
  * @node_p: pointer to variable to hold &librdf_node of concept or NULL if not required
  * 
  * Allows the dynamic look-up of an RDF concept by the local_name of
- * the concept in either the RDF M&S or RDF Schema namespace.  Returns
+ * the concept in either the RDF or RDF Schema namespace.  Returns
  * the &librdf_uri and/or &librdf_node found as required.
  **/
 void
