@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2002-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2002-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -30,75 +30,14 @@
 #ifndef LIBRDF_SERIALIZER_H
 #define LIBRDF_SERIALIZER_H
 
+#ifdef LIBRDF_INTERNAL
+#include <rdf_serializer_internal.h>
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifdef LIBRDF_INTERNAL
-
-struct librdf_serializer_factory_s 
-{
-  struct librdf_serializer_factory_s* next;
-
-  /* factory name - required */
-  char *name;
-
-  /* serialize to this MIME type/ Internet Media Type - optional */
-  char *mime_type;
-
-  /* writes the syntax defined by this URI - optional */
-  librdf_uri *type_uri;
-
-  /* the rest of this structure is populated by the
-     serializer-specific register function */
-  size_t  context_length;
-
-  /* create a new serializer */
-  int (*init)(librdf_serializer* serializer, void *_context);
-
-  /* destroy a serializer */
-  void (*terminate)(void *_context);
-
-  /* get/set features of serializer */
-  librdf_node* (*get_feature)(void *_context, librdf_uri* feature);
-  int (*set_feature)(void *_context, librdf_uri *feature, librdf_node* value);
-
-  int (*set_namespace)(void *_context, librdf_uri *uri, const char *prefix);
-  
-  int (*serialize_model_to_file_handle)(void *_context, FILE *handle, librdf_uri* base_uri, librdf_model *model);
-
-  unsigned char* (*serialize_model_to_counted_string)(void *_context, librdf_uri* base_uri, librdf_model *model, size_t *length_p);
-};
-
-
-struct librdf_serializer_s {
-  librdf_world *world;
-  
-  void *context;
-
-  void *error_user_data;
-  void *warning_user_data;
-  void (*error_fn)(void *user_data, const char *msg, ...);
-  void (*warning_fn)(void *user_data, const char *msg, ...);
-
-  librdf_serializer_factory* factory;
-};
-
-/* class methods */
-librdf_serializer_factory* librdf_get_serializer_factory(librdf_world *world, const char *name, const char *mime_type, librdf_uri *type_uri);
-
-
-/* module init */
-void librdf_init_serializer(librdf_world *world);
-/* module finish */
-void librdf_finish_serializer(librdf_world *world);
-                    
-void librdf_serializer_raptor_constructor(librdf_world* world);
-void librdf_serializer_rdfxml_constructor(librdf_world* world);
-
-#endif
-
 
 /* class methods */
 REDLAND_API void librdf_serializer_register_factory(librdf_world *world, const char *name, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_serializer_factory*));

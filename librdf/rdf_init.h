@@ -29,6 +29,10 @@
 #ifndef LIBRDF_INIT_H
 #define LIBRDF_INIT_H
 
+#ifdef LIBRDF_INTERNAL
+#include <rdf_init_internal.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -47,10 +47,6 @@
 #include <redland.h>
 
 #include <rdf_hash.h>
-#ifdef HAVE_BDB_HASH
-#include <rdf_hash_bdb.h>
-#endif
-#include <rdf_hash_memory.h>
 #include <rdf_heuristics.h>
 
 #ifndef STANDALONE

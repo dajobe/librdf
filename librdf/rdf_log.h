@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2004-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2004-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -114,15 +114,9 @@ typedef int (*librdf_log_level_func)(void *user_data, const char *message, va_li
 typedef int (*librdf_log_func)(void *user_data, librdf_log_message *message);
 
 #ifdef LIBRDF_INTERNAL
-void librdf_log_simple(librdf_world* world, int code, librdf_log_level level, librdf_log_facility facility, void *locator, const char *message);
-void librdf_log(librdf_world* world, int code, librdf_log_level level, librdf_log_facility facility, void *locator, const char *message, ...);
-
-void librdf_fatal(librdf_world* world, int facility, const char *file, int line, const char *function, const char *message);
-
-void librdf_test_error(librdf_world* world, const char *message);
-void librdf_test_warning(librdf_world* world, const char *message);
-
+#include <rdf_log_internal.h>
 #endif
+
 
 /* log message accessors */
 REDLAND_API int librdf_log_message_code(librdf_log_message *message);

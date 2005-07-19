@@ -51,7 +51,6 @@
 
 #include <redland.h>
 #include <rdf_hash.h>
-#include <rdf_hash_bdb.h>
 
 
 typedef struct 

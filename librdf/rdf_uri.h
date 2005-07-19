@@ -30,6 +30,10 @@
 #ifndef LIBRDF_URI_H
 #define LIBRDF_URI_H
 
+#ifdef LIBRDF_INTERNAL
+#include <rdf_uri_internal.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

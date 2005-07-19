@@ -40,29 +40,6 @@
 extern "C" {
 #endif
 
-#ifdef LIBRDF_INTERNAL
-
-/* private structure */
-struct librdf_list_node_s
-{
-  struct librdf_list_node_s* next;
-  struct librdf_list_node_s* prev;
-  void *data;
-};
-typedef struct librdf_list_node_s librdf_list_node;
-
-
-struct librdf_list_s
-{
-  librdf_world *world;
-  librdf_list_node* first;
-  librdf_list_node* last;
-  int length;
-  int (*equals) (void* data1, void *data2);
-};
-
-#endif
-
 librdf_list* librdf_new_list(librdf_world *world);
 void librdf_free_list(librdf_list* list);
 

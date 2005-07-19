@@ -44,7 +44,6 @@
 #endif
 
 #include <redland.h>
-#include <rdf_hash_memory.h>
 #include <rdf_types.h>
 
 

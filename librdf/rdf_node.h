@@ -56,66 +56,8 @@ typedef enum {
 } librdf_node_type;
 
 
-/* literal xml:space values as defined in
- * http://www.w3.org/TR/REC-xml section 2.10 White Space Handling
- */
-
-
 #ifdef LIBRDF_INTERNAL
-
-struct librdf_node_s
-{
-  librdf_world *world;
-  librdf_node_type type;
-  int usage;
-  union 
-  {
-    struct
-    {
-      /* rdf:Resource and rdf:Property-s have URIs */
-      librdf_uri *uri;
-    } resource;
-    struct
-    {
-      /* literals are UTF-8 string values ... */
-      unsigned char *string;
-      unsigned int string_len;
-
-      /* datatype URI or null */
-      librdf_uri* datatype_uri;
-
-      /* XML defines these additional attributes for literals */
-
-      /* Language of literal (xml:lang) */
-      char *xml_language;
-
-      /* Hash key & size */
-      unsigned char *key;
-      size_t size;
-    } literal;
-    struct 
-    {
-      /* blank nodes have an identifier */
-      unsigned char *identifier;
-      int identifier_len;
-    } blank;
-  } value;
-};
-
-
-/* initialising functions / constructors */
-
-/* class methods */
-void librdf_init_node(librdf_world* world);
-void librdf_finish_node(librdf_world* world);
-
-#ifdef LIBRDF_DEBUG
-const char* librdf_node_get_type_as_string(int type);
-#endif
-
-/* exported public in error but never usable */
-librdf_digest* librdf_node_get_digest(librdf_node* node);
-
+#include <rdf_node_internal.h>
 #endif
 
 

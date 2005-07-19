@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
  * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
  * University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -29,180 +29,13 @@
 #ifndef LIBRDF_STORAGE_H
 #define LIBRDF_STORAGE_H
 
+#ifdef LIBRDF_INTERNAL
+#include <rdf_storage_internal.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifdef LIBRDF_INTERNAL
-
-/** A storage object */
-struct librdf_storage_s
-{
-  librdf_world *world;
-
-  /* usage count of this instance
-   * Used by other redland classes such as model, iterator, stream
-   * via  librdf_storage_add_reference librdf_storage_remove_reference
-   * The usage count of storage after construction is 1.
-   */
-  int usage;
-  
-  librdf_model *model;
-  void *context;
-  int index_contexts;
-  struct librdf_storage_factory_s* factory;
-};
-
-
-/** A Storage Factory */
-struct librdf_storage_factory_s {
-  librdf_world *world;
-  struct librdf_storage_factory_s* next;
-  char* name;
-  char* label;
-  
-  /* the rest of this structure is populated by the
-     storage-specific register function */
-  size_t context_length;
-  
-  /* create a new storage */
-  int (*init)(librdf_storage* storage, char *name, librdf_hash* options);
-  
-  /* copy a storage */
-  /* clone is assumed to do leave the new storage in the same state
-   * after an init() method on an existing storage - i.e ready to
-   * use but closed.
-   */
-  int (*clone)(librdf_storage* new_storage, librdf_storage* old_storage);
-
-  /* destroy a storage */
-  void (*terminate)(librdf_storage* storage);
-  
-  /* make storage be associated with model */
-  int (*open)(librdf_storage* storage, librdf_model* model);
-  
-  /* close storage/model context */
-  int (*close)(librdf_storage* storage);
-  
-  /* return the number of statements in the storage for model */
-  int (*size)(librdf_storage* storage);
-  
-  /* add a statement to the storage from the given model - OPTIONAL */
-  int (*add_statement)(librdf_storage* storage, librdf_statement* statement);
-  
-  /* add a statement to the storage from the given model - OPTIONAL */
-  int (*add_statements)(librdf_storage* storage, librdf_stream* statement_stream);
-  
-  /* remove a statement from the storage - OPTIONAL */
-  int (*remove_statement)(librdf_storage* storage, librdf_statement* statement);
-  
-  /* check if statement in storage  */
-  int (*contains_statement)(librdf_storage* storage, librdf_statement* statement);
-  /* check for [node, property, ?] */
-  int (*has_arc_in)(librdf_storage *storage, librdf_node *node, librdf_node *property);
-  /* check for [?, property, node] */
-  int (*has_arc_out)(librdf_storage *storage, librdf_node *node, librdf_node *property);
-
-  
-  /* serialise the model in storage  */
-  librdf_stream* (*serialise)(librdf_storage* storage);
-  
-  /* serialise the results of a query */
-  librdf_stream* (*find_statements)(librdf_storage* storage, librdf_statement* statement);
-  /* OPTIONAL */
-  librdf_stream* (*find_statements_with_options)(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node, librdf_hash* options);
-
-  /* return a list of Nodes marching given arc, target */
-  librdf_iterator* (*find_sources)(librdf_storage* storage, librdf_node *arc, librdf_node *target);
-
-  /* return a list of Nodes marching given source, target */
-  librdf_iterator* (*find_arcs)(librdf_storage* storage, librdf_node *source, librdf_node *target);
-
-  /* return a list of Nodes marching given source, target */
-  librdf_iterator* (*find_targets)(librdf_storage* storage, librdf_node *source, librdf_node *target);
-
-  /* return list of properties to/from a node */
-  librdf_iterator* (*get_arcs_in)(librdf_storage *storage, librdf_node *node);
-  librdf_iterator* (*get_arcs_out)(librdf_storage *storage, librdf_node *node);
-
-
-  /* add a statement to the storage from the context - OPTIONAL */
-  /* NOTE: if context is NULL, this MUST be equivalent to add_statement */
-  int (*context_add_statement)(librdf_storage* storage, librdf_node* context, librdf_statement *statement);
-  
-  /* remove a statement from the context - OPTIONAL */
-  /* NOTE: if context is NULL, this MUST be equivalent to remove_statement */
-  int (*context_remove_statement)(librdf_storage* storage, librdf_node* context, librdf_statement *statement);
-
-  /* list statements in a context - OPTIONAL */
-  librdf_stream* (*context_serialise)(librdf_storage* storage, librdf_node* context);
-
-  /* synchronise to underlying storage - OPTIONAL */
-  int (*sync)(librdf_storage* storage);
-
-  /* add statements to the context - OPTIONAL (rdf_storage will do it
-   * using context_add_statement if missing)
-   * NOTE: if context is NULL, this MUST be equivalent to add_statements
-  */
-  int (*context_add_statements)(librdf_storage* storage, librdf_node* context, librdf_stream *stream);
-
-  /* remove statements from the context - OPTIONAL (rdf_storage will do it
-   * using context_remove_statement if missing)
-   */
-  int (*context_remove_statements)(librdf_storage* storage, librdf_node* context);
-
-  /* search for statement in a context - OPTIONAL (rdf_storage will do
-   * it using find_statements if missing)
-   */
-  librdf_stream* (*find_statements_in_context)(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node);
-
-  /* return an iterator of context nodes in the store - OPTIONAL
-   * (returning NULL)
-   */
-  librdf_iterator* (*get_contexts)(librdf_storage* storage);
-
-  /* features - OPTIONAL */
-  librdf_node* (*get_feature)(librdf_storage* storaage, librdf_uri* feature);
-  int (*set_feature)(librdf_storage* storage, librdf_uri* feature, librdf_node* value);
-
-};
-
-#include <rdf_storage_list.h>
-#include <rdf_storage_hashes.h>
-
-void librdf_init_storage_file(librdf_world *world);
-
-#ifdef STORAGE_MYSQL
-void librdf_init_storage_mysql(librdf_world *world);
-#endif
-
-#ifdef STORAGE_TSTORE
-void librdf_init_storage_tstore(librdf_world *world);
-#endif
-
-#ifdef STORAGE_SQLITE
-void librdf_init_storage_sqlite(librdf_world *world);
-#endif
-
-
-/* module init */
-void librdf_init_storage(librdf_world *world);
-
-/* module terminate */
-void librdf_finish_storage(librdf_world *world);
-
-/* class methods */
-librdf_storage_factory* librdf_get_storage_factory(const char *name);
-
-void librdf_storage_add_reference(librdf_storage *storage);
-void librdf_storage_remove_reference(librdf_storage *storage);
-
-#ifdef HAVE_SQLITE
-void librdf_init_storage_sqlite(librdf_world *world);
-#endif
-
-#endif
-
 
 /* class methods */
 REDLAND_API void librdf_storage_register_factory(librdf_world *world, const char *name, const char *label, void (*factory) (librdf_storage_factory*));

@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_concepts.h - Definitions of concepts from RDF Model and Syntax
+ * rdf_concepts.h - Definitions of RDF concept URIs and nodes
  *
  * $Id$
  *
@@ -29,10 +29,13 @@
 #ifndef LIBRDF_CONCEPTS_H
 #define LIBRDF_CONCEPTS_H
 
+#ifdef LIBRDF_INTERNAL
+#include <rdf_concepts_internal.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /* Private tokens for the concepts we 'know' about */
 
@@ -199,17 +202,6 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 /* private implementation */
 extern librdf_uri* librdf_concept_ms_namespace_uri;
 extern librdf_uri* librdf_concept_schema_namespace_uri;
-
-
-#ifdef LIBRDF_INTERNAL
-
-/* class methods */
-void librdf_init_concepts(librdf_world *world);
-void librdf_finish_concepts(librdf_world *world);
-
-void librdf_get_concept_by_name(librdf_world *world, int is_ms, const char *name, librdf_uri **uri_p, librdf_node **node_p);
-
-#endif
 
 
 #ifdef __cplusplus

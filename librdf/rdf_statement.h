@@ -30,29 +30,13 @@
 #ifndef LIBRDF_STATEMENT_H
 #define LIBRDF_STATEMENT_H
 
+#ifdef LIBRDF_INTERNAL
+#include <rdf_statement_internal.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-#ifdef LIBRDF_INTERNAL
-
-struct librdf_statement_s
-{
-  librdf_world* world;
-  librdf_node* subject;
-  librdf_node* predicate;
-  librdf_node* object;
-};
-
-
-/* class methods */
-void librdf_init_statement(librdf_world *world);
-void librdf_finish_statement(librdf_world *world);
-
-#endif
-
 
 /* Or-ed to indicate statement parts via fields arguments to various
  * methods such as the public:

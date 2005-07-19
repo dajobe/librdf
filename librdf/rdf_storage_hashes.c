@@ -45,7 +45,6 @@
 
 #include <redland.h>
 #include <rdf_storage.h>
-#include <rdf_storage_hashes.h>
 
 
 typedef struct 

@@ -37,37 +37,9 @@ typedef librdf_statement* (*librdf_stream_map_handler)(librdf_stream *stream, vo
 typedef void (*librdf_stream_map_free_context_handler)(void *map_context);
 
 #ifdef LIBRDF_INTERNAL
-
-/* used in map_list below */
-typedef struct {
-  void *context; /* context to pass on to map */
-  librdf_stream_map_handler fn;
-  librdf_stream_map_free_context_handler free_context;
-} librdf_stream_map;
-
-struct librdf_stream_s {
-  librdf_world *world;
-  void *context;
-  int is_finished; /* 1 when have no more statements */
-  int is_updated; /* 1 when we know there is a current item */
-  
-  /* Used when mapping */
-  librdf_statement *current;
-  librdf_list *map_list; /* non-empty means there is a list of maps */
-  
-  int (*is_end_method)(void*);
-  int (*next_method)(void*);
-  void* (*get_method)(void*, int); /* flags: type of get */
-  void (*finished_method)(void*);
-};
-
-/* FIXME - should all short lists be enums */
-#define LIBRDF_STREAM_GET_METHOD_GET_OBJECT  LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  
-#define LIBRDF_STREAM_GET_METHOD_GET_CONTEXT LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT
-
-librdf_statement* librdf_stream_statement_find_map(librdf_stream *stream, void* context, librdf_statement* statement);
-
+#include <rdf_stream_internal.h>
 #endif
+
 
 /* constructor */
 

@@ -118,10 +118,8 @@ REDLAND_API extern const unsigned int librdf_version_decimal;
 #include <rdf_log.h>
 #include <rdf_digest.h>
 #include <rdf_hash.h>
-#include <rdf_init_internal.h>
 #include <rdf_init.h>
 #include <rdf_iterator.h>
-#include <rdf_uri_internal.h>
 #include <rdf_uri.h>
 #include <rdf_node.h>
 #include <rdf_concepts.h>
