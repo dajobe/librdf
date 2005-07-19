@@ -31,7 +31,7 @@
 #define LIBRDF_LIST_INTERNAL_H
 
 #ifndef LIBRDF_OBJC_FRAMEWORK
-#include <rdf_iterator.h>
+#include <librdf/rdf_iterator.h>
 #else
 #include <Redland/rdf_iterator.h>
 #endif
