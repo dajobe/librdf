@@ -74,7 +74,9 @@ rdf_parser.h \
 rdf_heuristics.h rdf_files.h rdf_utf8.h \
 rdf_query.h \
 rdf_serializer.h \
-rdf_log.h
+rdf_log.h \
+rdf_init_internal.h \
+rdf_uri_internal.h
 
 if MEMCMP
 librdf_la_SOURCES += memcmp.c
