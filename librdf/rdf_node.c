@@ -253,7 +253,7 @@ librdf_new_node_from_uri_string(librdf_world *world,
 /**
  * librdf_new_node_from_uri:
  * @world: redland world object
- * @uri: &rdf_uri object
+ * @uri: #librdf_uri object
  *
  * Constructor - create a new resource librdf_node object with a given URI.
  *
@@ -271,7 +271,7 @@ librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
 /**
  * librdf_new_node_from_uri_local_name:
  * @world: redland world object
- * @uri: &rdf_uri object
+ * @uri: #librdf_uri object
  * @local_name: local name to append to URI
  *
  * Constructor - create a new resource librdf_node object with a given URI and local name.

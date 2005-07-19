@@ -130,7 +130,7 @@ librdf_query_results_finished(librdf_query_results *query_results)
  * const char **names=NULL;
  * librdf_node* values[10];
  * 
- * if(librdf_query_results_get_bindings(results, &names, values))
+ * if(librdf_query_results_get_bindings(results, &amp;names, values))
  *   ...
  *
  * Return value: non-0 if the assignment failed
