@@ -97,10 +97,6 @@ librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world, const un
 REDLAND_API
 librdf_node* librdf_new_node_from_node(librdf_node *node);
 
-/* Init a statically allocated node */
-REDLAND_API
-void librdf_node_init(librdf_world *world, librdf_node *node);
-
 /* destructor */
 REDLAND_API
 void librdf_free_node(librdf_node* node);
