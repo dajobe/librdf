@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_log.h - Internal RDF logging interfaces
+ * rdf_log_internal.h - Internal RDF logging definitions
  *
  * $Id$
  *

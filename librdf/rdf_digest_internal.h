@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_digest.h - Internal RDF Digest Factory / Digest interfaces and definition
+ * rdf_digest_internal.h - Internal RDF Digest Factory / Digest definitions
  *
  * $Id$
  *

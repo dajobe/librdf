@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_storage.h - Internal RDF Storage Factory and Storage definitions
+ * rdf_storage_internal.h - Internal RDF Storage definitions
  *
  * $Id$
  *

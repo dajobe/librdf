@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_statement.h - Internal RDF Statement definitions
+ * rdf_statement_internal.h - Internal RDF Statement definitions
  *
  * $Id$
  *

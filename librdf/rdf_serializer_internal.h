@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_serializer.h - Internal RDF Serializer Factory / Serializer definitions
+ * rdf_serializer_internal.h - Internal RDF Serializer definitions
  *
  * $Id$
  *

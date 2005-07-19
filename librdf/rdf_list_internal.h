@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_list.h - Internal RDF List Interface definition
+ * rdf_list_internal.h - Internal RDF List Interface definitions
  *
  * $Id$
  *
@@ -31,7 +31,7 @@
 #define LIBRDF_LIST_INTERNAL_H
 
 #ifndef LIBRDF_OBJC_FRAMEWORK
-#include <librdf/rdf_iterator.h>
+#include <rdf_iterator.h>
 #else
 #include <Redland/rdf_iterator.h>
 #endif

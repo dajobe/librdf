@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_concepts_internal.h - Internal definitions for RDF concept URIs and nodes
+ * rdf_concepts_internal.h - Internal RDF concept URIs and nodes definitions
  *
  * $Id$
  *

@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_uri_internal.h - RDF URI internals Definition
+ * rdf_uri_internal.h - Internal RDF URI definitions
  *
  * $Id$
  *

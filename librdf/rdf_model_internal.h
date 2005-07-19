@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_model.h - Internal RDF Model definitions
+ * rdf_model_internal.h - Internal RDF Model definitions
  *
  * $Id$
  *

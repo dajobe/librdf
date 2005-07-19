@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_hash.h - Internal RDF Hash Factory and Hash interfaces and definitions
+ * rdf_hash_internal.h - Internal RDF Hash Factory and Hash definitions
  *
  * $Id$
  *

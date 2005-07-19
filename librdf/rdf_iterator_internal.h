@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_iterator.h - Internal RDF Iterator definition
+ * rdf_iterator_internal.h - Internal RDF Iterator definitions
  *
  * $Id$
  *

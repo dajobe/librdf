@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_query_internal.h - Internal RDF Query Adaptor Factory and Query definitions
+ * rdf_query_internal.h - Internal RDF Query definitions
  *
  * $Id$
  *

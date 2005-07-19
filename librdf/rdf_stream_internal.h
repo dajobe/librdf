@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_stream.h - Interanl RDF Stream definitions
+ * rdf_stream_internal.h - Internal RDF Stream definitions
  *
  * $Id$
  *
