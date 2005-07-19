@@ -1,3 +1,84 @@
+2005-07-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Makefile.am: Remove 1-function headers from dist
+
+	* rdf_node.h: removed librdf_node_init - has no code
+
+	* rdf_uri.c (librdf_uri_print): xml fix
+
+	* rdf_node.h: librdf_node_init removed - in header only
+
+	* rdf_node.c, rdf_query_results.c: More fixes for gtkdoc
+
+	* rdf_concepts.c, rdf_digest.c, rdf_digest.h, rdf_digest_md5.c,
+	rdf_digest_openssl.c, rdf_digest_sha1.c, rdf_hash.c, rdf_hash.h,
+	rdf_hash_bdb.c, rdf_hash_cursor.c, rdf_hash_memory.c,
+	rdf_heuristics.c, rdf_init.c, rdf_init.h, rdf_iterator.c,
+	rdf_iterator.h, rdf_list.c, rdf_log.c, rdf_log.h, rdf_model.c,
+	rdf_model.h, rdf_model_storage.c, rdf_node.c, rdf_node.h,
+	rdf_parser.c, rdf_parser.h, rdf_parser_raptor.c, rdf_query.c,
+	rdf_query.h, rdf_query_results.c, rdf_query_triples.c,
+	rdf_serializer.c, rdf_serializer.h, rdf_serializer_raptor.c,
+	rdf_statement.c, rdf_statement.h, rdf_storage.c, rdf_storage.h,
+	rdf_storage_hashes.c, rdf_storage_list.c, rdf_storage_mysql.c,
+	rdf_storage_sqlite.c, rdf_storage_tstore.c, rdf_stream.c,
+	rdf_stream.h, rdf_uri.c, rdf_uri.h, rdf_utf8.c: Automated
+	docucomments updates for gtk-doc
+
+	* rdf_concepts_internal.h, rdf_digest_internal.h,
+	rdf_hash_internal.h, rdf_iterator_internal.h, rdf_list_internal.h,
+	rdf_log_internal.h, rdf_model_internal.h, rdf_node_internal.h,
+	rdf_query_internal.h, rdf_serializer_internal.h,
+	rdf_statement_internal.h, rdf_storage_internal.h,
+	rdf_stream_internal.h, rdf_uri_internal.h: Comment words.
+
+	* rdf_list_internal.h: Remove some calls to public headers that
+	are in redland.h also.
+
+	* Makefile.am: Added more internal headers
+
+	* librdf.h, rdf_concepts.h, rdf_digest.h, rdf_hash.c, rdf_hash.h,
+	rdf_hash_bdb.c, rdf_hash_memory.c, rdf_init.h, rdf_internal.h,
+	rdf_iterator.h, rdf_list.h, rdf_log.h, rdf_model.h,
+	rdf_model_storage.h, rdf_node.h, rdf_parser.h, rdf_query.h,
+	rdf_serializer.h, rdf_statement.h, rdf_storage.h,
+	rdf_storage_hashes.c, rdf_stream.h, rdf_uri.h: Use
+	rdf_MODULE_internal.h headers.
+
+	* rdf_concepts_internal.h, rdf_digest_internal.h,
+	rdf_hash_internal.h, rdf_iterator_internal.h, rdf_list_internal.h,
+	rdf_log_internal.h, rdf_model_internal.h, rdf_node_internal.h,
+	rdf_parser_internal.h, rdf_query_internal.h,
+	rdf_serializer_internal.h, rdf_statement_internal.h,
+	rdf_storage_internal.h, rdf_stream_internal.h: Added
+	rdf_MODULE_internal.h headers.
+
+	* rdf_hash_bdb.h, rdf_hash_memory.h, rdf_storage_hashes.h,
+	rdf_storage_list.h: delete 1 function headers
+
+	* Makefile.am: Added rdf_init_internal.h rdf_uri_internal.h
+
+	* librdf.h, rdf_concepts.c, rdf_digest.c, rdf_digest_md5.c,
+	rdf_digest_sha1.c, rdf_hash.c, rdf_hash_bdb.c, rdf_hash_cursor.c,
+	rdf_hash_memory.c, rdf_init.c, rdf_init.h, rdf_init_internal.h,
+	rdf_internal.h, rdf_iterator.c, rdf_list.c, rdf_log.c,
+	rdf_model.c, rdf_model.h, rdf_model_storage.c, rdf_node.c,
+	rdf_parser.c, rdf_parser_raptor.c, rdf_query.c,
+	rdf_query_results.c, rdf_query_triples.c, rdf_serializer.c,
+	rdf_serializer_raptor.c, rdf_statement.c, rdf_storage.c,
+	rdf_storage_hashes.c, rdf_storage_list.c, rdf_storage_mysql.c,
+	rdf_storage_sqlite.c, rdf_storage_tstore.c, rdf_stream.c,
+	rdf_uri.c, rdf_uri.h, rdf_uri_internal.h, rdf_utf8.c: Updates for
+	gtk-doc.  Pull out internal headers.
+
+2005-07-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_concepts.c: death to M&S for xml docs
+
+2005-07-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_storage_tstore.c: Unbreak 3store backend from not compiling.
+
 2005-06-22  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* rdf_storage_mysql.c: win32 fixes from John Barstow.
