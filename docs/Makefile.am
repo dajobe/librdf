@@ -41,24 +41,33 @@ DOC_SOURCE_DIR=../librdf
 HFILE_GLOB=$(top_srcdir)/librdf/*.h
 CFILE_GLOB=$(top_srcdir)/librdf/*.c
 
-IGNORE_CFILES= \
-	rdf_hash_bdb.c \
-	rdf_hash_memory.c \
-	rdf_model_storage.c \
-	rdf_storage_hashes.c \
-	rdf_storage_list.c
+IGNORE_CFILES=
 
 # Headers to ignore
 IGNORE_HFILES= \
-	librdf.h \
 	rdf_config.h \
-	rdf_init_internal.h \
-	rdf_internal.h \
-	rdf_types.h \
-	rdf_uri_internal.h \
-	redland.h \
 	win32_rdf_config.h \
+	rdf_types.h \
+	redland.h \
+	rdf_internal.h \
+	rdf_concepts_internal.h \
+	rdf_digest_internal.h \
+	rdf_hash_internal.h \
+	rdf_init_internal.h \
+	rdf_iterator_internal.h \
+	rdf_list_internal.h \
+	rdf_log_internal.h \
+	rdf_model_internal.h \
+	rdf_node_internal.h \
+	rdf_parser_internal.h \
+	rdf_query_internal.h \
+	rdf_serializer_internal.h \
+	rdf_statement_internal.h \
+	rdf_storage_internal.h \
+	rdf_stream_internal.h \
+	rdf_uri_internal.h
 	$(IGNORE_CFILES)
+
 
 # CFLAGS and LDFLAGS for compiling scan program. Only needed
 # if $(DOC_MODULE).types is non-empty.
@@ -87,24 +96,14 @@ man_MANS=redland.3
 
 EXTRA_DIST+=README.html README \
 storage.html \
-build-docs \
-api \
-redland.pod kernel-doc \
+redland.pod \
 $(man_MANS)
 
 CLEANFILES+=README pod2htm*
-MAINTAINERCLEANFILES=
-
-PERL=perl
 
 # Create some text files from HTML sources
 LYNX=lynx
 LYNXARGS=-dump -nolist
-
-#SUFFIXES = .html .txt .ps .pdf .pm .pod .3
-#
-#.html.txt:
-#	$(LYNX) $(LYNXARGS) $< > $@
 
 if MAINTAINER_MODE
 redland.3: redland.pod
