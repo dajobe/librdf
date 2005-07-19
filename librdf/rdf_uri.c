@@ -519,7 +519,7 @@ librdf_uri_get_digest(librdf_uri* uri)
 /**
  * librdf_uri_print:
  * @uri: #librdf_uri object
- * @fh: &FILE handle
+ * @fh: file handle
  *
  * Print the URI to the given file handle.
  *
