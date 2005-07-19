@@ -63,12 +63,12 @@ redland.h librdf.h \
 rdf_internal.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
-rdf_digest.h rdf_hash.h rdf_hash_bdb.h rdf_hash_memory.h \
+rdf_digest.h rdf_hash.h \
 rdf_types.h \
-rdf_model.h rdf_model_storage.h \
+rdf_model.h \
 rdf_iterator.h \
 rdf_list.h \
-rdf_storage.h rdf_storage_list.h rdf_storage_hashes.h \
+rdf_storage.h \
 rdf_stream.h \
 rdf_parser.h \
 rdf_heuristics.h rdf_files.h rdf_utf8.h \
