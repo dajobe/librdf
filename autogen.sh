@@ -265,7 +265,7 @@ do
       $DRYRUN $libtoolize --copy --automake
 
       echo "$program: Running $gtkdocize"
-      $DRYRUN $gtkdocize || exit 1
+      $DRYRUN $gtkdocize
 
       aclocalinclude="$ACLOCAL_FLAGS"
       echo "$program: Running $aclocal $aclocalinclude"
