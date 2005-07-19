@@ -63,6 +63,7 @@ autoheader=${AUTOHEADER-autoheader}
 autoheader_vers=0
 libtoolize=${LIBTOOLIZE-libtoolize}
 libtoolize_vers=0
+gtkdocize=${GTKDOCIZE-gtkdocize}
 
 here=`pwd`
 while [ $# -ne 0 ] ; do
@@ -263,6 +264,9 @@ do
       $DRYRUN rm -f ltmain.sh libtool
       $DRYRUN $libtoolize --copy --automake
 
+      echo "$program: Running $gtkdocize"
+      $DRYRUN $gtkdocize || exit 1
+
       aclocalinclude="$ACLOCAL_FLAGS"
       echo "$program: Running $aclocal $aclocalinclude"
       $DRYRUN $aclocal $aclocal_args
@@ -282,7 +286,7 @@ done
 
 rm -f config.cache
 
-conf_flags="--enable-maintainer-mode"
+conf_flags="--enable-maintainer-mode --enable-gtk-doc"
 
 AUTOMAKE=$automake
 AUTOCONF=$autoconf
