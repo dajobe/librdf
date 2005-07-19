@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
+  <bookinfo>
+    <title>Redland RDF Application Framework Reference Manual</title>
+  </bookinfo>
+
+  <part>
+    <xi:include href="redland-intro.xml"/>
+  </part>				  
+
+  <part>
+    <title>Tutorial</title>
+  </part>				  
+
+  <part>
+    <title>Reference</title>
+    <xi:include href="xml/rdf_init.xml"/>
+    <xi:include href="xml/rdf_concepts.xml"/>
+    <xi:include href="xml/rdf_digest.xml"/>
+    <xi:include href="xml/rdf_files.xml"/>
+    <xi:include href="xml/rdf_hash.xml"/>
+    <xi:include href="xml/rdf_heuristics.xml"/>
+    <xi:include href="xml/rdf_iterator.xml"/>
+    <xi:include href="xml/rdf_list.xml"/>
+    <xi:include href="xml/rdf_log.xml"/>
+    <xi:include href="xml/rdf_model.xml"/>
+    <xi:include href="xml/rdf_node.xml"/>
+    <xi:include href="xml/rdf_parser.xml"/>
+    <xi:include href="xml/rdf_query.xml"/>
+    <xi:include href="xml/rdf_serializer.xml"/>
+    <xi:include href="xml/rdf_statement.xml"/>
+    <xi:include href="xml/rdf_storage.xml"/>
+    <xi:include href="xml/rdf_stream.xml"/>
+    <xi:include href="xml/rdf_utf8.xml"/>
+  </part>
+  <index>
+    <title>Index</title>
+  </index>
+</book>
