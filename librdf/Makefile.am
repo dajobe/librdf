@@ -75,8 +75,23 @@ rdf_heuristics.h rdf_files.h rdf_utf8.h \
 rdf_query.h \
 rdf_serializer.h \
 rdf_log.h \
+rdf_concepts_internal.h \
+rdf_digest_internal.h \
+rdf_hash_internal.h \
 rdf_init_internal.h \
+rdf_iterator_internal.h \
+rdf_list_internal.h \
+rdf_log_internal.h \
+rdf_model_internal.h \
+rdf_node_internal.h \
+rdf_parser_internal.h \
+rdf_query_internal.h \
+rdf_serializer_internal.h \
+rdf_statement_internal.h \
+rdf_storage_internal.h \
+rdf_stream_internal.h \
 rdf_uri_internal.h
+
 
 if MEMCMP
 librdf_la_SOURCES += memcmp.c
