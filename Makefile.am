@@ -4,7 +4,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
+# Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
 # Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
 # University of Bristol, UK http://www.bristol.ac.uk/
 # 
@@ -30,6 +30,8 @@ noinst_SCRIPTS = redland-src-config
 man_MANS = redland-config.1
 
 dist_pkgdata_DATA = Redland.i
+
+DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
 
 # Subdirectories to build/install/distribute etc.
 #
@@ -58,7 +60,8 @@ Makefile.PL \
 redland-config.in \
 redland-src-config.in \
 $(man_MANS) \
-redland.sln
+redland.sln \
+gtk-doc.make
 
 if MAINTAINER_MODE
 # Create some text files from HTML sources
