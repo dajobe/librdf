@@ -226,7 +226,7 @@ librdf_get_query_factory(librdf_world *world,
  * @base_uri: the base URI of the query string (or NULL)
  * @query_string: the query string
  *
- * Return value: a new &librdf_query object or NULL on failure
+ * Return value: a new #librdf_query object or NULL on failure
  */
 librdf_query*
 librdf_new_query (librdf_world *world,
@@ -246,12 +246,12 @@ librdf_new_query (librdf_world *world,
 
 /**
  * librdf_new_query_from_query - Copy constructor - create a new librdf_query object from an existing one
- * @old_query: the existing query &librdf_query to use
+ * @old_query: the existing query #librdf_query to use
  *
  * Should create a new query in the same context as the existing one
  * as appropriate.
  *
- * Return value: a new &librdf_query object or NULL on failure
+ * Return value: a new #librdf_query object or NULL on failure
  */
 librdf_query*
 librdf_new_query_from_query(librdf_query* old_query) 
@@ -308,7 +308,7 @@ librdf_new_query_from_query(librdf_query* old_query)
  * @query_string: the query string
  * @base_uri: base URI of the query string (or NULL)
  *
- * Return value: a new &librdf_query object or NULL on failure
+ * Return value: a new #librdf_query object or NULL on failure
  */
 librdf_query*
 librdf_new_query_from_factory(librdf_world *world,
@@ -353,7 +353,7 @@ librdf_new_query_from_factory(librdf_world *world,
 
 /**
  * librdf_free_query - Destructor - destroy a librdf_query object
- * @query: &librdf_query object
+ * @query: #librdf_query object
  * 
  **/
 void
@@ -410,13 +410,13 @@ librdf_query_remove_query_result(librdf_query *query,
 
 /**
  * librdf_query_execute - Run the query on a model
- * @query: &librdf_query object
+ * @query: #librdf_query object
  * @model: model to operate query on
  * 
  * Runs the query against the (previously registered) model
- * and returns a &librdf_query_results for the result objects.
+ * and returns a #librdf_query_results for the result objects.
  * 
- * Return value:  &librdf_query_results or NULL on failure
+ * Return value:  #librdf_query_results or NULL on failure
  **/
 librdf_query_results*
 librdf_query_execute(librdf_query* query, librdf_model* model)
@@ -437,7 +437,7 @@ librdf_query_execute(librdf_query* query, librdf_model* model)
 
 /**
  * librdf_query_get_limit - Get the query-specified limit on results
- * @query: &librdf_query query object
+ * @query: #librdf_query query object
  *
  * This is the limit given in the query on the number of results allowed.
  *
@@ -455,7 +455,7 @@ librdf_query_get_limit(librdf_query *query)
 
 /**
  * librdf_query_set_limit - Set the query-specified limit on results
- * @query: &librdf_query query object
+ * @query: #librdf_query query object
  * @limit: the limit on results, >=0 to set a limit, <0 to have no limit
  *
  * This is the limit given in the query on the number of results allowed.
@@ -476,7 +476,7 @@ librdf_query_set_limit(librdf_query *query, int limit)
 
 /**
  * librdf_query_get_offset - Get the query-specified offset on results
- * @query: &librdf_query query object
+ * @query: #librdf_query query object
  *
  * This is the offset given in the query on the number of results allowed.
  *
@@ -494,7 +494,7 @@ librdf_query_get_offset(librdf_query *query)
 
 /**
  * librdf_query_set_offset - Set the query-specified offset on results
- * @query: &librdf_query query object
+ * @query: #librdf_query query object
  * @offset: offset for results, >=0 to set an offset, <0 to have no offset
  *
  * This is the offset given in the query on the number of results allowed.

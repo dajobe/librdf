@@ -71,7 +71,7 @@ librdf_finish_statement(librdf_world *world)
  * librdf_new_statement - Constructor - create a new empty librdf_statement
  * @world: redland world object
  * 
- * Return value: a new &librdf_statement or NULL on failure
+ * Return value: a new #librdf_statement or NULL on failure
  **/
 librdf_statement*
 librdf_new_statement(librdf_world *world) 
@@ -90,9 +90,9 @@ librdf_new_statement(librdf_world *world)
 /**
  * librdf_new_statement_from_statement - Copy constructor - create a new librdf_statement from an existing librdf_statement
  * @world: redland world object
- * @statement: &librdf_statement to copy
+ * @statement: #librdf_statement to copy
  * 
- * Return value: a new &librdf_statement with copy or NULL on failure
+ * Return value: a new #librdf_statement with copy or NULL on failure
  **/
 librdf_statement*
 librdf_new_statement_from_statement(librdf_statement* statement)
@@ -137,13 +137,13 @@ librdf_new_statement_from_statement(librdf_statement* statement)
 /**
  * librdf_new_statement_from_nodes - Constructor - create a new librdf_statement from existing librdf_node objects
  * @world: redland world object
- * @subject: &librdf_node
- * @predicate: &librdf_node
- * @object: &librdf_node
+ * @subject: #librdf_node
+ * @predicate: #librdf_node
+ * @object: #librdf_node
  * 
  * The node objects become owned by the new statement (or freed on error).
  *
- * Return value: a new &librdf_statement with copy or NULL on failure
+ * Return value: a new #librdf_statement with copy or NULL on failure
  **/
 librdf_statement*
 librdf_new_statement_from_nodes(librdf_world *world, 
@@ -175,14 +175,14 @@ librdf_new_statement_from_nodes(librdf_world *world,
 /**
  * librdf_statement_init - initialise a statically declared librdf_statement
  * @world: redland world object
- * @statement: &librdf_statement object
+ * @statement: #librdf_statement object
  * 
  * This MUST be called on a statically declared librdf_statement
  * to initialise it properly.  It is the responsibility of the
  * user of the statically allocated librdf_statement to deal
  * with deallocation of any statement parts (subject, predicate, object).
  *
- * Return value: a new &librdf_statement or NULL on failure
+ * Return value: a new #librdf_statement or NULL on failure
  **/
 void
 librdf_statement_init(librdf_world *world, librdf_statement *statement)
@@ -198,7 +198,7 @@ librdf_statement_init(librdf_world *world, librdf_statement *statement)
 
 /**
  * librdf_statement_clear - empty a librdf_statement of nodes
- * @statement: &librdf_statement object
+ * @statement: #librdf_statement object
  * 
  **/
 void
@@ -223,7 +223,7 @@ librdf_statement_clear(librdf_statement *statement)
 
 /**
  * librdf_free_statement - Destructor - destroy a librdf_statement
- * @statement: &librdf_statement object
+ * @statement: #librdf_statement object
  * 
  **/
 void
@@ -255,12 +255,12 @@ librdf_free_statement(librdf_statement* statement)
 
 /**
  * librdf_statement_get_subject - Get the statement subject
- * @statement: &librdf_statement object
+ * @statement: #librdf_statement object
  * 
  * This method returns a SHARED pointer to the subject which must
  * be copied by the caller if needed.
  * 
- * Return value: a pointer to the &librdf_node of the statement subject - 
+ * Return value: a pointer to the #librdf_node of the statement subject - 
  **/
 librdf_node*
 librdf_statement_get_subject(librdf_statement *statement) 
@@ -273,8 +273,8 @@ librdf_statement_get_subject(librdf_statement *statement)
 
 /**
  * librdf_statement_set_subject - Set the statement subject
- * @statement: &librdf_statement object
- * @node: &librdf_node of subject
+ * @statement: #librdf_statement object
+ * @node: #librdf_node of subject
  * 
  * The subject passed in becomes owned by
  * the statement object and must not be used by the caller after this call.
@@ -290,12 +290,12 @@ librdf_statement_set_subject(librdf_statement *statement, librdf_node *node)
 
 /**
  * librdf_statement_get_predicate - Get the statement predicate
- * @statement: &librdf_statement object
+ * @statement: #librdf_statement object
  * 
  * This method returns a SHARED pointer to the predicate which must
  * be copied by the caller if needed.
  * 
- * Return value: a pointer to the &librdf_node of the statement predicate - 
+ * Return value: a pointer to the #librdf_node of the statement predicate - 
  **/
 librdf_node*
 librdf_statement_get_predicate(librdf_statement *statement) 
@@ -308,8 +308,8 @@ librdf_statement_get_predicate(librdf_statement *statement)
 
 /**
  * librdf_statement_set_predicate - Set the statement predicate
- * @statement: &librdf_statement object
- * @node: &librdf_node of predicate
+ * @statement: #librdf_statement object
+ * @node: #librdf_node of predicate
  *
  * The predicate passed in becomes owned by
  * the statement object and must not be used by the caller after this call.
@@ -325,12 +325,12 @@ librdf_statement_set_predicate(librdf_statement *statement, librdf_node *node)
 
 /**
  * librdf_statement_get_object - Get the statement object
- * @statement: &librdf_statement object
+ * @statement: #librdf_statement object
  * 
  * This method returns a SHARED pointer to the object which must
  * be copied by the caller if needed.
  * 
- * Return value: a pointer to the &librdf_node of the statement object - 
+ * Return value: a pointer to the #librdf_node of the statement object - 
  **/
 librdf_node*
 librdf_statement_get_object(librdf_statement *statement) 
@@ -343,8 +343,8 @@ librdf_statement_get_object(librdf_statement *statement)
 
 /**
  * librdf_statement_set_object - Set the statement object
- * @statement: &librdf_statement object
- * @node: &librdf_node of object
+ * @statement: #librdf_statement object
+ * @node: #librdf_node of object
  * 
  * The object passed in becomes owned by
  * the statement object and must not be used by the caller after this call.
@@ -360,7 +360,7 @@ librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
 
 /**
  * librdf_statement_is_complete - Check if statement has all subject, predicate, object fields present
- * @statement: &librdf_statement object
+ * @statement: #librdf_statement object
  * 
  * Return value: non 0 if the statement has subject, predicate and object.
  **/
@@ -496,8 +496,8 @@ librdf_statement_print(librdf_statement *statement, FILE *fh)
 
 /**
  * librdf_statement_equals - Check if two statements are equal
- * @statement1: first &librdf_statement
- * @statement2: second &librdf_statement
+ * @statement1: first #librdf_statement
+ * @statement2: second #librdf_statement
  * 
  * Return value: non 0 if statements are equal
  **/
@@ -587,7 +587,7 @@ librdf_statement_encode(librdf_statement* statement,
 /**
  * librdf_statement_encode_parts - Serialise parts of a statement into a buffer
  * @statement: statement to serialise
- * @context_node: &librdf_node context node (can be NULL)
+ * @context_node: #librdf_node context node (can be NULL)
  * @buffer: the buffer to use
  * @length: buffer size
  * @fields: fields to encode
@@ -735,13 +735,13 @@ librdf_statement_decode(librdf_statement* statement,
 /**
  * librdf_statement_decode_parts - Decodes a statement + context node from a buffer
  * @statement: the statement to deserialise into
- * @context_node: pointer to &librdf_node context_node to deserialise into
+ * @context_node: pointer to #librdf_node context_node to deserialise into
  * @buffer: the buffer to use
  * @length: buffer size
  * 
  * Decodes the serialised statement (as created by librdf_statement_encode() )
  * from the given buffer.  If a context node is found and context_node is
- * not NULL, a pointer to the new &librdf_node is stored in *context_node.
+ * not NULL, a pointer to the new #librdf_node is stored in *context_node.
  * 
  * Return value: number of bytes used or 0 on failure (bad encoding, allocation failure)
  **/

@@ -48,7 +48,7 @@
 
 /**
  * librdf_query_get_result_count - Get number of bindings so far
- * @query_results: &librdf_query_results query results
+ * @query_results: #librdf_query_results query results
  * 
  * Return value: number of bindings found so far
  **/
@@ -66,7 +66,7 @@ librdf_query_results_get_count(librdf_query_results *query_results)
 
 /**
  * librdf_query_results_next - Move to the next result
- * @query_results: &librdf_query_results query results
+ * @query_results: #librdf_query_results query results
  * 
  * Return value: non-0 if failed or results exhausted
  **/
@@ -84,7 +84,7 @@ librdf_query_results_next(librdf_query_results *query_results)
 
 /**
  * librdf_query_results_finished - Find out if binding results are exhausted
- * @query_results: &librdf_query_results query results
+ * @query_results: #librdf_query_results query results
  * 
  * Return value: non-0 if results are finished or query failed
  **/
@@ -102,9 +102,9 @@ librdf_query_results_finished(librdf_query_results *query_results)
 
 /**
  * librdf_query_results_get_bindings - Get all binding names, values for current result
- * @query_results: &librdf_query_results query results
+ * @query_results: #librdf_query_results query results
  * @names: pointer to an array of binding names (or NULL)
- * @values: pointer to an array of binding value &librdf_node (or NULL)
+ * @values: pointer to an array of binding value #librdf_node (or NULL)
  * 
  * If names is not NULL, it is set to the address of a shared array
  * of names of the bindings (an output parameter).  These names
@@ -142,10 +142,10 @@ librdf_query_results_get_bindings(librdf_query_results *query_results,
 
 /**
  * librdf_query_results_get_binding_value - Get one binding value for the current result
- * @query_results: &librdf_query_results query results
+ * @query_results: #librdf_query_results query results
  * @offset: offset of binding name into array of known names
  * 
- * Return value: a new &librdf_node binding value or NULL on failure
+ * Return value: a new #librdf_node binding value or NULL on failure
  **/
 librdf_node*
 librdf_query_results_get_binding_value(librdf_query_results *query_results,
@@ -162,7 +162,7 @@ librdf_query_results_get_binding_value(librdf_query_results *query_results,
 
 /**
  * librdf_query_results_get_binding_name - Get binding name for the current result
- * @query_results: &librdf_query_results query results
+ * @query_results: #librdf_query_results query results
  * @offset: offset of binding name into array of known names
  * 
  * Return value: a pointer to a shared copy of the binding name or NULL on failure
@@ -181,10 +181,10 @@ librdf_query_results_get_binding_name(librdf_query_results *query_results, int o
 
 /**
  * librdf_query_results_get_binding_value_by_name - Get one binding value for a given name in the current result
- * @query_results: &librdf_query_results query results
+ * @query_results: #librdf_query_results query results
  * @name: variable name
  * 
- * Return value: a new &librdf_node binding value or NULL on failure
+ * Return value: a new #librdf_node binding value or NULL on failure
  **/
 librdf_node*
 librdf_query_results_get_binding_value_by_name(librdf_query_results *query_results, const char *name)
@@ -200,7 +200,7 @@ librdf_query_results_get_binding_value_by_name(librdf_query_results *query_resul
 
 /**
  * librdf_query_results_get_bindings_count - Get the number of bound variables in the result
- * @query_results: &librdf_query_results query results
+ * @query_results: #librdf_query_results query results
  * 
  * Return value: <0 if failed or results exhausted
  **/
@@ -218,7 +218,7 @@ librdf_query_results_get_bindings_count(librdf_query_results *query_results)
 
 /**
  * librdf_free_query_results - Destructor - destroy a librdf_query_results object
- * @query_results: &librdf_query_results object
+ * @query_results: #librdf_query_results object
  * 
  **/
 void
@@ -237,7 +237,7 @@ librdf_free_query_results(librdf_query_results* query_results)
 
 /**
  * librdf_query_results_to_counted_string - Turn a query results into a string
- * @query_results: &librdf_query_results object
+ * @query_results: #librdf_query_results object
  * @format_uri: URI of syntax to format to
  * @base_uri: Base URI of output formatted syntax  or NULL
  * @length_p: Pointer to where to store length of string or NULL
@@ -268,7 +268,7 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
 
 /**
  * librdf_query_results_to_string - Turn a query results into a string
- * @query_results: &librdf_query_results object
+ * @query_results: #librdf_query_results object
  * @format_uri: URI of syntax to format to
  * @base_uri: Base URI of output formatted syntax 
  * 
@@ -293,7 +293,7 @@ librdf_query_results_to_string(librdf_query_results *query_results,
 
 /**
  * librdf_query_results_to_file_handle - Write a query results to a FILE*
- * @query_results: &librdf_query_results object
+ * @query_results: #librdf_query_results object
  * @handle: file handle to write to
  * @format_uri: URI of syntax to format to
  * @base_uri: Base URI of output formatted syntax 
@@ -324,7 +324,7 @@ librdf_query_results_to_file_handle(librdf_query_results *query_results,
 
 /**
  * librdf_query_results_to_file_handle - Write a query results to a file
- * @query_results: &librdf_query_results object
+ * @query_results: #librdf_query_results object
  * @name: filename to write to
  * @format_uri: URI of syntax to format to
  * @base_uri: Base URI of output formatted syntax 
@@ -358,7 +358,7 @@ librdf_query_results_to_file(librdf_query_results *query_results,
 
 /**
  * librdf_query_results_is_bindings - test if librdf_query_results is variable bindings format
- * @query_results: &librdf_query_results object
+ * @query_results: #librdf_query_results object
  * 
  * Return value: non-0 if true
  **/
@@ -375,7 +375,7 @@ librdf_query_results_is_bindings(librdf_query_results* query_results) {
 
 /**
  * librdf_query_results_is_boolean - test if librdf_query_results is boolean format
- * @query_results: &librdf_query_results object
+ * @query_results: #librdf_query_results object
  * 
  * Return value: non-0 if true
  **/
@@ -392,7 +392,7 @@ librdf_query_results_is_boolean(librdf_query_results* query_results) {
 
 /**
  * librdf_query_results_is_graph - test if librdf_query_results is RDF graph format
- * @query_results: &librdf_query_results object
+ * @query_results: #librdf_query_results object
  * 
  * Return value: non-0 if true
  **/
@@ -409,10 +409,10 @@ librdf_query_results_is_graph(librdf_query_results* query_results) {
 
 /**
  * librdf_query_results_get_boolean - Get boolean query result
- * @query_results: &librdf_query_results query_results
+ * @query_results: #librdf_query_results query_results
  *
  * The return value is only meaningful if this is a boolean
- * query result - see &librdf_query_results_is_boolean
+ * query result - see #librdf_query_results_is_boolean
  *
  * Return value: boolean query result - >0 is true, 0 is false, <0 on error or finished
  */
@@ -429,10 +429,10 @@ librdf_query_results_get_boolean(librdf_query_results* query_results) {
 
 /**
  * librdf_query_results_as_stream - Get RDF graph query result
- * @query_results: &librdf_query_results query_results
+ * @query_results: #librdf_query_results query_results
  *
  * The return value is only meaningful if this is an RDF graph
- * query result - see &librdf_query_results_is_graph
+ * query result - see #librdf_query_results_is_graph
  *
  * Return value: RDF graph query result or NULL on error
  */

@@ -229,7 +229,7 @@ librdf_get_parser_factory(librdf_world *world,
  * If all fields are NULL, this means any parser supporting
  * MIME Type "application/rdf+xml"
  * 
- * Return value: new &librdf_parser object or NULL
+ * Return value: new #librdf_parser object or NULL
  **/
 librdf_parser*
 librdf_new_parser(librdf_world *world, 
@@ -251,7 +251,7 @@ librdf_new_parser(librdf_world *world,
  * @world: redland world object
  * @factory: the parser factory to use to create this parser
  * 
- * Return value: new &librdf_parser object or NULL
+ * Return value: new #librdf_parser object or NULL
  **/
 librdf_parser*
 librdf_new_parser_from_factory(librdf_world *world, 
@@ -310,7 +310,7 @@ librdf_free_parser(librdf_parser *parser)
  * @uri: the URI to read
  * @base_uri: the base URI to use (or NULL if the same)
  * 
- * Return value: &librdf_stream of statements or NULL
+ * Return value: #librdf_stream of statements or NULL
  **/
 librdf_stream*
 librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
@@ -368,7 +368,7 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
  * @string: the string to parse
  * @base_uri: the base URI to use
  * 
- * Return value: &librdf_stream of statements or NULL
+ * Return value: #librdf_stream of statements or NULL
  **/
 librdf_stream*
 librdf_parser_parse_string_as_stream(librdf_parser* parser, 
@@ -421,7 +421,7 @@ librdf_parser_parse_string_into_model(librdf_parser* parser,
  * @length: length of the string content (must be >0)
  * @base_uri: the base URI to use
  * 
- * Return value: &librdf_stream of statements or NULL
+ * Return value: #librdf_stream of statements or NULL
  **/
 librdf_stream*
 librdf_parser_parse_counted_string_as_stream(librdf_parser* parser, 
@@ -537,10 +537,10 @@ librdf_parser_set_warning(librdf_parser* parser, void *user_data,
 
 /**
  * librdf_parser_get_feature - get the value of a parser feature
- * @parser: &librdf_parser object
- * @feature: &librdf_Uuri feature property
+ * @parser: #librdf_parser object
+ * @feature: #librdf_Uuri feature property
  * 
- * Return value: new &librdf_node feature value or NULL if no such feature
+ * Return value: new #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
 librdf_node*
@@ -557,9 +557,9 @@ librdf_parser_get_feature(librdf_parser* parser, librdf_uri* feature)
 
 /**
  * librdf_parser_set_feature - set the value of a parser feature
- * @parser: &librdf_parser object
- * @feature: &librdf_uri feature property
- * @value: &librdf_node feature property value
+ * @parser: #librdf_parser object
+ * @feature: #librdf_uri feature property
+ * @value: #librdf_node feature property value
  * 
  * Return value: non 0 on failure (negative if no such feature)
  **/

@@ -110,7 +110,7 @@ librdf_finish_node(librdf_world *world)
  * construct a new redland blank node identifier and make a
  * new librdf_node object for it.
  *
- * Return value: a new &librdf_node object or NULL on failure
+ * Return value: a new #librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node(librdf_world *world)
@@ -124,9 +124,9 @@ librdf_new_node(librdf_world *world)
  * librdf_new_node_from_uri_string_or_uri - INTERNAL - Constructor - create a new librdf_node object from a URI string or URI object
  * @world: redland world object
  * @uri_string: string representing a URI
- * @uri: &librdf_uri object
+ * @uri: #librdf_uri object
  * 
- * Return value: a new &librdf_node object or NULL on failure
+ * Return value: a new #librdf_node object or NULL on failure
  **/
 static librdf_node*
 librdf_new_node_from_uri_string_or_uri(librdf_world *world, 
@@ -224,7 +224,7 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
  * @world: redland world object
  * @uri_string: string representing a URI
  * 
- * Return value: a new &librdf_node object or NULL on failure
+ * Return value: a new #librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_uri_string(librdf_world *world, 
@@ -244,7 +244,7 @@ librdf_new_node_from_uri_string(librdf_world *world,
  * @world: redland world object
  * @uri: &rdf_uri object
  *
- * Return value: a new &librdf_node object or NULL on failure
+ * Return value: a new #librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri) 
@@ -261,7 +261,7 @@ librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
  * @uri: &rdf_uri object
  * @local_name: local name to append to URI
  *
- * Return value: a new &librdf_node object or NULL on failure
+ * Return value: a new #librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_uri_local_name(librdf_world *world, 
@@ -293,7 +293,7 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
  * @source_uri: source URI
  * @base_uri: base URI
  * 
- * Return value: a new &librdf_node object or NULL on failure
+ * Return value: a new #librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_normalised_uri_string(librdf_world *world, 
@@ -328,7 +328,7 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
  * 
  * 0.9.12: xml_space argument deleted
  *
- * Return value: new &librdf_node object or NULL on failure
+ * Return value: new #librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_literal(librdf_world *world, 
@@ -353,7 +353,7 @@ librdf_new_node_from_literal(librdf_world *world,
  * @xml_language: literal XML language (or NULL, empty string)
  * @datatype_uri: URI of typed literal datatype or NULL
  * 
- * Return value: new &librdf_node object or NULL on failure
+ * Return value: new #librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_typed_literal(librdf_world *world, 
@@ -495,7 +495,7 @@ librdf_new_node_from_typed_literal(librdf_world *world,
  * If no identifier string is given, creates a new internal identifier
  * and assigns it.
  * 
- * Return value: new &librdf_node object or NULL on failure
+ * Return value: new #librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_blank_identifier(librdf_world *world,
@@ -578,9 +578,9 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
 
 /**
  * librdf_new_node_from_node - Copy constructor - create a new librdf_node object from an existing librdf_node object
- * @node: &librdf_node object to copy
+ * @node: #librdf_node object to copy
  * 
- * Return value: a new &librdf_node object or NULL on failure
+ * Return value: a new #librdf_node object or NULL on failure
  **/
 librdf_node*
 librdf_new_node_from_node(librdf_node *node) 
@@ -594,7 +594,7 @@ librdf_new_node_from_node(librdf_node *node)
 
 /**
  * librdf_free_node - Destructor - destroy an librdf_node object
- * @node: &librdf_node object
+ * @node: #librdf_node object
  * 
  **/
 void
@@ -1108,7 +1108,7 @@ librdf_node_print(librdf_node* node, FILE *fh)
  * 
  * A new digest object is created which must be freed by the caller.
  * 
- * Return value: a new &librdf_digest object or NULL on failure
+ * Return value: a new #librdf_digest object or NULL on failure
  **/
 librdf_digest*
 librdf_node_get_digest(librdf_node* node) 
@@ -1151,8 +1151,8 @@ librdf_node_get_digest(librdf_node* node)
 
 /**
  * librdf_node_equals - Compare two librdf_node objects for equality
- * @first_node: first &librdf_node node
- * @second_node: second &librdf_node node
+ * @first_node: first #librdf_node node
+ * @second_node: second #librdf_node node
  * 
  * Note - for literal nodes, XML language, XML space and well-formness are 
  * presently ignored in the comparison.
@@ -1523,13 +1523,13 @@ librdf_node_static_iterator_finished(void* iterator)
 
 /**
  * librdf_node_static_iterator_create - Create an iterator over an array of nodes
- * @nodes: static array of &librdf_node objects
+ * @nodes: static array of #librdf_node objects
  * @size: size of array
  * 
  * This creates an iterator for an existing static array of librdf_node
  * objects.  It is mostly intended for testing iterator code.
  * 
- * Return value: a &librdf_iterator serialization of the nodes or NULL on failure
+ * Return value: a #librdf_iterator serialization of the nodes or NULL on failure
  **/
 librdf_iterator*
 librdf_node_static_iterator_create(librdf_node** nodes,

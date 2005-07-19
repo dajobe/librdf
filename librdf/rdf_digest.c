@@ -158,14 +158,14 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
  * @name: the digest name to use to create this digest
  * 
  * After construction, data should be added to the digest using
- * &librdf_digest_update or &librdf_digest_update_string with
- * &librdf_digest_final to signify finishing.  Then the digest
- * value can be returned directly with &librdf_digest_get_digest
- * of &librdf_digest_get_digest_length bytes or as a hex encoded
- * string with &librdf_digest_to_string.  The digest can be
- * re-initialised for new data with &librdf_digest_init.
+ * #librdf_digest_update or #librdf_digest_update_string with
+ * #librdf_digest_final to signify finishing.  Then the digest
+ * value can be returned directly with #librdf_digest_get_digest
+ * of #librdf_digest_get_digest_length bytes or as a hex encoded
+ * string with #librdf_digest_to_string.  The digest can be
+ * re-initialised for new data with #librdf_digest_init.
  *
- * Return value: new &librdf_digest object or NULL
+ * Return value: new #librdf_digest object or NULL
  **/
 librdf_digest*
 librdf_new_digest(librdf_world *world, char *name)
@@ -186,14 +186,14 @@ librdf_new_digest(librdf_world *world, char *name)
  * @factory: the digest factory to use to create this digest
  * 
  * After construction, data should be added to the digest using
- * &librdf_digest_update or &librdf_digest_update_string with
- * &librdf_digest_final to signify finishing.  Then the digest
- * value can be returned directly with &librdf_digest_get_digest
- * of &librdf_digest_get_digest_length bytes or as a hex encoded
- * string with &librdf_digest_to_string.  The digest can be
- * re-initialised for new data with &librdf_digest_init.
+ * #librdf_digest_update or #librdf_digest_update_string with
+ * #librdf_digest_final to signify finishing.  Then the digest
+ * value can be returned directly with #librdf_digest_get_digest
+ * of #librdf_digest_get_digest_length bytes or as a hex encoded
+ * string with #librdf_digest_to_string.  The digest can be
+ * re-initialised for new data with #librdf_digest_init.
  *
- * Return value: new &librdf_digest object or NULL
+ * Return value: new #librdf_digest object or NULL
  **/
 librdf_digest*
 librdf_new_digest_from_factory(librdf_world *world,
@@ -315,7 +315,7 @@ librdf_digest_final(librdf_digest* digest)
  * @digest: the digest
  * 
  * Return value: pointer to the memory containing the digest.  It will
- * be &librdf_digest_get_digest_length bytes in length.
+ * be #librdf_digest_get_digest_length bytes in length.
  *
  **/
 void*

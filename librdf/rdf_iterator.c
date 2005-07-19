@@ -53,7 +53,7 @@ static void* librdf_iterator_update_current_element(librdf_iterator* iterator);
  * @get_method: function to get the next element
  * @finished_method: function to destroy the iterator context (or NULL if not needed)
  * 
- * Return value: a new &librdf_iterator object or NULL on failure
+ * Return value: a new #librdf_iterator object or NULL on failure
 **/
 librdf_iterator*
 librdf_new_iterator(librdf_world *world,
@@ -100,7 +100,7 @@ librdf_iterator_free_iterator_map(void *list_data, void *user_data)
 
 /**
  * librdf_free_iterator - Destructor - destroy a librdf_iterator object
- * @iterator: the &librdf_iterator object
+ * @iterator: the #librdf_iterator object
  * 
  **/
 void
@@ -125,7 +125,7 @@ librdf_free_iterator(librdf_iterator* iterator)
 
 /*
  * librdf_iterator_update_current_element - Update the current iterator element with filtering
- * @iterator: the &librdf_iterator object
+ * @iterator: the #librdf_iterator object
  * 
  * Helper function to set the iterator->current to the current
  * element as filtered optionally by a user defined 
@@ -190,7 +190,7 @@ librdf_iterator_update_current_element(librdf_iterator* iterator)
 
 /**
  * librdf_iterator_have_elements - Test if the iterator has finished
- * @iterator: the &librdf_iterator object
+ * @iterator: the #librdf_iterator object
  * 
  * DEPRECATED - use !librdf_iterator_end(iterator)
  *
@@ -205,7 +205,7 @@ librdf_iterator_have_elements(librdf_iterator* iterator)
 
 /**
  * librdf_iterator_end - Test if the iterator has finished
- * @iterator: the &librdf_iterator object
+ * @iterator: the #librdf_iterator object
  * 
  * Return value: non 0 if the iterator has finished
  **/
@@ -223,7 +223,7 @@ librdf_iterator_end(librdf_iterator* iterator)
 
 /**
  * librdf_iterator_next - Move to the next iterator element
- * @iterator: the &librdf_iterator object
+ * @iterator: the #librdf_iterator object
  *
  * Return value: non 0 if the iterator has finished
  **/
@@ -247,7 +247,7 @@ librdf_iterator_next(librdf_iterator* iterator)
 
 /**
  * librdf_iterator_get_object - Get the current object from the iterator
- * @iterator: the &librdf_iterator object
+ * @iterator: the #librdf_iterator object
  *
  * This method returns a SHARED pointer to the current iterator object
  * which should be copied by the caller to preserve it if the iterator
@@ -268,7 +268,7 @@ librdf_iterator_get_object(librdf_iterator* iterator)
 
 /**
  * librdf_iterator_get_context - Get the context of the current object on the iterator
- * @iterator: the &librdf_iterator object
+ * @iterator: the #librdf_iterator object
  *
  * This method returns a SHARED pointer to the current context node object
  * which should be copied by the caller to preserve it if the iterator
@@ -294,7 +294,7 @@ librdf_iterator_get_context(librdf_iterator* iterator)
 
 /**
  * librdf_iterator_get_key - Get the key of the current object on the iterator
- * @iterator: the &librdf_iterator object
+ * @iterator: the #librdf_iterator object
  *
  * Return value: The context or NULL if the iterator has finished.
  **/
@@ -315,7 +315,7 @@ librdf_iterator_get_key(librdf_iterator* iterator)
 
 /**
  * librdf_iterator_get_value - Get the value of the current object on the iterator
- * @iterator: the &librdf_iterator object
+ * @iterator: the #librdf_iterator object
  *
  * Return value: The context or NULL if the iterator has finished.
  **/
@@ -387,7 +387,7 @@ librdf_iterator_add_map(librdf_iterator* iterator,
  * librdf_new_empty_iterator - Constructor - create a new librdf_iterator with no content
  * @world: redland world object
  * 
- * Return value: a new &librdf_iterator object or NULL on failure
+ * Return value: a new #librdf_iterator object or NULL on failure
 **/
 librdf_iterator*
 librdf_new_empty_iterator(librdf_world *world)

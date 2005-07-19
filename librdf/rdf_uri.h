@@ -35,28 +35,6 @@ extern "C" {
 #endif
 
 
-#ifdef LIBRDF_INTERNAL
-
-struct librdf_uri_s
-{
-  librdf_world *world;
-  unsigned char *string;
-  int string_length; /* useful for fast comparisons (that fail) */
-  int usage;
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  int max_usage;
-#endif
-};
-
-/* class methods */
-void librdf_init_uri(librdf_world *world);
-void librdf_finish_uri(librdf_world *world);
-
-/* exported public in error but never usable */
-librdf_digest* librdf_uri_get_digest (librdf_uri *uri);
-
-#endif
-
 /* constructors */
 REDLAND_API librdf_uri* librdf_new_uri (librdf_world *world, const unsigned char *string);
 /* Create a new URI from an existing URI - CLONE */

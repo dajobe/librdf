@@ -359,8 +359,8 @@ librdf_parser_raptor_generate_id_handler(void *user_data,
 /**
  * librdf_parser_raptor_parse_file_as_stream - Retrieve the RDF/XML content at URI and parse it into a librdf_stream
  * @context: parser context
- * @uri: &librdf_uri URI of RDF/XML content source
- * @base_uri: &librdf_uri URI of the content location or NULL if the same
+ * @uri: #librdf_uri URI of RDF/XML content source
+ * @base_uri: #librdf_uri URI of the content location or NULL if the same
  *
  *
  **/
@@ -452,10 +452,10 @@ librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler(raptor_www *www,
 /**
  * librdf_parser_raptor_parse_as_stream_common - Retrieve the content at URI/string and parse it into a librdf_stream
  * @context: parser context
- * @uri: &librdf_uri URI of ontent source
+ * @uri: #librdf_uri URI of ontent source
  * @string: or content string
  * @length: length of the string or 0 if not yet counted
- * @base_uri: &librdf_uri URI of the content location or NULL if the same
+ * @base_uri: #librdf_uri URI of the content location or NULL if the same
  *
  * Only one of uri or string may be given
  *
@@ -558,8 +558,8 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
 /**
  * librdf_parser_raptor_parse_uri_as_stream - Retrieve the content at URI and parse it into a librdf_stream
  * @context: parser context
- * @uri: &librdf_uri URI of content source
- * @base_uri: &librdf_uri URI of the content location or NULL if the same
+ * @uri: #librdf_uri URI of content source
+ * @base_uri: #librdf_uri URI of the content location or NULL if the same
  *
  *
  **/
@@ -577,7 +577,7 @@ librdf_parser_raptor_parse_uri_as_stream(void *context, librdf_uri *uri,
  * librdf_parser_raptor_parse_string_as_stream - Parse the content in a string and return a librdf_stream
  * @context: parser context
  * @string: string content to parse
- * @base_uri: &librdf_uri URI of the content location or NULL if the same
+ * @base_uri: #librdf_uri URI of the content location or NULL if the same
  *
  *
  **/
@@ -599,7 +599,7 @@ librdf_parser_raptor_parse_string_as_stream(void *context,
  * @length: length of the string content (must be >0)
  * @base_uri: the base URI to use
  * 
- * Return value: &librdf_stream of statements or NULL
+ * Return value: #librdf_stream of statements or NULL
  **/
 static librdf_stream*
 librdf_parser_raptor_parse_counted_string_as_stream(void *context,
@@ -615,11 +615,11 @@ librdf_parser_raptor_parse_counted_string_as_stream(void *context,
 /**
  * librdf_parser_raptor_parse_uri_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
  * @context: parser context
- * @uri: &librdf_uri URI of RDF/XML content source
+ * @uri: #librdf_uri URI of RDF/XML content source
  * @string: string content to parser
  * @length: length of the string or 0 if not yet counted
- * @base_uri: &librdf_uri URI of the content location
- * @model: &librdf_model of model
+ * @base_uri: #librdf_uri URI of the content location
+ * @model: #librdf_model of model
  *
  * Parses the content at @uri or @string and store it in the given model.
  * A base URI must be given if @uri is NULL, when @string is used.
@@ -698,9 +698,9 @@ librdf_parser_raptor_parse_into_model_common(void *context,
 /**
  * librdf_parser_raptor_parse_uri_into_model - Retrieve the RDF/XML content at URI and store it into a librdf_model
  * @context: parser context
- * @uri: &librdf_uri URI of RDF/XML content source
- * @base_uri: &librdf_uri URI of the content location (or NULL if the same as @uri)
- * @model: &librdf_model of model
+ * @uri: #librdf_uri URI of RDF/XML content source
+ * @base_uri: #librdf_uri URI of the content location (or NULL if the same as @uri)
+ * @model: #librdf_model of model
  *
  * Retrieves all statements and stores them in the given model.
  *
@@ -720,8 +720,8 @@ librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri,
  * librdf_parser_raptor_parse_string_into_model - Parse the RDF/XML content in a string and store it into a librdf_model
  * @context: parser context
  * @string: content to parse
- * @base_uri: &librdf_uri URI of the content location
- * @model: &librdf_model of model
+ * @base_uri: #librdf_uri URI of the content location
+ * @model: #librdf_model of model
  *
  * Stores the statements found parsing string and stores in the given model.
  *
@@ -764,7 +764,7 @@ librdf_parser_raptor_parse_counted_string_into_model(void *context,
 
 /**
  * librdf_parser_raptor_serialise_end_of_stream - Check for the end of the stream of statements from the raptor RDF parser
- * @context: the context passed in by &librdf_stream
+ * @context: the context passed in by #librdf_stream
  * 
  * Return value: non 0 at end of stream
  **/
@@ -779,7 +779,7 @@ librdf_parser_raptor_serialise_end_of_stream(void* context)
 
 /**
  * librdf_parser_raptor_serialise_next_statement - Move to the next librdf_statement in the stream of statements from the raptor RDF parse
- * @context: the context passed in by &librdf_stream
+ * @context: the context passed in by #librdf_stream
  * 
  * Return value: non 0 at end of stream
  **/
@@ -810,10 +810,10 @@ librdf_parser_raptor_serialise_next_statement(void* context)
 
 /**
  * librdf_parser_raptor_serialise_get_statement - Get the current librdf_statement from the stream of statements from the raptor RDF parse
- * @context: the context passed in by &librdf_stream
+ * @context: the context passed in by #librdf_stream
  * @flags: the context get method flags
  * 
- * Return value: a new &librdf_statement or NULL on error or if no statements found.
+ * Return value: a new #librdf_statement or NULL on error or if no statements found.
  **/
 static void*
 librdf_parser_raptor_serialise_get_statement(void* context, int flags)
@@ -839,7 +839,7 @@ librdf_parser_raptor_serialise_get_statement(void* context, int flags)
 
 /**
  * librdf_parser_raptor_serialise_finished - Finish the serialisation of the statement stream from the raptor RDF parse
- * @context: the context passed in by &librdf_stream
+ * @context: the context passed in by #librdf_stream
  **/
 static void
 librdf_parser_raptor_serialise_finished(void* context)

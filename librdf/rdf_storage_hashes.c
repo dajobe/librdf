@@ -989,9 +989,9 @@ librdf_storage_hashes_serialise_finished(void* context)
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
  * statement can be empty in which case any statement part will match that.
- * Uses &librdf_statement_match to do the matching.
+ * Uses #librdf_statement_match to do the matching.
  * 
- * Return value: a &librdf_stream or NULL on failure
+ * Return value: a #librdf_stream or NULL on failure
  **/
 static librdf_stream*
 librdf_storage_hashes_find_statements(librdf_storage* storage, librdf_statement* statement)
@@ -1210,7 +1210,7 @@ librdf_storage_hashes_node_iterator_finished(void* iterator)
  * @hash_index: the index of the hash to iterate over
  * @want: the field required from the hash value
  * 
- * Return value: a new &librdf_iterator or NULL on failure
+ * Return value: a new #librdf_iterator or NULL on failure
  **/
 static librdf_iterator*
 librdf_storage_hashes_node_iterator_create(librdf_storage* storage, 
@@ -1371,9 +1371,9 @@ librdf_storage_hashes_find_targets(librdf_storage* storage,
 
 /**
  * librdf_storage_hashes_context_add_statement - Add a statement to a storage context
- * @storage: &librdf_storage object
- * @context_node: &librdf_node object
- * @statement: &librdf_statement statement to add
+ * @storage: #librdf_storage object
+ * @context_node: #librdf_node object
+ * @statement: #librdf_statement statement to add
  * 
  * Return value: non 0 on failure
  **/
@@ -1417,9 +1417,9 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
 
 /**
  * librdf_storage_hashes_context_remove_statement - Remove a statement from a storage context
- * @storage: &librdf_storage object
- * @context_node: &librdf_node object
- * @statement: &librdf_statement statement to remove
+ * @storage: #librdf_storage object
+ * @context_node: #librdf_node object
+ * @statement: #librdf_statement statement to remove
  * 
  * Return value: non 0 on failure
  **/
@@ -1475,10 +1475,10 @@ typedef struct {
 
 /**
  * librdf_storage_hashes_context_serialise - List all statements in a storage context
- * @storage: &librdf_storage object
- * @context_node: &librdf_node object
+ * @storage: #librdf_storage object
+ * @context_node: #librdf_node object
  * 
- * Return value: &librdf_stream of statements or NULL on failure or context is empty
+ * Return value: #librdf_stream of statements or NULL on failure or context is empty
  **/
 static librdf_stream*
 librdf_storage_hashes_context_serialise(librdf_storage* storage,
@@ -1747,9 +1747,9 @@ librdf_storage_hashes_get_contexts_finished(void* iterator)
 
 /**
  * librdf_storage_hashes_context_get_contexts - List all context nodes in a storage
- * @storage: &librdf_storage object
+ * @storage: #librdf_storage object
  * 
- * Return value: &librdf_iterator of context_nodes or NULL on failure or no contexts
+ * Return value: #librdf_iterator of context_nodes or NULL on failure or no contexts
  **/
 static librdf_iterator*
 librdf_storage_hashes_get_contexts(librdf_storage* storage) 
@@ -1801,10 +1801,10 @@ librdf_storage_hashes_get_contexts(librdf_storage* storage)
 
 /**
  * librdf_storage_hashes_get_feature - get the value of a storage feature
- * @storage: &librdf_storage object
- * @feature: &librdf_uri feature property
+ * @storage: #librdf_storage object
+ * @feature: #librdf_uri feature property
  * 
- * Return value: new &librdf_node feature value or NULL if no such feature
+ * Return value: new #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
 static librdf_node*

@@ -156,7 +156,7 @@ librdf_free_hash_datums(librdf_world *world)
  * @data: data to store
  * @size: size of data
  * 
- * Return value: New &librdf_hash_datum object or NULL on failure
+ * Return value: New #librdf_hash_datum object or NULL on failure
  **/
 librdf_hash_datum*
 librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
@@ -292,7 +292,7 @@ librdf_get_hash_factory(librdf_world *world, const char *name)
  * @world: redland world object
  * @name: factory name
  *
- * Return value: a new &librdf_hash object or NULL on failure
+ * Return value: a new #librdf_hash object or NULL on failure
  */
 librdf_hash*
 librdf_new_hash(librdf_world *world, const char* name)
@@ -312,7 +312,7 @@ librdf_new_hash(librdf_world *world, const char* name)
  * @world: redland world object
  * @factory: the factory to use to construct the hash
  *
- * Return value: a new &librdf_hash object or NULL on failure
+ * Return value: a new #librdf_hash object or NULL on failure
  */
 librdf_hash*
 librdf_new_hash_from_factory (librdf_world *world,
@@ -348,9 +348,9 @@ librdf_new_hash_from_factory (librdf_world *world,
  * @name: hash name
  * @string: hash encoded as a string
  * 
- * See &librdf_hash_from_string for the string format.
+ * See #librdf_hash_from_string for the string format.
  * 
- * Return value: a new &librdf_hash object or NULL on failure
+ * Return value: a new #librdf_hash object or NULL on failure
  */
 librdf_hash*
 librdf_new_hash_from_string(librdf_world *world, const char *name,
@@ -377,7 +377,7 @@ librdf_new_hash_from_string(librdf_world *world, const char *name,
  * @name: hash name
  * @array: address of the start of the array of char* pointers
  *
- * Return value: a new &librdf_hash object or NULL on failure
+ * Return value: a new #librdf_hash object or NULL on failure
  */
 librdf_hash*
 librdf_new_hash_from_array_of_strings(librdf_world *world, const char *name,
@@ -402,7 +402,7 @@ librdf_new_hash_from_array_of_strings(librdf_world *world, const char *name,
  * librdf_new_hash_from_hash -  Copy Constructor - create a new librdf_hash object from an existing one
  * @old_hash: the hash to use to construct the hash
  *
- * Return value: a new &librdf_hash object or NULL on failure
+ * Return value: a new #librdf_hash object or NULL on failure
  */
 librdf_hash*
 librdf_new_hash_from_hash(librdf_hash* old_hash)
@@ -646,10 +646,10 @@ typedef struct {
  * @key: pointer to key
  * @value: pointer to value
  * 
- * The iterator returns &librdf_hash_datum objects containing the values.
+ * The iterator returns #librdf_hash_datum objects containing the values.
  * These are newly allocated memory which the caller must free.
  * 
- * Return value: a &librdf_iterator serialization of all values or NULL on failure
+ * Return value: a #librdf_iterator serialization of all values or NULL on failure
  **/
 librdf_iterator*
 librdf_hash_get_all(librdf_hash* hash, 
@@ -898,10 +898,10 @@ typedef struct {
  * @hash: hash object
  * @key: pointer to key
  * 
- * The iterator returns &librdf_hash_datum objects containingvalue returned is from newly allocated memory which the
+ * The iterator returns #librdf_hash_datum objects containingvalue returned is from newly allocated memory which the
  * caller must free.
  * 
- * Return value: &librdf_iterator serialisation of keys or NULL on failure
+ * Return value: #librdf_iterator serialisation of keys or NULL on failure
  **/
 librdf_iterator*
 librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key)
@@ -1404,7 +1404,7 @@ librdf_hash_from_array_of_strings(librdf_hash* hash, const char **array)
 
 /**
  * librdf_hash_get_as_boolean - lookup a hash key and decode value as a boolean
- * @hash: &librdf_hash object
+ * @hash: #librdf_hash object
  * @key: key string to look up
  * 
  * Return value: >0 (for true), 0 (for false) or <0 (for key not found or not known boolean value)
@@ -1448,7 +1448,7 @@ librdf_hash_get_as_boolean (librdf_hash* hash, const char *key)
 
 /**
  * librdf_hash_get_as_long - lookup a hash key and decode value as a long
- * @hash: &librdf_hash object
+ * @hash: #librdf_hash object
  * @key: key string to look up
  * 
  * Return value: >0 (for success), <0 (for key not found or not known boolean value)

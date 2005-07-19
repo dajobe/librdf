@@ -291,10 +291,10 @@ librdf_world_set_digest(librdf_world* world, const char *name) {
 
 /**
  * librdf_world_get_feature - get the value of a world feature 
- * @world: &librdf_world object
- * @feature: &librdf_uri feature property
+ * @world: #librdf_world object
+ * @feature: #librdf_uri feature property
  * 
- * Return value: new &librdf_node feature value or NULL if no such feature
+ * Return value: new #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
 librdf_node*
@@ -306,9 +306,9 @@ librdf_world_get_feature(librdf_world* world, librdf_uri *feature)
 
 /**
  * librdf_world_set_feature - set the value of a world feature
- * @world: &librdf_world object
- * @feature: &librdf_uri feature property
- * @value: &librdf_node feature property value
+ * @world: #librdf_world object
+ * @feature: #librdf_uri feature property
+ * @value: #librdf_node feature property value
  * 
  * Return value: non 0 on failure (negative if no such feature)
  **/

@@ -307,5 +307,5 @@ void
 librdf_digest_sha1_constructor(librdf_world *world)
 {
   librdf_digest_register_factory(world, 
-                                 "SHA1", &librdf_digest_sha1_register_factory);
+                                 "SHA1", #librdf_digest_sha1_register_factory);
 }

@@ -90,9 +90,9 @@ librdf_serializer_raptor_terminate(void *context)
 /**
  * librdf_serializer_raptor_get_feature - Get a raptor parser feature
  * @context: context
- * @feature: &librdf_uri of feature
+ * @feature: #librdf_uri of feature
  *
- * Return value: new &librdf_node value or NULL on failure
+ * Return value: new #librdf_node value or NULL on failure
  **/
 static librdf_node*
 librdf_serializer_raptor_get_feature(void *context, librdf_uri* feature) {

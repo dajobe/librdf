@@ -54,7 +54,7 @@ struct librdf_hash_cursor_s {
  * librdf_new_hash_cursor - Constructor - Create a new hash cursor over a hash
  * @hash: the hash object
  *
- * Return value: a new &librdf_hash_cursor or NULL on failure
+ * Return value: a new #librdf_hash_cursor or NULL on failure
  **/
 librdf_hash_cursor*
 librdf_new_hash_cursor (librdf_hash* hash) 

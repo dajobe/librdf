@@ -93,7 +93,7 @@ static void librdf_hash_bdb_register_factory(librdf_hash_factory *factory);
 
 /**
  * librdf_hash_bdb_create - Create a BerkeleyDB hash
- * @hash: &librdf_hash hash that this implements
+ * @hash: #librdf_hash hash that this implements
  * @context: BerkeleyDB hash context
  * 
  * Return value: non 0 on failure.
@@ -302,7 +302,7 @@ librdf_hash_bdb_close(void* context)
 
 /**
  * librdf_hash_bdb_clone - Clone the BerkeleyDB hash
- * @hash: new &librdf_hash that this implements
+ * @hash: new #librdf_hash that this implements
  * @context: new BerkeleyDB hash context
  * @new_identifier: new identifier for this hash
  * @old_context: old BerkeleyDB hash context

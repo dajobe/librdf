@@ -69,7 +69,7 @@ static librdf_statement* librdf_stream_update_current_statement(librdf_stream* s
  * filtered and/or altered as they are generated before passing back
  * to the user.
  *
- * Return value:  a new &librdf_stream object or NULL on failure
+ * Return value:  a new #librdf_stream object or NULL on failure
  **/
 librdf_stream*
 librdf_new_stream(librdf_world *world, 
@@ -115,7 +115,7 @@ librdf_stream_free_stream_map(void *list_data, void *user_data)
 
 /**
  * librdf_free_stream - Destructor - destroy an libdf_stream object
- * @stream: &librdf_stream object
+ * @stream: #librdf_stream object
  **/
 void
 librdf_free_stream(librdf_stream* stream) 
@@ -135,7 +135,7 @@ librdf_free_stream(librdf_stream* stream)
 
 /*
  * librdf_stream_get_next_mapped_element - helper function to get the next element with map appled
- * @stream: &librdf_stream object
+ * @stream: #librdf_stream object
  * 
  * A helper function that gets the next element subject to the user
  * defined map function, if set by librdf_stream_add_map(),
@@ -199,7 +199,7 @@ librdf_stream_update_current_statement(librdf_stream* stream)
 
 /**
  * librdf_stream_end - Test if the stream has ended
- * @stream: &librdf_stream object
+ * @stream: #librdf_stream object
  * 
  * Return value: non 0 at end of stream.
  **/
@@ -218,7 +218,7 @@ librdf_stream_end(librdf_stream* stream)
 
 /**
  * librdf_stream_next - Move to the next librdf_statement in the stream
- * @stream: &librdf_stream object
+ * @stream: #librdf_stream object
  *
  * Return value: non 0 if the stream has finished
  **/
@@ -242,14 +242,14 @@ librdf_stream_next(librdf_stream* stream)
 
 /**
  * librdf_stream_get_object - Get the current librdf_statement in the stream
- * @stream: &librdf_stream object
+ * @stream: #librdf_stream object
  *
  * This method returns a SHARED pointer to the current statement object
  * which should be copied by the caller to preserve it if the stream
  * is moved on librdf_stream_next or if it should last after the
  * stream is closed.
  * 
- * Return value: the current &librdf_statement object or NULL at end of stream.
+ * Return value: the current #librdf_statement object or NULL at end of stream.
  **/
 librdf_statement*
 librdf_stream_get_object(librdf_stream* stream) 
@@ -263,7 +263,7 @@ librdf_stream_get_object(librdf_stream* stream)
 
 /**
  * librdf_stream_get_context - Get the context of the current object on the stream
- * @stream: the &librdf_stream object
+ * @stream: the #librdf_stream object
  *
  * This method returns a SHARED pointer to the current context node object
  * which should be copied by the caller to preserve it if the stream
@@ -352,16 +352,16 @@ typedef struct {
 
 /**
  * librdf_new_stream_from_node_iterator - Constructor - create a new librdf_stream from an iterator of nodes
- * @iterator: &librdf_iterator of &librdf_node objects
- * @statement: &librdf_statement prototype with one NULL node space
+ * @iterator: #librdf_iterator of #librdf_node objects
+ * @statement: #librdf_statement prototype with one NULL node space
  * @field: node part of statement
  *
- * Creates a new &librdf_stream using the passed in &librdf_iterator
- * which generates a series of &librdf_node objects.  The resulting
+ * Creates a new #librdf_stream using the passed in #librdf_iterator
+ * which generates a series of #librdf_node objects.  The resulting
  * nodes are then inserted into the given statement and returned.
  * The field attribute indicates which statement node is being generated.
  *
- * Return value: a new &librdf_stream object or NULL on failure
+ * Return value: a new #librdf_stream object or NULL on failure
  **/
 librdf_stream*
 librdf_new_stream_from_node_iterator(librdf_iterator* iterator,
@@ -569,7 +569,7 @@ librdf_stream_statement_find_map(librdf_stream *stream,
  * librdf_new_empty_stream - Constructor - create a new librdf_stream with no content
  * @world: redland world object
  * 
- * Return value: a new &librdf_stream object or NULL on failure
+ * Return value: a new #librdf_stream object or NULL on failure
 **/
 librdf_stream*
 librdf_new_empty_stream(librdf_world *world)

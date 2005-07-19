@@ -75,7 +75,7 @@ librdf_list_find_node(librdf_list* list, void *data)
  * librdf_new_list - Constructor - create a new librdf_list
  * @world: redland world object
  * 
- * Return value: a new &librdf_list or NULL on failure
+ * Return value: a new #librdf_list or NULL on failure
  **/
 librdf_list*
 librdf_new_list(librdf_world *world)
@@ -94,7 +94,7 @@ librdf_new_list(librdf_world *world)
 
 /**
  * librdf_free_list - Destructor - destroy a librdf_list object
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * 
  **/
 void
@@ -107,7 +107,7 @@ librdf_free_list(librdf_list* list)
 
 /**
  * librdf_list_clear - empty an librdf_list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * 
  **/
 void
@@ -124,7 +124,7 @@ librdf_list_clear(librdf_list* list)
 
 /**
  * librdf_list_add - add a data item to the end of a librdf_list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * @data: the data value
  * 
  * Equivalent to the list 'push' notion, thus if librdf_list_pop()
@@ -167,7 +167,7 @@ librdf_list_add(librdf_list* list, void *data)
 
 /**
  * librdf_list_unshift - add a data item to the start of a librdf_list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * @data: the data value
  * 
  * if librdf_list_shift() is called after this, it will return the value
@@ -210,7 +210,7 @@ librdf_list_unshift(librdf_list* list, void *data)
 
 /**
  * librdf_list_remove - remove a data item from an librdf_list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * @data: the data item
  * 
  * The search is done using the 'equals' function which may be set
@@ -252,7 +252,7 @@ librdf_list_remove(librdf_list* list, void *data)
 
 /**
  * librdf_list_shift - remove and return the data at the start of the list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * 
  * Return value: the data object or NULL if the list is empty
  **/
@@ -288,7 +288,7 @@ librdf_list_shift(librdf_list* list)
 
 /**
  * librdf_list_pop - remove and return the data at the end of the list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * 
  * Return value: the data object or NULL if the list is empty
  **/
@@ -324,7 +324,7 @@ librdf_list_pop(librdf_list* list)
 
 /**
  * librdf_list_contains - check for presence of data item in list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * @data: the data value
  * 
  * The search is done using the 'equals' function which may be set
@@ -345,7 +345,7 @@ librdf_list_contains(librdf_list* list, void *data)
 
 /**
  * librdf_list_size - return the length of the list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * 
  * Return value: length of the list
  **/
@@ -358,7 +358,7 @@ librdf_list_size(librdf_list* list)
 
 /**
  * librdf_list_set_equals - set the equals function for the list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * @equals: the equals function
  * 
  * The function given is used when comparing items in the list
@@ -383,9 +383,9 @@ typedef struct {
 
 /**
  * librdf_list_get_iterator - get an iterator for the list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * 
- * Return value: a new &librdf_iterator object or NULL on failure
+ * Return value: a new #librdf_iterator object or NULL on failure
  **/
 librdf_iterator*
 librdf_list_get_iterator(librdf_list* list)
@@ -462,7 +462,7 @@ librdf_list_iterator_finished(void* iterator)
 
 /**
  * librdf_list_foreach - apply a function for each data item in a librdf_list
- * @list: &librdf_list object
+ * @list: #librdf_list object
  * @fn: pointer to function to apply that takes data pointer and user data parameters
  * @user_data: user data for applied function 
  * 

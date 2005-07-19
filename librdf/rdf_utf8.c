@@ -396,7 +396,7 @@ librdf_latin1_to_utf8(const byte *input, int length, int *output_length)
  * @stream: FILE* stream
  * 
  * Pretty prints the UTF-8 string in a pseudo-C character
- * format like \u<hex digits> when the characters fail
+ * format like \u<emphasis>hex digits</emphasis> when the characters fail
  * the isprint() test.
  **/
 void

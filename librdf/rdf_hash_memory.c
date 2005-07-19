@@ -180,7 +180,7 @@ static void librdf_hash_memory_register_factory(librdf_hash_factory *factory);
  * If user_bucket is not NULL, the bucket used will be returned.  if
  * prev is no NULL, the previous node in the list will be returned.
  * 
- * Return value: &librdf_hash_memory_node of content or NULL on failure
+ * Return value: #librdf_hash_memory_node of content or NULL on failure
  **/
 static librdf_hash_memory_node*
 librdf_hash_memory_find_node(librdf_hash_memory_context* hash, 
@@ -311,7 +311,7 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
 
 /**
  * librdf_hash_memory_create - Create a new memory hash
- * @hash: &librdf_hash hash
+ * @hash: #librdf_hash hash
  * @context: memory hash contxt
  * 
  * Return value: non 0 on failure
@@ -369,7 +369,7 @@ librdf_hash_memory_destroy(void* context)
  * @mode: access mode - not used
  * @is_writable: is hash writable? - not used
  * @is_new: is hash new? - not used
- * @options: &librdf_hash of options - not used
+ * @options: #librdf_hash of options - not used
  * 
  * Return value: non 0 on failure
  **/

@@ -227,7 +227,7 @@ librdf_get_serializer_factory(librdf_world *world,
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI of syntax (NULL if not used)
  * 
- * Return value: new &librdf_serializer object or NULL
+ * Return value: new #librdf_serializer object or NULL
  **/
 librdf_serializer*
 librdf_new_serializer(librdf_world *world, 
@@ -249,7 +249,7 @@ librdf_new_serializer(librdf_world *world,
  * @world: redland world object
  * @factory: the serializer factory to use to create this serializer
  * 
- * Return value: new &librdf_serializer object or NULL
+ * Return value: new #librdf_serializer object or NULL
  **/
 librdf_serializer*
 librdf_new_serializer_from_factory(librdf_world *world, 
@@ -307,7 +307,7 @@ librdf_free_serializer(librdf_serializer *serializer)
  * @serializer: the serializer
  * @handle: file handle to serialize to
  * @base_uri: the base URI to use (or NULL)
- * @model: the &librdf_model model to use
+ * @model: the #librdf_model model to use
  * 
  * DEPRECATED: Use librdf_serializer_serialize_model_to_file_handle
  *
@@ -329,7 +329,7 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
  * @serializer: the serializer
  * @handle: file handle to serialize to
  * @base_uri: the base URI to use (or NULL)
- * @model: the &librdf_model model to use
+ * @model: the #librdf_model model to use
  * 
  * Return value: non 0 on failure
  **/
@@ -353,7 +353,7 @@ librdf_serializer_serialize_model_to_file_handle(librdf_serializer* serializer,
  * @serializer: the serializer
  * @name: filename to serialize to
  * @base_uri: the base URI to use (or NULL)
- * @model: the &librdf_model model to use
+ * @model: the #librdf_model model to use
  * 
  * Return value: non 0 on failure
  **/
@@ -384,7 +384,7 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
  * librdf_serializer_serialize_model_to_counted_string - Write a serialized librdf_model to a counted string
  * @serializer: the serializer
  * @base_uri: the base URI to use (or NULL)
- * @model: the &librdf_model model to use
+ * @model: the #librdf_model model to use
  * @length_p: pointer to store length or NULL
  * 
  * Return value: non 0 on failure
@@ -411,7 +411,7 @@ librdf_serializer_serialize_model_to_counted_string(librdf_serializer* serialize
  * librdf_serializer_serialize_model_to_string - Write a serialized librdf_model to a string
  * @serializer: the serializer
  * @base_uri: the base URI to use (or NULL)
- * @model: the &librdf_model model to use
+ * @model: the #librdf_model model to use
  * 
  * Return value: non 0 on failure
  **/

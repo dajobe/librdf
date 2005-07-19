@@ -63,9 +63,9 @@ librdf_model_storage_terminate(void) {
 
 /**
  * librdf_model_storage_create - Constructor - Create a new librdf_model with storage
- * @model: &librdf_model to initialise
- * @storage: &librdf_storage storage to use
- * @options: &librdf_hash of options to use
+ * @model: #librdf_model to initialise
+ * @storage: #librdf_storage storage to use
+ * @options: #librdf_hash of options to use
  * 
  * Options are presently not used.
  *
@@ -93,12 +93,12 @@ librdf_model_storage_create(librdf_model *model, librdf_storage *storage,
 
 /**
  * librdf_model_storage_clone - Copy constructor - create a new librdf_model from an existing one
- * @old_model: the existing &librdf_model
+ * @old_model: the existing #librdf_model
  * 
  * Creates a new model as a copy of the existing model in the same
  * storage context.
  * 
- * Return value: a new &librdf_model or NULL on failure
+ * Return value: a new #librdf_model or NULL on failure
  **/
 static librdf_model*
 librdf_model_storage_clone(librdf_model* old_model)
@@ -121,7 +121,7 @@ librdf_model_storage_clone(librdf_model* old_model)
 
 /**
  * librdf_model_storage_destroy - Destructor - Destroy a librdf_model object
- * @model: &librdf_model model to destroy
+ * @model: #librdf_model model to destroy
  * 
  **/
 static void
@@ -140,7 +140,7 @@ librdf_model_storage_destroy(librdf_model *model)
 
 /**
  * librdf_model_storage_size - get the number of statements in the model
- * @model: &librdf_model object
+ * @model: #librdf_model object
  * 
  * Return value: the number of statements
  **/
@@ -221,7 +221,7 @@ librdf_model_storage_contains_statement(librdf_model* model, librdf_statement* s
  * librdf_model_storage_serialise - serialise the entire model as a stream
  * @model: the model object
  * 
- * Return value: a &librdf_stream or NULL on failure
+ * Return value: a #librdf_stream or NULL on failure
  **/
 static librdf_stream*
 librdf_model_storage_serialise(librdf_model* model)
@@ -240,7 +240,7 @@ librdf_model_storage_serialise(librdf_model* model)
  * and/or object can take the value NULL which indicates a match with
  * any value in the model
  * 
- * Return value: a &librdf_stream of statements (can be empty) or NULL
+ * Return value: a #librdf_stream of statements (can be empty) or NULL
  * on failure.
  **/
 static librdf_stream*
@@ -254,14 +254,14 @@ librdf_model_storage_find_statements(librdf_model* model,
 
 /**
  * librdf_model_storage_get_sources - return the sources (subjects) of arc in an RDF graph given arc (predicate) and target (object)
- * @model: &librdf_model object
- * @arc: &librdf_node arc
- * @target: &librdf_node target
+ * @model: #librdf_model object
+ * @arc: #librdf_node arc
+ * @target: #librdf_node target
  * 
  * Searches the model for arcs matching the given arc and target
- * and returns a list of the source &librdf_node objects as an iterator
+ * and returns a list of the source #librdf_node objects as an iterator
  * 
- * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ * Return value:  #librdf_iterator of #librdf_node objects (may be empty) or NULL on failure
  **/
 static librdf_iterator*
 librdf_model_storage_get_sources(librdf_model *model,
@@ -274,14 +274,14 @@ librdf_model_storage_get_sources(librdf_model *model,
 
 /**
  * librdf_model_storage_get_arcs - return the arcs (predicates) of an arc in an RDF graph given source (subject) and target (object)
- * @model: &librdf_model object
- * @source: &librdf_node source
- * @target: &librdf_node target
+ * @model: #librdf_model object
+ * @source: #librdf_node source
+ * @target: #librdf_node target
  * 
  * Searches the model for arcs matching the given source and target
- * and returns a list of the arc &librdf_node objects as an iterator
+ * and returns a list of the arc #librdf_node objects as an iterator
  * 
- * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ * Return value:  #librdf_iterator of #librdf_node objects (may be empty) or NULL on failure
  **/
 static librdf_iterator*
 librdf_model_storage_get_arcs(librdf_model *model,
@@ -294,14 +294,14 @@ librdf_model_storage_get_arcs(librdf_model *model,
 
 /**
  * librdf_model_storage_get_targets - return the targets (objects) of an arc in an RDF graph given source (subject) and arc (predicate)
- * @model: &librdf_model object
- * @source: &librdf_node source
- * @arc: &librdf_node arc
+ * @model: #librdf_model object
+ * @source: #librdf_node source
+ * @arc: #librdf_node arc
  * 
  * Searches the model for targets matching the given source and arc
- * and returns a list of the source &librdf_node objects as an iterator
+ * and returns a list of the source #librdf_node objects as an iterator
  * 
- * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ * Return value:  #librdf_iterator of #librdf_node objects (may be empty) or NULL on failure
  **/
 static librdf_iterator*
 librdf_model_storage_get_targets(librdf_model *model,
@@ -315,10 +315,10 @@ librdf_model_storage_get_targets(librdf_model *model,
 
 /**
  * librdf_model_storage_get_arcs_in - return the properties pointing to the given resource
- * @model: &librdf_model object
- * @node: &librdf_node resource node
+ * @model: #librdf_model object
+ * @node: #librdf_node resource node
  * 
- * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ * Return value:  #librdf_iterator of #librdf_node objects (may be empty) or NULL on failure
  **/
 static librdf_iterator*
 librdf_model_storage_get_arcs_in(librdf_model *model, librdf_node *node) 
@@ -330,10 +330,10 @@ librdf_model_storage_get_arcs_in(librdf_model *model, librdf_node *node)
 
 /**
  * librdf_model_storage_get_arcs_out - return the properties pointing from the given resource
- * @model: &librdf_model object
- * @node: &librdf_node resource node
+ * @model: #librdf_model object
+ * @node: #librdf_node resource node
  * 
- * Return value:  &librdf_iterator of &librdf_node objects (may be empty) or NULL on failure
+ * Return value:  #librdf_iterator of #librdf_node objects (may be empty) or NULL on failure
  **/
 static librdf_iterator*
 librdf_model_storage_get_arcs_out(librdf_model *model, librdf_node *node) 
@@ -345,9 +345,9 @@ librdf_model_storage_get_arcs_out(librdf_model *model, librdf_node *node)
 
 /**
  * librdf_model_storage_has_arc_in - check if a node has a given property pointing to it
- * @model: &librdf_model object
- * @node: &librdf_node resource node
- * @property: &librdf_node property node
+ * @model: #librdf_model object
+ * @node: #librdf_node resource node
+ * @property: #librdf_node property node
  * 
  * Return value: non 0 if arc property does point to the resource node
  **/
@@ -362,9 +362,9 @@ librdf_model_storage_has_arc_in(librdf_model *model, librdf_node *node,
 
 /**
  * librdf_model_storage_has_arc_out - check if a node has a given property pointing from it
- * @model: &librdf_model object
- * @node: &librdf_node resource node
- * @property: &librdf_node property node
+ * @model: #librdf_model object
+ * @node: #librdf_node resource node
+ * @property: #librdf_node property node
  * 
  * Return value: non 0 if arc property does point from the resource node
  **/
@@ -380,9 +380,9 @@ librdf_model_storage_has_arc_out(librdf_model *model, librdf_node *node,
 
 /**
  * librdf_model_storage_context_add_statement - Add a statement to a model with a context
- * @model: &librdf_model object
- * @context: &librdf_node context
- * @statement: &librdf_statement statement object
+ * @model: #librdf_model object
+ * @context: #librdf_node context
+ * @statement: #librdf_statement statement object
  * 
  * Return value: Non 0 on failure
  **/
@@ -399,9 +399,9 @@ librdf_model_storage_context_add_statement(librdf_model* model,
 
 /**
  * librdf_model_storage_context_add_statements - Add statements to a model with a context
- * @model: &librdf_model object
- * @context: &librdf_node context
- * @stream: &librdf_stream stream object
+ * @model: #librdf_model object
+ * @context: #librdf_node context
+ * @stream: #librdf_stream stream object
  * 
  * Return value: Non 0 on failure
  **/
@@ -418,9 +418,9 @@ librdf_model_storage_context_add_statements(librdf_model* model,
 
 /**
  * librdf_model_storage_context_remove_statement - Remove a statement from a model in a context
- * @model: &librdf_model object
- * @context: &librdf_uri context
- * @statement: &librdf_statement statement
+ * @model: #librdf_model object
+ * @context: #librdf_uri context
+ * @statement: #librdf_statement statement
  * 
  * Return value: Non 0 on failure
  **/
@@ -437,8 +437,8 @@ librdf_model_storage_context_remove_statement(librdf_model* model,
 
 /**
  * librdf_model_storage_context_remove_statements - Remove statements from a model with the given context
- * @model: &librdf_model object
- * @context: &librdf_uri context
+ * @model: #librdf_model object
+ * @context: #librdf_uri context
  * 
  * Return value: Non 0 on failure
  **/
@@ -453,10 +453,10 @@ librdf_model_storage_context_remove_statements(librdf_model* model,
 
 /**
  * librdf_model_storage_context_serialize - List all statements in a model context
- * @model: &librdf_model object
- * @context: &librdf_uri context
+ * @model: #librdf_model object
+ * @context: #librdf_uri context
  * 
- * Return value: &librdf_stream of statements or NULL on failure
+ * Return value: #librdf_stream of statements or NULL on failure
  **/
 static librdf_stream*
 librdf_model_storage_context_serialize(librdf_model* model, 
@@ -469,12 +469,12 @@ librdf_model_storage_context_serialize(librdf_model* model,
 
 /**
  * librdf_model_storage_query_execute - Run a query against the model returning librdf_query_results
- * @model: &librdf_model object
- * @query: &librdf_query object
+ * @model: #librdf_model object
+ * @query: #librdf_query object
  * 
- * Run the given query against the model and return a &librdf_query_results
+ * Run the given query against the model and return a #librdf_query_results
  * 
- * Return value: &librdf_query_results or NULL on failure
+ * Return value: #librdf_query_results or NULL on failure
  **/
 static librdf_query_results*
 librdf_model_storage_query_execute(librdf_model* model,
@@ -491,7 +491,7 @@ librdf_model_storage_query_execute(librdf_model* model,
 
 /**
  * librdf_model_storage_sync - Synchronise the model to the storage
- * @model: &librdf_model object
+ * @model: #librdf_model object
  *
  * Return-value: Non-0 on failure
  **/
@@ -505,7 +505,7 @@ librdf_model_storage_sync(librdf_model* model)
 
 /**
  * librdf_model_storage_get_Storage - Get the storage for the model
- * @model: &librdf_model object
+ * @model: #librdf_model object
  * 
  **/
 static librdf_storage*
@@ -518,12 +518,12 @@ librdf_model_storage_get_storage(librdf_model* model)
 
 /**
  * librdf_model_storage_get_contexts - return the list of contexts in the store
- * @storage: &librdf_storage object
+ * @storage: #librdf_storage object
  * 
- * Returns an iterator of &librdf_node context nodes for each
+ * Returns an iterator of #librdf_node context nodes for each
  * context in the store.
  *
- * Return value: &librdf_iterator of context nodes or NULL on failure or if contexts are not supported
+ * Return value: #librdf_iterator of context nodes or NULL on failure or if contexts are not supported
  **/
 static librdf_iterator*
 librdf_model_storage_get_contexts(librdf_model* model) 
@@ -536,10 +536,10 @@ librdf_model_storage_get_contexts(librdf_model* model)
 
 /**
  * librdf_model_storage_get_feature - get the value of a model storage feature
- * @storage: &librdf_storage object
- * @feature: &librdf_uri feature property
+ * @storage: #librdf_storage object
+ * @feature: #librdf_uri feature property
  * 
- * Return value: new &librdf_node feature value or NULL if no such feature
+ * Return value: new #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
 static librdf_node*
@@ -552,11 +552,11 @@ librdf_model_storage_get_feature(librdf_model* model, librdf_uri* feature)
 
 /**
  * librdf_model_storage_set_feature - get the value of a model storage feature
- * @storage: &librdf_storage object
- * @feature: &librdf_uri feature property
- * @value: &librdf_node feature property value
+ * @storage: #librdf_storage object
+ * @feature: #librdf_uri feature property
+ * @value: #librdf_node feature property value
  * 
- * Return value: &librdf_node feature value or NULL if no such feature
+ * Return value: #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
 static int

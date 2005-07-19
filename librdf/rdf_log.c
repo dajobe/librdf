@@ -67,8 +67,8 @@ static const char *log_level_names[LIBRDF_LOG_LAST+1]={
  * librdf_log_simple - INTERNAL - Log a message
  * @world: redland world object or NULL
  * @code: error code
- * @level: &librdf_log_level log level
- * @facility: &librdf_log_facility log facility
+ * @level: #librdf_log_level log level
+ * @facility: #librdf_log_facility log facility
  * @locator: raptor_locator if available or NULL
  * @message: message to record
  *
@@ -153,8 +153,8 @@ librdf_log_simple(librdf_world* world, int code,
  * librdf_log - INTERNAL - Log a message
  * @world: redland world object or NULL
  * @code: error code
- * @level: &librdf_log_level log level
- * @facility: &librdf_log_facility log facility
+ * @level: #librdf_log_level log level
+ * @facility: #librdf_log_facility log facility
  * @locator: raptor_locator if available or NULL
  * @message: message to record
  *

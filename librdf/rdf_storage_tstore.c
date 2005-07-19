@@ -430,9 +430,9 @@ typedef struct {
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
  * statement can be empty in which case any statement part will match that.
- * Uses &librdf_statement_match to do the matching.
+ * Uses #librdf_statement_match to do the matching.
  * 
- * Return value: a &librdf_stream or NULL on failure
+ * Return value: a #librdf_stream or NULL on failure
  **/
 static librdf_stream*
 librdf_storage_tstore_find_statements(librdf_storage* storage, librdf_statement* statement)
@@ -568,9 +568,9 @@ librdf_storage_tstore_find_finished(void* context)
 
 /**
  * librdf_storage_tstore_context_add_statement - Add a statement to a storage context
- * @storage: &librdf_storage object
- * @context_node: &librdf_node object
- * @statement: &librdf_statement statement to add
+ * @storage: #librdf_storage object
+ * @context_node: #librdf_node object
+ * @statement: #librdf_statement statement to add
  * 
  * Return value: non 0 on failure
  **/
@@ -619,9 +619,9 @@ librdf_storage_tstore_context_add_statement(librdf_storage* storage,
 
 /**
  * librdf_storage_tstore_context_remove_statement - Remove a statement from a storage context
- * @storage: &librdf_storage object
- * @context_node: &librdf_node object
- * @statement: &librdf_statement statement to remove
+ * @storage: #librdf_storage object
+ * @context_node: #librdf_node object
+ * @statement: #librdf_statement statement to remove
  * 
  * Return value: non 0 on failure
  **/
@@ -648,10 +648,10 @@ typedef struct {
 
 /**
  * librdf_storage_tstore_context_serialise - List all statements in a storage context
- * @storage: &librdf_storage object
- * @context_node: &librdf_node object
+ * @storage: #librdf_storage object
+ * @context_node: #librdf_node object
  * 
- * Return value: &librdf_stream of statements or NULL on failure or context is empty
+ * Return value: #librdf_stream of statements or NULL on failure or context is empty
  **/
 static librdf_stream*
 librdf_storage_tstore_context_serialise(librdf_storage* storage,

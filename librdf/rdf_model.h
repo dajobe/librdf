@@ -45,26 +45,27 @@ extern "C" {
 struct librdf_model_s {
   librdf_world *world;
 
-  /** usage count of this instance
+  /* usage: usage count of this instance
+   *
    * Used by other redland classes such as iterator, stream
-   * via  librdf_model_add_reference librdf_model_remove_reference
+   * via librdf_model_add_reference librdf_model_remove_reference
    * The usage count of model after construction is 1.
    */
   int usage;
   
-  /** list of sub librdf_model* */
+  /* sub_models: list of sub librdf_model* */
   librdf_list*     sub_models;
 
-  /** does the storage model support redland contexts? */
+  /* supports_contexts : does the storage model support redland contexts? */
   int supports_contexts;
 
-  /* model implementation user data */
+  /* context : model implementation user data */
   void *context;
 
   struct librdf_model_factory_s* factory;
 };
 
-/** A Model Factory */
+/* A Model Factory */
 struct librdf_model_factory_s {
   librdf_world *world;
   struct librdf_model_factory_s* next;
