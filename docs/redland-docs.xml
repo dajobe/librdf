@@ -6,34 +6,37 @@
     <title>Redland RDF Application Framework Reference Manual</title>
   </bookinfo>
 
-  <part>
-    <xi:include href="redland-intro.xml"/>
-  </part>				  
+
+   <xi:include href="redland-intro.xml"/>
 
   <part>
     <title>Tutorial</title>
+    <xi:include href="redland-objects-in-c.xml"/>
   </part>				  
 
   <part>
     <title>Reference</title>
-    <xi:include href="xml/rdf_init.xml"/>
-    <xi:include href="xml/rdf_concepts.xml"/>
-    <xi:include href="xml/rdf_digest.xml"/>
-    <xi:include href="xml/rdf_files.xml"/>
-    <xi:include href="xml/rdf_hash.xml"/>
-    <xi:include href="xml/rdf_heuristics.xml"/>
-    <xi:include href="xml/rdf_iterator.xml"/>
-    <xi:include href="xml/rdf_list.xml"/>
-    <xi:include href="xml/rdf_log.xml"/>
-    <xi:include href="xml/rdf_model.xml"/>
-    <xi:include href="xml/rdf_node.xml"/>
-    <xi:include href="xml/rdf_parser.xml"/>
-    <xi:include href="xml/rdf_query.xml"/>
-    <xi:include href="xml/rdf_serializer.xml"/>
-    <xi:include href="xml/rdf_statement.xml"/>
-    <xi:include href="xml/rdf_storage.xml"/>
-    <xi:include href="xml/rdf_stream.xml"/>
-    <xi:include href="xml/rdf_utf8.xml"/>
+    <xi:include href="xml/world.xml"/>
+    <xi:include href="xml/concepts.xml"/>
+    <xi:include href="xml/digest.xml"/>
+    <xi:include href="xml/files.xml"/>
+    <xi:include href="xml/hash.xml"/>
+    <xi:include href="xml/heuristics.xml"/>
+    <xi:include href="xml/iterator.xml"/>
+    <xi:include href="xml/list.xml"/>
+    <xi:include href="xml/log.xml"/>
+    <xi:include href="xml/model.xml"/>
+    <xi:include href="xml/node.xml"/>
+    <xi:include href="xml/parser.xml"/>
+    <xi:include href="xml/query.xml"/>
+    <xi:include href="xml/query_results.xml"/>
+    <xi:include href="xml/serializer.xml"/>
+    <xi:include href="xml/statement.xml"/>
+    <xi:include href="xml/storage.xml"/>
+    <xi:include href="xml/stream.xml"/>
+    <xi:include href="xml/unicode.xml"/>
+    <xi:include href="xml/uri.xml"/>
+    <!-- <xi:include href="xml/macros.xml"/> -->
   </part>
   <index>
     <title>Index</title>
