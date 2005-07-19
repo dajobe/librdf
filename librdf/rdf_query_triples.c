@@ -106,11 +106,13 @@ librdf_query_triples_find_next_term(unsigned char *string)
 
 
 /**
- * librdf_query_triples_init - Initialise a triples query from the string
+ * librdf_query_triples_init:
  * @query: the #librdf_query
  * @name: the query language name
  * @uri: the query language URI or NULL
  * @query_string: the query string
+ *
+ * Initialise a triples query from the string.
  * 
  * Parses the query string in the triples form to create an internal
  * representation, suitable for use in querying.

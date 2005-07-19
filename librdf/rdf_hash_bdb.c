@@ -91,9 +91,11 @@ static void librdf_hash_bdb_register_factory(librdf_hash_factory *factory);
 /* functions implementing hash api */
 
 /**
- * librdf_hash_bdb_create - Create a BerkeleyDB hash
+ * librdf_hash_bdb_create:
  * @hash: #librdf_hash hash that this implements
  * @context: BerkeleyDB hash context
+ *
+ * Create a BerkeleyDB hash.
  * 
  * Return value: non 0 on failure.
  **/
@@ -108,8 +110,10 @@ librdf_hash_bdb_create(librdf_hash* hash, void* context)
 
 
 /**
- * librdf_hash_bdb_destroy - Destroy a BerkeleyDB hash
+ * librdf_hash_bdb_destroy:
  * @context: BerkeleyDB hash context
+ *
+ * Destroy a BerkeleyDB hash.
  * 
  * Return value: non 0 on failure
  **/
@@ -122,13 +126,15 @@ librdf_hash_bdb_destroy(void* context)
 
 
 /**
- * librdf_hash_bdb_open - Open and maybe create a BerkeleyDB hash
+ * librdf_hash_bdb_open:
  * @context: BerkeleyDB hash context
  * @identifier: filename to use for BerkeleyDB file
  * @mode: file creation mode
  * @is_writable: is hash writable?
  * @is_new: is hash new?
  * @options: hash options (currently unused)
+ *
+ * Open and maybe create a BerkeleyDB hash.
  * 
  * Return value: non 0 on failure.
  **/
@@ -272,8 +278,10 @@ ERROR - no idea how to use Berkeley DB
 
 
 /**
- * librdf_hash_bdb_close - Close the hash
+ * librdf_hash_bdb_close:
  * @context: BerkeleyDB hash context
+ *
+ * Close the hash.
  * 
  * Finish the association between the rdf hash and the BDB file (does
  * not delete the file)
@@ -300,11 +308,13 @@ librdf_hash_bdb_close(void* context)
 
 
 /**
- * librdf_hash_bdb_clone - Clone the BerkeleyDB hash
+ * librdf_hash_bdb_clone:
  * @hash: new #librdf_hash that this implements
  * @context: new BerkeleyDB hash context
  * @new_identifier: new identifier for this hash
  * @old_context: old BerkeleyDB hash context
+ *
+ * Clone the BerkeleyDB hash.
  * 
  * Clones the existing Berkeley DB hash into the new one with the
  * new identifier.
@@ -362,8 +372,10 @@ librdf_hash_bdb_clone(librdf_hash *hash, void* context, char *new_identifier,
 
 
 /**
- * librdf_hash_bdb_values_count - Get the number of values in the hash
+ * librdf_hash_bdb_values_count:
  * @context: BerkeleyDB hash context
+ *
+ * Get the number of values in the hash.
  * 
  * Return value: number of values in the hash or <0 if not available
  **/
@@ -386,9 +398,11 @@ typedef struct {
 
 
 /**
- * librdf_hash_bdb_cursor_init - Initialise a new bdb cursor
+ * librdf_hash_bdb_cursor_init:
  * @cursor_context: hash cursor context
  * @hash_context: hash to operate over
+ *
+ * Initialise a new bdb cursor.
  * 
  * Return value: non 0 on failure
  **/
@@ -424,11 +438,13 @@ librdf_hash_bdb_cursor_init(void *cursor_context, void *hash_context)
 
 
 /**
- * librdf_hash_bdb_cursor_get - Retrieve a hash value for the given key
+ * librdf_hash_bdb_cursor_get:
  * @context: BerkeleyDB hash cursor context
  * @key: pointer to key to use
  * @value: pointer to value to use
  * @flags: flags
+ *
+ * Retrieve a hash value for the given key.
  * 
  * Return value: non 0 on failure
  **/
@@ -623,8 +639,11 @@ librdf_hash_bdb_cursor_get(void* context,
 
 
 /**
- * librdf_hash_bdb_cursor_finished - Finish the serialisation of the hash bdb get
+ * librdf_hash_bdb_cursor_finished:
  * @context: BerkeleyDB hash cursor context
+ *
+ * Finish the serialisation of the hash bdb get.
+ *
  **/
 static void
 librdf_hash_bdb_cursor_finish(void* context)
@@ -645,10 +664,12 @@ librdf_hash_bdb_cursor_finish(void* context)
 
 
 /**
- * librdf_hash_bdb_put - Store a key/value pair in the hash
+ * librdf_hash_bdb_put:
  * @context: BerkeleyDB hash context
  * @key: pointer to key to store
  * @value: pointer to value to store
+ *
+ * Store a key/value pair in the hash.
  * 
  * Return value: non 0 on failure
  **/
@@ -691,10 +712,12 @@ librdf_hash_bdb_put(void* context, librdf_hash_datum *key,
 
 
 /**
- * librdf_hash_bdb_exists - Test the existence of a key/value in the hash
+ * librdf_hash_bdb_exists:
  * @context: BerkeleyDB hash context
  * @key: pointer to key
  * @value: pointer to value (optional)
+ *
+ * Test the existence of a key/value in the hash.
  * 
  * The value can be NULL in which case the check will just be
  * for the key.
@@ -833,9 +856,11 @@ librdf_hash_bdb_exists(void* context, librdf_hash_datum *key,
 
 
 /**
- * librdf_hash_bdb_delete_key - Delete all values for given key from the hash
+ * librdf_hash_bdb_delete_key:
  * @context: BerkeleyDB hash context
  * @key: key
+ *
+ * Delete all values for given key from the hash.
  * 
  * Return value: non 0 on failure
  **/
@@ -868,10 +893,12 @@ librdf_hash_bdb_delete_key(void* context, librdf_hash_datum *key)
 
 
 /**
- * librdf_hash_bdb_delete_key_value - Delete given key/value from the hash
+ * librdf_hash_bdb_delete_key_value:
  * @context: BerkeleyDB hash context
  * @key: key
  * @value: value
+ *
+ * Delete given key/value from the hash.
  * 
  * Return value: non 0 on failure
  **/
@@ -953,8 +980,10 @@ librdf_hash_bdb_delete_key_value(void* context,
 
 
 /**
- * librdf_hash_bdb_sync - Flush the hash to disk
+ * librdf_hash_bdb_sync:
  * @context: BerkeleyDB hash context
+ *
+ * Flush the hash to disk.
  * 
  * Return value: non 0 on failure
  **/
@@ -970,8 +999,10 @@ librdf_hash_bdb_sync(void* context)
 
 
 /**
- * librdf_hash_bdb_get_fd - Get the file description representing the hash
+ * librdf_hash_bdb_get_fd:
  * @context: BerkeleyDB hash context
+ *
+ * Get the file description representing the hash.
  * 
  * Return value: the file descriptor
  **/
@@ -996,8 +1027,10 @@ librdf_hash_bdb_get_fd(void* context)
 /* local function to register BDB hash functions */
 
 /**
- * librdf_hash_bdb_register_factory - Register the BerkeleyDB hash module with the hash factory
+ * librdf_hash_bdb_register_factory:
  * @factory: hash factory prototype
+ *
+ * Register the BerkeleyDB hash module with the hash factory.
  * 
  **/
 static void
@@ -1029,8 +1062,11 @@ librdf_hash_bdb_register_factory(librdf_hash_factory *factory)
 
 
 /**
- * librdf_init_hash_bdb - Initialise the BerkeleyDB hash module
+ * librdf_init_hash_bdb:
  * @world: redland world object
+ *
+ * Initialise the BerkeleyDB hash module.
+ *
  **/
 void
 librdf_init_hash_bdb(librdf_world *world)

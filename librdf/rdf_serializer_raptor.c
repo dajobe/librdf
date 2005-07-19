@@ -51,9 +51,11 @@ typedef struct {
 
 
 /**
- * librdf_serializer_raptor_init - Initialise the N-Triples RDF serializer
+ * librdf_serializer_raptor_init:
  * @serializer: the serializer
  * @context: context
+ *
+ * Initialise the N-Triples RDF serializer.
  * 
  * Return value: non 0 on failure
  **/
@@ -74,8 +76,11 @@ librdf_serializer_raptor_init(librdf_serializer *serializer, void *context)
 
 
 /**
- * librdf_serializer_raptor_terminate - Terminate the raptor RDF serializer
+ * librdf_serializer_raptor_terminate:
  * @context: context
+ *
+ * Terminate the raptor RDF serializer.
+ *
  **/
 static void
 librdf_serializer_raptor_terminate(void *context) 
@@ -88,9 +93,11 @@ librdf_serializer_raptor_terminate(void *context)
 
 
 /**
- * librdf_serializer_raptor_get_feature - Get a raptor parser feature
+ * librdf_serializer_raptor_get_feature:
  * @context: context
  * @feature: #librdf_uri of feature
+ *
+ * Get a raptor parser feature.
  *
  * Return value: new #librdf_node value or NULL on failure
  **/
@@ -346,8 +353,10 @@ librdf_serializer_raptor_serialize_model_to_counted_string(void *context,
 
 
 /**
- * librdf_serializer_raptor_register_factory - Register the N-riples serializer with the RDF serializer factory
+ * librdf_serializer_raptor_register_factory:
  * @factory: factory
+ *
+ * Register the N-riples serializer with the RDF serializer factory.
  * 
  **/
 static void
@@ -368,8 +377,11 @@ librdf_serializer_raptor_register_factory(librdf_serializer_factory *factory)
 
 
 /**
- * librdf_serializer_raptor_constructor - Initialise the raptor RDF serializer module
+ * librdf_serializer_raptor_constructor:
  * @world: redland world object
+ *
+ * Initialise the raptor RDF serializer module.
+ *
  **/
 void
 librdf_serializer_raptor_constructor(librdf_world *world)

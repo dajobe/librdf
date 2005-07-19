@@ -53,8 +53,10 @@
 
 
 /**
- * librdf_init_uri - INTERNAL - Initialise the librdf_uri class
+ * librdf_init_uri:
  * @world: redland world object
+ *
+ * INTERNAL - Initialise the librdf_uri class.
  *
  **/
 void
@@ -77,8 +79,11 @@ librdf_init_uri(librdf_world *world)
 
 
 /**
- * librdf_finish_uri - INTERNAL - Terminate the librdf_uri class
+ * librdf_finish_uri:
  * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_uri class.
+ *
  **/
 void
 librdf_finish_uri(librdf_world *world)
@@ -92,9 +97,11 @@ librdf_finish_uri(librdf_world *world)
 
 
 /**
- * librdf_new_uri - Constructor - create a new librdf_uri object from a URI string
+ * librdf_new_uri:
  * @world: redland world object
  * @uri_string: URI in string form
+ *
+ * Constructor - create a new librdf_uri object from a URI string.
  * 
  * A new URI is constructed from a copy of the string.  If the
  * string is a NULL pointer or empty (0 length) then the result is NULL.
@@ -190,8 +197,10 @@ librdf_new_uri (librdf_world *world,
 
 
 /**
- * librdf_new_uri_from_uri - Copy constructor - create a new librdf_uri object from an existing librdf_uri object
+ * librdf_new_uri_from_uri:
  * @old_uri: #librdf_uri object
+ *
+ * Copy constructor - create a new librdf_uri object from an existing librdf_uri object.
  * 
  * Return value: a new #librdf_uri object or NULL on failure
  **/
@@ -206,9 +215,11 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 
 
 /**
- * librdf_new_uri_from_uri_local_name - Copy constructor - create a new librdf_uri object from an existing librdf_uri object and a local name
+ * librdf_new_uri_from_uri_local_name:
  * @old_uri: #librdf_uri object
  * @local_name: local name to append to URI
+ *
+ * Copy constructor - create a new librdf_uri object from an existing librdf_uri object and a local name.
  * 
  * Return value: a new #librdf_uri object or NULL on failure
  **/
@@ -239,10 +250,12 @@ librdf_new_uri_from_uri_local_name (librdf_uri* old_uri,
 
 
 /**
- * librdf_new_uri_normalised_to_base - Constructor - create a new librdf_uri object from a URI string stripped of the source URI, made relative to the base URI
+ * librdf_new_uri_normalised_to_base:
  * @uri_string: URI in string form
  * @source_uri: source URI to remove
  * @base_uri: base URI to add
+ *
+ * Constructor - create a new librdf_uri object from a URI string stripped of the source URI, made relative to the base URI.
  * 
  * Return value: a new #librdf_uri object or NULL on failure
  **/
@@ -303,9 +316,11 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
 
 
 /**
- * librdf_new_uri_relative_to_base - Constructor - create a new librdf_uri object from a URI string relative to a base URI
+ * librdf_new_uri_relative_to_base:
  * @base_uri: absolute base URI
  * @uri_string: relative URI string
+ *
+ * Constructor - create a new librdf_uri object from a URI string relative to a base URI.
  *
  * An empty uri_string or NULL is equivalent to 
  * librdf_new_uri_from_uri(base_uri)
@@ -345,9 +360,11 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
 
 
 /**
- * librdf_new_uri_from_filename - Constructor - create a new librdf_uri object from a filename
+ * librdf_new_uri_from_filename:
  * @world: Redland #librdf_world object
  * @filename: filename
+ *
+ * Constructor - create a new librdf_uri object from a filename.
  *
  * Return value: a new #librdf_uri object or NULL on failure
  **/
@@ -371,8 +388,10 @@ librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
 
 
 /**
- * librdf_free_uri - Destructor - destroy a librdf_uri object
+ * librdf_free_uri:
  * @uri: #librdf_uri object
+ *
+ * Destructor - destroy a librdf_uri object.
  * 
  **/
 void
@@ -425,8 +444,10 @@ librdf_free_uri (librdf_uri* uri)
 
 
 /**
- * librdf_uri_as_string - Get a pointer to the string representation of the URI
+ * librdf_uri_as_string:
  * @uri: #librdf_uri object
+ *
+ * Get a pointer to the string representation of the URI.
  * 
  * Returns a shared pointer to the URI string representation. 
  * Note: does not allocate a new string so the caller must not free it.
@@ -443,9 +464,11 @@ librdf_uri_as_string (librdf_uri *uri)
 
 
 /**
- * librdf_uri_as_counted_string - Get a pointer to the string representation of the URI with length
+ * librdf_uri_as_counted_string:
  * @uri: #librdf_uri object
  * @len_p: pointer to location to store length
+ *
+ * Get a pointer to the string representation of the URI with length.
  * 
  * Returns a shared pointer to the URI string representation. 
  * Note: does not allocate a new string so the caller must not free it.
@@ -464,8 +487,10 @@ librdf_uri_as_counted_string(librdf_uri *uri, size_t* len_p)
 
 
 /**
- * librdf_uri_get_digest - Get a digest for the URI
+ * librdf_uri_get_digest:
  * @uri: #librdf_uri object
+ *
+ * Get a digest for the URI.
  * 
  * Generates a digest object for the URI.  The digest factory used is
  * determined at class initialisation time by librdf_init_uri().
@@ -492,9 +517,12 @@ librdf_uri_get_digest(librdf_uri* uri)
 
 
 /**
- * librdf_uri_print - Print the URI to the given file handle
+ * librdf_uri_print:
  * @uri: #librdf_uri object
  * @fh: &FILE handle
+ *
+ * Print the URI to the given file handle.
+ *
  **/
 void
 librdf_uri_print (librdf_uri* uri, FILE *fh) 
@@ -506,8 +534,10 @@ librdf_uri_print (librdf_uri* uri, FILE *fh)
 
 
 /**
- * librdf_uri_to_string - Format the URI as a string
+ * librdf_uri_to_string:
  * @uri: #librdf_uri object
+ *
+ * Format the URI as a string.
  * 
  * Note: this method allocates a new string since this is a _to_ method
  * and the caller must free the resulting memory.
@@ -524,9 +554,11 @@ librdf_uri_to_string (librdf_uri* uri)
 
 
 /**
- * librdf_uri_to_counted_string - Format the URI as a counted string
+ * librdf_uri_to_counted_string:
  * @uri: #librdf_uri object
  * @len_p: pointer to location to store length
+ *
+ * Format the URI as a counted string.
  * 
  * Note: this method allocates a new string since this is a _to_ method
  * and the caller must free the resulting memory.
@@ -556,9 +588,11 @@ librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p)
 
 
 /**
- * librdf_uri_equals - Compare two librdf_uri objects for equality
+ * librdf_uri_equals:
  * @first_uri: #librdf_uri object 1
  * @second_uri: #librdf_uri object 2
+ *
+ * Compare two librdf_uri objects for equality.
  * 
  * Return value: non 0 if the objects are equal
  **/
@@ -575,8 +609,10 @@ librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri)
 
 
 /**
- * librdf_uri_is_file_uri - Test if a URI points to a filename
+ * librdf_uri_is_file_uri:
  * @uri: #librdf_uri object
+ *
+ * Test if a URI points to a filename.
  * 
  * Return value: 0 if the URI points to a file
  **/
@@ -590,8 +626,10 @@ librdf_uri_is_file_uri(librdf_uri* uri)
 
 
 /**
- * librdf_uri_to_filename - Return pointer to filename of URI
+ * librdf_uri_to_filename:
  * @uri: #librdf_uri object
+ *
+ * Return pointer to filename of URI.
  * 
  * Returns a pointer to a newly allocated buffer that
  * the caller must free.  This will fail if the URI

@@ -386,6 +386,8 @@ librdf_storage_mysql_release_handle(librdf_storage* storage, MYSQL *handle)
  * @name: model name
  * @options: host, port, database, user, password [, new] [, bulk] [, merge].
  *
+ * .
+ *
  * Create connection to database.  Defaults to port 3306 if not given.
  *
  * The boolean bulk option can be set to true if optimized inserts (table
@@ -653,6 +655,8 @@ librdf_storage_mysql_merge(librdf_storage* storage)
  * librdf_storage_mysql_terminate:
  * @storage: the storage
  *
+ * .
+ *
  * Close the storage and database connections.
  *
  * Return value: None.
@@ -685,6 +689,8 @@ librdf_storage_mysql_terminate(librdf_storage* storage)
  * @storage: the storage
  * @model: the model
  *
+ * .
+ *
  * Create or open model in database (nop).
  *
  * Return value: Non-zero on failure.
@@ -699,6 +705,8 @@ librdf_storage_mysql_open(librdf_storage* storage, librdf_model* model)
  * librdf_storage_mysql_close:
  * @storage: the storage
  *
+ * .
+ *
  * Close model (nop).
  *
  * Return value: Non-zero on failure.
@@ -710,8 +718,10 @@ librdf_storage_mysql_close(librdf_storage* storage)
 }
 
 /**
- * librdf_storage_mysql_sync - Flush all tables, making sure they are saved on disk.
+ * librdf_storage_mysql_sync:
  * @storage: the storage
+ *
+ * Flush all tables, making sure they are saved on disk.
  *
  * Return value: Non-zero on failure.
  **/
@@ -730,6 +740,8 @@ librdf_storage_mysql_sync(librdf_storage* storage)
 /**
  * librdf_storage_mysql_size:
  * @storage: the storage
+ *
+ * .
  *
  * Close model (nop).
  *
@@ -793,6 +805,8 @@ librdf_storage_mysql_add_statement(librdf_storage* storage,
  * librdf_storage_mysql_add_statements:
  * @storage: the storage
  * @statement_stream: the stream of statements
+ *
+ * .
  *
  * Add statements in stream to storage, without context.
  *
@@ -1148,6 +1162,8 @@ librdf_storage_mysql_stop_bulk(librdf_storage* storage)
  * @context_node: #librdf_node object
  * @statement_stream: the stream of statements
  *
+ * .
+ *
  * Add statements in stream to storage, with context.
  *
  * Return value: Non-zero on failure.
@@ -1186,10 +1202,12 @@ librdf_storage_mysql_context_add_statements(librdf_storage* storage,
 
 
 /**
- * librdf_storage_mysql_context_add_statement - Add a statement to a storage context
+ * librdf_storage_mysql_context_add_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to add
+ *
+ * Add a statement to a storage context.
  *
  * Return value: non 0 on failure
  **/
@@ -1269,9 +1287,11 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
 
 
 /**
- * librdf_storage_mysql_contains_statement - Test if a given complete statement is present in the model
+ * librdf_storage_mysql_contains_statement:
  * @storage: the storage
  * @statement: a complete statement
+ *
+ * Test if a given complete statement is present in the model.
  *
  * Return value: Non-zero if the model contains the statement.
  **/
@@ -1334,9 +1354,11 @@ librdf_storage_mysql_contains_statement(librdf_storage* storage,
 
 
 /**
- * librdf_storage_mysql_remove_statement - Remove a statement from storage
+ * librdf_storage_mysql_remove_statement:
  * @storage: #librdf_storage object
  * @statement: #librdf_statement statement to remove
+ *
+ * Remove a statement from storage.
  *
  * Return value: non-zero on failure
  **/
@@ -1348,10 +1370,12 @@ librdf_storage_mysql_remove_statement(librdf_storage* storage, librdf_statement*
 
 
 /**
- * librdf_storage_mysql_context_remove_statement - Remove a statement from a storage context
+ * librdf_storage_mysql_context_remove_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to remove
+ *
+ * Remove a statement from a storage context.
  *
  * Return value: non-zero on failure
  **/
@@ -1423,9 +1447,11 @@ librdf_storage_mysql_context_remove_statement(librdf_storage* storage,
 
 
 /**
- * librdf_storage_mysql_context_remove_statements - Remove all statement from a storage context
+ * librdf_storage_mysql_context_remove_statements:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
+ *
+ * Remove all statement from a storage context.
  *
  * Return value: non-zero on failure
  **/
@@ -1496,8 +1522,10 @@ librdf_storage_mysql_context_remove_statements(librdf_storage* storage,
 
 
 /**
- * librdf_storage_mysql_serialise - Return a stream of all statements in a storage
+ * librdf_storage_mysql_serialise:
  * @storage: the storage
+ *
+ * Return a stream of all statements in a storage.
  *
  * Return a stream of all statements in a storage.
  *
@@ -1511,9 +1539,11 @@ librdf_storage_mysql_serialise(librdf_storage* storage)
 
 
 /**
- * librdf_storage_mysql_find_statements - Find a graph of statements in storage.
+ * librdf_storage_mysql_find_statements:
  * @storage: the storage
  * @statement: the statement to match
+ *
+ * Find a graph of statements in storage.
  *
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
@@ -1530,9 +1560,11 @@ librdf_storage_mysql_find_statements(librdf_storage* storage,
 
 
 /**
- * librdf_storage_mysql_context_serialise - List all statements in a storage context
+ * librdf_storage_mysql_context_serialise:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
+ *
+ * List all statements in a storage context.
  *
  * Return value: #librdf_stream of statements or NULL on failure or context is empty
  **/
@@ -1545,10 +1577,12 @@ librdf_storage_mysql_context_serialise(librdf_storage* storage,
 
 
 /**
- * librdf_storage_mysql_find_statements_in_context - Find a graph of statements in a storage context.
+ * librdf_storage_mysql_find_statements_in_context:
  * @storage: the storage
  * @statement: the statement to match
  * @context_node: the context to search
+ *
+ * Find a graph of statements in a storage context.
  *
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
@@ -1565,11 +1599,13 @@ librdf_storage_mysql_find_statements_in_context(librdf_storage* storage, librdf_
 
 
 /**
- * librdf_storage_mysql_find_statements_with_options - Find a graph of statements in a storage context with options.
+ * librdf_storage_mysql_find_statements_with_options:
  * @storage: the storage
  * @statement: the statement to match
  * @context_node: the context to search
  * @options: #librdf_hash of match options or NULL
+ *
+ * Find a graph of statements in a storage context with options.
  *
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
@@ -2030,6 +2066,8 @@ librdf_storage_mysql_find_statements_in_context_finished(void* context)
  * librdf_storage_mysql_get_contexts:
  * @storage: the storage
  *
+ * .
+ *
  * Return an iterator with the context nodes present in storage.
  *
  * Return value: a #librdf_iterator or NULL on failure
@@ -2192,9 +2230,11 @@ librdf_storage_mysql_get_contexts_finished(void* context)
 
 
 /**
- * librdf_storage_mysql_get_feature - get the value of a storage feature
+ * librdf_storage_mysql_get_feature:
  * @storage: #librdf_storage object
  * @feature: #librdf_uri feature property
+ *
+ * Get the value of a storage feature.
  * 
  * Return value: #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.

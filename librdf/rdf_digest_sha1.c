@@ -300,8 +300,11 @@ librdf_digest_sha1_register_factory(librdf_digest_factory *factory)
 }
 
 /**
- * librdf_digest_sha1_constructor - Initialise the SHA1 digest factory
+ * librdf_digest_sha1_constructor:
  * @world: redland world object
+ *
+ * Initialise the SHA1 digest factory.
+ *
  **/
 void
 librdf_digest_sha1_constructor(librdf_world *world)

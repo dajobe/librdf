@@ -154,6 +154,8 @@ librdf_storage_tstore_open(librdf_storage* storage, librdf_model* model)
 /**
  * librdf_storage_tstore_close:
  * @storage: the storage
+ *
+ * .
  * 
  * Close the storage list storage, and free all content since there is no 
  * persistance.
@@ -426,6 +428,8 @@ typedef struct {
  * librdf_storage_tstore_find_statements:
  * @storage: the storage
  * @statement: the statement to match
+ *
+ * .
  * 
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
@@ -567,10 +571,12 @@ librdf_storage_tstore_find_finished(void* context)
 }
 
 /**
- * librdf_storage_tstore_context_add_statement - Add a statement to a storage context
+ * librdf_storage_tstore_context_add_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to add
+ *
+ * Add a statement to a storage context.
  * 
  * Return value: non 0 on failure
  **/
@@ -618,10 +624,12 @@ librdf_storage_tstore_context_add_statement(librdf_storage* storage,
 
 
 /**
- * librdf_storage_tstore_context_remove_statement - Remove a statement from a storage context
+ * librdf_storage_tstore_context_remove_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to remove
+ *
+ * Remove a statement from a storage context.
  * 
  * Return value: non 0 on failure
  **/
@@ -647,9 +655,11 @@ typedef struct {
 
 
 /**
- * librdf_storage_tstore_context_serialise - List all statements in a storage context
+ * librdf_storage_tstore_context_serialise:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
+ *
+ * List all statements in a storage context.
  * 
  * Return value: #librdf_stream of statements or NULL on failure or context is empty
  **/

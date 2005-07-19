@@ -43,25 +43,35 @@ typedef void (*librdf_stream_map_free_context_handler)(void *map_context);
 
 /* constructor */
 
-REDLAND_API librdf_stream* librdf_new_stream(librdf_world *world, void* context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
-REDLAND_API librdf_stream* librdf_new_stream_from_node_iterator(librdf_iterator* iterator, librdf_statement* statement, librdf_statement_part field);
+REDLAND_API
+librdf_stream* librdf_new_stream(librdf_world *world, void* context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
+REDLAND_API
+librdf_stream* librdf_new_stream_from_node_iterator(librdf_iterator* iterator, librdf_statement* statement, librdf_statement_part field);
 
 /* destructor */
 
-REDLAND_API void librdf_free_stream(librdf_stream* stream);
+REDLAND_API
+void librdf_free_stream(librdf_stream* stream);
 
 /* methods */
-REDLAND_API int librdf_stream_end(librdf_stream* stream);
+REDLAND_API
+int librdf_stream_end(librdf_stream* stream);
 
-REDLAND_API int librdf_stream_next(librdf_stream* stream);
-REDLAND_API librdf_statement* librdf_stream_get_object(librdf_stream* stream);
-REDLAND_API void* librdf_stream_get_context(librdf_stream* stream);
+REDLAND_API
+int librdf_stream_next(librdf_stream* stream);
+REDLAND_API
+librdf_statement* librdf_stream_get_object(librdf_stream* stream);
+REDLAND_API
+void* librdf_stream_get_context(librdf_stream* stream);
 
-REDLAND_API int librdf_stream_add_map(librdf_stream* stream, librdf_stream_map_handler map_function, librdf_stream_map_free_context_handler free_context, void *map_context);
+REDLAND_API
+int librdf_stream_add_map(librdf_stream* stream, librdf_stream_map_handler map_function, librdf_stream_map_free_context_handler free_context, void *map_context);
 
-REDLAND_API void librdf_stream_print(librdf_stream *stream, FILE *fh);
+REDLAND_API
+void librdf_stream_print(librdf_stream *stream, FILE *fh);
 
-REDLAND_API librdf_stream* librdf_new_empty_stream(librdf_world *world);
+REDLAND_API
+librdf_stream* librdf_new_empty_stream(librdf_world *world);
 
 #ifdef __cplusplus
 }

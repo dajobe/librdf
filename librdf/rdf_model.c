@@ -48,8 +48,11 @@ static void librdf_delete_model_factories(void);
 
 
 /**
- * librdf_init_model - INTERNAL - Initialise librdf_model class
+ * librdf_init_model:
  * @world: redland world object
+ *
+ * INTERNAL - Initialise librdf_model class.
+ *
  **/
 void
 librdf_init_model(librdf_world *world)
@@ -60,8 +63,11 @@ librdf_init_model(librdf_world *world)
 
 
 /**
- * librdf_finish_model - INTERNAL - Terminate librdf_model class
+ * librdf_finish_model:
  * @world: redland world object
+ *
+ * INTERNAL - Terminate librdf_model class.
+ *
  **/
 void
 librdf_finish_model(librdf_world *world)
@@ -106,10 +112,12 @@ librdf_model_supports_contexts(librdf_model* model) {
 /* class methods */
 
 /**
- * librdf_model_register_factory - Register a model factory
+ * librdf_model_register_factory:
  * @world: redland world object
  * @name: the model factory name
  * @factory: pointer to function to call to register the factory
+ *
+ * Register a model factory.
  * 
  **/
 void
@@ -159,8 +167,10 @@ librdf_model_register_factory(librdf_world *world, const char *name,
 
 
 /**
- * librdf_get_model_factory - Get a model factory by name
+ * librdf_get_model_factory:
  * @name: the factory name or NULL for the default factory
+ *
+ * Get a model factory by name.
  * 
  * Return value: the factory object or NULL if there is no such factory
  **/
@@ -196,10 +206,12 @@ librdf_get_model_factory (const char *name)
 
 
 /**
- * librdf_new_model - Constructor - create a new storage librdf_model object
+ * librdf_new_model:
  * @world: redland world object
  * @storage: #librdf_storage to use
  * @options_string: options to initialise model
+ *
+ * Constructor - create a new storage librdf_model object.
  *
  * The options are encoded as described in librdf_hash_from_string()
  * and can be NULL if none are required.
@@ -291,8 +303,10 @@ librdf_new_model_with_options(librdf_world *world,
 
 
 /**
- * librdf_new_model_from_model - Copy constructor - create a new librdf_model from an existing one
+ * librdf_new_model_from_model:
  * @model: the existing #librdf_model
+ *
+ * Copy constructor - create a new librdf_model from an existing one.
  * 
  * Creates a new model as a copy of the existing model in the same
  * storage context.
@@ -314,8 +328,10 @@ librdf_new_model_from_model(librdf_model* model)
 
 
 /**
- * librdf_free_model - Destructor - Destroy a librdf_model object
+ * librdf_free_model:
  * @model: #librdf_model model to destroy
+ *
+ * Destructor - Destroy a librdf_model object.
  * 
  **/
 void
@@ -366,8 +382,10 @@ librdf_model_remove_reference(librdf_model *model)
 /* methods */
 
 /**
- * librdf_model_size - get the number of statements in the model
+ * librdf_model_size:
  * @model: #librdf_model object
+ *
+ * Get the number of statements in the model.
  * 
  * WARNING: Not all underlying stores can return the size of the graph
  * In which case the return value will be negative.
@@ -384,9 +402,11 @@ librdf_model_size(librdf_model* model)
 
 
 /**
- * librdf_model_add_statement - Add a statement to the model
+ * librdf_model_add_statement:
  * @model: model object
  * @statement: statement object
+ *
+ * Add a statement to the model.
  * 
  * The passed-in statement is copied when added to the model, not
  * shared with the model.  It must be a complete statement - all
@@ -416,9 +436,11 @@ librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
 
 
 /**
- * librdf_model_add_statements - Add a stream of statements to the model
+ * librdf_model_add_statements:
  * @model: model object
  * @statement_stream: stream of statements to use
+ *
+ * Add a stream of statements to the model.
  * 
  * If any of the statements already exists in the store, they are not
  * added unless Redland contexts are being used.  See also
@@ -437,11 +459,13 @@ librdf_model_add_statements(librdf_model* model, librdf_stream* statement_stream
 
 
 /**
- * librdf_model_add - Create and add a new statement about a resource to the model
+ * librdf_model_add:
  * @model: model object
  * @subject: #librdf_node of subject
  * @predicate: #librdf_node of predicate
  * @object: #librdf_node of object (literal or resource)
+ *
+ * Create and add a new statement about a resource to the model.
  * 
  * After this method, the #librdf_node objects become owned by the model.
  * All of subject, predicate and object must be non-NULL.
@@ -479,13 +503,15 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
 
 
 /**
- * librdf_model_add_typed_literal_statement - Create and add a new statement about a typed literal to the model
+ * librdf_model_add_typed_literal_statement:
  * @model: model object
  * @subject: #librdf_node of subject
  * @predicate: #librdf_node of predicate
  * @literal: string literal content
  * @xml_language: language of literal
  * @datatype_uri: datatype #librdf_uri
+ *
+ * Create and add a new statement about a typed literal to the model.
  * 
  * After this method, the #librdf_node subject and predicate become
  * owned by the model.
@@ -524,13 +550,15 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
 
 
 /**
- * librdf_model_add_string_literal_statement - Create and add a new statement about a literal to the model
+ * librdf_model_add_string_literal_statement:
  * @model: model object
  * @subject: #librdf_node of subject
  * @predicate: #librdf_node of predicate
  * @literal: string literal conten
  * @xml_language: language of literal
  * @is_wf_xml: literal is XML
+ *
+ * Create and add a new statement about a literal to the model.
  * 
  * The language can be set to NULL if not used.
  * All of subject, predicate and literal must be non-NULL.
@@ -573,9 +601,11 @@ librdf_model_add_string_literal_statement(librdf_model* model,
 
 
 /**
- * librdf_model_remove_statement - Remove a known statement from the model
+ * librdf_model_remove_statement:
  * @model: the model object
  * @statement: the statement
+ *
+ * Remove a known statement from the model.
  *
  * It must be a complete statement - all of subject, predicate, object
  * parts must be present.
@@ -596,9 +626,11 @@ librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
 
 
 /**
- * librdf_model_contains_statement - Check for a statement in the model
+ * librdf_model_contains_statement:
  * @model: the model object
  * @statement: the statement
+ *
+ * Check for a statement in the model.
  * 
  * It must be a complete statement - all of subject, predicate, object
  * parts must be present.  Use librdf_model_find_statements to search
@@ -625,8 +657,10 @@ librdf_model_contains_statement(librdf_model* model, librdf_statement* statement
 
 
 /**
- * librdf_model_as_stream - list the model contents as a stream of statements
+ * librdf_model_as_stream:
  * @model: the model object
+ *
+ * List the model contents as a stream of statements.
  * 
  * Return value: a #librdf_stream or NULL on failure
  **/
@@ -640,8 +674,10 @@ librdf_model_as_stream(librdf_model* model)
 
 
 /**
- * librdf_model_serialise - serialise the entire model as a stream (DEPRECATED)
+ * librdf_model_serialise:
  * @model: the model object
+ *
+ * Serialise the entire model as a stream (DEPRECATED).
  * 
  * DEPRECATED to reduce confusion with the librdf_serializer class.
  * Please use librdf_model_as_stream.
@@ -658,9 +694,11 @@ librdf_model_serialise(librdf_model* model)
 
 
 /**
- * librdf_model_find_statements - find matching statements in the model
+ * librdf_model_find_statements:
  * @model: the model object
  * @statement: the partial statement to match
+ *
+ * Find matching statements in the model.
  * 
  * The partial statement is a statement where the subject, predicate
  * and/or object can take the value NULL which indicates a match with
@@ -681,10 +719,12 @@ librdf_model_find_statements(librdf_model* model,
 
 
 /**
- * librdf_model_get_sources - return the sources (subjects) of arc in an RDF graph given arc (predicate) and target (object)
+ * librdf_model_get_sources:
  * @model: #librdf_model object
  * @arc: #librdf_node arc
  * @target: #librdf_node target
+ *
+ * Return the sources (subjects) of arc in an RDF graph given arc (predicate) and target (object).
  * 
  * Searches the model for arcs matching the given arc and target
  * and returns a list of the source #librdf_node objects as an iterator
@@ -704,10 +744,12 @@ librdf_model_get_sources(librdf_model *model,
 
 
 /**
- * librdf_model_get_arcs - return the arcs (predicates) of an arc in an RDF graph given source (subject) and target (object)
+ * librdf_model_get_arcs:
  * @model: #librdf_model object
  * @source: #librdf_node source
  * @target: #librdf_node target
+ *
+ * Return the arcs (predicates) of an arc in an RDF graph given source (subject) and target (object).
  * 
  * Searches the model for arcs matching the given source and target
  * and returns a list of the arc #librdf_node objects as an iterator
@@ -727,10 +769,12 @@ librdf_model_get_arcs(librdf_model *model,
 
 
 /**
- * librdf_model_get_targets - return the targets (objects) of an arc in an RDF graph given source (subject) and arc (predicate)
+ * librdf_model_get_targets:
  * @model: #librdf_model object
  * @source: #librdf_node source
  * @arc: #librdf_node arc
+ *
+ * Return the targets (objects) of an arc in an RDF graph given source (subject) and arc (predicate).
  * 
  * Searches the model for targets matching the given source and arc
  * and returns a list of the source #librdf_node objects as an iterator
@@ -750,10 +794,12 @@ librdf_model_get_targets(librdf_model *model,
 
 
 /**
- * librdf_model_get_source - return one source (subject) of arc in an RDF graph given arc (predicate) and target (object)
+ * librdf_model_get_source:
  * @model: #librdf_model object
  * @arc: #librdf_node arc
  * @target: #librdf_node target
+ *
+ * Return one source (subject) of arc in an RDF graph given arc (predicate) and target (object).
  * 
  * Searches the model for arcs matching the given arc and target
  * and returns one #librdf_node object
@@ -784,10 +830,12 @@ librdf_model_get_source(librdf_model *model,
 
 
 /**
- * librdf_model_get_arc - return one arc (predicate) of an arc in an RDF graph given source (subject) and target (object)
+ * librdf_model_get_arc:
  * @model: #librdf_model object
  * @source: #librdf_node source
  * @target: #librdf_node target
+ *
+ * Return one arc (predicate) of an arc in an RDF graph given source (subject) and target (object).
  * 
  * Searches the model for arcs matching the given source and target
  * and returns one #librdf_node object
@@ -818,10 +866,12 @@ librdf_model_get_arc(librdf_model *model,
 
 
 /**
- * librdf_model_get_target - return one target (object) of an arc in an RDF graph given source (subject) and arc (predicate)
+ * librdf_model_get_target:
  * @model: #librdf_model object
  * @source: #librdf_node source
  * @arc: #librdf_node arc
+ *
+ * Return one target (object) of an arc in an RDF graph given source (subject) and arc (predicate).
  * 
  * Searches the model for targets matching the given source and arc
  * and returns one #librdf_node object
@@ -852,9 +902,11 @@ librdf_model_get_target(librdf_model *model,
 
 
 /**
- * librdf_model_add_submodel - add a sub-model to the model
+ * librdf_model_add_submodel:
  * @model: the model object
  * @sub_model: the sub model to add
+ *
+ * Add a sub-model to the model.
  * 
  * FIXME: Not tested
  * 
@@ -884,9 +936,11 @@ librdf_model_add_submodel(librdf_model* model, librdf_model* sub_model)
 
 
 /**
- * librdf_model_remove_submodel - remove a sub-model from the model
+ * librdf_model_remove_submodel:
  * @model: the model object
  * @sub_model: the sub model to remove
+ *
+ * Remove a sub-model from the model.
  * 
  * FIXME: Not tested
  * 
@@ -911,9 +965,11 @@ librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model)
 
 
 /**
- * librdf_model_get_arcs_in - return the properties pointing to the given resource
+ * librdf_model_get_arcs_in:
  * @model: #librdf_model object
  * @node: #librdf_node resource node
+ *
+ * Return the properties pointing to the given resource.
  * 
  * Return value:  #librdf_iterator of #librdf_node objects (may be empty) or NULL on failure
  **/
@@ -928,9 +984,11 @@ librdf_model_get_arcs_in(librdf_model *model, librdf_node *node)
 
 
 /**
- * librdf_model_get_arcs_out - return the properties pointing from the given resource
+ * librdf_model_get_arcs_out:
  * @model: #librdf_model object
  * @node: #librdf_node resource node
+ *
+ * Return the properties pointing from the given resource.
  * 
  * Return value:  #librdf_iterator of #librdf_node objects (may be empty) or NULL on failure
  **/
@@ -945,10 +1003,12 @@ librdf_model_get_arcs_out(librdf_model *model, librdf_node *node)
 
 
 /**
- * librdf_model_has_arc_in - check if a node has a given property pointing to it
+ * librdf_model_has_arc_in:
  * @model: #librdf_model object
  * @node: #librdf_node resource node
  * @property: #librdf_node property node
+ *
+ * Check if a node has a given property pointing to it.
  * 
  * Return value: non 0 if arc property does point to the resource node
  **/
@@ -965,10 +1025,12 @@ librdf_model_has_arc_in(librdf_model *model, librdf_node *node,
 
 
 /**
- * librdf_model_has_arc_out - check if a node has a given property pointing from it
+ * librdf_model_has_arc_out:
  * @model: #librdf_model object
  * @node: #librdf_node resource node
  * @property: #librdf_node property node
+ *
+ * Check if a node has a given property pointing from it.
  * 
  * Return value: non 0 if arc property does point from the resource node
  **/
@@ -987,9 +1049,11 @@ librdf_model_has_arc_out(librdf_model *model, librdf_node *node,
 
 
 /**
- * librdf_model_print - print the model
+ * librdf_model_print:
  * @model: the model object
  * @fh: the FILE stream to print to
+ *
+ * Print the model.
  * 
  * This method is for debugging and the format of the output should
  * not be relied on.
@@ -1013,10 +1077,12 @@ librdf_model_print(librdf_model *model, FILE *fh)
 
 
 /**
- * librdf_model_context_add_statement - Add a statement to a model with a context
+ * librdf_model_context_add_statement:
  * @model: #librdf_model object
  * @context: #librdf_node context
  * @statement: #librdf_statement statement object
+ *
+ * Add a statement to a model with a context.
  * 
  * It must be a complete statement - all
  * of subject, predicate, object parts must be present.
@@ -1048,10 +1114,12 @@ librdf_model_context_add_statement(librdf_model* model,
 
 
 /**
- * librdf_model_context_add_statements - Add statements to a model with a context
+ * librdf_model_context_add_statements:
  * @model: #librdf_model object
  * @context: #librdf_node context
  * @stream: #librdf_stream stream object
+ *
+ * Add statements to a model with a context.
  * 
  * If @context is NULL, this is equivalent to librdf_model_add_statements
  *
@@ -1095,10 +1163,12 @@ librdf_model_context_add_statements(librdf_model* model,
 
 
 /**
- * librdf_model_context_remove_statement - Remove a statement from a model in a context
+ * librdf_model_context_remove_statement:
  * @model: #librdf_model object
  * @context: #librdf_uri context
  * @statement: #librdf_statement statement
+ *
+ * Remove a statement from a model in a context.
  * 
  * It must be a complete statement - all of subject, predicate, object
  * parts must be present.
@@ -1129,9 +1199,11 @@ librdf_model_context_remove_statement(librdf_model* model,
 
 
 /**
- * librdf_model_context_remove_statements - Remove statements from a model with the given context
+ * librdf_model_context_remove_statements:
  * @model: #librdf_model object
  * @context: #librdf_uri context
+ *
+ * Remove statements from a model with the given context.
  * 
  * Return value: Non 0 on failure
  **/
@@ -1170,9 +1242,11 @@ librdf_model_context_remove_statements(librdf_model* model,
 
 
 /**
- * librdf_model_context_as_stream - list all statements in a model context
+ * librdf_model_context_as_stream:
  * @model: #librdf_model object
  * @context: #librdf_uri context
+ *
+ * List all statements in a model context.
  * 
  * Return value: #librdf_stream of statements or NULL on failure
  **/
@@ -1193,9 +1267,11 @@ librdf_model_context_as_stream(librdf_model* model, librdf_node* context)
 
 
 /**
- * librdf_model_context_serialize - List all statements in a model context
+ * librdf_model_context_serialize:
  * @model: #librdf_model object
  * @context: #librdf_uri context
+ *
+ * List all statements in a model context.
  * 
  * DEPRECATED to reduce confusion with the librdf_serializer class.
  * Please use librdf_model_context_as_stream.
@@ -1219,9 +1295,11 @@ librdf_model_context_serialize(librdf_model* model, librdf_node* context)
 
 
 /**
- * librdf_model_query_execute - Execute a query against the model
+ * librdf_model_query_execute:
  * @model: #librdf_model object
  * @query: #librdf_query object
+ *
+ * Execute a query against the model.
  * 
  * Run the given query against the model and return a #librdf_stream of
  * matching #librdf_statement objects
@@ -1239,8 +1317,10 @@ librdf_model_query_execute(librdf_model* model, librdf_query* query)
 
 
 /**
- * librdf_model_sync - Synchronise the model to the model implementation
+ * librdf_model_sync:
  * @model: #librdf_model object
+ *
+ * Synchronise the model to the model implementation.
  * 
  * Return value: non-0 on failure
  **/
@@ -1257,8 +1337,10 @@ librdf_model_sync(librdf_model* model)
 
 
 /**
- * librdf_model_get_storage - return the storage of this model
+ * librdf_model_get_storage:
  * @model: #librdf_model object
+ *
+ * Return the storage of this model.
  * 
  * Note: this can only return one storage, so model implementations
  * that have multiple #librdf_storage internally may chose not to
@@ -1279,10 +1361,12 @@ librdf_model_get_storage(librdf_model *model)
 
 
 /**
- * librdf_model_find_statements_in_context - search the model for matching statements in a given context
+ * librdf_model_find_statements_in_context:
  * @model: #librdf_model object
  * @statement: #librdf_statement partial statement to find
  * @context_node: context #librdf_node (or NULL)
+ *
+ * Search the model for matching statements in a given context.
  * 
  * Searches the model for a (partial) statement as described in
  * librdf_statement_match() in the given context and returns a
@@ -1327,8 +1411,10 @@ librdf_model_find_statements_in_context(librdf_model* model, librdf_statement* s
 
 
 /**
- * librdf_model_get_contexts - return the list of contexts in the graph
+ * librdf_model_get_contexts:
  * @model: #librdf_model object
+ *
+ * Return the list of contexts in the graph.
  * 
  * Returns an iterator of #librdf_node context nodes for each
  * context in the graph.
@@ -1354,9 +1440,11 @@ librdf_model_get_contexts(librdf_model* model)
 
 
 /**
- * librdf_model_get_feature - get the value of a graph feature 
+ * librdf_model_get_feature:
  * @model: #librdf_model object
  * @feature: #librdf_uri feature property
+ *
+ * Get the value of a graph feature .
  * 
  * Return value: new #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
@@ -1374,10 +1462,12 @@ librdf_model_get_feature(librdf_model* model, librdf_uri* feature)
 
 
 /**
- * librdf_model_set_feature - set the value of a graph feature
+ * librdf_model_set_feature:
  * @model: #librdf_model object
  * @feature: #librdf_uri feature property
  * @value: #librdf_node feature property value
+ *
+ * Set the value of a graph feature.
  * 
  * Return value: non 0 on failure (negative if no such feature)
  **/
@@ -1396,11 +1486,13 @@ librdf_model_set_feature(librdf_model* model, librdf_uri* feature,
 
 
 /**
- * librdf_model_find_statements_with_options - search the model for matching statements with match options
+ * librdf_model_find_statements_with_options:
  * @model: #librdf_model object
  * @statement: #librdf_statement partial statement to find
  * @context_node: #librdf_node context node or NULL.
  * @options: #librdf_hash of matching options or NULL
+ *
+ * Search the model for matching statements with match options.
  * 
  * Searches the model for a (partial) statement as described in
  * librdf_statement_match() and returns a #librdf_stream of
@@ -1432,12 +1524,14 @@ librdf_model_find_statements_with_options(librdf_model* model,
 
 
 /**
- * librdf_model_load - Load content from a URI into the model
+ * librdf_model_load:
  * @model: #librdf_model object
  * @uri: the URI to read the content
  * @name: the name of the parser (or NULL)
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI identifying the syntax (NULL if not used)
+ *
+ * Load content from a URI into the model.
  *
  * If the name field is NULL, the library will try to guess
  * the parser to use from the uri, mime_type and type_uri fields.
@@ -1472,13 +1566,15 @@ librdf_model_load(librdf_model* model, librdf_uri *uri,
 
 
 /**
- * librdf_model_to_counted_string - Write serialized model to a string
+ * librdf_model_to_counted_string:
  * @model: #librdf_model object
  * @uri: base URI to use in serializing (or NULL if not used)
  * @name: the name of the serializer (or NULL for default)
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI identifying the syntax (NULL if not used)
  * @string_length_p: pointer to location to store string length (or NULL)
+ *
+ * Write serialized model to a string.
  *
  * If the name field is NULL, the default serializer will be used.
  *
@@ -1512,12 +1608,14 @@ librdf_model_to_counted_string(librdf_model* model, librdf_uri *uri,
 
 
 /**
- * librdf_model_to_string - Write serialized model to a string
+ * librdf_model_to_string:
  * @model: #librdf_model object
  * @uri: base URI to use in serializing (or NULL if not used)
  * @name: the name of the serializer (or NULL for default)
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI identifying the syntax (NULL if not used)
+ *
+ * Write serialized model to a string.
  *
  * If the name field is NULL, the default serializer will be used.
  *
@@ -1536,9 +1634,11 @@ librdf_model_to_string(librdf_model* model, librdf_uri *uri,
 
 
 /**
- * librdf_model_contains_context - Check for a context in the model
+ * librdf_model_contains_context:
  * @model: the model object
  * @context: the contest
+ *
+ * Check for a context in the model.
  * 
  * Return value: non 0 if the model contains the context node
  **/

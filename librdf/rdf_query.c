@@ -53,8 +53,10 @@ static void librdf_delete_query_factories(librdf_world *world);
 
 
 /**
- * librdf_init_query - INTERNAL - Initialise the librdf_query module
+ * librdf_init_query:
  * @world: redland world object
+ *
+ * INTERNAL - Initialise the librdf_query module.
  * 
  * Initialises and registers all
  * compiled query modules.  Must be called before using any of the query
@@ -70,8 +72,11 @@ librdf_init_query(librdf_world *world)
 
 
 /**
- * librdf_finish_query - INTERNAL - Terminate the librdf_query module
+ * librdf_finish_query:
  * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_query module.
+ *
  **/
 void
 librdf_finish_query(librdf_world *world) 
@@ -107,11 +112,13 @@ librdf_delete_query_factories(librdf_world *world)
 /* class methods */
 
 /**
- * librdf_query_register_factory - Register a query factory
+ * librdf_query_register_factory:
  * @world: redland world object
  * @name: the query language name
  * @uri_string: the query language URI string (or NULL if none)
  * @factory: pointer to function to call to register the factory
+ *
+ * Register a query factory.
  * 
  **/
 void
@@ -176,10 +183,12 @@ librdf_query_register_factory(librdf_world *world, const char *name,
 
 
 /**
- * librdf_get_query_factory - Get a query factory by name
+ * librdf_get_query_factory:
  * @world: redland world object
  * @name: the factory name or NULL for the default factory
  * @uri: the factory URI or NULL for the default factory
+ *
+ * Get a query factory by name.
  * 
  * Return value: the factory object or NULL if there is no such factory
  **/
@@ -219,12 +228,14 @@ librdf_get_query_factory(librdf_world *world,
 
 
 /**
- * librdf_new_query - Constructor - create a new librdf_query object
+ * librdf_new_query:
  * @world: redland world object
  * @name: the name identifying the query language
  * @uri: the URI identifying the query language (or NULL)
  * @base_uri: the base URI of the query string (or NULL)
  * @query_string: the query string
+ *
+ * Constructor - create a new librdf_query object.
  *
  * Return value: a new #librdf_query object or NULL on failure
  */
@@ -409,9 +420,11 @@ librdf_query_remove_query_result(librdf_query *query,
 
 
 /**
- * librdf_query_execute - Run the query on a model
+ * librdf_query_execute:
  * @query: #librdf_query object
  * @model: model to operate query on
+ *
+ * Run the query on a model.
  * 
  * Runs the query against the (previously registered) model
  * and returns a #librdf_query_results for the result objects.
@@ -436,8 +449,10 @@ librdf_query_execute(librdf_query* query, librdf_model* model)
 
 
 /**
- * librdf_query_get_limit - Get the query-specified limit on results
+ * librdf_query_get_limit:
  * @query: #librdf_query query object
+ *
+ * Get the query-specified limit on results.
  *
  * This is the limit given in the query on the number of results allowed.
  *
@@ -454,9 +469,11 @@ librdf_query_get_limit(librdf_query *query)
 
 
 /**
- * librdf_query_set_limit - Set the query-specified limit on results
+ * librdf_query_set_limit:
  * @query: #librdf_query query object
  * @limit: the limit on results, >=0 to set a limit, <0 to have no limit
+ *
+ * Set the query-specified limit on results.
  *
  * This is the limit given in the query on the number of results allowed.
  *
@@ -475,8 +492,10 @@ librdf_query_set_limit(librdf_query *query, int limit)
 
 
 /**
- * librdf_query_get_offset - Get the query-specified offset on results
+ * librdf_query_get_offset:
  * @query: #librdf_query query object
+ *
+ * Get the query-specified offset on results.
  *
  * This is the offset given in the query on the number of results allowed.
  *
@@ -493,9 +512,11 @@ librdf_query_get_offset(librdf_query *query)
 
 
 /**
- * librdf_query_set_offset - Set the query-specified offset on results
+ * librdf_query_set_offset:
  * @query: #librdf_query query object
  * @offset: offset for results, >=0 to set an offset, <0 to have no offset
+ *
+ * Set the query-specified offset on results.
  *
  * This is the offset given in the query on the number of results allowed.
  *

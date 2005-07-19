@@ -48,8 +48,10 @@
 
 #ifndef STANDALONE
 /**
- * librdf_heuristic_is_blank_node - try to guess if an node string is a blank node identifier
+ * librdf_heuristic_is_blank_node:
  * @node: string object to guess type
+ *
+ * Try to guess if an node string is a blank node identifier.
  *
  * The guessing is done by assuming the object is a blank node if it matches
  * ^_: like N-Triples, N3 and related.
@@ -65,8 +67,10 @@ librdf_heuristic_is_blank_node(char *node)
 
 
 /**
- * librdf_heuristic_get_blank_node - get a blank node identifier from a node string
+ * librdf_heuristic_get_blank_node:
  * @node: string object to guess type
+ *
+ * Get a blank node identifier from a node string.
  *
  * Picks the blank node identifier out of a string.  Looks for things
  * like _:ABC
@@ -82,8 +86,10 @@ librdf_heuristic_get_blank_node(char *node)
 
 
 /**
- * librdf_heuristic_object_is_literal - try to guess if an object string is a literal or a resource
+ * librdf_heuristic_object_is_literal:
  * @object: string object to guess type
+ *
+ * Try to guess if an object string is a literal or a resource.
  *
  * The guessing is done by assuming the object is a URL if it matches
  *   ^[isalnum()]+:[^isblank()]+$
@@ -125,8 +131,10 @@ librdf_heuristic_object_is_literal(char *object)
 
 
 /**
- * librdf_heuristic_gen_name - Generate a new name from an existing name
+ * librdf_heuristic_gen_name:
  * @name: the name
+ *
+ * Generate a new name from an existing name.
  * 
  * Adds an integer or increases the integer at the end of the name
  * in order to generate a new one

@@ -64,13 +64,15 @@ static const char *log_level_names[LIBRDF_LOG_LAST+1]={
 
 
 /**
- * librdf_log_simple - INTERNAL - Log a message
+ * librdf_log_simple:
  * @world: redland world object or NULL
  * @code: error code
  * @level: #librdf_log_level log level
  * @facility: #librdf_log_facility log facility
  * @locator: raptor_locator if available or NULL
  * @message: message to record
+ *
+ * INTERNAL - Log a message.
  *
  * If world is NULL, the error ocurred in redland startup before
  * the world was created.
@@ -150,13 +152,15 @@ librdf_log_simple(librdf_world* world, int code,
 
 
 /**
- * librdf_log - INTERNAL - Log a message
+ * librdf_log:
  * @world: redland world object or NULL
  * @code: error code
  * @level: #librdf_log_level log level
  * @facility: #librdf_log_facility log facility
  * @locator: raptor_locator if available or NULL
  * @message: message to record
+ *
+ * INTERNAL - Log a message.
  *
  * If world is NULL, the error ocurred in redland startup before
  * the world was created.
@@ -180,9 +184,11 @@ librdf_log(librdf_world* world, int code,
 
 
 /**
- * librdf_fatal - INTERNAL - Fatal error
+ * librdf_fatal:
  * @world: redland world object or NULL
  * @message: message arguments
+ *
+ * INTERNAL - Fatal error.
  *
  * If world is NULL, the error ocurred in redland startup before
  * the world was created.
@@ -214,8 +220,10 @@ librdf_fatal(librdf_world* world, int facility,
 
 
 /**
- * librdf_log_message_code: retrieve error code from log message
+ * librdf_log_message_code:
  * @message: log message
+ *
+ * Retrieve error code from log message.
  *
  * Return value: int error code
  **/
@@ -227,8 +235,10 @@ librdf_log_message_code(librdf_log_message *message)
 
 
 /**
- * librdf_log_message_level - retrieve severity of log message
+ * librdf_log_message_level:
  * @message: log message
+ *
+ * Retrieve severity of log message.
  *
  * The log message severity level is defined in rdf_log.h as values
  * of enum librdf_log_level.
@@ -243,8 +253,10 @@ librdf_log_message_level(librdf_log_message *message)
 
 
 /**
- * librdf_log_message_facility - retrieve facility that generated the message
+ * librdf_log_message_facility:
  * @message: log message
+ *
+ * Retrieve facility that generated the message.
  *
  * The log message facility is defined in rdf_log.h as values
  * of enum librdf_log_facility.
@@ -259,8 +271,10 @@ librdf_log_message_facility(librdf_log_message *message)
 
 
 /**
- * librdf_log_message_message - retrieve text message from log entry
+ * librdf_log_message_message:
  * @message: log message
+ *
+ * Retrieve text message from log entry.
  *
  * The string returned is shared and must be copied by the caller
  * if required to be retained.
@@ -275,8 +289,10 @@ librdf_log_message_message(librdf_log_message *message)
 
 
 /**
- * librdf_log_message_locator - retrieve locator of log entry
+ * librdf_log_message_locator:
  * @message: log message
+ *
+ * Retrieve locator of log entry.
  *
  * Return value: pointer to an appropriate raptor_locator* or NULL if not available
  **/

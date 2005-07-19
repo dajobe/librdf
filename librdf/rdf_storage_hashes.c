@@ -497,6 +497,8 @@ librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
 /**
  * librdf_storage_hashes_close:
  * @storage: 
+ *
+ * .
  * 
  * Close the storage hashes storage, and free all content since there is no 
  * persistance.
@@ -984,6 +986,8 @@ librdf_storage_hashes_serialise_finished(void* context)
  * librdf_storage_hashes_find_statements:
  * @storage: the storage
  * @statement: the statement to match
+ *
+ * .
  * 
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
@@ -1369,10 +1373,12 @@ librdf_storage_hashes_find_targets(librdf_storage* storage,
 }
 
 /**
- * librdf_storage_hashes_context_add_statement - Add a statement to a storage context
+ * librdf_storage_hashes_context_add_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to add
+ *
+ * Add a statement to a storage context.
  * 
  * Return value: non 0 on failure
  **/
@@ -1415,10 +1421,12 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
 
 
 /**
- * librdf_storage_hashes_context_remove_statement - Remove a statement from a storage context
+ * librdf_storage_hashes_context_remove_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to remove
+ *
+ * Remove a statement from a storage context.
  * 
  * Return value: non 0 on failure
  **/
@@ -1473,9 +1481,11 @@ typedef struct {
 
 
 /**
- * librdf_storage_hashes_context_serialise - List all statements in a storage context
+ * librdf_storage_hashes_context_serialise:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
+ *
+ * List all statements in a storage context.
  * 
  * Return value: #librdf_stream of statements or NULL on failure or context is empty
  **/
@@ -1745,8 +1755,10 @@ librdf_storage_hashes_get_contexts_finished(void* iterator)
 
 
 /**
- * librdf_storage_hashes_context_get_contexts - List all context nodes in a storage
+ * librdf_storage_hashes_context_get_contexts:
  * @storage: #librdf_storage object
+ *
+ * List all context nodes in a storage.
  * 
  * Return value: #librdf_iterator of context_nodes or NULL on failure or no contexts
  **/
@@ -1799,9 +1811,11 @@ librdf_storage_hashes_get_contexts(librdf_storage* storage)
 
 
 /**
- * librdf_storage_hashes_get_feature - get the value of a storage feature
+ * librdf_storage_hashes_get_feature:
  * @storage: #librdf_storage object
  * @feature: #librdf_uri feature property
+ *
+ * Get the value of a storage feature.
  * 
  * Return value: new #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.

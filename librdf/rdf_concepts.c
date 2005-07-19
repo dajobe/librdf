@@ -86,8 +86,10 @@ librdf_uri* librdf_concept_schema_namespace_uri = NULL;
 
 
 /**
- * librdf_init_concepts - INTERNAL - Initialise the concepts module.
+ * librdf_init_concepts:
  * @world: redland world object
+ *
+ * INTERNAL - Initialise the concepts module.
  * 
  **/
 void
@@ -117,12 +119,14 @@ librdf_init_concepts(librdf_world *world)
 
 
 /**
- * librdf_get_concept_by_name - get Redland uri and/or node objects for RDF concepts
+ * librdf_get_concept_by_name:
  * @world: redland world object
  * @is_ms: non zero if name is a RDF namespace concept (else is RDF schema)
  * @name: the name to look up
  * @uri_p: pointer to variable to hold #librdf_uri of concept or NULL if not required
  * @node_p: pointer to variable to hold #librdf_node of concept or NULL if not required
+ *
+ * Get Redland uri and/or node objects for RDF concepts.
  * 
  * Allows the dynamic look-up of an RDF concept by the local_name of
  * the concept in either the RDF or RDF Schema namespace.  Returns
@@ -148,8 +152,11 @@ librdf_get_concept_by_name(librdf_world *world, int is_ms,
 
 
 /**
- * librdf_finish_concepts - INTERNAL - Terminate the librdf_concepts module
+ * librdf_finish_concepts:
  * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_concepts module.
+ *
  **/
 void
 librdf_finish_concepts(librdf_world *world)

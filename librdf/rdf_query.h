@@ -38,47 +38,75 @@ extern "C" {
 #endif
 
 /* class methods */
-REDLAND_API void librdf_query_register_factory(librdf_world *world, const char *name, const unsigned char *uri_string, void (*factory) (librdf_query_factory*));
+REDLAND_API
+void librdf_query_register_factory(librdf_world *world, const char *name, const unsigned char *uri_string, void (*factory) (librdf_query_factory*));
 
 /* constructor */
-REDLAND_API librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string, librdf_uri* base_uri);
-REDLAND_API librdf_query* librdf_new_query_from_query (librdf_query* old_query);
-REDLAND_API librdf_query* librdf_new_query_from_factory(librdf_world* world, librdf_query_factory* factory, const char *name, librdf_uri* uri, const unsigned char* query_string, librdf_uri* base_uri);
+REDLAND_API
+librdf_query* librdf_new_query(librdf_world* world, const char *name, librdf_uri* uri, const unsigned char *query_string, librdf_uri* base_uri);
+REDLAND_API
+librdf_query* librdf_new_query_from_query (librdf_query* old_query);
+REDLAND_API
+librdf_query* librdf_new_query_from_factory(librdf_world* world, librdf_query_factory* factory, const char *name, librdf_uri* uri, const unsigned char* query_string, librdf_uri* base_uri);
 
 /* destructor */
-REDLAND_API void librdf_free_query(librdf_query *query);
+REDLAND_API
+void librdf_free_query(librdf_query *query);
 
 
 /* methods */
-REDLAND_API librdf_query_results* librdf_query_execute(librdf_query* query, librdf_model *model);
-REDLAND_API int librdf_query_get_limit(librdf_query *query);
-REDLAND_API int librdf_query_set_limit(librdf_query *query, int limit);
-REDLAND_API int librdf_query_get_offset(librdf_query *query);
-REDLAND_API int librdf_query_set_offset(librdf_query *query, int offset);
+REDLAND_API
+librdf_query_results* librdf_query_execute(librdf_query* query, librdf_model *model);
+REDLAND_API
+int librdf_query_get_limit(librdf_query *query);
+REDLAND_API
+int librdf_query_set_limit(librdf_query *query, int limit);
+REDLAND_API
+int librdf_query_get_offset(librdf_query *query);
+REDLAND_API
+int librdf_query_set_offset(librdf_query *query, int offset);
 
-REDLAND_API librdf_stream* librdf_query_results_as_stream(librdf_query_results* query_results);
+REDLAND_API
+librdf_stream* librdf_query_results_as_stream(librdf_query_results* query_results);
 
-REDLAND_API int librdf_query_results_get_count(librdf_query_results* query_results);
-REDLAND_API int librdf_query_results_next(librdf_query_results* query_results);
-REDLAND_API int librdf_query_results_finished(librdf_query_results* query_results);
+REDLAND_API
+int librdf_query_results_get_count(librdf_query_results* query_results);
+REDLAND_API
+int librdf_query_results_next(librdf_query_results* query_results);
+REDLAND_API
+int librdf_query_results_finished(librdf_query_results* query_results);
 
-REDLAND_API int librdf_query_results_get_bindings(librdf_query_results* query_results, const char ***names, librdf_node **values);
-REDLAND_API librdf_node* librdf_query_results_get_binding_value(librdf_query_results* query_results, int offset);
-REDLAND_API const char* librdf_query_results_get_binding_name(librdf_query_results* query_results, int offset);
-REDLAND_API librdf_node* librdf_query_results_get_binding_value_by_name(librdf_query_results* query_results, const char *name);
-REDLAND_API int librdf_query_results_get_bindings_count(librdf_query_results* query_results);
-REDLAND_API unsigned char* librdf_query_results_to_counted_string(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri, size_t *length_p);
-REDLAND_API unsigned char* librdf_query_results_to_string(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri);
-REDLAND_API int librdf_query_results_to_file_handle(librdf_query_results *query_results, FILE *handle, librdf_uri *format_uri, librdf_uri *base_uri);
-REDLAND_API int librdf_query_results_to_file(librdf_query_results *query_results, const char *name, librdf_uri *format_uri, librdf_uri *base_uri);
+REDLAND_API
+int librdf_query_results_get_bindings(librdf_query_results* query_results, const char ***names, librdf_node **values);
+REDLAND_API
+librdf_node* librdf_query_results_get_binding_value(librdf_query_results* query_results, int offset);
+REDLAND_API
+const char* librdf_query_results_get_binding_name(librdf_query_results* query_results, int offset);
+REDLAND_API
+librdf_node* librdf_query_results_get_binding_value_by_name(librdf_query_results* query_results, const char *name);
+REDLAND_API
+int librdf_query_results_get_bindings_count(librdf_query_results* query_results);
+REDLAND_API
+unsigned char* librdf_query_results_to_counted_string(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri, size_t *length_p);
+REDLAND_API
+unsigned char* librdf_query_results_to_string(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri);
+REDLAND_API
+int librdf_query_results_to_file_handle(librdf_query_results *query_results, FILE *handle, librdf_uri *format_uri, librdf_uri *base_uri);
+REDLAND_API
+int librdf_query_results_to_file(librdf_query_results *query_results, const char *name, librdf_uri *format_uri, librdf_uri *base_uri);
 
-REDLAND_API void librdf_free_query_results(librdf_query_results* query_results);
+REDLAND_API
+void librdf_free_query_results(librdf_query_results* query_results);
 
-REDLAND_API int librdf_query_results_is_bindings(librdf_query_results *query_results);
-REDLAND_API int librdf_query_results_is_boolean(librdf_query_results *query_results);
-REDLAND_API int librdf_query_results_is_graph(librdf_query_results *query_results);
+REDLAND_API
+int librdf_query_results_is_bindings(librdf_query_results *query_results);
+REDLAND_API
+int librdf_query_results_is_boolean(librdf_query_results *query_results);
+REDLAND_API
+int librdf_query_results_is_graph(librdf_query_results *query_results);
 
-REDLAND_API int librdf_query_results_get_boolean(librdf_query_results *query_results);
+REDLAND_API
+int librdf_query_results_get_boolean(librdf_query_results *query_results);
 
 
 #ifdef __cplusplus

@@ -39,31 +39,45 @@ extern "C" {
 #endif
 
 /* class methods */
-REDLAND_API void librdf_parser_register_factory(librdf_world *world, const char *name, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_parser_factory*));
+REDLAND_API
+void librdf_parser_register_factory(librdf_world *world, const char *name, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_parser_factory*));
 
 /* constructor */
-REDLAND_API librdf_parser* librdf_new_parser(librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri);
-REDLAND_API librdf_parser* librdf_new_parser_from_factory(librdf_world* world, librdf_parser_factory *factory);
+REDLAND_API
+librdf_parser* librdf_new_parser(librdf_world* world, const char *name, const char *mime_type, librdf_uri *type_uri);
+REDLAND_API
+librdf_parser* librdf_new_parser_from_factory(librdf_world* world, librdf_parser_factory *factory);
 
 /* destructor */
-REDLAND_API void librdf_free_parser(librdf_parser *parser);
+REDLAND_API
+void librdf_free_parser(librdf_parser *parser);
 
 
 /* methods */
-REDLAND_API librdf_stream* librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri);
-REDLAND_API int librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri, librdf_model* model);
-REDLAND_API librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const unsigned char* string, librdf_uri* base_uri);
-REDLAND_API int librdf_parser_parse_string_into_model(librdf_parser* parser, const unsigned char *string, librdf_uri* base_uri, librdf_model* model);
-REDLAND_API REDLAND_DEPRECATED void librdf_parser_set_error(librdf_parser* parser, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
-REDLAND_API REDLAND_DEPRECATED void librdf_parser_set_warning(librdf_parser* parser, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
-REDLAND_API librdf_stream* librdf_parser_parse_counted_string_as_stream(librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri);
-REDLAND_API int librdf_parser_parse_counted_string_into_model(librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri, librdf_model* model);
+REDLAND_API
+librdf_stream* librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri);
+REDLAND_API
+int librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri, librdf_uri* base_uri, librdf_model* model);
+REDLAND_API
+librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const unsigned char* string, librdf_uri* base_uri);
+REDLAND_API
+int librdf_parser_parse_string_into_model(librdf_parser* parser, const unsigned char *string, librdf_uri* base_uri, librdf_model* model);
+REDLAND_API REDLAND_DEPRECATED
+void librdf_parser_set_error(librdf_parser* parser, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
+REDLAND_API REDLAND_DEPRECATED
+void librdf_parser_set_warning(librdf_parser* parser, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
+REDLAND_API
+librdf_stream* librdf_parser_parse_counted_string_as_stream(librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri);
+REDLAND_API
+int librdf_parser_parse_counted_string_into_model(librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri, librdf_model* model);
 
 #define LIBRDF_PARSER_FEATURE_ERROR_COUNT "http://feature.librdf.org/parser-error-count"
 #define LIBRDF_PARSER_FEATURE_WARNING_COUNT "http://feature.librdf.org/parser-warning-count"
 
-REDLAND_API librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
-REDLAND_API int librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature, librdf_node* value);
+REDLAND_API
+librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
+REDLAND_API
+int librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature, librdf_node* value);
 
 #ifdef __cplusplus
 }

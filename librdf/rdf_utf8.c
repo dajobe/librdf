@@ -102,10 +102,12 @@
 
 
 /**
- * librdf_unicode_char_to_utf8 - Convert a Unicode character to UTF-8 encoding
+ * librdf_unicode_char_to_utf8:
  * @c: Unicode character
  * @output: UTF-8 string buffer or NULL
  * @length: buffer size
+ *
+ * Convert a Unicode character to UTF-8 encoding.
  * 
  * If buffer is NULL, then will calculate the length rather than
  * perform it.  This can be used by the caller to allocate space
@@ -174,10 +176,12 @@ librdf_unicode_char_to_utf8(librdf_unichar c, byte *output, int length)
 
 
 /**
- * librdf_utf8_to_unicode_char - Convert an UTF-8 encoded buffer to a Unicode character
+ * librdf_utf8_to_unicode_char:
  * @output: Pointer to the Unicode character or NULL
  * @input: UTF-8 string buffer
  * @length: buffer size
+ *
+ * Convert an UTF-8 encoded buffer to a Unicode character.
  * 
  * If output is NULL, then will calculate the number of bytes that
  * will be used from the input buffer and not perform the conversion.
@@ -277,10 +281,12 @@ librdf_utf8_to_unicode_char(librdf_unichar *output, const byte *input, int lengt
 
 
 /**
- * librdf_utf8_to_latin1 - Convert a UTF-8 string to ISO Latin-1
+ * librdf_utf8_to_latin1:
  * @input: UTF-8 string buffer
  * @length: buffer size
  * @output_length: Pointer to variable to store resulting string length or NULL
+ *
+ * Convert a UTF-8 string to ISO Latin-1.
  * 
  * Converts the given UTF-8 string to the ISO Latin-1 subset of
  * Unicode (characters 0x00-0xff), discarding any out of range
@@ -340,10 +346,12 @@ librdf_utf8_to_latin1(const byte *input, int length, int *output_length)
 
 
 /**
- * librdf_latin1_to_utf8 - Convert an ISO Latin-1 encoded string to UTF-8
+ * librdf_latin1_to_utf8:
  * @input: ISO Latin-1 string buffer
  * @length: buffer size
  * @output_length: Pointer to variable to store resulting string length or NULL
+ *
+ * Convert an ISO Latin-1 encoded string to UTF-8.
  * 
  * Converts the given ISO Latin-1 string to an UTF-8 encoded string
  * representing the same content.  This is lossless.
@@ -390,10 +398,12 @@ librdf_latin1_to_utf8(const byte *input, int length, int *output_length)
 
 
 /**
- * librdf_utf8_print - Print a UTF-8 string to a stream
+ * librdf_utf8_print:
  * @input: UTF-8 string buffer
  * @length: buffer size
  * @stream: FILE* stream
+ *
+ * Print a UTF-8 string to a stream.
  * 
  * Pretty prints the UTF-8 string in a pseudo-C character
  * format like \u<emphasis>hex digits</emphasis> when the characters fail

@@ -37,29 +37,42 @@
 extern "C" {
 #endif
 
-REDLAND_API librdf_world* librdf_new_world(void);
-REDLAND_API void librdf_free_world(librdf_world *world);
-REDLAND_API void librdf_world_open(librdf_world *world);
+REDLAND_API
+librdf_world* librdf_new_world(void);
+REDLAND_API
+void librdf_free_world(librdf_world *world);
+REDLAND_API
+void librdf_world_open(librdf_world *world);
 
-REDLAND_API void librdf_world_init_mutex(librdf_world *world);
+REDLAND_API
+void librdf_world_init_mutex(librdf_world *world);
   
-REDLAND_API void librdf_world_set_error(librdf_world* world, void *user_data, librdf_log_level_func error_handler);
-REDLAND_API void librdf_world_set_warning(librdf_world* world, void *user_data, librdf_log_level_func warning_handler);
-REDLAND_API void librdf_world_set_logger(librdf_world* world, void *user_data, librdf_log_func log_handler);
+REDLAND_API
+void librdf_world_set_error(librdf_world* world, void *user_data, librdf_log_level_func error_handler);
+REDLAND_API
+void librdf_world_set_warning(librdf_world* world, void *user_data, librdf_log_level_func warning_handler);
+REDLAND_API
+void librdf_world_set_logger(librdf_world* world, void *user_data, librdf_log_func log_handler);
 
-REDLAND_API void librdf_world_set_digest(librdf_world*, const char *name);
-REDLAND_API void librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash);
+REDLAND_API
+void librdf_world_set_digest(librdf_world* world, const char *name);
+REDLAND_API
+void librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash);
 
 
 #define LIBRDF_WORLD_FEATURE_GENID_BASE "http://feature.librdf.org/genid-base"
 #define LIBRDF_WORLD_FEATURE_GENID_COUNTER "http://feature.librdf.org/genid-counter"
 
-REDLAND_API librdf_node* librdf_world_get_feature(librdf_world* world, librdf_uri *feature);
-REDLAND_API int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, librdf_node* value);
+REDLAND_API
+librdf_node* librdf_world_get_feature(librdf_world* world, librdf_uri *feature);
+REDLAND_API
+int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, librdf_node* value);
 
 /* OLD INTERFACES */
-REDLAND_API REDLAND_DEPRECATED void librdf_init_world(char *digest_factory_name, void* not_used2);
-REDLAND_API REDLAND_DEPRECATED void librdf_destroy_world(void);
+REDLAND_API REDLAND_DEPRECATED
+void librdf_init_world(char *digest_factory_name, void* not_used2);
+REDLAND_API REDLAND_DEPRECATED
+void librdf_destroy_world(void);
 
 #ifdef __cplusplus
 }

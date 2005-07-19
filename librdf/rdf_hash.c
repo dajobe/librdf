@@ -74,7 +74,9 @@ static void librdf_hash_keys_iterator_finished(void* iterator);
 
 
 /**
- * librdf_init_hash - INTERNAL - Initialise the librdf_hash module
+ * librdf_init_hash:
+ *
+ * INTERNAL - Initialise the librdf_hash module.
  *
  * Initialises and registers all
  * compiled hash modules.  Must be called before using any of the hash
@@ -95,8 +97,11 @@ librdf_init_hash(librdf_world *world)
 
 
 /**
- * librdf_finish_hash - INTERNAL - Terminate the librdf_hash module
+ * librdf_finish_hash:
  * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_hash module.
+ *
  **/
 void
 librdf_finish_hash(librdf_world *world) 
@@ -147,10 +152,12 @@ librdf_free_hash_datums(librdf_world *world)
 
 
 /**
- * librdf_new_hash_datum - Constructor - Create a new hash datum object
+ * librdf_new_hash_datum:
  * @world: redland world object
  * @data: data to store
  * @size: size of data
+ *
+ * Constructor - Create a new hash datum object.
  * 
  * Return value: New #librdf_hash_datum object or NULL on failure
  **/
@@ -177,8 +184,11 @@ librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
 
 
 /**
- * librdf_free_hash_datum - Destructor - destroy a hash datum object
+ * librdf_free_hash_datum:
  * @datum: hash datum object
+ *
+ * Destructor - destroy a hash datum object.
+ *
  **/
 void
 librdf_free_hash_datum(librdf_hash_datum *datum) 
@@ -193,10 +203,12 @@ librdf_free_hash_datum(librdf_hash_datum *datum)
 /* class methods */
 
 /**
- * librdf_hash_register_factory - Register a hash factory
+ * librdf_hash_register_factory:
  * @world: redland world object
  * @name: the hash factory name
  * @factory: pointer to function to call to register the factory
+ *
+ * Register a hash factory.
  * 
  **/
 void
@@ -246,9 +258,11 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
 
 
 /**
- * librdf_get_hash_factory - Get a hash factory by name
+ * librdf_get_hash_factory:
  * @world: redland world object
  * @name: the factory name or NULL for the default factory
+ *
+ * Get a hash factory by name.
  * 
  * FIXME: several bits of code assume the default hash factory is
  * in memory.
@@ -284,9 +298,11 @@ librdf_get_hash_factory(librdf_world *world, const char *name)
 
 
 /**
- * librdf_new_hash -  Constructor - create a new librdf_hash object
+ * librdf_new_hash:
  * @world: redland world object
  * @name: factory name
+ *
+ * Constructor - create a new librdf_hash object.
  *
  * Return value: a new #librdf_hash object or NULL on failure
  */
@@ -368,10 +384,12 @@ librdf_new_hash_from_string(librdf_world *world, const char *name,
 
 
 /**
- * librdf_new_hash_from_array_of_strings -  Constructor - create a new librdf_hash object from an array of strings
+ * librdf_new_hash_from_array_of_strings:
  * @world: redland world object
  * @name: hash name
  * @array: address of the start of the array of char* pointers
+ *
+ *  Constructor - create a new librdf_hash object from an array of strings.
  *
  * Return value: a new #librdf_hash object or NULL on failure
  */
@@ -461,13 +479,15 @@ librdf_free_hash(librdf_hash* hash)
 /* methods */
 
 /**
- * librdf_hash_open - Start a hash association 
+ * librdf_hash_open:
  * @hash: hash object
  * @identifier: indentifier for the hash factory - usually a URI or file name
  * @mode: hash access mode
  * @is_writable: is hash writable?
  * @is_new: is hash new?
  * @options: a hash of options for the hash factory or NULL if there are none.
+ *
+ * Start a hash association .
  * 
  * This method opens and/or creates a new hash with any resources it
  * needs.
@@ -497,8 +517,10 @@ librdf_hash_open(librdf_hash* hash, char *identifier,
 
 
 /**
- * librdf_hash_close - End a hash association
+ * librdf_hash_close:
  * @hash: hash object
+ *
+ * End a hash association.
  * 
  * Return value: non 0 on failure
  **/
@@ -515,8 +537,10 @@ librdf_hash_close(librdf_hash* hash)
 
 
 /**
- * librdf_hash_values_count - Get the number of values in the hash
+ * librdf_hash_values_count:
  * @hash: 
+ *
+ * Get the number of values in the hash.
  * 
  * Return value: integer number of values in the hash or <0 if cannot be determined
  **/
@@ -528,9 +552,11 @@ librdf_hash_values_count(librdf_hash* hash)
 
 
 /**
- * librdf_hash_get - Retrieve one value from hash for a given key as string
+ * librdf_hash_get:
  * @hash: hash object
  * @key: pointer to key
+ *
+ * Retrieve one value from hash for a given key as string.
  * 
  * The value returned is from newly allocated memory which the
  * caller must free.
@@ -570,9 +596,11 @@ librdf_hash_get(librdf_hash* hash, const char *key)
 
 
 /**
- * librdf_hash_get_one - Retrieve one value from hash for a given key
+ * librdf_hash_get_one:
  * @hash: hash object
  * @key: pointer to key
+ *
+ * Retrieve one value from hash for a given key.
  * 
  * The value returned is from newly allocated memory which the
  * caller must free.
@@ -637,10 +665,12 @@ typedef struct {
 
 
 /**
- * librdf_hash_get_all - Retrieve all values from hash for a given key
+ * librdf_hash_get_all:
  * @hash: hash object
  * @key: pointer to key
  * @value: pointer to value
+ *
+ * Retrieve all values from hash for a given key.
  * 
  * The iterator returns #librdf_hash_datum objects containing the values.
  * These are newly allocated memory which the caller must free.
@@ -784,9 +814,11 @@ librdf_hash_get_all_iterator_finished(void* iterator)
 
 
 /**
- * librdf_hash_get_del - Retrieve one value from hash for a given key as string and remove all values with that key
+ * librdf_hash_get_del:
  * @hash: hash object
  * @key: pointer to key
+ *
+ * Retrieve one value from hash for a given key as string and remove all values with that key.
  * 
  * The value returned is from newly allocated memory which the
  * caller must free.
@@ -814,10 +846,12 @@ librdf_hash_get_del(librdf_hash* hash, const char *key)
 
 
 /**
- * librdf_hash_put - Insert key/value pairs into the hash according to flags
+ * librdf_hash_put:
  * @hash: hash object
  * @key: key 
  * @value: value
+ *
+ * Insert key/value pairs into the hash according to flags.
  * 
  * The key and values are copied into the hash; the original pointers
  * can be deleted.
@@ -833,10 +867,12 @@ librdf_hash_put(librdf_hash* hash, librdf_hash_datum *key,
 
 
 /**
- * librdf_hash_exists - Check if a given key/value is in the hash
+ * librdf_hash_exists:
  * @hash: hash object
  * @key: key
  * @value: value
+ *
+ * Check if a given key/value is in the hash.
  * 
  * Return value: >0 if the key/value exists in the hash, 0 if not, <0 on failure
  **/
@@ -849,10 +885,12 @@ librdf_hash_exists(librdf_hash* hash, librdf_hash_datum *key,
 
 
 /**
- * librdf_hash_delete - Delete a key/value pair from the hash
+ * librdf_hash_delete:
  * @hash: hash object
  * @key: key
  * @value: value
+ *
+ * Delete a key/value pair from the hash.
  * 
  * Return value: non 0 on failure (including pair not present)
  **/
@@ -865,9 +903,11 @@ librdf_hash_delete(librdf_hash* hash, librdf_hash_datum *key,
 
 
 /**
- * librdf_hash_delete_all - Delete a key and all values from the hash
+ * librdf_hash_delete_all:
  * @hash: hash object
  * @key: key
+ *
+ * Delete a key and all values from the hash.
  * 
  * Return value: non 0 on failure (including pair not present)
  **/
@@ -890,9 +930,11 @@ typedef struct {
 
 
 /**
- * librdf_hash_keys - Get the hash keys
+ * librdf_hash_keys:
  * @hash: hash object
  * @key: pointer to key
+ *
+ * Get the hash keys.
  * 
  * The iterator returns #librdf_hash_datum objects containingvalue returned is from newly allocated memory which the
  * caller must free.
@@ -1016,8 +1058,10 @@ librdf_hash_keys_iterator_finished(void* iterator)
 
 
 /**
- * librdf_hash_sync - Flush any cached information to disk if appropriate
+ * librdf_hash_sync:
  * @hash: hash object
+ *
+ * Flush any cached information to disk if appropriate.
  * 
  * Return value: non 0 on failure
  **/
@@ -1029,8 +1073,10 @@ librdf_hash_sync(librdf_hash* hash)
 
 
 /**
- * librdf_hash_get_fd - Get the file descriptor for the hash
+ * librdf_hash_get_fd:
  * @hash: hash object
+ *
+ * Get the file descriptor for the hash.
  * 
  * This returns the file descriptor if it is file based for
  * use with file locking.
@@ -1045,9 +1091,12 @@ librdf_hash_get_fd(librdf_hash* hash)
 
 
 /**
- * librdf_hash_print - pretty print the hash to a file descriptor
+ * librdf_hash_print:
  * @hash: the hash
  * @fh: file handle
+ *
+ * Pretty print the hash to a file descriptor.
+ *
  **/
 void
 librdf_hash_print(librdf_hash* hash, FILE *fh) 
@@ -1087,9 +1136,12 @@ librdf_hash_print(librdf_hash* hash, FILE *fh)
 
 
 /**
- * librdf_hash_print_keys - pretty print the keys to a file descriptor
+ * librdf_hash_print_keys:
  * @hash: the hash
  * @fh: file handle
+ *
+ * Pretty print the keys to a file descriptor.
+ *
  **/
 void
 librdf_hash_print_keys(librdf_hash* hash, FILE *fh) 
@@ -1121,10 +1173,13 @@ librdf_hash_print_keys(librdf_hash* hash, FILE *fh)
 
 
 /**
- * librdf_hash_print_values - pretty print the values of one key to a file descriptor
+ * librdf_hash_print_values:
  * @hash: the hash
  * @key_string: the key as a string
  * @fh: file handle
+ *
+ * Pretty print the values of one key to a file descriptor.
+ *
  **/
 void
 librdf_hash_print_values(librdf_hash* hash, char *key_string, FILE *fh)
@@ -1179,9 +1234,11 @@ typedef enum {
 
 
 /**
- * librdf_hash_from_string - Initialise a hash from a string
+ * librdf_hash_from_string:
  * @hash: hash object
  * @string: hash encoded as a string
+ *
+ * Initialise a hash from a string.
  * 
  * The string format is something like:
  * key1='value1',key2='value2', key3='\'quoted value\''
@@ -1370,9 +1427,11 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
 
 
 /**
- * librdf_hash_from_array_of_strings - Initialise a hash from an array of strings
+ * librdf_hash_from_array_of_strings:
  * @hash: hash object
  * @array: address of the start of the array of char* pointers
+ *
+ * Initialise a hash from an array of strings.
  * 
  * Return value:  non 0 on failure
  **/
@@ -1399,9 +1458,11 @@ librdf_hash_from_array_of_strings(librdf_hash* hash, const char **array)
 
 
 /**
- * librdf_hash_get_as_boolean - lookup a hash key and decode value as a boolean
+ * librdf_hash_get_as_boolean:
  * @hash: #librdf_hash object
  * @key: key string to look up
+ *
+ * Lookup a hash key and decode value as a boolean.
  * 
  * Return value: >0 (for true), 0 (for false) or <0 (for key not found or not known boolean value)
  **/
@@ -1443,9 +1504,11 @@ librdf_hash_get_as_boolean (librdf_hash* hash, const char *key)
 
 
 /**
- * librdf_hash_get_as_long - lookup a hash key and decode value as a long
+ * librdf_hash_get_as_long:
  * @hash: #librdf_hash object
  * @key: key string to look up
+ *
+ * Lookup a hash key and decode value as a long.
  * 
  * Return value: >0 (for success), <0 (for key not found or not known boolean value)
  **/
@@ -1473,10 +1536,12 @@ librdf_hash_get_as_long (librdf_hash* hash, const char *key)
 }
 
 /**
- * librdf_hash_put_strings - Insert key/value pairs into the hash as strings
+ * librdf_hash_put_strings:
  * @hash: hash object
  * @key: key 
  * @value: value
+ *
+ * Insert key/value pairs into the hash as strings.
  * 
  * The key and values are copied into the hash, no sharing i s done.
  * 

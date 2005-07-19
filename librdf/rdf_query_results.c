@@ -47,8 +47,10 @@
 
 
 /**
- * librdf_query_get_result_count - Get number of bindings so far
+ * librdf_query_get_result_count:
  * @query_results: #librdf_query_results query results
+ *
+ * Get number of bindings so far.
  * 
  * Return value: number of bindings found so far
  **/
@@ -65,8 +67,10 @@ librdf_query_results_get_count(librdf_query_results *query_results)
 
 
 /**
- * librdf_query_results_next - Move to the next result
+ * librdf_query_results_next:
  * @query_results: #librdf_query_results query results
+ *
+ * Move to the next result.
  * 
  * Return value: non-0 if failed or results exhausted
  **/
@@ -83,8 +87,10 @@ librdf_query_results_next(librdf_query_results *query_results)
 
 
 /**
- * librdf_query_results_finished - Find out if binding results are exhausted
+ * librdf_query_results_finished:
  * @query_results: #librdf_query_results query results
+ *
+ * Find out if binding results are exhausted.
  * 
  * Return value: non-0 if results are finished or query failed
  **/
@@ -101,10 +107,12 @@ librdf_query_results_finished(librdf_query_results *query_results)
 
 
 /**
- * librdf_query_results_get_bindings - Get all binding names, values for current result
+ * librdf_query_results_get_bindings:
  * @query_results: #librdf_query_results query results
  * @names: pointer to an array of binding names (or NULL)
  * @values: pointer to an array of binding value #librdf_node (or NULL)
+ *
+ * Get all binding names, values for current result.
  * 
  * If names is not NULL, it is set to the address of a shared array
  * of names of the bindings (an output parameter).  These names
@@ -141,9 +149,11 @@ librdf_query_results_get_bindings(librdf_query_results *query_results,
 
 
 /**
- * librdf_query_results_get_binding_value - Get one binding value for the current result
+ * librdf_query_results_get_binding_value:
  * @query_results: #librdf_query_results query results
  * @offset: offset of binding name into array of known names
+ *
+ * Get one binding value for the current result.
  * 
  * Return value: a new #librdf_node binding value or NULL on failure
  **/
@@ -161,9 +171,11 @@ librdf_query_results_get_binding_value(librdf_query_results *query_results,
 
 
 /**
- * librdf_query_results_get_binding_name - Get binding name for the current result
+ * librdf_query_results_get_binding_name:
  * @query_results: #librdf_query_results query results
  * @offset: offset of binding name into array of known names
+ *
+ * Get binding name for the current result.
  * 
  * Return value: a pointer to a shared copy of the binding name or NULL on failure
  **/
@@ -180,9 +192,11 @@ librdf_query_results_get_binding_name(librdf_query_results *query_results, int o
 
 
 /**
- * librdf_query_results_get_binding_value_by_name - Get one binding value for a given name in the current result
+ * librdf_query_results_get_binding_value_by_name:
  * @query_results: #librdf_query_results query results
  * @name: variable name
+ *
+ * Get one binding value for a given name in the current result.
  * 
  * Return value: a new #librdf_node binding value or NULL on failure
  **/
@@ -199,8 +213,10 @@ librdf_query_results_get_binding_value_by_name(librdf_query_results *query_resul
 
 
 /**
- * librdf_query_results_get_bindings_count - Get the number of bound variables in the result
+ * librdf_query_results_get_bindings_count:
  * @query_results: #librdf_query_results query results
+ *
+ * Get the number of bound variables in the result.
  * 
  * Return value: <0 if failed or results exhausted
  **/
@@ -217,8 +233,10 @@ librdf_query_results_get_bindings_count(librdf_query_results *query_results)
 
 
 /**
- * librdf_free_query_results - Destructor - destroy a librdf_query_results object
+ * librdf_free_query_results:
  * @query_results: #librdf_query_results object
+ *
+ * Destructor - destroy a librdf_query_results object.
  * 
  **/
 void
@@ -236,11 +254,13 @@ librdf_free_query_results(librdf_query_results* query_results)
 
 
 /**
- * librdf_query_results_to_counted_string - Turn a query results into a string
+ * librdf_query_results_to_counted_string:
  * @query_results: #librdf_query_results object
  * @format_uri: URI of syntax to format to
  * @base_uri: Base URI of output formatted syntax  or NULL
  * @length_p: Pointer to where to store length of string or NULL
+ *
+ * Turn a query results into a string.
  * 
  * Values of format_uri currently supported (via Rasqal) are:
  *  http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/
@@ -267,10 +287,12 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
 
 
 /**
- * librdf_query_results_to_string - Turn a query results into a string
+ * librdf_query_results_to_string:
  * @query_results: #librdf_query_results object
  * @format_uri: URI of syntax to format to
  * @base_uri: Base URI of output formatted syntax 
+ *
+ * Turn a query results into a string.
  * 
  * See librdf_query_results_to_counted_string for information on the
  * format_uri and base_uri parameters.
@@ -292,11 +314,13 @@ librdf_query_results_to_string(librdf_query_results *query_results,
 
 
 /**
- * librdf_query_results_to_file_handle - Write a query results to a FILE*
+ * librdf_query_results_to_file_handle:
  * @query_results: #librdf_query_results object
  * @handle: file handle to write to
  * @format_uri: URI of syntax to format to
  * @base_uri: Base URI of output formatted syntax 
+ *
+ * Write a query results to a FILE*.
  * 
  * See librdf_query_results_to_counted_string for information on the
  * format_uri and base_uri parameters.
@@ -323,11 +347,13 @@ librdf_query_results_to_file_handle(librdf_query_results *query_results,
 
 
 /**
- * librdf_query_results_to_file_handle - Write a query results to a file
+ * librdf_query_results_to_file:
  * @query_results: #librdf_query_results object
  * @name: filename to write to
  * @format_uri: URI of syntax to format to
  * @base_uri: Base URI of output formatted syntax 
+ *
+ * Write a query results to a file.
  * 
  * See librdf_query_results_to_counted_string for information on the
  * format_uri and base_uri parameters.
@@ -357,8 +383,10 @@ librdf_query_results_to_file(librdf_query_results *query_results,
 
 
 /**
- * librdf_query_results_is_bindings - test if librdf_query_results is variable bindings format
+ * librdf_query_results_is_bindings:
  * @query_results: #librdf_query_results object
+ *
+ * Test if librdf_query_results is variable bindings format.
  * 
  * Return value: non-0 if true
  **/
@@ -374,8 +402,10 @@ librdf_query_results_is_bindings(librdf_query_results* query_results) {
   
 
 /**
- * librdf_query_results_is_boolean - test if librdf_query_results is boolean format
+ * librdf_query_results_is_boolean:
  * @query_results: #librdf_query_results object
+ *
+ * Test if librdf_query_results is boolean format.
  * 
  * Return value: non-0 if true
  **/
@@ -391,8 +421,10 @@ librdf_query_results_is_boolean(librdf_query_results* query_results) {
 
 
 /**
- * librdf_query_results_is_graph - test if librdf_query_results is RDF graph format
+ * librdf_query_results_is_graph:
  * @query_results: #librdf_query_results object
+ *
+ * Test if librdf_query_results is RDF graph format.
  * 
  * Return value: non-0 if true
  **/
@@ -408,8 +440,10 @@ librdf_query_results_is_graph(librdf_query_results* query_results) {
 
 
 /**
- * librdf_query_results_get_boolean - Get boolean query result
+ * librdf_query_results_get_boolean:
  * @query_results: #librdf_query_results query_results
+ *
+ * Get boolean query result.
  *
  * The return value is only meaningful if this is a boolean
  * query result - see #librdf_query_results_is_boolean

@@ -50,13 +50,15 @@ static librdf_statement* librdf_stream_update_current_statement(librdf_stream* s
 
 
 /**
- * librdf_new_stream - Constructor - create a new librdf_stream
+ * librdf_new_stream:
  * @world: redland world object
  * @context: context to pass to the stream implementing objects
  * @is_end_method: pointer to function to test for end of stream
  * @next_method: pointer to function to move to the next statement in stream
  * @get_method: pointer to function to get the current statement
  * @finished_method: pointer to function to finish the stream.
+ *
+ * Constructor - create a new librdf_stream.
  *
  * Creates a new stream with an implementation based on the passed in
  * functions.  The functions next_statement and end_of_stream will be called
@@ -114,8 +116,11 @@ librdf_stream_free_stream_map(void *list_data, void *user_data)
   
 
 /**
- * librdf_free_stream - Destructor - destroy an libdf_stream object
+ * librdf_free_stream:
  * @stream: #librdf_stream object
+ *
+ * Destructor - destroy an libdf_stream object.
+ *
  **/
 void
 librdf_free_stream(librdf_stream* stream) 
@@ -198,8 +203,10 @@ librdf_stream_update_current_statement(librdf_stream* stream)
 
 
 /**
- * librdf_stream_end - Test if the stream has ended
+ * librdf_stream_end:
  * @stream: #librdf_stream object
+ *
+ * Test if the stream has ended.
  * 
  * Return value: non 0 at end of stream.
  **/
@@ -217,8 +224,10 @@ librdf_stream_end(librdf_stream* stream)
 
 
 /**
- * librdf_stream_next - Move to the next librdf_statement in the stream
+ * librdf_stream_next:
  * @stream: #librdf_stream object
+ *
+ * Move to the next librdf_statement in the stream.
  *
  * Return value: non 0 if the stream has finished
  **/
@@ -241,8 +250,10 @@ librdf_stream_next(librdf_stream* stream)
 
 
 /**
- * librdf_stream_get_object - Get the current librdf_statement in the stream
+ * librdf_stream_get_object:
  * @stream: #librdf_stream object
+ *
+ * Get the current librdf_statement in the stream.
  *
  * This method returns a SHARED pointer to the current statement object
  * which should be copied by the caller to preserve it if the stream
@@ -262,8 +273,10 @@ librdf_stream_get_object(librdf_stream* stream)
 
 
 /**
- * librdf_stream_get_context - Get the context of the current object on the stream
+ * librdf_stream_get_context:
  * @stream: the #librdf_stream object
+ *
+ * Get the context of the current object on the stream.
  *
  * This method returns a SHARED pointer to the current context node object
  * which should be copied by the caller to preserve it if the stream
@@ -287,11 +300,13 @@ librdf_stream_get_context(librdf_stream* stream)
 
 
 /**
- * librdf_stream_add_map - Add a librdf_stream mapping function
+ * librdf_stream_add_map:
  * @stream: the stream
  * @map_function: the function to perform the mapping
  * @free_context: the function to use to free the context (or NULL)
  * @map_context: the context to pass to the map function
+ *
+ * Add a librdf_stream mapping function.
  * 
  * Adds an stream mapping function which operates over the stream to
  * select which elements are returned; it will be applied as soon as
@@ -351,10 +366,12 @@ typedef struct {
 
 
 /**
- * librdf_new_stream_from_node_iterator - Constructor - create a new librdf_stream from an iterator of nodes
+ * librdf_new_stream_from_node_iterator:
  * @iterator: #librdf_iterator of #librdf_node objects
  * @statement: #librdf_statement prototype with one NULL node space
  * @field: node part of statement
+ *
+ * Constructor - create a new librdf_stream from an iterator of nodes.
  *
  * Creates a new #librdf_stream using the passed in #librdf_iterator
  * which generates a series of #librdf_node objects.  The resulting
@@ -502,9 +519,11 @@ librdf_stream_from_node_iterator_finished(void* context)
 
 
 /**
- * librdf_stream_print - print the stream
+ * librdf_stream_print:
  * @stream: the stream object
  * @fh: the FILE stream to print to
+ *
+ * Print the stream.
  *
  * This prints the remaining statements of the stream to the given
  * file handle.  Note that after this method is called the stream
@@ -566,8 +585,10 @@ librdf_stream_statement_find_map(librdf_stream *stream,
 
 
 /**
- * librdf_new_empty_stream - Constructor - create a new librdf_stream with no content
+ * librdf_new_empty_stream:
  * @world: redland world object
+ *
+ * Constructor - create a new librdf_stream with no content.
  * 
  * Return value: a new #librdf_stream object or NULL on failure
 **/

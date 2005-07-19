@@ -77,12 +77,14 @@ librdf_delete_serializer_factories(librdf_world *world)
 
 
 /**
- * librdf_serializer_register_factory - Register a serializer factory 
+ * librdf_serializer_register_factory:
  * @world: redland world object
  * @name: the name of the serializer
  * @mime_type: MIME type of the syntax (optional)
  * @uri_string: URI of the syntax (optional)
  * @factory: function to be called to register the factor parameters
+ *
+ * Register a serializer factory .
  * 
  **/
 void
@@ -151,11 +153,13 @@ librdf_serializer_register_factory(librdf_world *world,
 
 
 /**
- * librdf_get_serializer_factory - Get a serializer factory by name
+ * librdf_get_serializer_factory:
  * @world: redland world object
  * @name: the name of the factory (NULL or empty string if don't care)
  * @mime_type: the MIME type of the syntax (NULL or empty string if not used)
  * @type_uri: URI of syntax (NULL if not used)
+ *
+ * Get a serializer factory by name.
  * 
  * If all fields are NULL, this means any parser supporting
  * MIME Type "application/rdf+xml"
@@ -221,11 +225,13 @@ librdf_get_serializer_factory(librdf_world *world,
 
 
 /**
- * librdf_new_serializer - Constructor - create a new librdf_serializer object
+ * librdf_new_serializer:
  * @world: redland world object
  * @name: the serializer factory name
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI of syntax (NULL if not used)
+ *
+ * Constructor - create a new librdf_serializer object.
  * 
  * Return value: new #librdf_serializer object or NULL
  **/
@@ -245,9 +251,11 @@ librdf_new_serializer(librdf_world *world,
 
 
 /**
- * librdf_new_serializer_from_factory - Constructor - create a new librdf_serializer object
+ * librdf_new_serializer_from_factory:
  * @world: redland world object
  * @factory: the serializer factory to use to create this serializer
+ *
+ * Constructor - create a new librdf_serializer object.
  * 
  * Return value: new #librdf_serializer object or NULL
  **/
@@ -281,8 +289,10 @@ librdf_new_serializer_from_factory(librdf_world *world,
 
 
 /**
- * librdf_free_serializer - Destructor - destroys a librdf_serializer object
+ * librdf_free_serializer:
  * @serializer: the serializer
+ *
+ * Destructor - destroys a librdf_serializer object.
  * 
  **/
 void
@@ -303,11 +313,13 @@ librdf_free_serializer(librdf_serializer *serializer)
 /* methods */
 
 /**
- * librdf_serializer_serialize_model - Write a serialized librdf_mode to a FILE*
+ * librdf_serializer_serialize_model:
  * @serializer: the serializer
  * @handle: file handle to serialize to
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
+ *
+ * Write a serialized librdf_mode to a FILE*.
  * 
  * DEPRECATED: Use librdf_serializer_serialize_model_to_file_handle
  *
@@ -325,11 +337,13 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
 
 
 /**
- * librdf_serializer_serialize_model_to_file_handle - Write a serialized librdf_model to a FILE*
+ * librdf_serializer_serialize_model_to_file_handle:
  * @serializer: the serializer
  * @handle: file handle to serialize to
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
+ *
+ * Write a serialized librdf_model to a FILE*.
  * 
  * Return value: non 0 on failure
  **/
@@ -349,11 +363,13 @@ librdf_serializer_serialize_model_to_file_handle(librdf_serializer* serializer,
 
 
 /**
- * librdf_serializer_serialize_model_to_file - Write a serialized librdf_model to a file
+ * librdf_serializer_serialize_model_to_file:
  * @serializer: the serializer
  * @name: filename to serialize to
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
+ *
+ * Write a serialized librdf_model to a file.
  * 
  * Return value: non 0 on failure
  **/
@@ -381,11 +397,13 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
 
 
 /**
- * librdf_serializer_serialize_model_to_counted_string - Write a serialized librdf_model to a counted string
+ * librdf_serializer_serialize_model_to_counted_string:
  * @serializer: the serializer
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
  * @length_p: pointer to store length or NULL
+ *
+ * Write a serialized librdf_model to a counted string.
  * 
  * Return value: non 0 on failure
  **/
@@ -408,10 +426,12 @@ librdf_serializer_serialize_model_to_counted_string(librdf_serializer* serialize
 
 
 /**
- * librdf_serializer_serialize_model_to_string - Write a serialized librdf_model to a string
+ * librdf_serializer_serialize_model_to_string:
  * @serializer: the serializer
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
+ *
+ * Write a serialized librdf_model to a string.
  * 
  * Return value: non 0 on failure
  **/
@@ -430,8 +450,11 @@ librdf_serializer_serialize_model_to_string(librdf_serializer* serializer,
 
 
 /**
- * librdf_init_serializer - INTERNAL - Initialise the librdf_serializer class
+ * librdf_init_serializer:
  * @world: redland world object
+ *
+ * INTERNAL - Initialise the librdf_serializer class.
+ *
  **/
 void
 librdf_init_serializer(librdf_world *world) 
@@ -441,8 +464,11 @@ librdf_init_serializer(librdf_world *world)
 
 
 /**
- * librdf_finish_serializer - INTERNAL - Terminate the librdf_serializer class
+ * librdf_finish_serializer:
  * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_serializer class.
+ *
  **/
 void
 librdf_finish_serializer(librdf_world *world) 
@@ -452,10 +478,12 @@ librdf_finish_serializer(librdf_world *world)
 
 
 /**
- * librdf_serializer_set_error - Set the serializer error handling function
+ * librdf_serializer_set_error:
  * @serializer: the serializer
  * @user_data: user data to pass to function
  * @error_fn: pointer to the function
+ *
+ * Set the serializer error handling function.
  * 
  * DEPRECATED: Does nothing
  * 
@@ -468,10 +496,12 @@ librdf_serializer_set_error(librdf_serializer* serializer, void *user_data,
 
 
 /**
- * librdf_serializer_set_warning - Set the serializer warning handling function
+ * librdf_serializer_set_warning:
  * @serializer: the serializer
  * @user_data: user data to pass to function
  * @warning_fn: pointer to the function
+ *
+ * Set the serializer warning handling function.
  * 
  * DEPRECATED: Does nothing
  * 
@@ -484,9 +514,11 @@ librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data,
 
 
 /**
- * librdf_serializer_get_feature - Get the value of a serializer feature
+ * librdf_serializer_get_feature:
  * @serializer: serializer object
  * @feature: URI of feature
+ *
+ * Get the value of a serializer feature.
  * 
  * Return value: the value of the feature or NULL if no such feature
  * exists or the value is empty.
@@ -504,10 +536,12 @@ librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature
 }
 
 /**
- * librdf_serializer_set_feature - Set the value of a serializer feature
+ * librdf_serializer_set_feature:
  * @serializer: serializer object
  * @feature: URI of feature
  * @value: value to set
+ *
+ * Set the value of a serializer feature.
  * 
  * Return value: non 0 on failure (negative if no such feature)
  **/
@@ -527,10 +561,12 @@ librdf_serializer_set_feature(librdf_serializer* serializer,
 }
 
 /**
- * librdf_serializer_set_namespace - Set a namespace URI/prefix mapping
+ * librdf_serializer_set_namespace:
  * @serializer: serializer object
  * @uri: URI of namespace
  * @prefix: prefix to use
+ *
+ * Set a namespace URI/prefix mapping.
  * 
  * NOTE: May not be implemented yet - depends on raptor_serializer work.
  * 

@@ -77,12 +77,14 @@ librdf_delete_parser_factories(librdf_world *world)
 
 
 /**
- * librdf_parser_register_factory - Register a parser factory 
+ * librdf_parser_register_factory:
  * @world: redland world object
  * @name: the name of the parser
  * @mime_type: MIME type of the syntax (optional)
  * @uri_string: URI of the syntax (optional)
  * @factory: function to be called to register the factor parameters
+ *
+ * Register a parser factory .
  * 
  **/
 void
@@ -151,11 +153,13 @@ librdf_parser_register_factory(librdf_world *world,
 
 
 /**
- * librdf_get_parser_factory - Get a parser factory by name
+ * librdf_get_parser_factory:
  * @world: redland world object
  * @name: the name of the factory (NULL or empty string if don't care)
  * @mime_type: the MIME type of the syntax (NULL or empty if don't care)
  * @type_uri: URI of syntax (NULL if not used)
+ *
+ * Get a parser factory by name.
  *
  * If all fields are NULL, this means any parser supporting
  * MIME Type "application/rdf+xml"
@@ -220,11 +224,13 @@ librdf_get_parser_factory(librdf_world *world,
 
 
 /**
- * librdf_new_parser - Constructor - create a new librdf_parser object
+ * librdf_new_parser:
  * @world: redland world object
  * @name: the parser factory name
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI of syntax (NULL if not used)
+ *
+ * Constructor - create a new librdf_parser object.
  * 
  * If all fields are NULL, this means any parser supporting
  * MIME Type "application/rdf+xml"
@@ -247,9 +253,11 @@ librdf_new_parser(librdf_world *world,
 
 
 /**
- * librdf_new_parser_from_factory - Constructor - create a new librdf_parser object
+ * librdf_new_parser_from_factory:
  * @world: redland world object
  * @factory: the parser factory to use to create this parser
+ *
+ * Constructor - create a new librdf_parser object.
  * 
  * Return value: new #librdf_parser object or NULL
  **/
@@ -283,8 +291,10 @@ librdf_new_parser_from_factory(librdf_world *world,
 
 
 /**
- * librdf_free_parser - Destructor - destroys a librdf_parser object
+ * librdf_free_parser:
  * @parser: the parser
+ *
+ * Destructor - destroys a librdf_parser object.
  * 
  **/
 void
@@ -305,10 +315,12 @@ librdf_free_parser(librdf_parser *parser)
 /* methods */
 
 /**
- * librdf_parser_parse_as_stream - Parse a URI to a librdf_stream of statements
+ * librdf_parser_parse_as_stream:
  * @parser: the parser
  * @uri: the URI to read
  * @base_uri: the base URI to use (or NULL if the same)
+ *
+ * Parse a URI to a librdf_stream of statements.
  * 
  * Return value: #librdf_stream of statements or NULL
  **/
@@ -333,11 +345,13 @@ librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
 
 
 /**
- * librdf_parser_parse_into_model - Parse a URI of content into an librdf_model
+ * librdf_parser_parse_into_model:
  * @parser: the parser
  * @uri: the URI to read the content
  * @base_uri: the base URI to use (or NULL if the same as @uri)
  * @model: the model to use
+ *
+ * Parse a URI of content into an librdf_model.
  * 
  * Return value: non 0 on failure
  **/
@@ -363,10 +377,12 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
 
 
 /**
- * librdf_parser_parse_string_as_stream - Parse a string of content to a librdf_stream of statements
+ * librdf_parser_parse_string_as_stream:
  * @parser: the parser
  * @string: the string to parse
  * @base_uri: the base URI to use
+ *
+ * Parse a string of content to a librdf_stream of statements.
  * 
  * Return value: #librdf_stream of statements or NULL
  **/
@@ -388,11 +404,13 @@ librdf_parser_parse_string_as_stream(librdf_parser* parser,
 
 
 /**
- * librdf_parser_parse_string_into_model - Parse a string of content into an librdf_model
+ * librdf_parser_parse_string_into_model:
  * @parser: the parser
  * @string: the content to parse
  * @base_uri: the base URI to use
  * @model: the model to use
+ *
+ * Parse a string of content into an librdf_model.
  * 
  * Return value: non 0 on failure
  **/
@@ -415,11 +433,13 @@ librdf_parser_parse_string_into_model(librdf_parser* parser,
 
 
 /**
- * librdf_parser_parse_counted_string_as_stream - Parse a counted string of content to a librdf_stream of statements
+ * librdf_parser_parse_counted_string_as_stream:
  * @parser: the parser
  * @string: the string to parse
  * @length: length of the string content (must be >0)
  * @base_uri: the base URI to use
+ *
+ * Parse a counted string of content to a librdf_stream of statements.
  * 
  * Return value: #librdf_stream of statements or NULL
  **/
@@ -445,12 +465,14 @@ librdf_parser_parse_counted_string_as_stream(librdf_parser* parser,
 
 
 /**
- * librdf_parser_parse_counted_string_into_model - Parse a counted string of content into an librdf_model
+ * librdf_parser_parse_counted_string_into_model:
  * @parser: the parser
  * @string: the content to parse
  * @length: length of content (must be >0)
  * @base_uri: the base URI to use
  * @model: the model to use
+ *
+ * Parse a counted string of content into an librdf_model.
  * 
  * Return value: non 0 on failure
  **/
@@ -477,8 +499,11 @@ librdf_parser_parse_counted_string_into_model(librdf_parser* parser,
 
 
 /**
- * librdf_init_parser - INTERNAL - Initialise the librdf_parser class
+ * librdf_init_parser:
  * @world: redland world object
+ *
+ * INTERNAL - Initialise the librdf_parser class.
+ *
  **/
 void
 librdf_init_parser(librdf_world *world) 
@@ -490,8 +515,11 @@ librdf_init_parser(librdf_world *world)
 
 
 /**
- * librdf_finish_parser - INTERNAL - Terminate the librdf_parser class
+ * librdf_finish_parser:
  * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_parser class.
+ *
  **/
 void
 librdf_finish_parser(librdf_world *world) 
@@ -504,10 +532,12 @@ librdf_finish_parser(librdf_world *world)
 
 
 /**
- * librdf_parser_set_error - Set the parser error handling function
+ * librdf_parser_set_error:
  * @parser: the parser
  * @user_data: user data to pass to function
  * @error_fn: pointer to the function
+ *
+ * Set the parser error handling function.
  * 
  * DEPRECATED: Does nothing
  * 
@@ -520,10 +550,12 @@ librdf_parser_set_error(librdf_parser* parser, void *user_data,
 
 
 /**
- * librdf_parser_set_warning - Set the parser warning handling function
+ * librdf_parser_set_warning:
  * @parser: the parser
  * @user_data: user data to pass to function
  * @warning_fn: pointer to the function
+ *
+ * Set the parser warning handling function.
  * 
  * DEPRECATED: Does nothing.
  *
@@ -536,9 +568,11 @@ librdf_parser_set_warning(librdf_parser* parser, void *user_data,
 
 
 /**
- * librdf_parser_get_feature - get the value of a parser feature
+ * librdf_parser_get_feature:
  * @parser: #librdf_parser object
  * @feature: #librdf_Uuri feature property
+ *
+ * Get the value of a parser feature.
  * 
  * Return value: new #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
@@ -556,10 +590,12 @@ librdf_parser_get_feature(librdf_parser* parser, librdf_uri* feature)
 }
 
 /**
- * librdf_parser_set_feature - set the value of a parser feature
+ * librdf_parser_set_feature:
  * @parser: #librdf_parser object
  * @feature: #librdf_uri feature property
  * @value: #librdf_node feature property value
+ *
+ * Set the value of a parser feature.
  * 
  * Return value: non 0 on failure (negative if no such feature)
  **/

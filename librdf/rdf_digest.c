@@ -65,10 +65,12 @@ librdf_delete_digest_factories(librdf_world *world)
 
 
 /**
- * librdf_digest_register_factory - Register a hash factory
+ * librdf_digest_register_factory:
  * @world: redland world object
  * @name: the name of the hash
  * @factory: function to be called to register the factory parameters
+ *
+ * Register a hash factory.
  * 
  **/
 void
@@ -119,9 +121,11 @@ librdf_digest_register_factory(librdf_world *world, const char *name,
 
 
 /**
- * librdf_get_digest_factory - get a digest factory
+ * librdf_get_digest_factory:
  * @world: redland world object
  * @name: the name of the factory
+ *
+ * Get a digest factory.
  * 
  * Return value: the factory or NULL if not found
  **/
@@ -153,9 +157,11 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
 
 
 /**
- * librdf_new_digest - Constructor - create a new librdf_digest object
+ * librdf_new_digest:
  * @world: redland world object
  * @name: the digest name to use to create this digest
+ *
+ * Constructor - create a new librdf_digest object.
  * 
  * After construction, data should be added to the digest using
  * #librdf_digest_update or #librdf_digest_update_string with
@@ -181,9 +187,11 @@ librdf_new_digest(librdf_world *world, char *name)
 
 
 /**
- * librdf_new_digest_from_factory - Constructor - create a new librdf_digest object
+ * librdf_new_digest_from_factory:
  * @world: redland world object
  * @factory: the digest factory to use to create this digest
+ *
+ * Constructor - create a new librdf_digest object.
  * 
  * After construction, data should be added to the digest using
  * #librdf_digest_update or #librdf_digest_update_string with
@@ -229,8 +237,10 @@ librdf_new_digest_from_factory(librdf_world *world,
 
 
 /**
- * librdf_free_digest - Destructor- destroy a librdf_digest object
+ * librdf_free_digest:
  * @digest: the digest
+ *
+ * Destructor- destroy a librdf_digest object.
  * 
  **/
 void
@@ -248,8 +258,10 @@ librdf_free_digest(librdf_digest *digest)
 /* methods */
 
 /**
- * librdf_digest_init - (Re)initialise the librdf_digest object
+ * librdf_digest_init:
  * @digest: the digest
+ *
+ * (Re)initialise the librdf_digest object.
  * 
  * This is automatically called on construction but can be used to
  * re-initialise the digest to the initial state for digesting new
@@ -263,10 +275,12 @@ librdf_digest_init(librdf_digest* digest)
 
 
 /**
- * librdf_digest_update - Add more data to the librdf_digest object
+ * librdf_digest_update:
  * @digest: the digest
  * @buf: the data buffer
  * @length: the length of the data
+ *
+ * Add more data to the librdf_digest object.
  * 
  **/
 void
@@ -278,9 +292,11 @@ librdf_digest_update(librdf_digest* digest,
 
 
 /**
- * librdf_digest_update_string - Add a string to the librdf_digest object
+ * librdf_digest_update_string:
  * @digest: the digest
  * @string: string to add
+ *
+ * Add a string to the librdf_digest object.
  * 
  **/
 void
@@ -293,8 +309,10 @@ librdf_digest_update_string(librdf_digest* digest,
 
 
 /**
- * librdf_digest_final - Finish the digesting of data
+ * librdf_digest_final:
  * @digest: the digest
+ *
+ * Finish the digesting of data.
  * 
  * The digest can now be returned via librdf_digest_get_digest().
  **/
@@ -311,8 +329,10 @@ librdf_digest_final(librdf_digest* digest)
 
 
 /**
- * librdf_digest_get_digest - Get the calculated digested value.
+ * librdf_digest_get_digest:
  * @digest: the digest
+ *
+ * Get the calculated digested value.
  * 
  * Return value: pointer to the memory containing the digest.  It will
  * be #librdf_digest_get_digest_length bytes in length.
@@ -326,8 +346,10 @@ librdf_digest_get_digest(librdf_digest* digest)
 
 
 /**
- * librdf_digest_get_digest_length - Get length of the calculated digested
+ * librdf_digest_get_digest_length:
  * @digest: the digest
+ *
+ * Get length of the calculated digested.
  * 
  * Return value: size of the digest in bytes
  *
@@ -340,8 +362,10 @@ librdf_digest_get_digest_length(librdf_digest* digest)
 
 
 /**
- * librdf_digest_to_string - Get a string representation of the digest object
+ * librdf_digest_to_string:
  * @digest: the digest
+ *
+ * Get a string representation of the digest object.
  * 
  * Return value: a newly allocated string that represents the digest.
  * This must be released by the caller using free() 
@@ -367,9 +391,11 @@ librdf_digest_to_string(librdf_digest* digest)
 
 
 /**
- * librdf_digest_print - Print the digest to a FILE handle
+ * librdf_digest_print:
  * @digest: the digest
  * @fh: file handle
+ *
+ * Print the digest to a FILE handle.
  *
  **/
 void
@@ -385,8 +411,11 @@ librdf_digest_print(librdf_digest* digest, FILE* fh)
 
 
 /**
- * librdf_init_digest - INTERNAL - Initialise the librdf_digest class
+ * librdf_init_digest:
  * @world: redland world object
+ *
+ * INTERNAL - Initialise the librdf_digest class.
+ *
  **/
 void
 librdf_init_digest(librdf_world *world) 
@@ -412,8 +441,11 @@ librdf_init_digest(librdf_world *world)
 
 
 /**
- * librdf_finish_digest - INTERNAL - Terminate the librdf_digest class
+ * librdf_finish_digest:
  * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_digest class.
+ *
  **/
 void
 librdf_finish_digest(librdf_world *world) 

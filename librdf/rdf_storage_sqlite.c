@@ -742,8 +742,10 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 
 
 /**
- * librdf_storage_sqlite_close - Close the sqlite storage
+ * librdf_storage_sqlite_close:
  * @storage: the storage
+ *
+ * Close the sqlite storage.
  * 
  * Return value: non 0 on failure
  **/
@@ -1382,6 +1384,8 @@ typedef struct {
  * librdf_storage_sqlite_find_statements:
  * @storage: the storage
  * @statement: the statement to match
+ *
+ * .
  * 
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
@@ -1615,10 +1619,12 @@ librdf_storage_sqlite_find_statements_finished(void* context)
 
 
 /**
- * librdf_storage_sqlite_context_add_statement - Add a statement to a storage context
+ * librdf_storage_sqlite_context_add_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to add
+ *
+ * Add a statement to a storage context.
  * 
  * Return value: non 0 on failure
  **/
@@ -1689,10 +1695,12 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
 
 
 /**
- * librdf_storage_sqlite_context_remove_statement - Remove a statement from a storage context
+ * librdf_storage_sqlite_context_remove_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to remove
+ *
+ * Remove a statement from a storage context.
  * 
  * Return value: non 0 on failure
  **/
@@ -1744,9 +1752,11 @@ typedef struct {
 
 
 /**
- * librdf_storage_sqlite_context_serialise - Sqlite all statements in a storage context
+ * librdf_storage_sqlite_context_serialise:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
+ *
+ * Sqlite all statements in a storage context.
  * 
  * Return value: #librdf_stream of statements or NULL on failure or context is empty
  **/
@@ -2177,8 +2187,10 @@ librdf_storage_sqlite_get_contexts_finished(void* iterator)
 
 
 /**
- * librdf_storage_sqlite_context_get_contexts - Sqlite all context nodes in a storage
+ * librdf_storage_sqlite_context_get_contexts:
  * @storage: #librdf_storage object
+ *
+ * Sqlite all context nodes in a storage.
  * 
  * Return value: #librdf_iterator of context_nodes or NULL on failure or no contexts
  **/
@@ -2260,9 +2272,11 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
 
 
 /**
- * librdf_storage_sqlite_get_feature - get the value of a storage feature
+ * librdf_storage_sqlite_get_feature:
  * @storage: #librdf_storage object
  * @feature: #librdf_uri feature property
+ *
+ * Get the value of a storage feature.
  * 
  * Return value: #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.

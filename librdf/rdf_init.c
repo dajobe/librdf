@@ -73,7 +73,7 @@ const unsigned int librdf_version_decimal = LIBRDF_VERSION_DECIMAL;
 
 
 /**
- * librdf_new_world - Creates a new Redland execution environment
+ * librdf_new_world:
  */
 librdf_world*
 librdf_new_world(void) {
@@ -101,6 +101,8 @@ librdf_new_world(void) {
 /**
  * librdf_free_world - Terminate the library
  * @world: redland world object
+ *
+ * Creates a new Redland execution environment.
  * 
  * Terminates and frees the resources.
  **/
@@ -151,7 +153,7 @@ librdf_free_world(librdf_world *world)
 
 
 /**
- * librdf_world_init_mutex - INTERNAL - Create the world mutex
+ * librdf_world_init_mutex:
  * @world: redland world object
  */
 void
@@ -174,6 +176,8 @@ librdf_world_init_mutex(librdf_world* world)
 /**
  * librdf_world_open - Open an environment
  * @world: redland world object
+ *
+ * INTERNAL - Create the world mutex.
  * 
  **/
 void
@@ -219,10 +223,12 @@ librdf_world_open(librdf_world *world)
 
 
 /**
- * librdf_world_set_error - Set the world error handling function
+ * librdf_world_set_error:
  * @world: redland world object
  * @user_data: user data to pass to function
  * @error_handler: pointer to the function
+ *
+ * Set the world error handling function.
  * 
  * The function will receive callbacks when the world fails.
  * 
@@ -237,10 +243,12 @@ librdf_world_set_error(librdf_world* world, void *user_data,
 
 
 /**
- * librdf_world_set_warning - Set the world warning handling function
+ * librdf_world_set_warning:
  * @world: redland world object
  * @user_data: user data to pass to function
  * @warning_handler: pointer to the function
+ *
+ * Set the world warning handling function.
  * 
  * The function will receive callbacks when the world gives a warning.
  * 
@@ -256,10 +264,12 @@ librdf_world_set_warning(librdf_world* world, void *user_data,
 
 
 /**
- * librdf_world_set_logger - Set the world log handling function
+ * librdf_world_set_logger:
  * @world: redland world object
  * @user_data: user data to pass to function
  * @log_handler: pointer to the function
+ *
+ * Set the world log handling function.
  * 
  * The function will receive callbacks when redland generates a log message
  * 
@@ -275,9 +285,11 @@ librdf_world_set_logger(librdf_world* world, void *user_data,
 
 
 /**
- * librdf_world_set_digest - Set the default digest name
+ * librdf_world_set_digest:
  * @world: redland world object
  * @name: Digest factory name
+ *
+ * Set the default digest name.
  *
  * Sets the digest factory for various modules that need to make
  * digests of their objects.
@@ -305,10 +317,12 @@ librdf_world_get_feature(librdf_world* world, librdf_uri *feature)
 
 
 /**
- * librdf_world_set_feature - set the value of a world feature
+ * librdf_world_set_feature:
  * @world: #librdf_world object
  * @feature: #librdf_uri feature property
  * @value: #librdf_node feature property value
+ *
+ * Set the value of a world feature.
  * 
  * Return value: non 0 on failure (negative if no such feature)
  **/
@@ -403,9 +417,11 @@ librdf_world_get_genid(librdf_world* world)
 static librdf_world* RDF_World;
 
 /**
- * librdf_init_world - Initialise the library (DEPRECATED)
+ * librdf_init_world:
  * @digest_factory_name: Name of digest factory to use
  * @not_used2: Not used
+ *
+ * Initialise the library (DEPRECATED).
  *
  * Use librdf_new_world and librdf_world_open on librdf_world object
  * 
@@ -425,7 +441,9 @@ librdf_init_world(char *digest_factory_name, void* not_used2)
 
 
 /**
- * librdf_destroy_world - Terminate the library (DEPRECATED)
+ * librdf_destroy_world:
+ *
+ * Terminate the library (DEPRECATED).
  *
  * Use librdf_free_world on librdf_world object
  * 

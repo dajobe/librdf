@@ -339,8 +339,11 @@ librdf_digest_md5_register_factory(librdf_digest_factory *factory)
 }
 
 /**
- * librdf_digest_md5_constructor - Initialise the MD5 digest factory
+ * librdf_digest_md5_constructor:
  * @world: redland world object
+ *
+ * Initialise the MD5 digest factory.
+ *
  **/
 void
 librdf_digest_md5_constructor(librdf_world *world)

@@ -61,8 +61,10 @@ enum {
 /* class functions */
 
 /**
- * librdf_init_node - INTERNAL - Initialise the node module.
+ * librdf_init_node:
  * @world: redland world object
+ *
+ * INTERNAL - Initialise the node module.
  * 
  **/
 void
@@ -82,8 +84,11 @@ librdf_init_node(librdf_world* world)
 
 
 /**
- * librdf_finish_node - INTERNAL - Terminate the librdf_node module
+ * librdf_finish_node:
  * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_node module.
+ *
  **/
 void
 librdf_finish_node(librdf_world *world)
@@ -103,8 +108,10 @@ librdf_finish_node(librdf_world *world)
 /* constructors */
 
 /**
- * librdf_new_node - Constructor - create a new librdf_node object with a private identifier
+ * librdf_new_node:
  * @world: redland world object
+ *
+ * Constructor - create a new librdf_node object with a private identifier.
  * 
  * Calls librdf_new_node_from_blank_identifier(world, NULL) to
  * construct a new redland blank node identifier and make a
@@ -121,10 +128,12 @@ librdf_new_node(librdf_world *world)
     
 
 /**
- * librdf_new_node_from_uri_string_or_uri - INTERNAL - Constructor - create a new librdf_node object from a URI string or URI object
+ * librdf_new_node_from_uri_string_or_uri:
  * @world: redland world object
  * @uri_string: string representing a URI
  * @uri: #librdf_uri object
+ *
+ * INTERNAL - Constructor - create a new librdf_node object from a URI string or URI object.
  * 
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -220,9 +229,11 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
     
 
 /**
- * librdf_new_node_from_uri_string - Constructor - create a new librdf_node object from a URI string
+ * librdf_new_node_from_uri_string:
  * @world: redland world object
  * @uri_string: string representing a URI
+ *
+ * Constructor - create a new librdf_node object from a URI string.
  * 
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -240,9 +251,11 @@ librdf_new_node_from_uri_string(librdf_world *world,
 /* Create a new (Resource) Node and set the URI. */
 
 /**
- * librdf_new_node_from_uri - Constructor - create a new resource librdf_node object with a given URI
+ * librdf_new_node_from_uri:
  * @world: redland world object
  * @uri: &rdf_uri object
+ *
+ * Constructor - create a new resource librdf_node object with a given URI.
  *
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -256,10 +269,12 @@ librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
 
 
 /**
- * librdf_new_node_from_uri_local_name - Constructor - create a new resource librdf_node object with a given URI and local name
+ * librdf_new_node_from_uri_local_name:
  * @world: redland world object
  * @uri: &rdf_uri object
  * @local_name: local name to append to URI
+ *
+ * Constructor - create a new resource librdf_node object with a given URI and local name.
  *
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -287,11 +302,13 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
 
 
 /**
- * librdf_new_node_from_normalised_uri_string - Constructor - create a new librdf_node object from a URI string normalised to a new base URI
+ * librdf_new_node_from_normalised_uri_string:
  * @world: redland world object
  * @uri_string: string representing a URI
  * @source_uri: source URI
  * @base_uri: base URI
+ *
+ * Constructor - create a new librdf_node object from a URI string normalised to a new base URI.
  * 
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -320,11 +337,13 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
 
 
 /**
- * librdf_new_node_from_literal -  Constructor - create a new literal librdf_node object
+ * librdf_new_node_from_literal:
  * @world: redland world object
  * @string: literal string value
  * @xml_language: literal XML language (or NULL, empty string)
  * @is_wf_xml: non 0 if literal is XML
+ *
+ * Constructor - create a new literal librdf_node object.
  * 
  * 0.9.12: xml_space argument deleted
  *
@@ -347,11 +366,13 @@ librdf_new_node_from_literal(librdf_world *world,
 
 
 /**
- * librdf_new_node_from_typed_literal -  Constructor - create a new typed literal librdf_node object
+ * librdf_new_node_from_typed_literal:
  * @world: redland world object
  * @value: literal string value
  * @xml_language: literal XML language (or NULL, empty string)
  * @datatype_uri: URI of typed literal datatype or NULL
+ *
+ * Constructor - create a new typed literal librdf_node object.
  * 
  * Return value: new #librdf_node object or NULL on failure
  **/
@@ -488,9 +509,11 @@ librdf_new_node_from_typed_literal(librdf_world *world,
 
 
 /**
- * librdf_new_node_from_blank_identifier -  Constructor - create a new literal librdf_node object from a blank node identifier
+ * librdf_new_node_from_blank_identifier:
  * @world: redland world object
  * @identifier: blank node identifier or NULL
+ *
+ * Constructor - create a new literal librdf_node object from a blank node identifier.
  *
  * If no identifier string is given, creates a new internal identifier
  * and assigns it.
@@ -577,8 +600,10 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
 
 
 /**
- * librdf_new_node_from_node - Copy constructor - create a new librdf_node object from an existing librdf_node object
+ * librdf_new_node_from_node:
  * @node: #librdf_node object to copy
+ *
+ * Copy constructor - create a new librdf_node object from an existing librdf_node object.
  * 
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -593,8 +618,10 @@ librdf_new_node_from_node(librdf_node *node)
 
 
 /**
- * librdf_free_node - Destructor - destroy an librdf_node object
+ * librdf_free_node:
  * @node: #librdf_node object
+ *
+ * Destructor - destroy an librdf_node object.
  * 
  **/
 void
@@ -683,8 +710,10 @@ librdf_free_node(librdf_node *node)
 /* functions / methods */
 
 /**
- * librdf_node_get_uri - Get the URI for a node object
+ * librdf_node_get_uri:
  * @node: the node object
+ *
+ * Get the URI for a node object.
  *
  * Returns a pointer to the URI object held by the node, it must be
  * copied if it is wanted to be used by the caller.
@@ -704,8 +733,10 @@ librdf_node_get_uri(librdf_node* node)
 
 
 /**
- * librdf_node_get_type - Get the type of the node
+ * librdf_node_get_type:
  * @node: the node object
+ *
+ * Get the type of the node.
  * 
  * Return value: the node type
  **/
@@ -746,8 +777,10 @@ librdf_node_get_type_as_string(int type)
 
 
 /**
- * librdf_node_get_literal_value - Get the string literal value of the node
+ * librdf_node_get_literal_value:
  * @node: the node object
+ *
+ * Get the string literal value of the node.
  * 
  * Returns a pointer to the literal value held by the node, it must be
  * copied if it is wanted to be used by the caller.
@@ -766,9 +799,11 @@ librdf_node_get_literal_value(librdf_node* node)
 
 
 /**
- * librdf_node_get_literal_value_as_counted_string - Get the string literal value of the node as a counted string
+ * librdf_node_get_literal_value_as_counted_string:
  * @node: the node object
  * @len_p: pointer to location to store length (or NULL)
+ *
+ * Get the string literal value of the node as a counted string.
  * 
  * Returns a pointer to the literal value held by the node, it must be
  * copied if it is wanted to be used by the caller.
@@ -792,8 +827,10 @@ librdf_node_get_literal_value_as_counted_string(librdf_node* node,
 
 
 /**
- * librdf_node_get_literal_value_as_latin1 - Get the string literal value of the node as ISO Latin-1
+ * librdf_node_get_literal_value_as_latin1:
  * @node: the node object
+ *
+ * Get the string literal value of the node as ISO Latin-1.
  * 
  * Returns a newly allocated string containing the conversion of the
  * UTF-8 literal value held by the node.
@@ -815,8 +852,10 @@ librdf_node_get_literal_value_as_latin1(librdf_node* node)
 
 
 /**
- * librdf_node_get_literal_value_language - Get the XML language of the node
+ * librdf_node_get_literal_value_language:
  * @node: the node object
+ *
+ * Get the XML language of the node.
  * 
  * Returns a pointer to the literal language value held by the node, it must
  * be copied if it is wanted to be used by the caller.
@@ -838,8 +877,10 @@ librdf_node_get_literal_value_language(librdf_node* node)
 
 
 /**
- * librdf_node_get_literal_value_is_wf_xml - Get the XML well-formness property of the node
+ * librdf_node_get_literal_value_is_wf_xml:
  * @node: the node object
+ *
+ * Get the XML well-formness property of the node.
  * 
  * Return value: 0 if the XML literal is NOT well formed XML content, or the node is not a literal
  **/
@@ -862,8 +903,10 @@ librdf_node_get_literal_value_is_wf_xml(librdf_node* node)
 
 
 /**
- * librdf_node_get_literal_value_datatype_uri - Get the typed literal datatype URI of the literal node
+ * librdf_node_get_literal_value_datatype_uri:
  * @node: the node object
+ *
+ * Get the typed literal datatype URI of the literal node.
  * 
  * Return value: shared URI of the datatyped literal or NULL if the node is not a literal, or has no datatype URI
  **/
@@ -881,8 +924,10 @@ librdf_node_get_literal_value_datatype_uri(librdf_node* node)
 
 
 /**
- * librdf_node_get_li_ordinal - Get the node li object ordinal value
+ * librdf_node_get_li_ordinal:
  * @node: the node object
+ *
+ * Get the node li object ordinal value.
  *
  * Return value: the li ordinal value or < 1 on failure
  **/
@@ -907,8 +952,10 @@ librdf_node_get_li_ordinal(librdf_node* node) {
 
 
 /**
- * librdf_node_get_blank_identifier - Get the blank node identifier
+ * librdf_node_get_blank_identifier:
  * @node: the node object
+ *
+ * Get the blank node identifier.
  *
  * Return value: the identifier value
  **/
@@ -923,8 +970,10 @@ librdf_node_get_blank_identifier(librdf_node* node) {
 
 
 /**
- * librdf_node_is_resource -  Check node is a resource
+ * librdf_node_is_resource:
  * @node: the node object
+ *
+ * Check node is a resource.
  * 
  * Return value: non-zero if the node is a resource (URI)
  **/
@@ -937,8 +986,10 @@ librdf_node_is_resource(librdf_node* node) {
 
 
 /**
- * librdf_node_is_resource -  Check node is a literal
+ * librdf_node_is_resource:
  * @node: the node object
+ *
+ * Check node is a literal.
  * 
  * Return value: non-zero if the node is a literal
  **/
@@ -951,8 +1002,10 @@ librdf_node_is_literal(librdf_node* node) {
 
 
 /**
- * librdf_node_is_blank -  Check node is a blank nodeID
+ * librdf_node_is_blank:
  * @node: the node object
+ *
+ * Check node is a blank nodeID.
  * 
  * Return value: non-zero if the node is a blank nodeID
  **/
@@ -965,8 +1018,10 @@ librdf_node_is_blank(librdf_node* node) {
 
 
 /**
- * librdf_node_to_string - Format the node as a string
+ * librdf_node_to_string:
  * @node: the node object
+ *
+ * Format the node as a string.
  * 
  * Note a new string is allocated which must be freed by the caller.
  * 
@@ -982,9 +1037,11 @@ librdf_node_to_string(librdf_node* node)
 
 
 /**
- * librdf_node_to_counted_string - Format the node as a counted string
+ * librdf_node_to_counted_string:
  * @node: the node object
  * @len_p: pointer to location to store length
+ *
+ * Format the node as a counted string.
  * 
  * Note a new string is allocated which must be freed by the caller.
  * 
@@ -1074,9 +1131,11 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
 
 
 /**
- * librdf_node_print - pretty print the node to a file descriptor
+ * librdf_node_print:
  * @node: the node
  * @fh: file handle
+ *
+ * Pretty print the node to a file descriptor.
  * 
  * This method is for debugging and the format of the output should
  * not be relied on.
@@ -1103,8 +1162,10 @@ librdf_node_print(librdf_node* node, FILE *fh)
 
 
 /**
- * librdf_node_get_digest - Get a digest representing a librdf_node
+ * librdf_node_get_digest:
  * @node: the node object
+ *
+ * Get a digest representing a librdf_node.
  * 
  * A new digest object is created which must be freed by the caller.
  * 
@@ -1150,9 +1211,11 @@ librdf_node_get_digest(librdf_node* node)
 
 
 /**
- * librdf_node_equals - Compare two librdf_node objects for equality
+ * librdf_node_equals:
  * @first_node: first #librdf_node node
  * @second_node: second #librdf_node node
+ *
+ * Compare two librdf_node objects for equality.
  * 
  * Note - for literal nodes, XML language, XML space and well-formness are 
  * presently ignored in the comparison.
@@ -1174,10 +1237,12 @@ librdf_node_equals(librdf_node* first_node, librdf_node* second_node)
 
 
 /**
- * librdf_node_encode - Serialise a node into a buffer
+ * librdf_node_encode:
  * @node: the node to serialise
  * @buffer: the buffer to use
  * @length: buffer size
+ *
+ * Serialise a node into a buffer.
  * 
  * Encodes the given node in the buffer, which must be of sufficient
  * size.  If buffer is NULL, no work is done but the size of buffer
@@ -1325,11 +1390,13 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
 
 
 /**
- * librdf_node_decode - Deserialise a node from a buffer
+ * librdf_node_decode:
  * @world: librdf_world
  * @size_p: pointer to bytes used or NULL
  * @buffer: the buffer to use
  * @length: buffer size
+ *
+ * Deserialise a node from a buffer.
  * 
  * Decodes the serialised node (as created by librdf_node_encode() )
  * from the given buffer.
@@ -1522,9 +1589,11 @@ librdf_node_static_iterator_finished(void* iterator)
 
 
 /**
- * librdf_node_static_iterator_create - Create an iterator over an array of nodes
+ * librdf_node_static_iterator_create:
  * @nodes: static array of #librdf_node objects
  * @size: size of array
+ *
+ * Create an iterator over an array of nodes.
  * 
  * This creates an iterator for an existing static array of librdf_node
  * objects.  It is mostly intended for testing iterator code.
