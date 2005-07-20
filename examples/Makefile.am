@@ -30,7 +30,7 @@ example5_SOURCES = example5.c
 
 example6_SOURCES = example6.c
 
-example7_SOURCES = example6.c
+example7_SOURCES = example7.c
 
 
 redland_dbus_SOURCES = redland_dbus.c
