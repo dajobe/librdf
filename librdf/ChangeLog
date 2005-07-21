@@ -1,3 +1,7 @@
+2005-07-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_serializer.c, rdf_parser.c: docucomment @Deprecated tags
+
 2005-07-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* Makefile.am: Remove 1-function headers from dist

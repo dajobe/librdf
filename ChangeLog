@@ -1,3 +1,238 @@
+2005-07-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_serializer.c, librdf/rdf_parser.c: docucomment
+	@Deprecated tags
+
+2005-07-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* examples/Makefile.am: added example7
+
+	* examples/example7.c: read from a file 'file.rdf', add a triple,
+	write it again
+
+2005-07-19  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/Makefile.am: Remove 1-function headers from dist
+
+	* librdf/rdf_node.h: removed librdf_node_init - has no code
+
+	* docs/.cvsignore: ignore gtkdoc bits
+
+	* docs/redland-docs.xml: redland doc
+
+	* docs/redland-intro.xml: Doc intro
+
+	* docs/redland-objects-in-c.xml: Objects in C
+
+	* librdf/rdf_uri.c (librdf_uri_print): xml fix
+
+	* docs/redland-sections.txt: doc sections
+
+	* librdf/rdf_node.h: librdf_node_init removed - in header only
+
+	* docs/Makefile.am: ignore internal headers
+
+	* librdf/rdf_query_results.c, librdf/rdf_node.c: More fixes for
+	gtkdoc
+
+	* librdf/rdf_stream.c, librdf/rdf_stream.h, librdf/rdf_uri.c,
+	librdf/rdf_uri.h, librdf/rdf_utf8.c, librdf/rdf_concepts.c,
+	librdf/rdf_digest.c, librdf/rdf_digest.h, librdf/rdf_digest_md5.c,
+	librdf/rdf_digest_openssl.c, librdf/rdf_digest_sha1.c,
+	librdf/rdf_hash.c, librdf/rdf_hash.h, librdf/rdf_hash_bdb.c,
+	librdf/rdf_hash_cursor.c, librdf/rdf_hash_memory.c,
+	librdf/rdf_heuristics.c, librdf/rdf_init.c, librdf/rdf_init.h,
+	librdf/rdf_iterator.c, librdf/rdf_iterator.h, librdf/rdf_list.c,
+	librdf/rdf_log.c, librdf/rdf_log.h, librdf/rdf_model.c,
+	librdf/rdf_model.h, librdf/rdf_model_storage.c, librdf/rdf_node.c,
+	librdf/rdf_node.h, librdf/rdf_parser.c, librdf/rdf_parser.h,
+	librdf/rdf_parser_raptor.c, librdf/rdf_query.c,
+	librdf/rdf_query.h, librdf/rdf_query_results.c,
+	librdf/rdf_query_triples.c, librdf/rdf_serializer.c,
+	librdf/rdf_serializer.h, librdf/rdf_serializer_raptor.c,
+	librdf/rdf_statement.c, librdf/rdf_statement.h,
+	librdf/rdf_storage.c, librdf/rdf_storage.h,
+	librdf/rdf_storage_hashes.c, librdf/rdf_storage_list.c,
+	librdf/rdf_storage_mysql.c, librdf/rdf_storage_sqlite.c,
+	librdf/rdf_storage_tstore.c: automated docucomments updates for
+	gtk-doc
+
+	* autogen.sh: allow gtkdocize to fail
+
+	* librdf/rdf_concepts_internal.h, librdf/rdf_digest_internal.h,
+	librdf/rdf_hash_internal.h, librdf/rdf_iterator_internal.h,
+	librdf/rdf_list_internal.h, librdf/rdf_log_internal.h,
+	librdf/rdf_model_internal.h, librdf/rdf_node_internal.h,
+	librdf/rdf_query_internal.h, librdf/rdf_serializer_internal.h,
+	librdf/rdf_statement_internal.h, librdf/rdf_storage_internal.h,
+	librdf/rdf_stream_internal.h, librdf/rdf_uri_internal.h: comment
+	words
+
+	* raptor/raptor_guess.c (raptor_guess_parse_chunk): unused var
+	parser
+
+	* librdf/rdf_list_internal.h: Remove some calls to public headers
+	that are in redland.h also.
+
+	* raptor/ntriples_parse.c (raptor_init_parser_ntriples): Do not
+	register interest in text/plain -- too general.
+
+	* librdf/Makefile.am: Added more internal headers
+
+	* librdf/librdf.h, librdf/rdf_concepts.h, librdf/rdf_digest.h,
+	librdf/rdf_hash.c, librdf/rdf_hash.h, librdf/rdf_hash_bdb.c,
+	librdf/rdf_hash_memory.c, librdf/rdf_init.h,
+	librdf/rdf_internal.h, librdf/rdf_iterator.h, librdf/rdf_list.h,
+	librdf/rdf_log.h, librdf/rdf_model.h, librdf/rdf_model_storage.h,
+	librdf/rdf_node.h, librdf/rdf_parser.h, librdf/rdf_query.h,
+	librdf/rdf_serializer.h, librdf/rdf_statement.h,
+	librdf/rdf_storage.h, librdf/rdf_storage_hashes.c,
+	librdf/rdf_stream.h, librdf/rdf_uri.h: use rdf_MODULE_internal.h
+	headersrdf_*.h
+
+	* librdf/rdf_concepts_internal.h, librdf/rdf_digest_internal.h,
+	librdf/rdf_hash_internal.h, librdf/rdf_iterator_internal.h,
+	librdf/rdf_list_internal.h, librdf/rdf_log_internal.h,
+	librdf/rdf_model_internal.h, librdf/rdf_node_internal.h,
+	librdf/rdf_parser_internal.h, librdf/rdf_query_internal.h,
+	librdf/rdf_serializer_internal.h, librdf/rdf_statement_internal.h,
+	librdf/rdf_storage_internal.h, librdf/rdf_stream_internal.h: added
+	rdf_MODULE_internal.h headers
+
+	* librdf/rdf_hash_bdb.h, librdf/rdf_hash_memory.h,
+	librdf/rdf_storage_hashes.h, librdf/rdf_storage_list.h: delete 1
+	function headers
+
+	* docs/redland.types: must be empty
+
+	* docs/kernel-doc, docs/build-docs: replace with gtk-doc
+
+	* docs/api.html.in, docs/api.sgml.in: switch to gtk-doc
+
+	* docs/redland-intro.xml, docs/redland-docs.xml: gtk-doc bit
+
+	* autogen.sh: Run gtkdocize
+
+	* docs/Makefile.am: Switch to gtk-doc
+
+	* configure.ac: Added GTK_DOC_CHECK
+
+	* Makefile.am: Added gtk-doc.make
+
+	* librdf/Makefile.am: Added rdf_init_internal.h rdf_uri_internal.h
+
+	* librdf/rdf_storage_sqlite.c, librdf/rdf_storage_tstore.c,
+	librdf/rdf_stream.c, librdf/rdf_uri.c, librdf/rdf_uri.h,
+	librdf/rdf_uri_internal.h, librdf/rdf_utf8.c, librdf/librdf.h,
+	librdf/rdf_concepts.c, librdf/rdf_digest.c,
+	librdf/rdf_digest_md5.c, librdf/rdf_digest_sha1.c,
+	librdf/rdf_hash.c, librdf/rdf_hash_bdb.c,
+	librdf/rdf_hash_cursor.c, librdf/rdf_hash_memory.c,
+	librdf/rdf_init.c, librdf/rdf_init.h, librdf/rdf_init_internal.h,
+	librdf/rdf_internal.h, librdf/rdf_iterator.c, librdf/rdf_list.c,
+	librdf/rdf_log.c, librdf/rdf_model.c, librdf/rdf_model.h,
+	librdf/rdf_model_storage.c, librdf/rdf_node.c,
+	librdf/rdf_parser.c, librdf/rdf_parser_raptor.c,
+	librdf/rdf_query.c, librdf/rdf_query_results.c,
+	librdf/rdf_query_triples.c, librdf/rdf_serializer.c,
+	librdf/rdf_serializer_raptor.c, librdf/rdf_statement.c,
+	librdf/rdf_storage.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_list.c, librdf/rdf_storage_mysql.c: Updates for
+	gtk-doc.  Pull out internal headers
+
+	* Switch API docs from gnome-doc / kernel-doc to gtk-doc.  This
+	requires a variety of source level changes that edit the
+	docucomments as well as some header file edits to work with
+	gtk-doc.   Internal symbols are removed from public headers
+	entirely.
+	
+2005-07-18  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* librdf/rdf_concepts.c: death to M&S for xml docs
+
+	* raptor/raptor_guess.c: Slim down, to use raptor_parser_exec.
+	(raptor_guess_parse_start): Deleted again.
+	(raptor_guess_parse_chunk): Use guessing and raptor_parser_exec to
+	switch to the right parser.
+
+	* raptor/raptor_internal.h: Added prototype to raptor_parser_exec
+
+	* raptor/raptor_parse.c (raptor_parser_exec): Added to turn one
+	parser type into another in-situ.
+
+	* raptor/rdfdump.c: make -g invoke the guess parser and report the
+	resulting parser at the first triple returned
+
+	* raptor/raptor_guess.c (raptor_guess_parse_start): Added.
+	(raptor_guess_parse_chunk): Pass in buffer to
+	raptor_guess_parser_name since we have it.  Work with no
+	content_type such as when using a filename alone.
+
+	* raptor/ntriples_parse.c (raptor_ntriples_parse_chunk): Handle
+	ending on \r\n by updating 'start' by 1 position.
+
+	* configure.ac: Require rasqal 0.9.11
+
+	* configure.ac: Require raptor 1.4.8 for guess parser.
+
+	* rasqal/rasqal_raptor.c (rasqal_raptor_new_triples_source): Use
+	raptor guess parser.
+
+	* rasqal/configure.ac: Require raptor 1.4.8 for guess parser.
+
+	* raptor/ntriples_parse.c (raptor_ntriples_term): Check sscanf
+	return to catch bad \u or \U hex escape.
+
+	* raptor/turtle_lexer.l (turtle_copy_string_token): Check sscanf
+	return to catch bad \u or \U hex escape.
+
+	* raptor/raptor_general.c (raptor_init): Added guessing parser
+
+	* raptor/configure.ac, raptor/Makefile.am: Added raptor_guess.c
+
+	* raptor/raptor_guess.c: guessing parser using content type and an
+	internal parser
+
+	* raptor/raptor_xslt.c (raptor_xslt_parse_start): No need to init
+	column, byte locator.
+
+	* raptor/raptor_rdfxml.c (raptor_xml_parse_recognise_syntax):
+	Guess that application/xml is likely RDF/XML
+
+	* raptor/raptor_internal.h: raptor_parser_factory_s gains a
+	content_type_handler field.
+
+	* raptor/raptor_parse.c (raptor_start_parse): Init locator line,
+	column, byte to -1 (unknown)
+	(raptor_parse_uri_content_type_handler): Added to handle
+	raptor_www content type field return.  Pass on to factory method
+	content_type_handler if present.
+	(raptor_parse_uri_with_connection): Init
+	raptor_parse_uri_content_type_handler to receive raptor_www
+	callbacks using raptor_www_set_content_type_handler.
+	(raptor_guess_parser_name): Check static buffer size for overflow.
+	Add some comments.
+
+	* raptor/raptor_xslt.c (raptor_xslt_parse_start): Use
+	raptor_parser_copy_user_state
+
+	* raptor/raptor_parse.c (raptor_parser_copy_user_state): docs
+
+	* raptor/raptor_parse.c (raptor_parser_copy_user_state): Added.
+
+	* raptor/raptor_internal.h: Added prototype for
+	raptor_parser_copy_user_state
+
+	* raptor/tests/ex-58.rdf, raptor/tests/ex-58.out,
+	raptor/tests/Makefile.am: Added ex-58
+
+	* raptor/raptor_rdfxml.c (raptor_end_element_grammar): When
+	emitting literals, handle a datatyped empty literal.  Merge the
+	property element/member property element code.
+
+	* raptor/tests/ex-57.rdf, raptor/tests/ex-57.out,
+	raptor/tests/Makefile.am: Added ex-57
+
 2005-07-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
 	* librdf/rdf_storage_tstore.c: Unbreak 3store backend from not
