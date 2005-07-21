@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="iso8859-1"?>
+<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <chapter id="objects">
 <title>Introduction to Objects in C</title>
+
 <para>
 Redland uses objects and is written in C, which has no built in support for
 object construction, destruction, copying etc.  This library thus uses
@@ -10,6 +11,7 @@ conventions for the names of the routines providing the
 constructor, destructor and copy constructor functionality for a class as
 well as conventions for the general methods.
 </para>
+
 <para>
 A class FOO is defined as a C typedef <literal>librdf_foo</literal>,
 and its a public interface defined in <filename>rdf_foo.h</filename>
@@ -20,6 +22,7 @@ class is defined in file <filename>rdf_foo.c</filename> and may
 include private (static) functions either for internal
 implementations or to satisfy part of a factory API.
 </para>
+
 <para>Each class may have a class initialiser / termination pair
 of functions which must be called before any object in the class is created,
 and after the last object has been freed. These are defined with signatures
@@ -31,6 +34,7 @@ like:
 The arguments to the initialisation vary since there are sometimes
 some class wide options that can be set at initialisation time.
 </para>
+
 <para>
 The object constructor(s) are defined with signatures like:
 <programlisting>
@@ -43,16 +47,19 @@ appropriate for the name for example:
   librdf_foo* librdf_new_foo_with_options(char *options)
 </programlisting>
 </para>
+
 <para>A copy constructor may be defined which will have the signature:
 <programlisting>
   librdf_foo* librdf_new_foo_from_foo(librdf_foo* old_foo)
 </programlisting>
 </para>
+
 <para>A destructor must be defined and has the signature:
 <programlisting>
   void librdf_free_foo(librdf_foo* foo)
 </programlisting>
 </para>
+
 <para>Methods of the class have names starting with <literal>librdf_foo_</literal> and
 examples could be:
 <programlisting>
@@ -61,6 +68,7 @@ examples could be:
   char *librdf_foo_get_thing(librdf_foo* foo)
 </programlisting>
 </para>
+
 <para>It is often convienent to get a string representation of an
 object for further processing, debugging or serialisation.  There are
 two conventions for methods that provide this functionality - the
@@ -69,7 +77,8 @@ copy of the string and in that case the method ends
 <literal>_as_string</literal>.  The second is when a pointer is
 returned to a <emphasis>newly allocated</emphasis> string in which
 case the method ends <literal>_to_string</literal>.</para>
-  </chapter>
+
+</chapter>
 
 <!--
 Local variables:

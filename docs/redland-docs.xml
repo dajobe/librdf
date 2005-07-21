@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="iso8859-1"?>
+<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"> [
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 <!ENTITY version SYSTEM "version.xml">
 ]>
 <book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
