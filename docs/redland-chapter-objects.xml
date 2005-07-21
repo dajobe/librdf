@@ -2,7 +2,7 @@
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <chapter id="objects">
-<title>Introduction to Objects in C</title>
+<title>Objects in C</title>
 
 <para>
 Redland uses objects and is written in C, which has no built in support for
