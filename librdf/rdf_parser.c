@@ -537,9 +537,9 @@ librdf_finish_parser(librdf_world *world)
  * @user_data: user data to pass to function
  * @error_fn: pointer to the function
  *
+ * @Deprecated: Does nothing
+ *
  * Set the parser error handling function.
- * 
- * DEPRECATED: Does nothing
  * 
  **/
 void
@@ -555,9 +555,9 @@ librdf_parser_set_error(librdf_parser* parser, void *user_data,
  * @user_data: user data to pass to function
  * @warning_fn: pointer to the function
  *
+ * @Deprecated: Does nothing.
+ *
  * Set the parser warning handling function.
- * 
- * DEPRECATED: Does nothing.
  *
  **/
 void

@@ -319,9 +319,9 @@ librdf_free_serializer(librdf_serializer *serializer)
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
  *
+ * @Deprecated: Use librdf_serializer_serialize_model_to_file_handle
+ *
  * Write a serialized librdf_mode to a FILE*.
- * 
- * DEPRECATED: Use librdf_serializer_serialize_model_to_file_handle
  *
  * Return value: non 0 on failure
  **/
@@ -483,9 +483,9 @@ librdf_finish_serializer(librdf_world *world)
  * @user_data: user data to pass to function
  * @error_fn: pointer to the function
  *
- * Set the serializer error handling function.
+ * @Deprecated: Does nothing
  * 
- * DEPRECATED: Does nothing
+ * Set the serializer error handling function.
  * 
  **/
 void
@@ -501,9 +501,9 @@ librdf_serializer_set_error(librdf_serializer* serializer, void *user_data,
  * @user_data: user data to pass to function
  * @warning_fn: pointer to the function
  *
+ * @Deprecated: Does nothing
+ *
  * Set the serializer warning handling function.
- * 
- * DEPRECATED: Does nothing
  * 
  **/
 void
