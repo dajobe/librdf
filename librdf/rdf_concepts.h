@@ -37,27 +37,6 @@
 extern "C" {
 #endif
 
-/**
- * librdf_concepts_index:
- *
- * RDF concepts from either the
- * RDF namespace http://www.w3.org/1999/02/22-rdf-syntax-ns#
- * or the RDF Schema namespace http://www.w3.org/2000/01/rdf-schema#
- *
- * This list includes both syntax terms such as
- * <literal>rdf:li</literal> as well as model concepts (RDF
- * properties or classes) such as <literal>rdf:Seq</literal>
- *
- * These can be used in code along with the #librdf_concept_resources
- * or #librdf_concept_uris arrays to get fast pointers to #librdf_node
- * or #librdf_uri objects for the concept.  These are also available
- * via a set of macros that match the terms names.  
- *
- * Example: #LIBRDF_MS_value is a pointer to the #librdf_node for
- * <literal>rdf:value</literal> and #LIBRDF_MS_value_URI is a
- * pointer to the #librdf_uri.  These should be copied with the
- * class copy constructors before use.
- */
 typedef enum {
   LIBRDF_CONCEPT_MS_Alt,
   LIBRDF_CONCEPT_MS_Bag,
@@ -124,12 +103,6 @@ extern librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
 
 /* public macros for the resources (librdf_node*) representing the concepts */
 
-/**
- * LIBRDF_MS_Alt:
- *
- * #librdf_node for <literal>rdf:Alt</literal>.  Copy with
- * librdf_new_node_from_node() before using.
- */
 #define LIBRDF_MS_Alt librdf_concept_resources[LIBRDF_CONCEPT_MS_Alt]
 #define LIBRDF_MS_Bag librdf_concept_resources[LIBRDF_CONCEPT_MS_Bag]
 #define LIBRDF_MS_Property librdf_concept_resources[LIBRDF_CONCEPT_MS_Property]
