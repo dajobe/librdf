@@ -32,7 +32,7 @@ DOC_MODULE=redland
 DOC_MAIN_SGML_FILE=redland-docs.xml
 
 # Extra options to supply to gtkdoc-scan
-SCAN_OPTIONS=--deprecated-guards="REDLAND_DISABLE_DEPRECATED"
+SCAN_OPTIONS=
 
 # The directory containing the source code. Relative to $(srcdir)
 DOC_SOURCE_DIR=../librdf
