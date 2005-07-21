@@ -1026,6 +1026,7 @@ AC_CONFIG_FILES([Makefile
 redland.rdf
 librdf/redland.spec
 docs/Makefile
+docs/version.xml
 librdf/Makefile
 librdf/win32/Makefile
 examples/Makefile
