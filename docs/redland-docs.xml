@@ -1,21 +1,32 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="iso8859-1"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"> [
+<!ENTITY version SYSTEM "version.xml">
+]>
 <book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
   <bookinfo>
-    <title>Redland RDF Application Framework Reference Manual</title>
+    <title>Redland RDF Application Framework Manual</title>
+    <releaseinfo>for Redland &version;</releaseinfo>
   </bookinfo>
 
+  <chapter id="redland">
+    <title>Redland Overview</title>
+    <para>
+Redland is a general-purpose Resource Description Framework (RDF)
+library providing APIs to the RDF model and it's concepts.
+    </para>
 
-   <xi:include href="redland-intro.xml"/>
+  </chapter>
+
+   <xi:include href="redland-chapter-intro.xml"/>
 
   <part>
     <title>Tutorial</title>
-    <xi:include href="redland-objects-in-c.xml"/>
   </part>				  
 
   <part>
-    <title>Reference</title>
+    <title>Reference Manual</title>
+    <xi:include href="redland-chapter-objects.xml"/>
     <xi:include href="xml/world.xml"/>
     <xi:include href="xml/concepts.xml"/>
     <xi:include href="xml/digest.xml"/>

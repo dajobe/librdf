@@ -1,9 +1,7 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="iso8859-1"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
-<sect1 id="intro-objects-in-c">
-   <title>Introduction to Objects in C</title>
-
+<chapter id="objects">
 <title>Introduction to Objects in C</title>
 <para>
 Redland uses objects and is written in C, which has no built in support for
@@ -71,11 +69,11 @@ copy of the string and in that case the method ends
 <literal>_as_string</literal>.  The second is when a pointer is
 returned to a <emphasis>newly allocated</emphasis> string in which
 case the method ends <literal>_to_string</literal>.</para>
-  </sect1>
+  </chapter>
 
 <!--
 Local variables:
 mode: sgml
-sgml-parent-document: ("redland-docs.xml" "book" "part" "sect1")
+sgml-parent-document: ("redland-docs.xml" "book" "part" "chapter")
 End:
 -->
