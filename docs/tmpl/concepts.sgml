@@ -28,12 +28,14 @@ or #librdf_uri class copy constructors before use.
 <example>
 <title>Using macros to get a node and URI for an RDF concept</title>
 <programlisting>
+  #include &lt;redland.h&gt;
+  ...
+
   librdf_node* n=librdf_new_node_from_node(LIBRDF_MS_value);
 
-  librdf_uri* u=librdf_new_uri_from_uri(LIBRDF_MS_value_URI)
+  librdf_uri* u=librdf_new_uri_from_uri(LIBRDF_MS_value_URI);
 </programlisting>
 </example>
-
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
