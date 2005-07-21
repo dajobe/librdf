@@ -1,7 +1,27 @@
 2005-07-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
-	* librdf/rdf_serializer.c, librdf/rdf_parser.c: docucomment
-	@Deprecated tags
+	* rasqal/rasqal_query.c (rasqal_query_results_write_xml_result2,
+	rasqal_query_results_write_xml_result3): Use
+	RASQAL_XSD_BOOLEAN_TRUE and RASQAL_XSD_BOOLEAN_FALSE for boolean
+	result value.
+	(rasqal_query_results_write_xml_result3): Add ordered and distinct
+	attributes to <results> element.
+
+	* rasqal/rasqal_literal.c (rasqal_literal_string_to_native,
+	rasqal_new_boolean_literal): Use RASQAL_XSD_BOOLEAN_TRUE and
+	RASQAL_XSD_BOOLEAN_FALSE.
+
+	* rasqal/rasqal_internal.h: Added RASQAL_XSD_BOOLEAN_TRUE and
+	RASQAL_XSD_BOOLEAN_FALSE, maybe could be pointers to a shared
+	string but compilers can work it out.
+
+	* docs/redland-sections.txt: remove internal
+	librdf_concept_ms_namespace_uri and
+	librdf_concept_schema_namespace_uri
+
+	* librdf/rdf_concepts.h: docs
+
+	* docs/Makefile.am: Remove unused SCAN_OPTIONS
 
 2005-07-20  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
 
