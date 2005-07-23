@@ -124,7 +124,7 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 /sbin/ldconfig
 
 %changelog
-* Thu Jul 2005  Dave Beckett <dave.beckett@bristol.ac.uk>
+* Thu Jul 21 2005  Dave Beckett <dave.beckett@bristol.ac.uk>
 - Updated for gtk-doc locations
 
 * Mon Nov 1 2004  Dave Beckett <dave.beckett@bristol.ac.uk>
