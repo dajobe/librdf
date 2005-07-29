@@ -1038,7 +1038,7 @@ AC_CONFIG_FILES([redland-config], [chmod +x redland-config])
 AC_CONFIG_FILES([redland-src-config], [chmod +x redland-src-config])
 
 dnl Check for gtk-doc and docbook
-GTK_DOC_CHECK([1.3])
+GTK_DOC_CHECK([1.4])
 
 AC_OUTPUT
 
