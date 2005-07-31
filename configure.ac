@@ -485,8 +485,8 @@ for parser in $parser_modules; do
     config_subdir_raptor=no
     if test $parser = raptor; then
       if test $with_raptor = internal; then
-        LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor $LIBRDF_INTERNAL_CPPFLAGS"
-        LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/libraptor.la $LIBRDF_INTERNAL_LIBS"
+        LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor/src $LIBRDF_INTERNAL_CPPFLAGS"
+        LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/src/libraptor.la $LIBRDF_INTERNAL_LIBS"
         config_subdir_raptor=yes
       else
         LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
@@ -899,7 +899,7 @@ rasqal_dir=
 config_subdir_rasqal=no
 
 if test $with_rasqal = internal; then
-  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/rasqal $LIBRDF_INTERNAL_CPPFLAGS"
+  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/rasqal/src $LIBRDF_INTERNAL_CPPFLAGS"
   LIBRDF_INTERNAL_LIBS="\$(top_builddir)/rasqal/src/librasqal.la $LIBRDF_INTERNAL_LIBS"
   rasqal_dir=rasqal
   config_subdir_rasqal=yes
