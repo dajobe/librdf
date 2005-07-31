@@ -900,7 +900,7 @@ config_subdir_rasqal=no
 
 if test $with_rasqal = internal; then
   LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/rasqal $LIBRDF_INTERNAL_CPPFLAGS"
-  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/rasqal/librasqal.la $LIBRDF_INTERNAL_LIBS"
+  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/rasqal/src/librasqal.la $LIBRDF_INTERNAL_LIBS"
   rasqal_dir=rasqal
   config_subdir_rasqal=yes
 else
