@@ -12,7 +12,7 @@ Release:   %{release}
 Prefix:    %{_prefix}
 License:   LGPL/Apache 2
 Group:     Development/Libraries
-Source:    http://librdf.org/dist/source/%{name}-%{version}.tar.gz
+Source:    http://download.librdf.org/source/%{name}-%{version}.tar.gz
 URL:       http://librdf.org/
 BuildRoot: /tmp/%{name}-%{version}
 BuildRequires: libxml2-devel >= 2.4.0
@@ -20,8 +20,8 @@ BuildRequires: curl-devel
 BuildRequires: raptor-devel >= @RAPTOR_MIN_VERSION@
 BuildRequires: rasqal-devel >= @RASQAL_MIN_VERSION@
 BuildRequires: perl >= 5.8.0
-BuildRequires: python >= 2.2.0 python-devel
 BuildRequires: mysql-devel
+BuildRequires: sqlite-devel
 Packager:  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 Docdir: %{prefix}/doc
 Requires:  libxml2
@@ -57,11 +57,7 @@ Header files for development with Redland
 PYTHON=python
 export PYTHON
 
-if [ ! -f configure ]; then
-  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix} --enable-release --sysconfdir=/etc --mandir=%{_mandir} --libdir=%{_libdir} --with-raptor=system --with-rasqal=system --with-threestore=no
-else
-  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix} --enable-release --sysconfdir=/etc --mandir=%{_mandir} --libdir=%{_libdir} --with-raptor=system --with-rasqal=system --with-threestore=no
-fi
+%configure --enable-release --with-raptor=system --with-rasqal=system --with-threestore=no
 
 %{__make} OPTIMIZE="$RPM_OPT_FLAGS"
 
@@ -69,7 +65,7 @@ fi
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
-%makeinstall prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT/etc libdir=$RPM_BUILD_ROOT%{_libdir} mandir=$RPM_BUILD_ROOT%{_mandir}
+%makeinstall
 
 find $RPM_BUILD_ROOT -print | xargs chmod u+w
 
@@ -124,6 +120,12 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 /sbin/ldconfig
 
 %changelog
+* Thu Aug 11 2005  Dave Beckett <dave.beckett@bristol.ac.uk>
+- Update Source:
+- Do not require python-devel at build time
+- Add sqlite-devel build requirement.
+- Use %configure and %makeinstall
+
 * Thu Jul 21 2005  Dave Beckett <dave.beckett@bristol.ac.uk>
 - Updated for gtk-doc locations
 
