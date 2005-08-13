@@ -38,6 +38,8 @@ known values for OPTION are:
   --run COMMAND         run the COMMAND with the shared libraries for
                         the source tree
   --swig                display the SWIG interface file
+  --version             output version information
+  --version-decimal     output version as a decimal integer
 EOF
   exit $1
 }
@@ -101,6 +103,16 @@ while test $# -gt 0; do
 
     --swig)
       echo_swig=yes
+      ;;
+
+    --version)
+      echo @VERSION@
+      exit 0
+      ;;
+
+    --version-decimal)
+      echo @LIBRDF_VERSION_DECIMAL@
+      exit 0
       ;;
 
     *)
