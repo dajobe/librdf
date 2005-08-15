@@ -307,17 +307,16 @@ documentation.
 </dl>
 
 
-<p><b>WARNING</b> If the libwww or Sleepycat/Berkeley DB libraries
-are installed in a non-default directory, when the final linking
-occurs, the libraries may not be found at run time.  To fix this you
-will need to use a system-specific method of passing this information
-to the run-time loader.  On most systems you can set the
-LD_LIBRARY_PATH environment variable to include the directory where
-the libwww libraries are found. (On OSX this is DYLD_LIBRARY_PATH)
-You can also configure it via a
-system wide file - see the <code>ld</code>, <code>ld.so</code>
-or<code>ld.so.1</code> manual pages for details.  The alternative, to
-link libwww statically, works but is difficult to enable.</p>
+<p><b>WARNING</b> If the Sleepycat/Berkeley DB library is installed
+in a non-default directory, when the final linking occurs, the
+libraries may not be found at run time.  To fix this you will need to
+use a system-specific method of passing this information to the
+run-time loader.  On most systems you can set the LD_LIBRARY_PATH
+environment variable to include the directory where the libdb*
+libraries are found. (On OSX this is DYLD_LIBRARY_PATH) You can also
+configure it via a system wide file - see the <code>ld</code>,
+<code>ld.so</code> or<code>ld.so.1</code> manual pages for
+details.</p>
 
 
 <h3>2.3 Configuring</h3>
@@ -421,8 +420,7 @@ parse a URI of RDF/XML content, store it in multple Berkeley DB
 hashes on the disk and run queries against them.  It takes two
 arguments, the first the URI of the RDF/XML content (or
 <code>file:</code><em>filename</em>) and the second, optional one, is the
-name of the RDF parser to use.  At present these can be
-<code>sirpac</code> or <code>libwww</code></p>
+name of the RDF parser to use.</p>
 
 <h3>3.3. <a href="example2.c">example2.c</a></h3>
 
