@@ -789,7 +789,7 @@ main(int argc, char *argv[])
       }
 
       if (librdf_query_results_is_bindings(results)) {
-        fprintf(stderr, "%s: Query returned bindings results:\n", program);
+        fprintf(stdout, "%s: Query returned bindings results:\n", program);
         
         while(!librdf_query_results_finished(results)) {
           fputs("result: [", stdout);
