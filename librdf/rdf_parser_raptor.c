@@ -361,26 +361,24 @@ librdf_parser_raptor_generate_id_handler(void *user_data,
 }
 
 
-/**
- * librdf_parser_raptor_parse_file_as_stream:
+/*
+ * librdf_parser_raptor_parse_file_handle_as_stream:
  * @context: parser context
- * @uri: #librdf_uri URI of RDF/XML content source
- * @base_uri: #librdf_uri URI of the content location or NULL if the same
+ * @fh: FILE* of content source
+ * @base_uri: #librdf_uri URI of the content location
  *
- * Retrieve the RDF/XML content at URI and parse it into a librdf_stream.
- *
+ * Retrieve content from FILE* @fh and parse it into a #librdf_stream.
  *
  **/
 static librdf_stream*
-librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
-                                          librdf_uri *base_uri)
+librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
+                                                 void *context, 
+                                                 FILE *fh, librdf_uri *base_uri)
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
   librdf_stream *stream;
-  char* filename;
   int rc;
-  librdf_world *world=uri->world;
 
   pcontext->errors=0;
   pcontext->warnings=0;
@@ -402,23 +400,9 @@ librdf_parser_raptor_parse_file_as_stream(void *context, librdf_uri *uri,
   
   
   scontext->pcontext=pcontext;
-  scontext->source_uri = librdf_new_uri_from_uri(uri);
-  if(!base_uri)
-    base_uri=uri;
+  scontext->source_uri = librdf_new_uri_from_uri(base_uri);
   scontext->base_uri = librdf_new_uri_from_uri(base_uri);
-
-  filename=(char*)librdf_uri_to_filename(uri);
-  if(!filename)
-    return NULL;
-  
-  scontext->fh=fopen(filename, "r");
-  if(!scontext->fh) {
-    LIBRDF_DEBUG3("Failed to open file '%s' - %s\n", filename, strerror(errno));
-    SYSTEM_FREE(filename);
-    librdf_parser_raptor_serialise_finished((void*)scontext);
-    return(NULL);
-  }
-  SYSTEM_FREE(filename);
+  scontext->fh=fh;
 
   /* Start the parse */
   rc=raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
@@ -482,9 +466,28 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   pcontext->errors=0;
   pcontext->warnings=0;
   
-  if(uri && librdf_uri_is_file_uri(uri))
-    return librdf_parser_raptor_parse_file_as_stream(context, uri, base_uri);
+  if(uri && librdf_uri_is_file_uri(uri)) {
+    char* filename=(char*)librdf_uri_to_filename(uri);
+    FILE *fh;
 
+    if(!filename)
+      return NULL;
+    
+    fh=fopen(filename, "r");
+    if(!fh) {
+      LIBRDF_DEBUG3("Failed to open file '%s' - %s\n", filename, strerror(errno));
+      SYSTEM_FREE(filename);
+      return NULL;
+    }
+    
+    stream=librdf_parser_raptor_parse_file_handle_as_stream(pcontext->parser->world,
+                                                            context, fh, base_uri);
+
+    fclose(fh);
+    SYSTEM_FREE(filename);
+    return stream;
+  }
+  
 
   scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
   if(!scontext)
