@@ -1,4 +1,40 @@
+2005-09-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_serializer_internal.h: struct librdf_serializer_factory_s
+	gains serialize_model_to_iostream method.
+
+	* rdf_serializer_raptor.c
+	(librdf_serializer_raptor_serialize_model_to_iostream): Added to
+	write to a raptor_iostream object.
+
+	* rdf_serializer.c
+	(librdf_serializer_serialize_model_to_iostream): Added to write to
+	a raptor_iostream object.
+
+	* rdf_serializer.h: Added
+	librdf_serializer_serialize_model_to_iostream
+
+2005-08-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* redland.spec.in: - Update Source: - Do not require python-devel
+	at build time - Add sqlite-devel build requirement.  - Use
+	%configure and %makeinstall
+
+2005-07-31  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Makefile.am: adjust source of librasqal.la
+
+2005-07-23  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* redland.spec.in: date typo
+
 2005-07-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_concepts.h: Move some docs into the sgml template
+
+	* redland.spec.in: Updated for gtk-doc locations
+
+	* rdf_concepts.h: docs
 
 	* rdf_serializer.c, rdf_parser.c: docucomment @Deprecated tags
 
