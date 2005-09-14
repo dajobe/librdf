@@ -66,6 +66,8 @@ unsigned char* librdf_serializer_serialize_model_to_string(librdf_serializer* se
 REDLAND_API
 unsigned char* librdf_serializer_serialize_model_to_counted_string(librdf_serializer* serializer, librdf_uri* base_uri, librdf_model* model, size_t *length_p);
 REDLAND_API
+int librdf_serializer_serialize_model_to_iostream(librdf_serializer* serializer, librdf_uri* base_uri, librdf_model *model, raptor_iostream* iostr);
+REDLAND_API
 void librdf_serializer_set_error(librdf_serializer* serializer, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
 REDLAND_API
 void librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data, void (*warning_fn)(void *user_data, const char *msg, ...));
