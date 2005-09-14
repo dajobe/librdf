@@ -231,7 +231,7 @@ librdf_get_serializer_factory(librdf_world *world,
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI of syntax (NULL if not used)
  *
- * Constructor - create a new librdf_serializer object.
+ * Constructor - create a new #librdf_serializer object.
  * 
  * Return value: new #librdf_serializer object or NULL
  **/
@@ -255,7 +255,7 @@ librdf_new_serializer(librdf_world *world,
  * @world: redland world object
  * @factory: the serializer factory to use to create this serializer
  *
- * Constructor - create a new librdf_serializer object.
+ * Constructor - create a new #librdf_serializer object.
  * 
  * Return value: new #librdf_serializer object or NULL
  **/
@@ -292,7 +292,7 @@ librdf_new_serializer_from_factory(librdf_world *world,
  * librdf_free_serializer:
  * @serializer: the serializer
  *
- * Destructor - destroys a librdf_serializer object.
+ * Destructor - destroys a #librdf_serializer object.
  * 
  **/
 void
@@ -319,9 +319,9 @@ librdf_free_serializer(librdf_serializer *serializer)
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
  *
- * @Deprecated: Use librdf_serializer_serialize_model_to_file_handle
+ * @Deprecated: Use librdf_serializer_serialize_model_to_file_handle()
  *
- * Write a serialized librdf_mode to a FILE*.
+ * Write a serialized #librdf_model to a FILE*.
  *
  * Return value: non 0 on failure
  **/
@@ -343,7 +343,7 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
  *
- * Write a serialized librdf_model to a FILE*.
+ * Write a serialized #librdf_model to a FILE*.
  * 
  * Return value: non 0 on failure
  **/
@@ -369,7 +369,7 @@ librdf_serializer_serialize_model_to_file_handle(librdf_serializer* serializer,
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
  *
- * Write a serialized librdf_model to a file.
+ * Write a serialized #librdf_model to a file.
  * 
  * Return value: non 0 on failure
  **/
@@ -403,7 +403,7 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
  * @model: the #librdf_model model to use
  * @length_p: pointer to store length or NULL
  *
- * Write a serialized librdf_model to a counted string.
+ * Write a serialized #librdf_model to a counted string.
  * 
  * Return value: non 0 on failure
  **/
@@ -431,9 +431,9 @@ librdf_serializer_serialize_model_to_counted_string(librdf_serializer* serialize
  * @base_uri: the base URI to use (or NULL)
  * @model: the #librdf_model model to use
  *
- * Write a serialized librdf_model to a string.
+ * Write a serialized #librdf_model to a string.
  * 
- * Return value: non 0 on failure
+ * Return value: NULL on failure
  **/
 unsigned char*
 librdf_serializer_serialize_model_to_string(librdf_serializer* serializer,
@@ -447,6 +447,33 @@ librdf_serializer_serialize_model_to_string(librdf_serializer* serializer,
                                                                 base_uri, model,
                                                                 NULL);
 }
+
+
+/**
+ * librdf_serializer_serialize_model_to_iostream:
+ * @serializer: the serializer
+ * @base_uri: the base URI to use (or NULL)
+ * @model: the #librdf_model model to use
+ * @iostr: the #raptor_iostream to write to
+ *
+ * Write a serialized #librdf_model to a #raptor_iostream.
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_serializer_serialize_model_to_iostream(librdf_serializer* serializer,
+                                              librdf_uri* base_uri,
+                                              librdf_model *model,
+                                              raptor_iostream* iostr)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+
+  return serializer->factory->serialize_model_to_iostream(serializer->context,
+                                                          base_uri, model,
+                                                          iostr);
+}
+
 
 
 /**
