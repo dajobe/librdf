@@ -693,8 +693,10 @@ libmysql_min_version=3.23.56
 # Also tested on 4.0.14
 
 if test "X$MYSQL_CONFIG" != X; then
-  LIBS="$LIBRDF_LIBS `$MYSQL_CONFIG --libs|sed -e "s/'//g"`"
-  CPPFLAGS="$LIBRDF_CPPFLAGS `$MYSQL_CONFIG --cflags|sed -e "s/'//g"`"
+  mysql_libs=`$MYSQL_CONFIG --libs|sed -e "s/'//g"`
+  LIBS="$LIBRDF_LIBS $mysql_libs"
+  mysql_cflags=`$MYSQL_CONFIG --cflags|sed -e "s/'//g"`
+  CPPFLAGS="$LIBRDF_CPPFLAGS $mysql_cflags"
   AC_MSG_CHECKING(for mysql library)
   LIBMYSQL_VERSION=`$MYSQL_CONFIG --version`
   libmysql_version_dec=`echo $LIBMYSQL_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
@@ -811,7 +813,8 @@ AM_CONDITIONAL(STORAGE_SQLITE, test $sqlite_storage = yes)
 AM_CONDITIONAL(STORAGE_TSTORE, test $tstore_storage = yes)
 
 if test $mysql_storage  = yes; then
-  LIBRDF_LIBS="$LIBRDF_LIBS `$MYSQL_CONFIG --libs|sed -e "s/'//g"`"
+  mysql_libs=`$MYSQL_CONFIG --libs|sed -e "s/'//g"`
+  LIBRDF_LIBS="$LIBRDF_LIBS $mysql_libs"
   dnl need to change quotes to allow square brackets
   changequote(<<, >>)dnl
   # Stop the MySQL config program adding -O<n> options to CFLAGS
