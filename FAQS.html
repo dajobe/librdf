@@ -49,8 +49,8 @@ check the link above for updates, since the above is not a definitive
 list.</li>
 
 <li>If you choose Apache 2.0, you should be able to
-link with most anything else.  There is current
-debate if the (L)GPL2 is compatible with Apache 2.0
+link with most anything.  There is presently a
+debate on whether the (L)GPL2 is compatible with Apache 2.0
 (FSF says no, ASF says yes) so when linking with LGPL or GPLed
 code it makes sense to pick either of the LGPL or GPL licenses.</li>
 </ul>
@@ -66,9 +66,11 @@ C libraries or calling of C functions.</p>
 should be compilable on many different systems.  I have access to
 and have built it on (at various times):</p>
 
-<p>Redhat 7-9, Gentoo, Debian 3.0/unstable GNU/Linux (x86); Solaris
-2.5, 7, 8 (Sparc); OSX 10.2, 10.3 (PPC); Debian GNU/Linux (DEC
-Alpha); FreeBSD 4.7-4.9 (x86); HP-UX 10.</p>
+<p>Redhat 7-9, Redhat Fedora Core 1-4, Gentoo, Debian 3.0/unstable
+GNU/Linux (x86); Solaris 2.5, 7, 8, 9 (Sparc); OSX 10.2, 10.3, 10.4
+(PPC); Debian GNU/Linux (DEC Alpha); FreeBSD 4.7-4.9 (x86); HP-UX 10,
+OpenBSD, NetBSD and more more.  The release announcements for
+the packages typically list the systems that it has been tested on..</p>
 
 <p>it configured, built and tested out of the box on all of these (C
 interface; the other language APIs depend on the particular support
@@ -82,11 +84,12 @@ finding this.</p>
 
 <li>Why is it called Redland?
 
-<p>Well, librdf was too boring <tt>:)</tt>!  I work for
+<p>Well, librdf was too boring <tt>:)</tt>!  When I originally
+created it, I worked for
 the <a href="http://www.bristol.ac.uk/">University of Bristol</a>
-and <em>Redland</em> is an area of Bristol which has an 'R' and a 'D'
+and lived in the <em>Redland</em> area of Bristol which has an 'R' and a 'D'
 in the name.  Plus I couldn't find a decent word with the letters 'RDF'
-in it.  Years later I discover there's an area of Bristol called
+in it.  Years later I realised there's an area of Bristol called
 Redcliffe, but that opportunity has passed.</p>
 </li>
 
@@ -118,9 +121,10 @@ and query results in several langauges.
 <li>Does it run on MS Windows?<br />
 
 <p>Yes, from reports others have had success compiling the Redland
-libraries for win32.  As of Redland 0.9.19, Raptor 1.3.3 and Rasqal
-0.9.3 several patches have been merged in from people who built it
-for win32.
+libraries for win32.  As of Redland 1.0.0 there are packaged pre-built
+DLLs for redland available from the
+<a href="http://download.librdf.org/binaries/win32/">download site</a>,
+including some language bindings.
 </p>
 
 <p>With respect to portability and "unix"-isms in the code, they are
@@ -137,7 +141,7 @@ using the standard configure and make system.
 <li>Does it run on Apple OSX?<br />
 <p>Yes.  The most recent version of this operating system has most of
 the basic requirements for using Redland and Raptor - an XML parser
-(in 10.3). You may need to install the Apple Developer Tools/XCode
+(in 10.3 onwards). You may need to install the Apple Developer Tools/XCode
 to get all the standard GNU toolchain, make, autotools and other
 things needed to build from CVS.  Another alternative is to
 install the <a href="http://fink.sourceforge.net/">Fink</a> environment
@@ -215,7 +219,7 @@ Dave
 
 <hr />
 
-<p>Copyright (C) 2000-2004 <a href="http://purl.org/net/dajobe/">Dave Beckett</a><br />Copyright (C) 2000-2004 <a href="http://www.ilrt.bris.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright (C) 2000-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a><br />Copyright (C) 2000-2004, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
