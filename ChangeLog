@@ -1,4 +1,2087 @@
-2005-07-21  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+2006-01-16  Dave Beckett  <dave@dajobe.org>
+
+	* redland.rdf.in: use download.librdf.org
+
+	* rasqal/docs/librasqal.3: Updates for 0.9.11
+
+	* rasqal/fix-groff-xhtml: style edits
+
+2006-01-15  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/rasqal_query.c: Change results indexing when using
+	ORDER; the query->results_count is now a count (again) so starts
+	from 1 when there is at least 1 result, indexing into item 0 of
+	the query->results_sequence sequence.
+	(rasqal_query_results_update): If result_count goes beyond range,
+	adjust it down and return.
+	(rasqal_query_execute): If a results sequence is created, but it
+	is empty, set result count to 0, otherwise immediately check if it
+	is finished by the limit/offset rules.
+	(rasqal_query_results_next): Check result_count is finished and
+	adjust down if it was.
+	(rasqal_query_results_get_bindings,
+	rasqal_query_results_get_binding_value,
+	rasqal_query_results_get_binding_value_by_name): Adjusted to use
+	result_count offset -1.
+
+	* rasqal/src/rasqal_engine.c (rasqal_engine_check_limit_offset):
+	Do not muck about with result_count here.
+
+2006-01-12  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/Makefile.am: Add strcasecmp_test_LDADD to link in
+	libraries on some platforms.
+
+	* rasqal/src/Makefile.am, rasqal/src/rasqal-config.1,
+	rasqal/src/rasqal-config.in, rasqal/src/rasqal_general.c,
+	rasqal/src/rasqal.h, rasqal/src/rasqal_engine.c,
+	rasqal/src/rasqal_expr.c, rasqal/src/rasqal_graph_pattern.c,
+	rasqal/src/rasqal_internal.h, rasqal/src/rasqal_map.c,
+	rasqal/src/rasqal_query_test.c, rasqal/src/rasqal_raptor.c,
+	rasqal/src/rasqal_redland.c, rasqal/src/rasqal_skiplist.c,
+	rasqal/src/rasqal_xsd_datatypes.c, rasqal/src/rdql_common.h,
+	rasqal/src/rdql_lexer.l, rasqal/src/rdql_parser.y,
+	rasqal/src/sparql_common.h, rasqal/src/sparql_lexer.l,
+	rasqal/src/sparql_parser.y, rasqal/src/win32_rasqal_config.h:
+	Copyright 2006
+
+	* rasqal/src/rasqal_query.c (rasqal_query_results_get_triple):
+	Skip ill-formed triples with an unbound variable or the wrong type
+	and give a warning.
+
+	* rasqal/tests/sparql/ValueTesting/Makefile.am: Add boolean tests
+	to dist.
+
+	* rasqal/src/rasqal_literal.c (rasqal_literal_string_to_native):
+	Accept "1" as an xsd:boolean true.
+
+2006-01-11  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/tests/sparql/ValueTesting/boolean-0.n3,
+	rasqal/tests/sparql/ValueTesting/boolean-equiv-FALSE-result.n3,
+	rasqal/tests/sparql/ValueTesting/boolean-equiv-FALSE.rq,
+	rasqal/tests/sparql/ValueTesting/boolean-equiv-TRUE-result.n3,
+	rasqal/tests/sparql/ValueTesting/boolean-equiv-TRUE.rq,
+	rasqal/tests/sparql/ValueTesting/boolean-equiv-xsdType-result.n3,
+	rasqal/tests/sparql/ValueTesting/boolean-equiv-xsdType.rq,
+	rasqal/tests/sparql/ValueTesting/boolean-logical-OR-result.n3,
+	rasqal/tests/sparql/ValueTesting/boolean-logical-OR.rq,
+	rasqal/tests/sparql/ValueTesting/manifest.n3: Added more boolean
+	tests from DAWG (unapproved)
+
+2006-01-10  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/rasqal_engine.c:
+	(rasqal_graph_pattern_get_next_match,
+	rasqal_engine_get_next_result): Return errors when query fails due
+	to unimplemented sequence/union of graph patterns.
+
+	* rasqal/utils/Makefile.am: Add src dir to CPPFLAGS
+
+	* rasqal/src/rasqal_query.c:
+	(rasqal_query_results_get_triple,
+	rasqal_query_results_next_triple): Do not crash with DESCRIBE,
+	return an empty graph always.
+
+2006-01-06  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/configure.ac: Add --disable-pcre and --disable-xml2
+	options to configure to prevent automatic use of libpcre or
+	libxml2 when found.  Patch from Mike Frysinger.  Addresses
+	Issue#0000052 - http://bugs.librdf.org/mantis/view.php?id=52
+
+	* rasqal/tests/sparql/ExprBuiltins/Makefile.am: Add u/iri tests to
+	dist
+
+	* rasqal/tests/sparql/ExprBuiltins/Makefile.am: Add langMatches
+	tests to dist
+
+	* rasqal/tests/sparql/ValueTesting/Makefile.am: Add typePromotion
+	tests to dist
+
+	* rasqal/src/rasqal.h: rasqal_op: RASQAL_EXPR_LANGMATCHES is last
+
+	* rasqal/src/rasqal_expr.c (rasqal_expression_evaluate): Make
+	LANG() return "" for non-literals as tests depend on it.  Return
+	"" not "-".  Update LANGMATCHES() to make the wildcard the second
+	arg; still does not do proper subtag matches.
+
+	* rasqal/tests/sparql/ExprBuiltins/Makefile.am: q-langMatches-1
+	works
+
+2006-01-05  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/rasqal_query.c: Do not emit XML header here as raptor
+	1.4.8 xml writer does that automatically now.
+
+2006-01-03  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/rasqal_expr.c (rasqal_expression_evaluate): Add
+	proper error checking to expression evaluating for arguments to
+	unary operators UMINUS, TILDE and BANG.
+
+	* rasqal/tests/sparql/ExprEquals/result-eq2-1.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq2-graph-1.ttl,
+	rasqal/tests/sparql/ValueTesting/dateTime-tz0.rq,
+	rasqal/tests/sparql/ValueTesting/dateTime-tz1.rq,
+	rasqal/tests/sparql/ValueTesting/extendedType-ne-pass.rq,
+	rasqal/tests/sparql/ValueTesting/manifest.n3,
+	rasqal/tests/sparql/ValueTesting/roman-result.n3,
+	rasqal/tests/sparql/ValueTesting/typePromotion-0.n3,
+	rasqal/tests/sparql/ValueTesting/typePromotion-decimal-decimal-fail-result.n3,
+	rasqal/tests/sparql/ValueTesting/typePromotion-decimal-decimal-fail.rq,
+	rasqal/tests/sparql/ValueTesting/typePromotion-decimal-decimal-pass-result.n3,
+	rasqal/tests/sparql/ValueTesting/typePromotion-decimal-decimal-pass.rq:
+	Updated DAWG test cases from CVS 2006-01-02
+
+	* rasqal/tests/sparql/ValueTesting/Makefile.am: Added expected
+	test failures: typePromotion-decimal-decimal-fail
+
+	* rasqal/tests/sparql/ExprBuiltins/Makefile.am: Added expected
+	test failures: datatype-1 LangMatches-1 LangMatches-2
+	LangMatches-3 LangMatches-4
+
+	* rasqal/tests/sparql/ExprBuiltins/data-builtin-1.ttl,
+	rasqal/tests/sparql/ExprBuiltins/data-langMatches.ttl,
+	rasqal/tests/sparql/ExprBuiltins/manifest.ttl,
+	rasqal/tests/sparql/ExprBuiltins/q-iri-1.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-langMatches-1.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-langMatches-2.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-langMatches-3.rq,
+	rasqal/tests/sparql/ExprBuiltins/q-langMatches-4.rq,
+	rasqal/tests/sparql/ExprBuiltins/result-iri-1.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-langMatches-1.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-langMatches-2.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-langMatches-3.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-langMatches-4.ttl,
+	rasqal/tests/sparql/ExprBuiltins/result-str-4.ttl: Updated DAWG
+	test cases from CVS 2006-01-02
+
+	* raptor/src/raptor_namespace.c (main): Cast for string
+
+2006-01-02  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/n3_lexer.l: Apply more turtle to n3 changes for
+	names.
+
+	* raptor/src/n3_parser.y: Update N3 parser to turtle.
+
+	* raptor/src/n3_lexer.l: Update N3 lexer to turtle.
+
+	* raptor/src/raptor_general.c, raptor/src/raptor_namespace.c,
+	raptor/src/turtle_parser.y, raptor/src/turtle_lexer.l: 2006 and
+	urls
+
+	* raptor/tests/turtle/Makefile.am: Added test-23
+
+	* raptor/tests/turtle/test-23.out,
+	raptor/tests/turtle/test-23.ttl: Test long literal ending in a
+	double quote
+
+	* raptor/tests/turtle/manifest.ttl: Added test-23 testing long
+	literal ending in a double quote
+
+	* raptor/src/turtle_common.c
+	(raptor_stringbuffer_append_turtle_string): Fix comment to match
+	code and report hex char of bad escapes.
+
+	* raptor/src/turtle_lexer.l: Try to handle \-escapes inside """
+	properly.
+
+	* raptor/tests/turtle/README.txt: url
+
+	* raptor/tests/turtle/Makefile.am: Add TEST_MANIFEST_FILES to
+	tests.zip
+
+	* raptor/tests/turtle/manifest-bad.ttl,
+	raptor/tests/turtle/manifest.ttl: Updated manifests from Arjohn
+	Kampman
+
+	* raptor/src/turtle_parser.y (DECIMAL_LITERAL): Added turtle
+	decimal and double after SPARQL 2005-11-23
+
+	* raptor/src/turtle_lexer.l: Added turtle decimal and double after
+	SPARQL 2005-11-23
+
+	* raptor/tests/turtle/Makefile.am,
+	raptor/tests/turtle/test-19.out, raptor/tests/turtle/test-21.out,
+	raptor/tests/turtle/test-21.ttl, raptor/tests/turtle/test-22.out,
+	raptor/tests/turtle/test-22.ttl: Added decimal/double/integer +
+	and - checks from
+	http://lists.w3.org/Archives/Public/public-cwm-talk/2005OctDec/0017.html
+
+	* rasqal/tests/sparql/ExprEquals/result-eq2-graph-1.ttl: new
+	result
+
+	* rasqal/docs/tmpl/section-literal.sgml: Added
+	rasqal_new_decimal_literal
+
+	* rasqal/docs/tmpl/section-expression.sgml: Added
+	@RASQAL_EXPR_LANGMATCHES:
+
+	* rasqal/src/rasqal_literal.c: autodocs
+
+	* rasqal/docs/rasqal-sections.txt: Added
+	rasqal_new_decimal_literal
+
+	* rasqal/src/sparql_parser.y: Updates for SPARQL Query Language
+	for RDF, 23 November 2005
+	http://www.w3.org/TR/2005/WD-rdf-sparql-query-20051123/ Including
+	many renamings of tokens to match grammar.
+	(DECIMAL_LITERAL): Added.
+	(GraphNodeListNotEmpty): Renamed from ItemList
+	(GraphNode): Renamed from Object
+	(GraphTerm): Renamed from RDFTerm. Added DECIMAL_LITERAL option.
+	(VarOrTerm): Added.
+	(VarOrBnodeOrURI): Replaced by VarOrBlankNodeOrIRIref.
+	(Select/Construct/Describe/AskQuery): Renamed from *Clause.
+	(Prolog): Re-added.
+	(BuiltInCall): Added LANGMATCHES option.
+
+	* rasqal/src/sparql_lexer.l (DECIMAl, DOUBLE, EXPONENT): Added.
+	Support SPARQL decimal and double literal syntax and return new
+	DECIMAL_LITERAL when there is a '.' else FLOATING_LITERAL with an
+	EXPONENT
+
+	* rasqal/src/rasqal_literal.c (rasqal_new_decimal_literal): Added
+	to make a decimal literal
+	(xsd:decimal).
+
+	* rasqal/src/rasqal.h: Added prototype for
+	rasqal_new_decimal_literal
+
+	* rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/Makefile.am:
+	syntax-general-03.rq and syntax-function-01.rq now work (7
+	failures remain)
+
+	* rasqal/tests/sparql/ExprEquals/result-eq2-1.ttl,
+	rasqal/tests/sparql/ExprEquals/query-eq-2.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-graph-2.rq,
+	rasqal/tests/sparql/ExprEquals/Makefile.am,
+	rasqal/tests/sparql/ExprEquals/data-eq.ttl,
+	rasqal/tests/sparql/ExprEquals/manifest.n3: Updates for decimal
+	syntax changes and equality rules
+
+2006-01-01  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/sparql_parser.y (PrefixDeclOpt): gcc const string
+	warning fix.
+
+	* rasqal/src/sparql_parser.y (PrefixDeclOpt): Generate a warning
+	if a PREFIX appears more than once.  Check added after update in
+	http://www.w3.org/TR/2005/WD-rdf-sparql-query-20051123/
+
+	* raptor/src/raptor_namespace.c
+	(raptor_namespaces_find_namespace): Handle searching for default
+	namespace with prefix=NULL.
+	(main): Add test code for above.
+
+	* rasqal/src/rasqal_expr.c (rasqal_expression_evaluate): Added
+	SPARQL trinary logic evaluation of AND and OR expressions for
+	T,F,E following the truth table in
+	http://www.w3.org/TR/2005/WD-rdf-sparql-query-20051123/#truthTable
+
+	* rasqal/src/rasqal_expr.c (rasqal_expression_clear,
+	rasqal_expression_visit, rasqal_expression_print,
+	rasqal_expression_is_constant): Added SPARQL_EXPR_LANGMATCHEs to
+	switch statements as a new 2-argument expression.
+	(rasqal_expression_evaluate): Added a simple evaluation for
+	SPARQL_EXPR_LANGMATCHES that handles '*' and otherwise does a case
+	independent string compare.  This is not a full implementation by
+	any means.  Support for the new SPARQL keyword langMatches added
+	in http://www.w3.org/TR/2005/WD-rdf-sparql-query-20051123/
+
+	* rasqal/src/sparql_parser.y (BuiltInCall): Added SPARQL
+	langMatches 2-argument expresson after addition in
+	http://www.w3.org/TR/2005/WD-rdf-sparql-query-20051123/
+
+	* rasqal/src/rasqal.h: Added SPARQL_EXPR_LANGMATCHES for SPARQL
+	langMatches expression
+
+	* rasqal/src/sparql_lexer.l: Allow _ at the start of sparql
+	variable names, as changed in
+	http://www.w3.org/TR/2005/WD-rdf-sparql-query-20051123/
+	(enum sparql_name_check_flags): Remove
+	SPARQL_NAME_CHECK_NO_UL_FIRST for varname.
+	(NCCHAR1p): Renamed from NCCHAR1 - no _.
+	(NCCHAR1): Added to aloow _
+	(VARNAME, NCCHAR, NCNAME): No need to use _ here, NCCHAR1 has it.
+	(NCNAME_PREFIX): Use NCCHAR1p at start, no _ still.
+
+	* rasqal/src/sparql_lexer.l, rasqal/src/sparql_parser.y: Added
+	LANGMATCHES token (case independent) new in
+	http://www.w3.org/TR/2005/WD-rdf-sparql-query-20051123/
+
+	* rasqal/src/sparql_lexer.l: Allow isiri (case independent)
+	returning ISURI token
+
+2005-12-21  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/configure.ac, raptor/raptor.spec.in, raptor/Makefile.am:
+	Write rpm release as 1 (with --enable-release) or SNAP otherwise.
+
+	* raptor/src/turtle_parser.y, raptor/src/raptor_general.c,
+	raptor/utils/rapper.1, rasqal/docs/librasqal.3,
+	rasqal/utils/roqet.1, rasqal/fix-groff-xhtml,
+	rasqal/rasqal-src-config.in, rasqal/configure.ac,
+	rasqal/Makefile.am: updated urls
+
+	* raptor/docs/tmpl/section-feature.sgml: Added
+	@RAPTOR_FEATURE_WRITER_XML_DECLARATION
+
+	* redland-config.in, redland-src-config.in, configure.ac,
+	Redland.i, Makefile.am, Makefile.PL: updated urls
+
+2005-12-20  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/utils/Makefile.am: Added rapper.html to dist
+
+	* raptor/raptor-src-config.in, raptor/Makefile.am,
+	raptor/manifest.pl, raptor/configure.ac: ILRT/UB link updates
+
+	* raptor/docs/libraptor.3: Updated docs for 1.4.8
+
+2005-11-30  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_xml_writer.c (raptor_xml_writer_indent): Fix
+	writing an extra newline at doc start.
+
+2005-11-26  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/docs/tmpl/section-feature.sgml: Added new feature
+	RAPTOR_FEATURE_WRITER_XML_DECLARATION.
+
+	* raptor/src/raptor_rdfxml.c (raptor_start_element_grammar):
+	Disable XML declaration when building XML fragment for
+	parseType="Literal".
+
+	* raptor/src/raptor_xml_writer.c: Add automatic writing of the XML
+	declaration (dependent on the XML version).
+	(raptor_xml_writer_write_xml_declaration): Added, to support this.
+	New feature RAPTOR_FEATURE_WRITER_XML_DECLARATION can disable
+	this.
+	(main): Update the test code to expect an XML declaration in the
+	string.
+
+	* raptor/src/raptor_parse.c: Add do-nothing switch cases for
+	RAPTOR_FEATURE_WRITER_XML_DECLARATION.
+
+	* raptor/src/raptor_serialize_rdfxmla.c: Add Adobe XMP compatible
+	output as new serializer rdfxml-xmp based on patch from Sid
+	Steward.  Duplicate predicates are ignored for a single subject.
+
+	* raptor/src/raptor_serialize_rdfxml.c: Defer writing xml
+	declaration to the xml writer.
+
+	* raptor/src/raptor_serialize.c: Add XML declaration writing
+	feature support
+	(RAPTOR_FEATURE_WRITER_XML_DECLARATION) for serializer.
+
+	* raptor/utils/Makefile.am, raptor/utils/rdfcat.1,
+	raptor/utils/rdfcat.c: Delete rdfcat for now
+
+	* raptor/utils/Makefile.am, raptor/utils/rdfcat.1,
+	raptor/utils/rdfcat.c: Added rdfcat from Sid Steward.  Not
+	automatically built or installed
+
+2005-11-25  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac: Remove multi-level escapings - dquote in backticks
+	in dquote that are likely not very portable.  Fixes Issue#0000058.
+
+	* raptor/configure.ac: Add test X = 1 for expat and libxml tests.
+	Fixes Issue#0000060
+
+2005-11-22  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_feature.c: Added
+	RAPTOR_FEATURE_WRITER_XML_DECLARATION feature.
+
+	* raptor/src/raptor.h: Added RAPTOR_FEATURE_WRITER_XML_DECLARATION
+	to control generating the XML declaration on serializers and XML
+	writer.
+
+2005-11-21  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_internal.h: docs
+
+2005-11-20  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/Makefile.am, rasqal/src/rasqal_internal.h: Disable
+	skiplist code for now (don't ship it)
+
+2005-11-10  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/raptor.spec.in: Add gtk-doc docs to rpm
+
+2005-11-05  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/docs/tmpl/section-xml.sgml: new functions
+
+	* raptor/docs/tmpl/section-feature.sgml: New feature
+
+	* raptor/docs/libraptor.3: Updated for 1.4.8
+
+2005-11-03  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/docs/raptor-sections.txt: Added
+	raptor_iostream_write_xml_any_escaped_string
+	raptor_xml_any_escape_string
+
+	* raptor/src/n3_parser.y, raptor/src/raptor_internal.h,
+	raptor/src/turtle_parser.y: Added RAPTOR_ASSERT with no return
+	value and use it for turtle and n3 parsers.  Some compilers
+	complain at an empty 3rd macro arg with RAPTOR_ASSERT_RETURN.
+
+	* raptor/src/raptor_serialize_rss.c: remove ;;
+
+	* raptor/src/raptor_rdfxml.c (raptor_generate_statement): Make
+	predicate type fix in reifying.
+
+	* raptor/src/raptor_rdfxml.c (raptor_generate_statement): Make
+	predicate revert fix actually work.
+
+	* raptor/src/raptor_rdfxml.c, raptor/src/raptor_rss.c,
+	raptor/src/turtle_parser.y, raptor/src/n3_parser.y,
+	raptor/src/ntriples_parse.c, raptor/src/raptor.h: Revert
+	RAPTOR_IDENTIFIER_TYPE_PREDICATE to
+	RAPTOR_IDENTIFIER_TYPE_RESOURCE change for predicates until the
+	next release.
+
+2005-09-22  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/tests/sparql/SyntaxFull/Makefile.am: Add new tests, 2
+	fail
+
+	* rasqal/tests/sparql/SyntaxFull/Makefile.am: Added new tests, 2
+	fail
+
+	* rasqal/tests/sparql/SyntaxFull/syntax-keywords-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-keywords-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-keywords-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-01.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-02.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-03.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-04.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-05.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-qname-06.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-11.rq,
+	rasqal/tests/sparql/SyntaxFull/syntax-struct-12.rq,
+	rasqal/tests/sparql/ExprEquals/Makefile.am,
+	rasqal/tests/sparql/ExprEquals/query-eq-graph-1.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-graph-2.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-graph-3.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-graph-4.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq-graph-5.rq,
+	rasqal/tests/sparql/ExprEquals/query-eq2-graph-1.rq,
+	rasqal/tests/sparql/ExprEquals/result-eq-graph-1.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq-graph-2.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq-graph-3.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq-graph-4.ttl,
+	rasqal/tests/sparql/ExprEquals/result-eq-graph-5.ttl: Added new
+	tests
+
+	* rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/Makefile.am: Added
+	the 9 EXPECTED_SPARQL_PARSER_FAILURES
+
+	* rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/Makefile.am: Added
+	3 EXPECTED_SPARQL_PARSER_FAILURES: syn-05.rq syn-06.rq syn-07.rq
+
+	* rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/Makefile.am: ADded
+	3 EXPECTED_SPARQL_CORRECT_FAILURES: syn-05.rq syn-06.rq syn-07.rq
+
+	* rasqal/tests/sparql/check-sparql: If returning no results and
+	expect fail, return 1
+
+	* rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/Makefile.am: Added
+	9 EXPECTED_SPARQL_CORRECT_FAILURES
+
+	* rasqal/tests/sparql/ExprEquals/Makefile.am: Failures +1:
+	"Equality - 2 var - test equals -- graph", total 3
+
+	* rasqal/tests/sparql/check-sparql: report if expected failure
+	happens OK early on
+
+	* rasqal/tests/sparql/ExprEquals/manifest.n3: Update to DAWG CVS
+
+2005-09-21  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/utils/rdfdiff.c: Some code style tidying.
+	(rdfdiff_statement_equals): Fix comparisons of literals with/out
+	language with/out datatype.
+
+	* raptor/tests/Makefile.am: break on error with rdfxml
+
+	* raptor/src/raptor_serialize.c (raptor_new_serializer): Init
+	default xml_version to 10 (XML 1.0)
+
+	* raptor/src/raptor_uri.c:
+	(raptor_new_uri_for_xmlbase, raptor_new_uri_for_retrieval): Set
+	ud->path_len to 1 when adding a default path of / Fixes bug
+	0000045 http://bugs.librdf.org/mantis/view.php?id=45
+
+2005-09-20  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_serialize_rdfxmla.c
+	(raptor_rdfxmla_serialize_start): Pass down xml_version to the
+	raptor_xml_writer and write the versioned header.
+
+	* raptor/src/raptor_serialize_rdfxml.c
+	(raptor_rdfxml_serialize_start): Pass down xml_version to the
+	raptor_xml_writer and write the versioned header.
+
+	* raptor/src/raptor_xml_writer.c: Add xml_version to
+	raptor_xml_writer structure.
+	(raptor_iostream_write_xml_element_start): Add xml_version field
+	and pass it down to the XML escape function.
+	(raptor_new_xml_writer): Init xml_version to 10.
+	(raptor_xml_writer_empty_element, raptor_xml_writer_start_element,
+	raptor_xml_writer_cdata, raptor_xml_writer_cdata_counted): Pass
+	down xml_version.
+	(raptor_xml_writer_set_feature, raptor_xml_writer_get_feature):
+	Handle RAPTOR_FEATURE_WRITER_XML_VERSION.
+
+	* raptor/src/raptor_xml.c (raptor_xml_any_escape_string,
+	raptor_iostream_write_xml_any_escaped_string): Added, handling XML
+	1.0 or XML 1.1 Error if writing #x1-#x1f (excluding #x9, #xA, #xD)
+	or #x7F for XML 1.0
+
+	* raptor/src/raptor_serialize.c (raptor_serializer_set_feature,
+	raptor_serializer_get_feature): Add
+	RAPTOR_FEATURE_WRITER_XML_VERSION
+
+	* raptor/src/raptor_parse.c: switch on enum updates for feature
+	RAPTOR_FEATURE_WRITER_XML_VERSION for serializer and xml writer
+
+	* raptor/src/raptor_feature.c: Added
+	RAPTOR_FEATURE_WRITER_XML_VERSION for serializer and xml writer
+	with short name xmlVersion
+
+	* raptor/src/raptor.h: Added RAPTOR_FEATURE_WRITER_XML_VERSION for
+	serializer, xml writer.  Added prototypes for
+	raptor_xml_any_escape_string and
+	raptor_iostream_write_xml_any_escaped_string
+
+	* raptor/src/raptor_internal.h: raptor_serializer_s gains an
+	xml_version field
+
+	* raptor/src/raptor_sax2.c (raptor_sax2_parse_chunk): Once more
+	with static buffer, no vsnprintf
+
+	* raptor/src/raptor_sax2.c (raptor_sax2_parse_chunk): Fix error
+	message with 2 args for expat using raptor_vsnprintf.
+
+	* raptor/src/raptor_namespace.c (raptor_namespaces_format): XML
+	escape the written namespace name URI
+
+	* raptor/tests/ex-59.rdf: correct result
+
+	* raptor/tests/ex-59.nt, raptor/tests/ex-59.rdf: Test rdfxml
+	serializer escapes dquote in uri attrs
+
+	* raptor/tests/Makefile.am: Added RDF_SERIALIZE_TEST_FILES,
+	RDF_SERIALIZE_OUT_FILES and ex-59 for testing the rdfxml
+	serializer
+
+	* raptor/examples/Makefile.am: fix libraptor.la dir
+
+2005-09-18  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_rdfxml.c (raptor_generate_statement): When
+	reifiying, just copy predicate_type.
+
+	* raptor/src/raptor_uri.c (raptor_uri_equals): Alter to accept
+	NULL pointers, which do not compare equal to a non-NULL URI.  NULL
+	does equal NULL.
+
+	* raptor/src/raptor.h: Document that
+	RAPTOR_IDENTIFIER_TYPE_PREDICATE is never generated by a parser
+	from now, replaced by RAPTOR_IDENTIFIER_TYPE_RESOURCE and
+	RAPTOR_IDENTIFIER_TYPE_XML_LITERAL replaced by
+	RAPTOR_IDENTIFIER_TYPE_LITERAL with the rdf:XMLLiteral datatype.
+
+	* raptor/src/n3_parser.y, raptor/src/ntriples_parse.c,
+	raptor/src/turtle_parser.y: Replace all
+	RAPTOR_IDENTIFIER_TYPE_PREDICATE with
+	RAPTOR_IDENTIFIER_TYPE_RESOURCE
+
+	* raptor/src/raptor_rss.c: *** empty log message ***
+
+	* raptor/src/raptor_rdfxml.c: Replace all
+	RAPTOR_IDENTIFIER_TYPE_PREDICATE with
+	RAPTOR_IDENTIFIER_TYPE_RESOURCE
+
+	* raptor/src/raptor_rdfxml.c: Added a new concept for
+	rdf:XMLLiteral Rename RAPTOR_N_CONCEPTS to
+	RAPTOR_RDFXML_N_CONCEPTS
+	(raptor_rdfxml_parse_init): Init it.
+	(raptor_end_element_grammar): Never generate
+	RAPTOR_IDENTIFIER_TYPE_XML_LITERAL, instead generate a
+	RAPTOR_IDENTIFIER_TYPE_LITERAL with the rdf:XMLLiteral datatype.
+
+2005-09-16  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/docs/libraptor.3: Update for 1.4.8 - added
+	raptor_set_namespace_handler
+
+	* raptor/src/raptor.h, raptor/src/raptor_www.c: Revert: remove
+	raptor_www_set_source_uri, raptor_www_set_source_file_handle,
+	raptor_www_retrieve and raptor_www_retrieve_to_string
+
+2005-09-15  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor.h: delete unused raptor_www_fetch_to_string
+	prototype
+
+	* raptor/src/raptor_www.c: autodocs
+	(raptor_www_set_source_uri): Added to set URI for content source
+	(raptor_www_set_source_file_handle): Added to set URI for content
+	source.
+	(raptor_www_file_handle_fetch): Added, with guts of
+	raptor_www_file_fetch.
+	(raptor_www_file_fetch): Modified to call
+	raptor_www_file_handle_fetch.
+	(raptor_www_retrieve): Added to retrieve from whatever source (URI
+	or handle).
+	(raptor_www_retrieve_to_string): Added to retrieve from whatever
+	source (URI or handle) into a string.
+	(raptor_www_fetch): Now a wrapper over raptor_www_retrieve.
+	(raptor_www_fetch_to_string): Now a wrapper over
+	raptor_www_retrieve_to_string.
+
+	* raptor/src/raptor.h: Added prototypes for
+	raptor_www_set_source_uri, raptor_www_set_source_file_handle,
+	raptor_www_retrieve, raptor_www_retrieve_to_string and
+	raptor_www_fetch_from_file_handle
+
+	* raptor/src/raptor_internal.h:
+	(struct raptor_www_s) gains a handle field
+
+	* raptor/src/raptor_parse.c: autodocs
+
+	* raptor/src/ntriples_parse.c: autodocs and some code style fixes
+
+2005-09-14  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c
+	(librdf_parser_raptor_parse_file_handle_as_stream): Renamed from
+	librdf_parser_raptor_parse_file_as_stream and use FILE* arg.
+	(librdf_parser_raptor_parse_as_stream_common): Update to handle
+	rename.
+
+	* raptor/docs/tmpl/section-parser.sgml: new functions
+
+	* librdf/rdf_serializer_internal.h: struct
+	librdf_serializer_factory_s gains serialize_model_to_iostream
+	method.
+
+	* librdf/rdf_serializer_raptor.c
+	(librdf_serializer_raptor_serialize_model_to_iostream): Added to
+	write to a raptor_iostream object.
+
+	* librdf/rdf_serializer.c
+	(librdf_serializer_serialize_model_to_iostream): Added to write to
+	a raptor_iostream object.
+
+	* librdf/rdf_serializer.h: Added
+	librdf_serializer_serialize_model_to_iostream
+
+2005-09-12  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/sparql_parser.y (ConstructTriplesList): renamed from
+	TriplesList and allow an empty list.
+
+	* rasqal/docs/tmpl/section-unused.sgml: less unused
+
+	* rasqal/src/sparql_parser.y (GraphGraphPattern): Handle return of
+	NULL graph pattern
+
+	* rasqal/src/sparql_lexer.l ({QUOTEDURI}\(?): Pass the matched
+	string through rasqal_escaped_name_to_utf8_string to expand \u and
+	\Us and fail on errors, then make a new URI.
+	(rasqal_sparql_name_check): Add debug messages.
+	(sparql_copy_qname, sparql_copy_string_token): Report name errors
+	in prefix or local name part of a qname.
+
+	* rasqal/src/rasqal_general.c
+	(rasqal_escaped_name_to_utf8_string): Calculate dest size from
+	result pointers, not original string source.
+
+	* rasqal/configure.ac, rasqal/tests/sparql/Makefile.am,
+	rasqal/tests/sparql/SyntaxDev/Makefile.am,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/Makefile.am,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/manifest.ttl,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-basic-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-basic-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-basic-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-basic-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-basic-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-basic-06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-bnodes-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-bnodes-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-bnodes-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-bnodes-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-bnodes-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-bnodes-06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-bnodes-07.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-expr-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-expr-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-expr-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-expr-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-expr-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-forms-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-forms-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-limit-offset-07.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-limit-offset-08.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-limit-offset-09.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lists-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lists-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lists-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lists-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lists-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-07.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-08.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-09.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-10.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-11.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-12.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-13.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-lit-14.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-order-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-order-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-order-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-order-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-order-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-order-06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-pat-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-pat-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-pat-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-pat-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-qname-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-qname-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-qname-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-qname-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-qname-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-qname-06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-qname-07.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-qname-08.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-07.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-08.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-09.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-10.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-11.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-struct-12.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-union-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL/syntax-union-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/Makefile.am,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/manifest.ttl,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-bnode-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-bnode-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-bnode-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-dataset-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-dataset-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-dataset-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-dataset-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-esc-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-esc-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-esc-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-esc-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-ask-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-ask-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-construct01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-construct02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-construct03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-construct04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-construct05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-construct06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-describe01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-describe02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-select-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-form-select-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-function-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-function-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-function-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-function-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-general-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-general-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-general-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-graph-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-graph-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-graph-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-graph-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-graph-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-graph-06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-keywords-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-keywords-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-keywords-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-lists-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-lists-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-lists-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-lists-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL2/syntax-lists-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/Makefile.am,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/bnode-dot.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/bnodes-missing-pvalues-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/bnodes-missing-pvalues-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/empty-optional-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/empty-optional-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/filter-missing-parens.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/lone-list.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/lone-node.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/manifest.ttl,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-07.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-08.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-01.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-02.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-03.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-04.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-05.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-06.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-07.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-08.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-09.rq,
+	rasqal/tests/sparql/SyntaxDev/Syntax-SPARQL3/syn-bad-10.rq: Added
+	unapproved sparql syntax tests from DAWG SyntaxDev area
+
+	* rasqal/tests/sparql/check-sparql: Ad -n flag if no data is
+	present
+
+	* rasqal/tests/sparql/check-sparql: Handle expect fail tests of
+	type mfx:TestBadSyntax Check return code of roqet for failing.
+
+	* rasqal/tests/sparql/check-sparql: Handle mfx:SyntaxType
+	rdf:typed actions and in that case pick up the action node as the
+	query to use (no data, no result) Only evaluate queries that have
+	files
+
+2005-09-10  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_expat.c: Updates to use new raptor_sax2
+	handler style.  The user data now points at the raptor_sax2*
+	object, not the parser.
+	(raptor_expat_init): send SAX2 events to core raptor_sax2_EVENT
+	routines.
+	(raptor_expat_update_document_locator): Moved from raptor_parser.c
+
+	* raptor/src/raptor_libxml.c: Updates to use new raptor_sax2
+	handler style.  The user data now points at the raptor_sax2*
+	object, not the parser.  All raptor_parser* references are gone
+	and error/fatal error/warnings are returned via handler/data
+	pairs.
+	(raptor_libxml_call_handler): Added to aid returning messages.
+	Deleted old and unused internal entity resolution code.
+	(raptor_libxml_init): send SAX2 events to core raptor_sax2_EVENT
+	routines.
+
+	* raptor/src/raptor_internal.h: Removed old and hardly tested
+	internal handling of libxml entities
+
+	* raptor/src/raptor_rdfxml.c: Rename raptor_xml_* to
+	raptor_rdfxml_* in structs and functions.
+	(raptor_rdfxml_start_element_handler,
+	raptor_rdfxml_end_element_handler, raptor_cdata_grammar): Move
+	expat BOM fixes to raptor_sax2.c
+	(raptor_rdfxml_parse_init): Use new raptor_sax2_set_EVENT_handler
+	methods. Use raptor_sax2_set_locator.
+	(raptor_get_libxml_context, raptor_set_libxml_document_locator,
+	raptor_get_libxml_document_locator, raptor_get_libxml_entities,
+	raptor_set_libxml_entities, raptor_expat_update_document_locator):
+	Deleted or merged into raptor_sax2.c
+
+	* raptor/src/raptor_parse.c
+	(raptor_parser_fatal_error_message_handler,
+	raptor_parser_error_message_handler,
+	raptor_parser_warning_message_handler): Added handlers that take
+	location in same style as user message handler callbacks.
+	(raptor_stats_print): Update for raptor_rdfxml_parser
+
+	* raptor/src/raptor_locator.c (raptor_update_document_locator):
+	Moved to raptor_sax2.c
+
+	* raptor/src/raptor_general.c (raptor_init, raptor_finish): Call
+	raptor_init_sax2 and raptor_finish_sax2 respectively.
+
+	* raptor/src/raptor_internal.h: Removed several libxml/expat/rdxml
+	functions used to be too friendly with internals of other classes.
+	Renamed raptor_xml_parser to raptor_rdfxml_parser.  Updated
+	prototype of raptor_libxml_update_document_locator.  Added new
+	parser handler prototypes raptor_parser_error_message_handler,
+	raptor_parser_fatal_error_message_handler and
+	raptor_parser_warning_message_handler Added handlers for SAX2
+	events - start element, end element, characters, cdata, comment,
+	unparsed_entity_decl, external_entity_ref named as
+	raptor_sax2_EVENT_handler.  raptor_sax2 gains a magic field as
+	this is used as the user data for libxml.  raptor_sax2 uses the
+	handler typedefs for the event handlers.  raptor_sax2 gains erorr,
+	fatal and warning handler and data fields.  Added prototypes for
+	raptor_init_sax2 and raptor_finish_sax2.  Updated prototype for
+	raptor_new_sax2.  Added prototypes for
+	raptor_sax2_set_start_element_handler,
+	raptor_sax2_set_end_element_handler,
+	raptor_sax2_set_characters_handler, raptor_sax2_set_cdata_handler,
+	raptor_sax2_set_comment_handler,
+	raptor_sax2_set_unparsed_entity_decl_handler and
+	raptor_sax2_set_external_entity_ref_handler Added prototype for
+	raptor_sax2_set_locator.  Added prototypes for:
+	raptor_sax2_start_element raptor_sax2_end_element,
+	raptor_sax2_characters, raptor_sax2_cdata, raptor_sax2_comment,
+	raptor_sax2_unparsed_entity_decl and
+	raptor_sax2_external_entity_ref.
+
+	* raptor/src/raptor_sax2.c: Now a more complete class
+	(raptor_init_sax2, raptor_finish_sax2): Added, calling any static
+	initialising/finishing.
+	(raptor_new_sax2): Added error, fatal_error and warning data and
+	handler registers.  Register magic for libxml2 user_data fixups
+	(raptor_sax2_set_start_element_handler,
+	raptor_sax2_set_end_element_handler,
+	raptor_sax2_set_characters_handler, raptor_sax2_set_cdata_handler,
+	raptor_sax2_set_comment_handler,
+	raptor_sax2_set_unparsed_entity_decl_handler,
+	raptor_sax2_set_external_entity_ref_handler): Added for setting
+	SAX2 callback handlers.
+	(raptor_sax2_set_locator): Added, to set SAX2 file locator.
+	(raptor_sax2_parse_chunk): Update for new handlers, remove all
+	mention of raptor_parser.  Use this object (raptor_sax2*) as the
+	user data now, not an external raptor_parser*.
+	(raptor_sax2_update_document_locator): Added, updating the current
+	location for the internal parser.
+	(raptor_sax2_start_element): Added, internal function calling the
+	start element handler, adding various workarounds needed.
+	(raptor_sax2_end_element): Added, internal function calling the
+	end element handler, adding various workarounds needed.
+	(raptor_sax2_characters, raptor_sax2_cdata, raptor_sax2_comment,
+	raptor_sax2_unparsed_entity_decl,
+	raptor_sax2_external_entity_ref): Added, internal functions
+	calling the same-named handler.
+
+2005-09-09  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_qname.c: autodocs
+
+	* raptor/docs/raptor-sections.txt: Added new fns
+
+	* rasqal/src/rasqal.h: autodocs
+
+	* rasqal/docs/rasqal-sections.txt: No rasqal_variable_s
+
+	* rasqal/src/rasqal_query.c (rasqal_query_graph_pattern_visit):
+	autodocs
+
+	* rasqal/src/rasqal.h: autodocs
+
+	* rasqal/docs/tmpl/section-graph_pattern.sgml,
+	rasqal/docs/tmpl/section-query.sgml: add new fns
+
+	* rasqal/docs/tmpl/section-literal.sgml: remove dup text
+
+	* rasqal/src/rasqal.h, rasqal/src/rasqal_graph_pattern.c: autodocs
+
+	* rasqal/docs/rasqal-sections.txt: add new fns
+
+	* rasqal/src/Makefile.am, rasqal/utils/Makefile.am: Include
+	@RASQAL_INTERNAL_LIBS@ in linking flags to ensure internal raptor
+	is used.
+
+	* raptor/src/raptor_internal.h (raptor_parser_s): Add new fields
+	to the end of the struct; add unused1 to try to make old offsets
+	work
+
+	* docs/tmpl/iterator.sgml: sgml docs for iterator
+
+	* docs/tmpl/stream.sgml: sgml docs for stream
+
+	* raptor/src/raptor_namespace.c (raptor_namespaces_init): Remove
+	un-necessary casts for constant namespace names.
+
+	* raptor/src/raptor_uri.c
+	(raptor_uri_uri_string_to_filename_fragment): For win32, only
+	remove leading / if there is one present. (patch from John
+	C. Barstow)
+	(main): Correct test case result to match above.
+
+	* raptor/src/raptor_xslt.c (raptor_xslt_parse_chunk): If the
+	content is in one chunk and is_end is true, call xmlParseChunk
+	with the is_end flag.  (René Puls)
+
+2005-09-07  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/n3_parser.y, raptor/src/turtle_parser.y (statement):
+	Handle error recovery when subject is NULL
+
+2005-09-06  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/utils/rapper.c: fix #ifdef SHOW_NAMESPACES_FLAG
+
+	* raptor/src/turtle_common.c
+	(raptor_stringbuffer_append_turtle_string): Do not check unsigned
+	for <0
+
+	* raptor/src/raptor_xml.c (raptor_xml_name_check): Do not check
+	unsigned for <0
+
+	* raptor/src/raptor_utf8.c (raptor_utf8_check): Do not check
+	unsigned for <0
+
+	* raptor/src/raptor_serialize.c (raptor_serializers_enumerate):
+	counter can never be <0
+
+	* raptor/src/raptor_rdfxml.c
+	(raptor_element_content_type_as_string): Do not check unsigned for
+	<0
+
+	* raptor/src/raptor_feature.c (raptor_feature_value_type): Do not
+	check unsigned for <0
+
+	* raptor/src/ntriples_parse.c (raptor_ntriples_term): Do not check
+	unsigned for <0
+
+	* raptor/src/raptor_parse.c (raptor_syntaxes_enumerate): counter
+	can never be <0
+
+2005-09-01  Dave Beckett  <dave@dajobe.org>
+
+	* utils/rdfproc.c: one fprintf stderr to stdout
+
+	* rasqal/src/sparql_lexer.l: "true" and "false" are now case
+	independent
+
+2005-08-31  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/configure.ac: Added --with-redland-config
+
+	* rasqal/src/rasqal_internal.h: Updated
+	erasqal_engine_merge_graph_patterns and
+	rasqal_engine_merge_triples prototypes to return an int status.
+
+	* rasqal/src/rasqal_engine.c:
+	(rasqal_engine_merge_graph_patterns, rasqal_engine_merge_triples):
+	Visitor function now returns a status.
+
+	* rasqal/src/rasqal_query.c: Moved rasqal_graph_pattern_visit to
+	rasqal_graph_pattern.c
+
+	* rasqal/src/rasqal.h: Added rasqal_graph_pattern_visit_fn.  Added
+	prototype for rasqal_graph_pattern_visit
+
+	* rasqal/src/rasqal_graph_pattern.c (rasqal_graph_pattern_visit:):
+	Moved from rasqal_query.c
+
+	* rasqal/docs/tmpl/section-expression.sgml,
+	rasqal/docs/tmpl/section-query_results.sgml: docs
+
+	* rasqal/src/sparql_lexer.l, rasqal/src/sparql_parser.y: Remove
+	NULL_LITERAL - not in SPARQL
+
+2005-08-24  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/Makefile.am: Add more conditional compiles for
+	serializers
+
+	* raptor/src/Makefile.am: Added raptor_serialize_rdfxml.c
+	raptor_serialize_ntriples.c raptor_serialize_simple.c
+
+	* raptor/src/raptor_serialize.c: Moved specific serializers into
+	separate files - rdfxml, ntriples, simple
+
+	* raptor/src/raptor_serialize_rdfxml.c: RDF/XML serializer
+
+	* raptor/src/raptor_serialize_ntriples.c: N-Triples serializer
+
+	* raptor/src/raptor_serialize_simple.c: Simple serializer
+
+	* raptor/src/raptor-config.1, raptor/src/raptor-config.in:
+	s/features/options/ so not to confuse with raptor_feature
+
+	* raptor/utils/rapper.c: Add HELP_TEXT_LONG to deal with help that
+	has no short option.
+
+	* raptor/utils/rapper.c: fix --show-namespaces help
+
+	* raptor/utils/rapper.1: Added --show-namespaces
+
+	* raptor/utils/rapper.c: (print_namespaces) Added Added
+	--show-namespaces option - long options only.
+
+	* raptor/src/n3_parser.y, raptor/src/raptor_rdfxml.c,
+	raptor/src/turtle_parser.y: Handle raptor_new_namespace failing.
+
+	* raptor/src/n3_parser.y, raptor/src/raptor_rdfxml.c,
+	raptor/src/turtle_parser.y: Remove calls to
+	raptor_namespaces_start_namespace_full and use the three functions
+	raptor_new_namespace, raptor_namespaces_start_namespace and
+	raptor_parser_start_namespace instead.
+
+	* raptor/src/raptor_parse.c (raptor_set_namespace_handler): Added.
+	New user method.
+	(raptor_parser_start_namespace): Added.  Internal function to
+	operate when namespaces are declared.
+
+	* raptor/src/raptor.h: Added raptor_namespace_handler typedef.
+	Added raptor_set_namespace_handler prototype.
+
+	* raptor/src/raptor_internal.h: raptor_parser_s gains
+	namespace_handler and namespace_handler_user_data fields.  Added
+	raptor_parser_start_namespace prototype.
+
+	* raptor/tests/Makefile.am: link to libxml2 bug report
+
+	* raptor/src/raptor_rss.c (raptor_rss_emit_type_triple,
+	raptor_rss_emit_enclosure, raptor_rss_emit_connection): Zap
+	literal language and datatype before setting up statement objects.
+
+	* raptor/src/ntriples_parse.c
+	(raptor_ntriples_generate_statement): Zap literal language and
+	datatype before setting up statement objects.
+
+	* raptor/src/n3_parser.y (raptor_n3_generate_statement): Zap
+	literal language and datatype for !literals.  Add assertion.
+
+	* raptor/src/raptor_internal.h (RAPTOR_ASSERT_RETURN): Remove ()s
+	around return to allow no-value.
+
+	* raptor/src/turtle_parser.y (raptor_turtle_generate_statement):
+	Zap literal language and datatype for !literals.  Add assertion.
+
+2005-08-23  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/docs/tmpl/section-triples_source.sgml: section title
+
+	* rasqal/docs/tmpl/section-triples_source.sgml,
+	rasqal/src/rasqal_expr.c: autodocs
+
+	* rasqal/docs/rasqal-sections.txt: Added
+	rasqal_new_expression_from_expression
+
+	* rasqal/src/rasqal_expr.c: Added usage count to rasqal_expression
+	constructors
+	(rasqal_new_expression_from_expression): Added copy constructor.
+
+	* rasqal/src/rasqal_engine.c (rasqal_engine_join_graph_patterns):
+	Move constraints taking care to copy then free correctly.
+
+	* rasqal/src/rasqal.h: Added usage count to rasqal_expression.
+	Added rasqal_new_expression_from_expression prototype.
+
+2005-08-22  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor.h: autodocs fixes
+
+	* raptor/src/raptor.h: autodocs
+
+	* raptor/docs/raptor-sections.txt: raptor_uri_init now internal
+
+	* raptor/src/raptor_parse.c: autodocs
+
+	* raptor/docs/tmpl/section-unused.sgml: raptor_uri_init now
+	internal
+
+	* raptor/docs/tmpl/section-general.sgml,
+	raptor/src/raptor_internal.h: Remove unused container_test_handler
+	function.
+
+	* raptor/src/raptor.h, raptor/src/raptor_xml.c,
+	raptor/src/raptor_sequence.c, raptor/src/raptor_iostream.c,
+	raptor/src/raptor_stringbuffer.c: autodocs
+
+	* raptor/docs/raptor-sections.txt: No
+	raptor_container_test_handler
+
+	* raptor/src/raptor.h: raptor_uri_init was internal
+
+	* raptor/src/raptor_uri.c: autodocs
+
+	* raptor/src/raptor_internal.h: raptor_uri_init was internal
+
+	* raptor/src/raptor_uri.c: autodocs
+
+2005-08-19  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/Makefile.am: Enable gtk doc with make distcheck
+
+	* raptor/docs/tmpl/section-xml-namespace.sgml: args
+
+	* raptor/src/raptor.h, raptor/src/raptor_namespace.c,
+	raptor/src/raptor_iostream.c, raptor/src/raptor_parse.c,
+	raptor/src/raptor_qname.c, raptor/src/raptor_serialize.c,
+	raptor/src/raptor_xml.c, raptor/src/raptor_sequence.c,
+	raptor/src/raptor_general.c, raptor/src/raptor_feature.c: autodocs
+
+	* raptor/docs/version.xml.in: version.xml.in
+
+	* raptor/docs/tmpl/section-serializer.sgml: whitespace
+
+	* raptor/src/raptor_sequence.c: autodocs
+
+	* raptor/src/raptor_xml.c (raptor_xml_escape_string): autodocs
+	escapes
+
+	* raptor/src/ntriples_parse.c, raptor/src/raptor.h,
+	raptor/src/raptor_feature.c, raptor/src/raptor_general.c,
+	raptor/src/raptor_identifier.c, raptor/src/raptor_iostream.c,
+	raptor/src/raptor_locator.c, raptor/src/raptor_namespace.c,
+	raptor/src/raptor_nfc.c, raptor/src/raptor_nfc_test.c,
+	raptor/src/raptor_parse.c, raptor/src/raptor_qname.c,
+	raptor/src/raptor_rdfxml.c, raptor/src/raptor_rfc2396.c,
+	raptor/src/raptor_sequence.c, raptor/src/raptor_serialize.c,
+	raptor/src/raptor_serialize_rdfxmla.c, raptor/src/raptor_set.c,
+	raptor/src/raptor_stringbuffer.c, raptor/src/raptor_uri.c,
+	raptor/src/raptor_utf8.c, raptor/src/raptor_www.c,
+	raptor/src/raptor_www_libwww.c, raptor/src/raptor_xml.c,
+	raptor/src/raptor_xml_writer.c, raptor/src/turtle_common.c:
+	autodocs reformatted for gtk-doc
+
+	* raptor/docs/tmpl/section-constants.sgml,
+	raptor/docs/tmpl/section-feature.sgml,
+	raptor/docs/tmpl/section-general.sgml,
+	raptor/docs/tmpl/section-iostream.sgml,
+	raptor/docs/tmpl/section-locator.sgml,
+	raptor/docs/tmpl/section-memory.sgml,
+	raptor/docs/tmpl/section-parser.sgml,
+	raptor/docs/tmpl/section-sequence.sgml,
+	raptor/docs/tmpl/section-serializer.sgml,
+	raptor/docs/tmpl/section-stringbuffer.sgml,
+	raptor/docs/tmpl/section-triples.sgml,
+	raptor/docs/tmpl/section-unicode.sgml,
+	raptor/docs/tmpl/section-unused.sgml,
+	raptor/docs/tmpl/section-uri-factory.sgml,
+	raptor/docs/tmpl/section-uri.sgml,
+	raptor/docs/tmpl/section-www.sgml,
+	raptor/docs/tmpl/section-xml-namespace.sgml,
+	raptor/docs/tmpl/section-xml-qname.sgml,
+	raptor/docs/tmpl/section-xml.sgml: initial templates
+
+	* raptor/docs/raptor-docs.xml: fix
+
+	* raptor/docs/raptor-docs.xml, raptor/docs/raptor-overrides.txt,
+	raptor/docs/raptor-sections.txt: gtk-doc files
+
+	* raptor/configure.ac, raptor/docs/Makefile.am: Enable gtk-doc
+
+	* raptor/configure.ac: check for gtk-doc
+
+	* raptor/src/raptor-config.1: Document --features and --help.
+	Order flags alphabetically in summary and body.
+
+	* raptor/src/raptor-config.in: Add --features argument to list
+	configured or discovered features of the raptor library
+
+	* raptor/configure.ac: Add AC_SUBSTs for recording discovered
+	features: RAPTOR_WWW_LIBRARY (or none), RAPTOR_XML_PARSER (or
+	none), RAPTOR_PARSERS (list) and RAPTOR_SERIALIZERS (list).
+
+	* rasqal/src/rasqal.h, rasqal/src/rasqal_expr.c: autodocs fixes -
+	use %RASQAL_
+
+	* rasqal/docs/tmpl/section-graph_pattern.sgml: use %RASQAL
+
+2005-08-18  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/docs/tmpl/section-query_results.sgml,
+	rasqal/docs/tmpl/section-literal.sgml,
+	rasqal/docs/tmpl/section-query.sgml: document literal, query,
+	query_results types
+
+	* rasqal/docs/rasqal-sections.txt: Add rasqal_query and
+	rasqal_query_results
+
+	* rasqal/docs/rasqal-overrides.txt: override rasqal_query and
+	rasqal_query_results
+
+	* rasqal/docs/Makefile.am: Make gtkdoc-mkdb ignore the C files
+
+	* raptor/src/raptor_sax2.c (raptor_sax2_parse_start): Fix for
+	expat
+
+	* raptor/src/raptor_rdfxml.c
+	(raptor_xml_unparsed_entity_decl_handler,
+	raptor_xml_external_entity_ref_handler): Casts for gcc4
+
+	* raptor/src/raptor_expat.c (raptor_expat_init): Casts for expat
+	to use sax2 handlers.
+
+	* raptor/src/raptor_internal.h: Move raptor_sax2 declaration
+	outside libxml-only block Fixup general arguments for
+	raptor_xml_unparsed_entity_decl_handler and
+	raptor_xml_external_entity_ref_handler.
+
+	* raptor/src/raptor_rdfxml.c
+	(raptor_xml_unparsed_entity_decl_handler,
+	raptor_xml_external_entity_ref_handler): Generalise args from
+	expat-specific.
+	(raptor_xml_parse_init): Init sax2 handler fields
+
+	* raptor/src/raptor_libxml.c (raptor_libxml_init): Use sax2
+	structure handlers
+
+	* raptor/src/raptor_expat.c (raptor_expat_init): Use sax2
+	structure handlers
+
+	* raptor/src/raptor_internal.h: raptor_sax2 gains handlers for
+	start/end element, characters, cdata, comment, unparsed entity
+	declaration, extenal entity reference.
+
+	* rasqal/src/rasqal_query.c (rasqal_graph_pattern_visit): Make
+	this recursive.
+
+	* rasqal/tests/sparql/ExprBuiltins/Makefile.am: datatype-1 works
+
+	* rasqal/src/rasqal_expr.c (rasqal_expression_evaluate): For
+	datatype, if is a typed literal it has a datatype field then
+	return that, otherwise fail.
+
+	* rasqal/tests/sparql/ExprBuiltins/Makefile.am: str-1 passes
+
+	* raptor/src/raptor_sax2.c (raptor_sax2_parse_start): Init expat
+	and libxml the same
+
+	* raptor/src/raptor_libxml.c (raptor_libxml_init): Take
+	raptor_sax2* and raptor_uri* args
+
+	* raptor/src/raptor_expat.c (raptor_expat_init): Take raptor_sax2*
+	and raptor_uri* args
+
+	* raptor/src/raptor_internal.h: raptor_libxml_init and
+	raptor_expat_init take same args
+
+	* raptor/src/n3_parser.y, raptor/src/ntriples_parse.c,
+	raptor/src/raptor_guess.c, raptor/src/raptor_rdfxml.c,
+	raptor/src/raptor_rss.c, raptor/src/raptor_xslt.c,
+	raptor/src/turtle_parser.y: Update uses of
+	raptor_parser_register_factory to remove alias argument and add
+	calls to raptor_parser_factory_add_alias for raptor
+	(rdfxml) and ntriplesplus (turtle)
+
+	* raptor/src/raptor_internal.h: Update
+	raptor_parser_register_factory prototype to return the registered
+	factory and remvoe the alias arg.  Added prototype for
+	raptor_parser_factory_add_alias
+
+	* raptor/src/raptor_parse.c (raptor_parser_register_factory): Now
+	returns the registered factory.  Removed alias arg into new
+	function:
+	(raptor_parser_factory_add_alias): Added.
+
+2005-08-17  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/Makefile.am: maintainer clean n3 files
+
+	* raptor/src/Makefile.am: clean n3 tests
+
+	* raptor/src/n3_lexer.l (n3_lexer_syntax_error): Added, from
+	turtle.
+
+	* raptor/src/n3_lexer.l: Added n3_lexer_syntax_error
+	(<LITERAL>\"\"\"): Copy just the len and always terminate the
+	string.
+	(n3_copy_string_token): Handle empty strings without stringbuffer
+	and use raptor_stringbuffer_append_turtle_string for escapes.
+	Ensure string is always termianted.
+
+	* raptor/src/n3_common.h: added stringbuffer field
+
+	* raptor/src/turtle_parser.y: Expect 9 conflicts.  Added
+	FLOATING_LITERAL
+	(FLOATING_LITERAL): Use raptor_new_identifier_from_double common
+	with n3.
+
+	* raptor/src/n3_parser.y (FLOATING_LITERAL): Use
+	raptor_new_identifier_from_double common with turtle.
+
+	* raptor/src/turtle_lexer.l (<LITERAL>\"\"\"): Copy just the len
+	 and always terminate the string.  Added doubles to Turtle.
+	(turtle_copy_string_token): Handle empty strings without
+	stringbuffer.  Ensure string is always termianted.
+	(turtle_token_print): Print FLOATING_LITERAL
+
+	* raptor/tests/turtle/Makefile.am,
+	raptor/tests/turtle/test-20.out, raptor/tests/turtle/test-20.ttl:
+	Add test-20 for empty literals
+
+	* raptor/tests/turtle/Makefile.am: re-add test-19
+
+2005-08-16  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_internal.h: Added
+	raptor_new_identifier_from_double pointer
+
+	* raptor/src/Makefile.am: Added raptor_xsd.c
+
+	* raptor/src/raptor_xsd.c: raptor_xsd.c
+
+	* raptor/src/n3_lexer.l, raptor/src/n3_parser.y: Add double
+	constants to N3 parser
+
+	* raptor/src/n3_lexer.l (main): Make uri_string an unsigned char*
+
+	* raptor/tests/turtle/Makefile.am: remove test-19 for now, no
+	double constants
+
+	* raptor/tests/turtle/Makefile.am,
+	raptor/tests/turtle/test-19.out, raptor/tests/turtle/test-19.ttl:
+	added test-19 for 1.0 as a double
+
+	* raptor/src/Makefile.am: Add turtle_common.c
+
+	* raptor/tests/turtle/test-18.out: Remove header/footer
+
+	* raptor/src/turtle_parser.y: 2005
+
+	* raptor/src/turtle_lexer.l: Added turtle_lexer_syntax_error Build
+	up long strings inside a stringbuffer with
+	raptor_stringbuffer_append_turtle_string and avoid greedy match of
+	"""s
+	(turtle_copy_string_token): Use
+	raptor_stringbuffer_append_turtle_string
+	(turtle_lexer_syntax_error): Added.
+
+	* raptor/src/raptor_internal.h: Added
+	raptor_stringbuffer_append_turtle_string prototype
+
+	* raptor/src/turtle_common.h: Added raptor_stringbuffer* field sb
+
+	* raptor/src/turtle_common.c: Raptor Turtle common code with
+	raptor_stringbuffer_append_turtle_string from raptor_turtle.l
+
+	* raptor/tests/turtle/Makefile.am,
+	raptor/tests/turtle/test-18.out, raptor/tests/turtle/test-18.ttl:
+	Added test-18 for multiple long literals with escapes
+
+	* raptor/src/raptor_serialize_rss.c (raptor_rss10_emit_item): Die
+	in debug mode with NULL item - all calls to this are currently
+	wrapped with a check.
+	(raptor_rss10_emit_item): Do not emit atom author when no such
+	item exists.
+
+	* raptor/manifest.pl: typo
+
+2005-08-13  Dave Beckett  <dave@dajobe.org>
+
+	* redland-src-config.in: Add --version and --version-decimal
+
+	* rasqal/docs/tmpl/section-unused.sgml,
+	rasqal/docs/tmpl/section-variable.sgml,
+	rasqal/docs/tmpl/section-query_results.sgml,
+	rasqal/docs/tmpl/section-triple.sgml,
+	rasqal/docs/tmpl/section-prefix.sgml,
+	rasqal/docs/tmpl/section-query.sgml,
+	rasqal/docs/tmpl/section-graph_pattern.sgml,
+	rasqal/docs/tmpl/section-literal.sgml,
+	rasqal/docs/tmpl/section-expression.sgml,
+	rasqal/docs/tmpl/section-general.sgml,
+	rasqal/docs/rasqal-sections.txt: autodocs - sections intros
+
+	* rasqal/src/rasqal.h, rasqal/src/rasqal_expr.c,
+	rasqal/src/rasqal_general.c, rasqal/src/rasqal_engine.c: autodocs
+
+	* rasqal/src/rasqal.h: Remove unused
+	rasqal_new_variable_expression prototype.  Deprecate
+	rasqal_expression_foreach for rasqal_expression_visit Add
+	rasqal_expression_visit prototype and rasqal_expression_visit_fn.
+
+	* rasqal/docs/rasqal-sections.txt: Add rasqal_expression_visit_fn
+	rasqal_expression_visit
+
+2005-08-11  Dave Beckett  <dave@dajobe.org>
+
+	* autogen.sh, raptor/autogen.sh: update autogen.sh again
+
+	* rasqal/autogen.sh: programs spello
+
+	* autogen.sh, raptor/autogen.sh: update autogen.sh again
+
+	* rasqal/autogen.sh: Add gtkdocize and swig (for bindings) only if
+	seen in top-level configure.ac Add swig-specific version check,
+	different from gnu style
+
+	* autogen.sh, rasqal/autogen.sh: update autogen.sh again
+
+	* raptor/autogen.sh: Move warning to end
+
+	* raptor/autogen.sh, autogen.sh, rasqal/autogen.sh: Rewrite with
+	functions, generalize to any redland package.  Add docs.
+
+	* rasqal/src/rasqal_engine.c: restore undef RASQAL_DEBUG
+
+	* rasqal/tests/sparql/part1/dawg-query-003.rq: Declare rdf:
+
+	* rasqal/src/sparql_parser.y (rasqal_sparql_query_engine_init): Do
+	not declare any namespaces by default.
+
+	* rasqal/tests/sparql/syntax/Makefile.am: Added namespaces.rq
+
+	* rasqal/tests/sparql/syntax/namespaces.rq: namespaces.rq
+
+	* librdf/redland.spec.in: - Update Source: - Do not require
+	python-devel at build time - Add sqlite-devel build requirement.
+	- Use %configure and %makeinstall
+
+	* rasqal/rasqal.spec.in, raptor/raptor.spec.in: - Update Source: -
+	Use %makeinstall
+
+2005-08-10  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/rasqal_engine.c (rasqal_engine_merge_graph_patterns):
+	Renamed from rasqal_engine_make_basic_graph_pattern and added some
+	docucomments.  It no longer handles UNIONS - they are never
+	merged, the code was just handling them in order to descend down
+	the tree, now done by the visitor calling this function. Remove
+	calling lower sub-GPs.
+	(rasqal_engine_merge_triples): Renamed from
+	rasqal_engine_merge_basic_graph_patterns and added some
+	docucomments.
+
+	* rasqal/src/rasqal_internal.h: Added
+	rasqal_graph_pattern_visit_fn typdef.  Added prototype for
+	rasqal_query_graph_pattern_visit
+
+	* rasqal/src/rasqal_query.c (rasqal_query_prepare): Rewrite to use
+	rasqal_query_graph_pattern_visit to do graph pattern transforms.
+	(rasqal_graph_pattern_visit): Added, called by:
+	(rasqal_query_graph_pattern_visit): Added to walk all graph
+	patterns in a query.
+
+	* rasqal/src/rasqal_engine.c
+	(rasqal_engine_make_basic_graph_pattern): Do not lose sub-grpah
+	pattern UNION type.
+
+	* rasqal/src/sparql_parser.y (PrimaryExpression): Explain rq23
+	weirdness
+
+	* raptor/raptor.spec.in: Use %configure and %{_make}
+
+	* rasqal/tests/sparql/survey/query-survey-10.rq,
+	rasqal/tests/sparql/survey/query-survey-11.rq,
+	rasqal/tests/sparql/survey/query-survey-13.rq: FILTER() syntax
+
+	* rasqal/rasqal.spec.in: Use %configure
+
+	* rasqal/src/sparql_lexer.l: Remove '%' as a token.
+	(sparql_token_print): Remove '%'
+
+	* rasqal/src/sparql_parser.y: Remove '%' as a token.  Whitespace
+	style fixes near rule definitions.
+
+	* rasqal/src/sparql_parser.y: Make FILTER use Constraint for
+	multiple forms.
+	(Constraint): Added.  Allow the BrackettedExpression, BuiltInCall
+	or FunctionCall alternatives.
+	(Expression): Added.  9ConditionalOrExpression): Make it recursive
+	rather than just allow 0 or 1 &&s.
+	(MultiplicativeExpression): Remove '%' operator, not in SPARQL.
+	(BuiltInCall): Renamed from CallExpression and remove FunctionCall
+	from it.
+	(PrimaryExpression): use BuiltInCall and add FunctionCall from
+	above.
+
+	* rasqal/tests/sparql/ValueTesting/Makefile.am: +3 more tests,
+	extendedType-literal-ne fails.
+
+	* rasqal/tests/sparql/syntax/cast0.rq,
+	rasqal/tests/sparql/syntax/cast1.rq,
+	rasqal/tests/sparql/bound/bound1.rq: FILTER() syntax
+
+	* rasqal/tests/sparql/examples/ex11.2.3.8_0.rq,
+	rasqal/tests/sparql/examples/ex3.rq: Updates from DAWG for
+	FILTER()
+
+	* rasqal/tests/sparql/SyntaxFull/manifest.ttl,
+	rasqal/tests/sparql/simple/manifest.n3,
+	rasqal/tests/sparql/sort/manifest.ttl,
+	rasqal/tests/sparql/examples/manifest.n3: Update to DAWG tests -
+	some approved
+
+	* rasqal/tests/sparql/ValueTesting/extendedType-eq-pass-result.n3,
+	rasqal/tests/sparql/ValueTesting/extendedType-eq-pass.rq,
+	rasqal/tests/sparql/ValueTesting/extendedType-graph-result.n3,
+	rasqal/tests/sparql/ValueTesting/extendedType-graph.rq,
+	rasqal/tests/sparql/ValueTesting/extendedType-literal-eq-result.n3,
+	rasqal/tests/sparql/ValueTesting/extendedType-literal-eq.rq,
+	rasqal/tests/sparql/ValueTesting/extendedType-literal-ne-result.n3,
+	rasqal/tests/sparql/ValueTesting/extendedType-literal-ne.rq,
+	rasqal/tests/sparql/ValueTesting/extendedType-ne-fail-result.n3,
+	rasqal/tests/sparql/ValueTesting/extendedType-ne-fail.rq,
+	rasqal/tests/sparql/ValueTesting/manifest.n3: Update to DAWG tests
+
+2005-08-08  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_rss_common.c, raptor/src/raptor_internal.h,
+	raptor/src/raptor_rss.c: Move time.h and sys/time.h #ifdef and
+	includes to raptor_internal.h since time_t is mentioned there and
+	visible to all files.
+
+	* raptor/tests/Makefile.am: adjust -I to point to srcdir for
+	raptor_empty_test
+
+2005-08-04  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/rasqal_engine.c (rasqal_engine_join_graph_patterns):
+	Renamed from rasqal_engine_join_basic_graph_patterns.  Warn if
+	types are different.  Merge sub graph sequences.
+	(rasqal_engine_make_basic_graph_pattern): Operate over unions
+	recursively for any lower-level basic graph patterns.  Don't merge
+	if all sub-graph patterns aren't of the same type.  Never merge
+	union sequences of size>1
+
+	* rasqal/src/rasqal_internal.h:
+	rasqal_engine_join_basic_graph_patterns now
+	rasqal_engine_join_graph_patterns
+
+2005-08-03  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac, rasqal/configure.ac: gtk-doc 1.3 is ok
+
+2005-08-01  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/utils/Makefile.am: Add AM_CPPFLAGS and AM_CFLAGS back
+
+2005-07-31  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_xml_writer.c (main): syntax
+
+	* configure.ac, rasqal/configure.ac: Fix for compiling against
+	internal raptor
+
+	* raptor/src/raptor_uri.c: Add (void) casts for fwrite debug
+	messages
+
+	* raptor/utils/Makefile.am: Re-add rapper.1 to dist
+
+	* raptor/src/raptor_rdfxml.c, raptor/src/raptor_xml_writer.c,
+	raptor/src/raptor_nfc_test.c: Add (void) casts for fwrite debug
+	messages
+
+	* raptor/utils/Makefile.am, raptor/Makefile.am,
+	raptor/configure.ac, raptor/docs/Makefile.am,
+	raptor/raptor-src-config.in, raptor/src/Makefile.am,
+	raptor/tests/Makefile.am, raptor/tests/turtle/Makefile.am:
+	Reorganise sources - libraptor is in src, man pages in docs,
+	rapper in utils
+
+	* configure.ac, librdf/Makefile.am: adjust source of librasqal.la
+
+	* docs/Makefile.am, rasqal/docs/Makefile.am: Added version.xml to
+	content_files
+
+	* rasqal/docs/Makefile.am, rasqal/utils/Makefile.am: restore mans
+	to dist
+
+	* rasqal/src/Makefile.am: if STRCASECMP not GETOPT
+
+	* rasqal/Makefile.am: Add utils dir
+
+	* rasqal/utils/Makefile.am: roqet.html
+
+	* rasqal/utils/Makefile.am: utils automakefile
+
+	* rasqal/src/Makefile.am: Add Makefile.am
+
+	* rasqal/tests/sparql/survey/Makefile.am,
+	rasqal/tests/sparql/syntax/Makefile.am,
+	rasqal/tests/sparql/ExprEquals/Makefile.am,
+	rasqal/tests/sparql/SyntaxFull/Makefile.am,
+	rasqal/tests/sparql/ValueTesting/Makefile.am,
+	rasqal/tests/sparql/bound/Makefile.am,
+	rasqal/tests/sparql/examples/Makefile.am,
+	rasqal/tests/sparql/part1/Makefile.am,
+	rasqal/tests/sparql/regex/Makefile.am,
+	rasqal/tests/sparql/simple/Makefile.am,
+	rasqal/tests/sparql/sort/Makefile.am, rasqal/docs/Makefile.am,
+	rasqal/tests/rdql/Makefile.am,
+	rasqal/tests/rdql/testsuite/Makefile.am,
+	rasqal/tests/sparql/Expr1/Makefile.am,
+	rasqal/tests/sparql/Expr2/Makefile.am,
+	rasqal/tests/sparql/ExprBuiltins/Makefile.am, rasqal/Makefile.am,
+	rasqal/configure.ac, rasqal/rasqal-src-config.in: Reorganise
+	sources - librasqal is in src, man pages are in docs, roqt in
+	utils.
+
+2005-07-30  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/rasqal_expr.c, rasqal/src/rasqal.h: autodocs
+
+	* rasqal/docs/tmpl/section-variable.sgml,
+	rasqal/docs/tmpl/section-unused.sgml,
+	rasqal/docs/tmpl/section-query_results.sgml,
+	rasqal/docs/tmpl/section-triple.sgml,
+	rasqal/docs/tmpl/section-query.sgml,
+	rasqal/docs/tmpl/section-literal.sgml,
+	rasqal/docs/tmpl/section-prefix.sgml,
+	rasqal/docs/tmpl/section-general.sgml,
+	rasqal/docs/tmpl/section-graph_pattern.sgml: Updated templates.
+
+	* rasqal/docs/tmpl/section-expression.sgml: short and long desc
+	add rasqal_compare_flags not #defines
+
+	* rasqal/docs/tmpl/section-data.sgml: short and long desc
+
+	* rasqal/docs/rasqal-overrides.txt: override some things to hide
+	internals.
+
+	* rasqal/docs/rasqal-sections.txt, rasqal/docs/rasqal-docs.xml,
+	rasqal/src/rasqal_literal.c, rasqal/src/rasqal_expr.c,
+	rasqal/src/rasqal_general.c, rasqal/src/rasqal.h: more autodocs
+
+	* rasqal/src/rasqal_query.c, rasqal/src/rasqal_general.c,
+	rasqal/src/rasqal_expr.c: more autodocs and fixes for gtk-doc
+	style
+
+	* rasqal/src/rasqal_expr.c: autodocs for rasqal_data_graph
+
+	* rasqal/src/rasqal_query.c, rasqal/src/rasqal_expr.c,
+	rasqal/src/rasqal_graph_pattern.c, rasqal/src/rasqal.h: Source
+	code arg fixes for gtk-doc
+
+2005-07-29  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/docs/rasqal.types: empty types for gtk-doc
+
+	* rasqal/Makefile.am: Added DISTCHECK_CONFIGURE_FLAGS
+
+	* rasqal/rasqal.spec.in: Updated for gtk-doc locations
+
+	* rasqal/docs/tmpl/section-data.sgml,
+	rasqal/docs/tmpl/section-expression.sgml,
+	rasqal/docs/tmpl/section-general.sgml,
+	rasqal/docs/tmpl/section-graph_pattern.sgml,
+	rasqal/docs/tmpl/section-literal.sgml,
+	rasqal/docs/tmpl/section-prefix.sgml,
+	rasqal/docs/tmpl/section-query.sgml,
+	rasqal/docs/tmpl/section-query_results.sgml,
+	rasqal/docs/tmpl/section-triple.sgml,
+	rasqal/docs/tmpl/section-unused.sgml,
+	rasqal/docs/tmpl/section-variable.sgml,
+	rasqal/docs/rasqal-overrides.txt, rasqal/autogen.sh,
+	rasqal/configure.ac, rasqal/docs/Makefile.am,
+	rasqal/docs/api.sgml.in, rasqal/docs/build-docs,
+	rasqal/docs/kernel-doc, rasqal/docs/rasqal-docs.xml,
+	rasqal/docs/rasqal-sections.txt, rasqal/src/rasqal.h,
+	rasqal/src/rasqal_engine.c, rasqal/src/rasqal_expr.c,
+	rasqal/src/rasqal_general.c, rasqal/src/rasqal_graph_pattern.c,
+	rasqal/src/rasqal_literal.c, rasqal/src/rasqal_map.c,
+	rasqal/src/rasqal_query.c, rasqal/src/rasqal_raptor.c,
+	rasqal/src/rasqal_skiplist.c: Switch to gtkdoc for autodocs.
+	Adjust source code comment style.
+
+	* rasqal/docs/version.xml.in: version xml
+
+	* configure.ac: require gtk-doc 1.4
+
+	* rasqal/autogen.sh: run gtkdocize
+
+	* rasqal/configure.ac, configure.ac: require gtk-doc 1.4
+
+2005-07-28  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/utils/roqet.1: Update for newer result formats.
+
+	* rasqal/tests/sparql/syntax/manifest.n3,
+	rasqal/tests/sparql/syntax/Makefile.am: distinct-with-undef-var
+
+	* rasqal/tests/sparql/syntax/distinct-undef.rq,
+	rasqal/tests/sparql/syntax/result-distinct-undef.ttl: tests for
+	distinct with an undef var
+
+	* rasqal/src/rasqal_query.c
+	(rasqal_query_result_literal_sequence_compare): Two NULL literals
+	means equality not a final comparison result, so keep searching.
+
+	* rasqal/tests/sparql/syntax/Makefile.am,
+	rasqal/tests/sparql/syntax/manifest.n3,
+	rasqal/tests/sparql/syntax/order-distinct.rq,
+	rasqal/tests/sparql/syntax/order.ttl,
+	rasqal/tests/sparql/syntax/result-order-distinct.ttl: Added order
+	and distinct check
+
+	* rasqal/src/sparql_parser.y (PatternElement): Error recovery from
+	NULL triples but do return a graph pattern of some sort.
+
+	* rasqal/src/sparql_parser.y (PatternElement): Error recovery - do
+	not die when triples is NULL.
+
+2005-07-27  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/Makefile.am, raptor/docs/Makefile.am,
+	raptor/src/Makefile.am, raptor/utils/Makefile.am: Add
+	n3_lexer_test, n3_parser_test for maintainer
+
+	* raptor/src/n3_parser.y, raptor/src/turtle_parser.y (main): Make
+	it compile
+
+	* raptor/src/n3_parser.y: Updates from turtle_parser.y: gcc4
+	ignored return warning fixes:
+	(main): Check fread() return value and throw a user error.
+	(main): Fix for gcc4
+	(main) Move filename here
+
+	* raptor/examples/grapper.c: Add author url
+
+	* raptor/src/raptor_rss.c (raptor_rss_uplift_fields): Add
+	possibility of normalizing fields, but no code to do it yet.
+
+	* raptor/src/raptor_rss_common.c (raptor_rss_date_uplift): fail
+	and do nothing if function returns <0
+
+	* raptor/src/raptor_rss.c (raptor_rss_uplift_fields): Moved date
+	code into raptor_rss_date_uplift and call it.
+
+	* raptor/src/raptor_rss.h: Added raptor_rss_date_uplift prototype
+
+	* raptor/src/raptor_rss_common.c (raptor_rss_date_uplift): Added,
+	pulled out of raptor_rss.c
+
+	* raptor/src/turtle_parser.y: gcc4 ignored return warning fixes:
+	(main): Check fread() return value and throw a user error.
+
+	* rasqal/src/sparql_parser.y, rasqal/utils/roqet.c,
+	rasqal/src/rdql_parser.y, rasqal/src/rasqal_map.c: gcc4 ignored
+	return warning fixes: Discard fwrite() return values since
+	fprintf/fputs() aren't checked.  Check fread() return values and
+	throw a user error.
+
+	* rasqal/src/rasqal_skiplist.c, rasqal/src/rasqal_map.c: autodocs
+
+	* rasqal/src/rasqal_query.c (rasqal_query_execute): For a stored
+	sequence of result rows, use result_count as an offset so
+	initialise to 0 always
+	(rasqal_query_results_next, rasqal_query_results_get_bindings,
+	rasqal_query_results_get_binding_value,
+	rasqal_query_results_get_binding_value_by_name): Adjust to use
+	offset.
+
+	* rasqal/src/rasqal_query.c: Removed RASQAL_MAP define; it's the
+	default now.
+
+	* rasqal/src/rasqal_skiplist.c (main): Update for new
+	rasqal_new_skiplist API
+
+	* rasqal/src/rasqal_query.c: General: rasqal_tree renamed to
+	rasqal_map and code moved to rasqal_map.c
+	(rasqal_new_query_result_row, rasqal_free_query_result_row):
+	Init/use usage counting.
+	(rasqal_new_query_result_row_from_query_result_row): Added.
+	(rasqal_query_result_row_compare): Take void* args, like a qsort()
+	compare Do a distinct comparison on values before an ordering, if
+	needed and discard duplicates there.
+	(rasqal_map_print_query_result_row,
+	rasqal_map_free_query_result_row): Added as rasqal_map helpers.
+	(rasqal_query_execute): Make a new map, not tree, calling above
+	helpers.
+
+	* rasqal/src/rasqal_map.c: autodocs
+
+	* rasqal/src/rasqal_map.c (rasqal_free_map_node): follow subtrees
+	recursively.
+
+	* rasqal/src/rasqal_skiplist.c: rasqal_skiplist_s gains split
+	key/value print handler methods
+	(rasqal_new_skiplist): Split print_fn into print_key_fn and
+	print_value_fn
+	(rasqal_skiplist_node_print): Use new functions.
+
+	* rasqal/src/rasqal_internal.h: rasqal_query_result_row gains
+	usage count Changed skiplist API to split key/value print handler
+	methods Added rasqal_map class, methods.
+
+	* rasqal/Makefile.am: Added rasqal_map.c
+
+	* rasqal/src/rasqal_map.c: Rasqal simple Key:Value Map with
+	duplicates allowed
+
+	* rasqal/src/rasqal_query.c (rasqal_query_execute): If added a
+	duplicate, free the row.
+
+	* rasqal/src/rasqal_raptor.c (ordinal_as_uri): off by 1 in making
+	ordinal URI.
+
+2005-07-26  Dave Beckett  <dave@dajobe.org>
+
+	* rasqal/src/rasqal_query.c: sparql-results
+
+	* rasqal/src/rasqal_query.c, rasqal/utils/roqet.c: Changed results
+	namespace from http://www.w3.org/2005/06/sparqlResults to
+	http://www.w3.org/2005/sparql-results#
+
+2005-07-25  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/examples/grapper.c (fs_ok_button_callback): Protect from
+	defining when when not used as a callback.
+	(open_button_callback): cast for gcc4
+
+2005-07-24  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_rss.c (raptor_rss_parser_processNode): for
+	rss:link and atom:link with href, allow multiple link for atom,
+	and continue to ignore all but <link rel="altenrate"> for rss.
+
+	* raptor/src/raptor_rss_common.c: Tidying.  Added atom:feed and
+	atom:entry to raptor_rss_types_info.  Declare atom namespace URI
+	string raptor_atom_namespace_uri
+
+	* raptor/src/raptor_rss.h: Added RAPTOR_ATOM_FEED,
+	RAPTOR_ATOM_ENTRY.
+
+	* raptor/src/raptor_serialize_rss.c: Add atom 1.0 serializing by
+	generalising rss 1.0 serializing.  Change field names to reflect
+	this rdf_nspace -> default_nspace, rdf_RDF_element ->
+	root_element.  Add is_atom flag.
+	(raptor_rss10_serialize_init): Init is_atom flag.
+	(raptor_rss10_move_statements, raptor_rss10_store_statement):
+	Rename back fields translated to rss: namespace.
+	(raptor_rss10_build_xml_names): Init namespace qname for rss/atom.
+	Declare the default namespace to rss/atom.  Ignore all item types
+	but rss:item for atom; all but atom:author for rss.  For item node
+	type use atom:entry / rss:item.
+	(raptor_rss10_emit_item): Add emit_container flag to prevent
+	generating the containing elements.  For atom:author, generate it
+	inline for atom, ignore it for rss.  When generating URI-valued
+	fields for atom, make them element content.  For atom, do not
+	generate rdf:Seq block.
+	(raptor_rss10_serialize_end): Only emit node type rss:item (aka
+	atom:entry) for atom.
+	(raptor_init_serializer_atom): Added.
+
+	* raptor/configure.ac: Added atom serializer, enabled for
+	maintainer only.
+
+	* raptor/src/raptor_general.c (raptor_init): Add call to
+	raptor_init_serializer_atom if enabled
+
+	* raptor/src/raptor_internal.h: Added prototype for
+	raptor_init_serializer_atom Added raptor_atom_namespace_uri
+
+	* raptor/src/raptor_serialize_rss.c (raptor_rss10_serialize_end):
+	End with an error if no rss channel was found.
+
+	* raptor/Makefile.am, raptor/docs/Makefile.am,
+	raptor/src/Makefile.am, raptor/utils/Makefile.am: Use
+	RAPTOR_SERIALIZER_RSS_1_0 for new separate rss serializer.  Use
+	RAPTOR_RSS_COMMON when either rss parser or serializer is needed.
+
+	* raptor/configure.ac: RSS 1.0 serializer is always available and
+	does not need the libxml requirements of the RSS tag soup parser.
+	Added RAPTOR_SERIALIZER_RSS_1_0 define and makefile conditional.
+	Added RAPTOR_RSS_COMMON when any rss code is needed.
+
+	* raptor/src/raptor_rss.c, raptor/src/raptor_rss_common.c,
+	raptor/src/raptor_serialize_rss.c: Moved common code between
+	parser and serializer from raptor_rss.c into new
+	raptor_rss_common.c as new class raptor_rss_model.  Moved rss-1.0
+	serializer into new raptor_serialize_rss.c.  Both can be compiled
+	independent of the other.
+
+	* raptor/src/raptor_rss.h: Redland Parser Toolkit Internal RSS
+	Model and API
+
+	* raptor/src/raptor_internal.h: Add RAPTOR_PARSEDATE_FUNCTION
+	macro for parsedate.c
+
+	* raptor/src/raptor_general.c (raptor_init): Use define
+	RAPTOR_SERIALIZER_RSS_1_0 to call raptor_init_serializer_rss10
+
+	* raptor/src/raptor_xml.c, raptor/src/raptor_sax2.c: Moved
+	raptor_new_xml_element, raptor_free_xml_element,
+	raptor_xml_element_set_attributes,
+	raptor_xml_element_declare_namespace, raptor_print_xml_element,
+	raptor_iostream_write_xml_element from raptor_sax2.c to
+	raptor_xml.c
+
+2005-07-23  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/redland.spec.in: date typo
+
+	* raptor/src/raptor_rss.c, raptor/src/raptor_rss_common.c,
+	raptor/src/raptor_serialize_rss.c: More base URIs on base URIs
+	fixes.
+	(raptor_rss_parser_processNode): Ensure base URI is always copied
+	at start element, always freed at end element.  Make sure xml:base
+	processing is done for all elements including document and
+	typed-node ones.
+	(raptor_rss_parse_chunk): Remove duplicate document base URI
+	setting.
+
+2005-07-22  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/src/raptor_rss.c, raptor/src/raptor_rss_common.c,
+	raptor/src/raptor_serialize_rss.c: raptor_rss_info gains flags
+	field to store RAPTOR_RSS_INFO_FLAG_URI_VALUE where the value of
+	the element <foo>value</foo> is always a URI.  Apply that to
+	atom:id, atom:icon and atom:logo.  struct
+	raptor_rss_parser_context_s gains a sequence of base URIs
+	per-element.
+	(raptor_rss_context_init, raptor_rss_context_terminate): Init and
+	free sequence of base URIs.
+	(raptor_rss_parse_start): Start base URI sequence with parser base
+	URI.
+	(raptor_rss_parser_processNode): Init base_uri from top of stack
+	of base URIs.  Update base_uri from an xml:base arg, relative to
+	the current base URI.  Use the base URI for all URi constructions.
+	Push the new base URI after an element has been found.  Pop the
+	base URI at the end of an element.  At the end of an element, if
+	the field always has a URI value, convert it.
+	(raptor_rss_parse_chunk): Init the URI sequence with the parser
+	base URI.
+
+	* raptor/src/raptor_rss.c, raptor/src/raptor_rss_common.c,
+	raptor/src/raptor_serialize_rss.c: map raptor_atom_to_rss: turn
+	more atom cloned rss fields into rss fields.
+	(raptor_rss_uplift_fields): Change default action to copy
+	(duplicate) fields.
+	(raptor_rss10_emit_item): Do not emit link to atom:author types in
+	rss1.0
+	(raptor_rss10_serialize_end): Do not emit atom:author type in
+	rss1.0
+
+	* raptor/src/raptor_rss.c, raptor/src/raptor_rss_common.c,
+	raptor/src/raptor_serialize_rss.c: Added atom 1.0 namespace
+	(ATOM1_0_NAMESPACE_URI, ASTOM1_0_NS) and terms.  Turn old atom 0.3
+	terms into 1.0 versions where known using raptor_atom_to_rss.
+	(raptor_rss_parser_processNode): Handle atom feed element
+	properly, make a new channel item.  Convert atom 0.3 namespaced
+	elements to atom 1.0 Use atom:id to get a URI for the feed/entry
+	Copy atom:published to dc:date and atom:rights to dc:rights via
+	raptor_rss_uplift_map.
+	(raptor_rss_uplift_fields): Copy dc:date and atom:rights
+
+	* raptor/src/raptor_rss.c, raptor/src/raptor_rss_common.c,
+	raptor/src/raptor_serialize_rss.c: Added content: namespace
+	CONTENT_NAMESPACE_URI, prefix "content:" Added content:encoded
+	field RAPTOR_RSS_FIELD_CONTENT_ENCODED
+	(raptor_rss_uplift_fields): Added an uplift from description to
+	content:encoded
+	(raptor_rss10_emit_item): Write content:encoded using
+	<![CDATA[...]]>
+
+2005-07-21  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_concepts.h: Move some docs into the sgml template
+
+	* configure.ac: Added docs/version.xml
+
+	* docs/Makefile.am, docs/redland-chapter-intro.xml,
+	docs/redland-chapter-objects.xml, docs/redland-docs.xml,
+	docs/redland-intro.xml, docs/redland-objects-in-c.xml,
+	docs/version.xml.in: more gtk-doc
+
+	* librdf/redland.spec.in: Updated for gtk-doc locations
 
 	* rasqal/rasqal_query.c (rasqal_query_results_write_xml_result2,
 	rasqal_query_results_write_xml_result3): Use
@@ -35,8 +2118,6 @@
 	* librdf/Makefile.am: Remove 1-function headers from dist
 
 	* librdf/rdf_node.h: removed librdf_node_init - has no code
-
-	* docs/.cvsignore: ignore gtkdoc bits
 
 	* docs/redland-docs.xml: redland doc
 
