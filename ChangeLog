@@ -219,8 +219,6 @@
 	* rasqal/docs/tmpl/section-expression.sgml: Added
 	@RASQAL_EXPR_LANGMATCHES:
 
-	* rasqal/src/rasqal_literal.c: autodocs
-
 	* rasqal/docs/rasqal-sections.txt: Added
 	rasqal_new_decimal_literal
 
@@ -657,10 +655,6 @@
 	* raptor/src/raptor_internal.h:
 	(struct raptor_www_s) gains a handle field
 
-	* raptor/src/raptor_parse.c: autodocs
-
-	* raptor/src/ntriples_parse.c: autodocs and some code style fixes
-
 2005-09-14  Dave Beckett  <dave@dajobe.org>
 
 	* librdf/rdf_parser_raptor.c
@@ -975,25 +969,14 @@
 
 2005-09-09  Dave Beckett  <dave@dajobe.org>
 
-	* raptor/src/raptor_qname.c: autodocs
-
 	* raptor/docs/raptor-sections.txt: Added new fns
 
-	* rasqal/src/rasqal.h: autodocs
-
 	* rasqal/docs/rasqal-sections.txt: No rasqal_variable_s
-
-	* rasqal/src/rasqal_query.c (rasqal_query_graph_pattern_visit):
-	autodocs
-
-	* rasqal/src/rasqal.h: autodocs
 
 	* rasqal/docs/tmpl/section-graph_pattern.sgml,
 	rasqal/docs/tmpl/section-query.sgml: add new fns
 
 	* rasqal/docs/tmpl/section-literal.sgml: remove dup text
-
-	* rasqal/src/rasqal.h, rasqal/src/rasqal_graph_pattern.c: autodocs
 
 	* rasqal/docs/rasqal-sections.txt: add new fns
 
@@ -1165,9 +1148,6 @@
 
 	* rasqal/docs/tmpl/section-triples_source.sgml: section title
 
-	* rasqal/docs/tmpl/section-triples_source.sgml,
-	rasqal/src/rasqal_expr.c: autodocs
-
 	* rasqal/docs/rasqal-sections.txt: Added
 	rasqal_new_expression_from_expression
 
@@ -1183,13 +1163,7 @@
 
 2005-08-22  Dave Beckett  <dave@dajobe.org>
 
-	* raptor/src/raptor.h: autodocs fixes
-
-	* raptor/src/raptor.h: autodocs
-
 	* raptor/docs/raptor-sections.txt: raptor_uri_init now internal
-
-	* raptor/src/raptor_parse.c: autodocs
 
 	* raptor/docs/tmpl/section-unused.sgml: raptor_uri_init now
 	internal
@@ -1198,20 +1172,12 @@
 	raptor/src/raptor_internal.h: Remove unused container_test_handler
 	function.
 
-	* raptor/src/raptor.h, raptor/src/raptor_xml.c,
-	raptor/src/raptor_sequence.c, raptor/src/raptor_iostream.c,
-	raptor/src/raptor_stringbuffer.c: autodocs
-
 	* raptor/docs/raptor-sections.txt: No
 	raptor_container_test_handler
 
 	* raptor/src/raptor.h: raptor_uri_init was internal
 
-	* raptor/src/raptor_uri.c: autodocs
-
 	* raptor/src/raptor_internal.h: raptor_uri_init was internal
-
-	* raptor/src/raptor_uri.c: autodocs
 
 2005-08-19  Dave Beckett  <dave@dajobe.org>
 
@@ -1219,20 +1185,9 @@
 
 	* raptor/docs/tmpl/section-xml-namespace.sgml: args
 
-	* raptor/src/raptor.h, raptor/src/raptor_namespace.c,
-	raptor/src/raptor_iostream.c, raptor/src/raptor_parse.c,
-	raptor/src/raptor_qname.c, raptor/src/raptor_serialize.c,
-	raptor/src/raptor_xml.c, raptor/src/raptor_sequence.c,
-	raptor/src/raptor_general.c, raptor/src/raptor_feature.c: autodocs
-
 	* raptor/docs/version.xml.in: version.xml.in
 
 	* raptor/docs/tmpl/section-serializer.sgml: whitespace
-
-	* raptor/src/raptor_sequence.c: autodocs
-
-	* raptor/src/raptor_xml.c (raptor_xml_escape_string): autodocs
-	escapes
 
 	* raptor/src/ntriples_parse.c, raptor/src/raptor.h,
 	raptor/src/raptor_feature.c, raptor/src/raptor_general.c,
