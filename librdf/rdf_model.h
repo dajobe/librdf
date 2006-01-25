@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -180,8 +179,15 @@ librdf_stream* librdf_model_find_statements_in_context(librdf_model* model, libr
 REDLAND_API
 librdf_iterator* librdf_model_get_contexts(librdf_model* model);
 
-
+/**
+ * LIBRDF_MODEL_FEATURE_CONTEXTS:
+ *
+ * Model feature contexts.
+ *
+ * If set, the model has redland contexts.
+ */
 #define LIBRDF_MODEL_FEATURE_CONTEXTS "http://feature.librdf.org/model-contexts"
+
 /* features */
 REDLAND_API
 librdf_node* librdf_model_get_feature(librdf_model* model, librdf_uri* feature);
