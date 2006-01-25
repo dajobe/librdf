@@ -122,9 +122,12 @@ typedef struct
 
 /**
  * librdf_log_level_func:
+ * @user_data: User data pointer
+ * @message: Log message.
+ * @arguments: Message arguments.
  *
  * Handler for one log level, for the warning and error levels ONLY.
- * Used by librdf_world_set_warning and librdf_world_set_error.
+ * Used by #librdf_world_set_warning and #librdf_world_set_error.
  *
  * Return value: non-zero to indicate log message has been handled 
  */
@@ -132,6 +135,8 @@ typedef int (*librdf_log_level_func)(void *user_data, const char *message, va_li
 
 /**
  * librdf_log_func:
+ * @user_data: User data pointer
+ * @message: Log message structure pointer.
  *
  * Handler for all log levels.
  *
