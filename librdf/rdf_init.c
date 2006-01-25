@@ -56,16 +56,47 @@
 #include <redland.h>
 
 
-const char * const librdf_short_copyright_string = "Copyright (C) 2000-2006 David Beckett. (C) 2000-2005 University of Bristol";
+const char * const librdf_short_copyright_string = "Copyright 2000-2006 David Beckett. Copyright 2000-2005 University of Bristol";
 
 const char * const librdf_copyright_string = "Copyright (C) 2000-2006 David Beckett - http://purl.org/net/dajobe/\nCopyright (C) 2000-2005 University of Bristol - http://www.bristol.ac.uk/";
 
+/**
+ * librdf_version_string:
+ *
+ * Library full version as a string.
+ *
+ * See also #librdf_version_decimal.
+ */
 const char * const librdf_version_string = VERSION;
 
+/**
+ * librdf_version_major:
+ *
+ * Library major version number as a decimal integer.
+ */
 const unsigned int librdf_version_major = LIBRDF_VERSION_MAJOR;
+
+/**
+ * librdf_version_minor:
+ *
+ * Library minor version number as a decimal integer.
+ */
 const unsigned int librdf_version_minor = LIBRDF_VERSION_MINOR;
+
+/**
+ * librdf_version_release:
+ *
+ * Library release version number as a decimal integer.
+ */
 const unsigned int librdf_version_release = LIBRDF_VERSION_RELEASE;
 
+/**
+ * librdf_version_decimal:
+ *
+ * Library full version as a decimal integer.
+ *
+ * See also #librdf_version_string.
+ */
 const unsigned int librdf_version_decimal = LIBRDF_VERSION_DECIMAL;
 
 
