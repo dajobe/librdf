@@ -104,6 +104,13 @@ librdf_stream* librdf_model_serialise(librdf_model* model);
 REDLAND_API
 librdf_stream* librdf_model_find_statements(librdf_model* model, librdf_statement* statement);
 
+/**
+ * LIBRDF_MODEL_FIND_OPTION_MATCH_SUBSTRING_LITERAL:
+ *
+ * Model find statement option.
+ *
+ * If set, the find statement uses substring matching.
+ */
 #define LIBRDF_MODEL_FIND_OPTION_MATCH_SUBSTRING_LITERAL "http://feature.librdf.org/model-find-match-substring-literal"
 
 REDLAND_API
