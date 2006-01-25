@@ -111,7 +111,7 @@ librdf_finish_node(librdf_world *world)
  * librdf_new_node:
  * @world: redland world object
  *
- * Constructor - create a new librdf_node object with a private identifier.
+ * Constructor - create a new #librdf_node object with a private identifier.
  * 
  * Calls librdf_new_node_from_blank_identifier(world, NULL) to
  * construct a new redland blank node identifier and make a
@@ -133,7 +133,7 @@ librdf_new_node(librdf_world *world)
  * @uri_string: string representing a URI
  * @uri: #librdf_uri object
  *
- * INTERNAL - Constructor - create a new librdf_node object from a URI string or URI object.
+ * INTERNAL Constructor - create a new #librdf_node object from a URI string or URI object.
  * 
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -233,7 +233,7 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
  * @world: redland world object
  * @uri_string: string representing a URI
  *
- * Constructor - create a new librdf_node object from a URI string.
+ * Constructor - create a new #librdf_node object from a URI string.
  * 
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -255,7 +255,7 @@ librdf_new_node_from_uri_string(librdf_world *world,
  * @world: redland world object
  * @uri: #librdf_uri object
  *
- * Constructor - create a new resource librdf_node object with a given URI.
+ * Constructor - create a new resource #librdf_node object with a given URI.
  *
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -274,7 +274,7 @@ librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
  * @uri: #librdf_uri object
  * @local_name: local name to append to URI
  *
- * Constructor - create a new resource librdf_node object with a given URI and local name.
+ * Constructor - create a new resource #librdf_node object with a given URI and local name.
  *
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -308,7 +308,7 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
  * @source_uri: source URI
  * @base_uri: base URI
  *
- * Constructor - create a new librdf_node object from a URI string normalised to a new base URI.
+ * Constructor - create a new #librdf_node object from a URI string normalised to a new base URI.
  * 
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -343,7 +343,7 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
  * @xml_language: literal XML language (or NULL, empty string)
  * @is_wf_xml: non 0 if literal is XML
  *
- * Constructor - create a new literal librdf_node object.
+ * Constructor - create a new literal #librdf_node object.
  * 
  * 0.9.12: xml_space argument deleted
  *
@@ -372,7 +372,7 @@ librdf_new_node_from_literal(librdf_world *world,
  * @xml_language: literal XML language (or NULL, empty string)
  * @datatype_uri: URI of typed literal datatype or NULL
  *
- * Constructor - create a new typed literal librdf_node object.
+ * Constructor - create a new typed literal #librdf_node object.
  * 
  * Return value: new #librdf_node object or NULL on failure
  **/
@@ -513,7 +513,7 @@ librdf_new_node_from_typed_literal(librdf_world *world,
  * @world: redland world object
  * @identifier: blank node identifier or NULL
  *
- * Constructor - create a new literal librdf_node object from a blank node identifier.
+ * Constructor - create a new literal #librdf_node object from a blank node identifier.
  *
  * If no identifier string is given, creates a new internal identifier
  * and assigns it.
@@ -621,7 +621,7 @@ librdf_new_node_from_node(librdf_node *node)
  * librdf_free_node:
  * @node: #librdf_node object
  *
- * Destructor - destroy an librdf_node object.
+ * Destructor - destroy an #librdf_node object.
  * 
  **/
 void

@@ -211,7 +211,7 @@ librdf_get_model_factory (const char *name)
  * @storage: #librdf_storage to use
  * @options_string: options to initialise model
  *
- * Constructor - create a new storage librdf_model object.
+ * Constructor - create a new storage #librdf_model object.
  *
  * The options are encoded as described in librdf_hash_from_string()
  * and can be NULL if none are required.
@@ -245,11 +245,13 @@ librdf_new_model (librdf_world *world,
 
 
 /**
- * librdf_new_model_with_options - Constructor - Create a new librdf_model with storage
+ * librdf_new_model_with_options:
  * @world: redland world object
  * @storage: #librdf_storage storage to use
  * @options: #librdf_hash of options to use
  * 
+ * Constructor - Create a new #librdf_model with storage.
+ *
  * Options are presently not used.
  *
  * Return value: a new #librdf_model object or NULL on failure
@@ -331,7 +333,7 @@ librdf_new_model_from_model(librdf_model* model)
  * librdf_free_model:
  * @model: #librdf_model model to destroy
  *
- * Destructor - Destroy a librdf_model object.
+ * Destructor - Destroy a #librdf_model object.
  * 
  **/
 void

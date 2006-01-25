@@ -157,7 +157,7 @@ librdf_free_hash_datums(librdf_world *world)
  * @data: data to store
  * @size: size of data
  *
- * Constructor - Create a new hash datum object.
+ * Constructor - Create a new #librdf_hash_datum object.
  * 
  * Return value: New #librdf_hash_datum object or NULL on failure
  **/
@@ -187,7 +187,7 @@ librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
  * librdf_free_hash_datum:
  * @datum: hash datum object
  *
- * Destructor - destroy a hash datum object.
+ * Destructor - destroy a #librdf_hash_datum object.
  *
  **/
 void
@@ -302,7 +302,7 @@ librdf_get_hash_factory(librdf_world *world, const char *name)
  * @world: redland world object
  * @name: factory name
  *
- * Constructor - create a new librdf_hash object.
+ * Constructor - create a new #librdf_hash object.
  *
  * Return value: a new #librdf_hash object or NULL on failure
  */
@@ -320,9 +320,11 @@ librdf_new_hash(librdf_world *world, const char* name)
 
 
 /**
- * librdf_new_hash_from_factory -  Constructor - create a new librdf_hash object from a factory
+ * librdf_new_hash_from_factory:
  * @world: redland world object
  * @factory: the factory to use to construct the hash
+ *
+ * Constructor - create a new #librdf_hash object from a factory.
  *
  * Return value: a new #librdf_hash object or NULL on failure
  */
@@ -355,11 +357,13 @@ librdf_new_hash_from_factory (librdf_world *world,
 
 
 /**
- * librdf_new_hash_from_string -  Constructor - create a new librdf_hash object from a string
+ * librdf_new_hash_from_string:
  * @world: redland world object
  * @name: hash name
  * @string: hash encoded as a string
  * 
+ * Constructor - create a new #librdf_hash object from a string.
+ *
  * See #librdf_hash_from_string for the string format.
  * 
  * Return value: a new #librdf_hash object or NULL on failure
@@ -389,7 +393,7 @@ librdf_new_hash_from_string(librdf_world *world, const char *name,
  * @name: hash name
  * @array: address of the start of the array of char* pointers
  *
- *  Constructor - create a new librdf_hash object from an array of strings.
+ * Constructor - create a new #librdf_hash object from an array of strings.
  *
  * Return value: a new #librdf_hash object or NULL on failure
  */
@@ -413,8 +417,10 @@ librdf_new_hash_from_array_of_strings(librdf_world *world, const char *name,
 
 
 /**
- * librdf_new_hash_from_hash -  Copy Constructor - create a new librdf_hash object from an existing one
+ * librdf_new_hash_from_hash:
  * @old_hash: the hash to use to construct the hash
+ *
+ * Copy Constructor - create a new #librdf_hash object from an existing one.
  *
  * Return value: a new #librdf_hash object or NULL on failure
  */
@@ -459,10 +465,11 @@ librdf_new_hash_from_hash(librdf_hash* old_hash)
 
 
 /**
- * librdf_free_hash - Destructor - destroy a librdf_hash object
- *
+ * librdf_free_hash:
  * @hash: hash object
- **/
+ *
+ * Destructor - destroy a #librdf_hash object.
+ */
 void
 librdf_free_hash(librdf_hash* hash) 
 {

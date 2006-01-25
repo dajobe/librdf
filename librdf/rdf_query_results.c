@@ -236,7 +236,7 @@ librdf_query_results_get_bindings_count(librdf_query_results *query_results)
  * librdf_free_query_results:
  * @query_results: #librdf_query_results object
  *
- * Destructor - destroy a librdf_query_results object.
+ * Destructor - destroy a #librdf_query_results object.
  * 
  **/
 void

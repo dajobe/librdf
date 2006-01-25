@@ -77,7 +77,7 @@ librdf_finish_statement(librdf_world *world)
  * librdf_new_statement:
  * @world: redland world object
  *
- * Constructor - create a new empty librdf_statement.
+ * Constructor - create a new empty #librdf_statement.
  * 
  * Return value: a new #librdf_statement or NULL on failure
  **/
@@ -150,7 +150,7 @@ librdf_new_statement_from_statement(librdf_statement* statement)
  * @predicate: #librdf_node
  * @object: #librdf_node
  *
- * Constructor - create a new librdf_statement from existing librdf_node objects.
+ * Constructor - create a new #librdf_statement from existing #librdf_node objects.
  * 
  * The node objects become owned by the new statement (or freed on error).
  *
@@ -238,7 +238,7 @@ librdf_statement_clear(librdf_statement *statement)
  * librdf_free_statement:
  * @statement: #librdf_statement object
  *
- * Destructor - destroy a librdf_statement.
+ * Destructor - destroy a #librdf_statement.
  * 
  **/
 void

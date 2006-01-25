@@ -230,7 +230,7 @@ librdf_get_parser_factory(librdf_world *world,
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI of syntax (NULL if not used)
  *
- * Constructor - create a new librdf_parser object.
+ * Constructor - create a new #librdf_parser object.
  * 
  * If all fields are NULL, this means any parser supporting
  * MIME Type "application/rdf+xml"
@@ -257,7 +257,7 @@ librdf_new_parser(librdf_world *world,
  * @world: redland world object
  * @factory: the parser factory to use to create this parser
  *
- * Constructor - create a new librdf_parser object.
+ * Constructor - create a new #librdf_parser object.
  * 
  * Return value: new #librdf_parser object or NULL
  **/
@@ -294,7 +294,7 @@ librdf_new_parser_from_factory(librdf_world *world,
  * librdf_free_parser:
  * @parser: the parser
  *
- * Destructor - destroys a librdf_parser object.
+ * Destructor - destroys a #librdf_parser object.
  * 
  **/
 void

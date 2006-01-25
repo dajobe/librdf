@@ -284,7 +284,7 @@ librdf_storage_enumerate(const unsigned int counter,
  * @name: an identifier for the storage
  * @options_string: options to initialise storage
  *
- * Constructor - create a new librdf_storage object.
+ * Constructor - create a new #librdf_storage object.
  *
  * The options are encoded as described in librdf_hash_from_string()
  * and can be NULL if none are required.
@@ -321,11 +321,13 @@ librdf_new_storage (librdf_world *world,
 
 
 /**
- * librdf_new_storage_with_options - Constructor - create a new librdf_storage object
+ * librdf_new_storage_with_options:
  * @world: redland world object
  * @storage_name: the storage factory name
  * @name: an identifier for the storage
  * @options: #librdf_hash of options to use
+ *
+ * Constructor - create a new #librdf_storage object.
  *
  * The options can be NULL if none are required.
  *
@@ -418,11 +420,13 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
 
 
 /**
- * librdf_new_storage_from_factory - Constructor - create a new librdf_storage object
+ * librdf_new_storage_from_factory:
  * @world: redland world object
  * @factory: the factory to use to construct the storage
  * @name: name to use for storage
  * @options: #librdf_hash of options to initialise storage
+ *
+ * Constructor - create a new #librdf_storage object.
  *
  * If the options are present, they become owned by the storage
  * and should no longer be used.
@@ -475,8 +479,10 @@ librdf_new_storage_from_factory (librdf_world *world,
 
 
 /**
- * librdf_free_storage - Destructor - destroy a librdf_storage object
+ * librdf_free_storage:
  * @storage: #librdf_storage object
+ *
+ * Destructor - destroy a #librdf_storage object.
  * 
  **/
 void

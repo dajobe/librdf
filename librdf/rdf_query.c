@@ -235,7 +235,7 @@ librdf_get_query_factory(librdf_world *world,
  * @base_uri: the base URI of the query string (or NULL)
  * @query_string: the query string
  *
- * Constructor - create a new librdf_query object.
+ * Constructor - create a new #librdf_query object.
  *
  * Return value: a new #librdf_query object or NULL on failure
  */
@@ -311,13 +311,15 @@ librdf_new_query_from_query(librdf_query* old_query)
 
 
 /**
- * librdf_new_query_from_factory - Constructor - create a new librdf_query object
+ * librdf_new_query_from_factory:
  * @world: redland world object
  * @factory: the factory to use to construct the query
  * @name: query language name
  * @uri: query language URI (or NULL)
  * @query_string: the query string
  * @base_uri: base URI of the query string (or NULL)
+ *
+ * Constructor - create a new #librdf_query object.
  *
  * Return value: a new #librdf_query object or NULL on failure
  */
@@ -363,9 +365,10 @@ librdf_new_query_from_factory(librdf_world *world,
 
 
 /**
- * librdf_free_query - Destructor - destroy a librdf_query object
+ * librdf_free_query:
  * @query: #librdf_query object
  * 
+ * Destructor - destroy a #librdf_query object.
  **/
 void
 librdf_free_query(librdf_query* query) 

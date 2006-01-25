@@ -67,7 +67,7 @@ librdf_model_storage_terminate(void) {
  * @storage: #librdf_storage storage to use
  * @options: #librdf_hash of options to use
  *
- * Constructor - Create a new librdf_model with storage.
+ * Constructor - Create a new #librdf_model with storage.
  * 
  * Options are presently not used.
  *
@@ -127,7 +127,7 @@ librdf_model_storage_clone(librdf_model* old_model)
  * librdf_model_storage_destroy:
  * @model: #librdf_model model to destroy
  *
- * Destructor - Destroy a librdf_model object.
+ * Destructor - Destroy a #librdf_model object.
  * 
  **/
 static void

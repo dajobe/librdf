@@ -161,7 +161,7 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
  * @world: redland world object
  * @name: the digest name to use to create this digest
  *
- * Constructor - create a new librdf_digest object.
+ * Constructor - create a new #librdf_digest object.
  * 
  * After construction, data should be added to the digest using
  * #librdf_digest_update or #librdf_digest_update_string with
@@ -191,7 +191,7 @@ librdf_new_digest(librdf_world *world, char *name)
  * @world: redland world object
  * @factory: the digest factory to use to create this digest
  *
- * Constructor - create a new librdf_digest object.
+ * Constructor - create a new #librdf_digest object.
  * 
  * After construction, data should be added to the digest using
  * #librdf_digest_update or #librdf_digest_update_string with
@@ -240,7 +240,7 @@ librdf_new_digest_from_factory(librdf_world *world,
  * librdf_free_digest:
  * @digest: the digest
  *
- * Destructor- destroy a librdf_digest object.
+ * Destructor- destroy a #librdf_digest object.
  * 
  **/
 void

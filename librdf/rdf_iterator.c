@@ -53,7 +53,7 @@ static void* librdf_iterator_update_current_element(librdf_iterator* iterator);
  * @get_method: function to get the next element
  * @finished_method: function to destroy the iterator context (or NULL if not needed)
  *
- * Constructor - create a new librdf_iterator object.
+ * Constructor - create a new #librdf_iterator object.
  * 
  * Return value: a new #librdf_iterator object or NULL on failure
 **/
@@ -104,7 +104,7 @@ librdf_iterator_free_iterator_map(void *list_data, void *user_data)
  * librdf_free_iterator:
  * @iterator: the #librdf_iterator object
  *
- * Destructor - destroy a librdf_iterator object.
+ * Destructor - destroy a #librdf_iterator object.
  * 
  **/
 void
@@ -407,7 +407,7 @@ librdf_iterator_add_map(librdf_iterator* iterator,
  * librdf_new_empty_iterator:
  * @world: redland world object
  *
- * Constructor - create a new librdf_iterator with no content.
+ * Constructor - create a new #librdf_iterator with no content.
  * 
  * Return value: a new #librdf_iterator object or NULL on failure
 **/

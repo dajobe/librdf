@@ -101,7 +101,7 @@ librdf_finish_uri(librdf_world *world)
  * @world: redland world object
  * @uri_string: URI in string form
  *
- * Constructor - create a new librdf_uri object from a URI string.
+ * Constructor - create a new #librdf_uri object from a URI string.
  * 
  * A new URI is constructed from a copy of the string.  If the
  * string is a NULL pointer or empty (0 length) then the result is NULL.
@@ -255,7 +255,7 @@ librdf_new_uri_from_uri_local_name (librdf_uri* old_uri,
  * @source_uri: source URI to remove
  * @base_uri: base URI to add
  *
- * Constructor - create a new librdf_uri object from a URI string stripped of the source URI, made relative to the base URI.
+ * Constructor - create a new #librdf_uri object from a URI string stripped of the source URI, made relative to the base URI.
  * 
  * Return value: a new #librdf_uri object or NULL on failure
  **/
@@ -320,7 +320,7 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
  * @base_uri: absolute base URI
  * @uri_string: relative URI string
  *
- * Constructor - create a new librdf_uri object from a URI string relative to a base URI.
+ * Constructor - create a new #librdf_uri object from a URI string relative to a base URI.
  *
  * An empty uri_string or NULL is equivalent to 
  * librdf_new_uri_from_uri(base_uri)
@@ -364,7 +364,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
  * @world: Redland #librdf_world object
  * @filename: filename
  *
- * Constructor - create a new librdf_uri object from a filename.
+ * Constructor - create a new #librdf_uri object from a filename.
  *
  * Return value: a new #librdf_uri object or NULL on failure
  **/
@@ -391,7 +391,7 @@ librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
  * librdf_free_uri:
  * @uri: #librdf_uri object
  *
- * Destructor - destroy a librdf_uri object.
+ * Destructor - destroy a #librdf_uri object.
  * 
  **/
 void

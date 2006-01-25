@@ -58,7 +58,7 @@ static librdf_statement* librdf_stream_update_current_statement(librdf_stream* s
  * @get_method: pointer to function to get the current statement
  * @finished_method: pointer to function to finish the stream.
  *
- * Constructor - create a new librdf_stream.
+ * Constructor - create a new #librdf_stream.
  *
  * Creates a new stream with an implementation based on the passed in
  * functions.  The functions next_statement and end_of_stream will be called
@@ -119,7 +119,7 @@ librdf_stream_free_stream_map(void *list_data, void *user_data)
  * librdf_free_stream:
  * @stream: #librdf_stream object
  *
- * Destructor - destroy an libdf_stream object.
+ * Destructor - destroy an #libdf_stream object.
  *
  **/
 void
@@ -371,7 +371,7 @@ typedef struct {
  * @statement: #librdf_statement prototype with one NULL node space
  * @field: node part of statement
  *
- * Constructor - create a new librdf_stream from an iterator of nodes.
+ * Constructor - create a new #librdf_stream from an iterator of nodes.
  *
  * Creates a new #librdf_stream using the passed in #librdf_iterator
  * which generates a series of #librdf_node objects.  The resulting
@@ -588,7 +588,7 @@ librdf_stream_statement_find_map(librdf_stream *stream,
  * librdf_new_empty_stream:
  * @world: redland world object
  *
- * Constructor - create a new librdf_stream with no content.
+ * Constructor - create a new #librdf_stream with no content.
  * 
  * Return value: a new #librdf_stream object or NULL on failure
 **/

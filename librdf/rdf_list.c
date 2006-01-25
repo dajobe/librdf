@@ -75,7 +75,7 @@ librdf_list_find_node(librdf_list* list, void *data)
  * librdf_new_list:
  * @world: redland world object
  *
- * Constructor - create a new librdf_list.
+ * Constructor - create a new #librdf_list.
  * 
  * Return value: a new #librdf_list or NULL on failure
  **/
@@ -98,7 +98,7 @@ librdf_new_list(librdf_world *world)
  * librdf_free_list:
  * @list: #librdf_list object
  *
- * Destructor - destroy a librdf_list object.
+ * Destructor - destroy a #librdf_list object.
  * 
  **/
 void
