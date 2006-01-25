@@ -53,9 +53,6 @@ REDLAND_API REDLAND_DEPRECATED
 int librdf_iterator_have_elements(librdf_iterator* iterator);
 
 REDLAND_API
-int librdf_iterator_finished(librdf_iterator* iterator);
-
-REDLAND_API
 int librdf_iterator_next(librdf_iterator* iterator);
 REDLAND_API
 void* librdf_iterator_get_object(librdf_iterator* iterator);
