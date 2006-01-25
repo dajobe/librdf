@@ -2,11 +2,11 @@
 General library facilities
 
 <!-- ##### SECTION Short_Description ##### -->
-Version checks and misc functions.
+Version static variables.
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+Version static variables.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
