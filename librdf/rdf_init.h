@@ -58,7 +58,22 @@ REDLAND_API
 void librdf_world_set_digest(librdf_world* world, const char *name);
 
 
+/**
+ * LIBRDF_WORLD_FEATURE_GENID_BASE:
+ *
+ * World feature to set the generated ID base.
+ *
+ * Must be set before the world is opened with librdf_world_open().
+ */
 #define LIBRDF_WORLD_FEATURE_GENID_BASE "http://feature.librdf.org/genid-base"
+
+/**
+ * LIBRDF_WORLD_FEATURE_GENID_COUNTER:
+ *
+ * World feature to set the generated ID counter.
+ *
+ * Must be set before the world is opened with librdf_world_open().
+ */
 #define LIBRDF_WORLD_FEATURE_GENID_COUNTER "http://feature.librdf.org/genid-counter"
 
 REDLAND_API
