@@ -47,7 +47,7 @@
 
 
 /**
- * librdf_query_get_result_count:
+ * librdf_query_results_get_count:
  * @query_results: #librdf_query_results query results
  *
  * Get number of bindings so far.

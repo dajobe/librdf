@@ -147,7 +147,6 @@ librdf_delete_storage_factories(void)
  * @factory: pointer to function to call to register the factory
  *
  * Register a storage factory.
- * 
  **/
 void
 librdf_storage_register_factory(librdf_world* world,
@@ -290,6 +289,7 @@ librdf_storage_enumerate(const unsigned int counter,
  * and can be NULL if none are required.
  *
  * Return value: a new #librdf_storage object or NULL on failure
+ *
  */
 librdf_storage*
 librdf_new_storage (librdf_world *world, 
@@ -332,6 +332,7 @@ librdf_new_storage (librdf_world *world,
  * The options can be NULL if none are required.
  *
  * Return value: a new #librdf_storage object or NULL on failure
+ *
  */
 librdf_storage*
 librdf_new_storage_with_options (librdf_world *world, 
@@ -369,6 +370,7 @@ librdf_new_storage_with_options (librdf_world *world,
  * storage identifier.
  *
  * Return value: a new #librdf_storage object or NULL on failure
+ *
  */
 librdf_storage*
 librdf_new_storage_from_storage(librdf_storage* old_storage) 
@@ -432,6 +434,7 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
  * and should no longer be used.
  *
  * Return value: a new #librdf_storage object or NULL on failure
+ *
  */
 librdf_storage*
 librdf_new_storage_from_factory (librdf_world *world,
@@ -483,7 +486,6 @@ librdf_new_storage_from_factory (librdf_world *world,
  * @storage: #librdf_storage object
  *
  * Destructor - destroy a #librdf_storage object.
- * 
  **/
 void
 librdf_free_storage (librdf_storage* storage) 
@@ -1335,28 +1337,56 @@ librdf_storage_context_serialise(librdf_storage* storage,
 }
 
 
+/**
+ * librdf_storage_supports_query:
+ * @storage: #librdf_storage object
+ * @query: #librdf_query query object
+ * 
+ * Check if a storage system supports a query language.
+ * 
+ * Not implemented.
+ *
+ * Return value: non-0 if the query is supported.
+ **/
 int
 librdf_storage_supports_query(librdf_storage* storage, librdf_query *query)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 0);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 0);
 
-  /* FIXME - no storage system supports a query language at present */
   return 0;
 }
 
 
+/**
+ * librdf_storage_query_execute:
+ * @storage: #librdf_storage object
+ * @query: #librdf_query query object
+ * 
+ * Run the given query against the storage.
+ * 
+ * Not implemented.
+ *
+ * Return value: #librdf_query_results or NULL on failure
+ **/
 librdf_query_results*
 librdf_storage_query_execute(librdf_storage* storage, librdf_query *query) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
 
-  /* FIXME - no storage system supports querying yet */
   return NULL;
 }
 
 
+/**
+ * librdf_storage_sync:
+ * @storage: #librdf_storage object
+ * 
+ * Synchronise the storage to the storage implementation.
+ * 
+ * Return value: non-0 on failure
+ **/
 int
 librdf_storage_sync(librdf_storage* storage) 
 {

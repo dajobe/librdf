@@ -33,7 +33,28 @@
 extern "C" {
 #endif
 
+/**
+ * librdf_stream_map_handler: 
+ * @stream: Stream that this map is operating over.
+ * @map_context: Map data context pointer.
+ * @item: Pointer to the current item in the iteration.
+ *
+ * Map function for a #librdf_stream map operation.
+ *
+ * See librdf_stream_add_map().
+ *
+ * Returns; item in keep the iteration or NULL to remove it
+ */
 typedef librdf_statement* (*librdf_stream_map_handler)(librdf_stream *stream, void *map_context, librdf_statement *item);
+
+/**
+ * librdf_stream_map_free_context_handler:
+ * @map_context: Map data context pointer.
+ *
+ * Free handler function for a #librdf_stream map operation.
+ *
+ * See librdf_stream_add_map().
+ */
 typedef void (*librdf_stream_map_free_context_handler)(void *map_context);
 
 #ifdef LIBRDF_INTERNAL

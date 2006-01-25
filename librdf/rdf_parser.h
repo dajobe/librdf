@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -71,7 +70,18 @@ librdf_stream* librdf_parser_parse_counted_string_as_stream(librdf_parser* parse
 REDLAND_API
 int librdf_parser_parse_counted_string_into_model(librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri, librdf_model* model);
 
+/**
+ * LIBRDF_PARSER_FEATURE_ERROR_COUNT:
+ *
+ * Parser feature URI string for getting the error count of the last parse.
+ */
 #define LIBRDF_PARSER_FEATURE_ERROR_COUNT "http://feature.librdf.org/parser-error-count"
+
+/**
+ * LIBRDF_PARSER_FEATURE_WARNING_COUNT:
+ *
+ * Parser feature URI string for getting the warning count of the last parse.
+ */
 #define LIBRDF_PARSER_FEATURE_WARNING_COUNT "http://feature.librdf.org/parser-warning-count"
 
 REDLAND_API

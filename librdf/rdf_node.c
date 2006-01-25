@@ -986,7 +986,7 @@ librdf_node_is_resource(librdf_node* node) {
 
 
 /**
- * librdf_node_is_resource:
+ * librdf_node_is_literal:
  * @node: the node object
  *
  * Check node is a literal.

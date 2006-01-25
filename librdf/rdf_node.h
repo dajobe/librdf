@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -43,9 +42,28 @@ extern "C" {
 
 /* Node types */
 
-/* DEPENDENCY: If this list is changed, the librdf_node_type_names definition in rdf_node.c
- * must be updated to match 
-*/
+/* DEPENDENCY: If this list is changed, the librdf_node_type_names
+ * definition in rdf_node.c must be updated to match
+ *
+ * Node type 3 is unused and should not be renumbered to keep binary
+ * ABI compatibility.
+ */
+
+/**
+ * librdf_node_type:
+ * @LIBRDF_NODE_TYPE_UNKNOWN: Internal
+ * @LIBRDF_NODE_TYPE_RESOURCE: rdf:Resource (& rdf:Property) - has a URI
+ * @LIBRDF_NODE_TYPE_LITERAL: rdf:Literal - has an XML string, language,
+ *   XML space
+ * @LIBRDF_NODE_TYPE_BLANK: blank node has an identifier string.
+ * @LIBRDF_NODE_TYPE_LAST: Internal
+ *
+ * Type of a redland node.
+ *
+ * Better to check this with functions librdf_node_is_resource(),
+ * librdf_node_is_literal() or librdf_node_is_blank().
+ *
+ */
 typedef enum {
   LIBRDF_NODE_TYPE_UNKNOWN   = 0,  /* To catch uninitialised nodes */
   LIBRDF_NODE_TYPE_RESOURCE  = 1,  /* rdf:Resource (& rdf:Property) - has a URI */

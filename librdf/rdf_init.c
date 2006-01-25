@@ -304,10 +304,12 @@ librdf_world_set_digest(librdf_world* world, const char *name) {
 
 
 /**
- * librdf_world_get_feature - get the value of a world feature 
+ * librdf_world_get_feature:
  * @world: #librdf_world object
  * @feature: #librdf_uri feature property
  * 
+ * Get the value of a world feature.
+ *
  * Return value: new #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
@@ -428,8 +430,7 @@ static librdf_world* RDF_World;
  *
  * Use librdf_new_world() and librdf_world_open() on #librdf_world object
  * 
- * See librdf_world_set_digest_factory_name() and
- * librdf_world_set_uris_hash() for documentation on arguments.
+ * See librdf_world_set_digest_factory_name() for documentation on arguments.
  **/
 void
 librdf_init_world(char *digest_factory_name, void* not_used2)
