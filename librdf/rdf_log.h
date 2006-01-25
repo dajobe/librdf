@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2004-2005, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2004-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2004-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -35,22 +34,49 @@ extern "C" {
 
 /**
  * librdf_log_level:
+ * @LIBRDF_LOG_NONE: No level
+ * @LIBRDF_LOG_DEBUG: Debug.
+ * @LIBRDF_LOG_INFO: Information.
+ * @LIBRDF_LOG_WARN: Warning.
+ * @LIBRDF_LOG_ERROR: Recoverable error.  Program can continue.
+ * @LIBRDF_LOG_FATAL: Fatal error.  Program will abort if this is not caught.
+ * @LIBRDF_LOG_LAST: Internal, never returned.
  *
- * Indicates the level of the log message
+ * Indicates the level of the log message.
  */
 typedef enum {
   LIBRDF_LOG_NONE = 0,
-  LIBRDF_LOG_DEBUG,    /* debug message */
-  LIBRDF_LOG_INFO,     /* information */
-  LIBRDF_LOG_WARN,     /* warning */
-  LIBRDF_LOG_ERROR,    /* recoverable error */
-  LIBRDF_LOG_FATAL,     /* fatal error */
+  LIBRDF_LOG_DEBUG,
+  LIBRDF_LOG_INFO,
+  LIBRDF_LOG_WARN,
+  LIBRDF_LOG_ERROR,
+  LIBRDF_LOG_FATAL,
   LIBRDF_LOG_LAST=LIBRDF_LOG_FATAL
 } librdf_log_level;
   
 
 /**
  * librdf_log_facility:
+ * @LIBRDF_FROM_CONCEPTS: Concepts
+ * @LIBRDF_FROM_DIGEST: Digest
+ * @LIBRDF_FROM_FILES: Files
+ * @LIBRDF_FROM_HASH: Hash
+ * @LIBRDF_FROM_INIT: Init
+ * @LIBRDF_FROM_ITERATOR: Iterator
+ * @LIBRDF_FROM_LIST: List
+ * @LIBRDF_FROM_MODEL: Model
+ * @LIBRDF_FROM_NODE: Node
+ * @LIBRDF_FROM_PARSER: Parser
+ * @LIBRDF_FROM_QUERY: Query
+ * @LIBRDF_FROM_SERIALIZER: Serializer
+ * @LIBRDF_FROM_STATEMENT: Statement
+ * @LIBRDF_FROM_STORAGE: Storage
+ * @LIBRDF_FROM_STREAM: Stream
+ * @LIBRDF_FROM_URI: URI
+ * @LIBRDF_FROM_UTF8: UTF8
+ * @LIBRDF_FROM_MEMORY: Memory
+ * @LIBRDF_FROM_NONE: Associated with no part.
+ * @LIBRDF_FROM_LAST: Internal, never returned.
  *
  * Indicates the part of the system that generated the log message
  */

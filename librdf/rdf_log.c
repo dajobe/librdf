@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2004-2004, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2004-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2004-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -241,7 +240,7 @@ librdf_log_message_code(librdf_log_message *message)
  * Retrieve severity of log message.
  *
  * The log message severity level is defined in rdf_log.h as values
- * of enum librdf_log_level.
+ * of enum #librdf_log_level
  *
  * Return value: severity level
  **/
@@ -259,7 +258,7 @@ librdf_log_message_level(librdf_log_message *message)
  * Retrieve facility that generated the message.
  *
  * The log message facility is defined in rdf_log.h as values
- * of enum librdf_log_facility.
+ * of enum #librdf_log_facility
  *
  * Return value: ID of Redland facility that generated the log message.
  **/
