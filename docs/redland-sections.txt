@@ -78,7 +78,6 @@ librdf_world_set_error
 librdf_world_set_warning
 librdf_world_set_logger
 librdf_world_set_digest
-librdf_world_set_uris_hash
 LIBRDF_WORLD_FEATURE_GENID_BASE
 LIBRDF_WORLD_FEATURE_GENID_COUNTER
 librdf_world_get_feature

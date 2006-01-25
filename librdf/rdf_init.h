@@ -56,8 +56,6 @@ void librdf_world_set_logger(librdf_world* world, void *user_data, librdf_log_fu
 
 REDLAND_API
 void librdf_world_set_digest(librdf_world* world, const char *name);
-REDLAND_API
-void librdf_world_set_uris_hash(librdf_world* world, librdf_hash* uris_hash);
 
 
 #define LIBRDF_WORLD_FEATURE_GENID_BASE "http://feature.librdf.org/genid-base"
