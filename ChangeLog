@@ -1,3 +1,38 @@
+2006-01-25  Dave Beckett  <dave@dajobe.org>
+
+	* raptor/docs/tmpl/section-feature.sgml: Sort
+	RAPTOR_FEATURE_WRITER_XML_DECLARATION
+
+	* configure.ac: Adjust byte, u32, u64 check
+
+	* docs/redland-sections.txt: Removed never-existed function
+	prototype librdf_world_set_uris_hash
+
+	* librdf/rdf_init.h: Removed never-existed function prototype
+	librdf_world_set_uris_hash
+
+	* librdf/rdf_query_results.c, librdf/rdf_node.c,
+	librdf/rdf_stream.h, librdf/rdf_node.h, librdf/rdf_storage.c:
+	autodocs
+
+	* librdf/rdf_storage.h: Removed never-existed function prototype
+	librdf_storage_get
+
+	* docs/redland-sections.txt: librdf_storage_get does not exist
+
+	* docs/redland-sections.txt: Removed never-existed function
+	prototype librdf_iterator_finished
+
+	* librdf/rdf_iterator.h: Removed never-existed function prototype
+	librdf_iterator_finished
+
+	* librdf/rdf_files.h: Deprecated librdf_files_temporary_file_name
+
+	* librdf/rdf_files.c (librdf_files_temporary_file_name): Deprecated
+
+	* docs/redland-sections.txt:
+	Add librdf_serializer_serialize_model_to_iostream
+
 2006-01-16  Dave Beckett  <dave@dajobe.org>
 
 	* redland.rdf.in: use download.librdf.org
