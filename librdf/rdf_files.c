@@ -54,6 +54,18 @@
 #include <redland.h>
 
 #ifndef STANDALONE
+
+
+
+/**
+ * librdf_files_temporary_file_name:
+ * 
+ * Create a temporary file name.
+ * 
+ * @deprecated: Do not use this, it is unsafe.
+ *
+ * Return value: a new filename or NULL on failure.
+ **/
 char *
 librdf_files_temporary_file_name(void) 
 {
