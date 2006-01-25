@@ -373,7 +373,6 @@ librdf_new_storage_from_factory
 librdf_free_storage
 librdf_storage_open
 librdf_storage_close
-librdf_storage_get
 librdf_storage_size
 librdf_storage_add_statement
 librdf_storage_add_statements
