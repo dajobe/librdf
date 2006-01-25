@@ -58,7 +58,6 @@ librdf_new_iterator
 librdf_free_iterator
 librdf_iterator_end
 librdf_iterator_have_elements
-librdf_iterator_finished
 librdf_iterator_next
 librdf_iterator_get_object
 librdf_iterator_get_context
