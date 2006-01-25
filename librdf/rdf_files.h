@@ -34,7 +34,8 @@ extern "C" {
 #endif
 
 
-char * librdf_files_temporary_file_name(void);
+REDLAND_DEPRECATED
+char* librdf_files_temporary_file_name(void);
 
 
 #ifdef __cplusplus
