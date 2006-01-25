@@ -35,17 +35,23 @@ extern "C" {
 #endif
 
 /**
- * librdf_iterator_map_handler:
+ * librdf_iterator_map_handler: 
+ * @iterator: Iterator that this map is operating over.
+ * @map_context: Map data context pointer.
+ * @item: Pointer to the current item in the iteration.
  *
  * Map function for a #librdf_iterator map operation.
  *
  * See librdf_iterator_add_map().
+ *
+ * Returns; item in keep the iteration or NULL to remove it
  */
 typedef void* (*librdf_iterator_map_handler)(librdf_iterator *iterator, void *map_context, void *item);
 
 
 /**
  * librdf_iterator_map_free_context_handler:
+ * @map_context: Map data context pointer.
  *
  * Free handler function for a #librdf_iterator map operation.
  *
