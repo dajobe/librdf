@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -57,9 +56,9 @@
 #include <redland.h>
 
 
-const char * const librdf_short_copyright_string = "Copyright (C) 2000-2005 David Beckett, ILRT, University of Bristol";
+const char * const librdf_short_copyright_string = "Copyright (C) 2000-2006 David Beckett. (C) 2000-2005 University of Bristol";
 
-const char * const librdf_copyright_string = "Copyright (C) 2000-2005 David Beckett - http://purl.org/net/dajobe/\nInstitute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/,\nUniversity of Bristol - http://www.bristol.ac.uk/";
+const char * const librdf_copyright_string = "Copyright (C) 2000-2006 David Beckett - http://purl.org/net/dajobe/\nCopyright (C) 2000-2005 University of Bristol - http://www.bristol.ac.uk/";
 
 const char * const librdf_version_string = VERSION;
 
@@ -74,6 +73,10 @@ const unsigned int librdf_version_decimal = LIBRDF_VERSION_DECIMAL;
 
 /**
  * librdf_new_world:
+ *
+ * Create a new redland execution environment.
+ *
+ * Returns: a new #librdf_world or NULL on failure
  */
 librdf_world*
 librdf_new_world(void) {
@@ -99,12 +102,10 @@ librdf_new_world(void) {
 
 
 /**
- * librdf_free_world - Terminate the library
+ * librdf_free_world
  * @world: redland world object
  *
- * Creates a new Redland execution environment.
- * 
- * Terminates and frees the resources.
+ * Terminate the library and frees all allocated resources.
  **/
 void
 librdf_free_world(librdf_world *world)
@@ -155,6 +156,8 @@ librdf_free_world(librdf_world *world)
 /**
  * librdf_world_init_mutex:
  * @world: redland world object
+ *
+ * INTERNAL - Create the world mutex.
  */
 void
 librdf_world_init_mutex(librdf_world* world)
@@ -174,11 +177,10 @@ librdf_world_init_mutex(librdf_world* world)
 
 
 /**
- * librdf_world_open - Open an environment
+ * librdf_world_open
  * @world: redland world object
  *
- * INTERNAL - Create the world mutex.
- * 
+ * Open a created redland world environment.
  **/
 void
 librdf_world_open(librdf_world *world)
@@ -231,7 +233,8 @@ librdf_world_open(librdf_world *world)
  * Set the world error handling function.
  * 
  * The function will receive callbacks when the world fails.
- * 
+ * librdf_world_set_logger() provides richer access to all log messages
+ * and should be used in preference.
  **/
 void
 librdf_world_set_error(librdf_world* world, void *user_data,
@@ -251,7 +254,8 @@ librdf_world_set_error(librdf_world* world, void *user_data,
  * Set the world warning handling function.
  * 
  * The function will receive callbacks when the world gives a warning.
- * 
+ * librdf_world_set_logger() provides richer access to all log messages
+ * and should be used in preference.
  **/
 void
 librdf_world_set_warning(librdf_world* world, void *user_data,
@@ -272,7 +276,6 @@ librdf_world_set_warning(librdf_world* world, void *user_data,
  * Set the world log handling function.
  * 
  * The function will receive callbacks when redland generates a log message
- * 
  **/
 void
 librdf_world_set_logger(librdf_world* world, void *user_data,
@@ -289,11 +292,10 @@ librdf_world_set_logger(librdf_world* world, void *user_data,
  * @world: redland world object
  * @name: Digest factory name
  *
- * Set the default digest name.
+ * Set the default content digest name.
  *
  * Sets the digest factory for various modules that need to make
  * digests of their objects.
- * 
  */
 void
 librdf_world_set_digest(librdf_world* world, const char *name) {
@@ -421,12 +423,13 @@ static librdf_world* RDF_World;
  * @digest_factory_name: Name of digest factory to use
  * @not_used2: Not used
  *
- * Initialise the library (DEPRECATED).
+ * Initialise the library
+ * @deprecated: Do not use.
  *
- * Use librdf_new_world and librdf_world_open on librdf_world object
+ * Use librdf_new_world() and librdf_world_open() on #librdf_world object
  * 
- * See librdf_world_set_digest_factory_name and
- * librdf_world_set_uris_hash for documentation on arguments.
+ * See librdf_world_set_digest_factory_name() and
+ * librdf_world_set_uris_hash() for documentation on arguments.
  **/
 void
 librdf_init_world(char *digest_factory_name, void* not_used2)
@@ -443,9 +446,10 @@ librdf_init_world(char *digest_factory_name, void* not_used2)
 /**
  * librdf_destroy_world:
  *
- * Terminate the library (DEPRECATED).
+ * Terminate the library
+ * @deprecated: Do not use.
  *
- * Use librdf_free_world on librdf_world object
+ * Use librdf_free_world() on #librdf_world object
  * 
  * Terminates and frees the resources.
  **/
