@@ -65,8 +65,6 @@ REDLAND_API
 int librdf_storage_open(librdf_storage* storage, librdf_model *model);
 REDLAND_API
 int librdf_storage_close(librdf_storage* storage);
-REDLAND_API
-int librdf_storage_get(librdf_storage* storage, void *key, size_t key_len, void **value, size_t* value_len, unsigned int flags);
 
 REDLAND_API
 int librdf_storage_size(librdf_storage* storage);
