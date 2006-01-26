@@ -38,13 +38,19 @@
 extern "C" {
 #endif
 
-/* Or-ed to indicate statement parts via fields arguments to various
- * methods such as the public:
- *   librdf_statement_encode_parts
- *   librdf_statement_decode_parts
- *   librdf_new_stream_from_node_iterator
- * and the internal:
- *   librdf_storage_node_stream_to_node_create
+/**
+ * librdf_statement_part:
+ * @LIBRDF_STATEMENT_SUBJECT: Subject of a statement.
+ * @LIBRDF_STATEMENT_PREDICATE: Predicate of a statement.
+ * @LIBRDF_STATEMENT_OBJECT: Object of a statement.
+ * @LIBRDF_STATEMENT_ALL: All parts of a statement.
+ *
+ * Flags that are or-ed to indicate statement parts.
+ *
+ * Used in fields arguments to methods such as the public
+ * librdf_statement_encode_parts() librdf_statement_decode_parts()
+ * librdf_new_stream_from_node_iterator() and the internal
+ * librdf_storage_node_stream_to_node_create()
  */
 typedef enum {
   LIBRDF_STATEMENT_SUBJECT   = 1 << 0,

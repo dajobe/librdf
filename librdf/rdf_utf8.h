@@ -40,6 +40,12 @@ extern "C" {
 #include <Redland/rdf_types.h>
 #endif
 
+/**
+ * librdf_unichar:
+ *
+ * Unicode codepoint.
+ *
+ */
 typedef u32 librdf_unichar;
 
 int librdf_unicode_char_to_utf8(librdf_unichar c, byte *output, int length);
