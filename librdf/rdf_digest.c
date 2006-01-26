@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, Copyright (C) 2000-2006, Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -470,7 +469,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_digest* d;
-  char *test_data="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
+  char *test_data="http://purl.org/net/dajobe/";
   struct t test_data_answers[]={
     {"MD5", "78f68989ea3ded775925a1a00fe49abe"},
     {"SHA1", "0452bca820dfdaa707f0278216c598f185867993"},

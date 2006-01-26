@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, Copyright (C) 2000-2006, Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -1645,7 +1644,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_node *node, *node2, *node3, *node4, *node5, *node6, *node7;
-  char *hp_string1="http://www.ilrt.bristol.ac.uk/people/cmdjb/";
+  char *hp_string1="http://purl.org/net/dajobe/";
   char *hp_string2="http://purl.org/net/dajobe/";
   char *lit_string="Dave Beckett";
   char *genid="genid42";

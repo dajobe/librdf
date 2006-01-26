@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, Copyright (C) 2000-2006, Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -661,7 +660,7 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  const unsigned char *hp_string=(const unsigned char*)"http://www.ilrt.bristol.ac.uk/people/cmdjb/";
+  const unsigned char *hp_string=(const unsigned char*)"http://purl.org/net/dajobe/";
   librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5, *uri6, *uri7, *uri8, *uri9;
   librdf_digest *d;
   char *program=argv[0];

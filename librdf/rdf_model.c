@@ -4,9 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2005, David Beckett http://purl.org/net/dajobe/
- * Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
- * University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, Copyright (C) 2000-2006, Copyright (C) 2000-2006, Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -1745,7 +1744,7 @@ main(int argc, char *argv[])
 
   statement=librdf_new_statement(world);
   /* after this, nodes become owned by model */
-  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://www.ilrt.bris.ac.uk/people/cmdjb/"));
+  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/"));
   librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"));
 
   if(!librdf_model_add_statement(model, statement)) {
