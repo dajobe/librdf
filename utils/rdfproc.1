@@ -4,11 +4,10 @@
 .\"
 .\" $Id$
 .\"
-.\" Copyright (C) 2003-2005 David Beckett - http://purl.org/net/dajobe/
-.\" Institute for Learning and Research Technology - http://www.ilrt.bristol.ac.uk/
-.\" University of Bristol - http://www.bristol.ac.uk/
+.\" Copyright (C) 2003-2006 David Beckett - http://purl.org/net/dajobe/
+.\" Copyright (C) 2003-2005 University of Bristol - http://www.bristol.ac.uk/
 .\"
-.TH rdfproc 1 "2005-05-06"
+.TH rdfproc 1 "2006-01-25"
 .\" Please adjust this date whenever revising the manpage.
 .SH NAME
 rdfproc \- Redland RDF processor utility
@@ -20,7 +19,7 @@ rdfproc \- Redland RDF processor utility
 .IR "arg..."
 .SH EXAMPLE
 .nf
-.B rdfproc test parse http://ilrt.org/discovery/rdf/resources/rss.rdf
+.B rdfproc test parse http://planetrdf.com/guide/rss.rdf
 .br
 .B rdfproc test print
 .br
@@ -63,10 +62,10 @@ require exposing the password in the argument list.
 .TP
 .B \-s, \-\-storage \fITYPE\fR
 Set the Redland storage type (default 'hashes').  Alternatives
-are 'memory' which is always present and '3store', 'mysql' when
-support for those is compiled in
-If environment variable RDFPROC_STORAGE_TYPE is set, the storage
-type given here will override it.
+are 'memory' which is always present
+and '3store', 'file', 'mysql', 'sqlite', 'uri' when support for those
+is compiled in If environment variable RDFPROC_STORAGE_TYPE is set,
+the storage type given here will override it.
 .TP
 .B \-t, \-\-storage-options \fIOPTIONS\fR
 Set options for the the Redland storage, default is "hash-type='bdb',dir='.'"
@@ -126,7 +125,10 @@ and \fIARC\fP as a predicate.
 
 .IP "\fBparse \fIURI|FILENAME\fP [\fISYNTAX|\fP [\fIBASE URI\fP]]\fR"
 Parse syntax at \fIURI\fP intothe graph using \fISYNTAX\fP which
-can be one of \fIrdfxml\fP (RDF/XML, default) or \fIntriples\fP.
+can be one of \fIrdfxml\fP (RDF/XML, default), \fIntriples\fP, \fIturtle\fP,
+\fIrss-tag-soup\fP (for all RSS and Atoms), \fIgrddl\fP and \fIguess\fP to
+use content hints and protocol information to work it out. (This list changes
+faster than this manual page)
 If \fIFILENAME\fP is a existing file, the appropriate URI will be
 generated for it.
 
@@ -144,6 +146,7 @@ if present.
 .IP "\fBquery \fINAME\fP|- \fIURI\fP|- \fIQUERY-STRING\fP\fR"
 Run \fIQUERY-STRING\fI query in language \fINAME\fR returning
 variable bindings, a boolean or RDF graph depending on the query.
+Query language can be 'sparql' or 'rdql'.
 
 .IP "\fBremove \fISUBJECT\fP \fIPREDICATE\fP \fIOBJECT\fP \fI[CONTEXT]\fP\fR"
 Remove the given triple graph, in the optional Redland context
@@ -177,13 +180,13 @@ instead of using the option \-s, \-\-storage \fITYPE\fR.
 When both are given, the storage type from the command is used.
 .SH "CONFORMING TO"
 \fIRDF/XML Syntax (Revised)\fR,
-W3C Proposed Recommendation,
+W3C Recommendation,
 .UR http://www.w3.org/TR/rdf-syntax-grammar/
 http://www.w3.org/TR/rdf-syntax-grammar/
 .UE
 
 \fIN-Triples\fR, in \fIRDF Test Cases\fR, Jan Grant and Dave Beckett (eds.)
-W3C Proposed Recommendation,
+W3C Recommendation,
 .UR http://www.w3.org/TR/rdf-testcases/#ntriples
 http://www.w3.org/TR/rdf-testcases/#ntriples
 .UE
@@ -194,14 +197,3 @@ Dave Beckett -
 .UR http://purl.org/net/dajobe/
 http://purl.org/net/dajobe/
 .UE
-.br
-.UR
-Institute for Learning and Research Technology (ILRT)
-http://www.ilrt.bristol.ac.uk/
-.UE
-.br
-.UR
-University of Bristol
-http://www.bristol.ac.uk/
-.UE
-
