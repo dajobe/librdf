@@ -1716,7 +1716,7 @@ main(int argc, char *argv[])
   librdf_node *n1, *n2;
   int count;
   int expected_count;
-#define EXPECTED_BAD_STRING_LENGTH 299
+#define EXPECTED_BAD_STRING_LENGTH 281
   librdf_uri* base_uri;
   unsigned char *string;
   size_t string_length=0;
@@ -1744,7 +1744,7 @@ main(int argc, char *argv[])
 
   statement=librdf_new_statement(world);
   /* after this, nodes become owned by model */
-  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/"));
+  librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://www.dajobe.org/"));
   librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"));
 
   if(!librdf_model_add_statement(model, statement)) {
