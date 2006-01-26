@@ -1,3 +1,16 @@
+2006-01-26  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_init.c (librdf_world_get_genid):
+	Include process ID in generated blank ID .
+	Fixes bug 0000037 http://bugs.librdf.org/mantis/view.php?id=37
+	(patch from Marc Powell)
+
+	* utils/rdfproc.1: update storage, parser, query names
+
+	* docs/redland-sections.txt: move REDLAND_DEPRECATED to general
+
+	* docs/tmpl/unused.sgml: internal tokens
+
 2006-01-25  Dave Beckett  <dave@dajobe.org>
 
 	* raptor/docs/tmpl/section-feature.sgml: Sort
