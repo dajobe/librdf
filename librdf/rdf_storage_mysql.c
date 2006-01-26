@@ -7,9 +7,6 @@
  * Based in part on rdf_storage_list and rdf_storage_parka.
  *
  * Copyright (C) 2003-2005 Morten Frederiksen - http://purl.org/net/morten/
- *
- * and
- *
  * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
