@@ -45,6 +45,16 @@ same sources).
 
 <h3>1.3. Getting the sources from CVS</h3>
 
+<p><strong>NOTE</strong>: Redland will be switching to use
+<a href="http://subversion.tigris.org/">Subversion</a>
+for version control after the 1.0.3 release.  Please check the
+<a href="http://svn.librdf.org/">Redland Subversion site</a>
+for the latest status or the online
+<a href="http://librdf.org/INSTALL.html">Redland installation notes</a>
+for the raptor specific subversion installation information.
+</p>
+
+
 <pre>
   # sh, bash, ...
   CVSROOT=:pserver:anonymous@cvs.librdf.org:/cvsroot
@@ -91,7 +101,7 @@ Sparc, IA64), FreeBSD (x86) and Apple OSX.</p>
 
 <p>Configure tries very hard to find several programs and libraries
 that Redland might need.  These include
-the storage modules (Berkeley/Sleepycat DB, MySQL,
+the storage modules (Berkeley/Sleepycat DB, MySQL, PostgreSQL
 3store), the XML parsers -- via Raptor's configure -- and various
 others.  A summary of the modular parts found is given at the end of
 the configure run.  Several options to configure given below can be
@@ -259,6 +269,15 @@ default when either no argument is given, or
 libcrypto library (MD5, SHA1 and RIPEMD160) if the library is
 available. configure will automatically enable this unless disabled
 by setting this option to <em>no</em>.</p></dd>
+
+<dt><code>--with-postgresql</code>(<code>=</code><em>CONFIG</em>|<code>yes</code>|<code>no</code>)<br /></dt>
+<dd><p>Enable use of the Redland PostgreSQL triple store backend
+using <em>CONFIG</em> for the <em>pg_config</em> program. The
+default when either no argument is given, or
+<code>--with-postgresql</code> alone, is to search for
+<em>pg_config</em> on the search PATH.  With
+<code>--with-postgresql=no</code>, this store is disabled.
+</p></dd>
 
 <dt><code>--with-raptor=</code> <code>system</code> or <code>internal</code><br /></dt>
 <dd><p>
