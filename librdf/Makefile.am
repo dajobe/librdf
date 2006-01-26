@@ -112,6 +112,10 @@ if STORAGE_SQLITE
 librdf_la_SOURCES += rdf_storage_sqlite.c
 endif
 
+if STORAGE_POSTGRESQL
+librdf_la_SOURCES += rdf_storage_postgresql.c
+endif
+
 librdf_la_LIBADD = \
 @LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@

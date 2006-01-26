@@ -5,7 +5,7 @@ dnl (Process this file with autoconf to produce a configure script.)
 dnl
 dnl $Id$
 dnl
-dnl Copyright (C) 2000-2005 David Beckett http://purl.org/net/dajobe/
+dnl Copyright (C) 2000-2006 David Beckett http://purl.org/net/dajobe/
 dnl Copyright (C) 2000-2005 University of Bristol, UK http://www.bristol.ac.uk/
 dnl 
 dnl This package is Free Software and part of Redland http://librdf.org/
@@ -636,7 +636,7 @@ AC_SUBST(HASH_SRCS)
 dnl Storages
 persistent_storages="/file/tstore/mysql/sqlite/"
 persistent_store=no
-all_storages="memory file hashes mysql sqlite tstore"
+all_storages="memory file hashes mysql sqlite tstore postgresql"
 always_available_storages="memory file hashes"
 
 dnl default availabilities and enablements
@@ -762,6 +762,34 @@ else
   AC_MSG_RESULT(no)
 fi
 
+AC_ARG_WITH(postgresql, [  --with-postgresql(=CONFIG|yes|no)  Location of pg_config (default=auto)], pg_config="$withval", postgresql_config="")
+if test "X$pg_config" != "Xno"; then
+  if test "X$pg_config" != "Xyes" ; then
+    PG_CONFIG=$pg_config
+  fi
+  pg_config=yes
+fi
+if test $pg_config = yes -a "X$PG_CONFIG" = "X" ; then
+  AC_CHECK_PROGS(PG_CONFIG, pg_config)
+fi
+
+AC_MSG_CHECKING(for postgresql library)
+if test "X$PG_CONFIG" != X -a "X$PKG_CONFIG" != X ; then
+  postgresql_version=`$PG_CONFIG --version`
+  storages_available="$storages_available postgresql"
+  postgresql_storage_available=yes
+
+  AC_MSG_RESULT(yes - version $postgresql_version)
+  
+  CPPFLAGS="$LIBRDF_CPPFLAGS -I`$PG_CONFIG --includedir`"
+  AC_CHECK_HEADERS(libpq-fe.h)
+  CPPFLAGS="$LIBRDF_CPPFLAGS"
+  
+  LIBS="$LIBRDF_LIBS -L`$PG_CONFIG --libdir` -lpq"
+else
+  AC_MSG_RESULT(no)
+fi
+
 
 # This is needed because autoheader can't work out which computed
 # symbols must be pulled from acconfig.h into config.h.in
@@ -772,6 +800,7 @@ if test "x" = "y"; then
   AC_DEFINE(STORAGE_MYSQL,  1, [Building MySQL storage])
   AC_DEFINE(STORAGE_SQLITE, 1, [Building SQLite storage])
   AC_DEFINE(STORAGE_TSTORE, 1, [Building 3store storage])
+  AC_DEFINE(STORAGE_POSTGRESQL, 1, [Building PostgreSQL storage])
 fi
 
 
@@ -812,6 +841,7 @@ AM_CONDITIONAL(STORAGE_MEMORY, test $memory_storage = yes)
 AM_CONDITIONAL(STORAGE_MYSQL,  test $mysql_storage  = yes)
 AM_CONDITIONAL(STORAGE_SQLITE, test $sqlite_storage = yes)
 AM_CONDITIONAL(STORAGE_TSTORE, test $tstore_storage = yes)
+AM_CONDITIONAL(STORAGE_POSTGRESQL, test $postgresql_storage = yes)
 
 if test $mysql_storage  = yes; then
   mysql_libs=`$MYSQL_CONFIG --libs|sed -e "s/'//g"`
@@ -830,6 +860,10 @@ fi
 if test $tstore_storage  = yes; then
   LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
   LIBRDF_LIBS="$LIBRDF_LIBS `$TSTORE_CONFIG --libs` `$PKG_CONFIG glib --libs`"
+fi
+if test $postgresql_storage  = yes; then
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS -I`$PG_CONFIG --includedir`"
+  LIBRDF_LIBS="$LIBRDF_LIBS -L`$PG_CONFIG --libdir` -lpq"
 fi
 
 

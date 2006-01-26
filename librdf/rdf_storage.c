@@ -79,6 +79,9 @@ librdf_init_storage(librdf_world *world)
 #ifdef STORAGE_MYSQL
   librdf_init_storage_mysql(world);
 #endif
+#ifdef STORAGE_POSTGRESQL
+  librdf_init_storage_postgresql(world);
+#endif
 #ifdef STORAGE_TSTORE
   librdf_init_storage_tstore(world);
 #endif
