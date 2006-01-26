@@ -54,6 +54,10 @@
 #endif
 
 #include <redland.h>
+/* for getpid */
+#include <sys/types.h>
+#include <unistd.h>
+
 
 
 const char * const librdf_short_copyright_string = "Copyright 2000-2006 David Beckett. Copyright 2000-2005 University of Bristol";
@@ -414,7 +418,7 @@ librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
 unsigned char*
 librdf_world_get_genid(librdf_world* world)
 {
-  int id, tmpid, counter, tmpcounter;
+  int id, tmpid, counter, tmpcounter, pid, tmppid;
   int length;
   unsigned char *buffer;
 
@@ -429,18 +433,28 @@ librdf_world_get_genid(librdf_world* world)
   pthread_mutex_unlock(world->mutex);
 #endif
 
+  /* Add the process ID to the seed to differentiate between
+   * simultaneously executed child processes.
+   */
+  pid=(int) getpid();
+  if(!pid)
+    pid=1;
+  tmppid=pid;
 
-  length=5;  /* min length 1 + "r" + min length 1 + "r" \0 */
+
+  length=7;  /* min length 1 + "r" + min length 1 + "r" + min length 1 + "r" \0 */
   while(tmpid/=10)
     length++;
   while(tmpcounter/=10)
+    length++;
+  while(tmppid/=10)
     length++;
   
   buffer=(unsigned char*)LIBRDF_MALLOC(cstring, length);
   if(!buffer)
     return NULL;
 
-  sprintf((char*)buffer, "r%dr%d", id, counter);
+  sprintf((char*)buffer, "r%dr%dr%d", id, pid, counter);
   return buffer;
 }
 
