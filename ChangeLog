@@ -1,5 +1,11 @@
 2006-01-26  Dave Beckett  <dave@dajobe.org>
 
+	* configure.ac, Makefile.am, librdf/rdf_storage.c,
+	librdf/rdf_storage_postgresql.c, librdf/rdf_storage_internal.h:
+	Added PostgreSQL storage backend contributed by Shi Wenzhong based
+	on the MySQL backend.  
+	Fixes issue 0000046 http://bugs.librdf.org/mantis/view.php?id=46
+
 	* librdf/rdf_init.c (librdf_world_get_genid):
 	Include process ID in generated blank ID .
 	Fixes bug 0000037 http://bugs.librdf.org/mantis/view.php?id=37
