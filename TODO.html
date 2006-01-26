@@ -20,19 +20,11 @@
 <li>RFE: model class method to load into model with context</li>
 <li>RFE: model class method to a remove/load into model for some context</li>
 <li>Initialise the default genid base in <code>librdf_new_world</code> with something more fine-grained than seconds.  Add some microseconds digits</li>
-<li>remove "raptor" parser name in any examples, replace with syntax names such as "rdfxml"</li>
 <li>Docs: it was hard to find the legal (parser) feature URIs in
 the documentation, or what values to use.</li>
 <li>RFE: consider how to add parser guessing (via raptor) into the
 redland parser API</li>
 <li>Documentation: describe the redland features available per class</li>
-<li>RFE: add user mappings from URIs to namespace aliases to the serializer</li>
-<li>RFE: The parser should be able to adjust error and warning
-actions, stopping immediately or ignoring them by features. Document
-the defaults.</li>
-<li>RFE: model.parseString(format, "string"), model.parseURI(format, URI, baseURI=URI) creating and destroying temporary parser objects for <em>format</em>.
-Means no need to care about parser class if you just want simple things.  Similarly
-for model.serialize() and Serializer class, however take care with serialise() method.  Better as model.load(), model.save() or write()?</li>
 <li>Update the RDF/RDFS terms/labels for the latest RDF Schema revision</li>
 <li>In-memory storage uses more memory than needed</li>
 <li>Defensive code - check object types are correct by adding magic fields to start of all objects</li>
@@ -48,7 +40,6 @@ for model.serialize() and Serializer class, however take care with serialise() m
 <li>Write some better example code</li>
 <li>Write a quickstart / howto document</li>
 <li>Maybe generate part of librdf.h automatically to make a 1-header file system.</li>
-<li>Make API docbook sgml generate decent PostScript / PDF output</li>
 <li>Fix the URI hash mechanism - currently stores URI/pointer pairs in hash - wrong</li>
 <li>The library does not do file locking on e.g. DB files</li>
 <li>For IRIX (and others?), try also linking with -lpthreads when testing for working Berkeley DB</li>
@@ -65,6 +56,10 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>RFE: add user mappings from URIs to namespace aliases to the serializer (Raptor 1.4.7)</li>
+<li>RFE: The parser should be able to adjust error and warning
+actions, stopping immediately or ignoring them by features. Document
+the defaults. (1.0.2)</li>
 <li>Add <tt>#ifdef WIN32</tt> around parts including the config file and create a win32 build (1.0.1 - third party)</li>
 <li>RFE: Add node.as_sha1 easy digest methods for literal nodes (1.0.1)</li>
 <li>RFE: return serialized models to syntax as strings (1.0.0)</li>
@@ -163,6 +158,10 @@ style, but for C</li>
 
 <p>I reserve the right to change my mind again!</p>
 <ul>
+<li>RFE: model.parseString(format, "string"), model.parseURI(format, URI, baseURI=URI) creating and destroying temporary parser objects for <em>format</em>.
+Means no need to care about parser class if you just want simple things.  Similarly
+for model.serialize() and Serializer class, however take care with serialise() method.  Better as model.load(), model.save() or write()?  Addressed by the guess parser in raptor 1.4.7+.</li>
+<li>Make API docbook sgml generate decent PostScript / PDF output (1.0.3)</li>
 <li>Split the header files into internal / user ones - now most headers are user ones (1.0.1)</li>
 <li>Write stringbuffer for easy creation of growing in-memory strings - now being considered inside raptor.</li>
 <li>Provide a way to represent reified statements</li>
@@ -192,7 +191,7 @@ parser will use expat or libxml as necessary.
 
 <hr />
 
-<p>Copyright (C) 2000-2005 <a href="http://purl.org/net/dajobe/">Dave Beckett</a><br />Copyright (C) 2000-2005 <a href="http://www.ilrt.bris.ac.uk/">Institute for Learning and Research Technology</a>, <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright (C) 2000-2006 <a href="http://purl.org/net/dajobe/">Dave Beckett</a><br />Copyright (C) 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
