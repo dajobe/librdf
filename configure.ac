@@ -174,188 +174,196 @@ AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include director
 AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Berkeley DB library name (auto)], bdb_dbname="$withval", bdb_dbname="none")
 
 bdb_version=unknown
-
-# Only prefix given - set lib and include
-if test "X$bdb_prefix" != "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_dir" = "Xnone" ; then
-  bdb_lib_dir="$bdb_prefix/lib"
-  bdb_include_dir="$bdb_prefix/include"
-fi
-
-# Nothing given - search
-if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_dir" = "Xnone" -a "X$bdb_dbname" = "Xnone" ; then
-  bdb_prefix="/usr"
-  bdb_lib_dir="/usr/lib"
-  bdb_include_dir="/usr/include"
-
-  extraprefix=
-  # OSX fink area added if found and /sw/bin is in the PATH
-  if test -d /sw/include -a -d /sw/lib ; then
-    if echo $PATH |grep /sw/bin >/dev/null; then
-      extraprefix=/sw
-    fi
-  fi
-
-  # Sigh!  And this still might not be good enough.
-  for bdbc_version in 4.3 4.2 4.1 4.0 4 3.3 3.2 3.1 3 2; do
-    bdbc_major=`echo $bdbc_version | sed -e 's/^\(.\).*$/\1/'`;
-    bdbc_version2=`echo $bdbc_version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
-
-    for bdbc_prefix in $extraprefix /usr/local/BerkeleyDB.$bdbc_version /usr/local /opt/local /usr; do
-      bdbc_libdir=$bdbc_prefix/lib
-
-      for bdbc_incdir in $bdbc_prefix/include/db$bdbc_version $bdbc_prefix/include/db$bdbc_version2 $bdbc_prefix/include/db$bdbc_major $bdbc_prefix/include ; do
-        if test -r $bdbc_incdir/db.h ; then
-          header_bdbc_version=`sed -ne 's/^.*DB_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $bdbc_incdir/db.h`
-          if test "X$header_bdbc_version" = "X$bdbc_version" ; then 
-            for bdbc_name in db-$bdbc_version db$bdbc_version db-$bdbc_version2 db$bdbc_version2; do
-              if test -r $bdbc_libdir/lib$bdbc_name.a -o -r $bdbc_libdir/lib$bdbc_name.so -o -r $bdbc_libdir/lib$bdbc_name.dylib; then
-  	        bdb_version=$bdbc_version
-  	        bdb_prefix=$bdbc_prefix
-  	        bdb_include_dir=$bdbc_incdir
-	        bdb_lib_dir=$bdbc_libdir
-	        bdb_dbname=$bdbc_name
-                break 4
-              fi
-            done
-          fi
-        fi
-
-      done
-     done
-   done
-
-fi
-
-AC_MSG_CHECKING(BDB version)
-AC_MSG_RESULT($bdb_version)
-AC_MSG_CHECKING(location of BDB libs)
-AC_MSG_RESULT($bdb_lib_dir)
-AC_MSG_CHECKING(location of BDB includes)
-AC_MSG_RESULT($bdb_include_dir)
-
 bdb_available=Missing
-if test "$bdb_prefix" != no; then
-  nLDFLAGS=$LDFLAGS
-  nCPPFLAGS=
 
-  if test "$bdb_lib_dir" != /usr/lib; then
-    nLDFLAGS="-L$bdb_lib_dir";
+if test "x$bdb_prefix" != "xno" ; then
+
+  if test "x$bdb_prefix" = "xyes" ; then
+    bdb_prefix="none"
   fi
 
-  if test "$bdb_dbname" = none; then
-    # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
-    bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb*.a 2>/dev/null |sed -e 's/^lib//' -e 's/\.a$//' | head -1`
-    if test "X$bdb_dbname" = X; then
-      AC_MSG_WARN(Cannot find the BDB library name from the files in $bdb_lib_dir)
-      AC_MSG_WARN(Assuming it is 'db' and will link like -ldb)
-      AC_MSG_WARN(Use --with-bdb-dbname=NAME if this is wrong)
-      bdb_dbname=db
+  # Only prefix given - set lib and include
+  if test "X$bdb_prefix" != "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_dir" = "Xnone" ; then
+    bdb_lib_dir="$bdb_prefix/lib"
+    bdb_include_dir="$bdb_prefix/include"
+  fi
+
+  # Nothing given - search
+  if test "X$bdb_prefix" = "Xnone" -a "X$bdb_lib_dir" = "Xnone" -a "X$bdb_include_dir" = "Xnone" -a "X$bdb_dbname" = "Xnone" ; then
+    bdb_prefix="/usr"
+    bdb_lib_dir="/usr/lib"
+    bdb_include_dir="/usr/include"
+
+    extraprefix=
+    # OSX fink area added if found and /sw/bin is in the PATH
+    if test -d /sw/include -a -d /sw/lib ; then
+      if echo $PATH |grep /sw/bin >/dev/null; then
+	extraprefix=/sw
+      fi
     fi
+
+    # Sigh!  And this still might not be good enough.
+    for bdbc_version in 4.3 4.2 4.1 4.0 4 3.3 3.2 3.1 3 2; do
+      bdbc_major=`echo $bdbc_version | sed -e 's/^\(.\).*$/\1/'`;
+      bdbc_version2=`echo $bdbc_version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
+
+      for bdbc_prefix in $extraprefix /usr/local/BerkeleyDB.$bdbc_version /usr/local /opt/local /usr; do
+	bdbc_libdir=$bdbc_prefix/lib
+
+	for bdbc_incdir in $bdbc_prefix/include/db$bdbc_version $bdbc_prefix/include/db$bdbc_version2 $bdbc_prefix/include/db$bdbc_major $bdbc_prefix/include ; do
+	  if test -r $bdbc_incdir/db.h ; then
+	    header_bdbc_version=`sed -ne 's/^.*DB_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $bdbc_incdir/db.h`
+	    if test "X$header_bdbc_version" = "X$bdbc_version" ; then 
+	      for bdbc_name in db-$bdbc_version db$bdbc_version db-$bdbc_version2 db$bdbc_version2; do
+		if test -r $bdbc_libdir/lib$bdbc_name.a -o -r $bdbc_libdir/lib$bdbc_name.so -o -r $bdbc_libdir/lib$bdbc_name.dylib; then
+		  bdb_version=$bdbc_version
+		  bdb_prefix=$bdbc_prefix
+		  bdb_include_dir=$bdbc_incdir
+		  bdb_lib_dir=$bdbc_libdir
+		  bdb_dbname=$bdbc_name
+		  break 4
+		fi
+	      done
+	    fi
+	  fi
+
+	done
+       done
+     done
+
   fi
 
-  AC_MSG_CHECKING(name of BDB library)
-  AC_MSG_RESULT($bdb_dbname)
+  AC_MSG_CHECKING(BDB version)
+  AC_MSG_RESULT($bdb_version)
+  AC_MSG_CHECKING(location of BDB libs)
+  AC_MSG_RESULT($bdb_lib_dir)
+  AC_MSG_CHECKING(location of BDB includes)
+  AC_MSG_RESULT($bdb_include_dir)
 
-  if test "$bdb_include_dir" != /usr/include; then
-    nCPPFLAGS="-I$bdb_include_dir";
-  fi
+  if test "$bdb_prefix" != no; then
+    nLDFLAGS=$LDFLAGS
+    nCPPFLAGS=
 
-  LDFLAGS="$nLDFLAGS $LDFLAGS"
-  CPPFLAGS="$nCPPFLAGS $CPPFLAGS"
-  LIBS="-l$bdb_dbname $LIBS"
+    if test "$bdb_lib_dir" != /usr/lib; then
+      nLDFLAGS="-L$bdb_lib_dir";
+    fi
 
-  AC_CHECK_HEADERS(db.h)
-  if test "$ac_cv_header_db_h" = yes ; then
-    have_libdb=no
+    if test "$bdb_dbname" = none; then
+      # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
+      bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb*.a 2>/dev/null |sed -e 's/^lib//' -e 's/\.a$//' | head -1`
+      if test "X$bdb_dbname" = X; then
+	AC_MSG_WARN(Cannot find the BDB library name from the files in $bdb_lib_dir)
+	AC_MSG_WARN(Assuming it is 'db' and will link like -ldb)
+	AC_MSG_WARN(Use --with-bdb-dbname=NAME if this is wrong)
+	bdb_dbname=db
+      fi
+    fi
 
-    AC_MSG_CHECKING(for BDB V1 dbopen)
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [dbopen(NULL, 0, 0, DB_BTREE, NULL);],
-		AC_DEFINE(HAVE_DBOPEN, 1, [BDB has dbopen method])
-                if test $have_libdb = no; then
-                  bdb_available="Version 1.x - not supported"
-                  have_libdb=no
-                fi
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+    AC_MSG_CHECKING(name of BDB library)
+    AC_MSG_RESULT($bdb_dbname)
 
-    AC_MSG_CHECKING(for BDB V2 db_open)
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [db_open(NULL, DB_BTREE, 0, 0, NULL, NULL, NULL);],
-		AC_DEFINE(HAVE_DB_OPEN, 1, [BDB has db_open method])
-                have_libdb=yes
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+    if test "$bdb_include_dir" != /usr/include; then
+      nCPPFLAGS="-I$bdb_include_dir";
+    fi
 
-    AC_MSG_CHECKING(for BDB V3/V4.x db_create)
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [db_create(NULL, NULL, 0);],
-		AC_DEFINE(HAVE_DB_CREATE, 1, [BDB has db_create method])
-                have_libdb=yes
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+    LDFLAGS="$nLDFLAGS $LDFLAGS"
+    CPPFLAGS="$nCPPFLAGS $CPPFLAGS"
+    LIBS="-l$bdb_dbname $LIBS"
 
-    AC_MSG_CHECKING(for BDB V4.0 DB->open with 6 arguments)
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, DB_BTREE, 0, 0);],
-		AC_DEFINE(HAVE_BDB_OPEN_6_ARGS, 1, [BDB has open method with 6 args])
-                have_libdb=yes
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+    AC_CHECK_HEADERS(db.h)
+    if test "$ac_cv_header_db_h" = yes ; then
+      have_libdb=no
 
-    AC_MSG_CHECKING(for BDB DB->close with 2 arguments)
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [DB *bdb; bdb->close(bdb, 0);],
-		AC_DEFINE(HAVE_BDB_CLOSE_2_ARGS, 1, [BDB has close method with 2 args])
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+      AC_MSG_CHECKING(for BDB V1 dbopen)
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [dbopen(NULL, 0, 0, DB_BTREE, NULL);],
+		  AC_DEFINE(HAVE_DBOPEN, 1, [BDB has dbopen method])
+		  if test $have_libdb = no; then
+		    bdb_available="Version 1.x - not supported"
+		    have_libdb=no
+		  fi
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
 
-    AC_MSG_CHECKING(for BDB DB->fd with 2 arguments)
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [DB *bdb; bdb->fd(bdb, 0);],
-		AC_DEFINE(HAVE_BDB_FD_2_ARGS, 1, [BDB has fd method with 2 args])
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+      AC_MSG_CHECKING(for BDB V2 db_open)
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [db_open(NULL, DB_BTREE, 0, 0, NULL, NULL, NULL);],
+		  AC_DEFINE(HAVE_DB_OPEN, 1, [BDB has db_open method])
+		  have_libdb=yes
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
 
-    AC_MSG_CHECKING(for BDB DB->set_flags)
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [DB *bdb; bdb->set_flags(bdb, 0);],
-		AC_DEFINE(HAVE_BDB_SET_FLAGS, 1, [BDB has set_flags method])
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+      AC_MSG_CHECKING(for BDB V3/V4.x db_create)
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [db_create(NULL, NULL, 0);],
+		  AC_DEFINE(HAVE_DB_CREATE, 1, [BDB has db_create method])
+		  have_libdb=yes
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
 
-    AC_MSG_CHECKING(for BDB V4.1+ DB->open with 7 arguments)
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);],
-		AC_DEFINE(HAVE_BDB_OPEN_7_ARGS, 1, [BDB has open method with 7 args])
-                have_libdb=yes
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+      AC_MSG_CHECKING(for BDB V4.0 DB->open with 6 arguments)
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, DB_BTREE, 0, 0);],
+		  AC_DEFINE(HAVE_BDB_OPEN_6_ARGS, 1, [BDB has open method with 6 args])
+		  have_libdb=yes
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
 
-    AC_MSG_CHECKING(whether DB_TXN defined in db.h)
-    dnl In BDB, DB_TXN is a pointer to a structure never defined
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [DB_TXN* ptr=(DB_TXN*)NULL],
-		AC_DEFINE(HAVE_BDB_DB_TXN, 1, [BDB defines DB_TXN])
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
-    AC_MSG_CHECKING(whether DBC defined in db.h)
-    AC_TRY_LINK([#include <db.h>], [size_t len=sizeof(DBC)],
-		AC_DEFINE(HAVE_BDB_CURSOR, 1, [BDB defines DBC])
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
-    AC_MSG_CHECKING(number of arguments to db_cursor)
-    AC_TRY_LINK([#include <stdio.h>
-                 #include <db.h>], [DB* db; db->cursor(db, NULL, NULL, 0);],
-		AC_DEFINE(HAVE_BDB_CURSOR_4_ARGS, 1, [BDB cursor method has 4 arguments])
-		AC_MSG_RESULT(4),
-		AC_MSG_RESULT(3))
-  fi
+      AC_MSG_CHECKING(for BDB DB->close with 2 arguments)
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [DB *bdb; bdb->close(bdb, 0);],
+		  AC_DEFINE(HAVE_BDB_CLOSE_2_ARGS, 1, [BDB has close method with 2 args])
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
 
-  if test "$have_libdb" = yes; then
-    bdb_available="Version $bdb_version (library $bdb_dbname in $bdb_lib_dir)"
-    LIBRDF_LIBS="$LIBRDF_LIBS $nLDFLAGS -l$bdb_dbname"
-    LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $nCPPFLAGS"
+      AC_MSG_CHECKING(for BDB DB->fd with 2 arguments)
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [DB *bdb; bdb->fd(bdb, 0);],
+		  AC_DEFINE(HAVE_BDB_FD_2_ARGS, 1, [BDB has fd method with 2 args])
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
+
+      AC_MSG_CHECKING(for BDB DB->set_flags)
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [DB *bdb; bdb->set_flags(bdb, 0);],
+		  AC_DEFINE(HAVE_BDB_SET_FLAGS, 1, [BDB has set_flags method])
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
+
+      AC_MSG_CHECKING(for BDB V4.1+ DB->open with 7 arguments)
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);],
+		  AC_DEFINE(HAVE_BDB_OPEN_7_ARGS, 1, [BDB has open method with 7 args])
+		  have_libdb=yes
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
+
+      AC_MSG_CHECKING(whether DB_TXN defined in db.h)
+      dnl In BDB, DB_TXN is a pointer to a structure never defined
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [DB_TXN* ptr=(DB_TXN*)NULL],
+		  AC_DEFINE(HAVE_BDB_DB_TXN, 1, [BDB defines DB_TXN])
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
+      AC_MSG_CHECKING(whether DBC defined in db.h)
+      AC_TRY_LINK([#include <db.h>], [size_t len=sizeof(DBC)],
+		  AC_DEFINE(HAVE_BDB_CURSOR, 1, [BDB defines DBC])
+		  AC_MSG_RESULT(yes),
+		  AC_MSG_RESULT(no))
+      AC_MSG_CHECKING(number of arguments to db_cursor)
+      AC_TRY_LINK([#include <stdio.h>
+		   #include <db.h>], [DB* db; db->cursor(db, NULL, NULL, 0);],
+		  AC_DEFINE(HAVE_BDB_CURSOR_4_ARGS, 1, [BDB cursor method has 4 arguments])
+		  AC_MSG_RESULT(4),
+		  AC_MSG_RESULT(3))
+    fi
+
+    if test "$have_libdb" = yes; then
+      bdb_available="Version $bdb_version (library $bdb_dbname in $bdb_lib_dir)"
+      LIBRDF_LIBS="$LIBRDF_LIBS $nLDFLAGS -l$bdb_dbname"
+      LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $nCPPFLAGS"
+    fi
+
   fi
 
 fi
@@ -715,7 +723,11 @@ fi
 
 
 
-AC_ARG_WITH(sqlite-version, [  --with-sqlite-version(=2|3) SQLite version to use (default=auto)], sqlite_api_version="$withval", sqlite_api_version="auto")
+AC_ARG_WITH(sqlite, [  --with-sqlite(=yes|no|2|3) Enable SQLite store with version (default=auto)], sqlite_api_version="$withval", sqlite_api_version="auto")
+AC_ARG_WITH(sqlite-version, [  --with-sqlite-version(=yes|no|2|3) SQLite version to use (default=auto)], sqlite_api_version="$withval")
+if test "x$sqlite_api_version" = "xyes" ; then
+  sqlite_api_version="auto"
+fi
 
 AC_MSG_CHECKING(for sqlite library versions available)
 sqlite_versions=
@@ -738,11 +750,11 @@ fi
 AC_MSG_RESULT($sqlite_versions)
 
 if test "X$sqlite_api_version" = Xauto; then
-  sqlite_api_version=none
+  sqlite_api_version=no
 fi
 
 AC_MSG_CHECKING(using sqlite library)
-if test "X$sqlite_api_version" != Xnone ; then
+if test "X$sqlite_api_version" != Xno ; then
   if test "$sqlite_api_version" = 3; then
     SQLITE_CONFIG="$PKG_CONFIG sqlite3"
   else
