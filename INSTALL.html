@@ -175,14 +175,16 @@ libxml2 (prefered) or expat.  Redland requires the Raptor parser for
 other functionality, so it cannot be disabled.
 </p></dd>
 
-<dt><code>--with-bdb=ROOT</code><br /></dt>
+<dt><code>--with-bdb=</code> <em>ROOT</em> or <code>no</code><br /></dt>
 <dd><p>Enable use of the Berkeley / Sleepycat DB library installed at
 <em>ROOT</em>.  That means <em>ROOT</em><code>/include</code> must
 contain the BDB header <code>db.h</code> and <em>ROOT</em><code>/lib</code>
 must contain the library <code>libdb.a</code> (or whatever shared library
 version/name your system uses).</p>
 
-<p>Berkeley DB is now known as Sleepycat DB (after version 2) and
+<p>If the value is <code>no</code>, the BDB backend store is disabled.</p>
+
+<p>Berkeley DB is known as Sleepycat DB (after version 2) and
 distributed and supported by
 <a href="http://www.sleepycat.com/">SleepyCat Software</a>.
 Versions 4.1.25, 4.1.24, 4.0.14, 3.3.11, 3.2.9, 3.1.17, 3.1.14, 2.7.7
@@ -299,6 +301,13 @@ redland will guess and choose either the system one, if new enough or
 the internal one (always present).  If <code>--with-rasqal=system</code>
 is used and redland discovers that the system rasqal is too old,
 a warning will be given but the configuration will continue.
+</p></dd>
+
+<dt><code>--with-sqlite=</code>(<code>yes</code>|<code>no</code>|<code>2</code>|<code>3</code>)<br /></dt>
+<dd><p>Enable use of <a href="http://www.sqlite.org/">SQLite</a>
+triple store backend with a particular version V2 or V3,
+an automatically chosen one with <code>yes</code> or disable it
+(with <code>no</code>).
 </p></dd>
 
 <dt><code>--with-threestore</code>(<code>=</code><em>CONFIG</em>|<code>yes</code>|<code>no</code>)<br /></dt>
