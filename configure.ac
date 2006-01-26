@@ -787,8 +787,8 @@ fi
 
 AC_MSG_CHECKING(for postgresql library)
 if test "X$PG_CONFIG" != X -a "X$PKG_CONFIG" != X ; then
-  postgresql_version=`$PG_CONFIG --version`
-  storages_available="$storages_available postgresql"
+  postgresql_version=`$PG_CONFIG --version | sed -e 's/^.* //'`
+  storages_available="$storages_available postgresql($postgresql_version)"
   postgresql_storage_available=yes
 
   AC_MSG_RESULT(yes - version $postgresql_version)
