@@ -19,64 +19,64 @@ Do not read this, it is not in the document.
 
 <!-- ##### MACRO REDLAND_API ##### -->
 <para>
-
+Internal.
 </para>
 
 
 
 <!-- ##### ENUM librdf_concepts_index ##### -->
 <para>
-
+Internal.
 </para>
 
-@LIBRDF_CONCEPT_MS_Alt: 
-@LIBRDF_CONCEPT_MS_Bag: 
-@LIBRDF_CONCEPT_MS_Property: 
-@LIBRDF_CONCEPT_MS_Seq: 
-@LIBRDF_CONCEPT_MS_Statement: 
-@LIBRDF_CONCEPT_MS_object: 
-@LIBRDF_CONCEPT_MS_predicate: 
-@LIBRDF_CONCEPT_MS_subject: 
-@LIBRDF_CONCEPT_MS_type: 
-@LIBRDF_CONCEPT_MS_value: 
-@LIBRDF_CONCEPT_MS_li: 
-@LIBRDF_CONCEPT_MS_RDF: 
-@LIBRDF_CONCEPT_MS_Description: 
-@LIBRDF_CONCEPT_MS_aboutEach: 
-@LIBRDF_CONCEPT_MS_aboutEachPrefix: 
-@LIBRDF_CONCEPT_RS_nodeID: 
-@LIBRDF_CONCEPT_RS_List: 
-@LIBRDF_CONCEPT_RS_first: 
-@LIBRDF_CONCEPT_RS_rest: 
-@LIBRDF_CONCEPT_RS_nil: 
-@LIBRDF_CONCEPT_RS_XMLLiteral: 
-@LIBRDF_CONCEPT_S_Class: 
-@LIBRDF_CONCEPT_S_ConstraintProperty: 
-@LIBRDF_CONCEPT_S_ConstraintResource: 
-@LIBRDF_CONCEPT_S_Container: 
-@LIBRDF_CONCEPT_S_ContainerMembershipProperty: 
-@LIBRDF_CONCEPT_S_Literal: 
-@LIBRDF_CONCEPT_S_Resource: 
-@LIBRDF_CONCEPT_S_comment: 
-@LIBRDF_CONCEPT_S_domain: 
-@LIBRDF_CONCEPT_S_isDefinedBy: 
-@LIBRDF_CONCEPT_S_label: 
-@LIBRDF_CONCEPT_S_range: 
-@LIBRDF_CONCEPT_S_seeAlso: 
-@LIBRDF_CONCEPT_S_subClassOf: 
-@LIBRDF_CONCEPT_S_subPropertyOf: 
-@LIBRDF_CONCEPT_FIRST_S_ID: 
-@LIBRDF_CONCEPT_LAST: 
+@LIBRDF_CONCEPT_MS_Alt: offset
+@LIBRDF_CONCEPT_MS_Bag: offset
+@LIBRDF_CONCEPT_MS_Property: offset
+@LIBRDF_CONCEPT_MS_Seq: offset
+@LIBRDF_CONCEPT_MS_Statement: offset
+@LIBRDF_CONCEPT_MS_object: offset
+@LIBRDF_CONCEPT_MS_predicate: offset
+@LIBRDF_CONCEPT_MS_subject: offset
+@LIBRDF_CONCEPT_MS_type: offset
+@LIBRDF_CONCEPT_MS_value: offset
+@LIBRDF_CONCEPT_MS_li: offset
+@LIBRDF_CONCEPT_MS_RDF: offset
+@LIBRDF_CONCEPT_MS_Description: offset
+@LIBRDF_CONCEPT_MS_aboutEach: offset
+@LIBRDF_CONCEPT_MS_aboutEachPrefix: offset
+@LIBRDF_CONCEPT_RS_nodeID: offset
+@LIBRDF_CONCEPT_RS_List: offset
+@LIBRDF_CONCEPT_RS_first: offset
+@LIBRDF_CONCEPT_RS_rest: offset
+@LIBRDF_CONCEPT_RS_nil: offset
+@LIBRDF_CONCEPT_RS_XMLLiteral: offset
+@LIBRDF_CONCEPT_S_Class: offset
+@LIBRDF_CONCEPT_S_ConstraintProperty: offset
+@LIBRDF_CONCEPT_S_ConstraintResource: offset
+@LIBRDF_CONCEPT_S_Container: offset
+@LIBRDF_CONCEPT_S_ContainerMembershipProperty: offset
+@LIBRDF_CONCEPT_S_Literal: offset
+@LIBRDF_CONCEPT_S_Resource: offset
+@LIBRDF_CONCEPT_S_comment: offset
+@LIBRDF_CONCEPT_S_domain: offset
+@LIBRDF_CONCEPT_S_isDefinedBy: offset
+@LIBRDF_CONCEPT_S_label: offset
+@LIBRDF_CONCEPT_S_range: offset
+@LIBRDF_CONCEPT_S_seeAlso: offset
+@LIBRDF_CONCEPT_S_subClassOf: offset
+@LIBRDF_CONCEPT_S_subPropertyOf: offset
+@LIBRDF_CONCEPT_FIRST_S_ID: offset
+@LIBRDF_CONCEPT_LAST: offset
 
 <!-- ##### VARIABLE librdf_concept_ms_namespace_uri ##### -->
 <para>
-
+Internal.
 </para>
 
 
 <!-- ##### VARIABLE librdf_concept_schema_namespace_uri ##### -->
 <para>
-
+Internal.
 </para>
 
 
