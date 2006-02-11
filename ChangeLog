@@ -1,3 +1,11 @@
+2006-02-11  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_digest_sha1.c (librdf_digest_sha1_constructor):
+	Fix over eager docstring fix.
+
+	* librdf/rdf_digest_md5.c (librdf_digest_md5_constructor):
+	Fix over eager docstring fix.
+
 2006-01-26  Dave Beckett  <dave@dajobe.org>
 
 	* configure.ac, Makefile.am, librdf/rdf_storage.c,

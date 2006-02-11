@@ -1,4 +1,90 @@
+2006-02-11  Dave Beckett  <dave@dajobe.org>
+
+	* rdf_digest_sha1.c (librdf_digest_sha1_constructor): Fix over
+	eager docstring fix.
+
+	* rdf_digest_md5.c (librdf_digest_md5_constructor): Fix over eager
+	docstring fix.
+
+2006-01-26  Dave Beckett  <dave@dajobe.org>
+
+	* Makefile.am, rdf_storage.c, rdf_storage_internal.h,
+	rdf_storage_postgresql.c: Added PostgreSQL storage backend
+	contributed by Shi Wenzhong based on the MySQL backend.  Fixes
+	issue 0000046 http://bugs.librdf.org/mantis/view.php?id=46
+
+	* rdf_storage_mysql.c: 2006
+
+	* rdf_init.c (librdf_world_get_genid): Include process ID in
+	generated blank ID .  Fixes bug 0000037
+	http://bugs.librdf.org/mantis/view.php?id=37
+	(patch from Marc Powell)
+
+	* rdf_model.c (main): Update test serialization length
+
+	* Makefile.am, librdf.h, rdf_concepts.c, rdf_concepts.h,
+	rdf_concepts_internal.h, rdf_digest.c, rdf_digest.h,
+	rdf_digest_internal.h, rdf_digest_md5.c, rdf_digest_openssl.c,
+	rdf_digest_sha1.c, rdf_files.c, rdf_files.h, rdf_hash.c,
+	rdf_hash.h, rdf_hash_bdb.c, rdf_hash_cursor.c,
+	rdf_hash_internal.h, rdf_hash_memory.c, rdf_heuristics.c,
+	rdf_heuristics.h, rdf_init.h, rdf_init_internal.h, rdf_internal.h,
+	rdf_iterator.c, rdf_iterator.h, rdf_iterator_internal.h,
+	rdf_list.c, rdf_list.h, rdf_list_internal.h, rdf_log_internal.h,
+	rdf_model.c, rdf_model_internal.h, rdf_model_storage.c,
+	rdf_node.c, rdf_node_internal.h, rdf_parser.c,
+	rdf_parser_internal.h, rdf_parser_raptor.c, rdf_query.c,
+	rdf_query.h, rdf_query_internal.h, rdf_query_rasqal.c,
+	rdf_query_results.c, rdf_query_triples.c, rdf_serializer.c,
+	rdf_serializer.h, rdf_serializer_internal.h,
+	rdf_serializer_raptor.c, rdf_statement.c, rdf_statement.h,
+	rdf_statement_internal.h, rdf_storage.c, rdf_storage.h,
+	rdf_storage_file.c, rdf_storage_hashes.c, rdf_storage_internal.h,
+	rdf_storage_list.c, rdf_storage_mysql.c, rdf_storage_sqlite.c,
+	rdf_storage_tstore.c, rdf_stream.c, rdf_stream.h,
+	rdf_stream_internal.h, rdf_types.h, rdf_uri.c, rdf_uri.h,
+	rdf_uri_internal.h, rdf_utf8.c, rdf_utf8.h, redland.h,
+	win32_rdf_config.h: 2006
+
+	* librdf.h, rdf_statement.h, rdf_utf8.h: autodocs
+
+2006-01-25  Dave Beckett  <dave@dajobe.org>
+
+	* rdf_init.c, rdf_init.h, rdf_parser.h: autodocs
+
+	* rdf_init.h: Removed never-existed function prototype
+	librdf_world_set_uris_hash
+
+	* rdf_query_results.c, rdf_node.c, rdf_stream.h, rdf_node.h,
+	rdf_storage.c: autodocs
+
+	* rdf_storage.h: Removed never-existed function prototype
+	librdf_storage_get
+
+	* rdf_init.c, rdf_log.h, rdf_log.c, rdf_iterator.h: autodocs
+
+	* rdf_iterator.h: Removed never-existed function prototype
+	librdf_iterator_finished
+
+	* rdf_stream.c, rdf_uri.c, rdf_statement.c, rdf_storage.c,
+	rdf_query_results.c, rdf_parser.c, rdf_query.c,
+	rdf_model_storage.c, rdf_node.c, rdf_model.c, rdf_iterator.c,
+	rdf_list.c, rdf_hash.c, rdf_hash_cursor.c, rdf_digest.c: autodocs
+
+	* rdf_files.h: Deprecated librdf_files_temporary_file_name
+
+	* rdf_files.c (librdf_files_temporary_file_name): Deprecated +
+	autodocs
+
+	* rdf_concepts.h, rdf_model.h: autodocs
+
 2005-09-14  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* rdf_parser_raptor.c
+	(librdf_parser_raptor_parse_file_handle_as_stream): Renamed from
+	librdf_parser_raptor_parse_file_as_stream and use FILE* arg.
+	(librdf_parser_raptor_parse_as_stream_common): Update to handle
+	rename.
 
 	* rdf_serializer_internal.h: struct librdf_serializer_factory_s
 	gains serialize_model_to_iostream method.
