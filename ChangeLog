@@ -1,5 +1,11 @@
 2006-02-11  Dave Beckett  <dave@dajobe.org>
 
+	* librdf/rdf_node.c (librdf_new_node_from_literal,
+	librdf_new_node_from_typed_literal): Fail if both a datatype
+	URI/datatype flag and a language is given.  Fixes issue 0000069
+	http://bugs.librdf.org/mantis/view.php?id=69
+	(main): Add tests for this.
+	
 	* librdf/rdf_digest_sha1.c (librdf_digest_sha1_constructor):
 	Fix over eager docstring fix.
 
