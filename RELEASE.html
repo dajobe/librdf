@@ -26,6 +26,58 @@ pre
 <p>Not yet released.
 </p>
 
+<p>The changes in this release are:</p>
+
+<ul>
+
+<li>Added PostgreSQL storage backend contributed by Shi Wenzhong based
+on the MySQL storage backend.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=46">issue 0000046</a>
+</li>
+
+<li>librdf_world_get_genid changed to include the process ID in the
+generated blank ID.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=37">issue 0000037</a>
+(patch from Marc Powell).
+</li>
+
+<li>Deprecated librdf_files_temporary_file_name().</li>
+
+<li>Added librdf_serializer_serialize_model_to_iostream()</li>
+
+<li>Added examples/example7.c to read from an RDF/XML file, add a
+triple and write it back.</li>
+
+<li>Deleted some functions that had prototypes in headers but had no
+code in librdf such as
+librdf_node_init(),
+librdf_iterator_finished(),
+librdf_storage_get(),
+librdf_world_set_uris_hash().
+</li>
+
+<li>Some win32 build fixes</li>
+
+<li>Enhanced API documentation using gtk-doc to make improved
+docbook and XHTML pages
+</li>
+
+<li>librdf_node_encode: Give an error when a node cannot be encoded
+due to string data being too long.
+</li>
+
+<li>Update to use 
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.11
+(<a href="http://librdf.org/rasqal/RELEASE.html#rel0_9_11">Rasqal 0.9.11 release notes</a>)
+to update to SPARQL 2005-11-23
+</li>
+
+<li>Update to use
+<a href="http://librdf.org/raptor/">Raptor</a> 1.4.8
+(<a href="http://librdf.org/raptor/RELEASE.html#rel1_4_8">Raptor 1.4.8 release notes</a>)
+</li>
+</ul>
+
 
 <h2 id="rel1_0_2"><a name="rel1_0_2">Redland 1.0.2 Changes</a></h2>
 
