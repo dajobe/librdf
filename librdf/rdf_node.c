@@ -346,6 +346,9 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
  * 
  * 0.9.12: xml_space argument deleted
  *
+ * An @xml_language cannot be used when @is_wf_xml is non-0. If both
+ * are given, NULL is returned.
+ *
  * Return value: new #librdf_node object or NULL on failure
  **/
 librdf_node*
@@ -356,6 +359,9 @@ librdf_new_node_from_literal(librdf_world *world,
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL);
 
+  if(xml_language && is_wf_xml)
+    return NULL;
+  
   return librdf_new_node_from_typed_literal(world,
                                             string, xml_language,
                                             (is_wf_xml ? 
@@ -373,6 +379,9 @@ librdf_new_node_from_literal(librdf_world *world,
  *
  * Constructor - create a new typed literal #librdf_node object.
  * 
+ * Only one of @xml_language or @datatype_uri may be given.  If both
+ * are given, NULL is returned.
+ *
  * Return value: new #librdf_node object or NULL on failure
  **/
 librdf_node*
@@ -392,6 +401,9 @@ librdf_new_node_from_typed_literal(librdf_world *world,
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(value, string, NULL);
 
+  if(xml_language && datatype_uri)
+    return NULL;
+  
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->nodes_mutex);
 #endif
@@ -1760,7 +1772,7 @@ main(int argc, char *argv[])
   uri2=librdf_new_uri(world, (const unsigned char*)"http://example.org/datatypeURI");
   node6=librdf_new_node_from_typed_literal(world, 
                                            (const unsigned char*)"Datatyped literal value",
-                                           "en-GB", uri2);
+                                           NULL, uri2);
   librdf_free_uri(uri2);
 
   size=librdf_node_encode(node6, NULL, 0);
@@ -1781,6 +1793,19 @@ main(int argc, char *argv[])
   }
   LIBRDF_FREE(cstring, buffer);
    
+  if(librdf_new_node_from_typed_literal(world, 
+                                        (const unsigned char*)"Datatyped literal value",
+                                        "en-GB", uri2)) {
+    fprintf(stderr, "%s: Unexpected success allowing a datatyped literal with a language\n", program);
+    return(1);
+  }
+    
+  if(librdf_new_node_from_literal(world, 
+                                  (const unsigned char*)"XML literal value",
+                                  "en-GB", 1)) {
+    fprintf(stderr, "%s: Unexpected success allowing an XML literal with a language\n", program);
+    return(1);
+  }
     
 
 
