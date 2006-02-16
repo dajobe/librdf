@@ -20,6 +20,7 @@ BuildRequires: curl-devel
 BuildRequires: raptor-devel >= @RAPTOR_MIN_VERSION@
 BuildRequires: rasqal-devel >= @RASQAL_MIN_VERSION@
 BuildRequires: perl >= 5.8.0
+BuildRequires: db4-devel
 BuildRequires: mysql-devel
 BuildRequires: sqlite-devel
 Packager:  Dave Beckett <Dave.Beckett@bristol.ac.uk>
@@ -120,6 +121,9 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 /sbin/ldconfig
 
 %changelog
+* Wed Feb 15 2005  Dave Beckett <dave@dajobe.org>
+- Require db4-devel
+
 * Thu Aug 11 2005  Dave Beckett <dave.beckett@bristol.ac.uk>
 - Update Source:
 - Do not require python-devel at build time
