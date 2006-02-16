@@ -121,7 +121,7 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 /sbin/ldconfig
 
 %changelog
-* Wed Feb 15 2005  Dave Beckett <dave@dajobe.org>
+* Wed Feb 15 2006  Dave Beckett <dave@dajobe.org>
 - Require db4-devel
 
 * Thu Aug 11 2005  Dave Beckett <dave.beckett@bristol.ac.uk>
