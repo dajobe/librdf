@@ -1,5 +1,11 @@
 2006-02-15  Dave Beckett  <dave@dajobe.org>
 
+	* configure.ac, src/win32_rdf_config.h: Bumped version to 1.0.4
+
+	* Switched to Subversion version control.
+	CVS tag for redland 1.0.3: redland_1_0_3
+	Subversion revision ID for redland 1.0.3: r8564
+
 	* Snapshotted redland_1_0_3 for 1.0.3 release
 
 2006-02-11  Dave Beckett  <dave@dajobe.org>
