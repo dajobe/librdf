@@ -23,6 +23,7 @@ BuildRequires: perl >= 5.8.0
 BuildRequires: db4-devel
 BuildRequires: mysql-devel
 BuildRequires: sqlite-devel
+BuildRequires: postgresql-devel
 Packager:  Dave Beckett <Dave.Beckett@bristol.ac.uk>
 Docdir: %{prefix}/doc
 Requires:  libxml2
@@ -122,7 +123,7 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 
 %changelog
 * Wed Feb 15 2006  Dave Beckett <dave@dajobe.org>
-- Require db4-devel
+- Require db4-devel, postgresql-devel
 
 * Thu Aug 11 2005  Dave Beckett <dave.beckett@bristol.ac.uk>
 - Update Source:
