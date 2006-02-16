@@ -1,28 +1,24 @@
 <!-- ##### SECTION Title ##### -->
-stream
+Stream of triples (#librdf_statement).
 
 <!-- ##### SECTION Short_Description ##### -->
-Iterator over triples/statements
+Sequence of RDF Triples.
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-This class provides a pull-iterator API for reading a sequence of
-#librdf_statement (triples) generated from some method.  This is
-a way to return a serialized #librdf_model in a generated form
-and is in most instances, generated lazily when the next statement
-is needed.
-</para>
-
-<para>Streams are not cursors; the original object that generated the
-stream should not be modified while the streaming is in progress
-and the returned #librdf_statement should be copied with the class
-copy constructor librdf_new_statement_from_statement() if needed to
-persist after the stream is exhausted.
+Iterate a sequence of RDF triples from some object.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+Provides a way to operate across a sequence of RDF Triples that are
+generated one-by-one on demand.   The generated triples can be from
+some API call in the #librdf_model class, from listing a graph content
+as individual triples, from parsing a syntax or returning an RDF graph
+result from a query.  Streams can be passed into methods for the reverse
+operations such as adding to a graph, serializing a graph to a syntax.
+Streams pass individual triples (#librdf_statement) between objects
+and are usually lazily generated and consumed.
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -1,22 +1,15 @@
 <!-- ##### SECTION Title ##### -->
-iterator
+Iterator
 
 <!-- ##### SECTION Short_Description ##### -->
-Iterator over nodes/objects
+Iterate a sequence of objects across some other object.
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-This class provides a pull-iterator API for reading a sequence of
-objects generated from some method.  The sequence is primarily
-for sequences of #librdf_node objects returned from some model
-method but is used internally for other purposes.
-</para>
-
-<para>Iterators are not cursors; the original object that generated
-the iteration should not be modified while the iteration is in
-progress and the returned object should be copied with the
-class copy constructor if needed to persist after the iteration
-is exhausted.
+Provides a way to operate across a sequence of objects that are
+generated one-by-one on demand.  The returned objects can be of any
+type but the main public methods are on the #librdf_model classs and
+return sequence of #librdf_node objects such as librdf_model_get_sources().
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
@@ -84,15 +77,6 @@ is exhausted.
 
 
 <!-- ##### FUNCTION librdf_iterator_have_elements ##### -->
-<para>
-
-</para>
-
-@iterator: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_iterator_finished ##### -->
 <para>
 
 </para>
