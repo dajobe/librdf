@@ -1,6 +1,0 @@
-.cvsignore
-notRCS
-Makefile
-Makefile.in
-db
-logs
