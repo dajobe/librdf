@@ -19,11 +19,8 @@
 <li>Docs: hard to find/know of raptor parser and serializer features</li>
 <li>RFE: model class method to load into model with context</li>
 <li>RFE: model class method to a remove/load into model for some context</li>
-<li>Initialise the default genid base in <code>librdf_new_world</code> with something more fine-grained than seconds.  Add some microseconds digits</li>
 <li>Docs: it was hard to find the legal (parser) feature URIs in
 the documentation, or what values to use.</li>
-<li>RFE: consider how to add parser guessing (via raptor) into the
-redland parser API</li>
 <li>Documentation: describe the redland features available per class</li>
 <li>Update the RDF/RDFS terms/labels for the latest RDF Schema revision</li>
 <li>In-memory storage uses more memory than needed</li>
@@ -56,6 +53,9 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Initialise the default genid base in <code>librdf_new_world</code> with something more fine-grained than seconds.  Add some microseconds digits (1.0.3)</li>
+<li>RFE: consider how to add parser guessing (via raptor) into the
+redland parser API - use the 'guess' parser name (1.0.3)</li>
 <li>RFE: add user mappings from URIs to namespace aliases to the serializer (Raptor 1.4.7)</li>
 <li>RFE: The parser should be able to adjust error and warning
 actions, stopping immediately or ignoring them by features. Document
