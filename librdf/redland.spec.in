@@ -23,8 +23,7 @@ BuildRequires: perl >= 5.8.0
 BuildRequires: db4-devel
 BuildRequires: mysql-devel
 BuildRequires: sqlite-devel
-BuildRequires: postgresql-devel
-Packager:  Dave Beckett <Dave.Beckett@bristol.ac.uk>
+Packager:  Dave Beckett <dave@dajobe.org>
 Docdir: %{prefix}/doc
 Requires:  libxml2
 Requires:  curl
@@ -36,10 +35,10 @@ Requires:  mysql
 
 Redland is a library that provides a high-level interface for RDF
 (Resource Description Framework) implemented in an object-based API.
-It is modular and supports different RDF/XML parsers, storage
-mechanisms and other elements. Redland is designed for applications
-developers to provide RDF support in their applications as well as
-for RDF developers to experiment with the technology.
+It is modular and supports different RDF parsers, serializers,
+storage and query languages.  Redland is designed for developers to
+provide RDF support in their applications as well as a core library
+for RDF developers to start with.
 
 %package devel
 Summary: Libraries and header files for programs that use Redland.
@@ -123,7 +122,8 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 
 %changelog
 * Wed Feb 15 2006  Dave Beckett <dave@dajobe.org>
-- Require db4-devel, postgresql-devel
+- Require db4-devel
+- Disable postgresql for now
 
 * Thu Aug 11 2005  Dave Beckett <dave.beckett@bristol.ac.uk>
 - Update Source:
