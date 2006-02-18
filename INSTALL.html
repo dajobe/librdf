@@ -51,12 +51,17 @@ same sources).
 <h3>1.3. Getting the sources from Subversion</h3>
 
 <pre>
+  svn checkout http://svn.librdf.org/repository/raptor/trunk/
+  mv trunk raptor
+  svn checkout http://svn.librdf.org/repository/rasqal/trunk/
+  mv trunk rasqal
   svn checkout http://svn.librdf.org/repository/librdf/trunk/
   mv trunk librdf
+
   cd librdf
+  ln -s ../raptor
+  ln -s ../rasqal
 </pre>
-<p>This will also pull in the raptor and rasqal Subversion trunks as
-sub-directories.</p>
 
 
 <p>At this stage, or after a <code>svn update</code> you will
