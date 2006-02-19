@@ -331,7 +331,6 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
   }
 
   if(feof(context->fh) || status <1) {
-    fclose(context->fh);
     context->fh=NULL;
   }
   
