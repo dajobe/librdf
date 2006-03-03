@@ -34,6 +34,8 @@
 extern "C" {
 #endif
 
+#include <raptor.h>
+
 struct librdf_serializer_factory_s 
 {
   struct librdf_serializer_factory_s* next;

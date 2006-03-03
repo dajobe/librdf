@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+#include <raptor.h>
+
 /**
  * librdf_log_level:
  * @LIBRDF_LOG_NONE: No level
