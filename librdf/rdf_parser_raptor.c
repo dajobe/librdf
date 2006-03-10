@@ -398,8 +398,10 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   
   
   scontext->pcontext=pcontext;
-  scontext->source_uri = librdf_new_uri_from_uri(base_uri);
-  scontext->base_uri = librdf_new_uri_from_uri(base_uri);
+  if(base_uri)
+    scontext->source_uri = librdf_new_uri_from_uri(base_uri);
+  if(base_uri)
+    scontext->base_uri = librdf_new_uri_from_uri(base_uri);
   scontext->fh=fh;
 
   /* Start the parse */
