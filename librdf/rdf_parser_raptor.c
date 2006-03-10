@@ -68,6 +68,8 @@ typedef struct {
 
   /* when reading from a file */
   FILE *fh;
+  /* when true, this FH is closed on finish */
+  int close_fh;
 
   /* when storing into a model - librdf_parser_raptor_parse_uri_into_model */
   librdf_model *model;
@@ -363,6 +365,7 @@ librdf_parser_raptor_generate_id_handler(void *user_data,
  * librdf_parser_raptor_parse_file_handle_as_stream:
  * @context: parser context
  * @fh: FILE* of content source
+ * @close_fh: if true to fclose(fh) on finish
  * @base_uri: #librdf_uri URI of the content location
  *
  * Retrieve content from FILE* @fh and parse it into a #librdf_stream.
@@ -371,7 +374,8 @@ librdf_parser_raptor_generate_id_handler(void *user_data,
 static librdf_stream*
 librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
                                                  void *context, 
-                                                 FILE *fh, librdf_uri *base_uri)
+                                                 FILE *fh, int close_fh,
+                                                 librdf_uri *base_uri)
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
@@ -403,6 +407,7 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   if(base_uri)
     scontext->base_uri = librdf_new_uri_from_uri(base_uri);
   scontext->fh=fh;
+  scontext->close_fh=close_fh;
 
   /* Start the parse */
   rc=raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
@@ -479,11 +484,12 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
       SYSTEM_FREE(filename);
       return NULL;
     }
-    
-    stream=librdf_parser_raptor_parse_file_handle_as_stream(pcontext->parser->world,
-                                                            context, fh, base_uri);
 
-    fclose(fh);
+    /* stream will close FH */
+    stream=librdf_parser_raptor_parse_file_handle_as_stream(pcontext->parser->world,
+                                                            context, fh, 1,
+                                                            base_uri);
+
     SYSTEM_FREE(filename);
     return stream;
   }
@@ -897,6 +903,9 @@ librdf_parser_raptor_serialise_finished(void* context)
       librdf_free_statement(statement);
     librdf_list_clear(&scontext->statements);
 
+    if(scontext->fh && scontext->close_fh)
+      fclose(scontext->fh); 
+ 
     LIBRDF_FREE(librdf_parser_raptor_context, scontext);
   }
 }
