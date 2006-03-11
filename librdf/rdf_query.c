@@ -668,7 +668,7 @@ main(int argc, char *argv[])
                                                 format_uri, NULL,
                                                 &string_length);
   fprintf(stdout, "%s: Got query results string of length %d\n", program,
-          string_length);
+          (int)string_length);
 
   librdf_free_uri(format_uri);
   free(string);
