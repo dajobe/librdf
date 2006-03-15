@@ -1,3 +1,40 @@
+2006-03-10  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_query.c: (main): Cast for size_t
+
+2006-03-09  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c: Add close_fh flag to
+	librdf_parser_raptor_stream_context to manage tidying up a FILE*.
+	(librdf_parser_raptor_parse_file_handle_as_stream): Added close_fh
+	flag to ask for fclose(fh) on
+	exit. (librdf_parser_raptor_parse_as_stream_common): Do not
+	fclose(fh) before it actually likely gets read.
+	(librdf_parser_raptor_serialise_finished): fclose(fh) here if
+	asked for.
+
+	* librdf/rdf_parser_raptor.c:
+	(librdf_parser_raptor_parse_file_handle_as_stream): Work with NULL
+	base_uri.
+
+2006-03-05  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac: Require raptor 1.4.9 now
+
+2006-03-02  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_log.h, librdf/rdf_serializer.h,
+	librdf/rdf_serializer_internal.h: Include raptor.h when raptor
+	definitions are used in headers
+
+2006-02-19  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c:
+	(librdf_parser_raptor_get_next_statement): Remove bad use of
+	fclose() on a FILE* not opened here.
+
+	* AUTHORS: update me
+
 2006-02-15  Dave Beckett  <dave@dajobe.org>
 
 	* configure.ac, src/win32_rdf_config.h: Bumped version to 1.0.4
