@@ -71,6 +71,9 @@ typedef struct {
   /* when true, this FH is closed on finish */
   int close_fh;
 
+  /* when finished */
+  int finished;
+  
   /* when storing into a model - librdf_parser_raptor_parse_uri_into_model */
   librdf_model *model;
   
@@ -308,7 +311,7 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
   unsigned char buffer[RAPTOR_IO_BUFFER_LEN];
   int status=0;
   
-  if(!context->fh)
+  if(context->finished || !context->fh)
     return 0;
   
   context->current=NULL;
@@ -332,9 +335,8 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
       break;
   }
 
-  if(feof(context->fh) || status <1) {
-    context->fh=NULL;
-  }
+  if(feof(context->fh) || status <1)
+    context->finished=1;
   
   return status;
 }
