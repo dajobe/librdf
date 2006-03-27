@@ -196,7 +196,8 @@ librdf_parser_raptor_new_statement_handler(void *context,
     sprintf(ordinal_buffer, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_%d", ordinal);
     
     node=librdf_new_node_from_uri_string(world, (const unsigned char*)ordinal_buffer);
-  } else if (rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_PREDICATE) {
+  } else if (rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE ||
+             rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_PREDICATE) {
     node=librdf_new_node_from_normalised_uri_string(world,
                                                     librdf_uri_as_string((librdf_uri*)rstatement->predicate),
                                                     scontext->source_uri,
