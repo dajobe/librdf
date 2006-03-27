@@ -1,3 +1,30 @@
+2006-03-27  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c:
+	(librdf_parser_raptor_new_statement_handler): Allow
+	RAPTOR_IDENTIFIER_TYPE_RESOURCE and
+	RAPTOR_IDENTIFIER_TYPE_PREDICATE raptor predicate types again.
+
+	* examples/example5.c: Update to librdf_new_query change from long
+	ago
+
+2006-03-18  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/Makefile.am: fix make libraptor.la & librasqal.la rules
+
+2006-03-15  Dave Beckett  <dave@dajobe.org>
+
+	* COPYING, COPYING.LIB, README.html, TODO.html,
+	librdf/rdf_parser_raptor.c: docs
+
+2006-03-14  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac: require rasqal 0.9.12
+
+2006-03-13  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac: BDB 4.4 now exists
+
 2006-03-10  Dave Beckett  <dave@dajobe.org>
 
 	* librdf/rdf_query.c: (main): Cast for size_t
