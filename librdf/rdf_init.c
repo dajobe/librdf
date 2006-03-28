@@ -56,7 +56,9 @@
 #include <redland.h>
 /* for getpid */
 #include <sys/types.h>
+#ifdef HAVE_UNISTD
 #include <unistd.h>
+#endif
 
 
 
