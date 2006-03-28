@@ -39,8 +39,8 @@ extern "C" {
 #define HAVE_STDLIB_H 1
 
 /* For using expat on win32 */
-#define RAPTOR_XML_EXPAT 1
-#define HAVE_EXPAT_H 1
+/*#define RAPTOR_XML_EXPAT 1
+#define HAVE_EXPAT_H 1*/
 
 #define HAVE_STRICMP 1
 
@@ -74,43 +74,40 @@ extern "C" {
  */
 
 /* BDB has close method with 2 args */
-/* #undef HAVE_BDB_CLOSE_2_ARGS */
+#define HAVE_BDB_CLOSE_2_ARGS 1
 
 /* BDB defines DBC */
-/* #undef HAVE_BDB_CURSOR */
+#define HAVE_BDB_CURSOR 1
 
 /* BDB cursor method has 4 arguments */
-/* #undef HAVE_BDB_CURSOR_4_ARGS */
+#define HAVE_BDB_CURSOR_4_ARGS 1
 
 /* BDB defines DB_TXN */
-/* #undef HAVE_BDB_DB_TXN */
+#define HAVE_BDB_DB_TXN 1
 
 /* BDB has fd method with 2 args */
-/* #undef HAVE_BDB_FD_2_ARGS */
+#define HAVE_BDB_FD_2_ARGS 1
 
 /* Have BDB hash support */
-/* #undef HAVE_BDB_HASH */
+#define HAVE_BDB_HASH 1
 
 /* BDB has open method with 6 args */
 /* #undef HAVE_BDB_OPEN_6_ARGS */
 
 /* BDB has open method with 7 args */
-/* #undef HAVE_BDB_OPEN_7_ARGS */
+#define HAVE_BDB_OPEN_7_ARGS 1
 
 /* BDB has set_flags method */
-/* #undef HAVE_BDB_SET_FLAGS */
+#define HAVE_BDB_SET_FLAGS 1
 
 /* BDB has dbopen method */
 /* #undef HAVE_DBOPEN */
 
 /* BDB has db_create method */
-/* #undef HAVE_DB_CREATE */
+#define HAVE_DB_CREATE 1
 
 /* Define to 1 if you have the <db.h> header file. */
-/* #undef HAVE_DB_H */
-
-/* BDB has db_open method */
-/* #undef HAVE_DB_OPEN */
+#define HAVE_DB_H 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 /* undef HAVE_DLFCN_H */
@@ -164,7 +161,7 @@ extern "C" {
 #define HAVE_MKTEMP 1
 
 /* MySQL libraries are present */
-/* #undef HAVE_MYSQL */
+#define HAVE_MYSQL 1
 
 /* Define to 1 if you have the <openssl/crypto.h> header file. */
 /* #undef HAVE_OPENSSL_CRYPTO_H */
@@ -227,7 +224,7 @@ extern "C" {
 /* #undef LIBRDF_DISABLE_ASSERT_MESSAGES */
 
 /* Release version as a decimal */
-#define LIBRDF_VERSION_DECIMAL 10004
+#define LIBRDF_VERSION_DECIMAL 10003
 
 /* Major version number */
 #define LIBRDF_VERSION_MAJOR 1
@@ -236,7 +233,7 @@ extern "C" {
 #define LIBRDF_VERSION_MINOR 0
 
 /* Release version number */
-#define LIBRDF_VERSION_RELEASE 4
+#define LIBRDF_VERSION_RELEASE 3
 
 /* The size of a `unsigned char', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_CHAR 1
@@ -253,8 +250,26 @@ extern "C" {
 /* The size of a `unsigned long long', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_LONG_LONG 8
 
+/* SQLite API version */
+#define SQLITE_API 3
+
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
+
+/* Building file storage */
+#define STORAGE_FILE 1
+
+/* Building MySQL storage */
+#define STORAGE_MYSQL 1
+
+/* Building PostgreSQL storage */
+/*#undef STORAGE_POSTGRESQL*/
+
+/* Building SQLite storage */
+#define STORAGE_SQLITE 1
+
+/* Building 3store storage */
+/*#undef STORAGE_TSTORE*/
 
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 /* #define TIME_WITH_SYS_TIME*/
@@ -276,6 +291,12 @@ extern "C" {
 #include <windows.h>
 #include <io.h>
 #include <memory.h>
+
+/* get _isnan() since it is not in math.h */
+#include <float.h>
+#ifndef isnan
+#define isnan(d) (_isnan(d))
+#endif
 
 #ifdef __cplusplus
 }
