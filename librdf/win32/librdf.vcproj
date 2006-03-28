@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\librdf;..\..\raptor;..\..\rasqal"
+				AdditionalIncludeDirectories="..\..\librdf;..\..\raptor\src;..\..\rasqal\src;..\..\..\bdb\include;..\..\..\sqlite3;..\..\..\mysql\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;LIBRDF_INTERNAL"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -33,13 +33,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="raptor.lib rasqal.lib"
+				AdditionalDependencies="raptor.lib rasqal.lib libdb43.lib sqlite3.lib libmysql.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\source\sandbox\redland-win\redland-1.0.0\raptor\win32\Debug&quot;;&quot;C:\source\sandbox\redland-win\redland-1.0.0\rasqal\win32\Debug&quot;;.."
+				AdditionalLibraryDirectories="..\..\raptor\win32\Debug;..\..\rasqal\win32\Debug;..;..\..\..\bdb;..\..\..\sqlite3\win32\Debug;..\..\..\mysql\lib"
 				ModuleDefinitionFile="msvc.def"
+				DelayLoadDLLs="libmysql.dll"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/librdf.pdb"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -71,7 +72,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\librdf;..\..\raptor;..\..\rasqal"
+				AdditionalIncludeDirectories="..\..\librdf;..\..\raptor\src;..\..\rasqal\src;..\..\..\bdb\include;..\..\..\sqlite3;..\..\..\mysql\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;LIBRDF_INTERNAL"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -83,10 +84,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="raptor.lib rasqal.lib"
+				AdditionalDependencies="raptor.lib rasqal.lib libdb43.lib sqlite3.lib libmysql.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\raptor\win32\Release;..\..\rasqal\win32\Debug;.."
+				AdditionalLibraryDirectories="..\..\raptor\win32\Release;..\..\rasqal\win32\Release;..;..\..\..\bdb;..\..\..\sqlite3\win32\Release;..\..\..\mysql\lib"
 				ModuleDefinitionFile="msvc.def"
+				DelayLoadDLLs="libmysql.dll"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -141,6 +143,9 @@
 			</File>
 			<File
 				RelativePath="..\rdf_hash.c">
+			</File>
+			<File
+				RelativePath="..\rdf_hash_bdb.c">
 			</File>
 			<File
 				RelativePath="..\rdf_hash_cursor.c">
@@ -212,6 +217,12 @@
 				RelativePath="..\rdf_storage_list.c">
 			</File>
 			<File
+				RelativePath="..\rdf_storage_mysql.c">
+			</File>
+			<File
+				RelativePath="..\rdf_storage_sqlite.c">
+			</File>
+			<File
 				RelativePath="..\rdf_stream.c">
 			</File>
 			<File
@@ -240,12 +251,6 @@
 			</File>
 			<File
 				RelativePath="..\rdf_hash.h">
-			</File>
-			<File
-				RelativePath="..\rdf_hash_bdb.h">
-			</File>
-			<File
-				RelativePath="..\rdf_hash_memory.h">
 			</File>
 			<File
 				RelativePath="..\rdf_heuristics.h">
