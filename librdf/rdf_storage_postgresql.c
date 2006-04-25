@@ -408,7 +408,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, char *name,
 {
   librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context*)storage->context;
   const char create_table_statements[]="\
-  CREATE TABLE Statements%llu (\
+  CREATE TABLE Statements" UINT64_T_FMT " (\
   Subject numeric(20) NOT NULL,\
   Predicate numeric(20) NOT NULL,\
   Object numeric(20) NOT NULL,\
@@ -440,8 +440,8 @@ librdf_storage_postgresql_init(librdf_storage* storage, char *name,
   Name text NOT NULL,\
   PRIMARY KEY (ID)\
 ) ";
-  const char create_model[]="INSERT INTO Models (ID,Name) VALUES (%llu,'%s')";
-  const char check_model[]="SELECT 1 FROM Models WHERE ID=%llu AND Name='%s'";
+  const char create_model[]="INSERT INTO Models (ID,Name) VALUES (" UINT64_T_FMT ",'%s')";
+  const char check_model[]="SELECT 1 FROM Models WHERE ID=" UINT64_T_FMT " AND Name='%s'";
   int status=0;
   char *escaped_name=NULL;
   char *query=NULL;
@@ -525,7 +525,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, char *name,
     if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(create_model)+20+
                                     strlen(escaped_name)+1)))
       status=1;
-    sprintf(query, create_model, context->model, name);
+    sprintf(query, create_model, context->model, escaped_name);
     if(!status && !(res=(PQexec(handle, query))) 
          && PQresultStatus(res) != PGRES_COMMAND_OK) {  
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
@@ -748,7 +748,7 @@ static int
 librdf_storage_postgresql_size(librdf_storage* storage)
 {
   librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context*)storage->context;
-  char model_size[]="SELECT COUNT(*) FROM Statements%llu";
+  char model_size[]="SELECT COUNT(*) FROM Statements" UINT64_T_FMT;
   char *query;
   PGresult *res;
   int count;
@@ -853,7 +853,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
     hash=librdf_storage_postgresql_hash(storage, "R", (char*)uri, nodelen);
 
     if(add) {
-      char create_resource[]="INSERT INTO Resources (ID,URI) VALUES (%llu,'%s')";
+      char create_resource[]="INSERT INTO Resources (ID,URI) VALUES (" UINT64_T_FMT ",'%s')";
       /* Escape URI for db query */
       char *escaped_uri;
       if(!(escaped_uri=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1))) {
@@ -916,7 +916,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
     LIBRDF_FREE(cstring,nodestring);
 
     if(add) {
-      char create_literal[]="INSERT INTO Literals (ID,Value,Language,Datatype) VALUES (%llu,'%s','%s','%s')";
+      char create_literal[]="INSERT INTO Literals (ID,Value,Language,Datatype) VALUES (" UINT64_T_FMT ",'%s','%s','%s')";
       /* Escape value, lang and datatype for db query */
       char *escaped_value, *escaped_lang, *escaped_datatype;
       if(!(escaped_value=(char*)LIBRDF_MALLOC(cstring, valuelen*2+1)) ||
@@ -969,7 +969,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
     hash=librdf_storage_postgresql_hash(storage, "B", (char*)name, nodelen);
 
     if(add) {
-      char create_bnode[]="INSERT INTO Bnodes (ID,Name) VALUES (%llu,'%s')";
+      char create_bnode[]="INSERT INTO Bnodes (ID,Name) VALUES (" UINT64_T_FMT ",'%s')";
       /* Escape name for db query */
       char *escaped_name;
       if(!(escaped_name=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1))) {
@@ -1120,7 +1120,7 @@ librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
                                           u64 ctxt, librdf_statement* statement)
 {
   librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
-  char insert_statement[]="INSERT INTO Statements%llu (Subject,Predicate,Object,Context) VALUES (%llu,%llu,%llu,%llu)";
+  char insert_statement[]="INSERT INTO Statements" UINT64_T_FMT " (Subject,Predicate,Object,Context) VALUES (" UINT64_T_FMT "," UINT64_T_FMT "," UINT64_T_FMT "," UINT64_T_FMT ")";
   u64 subject, predicate, object;
   char *query;
   PGconn *handle;
@@ -1177,7 +1177,7 @@ librdf_storage_postgresql_contains_statement(librdf_storage* storage,
                                         librdf_statement* statement)
 {
   librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
-  char find_statement[]="SELECT 1 FROM Statements%llu WHERE Subject=%llu AND Predicate=%llu AND Object=%llu limit 1";
+  char find_statement[]="SELECT 1 FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " limit 1";
   u64 subject, predicate, object;
   char *query;
   PGresult *res;
@@ -1257,8 +1257,8 @@ librdf_storage_postgresql_context_remove_statement(librdf_storage* storage,
                                              librdf_statement* statement)
 {
   librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
-  char delete_statement[]="DELETE FROM Statements%llu WHERE Subject=%llu AND Predicate=%llu AND Object=%llu";
-  char delete_statement_with_context[]="DELETE FROM Statements%llu WHERE Subject=%llu AND Predicate=%llu AND Object=%llu AND Context=%llu";
+  char delete_statement[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT;
+  char delete_statement_with_context[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " AND Context=" UINT64_T_FMT;
   u64 subject, predicate, object, ctxt=0;
   char *query;
   PGconn *handle;
@@ -1330,8 +1330,8 @@ librdf_storage_postgresql_context_remove_statements(librdf_storage* storage,
                                                librdf_node* context_node)
 {
   librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
-  char delete_context[]="DELETE FROM Statements%llu WHERE Context=%llu";
-  char delete_model[]="DELETE FROM Statements%llu";
+  char delete_context[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Context=" UINT64_T_FMT;
+  char delete_model[]="DELETE FROM Statements" UINT64_T_FMT;
   u64 ctxt=0;
   char *query;
   PGconn *handle;
@@ -1510,10 +1510,10 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
   strcpy(query, "SELECT ");
   *where='\0';
   if(sos->is_literal_match)
-    sprintf(joins, " FROM Literals AS L LEFT JOIN Statements%llu as S ON L.ID=S.Object",
+    sprintf(joins, " FROM Literals AS L LEFT JOIN Statements" UINT64_T_FMT " as S ON L.ID=S.Object",
             context->model);
   else
-    sprintf(joins, " FROM Statements%llu AS S", context->model);
+    sprintf(joins, " FROM Statements" UINT64_T_FMT " AS S", context->model);
 
   if(statement) {
     subject=librdf_statement_get_subject(statement);
@@ -1523,7 +1523,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
 
   /* Subject */
   if(statement && subject) {
-    sprintf(tmp, "S.Subject=%llu",
+    sprintf(tmp, "S.Subject=" UINT64_T_FMT "",
             librdf_storage_postgresql_node_hash(storage,subject,0));
     if(!strlen(where))
       strcat(where, " WHERE ");
@@ -1541,7 +1541,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
 
   /* Predicate */
   if(statement && predicate) {
-    sprintf(tmp, "S.Predicate=%llu",
+    sprintf(tmp, "S.Predicate=" UINT64_T_FMT "",
             librdf_storage_postgresql_node_hash(storage, predicate, 0));
     if(!strlen(where))
       strcat(where, " WHERE ");
@@ -1565,7 +1565,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
   /* Object */
   if(statement && object) {
     if(!sos->is_literal_match) {
-      sprintf(tmp,"S.Object=%llu",
+      sprintf(tmp,"S.Object=" UINT64_T_FMT "",
               librdf_storage_postgresql_node_hash(storage, object, 0));
       if(!strlen(where))
         strcat(where, " WHERE ");
@@ -1620,7 +1620,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
  
   /* Context */
   if(context_node) {
-    sprintf(tmp,"S.Context=%llu",
+    sprintf(tmp,"S.Context=" UINT64_T_FMT "",
             librdf_storage_postgresql_node_hash(storage,context_node,0));
     if(!strlen(where))
       strcat(where, " WHERE ");
@@ -1955,7 +1955,7 @@ librdf_storage_postgresql_get_contexts(librdf_storage* storage)
   const char select_contexts[]="\
 SELECT DISTINCT R.URI AS CoR, B.Name AS CoB, \
 L.Value AS CoV, L.Language AS CoL, L.Datatype AS CoD \
-FROM Statements%llu as S \
+FROM Statements" UINT64_T_FMT " as S \
 LEFT JOIN Resources AS R ON S.Context=R.ID \
 LEFT JOIN Bnodes AS B ON S.Context=B.ID \
 LEFT JOIN Literals AS L ON S.Context=L.ID";
