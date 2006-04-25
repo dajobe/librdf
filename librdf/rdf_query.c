@@ -231,8 +231,8 @@ librdf_get_query_factory(librdf_world *world,
  * @world: redland world object
  * @name: the name identifying the query language
  * @uri: the URI identifying the query language (or NULL)
- * @base_uri: the base URI of the query string (or NULL)
  * @query_string: the query string
+ * @base_uri: the base URI of the query string (or NULL)
  *
  * Constructor - create a new #librdf_query object.
  *
