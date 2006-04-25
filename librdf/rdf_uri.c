@@ -620,7 +620,7 @@ librdf_uri_is_file_uri(librdf_uri* uri)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, 1);
 
-  return raptor_uri_is_file_uri(uri->string);
+  return raptor_uri_uri_string_is_file_uri(uri->string);
 }
 
 
