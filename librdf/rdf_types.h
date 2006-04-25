@@ -74,6 +74,13 @@ extern "C" {
 #endif
 
 
+#ifdef WIN32
+#define UINT64_T_FMT "%I64u"
+#else
+#define UINT64_T_FMT "%llu"
+#endif
+
+
 #ifdef __cplusplus
 }
 #endif
