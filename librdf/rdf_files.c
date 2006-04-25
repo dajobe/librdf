@@ -140,18 +140,6 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  char *program=argv[0];
-  char *name;
-  
-  name=librdf_files_temporary_file_name();
-  if(!name)
-    fprintf(stderr, "%s: Failed to get temporary file anme\n", program);
-  else {
-    fprintf(stdout, "%s: Got temporary file name %s\n", program, name);
-    LIBRDF_FREE(cstring, name);
-  }
-
-  
   /* keep gcc -Wall happy */
   return(0);
 }
