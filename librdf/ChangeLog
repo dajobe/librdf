@@ -1,3 +1,91 @@
+2006-05-02  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_utf8.c: (librdf_utf8_to_unicode_char,
+	librdf_utf8_to_latin1, librdf_utf8_print, main): Use
+	raptor_utf8_to_unicode_char.
+
+	* librdf/rdf_node.c: (librdf_new_node_from_literal,
+	librdf_new_node_from_typed_literal): An empty language string is
+	equivalent to a NULL pointer.  This makes calling this slightly
+	easier from higher-level languages.
+
+2006-04-24  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_uri.c: (librdf_uri_is_file_uri): Replace raptor
+	1.4.9-deprecated raptor_uri_is_file_uri with
+	raptor_uri_uri_string_is_file_uri
+
+	* librdf/rdf_files.c: (main): Remove test for deprecated function.
+
+	* librdf/rdf_storage_postgresql.c: Use UINT64_T_FMT instead of
+	%llu for portability.
+	(librdf_storage_postgresql_init): Use escaped_name in query.
+
+	* librdf/rdf_storage_mysql.c: Use UINT64_T_FMT instead of %llu for
+	portability.
+	(librdf_storage_mysql_init): Use escaped_name in query.
+
+	* librdf/rdf_types.h: Define UINT64_T_FMT with the portable
+	sprintf formatting for a 64-bit unsigned int %I64u on win32,
+	%llu (gcc) elsewhere.
+
+2006-03-27  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/win32/librdf.vcproj: redland win32 build files update
+	from John Barstow
+
+	* librdf/win32_rdf_config.h: redland win32 build files update from
+	John Barstow
+
+	* librdf/rdf_init.c: Protect #include <unistd.h> with defines as
+	elsewhere
+
+	* librdf/rdf_parser_raptor.c: (librdf_parser_raptor_new_statement_handler):
+	Allow RAPTOR_IDENTIFIER_TYPE_RESOURCE and
+	RAPTOR_IDENTIFIER_TYPE_PREDICATE raptor predicate types again.
+
+2006-03-18  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/Makefile.am: fix make libraptor.la & librasqal.la rules
+
+
+	* librdf/rdf_query.c: (main): Cast for size_t
+
+2006-03-09  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c: Add close_fh flag to
+	librdf_parser_raptor_stream_context to manage tidying up a FILE*.
+	(librdf_parser_raptor_parse_file_handle_as_stream): Added close_fh
+	flag to ask for fclose(fh) on exit.
+	(librdf_parser_raptor_parse_as_stream_common): Do not fclose(fh)
+	before it actually likely gets read.
+	(librdf_parser_raptor_serialise_finished): fclose(fh) here if
+	asked for.
+
+	* librdf/rdf_parser_raptor.c: (librdf_parser_raptor_parse_file_handle_as_stream):
+	Work with NULL base_uri.
+
+2006-03-02  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_log.h, librdf/rdf_serializer.h,
+	librdf/rdf_serializer_internal.h: Include raptor.h when raptor
+	definitions are used in headers
+
+2006-02-19  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c: (librdf_parser_raptor_get_next_statement):
+	Remove bad use of fclose() on a FILE* not opened here.
+
+2006-02-15  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/win32_rdf_config.h: Bumped version to 1.0.4
+
+	* librdf/redland.spec.in: disable postgresql for now
+
+	* librdf/redland.spec.in: require postgresql-devel
+
+	* librdf/redland.spec.in: require db4-devel
+
 2006-02-11  Dave Beckett  <dave@dajobe.org>
 
 	* rdf_node.c (librdf_new_node_from_literal,
