@@ -347,7 +347,8 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
  * 0.9.12: xml_space argument deleted
  *
  * An @xml_language cannot be used when @is_wf_xml is non-0. If both
- * are given, NULL is returned.
+ * are given, NULL is returned.  If @xml_language is the empty string,
+ * it is the equivalent to NULL.
  *
  * Return value: new #librdf_node object or NULL on failure
  **/
@@ -358,6 +359,9 @@ librdf_new_node_from_literal(librdf_world *world,
                              int is_wf_xml) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL);
+
+  if(xml_language && !*xml_language)
+    xml_language=NULL;
 
   if(xml_language && is_wf_xml)
     return NULL;
@@ -380,7 +384,8 @@ librdf_new_node_from_literal(librdf_world *world,
  * Constructor - create a new typed literal #librdf_node object.
  * 
  * Only one of @xml_language or @datatype_uri may be given.  If both
- * are given, NULL is returned.
+ * are given, NULL is returned.  If @xml_language is the empty string,
+ * it is the equivalent to NULL.
  *
  * Return value: new #librdf_node object or NULL on failure
  **/
@@ -400,6 +405,9 @@ librdf_new_node_from_typed_literal(librdf_world *world,
   unsigned char *buffer;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(value, string, NULL);
+
+  if(xml_language && !*xml_language)
+    xml_language=NULL;
 
   if(xml_language && datatype_uri)
     return NULL;
