@@ -1,3 +1,18 @@
+2006-05-02  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_utf8.c: (librdf_utf8_to_unicode_char,
+	librdf_utf8_to_latin1, librdf_utf8_print, main): Use
+	raptor_utf8_to_unicode_char.
+
+	* librdf/rdf_node.c: (librdf_new_node_from_literal,
+	librdf_new_node_from_typed_literal):
+	An empty language string is equivalent to a NULL pointer.  This
+	makes calling this slightly easier from higher-level languages.
+
+2006-05-01  Dave Beckett  <dave@dajobe.org>
+
+	* Makefile.am: Added ChangeLog.6
+
 2006-04-24  Dave Beckett  <dave@dajobe.org>
 
 	* librdf/rdf_uri.c: (librdf_uri_is_file_uri): Replace raptor
