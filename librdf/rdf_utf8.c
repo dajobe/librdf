@@ -190,8 +190,92 @@ librdf_unicode_char_to_utf8(librdf_unichar c, byte *output, int length)
 int
 librdf_utf8_to_unicode_char(librdf_unichar *output, const byte *input, int length)
 {
-  return raptor_utf8_to_unicode_char((unsigned long*)output,
-                                     (const unsigned char*)input, length);
+  byte in;
+  int size;
+  librdf_unichar c=0;
+  
+  if(length < 1)
+    return -1;
+
+  in=*input++;
+  if((in & 0x80) == 0) { /* First byte 00..7F */
+    size=1;
+    c= in & 0x7f;
+  } else if((in & 0xe0) == 0xc0) { /* First byte C0..DF */
+    size=2;
+    c= in & 0x1f;
+  } else if((in & 0xf0) == 0xe0) { /* First byte E0..EF */
+    size=3;
+    c= in & 0x0f;
+  } else if((in & 0xf8) == 0xf0) { /* First byte F0..F7 */
+    size=4;
+    c = in & 0x07;
+  } else /* First byte anything else: 80..BF F8..FF - illegal */
+    return -1;
+
+
+  if(!output)
+    return size;
+
+  if(length < size)
+    return -1;
+
+  switch(size) {
+    case 4:
+      in=*input++ & 0x3f;
+      c= c << 6;
+      c |= in;
+      /* FALLTHROUGH */
+    case 3:
+      in=*input++ & 0x3f;
+      c= c << 6;
+      c |= in;
+      /* FALLTHROUGH */
+    case 2:
+      in=*input++ & 0x3f;
+      c= c << 6;
+      c |= in;
+      /* FALLTHROUGH */
+    default:
+      break;
+  }
+
+
+  /* check for overlong UTF-8 sequences */
+  switch(size) {
+    case 2:
+      if(c < 0x00000080)
+        return -2;
+      break;
+    case 3:
+      if(c < 0x00000800)
+        return -2;
+      break;
+    case 4:
+      if(c < 0x00010000)
+        return -2;
+      break;
+
+    default: /* 1 */
+      break;
+  }
+
+
+  /* check for illegal code positions:
+   * U+D800 to U+DFFF (UTF-16 surrogates)
+   * U+FFFE and U+FFFF
+   */
+  if((c > 0xD7FF && c < 0xE000) || c == 0xFFFE || c == 0xFFFF)
+    return -1;
+
+  /* Unicode 3.2 only defines U+0000 to U+10FFFF and UTF-8 encodings of it */
+  /* of course this makes some 4 byte forms illegal */
+  if(c > 0x10ffff)
+    return -1;
+
+  *output=c;
+
+  return size;
 }
 
 
@@ -223,9 +307,7 @@ librdf_utf8_to_latin1(const byte *input, int length, int *output_length)
 
   i=0;
   while(input[i]) {
-    int size=raptor_utf8_to_unicode_char(NULL,
-                                         (const unsigned char*)&input[i],
-                                         length-i);
+    int size=librdf_utf8_to_unicode_char(NULL, &input[i], length-i);
     if(size <= 0)
       return NULL;
     utf8_char_length++;
@@ -246,9 +328,7 @@ librdf_utf8_to_latin1(const byte *input, int length, int *output_length)
   i=0; j=0;
   while(i < utf8_byte_length) {
     librdf_unichar c;
-    int size=librdf_utf8_to_unicode_char((unsigned long*)&c,
-                                         (const unsigned char*)&input[i],
-                                         length-i);
+    int size=librdf_utf8_to_unicode_char(&c, &input[i], length-i);
     if(size <= 0)
       return NULL;
     if(c < 0x100) /* Discards characters! */
@@ -335,9 +415,7 @@ librdf_utf8_print(const byte *input, int length, FILE *stream)
   
   while(i<length && *input) {
     librdf_unichar c;
-    int size=raptor_utf8_to_unicode_char((unsigned long*)&c,
-                                         (const unsigned char*)input,
-                                         length-i);
+    int size=librdf_utf8_to_unicode_char(&c, input, length-i);
     if(size <= 0)
       return;
     if(c < 0x100) {
@@ -465,8 +543,7 @@ main(int argc, char *argv[])
 #define OUT_BUFFER_SIZE 6
     byte out_buffer[OUT_BUFFER_SIZE];
     
-    size=raptor_utf8_to_unicode_char((unsigned long*)&c, 
-                                     (const unsigned char*)buffer, length);
+    size=librdf_utf8_to_unicode_char(&c, buffer, length);
     if(size < 0) {
       fprintf(stderr, "%s: librdf_utf8_to_unicode_char FAILED to convert UTF-8 string '", program);
       librdf_bad_string_print(buffer, length, stderr);
@@ -516,8 +593,7 @@ main(int argc, char *argv[])
     const byte *buffer=t->string;
     int length=t->length;
     
-    size=raptor_utf8_to_unicode_char((unsigned long*)&c,
-                                     (const unsigned char*)buffer, length);
+    size=librdf_utf8_to_unicode_char(&c, buffer, length);
     if(size >= 0) {
       fprintf(stderr, "%s: librdf_utf8_to_unicode_char SUCCEEDED when it should have failed to convert UTF-8 string '", program);
       librdf_bad_string_print(buffer, length, stderr);
