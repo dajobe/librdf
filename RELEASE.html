@@ -21,6 +21,75 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<h2 id="rel1_0_4"><a name="rel1_0_4">Redland 1.0.4 Changes</a></h2>
+
+<p>Not yet released.
+</p>
+
+<p>The main changes in this release are:</p>
+
+<p>Updated to use 
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.12
+(<a href="http://librdf.org/rasqal/RELEASE.html#rel0_9_12">Rasqal 0.9.12 release notes</a>)
+to update to SPARQL 2006-04-06 for JSON results
+</p>
+
+<p>Updated to use
+<a href="http://librdf.org/raptor/">Raptor</a> 1.4.9
+(<a href="http://librdf.org/raptor/RELEASE.html#rel1_4_9">Raptor 1.4.9 release notes</a>)
+</p>
+
+<p>Plus fixing some crash bugs in parsing and serializing.</p>
+
+
+<h3>Configuration and Build Changes</h3>
+
+<p>Now using <a href="http://subversion.tigris.org/">Subversion</a>
+for version control and the <a href="INSTALL.html">Redland installation instructions</a> explain how to get Redland from Subversion.</p>
+
+<p>Win32 fixes and VC build files updates from John Barstow.
+</p>
+
+<p>Let configure find BDB 4.4</p>
+
+
+<h3>Node Class Changes</h3>
+
+<p><code>librdf_new_node_from_literal</code>
+and <code>librdf_new_node_from_typed_literal</code> now accept empty
+strings as an alternative to a NULL language pointer.
+</p>
+
+
+<h3>Parser Class Changes</h3>
+
+<p>Add one more place where it needed handling old and new raptor
+statement predicate values
+<code>RAPTOR_IDENTIFIER_TYPE_RESOURCE</code> and
+<code>RAPTOR_IDENTIFIER_TYPE_PREDICATE</code>.
+</p>
+
+<p>Fixed a bad uses of flose() causing a crash in parsing a file or
+from a <code>FILE*</code> file handle when run under
+newer <code>glibc</code>s.
+</p>
+
+
+<h3>Serializer Class Changes</h3>
+
+<p>Fixed a bad uses of flose() causing a crash in serializing to a
+file when run under newer <code>glibc</code>s.
+</p>
+
+
+<h3>Storage Class Changes</h3>
+
+<p>Introduced a <code>UINT64_T_FMT</code> to handle formatting a 64-bit
+<code>unsigned</code> <code>int</code> in storages
+as <code>%llu</code> is not portable.
+</p>
+
+
 <h2 id="rel1_0_3"><a name="rel1_0_3">Redland 1.0.3 Changes</a></h2>
 
 <p>The main changes in this release are:</p>
