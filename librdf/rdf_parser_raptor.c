@@ -269,14 +269,10 @@ static void
 librdf_parser_raptor_error_handler(void *data, raptor_locator *locator,
                                    const char *message) 
 {
-  librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)data;
-  librdf_parser_raptor_context* pcontext;
-  librdf_parser* parser;
-
-  pcontext=scontext->pcontext;
-  parser=pcontext->parser;
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)data;
 
   pcontext->errors++;
+
   raptor_parse_abort(pcontext->rdf_parser);
 
   librdf_log_simple(pcontext->parser->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, locator, message);
@@ -287,10 +283,8 @@ static void
 librdf_parser_raptor_warning_handler(void *data, raptor_locator *locator,
                                      const char *message) 
 {
-  librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)data;
-  librdf_parser_raptor_context* pcontext;
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)data;
 
-  pcontext=scontext->pcontext;
   pcontext->warnings++;
 
   librdf_log_simple(pcontext->parser->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_PARSER, locator, message);
@@ -395,9 +389,9 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
   
-  raptor_set_error_handler(pcontext->rdf_parser, scontext, 
+  raptor_set_error_handler(pcontext->rdf_parser, pcontext, 
                            librdf_parser_raptor_error_handler);
-  raptor_set_warning_handler(pcontext->rdf_parser, scontext,
+  raptor_set_warning_handler(pcontext->rdf_parser, pcontext,
                              librdf_parser_raptor_warning_handler);
 
   raptor_set_generate_id_handler(pcontext->rdf_parser, pcontext,
@@ -505,9 +499,9 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
   
-  raptor_set_error_handler(pcontext->rdf_parser, scontext, 
+  raptor_set_error_handler(pcontext->rdf_parser, pcontext, 
                            librdf_parser_raptor_error_handler);
-  raptor_set_warning_handler(pcontext->rdf_parser, scontext,
+  raptor_set_warning_handler(pcontext->rdf_parser, pcontext,
                              librdf_parser_raptor_warning_handler);
 
   raptor_set_generate_id_handler(pcontext->rdf_parser, pcontext,
@@ -677,9 +671,9 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
   
-  raptor_set_error_handler(pcontext->rdf_parser, scontext, 
+  raptor_set_error_handler(pcontext->rdf_parser, pcontext, 
                            librdf_parser_raptor_error_handler);
-  raptor_set_warning_handler(pcontext->rdf_parser, scontext,
+  raptor_set_warning_handler(pcontext->rdf_parser, pcontext,
                              librdf_parser_raptor_warning_handler);
 
   raptor_set_generate_id_handler(pcontext->rdf_parser, pcontext,
