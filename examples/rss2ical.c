@@ -25,7 +25,6 @@
 #include <redland.h>
 
 
-#define DO_DURATION 1
 #define DO_ESCAPE_NL 0
 
 static const unsigned char* get_items_query=(const unsigned char*)
@@ -234,12 +233,6 @@ main(int argc, char *argv[])
     unsigned char *uid=NULL;
     unsigned char *summary=NULL;
     unsigned char *dtstart=NULL;
-#ifdef DO_DURATION
-#else
-    unsigned char *dtend=NULL;
-    int h;
-    int m;
-#endif
     unsigned char *location=NULL;
     unsigned char *html_desc=NULL;
     size_t html_desc_len;
@@ -272,27 +265,6 @@ main(int argc, char *argv[])
     dtstart=librdf_node_get_literal_value(node);
     dtstart=iso2vcaldate(dtstart);
     
-    /* Make the entry turn into a 15min duration event */
-#ifdef DO_DURATION
-#else
-    dtend=librdf_node_get_literal_value(node);
-    dtend=iso2vcaldate(dtend);
-
-    h=((dtend[9]-'0')*10)+(dtend[10]-'0');
-    m=((dtend[11]-'0')*10)+(dtend[12]-'0');;
-    
-    m+= 15;
-    if(m > 60) {
-      h++;
-      m-= 60;
-    }
-
-    dtend[9]=(h / 10)+'0';
-    dtend[10]=(h % 10)+'0';
-    dtend[11]=(m / 10)+'0';
-    dtend[12]=(m % 10)+'0';
-#endif    
-
     node=librdf_query_results_get_binding_value_by_name(results, "title");
     if(!librdf_node_is_literal(node))
       summary=(unsigned char*)"(No Title)";
@@ -331,11 +303,6 @@ main(int argc, char *argv[])
     if(location)
       ical_format(stdout, "LOCATION", NULL, NULL, location);
     ical_format(stdout, "DTSTART", NULL, NULL, dtstart);
-#ifdef DO_DURATION
-    ical_format(stdout, "DURATION", NULL, NULL, (const unsigned char*)"PT15M");
-#else
-    ical_format(stdout, "DTEND", NULL, NULL, dtend);
-#endif
     ical_format(stdout, "DTSTAMP", NULL, NULL, dtstart);
     ical_format(stdout, "LAST-MODIFIED", NULL, NULL, dtstart);
     ical_format(stdout, "DESCRIPTION", NULL, ";,\"", description);
