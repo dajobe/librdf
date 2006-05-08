@@ -25,6 +25,8 @@
 #include <redland.h>
 
 
+#undef RSS2ICAL_DEBUG
+
 #define DO_ESCAPE_NL 0
 
 static const unsigned char* get_items_query=(const unsigned char*)
@@ -161,6 +163,75 @@ unsigned char* iso2vcaldate(const unsigned char* iso_date)
 
 
 
+static
+unsigned char* remove_html_entities(unsigned char* html_desc, size_t len)
+{
+  int i, j;
+  unsigned char* description;
+  unsigned char c;
+  
+  description=malloc(len);
+  for(i=0, j=0; (c=html_desc[i]); i++) {
+    if(c == '\n')
+      c=' ';
+    else if(c == '&') {
+      c=html_desc[++i];
+      
+      /* Expand &#123; to UTF-8 for codepoint decimal 123 */
+      if(c == '#') {
+        unsigned char *orig_p=&html_desc[i];
+        unsigned long d=0;
+        int ulen;
+        
+        i++;
+        while(c) { 
+          c=html_desc[i++];
+          if(c<'0' || c>'9')
+            break;
+          d=d*10;
+          d+= (c - '0');
+        }
+        if(c != ';') {
+          fprintf(stderr, "%s: Expected ';' after &#NNN in '%s'\n",
+                  program, orig_p);
+          abort();
+        }
+
+#ifdef RSS2ICAL_DEBUG
+        fprintf(stderr, "%s: Encoding char %d\n", program, d);
+#endif
+        ulen=raptor_unicode_char_to_utf8(d, &description[j]);
+#ifdef RSS2ICAL_DEBUG
+        fprintf(stderr, "%s: UTF-8 len was %d\n", program, ulen);
+#endif
+        j+= ulen;
+        
+      } else {
+        const char* here=(const char*)&html_desc[i];
+
+        if(!strncmp(here, "amp;", 4)) {
+          i+= 4;
+          c='&';
+        } else if(!strncmp(here, "lt;", 3)) {
+          i+= 3;
+          c='<';
+        } else if(!strncmp(here, "gt;", 3)) {
+          i+= 3;
+          c='>';
+        }
+          
+        description[j++]=c;
+      }
+      continue;
+    }
+    
+    description[j++]=c;
+  }
+  description[j]='\0';
+  return description;
+}
+
+
 int
 main(int argc, char *argv[])
 {
@@ -283,15 +354,9 @@ main(int argc, char *argv[])
                                                                   &html_desc_len);
     }
     if(html_desc) {
-      description=malloc(html_desc_len);
-      for(i=0; (c=html_desc[i]); i++) {
-        if(c == '\n')
-          c=' ';
-        description[i]=c;
-      }
-      description[i]='\0';
+      description=remove_html_entities(html_desc, html_desc_len);
     }
-
+    
     node=librdf_query_results_get_binding_value_by_name(results, "source");
     if(node && librdf_node_is_literal(node))
       location=librdf_node_get_literal_value(node);
