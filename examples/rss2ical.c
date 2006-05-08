@@ -144,8 +144,8 @@ ical_format(FILE *fh, const char *key, const char *attr,
 }
 
 
-static
-unsigned char* iso2vcaldate(const unsigned char* iso_date) 
+static unsigned char*
+iso2vcaldate(const unsigned char* iso_date) 
 {
   unsigned char* vcaldate;
   unsigned char c;
@@ -164,8 +164,8 @@ unsigned char* iso2vcaldate(const unsigned char* iso_date)
 
 
 
-static
-unsigned char* remove_html_entities(unsigned char* html_desc, size_t len)
+static unsigned char*
+remove_html_entities(unsigned char* html_desc, size_t len)
 {
   int i, j;
   unsigned char* description;
@@ -238,6 +238,33 @@ unsigned char* remove_html_entities(unsigned char* html_desc, size_t len)
 }
 
 
+static char*
+uri_to_calid(librdf_uri* uri) 
+{
+  size_t len;
+  unsigned char* uri_string;
+  char* calid;
+  unsigned char c;
+  int i, j;
+  
+  uri_string=librdf_uri_as_counted_string(uri, &len);
+
+  calid=(char*)malloc(len+1);
+  for(i=0, j=0; (c=uri_string[i]); i++) {
+    if(c <= 0x20 || c >= 0x7f)
+      continue;
+    
+    if(c == '\\' || c == ';' || c == ':' || c == '\"' || c == ',' ||
+       c == '/')
+      calid[j++]='-';
+    else
+      calid[j++]=c;
+  }
+ 
+  return calid;
+}
+
+
 int
 main(int argc, char *argv[])
 {
@@ -250,6 +277,7 @@ main(int argc, char *argv[])
   librdf_uri *uri;
   char *p;
   char* calendar_name;
+  char* calendar_id;
   
   program=argv[0];
   if((p=strrchr(program, '/')))
@@ -298,15 +326,18 @@ main(int argc, char *argv[])
 
   fprintf(stderr, "%s: Processing results\n", program);
 
+  calendar_id=uri_to_calid(uri);
+  
   fprintf(stdout, ical_header_format,
           "-//librdf/rss2ical Version 1.0//EN",
           calendar_name, 
-          "8ED1A8D-8E65",
+          calendar_id,
           tzone,
           tzone);
 
+  free(calendar_id);
+
   while(!librdf_query_results_finished(results)) {
-    unsigned char *item_uri=NULL;
     unsigned char *uid=NULL;
     unsigned char *summary=NULL;
     unsigned char *dtstart=NULL;
@@ -316,8 +347,6 @@ main(int argc, char *argv[])
     unsigned char *description=NULL;
     unsigned char *url=NULL;
     librdf_node* node;
-    int i;
-    unsigned char c;
     char *creator=NULL;
 
     node=librdf_query_results_get_binding_value_by_name(results, "item");
@@ -327,15 +356,7 @@ main(int argc, char *argv[])
     url=librdf_uri_as_string(librdf_node_get_uri(node));
 
     /* uid is a new string */
-    item_uri=librdf_uri_to_string(librdf_node_get_uri(node));
-
-    /* 7=strlen("http://") */
-    uid=item_uri+7;
-    for(i=0; (c=uid[i]); i++) {
-      if(c == '/' || c == '#' || c == '?')
-        uid[i]='-';
-    }
-    
+    uid=(unsigned char*)uri_to_calid(librdf_node_get_uri(node));
 
     node=librdf_query_results_get_binding_value_by_name(results, "date");
     if(!librdf_node_is_literal(node))
@@ -397,8 +418,7 @@ main(int argc, char *argv[])
     ical_print(stdout, "END:VEVENT");
 
     free(description);
-
-    free(item_uri);
+    free(uid);
     
     librdf_query_results_next(results);
   }
