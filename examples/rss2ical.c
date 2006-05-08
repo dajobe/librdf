@@ -172,7 +172,12 @@ unsigned char* remove_html_entities(unsigned char* html_desc, size_t len)
   unsigned char c;
   
   description=malloc(len);
-  for(i=0, j=0; (c=html_desc[i]); i++) {
+
+  /* Trim leading white space */
+  for(i=0, j=0; (c=html_desc[i]) && (c == ' ' || c == '\n'); i++)
+    ;
+
+  for(; (c=html_desc[i]); i++) {
     if(c == '\n')
       c=' ';
     else if(c == '&') {
@@ -225,7 +230,7 @@ unsigned char* remove_html_entities(unsigned char* html_desc, size_t len)
       }
       continue;
     }
-    
+
     description[j++]=c;
   }
   description[j]='\0';
