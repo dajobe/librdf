@@ -151,13 +151,18 @@ iso2vcaldate(const unsigned char* iso_date)
   unsigned char c;
   int i, j;
   
-  /* YYYY-MM-DDTHH:MM:SSZ to YYYYMMDDTHHMMSSZ */
+  /* YYYY-MM-DDTHH:MM:SSZ }
+   * YYYY-MM-DDTHH:MMZ    } to YYYYMMDDTHHMMSSZ   
+   * ...                  }
+   */
   vcaldate=(unsigned char*)malloc(17);
+  strncpy((char*)vcaldate, "00000000T000000Z", 17);
   for(i=0, j=0; (c=iso_date[i]); i++) {
+    if(c == 'Z')
+      break;
     if(c != ':' && c != '-')
       vcaldate[j++]=iso_date[i];
   }
-  vcaldate[j]='\0';
 
   return vcaldate;
 }
