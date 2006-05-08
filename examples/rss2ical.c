@@ -38,13 +38,13 @@ WHERE {\n\
  ?item a rss:item;\n\
        dc:date ?date;\n\
        rss:title ?title;\n\
-       rss:description ?description;\n\
-       dc:creator ?creator;\n\
- OPTIONAL { ?item  dc:source ?source } \n\
+       rss:description ?description .\n\
+ OPTIONAL { ?item dc:creator ?creator . }\n\
 }";
 
 /*
   Removed for now:
+  OPTIONAL { ?item  dc:source ?source } \n\
   OPTIONAL { ?item  content:encoded ?htmldesc } \n      \
 */
 
