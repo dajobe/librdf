@@ -33,12 +33,13 @@ static const unsigned char* get_items_query=(const unsigned char*)
 "PREFIX rss: <http://purl.org/rss/1.0/>\n\
 PREFIX dc: <http://purl.org/dc/elements/1.1/>\n\
 PREFIX content: <http://web.resource.org/rss/1.0/modules/content/>\n\
-SELECT ?item ?date ?title ?description ?htmldesc ?source\n\
+SELECT ?item ?date ?title ?description ?htmldesc ?source ?creator\n\
 WHERE {\n\
  ?item a rss:item;\n\
        dc:date ?date;\n\
        rss:title ?title;\n\
        rss:description ?description;\n\
+       dc:creator ?creator;\n\
  OPTIONAL { ?item  dc:source ?source } \n\
 }";
 
@@ -118,7 +119,7 @@ ical_format(FILE *fh, const char *key, const char *attr,
 
   for(i=0; (c=value[i]); i++)  {
     if(col == 75) {
-      fwrite("\r\n ", 1, 3, fh);
+      fwrite("\n ", 1, 2, fh);
       col=0;
       lineno++;
     }
@@ -312,6 +313,7 @@ main(int argc, char *argv[])
     librdf_node* node;
     int i;
     unsigned char c;
+    char *creator=NULL;
 
     node=librdf_query_results_get_binding_value_by_name(results, "item");
     if(!librdf_node_is_resource(node))
@@ -360,6 +362,13 @@ main(int argc, char *argv[])
     node=librdf_query_results_get_binding_value_by_name(results, "source");
     if(node && librdf_node_is_literal(node))
       location=librdf_node_get_literal_value(node);
+
+    node=librdf_query_results_get_binding_value_by_name(results, "creator");
+    if(node && librdf_node_is_literal(node)) {
+      unsigned char *value=librdf_node_get_literal_value(node);
+      creator=malloc(strlen((const char*)value)+6);
+      sprintf(creator, "CN=\"%s\"", value);
+    }
     
 
     ical_print(stdout, "BEGIN:VEVENT");
@@ -367,6 +376,11 @@ main(int argc, char *argv[])
     ical_format(stdout, "SUMMARY", NULL, NULL, summary);
     if(location)
       ical_format(stdout, "LOCATION", NULL, NULL, location);
+    if(creator) {
+      ical_format(stdout, "ATTENDEE", creator, NULL, 
+                  (const unsigned char*)"invalid:nomail");
+      free(creator);
+    }
     ical_format(stdout, "DTSTART", NULL, NULL, dtstart);
     ical_format(stdout, "DTSTAMP", NULL, NULL, dtstart);
     ical_format(stdout, "LAST-MODIFIED", NULL, NULL, dtstart);
