@@ -16,6 +16,9 @@
  * complete terms and further detail along with the license texts for
  * the licenses in COPYING.LIB, COPYING and LICENSE-2.0.txt respectively.
  * 
+ *
+ * USAGE: rss2ical [URI of RSS/Atom Feed] [Calendar Title] > result.ics
+ *
  */
 
 #include <stdio.h>
@@ -43,7 +46,7 @@ WHERE {\n\
 }";
 
 /*
-  Removed for now:
+  Removed for now as OPTIONAL in Rasqal is fragile/broken:
   OPTIONAL { ?item  dc:source ?source } \n\
   OPTIONAL { ?item  content:encoded ?htmldesc } \n      \
 */
