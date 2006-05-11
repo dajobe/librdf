@@ -6,11 +6,12 @@
 #
 
 EXAMPLES=example1 example2 example3 example4 example5 example6 example7
-DBUS_EXAMPLES=redland_dbus
 
-EXTRA_PROGRAMS = $(EXAMPLES) $(DBUS_EXAMPLES)
+OTHER_EXAMPLES=redland_dbus rss2ical
 
-CLEANFILES=$(TESTS) $(EXAMPLES) $(DBUS_EXAMPLES) test*db
+EXTRA_PROGRAMS = $(EXAMPLES) $(OTHER_EXAMPLES)
+
+CLEANFILES=$(TESTS) $(EXAMPLES) $(OTHER_EXAMPLES) test*db
 
 examples: $(EXAMPLES)
 
@@ -32,6 +33,7 @@ example6_SOURCES = example6.c
 
 example7_SOURCES = example7.c
 
+rss2ical_SOURCES = rss2ical.c
 
 redland_dbus_SOURCES = redland_dbus.c
 redland_dbus_CFLAGS=`pkg-config --cflags dbus-1 glib-2.0 dbus-glib-1 gthread`
