@@ -179,7 +179,7 @@ remove_html_entities(unsigned char* html_desc, size_t len)
   unsigned char* description;
   unsigned char c;
   
-  description=malloc(len);
+  description=malloc(len+1);
 
   /* Trim leading white space */
   for(i=0, j=0; (c=html_desc[i]) && (c == ' ' || c == '\n'); i++)
