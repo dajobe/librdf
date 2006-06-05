@@ -1166,7 +1166,7 @@ librdf_model_context_add_statements(librdf_model* model,
 /**
  * librdf_model_context_remove_statement:
  * @model: #librdf_model object
- * @context: #librdf_uri context
+ * @context: #librdf_node context
  * @statement: #librdf_statement statement
  *
  * Remove a statement from a model in a context.
@@ -1202,7 +1202,7 @@ librdf_model_context_remove_statement(librdf_model* model,
 /**
  * librdf_model_context_remove_statements:
  * @model: #librdf_model object
- * @context: #librdf_uri context
+ * @context: #librdf_node context
  *
  * Remove statements from a model with the given context.
  * 
@@ -1245,7 +1245,7 @@ librdf_model_context_remove_statements(librdf_model* model,
 /**
  * librdf_model_context_as_stream:
  * @model: #librdf_model object
- * @context: #librdf_uri context
+ * @context: #librdf_node context
  *
  * List all statements in a model context.
  * 
@@ -1270,7 +1270,7 @@ librdf_model_context_as_stream(librdf_model* model, librdf_node* context)
 /**
  * librdf_model_context_serialize:
  * @model: #librdf_model object
- * @context: #librdf_uri context
+ * @context: #librdf_node context
  *
  * List all statements in a model context.
  * 
