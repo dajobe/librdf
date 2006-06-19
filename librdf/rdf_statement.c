@@ -388,16 +388,30 @@ librdf_statement_set_object(librdf_statement *statement, librdf_node *node)
  * librdf_statement_is_complete:
  * @statement: #librdf_statement object
  *
- * Check if statement has all subject, predicate, object fields present.
+ * Check if statement is a complete and legal RDF triple.
+ *
+ * Checks that all subject, predicate, object fields are present
+ * and they have the allowed node types.
  * 
- * Return value: non 0 if the statement has subject, predicate and object.
+ * Return value: non 0 if the statement is complete and legal
  **/
 int
 librdf_statement_is_complete(librdf_statement *statement)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
-  return (statement->subject && statement->predicate && statement->object);
+  if(!statement->subject ||
+     (!librdf_node_is_resource(statement->subject) && 
+      !librdf_node_is_blank(statement->subject)))
+    return 0;
+
+  if(!statement->predicate || !librdf_node_is_resource(statement->predicate))
+     return 0;
+
+  if(!statement->object)
+    return 0;
+
+  return 1;
 }
 
 
