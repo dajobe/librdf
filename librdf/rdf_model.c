@@ -413,6 +413,9 @@ librdf_model_size(librdf_model* model)
  * shared with the model.  It must be a complete statement - all
  * of subject, predicate, object parts must be present.
  *
+ * Only statements that are legal RDF can be added: URI or blank subject,
+ * URI predicate and URI or blank or literal object (i.e. anything).
+ *
  * If the statement already exists in the model, it is not added.
  * Duplicate statements can be added when used with Redland Contexts
  * such as with #librdf_model_context_add_statement
@@ -443,6 +446,9 @@ librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
  *
  * Add a stream of statements to the model.
  * 
+ * If any of the statements are illegal RDF statements they will
+ * be skipped and not added.  See #librdf_model_add_statement for the detail.
+ *
  * If any of the statements already exists in the store, they are not
  * added unless Redland contexts are being used.  See also
  * #librdf_model_context_add_statements
@@ -485,7 +491,14 @@ librdf_model_add(librdf_model* model, librdf_node* subject,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(predicate, librdf_node, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(object, librdf_node, 1);
 
-  if(!subject || !predicate || !object)
+  if(!subject ||
+     (!librdf_node_is_resource(subject) && !librdf_node_is_blank(subject)))
+    return 1;
+
+  if(!predicate || !librdf_node_is_resource(predicate))
+     return 1;
+
+  if(!object)
     return 1;
 
   statement=librdf_new_statement(model->world);
@@ -537,7 +550,14 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(predicate, librdf_node, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(literal, string, 1);
 
-  if(!subject || !predicate || !literal)
+  if(!subject ||
+     (!librdf_node_is_resource(subject) && !librdf_node_is_blank(subject)))
+    return 1;
+
+  if(!predicate || !librdf_node_is_resource(predicate))
+     return 1;
+
+  if(!literal)
     return 1;
 
   object=librdf_new_node_from_typed_literal(model->world,
@@ -584,7 +604,14 @@ librdf_model_add_string_literal_statement(librdf_model* model,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(predicate, librdf_node, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(literal, string, 1);
 
-  if(!subject || !predicate || !literal)
+  if(!subject ||
+     (!librdf_node_is_resource(subject) && !librdf_node_is_blank(subject)))
+    return 1;
+
+  if(!predicate || !librdf_node_is_resource(predicate))
+     return 1;
+
+  if(!literal)
     return 1;
 
   object=librdf_new_node_from_literal(model->world,
@@ -609,7 +636,7 @@ librdf_model_add_string_literal_statement(librdf_model* model,
  * Remove a known statement from the model.
  *
  * It must be a complete statement - all of subject, predicate, object
- * parts must be present.
+ * parts must be present and a legal RDF triple.
  *
  * Return value: non 0 on failure
  **/
@@ -633,16 +660,17 @@ librdf_model_remove_statement(librdf_model* model, librdf_statement* statement)
  *
  * Check for a statement in the model.
  * 
- * It must be a complete statement - all of subject, predicate, object
- * parts must be present.  Use librdf_model_find_statements to search
- * for partial statement matches.
+ * It must be a complete statement - all of subject, predicate,
+ * object parts must be present and a legal RDF triple.  Use
+ * librdf_model_find_statements to search for partial statement
+ * matches.
  *
  * WARNING: librdf_model_contains_statement may not work correctly
  * with stores using contexts.  In this case, a search using
  * librdf_model_find_statements for a non-empty list will
  * return the correct result.
  *
- * Return value: non 0 if the model contains the statement
+ * Return value: non 0 if the model contains the statement (>0 if the statement is illegal)
  **/
 int
 librdf_model_contains_statement(librdf_model* model, librdf_statement* statement)
@@ -1755,6 +1783,18 @@ main(int argc, char *argv[])
   librdf_statement_set_object(statement, librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0));
 
   librdf_model_add_statement(model, statement);
+  librdf_free_statement(statement);
+
+  /* make it illegal */
+  statement=librdf_new_statement(world);
+  librdf_statement_set_subject(statement, librdf_new_node_from_literal(world, (const unsigned char*)"Bad Subject", NULL, 0));
+  librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/pred"));
+  librdf_statement_set_object(statement, librdf_new_node_from_literal(world, (const unsigned char*)"Good Object", NULL, 0));
+
+  if(!librdf_model_add_statement(model, statement)) {
+    fprintf(stderr, "%s: librdf_model_add_statement unexpectedly succeeded adding an illegal triple\n", program);
+    return(1);
+  }
   librdf_free_statement(statement);
 
   fprintf(stderr, "%s: Printing model\n", program);
