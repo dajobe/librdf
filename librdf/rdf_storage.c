@@ -588,7 +588,10 @@ librdf_storage_size(librdf_storage* storage)
  * If the statement already exists in the store, it is not added
  * unless Redland contexts are being used.
  *
- * Return value: non 0 on failure
+ * Enforces that the statement is legal for RDF - URI or blank subject,
+ * URI predicate and URI or blank or literal object (i.e. anything).
+ *
+ * Return value: non 0 on failure, <0 on error, >0 if statement was illegal
  **/
 int
 librdf_storage_add_statement(librdf_storage* storage,
@@ -597,9 +600,21 @@ librdf_storage_add_statement(librdf_storage* storage,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
 
+  /* subject can be a URI or blank node */
+  if(!librdf_node_is_resource(statement->subject) &&
+     !librdf_node_is_blank(statement->subject))
+    return 1;
+  
+  /* subject can only be a URI */
+  if(!librdf_node_is_resource(statement->predicate))
+     return 1;
+
+  /* object can be any node - no check needed */
+
   if(storage->factory->add_statement)
     return storage->factory->add_statement(storage, statement);
-  return 1;
+
+  return -1;
 }
 
 
@@ -630,8 +645,12 @@ librdf_storage_add_statements(librdf_storage* storage,
   while(!librdf_stream_end(statement_stream)) {
     librdf_statement* statement=librdf_stream_get_object(statement_stream);
 
-    if(statement)
+    if(statement) {
       status=librdf_storage_add_statement(storage, statement);
+      if(status > 0)
+        /* just skip illegal statements */
+        status=0;
+    }
     else
       status=1;
 
@@ -674,7 +693,7 @@ librdf_storage_remove_statement(librdf_storage* storage,
  *
  * Test if a given statement is present in the storage.
  *
- * Return value: non 0 if the storage contains the statement
+ * Return value: non 0 if the storage contains the statement (>0 if illegal statement)
  **/
 int
 librdf_storage_contains_statement(librdf_storage* storage,
@@ -682,6 +701,19 @@ librdf_storage_contains_statement(librdf_storage* storage,
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
+
+  /* subject can be a URI or blank node */
+  if(!statement->subject ||
+     (!librdf_node_is_resource(statement->subject) &&
+      !librdf_node_is_blank(statement->subject)))
+    return 1;
+  
+  /* subject can only be a URI */
+  if(!statement->predicate || !librdf_node_is_resource(statement->predicate))
+     return 1;
+
+  if(!statement->object)
+    return 1;
 
   return storage->factory->contains_statement(storage, statement);
 }
