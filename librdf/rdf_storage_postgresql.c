@@ -467,10 +467,14 @@ librdf_storage_postgresql_init(librdf_storage* storage, char *name,
      context->port=(char*)LIBRDF_MALLOC(cstring, 10);
      strcpy(context->port,"5432"); /* default postgresql port */
   }
-  context->dbname=librdf_hash_get(options, "dbname");
+  context->dbname=librdf_hash_get(options, "database");
+  if(!context->dbname)
+    context->dbname=librdf_hash_get(options, "dbname");
   context->user=librdf_hash_get(options, "user");
   if(context->user && !context->dbname)
-     strcpy(context->dbname,context->user); /* default dbname=user */
+     context->dbname=(char*)LIBRDF_MALLOC(cstring, strlen(context->user)+1);
+     strcpy(context->dbname, context->user); /* default dbname=user */
+  }
 
   context->password=librdf_hash_get(options, "password");
 
