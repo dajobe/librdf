@@ -176,7 +176,6 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
   } else if(librdf_node_is_resource(subject)) {
     rstatement.subject=(raptor_uri*)librdf_node_get_uri(subject);
     rstatement.subject_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
-    /* or  RAPTOR_IDENTIFIER_TYPE_ORDINAL ? */
   } else {
     librdf_log(statement->world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
@@ -203,7 +202,6 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
       rstatement.object=librdf_node_get_literal_value(object);
       rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_LITERAL;
       
-      /* or RAPTOR_IDENTIFIER_TYPE_XML_LITERAL ? */
       rstatement.object_literal_language=(const unsigned char*)librdf_node_get_literal_value_language(object);
       rstatement.object_literal_datatype=(raptor_uri*)librdf_node_get_literal_value_datatype_uri(object);
       break;
@@ -214,7 +212,6 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
       break;
 
     case LIBRDF_NODE_TYPE_RESOURCE:
-      /* or  RAPTOR_IDENTIFIER_TYPE_ORDINAL ? */
       rstatement.object=librdf_node_get_uri(object);
       rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
       break;
