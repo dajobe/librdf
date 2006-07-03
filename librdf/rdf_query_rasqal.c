@@ -338,6 +338,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
 
   if(bindings[1] && (parts & RASQAL_TRIPLE_PREDICATE)) {
     if(bindings[0] == bindings[1]) {
+      /* check matching(?x, ?x, ...) / subject=predicate */
       if(!librdf_node_equals(librdf_statement_get_subject(statement),
                              librdf_statement_get_predicate(statement)))
         return (rasqal_triple_parts)0;
@@ -355,15 +356,19 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     int bind=1;
     
     if(bindings[0] == bindings[2]) {
+      /* check matching (?x, ..., ?x) / subject=object */
       if(!librdf_node_equals(librdf_statement_get_subject(statement),
                              librdf_statement_get_object(statement)))
         return (rasqal_triple_parts)0;
       bind=0;
       LIBRDF_DEBUG1("subject and object values match\n");
     }
-    if(bindings[1] == bindings[2] &&
-       !(bindings[0] == bindings[1]) /* don't do this check if ?x ?x ?x */
-       ) {
+    if((bindings[1] == bindings[2]) && 
+       !(bindings[0] == bindings[1])) {
+      /* check matching (..., ?x, ?x) / predicate=object
+       * Don't do this if matching (?x, ?x, ...) / subject=predicate
+       * was already done since that would mean the match was (?x, ?x, ?x)
+       */
       if(!librdf_node_equals(librdf_statement_get_predicate(statement),
                              librdf_statement_get_object(statement)))
         return (rasqal_triple_parts)0;
@@ -380,16 +385,46 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     }
   }
 
-  /* FIXME contexts */
-  /*
+  /* Contexts */
   if(bindings[3] && (parts & RASQAL_TRIPLE_ORIGIN)) {
-    l=redland_node_to_rasqal_literal((librdf_node*)librdf_stream_get_context(rtmc->stream));
-    LIBRDF_DEBUG1("binding origin to variable\n");
-    rasqal_variable_set_value(bindings[3], rasqal_literal_as_node(l));
-    rasqal_free_literal(l);
-    result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_ORIGIN);
+    int bind=1;
+    librdf_node* context_node=(librdf_node*)librdf_stream_get_context(rtmc->stream);
+    
+    if(bindings[0] == bindings[3]) {
+      /* check matching (?x, ..., ...) in context ?x */
+      if(!librdf_node_equals(librdf_statement_get_subject(statement),
+                             context_node))
+        return (rasqal_triple_parts)0;
+      bind=0;
+      LIBRDF_DEBUG1("subject and context values match\n");
+    }
+
+    if(bindings[1] == bindings[3]) {
+      /* check matching (..., ?x,  ...) in context ?x */
+      if(!librdf_node_equals(librdf_statement_get_predicate(statement),
+                             context_node))
+        return (rasqal_triple_parts)0;
+      bind=0;
+      LIBRDF_DEBUG1("predicate and context values match\n");
+    }
+
+    if(bindings[2] == bindings[3]) {
+      /* check matching (..., ..., ?x) in context ?x */
+      if(!librdf_node_equals(librdf_statement_get_object(statement),
+                             context_node))
+        return (rasqal_triple_parts)0;
+      bind=0;
+      LIBRDF_DEBUG1("object and context values match\n");
+    }
+
+    if(bind) {
+      LIBRDF_DEBUG1("binding origin to variable\n");
+      l=redland_node_to_rasqal_literal(context_node);
+      rasqal_variable_set_value(bindings[3], rasqal_literal_as_node(l));
+      rasqal_free_literal(l);
+      result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_ORIGIN);
+    }
   }
-  */
 
   return result;
 }
@@ -506,10 +541,19 @@ rasqal_redland_init_triples_match(rasqal_triples_match* rtm,
 #ifdef RASQAL_DEBUG
   LIBRDF_DEBUG1("query statement: ");
   librdf_statement_print(rtmc->qstatement, stderr);
+  if(rtmc->origin) {
+    fput(" with context node: ", stderr);
+    librdf_node_print(rtmc->origin, stderr);
+  }
   fputc('\n', stderr);
 #endif
   
-  rtmc->stream=librdf_model_find_statements(rtsc->model, rtmc->qstatement);
+  if(rtmc->origin)
+    rtmc->stream=librdf_model_find_statements_in_context(rtsc->model, 
+                                                         rtmc->qstatement,
+                                                         rtmc->origin);
+  else
+    rtmc->stream=librdf_model_find_statements(rtsc->model, rtmc->qstatement);
 
   LIBRDF_DEBUG1("rasqal_init_triples_match done\n");
 
