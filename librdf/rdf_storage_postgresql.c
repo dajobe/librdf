@@ -389,7 +389,7 @@ librdf_storage_postgresql_release_handle(librdf_storage* storage, PGconn *handle
  * librdf_storage_postgresql_init:
  * @storage: the storage
  * @name: model name
- * @options: host, port, dbname, user, password [, new] [, bulk] [, merge].
+ * @options: host, port, database, user, password [, new] [, bulk] [, merge].
  *
  * Create connection to database.  Defaults to port 5432 if not given.
  *
@@ -471,7 +471,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, char *name,
   if(!context->dbname)
     context->dbname=librdf_hash_get(options, "dbname");
   context->user=librdf_hash_get(options, "user");
-  if(context->user && !context->dbname)
+  if(context->user && !context->dbname) {
      context->dbname=(char*)LIBRDF_MALLOC(cstring, strlen(context->user)+1);
      strcpy(context->dbname, context->user); /* default dbname=user */
   }
