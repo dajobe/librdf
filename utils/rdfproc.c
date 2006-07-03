@@ -111,7 +111,7 @@ static command commands[]={
   {CMD_ADD, "add", 3, 4, 1},
   {CMD_REMOVE, "remove", 3, 4, 1},
   {CMD_ADD_TYPED, "add-typed", 5, 6, 1},
-  {CMD_PARSE_MODEL, "parse", 1, 3, 1},
+  {CMD_PARSE_MODEL, "parse", 1, 4, 1},
   {CMD_PARSE_STREAM, "parse-stream", 1, 4, 1},
   {CMD_ARCS_IN, "arcs-in", 1, 1, 0},
   {CMD_ARCS_OUT, "arcs-out", 1, 1, 0},
@@ -468,7 +468,7 @@ main(int argc, char *argv[])
     printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Storage options (default \"%s\")\n"), default_storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
     puts("\nCommands:");
-    puts("  parse FILE|URI [SYNTAX [BASEURI]]");
+    puts("  parse FILE|URI [SYNTAX [BASEURI [CONTEXT]]]");
     puts("  parse-stream FILE|URI [SYNTAX [BASEURI [CONTEXT]]]");
     puts("      Parse RDF syntax (default RDF/XML) in FILE or URI into the graph");
     puts("      with optional BASEURI, into the optional CONTEXT.");
@@ -595,13 +595,13 @@ main(int argc, char *argv[])
 
       rc=0;
 
-      if (type == CMD_PARSE_MODEL) {
+      if (type == CMD_PARSE_MODEL && !target) {
         if(librdf_parser_parse_into_model(parser, uri, base_uri, model)) {
           fprintf(stderr, "%s: Failed to parse into the graph\n", program);
           rc=1;
         }
       } else {
-        /* must be CMD_PARSE_STREAM */
+        /* either CMD_PARSE_STREAM or it's a parse into context */
         if(!(stream=librdf_parser_parse_as_stream(parser, uri, base_uri))) {
           fprintf(stderr, "%s: Failed to parse RDF as stream\n", program);
           rc=1;
