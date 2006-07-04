@@ -86,6 +86,10 @@ void librdf_init_world(char *digest_factory_name, void* not_used2);
 REDLAND_API REDLAND_DEPRECATED
 void librdf_destroy_world(void);
 
+#ifdef LIBRDF_INTERNAL
+const char* librdf_basename(const char *name);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
