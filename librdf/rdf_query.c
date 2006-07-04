@@ -567,7 +567,7 @@ main(int argc, char *argv[])
   librdf_storage* storage;
   librdf_parser* parser;
   librdf_uri *uri;
-  char *program=argv[0];
+  char *program=librdf_basename(argv[0]);
   librdf_world *world;
   librdf_uri* format_uri;
   size_t string_length;

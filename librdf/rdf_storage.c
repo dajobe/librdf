@@ -1594,7 +1594,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_storage* storage;
-  char *program=argv[0];
+  char *program=librdf_basename(argv[0]);
   librdf_world *world;
   
   world=librdf_new_world();

@@ -203,7 +203,7 @@ main(int argc, char *argv[])
   
 #define NAMES_COUNT 11
 
-  char *program=argv[0];
+  char *program=librdf_basename(argv[0]);
 
   for(n=0; (name=test_names[n]); n++) {
     int i;

@@ -1737,7 +1737,7 @@ main(int argc, char *argv[])
   librdf_uri* uris[URI_STRING_COUNT];
   librdf_node* nodes[URI_STRING_COUNT];
   int i;
-  char *program=argv[0];
+  char *program=librdf_basename(argv[0]);
   /* initialise dependent modules - all of them! */
   librdf_world *world=librdf_new_world();
   librdf_iterator* iterator;

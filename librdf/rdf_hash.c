@@ -1608,7 +1608,7 @@ main(int argc, char *argv[])
   int i,j;
   char *type;
   librdf_hash_datum hd_key, hd_value; /* on stack */
-  char *program=argv[0];
+  char *program=librdf_basename(argv[0]);
   int b;
   long l;
   librdf_world *world;
@@ -1771,7 +1771,6 @@ main(int argc, char *argv[])
   /* close() done automatically by free so not required */
   /* librdf_hash_close(h2); */
   librdf_free_hash(h2);
-
 
   h2=librdf_new_hash(world, NULL);
   fprintf(stdout, "%s: Initialising hash from string >>%s<<\n", program, 

@@ -663,7 +663,7 @@ main(int argc, char *argv[])
   const unsigned char *hp_string=(const unsigned char*)"http://purl.org/net/dajobe/";
   librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5, *uri6, *uri7, *uri8, *uri9;
   librdf_digest *d;
-  char *program=argv[0];
+  char *program=librdf_basename(argv[0]);
   const char *file_string="/big/long/directory/file";
   const unsigned char *file_uri_string=(const unsigned char*)"file:///big/long/directory/file";
   const unsigned char *uri_string=(const unsigned char*)"http://example.com/big/long/directory/blah#frag";

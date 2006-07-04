@@ -479,7 +479,7 @@ main(int argc, char *argv[])
 
   int i;
   struct t *answer=NULL;
-  char *program=argv[0];
+  char *program=librdf_basename(argv[0]);
   librdf_world *world;
   
   world=librdf_new_world();
