@@ -476,6 +476,7 @@ main(int argc, char *argv[])
     {"RIPEMD160", "75c5de1d21e7e96400d5d9f42ccce6552bb685a5"},
     {NULL, NULL},
   };
+  int failures=0;
 
   int i;
   struct t *answer=NULL;
@@ -512,9 +513,10 @@ main(int argc, char *argv[])
     fputc('\n', stdout);
 
     s=librdf_digest_to_string(d);
-    if(strcmp(s, answer->result))
+    if(strcmp(s, answer->result)) {
       fprintf(stderr, "%s: %s digest is wrong - expected: %s\n", program, answer->type, answer->result);
-    else
+      failures++;
+    } else
       fprintf(stderr, "%s: %s digest is correct\n", program, answer->type);
     LIBRDF_FREE(cstring, s);
     
@@ -529,7 +531,7 @@ main(int argc, char *argv[])
   LIBRDF_FREE(librdf_world, world);
   
   /* keep gcc -Wall happy */
-  return(0);
+  return failures;
 }
 
 #endif
