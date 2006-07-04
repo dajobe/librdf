@@ -508,6 +508,27 @@ librdf_destroy_world(void)
 }
 
 
+/**
+ * librdf_basename:
+ * @name: path
+ * 
+ * Get the basename of a path
+ * 
+ * Return value: filename part of a pathname
+ **/
+const char*
+librdf_basename(const char *name)
+{
+  char *p;
+  if((p=strrchr(name, '/')))
+    name=p+1;
+  else if((p=strrchr(name, '\\')))
+    name=p+1;
+
+  return name;
+}
+
+
 #if defined (LIBRDF_DEBUG) && defined(LIBRDF_MEMORY_SIGN)
 void*
 librdf_sign_malloc(size_t size)
