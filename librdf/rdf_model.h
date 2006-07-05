@@ -47,7 +47,7 @@ extern "C" {
 
 /* Create a new Model */
 REDLAND_API
-librdf_model* librdf_new_model(librdf_world *world, librdf_storage *storage, char* options_string);
+librdf_model* librdf_new_model(librdf_world *world, librdf_storage *storage, const char* options_string);
 REDLAND_API
 librdf_model* librdf_new_model_with_options(librdf_world *world, librdf_storage *storage, librdf_hash* options);
 
@@ -68,9 +68,9 @@ int librdf_model_size(librdf_model* model);
 REDLAND_API
 int librdf_model_add(librdf_model* model, librdf_node* subject, librdf_node* predicate, librdf_node* object);
 REDLAND_API
-int librdf_model_add_string_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* literal, char *xml_language, int is_wf_xml);
+int librdf_model_add_string_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* literal, const char *xml_language, int is_wf_xml);
 REDLAND_API
-int librdf_model_add_typed_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* literal, char *xml_language, librdf_uri *datatype_uri);
+int librdf_model_add_typed_literal_statement(librdf_model* model, librdf_node* subject, librdf_node* predicate, const unsigned char* literal, const char *xml_language, librdf_uri *datatype_uri);
 REDLAND_API
 int librdf_model_add_statement(librdf_model* model, librdf_statement* statement);
 REDLAND_API
