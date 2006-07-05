@@ -39,7 +39,7 @@ extern "C" {
 
 /* public constructor */
 REDLAND_API
-librdf_digest* librdf_new_digest(librdf_world *world, char *name);
+librdf_digest* librdf_new_digest(librdf_world *world, const char *name);
 
 /* destructor */
 REDLAND_API
