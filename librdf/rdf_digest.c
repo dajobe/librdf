@@ -471,16 +471,16 @@ main(int argc, char *argv[])
   librdf_digest* d;
   char *test_data="http://purl.org/net/dajobe/";
   struct t test_data_answers[]={
-    {"MD5", "78f68989ea3ded775925a1a00fe49abe"},
-    {"SHA1", "0452bca820dfdaa707f0278216c598f185867993"},
-    {"RIPEMD160", "75c5de1d21e7e96400d5d9f42ccce6552bb685a5"},
+    {"MD5", "80b52def747e8748199c1a0cf66cb35c"},
+    {"SHA1", "67d6a7b73504ce5c6b47fd6db9b7c4939bfe5174"},
+    {"RIPEMD160", "83ce259f0c23642a95fc92fade583e6d8e15784d"},
     {NULL, NULL},
   };
   int failures=0;
 
   int i;
   struct t *answer=NULL;
-  char *program=librdf_basename((const char*)argv[0]);
+  const char *program=librdf_basename((const char*)argv[0]);
   librdf_world *world;
   
   world=librdf_new_world();
