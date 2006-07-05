@@ -219,7 +219,7 @@ librdf_get_model_factory (const char *name)
  */
 librdf_model*
 librdf_new_model (librdf_world *world,
-                  librdf_storage *storage, char *options_string) {
+                  librdf_storage *storage, const char *options_string) {
   librdf_hash* options_hash;
   librdf_model *model;
 
@@ -540,7 +540,7 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
                                          librdf_node* subject, 
                                          librdf_node* predicate, 
                                          const unsigned char* literal,
-                                         char *xml_language,
+                                         const char *xml_language,
                                          librdf_uri *datatype_uri)
 {
   librdf_node* object;
@@ -593,7 +593,7 @@ librdf_model_add_string_literal_statement(librdf_model* model,
 					  librdf_node* subject, 
 					  librdf_node* predicate, 
                                           const unsigned char* literal,
-					  char *xml_language,
+					  const char *xml_language,
                                           int is_wf_xml)
 {
   librdf_node* object;
@@ -1737,7 +1737,7 @@ main(int argc, char *argv[])
   librdf_uri* uris[URI_STRING_COUNT];
   librdf_node* nodes[URI_STRING_COUNT];
   int i;
-  char *program=librdf_basename(argv[0]);
+  char *program=librdf_basename((const char*)argv[0]);
   /* initialise dependent modules - all of them! */
   librdf_world *world=librdf_new_world();
   librdf_iterator* iterator;
