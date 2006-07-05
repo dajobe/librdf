@@ -142,7 +142,7 @@ librdf_log_simple(librdf_world* world, int code,
   }
   
   fputs(" - ", stderr);
-  fputs(message, stderr);
+  fputs((message ? message : "(no message)"), stderr);
   fputc('\n', stderr);
 
   if(level >= LIBRDF_LOG_FATAL)
