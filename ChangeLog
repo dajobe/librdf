@@ -1,4 +1,114 @@
+2006-07-04  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/ChangeLog: #changes
+
+	* librdf/rdf_storage_hashes.c: (librdf_storage_hashes_init_common):
+	Do not free any options here.
+	(librdf_storage_hashes_open): Free any options after passing them
+	to librdf_hash_open
+
+	* librdf/rdf_digest.c: (main): Count failures in digest checks and
+	return them in the return.
+
+	* librdf/rdf_digest.c, librdf/rdf_hash.c, librdf/rdf_heuristics.c,
+	librdf/rdf_iterator.c, librdf/rdf_model.c, librdf/rdf_node.c,
+	librdf/rdf_parser.c, librdf/rdf_query.c, librdf/rdf_serializer.c,
+	librdf/rdf_statement.c, librdf/rdf_storage.c, librdf/rdf_stream.c,
+	librdf/rdf_uri.c, librdf/rdf_utf8.c: use librdf_basename
+
+	* librdf/rdf_init.h: Added internal prototype for librdf_basename
+
+	* librdf/rdf_init.c: (librdf_basename): Added
+
+2006-07-03  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_postgresql.c: make it legal C again
+
+2006-07-02  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_query_rasqal.c: (rasqal_redland_bind_match): Tidy
+	docs and make the graph field (aka origin) match redland context.
+	(rasqal_redland_init_triples_match): If a context node is given,
+	use librdf_model_find_statements_in_context
+
+	* utils/rdfproc.c: Allow parse command to take an optional CONTEXT
+	argument
+
+	* configure.ac: postgresql test does not need pkg_config
+
+2006-06-30  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_init): Use option 'database' like mysql
+	does as well as 'dbname'.  If neither is present, allocate memory
+	for copying the user name rather than use a shared pointer.
+
+2006-06-29  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_serializer_raptor.c: remove ORDINAL code comment
+	references
+
+2006-06-18  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage.c: (librdf_storage_add_statement,
+	librdf_storage_add_statements, librdf_storage_contains_statement):
+	Document and enforce that only legal RDF triples are only allowed.
+
+	* librdf/rdf_statement.c: (librdf_statement_is_complete): Document
+	and enforce that only complete and legal RDF triples are only
+	allowed.
+
+	* librdf/rdf_model.c: (librdf_model_add_statement,
+	librdf_model_add, librdf_model_add_typed_literal_statement,
+	librdf_model_add_string_literal_statement,
+	librdf_model_contains_statement): Document and enforce legal RDF
+	triples are only allowed.
+
+2006-06-05  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_model.c: docucomments typos
+
+2006-05-11  Dave Beckett  <dave@dajobe.org>
+
+	* examples/rss2ical.c: malloc +1 for nul
+
+	* examples/Makefile.am: make rss2ical
+
+2006-05-10  Dave Beckett  <dave@dajobe.org>
+
+	* examples/rss2ical.c: docs
+
+2006-05-08  Dave Beckett  <dave@dajobe.org>
+
+	* examples/rss2ical.c: (iso2vcaldate): handle shorter iso dats
+
+	* examples/rss2ical.c: (uri_to_calid): Added to form icalendar
+	identifiers from URIs
+
+	* examples/rss2ical.c: Use optional creator in query
+
+	* examples/rss2ical.c: (remove_html_entities): Remove leading
+	white space
+
+	* examples/rss2ical.c: Add dc:creator - bogus, but works for
+	planetRDF
+	(ical_format): Just use \n when wrapping long lines
+	(main): Output ATTENDEE name with value of creator
+
+	* examples/rss2ical.c: (remove_html_entities): Added, to get rid
+	of &#NNN; mostly, also doing amp, lt, gt.
+
+	* examples/rss2ical.c: Delete duration
+
+	* examples/rss2ical.c: rss2ical
+
 2006-05-05  Dave Beckett  <dave@dajobe.org>
+
+	* NEWS.html: 05-05 not 05-15
+
+	* NEWS.html, RELEASE.html: 1.0.4
+
+	* librdf/win32_rdf_config.h: bumped to 1.0.4
 
 	* Snapshotted redland_1_0_4 for 1.0.4 release
 
