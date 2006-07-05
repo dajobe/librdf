@@ -46,13 +46,13 @@ int librdf_storage_enumerate(const unsigned int counter, const char **name, cons
 
 /* constructor */
 REDLAND_API
-librdf_storage* librdf_new_storage(librdf_world *world, char *storage_name, char *name, char *options_string);
+librdf_storage* librdf_new_storage(librdf_world *world, const char *storage_name, const char *name, const char *options_string);
 REDLAND_API
-librdf_storage* librdf_new_storage_with_options(librdf_world *world, char *storage_name, char *name, librdf_hash *options);
+librdf_storage* librdf_new_storage_with_options(librdf_world *world, const char *storage_name, const char *name, librdf_hash *options);
 REDLAND_API
 librdf_storage* librdf_new_storage_from_storage(librdf_storage* old_storage);
 REDLAND_API
-librdf_storage* librdf_new_storage_from_factory(librdf_world *world, librdf_storage_factory* factory, char *name, librdf_hash* options);
+librdf_storage* librdf_new_storage_from_factory(librdf_world *world, librdf_storage_factory* factory, const char *name, librdf_hash* options);
 
 /* destructor */
 REDLAND_API
