@@ -631,7 +631,7 @@ main(int argc, char *argv[])
 {
   librdf_statement *statement;
   librdf_stream* stream;
-  char *program=librdf_basename(argv[0]);
+  char *program=librdf_basename((const char*)argv[0]);
   librdf_world *world;
   librdf_uri* prefix_uri;
   librdf_node* nodes[STREAM_NODES_COUNT];

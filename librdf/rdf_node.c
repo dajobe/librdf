@@ -1673,7 +1673,7 @@ main(int argc, char *argv[])
   unsigned char *buffer;
   librdf_world *world;
   
-  char *program=librdf_basename(argv[0]);
+  char *program=librdf_basename((const char*)argv[0]);
 	
   world=librdf_new_world();
   librdf_world_init_mutex(world);

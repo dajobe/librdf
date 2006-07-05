@@ -173,7 +173,7 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
  * Return value: new #librdf_digest object or NULL
  **/
 librdf_digest*
-librdf_new_digest(librdf_world *world, char *name)
+librdf_new_digest(librdf_world *world, const char *name)
 {
   librdf_digest_factory* factory;
   
@@ -480,7 +480,7 @@ main(int argc, char *argv[])
 
   int i;
   struct t *answer=NULL;
-  char *program=librdf_basename(argv[0]);
+  char *program=librdf_basename((const char*)argv[0]);
   librdf_world *world;
   
   world=librdf_new_world();

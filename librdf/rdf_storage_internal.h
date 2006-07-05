@@ -63,7 +63,7 @@ struct librdf_storage_factory_s {
   size_t context_length;
   
   /* create a new storage */
-  int (*init)(librdf_storage* storage, char *name, librdf_hash* options);
+  int (*init)(librdf_storage* storage, const char *name, librdf_hash* options);
   
   /* copy a storage */
   /* clone is assumed to do leave the new storage in the same state

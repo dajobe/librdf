@@ -1608,7 +1608,7 @@ main(int argc, char *argv[])
   int i,j;
   char *type;
   librdf_hash_datum hd_key, hd_value; /* on stack */
-  char *program=librdf_basename(argv[0]);
+  char *program=librdf_basename((const char*)argv[0]);
   int b;
   long l;
   librdf_world *world;
