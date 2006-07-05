@@ -295,8 +295,8 @@ librdf_storage_enumerate(const unsigned int counter,
  */
 librdf_storage*
 librdf_new_storage (librdf_world *world, 
-                    char *storage_name, char *name, 
-                    char *options_string) {
+                    const char *storage_name, const char *name, 
+                    const char *options_string) {
   librdf_storage_factory* factory;
   librdf_hash* options_hash;
   
@@ -338,7 +338,7 @@ librdf_new_storage (librdf_world *world,
  */
 librdf_storage*
 librdf_new_storage_with_options (librdf_world *world, 
-                                 char *storage_name, char *name, 
+                                 const char *storage_name, const char *name, 
                                  librdf_hash *options) {
   librdf_storage_factory* factory;
   librdf_hash* options_hash;
@@ -441,7 +441,7 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
 librdf_storage*
 librdf_new_storage_from_factory (librdf_world *world,
                                  librdf_storage_factory* factory,
-                                 char *name,
+                                 const char *name,
                                  librdf_hash* options) {
   librdf_storage* storage;
 
@@ -1594,7 +1594,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_storage* storage;
-  char *program=librdf_basename(argv[0]);
+  char *program=librdf_basename((const char*)argv[0]);
   librdf_world *world;
   
   world=librdf_new_world();
