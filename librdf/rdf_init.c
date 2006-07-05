@@ -34,11 +34,15 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #ifdef WITH_THREADS
 #include <pthread.h>
 #endif
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h> /* for getpid() */
 #endif
 
 /* for gettimeofday */
