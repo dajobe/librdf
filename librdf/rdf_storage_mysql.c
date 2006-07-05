@@ -91,7 +91,7 @@ typedef struct {
 } librdf_storage_mysql_context;
 
 /* prototypes for local functions */
-static int librdf_storage_mysql_init(librdf_storage* storage, char *name,
+static int librdf_storage_mysql_init(librdf_storage* storage, const char *name,
                                      librdf_hash* options);
 static int librdf_storage_mysql_merge(librdf_storage* storage);
 static void librdf_storage_mysql_terminate(librdf_storage* storage);
@@ -396,7 +396,7 @@ librdf_storage_mysql_release_handle(librdf_storage* storage, MYSQL *handle)
  * Return value: Non-zero on failure.
  **/
 static int
-librdf_storage_mysql_init(librdf_storage* storage, char *name,
+librdf_storage_mysql_init(librdf_storage* storage, const char *name,
                           librdf_hash* options)
 {
   librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
