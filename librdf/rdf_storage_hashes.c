@@ -339,12 +339,6 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
     }
   }
 
-  /* on success or failure - don't need the passed in options */
-  if(context->options) {
-    librdf_free_hash(context->options);
-    context->options=NULL;
-  }
-  
   return status;
 }
 
@@ -470,6 +464,7 @@ librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
 {
   librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
   int i;
+  int result=0;
   
   for(i=0; i<context->hash_count; i++) {
     librdf_hash *hash=context->hashes[i];
@@ -485,11 +480,20 @@ librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
         context->hashes[j]=NULL;
       }
       
-      return 1;
+      result=1;
     }
+
+    if(result)
+      break;
   }
 
-  return 0;
+  /* on success or failure - don't need the passed in options any more */
+  if(context->options) {
+    librdf_free_hash(context->options);
+    context->options=NULL;
+  }
+  
+  return result;
 }
 
 
