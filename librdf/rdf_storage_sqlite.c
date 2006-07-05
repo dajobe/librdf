@@ -95,7 +95,7 @@ typedef struct
 
 
 /* prototypes for local functions */
-static int librdf_storage_sqlite_init(librdf_storage* storage, char *name, librdf_hash* options);
+static int librdf_storage_sqlite_init(librdf_storage* storage, const char *name, librdf_hash* options);
 static int librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model);
 static int librdf_storage_sqlite_close(librdf_storage* storage);
 static int librdf_storage_sqlite_size(librdf_storage* storage);
@@ -146,7 +146,7 @@ static void librdf_storage_sqlite_register_factory(librdf_storage_factory *facto
 
 /* functions implementing storage api */
 static int
-librdf_storage_sqlite_init(librdf_storage* storage, char *name,
+librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
                            librdf_hash* options)
 {
   librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
