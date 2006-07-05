@@ -87,7 +87,7 @@ typedef struct {
 } librdf_storage_postgresql_context;
 
 /* prototypes for local functions */
-static int librdf_storage_postgresql_init(librdf_storage* storage, char *name,
+static int librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
                                           librdf_hash* options);
 static int librdf_storage_postgresql_merge(librdf_storage* storage);
 static void librdf_storage_postgresql_terminate(librdf_storage* storage);
@@ -403,8 +403,8 @@ librdf_storage_postgresql_release_handle(librdf_storage* storage, PGconn *handle
  * Return value: Non-zero on failure.
  **/
 static int
-librdf_storage_postgresql_init(librdf_storage* storage, char *name,
-                          librdf_hash* options)
+librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
+                               librdf_hash* options)
 {
   librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context*)storage->context;
   const char create_table_statements[]="\
