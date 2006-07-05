@@ -133,12 +133,12 @@ typedef struct
 
 
 /* helper function for implementing init and clone methods */
-static int librdf_storage_hashes_register(librdf_storage *storage, char *name, const librdf_hash_descriptor *source_desc);
-static int librdf_storage_hashes_init_common(librdf_storage* storage, char *name, char *hash_type, char *db_dir, char *indexes, int mode, int is_writable, int is_new, librdf_hash* options);
+static int librdf_storage_hashes_register(librdf_storage *storage, const char *name, const librdf_hash_descriptor *source_desc);
+static int librdf_storage_hashes_init_common(librdf_storage* storage, const char *name, char *hash_type, char *db_dir, char *indexes, int mode, int is_writable, int is_new, librdf_hash* options);
 
 
 /* prototypes for local functions */
-static int librdf_storage_hashes_init(librdf_storage* storage, char *name, librdf_hash* options);
+static int librdf_storage_hashes_init(librdf_storage* storage, const char *name, librdf_hash* options);
 static void librdf_storage_hashes_terminate(librdf_storage* storage);
 static int librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_storage);
 static int librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model);
@@ -186,7 +186,7 @@ static librdf_iterator* librdf_storage_hashes_node_iterator_create(librdf_storag
 
 static int
 librdf_storage_hashes_register(librdf_storage *storage,
-                               char *name,
+                               const char *name,
                                const librdf_hash_descriptor *source_desc) 
 {
   librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
@@ -230,7 +230,7 @@ librdf_storage_hashes_register(librdf_storage *storage,
 /* helper function for implementing init and clone methods */
 
 static int
-librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
+librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
                                   char *hash_type, char *db_dir,
                                   char *indexes,
                                   int mode, int is_writable, int is_new,
@@ -345,7 +345,7 @@ librdf_storage_hashes_init_common(librdf_storage* storage, char *name,
 
 /* functions implementing storage api */
 static int
-librdf_storage_hashes_init(librdf_storage* storage, char *name,
+librdf_storage_hashes_init(librdf_storage* storage, const char *name,
                            librdf_hash* options)
 {
   char *hash_type, *db_dir, *indexes;
