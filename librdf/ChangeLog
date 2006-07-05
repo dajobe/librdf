@@ -1,3 +1,60 @@
+2006-07-02  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_query_rasqal.c: (rasqal_redland_bind_match): Tidy
+	docs and make the graph field (aka origin) match redland context.
+	(rasqal_redland_init_triples_match): If a context node is given,
+	use librdf_model_find_statements_in_context
+
+2006-06-30  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_init): Use option 'database' like mysql
+	does as well as 'dbname'.  If neither is present, allocate memory
+	for copying the user name rather than use a shared pointer.
+
+2006-06-29  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_serializer_raptor.c: remove ORDINAL code comment
+	references
+
+2006-06-18  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage.c: (librdf_storage_add_statement,
+	librdf_storage_add_statements, librdf_storage_contains_statement):
+	Document and enforce that only legal RDF triples are only allowed.
+
+	* librdf/rdf_statement.c: (librdf_statement_is_complete): Document
+	and enforce that only complete and legal RDF triples are only
+	allowed.
+
+	* librdf/rdf_model.c: (librdf_model_add_statement,
+	librdf_model_add, librdf_model_add_typed_literal_statement,
+	librdf_model_add_string_literal_statement,
+	librdf_model_contains_statement): Document and enforce legal RDF
+	triples are only allowed.
+
+2006-06-05  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_model.c: docucomments typos
+
+2006-05-05  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/win32_rdf_config.h: bumped to 1.0.4
+
+2006-05-03  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c: (librdf_parser_raptor_error_handler,
+	librdf_parser_raptor_warning_handler): Context is a now a
+	librdf_parser_raptor_context not a transient stream context.
+	(librdf_parser_raptor_parse_file_handle_as_stream,
+	librdf_parser_raptor_parse_as_stream_common,
+	librdf_parser_raptor_parse_into_model_common): Set parser factory
+	context to be raptor error context.
+
+	* librdf/rdf_utf8.c: Revert change to use
+	raptor_utf8_to_unicode_char - it breaks since unsigned long in
+	raptor != librdf_unichar / u32 in librdf for all archs.
+
 2006-05-02  Dave Beckett  <dave@dajobe.org>
 
 	* librdf/rdf_utf8.c: (librdf_utf8_to_unicode_char,
