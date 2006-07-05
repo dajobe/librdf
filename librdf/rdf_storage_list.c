@@ -63,7 +63,7 @@ typedef struct
 
 
 /* prototypes for local functions */
-static int librdf_storage_list_init(librdf_storage* storage, char *name, librdf_hash* options);
+static int librdf_storage_list_init(librdf_storage* storage, const char *name, librdf_hash* options);
 static int librdf_storage_list_open(librdf_storage* storage, librdf_model* model);
 static int librdf_storage_list_close(librdf_storage* storage);
 static int librdf_storage_list_size(librdf_storage* storage);
@@ -109,7 +109,7 @@ static void librdf_storage_list_register_factory(librdf_storage_factory *factory
 
 /* functions implementing storage api */
 static int
-librdf_storage_list_init(librdf_storage* storage, char *name,
+librdf_storage_list_init(librdf_storage* storage, const char *name,
                          librdf_hash* options)
 {
   librdf_storage_list_context *context=(librdf_storage_list_context*)storage->context;
