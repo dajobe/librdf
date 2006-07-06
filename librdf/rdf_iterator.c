@@ -456,8 +456,7 @@ main(int argc, char *argv[])
   int i;
   librdf_iterator* iterator;
   int count;
-  
-  char *program=librdf_basename((const char*)argv[0]);
+  const char *program=librdf_basename((const char*)argv[0]);
 	
   world=librdf_new_world();
   librdf_world_init_mutex(world);

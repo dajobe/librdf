@@ -662,7 +662,7 @@ log_handler(void *user_data, librdf_log_message *message)
 int
 main(int argc, char *argv[]) 
 {
-  char *program=librdf_basename((const char*)argv[0]);
+  const char *program=librdf_basename((const char*)argv[0]);
   char *test_serializer_types[]={"rdfxml", "ntriples", NULL};
   int i;
   char *type;

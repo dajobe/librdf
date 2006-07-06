@@ -462,7 +462,7 @@ librdf_bad_string_print(const byte *input, int length, FILE *stream)
 int
 main(int argc, char *argv[]) 
 {
-  char *program=librdf_basename((const char*)argv[0]);
+  const char *program=librdf_basename((const char*)argv[0]);
   librdf_unichar c;
   struct tv {
     const byte *string;

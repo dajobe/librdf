@@ -900,7 +900,7 @@ main(int argc, char *argv[])
 {
   librdf_statement *statement, *statement2;
   int size, size2;
-  char *program=librdf_basename((const char*)argv[0]);
+  const char *program=librdf_basename((const char*)argv[0]);
   char *s, *buffer;
   librdf_world *world;
   
