@@ -455,7 +455,7 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
     return 1;
 
   /* Save hash of model name */
-  context->model=librdf_storage_mysql_hash(storage, NULL, name, strlen(name));
+  context->model=librdf_storage_mysql_hash(storage, NULL, (char*)name, strlen(name));
 
   /* Save connection parameters */
   context->host=librdf_hash_get_del(options, "host");
