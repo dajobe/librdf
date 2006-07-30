@@ -680,7 +680,9 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "SQLite database %s open failed - %s", 
                context->name, errmsg);
+#if SQLITE_API == 2
     sqlite_FREE(errmsg);
+#endif
 #if SQLITE_API == 3
     sqlite_CLOSE(context->db);
 #endif
@@ -1243,7 +1245,9 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->name, errmsg, status);
+#if SQLITE_API == 2
       sqlite_FREE(errmsg);
+#endif
     }
     result= -1;
   }
@@ -1345,7 +1349,9 @@ librdf_storage_sqlite_serialise_finished(void* context)
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
+#if SQLITE_API == 2
       sqlite_FREE(errmsg);
+#endif
     }
   }
 
@@ -1597,7 +1603,9 @@ librdf_storage_sqlite_find_statements_finished(void* context)
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
+#if SQLITE_API == 2
       sqlite_FREE(errmsg);
+#endif
     }
   }
 
@@ -1946,7 +1954,9 @@ librdf_storage_sqlite_context_serialise_finished(void* context)
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
+#if SQLITE_API == 2
       sqlite_FREE(errmsg);
+#endif
     }
   }
 
@@ -2061,7 +2071,9 @@ librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_context* sco
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->name, errmsg, status);
+#if SQLITE_API == 2
       sqlite_FREE(errmsg);
+#endif
     }
     result= -1;
   }
@@ -2171,7 +2183,9 @@ librdf_storage_sqlite_get_contexts_finished(void* iterator)
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  icontext->sqlite_context->name, errmsg, status);
+#if SQLITE_API == 2
       sqlite_FREE(errmsg);
+#endif
     }
   }
 
