@@ -1741,6 +1741,62 @@ librdf_storage_sqlite_context_remove_statement(librdf_storage* storage,
 }
 
 
+static  int
+librdf_storage_sqlite_context_remove_statements(librdf_storage* storage, 
+                                                librdf_node* context_node)
+{
+  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
+  int status;
+  char *errmsg=NULL;
+  triple_node_type node_types[4];
+  int node_ids[4];
+  const unsigned char* fields[4];
+  raptor_stringbuffer *sb;
+  unsigned char *request;
+  int rc=0;
+  
+  
+  if(librdf_storage_sqlite_statement_helper(storage,
+                                            NULL,
+                                            context_node,
+                                            node_types, node_ids, fields))
+    return -1;
+    
+  sb=raptor_new_stringbuffer();
+  raptor_stringbuffer_append_counted_string(sb,
+                                    (unsigned char*)"DELETE FROM ", 12, 1);
+  raptor_stringbuffer_append_string(sb, 
+                                    (unsigned char*)sqlite_tables[TABLE_TRIPLES].name, 1);
+
+  raptor_stringbuffer_append_counted_string(sb, 
+                                            (unsigned char*)" WHERE ", 7, 1);
+
+  raptor_stringbuffer_append_string(sb, fields[TRIPLE_CONTEXT], 1);
+  raptor_stringbuffer_append_counted_string(sb, 
+                                            (unsigned char*)"=", 1, 1);
+  raptor_stringbuffer_append_decimal(sb, node_ids[TRIPLE_CONTEXT]);
+  raptor_stringbuffer_append_counted_string(sb, 
+                                            (unsigned char*)"\n", 1, 1);
+  raptor_stringbuffer_append_counted_string(sb, 
+                                            (unsigned char*)";", 1, 1);
+  
+  request=raptor_stringbuffer_as_string(sb);
+
+  rc=librdf_storage_sqlite_exec(storage,
+                                request,
+                                NULL, /* no callback */
+                                NULL, /* arg */
+                                0);
+
+  raptor_free_stringbuffer(sb);
+
+  if(rc)
+    return -1;
+
+  return 0;
+}
+
+
 typedef struct {
   librdf_storage *storage;
   librdf_storage_sqlite_context* sqlite_context;
@@ -2337,6 +2393,7 @@ librdf_storage_sqlite_register_factory(librdf_storage_factory *factory)
   factory->find_statements    = librdf_storage_sqlite_find_statements;
   factory->context_add_statement    = librdf_storage_sqlite_context_add_statement;
   factory->context_remove_statement = librdf_storage_sqlite_context_remove_statement;
+  factory->context_remove_statements = librdf_storage_sqlite_context_remove_statements;
   factory->context_serialise        = librdf_storage_sqlite_context_serialise;
   factory->get_contexts             = librdf_storage_sqlite_get_contexts;
   factory->get_feature              = librdf_storage_sqlite_get_feature;
