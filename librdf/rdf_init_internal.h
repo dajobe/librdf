@@ -56,6 +56,9 @@ struct librdf_world_s
   /* Node interning */
   librdf_hash* nodes_hash[3]; /* resource, literal, blank */
 
+  /* Sequence of storage factories */
+  raptor_sequence* storages;
+  
   /* List of parser factories */
   librdf_parser_factory* parsers;
 
