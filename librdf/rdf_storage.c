@@ -198,6 +198,7 @@ librdf_storage_register_factory(librdf_world* world,
 
 /**
  * librdf_get_storage_factory:
+ * @world: redland world object
  * @name: the factory name or NULL for the default factory
  *
  * Get a storage factory by name.
@@ -205,7 +206,7 @@ librdf_storage_register_factory(librdf_world* world,
  * Return value: the factory object or NULL if there is no such factory
  **/
 librdf_storage_factory*
-librdf_get_storage_factory(const char *name) 
+librdf_get_storage_factory(librdf_world* world, const char *name) 
 {
   librdf_storage_factory *factory;
 
@@ -247,7 +248,8 @@ librdf_get_storage_factory(const char *name)
  * Return value: non 0 on failure of if counter is out of range
  **/
 int
-librdf_storage_enumerate(const unsigned int counter,
+librdf_storage_enumerate(librdf_world* world,
+                         const unsigned int counter,
                          const char **name, const char **label)
 {
   librdf_storage_factory *factory;
@@ -290,7 +292,7 @@ librdf_new_storage (librdf_world *world,
   librdf_storage_factory* factory;
   librdf_hash* options_hash;
   
-  factory=librdf_get_storage_factory(storage_name);
+  factory=librdf_get_storage_factory(world, storage_name);
   if(!factory)
     return NULL;
 
@@ -327,13 +329,13 @@ librdf_new_storage (librdf_world *world,
  *
  */
 librdf_storage*
-librdf_new_storage_with_options (librdf_world *world, 
-                                 const char *storage_name, const char *name, 
-                                 librdf_hash *options) {
+librdf_new_storage_with_options(librdf_world *world, 
+                                const char *storage_name, const char *name, 
+                                librdf_hash *options) {
   librdf_storage_factory* factory;
   librdf_hash* options_hash;
   
-  factory=librdf_get_storage_factory(storage_name);
+  factory=librdf_get_storage_factory(world, storage_name);
   if(!factory)
     return NULL;
 
