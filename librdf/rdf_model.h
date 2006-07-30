@@ -43,6 +43,11 @@
 extern "C" {
 #endif
 
+/* class methods */
+
+REDLAND_API
+int librdf_model_enumerate(librdf_world* world, const unsigned int counter, const char **name, const char **label);
+
 /* constructors */
 
 /* Create a new Model */
