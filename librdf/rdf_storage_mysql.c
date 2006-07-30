@@ -812,18 +812,8 @@ static int
 librdf_storage_mysql_add_statements(librdf_storage* storage,
                                     librdf_stream* statement_stream)
 {
-  int helper=0;
-
-  while(!helper && !librdf_stream_end(statement_stream)) {
-    librdf_statement* statement=librdf_stream_get_object(statement_stream);
-    /* Do not add duplicate statements */
-    if(!librdf_storage_mysql_contains_statement(storage, statement))
-      helper=librdf_storage_mysql_context_add_statement_helper(storage, 0,
-                                                               statement);
-    librdf_stream_next(statement_stream);
-  };
-
-  return helper;
+  return librdf_storage_mysql_context_add_statements(storage, NULL,
+                                                     statement_stream);
 }
 
 /*
@@ -1188,10 +1178,18 @@ librdf_storage_mysql_context_add_statements(librdf_storage* storage,
 
   while(!helper && !librdf_stream_end(statement_stream)) {
     librdf_statement* statement=librdf_stream_get_object(statement_stream);
+    if(!context->bulk) {
+      /* Do not add duplicate statements 
+       * but do not check for this when in bulk mode.
+       */
+      if(librdf_storage_mysql_contains_statement(storage, statement))
+        continue;
+    }
+    
     helper=librdf_storage_mysql_context_add_statement_helper(storage, ctxt,
                                                              statement);
     librdf_stream_next(statement_stream);
-  };
+  }
 
   return helper;
 }
@@ -1219,7 +1217,7 @@ librdf_storage_mysql_context_add_statement(librdf_storage* storage,
     ctxt=librdf_storage_mysql_node_hash(storage,context_node,1);
     if(!ctxt)
       return 1;
-  };
+  }
 
   return librdf_storage_mysql_context_add_statement_helper(storage, ctxt,
                                                            statement);
@@ -1815,7 +1813,7 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
                mysql_error(sos->handle));
     librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
     return NULL;
-  };
+  }
   LIBRDF_FREE(cstring, query);
 
   /* Get first statement, if any, and initialize stream */
@@ -1833,7 +1831,7 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
   if(!stream) {
     librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
     return NULL;
-  };
+  }
 
   return stream;
 }
