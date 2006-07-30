@@ -53,8 +53,6 @@ struct librdf_storage_s
 
 /** A Storage Factory */
 struct librdf_storage_factory_s {
-  librdf_world *world;
-  struct librdf_storage_factory_s* next;
   char* name;
   char* label;
   
