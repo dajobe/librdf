@@ -58,9 +58,8 @@ struct librdf_model_s {
 
 /* A Model Factory */
 struct librdf_model_factory_s {
-  librdf_world *world;
-  struct librdf_model_factory_s* next;
   char* name;
+  char* label;
   
   /* the rest of this structure is populated by the
      model-specific register function */
@@ -176,8 +175,8 @@ void librdf_init_model(librdf_world *world);
 void librdf_finish_model(librdf_world *world);
 
 /* class methods */
-void librdf_model_register_factory(librdf_world *world, const char *name, void (*factory) (librdf_model_factory*));
-librdf_model_factory* librdf_get_model_factory(const char *name);
+void librdf_model_register_factory(librdf_world *world, const char *name, const char *label, void (*factory) (librdf_model_factory*));
+librdf_model_factory* librdf_get_model_factory(librdf_world* world, const char *name);
 
 void librdf_model_add_reference(librdf_model *model);
 void librdf_model_remove_reference(librdf_model *model);
