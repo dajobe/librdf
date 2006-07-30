@@ -42,9 +42,6 @@
 #include <redland.h>
 
 #ifndef STANDALONE
-/* prototypes for helper functions */
-static void librdf_delete_model_factories(void);
-
 
 /**
  * librdf_init_model:
@@ -56,7 +53,7 @@ static void librdf_delete_model_factories(void);
 void
 librdf_init_model(librdf_world *world)
 {
-  /* Always have model storage implementation available */
+  /* Always have model storage - must always be the default model */
   librdf_init_model_storage(world);
 }
 
@@ -71,30 +68,8 @@ librdf_init_model(librdf_world *world)
 void
 librdf_finish_model(librdf_world *world)
 {
-  librdf_delete_model_factories();
-}
-
-
-/* statics */
-
-/* list of storage factories */
-static librdf_model_factory* models;
-
-
-/*
- * librdf_delete_model_factories - helper function to delete all the registered model factories
- */
-static void
-librdf_delete_model_factories(void)
-{
-  librdf_model_factory *factory, *next;
-  
-  for(factory=models; factory; factory=next) {
-    next=factory->next;
-    LIBRDF_FREE(librdf_model_factory, factory->name);
-    LIBRDF_FREE(librdf_model_factory, factory);
-  }
-  models=NULL;
+   raptor_free_sequence(world->models);
+   world->models=NULL;
 }
 
 
@@ -110,25 +85,52 @@ librdf_model_supports_contexts(librdf_model* model) {
 
 /* class methods */
 
+static void
+librdf_free_model_factory(librdf_model_factory* factory)
+{
+  LIBRDF_FREE(librdf_model_factory, factory->name);
+  LIBRDF_FREE(librdf_model_factory, factory->label);
+  LIBRDF_FREE(librdf_model_factory, factory);
+}
+
+
 /**
  * librdf_model_register_factory:
  * @world: redland world object
  * @name: the model factory name
+ * @label: the storage factory label
  * @factory: pointer to function to call to register the factory
  *
  * Register a model factory.
  * 
  **/
 void
-librdf_model_register_factory(librdf_world *world, const char *name,
+librdf_model_register_factory(librdf_world *world, 
+                              const char *name, const char *label,
                               void (*factory) (librdf_model_factory*)) 
 {
   librdf_model_factory *model, *h;
   char *name_copy;
+  char *label_copy;
+  int i;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for model %s\n", name);
 #endif
+
+  if(!world->models)
+    world->models=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_model_factory, NULL);
+  
+  for(i=0;
+      (h=(librdf_model_factory*)raptor_sequence_get_at(world->models, i));
+      i++) {
+    if(!strcmp(h->name, name)) {
+      librdf_log(world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_MODEL, NULL,
+                 "model %s already registered", h->name);
+      return;
+    }
+  }
   
   model=(librdf_model_factory*)LIBRDF_CALLOC(librdf_model_factory, 1,
                                              sizeof(librdf_model_factory));
@@ -143,30 +145,28 @@ librdf_model_register_factory(librdf_world *world, const char *name,
   strcpy(name_copy, name);
   model->name=name_copy;
         
-  for(h = models; h; h = h->next ) {
-    if(!strcmp(h->name, name_copy)) {
-      LIBRDF_FREE(cstring, name_copy);
-      librdf_log(world,
-                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_MODEL, NULL,
-                 "model %s already registered", h->name);
-      return;
-    }
+  label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+  if(!label_copy) {
+    LIBRDF_FREE(librdf_model, model);
+    LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
   }
-  
+  strcpy(label_copy, label);
+  model->label=label_copy;
+
   /* Call the model registration function on the new object */
   (*factory)(model);
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, model->context_length);
 #endif
-  
-  model->next = models;
-  models = model;
+
+  raptor_sequence_push(world->models, model);
 }
 
 
 /**
  * librdf_get_model_factory:
+ * @world: redland world object
  * @name: the factory name or NULL for the default factory
  *
  * Get a model factory by name.
@@ -174,22 +174,25 @@ librdf_model_register_factory(librdf_world *world, const char *name,
  * Return value: the factory object or NULL if there is no such factory
  **/
 librdf_model_factory*
-librdf_get_model_factory (const char *name) 
+librdf_get_model_factory(librdf_world* world, const char *name) 
 {
   librdf_model_factory *factory;
 
   /* return 1st model if no particular one wanted - why? */
   if(!name) {
-    factory=models;
+    factory=(librdf_model_factory *)raptor_sequence_get_at(world->models, 0);
     if(!factory) {
       LIBRDF_DEBUG1("No (default) models registered\n");
       return NULL;
     }
   } else {
-    for(factory=models; factory; factory=factory->next) {
-      if(!strcmp(factory->name, name)) {
+    int i;
+    
+    for(i=0;
+        (factory=(librdf_model_factory*)raptor_sequence_get_at(world->models, i));
+        i++) {
+      if(!strcmp(factory->name, name))
         break;
-      }
     }
     /* else FACTORY name not found */
     if(!factory) {
@@ -202,6 +205,37 @@ librdf_get_model_factory (const char *name)
 }
 
 
+/**
+ * librdf_model_enumerate:
+ * @counter: index into the list of models
+ * @name: pointer to store the name of the model (or NULL)
+ * @label: pointer to store syntax readable label (or NULL)
+ *
+ * Get information on models.
+ * 
+ * Return value: non 0 on failure of if counter is out of range
+ **/
+int
+librdf_model_enumerate(librdf_world* world,
+                       const unsigned int counter,
+                       const char **name, const char **label)
+{
+  librdf_model_factory *factory;
+  
+  if(counter < 0)
+    return 1;
+
+  factory=(librdf_model_factory*)raptor_sequence_get_at(world->models,
+                                                        counter);
+  if(!factory)
+    return 1;
+  
+  if(name)
+    *name=factory->name;
+  if(label)
+    *label=factory->label;
+  return 0;
+}
 
 
 /**
@@ -273,7 +307,7 @@ librdf_new_model_with_options(librdf_world *world,
   
   model->world=world;
 
-  model->factory=librdf_get_model_factory("storage");
+  model->factory=librdf_get_model_factory(world, "storage");
   if(!model->factory) {
     LIBRDF_FREE(librdf_model, model);
     return NULL;
