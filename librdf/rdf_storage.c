@@ -47,10 +47,6 @@
 
 #ifndef STANDALONE
 
-/* prototypes for helper functions */
-static void librdf_delete_storage_factories(void);
-
-
 /* prototypes for functions implementing get_sources, arcs, targets
  * librdf_iterator via conversion from a librdf_stream of librdf_statement
  */
@@ -76,6 +72,15 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
 void
 librdf_init_storage(librdf_world *world)
 {
+  /* Always have storage memory - must always be the default storage */
+  librdf_init_storage_list(world);
+
+  /* Always have storage list, hashes, file implementations available */
+  librdf_init_storage_hashes(world);
+#ifdef STORAGE_FILE
+  librdf_init_storage_file(world);
+#endif
+
 #ifdef STORAGE_MYSQL
   librdf_init_storage_mysql(world);
 #endif
@@ -88,13 +93,6 @@ librdf_init_storage(librdf_world *world)
 #ifdef STORAGE_SQLITE
   librdf_init_storage_sqlite(world);
 #endif
-#ifdef STORAGE_FILE
-  librdf_init_storage_file(world);
-#endif
-  /* Always have storage list, hashes, file implementations available */
-  librdf_init_storage_hashes(world);
-  /* Always have storage memory must always be available */
-  librdf_init_storage_list(world);
 }
 
 
@@ -108,35 +106,23 @@ librdf_init_storage(librdf_world *world)
 void
 librdf_finish_storage(librdf_world *world) 
 {
-  librdf_delete_storage_factories();
+  raptor_free_sequence(world->storages);
+  world->storages=NULL;
 }
 
-
-/* statics */
-
-/* list of storage factories */
-static librdf_storage_factory* storages;
 
 
 /* helper functions */
 
 
-/*
- * librdf_delete_storage_factories - helper function to delete all the registered storage factories
- */
 static void
-librdf_delete_storage_factories(void)
+librdf_free_storage_factory(librdf_storage_factory* factory)
 {
-  librdf_storage_factory *factory, *next;
-  
-  for(factory=storages; factory; factory=next) {
-    next=factory->next;
-    LIBRDF_FREE(librdf_storage_factory, factory->name);
-    LIBRDF_FREE(librdf_storage_factory, factory->label);
-    LIBRDF_FREE(librdf_storage_factory, factory);
-  }
-  storages=NULL;
+  LIBRDF_FREE(librdf_storage_factory, factory->name);
+  LIBRDF_FREE(librdf_storage_factory, factory->label);
+  LIBRDF_FREE(librdf_storage_factory, factory);
 }
+
 
 
 /* class methods */
@@ -158,10 +144,25 @@ librdf_storage_register_factory(librdf_world* world,
   librdf_storage_factory *storage, *h;
   char *name_copy;
   char *label_copy;
-  
+  int i;
+
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for storage %s\n", name);
 #endif
+  
+  if(!world->storages)
+    world->storages=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_storage_factory, NULL);
+  
+  for(i=0;
+      (h=(librdf_storage_factory*)raptor_sequence_get_at(world->storages, i));
+      i++) {
+    if(!strcmp(h->name, name)) {
+      librdf_log(world,
+                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "storage %s already registered", h->name);
+      return;
+    }
+  }
   
   storage=(librdf_storage_factory*)LIBRDF_CALLOC(librdf_storage_factory, 1,
                                                  sizeof(librdf_storage_factory));
@@ -175,18 +176,7 @@ librdf_storage_register_factory(librdf_world* world,
   }
   strcpy(name_copy, name);
   storage->name=name_copy;
-        
-  for(h = storages; h; h = h->next ) {
-    if(!strcmp(h->name, name_copy)) {
-      LIBRDF_FREE(cstring, name_copy); 
-      LIBRDF_FREE(librdf_storage, storage);
-      librdf_log(world,
-                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "storage %s already registered", h->name);
-      return;
-    }
-  }
-  
+
   label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
   if(!label_copy) {
     LIBRDF_FREE(librdf_storage, storage);
@@ -201,9 +191,8 @@ librdf_storage_register_factory(librdf_world* world,
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, storage->context_length);
 #endif
-  
-  storage->next = storages;
-  storages = storage;
+
+  raptor_sequence_push(world->storages, storage);
 }
 
 
@@ -216,22 +205,25 @@ librdf_storage_register_factory(librdf_world* world,
  * Return value: the factory object or NULL if there is no such factory
  **/
 librdf_storage_factory*
-librdf_get_storage_factory (const char *name) 
+librdf_get_storage_factory(const char *name) 
 {
   librdf_storage_factory *factory;
 
   /* return 1st storage if no particular one wanted - why? */
   if(!name) {
-    factory=storages;
+    factory=(librdf_storage_factory *)raptor_sequence_get_at(world->storages, 0);
     if(!factory) {
       LIBRDF_DEBUG1("No (default) storages registered\n");
       return NULL;
     }
   } else {
-    for(factory=storages; factory; factory=factory->next) {
-      if(!strcmp(factory->name, name)) {
+    int i;
+    
+    for(i=0;
+        (factory=(librdf_storage_factory*)raptor_sequence_get_at(world->storages, i));
+        i++) {
+      if(!strcmp(factory->name, name))
         break;
-      }
     }
     /* else FACTORY name not found */
     if(!factory) {
@@ -258,23 +250,21 @@ int
 librdf_storage_enumerate(const unsigned int counter,
                          const char **name, const char **label)
 {
-  unsigned int i;
-  librdf_storage_factory *factory=storages;
-
-  if(!factory || counter < 0)
+  librdf_storage_factory *factory;
+  
+  if(counter < 0)
     return 1;
 
-  for(i=0; factory && i<=counter ; i++, factory=factory->next) {
-    if(i == counter) {
-      if(name)
-        *name=factory->name;
-      if(label)
-        *label=factory->label;
-      return 0;
-    }
-  }
-        
-  return 1;
+  factory=(librdf_storage_factory*)raptor_sequence_get_at(world->storages,
+                                                          counter);
+  if(!factory)
+    return 1;
+  
+  if(name)
+    *name=factory->name;
+  if(label)
+    *label=factory->label;
+  return 0;
 }
 
 
