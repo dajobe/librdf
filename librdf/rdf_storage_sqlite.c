@@ -1745,9 +1745,6 @@ static  int
 librdf_storage_sqlite_context_remove_statements(librdf_storage* storage, 
                                                 librdf_node* context_node)
 {
-  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
-  int status;
-  char *errmsg=NULL;
   triple_node_type node_types[4];
   int node_ids[4];
   const unsigned char* fields[4];
