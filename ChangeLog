@@ -1,6 +1,150 @@
+2006-07-29  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_init_internal.h: struct librdf_world_s gains
+	raptor_sequence of models
+
+	* librdf/rdf_model.c: Switch to a raptor_sequence of models.
+	(librdf_finish_model): Use raptor_free_sequence.
+	(librdf_delete_model_factories): Deleted.
+	(librdf_free_model_factory): Added helper for
+	raptor_free_sequence.
+	(librdf_model_register_factory, librdf_get_model_factory): Switch
+	to use sequences.
+	(librdf_model_enumerate): Added.
+
+	* librdf/rdf_model.h: Added librdf_model_enumerate
+
+	* librdf/rdf_model_storage.c: (librdf_init_model_storage): Update
+	for librdf_model_register_factory world arg.
+
+	* librdf/rdf_model_internal.h: struct librdf_model_factory_s loses
+	world, next fields, gains label.  librdf_model_register_factory
+	gains label field librdf_get_model_factory gains world field
+
+	* librdf/rdf_storage.h: librdf_storage_enumerate gains world args.
+
+	* librdf/rdf_storage_internal.h: librdf_get_storage_factory gains
+	world args.
+
+	* librdf/rdf_storage.c: (librdf_get_storage_factory,
+	librdf_storage_enumerate): Add world args.
+
+	* librdf/rdf_storage.c: Switch to a raptor_sequence of storages.
+	(librdf_init_storage): Re-order, first thing registered is the default.
+	(librdf_finish_storage): Use raptor_free_sequence.
+	(librdf_delete_storage_factories): Deleted.
+	(librdf_free_storage_factory): Added helper for raptor_free_sequence.
+	(librdf_storage_register_factory, librdf_get_storage_factory,
+	librdf_storage_enumerate): Switch to use sequences.
+
+	* librdf/rdf_init_internal.h: (struct librdf_world_s): Add
+	raptor_sequence of storages
+
+	* librdf/rdf_storage_internal.h: (struct
+	librdf_storage_factory_s): Lose world and next fields.
+
+	* librdf/rdf_storage_sqlite.c: (librdf_storage_sqlite_context_remove_statements):
+	Remove unused vars
+
+	* utils/rdfproc.c: Check for invalid storage name with '-s' option
+
+	* librdf/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_context_remove_statements): Added.
+	Fixes Issue #0000103
+	http://bugs.librdf.org/mantis/view.php?id=103
+
+	* librdf/rdf_storage_sqlite.c: Wrap all sqlite_FREE calls on error
+	messages so that they are only called with SQLITE API v2.
+	Fixes Issue #0000105
+	http://bugs.librdf.org/mantis/view.php?id=105
+
+	* librdf/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_add_statements): Use
+	librdf_storage_postgresql_context_add_statements.
+	(librdf_storage_postgresql_context_add_statements): Add check for
+	adding duplicate statements and remove the check when in bulk mode.
+
+	* librdf/rdf_storage_mysql.c:
+	(librdf_storage_mysql_add_statements): Use
+	librdf_storage_mysql_context_add_statements.
+	(librdf_storage_mysql_context_add_statements): Add check for
+	adding duplicate statements and remove the check when in bulk mode.
+
+2006-07-11  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_mysql.c: cast
+
+2006-07-05  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_hash.c, librdf/rdf_heuristics.c,
+	librdf/rdf_iterator.c, librdf/rdf_model.c, librdf/rdf_node.c,
+	librdf/rdf_parser.c, librdf/rdf_query.c, librdf/rdf_serializer.c,
+	librdf/rdf_statement.c, librdf/rdf_storage.c, librdf/rdf_stream.c,
+	librdf/rdf_uri.c, librdf/rdf_utf8.c: (main): More const decls for
+	program
+
 2006-07-04  Dave Beckett  <dave@dajobe.org>
 
-	* librdf/ChangeLog: #changes
+	* librdf/rdf_digest.c: (main): Revalidate digest answers
+
+	* librdf/rdf_digest.c, librdf/rdf_hash.c, librdf/rdf_heuristics.c,
+	librdf/rdf_iterator.c, librdf/rdf_node.c, librdf/rdf_parser.c,
+	librdf/rdf_query.c, librdf/rdf_serializer.c,
+	librdf/rdf_statement.c, librdf/rdf_storage_internal.h,
+	librdf/rdf_stream.c, librdf/rdf_uri.c, librdf/rdf_utf8.c: Fixes
+	for calls to librdf_basename in unit tests
+
+	* librdf/rdf_storage_file.c: Add const for some char* args:
+	(librdf_storage_file_init): argument name
+
+	* librdf/rdf_storage_sqlite.c: Add const for some char* args:
+	(librdf_storage_sqlite_init): argument name
+
+	* librdf/rdf_storage_tstore.c: Add const for some char* args:
+	(librdf_storage_tstore_init): argument name
+
+	* librdf/rdf_storage_mysql.c: Add const for some char* args:
+	(librdf_storage_mysql_init): argument name
+
+	* librdf/rdf_storage_list.c: Add const for some char* args:
+	(librdf_storage_list_init): argument name
+
+	* librdf/rdf_storage_postgresql.c: Add const for some char* args:
+	(librdf_storage_postgresql_init): argument name
+
+	* librdf/rdf_init.c: Added string.h and (protected by
+	HAVE_UNISTD_H) unistd.h headers
+
+	* librdf/rdf_storage_hashes.c: Add const for some char* args:
+	(librdf_storage_hashes_register): argument name
+	(librdf_storage_hashes_register): argument name
+	(librdf_storage_hashes_init): argument name
+
+	* librdf/rdf_storage.c: Add const for some char* args:
+	(librdf_new_storage): argument storage_name
+	(librdf_new_storage_with_options): arguments storage_name, name
+	(librdf_new_storage_from_factory): argument name
+
+	* librdf/rdf_storage.h: Add const for some char* args:
+	librdf_new_storage argument storage_name
+	librdf_new_storage_with_options arguments storage_name, name
+	librdf_new_storage_from_factory argument name
+
+	* librdf/rdf_model.c: Update to add const for some char* args:
+	(librdf_new_model): argument options_string
+	(librdf_model_add_string_literal_statement): argument xml_language
+	(librdf_model_add_typed_literal_statement): argument xml_language
+
+	* librdf/rdf_digest.h: Add const for some char* args:
+	librdf_new_digest argument name
+
+	* librdf/rdf_model.h: Add const for some char* args:
+	librdf_new_model argument options_string
+	librdf_model_add_string_literal_statement argument xml_language
+	librdf_model_add_typed_literal_statement argument xml_language
+
+	* librdf/rdf_log.c: (librdf_log_simple): Handle attempting to
+	fputs a NULL message.
 
 	* librdf/rdf_storage_hashes.c: (librdf_storage_hashes_init_common):
 	Do not free any options here.
