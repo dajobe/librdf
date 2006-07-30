@@ -366,7 +366,13 @@ main(int argc, char *argv[])
         break;
 
       case 's':
-        storage_name=optarg;
+        if(optarg) {
+          if(!librdf_get_storage_factory(optarg)) {
+            fprintf(stderr, "%s: invalid storage `%s'\n", program, optarg);
+            usage=1;
+          } else
+            storage_name=optarg;
+        }
         break;
 
       case 't':
