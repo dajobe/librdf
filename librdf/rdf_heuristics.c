@@ -59,7 +59,7 @@
  **/
 
 int
-librdf_heuristic_is_blank_node(char *node)
+librdf_heuristic_is_blank_node(const char *node)
 {
   return node && (*node == '_' && node[1] == ':'); 
 }
@@ -77,8 +77,8 @@ librdf_heuristic_is_blank_node(char *node)
  * Return value: the blank node identifer string or NULL if the node does not seem to be a blank node identifier
  **/
 
-char*
-librdf_heuristic_get_blank_node(char *node)
+const char*
+librdf_heuristic_get_blank_node(const char *node)
 {
   return librdf_heuristic_is_blank_node(node) ? node+2 : NULL;
 }
@@ -100,7 +100,7 @@ librdf_heuristic_get_blank_node(char *node)
  **/
 
 int
-librdf_heuristic_object_is_literal(char *object) 
+librdf_heuristic_object_is_literal(const char *object) 
 {
   int object_is_literal=1; /* assume the worst */
 
@@ -141,10 +141,10 @@ librdf_heuristic_object_is_literal(char *object)
  * Return value: a new name or NULL on failure
  **/
 char *
-librdf_heuristic_gen_name(char *name) 
+librdf_heuristic_gen_name(const char *name) 
 {
   char *new_name;
-  char *p=name;
+  const char *p=name;
   size_t len;
   size_t offset;
   long l=-1L;

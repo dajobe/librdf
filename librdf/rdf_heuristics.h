@@ -32,10 +32,10 @@
 extern "C" {
 #endif
 
-char* librdf_heuristic_gen_name(char *name);
-int librdf_heuristic_is_blank_node(char *node);
-char* librdf_heuristic_get_blank_node(char *node);
-int librdf_heuristic_object_is_literal(char *object);
+char* librdf_heuristic_gen_name(const char *name);
+int librdf_heuristic_is_blank_node(const char *node);
+const char* librdf_heuristic_get_blank_node(const char *node);
+int librdf_heuristic_object_is_literal(const char *object);
 
 #ifdef __cplusplus
 }
