@@ -41,7 +41,7 @@ REDLAND_API
 void librdf_storage_register_factory(librdf_world *world, const char *name, const char *label, void (*factory) (librdf_storage_factory*));
 
 REDLAND_API
-int librdf_storage_enumerate(const unsigned int counter, const char **name, const char **label);
+int librdf_storage_enumerate(librdf_world* world, const unsigned int counter, const char **name, const char **label);
 
 
 /* constructor */
