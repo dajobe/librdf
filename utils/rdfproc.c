@@ -367,7 +367,7 @@ main(int argc, char *argv[])
 
       case 's':
         if(optarg) {
-          if(!librdf_get_storage_factory(optarg)) {
+          if(!librdf_get_storage_factory(world, optarg)) {
             fprintf(stderr, "%s: invalid storage `%s'\n", program, optarg);
             usage=1;
           } else
@@ -463,7 +463,7 @@ main(int argc, char *argv[])
     for(i=0; 1; i++) {
       const char *help_name;
       const char *help_label;
-      if(librdf_storage_enumerate(i, &help_name, &help_label))
+      if(librdf_storage_enumerate(world, i, &help_name, &help_label))
         break;
       printf("    %-10s              %s", help_name, help_label);
       if(!i)
