@@ -240,9 +240,15 @@ rasqal_redland_new_triples_source(rasqal_query* rdf_query,
 
   seq=rasqal_query_get_data_graph_sequence(rdf_query);
   
-  /* FIXME: queries with triple sources are actively discarded */
-  if(seq && raptor_sequence_size(seq))
-    return 1;
+  /* FIXME: queries with data graphs in them (such as FROM in SPARQL)
+   * are deleted, so that there are no unexpected data loads
+   */
+  if(seq) {
+    while(raptor_sequence_size(seq)) {
+      rasqal_data_graph* dg=(rasqal_data_graph*)raptor_sequence_pop(seq);
+      rasqal_free_data_graph(dg);
+    }
+  }
 
   rtsc->world=world;
 
