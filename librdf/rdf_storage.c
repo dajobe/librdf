@@ -1289,8 +1289,6 @@ librdf_storage_context_remove_statement(librdf_storage* storage,
  *
  * Remove statements from a storage with the given context.
  * 
- * If @context is NULL, this is equivalent to librdf_storage_remove_statements
- *
  * Return value: Non 0 on failure
  **/
 int
