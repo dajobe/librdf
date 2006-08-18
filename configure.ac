@@ -99,6 +99,11 @@ AM_SANITY_CHECK
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+
+m4_undefine([AC_PROG_CXX])
+m4_defun([AC_PROG_CXX],[])
+m4_undefine([AC_PROG_F77])
+m4_defun([AC_PROG_F77],[])
 AC_PROG_LIBTOOL
 
 # Find a tar command for 'make dist'
