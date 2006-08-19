@@ -865,8 +865,8 @@ if test $mysql_storage  = yes; then
   LIBRDF_LIBS="$LIBRDF_LIBS $mysql_libs"
   dnl need to change quotes to allow square brackets
   changequote(<<, >>)dnl
-  # Stop the MySQL config program adding -O<n> options to CFLAGS
-  mysql_cflags=`$MYSQL_CONFIG --cflags | sed -e "s/'//g" -e "s/-O[1-9]*//" `
+  # Stop the MySQL config program adding -Os or -O<n> options to CFLAGS
+  mysql_cflags=`$MYSQL_CONFIG --cflags | sed -e "s/'//g" -e "s/-O[A-Za-z0-9]*//" `
   LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $mysql_cflags"
   changequote([, ])dnl
 fi
@@ -1041,12 +1041,12 @@ fi
 if test "$USE_MAINTAINER_MODE" = yes -a $release_version = no; then 
   dnl need to change quotes to allow square brackets
   changequote(<<, >>)dnl
-  CFLAGS=`echo $CFLAGS | sed s/-O[1-9]*//`
-  CXXFLAGS=`echo $CXXFLAGS | sed s/-O[1-9]*//`
-  STANDARD_CFLAGS=`echo $STANDARD_CFLAGS | sed s/-O[1-9]*//`
-  LIBRDF_CPPFLAGS=`echo $LIBRDF_CPPFLAGS | sed s/-O[1-9]*//`
-  LIBRDF_EXTERNAL_CPPFLAGS=`echo $LIBRDF_EXTERNAL_CPPFLAGS | sed s/-O[1-9]*//`
-  LIBRDF_INTERNAL_CPPFLAGS=`echo $LIBRDF_INTERNAL_CPPFLAGS | sed s/-O[1-9]*//`
+  CFLAGS=`echo $CFLAGS | sed -e "/-O[A-Za-z0-9]*//"`
+  CXXFLAGS=`echo $CXXFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
+  STANDARD_CFLAGS=`echo $STANDARD_CFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
+  LIBRDF_CPPFLAGS=`echo $LIBRDF_CPPFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
+  LIBRDF_EXTERNAL_CPPFLAGS=`echo $LIBRDF_EXTERNAL_CPPFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
+  LIBRDF_INTERNAL_CPPFLAGS=`echo $LIBRDF_INTERNAL_CPPFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
   changequote([, ])dnl
 fi
 
