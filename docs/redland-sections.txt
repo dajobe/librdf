@@ -121,6 +121,7 @@ librdf_list_foreach
 <FILE>model</FILE>
 librdf_model
 librdf_model_factory
+librdf_model_enumerate
 librdf_new_model
 librdf_new_model_with_options
 librdf_new_model_from_model
@@ -492,6 +493,7 @@ librdf_files_temporary_file_name
 <SECTION>
 <FILE>unused</FILE>
 REDLAND_API
+librdf_basename
 librdf_concepts_index
 librdf_concept_ms_namespace_uri
 librdf_concept_schema_namespace_uri
