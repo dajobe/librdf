@@ -91,7 +91,7 @@ void librdf_system_free(void *ptr);
   if(condition) { \
     LIBRDF_ASSERT_REPORT(msg) \
     LIBRDF_ASSERT_DIE \
-    return(ret); \
+    return ret; \
   } \
 } while(0)
 
@@ -107,7 +107,7 @@ void librdf_system_free(void *ptr);
   if(!pointer) { \
     LIBRDF_ASSERT_REPORT("object pointer of type " #type " is NULL.") \
     LIBRDF_ASSERT_DIE \
-    return(ret); \
+    return ret; \
   } \
 } while(0)
 
