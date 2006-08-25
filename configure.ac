@@ -1041,7 +1041,7 @@ fi
 if test "$USE_MAINTAINER_MODE" = yes -a $release_version = no; then 
   dnl need to change quotes to allow square brackets
   changequote(<<, >>)dnl
-  CFLAGS=`echo $CFLAGS | sed -e "/-O[A-Za-z0-9]*//"`
+  CFLAGS=`echo $CFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
   CXXFLAGS=`echo $CXXFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
   STANDARD_CFLAGS=`echo $STANDARD_CFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
   LIBRDF_CPPFLAGS=`echo $LIBRDF_CPPFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
