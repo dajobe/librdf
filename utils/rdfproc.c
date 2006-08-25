@@ -1328,7 +1328,7 @@ main(int argc, char *argv[])
     librdf_free_query(query);
 
   if(free_uri_string)
-    SYSTEM_FREE(uri_string);
+    free(uri_string);
 
   if(output_model) {
     if(librdf_serializer_serialize_model_to_file_handle(output_serializer, 
