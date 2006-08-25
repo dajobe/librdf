@@ -114,6 +114,10 @@ redland.3: redland.pod
 	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @PACKAGE_VERSION@" $< | \
 	sed -e "s;REDLAND_VERSION_STRING;@PACKAGE_VERSION@;" > $@
 	rm -f pod2htm*
+else
+redland.3: redland.pod
+	@echo "Creating fake $@ since maintainer mode is not enabled"
+	touch $@
 endif
 
 README: README.html
