@@ -532,7 +532,7 @@ librdf_new_node_from_typed_literal(librdf_world *world,
  * @world: redland world object
  * @identifier: blank node identifier or NULL
  *
- * Constructor - create a new literal #librdf_node object from a blank node identifier.
+ * Constructor - create a new blank node #librdf_node object from a blank node identifier.
  *
  * If no identifier string is given, creates a new internal identifier
  * and assigns it.
