@@ -38,6 +38,9 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#endif
 
 #include <redland.h>
 
@@ -386,8 +389,13 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
 
   fh=fopen(name, "w+");
-  if(!fh)
+  if(!fh) {
+    librdf_log(serializer->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER,
+               NULL, "failed to open file '%s' for writing - %s",
+               name, strerror(errno));
     return 1;
+  }
+  
   status=librdf_serializer_serialize_model_to_file_handle(serializer, fh, 
                                                           base_uri, model);
   fclose(fh);
