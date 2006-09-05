@@ -85,6 +85,9 @@ typedef struct {
   /* if a table with merged models should be maintained */
   int merge;
 
+  /* if mysql MYSQL_OPT_RECONNECT should be set on new connections */
+  int reconnect;
+
   /* digest object for node hashes */
   librdf_digest *digest;
 
@@ -333,6 +336,13 @@ librdf_storage_mysql_get_handle(librdf_storage* storage)
   /* Initialize closed MySQL connection handle */
   connection->handle=mysql_init(connection->handle);
 
+#ifdef MYSQL_OPT_RECONNECT
+  if(1) {
+    my_bool value=(context->reconnect) ? 1 : 0;
+    mysql_options(connection->handle, MYSQL_OPT_RECONNECT, &value);
+  }
+#endif
+
   /* Create connection to database for handle */
   if(!mysql_real_connect(connection->handle,
                          context->host, context->user, context->password,
@@ -472,6 +482,9 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
 
   /* Maintain merge table? */
   context->merge=(librdf_hash_get_as_boolean(options, "merge")>0);
+
+  /* Reconnect? */
+  context->reconnect=(librdf_hash_get_as_boolean(options, "reconnect")>0);
 
   /* Initialize MySQL connections */
   librdf_storage_mysql_init_connections(storage);
