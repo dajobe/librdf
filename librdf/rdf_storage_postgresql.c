@@ -162,7 +162,7 @@ typedef struct {
 } librdf_storage_postgresql_get_contexts_context;
 
 static u64 librdf_storage_postgresql_hash(librdf_storage* storage, char *type,
-                                          char *string, int length);
+                                          const char *string, int length);
 static u64 librdf_storage_postgresql_node_hash(librdf_storage* storage,
                                                librdf_node* node,int add);
 static int librdf_storage_postgresql_start_bulk(librdf_storage* storage);
@@ -201,7 +201,7 @@ static void librdf_storage_postgresql_get_contexts_finished(void* context);
  **/
 static u64
 librdf_storage_postgresql_hash(librdf_storage* storage, char *type,
-                          char *string, int length)
+                               const char *string, int length)
 {
   librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
   u64 hash;
