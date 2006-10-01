@@ -611,28 +611,28 @@ main(int argc, char *argv[])
         }
       } else {
         /* either CMD_PARSE_STREAM or it's a parse into context */
+        count=0;
         if(!(stream=librdf_parser_parse_as_stream(parser, uri, base_uri))) {
           fprintf(stderr, "%s: Failed to parse RDF as stream\n", program);
           rc=1;
-        }
-        
-        count=0;
-        while(!librdf_stream_end(stream)) {
-          librdf_statement *statement=librdf_stream_get_object(stream);
-          if(!statement) {
-            fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
-            break;
-          }
+        } else {
+          while(!librdf_stream_end(stream)) {
+            librdf_statement *statement=librdf_stream_get_object(stream);
+            if(!statement) {
+              fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
+              break;
+            }
           
-          if(target)  /* context node */
-            librdf_model_context_add_statement(model, target, statement);
-          else
-            librdf_model_add_statement(model, statement);
-          count++;
-          librdf_stream_next(stream);
+            if(target)  /* context node */
+              librdf_model_context_add_statement(model, target, statement);
+            else
+              librdf_model_add_statement(model, statement);
+            count++;
+            librdf_stream_next(stream);
+          }
+          librdf_free_stream(stream);  
         }
-        librdf_free_stream(stream);  
-        
+
         if(target) {
           librdf_free_node(target);
           target=NULL;
