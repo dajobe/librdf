@@ -579,13 +579,16 @@ main(int argc, char *argv[])
               (argc > 1) ? argv[1] : "default");
       
       if(argc >= 3 && argv[2]) {
-        base_uri=librdf_new_uri(world, (const unsigned char *)argv[2]);
-        if(!base_uri) {
-          fprintf(stderr, "%s: Failed to create base URI from %s\n", program, argv[2]);
-          break;
+        base_uri=NULL;
+        if(strcmp(argv[2], "-")) {
+          base_uri=librdf_new_uri(world, (const unsigned char *)argv[2]);
+          if(!base_uri) {
+            fprintf(stderr, "%s: Failed to create base URI from %s\n", program, argv[2]);
+            break;
+          }
         }
         fprintf(stderr, "%s: Using base URI %s\n", program,
-                librdf_uri_as_string(base_uri));
+                (base_uri ? (const char*)librdf_uri_as_string(base_uri) : "NULL"));
 
         target=NULL; /* context node */
         if(argc >= 4 && argv[3]) {
@@ -595,7 +598,7 @@ main(int argc, char *argv[])
             target=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
         }
         fprintf(stderr, "%s: Using context node %s\n", program,
-                argv[3]);
+                (argv[3] ? argv[3] : "NULL"));
       } else
         base_uri=librdf_new_uri_from_uri(uri);
 
@@ -676,7 +679,8 @@ main(int argc, char *argv[])
       
       librdf_free_parser(parser);
       librdf_free_uri(uri);
-      librdf_free_uri(base_uri);
+      if(base_uri)
+        librdf_free_uri(base_uri);
       break;
 
     case CMD_SERIALIZE:
