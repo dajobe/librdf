@@ -1130,24 +1130,27 @@ librdf_parser_raptor_constructor(librdf_world *world)
   /* enumerate from parser 1, so the default parser 0 is done last */
   for(i=1; 1; i++) {
     const char *syntax_name=NULL;
+    const char *syntax_label=NULL;
     const char *mime_type=NULL;
     const unsigned char *uri_string=NULL;
 
-    if(raptor_syntaxes_enumerate(i, &syntax_name, NULL, 
+    if(raptor_syntaxes_enumerate(i, &syntax_name, &syntax_label, 
                                  &mime_type, &uri_string)) {
       /* reached the end of the parsers, now register the default one */
       i=0;
-      raptor_syntaxes_enumerate(i, &syntax_name, NULL,
+      raptor_syntaxes_enumerate(i, &syntax_name, &syntax_label,
                                 &mime_type, &uri_string);
     }
 
     if(!strcmp(syntax_name, "rdfxml")) {
       /* legacy name - see librdf_parser_raptor_init */
-      librdf_parser_register_factory(world, "raptor", mime_type, uri_string,
+      librdf_parser_register_factory(world, "raptor", NULL,
+                                     mime_type, uri_string,
                                      &librdf_parser_raptor_register_factory);
     }
 
-    librdf_parser_register_factory(world, syntax_name, mime_type, uri_string,
+    librdf_parser_register_factory(world, syntax_name, syntax_label,
+                                   mime_type, uri_string,
                                    &librdf_parser_raptor_register_factory);
 
     if(!i) /* registered default parser, end */
