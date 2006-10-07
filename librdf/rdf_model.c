@@ -222,9 +222,6 @@ librdf_model_enumerate(librdf_world* world,
 {
   librdf_model_factory *factory;
   
-  if(counter < 0)
-    return 1;
-
   factory=(librdf_model_factory*)raptor_sequence_get_at(world->models,
                                                         counter);
   if(!factory)
