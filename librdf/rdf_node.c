@@ -1664,10 +1664,10 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_node *node, *node2, *node3, *node4, *node5, *node6, *node7;
-  char *hp_string1="http://purl.org/net/dajobe/";
-  char *hp_string2="http://purl.org/net/dajobe/";
-  char *lit_string="Dave Beckett";
-  char *genid="genid42";
+  const char *hp_string1="http://purl.org/net/dajobe/";
+  const char *hp_string2="http://purl.org/net/dajobe/";
+  const char *lit_string="Dave Beckett";
+  const char *genid="genid42";
   librdf_uri *uri, *uri2;
   int size, size2;
   unsigned char *buffer;
