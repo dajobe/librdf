@@ -82,6 +82,7 @@ static int librdf_list_iterator_next_method(void* iterator);
 static void* librdf_list_iterator_get_method(void* iterator, int flags);
 static void librdf_list_iterator_finished(void* iterator);
 
+static void librdf_list_iterators_replace_node(librdf_list* list, librdf_list_iterator_context* old_node, librdf_list_iterator_context* new_node);
 
 
 /* helper functions */
@@ -276,6 +277,8 @@ librdf_list_remove(librdf_list* list, void *data)
     /* not found */
     return NULL;
 
+  librdf_list_iterators_replace_node(list, node, node->next);
+  
   if(node == list->first)
     list->first=node->next;
   if(node->prev)
@@ -469,6 +472,28 @@ librdf_list_remove_iterator_context(librdf_list* list,
   LIBRDF_DEBUG4("Removed iterator %p from list %p leaving %d iterators\n",
                 node->iterator, list, list->iterator_count);
 }
+
+
+static void
+librdf_list_iterators_replace_node(librdf_list* list, 
+                                   librdf_list_iterator_context* old_node,
+                                   librdf_list_iterator_context* new_node)
+{
+  librdf_list_iterator_context *node, *next;
+  
+  if(!list->iterator_count)
+    return;
+  
+  for(node=list->first_iterator; node; node=next) {
+    next=node->next;
+    if(node->current == old_node) {
+      LIBRDF_DEBUG4("Moved iterator %p from node %p to node %p\n",
+                    node->iterator, old_node, new_node);
+      node->current=new_node;
+    }
+  }
+}
+
 
 
 /**
