@@ -47,8 +47,37 @@
 
 #ifndef STANDALONE
 
-/* prototypes for helper functions */
-static void librdf_delete_serializer_factories(librdf_world *world);
+/**
+ * librdf_init_serializer:
+ * @world: redland world object
+ *
+ * INTERNAL - Initialise the librdf_serializer class.
+ *
+ **/
+void
+librdf_init_serializer(librdf_world *world) 
+{
+  librdf_serializer_raptor_constructor(world);
+}
+
+
+/**
+ * librdf_finish_serializer:
+ * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_serializer class.
+ *
+ **/
+void
+librdf_finish_serializer(librdf_world *world) 
+{
+  raptor_free_sequence(world->serializers);
+  world->serializers=NULL;
+
+#ifdef HAVE_RAPTOR_RDF_SERIALIZER
+  librdf_serializer_raptor_destructor();
+#endif
+}
 
 
 /* helper functions */
@@ -56,25 +85,14 @@ static void
 librdf_free_serializer_factory(librdf_serializer_factory *factory) 
 {
   if(factory->name)
-    LIBRDF_FREE(librdf_serializer_factory, factory->name);
+    LIBRDF_FREE(cstring, factory->name);
+  if(factory->label)
+    LIBRDF_FREE(cstring, factory->label);
   if(factory->mime_type)
-    LIBRDF_FREE(librdf_serializer_factory, factory->mime_type);
+    LIBRDF_FREE(cstring, factory->mime_type);
   if(factory->type_uri)
     librdf_free_uri(factory->type_uri);
   LIBRDF_FREE(librdf_serializer_factory, factory);
-}
-
-
-static void
-librdf_delete_serializer_factories(librdf_world *world)
-{
-  librdf_serializer_factory *factory, *next;
-  
-  for(factory=world->serializers; factory; factory=next) {
-    next=factory->next;
-    librdf_free_serializer_factory(factory);
-  }
-  world->serializers=NULL;
 }
 
 
@@ -82,6 +100,7 @@ librdf_delete_serializer_factories(librdf_world *world)
  * librdf_serializer_register_factory:
  * @world: redland world object
  * @name: the name of the serializer
+ * @label: the label of the serializer (optional)
  * @mime_type: MIME type of the syntax (optional)
  * @uri_string: URI of the syntax (optional)
  * @factory: function to be called to register the factor parameters
@@ -91,40 +110,55 @@ librdf_delete_serializer_factories(librdf_world *world)
  **/
 void
 librdf_serializer_register_factory(librdf_world *world,
-                                   const char *name, const char *mime_type,
+                                   const char *name, const char *label,
+                                   const char *mime_type,
                                    const unsigned char *uri_string,
                                    void (*factory) (librdf_serializer_factory*))
 {
-  librdf_serializer_factory *serializer_factory;
+  librdf_serializer_factory *serializer;
   char *name_copy;
+  char *label_copy;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for serializer %s\n", name);
 #endif
   
-  serializer_factory=(librdf_serializer_factory*)LIBRDF_CALLOC(librdf_serializer_factory, 1,
-					       sizeof(librdf_serializer_factory));
-  if(!serializer_factory)
+  if(!world->serializers)
+    world->serializers=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_serializer_factory, NULL);
+  
+  serializer=(librdf_serializer_factory*)LIBRDF_CALLOC(librdf_serializer_factory, 1,
+                                                       sizeof(librdf_serializer_factory));
+  if(!serializer)
     LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
   if(!name_copy) {
-    librdf_free_serializer_factory(serializer_factory);
+    librdf_free_serializer_factory(serializer);
     LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
   }
   strcpy(name_copy, name);
-  serializer_factory->name=name_copy;
+  serializer->name=name_copy;
 
+  if(label) {
+    label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+    if(!label_copy) {
+      librdf_free_serializer_factory(serializer);
+      LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
+    }
+    strcpy(label_copy, label);
+    serializer->label=label_copy;
+  }
+        
   /* register mime type if any */
   if(mime_type) {
     char *mime_type_copy;
     mime_type_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
     if(!mime_type_copy) {
-      librdf_free_serializer_factory(serializer_factory);
+      librdf_free_serializer_factory(serializer);
       LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
     }
     strcpy(mime_type_copy, mime_type);
-    serializer_factory->mime_type=mime_type_copy;
+    serializer->mime_type=mime_type_copy;
   }
 
   /* register URI if any */
@@ -133,24 +167,22 @@ librdf_serializer_register_factory(librdf_world *world,
 
     uri=librdf_new_uri(world, uri_string);
     if(!uri) {
-      librdf_free_serializer_factory(serializer_factory);
+      librdf_free_serializer_factory(serializer);
       LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
     }
-    serializer_factory->type_uri=uri;
+    serializer->type_uri=uri;
   }
   
         
   /* Call the serializer registration function on the new object */
-  (*factory)(serializer_factory);
+  (*factory)(serializer);
 
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3("%s has context size %d\n", name, serializer_factory->context_length);
+  LIBRDF_DEBUG3("%s has context size %d\n", name, serializer->context_length);
 #endif
   
-  serializer_factory->next = world->serializers;
-  world->serializers = serializer_factory;
-  
+  raptor_sequence_push(world->serializers, serializer);
 }
 
 
@@ -186,13 +218,17 @@ librdf_get_serializer_factory(librdf_world *world,
 
   /* return 1st serializer if no particular one wanted */
   if(!name && !mime_type && !type_uri) {
-    factory=world->serializers;
+    factory=(librdf_serializer_factory*)raptor_sequence_get_at(world->serializers, 0);
     if(!factory) {
       LIBRDF_DEBUG1("No serializers available\n");
       return NULL;
     }
   } else {
-    for(factory=world->serializers; factory; factory=factory->next) {
+    int i;
+    
+    for(i=0;
+        (factory=(librdf_serializer_factory*)raptor_sequence_get_at(world->serializers, i));
+        i++) {
       /* next if name does not match */
       if(name && strcmp(factory->name, name))
 	continue;
@@ -223,6 +259,37 @@ librdf_get_serializer_factory(librdf_world *world,
   }
   
   return factory;
+}
+
+
+/**
+ * librdf_serializer_enumerate:
+ * @world: redland world object
+ * @counter: index into the list of serializers
+ * @name: pointer to store the name of the serializer (or NULL)
+ * @label: pointer to store syntax readable label (or NULL)
+ *
+ * Get information on serializers.
+ * 
+ * Return value: non 0 on failure of if counter is out of range
+ **/
+int
+librdf_serializer_enumerate(librdf_world* world,
+                        const unsigned int counter,
+                        const char **name, const char **label)
+{
+  librdf_serializer_factory *factory;
+  
+  factory=(librdf_serializer_factory*)raptor_sequence_get_at(world->serializers,
+                                                         counter);
+  if(!factory)
+    return 1;
+  
+  if(name)
+    *name=factory->name;
+  if(label)
+    *label=factory->label;
+  return 0;
 }
 
 
@@ -481,34 +548,6 @@ librdf_serializer_serialize_model_to_iostream(librdf_serializer* serializer,
                                                           iostr);
 }
 
-
-
-/**
- * librdf_init_serializer:
- * @world: redland world object
- *
- * INTERNAL - Initialise the librdf_serializer class.
- *
- **/
-void
-librdf_init_serializer(librdf_world *world) 
-{
-  librdf_serializer_raptor_constructor(world);
-}
-
-
-/**
- * librdf_finish_serializer:
- * @world: redland world object
- *
- * INTERNAL - Terminate the librdf_serializer class.
- *
- **/
-void
-librdf_finish_serializer(librdf_world *world) 
-{
-  librdf_delete_serializer_factories(world);
-}
 
 
 /**
