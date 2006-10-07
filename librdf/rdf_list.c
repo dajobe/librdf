@@ -527,6 +527,7 @@ librdf_list_iterator_next_method(void* iterator)
   return (context->current == NULL);
 }
 
+
 static void*
 librdf_list_iterator_get_method(void* iterator, int flags) 
 {
@@ -544,6 +545,7 @@ librdf_list_iterator_get_method(void* iterator, int flags)
              "Unsupported iterator method flag %d", flags);
   return NULL;
 }
+
 
 static void
 librdf_list_iterator_finished(void* iterator)
