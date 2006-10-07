@@ -735,6 +735,7 @@ main(int argc, char *argv[])
     librdf_stream *stream=NULL;
     size_t length=strlen((const char*)file_content[i]);
     int size;
+    char *accept_h;
 
     if(i>0)
       break;
@@ -761,6 +762,14 @@ main(int argc, char *argv[])
       goto tidy_test;
     }
 
+
+    accept_h=librdf_parser_get_accept_header(parser);
+    if(accept_h) {
+      fprintf(stderr, "%s: Parser accept header: '%s'\n", program, accept_h);
+      free(accept_h);
+    } else
+      fprintf(stderr, "%s: Parser has no accept header\n", program);
+    
 
     fprintf(stderr, "%s: Adding %s counted string content as stream\n", 
             program, type);
