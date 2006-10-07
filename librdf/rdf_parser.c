@@ -648,7 +648,7 @@ librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature,
 
 /**
  * librdf_parser_get_accept_header:
- * @rdf_parser: parser
+ * @parser: parser
  * 
  * Get an HTTP Accept value for the parser.
  *
