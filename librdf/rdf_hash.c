@@ -501,7 +501,7 @@ librdf_free_hash(librdf_hash* hash)
  * Return value: non 0 on failure
  **/
 int
-librdf_hash_open(librdf_hash* hash, char *identifier,
+librdf_hash_open(librdf_hash* hash, const char *identifier,
                  int mode, int is_writable, int is_new,
                  librdf_hash* options) 
 {
@@ -1188,13 +1188,13 @@ librdf_hash_print_keys(librdf_hash* hash, FILE *fh)
  *
  **/
 void
-librdf_hash_print_values(librdf_hash* hash, char *key_string, FILE *fh)
+librdf_hash_print_values(librdf_hash* hash, const char *key_string, FILE *fh)
 {
   librdf_hash_datum *key, *value;
   librdf_iterator* iterator;
   int first=1;
   
-  key=librdf_new_hash_datum(hash->world, key_string, strlen(key_string));
+  key=librdf_new_hash_datum(hash->world, (char*)key_string, strlen(key_string));
   if(!key)
     return;
   
@@ -1587,15 +1587,15 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_hash *h, *h2, *ch;
-  char *test_hash_types[]={"bdb", "memory", NULL};
-  char *test_hash_values[]={"colour","yellow", /* Made in UK, can you guess? */
+  const char *test_hash_types[]={"bdb", "memory", NULL};
+  const char *test_hash_values[]={"colour","yellow", /* Made in UK, can you guess? */
 			    "age", "new",
 			    "size", "large",
                             "colour", "green",
 			    "fruit", "banana",
                             "colour", "yellow",
 			    NULL, NULL};
-  char *test_duplicate_key="colour";
+  const char *test_duplicate_key="colour";
   const char *test_hash_array[]={"shape", "cube",
                                  "sides", "6", /* for testing get as long */
                                  "3d", "yes", /* testing bool */
@@ -1604,9 +1604,9 @@ main(int argc, char *argv[])
                                  "creator", "rubik",
                                  NULL};
   const char * const test_hash_string="field1='value1', field2='\\'value2', field3='\\\\', field4='\\\\\\'', field5 = 'a' ";
-  char *test_hash_delete_key="size";
+  const char *test_hash_delete_key="size";
   int i,j;
-  char *type;
+  const char *type;
   librdf_hash_datum hd_key, hd_value; /* on stack */
   const char *program=librdf_basename((const char*)argv[0]);
   int b;
@@ -1654,8 +1654,8 @@ main(int argc, char *argv[])
     
     
     for(j=0; test_hash_values[j]; j+=2) {
-      hd_key.data=test_hash_values[j];
-      hd_value.data=test_hash_values[j+1];
+      hd_key.data=(char*)test_hash_values[j];
+      hd_value.data=(char*)test_hash_values[j+1];
       fprintf(stdout, "%s: Adding key/value pair: %s=%s\n", program,
 	      (char*)hd_key.data, (char*)hd_value.data);
       
@@ -1670,7 +1670,7 @@ main(int argc, char *argv[])
     }
     
     fprintf(stdout, "%s: Deleting key '%s'\n", program, test_hash_delete_key);
-    hd_key.data=test_hash_delete_key;
+    hd_key.data=(char*)test_hash_delete_key;
     hd_key.size=strlen((char*)hd_key.data);
     librdf_hash_delete_all(h, &hd_key);
     
