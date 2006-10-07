@@ -71,6 +71,7 @@ struct librdf_parser_factory_s
   librdf_stream* (*parse_string_as_stream)(void *_context, const unsigned char *string, librdf_uri *base_uri);
   int (*parse_counted_string_into_model)(void *_context, const unsigned char *string, size_t length, librdf_uri* base_uri, librdf_model *model);
   librdf_stream* (*parse_counted_string_as_stream)(void *_context, const unsigned char *string, size_t length, librdf_uri *base_uri);
+  char* (*get_accept_header)(void* context);
 };
 
 
