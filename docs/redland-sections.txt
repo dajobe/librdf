@@ -212,6 +212,7 @@ librdf_node_static_iterator_create
 <FILE>parser</FILE>
 librdf_parser
 librdf_parser_factory
+librdf_parser_enumerate
 librdf_parser_register_factory
 librdf_new_parser
 librdf_new_parser_from_factory
@@ -228,6 +229,7 @@ LIBRDF_PARSER_FEATURE_ERROR_COUNT
 LIBRDF_PARSER_FEATURE_WARNING_COUNT
 librdf_parser_get_feature
 librdf_parser_set_feature
+librdf_parser_get_accept_header
 </SECTION>
 
 <SECTION>
@@ -273,6 +275,7 @@ librdf_query_results_get_boolean
 <FILE>serializer</FILE>
 librdf_serializer
 librdf_serializer_factory
+librdf_serializer_enumerate
 librdf_serializer_register_factory
 librdf_new_serializer
 librdf_new_serializer_from_factory
