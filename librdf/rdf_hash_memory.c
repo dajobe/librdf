@@ -116,7 +116,7 @@ static void librdf_hash_memory_cursor_finish(void* context);
 
 static int librdf_hash_memory_create(librdf_hash* new_hash, void* context);
 static int librdf_hash_memory_destroy(void* context);
-static int librdf_hash_memory_open(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
+static int librdf_hash_memory_open(void* context, const char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 static int librdf_hash_memory_close(void* context);
 static int librdf_hash_memory_clone(librdf_hash* new_hash, void *new_context, char *new_identifier, void* old_context);
 static int librdf_hash_memory_values_count(void *context);
@@ -380,7 +380,7 @@ librdf_hash_memory_destroy(void* context)
  * Return value: non 0 on failure
  **/
 static int
-librdf_hash_memory_open(void* context, char *identifier,
+librdf_hash_memory_open(void* context, const char *identifier,
                         int mode, int is_writable, int is_new,
                         librdf_hash* options) 
 {
