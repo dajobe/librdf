@@ -50,7 +50,8 @@ typedef struct librdf_list_node_s librdf_list_node;
 
 
 struct librdf_list_iterator_context_s {
-  librdf_list *list;
+  librdf_iterator* iterator;
+  librdf_list* list;
   librdf_list_node *current;
   struct librdf_list_iterator_context_s* next;
   struct librdf_list_iterator_context_s* prev;
@@ -65,7 +66,9 @@ struct librdf_list_s
   librdf_list_node* last;
   int length;
   int (*equals) (void* data1, void *data2);
-  librdf_list_iterator_context* iterators;
+  int iterator_count;
+  librdf_list_iterator_context* first_iterator;
+  librdf_list_iterator_context* last_iterator;
 };
 
 #ifdef __cplusplus
