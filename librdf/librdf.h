@@ -63,6 +63,14 @@ extern "C" {
 #endif
 
 
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+#define REDLAND_PRINTF_FORMAT(string_index, first_to_check_index) \
+  __attribute__((__format__(__printf__, string_index, first_to_check_index)))
+#else
+#define REDLAND_PRINTF_FORMAT(string_index, first_to_check_index)
+#endif
+
+
 /* Public typedefs (references to private structures) */
 
 /**
