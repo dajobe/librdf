@@ -73,7 +73,7 @@ static void librdf_hash_bdb_cursor_finish(void* context);
 /* prototypes for local functions */
 static int librdf_hash_bdb_create(librdf_hash* hash, void* context);
 static int librdf_hash_bdb_destroy(void* context);
-static int librdf_hash_bdb_open(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
+static int librdf_hash_bdb_open(void* context, const char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 static int librdf_hash_bdb_close(void* context);
 static int librdf_hash_bdb_clone(librdf_hash* new_hash, void *new_context, char *new_identifier, void* old_context);
 static int librdf_hash_bdb_values_count(void *context);
@@ -138,7 +138,7 @@ librdf_hash_bdb_destroy(void* context)
  * Return value: non 0 on failure.
  **/
 static int
-librdf_hash_bdb_open(void* context, char *identifier, 
+librdf_hash_bdb_open(void* context, const char *identifier, 
                      int mode, int is_writable, int is_new,
                      librdf_hash* options) 
 {
