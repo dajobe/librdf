@@ -197,7 +197,7 @@ int
 main(int argc, char *argv[]) 
 {
   const char *test_names[]={"test", "abc123", "99997", NULL};
-  const char *name;
+  char *name;
   int n;
   int rc=0;
   
@@ -205,7 +205,7 @@ main(int argc, char *argv[])
 
   const char *program=librdf_basename((const char*)argv[0]);
 
-  for(n=0; (name=test_names[n]); n++) {
+  for(n=0; (name=(char*)test_names[n]); n++) {
     int i;
     
 #if LIBRDF_DEBUG > 1
@@ -230,7 +230,7 @@ main(int argc, char *argv[])
 #endif
       
       if(name != test_names[n])
-        LIBRDF_FREE(cstring, name);
+        LIBRDF_FREE(cstring, (char*)name);
       /* copy them over */
       name=new_name;
     }
