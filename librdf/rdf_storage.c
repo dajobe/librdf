@@ -239,6 +239,7 @@ librdf_get_storage_factory(librdf_world* world, const char *name)
 
 /**
  * librdf_storage_enumerate:
+ * @world: redland world object
  * @counter: index into the list of storages
  * @name: pointer to store the name of the storage (or NULL)
  * @label: pointer to store syntax readable label (or NULL)
