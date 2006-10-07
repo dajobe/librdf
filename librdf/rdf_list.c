@@ -40,6 +40,7 @@
 
 #include <redland.h>
 
+#include <rdf_list_internal.h>
 
 /* prototypes for local functions */
 static librdf_list_node* librdf_list_find_node(librdf_list* list, void *data);
@@ -103,6 +104,9 @@ librdf_new_list(librdf_world *world)
 void
 librdf_free_list(librdf_list* list) 
 {
+  LIBRDF_ASSERT_RETURN(list->iterators,
+                       "Iterators were active on freeing list", );
+
   librdf_list_clear(list);
   LIBRDF_FREE(librdf_list, list);
 }
@@ -394,12 +398,6 @@ librdf_list_set_equals(librdf_list* list,
   list->equals=equals;
 }
 
-
-
-typedef struct {
-  librdf_list *list;
-  librdf_list_node *current;
-} librdf_list_iterator_context;
 
 
 /**
