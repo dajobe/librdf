@@ -435,7 +435,6 @@ librdf_serializer_raptor_serialize_model_to_iostream(void *context,
                                                      librdf_model *model,
                                                      raptor_iostream* iostr)
 {
-  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
   int rc=0;
   librdf_stream *stream;
   
