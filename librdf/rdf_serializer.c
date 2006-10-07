@@ -671,9 +671,9 @@ int
 main(int argc, char *argv[]) 
 {
   const char *program=librdf_basename((const char*)argv[0]);
-  char *test_serializer_types[]={"rdfxml", "ntriples", NULL};
+  const char *test_serializer_types[]={"rdfxml", "ntriples", NULL};
   int i;
-  char *type;
+  const char *type;
   unsigned char *string;
   size_t string_length;
   librdf_world *world;
