@@ -39,6 +39,8 @@ struct librdf_parser_factory_s
   struct librdf_parser_factory_s* next;
   /* syntax name - required */
   char *name;
+  /* syntax label */
+  char *label;
   /* handle this MIME type/ Internet Media Type - optional */
   char *mime_type;
   /* handles the syntax defined by this URI - optional */
