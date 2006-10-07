@@ -161,7 +161,8 @@ typedef struct {
   char **row;
 } librdf_storage_postgresql_get_contexts_context;
 
-static u64 librdf_storage_postgresql_hash(librdf_storage* storage, char *type,
+static u64 librdf_storage_postgresql_hash(librdf_storage* storage, 
+                                          const char *type,
                                           const char *string, int length);
 static u64 librdf_storage_postgresql_node_hash(librdf_storage* storage,
                                                librdf_node* node,int add);
@@ -170,7 +171,7 @@ static int librdf_storage_postgresql_stop_bulk(librdf_storage* storage);
 static int librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
                                                                   u64 ctxt,
                                                                   librdf_statement* statement);
-static int librdf_storage_postgresql_find_statements_in_context_augment_query(char **query, char *addition);
+static int librdf_storage_postgresql_find_statements_in_context_augment_query(char **query, const char *addition);
 
 /* methods for stream of statements */
 static int librdf_storage_postgresql_find_statements_in_context_end_of_stream(void* context);
@@ -200,7 +201,7 @@ static void librdf_storage_postgresql_get_contexts_finished(void* context);
  * Return value: Non-zero on succes.
  **/
 static u64
-librdf_storage_postgresql_hash(librdf_storage* storage, char *type,
+librdf_storage_postgresql_hash(librdf_storage* storage, const char *type,
                                const char *string, int length)
 {
   librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
@@ -380,7 +381,7 @@ librdf_storage_postgresql_release_handle(librdf_storage* storage, PGconn *handle
     }
   }
   librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-             "Unable to find busy connection (in pool of %i connections) to drop for postgresql server thread: %lu",
+             "Unable to find busy connection (in pool of %i connections) to drop for postgresql server thread: %d",
              context->connections_count, PQbackendPID(handle));
 }
 
@@ -1697,7 +1698,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
 
 
 static int
-librdf_storage_postgresql_find_statements_in_context_augment_query(char **query, char *addition)
+librdf_storage_postgresql_find_statements_in_context_augment_query(char **query, const char *addition)
 {
   char *newquery;
 
