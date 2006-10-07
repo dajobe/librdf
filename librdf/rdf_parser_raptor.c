@@ -1072,6 +1072,25 @@ librdf_raptor_uri_as_counted_string(void *context, raptor_uri *uri, size_t *len_
 }
 
 
+static char*
+librdf_parser_raptor_get_accept_header(void* context) 
+{
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+  const char* accept;
+  char* r_accept;
+  size_t length=strlen(accept);
+  
+  accept=raptor_parser_get_accept_header(pcontext->rdf_parser);
+  if(!accept)
+    return NULL;
+  
+  r_accept=LIBRDF_MALLOC(cstring, length+1);
+  strncpy(r_accept, accept, length+1);
+  raptor_free_memory(accept);
+  
+  return r_accept;
+}
+
 
 static raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_new_uri,
@@ -1109,6 +1128,7 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
   factory->parse_counted_string_into_model = librdf_parser_raptor_parse_counted_string_into_model;
   factory->get_feature = librdf_parser_raptor_get_feature;
   factory->set_feature = librdf_parser_raptor_set_feature;
+  factory->get_accept_header = librdf_parser_raptor_get_accept_header;
 }
 
 
