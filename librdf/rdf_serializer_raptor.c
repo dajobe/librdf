@@ -252,16 +252,14 @@ librdf_serializer_raptor_warning_handler(void *data, raptor_locator *locator,
 
 
 static int
-librdf_serializer_raptor_serialize_model_to_file_handle(void *context,
-                                                        FILE *handle, 
-                                                        librdf_uri* base_uri,
-                                                        librdf_model *model) 
+librdf_serializer_raptor_serialize_stream_to_file_handle(void *context,
+                                                         FILE *handle, 
+                                                         librdf_uri* base_uri,
+                                                         librdf_stream *stream) 
 {
   librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
   int rc=0;
-  librdf_stream *stream;
 
-  stream=librdf_model_as_stream(model);
   if(!stream)
     return 1;
 
@@ -284,7 +282,6 @@ librdf_serializer_raptor_serialize_model_to_file_handle(void *context,
                                                  statement);
     librdf_stream_next(stream);
   }
-  librdf_free_stream(stream);
   raptor_serialize_end(scontext->rdf_serializer);
 
   return 0;
@@ -292,10 +289,31 @@ librdf_serializer_raptor_serialize_model_to_file_handle(void *context,
 
 
 
+static int
+librdf_serializer_raptor_serialize_model_to_file_handle(void *context,
+                                                        FILE *handle, 
+                                                        librdf_uri* base_uri,
+                                                        librdf_model *model) 
+{
+  int rc;
+  librdf_stream *stream;
+
+  stream=librdf_model_as_stream(model);
+  if(!stream)
+    return 1;
+  rc=librdf_serializer_raptor_serialize_stream_to_file_handle(context, handle,
+                                                              base_uri, stream);
+  librdf_free_stream(stream);
+
+  return rc;
+}
+
+
+
 static unsigned char*
-librdf_serializer_raptor_serialize_model_to_counted_string(void *context,
+librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
                                                            librdf_uri* base_uri,
-                                                           librdf_model *model,
+                                                           librdf_stream *stream,
                                                            size_t* length_p)
 {
   librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
@@ -303,9 +321,7 @@ librdf_serializer_raptor_serialize_model_to_counted_string(void *context,
   unsigned char *string=NULL;
   size_t string_length=0;
   int rc=0;
-  librdf_stream *stream;
 
-  stream=librdf_model_as_stream(model);
   if(!stream)
     return NULL;
 
@@ -321,7 +337,6 @@ librdf_serializer_raptor_serialize_model_to_counted_string(void *context,
                             (raptor_uri*)base_uri, iostr);
 
   if(rc) {
-    librdf_free_stream(stream);    
     raptor_free_iostream(iostr);
     return NULL;
   }
@@ -339,13 +354,78 @@ librdf_serializer_raptor_serialize_model_to_counted_string(void *context,
                                                  statement);
     librdf_stream_next(stream);
   }
-  librdf_free_stream(stream);
   raptor_serialize_end(scontext->rdf_serializer);
 
   if(length_p)
     *length_p=string_length;
   
   return string;
+}
+
+
+static unsigned char*
+librdf_serializer_raptor_serialize_model_to_counted_string(void *context,
+                                                           librdf_uri* base_uri,
+                                                           librdf_model *model,
+                                                           size_t* length_p)
+{
+  unsigned char *string=NULL;
+  librdf_stream *stream;
+
+  stream=librdf_model_as_stream(model);
+  if(!stream)
+    return NULL;
+
+  string=librdf_serializer_raptor_serialize_stream_to_counted_string(context,
+                                                                     base_uri,
+                                                                     stream,
+                                                                     length_p);
+  librdf_free_stream(stream);
+  
+  return string;
+}
+
+
+static int
+librdf_serializer_raptor_serialize_stream_to_iostream(void *context,
+                                                     librdf_uri* base_uri,
+                                                     librdf_stream *stream,
+                                                     raptor_iostream* iostr)
+{
+  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
+  int rc=0;
+  
+  if(!iostr)
+    return 1;
+  
+  if(!stream)
+    return 1;
+
+  /* start the serialize */
+  rc=raptor_serialize_start(scontext->rdf_serializer, 
+                            (raptor_uri*)base_uri, iostr);
+
+  if(rc) {
+    raptor_free_iostream(iostr);
+    return 1;
+  }
+    
+  scontext->errors=0;
+  scontext->warnings=0;
+  raptor_serializer_set_error_handler(scontext->rdf_serializer, scontext, 
+                                      librdf_serializer_raptor_error_handler);
+  raptor_serializer_set_warning_handler(scontext->rdf_serializer, scontext, 
+                                        librdf_serializer_raptor_warning_handler);
+    
+  while(!librdf_stream_end(stream)) {
+    librdf_statement *statement=librdf_stream_get_object(stream);
+    librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
+                                                 statement);
+    librdf_stream_next(stream);
+  }
+  raptor_serialize_end(scontext->rdf_serializer);
+
+  return 0;
 }
 
 
@@ -365,34 +445,12 @@ librdf_serializer_raptor_serialize_model_to_iostream(void *context,
   stream=librdf_model_as_stream(model);
   if(!stream)
     return 1;
-
-  /* start the serialize */
-  rc=raptor_serialize_start(scontext->rdf_serializer, 
-                            (raptor_uri*)base_uri, iostr);
-
-  if(rc) {
-    librdf_free_stream(stream);    
-    raptor_free_iostream(iostr);
-    return 1;
-  }
-    
-  scontext->errors=0;
-  scontext->warnings=0;
-  raptor_serializer_set_error_handler(scontext->rdf_serializer, scontext, 
-                                      librdf_serializer_raptor_error_handler);
-  raptor_serializer_set_warning_handler(scontext->rdf_serializer, scontext, 
-                                        librdf_serializer_raptor_warning_handler);
-    
-  while(!librdf_stream_end(stream)) {
-    librdf_statement *statement=librdf_stream_get_object(stream);
-    librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
-                                                 statement);
-    librdf_stream_next(stream);
-  }
+  rc=librdf_serializer_raptor_serialize_stream_to_iostream(context,
+                                                           base_uri,
+                                                           stream, iostr);
   librdf_free_stream(stream);
-  raptor_serialize_end(scontext->rdf_serializer);
 
-  return 0;
+  return rc;
 }
 
 
@@ -415,8 +473,11 @@ librdf_serializer_raptor_register_factory(librdf_serializer_factory *factory)
   factory->set_feature = librdf_serializer_raptor_set_feature;
   factory->set_namespace = librdf_serializer_raptor_set_namespace;
 
+  factory->serialize_stream_to_file_handle= librdf_serializer_raptor_serialize_stream_to_file_handle;
   factory->serialize_model_to_file_handle = librdf_serializer_raptor_serialize_model_to_file_handle;
+  factory->serialize_stream_to_counted_string = librdf_serializer_raptor_serialize_stream_to_counted_string;
   factory->serialize_model_to_counted_string = librdf_serializer_raptor_serialize_model_to_counted_string;
+  factory->serialize_stream_to_iostream = librdf_serializer_raptor_serialize_stream_to_iostream;
   factory->serialize_model_to_iostream = librdf_serializer_raptor_serialize_model_to_iostream;
 }
 
