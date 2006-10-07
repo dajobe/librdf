@@ -418,8 +418,10 @@ librdf_list_add_iterator_context(librdf_list* list,
     list->first_iterator=node;
 
   list->iterator_count++;
+#if LIBRDF_DEBUG > 2
   LIBRDF_DEBUG4("Added iterator %p to list %p giving %d iterators\n",
                 node->iterator, list, list->iterator_count);
+#endif
 }
 
 
@@ -438,8 +440,10 @@ librdf_list_remove_iterator_context(librdf_list* list,
     node->next_ic->prev_ic=node->prev_ic;
 
   list->iterator_count--;
+#if LIBRDF_DEBUG > 2
   LIBRDF_DEBUG4("Removed iterator %p from list %p leaving %d iterators\n",
                 node->iterator, list, list->iterator_count);
+#endif
 }
 
 
@@ -456,8 +460,10 @@ librdf_list_iterators_replace_node(librdf_list* list,
   for(node=list->first_iterator; node; node=next) {
     next=node->next_ic;
     if(node->next == old_node) {
+#if LIBRDF_DEBUG > 2
       LIBRDF_DEBUG4("Moved iterator %p from node %p to node %p\n",
                     node->iterator, old_node, new_node);
+#endif
       node->next=new_node;
     }
   }
