@@ -80,7 +80,7 @@ struct librdf_hash_factory_s {
   int (*destroy)(void* context);
 
   /* open/create hash with identifier and options  */
-  int (*open)(void* context, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
+  int (*open)(void* context, const char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
   /* end hash association */
   int (*close)(void* context);
 
@@ -134,7 +134,7 @@ librdf_hash* librdf_new_hash_from_factory(librdf_world *world, librdf_hash_facto
 /* methods */
 
 /* open/create hash with identifier and options  */
-int librdf_hash_open(librdf_hash* hash, char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
+int librdf_hash_open(librdf_hash* hash, const char *identifier, int mode, int is_writable, int is_new, librdf_hash* options);
 /* end hash association */
 int librdf_hash_close(librdf_hash* hash);
 
