@@ -1772,7 +1772,7 @@ main(int argc, char *argv[])
   const char *program=librdf_basename((const char*)argv[0]);
   /* initialise dependent modules - all of them! */
   librdf_world *world=librdf_new_world();
-  librdf_iterator* iterator;
+  librdf_iterator *iterator, *second_iterator;
   librdf_node *n1, *n2;
   int count;
   int expected_count;
@@ -1780,6 +1780,7 @@ main(int argc, char *argv[])
   librdf_uri* base_uri;
   unsigned char *string;
   size_t string_length=0;
+  int remove_count=0;
 
   librdf_world_open(world);
   
@@ -2017,6 +2018,94 @@ main(int argc, char *argv[])
   librdf_free_uri(base_uri);
   free(string);
   fprintf(stderr, "%s: Serialized OK\n", program);
+
+
+#define TEST_SIMILAR_COUNT 9
+
+  /* add some similar statements */
+  fprintf(stderr, "%s: Adding %d similar statements\n", program, TEST_SIMILAR_COUNT);
+  for(i=0; i < TEST_SIMILAR_COUNT; i++) {
+    char literal[6];
+    strncpy(literal, "DaveX", 6);
+    literal[4]='0'+i;
+    statement=librdf_new_statement(world);
+    librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/"));
+    librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"));
+    librdf_statement_set_object(statement, librdf_new_node_from_literal(world, (const unsigned char*)literal, NULL, 0));
+    
+    librdf_model_add_statement(model, statement);
+    librdf_free_statement(statement);
+  }
+
+  /* targets */
+  fprintf(stderr, "%s: iterating similar statements\n", program);
+  n1=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/");
+  n2=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator");
+  iterator=librdf_model_get_targets(model, n1, n2);
+  if(!iterator) {
+    fprintf(stderr, "%s: librdf_model_get_targets failed\n", program);
+    exit(1);
+  }
+
+  fprintf(stderr, "%s: iterating similar statements again\n", program);
+  second_iterator=librdf_model_get_targets(model, n1, n2);
+
+  /* Deleting 2 statements but only 1 before counting */
+  expected_count= TEST_SIMILAR_COUNT - 1;
+  for(count=0;
+      !librdf_iterator_end(iterator); 
+      librdf_iterator_next(iterator), librdf_iterator_next(second_iterator), count++) {
+    librdf_node* n;
+    char literal[6];
+
+    if(count == 2 ) {
+      strncpy(literal, "DaveX", 6);
+      literal[4]='0'+count;
+      statement=librdf_new_statement(world);
+      librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/"));
+      librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"));
+      librdf_statement_set_object(statement, librdf_new_node_from_literal(world, (const unsigned char*)literal, NULL, 0));
+
+      fprintf(stderr, "%s: Removing statement with literal '%s'\n",
+              program, literal);
+      
+      librdf_model_remove_statement(model, statement);
+      librdf_free_statement(statement);
+      remove_count++;
+    }
+  
+    n=(librdf_node*)librdf_iterator_get_object(iterator);
+    fputs("  ", stderr);
+    librdf_node_print(n, stderr);
+    fputs("\n", stderr);
+
+    if(count == 5 ) {
+      strncpy(literal, "DaveX", 6);
+      literal[4]='0'+count+remove_count;
+      statement=librdf_new_statement(world);
+      librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/"));
+      librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"));
+      librdf_statement_set_object(statement, librdf_new_node_from_literal(world, (const unsigned char*)literal, NULL, 0));
+
+      fprintf(stderr, "%s: Removing statement with literal '%s'\n",
+              program, literal);
+      
+      librdf_model_remove_statement(model, statement);
+      librdf_free_statement(statement);
+      remove_count++;
+    }
+  
+  }
+  librdf_free_iterator(iterator);
+  if(count != expected_count) {
+    fprintf(stderr, "%s: librdf_model_get_targets returned %d nodes, expected %d\n", program, count, expected_count);
+    exit(1);
+  }
+  librdf_free_node(n1);
+  librdf_free_node(n2);
+  
+
+  librdf_free_iterator(second_iterator);
 
   fprintf(stderr, "%s: Freeing URIs and Nodes\n", program);
   for (i=0; i<URI_STRING_COUNT; i++) {
