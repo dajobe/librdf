@@ -65,8 +65,8 @@ struct librdf_world_s
   /* Sequence of parser factories */
   raptor_sequence* parsers;
 
-  /* List of serializer factories */
-  librdf_serializer_factory* serializers;
+  /* Sequence of serializer factories */
+  raptor_sequence* serializers;
 
   /* List of query factories */
   librdf_query_factory* query_factories;
