@@ -406,6 +406,32 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
 
 
 /**
+ * librdf_serializer_serialize_stream_to_file_handle:
+ * @serializer: the serializer
+ * @handle: file handle to serialize to
+ * @base_uri: the base URI to use (or NULL)
+ * @stream: the #librdf_stream model to use
+ *
+ * Write a #librdf_stream to a FILE*.
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_serializer_serialize_stream_to_file_handle(librdf_serializer* serializer,
+                                                  FILE *handle, 
+                                                  librdf_uri* base_uri,
+                                                  librdf_stream* stream) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(handle, FILE*, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(stream, librdf_stream, 1);
+
+  return serializer->factory->serialize_stream_to_file_handle(serializer->context,
+                                                              handle, base_uri, stream);
+}
+
+
+/**
  * librdf_serializer_serialize_model_to_file_handle:
  * @serializer: the serializer
  * @handle: file handle to serialize to
@@ -428,6 +454,45 @@ librdf_serializer_serialize_model_to_file_handle(librdf_serializer* serializer,
 
   return serializer->factory->serialize_model_to_file_handle(serializer->context,
                                                              handle, base_uri, model);
+}
+
+
+/**
+ * librdf_serializer_serialize_stream_to_file:
+ * @serializer: the serializer
+ * @name: filename to serialize to
+ * @base_uri: the base URI to use (or NULL)
+ * @stream: the #librdf_stream stream to use
+ *
+ * Write a #librdf_stream to a file.
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_serializer_serialize_stream_to_file(librdf_serializer* serializer,
+                                           const char *name, 
+                                           librdf_uri* base_uri,
+                                           librdf_stream* stream) 
+{
+  FILE* fh;
+  int status;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, string, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(stream, librdf_stream, 1);
+
+  fh=fopen(name, "w+");
+  if(!fh) {
+    librdf_log(serializer->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER,
+               NULL, "failed to open file '%s' for writing - %s",
+               name, strerror(errno));
+    return 1;
+  }
+  
+  status=librdf_serializer_serialize_stream_to_file_handle(serializer, fh, 
+                                                           base_uri, stream);
+  fclose(fh);
+  return status;
 }
 
 
@@ -471,6 +536,36 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
 
 
 /**
+ * librdf_serializer_serialize_stream_to_counted_string:
+ * @serializer: the serializer
+ * @base_uri: the base URI to use (or NULL)
+ * @stream: the #librdf_stream stream to use
+ * @length_p: pointer to store length or NULL
+ *
+ * Write a #librdf_stream to a counted string.
+ * 
+ * Return value: non 0 on failure
+ **/
+unsigned char*
+librdf_serializer_serialize_stream_to_counted_string(librdf_serializer* serializer,
+                                                     librdf_uri* base_uri,
+                                                     librdf_stream* stream,
+                                                     size_t* length_p) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(stream, librdf_stream, NULL);
+
+  if(length_p)
+    *length_p=0;
+  
+  return serializer->factory->serialize_stream_to_counted_string(serializer->context,
+                                                                 base_uri,
+                                                                 stream,
+                                                                 length_p);
+}
+
+
+/**
  * librdf_serializer_serialize_model_to_counted_string:
  * @serializer: the serializer
  * @base_uri: the base URI to use (or NULL)
@@ -500,6 +595,31 @@ librdf_serializer_serialize_model_to_counted_string(librdf_serializer* serialize
 
 
 /**
+ * librdf_serializer_serialize_stream_to_string:
+ * @serializer: the serializer
+ * @base_uri: the base URI to use (or NULL)
+ * @stream: the #librdf_stream stream to use
+ *
+ * Write a #librdf_stream to a string.
+ * 
+ * Return value: NULL on failure
+ **/
+unsigned char*
+librdf_serializer_serialize_stream_to_string(librdf_serializer* serializer,
+                                             librdf_uri* base_uri,
+                                             librdf_stream* stream) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(stream, librdf_stream, NULL);
+
+  return serializer->factory->serialize_stream_to_counted_string(serializer->context,
+                                                                 base_uri,
+                                                                 stream,
+                                                                 NULL);
+}
+
+
+/**
  * librdf_serializer_serialize_model_to_string:
  * @serializer: the serializer
  * @base_uri: the base URI to use (or NULL)
@@ -521,6 +641,33 @@ librdf_serializer_serialize_model_to_string(librdf_serializer* serializer,
                                                                 base_uri, model,
                                                                 NULL);
 }
+
+
+/**
+ * librdf_serializer_serialize_stream_to_iostream:
+ * @serializer: the serializer
+ * @base_uri: the base URI to use (or NULL)
+ * @stream: the #librdf_stream stream to use
+ * @iostr: the #raptor_iostream to write to
+ *
+ * Write a #librdf_stream to a #raptor_iostream.
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_serializer_serialize_stream_to_iostream(librdf_serializer* serializer,
+                                              librdf_uri* base_uri,
+                                              librdf_stream *stream,
+                                              raptor_iostream* iostr)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(stream, librdf_stream, 1);
+
+  return serializer->factory->serialize_stream_to_iostream(serializer->context,
+                                                           base_uri, stream,
+                                                           iostr);
+}
+
 
 
 /**
