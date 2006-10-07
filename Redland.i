@@ -144,6 +144,8 @@ void librdf_world_open(librdf_world *world);
 
 %newobject librdf_world_get_feature;
 librdf_node* librdf_world_get_feature(librdf_world* world, librdf_uri *feature);int librdf_world_set_feature(librdf_world* world, librdf_uri *feature, librdf_node* value);
+%newobject librdf_parser_get_accept_header;
+char* librdf_parser_get_accept_header(librdf_parser* parser);
 
 
 /* rdf_iterator.h */
