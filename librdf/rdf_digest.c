@@ -461,15 +461,15 @@ int main(int argc, char *argv[]);
 
 struct t
 {
-  char *type;
-  char *result;
+  const char *type;
+  const char *result;
 };
 
 int
 main(int argc, char *argv[]) 
 {
   librdf_digest* d;
-  char *test_data="http://purl.org/net/dajobe/";
+  const char *test_data="http://purl.org/net/dajobe/";
   struct t test_data_answers[]={
     {"MD5", "80b52def747e8748199c1a0cf66cb35c"},
     {"SHA1", "67d6a7b73504ce5c6b47fd6db9b7c4939bfe5174"},
