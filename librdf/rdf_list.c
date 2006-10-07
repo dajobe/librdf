@@ -445,9 +445,9 @@ librdf_list_add_iterator_context(librdf_list* list,
   if(!list->first_iterator)
     list->first_iterator=node;
 
+  list->iterator_count++;
   LIBRDF_DEBUG4("Added iterator %p to list %p giving %d iterators\n",
                 node->iterator, list, list->iterator_count);
-  list->iterator_count++;
 }
 
 
