@@ -48,7 +48,7 @@
 
 typedef struct 
 {
-  char *name;
+  const char *name;
   int key_fields; /* OR of LIBRDF_STATEMENT_* fields defined in rdf_statement.h */
   int value_fields; /* ditto */
 } librdf_hash_descriptor;
