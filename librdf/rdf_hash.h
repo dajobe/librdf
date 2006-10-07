@@ -77,7 +77,7 @@ void librdf_hash_print(librdf_hash* hash, FILE *fh);
 REDLAND_API
 void librdf_hash_print_keys(librdf_hash* hash, FILE *fh);
 REDLAND_API
-void librdf_hash_print_values(librdf_hash* hash, char *key_string, FILE *fh);
+void librdf_hash_print_values(librdf_hash* hash, const char *key_string, FILE *fh);
 
 #ifdef __cplusplus
 }
