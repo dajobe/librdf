@@ -436,19 +436,20 @@ librdf_serializer_raptor_constructor(librdf_world *world)
   /* enumerate from serializer 1, so the default serializer 0 is done last */
   for(i=1; 1; i++) {
     const char *syntax_name=NULL;
+    const char *syntax_label=NULL;
     const char *mime_type=NULL;
     const unsigned char *uri_string=NULL;
 
-    if(raptor_serializers_enumerate(i, &syntax_name, NULL, 
+    if(raptor_serializers_enumerate(i, &syntax_name, &syntax_label, 
                                     &mime_type, &uri_string)) {
       /* reached the end of the serializers, now register the default one */
       i=0;
-      raptor_serializers_enumerate(i, &syntax_name, NULL,
+      raptor_serializers_enumerate(i, &syntax_name, &syntax_label,
                                    &mime_type, &uri_string);
     }
     
-    librdf_serializer_register_factory(world, syntax_name, mime_type, 
-                                       uri_string,
+    librdf_serializer_register_factory(world, syntax_name, syntax_label,
+                                       mime_type, uri_string,
                                        &librdf_serializer_raptor_register_factory);
 
     if(!i) /* registered default serializer, end */
