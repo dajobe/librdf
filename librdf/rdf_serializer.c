@@ -814,6 +814,14 @@ librdf_serializer_set_namespace(librdf_serializer* serializer,
 
 #ifdef STANDALONE
 
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 /* one more prototype */
 int main(int argc, char *argv[]);
 
@@ -852,6 +860,12 @@ log_handler(void *user_data, librdf_log_message *message)
 #define EXPECTED_ERRORS 3
 #define EXPECTED_WARNINGS 0
 
+#define SYNTAX_TYPE "ntriples"
+#define SYNTAX_CONTENT \
+"<http://purl.org/net/dajobe/> <http://purl.org/dc/elements/1.1/creator> \"Dave Beckett\" .\n" \
+"<http://purl.org/net/dajobe/> <http://purl.org/dc/elements/1.1/description> \"The generic home page of Dave Beckett.\" .\n" \
+"<http://purl.org/net/dajobe/> <http://purl.org/dc/elements/1.1/title> \"Dave Beckett's Home Page\" . \n"
+
 
 int
 main(int argc, char *argv[]) 
@@ -868,6 +882,10 @@ main(int argc, char *argv[])
   librdf_uri* base_uri;
   librdf_statement* statement;
   librdf_serializer* serializer;
+  librdf_parser* parser;
+  librdf_stream* stream;
+  FILE *fh;
+  struct stat st_buf;
 
   world=librdf_new_world();
   librdf_world_open(world);
@@ -925,7 +943,7 @@ main(int argc, char *argv[])
                                                              &string_length);
 #define EXPECTED_BAD_STRING_LENGTH 346
   if(string_length != EXPECTED_BAD_STRING_LENGTH) {
-    fprintf(stderr, "%s: Serialising to RDF/XML returned string '%s' size %d, expected %d\n", program, string,
+    fprintf(stderr, "%s: Serialising model to RDF/XML returned string '%s' size %d, expected %d\n", program, string,
             (int)string_length, EXPECTED_BAD_STRING_LENGTH);
     return 1;
   }
@@ -933,12 +951,10 @@ main(int argc, char *argv[])
   if(string)
     free(string);
 
-  librdf_free_serializer(serializer);
-
-  librdf_free_uri(base_uri);
+  librdf_free_uri(base_uri); base_uri=NULL;
+  librdf_free_model(model); model=NULL;
+  librdf_free_storage(storage); storage=NULL;
   
-  librdf_free_model(model);
-  librdf_free_storage(storage);
 
   if(LogData.errors != EXPECTED_ERRORS) {
     fprintf(stderr, "%s: Serialising to RDF/XML returned %d errors, expected %d\n", program,
@@ -952,6 +968,83 @@ main(int argc, char *argv[])
     return 1;
   }
   
+
+  /* Good model to serialize */
+  storage=librdf_new_storage(world, NULL, NULL, NULL);
+  model=librdf_new_model(world, storage, NULL);
+
+  parser=librdf_new_parser(world, SYNTAX_TYPE, NULL, NULL);
+  if(!parser) {
+    fprintf(stderr, "%s: Failed to create new parser type %s\n", program, 
+            SYNTAX_TYPE);
+    return 1;
+  }
+
+  fprintf(stderr, "%s: Adding %s string content\n", program, SYNTAX_TYPE);
+  if(librdf_parser_parse_string_into_model(parser, 
+                                           (const unsigned char*)SYNTAX_CONTENT,
+                                           NULL /* no base URI*/, 
+                                           model)) {
+    fprintf(stderr, "%s: Failed to parse RDF from %s string into model\n", 
+            SYNTAX_TYPE, program);
+    return 1;
+  }
+  librdf_free_parser(parser);
+  
+
+  serializer=librdf_new_serializer(world, "rdfxml", NULL, NULL);
+
+
+  fprintf(stderr, "%s: Serializing stream to a string\n", program);
+
+  stream=librdf_model_as_stream(model);
+  string_length=0;
+  string=librdf_serializer_serialize_stream_to_counted_string(serializer,
+                                                              NULL, stream,
+                                                              &string_length);
+#define EXPECTED_GOOD_STRING_LENGTH 668
+  if(string_length != EXPECTED_GOOD_STRING_LENGTH) {
+    fprintf(stderr, "%s: Serialising stream to RDF/XML returned string '%s' size %d, expected %d\n", program, string,
+            (int)string_length, EXPECTED_GOOD_STRING_LENGTH);
+    return 1;
+  }
+  librdf_free_stream(stream);
+
+  if(string)
+    free(string);
+
+
+  fprintf(stderr, "%s: Serializing stream to a file handle\n", program);
+
+  stream=librdf_model_as_stream(model);
+
+#define FILENAME "test.rdf"
+  fh=fopen(FILENAME, "w");
+  if(!fh) {
+    fprintf(stderr, "%s: Failed to fopen for writing '%s' - %s\n",
+            program, FILENAME, strerror(errno));
+    return 1;
+  }
+  librdf_serializer_serialize_stream_to_file_handle(serializer, fh, NULL, 
+                                                    stream);
+  fclose(fh);
+  stat(FILENAME, &st_buf);
+  
+  if((int)st_buf.st_size != EXPECTED_GOOD_STRING_LENGTH) {
+    fprintf(stderr, "%s: Serialising stream to file handle returned file '%s' of size %d bytes, expected %d\n", program, FILENAME, (int)st_buf.st_size, 
+            EXPECTED_GOOD_STRING_LENGTH);
+    return 1;
+  }
+  unlink(FILENAME);
+  
+  librdf_free_stream(stream);
+
+
+  librdf_free_serializer(serializer); serializer=NULL;
+  librdf_free_model(model); model=NULL;
+  librdf_free_storage(storage); storage=NULL;
+
+
   librdf_free_world(world);
   
   /* keep gcc -Wall happy */
