@@ -572,7 +572,7 @@ main(int argc, char *argv[])
   librdf_uri* format_uri;
   size_t string_length;
   unsigned char *string;
-  char *query_string=QUERY_STRING;
+  const char *query_string=QUERY_STRING;
 
   world=librdf_new_world();
   librdf_world_open(world);
