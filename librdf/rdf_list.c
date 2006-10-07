@@ -40,38 +40,7 @@
 
 #include <redland.h>
 
-
-/* private structure */
-struct librdf_list_node_s
-{
-  struct librdf_list_node_s* next;
-  struct librdf_list_node_s* prev;
-  void *data;
-};
-typedef struct librdf_list_node_s librdf_list_node;
-
-
-struct librdf_list_iterator_context_s {
-  librdf_iterator* iterator;
-  librdf_list* list;
-  librdf_list_node *current;
-  struct librdf_list_iterator_context_s* next;
-  struct librdf_list_iterator_context_s* prev;
-};
-
-typedef struct librdf_list_iterator_context_s librdf_list_iterator_context;
-
-struct librdf_list_s
-{
-  librdf_world *world;
-  librdf_list_node* first;
-  librdf_list_node* last;
-  int length;
-  int (*equals) (void* data1, void *data2);
-  int iterator_count;
-  librdf_list_iterator_context* first_iterator;
-  librdf_list_iterator_context* last_iterator;
-};
+#include <rdf_list_internal.h>
 
 
 /* prototypes for local functions */
@@ -82,7 +51,7 @@ static int librdf_list_iterator_next_method(void* iterator);
 static void* librdf_list_iterator_get_method(void* iterator, int flags);
 static void librdf_list_iterator_finished(void* iterator);
 
-static void librdf_list_iterators_replace_node(librdf_list* list, librdf_list_iterator_context* old_node, librdf_list_iterator_context* new_node);
+static void librdf_list_iterators_replace_node(librdf_list* list, librdf_list_node* old_node, librdf_list_node* new_node);
 
 
 /* helper functions */
@@ -476,8 +445,8 @@ librdf_list_remove_iterator_context(librdf_list* list,
 
 static void
 librdf_list_iterators_replace_node(librdf_list* list, 
-                                   librdf_list_iterator_context* old_node,
-                                   librdf_list_iterator_context* new_node)
+                                   librdf_list_node* old_node,
+                                   librdf_list_node* new_node)
 {
   librdf_list_iterator_context *node, *next;
   
