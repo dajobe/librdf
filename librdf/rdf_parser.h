@@ -91,6 +91,8 @@ REDLAND_API
 librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
 REDLAND_API
 int librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature, librdf_node* value);
+REDLAND_API
+char* librdf_parser_get_accept_header(librdf_parser* parser);
 
 #ifdef __cplusplus
 }
