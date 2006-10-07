@@ -42,7 +42,10 @@ extern "C" {
 
 /* class methods */
 REDLAND_API
-void librdf_serializer_register_factory(librdf_world *world, const char *name, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_serializer_factory*));
+void librdf_serializer_register_factory(librdf_world *world, const char *name, const char *label, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_serializer_factory*));
+
+REDLAND_API
+int librdf_serializer_enumerate(librdf_world* world, const unsigned int counter, const char **name, const char **label);
 
 /* constructor */
 REDLAND_API
