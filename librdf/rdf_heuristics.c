@@ -196,8 +196,8 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  char *test_names[]={"test", "abc123", "99997", NULL};
-  char *name;
+  const char *test_names[]={"test", "abc123", "99997", NULL};
+  const char *name;
   int n;
   int rc=0;
   
