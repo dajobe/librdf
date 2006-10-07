@@ -92,7 +92,7 @@ enum command_type {
 typedef struct
 {
   enum command_type type;
-  char *name;
+  const char *name;
   int min_args; /* min args needed? */
   int max_args; /* max args needed? */
   int write; /* write to db? */
