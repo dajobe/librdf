@@ -1297,7 +1297,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
           librdf_log(node->world,
                      0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
                      "Cannot encode a URI string of %d bytes length",
-                     string_length);
+                     (int)string_length);
         return 0;
       }
 
@@ -1331,7 +1331,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
         librdf_log(node->world,
                    0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
                    "Cannot encode a literal string of %d bytes length",
-                   string_length);
+                   (int)string_length);
         return 0;
       }
 
@@ -1339,7 +1339,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
         librdf_log(node->world,
                    0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
                    "Cannot encode a datatype URI string of %d bytes length",
-                   datatype_uri_length);
+                   (int)datatype_uri_length);
         return 0;
       }
 
@@ -1347,7 +1347,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
         librdf_log(node->world,
                    0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
                    "Cannot encode a language string of %d bytes length",
-                   language_length);
+                   (int)language_length);
         return 0;
       }
 
@@ -1384,7 +1384,7 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
         librdf_log(node->world,
                    0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
                    "Cannot encode a blank node identifier string of %d bytes length",
-                   string_length);
+                   (int)string_length);
         return 0;
       }
 
