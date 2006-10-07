@@ -207,6 +207,7 @@ librdf_get_model_factory(librdf_world* world, const char *name)
 
 /**
  * librdf_model_enumerate:
+ * @world: redland world object
  * @counter: index into the list of models
  * @name: pointer to store the name of the model (or NULL)
  * @label: pointer to store syntax readable label (or NULL)
