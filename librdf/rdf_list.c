@@ -408,8 +408,8 @@ librdf_list_add_iterator_context(librdf_list* list,
                                  librdf_list_iterator_context* node)
 {
   if(list->last_iterator) {
-    node->prev=list->last_iterator;
-    list->last_iterator->next=node;
+    node->prev_ic=list->last_iterator;
+    list->last_iterator->next_ic=node;
   }
 
   list->last_iterator=node;
@@ -428,14 +428,14 @@ librdf_list_remove_iterator_context(librdf_list* list,
                                     librdf_list_iterator_context* node)
 {
   if(node == list->first_iterator)
-    list->first_iterator=node->next;
-  if(node->prev)
-    node->prev->next=node->next;
+    list->first_iterator=node->next_ic;
+  if(node->prev_ic)
+    node->prev_ic->next_ic=node->next_ic;
 
   if(node == list->last_iterator)
-    list->last_iterator=node->prev;
-  if(node->next)
-    node->next->prev=node->prev;
+    list->last_iterator=node->prev_ic;
+  if(node->next_ic)
+    node->next_ic->prev_ic=node->prev_ic;
 
   list->iterator_count--;
   LIBRDF_DEBUG4("Removed iterator %p from list %p leaving %d iterators\n",
@@ -454,11 +454,11 @@ librdf_list_iterators_replace_node(librdf_list* list,
     return;
   
   for(node=list->first_iterator; node; node=next) {
-    next=node->next;
-    if(node->current == old_node) {
+    next=node->next_ic;
+    if(node->next == old_node) {
       LIBRDF_DEBUG4("Moved iterator %p from node %p to node %p\n",
                     node->iterator, old_node, new_node);
-      node->current=new_node;
+      node->next=new_node;
     }
   }
 }
@@ -485,6 +485,7 @@ librdf_list_get_iterator(librdf_list* list)
 
   context->list=list;
   context->current=list->first;
+  context->next=context->current ? context->current->next  : NULL;
 
   iterator=librdf_new_iterator(list->world, 
                                (void*)context,
@@ -522,8 +523,9 @@ librdf_list_iterator_next_method(void* iterator)
   if(!node)
     return 1;
   
-  context->current = node->next;
-
+  context->current = context->next;
+  context->next = context->current ? context->current->next : NULL;
+  
   return (context->current == NULL);
 }
 
