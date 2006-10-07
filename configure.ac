@@ -409,7 +409,7 @@ LIBS="$LIBRDF_LIBS"
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h getopt.h)
+AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h sys/stat.h getopt.h)
 AC_HEADER_TIME
 
 dnl Checks for typedefs, structures, and compiler characteristics.
