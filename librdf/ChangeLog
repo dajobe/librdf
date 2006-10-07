@@ -1,4 +1,209 @@
+2006-10-07  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_serializer_raptor.c:
+	(librdf_serializer_raptor_constructor): Grab and register the
+	label with librdf_serializer_register_factory.
+
+	* librdf/rdf_serializer_internal.h: struct
+	librdf_serializer_factory_s gains label field
+
+	* librdf/rdf_serializer.h: librdf_parser_register_factory gains
+	Add label arg.  Added librdf_serializer_enumerate prototype
+
+	* librdf/rdf_serializer.c: Replace world->serializers with
+	raptor_sequence of parsers.
+	(librdf_serializer_register_factory): Add label arg.
+
+	* librdf/rdf_init_internal.h: struct librdf_world_s field
+	serializers is now a raptor_sequence
+
+	* librdf/rdf_init_internal.h: struct librdf_world_s field parsers
+	is now a raptor_sequence
+
+	* librdf/rdf_parser_internal.h: struct librdf_parser_factory_s
+	gains label field.
+
+	* librdf/rdf_parser.h: librdf_parser_register_factory gains Add
+	label arg. Added librdf_parser_enumerate prototype
+
+	* librdf/rdf_parser_raptor.c: (librdf_parser_raptor_constructor):
+	Grab and register the label with librdf_parser_register_factory.
+
+	* librdf/rdf_parser.c: Replace world->parsers with raptor_sequence
+	of parsers
+	(librdf_parser_register_factory): Add label arg.
+
+	* librdf/rdf_list.c: Less debugging of list iterator changes
+
+2006-10-06  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_node.c: cast
+
+	* librdf/rdf_model.c: (test): During an iteration delete the
+	current triple item and the next triple item.
+
+	* librdf/rdf_list.c: Rename iterator_context fields to next_ic,
+	prev_ic. Store next pointer and use that to handle deleting the
+	next item.
+
+	* librdf/rdf_list_internal.h: Rename fields to next_ic, prev_ic
+
+	* librdf/rdf_list.c: Move structs to rdf_list_iternal.h
+
+	* librdf/rdf_list_internal.h: Add iterator contexts
+
+	* librdf/rdf_list.c: Added librdf_list_iterators_replace_node to
+	move iterators past deleted nodes.
+
+	* librdf/rdf_list.c: *** empty log message ***
+
+	* librdf/rdf_list.c: Moved internal structs here.
+	(librdf_list_add_iterator_context,
+	librdf_list_remove_iterator_context): Added.
+	(librdf_list_get_iterator): Add to list of iterators with
+	librdf_list_add_iterator_context on success.
+	(librdf_list_iterator_finished): Remove from list of iterators
+
+	* librdf/rdf_storage.c: autodocs
+
+	* librdf/rdf_model.c: autodocs
+
+	* librdf/rdf_list.c: (librdf_free_list): Warn if iterators were
+	running at exit.
+
+	* librdf/rdf_list_internal.h: Add struct librdf_list_iterator_context_s
+
+	* librdf/rdf_internal.h: Remove rdf_list_internal.h
+
+	* librdf/rdf_parser_raptor.c: statements field is now a dynamic
+	librdf_list*
+
+	* librdf/rdf_heuristics.c: statements field is now a dynamic
+	librdf_list*
+
+	* librdf/rdf_parser.c: (librdf_parser_parse_as_stream,
+	librdf_parser_parse_into_model): Allow NULL base_uri
+	(librdf_parser_parse_string_as_stream,
+	librdf_parser_parse_string_into_model,
+	librdf_parser_parse_counted_string_as_stream,
+	librdf_parser_parse_counted_string_into_model): Allow NULL
+	base_uri, remove assertion failure.
+	(main): Add const and count failures.
+
+	* librdf/rdf_parser_raptor.c: Changes to allow NULL base uris in
+	parsing, but to fail if it is omitted but required.
+	(librdf_parser_raptor_new_statement_handler): Incoming URIs are
+	always absolute so just use librdf_new_node_from_uri.
+	(librdf_parser_raptor_parse_file_handle_as_stream): Fail if
+	base_uri is NULL but required.
+	(librdf_parser_raptor_parse_as_stream_common): Fail if base_uri is
+	NULL but required.  Report fopen failure as an error.
+	(librdf_parser_raptor_parse_uri_into_model_common): docs allowing
+	NULL base_uri.
+	(librdf_parser_raptor_parse_into_model_common): Fail if base_uri
+	is NULL but required.
+	(librdf_parser_raptor_parse_uri_into_model): docs allowing NULL
+	base_uri.
+
+	* librdf/rdf_heuristics.c: const in test data
+
+	* librdf/rdf_node.c: const in test data
+
+	* librdf/rdf_storage_postgresql.c: (librdf_storage_postgresql_hash):
+	Take const type, string.
+
+	* librdf/rdf_storage_mysql.c: (librdf_storage_mysql_hash): Take
+	const type, string.
+
+	* librdf/rdf_storage_hashes.c: const in test data
+
+	* librdf/rdf_storage.c: (librdf_storage_enumerate): Do not check
+	unsigned int < 0
+
+	* librdf/rdf_serializer.c: const in test data
+
+	* librdf/rdf_query_results.c: (librdf_query_results_to_file): log
+	fopen failure error
+
+	* librdf/rdf_query.c: const in test data
+
+	* librdf/rdf_model.c: (librdf_model_enumerate): Do not check
+	unsigned int < 0
+
+	* librdf/rdf_log_internal.h: librdf_log prototype takes
+	REDLAND_PRINTF_FORMAT
+
+	* librdf/rdf_hash_internal.h: librdf_hash factory method open Take
+	const identifier. librdf_hash_open prototype changed to take const
+	identifier
+
+	* librdf/rdf_hash_memory.c: (librdf_hash_memory_open): Take const
+	identifier.
+
+	* librdf/rdf_hash_bdb.c: (librdf_hash_bdb_open): Take const identifier.
+
+	* librdf/rdf_hash.h: Change librdf_hash_print_values prototype to
+	take const key_string.
+
+	* librdf/rdf_hash.c: (librdf_hash_open, librdf_hash_print_values):
+	Take const identifier, key_string. const in test data
+
+	* librdf/rdf_digest.c: const in test data
+
+	* librdf/librdf.h: Added REDLAND_PRINT_FORMAT
+
+2006-09-10  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_sqlite.c: (librdf_storage_sqlite_literal_helper):
+	Move stringbuffer allocation to after sqlite_string_escape so if
+	it fails, no memory is lost.
+	(librdf_storage_sqlite_contains_statement): If
+	librdf_storage_sqlite_statement_operator_helper fails, free the
+	stringbuffer.
+	(librdf_storage_sqlite_context_remove_statement): If
+	librdf_storage_sqlite_statement_operator_helper fails, free the
+	stringbuffer.  Fixes issue #0000116
+	http://bugs.librdf.org/mantis/view.php?id=116
+
+2006-09-04  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_serializer.c:
+	(librdf_serializer_serialize_model_to_file): Report an error when
+	failed to fopen to create a file.
+
+	*
+	librdf/rdf_storage_postgresql.c: (librdf_storage_postgresql_hash):
+	Take const char* string arg.
+
+
+	* librdf/rdf_storage_mysql.c: Add mysql reconnect option
+
+2006-08-26  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_node.c: (librdf_new_node_from_blank_identifier): Autodocs
+	Fixes issue#00001114 http://bugs.librdf.org/mantis/view.php?id=114
+
+2006-08-20  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_internal.h: tweak debug macros
+
+2006-08-16  Dave Beckett  <dave@dajobe.org>
+
+	*
+	librdf/rdf_storage.c: (librdf_storage_context_remove_statements):
+	Doc fix
+
+2006-08-11  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_query_rasqal.c: (rasqal_redland_new_triples_source):
+	Do not die if a sequence of data graphs is found, instead empty
+	the sequence of data graphs.
+
 2006-07-29  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_heuristics.c, librdf/rdf_heuristics.h: Add some more
+	const fixes.  Fixes Issue #0000107
+	http://bugs.librdf.org/mantis/view.php?id=107
 
 	* librdf/rdf_init_internal.h: struct librdf_world_s gains
 	raptor_sequence of models
