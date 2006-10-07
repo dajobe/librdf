@@ -254,9 +254,6 @@ librdf_storage_enumerate(librdf_world* world,
 {
   librdf_storage_factory *factory;
   
-  if(counter < 0)
-    return 1;
-
   factory=(librdf_storage_factory*)raptor_sequence_get_at(world->storages,
                                                           counter);
   if(!factory)
