@@ -86,7 +86,7 @@ typedef struct {
    * sequence is empty := current=NULL and librdf_list_size(statements)=0
    */
   librdf_statement* current; /* current statement */
-  librdf_list statements;   /* STATIC following statements after current */
+  librdf_list* statements;
 } librdf_parser_raptor_stream_context;
 
 
@@ -252,7 +252,7 @@ librdf_parser_raptor_new_statement_handler(void *context,
     librdf_model_add_statement(scontext->model, statement);
     librdf_free_statement(statement);
   } else
-    librdf_list_add(&scontext->statements, statement);
+    librdf_list_add(scontext->statements, statement);
 }
 
 
@@ -311,8 +311,8 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
     }
 
     /* parsing found at least 1 statement, return */
-    if(librdf_list_size(&context->statements)) {
-      context->current=(librdf_statement*)librdf_list_pop(&context->statements);
+    if(librdf_list_size(context->statements)) {
+      context->current=(librdf_statement*)librdf_list_pop(context->statements);
       status=1;
       break;
     }
@@ -386,6 +386,8 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   if(!scontext)
     return NULL;
 
+  scontext->statements=librdf_new_list(world);
+  
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
   
@@ -515,6 +517,8 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   if(!scontext)
     return NULL;
 
+  scontext->statements=librdf_new_list(pcontext->parser->world);
+
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
   
@@ -572,7 +576,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   
 
   /* get first statement, else is empty */
-  scontext->current=(librdf_statement*)librdf_list_pop(&scontext->statements);
+  scontext->current=(librdf_statement*)librdf_list_pop(scontext->statements);
 
   stream=librdf_new_stream(pcontext->parser->world,
                            (void*)scontext,
@@ -833,7 +837,7 @@ librdf_parser_raptor_serialise_end_of_stream(void* context)
 {
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)context;
 
-  return (!scontext->current && !librdf_list_size(&scontext->statements));
+  return (!scontext->current && !librdf_list_size(scontext->statements));
 }
 
 
@@ -855,7 +859,7 @@ librdf_parser_raptor_serialise_next_statement(void* context)
 
   /* get another statement if there is one */
   while(!scontext->current) {
-    scontext->current=(librdf_statement*)librdf_list_pop(&scontext->statements);
+    scontext->current=(librdf_statement*)librdf_list_pop(scontext->statements);
     if(scontext->current)
       break;
   
@@ -925,13 +929,15 @@ librdf_parser_raptor_serialise_finished(void* context)
     if(scontext->base_uri)
       librdf_free_uri(scontext->base_uri); 
  
-    while((statement=(librdf_statement*)librdf_list_pop(&scontext->statements)))
-      librdf_free_statement(statement);
-    librdf_list_clear(&scontext->statements);
+    if(scontext->statements) {
+      while((statement=(librdf_statement*)librdf_list_pop(scontext->statements)))
+        librdf_free_statement(statement);
+      librdf_free_list(scontext->statements);
+    }
 
     if(scontext->fh && scontext->close_fh)
       fclose(scontext->fh); 
- 
+
     LIBRDF_FREE(librdf_parser_raptor_context, scontext);
   }
 }
