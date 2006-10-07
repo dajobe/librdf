@@ -43,6 +43,9 @@ struct librdf_serializer_factory_s
   /* factory name - required */
   char *name;
 
+  /* factory label */
+  char *label;
+
   /* serialize to this MIME type/ Internet Media Type - optional */
   char *mime_type;
 
