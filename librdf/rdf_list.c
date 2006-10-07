@@ -40,7 +40,39 @@
 
 #include <redland.h>
 
-#include <rdf_list_internal.h>
+
+/* private structure */
+struct librdf_list_node_s
+{
+  struct librdf_list_node_s* next;
+  struct librdf_list_node_s* prev;
+  void *data;
+};
+typedef struct librdf_list_node_s librdf_list_node;
+
+
+struct librdf_list_iterator_context_s {
+  librdf_iterator* iterator;
+  librdf_list* list;
+  librdf_list_node *current;
+  struct librdf_list_iterator_context_s* next;
+  struct librdf_list_iterator_context_s* prev;
+};
+
+typedef struct librdf_list_iterator_context_s librdf_list_iterator_context;
+
+struct librdf_list_s
+{
+  librdf_world *world;
+  librdf_list_node* first;
+  librdf_list_node* last;
+  int length;
+  int (*equals) (void* data1, void *data2);
+  int iterator_count;
+  librdf_list_iterator_context* first_iterator;
+  librdf_list_iterator_context* last_iterator;
+};
+
 
 /* prototypes for local functions */
 static librdf_list_node* librdf_list_find_node(librdf_list* list, void *data);
@@ -104,7 +136,7 @@ librdf_new_list(librdf_world *world)
 void
 librdf_free_list(librdf_list* list) 
 {
-  LIBRDF_ASSERT_RETURN(list->iterators,
+  LIBRDF_ASSERT_RETURN(list->iterator_count,
                        "Iterators were active on freeing list", );
 
   librdf_list_clear(list);
@@ -399,6 +431,45 @@ librdf_list_set_equals(librdf_list* list,
 }
 
 
+static void
+librdf_list_add_iterator_context(librdf_list* list, 
+                                 librdf_list_iterator_context* node)
+{
+  if(list->last_iterator) {
+    node->prev=list->last_iterator;
+    list->last_iterator->next=node;
+  }
+
+  list->last_iterator=node;
+  
+  if(!list->first_iterator)
+    list->first_iterator=node;
+
+  LIBRDF_DEBUG4("Added iterator %p to list %p giving %d iterators\n",
+                node->iterator, list, list->iterator_count);
+  list->iterator_count++;
+}
+
+
+static void
+librdf_list_remove_iterator_context(librdf_list* list,
+                                    librdf_list_iterator_context* node)
+{
+  if(node == list->first_iterator)
+    list->first_iterator=node->next;
+  if(node->prev)
+    node->prev->next=node->next;
+
+  if(node == list->last_iterator)
+    list->last_iterator=node->prev;
+  if(node->next)
+    node->next->prev=node->prev;
+
+  list->iterator_count--;
+  LIBRDF_DEBUG4("Removed iterator %p from list %p leaving %d iterators\n",
+                node->iterator, list, list->iterator_count);
+}
+
 
 /**
  * librdf_list_get_iterator:
@@ -412,6 +483,7 @@ librdf_iterator*
 librdf_list_get_iterator(librdf_list* list)
 {
   librdf_list_iterator_context* context;
+  librdf_iterator* iterator;
 
   context=(librdf_list_iterator_context*)LIBRDF_CALLOC(librdf_list_iterator_context, 1, sizeof(librdf_list_iterator_context));
   if(!context)
@@ -419,14 +491,21 @@ librdf_list_get_iterator(librdf_list* list)
 
   context->list=list;
   context->current=list->first;
-  
-  return librdf_new_iterator(list->world, 
-                             (void*)context,
-                             librdf_list_iterator_is_end,
-                             librdf_list_iterator_next_method,
-                             librdf_list_iterator_get_method,
-                             librdf_list_iterator_finished);
-  
+
+  iterator=librdf_new_iterator(list->world, 
+                               (void*)context,
+                               librdf_list_iterator_is_end,
+                               librdf_list_iterator_next_method,
+                               librdf_list_iterator_get_method,
+                               librdf_list_iterator_finished);
+
+  if(iterator) {
+    context->iterator=iterator;
+    librdf_list_add_iterator_context(list, context);
+  } else
+    librdf_list_iterator_finished(iterator);
+    
+  return iterator;
 }
 
 
@@ -476,6 +555,9 @@ static void
 librdf_list_iterator_finished(void* iterator)
 {
   librdf_list_iterator_context* context=(librdf_list_iterator_context*)iterator;
+
+  librdf_list_remove_iterator_context(context->list, context);
+
   LIBRDF_FREE(librdf_list_iterator_context, context);
 }
 
