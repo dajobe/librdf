@@ -39,6 +39,9 @@
 #include <sys/types.h>
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for abort() as used in errors */
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#endif
 #endif
 
 #include <redland.h>
@@ -371,8 +374,13 @@ librdf_query_results_to_file(librdf_query_results *query_results,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, string, 1);
 
   fh=fopen(name, "w+");
-  if(!fh)
+  if(!fh) {
+    librdf_log(query_results->query->world, 0, LIBRDF_LOG_ERROR, 
+               LIBRDF_FROM_QUERY, NULL, 
+               "failed to open file '%s' for writing - %s",
+               name, strerror(errno));
     return 1;
+  }
 
   status=librdf_query_results_to_file_handle(query_results, fh, 
                                              format_uri, base_uri);
