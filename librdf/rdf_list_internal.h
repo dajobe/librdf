@@ -35,10 +35,6 @@
 #include <Redland/rdf_iterator.h>
 #endif
 
-#ifdef LIBRDF_INTERNAL
-#include <rdf_list_internal.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,6 +49,15 @@ struct librdf_list_node_s
 typedef struct librdf_list_node_s librdf_list_node;
 
 
+struct librdf_list_iterator_context_s {
+  librdf_list *list;
+  librdf_list_node *current;
+  struct librdf_list_iterator_context_s* next;
+  struct librdf_list_iterator_context_s* prev;
+};
+
+typedef struct librdf_list_iterator_context_s librdf_list_iterator_context;
+
 struct librdf_list_s
 {
   librdf_world *world;
@@ -60,6 +65,7 @@ struct librdf_list_s
   librdf_list_node* last;
   int length;
   int (*equals) (void* data1, void *data2);
+  librdf_list_iterator_context* iterators;
 };
 
 #ifdef __cplusplus
