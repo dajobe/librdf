@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 void librdf_log_simple(librdf_world* world, int code, librdf_log_level level, librdf_log_facility facility, void *locator, const char *message);
-void librdf_log(librdf_world* world, int code, librdf_log_level level, librdf_log_facility facility, void *locator, const char *message, ...);
+void librdf_log(librdf_world* world, int code, librdf_log_level level, librdf_log_facility facility, void *locator, const char *message, ...) REDLAND_PRINTF_FORMAT(6, 7);
 
 void librdf_fatal(librdf_world* world, int facility, const char *file, int line, const char *function, const char *message);
 
