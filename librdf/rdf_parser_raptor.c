@@ -1078,15 +1078,15 @@ librdf_parser_raptor_get_accept_header(void* context)
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   const char* accept;
   char* r_accept;
-  size_t length=strlen(accept);
+  size_t length;
   
   accept=raptor_parser_get_accept_header(pcontext->rdf_parser);
   if(!accept)
     return NULL;
-  
+  length=strlen(accept);
   r_accept=LIBRDF_MALLOC(cstring, length+1);
   strncpy(r_accept, accept, length+1);
-  raptor_free_memory(accept);
+  raptor_free_memory((void*)accept);
   
   return r_accept;
 }
