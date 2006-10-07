@@ -39,7 +39,10 @@ extern "C" {
 
 /* class methods */
 REDLAND_API
-void librdf_parser_register_factory(librdf_world *world, const char *name, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_parser_factory*));
+void librdf_parser_register_factory(librdf_world *world, const char *name, const char *label, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_parser_factory*));
+
+REDLAND_API
+int librdf_parser_enumerate(librdf_world* world, const unsigned int counter, const char **name, const char **label);
 
 /* constructor */
 REDLAND_API
