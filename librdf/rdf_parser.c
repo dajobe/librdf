@@ -44,8 +44,39 @@
 
 #ifndef STANDALONE
 
-/* prototypes for helper functions */
-static void librdf_delete_parser_factories(librdf_world *world);
+/**
+ * librdf_init_parser:
+ * @world: redland world object
+ *
+ * INTERNAL - Initialise the librdf_parser class.
+ *
+ **/
+void
+librdf_init_parser(librdf_world *world) 
+{
+#ifdef HAVE_RAPTOR_RDF_PARSER
+  librdf_parser_raptor_constructor(world);
+#endif
+}
+
+
+/**
+ * librdf_finish_parser:
+ * @world: redland world object
+ *
+ * INTERNAL - Terminate the librdf_parser class.
+ *
+ **/
+void
+librdf_finish_parser(librdf_world *world) 
+{
+  raptor_free_sequence(world->parsers);
+  world->parsers=NULL;
+
+#ifdef HAVE_RAPTOR_RDF_PARSER
+  librdf_parser_raptor_destructor();
+#endif
+}
 
 
 /* helper functions */
@@ -53,25 +84,14 @@ static void
 librdf_free_parser_factory(librdf_parser_factory *factory) 
 {
   if(factory->name)
-    LIBRDF_FREE(librdf_parser_factory, factory->name);
+    LIBRDF_FREE(cstring, factory->name);
+  if(factory->label)
+    LIBRDF_FREE(cstring, factory->label);
   if(factory->mime_type)
-    LIBRDF_FREE(librdf_parser_factory, factory->mime_type);
+    LIBRDF_FREE(cstring, factory->mime_type);
   if(factory->type_uri)
     librdf_free_uri(factory->type_uri);
   LIBRDF_FREE(librdf_parser_factory, factory);
-}
-
-
-static void
-librdf_delete_parser_factories(librdf_world *world)
-{
-  librdf_parser_factory *factory, *next;
-  
-  for(factory=world->parsers; factory; factory=next) {
-    next=factory->next;
-    librdf_free_parser_factory(factory);
-  }
-  world->parsers=NULL;
 }
 
 
@@ -79,6 +99,7 @@ librdf_delete_parser_factories(librdf_world *world)
  * librdf_parser_register_factory:
  * @world: redland world object
  * @name: the name of the parser
+ * @label: the label of the parser (optional)
  * @mime_type: MIME type of the syntax (optional)
  * @uri_string: URI of the syntax (optional)
  * @factory: function to be called to register the factor parameters
@@ -88,40 +109,55 @@ librdf_delete_parser_factories(librdf_world *world)
  **/
 void
 librdf_parser_register_factory(librdf_world *world,
-                               const char *name, const char *mime_type,
+                               const char *name, const char *label, 
+                               const char *mime_type,
                                const unsigned char *uri_string,
 			       void (*factory) (librdf_parser_factory*))
 {
-  librdf_parser_factory *parser_factory;
+  librdf_parser_factory *parser;
   char *name_copy;
+  char *label_copy;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for parser %s\n", name);
 #endif
   
-  parser_factory=(librdf_parser_factory*)LIBRDF_CALLOC(librdf_parser_factory, 1,
+  if(!world->parsers)
+    world->parsers=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_parser_factory, NULL);
+
+  parser=(librdf_parser_factory*)LIBRDF_CALLOC(librdf_parser_factory, 1,
 					       sizeof(librdf_parser_factory));
-  if(!parser_factory)
+  if(!parser)
     LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
   if(!name_copy) {
-    librdf_free_parser_factory(parser_factory);
+    librdf_free_parser_factory(parser);
     LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
   }
   strcpy(name_copy, name);
-  parser_factory->name=name_copy;
+  parser->name=name_copy;
 
+  if(label) {
+    label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+    if(!label_copy) {
+      librdf_free_parser_factory(parser);
+      LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
+    }
+    strcpy(label_copy, label);
+    parser->label=label_copy;
+  }
+        
   /* register mime type if any */
   if(mime_type) {
     char *mime_type_copy;
     mime_type_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
     if(!mime_type_copy) {
-      librdf_free_parser_factory(parser_factory);
+      librdf_free_parser_factory(parser);
       LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
     }
     strcpy(mime_type_copy, mime_type);
-    parser_factory->mime_type=mime_type_copy;
+    parser->mime_type=mime_type_copy;
   }
 
   /* register URI if any */
@@ -130,24 +166,22 @@ librdf_parser_register_factory(librdf_world *world,
 
     uri=librdf_new_uri(world, uri_string);
     if(!uri) {
-      librdf_free_parser_factory(parser_factory);
+      librdf_free_parser_factory(parser);
       LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
     }
-    parser_factory->type_uri=uri;
+    parser->type_uri=uri;
   }
   
         
   /* Call the parser registration function on the new object */
-  (*factory)(parser_factory);
+  (*factory)(parser);
 
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3("%s has context size %d\n", name, parser_factory->context_length);
+  LIBRDF_DEBUG3("%s has context size %d\n", name, parser->context_length);
 #endif
   
-  parser_factory->next = world->parsers;
-  world->parsers = parser_factory;
-  
+  raptor_sequence_push(world->parsers, parser);
 }
 
 
@@ -183,13 +217,17 @@ librdf_get_parser_factory(librdf_world *world,
 
   /* return 1st parser if no particular one wanted */
   if(!name && !mime_type && !type_uri) {
-    factory=world->parsers;
+    factory=(librdf_parser_factory*)raptor_sequence_get_at(world->parsers, 0);
     if(!factory) {
       LIBRDF_DEBUG1("No parsers available\n");
       return NULL;
     }
   } else {
-    for(factory=world->parsers; factory; factory=factory->next) {
+    int i;
+    
+    for(i=0;
+        (factory=(librdf_parser_factory*)raptor_sequence_get_at(world->parsers, i));
+        i++) {
       /* next if name does not match */
       if(name && strcmp(factory->name, name))
 	continue;
@@ -219,6 +257,37 @@ librdf_get_parser_factory(librdf_world *world,
   }
   
   return factory;
+}
+
+
+/**
+ * librdf_parser_enumerate:
+ * @world: redland world object
+ * @counter: index into the list of parsers
+ * @name: pointer to store the name of the parser (or NULL)
+ * @label: pointer to store syntax readable label (or NULL)
+ *
+ * Get information on parsers.
+ * 
+ * Return value: non 0 on failure of if counter is out of range
+ **/
+int
+librdf_parser_enumerate(librdf_world* world,
+                        const unsigned int counter,
+                        const char **name, const char **label)
+{
+  librdf_parser_factory *factory;
+  
+  factory=(librdf_parser_factory*)raptor_sequence_get_at(world->parsers,
+                                                         counter);
+  if(!factory)
+    return 1;
+  
+  if(name)
+    *name=factory->name;
+  if(label)
+    *label=factory->label;
+  return 0;
 }
 
 
@@ -490,39 +559,6 @@ librdf_parser_parse_counted_string_into_model(librdf_parser* parser,
                                                             base_uri, model);
   
   return 1;
-}
-
-
-/**
- * librdf_init_parser:
- * @world: redland world object
- *
- * INTERNAL - Initialise the librdf_parser class.
- *
- **/
-void
-librdf_init_parser(librdf_world *world) 
-{
-#ifdef HAVE_RAPTOR_RDF_PARSER
-  librdf_parser_raptor_constructor(world);
-#endif
-}
-
-
-/**
- * librdf_finish_parser:
- * @world: redland world object
- *
- * INTERNAL - Terminate the librdf_parser class.
- *
- **/
-void
-librdf_finish_parser(librdf_world *world) 
-{
-  librdf_delete_parser_factories(world);
-#ifdef HAVE_RAPTOR_RDF_PARSER
-  librdf_parser_raptor_destructor();
-#endif
 }
 
 
