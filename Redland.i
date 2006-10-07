@@ -332,7 +332,7 @@ librdf_stream* librdf_query_results_as_stream(librdf_query_results* query_result
 int librdf_query_results_get_count(librdf_query_results* query_results);
 int librdf_query_results_next(librdf_query_results* query_results);
 int librdf_query_results_finished(librdf_query_results* query_results);
-%newobject librdf_query_get_result_binding_value;
+%newobject librdf_query_results_get_binding_value;
 librdf_node* librdf_query_results_get_binding_value(librdf_query_results* query_results, int offset);
 const char* librdf_query_results_get_binding_name(librdf_query_results* query_results, int offset);
 %newobject librdf_query_results_get_binding_value_by_name;
