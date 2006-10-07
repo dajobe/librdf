@@ -496,6 +496,7 @@ librdf_files_temporary_file_name
 <SECTION>
 <FILE>unused</FILE>
 REDLAND_API
+REDLAND_PRINTF_FORMAT
 librdf_basename
 librdf_concepts_index
 librdf_concept_ms_namespace_uri
