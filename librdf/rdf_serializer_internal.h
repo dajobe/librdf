@@ -67,10 +67,16 @@ struct librdf_serializer_factory_s
   int (*set_feature)(void *_context, librdf_uri *feature, librdf_node* value);
 
   int (*set_namespace)(void *_context, librdf_uri *uri, const char *prefix);
+
+  int (*serialize_stream_to_file_handle)(void *_context, FILE *handle, librdf_uri* base_uri, librdf_stream *stream);
   
   int (*serialize_model_to_file_handle)(void *_context, FILE *handle, librdf_uri* base_uri, librdf_model *model);
 
+  unsigned char* (*serialize_stream_to_counted_string)(void *_context, librdf_uri* base_uri, librdf_stream *stream, size_t *length_p);
+
   unsigned char* (*serialize_model_to_counted_string)(void *_context, librdf_uri* base_uri, librdf_model *model, size_t *length_p);
+
+  int (*serialize_stream_to_iostream)(void *context, librdf_uri* base_uri, librdf_stream *stream, raptor_iostream* iostr);
 
   int (*serialize_model_to_iostream)(void *context, librdf_uri* base_uri, librdf_model *model, raptor_iostream* iostr);
 };
