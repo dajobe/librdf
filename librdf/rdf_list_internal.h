@@ -53,7 +53,6 @@ struct librdf_list_iterator_context_s {
   librdf_iterator* iterator;
   librdf_list* list;
   librdf_list_node *current;
-  librdf_list_node *next;
   struct librdf_list_iterator_context_s* next_ic;
   struct librdf_list_iterator_context_s* prev_ic;
 };
