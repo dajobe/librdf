@@ -792,6 +792,8 @@ typedef struct {
   librdf_stream *stream;
   librdf_statement *partial_statement;
   librdf_statement_part want;
+  librdf_node *object_node;
+  librdf_node *context_node;
 } librdf_storage_stream_to_node_iterator_context;
 
 
@@ -808,6 +810,15 @@ static int
 librdf_storage_stream_to_node_iterator_next_method(void* iterator) 
 {
   librdf_storage_stream_to_node_iterator_context* context=(librdf_storage_stream_to_node_iterator_context*)iterator;
+
+  if(context->object_node) {
+    librdf_free_node(context->object_node);
+    context->object_node=NULL;
+  }
+  if(context->context_node) {
+    librdf_free_node(context->context_node);
+    context->context_node=NULL;
+  }
 
   return librdf_stream_next(context->stream);
 }
@@ -826,30 +837,38 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
   switch(flags) {
     case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
 
-      switch(context->want) {
-        case LIBRDF_STATEMENT_SUBJECT: /* SOURCES (subjects) */
-          node=librdf_statement_get_subject(statement);
-          break;
+      if(!context->object_node) {
+        switch(context->want) {
+          case LIBRDF_STATEMENT_SUBJECT: /* SOURCES (subjects) */
+            node=librdf_statement_get_subject(statement);
+            break;
+            
+          case LIBRDF_STATEMENT_PREDICATE: /* ARCS (predicates) */
+            node=librdf_statement_get_predicate(statement);
+            break;
+            
+          case LIBRDF_STATEMENT_OBJECT: /* TARGETS (objects) */
+            node=librdf_statement_get_object(statement);
+            break;
 
-        case LIBRDF_STATEMENT_PREDICATE: /* ARCS (predicates) */
-          node=librdf_statement_get_predicate(statement);
-          break;
-
-        case LIBRDF_STATEMENT_OBJECT: /* TARGETS (objects) */
-          node=librdf_statement_get_object(statement);
-          break;
-
-        case LIBRDF_STATEMENT_ALL:
-        default: /* error */
-          librdf_log(statement->world,
-                     0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "Unknown statement part %d", context->want);
-          node=NULL;
+          case LIBRDF_STATEMENT_ALL:
+            default: /* error */
+              librdf_log(statement->world,
+                         0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                         "Unknown statement part %d", context->want);
+              node=NULL;
+        }
+        context->object_node=librdf_new_node_from_node(node);
       }
+      node=context->object_node;
       break;
       
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
-      node=(librdf_node*)librdf_stream_get_context(context->stream);
+      if(!context->context_node) {
+        node=(librdf_node*)librdf_stream_get_context(context->stream);
+        context->context_node=librdf_new_node_from_node(node);
+      }
+      node=context->context_node;
       break;
       
     default:
@@ -869,20 +888,20 @@ librdf_storage_stream_to_node_iterator_finished(void* iterator)
   librdf_storage_stream_to_node_iterator_context* context=(librdf_storage_stream_to_node_iterator_context*)iterator;
   librdf_statement *partial_statement=context->partial_statement;
 
-  /* make sure librdf_free_statement() doesn't free anything here */
-  if(partial_statement) {
-    librdf_statement_set_subject(partial_statement, NULL);
-    librdf_statement_set_predicate(partial_statement, NULL);
-    librdf_statement_set_object(partial_statement, NULL);
-
+  if(partial_statement)
     librdf_free_statement(partial_statement);
-  }
 
   if(context->stream)
     librdf_free_stream(context->stream);
 
   if(context->storage)
     librdf_storage_remove_reference(context->storage);
+
+  if(context->object_node)
+    librdf_free_node(context->object_node);
+
+  if(context->context_node)
+    librdf_free_node(context->context_node);
   
   LIBRDF_FREE(librdf_storage_stream_to_node_iterator_context, context);
 }
@@ -923,6 +942,10 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
     return NULL;
   }
 
+
+  node1=librdf_new_node_from_node(node1);
+  node2=librdf_new_node_from_node(node2);
+  
   switch(want) {
     case LIBRDF_STATEMENT_SUBJECT:
       librdf_statement_set_predicate(partial_statement, node1);
@@ -939,6 +962,8 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
 
     case LIBRDF_STATEMENT_ALL:
     default:
+      librdf_free_node(node1);
+      librdf_free_node(node2);
       librdf_free_statement(partial_statement);
       librdf_log(storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
