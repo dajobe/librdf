@@ -459,12 +459,12 @@ librdf_list_iterators_replace_node(librdf_list* list,
   
   for(node=list->first_iterator; node; node=next) {
     next=node->next_ic;
-    if(node->next == old_node) {
+    if(node->current == old_node) {
 #if LIBRDF_DEBUG > 2
-      LIBRDF_DEBUG4("Moved iterator %p from node %p to node %p\n",
-                    node->iterator, old_node, new_node);
+      LIBRDF_DEBUG3("Moved iterator %p pointing at %p to next node\n", 
+                    node->iterator, node->current);
 #endif
-      node->next=new_node;
+      librdf_iterator_next(node->iterator);
     }
   }
 }
@@ -491,7 +491,6 @@ librdf_list_get_iterator(librdf_list* list)
 
   context->list=list;
   context->current=list->first;
-  context->next=context->current ? context->current->next  : NULL;
 
   iterator=librdf_new_iterator(list->world, 
                                (void*)context,
@@ -529,8 +528,7 @@ librdf_list_iterator_next_method(void* iterator)
   if(!node)
     return 1;
   
-  context->current = context->next;
-  context->next = context->current ? context->current->next : NULL;
+  context->current = context->current->next;
   
   return (context->current == NULL);
 }
