@@ -498,8 +498,8 @@ librdf_storage_list_context_add_statement(librdf_storage* storage,
   if(context->index_contexts && context_node) {
     sln->context=librdf_new_node_from_node(context_node);
     if(!sln->context) {
-      LIBRDF_FREE(librdf_storage_list_node, sln);
       librdf_free_statement(sln->statement);
+      LIBRDF_FREE(librdf_storage_list_node, sln);
       return 1;
     }
   } else
@@ -507,10 +507,10 @@ librdf_storage_list_context_add_statement(librdf_storage* storage,
   
   status=librdf_list_add(context->list, sln);
   if(status) {
-    LIBRDF_FREE(librdf_storage_list_node, sln);
     if(context_node)
       librdf_free_node(sln->context);
     librdf_free_statement(sln->statement);
+    LIBRDF_FREE(librdf_storage_list_node, sln);
     return 1;
   }
 
