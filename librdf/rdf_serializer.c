@@ -992,9 +992,6 @@ main(int argc, char *argv[])
   librdf_free_parser(parser);
   
 
-  serializer=librdf_new_serializer(world, "rdfxml", NULL, NULL);
-
-
   fprintf(stderr, "%s: Serializing stream to a string\n", program);
 
   stream=librdf_model_as_stream(model);
