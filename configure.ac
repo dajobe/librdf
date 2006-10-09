@@ -926,7 +926,7 @@ LIBS="$LIBRDF_LIBS"
 
 dnl Check for use of threads
 
-AC_ARG_WITH(threads, [  --with-threads          With POSIX thread support (default=no)], with_threads="yes", with_threads="no")
+AC_ARG_WITH(threads, [  --with-threads          With POSIX thread support (default=no)], with_threads="$withval", with_threads="no")
 
 AC_CHECK_HEADERS(pthread.h)
 
