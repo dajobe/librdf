@@ -1983,6 +1983,7 @@ main(int argc, char *argv[])
             big_literal_length);
     return(1);
   }
+  LIBRDF_FREE(cstring, big_literal);
 
   size=librdf_node_encode(node8, NULL, 0);
   fprintf(stdout, "%s: Encoding big literal node requires %d bytes\n", program, size);
