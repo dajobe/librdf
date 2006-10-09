@@ -49,6 +49,7 @@ struct librdf_node_s
     {
       /* literals are UTF-8 string values ... */
       unsigned char *string;
+      /* up to 2^31-1 bytes long */
       unsigned int string_len;
 
       /* datatype URI or null */
@@ -58,6 +59,8 @@ struct librdf_node_s
 
       /* Language of literal (xml:lang) */
       char *xml_language;
+      /* up to 255 bytes long */
+      unsigned char xml_language_len;
 
       /* Hash key & size */
       unsigned char *key;
