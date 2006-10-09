@@ -358,27 +358,38 @@ librdf_new_node_from_literal(librdf_world *world,
                              const char *xml_language, 
                              int is_wf_xml) 
 {
+  size_t xml_language_len=0;
+  
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL);
 
   if(xml_language && !*xml_language)
     xml_language=NULL;
 
-  if(xml_language && is_wf_xml)
-    return NULL;
-  
-  return librdf_new_node_from_typed_literal(world,
-                                            string, xml_language,
-                                            (is_wf_xml ? 
-                                             LIBRDF_RS_XMLLiteral_URI : NULL)
-                                            );
+  if(xml_language) {
+    if(is_wf_xml)
+      return NULL;
+    xml_language_len=strlen(xml_language);
+  }
+    
+
+  return librdf_new_node_from_typed_counted_literal(world,
+                                                    string, 
+                                                    strlen((const char*)string),
+                                                    xml_language,
+                                                    xml_language_len,
+                                                    (is_wf_xml ? 
+                                                     LIBRDF_RS_XMLLiteral_URI : NULL)
+                                                    );
 }
 
 
 /**
- * librdf_new_node_from_typed_literal:
+ * librdf_new_node_from_typed_counted_literal:
  * @world: redland world object
  * @value: literal string value
+ * @value_len: literal string value length
  * @xml_language: literal XML language (or NULL, empty string)
+ * @xml_language_len: literal XML language length (not used if @xml_language is NULL)
  * @datatype_uri: URI of typed literal datatype or NULL
  *
  * Constructor - create a new typed literal #librdf_node object.
@@ -390,13 +401,14 @@ librdf_new_node_from_literal(librdf_world *world,
  * Return value: new #librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_typed_literal(librdf_world *world, 
-                                   const unsigned char *value,
-                                   const char *xml_language, 
-                                   librdf_uri* datatype_uri) 
+librdf_new_node_from_typed_counted_literal(librdf_world *world, 
+                                           const unsigned char *value,
+                                           size_t value_len,
+                                           const char *xml_language, 
+                                           size_t xml_language_len,
+                                           librdf_uri* datatype_uri) 
 {
   librdf_node* new_node;
-  int value_len;
   unsigned char *new_value;
   char *new_xml_language;
   librdf_hash_datum key, value_hd; /* on stack - not allocated */
@@ -426,7 +438,7 @@ librdf_new_node_from_typed_literal(librdf_world *world,
   new_node->type=LIBRDF_NODE_TYPE_LITERAL;
 
   /* the only time the string literal length should ever be measured */
-  new_node->value.literal.string_len = value_len = strlen((const char*)value);
+  new_node->value.literal.string_len = value_len;
   
   new_value=(unsigned char*)LIBRDF_MALLOC(cstring, value_len + 1);
   if(!new_value) {
@@ -438,7 +450,7 @@ librdf_new_node_from_typed_literal(librdf_world *world,
   new_node->value.literal.string=new_value;
   
   if(xml_language && *xml_language) {
-    new_xml_language=(char*)LIBRDF_MALLOC(cstring, strlen(xml_language) + 1);
+    new_xml_language=(char*)LIBRDF_MALLOC(cstring, xml_language_len + 1);
     if(!new_xml_language) {
       LIBRDF_FREE(cstring, new_value);
       LIBRDF_FREE(librdf_node, new_node);
@@ -447,6 +459,7 @@ librdf_new_node_from_typed_literal(librdf_world *world,
     }
     strcpy(new_xml_language, xml_language);
     new_node->value.literal.xml_language=new_xml_language;
+    new_node->value.literal.xml_language_len=xml_language_len;
   } else
     new_xml_language=NULL;
   
@@ -526,6 +539,38 @@ librdf_new_node_from_typed_literal(librdf_world *world,
   return new_node;
 }
 
+
+/**
+ * librdf_new_node_from_typed_literal:
+ * @world: redland world object
+ * @value: literal string value
+ * @xml_language: literal XML language (or NULL, empty string)
+ * @datatype_uri: URI of typed literal datatype or NULL
+ *
+ * Constructor - create a new typed literal #librdf_node object.
+ * 
+ * Only one of @xml_language or @datatype_uri may be given.  If both
+ * are given, NULL is returned.  If @xml_language is the empty string,
+ * it is the equivalent to NULL.
+ *
+ * Return value: new #librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_new_node_from_typed_literal(librdf_world *world, 
+                                   const unsigned char *value,
+                                   const char *xml_language, 
+                                   librdf_uri* datatype_uri) 
+{
+  size_t xml_language_len=0;
+  if(xml_language)
+    xml_language_len=strlen(xml_language);
+  
+  return librdf_new_node_from_typed_counted_literal(world, value,
+                                                    strlen((const char*)value),
+                                                    xml_language,
+                                                    xml_language_len,
+                                                    datatype_uri);
+}
 
 /**
  * librdf_new_node_from_blank_identifier:
@@ -1095,7 +1140,7 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
   case LIBRDF_NODE_TYPE_LITERAL:
     len=node->value.literal.string_len;
     if(node->value.literal.xml_language) {
-      language_len=strlen(node->value.literal.xml_language);
+      language_len=node->value.literal.xml_language_len;
       len+=1+language_len;
     }
     
@@ -1313,12 +1358,15 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       string=(unsigned char*)node->value.literal.string;
       string_length=node->value.literal.string_len;
       if(node->value.literal.xml_language)
-        language_length=strlen(node->value.literal.xml_language);
+        language_length=node->value.literal.xml_language_len;
       if(node->value.literal.datatype_uri) {
         datatype_uri_string=librdf_uri_as_counted_string(node->value.literal.datatype_uri, &datatype_uri_length);
       }
       
       total_length= 6 + string_length + 1; /* +1 for \0 at end */
+      if(string_length > 0xFFFF) /* for long literal - type 'N' */
+        total_length+= 2;
+
       if(language_length)
         total_length += language_length+1;
       if(datatype_uri_length)
@@ -1326,14 +1374,6 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
       
       if(length && total_length > length)
         return 0;    
-
-      if(string_length > 0xFFFF) {
-        librdf_log(node->world,
-                   0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
-                   "Cannot encode a literal string of %d bytes length",
-                   (int)string_length);
-        return 0;
-      }
 
       if(datatype_uri_length > 0xFFFF) {
         librdf_log(node->world,
@@ -1351,15 +1391,29 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
         return 0;
       }
 
-      
+
       if(buffer) {
-        buffer[0]='M';
-        buffer[1]=(string_length & 0xff00) >> 8;
-        buffer[2]=(string_length & 0x00ff);
-        buffer[3]=(datatype_uri_length & 0xff00) >> 8;
-        buffer[4]=(datatype_uri_length & 0x00ff);
-        buffer[5]=(language_length & 0x00ff);
-        buffer += 6;
+        if(string_length > 0xFFFF) {
+          /* long literal type N (string length > 0x10000) */
+          buffer[0]='N';
+          buffer[1]=(string_length & 0xff000000) >> 24;
+          buffer[2]=(string_length & 0x00ff0000) >> 16;
+          buffer[3]=(string_length & 0x0000ff00) >> 8;
+          buffer[4]=(string_length & 0x000000ff);
+          buffer[5]=(datatype_uri_length & 0xff00) >> 8;
+          buffer[6]=(datatype_uri_length & 0x00ff);
+          buffer[7]=(language_length & 0x00ff);
+          buffer += 8;
+        } else {
+          /* short literal type M (string length <= 0xFFFF) */
+          buffer[0]='M';
+          buffer[1]=(string_length & 0xff00) >> 8;
+          buffer[2]=(string_length & 0x00ff);
+          buffer[3]=(datatype_uri_length & 0xff00) >> 8;
+          buffer[4]=(datatype_uri_length & 0x00ff);
+          buffer[5]=(language_length & 0x00ff);
+          buffer += 6;
+        }
         strcpy((char*)buffer, (const char*)string);
         buffer += string_length+1;
         if(datatype_uri_length) {
@@ -1368,7 +1422,8 @@ librdf_node_encode(librdf_node* node, unsigned char *buffer, size_t length)
         }
         if(language_length)
           strcpy((char*)buffer, (const char*)node->value.literal.xml_language);
-      }
+      } /* end if buffer */
+
       break;
       
     case LIBRDF_NODE_TYPE_BLANK:
@@ -1470,10 +1525,12 @@ librdf_node_decode(librdf_world *world,
         total_length += language_length+1;
       }
       
-      node=librdf_new_node_from_typed_literal(world,
-                                              buffer+6,
-                                              (const char*)language,
-                                              is_wf_xml ? LIBRDF_RS_XMLLiteral_URI : NULL);
+      node=librdf_new_node_from_typed_counted_literal(world,
+                                                      buffer+6,
+                                                      string_length,
+                                                      (const char*)language,
+                                                      language_length,
+                                                      is_wf_xml ? LIBRDF_RS_XMLLiteral_URI : NULL);
     
     break;
 
@@ -1499,10 +1556,48 @@ librdf_node_decode(librdf_world *world,
       if(datatype_uri_string)
         datatype_uri=librdf_new_uri(world, datatype_uri_string);
       
-      node=librdf_new_node_from_typed_literal(world,
-                                              buffer+6,
-                                              (const char*)language,
-                                              datatype_uri);
+      node=librdf_new_node_from_typed_counted_literal(world,
+                                                      buffer+6,
+                                                      string_length,
+                                                      (const char*)language,
+                                                      language_length,
+                                                      datatype_uri);
+      if(datatype_uri)
+        librdf_free_uri(datatype_uri);
+      
+      if(status)
+        return NULL;
+      
+    break;
+
+    case 'N': /* LIBRDF_NODE_TYPE_LITERAL - redland 1.0.5+ (long literal) */
+      /* min */
+      if(length < 8)
+        return NULL;
+      
+      string_length=(buffer[1] << 24) | (buffer[2] << 16) | (buffer[3] << 8) | buffer[4];
+      datatype_uri_length=(buffer[5] << 8) | buffer[6];
+      language_length=buffer[7];
+
+      total_length= 8 + string_length + 1; /* +1 for \0 at end */
+      if(datatype_uri_length) {
+        datatype_uri_string = buffer + total_length;
+        total_length += datatype_uri_length+1;
+      }
+      if(language_length) {
+        language = buffer + total_length;
+        total_length += language_length+1;
+      }
+
+      if(datatype_uri_string)
+        datatype_uri=librdf_new_uri(world, datatype_uri_string);
+      
+      node=librdf_new_node_from_typed_counted_literal(world,
+                                                      buffer+8,
+                                                      string_length,
+                                                      (const char*)language,
+                                                      language_length,
+                                                      datatype_uri);
       if(datatype_uri)
         librdf_free_uri(datatype_uri);
       
