@@ -107,6 +107,9 @@ librdf_node* librdf_new_node_from_literal(librdf_world* world, const unsigned ch
 REDLAND_API
 librdf_node* librdf_new_node_from_typed_literal(librdf_world *world, const unsigned char *value, const char *xml_language, librdf_uri* datatype_uri);
 
+REDLAND_API
+librdf_node* librdf_new_node_from_typed_counted_literal(librdf_world *world, const unsigned char *value, size_t value_len, const char *xml_language, size_t xml_language_len, librdf_uri* datatype_uri);
+
 /* Create a new Node from blank node identifier. */
 REDLAND_API
 librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world, const unsigned char *identifier);
