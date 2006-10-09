@@ -1660,14 +1660,56 @@ librdf_node_static_iterator_create(librdf_node** nodes,
 int main(int argc, char *argv[]);
 
 
+static void
+dump_node_as_C(FILE* fh, const char* var, void *buffer, int size) {
+  int i;
+  unsigned char* p=(unsigned char*)buffer;
+  
+  fprintf(fh, "const unsigned char %s[%d] = {", var, size);
+  for (i=0; i < size; i++) {
+    if(i)
+      fputs(", ", fh);
+    fprintf(fh, "0x%02x", p[i]);
+  }
+  fputs("};\n", fh);
+}
+
+  
+static int
+check_node(const char* program, const unsigned char *expected, 
+           void *buffer, size_t size) {
+  unsigned int i;
+  for(i=0; i< size; i++) {
+    unsigned char c=((unsigned char*)buffer)[i];
+    if(c != expected[i]) {
+      fprintf(stderr, "%s: Encoding node byte %d: 0x%02x expected 0x%02x\n",
+              program, i, c, expected[i]);
+      return(1);
+    }
+  }
+  return(0);
+}
+
+
+static const char *hp_string1="http://purl.org/net/dajobe/";
+static const char *hp_string2="http://purl.org/net/dajobe/";
+static const char *lit_string="Dave Beckett";
+static const char *genid="genid42";
+static const char *datatype_lit_string="Datatyped literal value";
+static const char *datatype_uri_string="http://example.org/datatypeURI";
+
+/* Node Encoded (type R) version of hp_string1 */
+static const unsigned char hp_uri_encoded[31] = {0x52, 0x00, 0x1b, 0x68, 0x74, 0x74, 0x70, 0x3a, 0x2f, 0x2f, 0x70, 0x75, 0x72, 0x6c, 0x2e, 0x6f, 0x72, 0x67, 0x2f, 0x6e, 0x65, 0x74, 0x2f, 0x64, 0x61, 0x6a, 0x6f, 0x62, 0x65, 0x2f, 0x00};
+
+/* Node Encoded (type M) version of typed literal with literal value
+ * datatype_lit_string and datatype URI datatype_uri_string */
+static const unsigned char datatyped_literal_M_encoded[61] = {0x4d, 0x00, 0x17, 0x00, 0x1e, 0x00, 0x44, 0x61, 0x74, 0x61, 0x74, 0x79, 0x70, 0x65, 0x64, 0x20, 0x6c, 0x69, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x20, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x00, 0x68, 0x74, 0x74, 0x70, 0x3a, 0x2f, 0x2f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x2e, 0x6f, 0x72, 0x67, 0x2f, 0x64, 0x61, 0x74, 0x61, 0x74, 0x79, 0x70, 0x65, 0x55, 0x52, 0x49, 0x00};
+
+
 int
 main(int argc, char *argv[]) 
 {
   librdf_node *node, *node2, *node3, *node4, *node5, *node6, *node7;
-  const char *hp_string1="http://purl.org/net/dajobe/";
-  const char *hp_string2="http://purl.org/net/dajobe/";
-  const char *lit_string="Dave Beckett";
-  const char *genid="genid42";
   librdf_uri *uri, *uri2;
   int size, size2;
   unsigned char *buffer;
@@ -1716,6 +1758,11 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Encoding node used %d bytes, expected it to use %d\n", program, size2, size);
     return(1);
   }
+
+  if(0)
+    dump_node_as_C(stdout, "hp_uri_encoded", buffer, size);
+  if(check_node(program, hp_uri_encoded, buffer, size))
+    return(1);
   
     
   fprintf(stdout, "%s: Creating new node\n", program);
@@ -1777,9 +1824,9 @@ main(int argc, char *argv[])
   fprintf(stdout, "%s: Copied node identifier is: '%s'\n", program, buffer);
 
 
-  uri2=librdf_new_uri(world, (const unsigned char*)"http://example.org/datatypeURI");
+  uri2=librdf_new_uri(world, (const unsigned char*)datatype_uri_string);
   node6=librdf_new_node_from_typed_literal(world, 
-                                           (const unsigned char*)"Datatyped literal value",
+                                           (const unsigned char*)datatype_lit_string,
                                            NULL, uri2);
   librdf_free_uri(uri2);
 
@@ -1793,6 +1840,11 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Encoding typed node used %d bytes, expected it to use %d\n", program, size2, size);
     return(1);
   }
+
+  if(0)
+    dump_node_as_C(stdout, "datatyped_literal_M_encoded", buffer, size);
+  if(check_node(program, datatyped_literal_M_encoded, buffer, size))
+    return(1);
   
   fprintf(stdout, "%s: Decoding typed node from buffer\n", program);
   if(!(node7=librdf_node_decode(world, NULL, (unsigned char*)buffer, size))) {
