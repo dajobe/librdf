@@ -130,7 +130,7 @@ librdf_query_register_factory(librdf_world *world, const char *name,
   int name_length;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3("Received registration for query name %s\n", name);
+  LIBRDF_DEBUG2("Received registration for query name %s\n", name);
 #endif
   
   query=(librdf_query_factory*)LIBRDF_CALLOC(librdf_query_factory, 1,
