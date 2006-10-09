@@ -627,7 +627,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
 
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG4("Using %s hash key %d bytes -> value %d bytes\n", context->hash_descriptions[i].name, key_len, value_len);
+    LIBRDF_DEBUG4("Using %s hash key %d bytes -> value %d bytes\n", context->hash_descriptions[i]->name, key_len, value_len);
 #endif
 
     /* Finally, store / remove the sucker */
@@ -755,7 +755,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
 
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG4("Using %s hash key %d bytes -> value %d bytes\n", context->hash_descriptions[hash_index].name, key_len, value_len);
+  LIBRDF_DEBUG4("Using %s hash key %d bytes -> value %d bytes\n", context->hash_descriptions[hash_index]->name, key_len, value_len);
 #endif
 
   hd_key.data=key_buffer; hd_key.size=key_len;
