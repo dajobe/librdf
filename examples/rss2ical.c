@@ -359,7 +359,7 @@ main(int argc, char *argv[])
 
     node=librdf_query_results_get_binding_value_by_name(results, "item");
     if(!librdf_node_is_resource(node))
-      break;
+      goto nextresult;
 
     url=librdf_uri_as_string(librdf_node_get_uri(node));
 
@@ -367,8 +367,10 @@ main(int argc, char *argv[])
     uid=(unsigned char*)uri_to_calid(librdf_node_get_uri(node));
 
     node=librdf_query_results_get_binding_value_by_name(results, "date");
-    if(!librdf_node_is_literal(node))
-      break;
+    if(!librdf_node_is_literal(node)) {
+      fprintf(stderr, "%s: Date in item %s is not a literal\n", program, url);
+      goto nextresult;
+    }
     dtstart=librdf_node_get_literal_value(node);
     dtstart=iso2vcaldate(dtstart);
     
@@ -428,6 +430,7 @@ main(int argc, char *argv[])
     free(description);
     free(uid);
     
+nextresult:
     librdf_query_results_next(results);
   }
 
