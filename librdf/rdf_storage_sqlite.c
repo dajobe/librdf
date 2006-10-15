@@ -80,6 +80,11 @@
 #endif
 
 
+static const char* sqlite_synchronous_flags[4] = {
+  "off", "normal", "full", NULL
+};
+
+
 typedef struct
 {
   librdf_storage *storage;
@@ -90,6 +95,8 @@ typedef struct
   
   char *name;
   size_t name_len;  
+
+  int synchronous; /* -1 (not set), 0+ index into sqlite_synchronous_flags */
 } librdf_storage_sqlite_context;
 
 
@@ -152,6 +159,7 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
   librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
   char *name_copy;
   int is_new;
+  char* synchronous;
   
   if(!name)
     return 1;
@@ -167,6 +175,24 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
   
   if((is_new=librdf_hash_get_as_boolean(options, "new"))>0)
     context->is_new=1; /* default is NOT NEW */
+
+  /* Redland default is "PRAGMA synchronous normal" */
+  context->synchronous=1;
+
+  if((synchronous=librdf_hash_get(options, "synchronous"))) {
+    int i;
+    
+    for(i=0; sqlite_synchronous_flags[i]; i++) {
+      if(!strcmp(synchronous, sqlite_synchronous_flags[i])) {
+        context->synchronous=i;
+        break;
+      }
+    }
+    
+    LIBRDF_FREE(cstring, synchronous);
+
+  }
+  
 
   /* no more options, might as well free them now */
   if(options)
@@ -688,10 +714,36 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 #endif
     return 1;
   }
+
+  
+  if(context->synchronous >= 0) {
+    raptor_stringbuffer *sb;
+    unsigned char *request;
+
+    sb=raptor_new_stringbuffer();
+    raptor_stringbuffer_append_string(sb, 
+                                      (const unsigned char*)"PRAGMA synchronous=", 1);
+    raptor_stringbuffer_append_string(sb, 
+                                      (const unsigned char*)sqlite_synchronous_flags[context->synchronous], 1);
+    raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)";", 1, 1);
+    
+    request=raptor_stringbuffer_as_string(sb);
+
+    librdf_storage_sqlite_exec(storage, 
+                               request,
+                               NULL, NULL, 0);
+    raptor_free_stringbuffer(sb);
+  }
+
   
   if(context->is_new) {
     int i;
     unsigned char request[200];
+    int begin;
+
+    begin=librdf_storage_sqlite_exec(storage,
+                                     (unsigned char *)"BEGIN TRANSACTION;",
+                                     NULL, NULL, 0);
 
     for(i=0; i < NTABLES; i++) {
 
@@ -711,11 +763,15 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                                     request,
                                     NULL, /* no callback */
                                     NULL, /* arg */
-                                    0))
+                                    0)) {
+        if(!begin)
+          librdf_storage_sqlite_exec(storage,
+                                     (unsigned char *) "END TRANSACTION;",
+                                     NULL, NULL, 0);
         return 1;
+      }
 
     } /* end drop/create table loop */
-
 
     strcpy((char*)request, 
            "CREATE INDEX spindex ON triples (subjectUri, subjectBlank, predicateUri);");
@@ -723,8 +779,13 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                                   request,
                                   NULL, /* no callback */
                                   NULL, /* arg */
-                                  0))
+                                  0)) {
+      if(!begin)
+        librdf_storage_sqlite_exec(storage,
+                                   (unsigned char *) "END TRANSACTION;",
+                                   NULL, NULL, 0);
       return 1;
+    }
     
     strcpy((char*)request, 
            "CREATE INDEX uriindex ON uris (uri);");
@@ -732,12 +793,21 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                                   request,
                                   NULL, /* no callback */
                                   NULL, /* arg */
-                                  0))
+                                  0)) {
+      if(!begin)
+        librdf_storage_sqlite_exec(storage,
+                                   (unsigned char *) "END TRANSACTION;",
+                                   NULL, NULL, 0);
       return 1;
+    }
+    
+    if(!begin)
+      librdf_storage_sqlite_exec(storage,
+                                 (unsigned char *) "END TRANSACTION;",
+                                 NULL, NULL, 0);
     
   } /* end if is new */
 
-  
   return 0;
 }
 
@@ -927,8 +997,6 @@ librdf_storage_sqlite_statement_operator_helper(librdf_storage* storage,
     need_and=1;
   }
     
-  raptor_stringbuffer_append_counted_string(sb,  
-                                            (const unsigned char*)";", 1, 1);
   return 0;
 }
 
@@ -940,17 +1008,27 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
   raptor_stringbuffer *sb;
   unsigned char *request;
   int count=0;
-  int rc;
+  int rc, begin;
+
+  begin=librdf_storage_sqlite_exec(storage,
+                                   (unsigned char *) "BEGIN TRANSACTION;",
+                                   NULL, NULL, 0);
 
   sb=raptor_new_stringbuffer();
   raptor_stringbuffer_append_string(sb, 
-                                    (const unsigned char*)"SELECT COUNT(*)", 1);
+                                    (const unsigned char*)"SELECT subjectUri",
+                                    1);
   if(librdf_storage_sqlite_statement_operator_helper(storage, statement, 
                                                      NULL, sb)) {
+    if(!begin)
+      librdf_storage_sqlite_exec(storage,
+                                 (unsigned char *) "END TRANSACTION;",
+                                 NULL, NULL, 0);
     raptor_free_stringbuffer(sb);
     return -1;
   }
 
+  raptor_stringbuffer_append_string(sb, (const unsigned char*)" LIMIT 1;", 1);
   request=raptor_stringbuffer_as_string(sb);
   
   rc=librdf_storage_sqlite_exec(storage,
@@ -960,6 +1038,11 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
                                 0);
   
   raptor_free_stringbuffer(sb);
+
+  if(!begin)
+    librdf_storage_sqlite_exec(storage,
+                               (unsigned char *) "END TRANSACTION;",
+                               NULL, NULL, 0);
 
   if(rc)  
     return -1;
@@ -1649,14 +1732,24 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   raptor_stringbuffer *sb;
   unsigned char* request;
   int i;
-  int rc;
+  int rc, begin;
   int max=3;
   
+  begin=librdf_storage_sqlite_exec(storage,
+                                   (unsigned char *) "BEGIN TRANSACTION;",
+                                   NULL, NULL, 0);
+
   if(librdf_storage_sqlite_statement_helper(storage,
                                             statement,
                                             context_node,
-                                            node_types, node_ids, fields))
+                                            node_types, node_ids, fields)) {
+
+    if(!begin)
+      librdf_storage_sqlite_exec(storage,
+                                 (unsigned char *) "END TRANSACTION;",
+                                 NULL, NULL, 0);
     return -1;
+  }
   
   if(context_node)
     max++;
@@ -1696,6 +1789,11 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   
   raptor_free_stringbuffer(sb);
   
+  if(!begin)
+    librdf_storage_sqlite_exec(storage,
+                               (unsigned char *) "END TRANSACTION;",
+                               NULL, NULL, 0);
+
   if(rc)
     return 1;
 
@@ -1731,6 +1829,9 @@ librdf_storage_sqlite_context_remove_statement(librdf_storage* storage,
     return -1;
   }
 
+  raptor_stringbuffer_append_counted_string(sb,
+                                            (const unsigned char*)";", 1, 1);
+ 
   request=raptor_stringbuffer_as_string(sb);
   
   rc=librdf_storage_sqlite_exec(storage,
