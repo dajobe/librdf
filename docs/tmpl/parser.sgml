@@ -33,6 +33,18 @@ by callbacks.
 </para>
 
 
+<!-- ##### FUNCTION librdf_parser_enumerate ##### -->
+<para>
+
+</para>
+
+@world: 
+@counter: 
+@name: 
+@label: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_parser_register_factory ##### -->
 <para>
 
@@ -40,6 +52,7 @@ by callbacks.
 
 @world: 
 @name: 
+@label: 
 @mime_type: 
 @uri_string: 
 @factory: 
@@ -198,6 +211,15 @@ by callbacks.
 @parser: 
 @feature: 
 @value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_parser_get_accept_header ##### -->
+<para>
+
+</para>
+
+@parser: 
 @Returns: 
 
 
