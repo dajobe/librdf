@@ -1,4 +1,38 @@
+2006-10-14  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_sqlite.c: Add a 'sychronous' storage option
+	for the sqlite store with values off, normal or full.
+	(librdf_storage_sqlite_init, librdf_storage_sqlite_open): set
+	synchronous flag and do creation in a transaction.
+	(librdf_storage_sqlite_contains_statement,
+	librdf_storage_sqlite_context_add_statement): Add transaction
+	around operation.
+	(librdf_storage_sqlite_context_remove_statement): Add trailing ;
+
+	* librdf/rdf_storage_mysql.c: Revert change:
+	> r11074 | dajobe | 2006-07-29 17:18:34 -0700 (Sat, 29 Jul 2006) | 5 lines
+	> (librdf_storage_mysql_add_statements): Use
+	> librdf_storage_mysql_context_add_statements.
+	> (librdf_storage_mysql_context_add_statements): Add check for adding
+	> duplicate statements and remove the check when in bulk mode.
+
+	* examples/rss2ical.c: Skip results with non-resource node rather
+	than abort all results
+
 2006-10-08  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_hashes.c:
+	(librdf_storage_hashes_add_remove_statement,
+	librdf_storage_hashes_contains_statement): Fix debug calls.
+	Fixes Issue#0000132 http://bugs.librdf.org/mantis/view.php?id=132
+
+	* librdf/rdf_query.c: (librdf_query_register_factory): Fix debug call.
+	Fixes Issue#0000132 http://bugs.librdf.org/mantis/view.php?id=132
+
+	* configure.ac: Fix --with-threads arg
+	Fixes Issue#0000125 http://bugs.librdf.org/mantis/view.php?id=125
+
+	* docs/storage.html: Added sqlite and postgresql
 
 	* librdf/rdf_serializer.c: (main): Reuse serializer
 
