@@ -24,6 +24,24 @@ Internal.
 
 
 
+<!-- ##### MACRO REDLAND_PRINTF_FORMAT ##### -->
+<para>
+Internal.
+</para>
+
+@string_index: 
+@first_to_check_index: 
+
+
+<!-- ##### FUNCTION librdf_basename ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+
 <!-- ##### ENUM librdf_concepts_index ##### -->
 <para>
 Internal.
