@@ -26,11 +26,11 @@ Internal.
 
 <!-- ##### MACRO REDLAND_PRINTF_FORMAT ##### -->
 <para>
-Internal.
+Internal.  You should not be reading this.
 </para>
 
-@string_index: 
-@first_to_check_index: 
+@string_index: string index
+@first_to_check_index: first to check index
 
 
 <!-- ##### FUNCTION librdf_basename ##### -->
