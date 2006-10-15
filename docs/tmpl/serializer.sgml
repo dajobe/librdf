@@ -32,6 +32,18 @@ can be retrieved by callbacks.
 </para>
 
 
+<!-- ##### FUNCTION librdf_serializer_enumerate ##### -->
+<para>
+
+</para>
+
+@world: 
+@counter: 
+@name: 
+@label: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_serializer_register_factory ##### -->
 <para>
 
@@ -39,6 +51,7 @@ can be retrieved by callbacks.
 
 @world: 
 @name: 
+@label: 
 @mime_type: 
 @uri_string: 
 @factory: 
@@ -142,6 +155,65 @@ can be retrieved by callbacks.
 @base_uri: 
 @model: 
 @iostr: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_serializer_serialize_stream_to_counted_string ##### -->
+<para>
+
+</para>
+
+@serializer: 
+@base_uri: 
+@stream: 
+@length_p: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_serializer_serialize_stream_to_file ##### -->
+<para>
+
+</para>
+
+@serializer: 
+@name: 
+@base_uri: 
+@stream: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_serializer_serialize_stream_to_file_handle ##### -->
+<para>
+
+</para>
+
+@serializer: 
+@handle: 
+@base_uri: 
+@stream: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_serializer_serialize_stream_to_iostream ##### -->
+<para>
+
+</para>
+
+@serializer: 
+@base_uri: 
+@stream: 
+@iostr: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_serializer_serialize_stream_to_string ##### -->
+<para>
+
+</para>
+
+@serializer: 
+@base_uri: 
+@stream: 
 @Returns: 
 
 
