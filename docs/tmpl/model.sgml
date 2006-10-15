@@ -31,6 +31,18 @@ serializing and querying.
 </para>
 
 
+<!-- ##### FUNCTION librdf_model_enumerate ##### -->
+<para>
+
+</para>
+
+@world: 
+@counter: 
+@name: 
+@label: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_new_model ##### -->
 <para>
 
