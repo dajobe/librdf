@@ -1,4 +1,121 @@
+2006-10-08  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_hashes.c:
+	(librdf_storage_hashes_add_remove_statement,
+	librdf_storage_hashes_contains_statement): Fix debug calls.
+	Fixes Issue#0000132 http://bugs.librdf.org/mantis/view.php?id=132
+
+	* librdf/rdf_query.c: (librdf_query_register_factory): Fix debug call.
+	Fixes Issue#0000132 http://bugs.librdf.org/mantis/view.php?id=132
+
+	* librdf/rdf_serializer.c: (main): Reuse serializer
+
+	* librdf/rdf_node.c: (main): Free test big literal.
+
+	* librdf/rdf_node.c: (main): Add test for big 100,000-length literal.
+
+	* librdf/rdf_node.c: (librdf_new_node_from_literal): Call
+	librdf_new_node_from_typed_counted_literal directly.
+	(librdf_new_node_from_typed_counted_literal): Added, with guts of
+	librdf_new_node_from_typed_literal.
+	(librdf_new_node_from_typed_literal): Call
+	librdf_new_node_from_typed_counted_literal with additional
+	strlen()s.
+	(librdf_node_encode, librdf_node_decode): Added new long literal
+	type 'N' when the string length > 0xFFFF.  Does not affect
+	existing shorter literal encoding. Use
+	librdf_new_node_from_typed_counted_literal to save un-necessary
+	strlen()s.
+
+	* librdf/rdf_node.h: Added
+	librdf_new_node_from_typed_counted_literal prototype.
+
+	* librdf/rdf_node_internal.h: struct librdf_node_s now counts XML
+	language length
+
+	* librdf/rdf_node.c: Add tests for node encoding URIs, literals
+
+	* librdf/rdf_list.c, librdf/rdf_list_internal.h: rdf_list_context
+	restores current and next fields. When a node is deleted, just
+	adjust the next pointer.
+
 2006-10-07  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_list.c: (librdf_list_iterators_replace_node): Remove
+	next field, just use librdf_iterator_next() to move on.
+	(librdf_list_get_iterator, librdf_list_iterator_next_method):
+	Remove use of next field.
+
+	* librdf/rdf_list_internal.h: struct
+	librdf_list_iterator_context_s looses the next field.
+
+	* librdf/rdf_storage_list.c:
+	(librdf_storage_list_context_add_statement): Free some fields
+	before freeing the memory the pointers were stored in after
+	errors.
+
+	* librdf/rdf_storage.c: The stream to node iterator code was
+	altered to now save the grabbed object node and/or context nodes
+	taken from the shared librdf_stream that it converts so even if
+	the librdf_stream moves on, the librdf_nodes are preserved.
+	(librdf_storage_stream_to_node_iterator_next_method): Delete any
+	saved object/context nodes so they will get refreshed.
+	(librdf_storage_stream_to_node_iterator_get_method): Save
+	object/context nodes after retrieving them from the shared
+	librdf_statement got from the librdf_stream.
+	(librdf_storage_stream_to_node_iterator_finished): Free the new
+	saved node fields.
+	(librdf_storage_node_stream_to_node_create): Copy the node1, node2
+	explicitly rather than fake around with NULLing out them in the
+	librdf_storage_stream_to_node_iterator_finished function.
+
+	* librdf/rdf_serializer.c: (main): tests for serialize stream to
+	string/file handle
+
+	* librdf/Makefile.am: add test.rdf to CLEANFILES
+
+	* librdf/rdf_serializer_raptor.c: Removed unused var
+
+	* librdf/rdf_serializer_internal.h: Added factory methods:
+	serialize_stream_to_file_handle,
+	serialize_stream_to_counted_string and
+	serialize_stream_to_iostream
+
+	* librdf/rdf_serializer_raptor.c: (librdf_serializer_raptor_serialize_stream_to_file_handle,
+	librdf_serializer_raptor_serialize_stream_to_counted_string
+	librdf_serializer_raptor_serialize_stream_to_iostream): Added
+
+	* librdf/rdf_serializer.c:
+	(librdf_serializer_serialize_stream_to_file_handle,
+	librdf_serializer_serialize_stream_to_file,
+	librdf_serializer_serialize_stream_to_string,
+	librdf_serializer_serialize_stream_to_counted_string
+	librdf_serializer_serialize_stream_to_iostream): Added to satisfy
+	the request in Issue#000092 http://bugs.librdf.org/mantis/view.php?id=92
+
+	* librdf/rdf_serializer.h: Added prototypes for
+	librdf_serializer_serialize_stream_to_file_handle,
+	librdf_serializer_serialize_stream_to_file,
+	librdf_serializer_serialize_stream_to_string,
+	librdf_serializer_serialize_stream_to_counted_string and
+	librdf_serializer_serialize_stream_to_iostream
+
+	* librdf/rdf_parser.c: docs
+
+	* librdf/rdf_parser.c: (main): Add accept header test
+
+	* librdf/rdf_parser_raptor.c: (librdf_parser_raptor_get_accept_header):
+	fix
+
+	* librdf/rdf_parser_raptor.c: (librdf_parser_raptor_get_accept_header):
+	Added.
+
+	* librdf/rdf_parser.c: (librdf_parser_get_accept_header): Added.
+
+	* librdf/rdf_parser.h: Added librdf_parser_get_accept_header prototype.
+
+	* librdf/rdf_parser_internal.h: struct librdf_parser_factory_s
+	gains get_accept_header
 
 	* librdf/rdf_serializer_raptor.c:
 	(librdf_serializer_raptor_constructor): Grab and register the
