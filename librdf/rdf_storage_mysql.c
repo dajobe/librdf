@@ -825,8 +825,18 @@ static int
 librdf_storage_mysql_add_statements(librdf_storage* storage,
                                     librdf_stream* statement_stream)
 {
-  return librdf_storage_mysql_context_add_statements(storage, NULL,
-                                                     statement_stream);
+  int helper=0;
+
+  while(!helper && !librdf_stream_end(statement_stream)) {
+    librdf_statement* statement=librdf_stream_get_object(statement_stream);
+    /* Do not add duplicate statements */
+    if(!librdf_storage_mysql_contains_statement(storage, statement))
+      helper=librdf_storage_mysql_context_add_statement_helper(storage, 0,
+                                                               statement);
+    librdf_stream_next(statement_stream);
+  }
+
+  return helper;
 }
 
 /*
@@ -1191,14 +1201,6 @@ librdf_storage_mysql_context_add_statements(librdf_storage* storage,
 
   while(!helper && !librdf_stream_end(statement_stream)) {
     librdf_statement* statement=librdf_stream_get_object(statement_stream);
-    if(!context->bulk) {
-      /* Do not add duplicate statements 
-       * but do not check for this when in bulk mode.
-       */
-      if(librdf_storage_mysql_contains_statement(storage, statement))
-        continue;
-    }
-    
     helper=librdf_storage_mysql_context_add_statement_helper(storage, ctxt,
                                                              statement);
     librdf_stream_next(statement_stream);
