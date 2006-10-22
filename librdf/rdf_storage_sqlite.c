@@ -530,13 +530,15 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
       return -1;
     raptor_stringbuffer_append_string(sb, (const unsigned char*)"AND language = ", 1);
     raptor_stringbuffer_append_counted_string(sb, language_e, language_e_len, 1);
-  }
+  } else
+    raptor_stringbuffer_append_string(sb, (const unsigned char*)"AND language IS NULL ", 1);
 
   if(datatype) {
     datatype_id=librdf_storage_sqlite_uri_helper(storage, datatype);
     raptor_stringbuffer_append_string(sb, (const unsigned char*)"AND datatype = ", 1);
     raptor_stringbuffer_append_decimal(sb, datatype_id);
-  }
+  } else
+    raptor_stringbuffer_append_string(sb, (const unsigned char*)"AND datatype IS NULL ", 1);
   
   expression=raptor_stringbuffer_as_string(sb);
   id=librdf_storage_sqlite_get_helper(storage, TABLE_LITERALS, expression);
