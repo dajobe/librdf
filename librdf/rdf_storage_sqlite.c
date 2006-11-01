@@ -1958,7 +1958,7 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
                                             NULL,
                                             scontext->context_node,
                                             node_types, node_ids, fields)) {
-    librdf_storage_sqlite_context_serialize_finished((void*)scontext);
+    librdf_storage_sqlite_context_serialise_finished((void*)scontext);
     return NULL;
   }
 
@@ -2004,7 +2004,7 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
                context->name, errmsg, status);
 
     raptor_free_stringbuffer(sb);
-    librdf_storage_sqlite_context_serialize_finished((void*)scontext);
+    librdf_storage_sqlite_context_serialise_finished((void*)scontext);
     return NULL;
   }
   raptor_free_stringbuffer(sb);
