@@ -1,3 +1,19 @@
+2006-10-31  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/Makefile.am: FIx AM_CPPFLAGS AM_CFLAGS
+
+	* Redland.i: Export raptor and rasqal version strings and integers
+
+2006-10-22  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac, librdf/win32_rdf_config.h: Bump version to 1.0.5
+
+2006-10-21  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_sqlite.c: (librdf_storage_sqlite_literal_helper):
+	Check for no language or no datatype when they are NULL.
+	Fixes Issue#0000136 http://bugs.librdf.org/mantis/view.php?id=136
+
 2006-10-14  Dave Beckett  <dave@dajobe.org>
 
 	* librdf/rdf_storage_sqlite.c: Add a 'sychronous' storage option
