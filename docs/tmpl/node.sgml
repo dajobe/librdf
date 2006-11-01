@@ -110,6 +110,20 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_new_node_from_typed_counted_literal ##### -->
+<para>
+
+</para>
+
+@world: 
+@value: 
+@value_len: 
+@xml_language: 
+@xml_language_len: 
+@datatype_uri: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_new_node_from_blank_identifier ##### -->
 <para>
 
