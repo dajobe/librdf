@@ -401,6 +401,18 @@ extern const unsigned int librdf_version_major;
 extern const unsigned int librdf_version_minor;
 extern const unsigned int librdf_version_release;
 extern const unsigned int librdf_version_decimal;
+
+extern const char * const raptor_version_string;
+extern const unsigned int raptor_version_major;
+extern const unsigned int raptor_version_minor;
+extern const unsigned int raptor_version_release;
+extern const unsigned int raptor_version_decimal;
+
+extern const char* const  rasqal_version_string;
+extern const unsigned int rasqal_version_major;
+extern const unsigned int rasqal_version_minor;
+extern const unsigned int rasqal_version_release;
+extern const unsigned int rasqal_version_decimal;
 %mutable;
 
 
