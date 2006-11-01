@@ -1512,14 +1512,18 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
 
 
   scontext->query_statement=librdf_new_statement_from_statement(statement);
-  if(!scontext->query_statement)
+  if(!scontext->query_statement) {
+    librdf_storage_sqlite_find_statements_finished((void*)scontext);
     return NULL;
+  }
 
   if(librdf_storage_sqlite_statement_helper(storage,
                                             statement,
                                             NULL, 
-                                            node_types, node_ids, fields))
+                                            node_types, node_ids, fields)) {
+    librdf_storage_sqlite_find_statements_finished((void*)scontext);
     return NULL;
+  }
 
   sb=raptor_new_stringbuffer();
   sqlite_construct_select_helper(sb);
@@ -1575,7 +1579,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
                context->name, request, errmsg, status);
 
     raptor_free_stringbuffer(sb);
-    librdf_storage_sqlite_serialise_finished((void*)scontext);
+    librdf_storage_sqlite_find_statements_finished((void*)scontext);
     return NULL;
   }
   raptor_free_stringbuffer(sb);
@@ -1953,8 +1957,10 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
   if(librdf_storage_sqlite_statement_helper(storage,
                                             NULL,
                                             scontext->context_node,
-                                            node_types, node_ids, fields))
+                                            node_types, node_ids, fields)) {
+    librdf_storage_sqlite_context_serialize_finished((void*)scontext);
     return NULL;
+  }
 
   sb=raptor_new_stringbuffer();
   sqlite_construct_select_helper(sb);
@@ -1998,7 +2004,7 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
                context->name, errmsg, status);
 
     raptor_free_stringbuffer(sb);
-    librdf_storage_sqlite_serialise_finished((void*)scontext);
+    librdf_storage_sqlite_context_serialize_finished((void*)scontext);
     return NULL;
   }
   raptor_free_stringbuffer(sb);
