@@ -26,6 +26,213 @@ pre
 <p>Not yet released.
 </p>
 
+<p>The main changes in this release are:</p>
+
+<p>Updated to use 
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.13
+(<a href="http://librdf.org/rasqal/RELEASE.html#rel0_9_13">Rasqal 0.9.13 release notes</a>)
+</p>
+
+<p>Updated to use
+<a href="http://librdf.org/raptor/">Raptor</a> 1.4.13
+(<a href="http://librdf.org/raptor/RELEASE.html#rel1_4_13">Raptor 1.4.13 release notes</a>)
+</p>
+
+<p>Plus several API additions and many bug fixes.</p>
+
+
+<h3>Configuration and Build Changes</h3>
+
+<p><code>configure</code> now removes un-necessary tests for C++ or
+F77++ compilers that libtool stupidly insists on.  Add lots of
+gcc <code>-W</code> flags when they are supported and in maintainer
+mode.
+</p>
+
+<p>Made <code>configure --with-threads</code> work.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=125">Issue #0000125</a>
+</p>
+
+
+<h3>Model Class Changes</h3>
+
+<p>Methods
+<code>librdf_model_add</code>,
+<code>librdf_model_add_statement</code>,
+<code>librdf_model_add_typed_literal_statement</code>,
+<code>librdf_model_add_string_literal_statement</code> and
+<code>librdf_model_contains_statement</code>
+now enforce only allowing legal RDF triples.
+</p>
+
+<p>Added <code>librdf_model_enumerate</code> to list all the
+model implementations - currently just one, a model over
+a storage.
+</p>
+
+
+<h3>Node Class Changes</h3>
+
+<p>The node class can now encode and decode long literals with length
+>65535 using new encoding type 'N'.
+</p>
+
+<p>Added new constructor
+<code>librdf_new_node_from_typed_counted_literal</code>
+to build a typed node with a counted literal string.
+</p>
+
+
+<h3>Parser Class Changes</h3>
+
+<p>Changes to allow NULL base uris in parsing methods, but to fail if
+it is omitted but required.  Applies to
+<code>librdf_parser_parse_as_stream</code>,
+<code>librdf_parser_parse_into_model</code>,
+<code>librdf_parser_parse_string_as_stream</code>,
+<code>librdf_parser_parse_string_into_model</code>,
+<code>librdf_parser_parse_counted_string_as_stream</code>
+and
+<code>librdf_parser_parse_counted_string_into_model</code>
+</p>
+
+<p>Added <code>librdf_parser_get_accept_header</code> to get
+the <code>Accept</code> header that would be sent with a parser
+HTTP fetch of content.
+</p>
+
+
+<h3>Query Class Changes</h3>
+
+<p>Graph names in SPARQL now connect up to redland context nodes
+to allow SPARQL <code>GRAPH</code> to work.
+</p>
+
+
+<h3>Serializer Class Changes</h3>
+
+<p>Added new methods to serialize <code>librdf_stream</code>s of triples rather
+than just <code>librdf_model</code>:
+<code>librdf_serializer_serialize_stream_to_file_handle</code>,
+<code>librdf_serializer_serialize_stream_to_file</code>,
+<code>librdf_serializer_serialize_stream_to_string</code>,
+<code>librdf_serializer_serialize_stream_to_counted_string</code> and
+<code>librdf_serializer_serialize_stream_to_iostream</code>.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=92">Issue #000092</a>
+</p>
+
+
+<h3>Storage Class Changes</h3>
+
+<p>Methods <code>librdf_storage_add_statement</code>,
+<code>librdf_storage_add_statements</code> and
+<code>librdf_storage_contains_statement</code>
+now enforce only allowing legal RDF triples.
+</p>
+
+<p>The <em>Memory</em> storage now supports deleting while iterating or
+streaming the storage.
+</p>
+
+<p>The <em>PostgreSQL</em> storage now accepts option 'database' like
+MySQL and other Redland relational databases in addition to the
+existing option it accepted, 'dbname'.
+</p>
+
+<p><em>SQLite</em> storage fixes:<br />
+</p>
+<p>
+Fix crash in <code>librdf_model_context_remove_statements</code>
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=103">Issue #0000103</a>
+</p>
+
+<p>Wrap all <code>sqlite_FREE</code> calls on error messages so that
+they are only called with SQLITE API v2.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=105">Issue #0000105</a>
+</p>
+
+<p>Check for no language or no datatype when they are NULL
+in <code>librdf_storage_sqlite_literal_helper</code>.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=136">Issue#0000136</a>
+</p>
+
+<p>SQLite storage now has a 'synchronous' storage option which takes
+values 'off', 'normal' or 'full' allowing access to the sqlite pragma
+to control when commits are synchronised to file.
+</p>
+
+
+<h3>Other changes</h3>
+
+<p><code>rdfproc</code> now allows the base URI for parsing to be set
+to null with <code>-</code> and adjust messages to handle this.
+</p>
+
+<p>Added some more const fixes to heuristics.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=107">Issue #0000107</a>
+</p>
+
+<p>Autodocs for <code>librdf_new_node_from_blank_identifier</code>.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=114">Issue #00001114</a>
+</p>
+
+<p>If <code>librdf_storage_sqlite_statement_operator_helper<code> fails,
+free the stringbuffer.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=116">Issue #0000116</a>
+</p>
+
+<p>Do not read from stream when parsing returns a NULL pointer.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=130">Issue #0000130</a>
+</p>
+
+<p>Fix debug call in <code>librdf_query_register_factory</code>,
+<code>librdf_storage_hashes_add_remove_statement</code> and
+<code>librdf_storage_hashes_contains_statement</code>
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=132">Issue#0000132</a>
+</p>
+
+<p>Added rss2ical.c example to turn RSS/Atom 1.0 feeds into
+iCalendar using raptor, redland and SPARQL.
+</p>
+
+<p>Many minor fixes and changes due to adding lots of -W flags
+and using gcc4.
+</p>
+
+
+<h3>SWIG Bindings Interface</p>
+
+<p>Fixed typo to declare <code>librdf_query_results_get_binding_value</code>
+to return a new object.
+</p>
+
+<p>Export new function <code>librdf_parser_get_accept_header</code>
+</p>
+
+<p>Export version strings and integer constants for raptor:
+(<code>raptor_version_string</code>,
+<code>raptor_version_major</code>,
+<code>raptor_version_minor</code>,
+<code>raptor_version_release</code>,
+<code>raptor_version_decimal</code>)
+and rasqal
+(<code>rasqal_version_string</code>,
+<code>rasqal_version_major</code>,
+<code>rasqal_version_minor</code>,
+<code>rasqal_version_release</code>,
+<code>rasqal_version_decimal</code>)
+</p>
+
 
 <h2 id="rel1_0_4"><a name="rel1_0_4">Redland 1.0.4 Changes</a></h2>
 
@@ -125,7 +332,7 @@ for the redland specific subversion installation information.
 
 <p>A new PostgreSQL storage backend was added
 contributed by Shi Wenzhong based on the MySQL storage backend.
-Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=46">issue 0000046</a>
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=46">issue #0000046</a>
 </p>
 
 
@@ -158,7 +365,7 @@ support.</p>
 
 <p><code>librdf_world_get_genid()</code> was changed to include the
 process ID in the generated blank ID.
-Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=37">issue 0000037</a>
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=37">Issue #0000037</a>
 (patch from Marc Powell).
 </p>
 
@@ -180,7 +387,7 @@ exposed in the SWIG bindings.
 
 <p>Added a PostgreSQL storage backend contributed by Shi Wenzhong
 based on the MySQL storage backend.
-Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=46">issue 0000046</a>
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=46">Issue #0000046</a>
 </p>
 
 
