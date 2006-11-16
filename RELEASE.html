@@ -75,7 +75,7 @@ a storage.
 <h3>Node Class Changes</h3>
 
 <p>The node class can now encode and decode long literals with length
->65535 using new encoding type 'N'.
+&gt;65535 using new encoding type 'N'.
 </p>
 
 <p>Added new constructor
@@ -183,7 +183,7 @@ Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=114">Issue #00001114</a>
 </p>
 
-<p>If <code>librdf_storage_sqlite_statement_operator_helper<code> fails,
+<p>If <code>librdf_storage_sqlite_statement_operator_helper</code> fails,
 free the stringbuffer.
 Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=116">Issue #0000116</a>
@@ -210,7 +210,7 @@ and using gcc4.
 </p>
 
 
-<h3>SWIG Bindings Interface</p>
+<h3>SWIG Bindings Interface</h3>
 
 <p>Fixed typo to declare <code>librdf_query_results_get_binding_value</code>
 to return a new object.
@@ -598,9 +598,9 @@ create a 64bit key.  This fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=23">Issue #0000023</a>
 (Morten Frederiksen)</p>
 
-<blockquote><strong>NOTE: This matches the algorithm used for
+<blockquote><p><strong>NOTE: This matches the algorithm used for
 little-endian systems but big-endian stores will need to serialize
-the store before upgrading and reload afterwards.</strong></blockquote>
+the store before upgrading and reload afterwards.</strong></p></blockquote>
 
 <p>The MySQL store now uses connection pooling to prevent making a new
 connection to the database for each request.
