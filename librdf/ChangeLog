@@ -1,3 +1,20 @@
+2006-11-18  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_sqlite.c: Track when a stream is active and
+	store pending queries for SQLite in a list an apply after.
+	(librdf_storage_sqlite_exec): When the execution returns
+	SQLITE_LOCKED and in a stream, save the query for running later.
+	(librdf_storage_sqlite_serialise,
+	librdf_storage_sqlite_find_statements,
+	librdf_storage_sqlite_context_serialise,
+	librdf_storage_sqlite_get_contexts): Mark in stream.
+	(librdf_storage_sqlite_serialise_finished,
+	librdf_storage_sqlite_find_statements_finished
+	librdf_storage_sqlite_context_serialise_finished): End in stream.
+	(librdf_storage_sqlite_query_flush): Added.
+	Fixes Issue #0000139
+	http://bugs.librdf.org/mantis/view.php?id=139
+
 2006-10-31  Dave Beckett  <dave@dajobe.org>
 
 	* librdf/Makefile.am: FIx AM_CPPFLAGS AM_CFLAGS
