@@ -1,4 +1,44 @@
+2006-11-18  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_sqlite.c: Track when a stream is active and
+	store pending queries for SQLite in a list an apply after.
+	(librdf_storage_sqlite_exec): When the execution returns
+	SQLITE_LOCKED and in a stream, save the query for running later.
+	(librdf_storage_sqlite_serialise,
+	librdf_storage_sqlite_find_statements,
+	librdf_storage_sqlite_context_serialise,
+	librdf_storage_sqlite_get_contexts): Mark in stream.
+	(librdf_storage_sqlite_serialise_finished,
+	librdf_storage_sqlite_find_statements_finished
+	librdf_storage_sqlite_context_serialise_finished): End in stream.
+	(librdf_storage_sqlite_query_flush): Added.
+	Fixes Issue #0000139
+	http://bugs.librdf.org/mantis/view.php?id=139
+
+2006-11-13  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_model.c: (main): Add, still commented out, sqlite3 test.
+
 2006-10-31  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_find_statements): Tidy up correctly with
+	librdf_storage_sqlite_find_statements_finished if
+	librdf_new_statement_from_statement,
+	librdf_storage_sqlite_statement_helper or sqlite_compile fails.
+	(librdf_storage_sqlite_context_serialise): Tidy up correctly with
+	librdf_storage_sqlite_context_serialize_finished if
+	librdf_storage_sqlite_statement_helper or sqlite_compile fails.
+	Fixes Issue#0000137 http://bugs.librdf.org/mantis/view.php?id=137
+
+	* librdf/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_find_statements): Tidy up correctly with 
+	librdf_storage_sqlite_find_statements_finished if
+	librdf_new_statement_from_statement,
+	librdf_storage_sqlite_statement_helper or sqlite_compile fails.
+	(librdf_storage_sqlite_context_serialise): Tidy up correctly with
+	librdf_storage_sqlite_context_serialize_finished if
+	librdf_storage_sqlite_statement_helper or sqlite_compile fails.
 
 	* librdf/Makefile.am: FIx AM_CPPFLAGS AM_CFLAGS
 
