@@ -163,6 +163,14 @@ Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=136">Issue #0000136</a>
 </p>
 
+<p>Store pending queries while the database is locked doing
+a <code>SELECT</code> and do them once the select is done.  Such as
+deleting triples during a find or serialise.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=139">Issue #0000139</a>
+</p>
+
+
 <p>SQLite storage now has a 'synchronous' storage option which takes
 values 'off', 'normal' or 'full' allowing access to the sqlite pragma
 to control when commits are synchronised to file.
