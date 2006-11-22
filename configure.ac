@@ -445,7 +445,7 @@ rdf_parsers_available=
 AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
 AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default=auto)], with_raptor="$withval", with_raptor="auto")
 
-RAPTOR_MIN_VERSION=1.4.9
+RAPTOR_MIN_VERSION=1.4.11
 AC_SUBST(RAPTOR_MIN_VERSION)
 if test "X$RAPTOR_CONFIG" = "X"; then
   with_raptor=internal
@@ -552,7 +552,7 @@ done
 AC_CHECK_PROG(RASQAL_CONFIG, rasqal-config, rasqal-config)
 AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/internal (default=auto)], with_rasqal="$withval", with_rasqal="auto")
 
-RASQAL_MIN_VERSION=0.9.12
+RASQAL_MIN_VERSION=0.9.13
 AC_SUBST(RASQAL_MIN_VERSION)
 if test "X$RASQAL_CONFIG" = "X"; then
   with_rasqal=internal
