@@ -127,6 +127,10 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
     librdf_free_parser(parser);
   }
 
+  /* no more options, might as well free them now */
+  if(options)
+    librdf_free_hash(options);
+
   context->changed=0;
   
   return 0;
