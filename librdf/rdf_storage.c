@@ -505,7 +505,7 @@ librdf_storage_add_reference(librdf_storage *storage)
 void
 librdf_storage_remove_reference(librdf_storage *storage)
 {
-  storage->usage--;
+  librdf_free_storage(storage);
 }
 
 
