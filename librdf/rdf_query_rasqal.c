@@ -337,8 +337,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
   if(bindings[0] && (parts & RASQAL_TRIPLE_SUBJECT)) {
     LIBRDF_DEBUG1("binding subject to variable\n");
     l=redland_node_to_rasqal_literal(librdf_statement_get_subject(statement));
-    rasqal_variable_set_value(bindings[0], rasqal_literal_as_node(l));
-    rasqal_free_literal(l);
+    rasqal_variable_set_value(bindings[0], l);
     result= RASQAL_TRIPLE_SUBJECT;
   }
 
@@ -352,8 +351,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     } else {
       LIBRDF_DEBUG1("binding predicate to variable\n");
       l=redland_node_to_rasqal_literal(librdf_statement_get_predicate(statement));
-      rasqal_variable_set_value(bindings[1], rasqal_literal_as_node(l));
-      rasqal_free_literal(l);
+      rasqal_variable_set_value(bindings[1], l);
       result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_PREDICATE);
     }
   }
@@ -385,8 +383,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     if(bind) {
       LIBRDF_DEBUG1("binding object to variable\n");
       l=redland_node_to_rasqal_literal(librdf_statement_get_object(statement));
-      rasqal_variable_set_value(bindings[2], rasqal_literal_as_node(l));
-      rasqal_free_literal(l);
+      rasqal_variable_set_value(bindings[2], l);
       result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_OBJECT);
     }
   }
@@ -426,8 +423,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     if(bind) {
       LIBRDF_DEBUG1("binding origin to variable\n");
       l=redland_node_to_rasqal_literal(context_node);
-      rasqal_variable_set_value(bindings[3], rasqal_literal_as_node(l));
-      rasqal_free_literal(l);
+      rasqal_variable_set_value(bindings[3], l);
       result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_ORIGIN);
     }
   }
