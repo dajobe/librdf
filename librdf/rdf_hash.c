@@ -1699,6 +1699,7 @@ main(int argc, char *argv[])
   const char * const test_hash_string="field1='value1', field2='\\'value2', field3='\\\\', field4='\\\\\\'', field5 = 'a' ";
   const char *test_hash_delete_key="size";
   const unsigned char* template=(const unsigned char*)"the shape is %{shape} and the sides are %{sides} created by %{rubik}";
+  const unsigned char* template_expected=(const unsigned char*)"the shape is cube and the sides are 6 created by ";
   int i,j;
   const char *type;
   librdf_hash_datum hd_key, hd_value; /* on stack */
@@ -1887,8 +1888,13 @@ main(int argc, char *argv[])
   template_result=librdf_hash_interpret_template(template, h2, 
                                                  (const unsigned char*)"%{", 
                                                  (const unsigned char*)"}");
-  fprintf(stdout, "%s: resulting in >>%s<<\n", program, 
-          template_result);
+  if(strcmp((const char*)template_result, (const char*)template_expected)) {
+    fprintf(stdout, "%s: Templating failed. Result was >>%s<< but expected >>%s<<\n", program, 
+            template_result, template_expected);
+    exit(1);
+  } else
+    fprintf(stdout, "%s: resulting in >>%s<<\n", program, template_result);
+
   LIBRDF_FREE(cstring, template_result);
 
   librdf_free_hash(h2);
