@@ -1642,9 +1642,11 @@ librdf_hash_interpret_template(const unsigned char* template,
 
     hd_value=librdf_hash_get_one(dictionary, &key);
     /* append value if there is one */
-    if(hd_value)
+    if(hd_value) {
       raptor_stringbuffer_append_counted_string(sb, hd_value->data, 
                                                 hd_value->size, 1);
+      librdf_free_hash_datum(hd_value);
+    }
     
   }
 
