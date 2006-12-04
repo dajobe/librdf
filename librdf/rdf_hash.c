@@ -1571,6 +1571,97 @@ librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value)
   return librdf_hash_put(hash, &key_hd, &value_hd);
 }
 
+
+/**
+ * librdf_hash_interpret_template:
+ * @template: template string
+ * @dictionary: dictionary of key/values to substitute
+ * @prefix: prefix to mark a key in the template
+ * @suffix: suffix to mark a key in the template
+ * 
+ * Interpret keys in a template string to their value in a dictionary.
+ * 
+ * Can be used to do variable substitution for a string where
+ * the syntax that marks the variable is defined by the @prefix
+ * and @suffix strings, and the variables are stored in the @dictionary
+ * hash table.
+ *
+ * Return value: Newly allocated string, or NULL on failure
+ **/
+unsigned char*
+librdf_hash_interpret_template(const unsigned char* template,
+                               librdf_hash* dictionary,
+                               const unsigned char* prefix, 
+                               const unsigned char* suffix) 
+{
+  raptor_stringbuffer* sb;
+  unsigned char* result=NULL;
+  size_t len;
+  size_t prefix_len=strlen((const char*)prefix);
+  size_t suffix_len=strlen((const char*)suffix);
+  
+  sb=raptor_new_stringbuffer();
+  if(!sb)
+    return NULL;
+  
+  len=strlen((const char*)template);
+  
+  while(*template) {
+    unsigned char* p;
+    unsigned char* s;
+    librdf_hash_datum key; /* static */
+    librdf_hash_datum *hd_value;
+    size_t len2;
+    
+    p=(unsigned char*)strstr((const char*)template, (const char*)prefix);
+    if(!p) {
+      /* No more prefixes found so append rest of template */
+      raptor_stringbuffer_append_counted_string(sb, template, len, 1);
+      break;
+    }
+    len2=p-template;
+    if(len2)
+      raptor_stringbuffer_append_counted_string(sb, template, len2, 1);
+
+    template += len2 + prefix_len;  len -= len2 + prefix_len;
+    
+    /* key starts here */
+    key.data=(void*)template;
+    
+    s=(unsigned char*)strstr((const char*)template, (const char*)suffix);
+    if(!s)
+      /* template ended without a closing key suffix so just give up */
+      break;
+
+    /* now have key */
+    len2= s - (unsigned char*)key.data;
+    key.size= len2;
+
+    /* move past key and suffix */
+    template += len2 + suffix_len;  len -= len2 + suffix_len;
+
+    hd_value=librdf_hash_get_one(dictionary, &key);
+    /* append value if there is one */
+    if(hd_value)
+      raptor_stringbuffer_append_counted_string(sb, hd_value->data, 
+                                                hd_value->size, 1);
+    
+  }
+
+  /* Generate a string result */
+  len=raptor_stringbuffer_length(sb);
+  if(len) {
+    result=LIBRDF_MALLOC(cstring, len+1);
+    raptor_stringbuffer_copy_to_string(sb, result, len);
+  }
+  
+  raptor_free_stringbuffer(sb);
+  return result;
+}
+
+
+
+
 #endif
 
 
@@ -1605,12 +1696,14 @@ main(int argc, char *argv[])
                                  NULL};
   const char * const test_hash_string="field1='value1', field2='\\'value2', field3='\\\\', field4='\\\\\\'', field5 = 'a' ";
   const char *test_hash_delete_key="size";
+  const unsigned char* template=(const unsigned char*)"the shape is %{shape} and the sides are %{sides} created by %{rubik}";
   int i,j;
   const char *type;
   librdf_hash_datum hd_key, hd_value; /* on stack */
   const char *program=librdf_basename((const char*)argv[0]);
   int b;
   long l;
+  unsigned char* template_result;
   librdf_world *world;
   
   world=librdf_new_world();
@@ -1780,6 +1873,21 @@ main(int argc, char *argv[])
   librdf_hash_print(h2, stdout);
   fputc('\n', stdout);
   fprintf(stdout, "%s: values count %d\n", program, librdf_hash_values_count(h2));
+
+  librdf_free_hash(h2);
+
+   
+  fprintf(stdout, "%s: Subtituting into template >>%s<<\n", program, 
+          template);
+  h2=librdf_new_hash(world, NULL);
+  librdf_hash_from_array_of_strings(h2, test_hash_array);
+
+  template_result=librdf_hash_interpret_template(template, h2, 
+                                                 (const unsigned char*)"%{", 
+                                                 (const unsigned char*)"}");
+  fprintf(stdout, "%s: resulting in >>%s<<\n", program, 
+          template_result);
+  LIBRDF_FREE(cstring, template_result);
 
   librdf_free_hash(h2);
 
