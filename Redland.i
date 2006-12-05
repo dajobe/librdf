@@ -286,6 +286,11 @@ librdf_query_results* librdf_model_query_execute(librdf_model* model, librdf_que
 %newobject librdf_model_to_string;
 char* librdf_model_to_string(librdf_model* model, librdf_uri *uri /* or NULL */, const char* inStrOrNull /* name */ =NULL /* */ , const char* inStrOrNull /* mime_type */ =NULL, librdf_uri* inUriOrNull /*type_uri */ =NULL);
 
+int librdf_model_transaction_start(librdf_model* model);
+int librdf_model_transaction_commit(librdf_model* model);
+int librdf_model_transaction_rollback(librdf_model* model);
+
+
 /* rdf_storage.h */
 %newobject librdf_new_storage;
 %newobject librdf_new_storage_from_storage;
