@@ -55,7 +55,6 @@ RELEASE.html INSTALL.html FAQS.html \
 LICENSE-2.0.txt NOTICE \
 redland.rdf.in \
 autogen.sh \
-Makefile.PL \
 redland-config.in \
 redland-src-config.in \
 $(man_MANS) \
