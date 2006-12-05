@@ -1719,6 +1719,96 @@ librdf_model_contains_context(librdf_model* model, librdf_node* context) {
 }
 
 
+/**
+ * librdf_model_transaction_start:
+ * @model: the model object
+ * 
+ * Start a transaction
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_model_transaction_start(librdf_model* model) 
+{
+  if(model->factory->transaction_start)
+    return model->factory->transaction_start(model);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_model_transaction_start_with_handle:
+ * @model: the model object
+ * @handle: the transaction object
+ * 
+ * Start a transaction using an existing external transaction object.
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_model_transaction_start_with_handle(librdf_model* model, void* handle)
+{
+  if(model->factory->transaction_start_with_handle)
+    return model->factory->transaction_start_with_handle(model, handle);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_model_transaction_commit:
+ * @model: the model object
+ * 
+ * Commit a transaction.
+ * 
+ * Return value: non-0 on failure 
+ **/
+int
+librdf_model_transaction_commit(librdf_model* model) 
+{
+  if(model->factory->transaction_commit)
+    return model->factory->transaction_commit(model);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_model_transaction_rollback:
+ * @model: the model object
+ * 
+ * Rollback a transaction.
+ * 
+ * Return value: non-0 on failure 
+ **/
+int
+librdf_model_transaction_rollback(librdf_model* model) 
+{
+  if(model->factory->transaction_rollback)
+    return model->factory->transaction_rollback(model);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_model_transaction_get_handle:
+ * @model: the model object
+ * 
+ * Get the current transaction handle.
+ * 
+ * Return value: non-0 on failure 
+ **/
+void*
+librdf_model_transaction_get_handle(librdf_model* model) 
+{
+  if(model->factory->transaction_get_handle)
+    return model->factory->transaction_get_handle(model);
+  else
+    return NULL;
+}
+
 #endif
 
 
