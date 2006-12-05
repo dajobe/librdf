@@ -633,6 +633,90 @@ librdf_model_storage_find_statements_with_options(librdf_model* model,
   return librdf_storage_find_statements_with_options(context->storage, statement, context_node, options);
 }
 
+
+/**
+ * librdf_model_storage_transaction_start:
+ * @storage: the storage object
+ * 
+ * Start a transaction
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_model_storage_transaction_start(librdf_model* model) 
+{
+  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
+  return librdf_storage_transaction_start(context->storage);
+}
+
+
+/**
+ * librdf_model_storage_transaction_start_with_handle:
+ * @storage: the storage object
+ * @handle: the transaction object
+ * 
+ * Start a transaction using an existing external transaction object.
+ * 
+ * Return value: non-0 on failure
+ **/
+static int
+librdf_model_storage_transaction_start_with_handle(librdf_model* model,
+                                                   void* handle)
+{
+  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
+  return librdf_storage_transaction_start_with_handle(context->storage, handle);
+}
+
+
+/**
+ * librdf_model_storage_transaction_commit:
+ * @storage: the storage object
+ * 
+ * Commit a transaction.
+ * 
+ * Return value: non-0 on failure 
+ **/
+static int
+librdf_model_storage_transaction_commit(librdf_model* model) 
+{
+  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
+  return librdf_storage_transaction_commit(context->storage);
+}
+
+
+/**
+ * librdf_model_storage_transaction_rollback:
+ * @storage: the storage object
+ * 
+ * Rollback a transaction.
+ * 
+ * Return value: non-0 on failure 
+ **/
+static int
+librdf_model_storage_transaction_rollback(librdf_model* model) 
+{
+  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
+  return librdf_storage_transaction_rollback(context->storage);
+}
+
+
+/**
+ * librdf_model_storage_transaction_get_handle:
+ * @storage: the storage object
+ * 
+ * Get the current transaction handle.
+ * 
+ * Return value: non-0 on failure 
+ **/
+void*
+librdf_model_storage_transaction_get_handle(librdf_model* model) 
+{
+  librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
+  return librdf_storage_transaction_get_handle(context->storage);
+}
+
+
+
 /* local function to register model_storage functions */
 
 static void
@@ -676,6 +760,13 @@ librdf_model_storage_register_factory(librdf_model_factory *factory)
   factory->get_feature        = librdf_model_storage_get_feature;
   factory->set_feature        = librdf_model_storage_set_feature;
   factory->find_statements_with_options = librdf_model_storage_find_statements_with_options;
+
+  factory->transaction_start             = librdf_model_storage_transaction_start;
+  factory->transaction_start_with_handle = librdf_model_storage_transaction_start_with_handle;
+  factory->transaction_commit            = librdf_model_storage_transaction_commit;
+  factory->transaction_rollback          = librdf_model_storage_transaction_rollback;
+  factory->transaction_get_handle        = librdf_model_storage_transaction_get_handle;
+
 }
 
 
