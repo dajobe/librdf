@@ -137,6 +137,10 @@ librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = redland.pc
 
+pkgdata_DATA=
+if STORAGE_MYSQL
+pkgdata_DATA += mysql.ttl
+endif
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
