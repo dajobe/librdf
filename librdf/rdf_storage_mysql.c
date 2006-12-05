@@ -91,6 +91,8 @@ typedef struct {
   /* digest object for node hashes */
   librdf_digest *digest;
 
+  MYSQL* transaction_handle;
+  
 } librdf_storage_mysql_context;
 
 /* prototypes for local functions */
@@ -185,6 +187,10 @@ static int librdf_storage_mysql_get_contexts_end_of_iterator(void* context);
 static int librdf_storage_mysql_get_contexts_next_context(void* context);
 static void* librdf_storage_mysql_get_contexts_get_context(void* context, int flags);
 static void librdf_storage_mysql_get_contexts_finished(void* context);
+
+
+static int librdf_storage_mysql_transaction_rollback(librdf_storage* storage);
+
 
 
 /* functions implementing storage api */
@@ -290,6 +296,9 @@ librdf_storage_mysql_get_handle(librdf_storage* storage)
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
   librdf_storage_mysql_connection* connection= NULL;
   int i;
+
+  if(context->transaction_handle)
+    return context->transaction_handle;
 
   /* Look for an open connection handle to return */
   for(i=0; i < context->connections_count; i++) {
@@ -691,6 +700,9 @@ librdf_storage_mysql_terminate(librdf_storage* storage)
 
   if(context->digest)
     librdf_free_digest(context->digest);
+
+  if(context->transaction_handle)
+    librdf_storage_mysql_transaction_rollback(storage);
 }
 
 /**
@@ -723,6 +735,8 @@ librdf_storage_mysql_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_mysql_close(librdf_storage* storage)
 {
+  librdf_storage_mysql_transaction_rollback(storage);
+
   return librdf_storage_mysql_sync(storage);
 }
 
@@ -2076,8 +2090,6 @@ librdf_storage_mysql_find_statements_in_context_finished(void* context)
  * librdf_storage_mysql_get_contexts:
  * @storage: the storage
  *
- * .
- *
  * Return an iterator with the context nodes present in storage.
  *
  * Return value: a #librdf_iterator or NULL on failure
@@ -2275,6 +2287,131 @@ librdf_storage_mysql_get_feature(librdf_storage* storage, librdf_uri* feature)
 
 
 
+/**
+ * librdf_storage_mysql_transaction_start:
+ * @storage: the storage object
+ * 
+ * Start a transaction
+ * 
+ * Return value: non-0 on failure
+ **/
+static int
+librdf_storage_mysql_transaction_start(librdf_storage* storage) 
+{
+  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+  const char query[]="START TRANSACTION";
+  
+  if(context->transaction_handle) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL transaction already started");
+    return 1;
+  }
+  
+  context->transaction_handle=librdf_storage_mysql_get_handle(storage);
+  if(!context->transaction_handle) 
+    return 1;
+
+  if(mysql_real_query(context->transaction_handle, query, strlen(query))) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "MySQL query failed: %s", mysql_error(context->transaction_handle));
+    librdf_storage_mysql_transaction_rollback(storage);    
+    return 1;
+  }
+
+  return 0;
+}
+
+
+/**
+ * librdf_storage_mysql_transaction_start_with_handle:
+ * @storage: the storage object
+ * @handle: the transaction object
+ * 
+ * Start a transaction using an existing external transaction object.
+ * 
+ * Return value: non-0 on failure
+ **/
+static int
+librdf_storage_mysql_transaction_start_with_handle(librdf_storage* storage,
+                                                   void* handle)
+{
+  return librdf_storage_mysql_transaction_start(storage);
+}
+
+
+/**
+ * librdf_storage_mysql_transaction_commit:
+ * @storage: the storage object
+ * 
+ * Commit a transaction.
+ * 
+ * Return value: non-0 on failure 
+ **/
+static int
+librdf_storage_mysql_transaction_commit(librdf_storage* storage) 
+{
+  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+  MYSQL* handle;
+  int status;
+  
+  if(!context->transaction_handle)
+    return 1;
+
+  handle=context->transaction_handle;
+  status=mysql_commit(handle);
+  
+  librdf_storage_mysql_release_handle(storage, handle);
+  context->transaction_handle=NULL;
+  
+  return (status != 0);
+}
+
+
+/**
+ * librdf_storage_mysql_transaction_rollback:
+ * @storage: the storage object
+ * 
+ * Rollback a transaction.
+ * 
+ * Return value: non-0 on failure 
+ **/
+static int
+librdf_storage_mysql_transaction_rollback(librdf_storage* storage)
+{
+  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+  MYSQL* handle;
+  int status;
+  
+  handle=context->transaction_handle;
+  if(!handle)
+    return 1;
+  
+  status=mysql_rollback(handle);
+
+  librdf_storage_mysql_release_handle(storage, handle);
+  context->transaction_handle=NULL;
+  
+  return (status != 0);
+}
+
+
+/**
+ * librdf_storage_mysql_transaction_get_handle:
+ * @storage: the storage object
+ * 
+ * Get the current transaction handle.
+ * 
+ * Return value: non-0 on failure 
+ **/
+static void*
+librdf_storage_mysql_transaction_get_handle(librdf_storage* storage) 
+{
+  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+
+  return context->transaction_handle;
+}
+
+
 
 /* local function to register MySQL storage functions */
 static void
@@ -2302,6 +2439,12 @@ librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
   factory->find_statements_in_context = librdf_storage_mysql_find_statements_in_context;
   factory->get_contexts               = librdf_storage_mysql_get_contexts;
   factory->get_feature                = librdf_storage_mysql_get_feature;
+
+  factory->transaction_start             = librdf_storage_mysql_transaction_start;
+  factory->transaction_start_with_handle = librdf_storage_mysql_transaction_start_with_handle;
+  factory->transaction_commit            = librdf_storage_mysql_transaction_commit;
+  factory->transaction_rollback          = librdf_storage_mysql_transaction_rollback;
+  factory->transaction_get_handle        = librdf_storage_mysql_transaction_get_handle;
 }
 
 
