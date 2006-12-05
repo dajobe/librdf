@@ -12,7 +12,7 @@ mysql:
   rdfs:label "Redland MySQL Schema";
 
   dbconfig:createTableStatements """
-CREATE TABLE IF NOT EXISTS %(NAME) (
+CREATE TABLE IF NOT EXISTS $(NAME) (
   Subject bigint unsigned NOT NULL,
   Predicate bigint unsigned NOT NULL,
   Object bigint unsigned NOT NULL,
