@@ -160,6 +160,13 @@ struct librdf_storage_factory_s {
   librdf_node* (*get_feature)(librdf_storage* storaage, librdf_uri* feature);
   int (*set_feature)(librdf_storage* storage, librdf_uri* feature, librdf_node* value);
 
+  /* transactions - OPTIONAL */
+  int (*transaction_start)(librdf_storage* storage);
+  int (*transaction_start_with_handle)(librdf_storage* storage, void* handle);
+  int (*transaction_commit)(librdf_storage* storage);
+  int (*transaction_rollback)(librdf_storage* storage);
+  void* (*transaction_get_handle)(librdf_storage* storage);
+
 };
 
 void librdf_init_storage_list(librdf_world *world);
