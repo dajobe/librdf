@@ -140,6 +140,17 @@ librdf_node* librdf_storage_get_feature(librdf_storage* storage, librdf_uri* fea
 REDLAND_API
 int librdf_storage_set_feature(librdf_storage* storage, librdf_uri* feature, librdf_node* value);
 
+REDLAND_API
+int librdf_storage_transaction_start(librdf_storage* storage);
+REDLAND_API
+int librdf_storage_transaction_start_with_handle(librdf_storage* storage, void* handle);
+REDLAND_API
+int librdf_storage_transaction_commit(librdf_storage* storage);
+REDLAND_API
+int librdf_storage_transaction_rollback(librdf_storage* storage);
+REDLAND_API
+void* librdf_storage_transaction_get_handle(librdf_storage* storage);
+
 #ifdef __cplusplus
 }
 #endif
