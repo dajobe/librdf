@@ -166,6 +166,13 @@ struct librdf_model_factory_s {
   librdf_node* (*get_feature)(librdf_model* model, librdf_uri* feature);
   int (*set_feature)(librdf_model* model, librdf_uri* feature, librdf_node* value);
 
+  /* transactions - OPTIONAL */
+  int (*transaction_start)(librdf_model* model);
+  int (*transaction_start_with_handle)(librdf_model* model, void* handle);
+  int (*transaction_commit)(librdf_model* model);
+  int (*transaction_rollback)(librdf_model* model);
+  void* (*transaction_get_handle)(librdf_model* model);
+
 };
 
 /* module init */
