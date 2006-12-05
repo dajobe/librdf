@@ -191,6 +191,18 @@ librdf_stream* librdf_model_find_statements_in_context(librdf_model* model, libr
 REDLAND_API
 librdf_iterator* librdf_model_get_contexts(librdf_model* model);
 
+REDLAND_API
+int librdf_model_transaction_start(librdf_model* model);
+REDLAND_API
+int librdf_model_transaction_start_with_handle(librdf_model* model, void* handle);
+REDLAND_API
+int librdf_model_transaction_commit(librdf_model* model);
+REDLAND_API
+int librdf_model_transaction_rollback(librdf_model* model);
+REDLAND_API
+void* librdf_model_transaction_get_handle(librdf_model* model);
+
+
 /**
  * LIBRDF_MODEL_FEATURE_CONTEXTS:
  *
