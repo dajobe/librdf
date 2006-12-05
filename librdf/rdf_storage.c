@@ -1591,6 +1591,98 @@ librdf_storage_find_statements_with_options(librdf_storage* storage,
 }
 
 
+
+/**
+ * librdf_storage_transaction_start:
+ * @storage: the storage object
+ * 
+ * Start a transaction
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_storage_transaction_start(librdf_storage* storage) 
+{
+  if(storage->factory->transaction_start)
+    return storage->factory->transaction_start(storage);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_storage_transaction_start_with_handle:
+ * @storage: the storage object
+ * @handle: the transaction object
+ * 
+ * Start a transaction using an existing external transaction object.
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_storage_transaction_start_with_handle(librdf_storage* storage, void* handle)
+{
+  if(storage->factory->transaction_start_with_handle)
+    return storage->factory->transaction_start_with_handle(storage, handle);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_storage_transaction_commit:
+ * @storage: the storage object
+ * 
+ * Commit a transaction.
+ * 
+ * Return value: non-0 on failure 
+ **/
+int
+librdf_storage_transaction_commit(librdf_storage* storage) 
+{
+  if(storage->factory->transaction_commit)
+    return storage->factory->transaction_commit(storage);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_storage_transaction_rollback:
+ * @storage: the storage object
+ * 
+ * Rollback a transaction.
+ * 
+ * Return value: non-0 on failure 
+ **/
+int
+librdf_storage_transaction_rollback(librdf_storage* storage) 
+{
+  if(storage->factory->transaction_rollback)
+    return storage->factory->transaction_rollback(storage);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_storage_transaction_get_handle:
+ * @storage: the storage object
+ * 
+ * Get the current transaction handle.
+ * 
+ * Return value: non-0 on failure 
+ **/
+void*
+librdf_storage_transaction_get_handle(librdf_storage* storage) 
+{
+  if(storage->factory->transaction_get_handle)
+    return storage->factory->transaction_get_handle(storage);
+  else
+    return NULL;
+}
+
+
 #endif
 
 
