@@ -51,6 +51,7 @@ rdf_model.c rdf_model_storage.c \
 rdf_iterator.c rdf_concepts.c \
 rdf_list.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
+rdf_storage_sql.c \
 rdf_stream.c \
 rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
 rdf_query.c rdf_query_results.c \
@@ -145,7 +146,8 @@ endif
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
-rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test
+rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test \
+rdf_storage_sql_test
 
 CLEANFILES=$(TESTS) test test.db test1.db test.rdf
 
@@ -176,6 +178,8 @@ AM_CPPFLAGS=@LIBRDF_INTERNAL_CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_EXTERNAL_CPPFLA
 AM_CFLAGS=@LIBRDF_INTERNAL_CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_EXTERNAL_CPPFLAGS@ $(MEM)
 STANDARD_CFLAGS=@STANDARD_CFLAGS@ $(MEM)
 AM_LDFLAGS=@LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ $(MEM_LIBS)
+
+AM_CPPFLAGS += -DPKGDATADIR=\"$(pkgdatadir)\"
 
 LOCAL_LIB_DIR=lib
 
@@ -234,6 +238,9 @@ rdf_stream_test: rdf_stream.c librdf.la
 
 rdf_iterator_test: rdf_iterator.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_iterator.c librdf.la
+
+rdf_storage_sql_test: rdf_storage_sql.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_storage_sql.c librdf.la
 
 @SET_MAKE@
 
