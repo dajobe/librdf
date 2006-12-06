@@ -4,7 +4,7 @@
  *
  * $Id:$
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2006, David Beckett http://purl.org/net/dajobe/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -62,7 +62,20 @@ typedef struct
 
 
 librdf_sql_config* librdf_new_sql_config(librdf_world* world, const char *storage_name, const char* config_dir, const char** predicate_uri_strings);
+librdf_sql_config* librdf_new_sql_config_for_storage(librdf_storage* storage);
 void librdf_free_sql_config(librdf_sql_config* config);
+
+typedef enum {
+  DBCONFIG_CREATE_TABLE_STATEMENTS,
+  DBCONFIG_CREATE_TABLE_LITERALS,
+  DBCONFIG_CREATE_TABLE_RESOURCES,
+  DBCONFIG_CREATE_TABLE_BNODES,
+  DBCONFIG_CREATE_TABLE_MODELS,
+  DBCONFIG_CREATE_TABLE_LAST = DBCONFIG_CREATE_TABLE_MODELS
+} librdf_dbconfig;
+
+const char* dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2];
+
 
 
 #ifndef STANDALONE
@@ -163,6 +176,24 @@ librdf_new_sql_config(librdf_world* world,
 }
 
 
+const char* dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2]={
+  "http://schemas.librdf.org/2006/dbconfig#createTableStatements",
+  "http://schemas.librdf.org/2006/dbconfig#createTableLiterals",
+  "http://schemas.librdf.org/2006/dbconfig#createTableResources",
+  "http://schemas.librdf.org/2006/dbconfig#createTableBnodes",
+  "http://schemas.librdf.org/2006/dbconfig#createTableModels",
+  NULL
+};
+
+
+librdf_sql_config*
+librdf_new_sql_config_for_storage(librdf_storage* storage)
+{
+  return librdf_new_sql_config(storage->world, storage->factory->name,
+                               PKGDATADIR, dbconfig_predicates);
+}
+
+
 void
 librdf_free_sql_config(librdf_sql_config* config)
 {
@@ -187,48 +218,27 @@ librdf_free_sql_config(librdf_sql_config* config)
 
 #ifdef STANDALONE
 
-typedef enum {
-  DBCONFIG_CREATE_TABLE_STATEMENTS,
-  DBCONFIG_CREATE_TABLE_LITERALS,
-  DBCONFIG_CREATE_TABLE_RESOURCES,
-  DBCONFIG_CREATE_TABLE_BNODES,
-  DBCONFIG_CREATE_TABLE_MODELS,
-  DBCONFIG_CREATE_TABLE_LAST = DBCONFIG_CREATE_TABLE_MODELS
-} librdf_dbconfig;
-
-static const char* dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2]={
-  "http://schemas.librdf.org/2006/dbconfig#createTableStatements",
-  "http://schemas.librdf.org/2006/dbconfig#createTableLiterals",
-  "http://schemas.librdf.org/2006/dbconfig#createTableResources",
-  "http://schemas.librdf.org/2006/dbconfig#createTableBnodes",
-  "http://schemas.librdf.org/2006/dbconfig#createTableModels",
-  NULL
-};
-
-
 /* one more prototype */
 int main(int argc, char *argv[]);
 
 int
 main(int argc, char *argv[])
 {
-  int rc=0;
-  librdf_sql_config* config;
-  const char* dir;
   librdf_world* world;
+  librdf_sql_config* config;
+  int rc=0;
 
   world=librdf_new_world();
   librdf_world_open(world);
 
-  dir=PKGDATADIR;
-  dir=".";
-  
-  config=librdf_new_sql_config(world, "mysql", dir, dbconfig_predicates);
+  config=librdf_new_sql_config(world, "mysql", ".", dbconfig_predicates);
+  if(config) {
+    fprintf(stderr, "Bnode table declaration is '%s'\n",
+            config->values[DBCONFIG_CREATE_TABLE_BNODES]);
 
-  fprintf(stderr, "Bnode table declaration is '%s'\n",
-          config->values[DBCONFIG_CREATE_TABLE_BNODES]);
-
-  librdf_free_sql_config(config);
+    librdf_free_sql_config(config);
+  } else
+    rc=1;
 
   librdf_free_world(world);
 
