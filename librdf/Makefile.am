@@ -143,13 +143,18 @@ if STORAGE_MYSQL
 pkgdata_DATA += mysql-v1.ttl mysql-v2.ttl
 endif
 
+EXTRA_DIST += mysql-v1.ttl mysql-v2.ttl
+
+local_tests=rdf_storage_sql_test
+
+EXTRA_PROGRAMS=$(local_tests)
+
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
-rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test \
-rdf_storage_sql_test
+rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test
 
-CLEANFILES=$(TESTS) test test.db test1.db test.rdf
+CLEANFILES=$(TESTS) $(local_tests) test test.db test1.db test.rdf
 
 # Memory debugging alternatives
 MEM=@MEM@
@@ -184,6 +189,30 @@ AM_CPPFLAGS += -DPKGDATADIR=\"$(pkgdatadir)\"
 LOCAL_LIB_DIR=lib
 
 # Rules to construct test programs
+
+check-local: $(local_tests) run-local-tests
+
+rdf_storage_sql_test_SOURCES = rdf_storage_sql_test.c
+rdf_storage_sql_test_LDADD = librdf.la
+
+
+run-local-tests: rdf_storage_sql_test$(EXTEXE)
+	@tests="rdf_storage_sql_test"; \
+	status=0; \
+	for tst in $$tests; do \
+	  if test -f ./$$tst; then dir=./; \
+	  elif test -f $$tst; then dir=; \
+	  else dir="$(top_srcdir)/"; fi; \
+	  if $${dir}$$tst $(srcdir); then \
+	    echo "PASS: $$tst"; \
+	  else \
+	    echo "FAIL: $$tst"; \
+	    status=1; \
+	    break; \
+	  fi; \
+	done; \
+	exit $$status
+
 
 # Some people need a little help ;-)
 test: check
@@ -238,9 +267,6 @@ rdf_stream_test: rdf_stream.c librdf.la
 
 rdf_iterator_test: rdf_iterator.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_iterator.c librdf.la
-
-rdf_storage_sql_test: rdf_storage_sql.c librdf.la
-	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_storage_sql.c librdf.la
 
 @SET_MAKE@
 

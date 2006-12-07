@@ -49,37 +49,6 @@
 #include <redland.h>
 
 
-typedef struct  
-{
-  char* filename;
-  
-  const char** predicate_uri_strings;
-  int predicates_count;
-
-  /* array of char* with NULL at end - size predicates_count */
-  char** values;
-} librdf_sql_config;
-
-
-librdf_sql_config* librdf_new_sql_config(librdf_world* world, const char *storage_name, const char* layout, const char* config_dir, const char** predicate_uri_strings);
-librdf_sql_config* librdf_new_sql_config_for_storage(librdf_storage* storage, const char* layout);
-void librdf_free_sql_config(librdf_sql_config* config);
-
-typedef enum {
-  DBCONFIG_CREATE_TABLE_STATEMENTS,
-  DBCONFIG_CREATE_TABLE_LITERALS,
-  DBCONFIG_CREATE_TABLE_RESOURCES,
-  DBCONFIG_CREATE_TABLE_BNODES,
-  DBCONFIG_CREATE_TABLE_MODELS,
-  DBCONFIG_CREATE_TABLE_LAST = DBCONFIG_CREATE_TABLE_MODELS
-} librdf_dbconfig;
-
-const char* dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2];
-
-
-
-#ifndef STANDALONE
-
 static void librdf_sql_config_store_triple(void *user_data,  const raptor_statement *triple);
 
 
@@ -109,6 +78,22 @@ librdf_sql_config_store_triple(void *user_data,
 }
 
 
+/**
+ * librdf_new_sql_config:
+ * @world: librdf_world
+ * @storage_name: SQL storage name
+ * @layout: SQL schema variant
+ * @config_dir: directory for configuration files
+ * @predicate_uri_strings: configuration predicate URIs to look for
+ * 
+ * Constructor - Make a new SQL configuration for a layout from a file
+ *
+ * Uses SQL storage name @storage_name and with database schema
+ * @layout to give a configuration that will contain an array of
+ * string values in the #librdf_sql_config field values array.
+ * 
+ * Return value: configuration or NULL on failure
+ **/
 librdf_sql_config*
 librdf_new_sql_config(librdf_world* world,
                       const char* storage_name,
@@ -144,12 +129,13 @@ librdf_new_sql_config(librdf_world* world,
                                        config->predicates_count);
   
   LIBRDF_DEBUG4("Attempting to open %s layout %s storage config file %s\n", 
-                storage_name, (layout ? layout: "(none)"), config->filename);
+                storage_name, (layout ? layout: "(default)"), config->filename);
   
   if(access((const char*)config->filename, R_OK)) {
     librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Failed to open configuration file %s for storage %s - %s",
-               config->filename, storage_name, strerror(errno));
+               "Failed to open configuration file %s for storage %s layout %s - %s",
+               config->filename, storage_name, (layout ? layout: "(default)"),
+               strerror(errno));
     librdf_free_sql_config(config);
     return NULL;
   }
@@ -183,7 +169,7 @@ librdf_new_sql_config(librdf_world* world,
 }
 
 
-const char* dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2]={
+const char* librdf_storage_sql_dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2]={
   "http://schemas.librdf.org/2006/dbconfig#createTableStatements",
   "http://schemas.librdf.org/2006/dbconfig#createTableLiterals",
   "http://schemas.librdf.org/2006/dbconfig#createTableResources",
@@ -193,15 +179,31 @@ const char* dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2]={
 };
 
 
+/**
+ * librdf_new_sql_config_for_storage:
+ * @storage: SQL #librdf_storage to configure
+ * @layout: layout variant
+ * 
+ * Constructor - Create a new SQL storage configuration for a given database layout.
+ * 
+ * Return value: new configuration or NULL on failure
+ **/
 librdf_sql_config*
 librdf_new_sql_config_for_storage(librdf_storage* storage, const char* layout)
 {
   return librdf_new_sql_config(storage->world, storage->factory->name,
                                layout,
-                               PKGDATADIR, dbconfig_predicates);
+                               PKGDATADIR,
+                               librdf_storage_sql_dbconfig_predicates);
 }
 
 
+/**
+ * librdf_free_sql_config:
+ * @config: SQL storage configuration
+ * 
+ * Destructor - free a SQL configuration.
+ **/
 void
 librdf_free_sql_config(librdf_sql_config* config)
 {
@@ -220,43 +222,3 @@ librdf_free_sql_config(librdf_sql_config* config)
 
   LIBRDF_FREE(cstring, config);
 }
-
-#endif
-
-
-#ifdef STANDALONE
-
-/* one more prototype */
-int main(int argc, char *argv[]);
-
-int
-main(int argc, char *argv[])
-{
-  librdf_world* world;
-  int failures=0;
-  int i;
-  
-  world=librdf_new_world();
-  librdf_world_open(world);
-
-  for(i=0; i<2; i++) {
-    const char* layout=(i == 0) ? NULL : "v2";
-    librdf_sql_config* config;
-    
-    config=librdf_new_sql_config(world, "mysql", layout, ".", 
-                                 dbconfig_predicates);
-    if(config) {
-      fprintf(stderr, "Bnode table declaration is '%s'\n",
-              config->values[DBCONFIG_CREATE_TABLE_BNODES]);
-      
-      librdf_free_sql_config(config);
-    } else
-      failures++;
-  }
-
-  librdf_free_world(world);
-
-  return failures;
-}
-
-#endif
