@@ -222,7 +222,7 @@ typedef struct
 } librdf_sql_config;
 
 librdf_sql_config* librdf_new_sql_config(librdf_world* world, const char *storage_name, const char* layout, const char* config_dir, const char** predicate_uri_strings);
-librdf_sql_config* librdf_new_sql_config_for_storage(librdf_storage* storage, const char* layout);
+librdf_sql_config* librdf_new_sql_config_for_storage(librdf_storage* storage, const char* layout, const char* dir);
 void librdf_free_sql_config(librdf_sql_config* config);
 
 typedef enum {
