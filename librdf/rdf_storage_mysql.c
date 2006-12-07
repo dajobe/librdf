@@ -93,6 +93,13 @@ typedef struct {
 
   MYSQL* transaction_handle;
   
+  /* SQL schema layout - default is "v1" */
+  char *layout;
+
+  /* SQL config directory - default is defined in
+   * librdf_new_sql_config_for_storage
+   */
+  char *config_dir;
 } librdf_storage_mysql_context;
 
 /* prototypes for local functions */
@@ -419,44 +426,6 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
                           librdf_hash* options)
 {
   librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
-  const char create_table_statements[]="\
-  CREATE TABLE IF NOT EXISTS Statements" UINT64_T_FMT " (\
-  Subject bigint unsigned NOT NULL,\
-  Predicate bigint unsigned NOT NULL,\
-  Object bigint unsigned NOT NULL,\
-  Context bigint unsigned NOT NULL,\
-  KEY Context (Context),\
-  KEY SubjectPredicate (Subject,Predicate),\
-  KEY PredicateObject (Predicate,Object),\
-  KEY ObjectSubject (Object,Subject)\
-) TYPE=MyISAM DELAY_KEY_WRITE=1 MAX_ROWS=100000000 AVG_ROW_LENGTH=33";
-  const char create_table_literals[]="\
-  CREATE TABLE IF NOT EXISTS Literals (\
-  ID bigint unsigned NOT NULL,\
-  Value longtext NOT NULL,\
-  Language text NOT NULL,\
-  Datatype text NOT NULL,\
-  PRIMARY KEY ID (ID),\
-  FULLTEXT KEY Value (Value)\
-) TYPE=MyISAM DELAY_KEY_WRITE=1 MAX_ROWS=100000000 AVG_ROW_LENGTH=44";
-  const char create_table_resources[]="\
-  CREATE TABLE IF NOT EXISTS Resources (\
-  ID bigint unsigned NOT NULL,\
-  URI text NOT NULL,\
-  PRIMARY KEY ID (ID)\
-) TYPE=MyISAM DELAY_KEY_WRITE=1 MAX_ROWS=100000000 AVG_ROW_LENGTH=63";
-  const char create_table_bnodes[]="\
-  CREATE TABLE IF NOT EXISTS Bnodes (\
-  ID bigint unsigned NOT NULL,\
-  Name text NOT NULL,\
-  PRIMARY KEY ID (ID)\
-) TYPE=MyISAM DELAY_KEY_WRITE=1 MAX_ROWS=100000000 AVG_ROW_LENGTH=33";
-  const char create_table_models[]="\
-  CREATE TABLE IF NOT EXISTS Models (\
-  ID bigint unsigned NOT NULL,\
-  Name text NOT NULL,\
-  PRIMARY KEY ID (ID)\
-) TYPE=MyISAM DELAY_KEY_WRITE=1";
   const char create_model[]="INSERT INTO Models (ID,Name) VALUES (" UINT64_T_FMT ",'%s')";
   const char check_model[]="SELECT HIGH_PRIORITY 1 FROM Models WHERE ID=" UINT64_T_FMT " AND Name='%s'";
   int status=0;
@@ -464,6 +433,7 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   char *query=NULL;
   MYSQL_RES *res;
   MYSQL *handle;
+  const char* default_layout="v1";
 
   /* Must have connection parameters passed as options */
   if(!options)
@@ -495,6 +465,14 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   /* Reconnect? */
   context->reconnect=(librdf_hash_get_as_boolean(options, "reconnect")>0);
 
+  context->layout=librdf_hash_get_del(options, "layout");
+  if(!context->layout) {
+    context->layout=LIBRDF_MALLOC(cstring, strlen(default_layout)+1);
+    strcpy(context->layout, default_layout);
+  }
+
+  context->config_dir=librdf_hash_get_del(options, "config-dir");
+
   /* Initialize MySQL connections */
   librdf_storage_mysql_init_connections(storage);
 
@@ -505,26 +483,48 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
 
   /* Create tables, if new and not existing */
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) {
-    if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(create_table_statements)+
-                                    20))) {
-      status=1;
-    } else {
-      sprintf(query, create_table_statements, context->model);
-      if(mysql_real_query(handle, query, strlen(query)) ||
-         mysql_real_query(handle, create_table_literals,
-                          strlen(create_table_literals)) ||
-         mysql_real_query(handle, create_table_resources,
-                          strlen(create_table_resources)) ||
-         mysql_real_query(handle, create_table_bnodes,
-                          strlen(create_table_bnodes)) ||
-         mysql_real_query(handle, create_table_models,
-                          strlen(create_table_models))) {
-        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "MySQL table creation failed: %s",
-                   mysql_error(handle));
-        status=-1;
-      }
-      LIBRDF_FREE(cstring, query);
+    librdf_sql_config* config;
+    int table;
+    
+    /* Read SQL configuration */
+    config=librdf_new_sql_config_for_storage(storage, context->layout,
+                                             context->config_dir);
+    if(!config)
+      status= -1;
+    else {
+      for(table= DBCONFIG_CREATE_TABLE_STATEMENTS;
+          table < DBCONFIG_CREATE_TABLE_MODELS;
+          table++) {
+        librdf_hash* vars;
+        const unsigned char* sql;
+
+        vars=librdf_new_hash(storage->world, NULL);
+        if(table == DBCONFIG_CREATE_TABLE_STATEMENTS) {
+          char vars_str[50];
+          sprintf(vars_str, "STATEMENTS_NAME='Statements" UINT64_T_FMT "'", 
+                  context->model);
+          librdf_hash_from_string(vars, vars_str);
+        }
+
+        sql=librdf_hash_interpret_template((const unsigned char*)config->values[table],
+                                           vars, 
+                                           (const unsigned char*)"$(", 
+                                           (const unsigned char*)")");
+
+        librdf_free_hash(vars);
+
+        LIBRDF_DEBUG2("SQL: '%s'", sql);
+        if(mysql_real_query(handle, (const char*)sql, strlen((const char*)sql))) {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, 
+                     NULL,
+                     "MySQL table creation failed: %s",
+                     mysql_error(handle));
+          status=-1;
+          break;
+        }
+      } /* end for */
+
+      librdf_free_sql_config(config);
     }
   }
 
@@ -685,6 +685,12 @@ librdf_storage_mysql_terminate(librdf_storage* storage)
   librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
 
   librdf_storage_mysql_finish_connections(storage);
+
+  if(context->config_dir)
+    LIBRDF_FREE(cstring,(char *)context->config_dir);
+
+  if(context->layout)
+    LIBRDF_FREE(cstring,(char *)context->layout);
 
   if(context->password)
     LIBRDF_FREE(cstring,(char *)context->password);
