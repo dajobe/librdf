@@ -1,5 +1,5 @@
 #
-# Redland MySQL storage schema
+# Redland MySQL storage schema - MyISAM
 #
 # Turtle with variable substitution
 #
@@ -9,7 +9,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 mysql:
-  rdfs:label "Redland MySQL Schema";
+  rdfs:label "Redland MySQL Schema V1 MyISAM";
 
   dbconfig:createTableStatements """
 CREATE TABLE IF NOT EXISTS $(STATEMENTS_NAME) (
