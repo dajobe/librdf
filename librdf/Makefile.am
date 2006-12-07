@@ -140,7 +140,7 @@ pkgconfig_DATA = redland.pc
 
 pkgdata_DATA=
 if STORAGE_MYSQL
-pkgdata_DATA += mysql.ttl
+pkgdata_DATA += mysql-v1.ttl mysql-v2.ttl
 endif
 
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
