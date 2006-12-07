@@ -642,7 +642,7 @@ librdf_model_storage_find_statements_with_options(librdf_model* model,
  * 
  * Return value: non-0 on failure
  **/
-int
+static int
 librdf_model_storage_transaction_start(librdf_model* model) 
 {
   librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
@@ -708,7 +708,7 @@ librdf_model_storage_transaction_rollback(librdf_model* model)
  * 
  * Return value: non-0 on failure 
  **/
-void*
+static void*
 librdf_model_storage_transaction_get_handle(librdf_model* model) 
 {
   librdf_model_storage_context *context=(librdf_model_storage_context *)model->context;
