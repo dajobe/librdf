@@ -61,8 +61,8 @@ typedef struct
 } librdf_sql_config;
 
 
-librdf_sql_config* librdf_new_sql_config(librdf_world* world, const char *storage_name, const char* config_dir, const char** predicate_uri_strings);
-librdf_sql_config* librdf_new_sql_config_for_storage(librdf_storage* storage);
+librdf_sql_config* librdf_new_sql_config(librdf_world* world, const char *storage_name, const char* layout, const char* config_dir, const char** predicate_uri_strings);
+librdf_sql_config* librdf_new_sql_config_for_storage(librdf_storage* storage, const char* layout);
 void librdf_free_sql_config(librdf_sql_config* config);
 
 typedef enum {
@@ -112,6 +112,7 @@ librdf_sql_config_store_triple(void *user_data,
 librdf_sql_config*
 librdf_new_sql_config(librdf_world* world,
                       const char* storage_name,
+                      const char* layout,
                       const char* config_dir,
                       const char** predicate_uri_strings)
 {
@@ -120,14 +121,20 @@ librdf_new_sql_config(librdf_world* world,
   raptor_uri *base_uri;
   raptor_uri *uri;
   librdf_sql_config* config;
+  size_t len;
   int i;
   
   config=(librdf_sql_config*)LIBRDF_MALLOC(librdf_sql_config,
                                            sizeof(librdf_sql_config));
 
-  config->filename=LIBRDF_MALLOC(cstring, 
-                                 strlen(config_dir)+1+strlen(storage_name)+4+1);
-  sprintf(config->filename, "%s/%s.ttl", config_dir, storage_name);
+  len=strlen(config_dir) + 1 + strlen(storage_name) + 4 + 1;
+  if(layout)
+    len+= strlen(layout) + 1;
+  config->filename=LIBRDF_MALLOC(cstring, len);
+  if(layout)
+    sprintf(config->filename, "%s/%s-%s.ttl", config_dir, storage_name, layout);
+  else
+    sprintf(config->filename, "%s/%s.ttl", config_dir, storage_name);
 
   config->predicate_uri_strings=predicate_uri_strings;
   for(i=0; config->predicate_uri_strings[i]; i++)
@@ -136,8 +143,8 @@ librdf_new_sql_config(librdf_world* world,
   config->values=(char**)LIBRDF_CALLOC(cstring, sizeof(char*), 
                                        config->predicates_count);
   
-  LIBRDF_DEBUG3("Attempting to open %s storage config file %s\n", 
-                storage_name, config->filename);
+  LIBRDF_DEBUG4("Attempting to open %s layout %s storage config file %s\n", 
+                storage_name, (layout ? layout: "(none)"), config->filename);
   
   if(access((const char*)config->filename, R_OK)) {
     librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
@@ -187,9 +194,10 @@ const char* dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2]={
 
 
 librdf_sql_config*
-librdf_new_sql_config_for_storage(librdf_storage* storage)
+librdf_new_sql_config_for_storage(librdf_storage* storage, const char* layout)
 {
   return librdf_new_sql_config(storage->world, storage->factory->name,
+                               layout,
                                PKGDATADIR, dbconfig_predicates);
 }
 
@@ -225,25 +233,30 @@ int
 main(int argc, char *argv[])
 {
   librdf_world* world;
-  librdf_sql_config* config;
-  int rc=0;
-
+  int failures=0;
+  int i;
+  
   world=librdf_new_world();
   librdf_world_open(world);
 
-  config=librdf_new_sql_config(world, "mysql", ".", dbconfig_predicates);
-  if(config) {
-    fprintf(stderr, "Bnode table declaration is '%s'\n",
-            config->values[DBCONFIG_CREATE_TABLE_BNODES]);
-
-    librdf_free_sql_config(config);
-  } else
-    rc=1;
+  for(i=0; i<2; i++) {
+    const char* layout=(i == 0) ? NULL : "v2";
+    librdf_sql_config* config;
+    
+    config=librdf_new_sql_config(world, "mysql", layout, ".", 
+                                 dbconfig_predicates);
+    if(config) {
+      fprintf(stderr, "Bnode table declaration is '%s'\n",
+              config->values[DBCONFIG_CREATE_TABLE_BNODES]);
+      
+      librdf_free_sql_config(config);
+    } else
+      failures++;
+  }
 
   librdf_free_world(world);
 
-  /* keep gcc -Wall happy */
-  return rc;
+  return failures;
 }
 
 #endif
