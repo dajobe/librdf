@@ -208,6 +208,36 @@ void librdf_storage_remove_reference(librdf_storage *storage);
 void librdf_init_storage_sqlite(librdf_world *world);
 #endif
 
+
+/* rdf_storage_sql.c */
+typedef struct  
+{
+  char* filename;
+  
+  const char** predicate_uri_strings;
+  int predicates_count;
+
+  /* array of char* with NULL at end - size predicates_count */
+  char** values;
+} librdf_sql_config;
+
+librdf_sql_config* librdf_new_sql_config(librdf_world* world, const char *storage_name, const char* layout, const char* config_dir, const char** predicate_uri_strings);
+librdf_sql_config* librdf_new_sql_config_for_storage(librdf_storage* storage, const char* layout);
+void librdf_free_sql_config(librdf_sql_config* config);
+
+typedef enum {
+  DBCONFIG_CREATE_TABLE_STATEMENTS,
+  DBCONFIG_CREATE_TABLE_LITERALS,
+  DBCONFIG_CREATE_TABLE_RESOURCES,
+  DBCONFIG_CREATE_TABLE_BNODES,
+  DBCONFIG_CREATE_TABLE_MODELS,
+  DBCONFIG_CREATE_TABLE_LAST = DBCONFIG_CREATE_TABLE_MODELS
+} librdf_dbconfig;
+
+extern const char* librdf_storage_sql_dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2];
+
+
+
 #ifdef __cplusplus
 }
 #endif
