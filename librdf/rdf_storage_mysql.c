@@ -400,6 +400,9 @@ librdf_storage_mysql_release_handle(librdf_storage* storage, MYSQL *handle)
   librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
   int i;
 
+  if(handle == context->transaction_handle)
+    return;
+  
   /* Look for busy connection handle to drop */
   for(i=0; i < context->connections_count; i++) {
     if(LIBRDF_STORAGE_MYSQL_CONNECTION_BUSY == context->connections[i].status &&
@@ -2464,10 +2467,13 @@ librdf_storage_mysql_transaction_commit(librdf_storage* storage)
     return 1;
 
   handle=context->transaction_handle;
+#ifdef LIBRDF_DEBUG_SQL
+  LIBRDF_DEBUG1("SQL: mysql_commit()\n");
+#endif
   status=mysql_commit(handle);
   
-  librdf_storage_mysql_release_handle(storage, handle);
   context->transaction_handle=NULL;
+  librdf_storage_mysql_release_handle(storage, handle);
   
   return (status != 0);
 }
@@ -2492,10 +2498,13 @@ librdf_storage_mysql_transaction_rollback(librdf_storage* storage)
   if(!handle)
     return 1;
   
+#ifdef LIBRDF_DEBUG_SQL
+  LIBRDF_DEBUG1("SQL: mysql_rollback()\n");
+#endif
   status=mysql_rollback(handle);
 
-  librdf_storage_mysql_release_handle(storage, handle);
   context->transaction_handle=NULL;
+  librdf_storage_mysql_release_handle(storage, handle);
   
   return (status != 0);
 }
