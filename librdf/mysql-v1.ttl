@@ -12,7 +12,7 @@ mysql:
   rdfs:label "Redland MySQL Schema";
 
   dbconfig:createTableStatements """
-CREATE TABLE IF NOT EXISTS $(NAME) (
+CREATE TABLE IF NOT EXISTS $(STATEMENTS_NAME) (
   Subject bigint unsigned NOT NULL,
   Predicate bigint unsigned NOT NULL,
   Object bigint unsigned NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS $(NAME) (
 """;
 
   dbconfig:createTableLiterals """
-CREATE TABLE IF NOT EXISTS $(NAME) (
+CREATE TABLE IF NOT EXISTS Literals (
   ID bigint unsigned NOT NULL,
   Value longtext NOT NULL,
   Language text NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS $(NAME) (
 """;
 
   dbconfig:createTableResources """
-CREATE TABLE IF NOT EXISTS $(NAME) (
+CREATE TABLE IF NOT EXISTS Resources (
   ID bigint unsigned NOT NULL,
   URI text NOT NULL,
   PRIMARY KEY ID (ID)
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS $(NAME) (
 """;
 
   dbconfig:createTableBnodes """
-CREATE TABLE IF NOT EXISTS $(NAME) (
+CREATE TABLE IF NOT EXISTS Bnodes (
   ID bigint unsigned NOT NULL,
   Name text NOT NULL,
   PRIMARY KEY ID (ID)
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS $(NAME) (
 """;
 
   dbconfig:createTableModels """
-CREATE TABLE IF NOT EXISTS $(NAME) (
+CREATE TABLE IF NOT EXISTS Models (
   ID bigint unsigned NOT NULL,
   Name text NOT NULL,
   PRIMARY KEY ID (ID)
