@@ -183,17 +183,21 @@ const char* librdf_storage_sql_dbconfig_predicates[DBCONFIG_CREATE_TABLE_LAST+2]
  * librdf_new_sql_config_for_storage:
  * @storage: SQL #librdf_storage to configure
  * @layout: layout variant
+ * @dir: directory to look for configuration or NULL for default dir
  * 
  * Constructor - Create a new SQL storage configuration for a given database layout.
  * 
  * Return value: new configuration or NULL on failure
  **/
 librdf_sql_config*
-librdf_new_sql_config_for_storage(librdf_storage* storage, const char* layout)
+librdf_new_sql_config_for_storage(librdf_storage* storage, const char* layout,
+                                  const char *dir)
 {
+  if(!dir)
+    dir=PKGDATADIR;
+  
   return librdf_new_sql_config(storage->world, storage->factory->name,
-                               layout,
-                               PKGDATADIR,
+                               layout, dir,
                                librdf_storage_sql_dbconfig_predicates);
 }
 
