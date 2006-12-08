@@ -517,7 +517,7 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
     int table;
     
     for(table= DBCONFIG_CREATE_TABLE_STATEMENTS;
-        table < DBCONFIG_CREATE_TABLE_MODELS;
+        table <= DBCONFIG_CREATE_TABLE_MODELS;
         table++) {
       query=(char*)librdf_hash_interpret_template((const unsigned char*)context->config->values[table],
                                                   context->vars, 
