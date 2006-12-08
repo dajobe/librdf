@@ -1980,7 +1980,7 @@ main(int argc, char *argv[])
                                                    NULL, 0, NULL);
   if(!node8) {
     fprintf(stderr, "%s: Failed to make big %d byte literal\n", program,
-            big_literal_length);
+            (int)big_literal_length);
     return(1);
   }
   LIBRDF_FREE(cstring, big_literal);
