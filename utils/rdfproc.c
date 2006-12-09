@@ -138,7 +138,7 @@ static command commands[]={
 #endif
 
 
-#define GETOPT_STRING "chno:ps:t:v"
+#define GETOPT_STRING "chno:ps:t:Tv"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_options[] =
@@ -151,6 +151,7 @@ static struct option long_options[] =
   {"password", 0, 0, 'p'},
   {"storage", 1, 0, 's'},
   {"storage-options", 1, 0, 't'},
+  {"transactions", 0, 0, 'T'},
   {"version", 0, 0, 'v'},
   {NULL, 0, 0, 0}
 };
@@ -224,6 +225,7 @@ main(int argc, char *argv[])
   char *p;
   int i;
   int rc;
+  int transactions=0;
   char *storage_name=(char*)default_storage_name;
   char *storage_options=(char*)default_storage_options;
   char *storage_password=NULL;
@@ -377,6 +379,10 @@ main(int argc, char *argv[])
 
       case 't':
         storage_options=optarg;
+        break;
+
+      case 'T':
+        transactions=1;
         break;
 
       case 'v':
@@ -537,6 +543,8 @@ main(int argc, char *argv[])
     return(1);
   }
 
+  if(transactions)
+    librdf_model_transaction_start(model);
 
   /* Do this or gcc moans */
   stream=NULL;
@@ -1347,6 +1355,9 @@ main(int argc, char *argv[])
 
   
   librdf_free_hash(options);
+
+  if(transactions)
+    librdf_model_transaction_commit(model);
 
   librdf_free_model(model);
   librdf_free_storage(storage);
