@@ -866,7 +866,7 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
       if(!context->context_node) {
         node=(librdf_node*)librdf_stream_get_context(context->stream);
-        context->context_node=librdf_new_node_from_node(node);
+        context->context_node=node ? librdf_new_node_from_node(node) : NULL;
       }
       node=context->context_node;
       break;
