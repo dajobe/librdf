@@ -469,13 +469,15 @@ librdf_query_results_get_boolean(librdf_query_results* query_results) {
 
 
 /**
- * librdf_query_results_as_stream - Get RDF graph query result
+ * librdf_query_results_as_stream:
  * @query_results: #librdf_query_results query_results
+ *
+ * Get a query result as an RDF graph in #librdf_stream form
  *
  * The return value is only meaningful if this is an RDF graph
  * query result - see #librdf_query_results_is_graph
  *
- * Return value: RDF graph query result or NULL on error
+ * Return value: a new #librdf_stream result or NULL on error
  */
 librdf_stream*
 librdf_query_results_as_stream(librdf_query_results* query_results) {
