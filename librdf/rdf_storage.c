@@ -943,8 +943,10 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   }
 
 
-  node1=librdf_new_node_from_node(node1);
-  node2=librdf_new_node_from_node(node2);
+  if(node1)
+    node1=librdf_new_node_from_node(node1);
+  if(node2)
+    node2=librdf_new_node_from_node(node2);
   
   switch(want) {
     case LIBRDF_STATEMENT_SUBJECT:
