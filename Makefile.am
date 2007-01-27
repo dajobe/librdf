@@ -85,4 +85,4 @@ endif
 @SET_MAKE@
 
 install-data-hook:
-	touch -r $(srcdir)/Redland.i $(DESTDIR)$(pkgdatadir)/Redland.i
+	touch $(DESTDIR)$(pkgdatadir)/Redland.i -r $(srcdir)/Redland.i 
