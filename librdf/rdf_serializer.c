@@ -246,7 +246,7 @@ librdf_get_serializer_factory(librdf_world *world,
         if(!factory->type_uri)
           continue;
         
-        if(librdf_uri_equals(factory->type_uri, type_uri))
+        if(!librdf_uri_equals(factory->type_uri, type_uri))
           continue;
       }
 
