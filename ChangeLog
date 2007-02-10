@@ -1,3 +1,221 @@
+2007-01-26  Dave Beckett  <dave@dajobe.org>
+
+	* Makefile.am: Revert touch -r change as it just creates a file
+	called '-r' (reopen http://bugs.librdf.org/mantis/view.php?id=159)
+
+	* Makefile.am: Reverse use of touch -r since it seems to fail on
+	Solaris.  Fixes http://bugs.librdf.org/mantis/view.php?id=159
+
+2007-01-23  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac: RASQAL_MIN_VERSION 0.9.14
+
+	* librdf/rdf_storage.c: (librdf_storage_node_stream_to_node_create):
+	Allow copying NULL node1 and node2.
+
+2006-12-13  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/Makefile.am,
+	librdf/rdf_query_results.c: (librdf_query_results_as_stream) docs
+
+2006-12-09  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage.c:
+	(librdf_storage_stream_to_node_iterator_get_method): Do not try to
+	copy a NULL context node.
+
+	* utils/rdfproc.c: Added --transactions/-T for enabling
+	transactions
+
+2006-12-07  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_node.c: (main): Cast for size_t
+
+	* librdf/rdf_storage_mysql.c: off by 1 in table loop
+
+	* librdf/rdf_storage_mysql.c: (librdf_storage_mysql_release_handle):
+	Do not release if doing a transaction.
+	(librdf_storage_mysql_transaction_commit,
+	librdf_storage_mysql_transaction_rollback): Debug message and zap
+	transaction_handle before releasing it.
+
+
+	* librdf/rdf_storage_mysql.c: Put SQL configuration and variables
+	inside the mysql context Added LIBRDF_DEBUG_SQL define and macro
+	around all SQL queries.
+	(librdf_storage_mysql_init): Init context->config and
+	context->vars
+	(librdf_storage_mysql_terminate): Free config, vars.
+
+	* librdf/mysql-v1.ttl, librdf/mysql-v2.ttl: MyISAM and InnoDB
+
+	* librdf/rdf_storage_mysql.c: Add layout and config_dir to context.
+	(librdf_storage_mysql_init): Init layout and config_dir from options.
+	Use librdf_new_sql_config_for_storage() to get SQL create statements
+	and then invoke them with templated variables in a hash using
+	librdf_hash_interpret_template().
+	(librdf_storage_mysql_terminate): Free layout and config_dir
+
+	* librdf/mysql-v1.ttl: Only var is $(STATEMENTS_NAME)
+
+	* librdf/rdf_storage_sql.c: (librdf_new_sql_config_for_storage)
+	Add dir arg with default set if NULL.
+
+	* librdf/rdf_storage_internal.h: librdf_new_sql_config_for_storage
+	prototype gets dir arg
+
+2006-12-06  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_model_storage.c: extra static defines
+
+	* librdf/Makefile.am, librdf/rdf_storage_sql.c,
+	librdf/rdf_storage_sql_test.c: Split out sql config test
+
+	* librdf/mysql.ttl: renamed mysql.ttl to mysql-v1.ttl
+
+	* librdf/rdf_storage_internal.h: Move librdf_sql_config
+	definitions and declarations to rdf_storage_internal.h
+
+	* librdf/rdf_storage_sql.c: (librdf_new_sql_config,
+	librdf_new_sql_config_for_storage): Add layout arg (main): Test
+	NULL and mysql v2 layout
+
+	* librdf/Makefile.am, librdf/mysql-v1.ttl (from
+	/librdf/trunk/librdf/mysql.ttl:11717), librdf/mysql-v2.ttl:
+	mysql-v1.ttl mysql-v2.ttl
+
+2006-12-05  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_sql.c: (librdf_new_sql_config_for_storage): Added.
+
+	* librdf/Makefile.am, librdf/rdf_storage_sql.c: Added SQL config
+	reading from file
+
+2006-12-04  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/mysql.ttl: $(NAME)
+
+	* Makefile.am: No need for Makefile.PL here
+
+	* Makefile.PL: No need for Makefile.PL here
+
+	* librdf/Makefile.am, librdf/mysql.ttl: Add mysql.ttl
+
+	* Redland.i: Export librdf_model_transaction_start
+	librdf_model_transaction_commit and
+	librdf_model_transaction_rollback
+
+	* librdf/rdf_storage_postgresql.c: Added transaction support.
+	librdf_storage_postgresql_context gains PGconn*
+	transaction_handle;
+	(librdf_storage_postgresql_get_handle): Return transaction_handle
+	if there is one.
+	(librdf_storage_postgresql_terminate): Free transaction_handle
+	(librdf_storage_postgresql_close): Rollback transaction on close.
+	(librdf_storage_postgresql_transaction_start,
+	librdf_storage_postgresql_transaction_start_with_handle,
+	librdf_storage_postgresql_transaction_commit,
+	librdf_storage_postgresql_transaction_rollback and
+	librdf_storage_postgresql_transaction_get_handle): Added.
+	(librdf_storage_postgresql_register_factory): register transaction
+	functions.
+
+	* librdf/rdf_storage_mysql.c: Added transaction support.
+	librdf_storage_mysql_context gains MYSQL* transaction_handle;
+	(librdf_storage_mysql_get_handle): Return transaction_handle if
+	there is one.
+	(librdf_storage_mysql_terminate): Free transaction_handle
+	(librdf_storage_mysql_close): Rollback transaction on close.
+	(librdf_storage_mysql_transaction_start,
+	librdf_storage_mysql_transaction_start_with_handle,
+	librdf_storage_mysql_transaction_commit,
+	librdf_storage_mysql_transaction_rollback and
+	librdf_storage_mysql_transaction_get_handle): Added.
+	(librdf_storage_mysql_register_factory): register transaction
+	functions.
+
+	* librdf/rdf_storage.c: (librdf_storage_transaction_start,
+	librdf_storage_transaction_start_with_handle,
+	librdf_storage_transaction_commit,
+	librdf_storage_transaction_rollback and
+	librdf_storage_transaction_get_handle): Added, all optional if the
+	factories support them.
+
+	* librdf/rdf_storage_internal.h: struct librdf_storage_factory_s
+	gains factory methods transaction_start,
+	transaction_start_with_handle, transaction_commit,
+	transaction_rollback and transaction_get_handle
+
+	* librdf/rdf_storage.h: Added prototypes for
+	librdf_storage_transaction_start,
+	librdf_storage_transaction_start_with_handle,
+	librdf_storage_transaction_commit,
+	librdf_storage_transaction_rollback and
+	librdf_storage_transaction_get_handle
+
+	* librdf/rdf_model_storage.c: (librdf_model_storage_transaction_start,
+	librdf_model_storage_transaction_start_with_handle,
+	librdf_model_storage_transaction_commit,
+	librdf_model_storage_transaction_rollback and
+	librdf_model_storage_transaction_get_handle): Added, all calling
+	the librdf_storage_* equivalent.
+
+	* librdf/rdf_model_internal.h: struct librdf_model_factory_s gains
+	factory methods transaction_start, transaction_start_with_handle,
+	transaction_commit, transaction_rollback and
+	transaction_get_handle
+
+	* librdf/rdf_model.c: (librdf_model_transaction_start,
+	librdf_model_transaction_start_with_handle,
+	librdf_model_transaction_commit, librdf_model_transaction_rollback
+	and librdf_model_transaction_get_handle): Added, all optional if the
+	factories support them.
+
+	* librdf/rdf_model.h: Added prototypes for
+	librdf_model_transaction_start,
+	librdf_model_transaction_start_with_handle,
+	librdf_model_transaction_commit, librdf_model_transaction_rollback
+	and librdf_model_transaction_get_handle
+
+2006-12-03  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_hash.c: (main): Check for expected template result.
+
+	* librdf/rdf_hash.c: (librdf_hash_interpret_template): Free
+	returned librdf_hash_datum
+
+
+	* librdf/rdf_hash.c: (librdf_hash_interpret_template): Added, to
+	interpret key/values into a template.
+	(main): Test for the above.
+
+	* librdf/rdf_hash.h: Added prototype librdf_hash_interpret_template
+
+2006-12-02  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_query_rasqal.c: (rasqal_redland_bind_match): Do not
+	throw away the rasqal node type information now, it is needed
+	later on in FILTER comparisons.
+	Fixes Issue#0000153 http://bugs.librdf.org/mantis/view.php?id=153
+
+2006-11-30  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage.c: (librdf_storage_remove_reference): Call
+	librdf_storage_free to clean up if this is the last reference
+
+	* configure.ac: No need to add LIBRDF_CPPFLAGS to
+	LIBRDF_EXTERNAL_CPPFLAGS - they are only needed building inside
+	redland
+
+2006-11-23  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_file.c: (librdf_storage_file_init): Free
+	options when finished with them.
+
+2006-11-21  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac: Minimum raptor version is 1.4.11
+
 2006-11-19  Dave Beckett  <dave@dajobe.org>
 
 	* Snapshotted redland_1_0_5 for 1.0.5 release
