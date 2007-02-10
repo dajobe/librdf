@@ -244,7 +244,7 @@ librdf_get_parser_factory(librdf_world *world,
       if(type_uri) {
         if(!factory->type_uri)
           continue;
-        if(librdf_uri_equals(factory->type_uri, type_uri))
+        if(!librdf_uri_equals(factory->type_uri, type_uri))
           continue;
       }
 
