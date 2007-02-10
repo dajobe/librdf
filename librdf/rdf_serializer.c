@@ -211,7 +211,7 @@ librdf_get_serializer_factory(librdf_world *world,
     name=NULL;
   if(!mime_type || (mime_type && !*mime_type)) {
     if(!name && !type_uri)
-      mime_type="application/rdf+xml";
+      name="rdfxml";
     else
       mime_type=NULL;
   }
