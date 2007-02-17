@@ -155,7 +155,8 @@ librdf_query_rasqal_terminate(librdf_query* query)
 
 
 static librdf_node*
-rasqal_literal_to_redland_node(librdf_world *world, rasqal_literal* l) {
+rasqal_literal_to_redland_node(librdf_world *world, rasqal_literal* l)
+{
   if(!l)
     return NULL;
   
@@ -182,7 +183,8 @@ rasqal_literal_to_redland_node(librdf_world *world, rasqal_literal* l) {
 
 
 static rasqal_literal*
-redland_node_to_rasqal_literal(librdf_node *node) {
+redland_node_to_rasqal_literal(librdf_node *node)
+{
   rasqal_literal* l;
   
   if(librdf_node_is_resource(node)) {
@@ -232,7 +234,8 @@ static int
 rasqal_redland_new_triples_source(rasqal_query* rdf_query,
                                   void *factory_user_data,
                                   void *user_data,
-                                  rasqal_triples_source *rts) {
+                                  rasqal_triples_source *rts)
+{
   librdf_world *world=(librdf_world*)factory_user_data;
   rasqal_redland_triples_source_user_data* rtsc=(rasqal_redland_triples_source_user_data*)user_data;
   raptor_sequence *seq;
@@ -289,7 +292,8 @@ rasqal_redland_triple_present(rasqal_triples_source *rts, void *user_data,
 
 
 static void
-rasqal_redland_free_triples_source(void *user_data) {
+rasqal_redland_free_triples_source(void *user_data)
+{
   /* rasqal_redland_triples_source_user_data* rtsc=(rasqal_redland_triples_source_user_data*)user_data; */
 }
 
@@ -456,7 +460,8 @@ rasqal_redland_is_end(struct rasqal_triples_match_s* rtm,
 
 static void
 rasqal_redland_finish_triples_match(struct rasqal_triples_match_s* rtm,
-                                    void *user_data) {
+                                    void *user_data)
+{
   rasqal_redland_triples_match_context* rtmc=(rasqal_redland_triples_match_context*)rtm->user_data;
 
   if(rtmc->stream) {
@@ -471,7 +476,8 @@ rasqal_redland_finish_triples_match(struct rasqal_triples_match_s* rtm,
 static int
 rasqal_redland_init_triples_match(rasqal_triples_match* rtm,
                                   rasqal_triples_source *rts, void *user_data,
-                                  rasqal_triple_meta *m, rasqal_triple *t) {
+                                  rasqal_triple_meta *m, rasqal_triple *t)
+{
   rasqal_redland_triples_source_user_data* rtsc=(rasqal_redland_triples_source_user_data*)user_data;
   rasqal_redland_triples_match_context* rtmc;
   rasqal_variable* var;
@@ -758,64 +764,9 @@ librdf_query_rasqal_free_results(librdf_query_results* query_results)
 }
 
 
-static unsigned char*
-librdf_query_rasqal_results_to_counted_string(librdf_query_results *query_results,
-                                              librdf_uri *format_uri,
-                                              librdf_uri *base_uri,
-                                              size_t *length_p) 
+static int
+librdf_query_rasqal_results_is_bindings(librdf_query_results* query_results)
 {
-  librdf_query *query=query_results->query;
-  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
-  unsigned char *string=NULL;
-  size_t string_length=0;
-  raptor_iostream *iostr;
-
-  if(!context->results)
-    return NULL;
-  
-  iostr=raptor_new_iostream_to_string((void**)&string, &string_length, malloc);
-  if(!iostr)
-    return NULL;
-              
-  rasqal_query_results_write(iostr, context->results,
-                             (raptor_uri*)format_uri, (raptor_uri*)base_uri);
-
-  raptor_free_iostream(iostr);
-
-  if(length_p)
-    *length_p=string_length;
-  
-  return string;
-}
-
-
-static int
-librdf_query_rasqal_results_to_file_handle(librdf_query_results *query_results, 
-                                           FILE *handle,
-                                           librdf_uri *format_uri,
-                                           librdf_uri *base_uri) {
-  librdf_query *query=query_results->query;
-  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
-  raptor_iostream *iostr;
-
-  if(!context->results)
-    return 1;
-  
-  iostr=raptor_new_iostream_to_file_handle(handle);
-  if(!iostr)
-    return 1;
-              
-  rasqal_query_results_write(iostr, context->results,
-                             (raptor_uri*)format_uri, (raptor_uri*)base_uri);
-
-  raptor_free_iostream(iostr);
-
-  return 0;
-}
-
-
-static int
-librdf_query_rasqal_results_is_bindings(librdf_query_results* query_results) {
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
 
@@ -827,7 +778,8 @@ librdf_query_rasqal_results_is_bindings(librdf_query_results* query_results) {
   
 
 static int
-librdf_query_rasqal_results_is_boolean(librdf_query_results* query_results) {
+librdf_query_rasqal_results_is_boolean(librdf_query_results* query_results)
+{
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
 
@@ -839,7 +791,8 @@ librdf_query_rasqal_results_is_boolean(librdf_query_results* query_results) {
 
 
 static int
-librdf_query_rasqal_results_is_graph(librdf_query_results* query_results) {
+librdf_query_rasqal_results_is_graph(librdf_query_results* query_results)
+{
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
 
@@ -851,7 +804,21 @@ librdf_query_rasqal_results_is_graph(librdf_query_results* query_results) {
 
 
 static int
-librdf_query_rasqal_results_get_boolean(librdf_query_results* query_results) {
+librdf_query_rasqal_results_is_syntax(librdf_query_results* query_results)
+{
+  librdf_query *query=query_results->query;
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+
+  if(!context->results)
+    return 1;
+  
+  return rasqal_query_results_is_syntax(context->results);
+}
+
+
+static int
+librdf_query_rasqal_results_get_boolean(librdf_query_results* query_results)
+{
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
 
@@ -873,7 +840,8 @@ typedef struct {
 
 
 static int
-librdf_query_rasqal_query_results_end_of_stream(void* context) {
+librdf_query_rasqal_query_results_end_of_stream(void* context)
+{
   librdf_query_rasqal_stream_context* scontext=(librdf_query_rasqal_stream_context*)context;
 
   return scontext->finished;
@@ -997,7 +965,8 @@ librdf_query_rasqal_query_results_next_statement(void* context)
 
 
 static void*
-librdf_query_rasqal_query_results_get_statement(void* context, int flags) {
+librdf_query_rasqal_query_results_get_statement(void* context, int flags)
+{
   librdf_query_rasqal_stream_context* scontext=(librdf_query_rasqal_stream_context*)context;
 
   switch(flags) {
@@ -1018,7 +987,8 @@ librdf_query_rasqal_query_results_get_statement(void* context, int flags) {
 
 
 static void
-librdf_query_rasqal_query_results_finished(void* context) {
+librdf_query_rasqal_query_results_finished(void* context)
+{
   librdf_query_rasqal_stream_context* scontext=(librdf_query_rasqal_stream_context*)context;
 
   if(scontext) {
@@ -1031,7 +1001,8 @@ librdf_query_rasqal_query_results_finished(void* context) {
 
 
 static librdf_stream*
-librdf_query_rasqal_results_as_stream(librdf_query_results* query_results) {
+librdf_query_rasqal_results_as_stream(librdf_query_results* query_results)
+{
   librdf_query *query=query_results->query;
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   librdf_query_rasqal_stream_context* scontext;
@@ -1067,6 +1038,64 @@ librdf_query_rasqal_results_as_stream(librdf_query_results* query_results) {
 }
 
 
+static librdf_query_results_formatter*
+librdf_query_rasqal_new_results_formatter(librdf_query_results* query_results,
+                                          const char *name, 
+                                          librdf_uri* uri)
+{
+  rasqal_query_results_formatter* formatter;
+  librdf_query_results_formatter* qrf;
+
+  formatter=rasqal_new_query_results_formatter(name, (raptor_uri*)uri);
+  if(!formatter)
+    return NULL;
+
+  qrf = LIBRDF_MALLOC(query_results_formatter, 
+                      sizeof(librdf_query_results_formatter));
+  qrf->query_results=query_results;
+  qrf->formatter=formatter;
+  return qrf;
+}
+
+static librdf_query_results_formatter*
+librdf_query_rasqal_new_results_formatter_by_mime_type(librdf_query_results* query_results,
+                                                       const char *mime_type)
+{
+  rasqal_query_results_formatter* formatter;
+  librdf_query_results_formatter* qrf;
+
+  formatter=rasqal_new_query_results_formatter_by_mime_type(mime_type);
+  if(!formatter)
+    return NULL;
+
+  qrf = LIBRDF_MALLOC(query_results_formatter, 
+                      sizeof(librdf_query_results_formatter));
+  qrf->query_results=query_results;
+  qrf->formatter=formatter;
+  return qrf;
+}
+
+
+static void
+librdf_query_rasqal_free_results_formatter(librdf_query_results_formatter* qrf) 
+{
+  rasqal_free_query_results_formatter(qrf->formatter);
+}
+
+
+static int
+librdf_query_rasqal_results_formatter_write(raptor_iostream *iostr,
+                                            librdf_query_results_formatter* qrf,
+                                            librdf_query_results* query_results,
+                                            librdf_uri *base_uri)
+{
+  librdf_query *query=query_results->query;
+  librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
+  return rasqal_query_results_formatter_write(iostr, qrf->formatter,
+                                              context->results, 
+                                              (raptor_uri*)base_uri);
+}
+
 
 /* local function to register list query functions */
 
@@ -1092,13 +1121,17 @@ librdf_query_rasqal_register_factory(librdf_query_factory *factory)
   factory->results_get_binding_value_by_name = librdf_query_rasqal_results_get_binding_value_by_name;
   factory->results_get_bindings_count         = librdf_query_rasqal_results_get_bindings_count;
   factory->free_results                       = librdf_query_rasqal_free_results;
-  factory->results_to_counted_string          = librdf_query_rasqal_results_to_counted_string;
-  factory->results_to_file_handle             = librdf_query_rasqal_results_to_file_handle;
   factory->results_is_bindings                = librdf_query_rasqal_results_is_bindings;
   factory->results_is_boolean                 = librdf_query_rasqal_results_is_boolean;
   factory->results_is_graph                   = librdf_query_rasqal_results_is_graph;
+  factory->results_is_syntax                  = librdf_query_rasqal_results_is_syntax;
   factory->results_get_boolean                = librdf_query_rasqal_results_get_boolean;
   factory->results_as_stream                  = librdf_query_rasqal_results_as_stream;
+
+  factory->new_results_formatter              = librdf_query_rasqal_new_results_formatter;
+  factory->new_results_formatter_by_mime_type = librdf_query_rasqal_new_results_formatter_by_mime_type;
+  factory->free_results_formatter             = librdf_query_rasqal_free_results_formatter;
+  factory->results_formatter_write            = librdf_query_rasqal_results_formatter_write;
 }
 
 
@@ -1128,6 +1161,32 @@ librdf_query_rasqal_constructor(librdf_world *world)
   if(!i) /* registered default query, end */
     break;
   }
+
+
+#if 0
+  /* FIXME - this should be used but for now it is safe to assume
+   * all query is done by Rasqal
+   */
+
+  /* enumerate query result formats */
+  for(i=0; 1; i++) {
+    const char *format_name=NULL;
+    const char *format_label=NULL;
+    const unsigned char *format_uri_string=NULL;
+    const char *format_mime_type=NULL;
+
+    if(rasqal_query_results_formats_enumerate_full(i, 
+                                                   &format_name,
+                                                   &format_label,
+                                                   &format_uri_string, 
+                                                   &format_mime_type))
+      break;
+    
+    librdf_query_register_result_format(world, format_name, format_label,
+                                        format_uri_string, format_mime_type,
+                                        &librdf_query_rasqal_register_factory);
+  }
+#endif
 
 }
 
