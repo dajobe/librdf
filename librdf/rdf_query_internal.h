@@ -55,6 +55,15 @@ struct librdf_query_results_s
 };
 
 
+struct librdf_query_results_formatter_s
+{
+  /* query result that this is formatting */
+  librdf_query_results* query_results;
+
+  rasqal_query_results_formatter *formatter;
+};
+  
+
 /** A Query Factory */
 struct librdf_query_factory_s {
   librdf_world *world;
@@ -119,19 +128,20 @@ struct librdf_query_factory_s {
   /* tidy up query results - OPTIONAL */
   void (*free_results)(librdf_query_results* query_results);
 
-  /* turn the query results into a new string */
-  unsigned char* (*results_to_counted_string)(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri, size_t *length_p);
-
-  /* write the query results to an existing file handle */
-  int (*results_to_file_handle)(librdf_query_results *query_results, FILE *handle, librdf_uri *format_uri, librdf_uri *base_uri);
-
   /* Return true/false if result is format given - OPTIONAL */
   int (*results_is_bindings)(librdf_query_results *query_results);
   int (*results_is_boolean)(librdf_query_results *query_results);
   int (*results_is_graph)(librdf_query_results *query_results);
+  int (*results_is_syntax)(librdf_query_results *query_results);
   
   /* get a boolean result - OPTIONAL */
   int (*results_get_boolean)(librdf_query_results *query_results);
+
+  /* query results formatter */
+  librdf_query_results_formatter* (*new_results_formatter)(librdf_query_results* query_results, const char *name, librdf_uri* uri);
+  librdf_query_results_formatter* (*new_results_formatter_by_mime_type)(librdf_query_results* query_results, const char *mime_type);
+  void (*free_results_formatter)(librdf_query_results_formatter* formatter);
+  int (*results_formatter_write)(raptor_iostream *iostr, librdf_query_results_formatter* formatter, librdf_query_results* results, librdf_uri *base_uri);
 };
 
 
