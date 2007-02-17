@@ -107,6 +107,20 @@ int librdf_query_results_is_graph(librdf_query_results *query_results);
 REDLAND_API
 int librdf_query_results_get_boolean(librdf_query_results *query_results);
 
+/* query results formatter class */
+REDLAND_API
+librdf_query_results_formatter* librdf_new_query_results_formatter(librdf_query_results* query_results, const char *name, librdf_uri* uri);
+REDLAND_API
+librdf_query_results_formatter* librdf_new_query_results_formatter_by_mime_type(librdf_query_results* query_results, const char *mime_type);
+REDLAND_API
+void librdf_free_query_results_formatter(librdf_query_results_formatter* formatter);
+REDLAND_API
+int librdf_query_results_formatter_write(raptor_iostream *iostr, librdf_query_results_formatter* formatter, librdf_query_results* results, librdf_uri *base_uri);
+
+REDLAND_API
+int librdf_query_results_formats_check(librdf_world* world, const char *name, librdf_uri* uri, const char *mime_type);
+REDLAND_API
+int librdf_query_results_formats_enumerate(librdf_world* world, const unsigned int counter, const char **name, const char **label, const unsigned char **uri_string, const char **mime_type);
 
 #ifdef __cplusplus
 }
