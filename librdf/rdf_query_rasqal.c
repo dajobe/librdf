@@ -422,7 +422,10 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
 
     if(bind) {
       LIBRDF_DEBUG1("binding origin to variable\n");
-      l=redland_node_to_rasqal_literal(context_node);
+      if(context_node)
+        l=redland_node_to_rasqal_literal(context_node);
+      else
+        l=NULL;
       rasqal_variable_set_value(bindings[3], l);
       result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_ORIGIN);
     }
