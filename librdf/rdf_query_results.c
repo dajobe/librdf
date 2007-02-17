@@ -278,13 +278,39 @@ unsigned char*
 librdf_query_results_to_counted_string(librdf_query_results *query_results,
                                        librdf_uri *format_uri,
                                        librdf_uri *base_uri,
-                                       size_t *length_p) {
+                                       size_t *length_p)
+{
+  librdf_query_results_formatter *formatter;
+  unsigned char *string=NULL;
+  size_t string_length=0;
+  raptor_iostream *iostr;
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
-  if(query_results->query->factory->results_to_counted_string)
-    return query_results->query->factory->results_to_counted_string(query_results, format_uri, base_uri, length_p);
-  else
+  iostr=raptor_new_iostream_to_string((void**)&string, &string_length, malloc);
+  if(!iostr)
     return NULL;
+              
+  formatter=librdf_new_query_results_formatter(query_results,
+                                               NULL /* name */,
+                                               format_uri);
+  if(!formatter)
+    goto tidy;
+
+  if(librdf_query_results_formatter_write(iostr, formatter,
+                                          query_results, base_uri))
+    string=NULL;
+
+  librdf_free_query_results_formatter(formatter);
+
+ tidy:
+  if(iostr)
+    raptor_free_iostream(iostr);
+
+  if(length_p)
+    *length_p=string_length;
+  
+  return string;
 }
 
 
@@ -333,18 +359,36 @@ int
 librdf_query_results_to_file_handle(librdf_query_results *query_results, 
                                     FILE *handle, 
                                     librdf_uri *format_uri,
-                                    librdf_uri *base_uri) {
+                                    librdf_uri *base_uri)
+{
+  raptor_iostream *iostr;
+  librdf_query_results_formatter *formatter;
+  int status;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(handle, FILE*, 1);
 
-  if(query_results->query->factory->results_to_file_handle)
-    return query_results->query->factory->results_to_file_handle(query_results,
-                                                                 handle,
-                                                                 format_uri, 
-                                                                 base_uri);
-  else
+
+  iostr=raptor_new_iostream_to_file_handle(handle);
+  if(!iostr)
     return 1;
+              
+  formatter=librdf_new_query_results_formatter(query_results,
+                                               NULL /* name */,
+                                               format_uri);
+  if(!formatter) {
+    raptor_free_iostream(iostr);
+    return 1;
+  }
+
+  status=librdf_query_results_formatter_write(iostr, formatter,
+                                              query_results, base_uri);
+
+  librdf_free_query_results_formatter(formatter);
+
+  raptor_free_iostream(iostr);
+
+  return status;
 }
 
 
@@ -414,6 +458,9 @@ librdf_query_results_is_bindings(librdf_query_results* query_results) {
  *
  * Test if librdf_query_results is boolean format.
  * 
+ * If this function returns true, the result can be retrieved by
+ * librdf_query_results_get_boolean().
+ *
  * Return value: non-0 if true
  **/
 int
@@ -441,6 +488,31 @@ librdf_query_results_is_graph(librdf_query_results* query_results) {
 
   if(query_results->query->factory->results_is_graph)
     return query_results->query->factory->results_is_graph(query_results);
+  else
+    return -1;
+}
+
+
+/**
+ * librdf_query_results_is_syntax:
+ * @query_results: #librdf_query_results object
+ *
+ * Test if librdf_query_results is a syntax.
+ *
+ * If this function returns true, the ONLY result available
+ * from this query is a syntax that can be serialized using
+ * one of the #query_result_formatter class methods or with
+ * librdf_query_results_to_counted_string(), librdf_query_results_to_string(),
+ * librdf_query_results_to_file_handle() or librdf_query_results_to_file()
+ * 
+ * Return value: non-0 if true
+ **/
+int
+librdf_query_results_is_syntax(librdf_query_results* query_results) {
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
+
+  if(query_results->query->factory->results_is_syntax)
+    return query_results->query->factory->results_is_syntax(query_results);
   else
     return -1;
 }
@@ -488,3 +560,157 @@ librdf_query_results_as_stream(librdf_query_results* query_results) {
   else
     return NULL;
 }
+
+
+/**
+ * librdf_new_query_results_formatter:
+ * @query_results: #librdf_query_results query_results
+ * @name: the query results format name (or NULL)
+ * @uri: #librdf_uri query results format uri (or NULL)
+ *
+ * Constructor - create a new librdf_query_results_formatter object by identified format.
+ *
+ * A query results format can be named or identified by a URI, both
+ * of which are optional.  The default query results format will be used
+ * if both are NULL.  librdf_query_results_formats_enumerate() returns
+ * information on the known query results names, labels and URIs.
+ *
+ * Return value: a new #librdf_query_results_formatter object or NULL on failure
+ */
+librdf_query_results_formatter*
+librdf_new_query_results_formatter(librdf_query_results* query_results,
+                                   const char *name, librdf_uri* uri)
+{
+  if(query_results->query->factory->new_results_formatter)
+    return query_results->query->factory->new_results_formatter(query_results, name, uri);
+  else
+    return NULL;
+}
+
+
+/**
+ * librdf_new_query_results_formatter_by_mime_type:
+ * @query_results: #librdf_query_results query_results
+ * @mime_type: mime type name
+ *
+ * Constructor - create a new librdf_query_results_formatter object by mime type.
+ *
+ * A query results format generates a syntax with a mime type which
+ * may be requested with this constructor.
+
+ * Note that there may be several formatters that generate the same
+ * MIME Type (such as SPARQL XML results format drafts) and in thot
+ * case the librdf_new_query_results_formatter() constructor allows
+ * selecting of a specific one by name or URI.
+ *
+ * Return value: a new #librdf_query_results_formatter object or NULL on failure
+ */
+librdf_query_results_formatter*
+librdf_new_query_results_formatter_by_mime_type(librdf_query_results* query_results,
+                                                const char *mime_type)
+{
+  if(query_results->query->factory->new_results_formatter_by_mime_type)
+    return query_results->query->factory->new_results_formatter_by_mime_type(query_results, mime_type);
+  else
+    return NULL;
+}
+
+
+/**
+ * librdf_free_query_results_formatter:
+ * @formatter: #librdf_query_results_formatter object
+ * 
+ * Destructor - destroy a #librdf_query_results_formatter object.
+ **/
+void
+librdf_free_query_results_formatter(librdf_query_results_formatter* formatter) 
+{
+  if(formatter->query_results->query->factory->free_results_formatter)
+    return formatter->query_results->query->factory->free_results_formatter(formatter);
+}
+
+
+/**
+ * librdf_query_results_formatter_write:
+ * @iostr: #raptor_iostream to write the query to
+ * @formatter: #librdf_query_results_formatter object
+ * @results: #librdf_query_results query results format
+ * @base_uri: #librdf_uri base URI of the output format
+ *
+ * Write the query results using the given formatter to an iostream
+ * 
+ * See librdf_query_results_formats_enumerate() to get the
+ * list of syntax URIs and their description. 
+ *
+ * Return value: non-0 on failure
+ **/
+int
+librdf_query_results_formatter_write(raptor_iostream *iostr,
+                                     librdf_query_results_formatter* formatter,
+                                     librdf_query_results* query_results,
+                                     librdf_uri *base_uri)
+{
+  if(query_results->query->factory->results_formatter_write)
+    return query_results->query->factory->results_formatter_write(iostr,
+                                                                  formatter,
+                                                                  query_results,
+                                                                  base_uri);
+  else
+    return 1;
+}
+
+
+/**
+ * librdf_query_results_formats_check:
+ * @world: #librdf_world
+ * @name: the query results format name (or NULL)
+ * @uri: #librdf_uri query results format uri (or NULL)
+ * @mime_type: mime type name
+ * 
+ * Check if a query results formatter exists for the requested format.
+ * 
+ * Return value: non-0 if a formatter exists.
+ **/
+int
+librdf_query_results_formats_check(librdf_world* world, 
+                                   const char *name, librdf_uri* uri,
+                                   const char *mime_type)
+{
+  /* FIXME - this should use some kind of registration but for now
+   * it is safe to assume Rasqal does it all
+   */
+  return rasqal_query_results_formats_check(name, (raptor_uri*)uri, mime_type);
+}
+
+
+/**
+ * librdf_query_results_formats_enumerate:
+ * @world: #librdf_world
+ * @counter: index into the list of query result syntaxes
+ * @name: pointer to store the name of the query result syntax (or NULL)
+ * @label: pointer to store query result syntax readable label (or NULL)
+ * @uri_string: pointer to store query result syntax URI string (or NULL)
+ * @mime_type: pointer to store query result syntax mime type string (or NULL)
+ *
+ * Get information on query result syntaxes.
+ * 
+ * All returned strings are shared and must be copied if needed to be
+ * used dynamically.
+ * 
+ * Return value: non 0 on failure of if counter is out of range
+ */
+int
+librdf_query_results_formats_enumerate(librdf_world* world,
+                                       const unsigned int counter,
+                                       const char **name,
+                                       const char **label,
+                                       const unsigned char **uri_string,
+                                       const char **mime_type)
+{
+  /* FIXME - this should use some kind of registration but for now
+   * it is safe to assume Rasqal does it all
+   */
+  return rasqal_query_results_formats_enumerate_full(counter, name, label,
+                                                     uri_string, mime_type);
+}
+
