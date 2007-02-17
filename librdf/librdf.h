@@ -214,6 +214,13 @@ typedef struct librdf_query_factory_s librdf_query_factory;
 typedef struct librdf_query_results_s librdf_query_results;
 
 /**
+ * librdf_query_results_formatter:
+ *
+ * Redland query results formatter class.
+ */
+typedef struct librdf_query_results_formatter_s librdf_query_results_formatter;
+
+/**
  * librdf_serializer:
  *
  * Redland serializer class.
