@@ -4,10 +4,10 @@
 .\"
 .\" $Id$
 .\"
-.\" Copyright (C) 2003-2006 David Beckett - http://purl.org/net/dajobe/
+.\" Copyright (C) 2003-2007 David Beckett - http://purl.org/net/dajobe/
 .\" Copyright (C) 2003-2005 University of Bristol - http://www.bristol.ac.uk/
 .\"
-.TH rdfproc 1 "2006-01-25"
+.TH rdfproc 1 "2007-02-17"
 .\" Please adjust this date whenever revising the manpage.
 .SH NAME
 rdfproc \- Redland RDF processor utility
@@ -59,6 +59,12 @@ Read the storage option 'password' from standard input.  Terminated
 by end of line ('\\n') or end of file.  This is equivalent
 to setting it using \-t or \-\-storage-options but does not
 require exposing the password in the argument list.
+.TP
+.B \-r, \-\-results \fIFORMAT\fR
+Set the query results syntax format.
+.IP
+The exact list of formats depends on what libraptor(3) was built with
+but is given correct in the usage message with \-h.
 .TP
 .B \-s, \-\-storage \fITYPE\fR
 Set the Redland storage type (default 'hashes').  Alternatives
