@@ -71,6 +71,7 @@ librdf_hash_put_strings
 librdf_hash_print
 librdf_hash_print_keys
 librdf_hash_print_values
+librdf_hash_interpret_template
 </SECTION>
 
 <SECTION>
@@ -170,6 +171,11 @@ librdf_model_get_contexts
 LIBRDF_MODEL_FEATURE_CONTEXTS
 librdf_model_get_feature
 librdf_model_set_feature
+librdf_model_transaction_commit
+librdf_model_transaction_get_handle
+librdf_model_transaction_rollback
+librdf_model_transaction_start
+librdf_model_transaction_start_with_handle
 </SECTION>
 
 <SECTION>
@@ -270,6 +276,13 @@ librdf_query_results_is_bindings
 librdf_query_results_is_boolean
 librdf_query_results_is_graph
 librdf_query_results_get_boolean
+librdf_new_query_results_formatter
+librdf_new_query_results_formatter_by_mime_type
+librdf_free_query_results_formatter
+librdf_query_results_formats_check
+librdf_query_results_formats_enumerate
+librdf_query_results_formatter
+librdf_query_results_formatter_write
 </SECTION>
 
 <SECTION>
@@ -367,6 +380,11 @@ librdf_storage_find_statements_in_context
 librdf_storage_get_contexts
 librdf_storage_get_feature
 librdf_storage_set_feature
+librdf_storage_transaction_commit
+librdf_storage_transaction_get_handle
+librdf_storage_transaction_rollback
+librdf_storage_transaction_start
+librdf_storage_transaction_start_with_handle
 </SECTION>
 
 <SECTION>
