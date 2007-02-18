@@ -53,7 +53,8 @@ rdf_list.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c \
 rdf_storage_sql.c \
 rdf_stream.c \
-rdf_parser.c rdf_heuristics.c rdf_files.c rdf_utf8.c \
+rdf_parser.c rdf_parser_raptor.c \
+rdf_heuristics.c rdf_files.c rdf_utf8.c \
 rdf_query.c rdf_query_results.c \
 rdf_query_triples.c rdf_query_rasqal.c \
 rdf_serializer.c \
@@ -118,11 +119,11 @@ librdf_la_SOURCES += rdf_storage_postgresql.c
 endif
 
 librdf_la_LIBADD = \
-@LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+@LTLIBOBJS@ @DIGEST_OBJS@ @HASH_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 
 librdf_la_DEPENDENCIES = \
-@DIGEST_OBJS@ @HASH_OBJS@ @PARSER_OBJS@ \
+@DIGEST_OBJS@ @HASH_OBJS@ \
 @LIBRDF_INTERNAL_LIBS@
 
 EXTRA_librdf_la_SOURCES = rdf_hash_bdb.c \
