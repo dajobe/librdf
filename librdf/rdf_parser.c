@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -54,9 +54,7 @@
 void
 librdf_init_parser(librdf_world *world) 
 {
-#ifdef HAVE_RAPTOR_RDF_PARSER
   librdf_parser_raptor_constructor(world);
-#endif
 }
 
 
@@ -73,9 +71,7 @@ librdf_finish_parser(librdf_world *world)
   raptor_free_sequence(world->parsers);
   world->parsers=NULL;
 
-#ifdef HAVE_RAPTOR_RDF_PARSER
   librdf_parser_raptor_destructor();
-#endif
 }
 
 
