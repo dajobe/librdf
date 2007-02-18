@@ -483,69 +483,24 @@ else
 fi
 AC_SUBST(with_raptor)
 
-AC_MSG_CHECKING(RDF parsers required)
-AC_ARG_ENABLE(parsers, [  --enable-parsers=LIST   Use RDF parsers (default=raptor)], parser_modules="$enableval") 
-if test "X$parser_modules" = Xno -o "X$parser_modules" = X; then
-  parser_modules=
-  AC_MSG_RESULT($parser_modules)
-  AC_MSG_WARN(No parsers are enabled, however libraptor is still used internally)
-else
-  AC_MSG_RESULT($parser_modules)
-fi
-
-PARSER_OBJS=
-
-
-# This is needed because autoheader can't work out which computed
-# symbols must be pulled from acconfig.h into config.h.in
-if test "x" = "y"; then
-  AC_DEFINE(HAVE_RAPTOR_RDF_PARSER, 1, [Have Raptor RDF parser])
-fi
-
 
 # Always have these
 raptor_dir=raptor
 
-need_raptor=1
-for parser in $parser_modules; do
-  uname=`echo $parser | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
-  found=0
-  original_parser=$parser
+config_subdir_raptor=no
+if test $with_raptor = internal; then
+  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor/src $LIBRDF_INTERNAL_CPPFLAGS"
+  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/src/libraptor.la $LIBRDF_INTERNAL_LIBS"
+  config_subdir_raptor=yes
+else
+  LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+  LIBRDF_EXTERNAL_LIBS="`$RAPTOR_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
+  raptor_dir=
+fi
 
-  case $parser in
-    raptor)
-      need_raptor=1
-      found=1
-      ;;
-    *)
-      AC_MSG_ERROR(No such parser $parser)
-  esac
-
-  # Add objects, sources only if the parser was found
-  if test $found = 1; then
-    PARSER_OBJS="$PARSER_OBJS rdf_parser_$parser.lo"
-
-    config_subdir_raptor=no
-    if test $parser = raptor; then
-      if test $with_raptor = internal; then
-        LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor/src $LIBRDF_INTERNAL_CPPFLAGS"
-        LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/src/libraptor.la $LIBRDF_INTERNAL_LIBS"
-        config_subdir_raptor=yes
-      else
-        LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
-        LIBRDF_EXTERNAL_LIBS="`$RAPTOR_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
-        raptor_dir=
-      fi
-    fi
-
-    if test "$config_subdir_raptor" = yes -o "$USE_MAINTAINER_MODE" = yes; then
-      AC_CONFIG_SUBDIRS(raptor)
-    fi
-
-    n=HAVE_${uname}_RDF_PARSER
-    AC_DEFINE_UNQUOTED($n)
-  fi
-done
+if test "$config_subdir_raptor" = yes -o "$USE_MAINTAINER_MODE" = yes; then
+  AC_CONFIG_SUBDIRS(raptor)
+fi
 
 
 # rasqal is REQUIRED despite the checking here
@@ -584,13 +539,6 @@ else
   rdf_query="rasqal(system $RASQAL_VERSION)"
 fi
 AC_SUBST(with_rasqal)
-
-
-AC_SUBST(PARSER_OBJS)
-
-if test "X$PARSER_OBJS" = X; then
-  AC_MSG_WARN(No RDF parser configured)
-fi
 
 
 
