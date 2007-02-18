@@ -414,3 +414,49 @@ the RDF model API and have the same name.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_storage_transaction_commit ##### -->
+<para>
+
+</para>
+
+@storage: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_storage_transaction_get_handle ##### -->
+<para>
+
+</para>
+
+@storage: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_storage_transaction_rollback ##### -->
+<para>
+
+</para>
+
+@storage: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_storage_transaction_start ##### -->
+<para>
+
+</para>
+
+@storage: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_storage_transaction_start_with_handle ##### -->
+<para>
+
+</para>
+
+@storage: 
+@handle: 
+@Returns: 
+
+

@@ -207,3 +207,76 @@ based on the SPARQL XML results format which can also be written to a file.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_new_query_results_formatter ##### -->
+<para>
+
+</para>
+
+@query_results: 
+@name: 
+@uri: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_new_query_results_formatter_by_mime_type ##### -->
+<para>
+
+</para>
+
+@query_results: 
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_free_query_results_formatter ##### -->
+<para>
+
+</para>
+
+@formatter: 
+
+
+<!-- ##### FUNCTION librdf_query_results_formats_check ##### -->
+<para>
+
+</para>
+
+@world: 
+@name: 
+@uri: 
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_query_results_formats_enumerate ##### -->
+<para>
+
+</para>
+
+@world: 
+@counter: 
+@name: 
+@label: 
+@uri_string: 
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### TYPEDEF librdf_query_results_formatter ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION librdf_query_results_formatter_write ##### -->
+<para>
+
+</para>
+
+@iostr: 
+@formatter: 
+@results: 
+@base_uri: 
+@Returns: 
+
+

@@ -544,3 +544,49 @@ serializing and querying.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_model_transaction_commit ##### -->
+<para>
+
+</para>
+
+@model: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_model_transaction_get_handle ##### -->
+<para>
+
+</para>
+
+@model: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_model_transaction_rollback ##### -->
+<para>
+
+</para>
+
+@model: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_model_transaction_start ##### -->
+<para>
+
+</para>
+
+@model: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_model_transaction_start_with_handle ##### -->
+<para>
+
+</para>
+
+@model: 
+@handle: 
+@Returns: 
+
+
