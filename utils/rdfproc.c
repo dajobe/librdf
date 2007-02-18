@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -138,7 +138,7 @@ static command commands[]={
 #endif
 
 
-#define GETOPT_STRING "chno:ps:t:Tv"
+#define GETOPT_STRING "chno:pr:s:t:Tv"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_options[] =
@@ -149,6 +149,7 @@ static struct option long_options[] =
   {"new", 0, 0, 'n'},
   {"output", 1, 0, 'o'},
   {"password", 0, 0, 'p'},
+  {"results", 1, 0, 'r'},
   {"storage", 1, 0, 's'},
   {"storage-options", 1, 0, 't'},
   {"transactions", 0, 0, 'T'},
@@ -207,7 +208,7 @@ main(int argc, char *argv[])
   librdf_stream* stream;
   librdf_iterator* iterator;
   librdf_uri *uri;
-  librdf_uri *base_uri;
+  librdf_uri *base_uri=NULL;
   librdf_query *query;
   librdf_query_results *results;
   librdf_hash *options;
@@ -238,6 +239,7 @@ main(int argc, char *argv[])
   size_t capacity;
   size_t size;
   const char *query_graph_serializer_syntax_name="rdfxml";
+  char* results_format=NULL;
 
   program=argv[0];
   if((p=strrchr(program, '/')))
@@ -367,6 +369,33 @@ main(int argc, char *argv[])
         }
         break;
 
+      case 'r':
+        if(optarg) {
+          if(!strcmp(optarg, "help")) {
+            fprintf(stderr, "%s: Valid query result formats are:\n", program);
+            for(i=0; 1; i++) {
+              const char *format_name;
+              const char *format_label;
+              if(rasqal_query_results_formats_enumerate_full(i,
+                                                             &format_name, 
+                                                             &format_label,
+                                                             NULL, NULL))
+                break;
+              printf("  %-20s  %s\n", format_name, format_label);
+            }
+            exit(0);
+          } else {
+            if(rasqal_query_results_formats_check(optarg, NULL, NULL))
+              results_format=optarg;
+            else {
+              fprintf(stderr, "%s: invalid argument `%s' for `" HELP_ARG(r, results) "'\nTry '%s " HELP_ARG(r, results) " help' for a list of valid formats\n",
+                      program, optarg, program);
+              usage=1;
+            }
+          }
+        }
+        break;
+        
       case 's':
         if(optarg) {
           if(!librdf_get_storage_factory(world, optarg)) {
@@ -465,6 +494,20 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(o, "output FORMAT   ", "Set the triple output format to one of:"));
     puts("    simple                  A simple format (default)\n    ntriples                N-Triples\n    rdfxml                  RDF/XML");
     puts(HELP_TEXT(p, "password        ", "Read storage option 'password' from standard input"));
+    puts(HELP_TEXT(r, "results FORMAT  ", "Set the query results format"));
+    for(i=0; 1; i++) {
+      const char *help_name;
+      const char *help_label;
+      if(librdf_query_results_formats_enumerate(world, i, 
+                                                &help_name, &help_label, 
+                                                NULL, NULL))
+        break;
+      printf("    %-10s              %s", help_name, help_label);
+      if(!i)
+        puts(" (default)");
+      else
+        putchar('\n');
+    }
     puts(HELP_TEXT(s, "storage TYPE    ", "Set the graph storage type"));
     for(i=0; 1; i++) {
       const char *help_name;
@@ -805,7 +848,23 @@ main(int argc, char *argv[])
         break;
       }
 
-      if (librdf_query_results_is_bindings(results)) {
+      if(results_format) {
+        raptor_iostream *iostr;
+        librdf_query_results_formatter *formatter;
+
+        fprintf(stdout, "%s: Formatting query result as '%s':\n", program,
+                results_format);
+
+        iostr=raptor_new_iostream_to_file_handle(stdout);
+        formatter=librdf_new_query_results_formatter(results,
+                                                     results_format, NULL);
+
+        librdf_query_results_formatter_write(iostr, formatter, results, 
+                                             base_uri);
+
+        librdf_free_query_results_formatter(formatter);
+        raptor_free_iostream(iostr);
+      } else if (librdf_query_results_is_bindings(results)) {
         fprintf(stdout, "%s: Query returned bindings results:\n", program);
         
         while(!librdf_query_results_finished(results)) {
