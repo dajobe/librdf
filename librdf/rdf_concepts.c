@@ -140,6 +140,8 @@ librdf_get_concept_by_name(librdf_world *world, int is_ms,
   int start=is_ms ? 0 : LIBRDF_CONCEPT_FIRST_S_ID;
   int last=is_ms ? LIBRDF_CONCEPT_FIRST_S_ID : LIBRDF_CONCEPT_LAST;
 
+  librdf_world_open(world);
+
   for (i=start; i< last; i++)
     if(!strcmp(librdf_concept_tokens[i], name)) {
       if(uri_p)
@@ -154,7 +156,7 @@ librdf_get_concept_by_name(librdf_world *world, int is_ms,
  * librdf_finish_concepts:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_concepts module.
+ * INTERNAL - Terminate the concepts module.
  *
  **/
 void

@@ -79,6 +79,8 @@ librdf_digest_register_factory(librdf_world *world, const char *name,
   librdf_digest_factory *d, *digest;
   char *name_copy;
 
+  librdf_world_open(world);
+
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for digest %s\n", name);
 #endif
@@ -133,6 +135,8 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
 {
   librdf_digest_factory *factory;
 
+  librdf_world_open(world);
+
   /* return 1st digest if no particular one wanted - why? */
   if(!name) {
     factory=world->digests;
@@ -177,6 +181,8 @@ librdf_new_digest(librdf_world *world, const char *name)
 {
   librdf_digest_factory* factory;
   
+  librdf_world_open(world);
+
   factory=librdf_get_digest_factory(world, name);
   if(!factory)
     return NULL;
@@ -207,6 +213,8 @@ librdf_new_digest_from_factory(librdf_world *world,
                                librdf_digest_factory *factory)
 {
   librdf_digest* d;
+
+  librdf_world_open(world);
 
   d=(librdf_digest*)LIBRDF_CALLOC(librdf_digest, 1, sizeof(librdf_digest));
   if(!d)
@@ -413,7 +421,7 @@ librdf_digest_print(librdf_digest* digest, FILE* fh)
  * librdf_init_digest:
  * @world: redland world object
  *
- * INTERNAL - Initialise the librdf_digest class.
+ * INTERNAL - Initialise the digest module.
  *
  **/
 void
@@ -443,7 +451,7 @@ librdf_init_digest(librdf_world *world)
  * librdf_finish_digest:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_digest class.
+ * INTERNAL - Terminate the digest module.
  *
  **/
 void

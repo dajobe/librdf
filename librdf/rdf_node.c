@@ -86,7 +86,7 @@ librdf_init_node(librdf_world* world)
  * librdf_finish_node:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_node module.
+ * INTERNAL - Terminate the node module.
  *
  **/
 void
@@ -121,6 +121,8 @@ librdf_finish_node(librdf_world *world)
 librdf_node*
 librdf_new_node(librdf_world *world)
 {
+  librdf_world_open(world);
+
   return librdf_new_node_from_blank_identifier(world, (unsigned char*)NULL);
 }
 
@@ -145,6 +147,8 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
   librdf_uri *new_uri;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
+
+  librdf_world_open(world);
 
   LIBRDF_ASSERT_RETURN((uri_string == NULL && uri == NULL), 
                        "both uri_string and uri are NULL", NULL);
@@ -240,6 +244,8 @@ librdf_node*
 librdf_new_node_from_uri_string(librdf_world *world, 
                                 const unsigned char *uri_string) 
 {
+  librdf_world_open(world);
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri_string, string, NULL);
 
   return librdf_new_node_from_uri_string_or_uri(world, uri_string, NULL);
@@ -261,6 +267,8 @@ librdf_new_node_from_uri_string(librdf_world *world,
 librdf_node*
 librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri) 
 {
+  librdf_world_open(world);
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
 
   return librdf_new_node_from_uri_string_or_uri(world, NULL, uri);
@@ -284,6 +292,8 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
 {
   librdf_uri *new_uri;
   librdf_node* new_node;
+
+  librdf_world_open(world);
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(local_name, string, NULL);
@@ -320,6 +330,8 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
   librdf_uri* new_uri;
   librdf_node* new_node;
   
+  librdf_world_open(world);
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri_string, string, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(source_uri, librdf_uri, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
@@ -360,6 +372,8 @@ librdf_new_node_from_literal(librdf_world *world,
 {
   size_t xml_language_len=0;
   
+  librdf_world_open(world);
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL);
 
   if(xml_language && !*xml_language)
@@ -416,6 +430,8 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
   size_t size;
   unsigned char *buffer;
   
+  librdf_world_open(world);
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(value, string, NULL);
 
   if(xml_language && !*xml_language)
@@ -562,6 +578,9 @@ librdf_new_node_from_typed_literal(librdf_world *world,
                                    librdf_uri* datatype_uri) 
 {
   size_t xml_language_len=0;
+
+  librdf_world_open(world);
+
   if(xml_language)
     xml_language_len=strlen(xml_language);
   
@@ -593,6 +612,8 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   int len;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
+
+  librdf_world_open(world);
 
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->nodes_mutex);
@@ -1491,6 +1512,8 @@ librdf_node_decode(librdf_world *world,
   unsigned char *language=NULL;
   int status=0;
   librdf_node* node=NULL;
+
+  librdf_world_open(world);
 
   /* absolute minimum - first byte is type */
   if (length < 1)

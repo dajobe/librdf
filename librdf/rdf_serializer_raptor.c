@@ -485,7 +485,7 @@ librdf_serializer_raptor_register_factory(librdf_serializer_factory *factory)
  * librdf_serializer_raptor_constructor:
  * @world: redland world object
  *
- * Initialise the raptor RDF serializer module.
+ * INTERNAL - Initialise the serializer_raptor module.
  *
  **/
 void

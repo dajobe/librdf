@@ -370,6 +370,8 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   librdf_stream *stream;
   int rc;
 
+  librdf_world_open(world);
+
   if(raptor_get_need_base_uri(pcontext->rdf_parser) && !base_uri) {
     librdf_log(world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,

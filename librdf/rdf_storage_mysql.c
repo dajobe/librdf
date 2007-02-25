@@ -2563,6 +2563,12 @@ librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
 }
 
 
+/**
+ * librdf_init_storage_mysql:
+ * @world: world object
+ * 
+ * INTERNAL - initialise the storage_mysql module.
+ **/
 void
 librdf_init_storage_mysql(librdf_world *world)
 {

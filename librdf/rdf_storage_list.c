@@ -962,6 +962,12 @@ librdf_storage_list_register_factory(librdf_storage_factory *factory)
 }
 
 
+/**
+ * librdf_init_storage_list:
+ * @world: world object
+ * 
+ * INTERNAL - initialise the storage_list module.
+ **/
 void
 librdf_init_storage_list(librdf_world *world)
 {

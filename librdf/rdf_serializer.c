@@ -51,7 +51,7 @@
  * librdf_init_serializer:
  * @world: redland world object
  *
- * INTERNAL - Initialise the librdf_serializer class.
+ * INTERNAL - Initialise the serializer module.
  *
  **/
 void
@@ -65,7 +65,7 @@ librdf_init_serializer(librdf_world *world)
  * librdf_finish_serializer:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_serializer class.
+ * INTERNAL - Terminate the serializer module.
  *
  **/
 void
@@ -118,6 +118,8 @@ librdf_serializer_register_factory(librdf_world *world,
   librdf_serializer_factory *serializer;
   char *name_copy;
   char *label_copy;
+
+  librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for serializer %s\n", name);
@@ -207,6 +209,8 @@ librdf_get_serializer_factory(librdf_world *world,
 {
   librdf_serializer_factory *factory;
   
+  librdf_world_open(world);
+
   if(name && !*name)
     name=NULL;
   if(!mime_type || (mime_type && !*mime_type)) {
@@ -280,6 +284,8 @@ librdf_serializer_enumerate(librdf_world* world,
 {
   librdf_serializer_factory *factory;
   
+  librdf_world_open(world);
+
   factory=(librdf_serializer_factory*)raptor_sequence_get_at(world->serializers,
                                                          counter);
   if(!factory)
@@ -311,6 +317,8 @@ librdf_new_serializer(librdf_world *world,
 {
   librdf_serializer_factory* factory;
 
+  librdf_world_open(world);
+
   factory=librdf_get_serializer_factory(world, name, mime_type, type_uri);
   if(!factory)
     return NULL;
@@ -333,6 +341,8 @@ librdf_new_serializer_from_factory(librdf_world *world,
                                    librdf_serializer_factory *factory)
 {
   librdf_serializer* d;
+
+  librdf_world_open(world);
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_serializer_factory, NULL);
 

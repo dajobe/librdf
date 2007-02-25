@@ -75,7 +75,7 @@ static void librdf_hash_keys_iterator_finished(void* iterator);
 /**
  * librdf_init_hash:
  *
- * INTERNAL - Initialise the librdf_hash module.
+ * INTERNAL - Initialise the hash module.
  *
  * Initialises and registers all
  * compiled hash modules.  Must be called before using any of the hash
@@ -99,7 +99,7 @@ librdf_init_hash(librdf_world *world)
  * librdf_finish_hash:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_hash module.
+ * INTERNAL - Terminate the hash module.
  *
  **/
 void
@@ -165,6 +165,8 @@ librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
 {
   librdf_hash_datum *datum;
 
+  librdf_world_open(world);
+
   /* get one from free list, or allocate new one */ 
   if((datum=world->hash_datums_list)) {
     world->hash_datums_list=datum->next;
@@ -217,6 +219,8 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
   librdf_hash_factory *hash, *h;
   char *name_copy;
   
+  librdf_world_open(world);
+
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for hash %s\n", name);
 #endif
@@ -273,6 +277,8 @@ librdf_get_hash_factory(librdf_world *world, const char *name)
 {
   librdf_hash_factory *factory;
 
+  librdf_world_open(world);
+
   /* return 1st hash if no particular one wanted - why? */
   if(!name) {
     factory=world->hashes;
@@ -310,6 +316,8 @@ librdf_new_hash(librdf_world *world, const char* name)
 {
   librdf_hash_factory *factory;
 
+  librdf_world_open(world);
+
   factory=librdf_get_hash_factory(world, name);
   if(!factory)
     return NULL;
@@ -328,10 +336,12 @@ librdf_new_hash(librdf_world *world, const char* name)
  * Return value: a new #librdf_hash object or NULL on failure
  */
 librdf_hash*
-librdf_new_hash_from_factory (librdf_world *world,
-                              librdf_hash_factory* factory)
+librdf_new_hash_from_factory(librdf_world *world,
+                             librdf_hash_factory* factory)
 {
   librdf_hash* h;
+
+  librdf_world_open(world);
 
   h=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
   if(!h)
@@ -373,6 +383,8 @@ librdf_new_hash_from_string(librdf_world *world, const char *name,
 {
   librdf_hash* hash;
 
+  librdf_world_open(world);
+
   hash=librdf_new_hash(world, name);
   if(!hash)
     return NULL;
@@ -401,6 +413,8 @@ librdf_new_hash_from_array_of_strings(librdf_world *world, const char *name,
                                       const char **array)
 {
   librdf_hash* hash;
+
+  librdf_world_open(world);
 
   hash=librdf_new_hash(world, name);
   if(!hash)

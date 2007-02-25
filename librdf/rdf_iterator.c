@@ -66,6 +66,8 @@ librdf_new_iterator(librdf_world *world,
 {
   librdf_iterator* new_iterator;
   
+  librdf_world_open(world);
+
   new_iterator=(librdf_iterator*)LIBRDF_CALLOC(librdf_iterator, 1, 
                                                sizeof(librdf_iterator));
   if(!new_iterator)
@@ -415,6 +417,8 @@ librdf_new_empty_iterator(librdf_world *world)
 {
   librdf_iterator* new_iterator;
   
+  librdf_world_open(world);
+
   new_iterator=(librdf_iterator*)LIBRDF_CALLOC(librdf_iterator, 1, 
                                                sizeof(librdf_iterator));
   if(!new_iterator)

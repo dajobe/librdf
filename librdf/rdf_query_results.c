@@ -508,7 +508,8 @@ librdf_query_results_is_graph(librdf_query_results* query_results) {
  * Return value: non-0 if true
  **/
 int
-librdf_query_results_is_syntax(librdf_query_results* query_results) {
+librdf_query_results_is_syntax(librdf_query_results* query_results)
+{
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
 
   if(query_results->query->factory->results_is_syntax)
@@ -676,6 +677,8 @@ librdf_query_results_formats_check(librdf_world* world,
                                    const char *name, librdf_uri* uri,
                                    const char *mime_type)
 {
+  librdf_world_open(world);
+
   /* FIXME - this should use some kind of registration but for now
    * it is safe to assume Rasqal does it all
    */
@@ -707,6 +710,8 @@ librdf_query_results_formats_enumerate(librdf_world* world,
                                        const unsigned char **uri_string,
                                        const char **mime_type)
 {
+  librdf_world_open(world);
+
   /* FIXME - this should use some kind of registration but for now
    * it is safe to assume Rasqal does it all
    */

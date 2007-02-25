@@ -1881,6 +1881,12 @@ librdf_storage_hashes_register_factory(librdf_storage_factory *factory)
 }
 
 
+/**
+ * librdf_init_storage_hashes:
+ * @world: world object
+ * 
+ * INTERNAL - initialise the storage_hashes module.
+ **/
 void
 librdf_init_storage_hashes(librdf_world *world)
 {

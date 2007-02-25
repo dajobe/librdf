@@ -47,7 +47,7 @@
  * librdf_init_model:
  * @world: redland world object
  *
- * INTERNAL - Initialise librdf_model class.
+ * INTERNAL - Initialise the model module.
  *
  **/
 void
@@ -62,7 +62,7 @@ librdf_init_model(librdf_world *world)
  * librdf_finish_model:
  * @world: redland world object
  *
- * INTERNAL - Terminate librdf_model class.
+ * INTERNAL - Terminate the model module.
  *
  **/
 void
@@ -114,6 +114,8 @@ librdf_model_register_factory(librdf_world *world,
   char *label_copy;
   int i;
   
+  librdf_world_open(world);
+
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for model %s\n", name);
 #endif
@@ -178,6 +180,8 @@ librdf_get_model_factory(librdf_world* world, const char *name)
 {
   librdf_model_factory *factory;
 
+  librdf_world_open(world);
+
   /* return 1st model if no particular one wanted - why? */
   if(!name) {
     factory=(librdf_model_factory *)raptor_sequence_get_at(world->models, 0);
@@ -223,6 +227,8 @@ librdf_model_enumerate(librdf_world* world,
 {
   librdf_model_factory *factory;
   
+  librdf_world_open(world);
+
   factory=(librdf_model_factory*)raptor_sequence_get_at(world->models,
                                                         counter);
   if(!factory)
@@ -254,6 +260,8 @@ librdf_new_model (librdf_world *world,
                   librdf_storage *storage, const char *options_string) {
   librdf_hash* options_hash;
   librdf_model *model;
+
+  librdf_world_open(world);
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
 
@@ -294,6 +302,8 @@ librdf_new_model_with_options(librdf_world *world,
   librdf_model *model;
   librdf_uri *uri;
   
+  librdf_world_open(world);
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
 
   if(!storage)

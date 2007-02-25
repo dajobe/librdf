@@ -55,7 +55,7 @@ static void librdf_delete_query_factories(librdf_world *world);
  * librdf_init_query:
  * @world: redland world object
  *
- * INTERNAL - Initialise the librdf_query module.
+ * INTERNAL - Initialise the query module.
  * 
  * Initialises and registers all
  * compiled query modules.  Must be called before using any of the query
@@ -74,7 +74,7 @@ librdf_init_query(librdf_world *world)
  * librdf_finish_query:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_query module.
+ * INTERNAL - Terminate the query module.
  *
  **/
 void
@@ -129,6 +129,8 @@ librdf_query_register_factory(librdf_world *world, const char *name,
   char *name_copy;
   int name_length;
   
+  librdf_world_open(world);
+
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for query name %s\n", name);
 #endif
@@ -197,6 +199,8 @@ librdf_get_query_factory(librdf_world *world,
 {
   librdf_query_factory *factory;
 
+  librdf_world_open(world);
+
   /* return 1st query if no particular one wanted - why? */
   if(!name && !uri) {
     factory=world->query_factories;
@@ -239,11 +243,14 @@ librdf_get_query_factory(librdf_world *world,
  * Return value: a new #librdf_query object or NULL on failure
  */
 librdf_query*
-librdf_new_query (librdf_world *world,
-                  const char *name, librdf_uri *uri,
-                  const unsigned char *query_string,
-                  librdf_uri* base_uri) {
+librdf_new_query(librdf_world *world,
+                 const char *name, librdf_uri *uri,
+                 const unsigned char *query_string,
+                 librdf_uri* base_uri)
+{
   librdf_query_factory* factory;
+
+  librdf_world_open(world);
 
   factory=librdf_get_query_factory(world, name, uri);
   if(!factory)
@@ -327,8 +334,11 @@ librdf_new_query_from_factory(librdf_world *world,
                               librdf_query_factory* factory,
                               const char *name, librdf_uri *uri,
                               const unsigned char *query_string,
-                              librdf_uri *base_uri) {
+                              librdf_uri *base_uri)
+{
   librdf_query* query;
+
+  librdf_world_open(world);
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_query_factory, NULL);
 

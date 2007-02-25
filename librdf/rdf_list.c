@@ -86,6 +86,8 @@ librdf_new_list(librdf_world *world)
 {
   librdf_list* new_list;
   
+  librdf_world_open(world);
+
   new_list=(librdf_list*)LIBRDF_CALLOC(librdf_list, 1, sizeof(librdf_list));
   if(!new_list)
     return NULL;

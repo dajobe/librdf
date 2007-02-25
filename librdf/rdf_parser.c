@@ -48,7 +48,7 @@
  * librdf_init_parser:
  * @world: redland world object
  *
- * INTERNAL - Initialise the librdf_parser class.
+ * INTERNAL - Initialise the parser module.
  *
  **/
 void
@@ -62,7 +62,7 @@ librdf_init_parser(librdf_world *world)
  * librdf_finish_parser:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_parser class.
+ * INTERNAL - Terminate the parser module.
  *
  **/
 void
@@ -113,6 +113,8 @@ librdf_parser_register_factory(librdf_world *world,
   librdf_parser_factory *parser;
   char *name_copy;
   char *label_copy;
+
+  librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for parser %s\n", name);
@@ -202,6 +204,8 @@ librdf_get_parser_factory(librdf_world *world,
 {
   librdf_parser_factory *factory;
   
+  librdf_world_open(world);
+
   if(name && !*name)
     name=NULL;
   if(!mime_type || (mime_type && !*mime_type)) {
@@ -274,6 +278,8 @@ librdf_parser_enumerate(librdf_world* world,
 {
   librdf_parser_factory *factory;
   
+  librdf_world_open(world);
+
   factory=(librdf_parser_factory*)raptor_sequence_get_at(world->parsers,
                                                          counter);
   if(!factory)
@@ -308,6 +314,8 @@ librdf_new_parser(librdf_world *world,
 {
   librdf_parser_factory* factory;
 
+  librdf_world_open(world);
+
   factory=librdf_get_parser_factory(world, name, mime_type, type_uri);
   if(!factory)
     return NULL;
@@ -330,6 +338,8 @@ librdf_new_parser_from_factory(librdf_world *world,
                                librdf_parser_factory *factory)
 {
   librdf_parser* d;
+
+  librdf_world_open(world);
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_parser_factory, NULL);
 

@@ -226,6 +226,9 @@ librdf_world_init_mutex(librdf_world* world)
 void
 librdf_world_open(librdf_world *world)
 {
+  if(world->opened++)
+    return;
+  
   librdf_world_init_mutex(world);
   
   /* Digests first, lots of things use these */

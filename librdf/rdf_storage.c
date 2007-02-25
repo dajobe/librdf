@@ -63,7 +63,7 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
  * librdf_init_storage:
  * @world: redland world object
  *
- * INTERNAL - Initialise the librdf_storage module.
+ * INTERNAL - Initialise the storage module.
  * 
  * Initialises and registers all
  * compiled storage modules.  Must be called before using any of the storage
@@ -100,7 +100,7 @@ librdf_init_storage(librdf_world *world)
  * librdf_finish_storage:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_storage module.
+ * INTERNAL - Terminate the storage module.
  *
  **/
 void
@@ -145,6 +145,8 @@ librdf_storage_register_factory(librdf_world* world,
   char *name_copy;
   char *label_copy;
   int i;
+
+  librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for storage %s\n", name);
@@ -210,6 +212,8 @@ librdf_get_storage_factory(librdf_world* world, const char *name)
 {
   librdf_storage_factory *factory;
 
+  librdf_world_open(world);
+
   /* return 1st storage if no particular one wanted - why? */
   if(!name) {
     factory=(librdf_storage_factory *)raptor_sequence_get_at(world->storages, 0);
@@ -255,6 +259,8 @@ librdf_storage_enumerate(librdf_world* world,
 {
   librdf_storage_factory *factory;
   
+  librdf_world_open(world);
+
   factory=(librdf_storage_factory*)raptor_sequence_get_at(world->storages,
                                                           counter);
   if(!factory)
@@ -284,12 +290,15 @@ librdf_storage_enumerate(librdf_world* world,
  *
  */
 librdf_storage*
-librdf_new_storage (librdf_world *world, 
-                    const char *storage_name, const char *name, 
-                    const char *options_string) {
+librdf_new_storage(librdf_world *world, 
+                   const char *storage_name, const char *name, 
+                   const char *options_string)
+{
   librdf_storage_factory* factory;
   librdf_hash* options_hash;
   
+  librdf_world_open(world);
+
   factory=librdf_get_storage_factory(world, storage_name);
   if(!factory)
     return NULL;
@@ -329,10 +338,13 @@ librdf_new_storage (librdf_world *world,
 librdf_storage*
 librdf_new_storage_with_options(librdf_world *world, 
                                 const char *storage_name, const char *name, 
-                                librdf_hash *options) {
+                                librdf_hash *options)
+{
   librdf_storage_factory* factory;
   librdf_hash* options_hash;
   
+  librdf_world_open(world);
+
   factory=librdf_get_storage_factory(world, storage_name);
   if(!factory)
     return NULL;
@@ -429,11 +441,14 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
  *
  */
 librdf_storage*
-librdf_new_storage_from_factory (librdf_world *world,
-                                 librdf_storage_factory* factory,
-                                 const char *name,
-                                 librdf_hash* options) {
+librdf_new_storage_from_factory(librdf_world *world,
+                                librdf_storage_factory* factory,
+                                const char *name,
+                                librdf_hash* options)
+{
   librdf_storage* storage;
+
+  librdf_world_open(world);
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_storage_factory, NULL);
 

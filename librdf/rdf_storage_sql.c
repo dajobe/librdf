@@ -109,6 +109,8 @@ librdf_new_sql_config(librdf_world* world,
   size_t len;
   int i;
   
+  librdf_world_open(world);
+
   config=(librdf_sql_config*)LIBRDF_MALLOC(librdf_sql_config,
                                            sizeof(librdf_sql_config));
 

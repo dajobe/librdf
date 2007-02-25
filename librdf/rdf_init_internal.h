@@ -99,6 +99,8 @@ struct librdf_world_s
   /* mutex to lock the statements class */
   pthread_mutex_t* statements_mutex;
 #endif
+
+  int opened;
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);

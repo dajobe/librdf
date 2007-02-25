@@ -50,7 +50,7 @@
  * librdf_init_statement:
  * @world: redland world object
  *
- * INTERNAL - Initialise the librdf_statement module.
+ * INTERNAL - Initialise the statement module.
  *
  **/
 void
@@ -63,7 +63,7 @@ librdf_init_statement(librdf_world *world)
  * librdf_finish_statement:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_statement module.
+ * INTERNAL - Terminate the statement module.
  *
  **/
 void
@@ -83,8 +83,12 @@ librdf_finish_statement(librdf_world *world)
 librdf_statement*
 librdf_new_statement(librdf_world *world) 
 {
-  librdf_statement* new_statement=(librdf_statement*)LIBRDF_CALLOC(librdf_statement, 1, 
-                                                                   sizeof(librdf_statement));
+  librdf_statement* new_statement;
+
+  librdf_world_open(world);
+
+  new_statement=(librdf_statement*)LIBRDF_CALLOC(librdf_statement, 1, 
+                                                 sizeof(librdf_statement));
   if(!new_statement)
     return NULL;
 
@@ -163,6 +167,8 @@ librdf_new_statement_from_nodes(librdf_world *world,
 {
   librdf_statement* new_statement;
 
+  librdf_world_open(world);
+
   new_statement = librdf_new_statement(world);
   if(!new_statement) {
     if(subject)
@@ -197,6 +203,8 @@ librdf_new_statement_from_nodes(librdf_world *world,
 void
 librdf_statement_init(librdf_world *world, librdf_statement *statement)
 {
+  librdf_world_open(world);
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
   statement->world=world;

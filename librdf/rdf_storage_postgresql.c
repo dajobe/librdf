@@ -2369,7 +2369,14 @@ librdf_storage_postgresql_register_factory(librdf_storage_factory *factory)
 }
 
 
-void librdf_init_storage_postgresql(librdf_world *world)
+/**
+ * librdf_init_storage_postgresql:
+ * @world: world object
+ * 
+ * INTERNAL - initialise the storage_postgresql module.
+ **/
+void
+librdf_init_storage_postgresql(librdf_world *world)
 {
   librdf_storage_register_factory(world, "postgresql", "postgresql database store",
                                   &librdf_storage_postgresql_register_factory);

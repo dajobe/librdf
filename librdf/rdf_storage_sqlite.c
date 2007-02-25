@@ -2588,6 +2588,12 @@ librdf_storage_sqlite_register_factory(librdf_storage_factory *factory)
 }
 
 
+/**
+ * librdf_init_storage_sqlite:
+ * @world: world object
+ * 
+ * INTERNAL - initialise the storage_sqlite module.
+ **/
 void
 librdf_init_storage_sqlite(librdf_world *world)
 {

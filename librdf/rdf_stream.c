@@ -82,12 +82,14 @@ librdf_new_stream(librdf_world *world,
 {
   librdf_stream* new_stream;
   
+  librdf_world_open(world);
+
   new_stream=(librdf_stream*)LIBRDF_CALLOC(librdf_stream, 1, 
 					   sizeof(librdf_stream));
   if(!new_stream)
     return NULL;
 
-
+  new_stream->world=world;
   new_stream->context=context;
 
   new_stream->is_end_method=is_end_method;
@@ -596,6 +598,8 @@ librdf_new_empty_stream(librdf_world *world)
 {
   librdf_stream* new_stream;
   
+  librdf_world_open(world);
+
   new_stream=(librdf_stream*)LIBRDF_CALLOC(librdf_stream, 1, 
                                                sizeof(librdf_stream));
   if(!new_stream)

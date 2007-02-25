@@ -55,7 +55,7 @@
  * librdf_init_uri:
  * @world: redland world object
  *
- * INTERNAL - Initialise the librdf_uri class.
+ * INTERNAL - Initialise the uri module.
  *
  **/
 void
@@ -81,7 +81,7 @@ librdf_init_uri(librdf_world *world)
  * librdf_finish_uri:
  * @world: redland world object
  *
- * INTERNAL - Terminate the librdf_uri class.
+ * INTERNAL - Terminate the uri module.
  *
  **/
 void
@@ -116,6 +116,8 @@ librdf_new_uri (librdf_world *world,
   int length;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
+
+  librdf_world_open(world);
 
   if(!uri_string || !*uri_string)
     return NULL;
@@ -371,6 +373,8 @@ librdf_uri*
 librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
   librdf_uri* new_uri;
   unsigned char *uri_string;
+
+  librdf_world_open(world);
 
   if(!filename)
     return NULL;

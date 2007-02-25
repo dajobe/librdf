@@ -770,6 +770,12 @@ librdf_model_storage_register_factory(librdf_model_factory *factory)
 }
 
 
+/**
+ * librdf_init_model_storage:
+ * @world: world object
+ * 
+ * INTERNAL - Initialise the model_storage module
+ **/
 void
 librdf_init_model_storage(librdf_world *world)
 {
