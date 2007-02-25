@@ -125,7 +125,7 @@ const unsigned int librdf_version_decimal = LIBRDF_VERSION_DECIMAL;
  *
  * The world object needs initializing using librdf_world_open()
  * whether or not the above functions are called.  It will be
- * automatically called by all object constructors in Redland 1.0.6
+ * automatically called by all object constructors in Redland 1.0.5
  * or later, but for earlier versions it MUST be called before using
  * any other part of Redland.
  *
