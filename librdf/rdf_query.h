@@ -103,6 +103,8 @@ REDLAND_API
 int librdf_query_results_is_boolean(librdf_query_results *query_results);
 REDLAND_API
 int librdf_query_results_is_graph(librdf_query_results *query_results);
+REDLAND_API
+int librdf_query_results_is_syntax(librdf_query_results* query_results);
 
 REDLAND_API
 int librdf_query_results_get_boolean(librdf_query_results *query_results);
