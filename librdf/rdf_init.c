@@ -115,17 +115,31 @@ const unsigned int librdf_version_decimal = LIBRDF_VERSION_DECIMAL;
 /**
  * librdf_new_world:
  *
- * Create a new redland execution environment.
+ * Create a new Redland execution environment.
+ *
+ * Once this constructor is called to build a #librdf_world object
+ * several functions may be called to set some parameters such as
+ * librdf_world_set_error(), librdf_world_set_warning(),
+ * librdf_world_set_logger(), librdf_world_set_digest(),
+ * librdf_world_set_feature().
+ *
+ * The world object needs initializing using librdf_world_open()
+ * whether or not the above functions are called.  It will be
+ * automatically called by all object constructors in Redland 1.0.6
+ * or later, but for earlier versions it MUST be called before using
+ * any other part of Redland.
  *
  * Returns: a new #librdf_world or NULL on failure
  */
 librdf_world*
 librdf_new_world(void) {
-  librdf_world *world=(librdf_world*)LIBRDF_CALLOC(librdf_world, sizeof(librdf_world), 1);
+  librdf_world *world;
 #ifdef HAVE_GETTIMEOFDAY
   struct timeval tv;
   struct timezone tz;
 #endif
+
+  world=(librdf_world*)LIBRDF_CALLOC(librdf_world, sizeof(librdf_world), 1);
 
 #ifdef HAVE_GETTIMEOFDAY
   if(!gettimeofday(&tv, &tz)) {
