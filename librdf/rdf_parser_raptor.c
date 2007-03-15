@@ -548,12 +548,21 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   scontext->base_uri = base_uri;
 
   if(uri) {
-    raptor_www *www=raptor_www_new();
+    raptor_www *www;
+    const char *accept_h;
+
+    www=raptor_www_new();
     if(!www) {
       LIBRDF_FREE(librdf_parser_raptor_stream_context, scontext);
       return NULL;
     }
     
+    accept_h=raptor_parser_get_accept_header(pcontext->rdf_parser);
+    if(accept_h) {
+      raptor_www_set_http_accept(www, accept_h);
+      raptor_free_memory(accept_h);
+    }
+
     raptor_www_set_write_bytes_handler(www, 
                                        librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler,
                                        scontext);
