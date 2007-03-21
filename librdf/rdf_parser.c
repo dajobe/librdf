@@ -671,6 +671,27 @@ librdf_parser_get_accept_header(librdf_parser* parser)
   return NULL;
 }
 
+
+/**
+ * librdf_parser_guess_name:
+ * @mime_type: MIME type of syntax or NULL
+ * @buffer: content buffer or NULL
+ * @identifier: content identifier or NULL
+ * 
+ * Get a parser name for content with type or identiifer
+ * 
+ * Return value: a parser name or NULL if nothing was guessable
+ **/
+const char*
+librdf_parser_guess_name(const char *mime_type,
+                         const unsigned char *buffer, 
+                         const unsigned char *identifier)
+{
+  return raptor_guess_parser_name(NULL, mime_type, buffer, strlen(buffer),
+                                  identifier);
+}
+
+
 #endif
 
 
