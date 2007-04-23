@@ -1876,7 +1876,7 @@ main(int argc, char *argv[])
   librdf_node *n1, *n2;
   int count;
   int expected_count;
-#define EXPECTED_BAD_STRING_LENGTH 281
+#define EXPECTED_BAD_STRING_LENGTH 317
   librdf_uri* base_uri;
   unsigned char *string;
   size_t string_length=0;
