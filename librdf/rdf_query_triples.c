@@ -138,6 +138,8 @@ librdf_query_triples_init(librdf_query* query,
   unsigned char *query_string_copy;
   unsigned char *cur, *p;
   librdf_node *subject, *predicate, *object;
+
+  librdf_statement_init(query->world, &context->statement);
   
   len=strlen((const char*)query_string);
   query_string_copy=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
