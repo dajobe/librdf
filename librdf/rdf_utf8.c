@@ -535,6 +535,7 @@ main(int argc, char *argv[])
   byte *utf8_string;
   int utf8_string_length;
   int failures=0;
+  int verbose=0;
 
   for(i=0; (t=&test_values[i]) && t->string; i++) {
     int size;
@@ -559,10 +560,12 @@ main(int argc, char *argv[])
       failures++;
       continue;
     }
-    
-    fprintf(stderr, "%s: librdf_utf8_to_unicode_char converted UTF-8 string '", program);
-    librdf_utf8_print(buffer, size, stderr);
-    fprintf(stderr, "' to Unicode char U+%04X correctly\n", (u32)c);
+
+    if(verbose) {
+      fprintf(stderr, "%s: librdf_utf8_to_unicode_char converted UTF-8 string '", program);
+      librdf_utf8_print(buffer, size, stderr);
+      fprintf(stderr, "' to Unicode char U+%04X correctly\n", (u32)c);
+    }
 
     size=librdf_unicode_char_to_utf8(t->result, out_buffer, OUT_BUFFER_SIZE);
     if(size <= 0) {
@@ -581,9 +584,11 @@ main(int argc, char *argv[])
       continue;
     }
     
-    fprintf(stderr, "%s: librdf_unicode_char_to_utf8 converted U+%04X to UTF-8 string '", program, (u32)t->result);
-    librdf_utf8_print(out_buffer, size, stderr);
-    fputs("' correctly\n", stderr);
+    if(verbose) {
+      fprintf(stderr, "%s: librdf_unicode_char_to_utf8 converted U+%04X to UTF-8 string '", program, (u32)t->result);
+      librdf_utf8_print(out_buffer, size, stderr);
+      fputs("' correctly\n", stderr);
+    }
   }
 
 
@@ -601,9 +606,11 @@ main(int argc, char *argv[])
       failures++;
       continue;
     }
-    fprintf(stderr, "%s: librdf_utf8_to_unicode_char failed as expected converting bad UTF-8 string '", program);
-    librdf_bad_string_print(buffer, length, stderr);
-    fprintf(stderr, "' (length %d) to Unicode\n", length);
+    if(verbose) {
+      fprintf(stderr, "%s: librdf_utf8_to_unicode_char failed as expected converting bad UTF-8 string '", program);
+      librdf_bad_string_print(buffer, length, stderr);
+      fprintf(stderr, "' (length %d) to Unicode\n", length);
+    }
   }
   
 
@@ -626,10 +633,12 @@ main(int argc, char *argv[])
     failures++;
   }
 
-  fprintf(stderr, "%s: librdf_utf8_to_latin1 converted UTF-8 string '",
-          program);
-  librdf_utf8_print(test_utf8_string, test_utf8_string_length, stderr);
-  fprintf(stderr, "' to Latin-1 string '%s' OK\n", latin1_string);
+  if(verbose) {
+    fprintf(stderr, "%s: librdf_utf8_to_latin1 converted UTF-8 string '",
+            program);
+    librdf_utf8_print(test_utf8_string, test_utf8_string_length, stderr);
+    fprintf(stderr, "' to Latin-1 string '%s' OK\n", latin1_string);
+  }
   
 
   utf8_string=librdf_latin1_to_utf8(latin1_string, latin1_string_length,
@@ -648,10 +657,11 @@ main(int argc, char *argv[])
     failures++;
   }
 
-  fprintf(stderr, "%s: librdf_latin1_to_utf8 converted Latin-1 string '%s' to UTF-8 string '", program, latin1_string);
-  librdf_utf8_print(utf8_string, utf8_string_length, stderr);
-  fputs("' OK\n", stderr);
-  
+  if(verbose) {
+    fprintf(stderr, "%s: librdf_latin1_to_utf8 converted Latin-1 string '%s' to UTF-8 string '", program, latin1_string);
+    librdf_utf8_print(utf8_string, utf8_string_length, stderr);
+    fputs("' OK\n", stderr);
+  }
 
   LIBRDF_FREE(cstring, latin1_string);
   LIBRDF_FREE(cstring, utf8_string);
