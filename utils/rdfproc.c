@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdfproc.c - Redland RDF processor
+ * rdfproc.c - Redland RDF command processor
  *
  * $Id$
  *
@@ -193,7 +193,81 @@ log_handler(void *user_data, librdf_log_message *message)
   return 1;
 }
 
-  
+
+
+static int
+add_stream_count(librdf_model* model, librdf_node* context,
+                 librdf_stream* stream) 
+{
+  int count;
+
+  count=0;
+  while(!librdf_stream_end(stream)) {
+    librdf_statement *statement=librdf_stream_get_object(stream);
+    if(!statement) {
+      fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
+      break;
+    }
+    
+    if(context)  /* context node */
+      librdf_model_context_add_statement(model, context, statement);
+    else
+      librdf_model_add_statement(model, statement);
+    count++;
+    librdf_stream_next(stream);
+  }
+  librdf_free_stream(stream);
+
+  return count;
+}
+
+
+static void
+print_nodes(FILE* fh, librdf_iterator* iterator) 
+{
+  int count;
+  librdf_node* context_node;
+  librdf_node* node;
+
+  /* (Common code) Print out nodes */
+  count=0;
+  while(!librdf_iterator_end(iterator)) {
+    context_node=(librdf_node*)librdf_iterator_get_context(iterator);
+    node=(librdf_node*)librdf_iterator_get_object(iterator);
+    if(!node) {
+      fprintf(stderr, "%s: librdf_iterator_get_object returned NULL\n",
+              program);
+      break;
+    }
+    
+    fputs("Matched node: ", fh);
+    librdf_node_print(node, fh);
+    if(context_node) {
+      fputs(" with context ", fh);
+      librdf_node_print(context_node, fh);
+    }
+    fputc('\n', fh);
+    
+    count++;
+    librdf_iterator_next(iterator);
+  }
+  librdf_free_iterator(iterator);
+  fprintf(stderr, "%s: matching nodes: %d\n", program, count);
+}
+
+
+static void
+print_node(FILE* fh, librdf_node* node) 
+{
+  if(node) {
+    fputs("Matched node: ", fh);
+    librdf_node_print(node, fh);
+    fputc('\n', fh);
+    
+    librdf_free_node(node);
+  }
+}
+
 
 int
 main(int argc, char *argv[]) 
@@ -276,7 +350,7 @@ main(int argc, char *argv[])
 #else
     c = getopt (argc, argv, GETOPT_STRING);
 #endif
-    if (c == -1)
+    if(c == -1)
       break;
 
     switch (c) {
@@ -564,7 +638,7 @@ main(int argc, char *argv[])
 
   if(commands[cmd_index].write) {
     librdf_hash_put_strings(options, "write", "yes");
-    if (is_new)
+    if(is_new)
       librdf_hash_put_strings(options, "new", "yes");
   }
 
@@ -606,6 +680,8 @@ main(int argc, char *argv[])
     case CMD_PRINT:
       librdf_model_print(model, stdout);
       break;
+
+
     case CMD_PARSE_MODEL:
     case CMD_PARSE_STREAM:
       uri_string=(unsigned char *)argv[0];
@@ -621,7 +697,8 @@ main(int argc, char *argv[])
       
       parser=librdf_new_parser(world, ((argc > 1) ? argv[1] : NULL), NULL, NULL);
       if(!parser) {
-        fprintf(stderr, "%s: Failed to create new parser %s\n", program, argv[1]);
+        fprintf(stderr, "%s: Failed to create new parser %s\n", program,
+                argv[1]);
         librdf_free_uri(uri);
         break;
       }
@@ -634,7 +711,8 @@ main(int argc, char *argv[])
         if(strcmp(argv[2], "-")) {
           base_uri=librdf_new_uri(world, (const unsigned char *)argv[2]);
           if(!base_uri) {
-            fprintf(stderr, "%s: Failed to create base URI from %s\n", program, argv[2]);
+            fprintf(stderr, "%s: Failed to create base URI from %s\n", program,
+                    argv[2]);
             break;
           }
         }
@@ -643,9 +721,11 @@ main(int argc, char *argv[])
 
         target=NULL; /* context node */
         if(argc >= 4 && argv[3]) {
-          if (librdf_heuristic_is_blank_node(argv[3]))
-            target=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
-          else
+          if(librdf_heuristic_is_blank_node(argv[3])) {
+            const unsigned char* bnodeid;
+            bnodeid=(const unsigned char *)librdf_heuristic_get_blank_node(argv[3]);
+            target=librdf_new_node_from_blank_identifier(world, bnodeid);
+          } else
             target=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
         }
         fprintf(stderr, "%s: Using context node %s\n", program,
@@ -655,7 +735,7 @@ main(int argc, char *argv[])
 
       rc=0;
 
-      if (type == CMD_PARSE_MODEL && !target) {
+      if(type == CMD_PARSE_MODEL && !target) {
         if(librdf_parser_parse_into_model(parser, uri, base_uri, model)) {
           fprintf(stderr, "%s: Failed to parse into the graph\n", program);
           rc=1;
@@ -666,23 +746,8 @@ main(int argc, char *argv[])
         if(!(stream=librdf_parser_parse_as_stream(parser, uri, base_uri))) {
           fprintf(stderr, "%s: Failed to parse RDF as stream\n", program);
           rc=1;
-        } else {
-          while(!librdf_stream_end(stream)) {
-            librdf_statement *statement=librdf_stream_get_object(stream);
-            if(!statement) {
-              fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
-              break;
-            }
-          
-            if(target)  /* context node */
-              librdf_model_context_add_statement(model, target, statement);
-            else
-              librdf_model_add_statement(model, statement);
-            count++;
-            librdf_stream_next(stream);
-          }
-          librdf_free_stream(stream);  
-        }
+        } else
+          count=add_stream_count(model, target, stream);
 
         if(target) {
           librdf_free_node(target);
@@ -700,7 +765,7 @@ main(int argc, char *argv[])
         librdf_node* warning_count_node;
         int error_count, warning_count;
 
-        error_count_node =librdf_parser_get_feature(parser, error_count_uri);
+        error_count_node=librdf_parser_get_feature(parser, error_count_uri);
         if(error_count_node) {
           error_count= atoi((const char*)librdf_node_get_literal_value(error_count_node));
           librdf_free_node(error_count_node);
@@ -709,7 +774,7 @@ main(int argc, char *argv[])
           error_count= (-1);
         }
 
-        warning_count_node =librdf_parser_get_feature(parser, warning_count_uri);
+        warning_count_node=librdf_parser_get_feature(parser, warning_count_uri);
         if(warning_count_node) {
           warning_count =atoi((const char*)librdf_node_get_literal_value(error_count_node));
           librdf_free_node(warning_count_node);
@@ -734,8 +799,11 @@ main(int argc, char *argv[])
         librdf_free_uri(base_uri);
       break;
 
+
     case CMD_SERIALIZE:
-        /* args are name (optional), uri (may be NULL), mime_type (optional), base URI (optional) */
+        /* args are name (optional), uri (may be NULL), mime_type
+         * (optional), base URI (optional)
+         */
 
         uri=NULL;
         name=NULL;
@@ -783,7 +851,8 @@ main(int argc, char *argv[])
           break;
         }
 
-        librdf_serializer_serialize_model_to_file_handle(serializer, stdout, NULL, model);
+        librdf_serializer_serialize_model_to_file_handle(serializer, stdout,
+                                                         NULL, model);
 
         librdf_free_serializer(serializer);
         if(uri)
@@ -791,6 +860,7 @@ main(int argc, char *argv[])
 
         break;
       
+
     case CMD_QUERY:
       /* args are name, uri (may be NULL), query_string/mime_type */
 
@@ -803,14 +873,17 @@ main(int argc, char *argv[])
       else {
         uri=librdf_new_uri(world, (const unsigned char *)argv[1]);
         if(!uri) {
-          fprintf(stderr, "%s: Failed to create URI from %s\n", program, argv[1]);
+          fprintf(stderr, "%s: Failed to create URI from %s\n", program,
+                  argv[1]);
           break;
         }
       }
 
-      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2], NULL);
+      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2],
+                             NULL);
       goto printmatching;
       break;
+
 
     case CMD_QUERY_AS_BINDINGS:
       /* args are name (optional), uri (may be NULL), query_string */
@@ -864,7 +937,7 @@ main(int argc, char *argv[])
 
         librdf_free_query_results_formatter(formatter);
         raptor_free_iostream(iostr);
-      } else if (librdf_query_results_is_bindings(results)) {
+      } else if(librdf_query_results_is_bindings(results)) {
         fprintf(stdout, "%s: Query returned bindings results:\n", program);
         
         while(!librdf_query_results_finished(results)) {
@@ -889,11 +962,11 @@ main(int argc, char *argv[])
 
         fprintf(stdout, "%s: Query returned %d results\n", program, 
                 librdf_query_results_get_count(results));
-     } else if (librdf_query_results_is_boolean(results)) {
+     } else if(librdf_query_results_is_boolean(results)) {
        fprintf(stdout, "%s: Query returned boolean result: %s\n",
                program,
                librdf_query_results_get_boolean(results) ? "true" : "false");
-     } else if (librdf_query_results_is_graph(results)) {
+     } else if(librdf_query_results_is_graph(results)) {
        librdf_storage* tmp_storage;
        librdf_model* tmp_model;
 
@@ -936,6 +1009,7 @@ main(int argc, char *argv[])
       librdf_free_query_results(results);
       break;
       
+
     case CMD_CONTAINS:
     case CMD_FIND:
     case CMD_MATCH:
@@ -944,7 +1018,7 @@ main(int argc, char *argv[])
     case CMD_ADD_TYPED:
       if(!strcmp(argv[0], "-"))
         source=NULL;
-      else if (librdf_heuristic_is_blank_node(argv[0]))
+      else if(librdf_heuristic_is_blank_node(argv[0]))
         source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
       else
         source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
@@ -963,7 +1037,7 @@ main(int argc, char *argv[])
         if(!strcmp(argv[2], "-"))
           target=NULL;
         else {
-          if (!strncmp(argv[2], "_:", 2))
+          if(!strncmp(argv[2], "_:", 2))
             target=librdf_new_node_from_blank_identifier(world, (const unsigned char *)argv[2]+2);
           else if(librdf_heuristic_object_is_literal(argv[2]))
             target=librdf_new_node_from_literal(world, (const unsigned char *)argv[2], NULL, 0);
@@ -1002,7 +1076,7 @@ main(int argc, char *argv[])
           if(type==CMD_FIND || type==CMD_MATCH) {
             if(argc == 4 || type==CMD_MATCH) {
               if(argc == 4) {
-                if (librdf_heuristic_is_blank_node(argv[3]))
+                if(librdf_heuristic_is_blank_node(argv[3]))
                   context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
                 else
                   context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
@@ -1070,10 +1144,11 @@ main(int argc, char *argv[])
           }
           break;
           
+
         case CMD_ADD:
         case CMD_ADD_TYPED:
           if(argv[3]) {
-            if (librdf_heuristic_is_blank_node(argv[3]))
+            if(librdf_heuristic_is_blank_node(argv[3]))
               context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
             else
               context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
@@ -1094,7 +1169,7 @@ main(int argc, char *argv[])
           
         case CMD_REMOVE:
           if(argv[3]) {
-            if (librdf_heuristic_is_blank_node(argv[3]))
+            if(librdf_heuristic_is_blank_node(argv[3]))
               context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[3]));
             else
               context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
@@ -1119,9 +1194,10 @@ main(int argc, char *argv[])
       librdf_free_statement(partial_statement);
       break;
       
+
     case CMD_SOURCES:
       arc=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
-      if (librdf_heuristic_is_blank_node(argv[1]))
+      if(librdf_heuristic_is_blank_node(argv[1]))
         target=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[1]));
       else if(librdf_heuristic_object_is_literal(argv[1]))
         target=librdf_new_node_from_literal(world, (const unsigned char *)argv[1], NULL, 0);
@@ -1134,14 +1210,19 @@ main(int argc, char *argv[])
         break;
       }
       
-      /* FALLTHROUGH */
+      print_nodes(stdout, iterator);
+
+      librdf_free_node(arc);
+      librdf_free_node(target);
+      break;
+      
     case CMD_ARCS:
       if(!iterator) {
-        if (librdf_heuristic_is_blank_node(argv[0]))
+        if(librdf_heuristic_is_blank_node(argv[0]))
           source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
         else
           source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
-        if (librdf_heuristic_is_blank_node(argv[1]))
+        if(librdf_heuristic_is_blank_node(argv[1]))
           target=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[1]));
         else if(librdf_heuristic_object_is_literal(argv[1]))
           target=librdf_new_node_from_literal(world, (const unsigned char *)argv[1], NULL, 0);
@@ -1153,11 +1234,17 @@ main(int argc, char *argv[])
           break;
         }
       }
+
+      print_nodes(stdout, iterator);
+
+      librdf_free_node(source);
+      librdf_free_node(target);
+      break;
       
-      /* FALLTHROUGH */
+
     case CMD_TARGETS:
       if(!iterator) {
-        if (librdf_heuristic_is_blank_node(argv[0]))
+        if(librdf_heuristic_is_blank_node(argv[0]))
           source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
         else
           source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
@@ -1168,43 +1255,17 @@ main(int argc, char *argv[])
           break;
         }
       }
-      
-      /* (Common code) Print out nodes */
-      count=0;
-      while(!librdf_iterator_end(iterator)) {
-        context_node=(librdf_node*)librdf_iterator_get_context(iterator);
-        node=(librdf_node*)librdf_iterator_get_object(iterator);
-        if(!node) {
-          fprintf(stderr, "%s: librdf_iterator_get_object returned NULL\n",
-                  program);
-          break;
-        }
-        
-        fputs("Matched node: ", stdout);
-        librdf_node_print(node, stdout);
-        if(context_node) {
-          fputs(" with context ", stdout);
-          librdf_node_print(context_node, stdout);
-        }
-        fputc('\n', stdout);
-        
-        count++;
-        librdf_iterator_next(iterator);
-      }
-      librdf_free_iterator(iterator);
-      fprintf(stderr, "%s: matching nodes: %d\n", program, count);
-      
-      if(source)
-        librdf_free_node(source);
-      if(arc)
-        librdf_free_node(arc);
-      if(target)
-        librdf_free_node(target);
+
+      print_nodes(stdout, iterator);
+
+      librdf_free_node(source);
+      librdf_free_node(arc);
       break;
       
+
     case CMD_SOURCE:
       arc=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
-      if (librdf_heuristic_is_blank_node(argv[1]))
+      if(librdf_heuristic_is_blank_node(argv[1]))
         target=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[1]));
       else if(librdf_heuristic_object_is_literal(argv[1]))
         target=librdf_new_node_from_literal(world, (const unsigned char *)argv[1], NULL, 0);
@@ -1219,14 +1280,19 @@ main(int argc, char *argv[])
         break;
       }
       
-      /* FALLTHROUGH */
+      print_node(stdout, node);
+      librdf_free_node(arc);
+      librdf_free_node(target);
+      break;
+      
+
     case CMD_ARC:
       if(!node) {
-        if (librdf_heuristic_is_blank_node(argv[0]))
+        if(librdf_heuristic_is_blank_node(argv[0]))
           source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
         else
           source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
-      if (librdf_heuristic_is_blank_node(argv[1]))
+      if(librdf_heuristic_is_blank_node(argv[1]))
         target=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[1]));
       else if(librdf_heuristic_object_is_literal(argv[1]))
         target=librdf_new_node_from_literal(world, (const unsigned char *)argv[1], NULL, 0);
@@ -1241,10 +1307,15 @@ main(int argc, char *argv[])
         }
       }
       
-      /* FALLTHROUGH */
+      print_node(stdout, node);
+      librdf_free_node(source);
+      librdf_free_node(target);
+      break;
+      
+
     case CMD_TARGET:
       if(!node) {
-        if (librdf_heuristic_is_blank_node(argv[0]))
+        if(librdf_heuristic_is_blank_node(argv[0]))
           source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
         else
           source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
@@ -1257,31 +1328,22 @@ main(int argc, char *argv[])
           break;
         }
       }
-      
-      /* (Common code) Print out node */
-      if(node) {
-        fputs("Matched node: ", stdout);
-        librdf_node_print(node, stdout);
-        fputc('\n', stdout);
-        
-        librdf_free_node(node);
-      }
-      if(source)
-        librdf_free_node(source);
-      if(arc)
-        librdf_free_node(arc);
-      if(target)
-        librdf_free_node(target);
+
+      print_node(stdout, node);
+      librdf_free_node(source);
+      librdf_free_node(arc);
       break;
 
 
-      
     case CMD_ARCS_IN:
     case CMD_ARCS_OUT:
-      if (librdf_heuristic_is_blank_node(argv[0]))
-        source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
-      else
-        source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
+      if(librdf_heuristic_is_blank_node(argv[0])) {
+        const unsigned char* bnodeid;
+        bnodeid=(const unsigned char *)librdf_heuristic_get_blank_node(argv[0]);
+        source=librdf_new_node_from_blank_identifier(world, bnodeid);
+      } else
+        source=librdf_new_node_from_uri_string(world, 
+                                               (const unsigned char *)argv[0]);
       iterator=(type == CMD_ARCS_IN) ? librdf_model_get_arcs_in(model, source) :
                                        librdf_model_get_arcs_out(model, source);
       if(!iterator) {
@@ -1321,9 +1383,11 @@ main(int argc, char *argv[])
       
     case CMD_HAS_ARC_IN:
     case CMD_HAS_ARC_OUT:
-      if (librdf_heuristic_is_blank_node(argv[0]))
-        source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
-      else
+      if(librdf_heuristic_is_blank_node(argv[0])) {
+        const unsigned char* bnodeid;
+        bnodeid=(const unsigned char *)librdf_heuristic_get_blank_node(argv[0]);
+        source=librdf_new_node_from_blank_identifier(world, bnodeid);
+      } else
         source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
       arc=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[1]);
       result=(type == CMD_HAS_ARC_IN) ? librdf_model_has_arc_in(model, arc, source) :
@@ -1337,8 +1401,9 @@ main(int argc, char *argv[])
       librdf_free_node(arc);
       break;
 
+
     case CMD_REMOVE_CONTEXT:
-      if (librdf_heuristic_is_blank_node(argv[0]))
+      if(librdf_heuristic_is_blank_node(argv[0]))
         context_node=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
       else
         context_node=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);

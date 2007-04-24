@@ -1,6 +1,6 @@
 MYSQL_UTILS=rdf-tree
 
-bin_PROGRAMS=redland-db-upgrade rdfproc
+bin_PROGRAMS=redland-db-upgrade rdfproc touch-mtime
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=redland-db-upgrade
 
@@ -15,14 +15,17 @@ CLEANFILES=*.db $(EXTRA_PROGRAMS)
 
 AM_CPPFLAGS=@CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_INTERNAL_CPPFLAGS@ -I$(top_srcdir)/librdf @LIBRDF_EXTERNAL_CPPFLAGS@
 AM_CFLAGS=@CFLAGS@ $(MEM)
-AM_LDFLAGS=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la
 
 redland_db_upgrade_SOURCES = db_upgrade.c
+redland_db_upgrade_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la
+
+touch_mtime_SOURCES = touch-mtime.c
 
 rdfproc_SOURCES = rdfproc.c
 if GETOPT
 rdfproc_SOURCES += getopt.c rdfproc_getopt.h
 endif
+rdfproc_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la
 
 mysql-utils: $(MYSQL_UTILS)
 
