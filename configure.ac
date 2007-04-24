@@ -5,7 +5,7 @@ dnl (Process this file with autoconf to produce a configure script.)
 dnl
 dnl $Id$
 dnl
-dnl Copyright (C) 2000-2006 David Beckett http://purl.org/net/dajobe/
+dnl Copyright (C) 2000-2007 David Beckett http://purl.org/net/dajobe/
 dnl Copyright (C) 2000-2005 University of Bristol, UK http://www.bristol.ac.uk/
 dnl 
 dnl This package is Free Software and part of Redland http://librdf.org/
@@ -445,7 +445,7 @@ rdf_parsers_available=
 AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
 AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default=auto)], with_raptor="$withval", with_raptor="auto")
 
-RAPTOR_MIN_VERSION=1.4.11
+RAPTOR_MIN_VERSION=1.4.15
 AC_SUBST(RAPTOR_MIN_VERSION)
 if test "X$RAPTOR_CONFIG" = "X"; then
   with_raptor=internal
