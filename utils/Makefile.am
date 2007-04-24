@@ -1,8 +1,9 @@
 MYSQL_UTILS=rdf-tree
 
-bin_PROGRAMS=redland-db-upgrade rdfproc touch-mtime
+bin_PROGRAMS=redland-db-upgrade rdfproc
+noinst_PROGRAMS=touch-mtime
 
-AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=redland-db-upgrade
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=redland-db-upgrade 
 
 EXTRA_PROGRAMS=$(MYSQL_UTILS)
 
