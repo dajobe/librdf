@@ -409,7 +409,7 @@ LIBS="$LIBRDF_LIBS"
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h sys/stat.h getopt.h)
+AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h sys/stat.h utime.h getopt.h)
 AC_HEADER_TIME
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -417,7 +417,7 @@ AC_C_CONST
 AC_C_BIGENDIAN
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(getopt getopt_long memcmp mkstemp mktemp tmpnam gettimeofday getenv)
+AC_CHECK_FUNCS(getopt getopt_long memcmp mkstemp mktemp tmpnam gettimeofday getenv utime utimes)
 
 AM_CONDITIONAL(MEMCMP, test $ac_cv_func_memcmp = no)
 AM_CONDITIONAL(GETOPT, test $ac_cv_func_getopt = no -a $ac_cv_func_getopt_long = no)
