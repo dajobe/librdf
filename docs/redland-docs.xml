@@ -20,11 +20,11 @@ library providing APIs to the RDF model and it's concepts.
 
    <xi:include href="redland-chapter-intro.xml"/>
 
-  <part>
+  <part id="tutorial"> 
     <title>Tutorial</title>
   </part>				  
 
-  <part>
+  <part id="reference-manual">
     <title>Reference Manual</title>
     <xi:include href="redland-chapter-objects.xml"/>
     <xi:include href="xml/world.xml"/>
@@ -49,7 +49,7 @@ library providing APIs to the RDF model and it's concepts.
     <xi:include href="xml/uri.xml"/>
     <!-- <xi:include href="xml/unused.xml"/> -->
   </part>
-  <index>
+  <index id="indexes">
     <title>Index</title>
   </index>
 </book>
