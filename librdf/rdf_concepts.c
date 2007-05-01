@@ -186,27 +186,32 @@ librdf_finish_concepts(librdf_world *world)
 int main(int argc, char *argv[]);
 
 
+#define EXPECTED_STRING "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq"
 int
 main(int argc, char *argv[]) 
 {
+  const char *program=librdf_basename((const char*)argv[0]);
   librdf_world *world;
+  librdf_uri* uri;
+  unsigned char* actual;
   
   world=librdf_new_world();
-  librdf_world_init_mutex(world);
+  librdf_world_open(world);
   
-  librdf_init_digest(world);
-  librdf_init_hash(world);
-  librdf_init_uri(world);
-  librdf_init_node(world);
-  librdf_init_concepts(world);
+  uri=LIBRDF_MS_Seq_URI;
+  if(!uri) {
+    fprintf(stderr, "%s: Got no concept URI for rdf:Seq\n", program);
+    exit(1);
+  }
   
-  librdf_finish_concepts(world);
-  librdf_finish_node(world);
-  librdf_finish_uri(world);
-  librdf_finish_hash(world);
-  librdf_finish_digest(world);
-
-  LIBRDF_FREE(librdf_world, world);
+  actual=librdf_uri_as_string(uri);
+  if(strcmp(EXPECTED_STRING, (const char*)actual)) {
+    fprintf(stderr, "%s: Expected URI: <%s> Got: <%s>\n", program,
+            EXPECTED_STRING, actual);
+    exit(1);
+  }
+  
+  librdf_free_world(world);
 
   /* keep gcc -Wall happy */
   return(0);
