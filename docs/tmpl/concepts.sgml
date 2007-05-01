@@ -25,7 +25,7 @@ These should be copied with the appropriate #librdf_node
 or #librdf_uri class copy constructors before use.
 </para>
 
-<example>
+<example id="redland-example-rdfconcept">
 <title>Using macros to get a node and URI for an RDF concept</title>
 <programlisting>
   #include &lt;redland.h&gt;
