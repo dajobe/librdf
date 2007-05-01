@@ -998,7 +998,7 @@ librdf_model_add_submodel(librdf_model* model, librdf_model* sub_model)
     model->sub_models=l;
   }
   
-  if(!librdf_list_add(l, sub_model))
+  if(librdf_list_add(l, sub_model))
     return 1;
   
   return 0;
