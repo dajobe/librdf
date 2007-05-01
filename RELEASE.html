@@ -52,13 +52,15 @@ connection) librdf_model_transaction_commit to commit the changes
 librdf_model_transaction_rollback to abort them (automatic if not
 commited before a close) and librdf_model_transaction_get_handle to
 get a handle associated with a connection.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=38">Issue #0000038</a>
 </p>
 
 <p>Implemented the transaction API for MySQL (tested) and PostgreSQL
 (not tested).
 </p>
 
-<h3>MySQL Storage Changes</h3>
+2<h3>MySQL Storage Changes</h3>
 
 <p>Implemented the transaction API for MySQL.
 </p>
@@ -84,6 +86,17 @@ the mysql storage will not work.
 
 <h3>Other Changes</h3>
 
+<p><code>librdf_model_add_submodel()</code> now returns non-zero on failure.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=175">Issue #0000175</a>
+</p>
+
+<p>Calling <code>librdf_world_open()</code> is now optional.  The
+first call (constructor) that needs to use it, will invoke it.
+Fixes 
+<a href="http://bugs.librdf.org/mantis/view.php?id=173">Issue #0000173</a>
+</p>
+
 <p>Added a building utility <code>touch-mtime.pl</code>
 to handle <code>touch -r</code> which does not work on SunOS.
 Fixes 
@@ -98,6 +111,12 @@ enabling transactions on the command line.
 later on in FILTER comparisons.
 Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=153">Issue #0000153</a>
+</p>
+
+<p>Fix reference count problem in storages that caused connections
+to fail to free in MySQL.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=150">#0000150</a>
 </p>
 
 <p>Fix reference count / memory leak in file storage.
