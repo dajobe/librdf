@@ -676,11 +676,7 @@ main(int argc, char *argv[])
   librdf_world *world;
   
   world=librdf_new_world();
-  librdf_world_init_mutex(world);
-
-  librdf_init_digest(world);
-  librdf_init_hash(world);
-  librdf_init_uri(world);
+  librdf_world_open(world);
 
   fprintf(stderr, "%s: Creating new URI from string\n", program);
   uri1=librdf_new_uri(world, hp_string);
@@ -764,11 +760,7 @@ main(int argc, char *argv[])
   librdf_free_uri(uri8);
   librdf_free_uri(uri9);
   
-  librdf_finish_uri(world);
-  librdf_finish_hash(world);
-  librdf_finish_digest(world);
-
-  LIBRDF_FREE(librdf_world, world);
+  librdf_free_world(world);
 
   /* keep gcc -Wall happy */
   return(0);

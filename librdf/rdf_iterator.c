@@ -463,11 +463,7 @@ main(int argc, char *argv[])
   const char *program=librdf_basename((const char*)argv[0]);
 	
   world=librdf_new_world();
-  librdf_world_init_mutex(world);
-
-  librdf_init_hash(world);
-  librdf_init_uri(world);
-  librdf_init_node(world);
+  librdf_world_open(world);
 
   prefix_uri=librdf_new_uri(world, (const unsigned char*)NODE_URI_PREFIX);
   if(!prefix_uri) {
@@ -537,11 +533,7 @@ main(int argc, char *argv[])
 
   librdf_free_uri(prefix_uri);
   
-  librdf_finish_node(world);
-  librdf_finish_uri(world);
-  librdf_finish_hash(world);
-
-  LIBRDF_FREE(librdf_world, world);
+  librdf_free_world(world);
 
   /* keep gcc -Wall happy */
   return(0);

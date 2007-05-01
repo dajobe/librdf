@@ -1720,11 +1720,7 @@ main(int argc, char *argv[])
   librdf_world *world;
   
   world=librdf_new_world();
-  
-  /* initialise hash, model and storage modules */
-  librdf_init_hash(world);
-  librdf_init_storage(world);
-  librdf_init_model(world);
+  librdf_world_open(world);
   
   fprintf(stdout, "%s: Creating storage\n", program);
   storage=librdf_new_storage(world, NULL, "test", NULL);
@@ -1750,12 +1746,7 @@ main(int argc, char *argv[])
   librdf_free_storage(storage);
   
 
-  /* finish model and storage modules */
-  librdf_finish_model(world);
-  librdf_finish_storage(world);
-  librdf_finish_hash(world);
-
-  LIBRDF_FREE(librdf_world, world);
+  librdf_free_world(world);
   
   /* keep gcc -Wall happy */
   return(0);
