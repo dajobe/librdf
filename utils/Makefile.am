@@ -1,7 +1,7 @@
 MYSQL_UTILS=rdf-tree
 
 bin_PROGRAMS=redland-db-upgrade rdfproc
-noinst_PROGRAMS=touch-mtime
+noinst_SCRIPTS=touch-mtime.pl
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=redland-db-upgrade 
 
@@ -10,7 +10,8 @@ EXTRA_PROGRAMS=$(MYSQL_UTILS)
 man_MANS = redland-db-upgrade.1 rdfproc.1
 
 EXTRA_DIST= rdfproc.html \
-$(man_MANS)
+$(man_MANS) \
+touch-mtime.pl
 
 CLEANFILES=*.db $(EXTRA_PROGRAMS)
 
@@ -19,8 +20,6 @@ AM_CFLAGS=@CFLAGS@ $(MEM)
 
 redland_db_upgrade_SOURCES = db_upgrade.c
 redland_db_upgrade_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la
-
-touch_mtime_SOURCES = touch-mtime.c
 
 rdfproc_SOURCES = rdfproc.c
 if GETOPT

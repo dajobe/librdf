@@ -21,6 +21,70 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<h2 id="rel1_0_6"><a name="rel1_0_6">Redland 1.0.6 Changes</a></h2>
+
+<p>Not yet released.</p>
+
+<p>The main changes in this release are:</p>
+
+<p>Updated to use 
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.14
+(<a href="http://librdf.org/rasqal/RELEASE.html#rel0_9_14">Rasqal 0.9.14 release notes</a>)
+from 0.9.13.
+</p>
+
+<p>Updated to use
+<a href="http://librdf.org/raptor/">Raptor</a> 1.4.15
+(<a href="http://librdf.org/raptor/RELEASE.html#rel1_4_15">Raptor 1.4.15 release notes</a>)
+from 1.4.13.
+</p>
+
+<p>Plus the new Transactions API, implemented initially for MySQL.</p>
+
+
+<h2>Detailed Changes</h>
+
+<p>Added a building utility <code>touch-mtime</code>
+to handle the non-portable features of <code>touch -r</code>.
+Fixes Issue #0000159 http://bugs.librdf.org/mantis/view.php?id=159
+</p>
+
+<p><code>rdfproc</code> gains an --transactions / -T option for
+enabling transactions on the command line.
+</p>
+
+<p>Added a supporting
+functions <code>librdf_hash_interpret_template()</code> to
+interpolate variables into strings using a librdf_hash of
+key/values.</p>
+
+<p>MySQL storage now takes an optional storage option 'layout' that
+can choose between the v1 and v2 SQL schemas (only the table type has
+changed).  The SQL fragments are described in Turtle files that are
+installed and read on startup.
+</p>
+
+<p>Implemented
+transaction API for MySQL (tested) and PostgreSQL (not tested).
+</p>
+
+<p>Added model transaction API.
+librdf_model_transaction_start,
+librdf_model_transaction_start_with_handle,
+librdf_model_transaction_commit,
+librdf_model_transaction_rollback and
+librdf_model_transaction_get_handle.
+</p>
+
+<p>Do not throw away the rasqal node type information now, it is needed
+later on in FILTER comparisons.
+Fixes Issue#0000153 http://bugs.librdf.org/mantis/view.php?id=153
+</p>
+
+<p>Fix reference count / memory leak in file storage.
+</p>
+
+
 <h2 id="rel1_0_5"><a name="rel1_0_5">Redland 1.0.5 Changes</a></h2>
 
 <p>The main changes in this release are:</p>
