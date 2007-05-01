@@ -220,6 +220,7 @@ librdf_node_static_iterator_create
 librdf_parser
 librdf_parser_factory
 librdf_parser_enumerate
+librdf_parser_guess_name
 librdf_parser_register_factory
 librdf_new_parser
 librdf_new_parser_from_factory
@@ -275,6 +276,7 @@ librdf_free_query_results
 librdf_query_results_is_bindings
 librdf_query_results_is_boolean
 librdf_query_results_is_graph
+librdf_query_results_is_syntax
 librdf_query_results_get_boolean
 librdf_new_query_results_formatter
 librdf_new_query_results_formatter_by_mime_type
