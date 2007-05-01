@@ -198,6 +198,15 @@ based on the SPARQL XML results format which can also be written to a file.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_query_results_is_syntax ##### -->
+<para>
+
+</para>
+
+@query_results: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_query_results_get_boolean ##### -->
 <para>
 
