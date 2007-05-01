@@ -39,18 +39,28 @@ from 0.9.13.
 from 1.4.13.
 </p>
 
-<p>Plus the new Transactions API, implemented initially for MySQL.</p>
+<p>Plus a new transactions API for changes to the graph, implemented
+and tested for MySQL.</p>
 
 
-<h2>Detailed Changes</h>
+<h3>Model Class Changes</h3>
 
-<p>Added a building utility <code>touch-mtime</code>
-to handle the non-portable features of <code>touch -r</code>.
-Fixes Issue #0000159 http://bugs.librdf.org/mantis/view.php?id=159
+<p>Added a model transaction API: librdf_model_transaction_start to
+begin the transaction librdf_model_transaction_start_with_handle to
+begin it using an existing connection pointer (such as a MySQL
+connection) librdf_model_transaction_commit to commit the changes
+librdf_model_transaction_rollback to abort them (automatic if not
+commited before a close) and librdf_model_transaction_get_handle to
+get a handle associated with a connection.
 </p>
 
-<p><code>rdfproc</code> gains an --transactions / -T option for
-enabling transactions on the command line.
+<p>Implemented the transaction API for MySQL (tested) and PostgreSQL
+(not tested).
+</p>
+
+<h3>MySQL Storage Changes</h3>
+
+<p>Implemented the transaction API for MySQL.
 </p>
 
 <p>Added a supporting
@@ -64,25 +74,28 @@ changed).  The SQL fragments are described in Turtle files that are
 installed and read on startup.
 </p>
 
-<p>Implemented
-transaction API for MySQL (tested) and PostgreSQL (not tested).
+<h3>Other Changes</h3>
+
+<p>Added a building utility <code>touch-mtime.pl</code>
+to handle <code>touch -r</code> which does not work on SunOS.
+Fixes 
+<a href="http://bugs.librdf.org/mantis/view.php?id=159">Issue #0000159</a>
 </p>
 
-<p>Added model transaction API.
-librdf_model_transaction_start,
-librdf_model_transaction_start_with_handle,
-librdf_model_transaction_commit,
-librdf_model_transaction_rollback and
-librdf_model_transaction_get_handle.
+<p><code>rdfproc</code> gains an --transactions / -T option for
+enabling transactions on the command line.
 </p>
 
 <p>Do not throw away the rasqal node type information now, it is needed
 later on in FILTER comparisons.
-Fixes Issue#0000153 http://bugs.librdf.org/mantis/view.php?id=153
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=153">Issue #0000153</a>
 </p>
 
 <p>Fix reference count / memory leak in file storage.
 </p>
+
+
 
 
 <h2 id="rel1_0_5"><a name="rel1_0_5">Redland 1.0.5 Changes</a></h2>
