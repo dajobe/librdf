@@ -1724,9 +1724,7 @@ main(int argc, char *argv[])
   librdf_world *world;
   
   world=librdf_new_world();
-  
-  /* initialise hash module */
-  librdf_init_hash(world);
+  librdf_world_open(world);
   
   if(argc ==2) {
     type=argv[1];
@@ -1914,10 +1912,7 @@ main(int argc, char *argv[])
   librdf_free_hash(h2);
 
    
-  /* finish hash module */
-  librdf_finish_hash(world);
-
-  LIBRDF_FREE(librdf_world, world);
+  librdf_free_world(world);
   
   /* keep gcc -Wall happy */
   return(0);

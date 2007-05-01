@@ -493,9 +493,6 @@ main(int argc, char *argv[])
   
   world=librdf_new_world();
   
-  /* initialise digest module */
-  librdf_init_digest(world);
-  
   for(i=0; ((answer= &test_data_answers[i]) && answer->type != NULL) ; i++) {
     char *s;
     
@@ -533,10 +530,7 @@ main(int argc, char *argv[])
   }
   
   
-  /* finish digest module */
-  librdf_finish_digest(world);
-
-  LIBRDF_FREE(librdf_world, world);
+  librdf_free_world(world);
   
   /* keep gcc -Wall happy */
   return failures;
