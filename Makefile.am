@@ -85,4 +85,4 @@ endif
 @SET_MAKE@
 
 install-data-hook:
-	$(srcdir)/utils/touch-mtime $(srcdir)/Redland.i $(DESTDIR)$(pkgdatadir)/Redland.i
+	$(PERL) $(srcdir)/utils/touch-mtime.pl $(srcdir)/Redland.i $(DESTDIR)$(pkgdatadir)/Redland.i
