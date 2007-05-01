@@ -47,6 +47,8 @@
 #endif
 
 
+static const char *usage="USAGE: %s REFERENCE-FILE FILE\n";
+
 /* one prototype needed */
 int main(int argc, char *argv[]);
 
@@ -70,8 +72,18 @@ main(int argc, char *argv[])
     program=p+1;
   argv[0]=program;
 
+  if(argc ==2) {
+    if(!strcmp(argv[1], "--help")) {
+      fprintf(stdout, usage, program);
+      exit(0);
+    } else if(!strcmp(argv[1], "--version")) {
+      fputs(PACKAGE_VERSION "\n", stdout);
+      exit(0);
+    }
+  }
+  
   if(argc != 3) {
-    fprintf(stderr, "USAGE: %s REFERENCE-FILE FILE\n", program);
+    fprintf(stderr, usage, program);
     exit(1);
   }
   
