@@ -1898,7 +1898,7 @@ main(int argc, char *argv[])
   h2=librdf_new_hash(world, NULL);
   librdf_hash_from_array_of_strings(h2, test_hash_array);
 
-  template_result=librdf_hash_interpret_template(template, h2, 
+  template_result=librdf_hash_interpret_template(template_string, h2, 
                                                  (const unsigned char*)"%{", 
                                                  (const unsigned char*)"}");
   if(strcmp((const char*)template_result, (const char*)template_expected)) {
