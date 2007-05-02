@@ -45,6 +45,7 @@ known values for OPTION are:
   --help                display this help and exit
   --libs                print library linking information
   --libtool-libs        print linking information for use with libtool
+  --private-libs        print library private/static linking information
   --swig                display the SWIG interface file
   --version             output version information
   --version-decimal     output version as a decimal integer
@@ -95,6 +96,10 @@ while test $# -gt 0; do
       echo_libtool_libs=yes
       ;;
 
+    --private-libs)
+      echo_private_libs=yes
+      ;;
+
     --swig)
       echo_swig=yes
       ;;
@@ -120,11 +125,15 @@ if test "$echo_cflags" = "yes"; then
 fi
 
 if test "$echo_libs" = "yes"; then
-  echo -L@libdir@ -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@
+  echo -L@libdir@ -lrdf
 fi
 
 if test "$echo_libtool_libs" = "yes"; then
   echo @libdir@/@LIBRDF_LIBTOOLLIBS@
+fi
+
+if test "$echo_private_libs" = "yes"; then
+  echo @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@
 fi
 
 if test "$echo_swig" = "yes"; then  
