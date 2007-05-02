@@ -560,7 +560,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     accept_h=raptor_parser_get_accept_header(pcontext->rdf_parser);
     if(accept_h) {
       raptor_www_set_http_accept(www, accept_h);
-      raptor_free_memory(accept_h);
+      raptor_free_memory((char*)accept_h);
     }
 
     raptor_www_set_write_bytes_handler(www, 
@@ -1095,7 +1095,7 @@ librdf_parser_raptor_get_accept_header(void* context)
   if(!accept)
     return NULL;
   length=strlen(accept);
-  r_accept=LIBRDF_MALLOC(cstring, length+1);
+  r_accept=(char*)LIBRDF_MALLOC(cstring, length+1);
   strncpy(r_accept, accept, length+1);
   raptor_free_memory((void*)accept);
   

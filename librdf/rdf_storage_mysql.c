@@ -482,7 +482,7 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
 
   context->layout=librdf_hash_get_del(options, "layout");
   if(!context->layout) {
-    context->layout=LIBRDF_MALLOC(cstring, strlen(default_layout)+1);
+    context->layout=(char*)LIBRDF_MALLOC(cstring, strlen(default_layout)+1);
     strcpy(context->layout, default_layout);
   }
 

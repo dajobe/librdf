@@ -117,7 +117,7 @@ librdf_new_sql_config(librdf_world* world,
   len=strlen(config_dir) + 1 + strlen(storage_name) + 4 + 1;
   if(layout)
     len+= strlen(layout) + 1;
-  config->filename=LIBRDF_MALLOC(cstring, len);
+  config->filename=(char*)LIBRDF_MALLOC(cstring, len);
   if(layout)
     sprintf(config->filename, "%s/%s-%s.ttl", config_dir, storage_name, layout);
   else

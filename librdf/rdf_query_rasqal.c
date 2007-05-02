@@ -1050,8 +1050,8 @@ librdf_query_rasqal_new_results_formatter(librdf_query_results* query_results,
   if(!formatter)
     return NULL;
 
-  qrf = LIBRDF_MALLOC(query_results_formatter, 
-                      sizeof(librdf_query_results_formatter));
+  qrf=(librdf_query_results_formatter*)LIBRDF_MALLOC(query_results_formatter, 
+                                                     sizeof(librdf_query_results_formatter));
   qrf->query_results=query_results;
   qrf->formatter=formatter;
   return qrf;
@@ -1068,8 +1068,8 @@ librdf_query_rasqal_new_results_formatter_by_mime_type(librdf_query_results* que
   if(!formatter)
     return NULL;
 
-  qrf = LIBRDF_MALLOC(query_results_formatter, 
-                      sizeof(librdf_query_results_formatter));
+  qrf=(librdf_query_results_formatter*)LIBRDF_MALLOC(query_results_formatter, 
+                                                     sizeof(librdf_query_results_formatter));
   qrf->query_results=query_results;
   qrf->formatter=formatter;
   return qrf;
