@@ -1588,7 +1588,7 @@ librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value)
 
 /**
  * librdf_hash_interpret_template:
- * @template: template string
+ * @template_string: template string to interprate
  * @dictionary: dictionary of key/values to substitute
  * @prefix: prefix to mark a key in the template
  * @suffix: suffix to mark a key in the template
@@ -1603,7 +1603,7 @@ librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *value)
  * Return value: Newly allocated string, or NULL on failure
  **/
 unsigned char*
-librdf_hash_interpret_template(const unsigned char* template,
+librdf_hash_interpret_template(const unsigned char* template_string,
                                librdf_hash* dictionary,
                                const unsigned char* prefix, 
                                const unsigned char* suffix) 
