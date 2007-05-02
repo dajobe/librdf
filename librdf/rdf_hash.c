@@ -1618,31 +1618,31 @@ librdf_hash_interpret_template(const unsigned char* template_string,
   if(!sb)
     return NULL;
   
-  len=strlen((const char*)template);
+  len=strlen((const char*)template_string);
   
-  while(*template) {
+  while(*template_string) {
     unsigned char* p;
     unsigned char* s;
     librdf_hash_datum key; /* static */
     librdf_hash_datum *hd_value;
     size_t len2;
     
-    p=(unsigned char*)strstr((const char*)template, (const char*)prefix);
+    p=(unsigned char*)strstr((const char*)template_string, (const char*)prefix);
     if(!p) {
       /* No more prefixes found so append rest of template */
-      raptor_stringbuffer_append_counted_string(sb, template, len, 1);
+      raptor_stringbuffer_append_counted_string(sb, template_string, len, 1);
       break;
     }
-    len2=p-template;
+    len2=p-template_string;
     if(len2)
-      raptor_stringbuffer_append_counted_string(sb, template, len2, 1);
+      raptor_stringbuffer_append_counted_string(sb, template_string, len2, 1);
 
-    template += len2 + prefix_len;  len -= len2 + prefix_len;
+    template_string += len2 + prefix_len;  len -= len2 + prefix_len;
     
     /* key starts here */
-    key.data=(void*)template;
+    key.data=(void*)template_string;
     
-    s=(unsigned char*)strstr((const char*)template, (const char*)suffix);
+    s=(unsigned char*)strstr((const char*)template_string, (const char*)suffix);
     if(!s)
       /* template ended without a closing key suffix so just give up */
       break;
@@ -1652,12 +1652,13 @@ librdf_hash_interpret_template(const unsigned char* template_string,
     key.size= len2;
 
     /* move past key and suffix */
-    template += len2 + suffix_len;  len -= len2 + suffix_len;
+    template_string += len2 + suffix_len;  len -= len2 + suffix_len;
 
     hd_value=librdf_hash_get_one(dictionary, &key);
     /* append value if there is one */
     if(hd_value) {
-      raptor_stringbuffer_append_counted_string(sb, hd_value->data, 
+      raptor_stringbuffer_append_counted_string(sb,
+                                                (const unsigned char*)hd_value->data, 
                                                 hd_value->size, 1);
       librdf_free_hash_datum(hd_value);
     }
@@ -1667,7 +1668,7 @@ librdf_hash_interpret_template(const unsigned char* template_string,
   /* Generate a string result */
   len=raptor_stringbuffer_length(sb);
   if(len) {
-    result=LIBRDF_MALLOC(cstring, len+1);
+    result=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
     raptor_stringbuffer_copy_to_string(sb, result, len);
   }
   
@@ -1712,7 +1713,7 @@ main(int argc, char *argv[])
                                  NULL};
   const char * const test_hash_string="field1='value1', field2='\\'value2', field3='\\\\', field4='\\\\\\'', field5 = 'a' ";
   const char *test_hash_delete_key="size";
-  const unsigned char* template=(const unsigned char*)"the shape is %{shape} and the sides are %{sides} created by %{rubik}";
+  const unsigned char* template_string=(const unsigned char*)"the shape is %{shape} and the sides are %{sides} created by %{rubik}";
   const unsigned char* template_expected=(const unsigned char*)"the shape is cube and the sides are 6 created by ";
   int i,j;
   const char *type;
@@ -1893,7 +1894,7 @@ main(int argc, char *argv[])
 
    
   fprintf(stdout, "%s: Subtituting into template >>%s<<\n", program, 
-          template);
+          template_string);
   h2=librdf_new_hash(world, NULL);
   librdf_hash_from_array_of_strings(h2, test_hash_array);
 
