@@ -88,7 +88,9 @@ typedef struct
   short key_len;
 
   u64 uints[4];           /* 4 is for Statements S,P,O,C, rest 1=ID, 2... */
-  const char *strings[3]; /* 3 is for Literals longtext, text, text */
+  char *strings[3];       /* 3 is for Literals longtext, text, text */
+  size_t strings_len[3];
+  int strings_count;
 } pending_row;
 
 
@@ -163,8 +165,7 @@ typedef struct {
 
   MYSQL* transaction_handle;
   
-  raptor_stringbuffer* pending_inserts[4];
-  int pending_inserts_count[4];
+  raptor_sequence* pending_inserts[4];
   librdf_hash* pending_insert_hash_nodes;
   raptor_sequence* pending_statements;
   
@@ -615,6 +616,8 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
         status=-1;
         break;
       }
+
+      LIBRDF_FREE(cstring, query);
     } /* end for */
     
   }
@@ -975,6 +978,105 @@ librdf_storage_mysql_add_statements(librdf_storage* storage,
   return helper;
 }
 
+
+static int
+compare_pending_rows(const void *a, const void *b)
+{
+  pending_row* prow_a=*(pending_row**)a;
+  pending_row* prow_b=*(pending_row**)b;
+  int i;
+  
+  for(i=0; i< prow_a->key_len; i++) {
+    /* These are u64 <> u64 compares - DO NOT USE 'int' here */
+    if(prow_b->uints[i] > prow_a->uints[i])
+      return -1;
+    else if(prow_b->uints[i] < prow_a->uints[i])
+      return 1;
+  }
+  return 0;
+}
+
+
+
+static void
+free_pending_row(pending_row* prow)
+{
+  int i;
+  
+  for(i=0; i < prow->strings_count; i++)
+    LIBRDF_FREE(cstring, prow->strings[i]);
+
+  LIBRDF_FREE(pending_row, prow);
+}
+
+
+static raptor_stringbuffer*
+format_pending_row_sequence(const table_info *table, raptor_sequence* seq)
+{
+  int i;
+  raptor_stringbuffer* sb;
+  
+  if(!raptor_sequence_size(seq))
+    return NULL;
+
+#ifdef LIBRDF_DEBUG_SQL
+  LIBRDF_DEBUG3("Format pending row for table %s with %d entries\n",
+                table->name, raptor_sequence_size(seq));
+#endif
+  
+  sb=raptor_new_stringbuffer();
+
+  raptor_stringbuffer_append_string(sb,
+                                    (const unsigned char*)"REPLACE INTO ", 1);
+  raptor_stringbuffer_append_string(sb,
+                                    (const unsigned char*)table->name, 1);
+  raptor_stringbuffer_append_string(sb,
+                                    (const unsigned char*)" (ID, ", 1);
+  raptor_stringbuffer_append_string(sb,
+                                    (const unsigned char*)table->columns, 1);
+  raptor_stringbuffer_append_counted_string(sb,
+                                    (const unsigned char*)") VALUES ", 9, 1);
+
+  for(i=0; i< raptor_sequence_size(seq); i++) {
+    pending_row* prow;
+    char uint64_buffer[64];
+    int j;
+    
+    if(i > 0)
+      raptor_stringbuffer_append_counted_string(sb,
+                                    (const unsigned char*)", ", 2, 1);
+    
+    prow=(pending_row*)raptor_sequence_get_at(seq, i);
+    
+    raptor_stringbuffer_append_counted_string(sb,
+                                    (const unsigned char*)"(", 1, 1);
+    /* First column is always the ID */
+    sprintf(uint64_buffer, UINT64_T_FMT, prow->uints[0]);
+    raptor_stringbuffer_append_string(sb,
+                                    (const unsigned char*)uint64_buffer, 1);
+
+    for(j=0; j < prow->strings_count; j++) {
+      raptor_stringbuffer_append_counted_string(sb,
+                                    (const unsigned char*)", '", 3, 1);
+      raptor_stringbuffer_append_string(sb,
+                                    (const unsigned char*)prow->strings[j], 1);
+      raptor_stringbuffer_append_counted_string(sb,
+                                    (const unsigned char*)"'", 1, 1);
+    }
+
+    raptor_stringbuffer_append_counted_string(sb,
+                                    (const unsigned char*)")", 1, 1);
+  }
+
+#ifdef LIBRDF_DEBUG_SQL
+  LIBRDF_DEBUG3("Format pending row for table %s returning query size %d\n",
+                table->name, raptor_stringbuffer_length(sb));
+#endif
+  
+  return sb;
+}
+
+
 /*
  * librdf_storage_mysql_node_hash_common - Create/get hash value for node
  * @storage: the storage
@@ -1002,17 +1104,16 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
   librdf_uri *dt;
   size_t valuelen, langlen=0, datatypelen=0;
   unsigned char *name;
-  char uint64_buffer[64];
   /* Escape URI for db query */
   char *escaped_uri;
   /* Escape value, lang and datatype for db query */
   char *escaped_value, *escaped_lang, *escaped_datatype;
   /* Escape name for db query */
   char *escaped_name;
-  raptor_stringbuffer *sb=NULL;
-  int need_replace_into;
+  raptor_sequence *seq=NULL;
   librdf_hash_datum hd_key, hd_value; /* on stack - not allocated */
   librdf_hash_datum* old_value;
+  pending_row* prow;
   
   /* Get MySQL connection handle */
   handle=librdf_storage_mysql_get_handle(storage);
@@ -1079,8 +1180,6 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
   
   table=&mysql_tables[node_type];
 
-  need_replace_into=0;
-
   if(context->transaction_handle) {
     /* In a transaction, check this node has not already been handled */
 
@@ -1107,37 +1206,18 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
       goto tidy;
     }
 
-
-    /* Now do the insert */
-    sb=context->pending_inserts[node_type];
-    
-    if(!context->pending_inserts_count[node_type]++) {
-      /* first item for this table, add the insert */
-      need_replace_into=1;
-    } else {
-      /* Add separator for previous set of values */
-      raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)", ", 2, 1);
-    }
+    /* Store in pending inserts sequence */
+    seq=context->pending_inserts[node_type];
   } else {
-    /* not a transaction - always need insert */
-    sb=raptor_new_stringbuffer();
-    need_replace_into=1;
+    /* not a transaction - store in temporary sequence */
+    seq=raptor_new_sequence((raptor_sequence_free_handler*)free_pending_row, NULL);
   }
 
-  if(need_replace_into) {
-    raptor_stringbuffer_append_string(sb, (const unsigned char*)"REPLACE INTO ", 1);
-    raptor_stringbuffer_append_string(sb, (const unsigned char*)table->name, 1);
-    raptor_stringbuffer_append_string(sb, (const unsigned char*)" (ID, ", 1);
-    raptor_stringbuffer_append_string(sb, (const unsigned char*)table->columns, 1);
-    raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)") VALUES ", 9, 1);
-  }
 
-  raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)"(", 1, 1);
+  prow=(pending_row*)LIBRDF_CALLOC(pending_row, sizeof(pending_row), 1);
+  prow->key_len=1;
+  prow->uints[0]=hash;
 
-  /* First column is always the ID */
-  sprintf(uint64_buffer, UINT64_T_FMT, hash);
-  raptor_stringbuffer_append_string(sb, (const unsigned char*)uint64_buffer, 1);
-  
   switch(type) {
    case LIBRDF_NODE_TYPE_RESOURCE:
      if(!(escaped_uri=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1))) {
@@ -1147,10 +1227,9 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
      mysql_real_escape_string(handle, escaped_uri,
                               (const char*)uri, nodelen);
      
-     raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)", '", 3, 1);
-     raptor_stringbuffer_append_string(sb, (const unsigned char*)escaped_uri, 1);
-     raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)"'", 1, 1);
-     LIBRDF_FREE(cstring, escaped_uri);
+     prow->strings[0]=escaped_uri;
+     prow->strings_len[0]=strlen(escaped_uri);
+     prow->strings_count=1;
      break;
   
     case LIBRDF_NODE_TYPE_LITERAL:
@@ -1172,19 +1251,14 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
                                  (const char*)datatype, datatypelen);
       else
         strcpy(escaped_datatype,"");
-      
-      raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)", '", 3, 1);
-      raptor_stringbuffer_append_string(sb, (const unsigned char*)escaped_value, 1);
-      raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)"', '", 4, 1);
-      raptor_stringbuffer_append_string(sb, (const unsigned char*)escaped_lang, 1);
-      raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)"', '", 4, 1);
-      raptor_stringbuffer_append_string(sb, (const unsigned char*)escaped_datatype, 1);
-      raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)"'", 1, 1);
 
-      LIBRDF_FREE(cstring,escaped_value);
-      LIBRDF_FREE(cstring,escaped_lang);
-      LIBRDF_FREE(cstring,escaped_datatype);
-      
+      prow->strings[0]=escaped_value;
+      prow->strings_len[0]=strlen(escaped_value);
+      prow->strings[1]=escaped_lang;
+      prow->strings_len[1]=strlen(escaped_lang);
+      prow->strings[2]=escaped_datatype;
+      prow->strings_len[2]=strlen(escaped_datatype);
+      prow->strings_count=3;
       break;
       
     case LIBRDF_NODE_TYPE_BLANK:
@@ -1194,12 +1268,10 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
       }
       mysql_real_escape_string(handle, escaped_name,
                                (const char*)name, nodelen);
-      
-      raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)", '", 3, 1);
-      raptor_stringbuffer_append_string(sb, (const unsigned char*)escaped_name, 1);
-      raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)"'", 1, 1);
-
-      LIBRDF_FREE(cstring, escaped_name);
+       
+      prow->strings[0]=escaped_name;
+      prow->strings_len[0]=strlen(escaped_name);
+      prow->strings_count=1;
       break;
       
     case LIBRDF_NODE_TYPE_UNKNOWN:
@@ -1212,35 +1284,43 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
 
   }
 
+  raptor_sequence_push(seq, prow);
 
-  raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)")", 1, 1);
 
   if(context->transaction_handle) {
-    /* in a transaction: the code above saves the result to a stringbuffer */
+    /* in a transaction */
   } else {
     /* not in a transaction so run it now */
+    raptor_stringbuffer *sb=NULL;
+    size_t query_len;
+
+    sb=format_pending_row_sequence(table, seq);
+    
+    query_len=raptor_stringbuffer_length(sb);
     query=(char*)raptor_stringbuffer_as_string(sb);
     if(query) {
 #ifdef LIBRDF_DEBUG_SQL
       LIBRDF_DEBUG2("SQL: >>%s<<\n", query);
 #endif
-      if(mysql_real_query(handle, query, strlen(query)) &&
+      if(mysql_real_query(handle, query, query_len) &&
          mysql_errno(handle) != ER_DUP_ENTRY) {
         librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE,
                    NULL, "MySQL insert into %s failed with error %s",
                    table->name, mysql_error(handle));
-        LIBRDF_FREE(cstring,query);
+        raptor_free_stringbuffer(sb);
         hash=0;
         goto tidy;
       }
     }
+
+    raptor_free_stringbuffer(sb);
   }
   
   tidy:
   if(!context->transaction_handle) {
     /* if not in a transaction, lose this */
-    if(sb)
-      raptor_free_stringbuffer(sb);
+    if(seq)
+      raptor_free_sequence(seq);
   }
 
   if(handle) {
@@ -2614,10 +2694,8 @@ librdf_storage_mysql_transaction_start(librdf_storage* storage)
   if(!context->transaction_handle) 
     return 1;
 
-  for(i=0; i<= TABLE_STATEMENTS; i++) {
-    context->pending_inserts[i]=raptor_new_stringbuffer();
-    context->pending_inserts_count[i]=0;
-  }
+  for(i=0; i<= TABLE_STATEMENTS; i++)
+    context->pending_inserts[i]=raptor_new_sequence((raptor_sequence_free_handler*)free_pending_row, NULL);
 
   context->pending_insert_hash_nodes=librdf_new_hash(storage->world, NULL);
   if(!context->pending_insert_hash_nodes)
@@ -2628,7 +2706,7 @@ librdf_storage_mysql_transaction_start(librdf_storage* storage)
     LIBRDF_FATAL1(storage->world, LIBRDF_FROM_STORAGE,
                   "Failed to open MySQL seen nodes hash");
 
-  context->pending_statements=raptor_new_sequence((raptor_sequence_free_handler*)free, NULL);
+  context->pending_statements=raptor_new_sequence((raptor_sequence_free_handler*)free_pending_row, NULL);
 
   return 0;
 }
@@ -2669,12 +2747,11 @@ void librdf_storage_mysql_transaction_terminate(librdf_storage *storage)
   librdf_storage_mysql_release_handle(storage, handle);
   
   for(i=0; i<= TABLE_STATEMENTS; i++) {
-    raptor_stringbuffer* tsb;
-    tsb=context->pending_inserts[i];
-    if(tsb)
-      raptor_free_stringbuffer(tsb);
+    raptor_sequence* seq;
+    seq=context->pending_inserts[i];
+    if(seq)
+      raptor_free_sequence(seq);
     context->pending_inserts[i]=NULL;
-    context->pending_inserts_count[i]=0;
   }
   
   if(context->pending_insert_hash_nodes) {
@@ -2688,17 +2765,6 @@ void librdf_storage_mysql_transaction_terminate(librdf_storage *storage)
   }
   
 }
-
-
-static int
-compare_pending_rows(const void *a, const void *b)
-{
-  pending_row* prow_a=*(pending_row**)a;
-  pending_row* prow_b=*(pending_row**)b;
-
-  return memcmp(prow_a, prow_b, (sizeof(u64) * prow_a->key_len));
-}
-
 
 
 /**
@@ -2732,7 +2798,7 @@ librdf_storage_mysql_transaction_commit(librdf_storage* storage)
   /* Take a look to see if there is anything at all to commit */
   count=raptor_sequence_size(context->pending_statements);
   for(i=0; i< TABLE_STATEMENTS; i++)
-    count += context->pending_inserts_count[i];
+    count += raptor_sequence_size(context->pending_inserts[i]);
     
   if(!count) {
 #ifdef LIBRDF_DEBUG_SQL
@@ -2762,16 +2828,18 @@ librdf_storage_mysql_transaction_commit(librdf_storage* storage)
 
   /* INSERT node values */
   for(i=0; i< TABLE_STATEMENTS; i++) {
+    raptor_sequence* seq;
     raptor_stringbuffer* tsb;
 
-    if(!context->pending_inserts_count[i])
-      continue;
-
-    tsb=context->pending_inserts[i];
-    if(!raptor_stringbuffer_length(tsb))
-      continue;
-
+    seq=context->pending_inserts[i];
     table=&mysql_tables[i];
+
+    /* sort pending nodes to always be inserted in same order */
+    raptor_sequence_sort(seq, compare_pending_rows);
+
+    tsb=format_pending_row_sequence(table, seq);
+    if(!tsb)
+      continue;
 
     query_len=raptor_stringbuffer_length(tsb);
     query=(char*)raptor_stringbuffer_as_string(tsb);
@@ -2783,9 +2851,12 @@ librdf_storage_mysql_transaction_commit(librdf_storage* storage)
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "MySQL query to table %s failed: %s", table->name,
                  mysql_error(context->transaction_handle));
+      raptor_free_stringbuffer(tsb);
       librdf_storage_mysql_transaction_rollback(storage);    
       return 1;
     }
+    
+    raptor_free_stringbuffer(tsb);
   }
 
 
@@ -2818,13 +2889,15 @@ librdf_storage_mysql_transaction_commit(librdf_storage* storage)
         raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)", ", 2, 1);
       
       raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)"(", 1, 1);
-      for(j=0; j<4; j++) {
-        if(j>0)
+
+      for(j=0; j < 4; i++) {
+        if(j > 0)
           raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)", ", 2, 1);
         sprintf(uint64_buffer, UINT64_T_FMT, prow->uints[j]);
         raptor_stringbuffer_append_string(sb, (const unsigned char*)uint64_buffer, 1);
       }
-      LIBRDF_FREE(pending_row, prow);
+
+      free_pending_row(prow);
       raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)")", 1, 1);
     }
     
