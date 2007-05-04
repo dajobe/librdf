@@ -2862,9 +2862,9 @@ librdf_storage_mysql_transaction_commit(librdf_storage* storage)
 
   /* INSERT STATEMENT* */
   if(raptor_sequence_size(context->pending_statements)) {
-    pending_row* prow;
     char uint64_buffer[64];
-
+    raptor_sequence* seq;
+    
     table=&mysql_tables[TABLE_STATEMENTS];
 
     /* sort pending statements to always be inserted in same order */
@@ -2880,25 +2880,29 @@ librdf_storage_mysql_transaction_commit(librdf_storage* storage)
     raptor_stringbuffer_append_string(sb, (const unsigned char*)table->columns, 1);
     raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)") VALUES ", 9, 1);
 
-    count=0;
-    while((prow=(pending_row*)raptor_sequence_pop(context->pending_statements)))
-    {
+    seq=context->pending_statements;
+    for(i=0; i< raptor_sequence_size(seq); i++) {
+      pending_row* prow=(pending_row*)raptor_sequence_get_at(seq, i);
       int j;
+
+      if(i > 0)
+        raptor_stringbuffer_append_counted_string(sb,
+                                             (const unsigned char*)", ", 2, 1);
       
-      if(count++ > 0)
-        raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)", ", 2, 1);
-      
-      raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)"(", 1, 1);
+      raptor_stringbuffer_append_counted_string(sb,
+                                             (const unsigned char*)"(", 1, 1);
 
       for(j=0; j < 4; j++) {
         if(j > 0)
-          raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)", ", 2, 1);
+          raptor_stringbuffer_append_counted_string(sb,
+                                             (const unsigned char*)", ", 2, 1);
         sprintf(uint64_buffer, UINT64_T_FMT, prow->uints[j]);
-        raptor_stringbuffer_append_string(sb, (const unsigned char*)uint64_buffer, 1);
+        raptor_stringbuffer_append_string(sb,
+                                       (const unsigned char*)uint64_buffer, 1);
       }
 
-      free_pending_row(prow);
-      raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)")", 1, 1);
+      raptor_stringbuffer_append_counted_string(sb,
+                                             (const unsigned char*)")", 1, 1);
     }
     
     query=(char*)raptor_stringbuffer_as_string(sb);
