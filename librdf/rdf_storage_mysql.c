@@ -2890,7 +2890,7 @@ librdf_storage_mysql_transaction_commit(librdf_storage* storage)
       
       raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)"(", 1, 1);
 
-      for(j=0; j < 4; i++) {
+      for(j=0; j < 4; j++) {
         if(j > 0)
           raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)", ", 2, 1);
         sprintf(uint64_buffer, UINT64_T_FMT, prow->uints[j]);
