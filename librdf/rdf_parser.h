@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -95,6 +95,12 @@ REDLAND_API
 char* librdf_parser_get_accept_header(librdf_parser* parser);
 REDLAND_API
 const char* librdf_parser_guess_name(const char *mime_type, const unsigned char *buffer, const unsigned char *identifier);
+REDLAND_API
+const char* librdf_parser_get_namespaces_seen_prefix(librdf_parser* parser, int offset);
+REDLAND_API
+librdf_uri* librdf_parser_get_namespaces_seen_uri(librdf_parser* parser, int offset);
+REDLAND_API
+int librdf_parser_get_namespaces_seen_count(librdf_parser* parser);
 
 #ifdef __cplusplus
 }
