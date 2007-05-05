@@ -283,7 +283,7 @@ librdf_parser_raptor_namespace_handler(void* user_data,
   prefix=raptor_namespace_get_counted_prefix(nspace, &prefix_length);
   uri=librdf_new_uri_from_uri((librdf_uri*)raptor_namespace_get_uri(nspace));
 
-  nprefix=LIBRDF_MALLOC(cstring, prefix_length+1);
+  nprefix=(unsigned char*)LIBRDF_MALLOC(cstring, prefix_length+1);
   strncpy((char*)nprefix, (const char*)prefix, prefix_length+1);
 
   raptor_sequence_push(pcontext->nspace_prefixes, nprefix);
