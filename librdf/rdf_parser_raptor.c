@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -58,6 +58,9 @@ typedef struct {
   raptor_parser *rdf_parser;    /* source URI string (for raptor) */
   const char *parser_name;      /* raptor parser name to use */
 
+  raptor_sequence* nspace_prefixes;
+  raptor_sequence* nspace_uris;
+  
   int errors;
   int warnings;
 } librdf_parser_raptor_context;
@@ -88,7 +91,6 @@ typedef struct {
   librdf_statement* current; /* current statement */
   librdf_list* statements;
 } librdf_parser_raptor_stream_context;
-
 
 
 /**
@@ -141,6 +143,11 @@ librdf_parser_raptor_terminate(void *context)
 
   if(pcontext->bnode_hash)
     librdf_free_hash(pcontext->bnode_hash);
+
+  if(pcontext->nspace_prefixes)
+    raptor_free_sequence(pcontext->nspace_prefixes);
+  if(pcontext->nspace_uris)
+    raptor_free_sequence(pcontext->nspace_uris);
 }
   
 
@@ -253,6 +260,34 @@ librdf_parser_raptor_new_statement_handler(void *context,
     librdf_free_statement(statement);
   } else
     librdf_list_add(scontext->statements, statement);
+}
+
+
+/*
+ * librdf_parser_raptor_namespace_handler - helper callback function for raptor RDF when a namespace is seen
+ * @context: context for callback
+ * @statement: raptor_statement
+ * 
+ * Adds the statement to the list of statements.
+ */
+static void
+librdf_parser_raptor_namespace_handler(void* user_data, 
+                                       raptor_namespace *nspace)
+{
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)user_data;
+  const unsigned char* prefix;
+  unsigned char* nprefix;
+  size_t prefix_length;
+  librdf_uri* uri;
+
+  prefix=raptor_namespace_get_counted_prefix(nspace, &prefix_length);
+  uri=librdf_new_uri_from_uri((librdf_uri*)raptor_namespace_get_uri(nspace));
+
+  nprefix=LIBRDF_MALLOC(cstring, prefix_length+1);
+  strncpy((char*)nprefix, (const char*)prefix, prefix_length+1);
+
+  raptor_sequence_push(pcontext->nspace_prefixes, nprefix);
+  raptor_sequence_push(pcontext->nspace_uris, uri);
 }
 
 
@@ -389,9 +424,18 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
     return NULL;
 
   scontext->statements=librdf_new_list(world);
+
+  if(pcontext->nspace_prefixes)
+    raptor_free_sequence(pcontext->nspace_prefixes);
+  if(pcontext->nspace_uris)
+    raptor_free_sequence(pcontext->nspace_uris);
+  pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
+  pcontext->nspace_uris=raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
   
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
+  raptor_set_namespace_handler(pcontext->rdf_parser, pcontext, 
+                               librdf_parser_raptor_namespace_handler);
   
   raptor_set_error_handler(pcontext->rdf_parser, pcontext, 
                            librdf_parser_raptor_error_handler);
@@ -521,8 +565,17 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
 
   scontext->statements=librdf_new_list(pcontext->parser->world);
 
+  if(pcontext->nspace_prefixes)
+    raptor_free_sequence(pcontext->nspace_prefixes);
+  if(pcontext->nspace_uris)
+    raptor_free_sequence(pcontext->nspace_uris);
+  pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
+  pcontext->nspace_uris=raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
+  
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
+  raptor_set_namespace_handler(pcontext->rdf_parser, pcontext, 
+                               librdf_parser_raptor_namespace_handler);
   
   raptor_set_error_handler(pcontext->rdf_parser, pcontext, 
                            librdf_parser_raptor_error_handler);
@@ -713,8 +766,17 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   if(!scontext)
     return 1;
 
+  if(pcontext->nspace_prefixes)
+    raptor_free_sequence(pcontext->nspace_prefixes);
+  if(pcontext->nspace_uris)
+    raptor_free_sequence(pcontext->nspace_uris);
+  pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
+  pcontext->nspace_uris=raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
+  
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
+  raptor_set_namespace_handler(pcontext->rdf_parser, pcontext, 
+                               librdf_parser_raptor_namespace_handler);
   
   raptor_set_error_handler(pcontext->rdf_parser, pcontext, 
                            librdf_parser_raptor_error_handler);
@@ -1034,7 +1096,7 @@ librdf_raptor_new_uri_from_uri_local_name(void *context,
 static raptor_uri*
 librdf_raptor_new_uri_relative_to_base(void *context,
                                        raptor_uri *base_uri,
-                                       const unsigned char *uri_string) 
+                                       const unsigned char *uri_string)
 {
   return (raptor_uri*)librdf_new_uri_relative_to_base((librdf_uri*)base_uri, uri_string);
 }
@@ -1103,6 +1165,48 @@ librdf_parser_raptor_get_accept_header(void* context)
 }
 
 
+static const char*
+librdf_parser_raptor_get_namespaces_seen_prefix(void* context, int offset)
+{
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+
+  if(!pcontext->nspace_prefixes)
+    return NULL;
+
+  if(offset < 0 || offset > raptor_sequence_size(pcontext->nspace_prefixes))
+    return NULL;
+
+  return (const char*)raptor_sequence_get_at(pcontext->nspace_prefixes, offset);
+}
+
+
+static librdf_uri*
+librdf_parser_raptor_get_namespaces_seen_uri(void* context, int offset)
+{
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+
+  if(!pcontext->nspace_uris)
+    return NULL;
+
+  if(offset < 0 || offset > raptor_sequence_size(pcontext->nspace_uris))
+    return NULL;
+
+  return (librdf_uri*)raptor_sequence_get_at(pcontext->nspace_uris, offset);
+}
+
+
+static int
+librdf_parser_raptor_get_namespaces_seen_count(void* context)
+{
+  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+
+  if(!pcontext->nspace_uris)
+    return 0;
+
+  return raptor_sequence_size(pcontext->nspace_uris);
+}
+
+
 static raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_new_uri,
   librdf_raptor_new_uri_from_uri_local_name,
@@ -1140,6 +1244,9 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
   factory->get_feature = librdf_parser_raptor_get_feature;
   factory->set_feature = librdf_parser_raptor_set_feature;
   factory->get_accept_header = librdf_parser_raptor_get_accept_header;
+  factory->get_namespaces_seen_prefix = librdf_parser_raptor_get_namespaces_seen_prefix;
+  factory->get_namespaces_seen_uri = librdf_parser_raptor_get_namespaces_seen_uri;
+  factory->get_namespaces_seen_count = librdf_parser_raptor_get_namespaces_seen_count;
 }
 
 
