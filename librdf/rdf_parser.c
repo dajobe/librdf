@@ -693,6 +693,57 @@ librdf_parser_guess_name(const char *mime_type,
 }
 
 
+/**
+ * librdf_parser_get_namespaces_seen_prefix:
+ * @parser: #librdf_parser object
+ * @offset: index into list of namespaces
+ * 
+ * Get the prefix of namespaces seen during parsing
+ * 
+ * Return value: prefix or NULL if no such namespace prefix
+ **/
+const char*
+librdf_parser_get_namespaces_seen_prefix(librdf_parser* parser, int offset)
+{
+  if(parser->factory->get_namespaces_seen_prefix)
+    return parser->factory->get_namespaces_seen_prefix(parser->context, offset);
+  return NULL;
+}
+
+
+/**
+ * librdf_parser_get_namespaces_seen_uri:
+ * @parser: #librdf_parser object
+ * @offset: index into list of namespaces
+ * 
+ * Get the uri of namespaces seen during parsing
+ * 
+ * Return value: uri or NULL if no such namespace uri
+ **/
+librdf_uri*
+librdf_parser_get_namespaces_seen_uri(librdf_parser* parser, int offset)
+{
+  if(parser->factory->get_namespaces_seen_uri)
+    return parser->factory->get_namespaces_seen_uri(parser->context, offset);
+  return NULL;
+}
+
+/**
+ * librdf_parser_get_namespaces_seen_count:
+ * @parser: #librdf_parser object
+ * 
+ * Get the number of namespaces seen during parsing
+ * 
+ * Return value: uri or NULL if no such namespace uri
+ **/
+int
+librdf_parser_get_namespaces_seen_count(librdf_parser* parser)
+{
+  if(parser->factory->get_namespaces_seen_count)
+    return parser->factory->get_namespaces_seen_count(parser->context);
+  return 0;
+}
+
 #endif
 
 
@@ -873,6 +924,18 @@ main(int argc, char *argv[])
       failures++;
       goto tidy_test;
     }
+
+
+    for(i=0; i < librdf_parser_get_namespaces_seen_count(parser); i++) {
+      const char* prefix=librdf_parser_get_namespaces_seen_prefix(parser, i);
+      librdf_uri* uri=librdf_parser_get_namespaces_seen_uri(parser, i);
+
+      fprintf(stderr, "%s: Saw namespace %d): prefix:%s URI:%s\n", program, i,
+              (!prefix ? "" : (const char*)prefix),
+              (!uri ? "(none)" : (const char*)librdf_uri_as_string(uri)));
+      
+    }
+    
 
     size=librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
