@@ -281,12 +281,16 @@ librdf_parser_raptor_namespace_handler(void* user_data,
   librdf_uri* uri;
 
   prefix=raptor_namespace_get_counted_prefix(nspace, &prefix_length);
-  uri=librdf_new_uri_from_uri((librdf_uri*)raptor_namespace_get_uri(nspace));
-
-  nprefix=(unsigned char*)LIBRDF_MALLOC(cstring, prefix_length+1);
-  strncpy((char*)nprefix, (const char*)prefix, prefix_length+1);
-
+  if(prefix) {
+    nprefix=(unsigned char*)LIBRDF_MALLOC(cstring, prefix_length+1);
+    strncpy((char*)nprefix, (const char*)prefix, prefix_length+1);
+  } else
+    nprefix=NULL;
   raptor_sequence_push(pcontext->nspace_prefixes, nprefix);
+
+  uri=(librdf_uri*)raptor_namespace_get_uri(nspace);
+  if(uri)
+    uri=librdf_new_uri_from_uri(uri);
   raptor_sequence_push(pcontext->nspace_uris, uri);
 }
 
