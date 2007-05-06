@@ -81,6 +81,9 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 %{prefix}/bin/rdfproc
 %{prefix}/bin/redland-db-upgrade
 
+%{_datadir}/%{name}/mysql-v1.ttl
+%{_datadir}/%{name}/mysql-v2.ttl
+
 %defattr (0444, bin, bin, 0555)
 
 %doc AUTHORS COPYING COPYING.LIB ChangeLog LICENSE.txt NEWS README
@@ -121,6 +124,9 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 /sbin/ldconfig
 
 %changelog
+* Sat May  5 2007  Dave Beckett <dave@dajobe.org>
+- Add /usr/share/redland/mysql-v1.ttl and /usr/share/redland/mysql-v2.ttl
+
 * Wed Feb 15 2006  Dave Beckett <dave@dajobe.org>
 - Require db4-devel
 - Disable postgresql for now
