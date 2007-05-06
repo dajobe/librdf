@@ -317,7 +317,9 @@ int librdf_parser_parse_counted_string_into_model(librdf_parser* parser, const c
 librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
 int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, librdf_node* value);
 const char* librdf_parser_guess_name(const char *mime_type, const char *buffer, const char *identifier);
-
+const char* librdf_parser_get_namespaces_seen_prefix(librdf_parser* parser, int offset);
+librdf_uri* librdf_parser_get_namespaces_seen_uri(librdf_parser* parser, int offset);
+int librdf_parser_get_namespaces_seen_count(librdf_parser* parser);
 
 /* rdf_query.h */
 %newobject librdf_new_query;
