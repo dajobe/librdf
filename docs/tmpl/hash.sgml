@@ -153,7 +153,7 @@ disk and with persistence.  Keys may have multiple and duplicate values.
 
 </para>
 
-@template: 
+@template_string: 
 @dictionary: 
 @prefix: 
 @suffix: 
