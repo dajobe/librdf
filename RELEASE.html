@@ -42,27 +42,91 @@ from 1.4.13.
 <p>Plus a new transactions API for changes to the graph, implemented
 and tested for MySQL.</p>
 
+<p>Added a new query results formatter class to turn a query results
+object into a syntax.</p>
+
 
 <h3>Model Class Changes</h3>
 
-<p>Added a model transaction API: librdf_model_transaction_start to
-begin the transaction librdf_model_transaction_start_with_handle to
-begin it using an existing connection pointer (such as a MySQL
-connection) librdf_model_transaction_commit to commit the changes
-librdf_model_transaction_rollback to abort them (automatic if not
-commited before a close) and librdf_model_transaction_get_handle to
-get a handle associated with a connection.
-Fixes
-<a href="http://bugs.librdf.org/mantis/view.php?id=38">Issue #0000038</a>
+<p>Added a model transaction API:</p>
+<ul>
+<li><code>librdf_model_transaction_start()</code> to begin the transaction</li>
+<li><code>librdf_model_transaction_start_with_handle()</code> to begin it
+using an existing connection pointer (such as a MySQL connection)</li>
+<li><code>librdf_model_transaction_commit()</code> to commit the changes</li>
+<li><code>librdf_model_transaction_rollback()</code> to abort them (automatic
+if not  commited before a close)</li>
+<li><code>librdf_model_transaction_get_handle()</code> to
+get a handle associated with a connection.</li>
+</ul>
+<p>Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=38">Issue #0000038</a>
 </p>
 
-<p>Implemented the transaction API for MySQL (tested) and PostgreSQL
+<p>Implemented the Transaction API for MySQL (tested) and PostgreSQL
 (not tested).
 </p>
 
+<p>Invert test in <code>librdf_model_add_submodel()</code>.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=175">Issue#0000175</a>
+</p>
+
+<p><code>librdf_model_add_submodel()</code> now returns non-zero on failure.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=175">Issue #0000175</a>
+</p>
+
+
+<h3>Parser Class Changes</h3>
+
+<p>Added <code>librdf_parser_guess_name()</code> to guess a parser
+name from content, similar to how a parser is constructed from
+content.
+</p>
+
+<p>Added functions to return the namespaces declared during a parse:
+<code>librdf_parser_get_namespaces_seen_count()</code> to return the
+number seen, <code>librdf_parser_get_namespaces_seen_prefix()</code> to
+get the prefix string and
+<code>librdf_parser_get_namespaces_seen_uri()</code> to get the
+<code>librdf_uri*</code>.
+</p>
+
+
+<h3>Query and Query Results Class Changes</h3>
+
+<p>Added a new <em>Query Results Formatter</em> class building
+<code>librdf_query_results_formatter*</code> objects
+to turn a query results into a syntax:</p>
+<ul>
+<li>Constructors: <code>librdf_new_query_results_formatter()</code> and
+<code>librdf_new_query_results_formatter_by_mime_type()</code>.
+</li>
+<li>Destructor: <code>librdf_free_query_results_formatter()</code></li>
+<li>Method: <code>librdf_query_results_formatter_write()</code>
+to write the query results to an iostream.</li>
+<li>Helper functions: <code>librdf_query_results_formats_check()</code>
+and <code>librdf_query_results_formats_enumerate()</code></li>
+</ul>
+
+<p>Added <code>librdf_query_results_is_syntax()</code> to
+check if a query result is a syntax, and not any of the other
+possibilities - bindings, boolean or graph.
+</p>
+
+
+<h3>Serializer Class Changes</h3>
+
+<p>Default to serializer named "rdfxml" if no name is given to ensure
+we don't get another rdfxml serializer such as XMP.
+</p>
+
+
 <h3>MySQL Storage Changes</h3>
 
-<p>Implemented the transaction API for MySQL.
+<p>Implemented the transaction API for MySQL.  It batches up
+all the pending insertions and aggregates them so that any set
+of triple writes during the transaction sequence are all done at
+one point, with 4 INSERTs only.
 </p>
 
 <p>Added a supporting
@@ -83,18 +147,17 @@ PREFIX/share/redland for the MySQL schemas.  Without them installed,
 the mysql storage will not work.
 </p>
 
-
-<h3>Other Changes</h3>
-
-<p><code>librdf_model_add_submodel()</code> now returns non-zero on failure.
-Fixes
-<a href="http://bugs.librdf.org/mantis/view.php?id=175">Issue #0000175</a>
+<p>Removed the configure argument <code>--enable-parsers</code> since
+Raptor is always required and always used inside Redland whether or
+not any parsers were available.
 </p>
 
-<p>Calling <code>librdf_world_open()</code> is now optional.  The
-first call (constructor) that needs to use it, will invoke it.
-Fixes 
-<a href="http://bugs.librdf.org/mantis/view.php?id=173">Issue #0000173</a>
+<p>Use pkgconfig Libs.private in <code>redland.pc</code> for internal
+dynamically linked libraries.
+</p>
+
+<p><code>redland-config</code> gains --private-libs option to hold
+private libraries moved from --libs which now only contains -lrdf.
 </p>
 
 <p>Added a building utility <code>touch-mtime.pl</code>
@@ -103,12 +166,25 @@ Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=159">Issue #0000159</a>
 </p>
 
+
+<h3>Other Changes</h3>
+
+<p>Added <code>librdf_world_open()</code> for every public API
+constructor or function that mentions librdf_world* and could have
+failed to run <code>librdf_world_open()</code> after
+<code>librdf_new_world()</code>.  This makes
+<code>librdf_world_open()</code> entirely optional.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=173">Issue #0000173</a>
+</p>
+
 <p><code>rdfproc</code> gains an --transactions / -T option for
-enabling transactions on the command line.
+enabling transactions on the command line and an --results / -r
+option to set the query results formatter name.
 </p>
 
 <p>Do not throw away the rasqal node type information now, it is needed
-later on in FILTER comparisons.
+later on in <code>FILTER</code> comparisons.
 Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=153">Issue #0000153</a>
 </p>
