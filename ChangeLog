@@ -1,3 +1,305 @@
+2007-05-05  Dave Beckett  <dave@dajobe.org>
+
+	* Redland.i: Add librdf_parser_get_namespaces_seen_prefix,
+	librdf_parser_get_namespaces_seen_uri and
+	librdf_parser_get_namespaces_seen_count
+
+	* librdf/rdf_parser_raptor.c: (librdf_parser_raptor_namespace_handler):
+	Handle NULL prefix, URIs
+
+2007-05-04  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c: cast for C++
+
+	* librdf/rdf_parser_raptor.c: librdf_parser_raptor_stream_context
+	gains nspace_prefixes and nspace_uris sequences for storing
+	namespaces seen.
+	(librdf_parser_raptor_terminate): Free sequences.
+	(librdf_parser_raptor_namespace_handler): Save namespaces prefixes
+	and URIs seen in the new sequences.
+	(librdf_parser_raptor_parse_file_handle_as_stream,
+	librdf_parser_raptor_parse_as_stream_common,
+	librdf_parser_raptor_parse_into_model_common): Reset/initialise
+	namespace prefix/uri sequences before starting parsing.
+	(librdf_parser_raptor_get_namespaces_seen_prefix,
+	librdf_parser_raptor_get_namespaces_seen_uri,
+	librdf_parser_raptor_get_namespaces_seen_count): Added to get the
+	namespaces returned during a parsing.
+	(librdf_parser_raptor_register_factory): Register new functions
+	above.
+
+	* librdf/rdf_parser.c: (librdf_parser_get_namespaces_seen_prefix,
+	librdf_parser_get_namespaces_seen_uri,
+	librdf_parser_get_namespaces_seen_count): Added to get the
+	namespaces returned during a parsing.
+
+	* librdf/rdf_parser.h: Added prototypes for
+	librdf_parser_get_namespaces_seen_prefix,
+	librdf_parser_get_namespaces_seen_uri and
+	librdf_parser_get_namespaces_seen_count
+
+	* librdf/rdf_parser_internal.h: struct librdf_parser_factory_s
+	gains factory methods 
+	const char* (*get_namespaces_seen_prefix)(void* context, int offset);
+	librdf_uri* (*get_namespaces_seen_uri)(void* context, int offset);
+	int (*get_namespaces_seen_count)(void* context);
+	to get the namespaces seen during a parsing.
+
+	* librdf/rdf_storage_mysql.c:
+	(librdf_storage_mysql_transaction_commit): Commit statements in
+	the sorted order, not reversed.  Fix off-by-1.
+
+	* librdf/rdf_storage_mysql.c: pending_row now has a set strings
+	with lengths.
+	(librdf_storage_mysql_context): pending_inserts is now an array of
+	raptor_sequence* of pending_rows.
+	(compare_pending_rows): Compare using ints not memcmp for
+	human understandable order.  Could go back to memcmp which would
+	do different things based on the storage of u64 in memory (big,
+	little endian)
+	(free_pending-row): Added, now freeing strings too.
+	(format_pending_row_sequence): Turn a sequence of pending rows for a
+	table into the appropriate REPLACE INTO query.
+	(librdf_storage_mysql_node_hash_common): Do not make query here, use
+	new format_pending_row_sequence for immediate use, or queue it if in
+	a transaction.
+	(librdf_storage_mysql_transaction_start): init pending_inserts
+	sequences.
+	(librdf_storage_mysql_transaction_terminate): Free pending_inserts
+	sequences.
+	(librdf_storage_mysql_transaction_commit): Count pending_inserts
+	sequences. sort the pending nodes rows before formatting with
+	format_pending_row_sequence.
+
+2007-05-02  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_mysql.c: Batch up INSERTS to be 1 per table type.
+	Replace INSERT INTO with REPLACE INTO for Resources, Literals,
+	BNodes.
+	Do nothing if there is no work to commit, not even start/commit.
+	Table mysql_tables added to declare table names and fields.
+	Lose all the SELECT HIGH_PRIORITY.
+	(librdf_storage_mysql_node_hash_common): Renamed from
+	librdf_storage_mysql_node_hash.
+	(librdf_storage_mysql_get_node_hash,
+	librdf_storage_mysql_store_node): Added as wrappers around the above.
+	(librdf_storage_mysql_node_hash_common): Split into 'get hash' and
+	'add hash' sections.  All queries are constructed with
+	raptor_stringbuffer.  When in transaction, save for later, otherwise
+	execute here as before.  Do not insert the same node twice in
+	the same transaction.  LATER: Need to remember this is inserted
+	outside a transaction too to prevent un-necessary SELECTs.
+	(librdf_storage_mysql_context_add_statement_helper): Use new function
+	names. When in transactions, save away statements hash u64 arrays
+	a raptor_sequence of pending_row objects otherwise execute as before.
+	(librdf_storage_mysql_transaction_start): Initialise the new hashes
+	for nodes, pending_inserts stringbuffers, pending_statements sequence.
+	(librdf_storage_mysql_transaction_terminate): Added to tidy up the
+	new fields added above when a transaction is done.
+	(librdf_storage_mysql_transaction_commit): If there is no pending
+	node or statement to add, end without connecting.
+	Otherwise for each node table, do one REPLACE INTO and for the
+	statement table, do one INSERT INTO.
+	(librdf_storage_mysql_transaction_rollback): use new
+	librdf_storage_mysql_transaction_terminate to tidy up.
+
+	* configure.ac: Move mysql flag munging to one place
+
+	* utils/Makefile.am: (AM_CPPFLAGS): Put internal flags first
+
+2007-05-01  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_hash.c: casts for C++
+
+	* librdf/rdf_parser.c, librdf/rdf_parser_raptor.c,
+	librdf/rdf_query_rasqal.c, librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_sql.c: casts for C++
+
+	* librdf/rdf_hash.c: Casts for C++
+
+	* librdf/rdf_hash.c, librdf/rdf_hash.h:
+	(librdf_hash_interpret_template): Do not use template as a
+	function parameter name for C++
+
+	* FAQS.html, INSTALL.html, LICENSE.html, NEWS.html, README.html,
+	RELEASE.html, TODO.html: HTML hello UTF-8
+
+	* redland-config.1: Document --private-libs and explain what it is
+	under --libs too.
+
+	* redland-config.in: Add --private-libs and move private libs to
+	that from --libs
+
+
+	* librdf/redland.pc.in: Use Libs.private for internal dynamically
+	linked libraries
+
+2007-04-30  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_model.c: (librdf_model_add_submodel): Invert test
+	Fixes Issue#0000175 http://bugs.librdf.org/mantis/view.php?id=175
+
+	* librdf/rdf_iterator.c, librdf/rdf_statement.c,
+	librdf/rdf_storage.c, librdf/rdf_stream.c, librdf/rdf_uri.c:
+	(main): Init library with world only, not librdf_init_CLASS
+
+	* librdf/rdf_concepts.c: (main): Self contained test.
+
+	* librdf/rdf_digest.c, librdf/rdf_hash.c, librdf/rdf_node.c:
+	(main): Init library with world only, not librdf_init_CLASS
+
+	* docs/redland-docs.xml: sgml IDs
+
+	* Makefile.am: touch-mtime.pl
+
+	* docs/redland-sections.txt: Add librdf_parser_guess_name add
+	librdf_query_results_is_syntax
+
+	* Makefile.am, RELEASE.html, configure.ac, utils/Makefile.am,
+	utils/touch-mtime.c, utils/touch-mtime.pl: Remove touch-mtime
+	program, use perl touch-mtime.pl
+
+2007-04-23  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac: min raptor 1.4.15
+
+	* utils/rdfproc.c: Revert add_stream_count() and heuristics changes
+
+	* librdf/rdf_model.c, librdf/rdf_serializer.c: Updates for rdf/xml
+	output adding xml:base
+
+	* NEWS.html, configure.ac, librdf/win32_rdf_config.h: Bump version
+	to 1.0.6
+
+	* librdf/rdf_utf8.c: (main): Run quietly when successful
+
+2007-04-22  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_query_triples.c: (librdf_query_triples_init): Init
+	context->statement.
+
+	* autogen.sh: Update autogen.sh
+
+2007-03-20  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser.c: (librdf_parser_guess_name): Guess a parser
+	name from content using raptor_guess_parser_name.
+
+	* librdf/rdf_parser.h: Added librdf_parser_guess_name
+
+	* Redland.i: Added librdf_parser_guess_name
+
+2007-03-14  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c:
+	(librdf_parser_raptor_parse_as_stream_common): Send the accept
+	header appropriate for the raptor parser.
+
+2007-02-25  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_init.c: (librdf_new_world): Document how you should
+	call librdf_world_open after, although the library will now do it
+	for you.
+
+	* librdf/rdf_concepts.c, librdf/rdf_digest.c, librdf/rdf_hash.c,
+	librdf/rdf_init.c, librdf/rdf_init_internal.h,
+	librdf/rdf_iterator.c, librdf/rdf_list.c, librdf/rdf_model.c,
+	librdf/rdf_model_storage.c, librdf/rdf_node.c,
+	librdf/rdf_parser.c, librdf/rdf_parser_raptor.c,
+	librdf/rdf_query.c, librdf/rdf_query_results.c,
+	librdf/rdf_serializer.c, librdf/rdf_serializer_raptor.c,
+	librdf/rdf_statement.c, librdf/rdf_storage.c,
+	librdf/rdf_storage_file.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_list.c, librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_postgresql.c, librdf/rdf_storage_sql.c,
+	librdf/rdf_storage_sqlite.c, librdf/rdf_storage_tstore.c,
+	librdf/rdf_stream.c, librdf/rdf_uri.c: Add librdf_world_open() for
+	every public API constructor or function that mentions
+	librdf_world* and could have failed to run librdf_world_open()
+	after librdf_new_world().  Fixes Issue#0000173
+	http://bugs.librdf.org/mantis/view.php?id=173
+
+	* librdf/rdf_query.h: Added librdf_query_results_is_syntax prototype.
+
+2007-02-17  Dave Beckett  <dave@dajobe.org>
+
+	* utils/rdfproc.1: Document -r/--results for query results formatting.
+
+	* utils/rdfproc.c: Added -r/--results option to set query results
+	formatter name.
+
+	* docs/tmpl/hash.sgml, docs/tmpl/model.sgml,
+	docs/tmpl/query_results.sgml, docs/tmpl/storage.sgml: Update for
+	new transactions functions
+
+	* librdf/rdf_parser.c, librdf/rdf_parser_internal.h,
+	librdf/win32_rdf_config.h: Remove HAVE_RAPTOR_RDF_PARSER - always
+	present now
+
+	* librdf/Makefile.am: rdf_parser_raptor.c is always compiled
+
+	* configure.ac: Remove --enable-parsers - raptor is always
+	required and always used, whatever this setting is.  It is now
+	passed onto raptor, if built internally, which *will* use it to
+	configure the library contents.
+
+2007-02-16  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_query_rasqal.c: (librdf_query_rasqal_results_to_counted_string,
+	librdf_query_rasqal_results_to_file_handle): Removed old factory
+	method impls
+	(librdf_query_rasqal_results_is_syntax,
+	librdf_query_rasqal_new_results_formatter,
+	librdf_query_rasqal_new_results_formatter_by_mime_type,
+	librdf_query_rasqal_free_results_formatter,
+	librdf_query_rasqal_results_formatter_write): Added to implement
+	new factory methods using rasqal_query_results_formatter
+	(librdf_query_rasqal_constructor): Register all rasqal query
+	results formats to be handled by this.
+
+	* librdf/rdf_query_results.c: (librdf_query_results_to_counted_string,
+	librdf_query_results_to_file_handle): Use query results formatter.
+	(librdf_query_results_is_syntax): Added
+	(librdf_new_query_results_formatter,
+	librdf_new_query_results_formatter_by_mime_type,
+	librdf_free_query_results_formatter,
+	librdf_query_results_formatter_write): Added, based on new factory
+	methods.  9librdf_query_results_formats_check,
+	librdf_query_results_formats_enumerate): Added, calling rasqal
+	directly.
+
+	* librdf/rdf_query.h: Added prototypes for
+	librdf_new_query_results_formatter,
+	librdf_new_query_results_formatter_by_mime_type,
+	librdf_free_query_results_formatter,
+	librdf_query_results_formatter_write,
+	librdf_query_results_formats_check and
+	librdf_query_results_formats_enumerate
+
+	* librdf/rdf_query_internal.h: Added
+	librdf_query_results_formatter librdf_query_factory_s gains
+	factory methods new_results_formatter,
+	new_results_formatter_by_mime_type, free_results_formatter and
+	results_formatter_write, results_is_syntax.  lose factory methods
+	results_to_counted_string and results_to_file_handle
+
+	* librdf/librdf.h: Added librdf_query_results_formatter
+
+	* librdf/rdf_query_rasqal.c: (rasqal_redland_bind_match): Allow
+	binding a NULL graph
+
+2007-02-09  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_serializer.c: (librdf_get_serializer_factory):
+	Default to serializer named "rdfxml" if nothing given to ensure we
+	don't get another rdfxml serializer such as XMP.
+
+	* librdf/rdf_serializer.c: (librdf_get_serializer_factory): Fix
+	negative test for uri inequality.
+
+	* librdf/rdf_parser.c: (librdf_get_parser_factory): Fix negative
+	test for uri inequality.
+
 2007-01-26  Dave Beckett  <dave@dajobe.org>
 
 	* Makefile.am: Revert touch -r change as it just creates a file
