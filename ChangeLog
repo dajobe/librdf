@@ -2,6 +2,9 @@
 
 	* Snapshotted redland_1_0_6 for 1.0.6 release (SVN 12231)
 	
+	* librdf/redland.spec.in: Add /usr/share/redland/mysql-v1.ttl and
+	/usr/share/redland/mysql-v2.ttl to redland package
+
 	* librdf/rdf_parser_raptor.c:
 	(librdf_parser_raptor_namespace_handler): Do not store namespaces
 	with null URIs.
