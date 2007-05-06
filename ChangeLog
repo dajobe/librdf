@@ -1,5 +1,11 @@
 2007-05-05  Dave Beckett  <dave@dajobe.org>
 
+	* Snapshotted redland_1_0_6 for 1.0.6 release (SVN 12231)
+	
+	* librdf/rdf_parser_raptor.c:
+	(librdf_parser_raptor_namespace_handler): Do not store namespaces
+	with null URIs.
+	
 	* Redland.i: Add librdf_parser_get_namespaces_seen_prefix,
 	librdf_parser_get_namespaces_seen_uri and
 	librdf_parser_get_namespaces_seen_count
