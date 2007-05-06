@@ -91,7 +91,8 @@ get the prefix string and
 
 <p>Added a new <em>Query Results Formatter</em> class building
 <code>librdf_query_results_formatter*</code> objects
-to turn a query results into a syntax:</p>
+to turn a query results into a syntax such as SPARQL query results
+formats, JSON.  New functions:</p>
 <ul>
 <li>Constructors: <code>librdf_new_query_results_formatter()</code> and
 <code>librdf_new_query_results_formatter_by_mime_type()</code>.
@@ -112,16 +113,16 @@ possibilities - bindings, boolean or graph.
 <h3>Serializer Class Changes</h3>
 
 <p>Default to serializer named "rdfxml" if no name is given to ensure
-we don't get another rdfxml serializer such as XMP.
+another rdfxml serializer such as XMP is not returned.
 </p>
 
 
-<h3>MySQL Storage Changes</h3>
+<h3>Storage Class Changes</h3>
 
-<p>Implemented the transaction API for MySQL.  It batches up
-all the pending insertions and aggregates them so that any set
-of triple writes during the transaction sequence are all done at
-one point, with 4 INSERTs only.
+<p>The MySQL storage implements the transaction API.  It batches up
+all the pending insertions and aggregates them so that any set of
+triple writes during the transaction sequence are all done at one
+point, with 4 INSERTs only.
 </p>
 
 <p>Added a supporting
@@ -129,30 +130,32 @@ functions <code>librdf_hash_interpret_template()</code> to
 interpolate variables into strings using a librdf_hash of
 key/values.</p>
 
-<p>MySQL storage now takes an optional storage option 'layout' that
-can choose between the v1 and v2 SQL schemas (only the table type has
-changed).  The SQL fragments are described in Turtle files that are
-installed and read on startup.
+<p>The MySQL storage now takes an optional storage option 'layout'
+that can choose between the v1 and v2 SQL schemas (only the table
+type has changed).  The SQL fragments are described in Turtle files
+that are installed and read on startup.
 </p>
+
 
 <h3>Configuration and Build Changes</h3>
 
 <p><strong>Packagers note</strong>: two new files are installed into
 PREFIX/share/redland for the MySQL schemas.  Without them installed,
-the mysql storage will not work.
+the MySQL storage will not work.
 </p>
 
-<p>Removed the configure argument <code>--enable-parsers</code> since
-Raptor is always required and always used inside Redland whether or
-not any parsers were available.
+<p>Removed the <code>configure</code> script option
+<code>--enable-parsers</code> since Raptor is always required and
+always used inside Redland whether or not any parsers were configured.
 </p>
 
-<p>Use pkgconfig Libs.private in <code>redland.pc</code> for internal
-dynamically linked libraries.
+<p>Use <code>pkg-config</code> Libs.private in
+<code>redland.pc</code> for internal dynamically linked libraries.
 </p>
 
-<p><code>redland-config</code> gains --private-libs option to hold
-private libraries moved from --libs which now only contains -lrdf.
+<p><code>redland-config</code> gains an --private-libs option to hold
+private libraries moved from --libs which now only contains -L and a
+-lrdf.
 </p>
 
 <p>Added a building utility <code>touch-mtime.pl</code>
