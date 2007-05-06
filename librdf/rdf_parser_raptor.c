@@ -279,6 +279,21 @@ librdf_parser_raptor_namespace_handler(void* user_data,
   unsigned char* nprefix;
   size_t prefix_length;
   librdf_uri* uri;
+  int i;
+  
+  uri=(librdf_uri*)raptor_namespace_get_uri(nspace);
+  if(!uri)
+    return;
+  
+  for(i=0; i < raptor_sequence_size(pcontext->nspace_uris); i++) {
+    librdf_uri* u=(librdf_uri*)raptor_sequence_get_at(pcontext->nspace_uris, i);
+    if(librdf_uri_equals(uri, u))
+      return;
+  }
+  
+  /* new namespace */
+  uri=librdf_new_uri_from_uri(uri);
+  raptor_sequence_push(pcontext->nspace_uris, uri);
 
   prefix=raptor_namespace_get_counted_prefix(nspace, &prefix_length);
   if(prefix) {
@@ -287,11 +302,6 @@ librdf_parser_raptor_namespace_handler(void* user_data,
   } else
     nprefix=NULL;
   raptor_sequence_push(pcontext->nspace_prefixes, nprefix);
-
-  uri=(librdf_uri*)raptor_namespace_get_uri(nspace);
-  if(uri)
-    uri=librdf_new_uri_from_uri(uri);
-  raptor_sequence_push(pcontext->nspace_uris, uri);
 }
 
 
