@@ -690,8 +690,7 @@ if test "X$MYSQL_CONFIG" != X; then
   changequote(<<, >>)dnl
   mysql_libs=`$MYSQL_CONFIG --libs | sed -e "s/'//g"`
   # Stop the MySQL config program adding -Os or -O<n> options to CFLAGS
-  mysql_cflags=`$MYSQL_CONFIG --cflags | sed -e "s/'//g" -e "s/-O[A-Za-z0-9]*//" `
-  mysql_cflags=`echo "$mysql_cflags" | sed -e 's/-L[^ ]*//g' -e 's/-l[^ ]*//g' -e 's/-Wl,[^ ]*//g'`
+  mysql_cflags=`$MYSQL_CONFIG --cflags | sed -e "s/'//g" -e "s/[ \t]-O[A-Za-z0-9]*/ /" `
   changequote([, ])dnl
 
   LIBS="$LIBRDF_LIBS $mysql_libs"
