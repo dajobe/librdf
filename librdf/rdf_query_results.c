@@ -627,7 +627,7 @@ void
 librdf_free_query_results_formatter(librdf_query_results_formatter* formatter) 
 {
   if(formatter->query_results->query->factory->free_results_formatter)
-    return formatter->query_results->query->factory->free_results_formatter(formatter);
+    formatter->query_results->query->factory->free_results_formatter(formatter);
 }
 
 
