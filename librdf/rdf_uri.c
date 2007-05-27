@@ -617,7 +617,7 @@ librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri)
  *
  * Test if a URI points to a filename.
  * 
- * Return value: 0 if the URI points to a file
+ * Return value: Non zero if the URI points to a file
  **/
 int
 librdf_uri_is_file_uri(librdf_uri* uri) 
