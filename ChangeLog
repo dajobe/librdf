@@ -1,3 +1,43 @@
+2007-06-08  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_storage_mysql.c:
+	(librdf_storage_mysql_transaction_commit): Run
+	librdf_storage_mysql_transaction_terminate if there is nothing to
+	do.
+
+2007-05-26  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_uri.c: (librdf_uri_is_file_uri): Correct return value
+	docs.
+	Fixes Issue#0000189 http://bugs.librdf.org/mantis/view.php?id=189
+
+	* librdf/librdf.h: Allow _declspec and __declspec
+	Fixes Issue#0000188 http://bugs.librdf.org/mantis/view.php?id=188
+
+2007-05-21  Dave Beckett  <dave@dajobe.org>
+
+	* configure.ac: Add -Wformat-security
+
+2007-05-09  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_query_results.c: (librdf_free_query_results_formatter):
+	Do not try to return a value.
+	Fixes Issue#0000187 http://bugs.librdf.org/mantis/view.php?id=187
+
+
+	* configure.ac: mysql_cflags - make sure -O match is after
+	whitespace.  Ditch trying to rip out linker junk from mysql_cflags
+
+2007-05-06  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_hash.c: (librdf_hash_print, librdf_hash_print_keys,
+	librdf_hash_print_values): Look at fwrite return value, it makes
+	gcc happier.
+
+
+	* NEWS.html, configure.ac, librdf/win32_rdf_config.h: Bump version
+	to 1.0.7
+	
 2007-05-05  Dave Beckett  <dave@dajobe.org>
 
 	* Snapshotted redland_1_0_6 for 1.0.6 release (SVN 12231)
