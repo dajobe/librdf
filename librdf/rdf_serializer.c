@@ -806,7 +806,7 @@ librdf_serializer_set_namespace(librdf_serializer* serializer,
                                 librdf_uri *uri, const char *prefix) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
-  if(uri && !*uri)
+  if(uri && !*librdf_uri_as_string(uri))
     uri=NULL;
   if(prefix && !*prefix)
     prefix=NULL;
