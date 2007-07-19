@@ -793,12 +793,10 @@ librdf_serializer_set_feature(librdf_serializer* serializer,
 /**
  * librdf_serializer_set_namespace:
  * @serializer: serializer object
- * @uri: URI of namespace
- * @prefix: prefix to use
+ * @uri: URI of namespace or NULL
+ * @prefix: prefix to use or NULL
  *
  * Set a namespace URI/prefix mapping.
- * 
- * NOTE: May not be implemented yet - depends on raptor_serializer work.
  * 
  * Return value: non 0 on failure
  **/
@@ -808,8 +806,10 @@ librdf_serializer_set_namespace(librdf_serializer* serializer,
                                 librdf_uri *uri, const char *prefix) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(serializer, librdf_serializer, 1);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, 1);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(prefix, string, 1);
+  if(uri && !*uri)
+    uri=NULL;
+  if(prefix && !*prefix)
+    prefix=NULL;
 
   if(serializer->factory->set_namespace)
     return serializer->factory->set_namespace(serializer->context, uri, prefix);
