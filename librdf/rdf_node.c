@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
- * Copyright (C) 2000-2005, Copyright (C) 2000-2006, Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -717,7 +717,8 @@ librdf_free_node(librdf_node *node)
   librdf_world *world;
 #endif
 
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(node, librdf_node);
+  if(!node)
+    return;
 
 #ifdef WITH_THREADS
   world = node->world;

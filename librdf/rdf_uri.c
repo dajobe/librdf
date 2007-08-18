@@ -4,8 +4,8 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
- * Copyright (C) 2000-2005, Copyright (C) 2000-2006, Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -87,10 +87,12 @@ librdf_init_uri(librdf_world *world)
 void
 librdf_finish_uri(librdf_world *world)
 {
-  librdf_hash_close(world->uris_hash);
+  if (world->uris_hash) {
+    librdf_hash_close(world->uris_hash);
 
-  if(world->uris_hash_allocated_here)
-    librdf_free_hash(world->uris_hash);
+    if(world->uris_hash_allocated_here)
+      librdf_free_hash(world->uris_hash);
+  }
 }
 
 

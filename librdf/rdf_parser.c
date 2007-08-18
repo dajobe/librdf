@@ -68,8 +68,10 @@ librdf_init_parser(librdf_world *world)
 void
 librdf_finish_parser(librdf_world *world) 
 {
-  raptor_free_sequence(world->parsers);
-  world->parsers=NULL;
+  if(world->parsers) {
+    raptor_free_sequence(world->parsers);
+    world->parsers=NULL;
+  }
 
   librdf_parser_raptor_destructor();
 }

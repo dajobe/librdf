@@ -65,6 +65,7 @@
 #endif
 
 
+#ifndef STANDALONE
 
 const char * const librdf_short_copyright_string = "Copyright 2000-2006 David Beckett. Copyright 2000-2005 University of Bristol";
 
@@ -637,3 +638,30 @@ librdf_system_free(void *ptr)
 
 #endif
 
+
+#endif
+
+
+/* TEST CODE */
+
+
+#ifdef STANDALONE
+
+/* one more prototype */
+int main(int argc, char *argv[]);
+
+
+int
+main(int argc, char *argv[]) 
+{
+  librdf_world *world;
+
+  /* Minimal setup-cleanup test */
+  world=librdf_new_world();
+  librdf_free_world(world);
+
+  /* keep gcc -Wall happy */
+  return(0);
+}
+
+#endif

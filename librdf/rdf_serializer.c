@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2002-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2002-2007, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2002-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -71,9 +71,10 @@ librdf_init_serializer(librdf_world *world)
 void
 librdf_finish_serializer(librdf_world *world) 
 {
-  raptor_free_sequence(world->serializers);
-  world->serializers=NULL;
-
+  if(world->serializers) {
+    raptor_free_sequence(world->serializers);
+    world->serializers=NULL;
+  }
 #ifdef HAVE_RAPTOR_RDF_SERIALIZER
   librdf_serializer_raptor_destructor();
 #endif

@@ -153,7 +153,8 @@ EXTRA_PROGRAMS=$(local_tests)
 TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
-rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test
+rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test \
+rdf_init_test
 
 CLEANFILES=$(TESTS) $(local_tests) test test.db test1.db test.rdf
 
@@ -268,6 +269,9 @@ rdf_stream_test: rdf_stream.c librdf.la
 
 rdf_iterator_test: rdf_iterator.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_iterator.c librdf.la
+
+rdf_init_test: rdf_init.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_init.c librdf.la
 
 @SET_MAKE@
 
