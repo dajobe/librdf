@@ -48,6 +48,12 @@ extern "C" {
 #      define REDLAND_API _declspec(dllimport)
 #    endif
 #  endif
+#elif defined(__SYMBIAN32__)
+#  ifdef LIBRDF_INTERNAL
+#    define REDLAND_API __declspec(dllexport)
+#  else
+#    define REDLAND_API __declspec(dllimport)
+#  endif
 #else
 #  define REDLAND_API
 #endif
