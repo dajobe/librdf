@@ -462,7 +462,8 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
     new_node=NULL;
     goto unlock;
   }
-  strcpy((char*)new_value, (const char*)value);
+  strncpy((char*)new_value, (const char*)value, value_len);
+  new_value[value_len]='\0';
   new_node->value.literal.string=new_value;
   
   if(xml_language && *xml_language) {
@@ -473,7 +474,8 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
       new_node=NULL;
       goto unlock;
     }
-    strcpy(new_xml_language, xml_language);
+    strncpy(new_xml_language, xml_language, xml_language_len);
+    new_xml_language[xml_language_len]='\0';
     new_node->value.literal.xml_language=new_xml_language;
     new_node->value.literal.xml_language_len=xml_language_len;
   } else
