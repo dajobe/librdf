@@ -238,7 +238,7 @@ if test "x$bdb_prefix" != "xno" ; then
     fi
 
     # Sigh!  And this still might not be good enough.
-    for bdbc_version in 4.4 4.3 4.2 4.1 4.0 4 3.3 3.2 3.1 3 2; do
+    for bdbc_version in 4.6 4.5 4.4 4.3 4.2 4.1 4.0 4 3.3 3.2 3.1 3 2; do
       bdbc_major=`echo $bdbc_version | sed -e 's/^\(.\).*$/\1/'`;
       bdbc_version2=`echo $bdbc_version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
 
