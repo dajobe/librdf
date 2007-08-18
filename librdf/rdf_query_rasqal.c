@@ -1080,6 +1080,7 @@ static void
 librdf_query_rasqal_free_results_formatter(librdf_query_results_formatter* qrf) 
 {
   rasqal_free_query_results_formatter(qrf->formatter);
+  LIBRDF_FREE(librdf_query_results, qrf);
 }
 
 
