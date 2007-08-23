@@ -93,6 +93,14 @@ typedef struct {
 } librdf_parser_raptor_stream_context;
 
 
+static int
+librdf_parser_raptor_relay_filter(void* user_data, raptor_uri* uri) 
+{
+  librdf_parser* parser=(librdf_parser*)user_data;
+  return parser->uri_filter(parser->uri_filter_user_data, (librdf_uri*)uri);
+}
+
+
 /**
  * librdf_parser_raptor_init:
  * @parser: the parser
@@ -470,6 +478,11 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   scontext->fh=fh;
   scontext->close_fh=close_fh;
 
+  if(pcontext->parser->uri_filter)
+    raptor_parser_set_uri_filter(pcontext->rdf_parser,
+                                 librdf_parser_raptor_relay_filter,
+                                 pcontext->parser);
+
   /* Start the parse */
   stream=NULL;
   rc=raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
@@ -614,6 +627,12 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     librdf_free_uri(scontext->base_uri); 
   scontext->base_uri = base_uri;
 
+  if(pcontext->parser->uri_filter)
+    raptor_parser_set_uri_filter(pcontext->rdf_parser,
+                                 librdf_parser_raptor_relay_filter,
+                                 pcontext->parser);
+  
+
   if(uri) {
     raptor_www *www;
     const char *accept_h;
@@ -633,7 +652,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     raptor_www_set_write_bytes_handler(www, 
                                        librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler,
                                        scontext);
-    
+
     if(raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri)) {
       raptor_www_free(www);
       return NULL;
@@ -817,6 +836,12 @@ librdf_parser_raptor_parse_into_model_common(void *context,
 
   /* direct into model */
   scontext->model = model;
+
+  if(pcontext->parser->uri_filter)
+    raptor_parser_set_uri_filter(pcontext->rdf_parser,
+                                 librdf_parser_raptor_relay_filter,
+                                 pcontext->parser);
+    
 
   if(uri) {
     status=raptor_parse_uri(pcontext->rdf_parser, (raptor_uri*)uri, 
