@@ -1,3 +1,60 @@
+2007-08-22  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c: (librdf_parser_raptor_relay_filter):
+	Added to use in filtering URIs during a parse operation.
+	(librdf_parser_raptor_parse_file_handle_as_stream,
+	librdf_parser_raptor_parse_as_stream_common,
+	librdf_parser_raptor_parse_into_model_common): Check URIs using
+	raptor_parser_set_uri_filter to set a filter function.
+
+	* librdf/rdf_parser.c: (librdf_parser_set_uri_filter): Added for
+	setting a handler function to check URIs being parsed.
+	(librdf_parser_get_uri_filter): Added for returning the current
+	handler/data.
+
+	* librdf/rdf_uri.h: Define librdf_uri_filter_func
+
+	* librdf/rdf_parser.h: Added librdf_parser_set_uri_filter and
+	librdf_parser_get_uri_filter
+
+	* librdf/rdf_parser_internal.h: struct librdf_parser_s gains
+	uri_filter_user_data and uri_filter
+
+2007-08-18  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_node.c: (librdf_new_node_from_typed_counted_literal):
+	Handle input value, xml_languge that are not necessarily NUL
+	terminated, although they should be since they are C strings.
+	Fixes Issue#0000215 http://bugs.librdf.org/mantis/view.php?id=215
+
+	* configure.ac: BDB is up to 4.6 now
+
+	* librdf/Makefile.am, librdf/rdf_init.c, librdf/rdf_model.c,
+	librdf/rdf_node.c, librdf/rdf_parser.c, librdf/rdf_serializer.c,
+	librdf/rdf_storage.c, librdf/rdf_uri.c: Fix setup/cleanup issues
+	if library is initialised and then closed.  Added rdf_init_test
+	test to run it.
+	Fixes Issue#0000209 http://bugs.librdf.org/mantis/view.php?id=209
+
+2007-08-17  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_query_rasqal.c: (librdf_query_rasqal_free_results_formatter):
+	Free the librdf_query_results_formatter
+	Fixes Issue#0000205 http://bugs.librdf.org/mantis/view.php?id=205
+
+
+	* librdf/librdf.h: Applied librdf part of symbian portability fix
+	for Issue#0000203
+	http://bugs.librdf.org/mantis/view.php?id=203
+
+2007-07-19  Dave Beckett  <dave@dajobe.org>
+
+	* librdf/rdf_serializer.c: (librdf_serializer_set_namespace): Now
+	with less typos
+
+	* librdf/rdf_serializer.c: (librdf_serializer_set_namespace):
+	Allow NULL uri and prefix to be given
+
 2007-06-08  Dave Beckett  <dave@dajobe.org>
 
 	* librdf/rdf_storage_mysql.c:
