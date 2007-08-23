@@ -72,6 +72,11 @@ REDLAND_API
 librdf_stream* librdf_parser_parse_counted_string_as_stream(librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri);
 REDLAND_API
 int librdf_parser_parse_counted_string_into_model(librdf_parser* parser, const unsigned char *string, size_t length, librdf_uri* base_uri, librdf_model* model);
+REDLAND_API
+void librdf_parser_set_uri_filter(librdf_parser* parser, librdf_uri_filter_func 
+filter, void* user_data);
+REDLAND_API
+librdf_uri_filter_func librdf_parser_get_uri_filter(librdf_parser* parser, void** user_data_p);
 
 /**
  * LIBRDF_PARSER_FEATURE_ERROR_COUNT:
