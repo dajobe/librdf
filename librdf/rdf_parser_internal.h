@@ -84,6 +84,9 @@ struct librdf_parser_s {
   void *context;
 
   librdf_parser_factory* factory;
+
+  void* uri_filter_user_data;
+  librdf_uri_filter_func uri_filter;
 };
 
 /* class methods */
