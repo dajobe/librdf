@@ -37,6 +37,17 @@
 extern "C" {
 #endif
 
+/**
+ * librdf_uri_filter_func:
+ * @user_data: user data
+ * @uri: #librdf_uri URI to check
+ *
+ * Callback function for librdf_parser_set_uri_filter()
+ *
+ * Return value: non-0 to filter the URI
+*/
+typedef int (*librdf_uri_filter_func)(void *user_data, librdf_uri* uri);
+
 
 /* constructors */
 REDLAND_API
