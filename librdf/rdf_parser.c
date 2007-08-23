@@ -746,6 +746,38 @@ librdf_parser_get_namespaces_seen_count(librdf_parser* parser)
   return 0;
 }
 
+
+/**
+ * librdf_parser_set_uri_filter:
+ * @parser: #librdf_parser object
+ * @filter: URI filter function
+ * @user_data: User data to pass to filter function
+ * 
+ * Set URI filter function for retrieval during parsing.
+**/
+void
+librdf_parser_set_uri_filter(librdf_parser* parser,
+                             librdf_uri_filter_func filter, void* user_data)
+{
+  parser->uri_filter=filter;
+  parser->uri_filter_user_data=user_data;
+}
+
+/**
+ * librdf_parser_get_uri_filter:
+ * @parser: #librdf_parser object
+ * @user_data_p: Pointer to user data to return
+ * 
+ * Get the current URI filter function for retrieval during parsing.
+**/
+librdf_uri_filter_func
+librdf_parser_get_uri_filter(librdf_parser* parser, void** user_data_p)
+{
+  if(user_data_p)
+    *user_data_p=parser->uri_filter_user_data;
+  return parser->uri_filter;
+}
+
 #endif
 
 
