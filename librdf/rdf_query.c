@@ -449,7 +449,7 @@ librdf_query_execute(librdf_query* query, librdf_model* model)
   librdf_query_results* results=NULL;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
 
   if(query->factory->execute) {
     if((results=query->factory->execute(query, model)))
