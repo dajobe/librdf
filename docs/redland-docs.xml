@@ -5,9 +5,60 @@
 ]>
 <book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
   <bookinfo>
-    <title>Redland RDF Application Framework Manual</title>
-    <releaseinfo>for Redland &version;</releaseinfo>
+    <title>Redland RDF Library Manual</title>
+    <releaseinfo>Manual for <ulink url="http://librdf.org/">Redland</ulink> &version;</releaseinfo>
+
+    <author>
+      <firstname>Dave</firstname>
+      <surname>Beckett</surname>
+      <affiliation>
+	<address>
+	  <otheraddr><ulink url="http://www.dajobe.org/">http://www.dajobe.org/</ulink></otheraddr>
+	</address>
+      </affiliation>
+    </author>
+
+    <legalnotice>
+    <para>
+      This documentation is Free Software / Open Source - you can
+      redistribute it and/or modify it under the same licenses as
+      <ulink url="http://librdf.org/">Redland</ulink>.
+      It is licensed under the following three licenses as alternatives:
+      <orderedlist>
+	<listitem><para>GNU Lesser General Public License (LGPL) V2.1 or any newer version</para></listitem>
+	<listitem><para>GNU General Public License (GPL) V2 or any newer version</para></listitem>
+	<listitem><para>Apache License, V2.0 or any newer version</para></listitem>
+      </orderedlist>
+      You may not use this documentation except in compliance with at
+      least one of the above three licenses. See the
+      <ulink url="http://librdf.org/">Redland</ulink>
+      site for the full license terms.
+    </para>
+
+    </legalnotice>
+
+    <copyright>
+      <year>2000</year>
+      <year>2001</year>
+      <year>2002</year>
+      <year>2003</year>
+      <year>2004</year>
+      <year>2005</year>
+      <year>2006</year>
+      <year>2007</year>
+      <holder>Dave Beckett</holder>
+    </copyright>
+    <copyright>
+      <year>2000</year>
+      <year>2001</year>
+      <year>2002</year>
+      <year>2003</year>
+      <year>2004</year>
+      <year>2005</year>
+      <holder>University of Bristol</holder>
+    </copyright>
   </bookinfo>
+
 
   <chapter id="redland">
     <title>Redland Overview</title>
@@ -22,10 +73,32 @@ library providing APIs to the RDF model and it's concepts.
 
   <part id="tutorial"> 
     <title>Tutorial</title>
+    <partintro id="tutorial-introduction">
+      <para>This part will describe how to use the
+      <ulink url="http://librdf.org/">Redland</ulink> APIs.
+      once it is written.
+      </para>
+    </partintro>
   </part>				  
 
   <part id="reference-manual">
     <title>Reference Manual</title>
+
+    <partintro id="reference-manual-introduction">
+      <para>This part contains the Redland Reference Manual
+      which comprehensively describes every class and function of the API.
+      </para>
+      
+      <para>The previous part contains the
+      <link linkend="tutorial">Redland Tutorial</link>
+      explaining how to use the API parts.
+      </para>
+
+      <para>For the latest information, see the
+      <ulink url="http://librdf.org/">Redland Home Page</ulink>
+      </para>
+    </partintro>
+
     <xi:include href="redland-chapter-objects.xml"/>
     <xi:include href="xml/world.xml"/>
     <xi:include href="xml/concepts.xml"/>
@@ -47,8 +120,10 @@ library providing APIs to the RDF model and it's concepts.
     <xi:include href="xml/stream.xml"/>
     <xi:include href="xml/unicode.xml"/>
     <xi:include href="xml/uri.xml"/>
+
     <!-- <xi:include href="xml/unused.xml"/> -->
   </part>
+
   <index id="indexes">
     <title>Index</title>
   </index>
