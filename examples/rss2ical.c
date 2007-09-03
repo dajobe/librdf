@@ -36,7 +36,7 @@ static const unsigned char* get_items_query=(const unsigned char*)
 "PREFIX rss: <http://purl.org/rss/1.0/>\n\
 PREFIX dc: <http://purl.org/dc/elements/1.1/>\n\
 PREFIX content: <http://web.resource.org/rss/1.0/modules/content/>\n\
-SELECT ?item ?date ?title ?description ?htmldesc ?source ?creator\n\
+SELECT ?item ?date ?title ?description ?creator\n\
 WHERE {\n\
  ?item a rss:item;\n\
        dc:date ?date;\n\
@@ -53,33 +53,33 @@ WHERE {\n\
 
 /* %s-prod id %s-cal name id %s-rel cal id %s-tzone %s-tzone */
 static const char *ical_header_format="\
-BEGIN:VCALENDAR\n\
-VERSION:2.0\n\
-PRODID:%s\n\
-X-WR-CALNAME:%s\n\
-X-WR-RELCALID:%s\n\
-X-WR-TIMEZONE:%s\n\
-CALSCALE:GREGORIAN\n\
-METHOD:PUBLISH\n\
-BEGIN:VTIMEZONE\n\
-TZID:%s\n\
-BEGIN:DAYLIGHT\n\
-DTSTART:20060326T020000\n\
-TZOFFSETTO:+0100\n\
-TZOFFSETFROM:+0000\n\
-TZNAME:BST\n\
-END:DAYLIGHT\n\
-BEGIN:STANDARD\n\
-DTSTART:20061029T020000\n\
-TZOFFSETTO:+0000\n\
-TZOFFSETFROM:+0100\n\
-TZNAME:GMT\n\
-END:STANDARD\n\
-END:VTIMEZONE\n\
+BEGIN:VCALENDAR\r\n\
+VERSION:2.0\r\n\
+PRODID:%s\r\n\
+X-WR-CALNAME:%s\r\n\
+X-WR-RELCALID:%s\r\n\
+X-WR-TIMEZONE:%s\r\n\
+CALSCALE:GREGORIAN\r\n\
+METHOD:PUBLISH\r\n\
+BEGIN:VTIMEZONE\r\n\
+TZID:%s\r\n\
+BEGIN:DAYLIGHT\r\n\
+DTSTART:20060326T020000\r\n\
+TZOFFSETTO:+0100\r\n\
+TZOFFSETFROM:+0000\r\n\
+TZNAME:BST\r\n\
+END:DAYLIGHT\r\n\
+BEGIN:STANDARD\r\n\
+DTSTART:20061029T020000\r\n\
+TZOFFSETTO:+0000\r\n\
+TZOFFSETFROM:+0100\r\n\
+TZNAME:GMT\r\n\
+END:STANDARD\r\n\
+END:VTIMEZONE\r\n\
 ";
 
 static const char *ical_footer_format="\
-END:VCALENDAR\n\
+END:VCALENDAR\r\n\
 ";
 
 static const char *tzone="Europe/London";
@@ -91,7 +91,7 @@ static void
 ical_print(FILE *fh, const char *line)  
 {
   fputs(line, fh);
-  fwrite("\n", 1, 1, fh);
+  fwrite("\r\n", 1, 2, fh);
 }
 
 
@@ -122,7 +122,7 @@ ical_format(FILE *fh, const char *key, const char *attr,
 
   for(i=0; (c=value[i]); i++)  {
     if(col == 75) {
-      fwrite("\n ", 1, 2, fh);
+      fwrite("\r\n ", 1, 3, fh);
       col=0;
       lineno++;
     }
@@ -143,7 +143,7 @@ ical_format(FILE *fh, const char *key, const char *attr,
     fputc(c, fh);
     col++;
   }
-  fputc('\n', fh);
+  fwrite("\r\n", 1, 2, fh);
 }
 
 
