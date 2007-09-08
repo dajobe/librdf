@@ -32,6 +32,10 @@
 extern "C" {
 #endif
 
+#ifdef WITH_THREADS
+#include <pthread.h>
+#endif
+
 struct librdf_world_s
 {
   void *error_user_data;
