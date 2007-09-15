@@ -1163,6 +1163,21 @@ librdf_raptor_uri_equals(void *context, raptor_uri* uri1, raptor_uri* uri2)
 }
 
 
+static int
+librdf_raptor_uri_compare(void *context, raptor_uri* uri1, raptor_uri* uri2)
+{
+  if(uri1 == NULL && uri2 == NULL)
+    return 0;
+  else if(uri1 == NULL)
+    return -1;
+  else if(uri2 == NULL)
+    return 1;
+  else
+    return strcmp(librdf_uri_as_string((librdf_uri*)uri1),
+                  librdf_uri_as_string((librdf_uri*)uri2));
+}
+
+
 static raptor_uri*
 librdf_raptor_uri_copy(void *context, raptor_uri *uri)
 {
@@ -1253,6 +1268,7 @@ static raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_new_uri_for_rdf_concept,
   librdf_raptor_free_uri,
   librdf_raptor_uri_equals,
+  librdf_raptor_uri_compare,
   librdf_raptor_uri_copy,
   librdf_raptor_uri_as_string,
   librdf_raptor_uri_as_counted_string,
