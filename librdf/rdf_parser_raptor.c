@@ -1166,15 +1166,15 @@ librdf_raptor_uri_equals(void *context, raptor_uri* uri1, raptor_uri* uri2)
 static int
 librdf_raptor_uri_compare(void *context, raptor_uri* uri1, raptor_uri* uri2)
 {
-  if(uri1 == NULL && uri2 == NULL)
+  if(librdf_uri_equals((librdf_uri*)uri1, (librdf_uri*)uri2))
     return 0;
   else if(uri1 == NULL)
     return -1;
   else if(uri2 == NULL)
     return 1;
   else
-    return strcmp(librdf_uri_as_string((librdf_uri*)uri1),
-                  librdf_uri_as_string((librdf_uri*)uri2));
+    return strcmp((const char*)librdf_uri_as_string((librdf_uri*)uri1),
+                  (const char*)librdf_uri_as_string((librdf_uri*)uri2));
 }
 
 
