@@ -1271,7 +1271,7 @@ static raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_uri_copy,
   librdf_raptor_uri_as_string,
   librdf_raptor_uri_as_counted_string,
-  1,
+  2,
   librdf_raptor_uri_compare
 };
 
