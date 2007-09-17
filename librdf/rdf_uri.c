@@ -651,6 +651,32 @@ librdf_uri_to_filename(librdf_uri* uri)
   
 }
 
+
+/**
+ * librdf_uri_compare:
+ * @uri1: #librdf_uri object 1 or NULL
+ * @uri2: #librdf_uri object 2 or NULL
+ * 
+ * Compare two librdf_uri objects lexicographically.
+ * 
+ * A NULL URI is always less than (never equal to) a non-NULL URI.
+ *
+ * Return value: <0 if @uri1 is less than @uri2, 0 if equal, >0 if @uri1 is greather @uri2
+ **/
+int
+librdf_uri_compare(librdf_uri* uri1, librdf_uri* uri2)
+{
+  if(uri1 == uri2)
+    return 0;
+  else if(!uri1)
+    return -1;
+  else if(!uri2)
+    return 1;
+  else
+    return strcmp((const char*)uri1->string, (const char*)uri2->string);
+}
+
+
 #endif
 
 

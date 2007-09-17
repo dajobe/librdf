@@ -167,6 +167,7 @@ void librdf_free_uri(librdf_uri *uri);
 %newobject librdf_uri_to_string;
 char* librdf_uri_to_string (librdf_uri* uri);
 int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
+int librdf_uri_compare(librdf_uri* first_uri, librdf_uri* second_uri);
 
 /* rdf_node.h */
 %newobject librdf_new_node;

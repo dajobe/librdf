@@ -77,6 +77,8 @@ unsigned char* librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p);
 REDLAND_API
 int librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri);
 REDLAND_API
+int librdf_uri_compare(librdf_uri* uri1, librdf_uri* uri2);
+REDLAND_API
 int librdf_uri_is_file_uri(librdf_uri* uri);
 REDLAND_API
 const char* librdf_uri_to_filename(librdf_uri* uri);
