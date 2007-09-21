@@ -350,13 +350,13 @@ librdf_hash_memory_destroy(void* context)
       
       /* this entry is used */
       if(node) {
-	librdf_hash_memory_node *next;
-	/* free all attached nodes */
-	while(node) {
-	  next=node->next;
-	  librdf_free_hash_memory_node(node);
-	  node=next;
-	}
+        librdf_hash_memory_node *next;
+        /* free all attached nodes */
+        while(node) {
+          next=node->next;
+          librdf_free_hash_memory_node(node);
+          node=next;
+        }
       }
     }
     LIBRDF_FREE(librdf_hash_memory_nodes, hcontext->nodes);
