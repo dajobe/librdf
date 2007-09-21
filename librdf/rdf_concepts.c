@@ -47,8 +47,11 @@
 
 #ifndef STANDALONE
 
-librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1];
-librdf_node* librdf_concept_resources[LIBRDF_CONCEPT_LAST+1];
+/* FIXME: Static variables - does not support multiple world properly
+ * http://bugs.librdf.org/mantis/view.php?id=213 */
+
+librdf_uri* librdf_concept_uris[LIBRDF_CONCEPT_LAST+1]={NULL};
+librdf_node* librdf_concept_resources[LIBRDF_CONCEPT_LAST+1]={NULL};
 
 
 /* FIXME: All the stuff here and in rdf_concepts.h should be machine
@@ -82,6 +85,7 @@ static const unsigned char * librdf_concept_schema_namespace=(const unsigned cha
 librdf_uri* librdf_concept_ms_namespace_uri = NULL;
 librdf_uri* librdf_concept_schema_namespace_uri = NULL;
 
+static int librdf_concepts_usage=0;
 
 
 /**
@@ -96,10 +100,15 @@ librdf_init_concepts(librdf_world *world)
 {
   int i;
 
+  /* return immediately if already initialised */
+  if(librdf_concepts_usage++)
+    return;
 
   /* Create the Unique URI objects */
   librdf_concept_ms_namespace_uri=librdf_new_uri(world, librdf_concept_ms_namespace);
   librdf_concept_schema_namespace_uri=librdf_new_uri(world, librdf_concept_schema_namespace);
+  if(!librdf_concept_ms_namespace_uri || !librdf_concept_schema_namespace_uri)
+    LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Failed to create M&S or Schema URIs");
 
   /* Create the M&S and Schema resource nodes */
   for (i=0; i< LIBRDF_CONCEPT_LAST; i++) {
@@ -164,14 +173,29 @@ librdf_finish_concepts(librdf_world *world)
 {
   int i;
 
-  if(librdf_concept_ms_namespace_uri)
-    librdf_free_uri(librdf_concept_ms_namespace_uri);
-  if(librdf_concept_schema_namespace_uri)
-    librdf_free_uri(librdf_concept_schema_namespace_uri);
+  /* Return immediately if usage counter is positive */
+  if(--librdf_concepts_usage)
+    return;
 
-  for (i=0; i< LIBRDF_CONCEPT_LAST; i++)
-    /* deleted associated URI too */
+  /* Free resources and set pointers to NULL so that they are cleared
+   * in case the concepts module is initialised again in the same process. */
+
+  if(librdf_concept_ms_namespace_uri) {
+    librdf_free_uri(librdf_concept_ms_namespace_uri);
+    librdf_concept_ms_namespace_uri=NULL;
+  }
+
+  if(librdf_concept_schema_namespace_uri) {
+    librdf_free_uri(librdf_concept_schema_namespace_uri);
+    librdf_concept_schema_namespace_uri=NULL;
+  }
+
+  for (i=0; i< LIBRDF_CONCEPT_LAST; i++) {
+    /* deletes associated URI too */
     librdf_free_node(librdf_concept_resources[i]);
+    librdf_concept_resources[i]=NULL;
+    librdf_concept_uris[i]=NULL;
+  }
 }
 
 #endif
