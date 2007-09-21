@@ -436,9 +436,9 @@ librdf_free_uri (librdf_uri* uri)
 
   key.data=uri->string;
   key.size=uri->string_length;
-  if(librdf_hash_delete_all(uri->world->uris_hash, &key) )
-    LIBRDF_FATAL1(uri->world, LIBRDF_FROM_URI, "Hash deletion failed");
-
+  /* Hash deletion fails only if the key is not found.
+     This is not a fatal error so do not check for return value. */
+  librdf_hash_delete_all(uri->world->uris_hash, &key);
 
   if(uri->string)
     LIBRDF_FREE(cstring, uri->string);
@@ -663,7 +663,7 @@ librdf_uri_to_filename(librdf_uri* uri)
  * 
  * A NULL URI is always less than (never equal to) a non-NULL URI.
  *
- * Return value: <0 if @uri1 is less than @uri2, 0 if equal, >0 if @uri1 is greather @uri2
+ * Return value: <0 if @uri1 is less than @uri2, 0 if equal, >0 if @uri1 is greater than @uri2
  **/
 int
 librdf_uri_compare(librdf_uri* uri1, librdf_uri* uri2)
