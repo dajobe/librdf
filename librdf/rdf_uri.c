@@ -67,11 +67,11 @@ librdf_init_uri(librdf_world *world)
     if(!world->uris_hash)
       LIBRDF_FATAL1(world, LIBRDF_FROM_URI, "Failed to create URI hash from factory");
     
-    if(librdf_hash_open(world->uris_hash, NULL, 0, 1, 1, NULL))
-      LIBRDF_FATAL1(world, LIBRDF_FROM_URI, "Failed to open URI hash");
-
     /* remember to free it later */
     world->uris_hash_allocated_here=1;
+
+    if(librdf_hash_open(world->uris_hash, NULL, 0, 1, 1, NULL))
+      LIBRDF_FATAL1(world, LIBRDF_FROM_URI, "Failed to open URI hash");
   }
 }
 
