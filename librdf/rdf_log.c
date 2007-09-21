@@ -144,9 +144,6 @@ librdf_log_simple(librdf_world* world, int code,
   fputs(" - ", stderr);
   fputs((message ? message : "(no message)"), stderr);
   fputc('\n', stderr);
-
-  if(level >= LIBRDF_LOG_FATAL)
-    abort();
 }
 
 
@@ -207,7 +204,7 @@ librdf_fatal(librdf_world* world, int facility,
   length++; /* add the length 1 passed in */
   buffer=(char*)LIBRDF_MALLOC(cstring, length+1); /* for \0 */
   if(!buffer)
-    return;
+    abort();
   
   snprintf(buffer, length, "%s:%d:%s: fatal error: %s", 
            file, line, function, message);
