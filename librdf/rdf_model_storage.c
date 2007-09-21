@@ -551,7 +551,7 @@ librdf_model_storage_sync(librdf_model* model)
 
 
 /**
- * librdf_model_storage_get_Storage:
+ * librdf_model_storage_get_storage:
  * @model: #librdf_model object
  *
  * Get the storage for the model.
