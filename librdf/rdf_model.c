@@ -90,8 +90,10 @@ librdf_model_supports_contexts(librdf_model* model) {
 static void
 librdf_free_model_factory(librdf_model_factory* factory)
 {
-  LIBRDF_FREE(librdf_model_factory, factory->name);
-  LIBRDF_FREE(librdf_model_factory, factory->label);
+  if(factory->name)
+    LIBRDF_FREE(librdf_model_factory, factory->name);
+  if(factory->label)
+    LIBRDF_FREE(librdf_model_factory, factory->label);
   LIBRDF_FREE(librdf_model_factory, factory);
 }
 
@@ -122,8 +124,11 @@ librdf_model_register_factory(librdf_world *world,
   LIBRDF_DEBUG2("Received registration for model %s\n", name);
 #endif
 
-  if(!world->models)
+  if(!world->models) {
     world->models=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_model_factory, NULL);
+    if(!world->models)
+      LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
+  }
   
   for(i=0;
       (h=(librdf_model_factory*)raptor_sequence_get_at(world->models, i));
@@ -143,7 +148,7 @@ librdf_model_register_factory(librdf_world *world,
 
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
-    LIBRDF_FREE(librdf_model, model);
+    librdf_free_model_factory(model);
     LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
   }
   strcpy(name_copy, name);
@@ -151,11 +156,13 @@ librdf_model_register_factory(librdf_world *world,
         
   label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
   if(!label_copy) {
-    LIBRDF_FREE(librdf_model, model);
+    librdf_free_model_factory(model);
     LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
   }
   strcpy(label_copy, label);
   model->label=label_copy;
+
+  raptor_sequence_push(world->models, model);
 
   /* Call the model registration function on the new object */
   (*factory)(model);
@@ -163,8 +170,6 @@ librdf_model_register_factory(librdf_world *world,
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, model->context_length);
 #endif
-
-  raptor_sequence_push(world->models, model);
 }
 
 
@@ -325,8 +330,9 @@ librdf_new_model_with_options(librdf_world *world,
     
   model->context=LIBRDF_MALLOC(data, model->factory->context_length);
 
-  if(model->context && model->factory->create(model, storage, options)) {
-    LIBRDF_FREE(data, model->context);
+  if(!model->context || model->factory->create(model, storage, options)) {
+    if(model->context)
+      LIBRDF_FREE(data, model->context);
     LIBRDF_FREE(librdf_model, model);
     return NULL;
   }
