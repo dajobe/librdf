@@ -172,14 +172,15 @@ librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
     world->hash_datums_list=datum->next;
   } else {
     datum=(librdf_hash_datum*)LIBRDF_CALLOC(librdf_hash_datum, 1, sizeof(librdf_hash_datum));
-    datum->world=world;
+    if(datum)
+      datum->world=world;
   }
   
-
   if(datum) {
     datum->data=data;
     datum->size=size;
   }
+
   return datum;
 }
 
@@ -359,7 +360,10 @@ librdf_new_hash_from_factory(librdf_world *world,
   h->factory=factory;
 
   /* call factory constructor */
-  h->factory->create(h, h->context);
+  if(h->factory->create(h, h->context)) {
+    librdf_free_hash(h);
+    return NULL;
+  }
   
   return h;
 }
