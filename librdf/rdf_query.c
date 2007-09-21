@@ -88,6 +88,21 @@ librdf_finish_query(librdf_world *world)
 
 /* helper functions */
 
+/*
+ * librdf_free_query_factory - delete a query factory
+ */
+static void
+librdf_free_query_factory(librdf_query_factory *factory)
+{
+  if(factory) {
+    if(factory->name)
+      LIBRDF_FREE(librdf_query_factory, factory->name);
+    if(factory->uri)
+      librdf_free_uri(factory->uri);
+    LIBRDF_FREE(librdf_query_factory, factory);
+  }
+}
+
 
 /*
  * librdf_delete_query_factories - helper function to delete all the registered query factories
@@ -99,10 +114,7 @@ librdf_delete_query_factories(librdf_world *world)
   
   for(factory=world->query_factories; factory; factory=next) {
     next=factory->next;
-    LIBRDF_FREE(librdf_query_factory, factory->name);
-    if(factory->uri)
-      librdf_free_uri(factory->uri);
-    LIBRDF_FREE(librdf_query_factory, factory);
+    librdf_free_query_factory(factory);
   }
   world->query_factories=NULL;
 }
@@ -138,32 +150,26 @@ librdf_query_register_factory(librdf_world *world, const char *name,
   query=(librdf_query_factory*)LIBRDF_CALLOC(librdf_query_factory, 1,
                                              sizeof(librdf_query_factory));
   if(!query)
-    LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
+    goto tidy_noquery;
 
   name_length=strlen(name);
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, name_length+1, 1);
-  if(!name_copy) {
-    LIBRDF_FREE(librdf_query, query);
-    LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
-  }
+  if(!name_copy)
+    goto tidy;
   query->name=strcpy(name_copy, name);
   if(uri_string) {
     librdf_uri *uri;
 
     uri=librdf_new_uri(world, uri_string);
-    if(!uri) {
-      LIBRDF_FREE(cstring, name_copy); 
-      LIBRDF_FREE(librdf_query, query);
-      LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
-    }
+    if(!uri)
+      goto tidy;
     query->uri=uri;
   }
         
   for(h = world->query_factories; h; h = h->next ) {
     if(!strcmp(h->name, name_copy)) {
-      LIBRDF_FREE(cstring, name_copy); 
-      LIBRDF_FREE(librdf_query, query);
+      librdf_free_query_factory(query);
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
                  "query language %s already registered", h->name);
@@ -180,6 +186,13 @@ librdf_query_register_factory(librdf_world *world, const char *name,
   
   query->next = world->query_factories;
   world->query_factories = query;
+
+  return;
+
+  tidy:
+  librdf_free_query_factory(query);
+  tidy_noquery:
+  LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
 }
 
 
