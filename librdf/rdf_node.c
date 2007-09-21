@@ -749,9 +749,9 @@ librdf_free_node(librdf_node *node)
     case LIBRDF_NODE_TYPE_RESOURCE:
       key.data=&node->value.resource.uri;
       key.size=sizeof(librdf_uri*);
-      if(librdf_hash_delete_all(node->world->nodes_hash[H_RESOURCE], &key) )
-        LIBRDF_FATAL1(node->world, LIBRDF_FROM_NODE, "Hash deletion failed");
-
+      /* Hash deletion fails only if the key is not found.
+         This is not a fatal error so do not check for return value. */
+      librdf_hash_delete_all(node->world->nodes_hash[H_RESOURCE], &key);
       librdf_free_uri(node->value.resource.uri);
       break;
       
@@ -759,8 +759,7 @@ librdf_free_node(librdf_node *node)
       if(node->value.literal.key) {
         key.data=node->value.literal.key;
         key.size=node->value.literal.size;
-        if(librdf_hash_delete_all(node->world->nodes_hash[H_LITERAL], &key) )
-          LIBRDF_FATAL1(node->world, LIBRDF_FROM_NODE, "Hash deletion failed");
+        librdf_hash_delete_all(node->world->nodes_hash[H_LITERAL], &key); /* see above */
         LIBRDF_FREE(cstring, node->value.literal.key);
       }
       
@@ -775,9 +774,7 @@ librdf_free_node(librdf_node *node)
     case LIBRDF_NODE_TYPE_BLANK:
       key.data=node->value.blank.identifier;
       key.size=node->value.blank.identifier_len;
-      if(librdf_hash_delete_all(node->world->nodes_hash[H_BLANK], &key) )
-        LIBRDF_FATAL1(node->world, LIBRDF_FROM_NODE, "Hash deletion failed");
-
+      librdf_hash_delete_all(node->world->nodes_hash[H_BLANK], &key); /* see above */
       if(node->value.blank.identifier != NULL)
         LIBRDF_FREE(cstring, node->value.blank.identifier);
       break;
