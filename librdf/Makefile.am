@@ -146,7 +146,7 @@ endif
 
 EXTRA_DIST += mysql-v1.ttl mysql-v2.ttl
 
-local_tests=rdf_storage_sql_test
+local_tests=rdf_storage_sql_test$(EXEEXT)
 
 EXTRA_PROGRAMS=$(local_tests)
 
@@ -198,7 +198,7 @@ rdf_storage_sql_test_SOURCES = rdf_storage_sql_test.c
 rdf_storage_sql_test_LDADD = librdf.la
 
 
-run-local-tests: rdf_storage_sql_test$(EXTEXE)
+run-local-tests: rdf_storage_sql_test$(EXEEXT)
 	@tests="rdf_storage_sql_test"; \
 	status=0; \
 	for tst in $$tests; do \
