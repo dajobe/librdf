@@ -142,6 +142,9 @@ librdf_new_world(void) {
 
   world=(librdf_world*)LIBRDF_CALLOC(librdf_world, sizeof(librdf_world), 1);
 
+  if(!world)
+    return NULL;
+
 #ifdef HAVE_GETTIMEOFDAY
   if(!gettimeofday(&tv, &tz)) {
     world->genid_base=tv.tv_sec;
