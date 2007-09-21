@@ -266,8 +266,11 @@ librdf_serializer_raptor_serialize_stream_to_file_handle(void *context,
   /* start the serialize */
   rc=raptor_serialize_start_to_file_handle(scontext->rdf_serializer, 
                                            (raptor_uri*)base_uri, handle);
-  if(rc)
+  if(rc) {
+    /* free up resources on error */
+    raptor_serialize_end(scontext->rdf_serializer);
     return 1;
+  }
 
   scontext->errors=0;
   scontext->warnings=0;
