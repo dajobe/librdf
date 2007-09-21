@@ -229,7 +229,7 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 librdf_uri*
 librdf_new_uri_from_uri_local_name (librdf_uri* old_uri, 
                                     const unsigned char *local_name) {
-  int len=old_uri->string_length + strlen((const char*)local_name) +1 ; /* +1 for \0 */
+  int len;
   unsigned char *new_string;
   librdf_uri* new_uri;
 
@@ -238,6 +238,8 @@ librdf_new_uri_from_uri_local_name (librdf_uri* old_uri,
   if(!old_uri)
     return NULL;
   
+  len=old_uri->string_length + strlen((const char*)local_name) +1 ; /* +1 for \0 */
+
   new_string=(unsigned char*)LIBRDF_CALLOC(cstring, 1, len);
   if(!new_string)
     return NULL;
