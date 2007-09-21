@@ -126,28 +126,27 @@ librdf_serializer_register_factory(librdf_world *world,
   LIBRDF_DEBUG2("Received registration for serializer %s\n", name);
 #endif
   
-  if(!world->serializers)
+  if(!world->serializers) {
     world->serializers=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_serializer_factory, NULL);
+    if(!world->serializers)
+      goto tidy_noserializer;
+  }
   
   serializer=(librdf_serializer_factory*)LIBRDF_CALLOC(librdf_serializer_factory, 1,
                                                        sizeof(librdf_serializer_factory));
   if(!serializer)
-    LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
+    goto tidy_noserializer;
   
   name_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
-  if(!name_copy) {
-    librdf_free_serializer_factory(serializer);
-    LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
-  }
+  if(!name_copy)
+    goto tidy;
   strcpy(name_copy, name);
   serializer->name=name_copy;
 
   if(label) {
     label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
-    if(!label_copy) {
-      librdf_free_serializer_factory(serializer);
-      LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
-    }
+    if(!label_copy)
+      goto tidy;
     strcpy(label_copy, label);
     serializer->label=label_copy;
   }
@@ -156,10 +155,8 @@ librdf_serializer_register_factory(librdf_world *world,
   if(mime_type) {
     char *mime_type_copy;
     mime_type_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
-    if(!mime_type_copy) {
-      librdf_free_serializer_factory(serializer);
-      LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
-    }
+    if(!mime_type_copy)
+      goto tidy;
     strcpy(mime_type_copy, mime_type);
     serializer->mime_type=mime_type_copy;
   }
@@ -169,23 +166,27 @@ librdf_serializer_register_factory(librdf_world *world,
     librdf_uri *uri;
 
     uri=librdf_new_uri(world, uri_string);
-    if(!uri) {
-      librdf_free_serializer_factory(serializer);
-      LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
-    }
+    if(!uri)
+      goto tidy;
     serializer->type_uri=uri;
   }
   
+  if(raptor_sequence_push(world->serializers, serializer)) 
+    goto tidy_noserializer; /* on error, the serializer was already freed by the sequence */
         
   /* Call the serializer registration function on the new object */
   (*factory)(serializer);
 
-
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, serializer->context_length);
 #endif
-  
-  raptor_sequence_push(world->serializers, serializer);
+
+  return;
+
+  tidy:
+  librdf_free_serializer_factory(serializer);
+  tidy_noserializer:
+  LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
 }
 
 
@@ -362,7 +363,10 @@ librdf_new_serializer_from_factory(librdf_world *world,
   d->factory=factory;
 
   if(factory->init)
-    factory->init(d, d->context);
+    if(factory->init(d, d->context)) {
+      librdf_free_serializer(d);
+      return NULL;
+    }
 
   return d;
 }
