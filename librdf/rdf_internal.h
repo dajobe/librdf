@@ -59,7 +59,9 @@ void librdf_system_free(void *ptr);
 #define SYSTEM_FREE(ptr)   free(ptr)
 #endif
 
+#ifndef LIBRDF_ASSERT_DIE
 #define LIBRDF_ASSERT_DIE abort();
+#endif
 
 #else
 /* DEBUGGING TURNED OFF */
@@ -73,7 +75,9 @@ void librdf_system_free(void *ptr);
 #define SYSTEM_MALLOC(size)   malloc(size)
 #define SYSTEM_FREE(ptr)   free(ptr)
 
+#ifndef LIBRDF_ASSERT_DIE
 #define LIBRDF_ASSERT_DIE
+#endif
 
 #endif
 
