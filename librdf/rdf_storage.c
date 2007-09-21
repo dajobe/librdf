@@ -120,8 +120,10 @@ librdf_finish_storage(librdf_world *world)
 static void
 librdf_free_storage_factory(librdf_storage_factory* factory)
 {
-  LIBRDF_FREE(librdf_storage_factory, factory->name);
-  LIBRDF_FREE(librdf_storage_factory, factory->label);
+  if(factory->name)
+    LIBRDF_FREE(librdf_storage_factory, factory->name);
+  if(factory->label)
+    LIBRDF_FREE(librdf_storage_factory, factory->label);
   LIBRDF_FREE(librdf_storage_factory, factory);
 }
 
@@ -154,8 +156,12 @@ librdf_storage_register_factory(librdf_world* world,
   LIBRDF_DEBUG2("Received registration for storage %s\n", name);
 #endif
   
-  if(!world->storages)
+  if(!world->storages) {
     world->storages=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_storage_factory, NULL);
+    if(!world->storages) {
+      LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
+    }
+  }
   
   for(i=0;
       (h=(librdf_storage_factory*)raptor_sequence_get_at(world->storages, i));
@@ -175,7 +181,7 @@ librdf_storage_register_factory(librdf_world* world,
 
   name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
   if(!name_copy) {
-    LIBRDF_FREE(librdf_storage, storage);
+    librdf_free_storage_factory(storage);
     LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
   }
   strcpy(name_copy, name);
@@ -183,11 +189,13 @@ librdf_storage_register_factory(librdf_world* world,
 
   label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
   if(!label_copy) {
-    LIBRDF_FREE(librdf_storage, storage);
+    librdf_free_storage_factory(storage);
     LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
   }
   strcpy(label_copy, label);
   storage->label=label_copy;
+
+  raptor_sequence_push(world->storages, storage);
         
   /* Call the storage registration function on the new object */
   (*factory)(storage);
@@ -195,8 +203,6 @@ librdf_storage_register_factory(librdf_world* world,
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, storage->context_length);
 #endif
-
-  raptor_sequence_push(world->storages, storage);
 }
 
 
@@ -466,8 +472,10 @@ librdf_new_storage_from_factory(librdf_world *world,
     return NULL;
   }
   
-
   storage->world=world;
+
+  /* set usage to 1 early to allow cleanup with librdf_free_storage() */
+  storage->usage=1; 
   
   storage->context=(char*)LIBRDF_CALLOC(librdf_storage_context, 1,
                                         factory->context_length);
@@ -483,8 +491,6 @@ librdf_new_storage_from_factory(librdf_world *world,
     librdf_free_storage(storage);
     return NULL;
   }
-  
-  storage->usage=1;
   
   return storage;
 }
