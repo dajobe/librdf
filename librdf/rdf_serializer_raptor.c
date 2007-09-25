@@ -187,7 +187,7 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
   if(!librdf_node_is_resource(predicate)) {
     librdf_log(statement->world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
-               "Do not know how to print triple predicate type %d",
+               "Do not know how to serialize triple predicate type %d",
                librdf_node_get_type(predicate));
     return 1;
   }
@@ -220,7 +220,7 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
     default:
       librdf_log(statement->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
-                 "Do not know how to print triple object type %d",
+                 "Do not know how to serialize triple object type %d",
                  librdf_node_get_type(object));
       return 1;
   }
@@ -278,16 +278,19 @@ librdf_serializer_raptor_serialize_stream_to_file_handle(void *context,
                                       librdf_serializer_raptor_error_handler);
   raptor_serializer_set_warning_handler(scontext->rdf_serializer, scontext, 
                                         librdf_serializer_raptor_warning_handler);
-    
+
+  rc=0;
   while(!librdf_stream_end(stream)) {
     librdf_statement *statement=librdf_stream_get_object(stream);
-    librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
-                                                 statement);
+    rc=librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
+                                                    statement);
+    if(rc)
+      break;
     librdf_stream_next(stream);
   }
   raptor_serialize_end(scontext->rdf_serializer);
 
-  return 0;
+  return rc;
 }
 
 
