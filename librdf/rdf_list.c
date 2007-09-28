@@ -562,6 +562,9 @@ librdf_list_iterator_finished(void* iterator)
 {
   librdf_list_iterator_context* context=(librdf_list_iterator_context*)iterator;
 
+  if(!context)
+    return;
+  
   librdf_list_remove_iterator_context(context->list, context);
 
   LIBRDF_FREE(librdf_list_iterator_context, context);
