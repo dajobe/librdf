@@ -122,8 +122,11 @@ librdf_parser_register_factory(librdf_world *world,
   LIBRDF_DEBUG2("Received registration for parser %s\n", name);
 #endif
   
-  if(!world->parsers)
+  if(!world->parsers) {
     world->parsers=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_parser_factory, NULL);
+    if(!world->parsers)
+      LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
+  }
 
   parser=(librdf_parser_factory*)LIBRDF_CALLOC(librdf_parser_factory, 1,
 					       sizeof(librdf_parser_factory));
@@ -172,16 +175,14 @@ librdf_parser_register_factory(librdf_world *world,
     parser->type_uri=uri;
   }
   
+  raptor_sequence_push(world->parsers, parser);
         
   /* Call the parser registration function on the new object */
   (*factory)(parser);
 
-
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, parser->context_length);
 #endif
-  
-  raptor_sequence_push(world->parsers, parser);
 }
 
 
@@ -359,8 +360,11 @@ librdf_new_parser_from_factory(librdf_world *world,
   
   d->factory=factory;
 
-  if(factory->init)
-    factory->init(d, d->context);
+  if(factory->init && factory->init(d, d->context)) {
+    /* factory init failed - clean up */
+    librdf_free_parser(d);
+    d=NULL;
+  }
 
   return d;
 }
