@@ -429,16 +429,22 @@ librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_sto
 {
   librdf_storage_hashes_context *old_context=(librdf_storage_hashes_context*)old_storage->context;
   librdf_storage_hashes_context *new_context=(librdf_storage_hashes_context*)new_storage->context;
-  librdf_hash *options;
-  
-  new_context->name=librdf_heuristic_gen_name(old_context->name);
-  if(!new_context->name)
-    return 1;
+  int i;
 
+  /* Copy old context name if any */
+  if(old_context->name) {  
+    new_context->name=librdf_heuristic_gen_name(old_context->name);
+    if(!new_context->name)
+      return 1;
+  }
+  
+  /* FIXME: new_context needs further init e.g. names array */
+  
   /* This is always a copy of an in-memory hash */
-  options=librdf_new_hash_from_hash(old_context->options);
-  if(!options) {
-    LIBRDF_FREE(cstring, new_context->name);
+  new_context->options=librdf_new_hash_from_hash(old_context->options);
+  if(!new_context->options) {
+    if(new_context->name)
+      LIBRDF_FREE(cstring, new_context->name);
     return 1;
   }
 
@@ -449,9 +455,10 @@ librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_sto
                                        old_context->mode,
                                        old_context->is_writable,
                                        old_context->is_new,
-                                       options)) {
-    librdf_free_hash(options);
-    LIBRDF_FREE(cstring, new_context->name);
+                                       new_context->options)) {
+    librdf_free_hash(new_context->options);
+    if(new_context->name)
+      LIBRDF_FREE(cstring, new_context->name);
     return 1;
   }
 
@@ -487,12 +494,6 @@ librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
       break;
   }
 
-  /* on success or failure - don't need the passed in options any more */
-  if(context->options) {
-    librdf_free_hash(context->options);
-    context->options=NULL;
-  }
-  
   return result;
 }
 
