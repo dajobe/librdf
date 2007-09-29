@@ -148,6 +148,8 @@ librdf_heuristic_gen_name(const char *name)
   size_t len;
   size_t offset;
   long l=-1L;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, cstring, NULL);
 
   /* Move to last character of name */
   len=strlen(name);
