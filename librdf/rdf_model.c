@@ -1863,6 +1863,7 @@ int main(int argc, char *argv[]);
 "  </rdf:Description>\n" \
 "</rdf:RDF>"
 
+int test_model_cloning(char const *program, librdf_world *);
 
 int
 main(int argc, char *argv[]) 
@@ -1893,6 +1894,11 @@ main(int argc, char *argv[])
   int remove_count=0;
 
   librdf_world_open(world);
+
+#if 0 /* Test model cloning - set to 1 to enable */
+  if(test_model_cloning(program, world))
+    return(1);
+#endif
   
   fprintf(stderr, "%s: Creating storage\n", program);
   if(1) {
@@ -2237,6 +2243,60 @@ main(int argc, char *argv[])
   
   /* keep gcc -Wall happy */
   return(0);
+}
+
+int test_model_cloning(char const *program, librdf_world *world) {
+  librdf_storage *storage;
+  librdf_model *model1;
+  librdf_model *model2;
+  librdf_model *model3;
+
+  fprintf(stderr, "%s: Testing model cloning\n", program);
+
+  fprintf(stderr, "%s: Creating hashes storage for cloning\n", program);
+  /* only the hashes storage supports cloning */
+  storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
+  if(!storage) {
+    fprintf(stderr, "%s: Failed to create new hashes storage\n", program);    
+    return 1;
+  }
+  
+  fprintf(stderr, "%s: Creating new model for cloning\n", program);
+  model1=librdf_new_model(world, storage, NULL);
+  if(!model1) {
+    fprintf(stderr, "%s: Failed to create new model\n", program);
+    /* ok to leak memory */    
+    return 1;
+  }
+  
+  fprintf(stderr, "%s: Cloning model\n", program);
+  model2=librdf_new_model_from_model(model1);
+  if(!model2) {
+    fprintf(stderr, "%s: Failed to clone model\n", program);
+    /* ok to leak memory */    
+    return 1;
+  }
+
+  /* Free original model now so we can test whether the clone is self-sufficient */
+  fprintf(stderr, "%s: Freeing original model\n", program);
+  librdf_free_model(model1);
+
+  fprintf(stderr, "%s: Cloning cloned model\n", program);
+  model3=librdf_new_model_from_model(model1);
+  if(!model3) {
+    fprintf(stderr, "%s: Failed to clone cloned model\n", program);
+    /* ok to leak memory */    
+    return 1;
+  }
+
+  fprintf(stderr, "%s: Freeing cloned models\n", program);  
+  librdf_free_model(model3);
+  librdf_free_model(model2);
+  
+  fprintf(stderr, "%s: Freeing hashes storage\n", program);  
+  librdf_free_storage(storage);
+  
+  return 0;
 }
 
 #endif
