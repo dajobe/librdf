@@ -372,8 +372,10 @@ librdf_new_model_from_model(librdf_model* model)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
 
   new_model=model->factory->clone(model);
-  new_model->supports_contexts=model->supports_contexts;
-  new_model->usage=1;
+  if(new_model) {
+    new_model->supports_contexts=model->supports_contexts;
+    new_model->usage=1;
+  }
   return new_model;
 }
 
