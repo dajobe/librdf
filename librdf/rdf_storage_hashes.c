@@ -243,6 +243,8 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
   int index_contexts=0;
   int hash_count=0;
   
+  context->name=(char*)name;
+  
   context->hash_type=hash_type;
   context->db_dir=db_dir;
   context->indexes=indexes;
@@ -271,12 +273,17 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
 
   /* Start allocating the arrays */
   context->hashes=(librdf_hash**)LIBRDF_CALLOC(librdf_hash, hash_count, sizeof(librdf_hash*));
-  if(!context->hashes)
+  if(!context->hashes) {
+    if(context->name)
+      LIBRDF_FREE(cstring, context->name);
     return 1;
+  }
 
   context->hash_descriptions=(librdf_hash_descriptor**)LIBRDF_CALLOC(librdf_hash_descriptor, hash_count, sizeof(librdf_hash_descriptor*));
   if(!context->hash_descriptions) {
     LIBRDF_FREE(librdf_hash, context->hashes);
+    if(context->name)
+      LIBRDF_FREE(cstring, context->name);
     return 1;
   }
   
@@ -284,6 +291,8 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
   if(!context->names) {
     LIBRDF_FREE(librdf_hash, context->hashes);
     LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions);
+    if(context->name)
+      LIBRDF_FREE(cstring, context->name);
     return 1;
   }
   
@@ -350,6 +359,7 @@ librdf_storage_hashes_init(librdf_storage* storage, const char *name,
 {
   char *hash_type, *db_dir, *indexes;
   int mode, is_writable, is_new;
+  char *name_copy=NULL;
   
   if(!options)
     return 1;
@@ -370,9 +380,15 @@ librdf_storage_hashes_init(librdf_storage* storage, const char *name,
   
   if((is_new=librdf_hash_get_as_boolean(options, "new"))<0)
     is_new=0; /* default is NOT NEW */
-  
 
-  return librdf_storage_hashes_init_common(storage, name, 
+  if(name) {
+    name_copy = (char *)LIBRDF_MALLOC(cstring, strlen(name)+1);
+    if(!name_copy)
+      return 1;
+    strcpy(name_copy, name);
+  }
+
+  return librdf_storage_hashes_init_common(storage, name_copy, 
                                            hash_type, db_dir, indexes,
                                            mode, is_writable, is_new, 
                                            options);
@@ -421,6 +437,8 @@ librdf_storage_hashes_terminate(librdf_storage* storage)
   if(context->value_buffer)
     LIBRDF_FREE(data, context->value_buffer);
 
+  if(context->name)
+    LIBRDF_FREE(cstring, context->name);
 }
 
 
@@ -429,16 +447,13 @@ librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_sto
 {
   librdf_storage_hashes_context *old_context=(librdf_storage_hashes_context*)old_storage->context;
   librdf_storage_hashes_context *new_context=(librdf_storage_hashes_context*)new_storage->context;
-  int i;
 
-  /* Copy old context name if any */
+  /* Bump up old context name if any */
   if(old_context->name) {  
     new_context->name=librdf_heuristic_gen_name(old_context->name);
     if(!new_context->name)
       return 1;
   }
-  
-  /* FIXME: new_context needs further init e.g. names array */
   
   /* This is always a copy of an in-memory hash */
   new_context->options=librdf_new_hash_from_hash(old_context->options);
