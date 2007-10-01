@@ -404,6 +404,9 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
   if(!new_storage)
     return NULL;
   
+  /* set usage to 1 early to allow cleanup with librdf_free_storage() */
+  new_storage->usage=1;
+
   new_storage->context=(char*)LIBRDF_CALLOC(librdf_storage_context, 1,
                                             old_storage->factory->context_length);
   if(!new_storage->context) {
@@ -426,9 +429,7 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
     librdf_free_storage(new_storage);
     return NULL;
   }
-
-  new_storage->usage=1;
-  
+ 
   return new_storage;
 }
 
