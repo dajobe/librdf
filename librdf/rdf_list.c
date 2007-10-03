@@ -502,11 +502,13 @@ librdf_list_get_iterator(librdf_list* list)
                                librdf_list_iterator_get_method,
                                librdf_list_iterator_finished);
 
+  librdf_list_add_iterator_context(list, context);
   if(iterator) {
     context->iterator=iterator;
-    librdf_list_add_iterator_context(list, context);
-  } else
-    librdf_list_iterator_finished(iterator);
+  } else {
+    /* librdf_list_iterator_finished() calls librdf_list_remove_iterator_context() */
+    librdf_list_iterator_finished(context);
+  }
     
   return iterator;
 }
