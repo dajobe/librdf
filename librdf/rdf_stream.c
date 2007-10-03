@@ -331,13 +331,19 @@ librdf_stream_add_map(librdf_stream* stream,
   
   if(!stream->map_list) {
     stream->map_list=librdf_new_list(stream->world);
-    if(!stream->map_list)
+    if(!stream->map_list) {
+      if(free_context && map_context)
+        (*free_context)(map_context);
       return 1;
+    }
   }
 
   map=(librdf_stream_map*)LIBRDF_CALLOC(librdf_stream_map, sizeof(librdf_stream_map), 1);
-  if(!map)
+  if(!map) {
+    if(free_context && map_context)
+      (*free_context)(map_context);
     return 1;
+  }
 
   map->fn=map_function;
   map->free_context=free_context;
@@ -345,6 +351,8 @@ librdf_stream_add_map(librdf_stream* stream,
 
   if(librdf_list_add(stream->map_list, map)) {
     LIBRDF_FREE(librdf_stream_map, map);
+    if(free_context && map_context)
+      (*free_context)(map_context);
     return 1;
   }
   
