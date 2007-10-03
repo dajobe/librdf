@@ -456,6 +456,9 @@ librdf_storage_list_find_statements(librdf_storage* storage, librdf_statement* s
   if(stream)
     librdf_stream_add_map(stream, &librdf_stream_statement_find_map,
                           (librdf_stream_map_free_context_handler)&librdf_free_statement, (void*)statement);
+  else
+    librdf_free_statement(statement);
+
   return stream;
 }
 
