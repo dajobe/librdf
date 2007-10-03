@@ -349,8 +349,10 @@ librdf_storage_list_serialise(librdf_storage* storage)
 
   scontext->index_contexts=context->index_contexts;
   scontext->iterator=librdf_list_get_iterator(context->list);
-  if(!scontext->iterator)
+  if(!scontext->iterator) {
+    LIBRDF_FREE(librdf_storage_list_serialise_stream_context, scontext);
     return librdf_new_empty_stream(storage->world);
+  }
     
   
   scontext->storage=storage;
