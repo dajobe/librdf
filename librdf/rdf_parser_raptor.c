@@ -179,6 +179,7 @@ librdf_parser_raptor_new_statement_handler(void *context,
 #endif
 #endif
   librdf_world* world=scontext->pcontext->parser->world;
+  int rc;
 
   statement=librdf_new_statement(world);
   if(!statement)
@@ -192,6 +193,14 @@ librdf_parser_raptor_new_statement_handler(void *context,
     librdf_log(world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
                "Unknown Raptor subject identifier type %d", rstatement->subject_type);
+    librdf_free_statement(statement);
+    return;
+  }
+
+  if(!node) {
+    librdf_log(world,
+               0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
+               "Cannot create subject node");
     librdf_free_statement(statement);
     return;
   }
@@ -219,6 +228,14 @@ librdf_parser_raptor_new_statement_handler(void *context,
     return;
   }
 
+  if(!node) {
+    librdf_log(world,
+               0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
+               "Cannot create predicate node");
+    librdf_free_statement(statement);
+    return;
+  }
+
   librdf_statement_set_predicate(statement, node);
 
 
@@ -227,25 +244,21 @@ librdf_parser_raptor_new_statement_handler(void *context,
     int is_xml_literal = (rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL);
     librdf_uri *datatype_uri=(librdf_uri*)rstatement->object_literal_datatype;
     
-    if(is_xml_literal)
-      librdf_statement_set_object(statement,
-                                 librdf_new_node_from_literal(world,
-                                                              (const unsigned char*)rstatement->object,
-                                                              (const char*)rstatement->object_literal_language,
-                                                              is_xml_literal));
-    else
-      librdf_statement_set_object(statement,
-                                  librdf_new_node_from_typed_literal(world,
-                                                                     (const unsigned char*)rstatement->object,
-                                                                     (const char*)rstatement->object_literal_language,
-                                                                     datatype_uri));
-
+    if(is_xml_literal) {
+      node = librdf_new_node_from_literal(world,
+                                          (const unsigned char*)rstatement->object,
+                                          (const char*)rstatement->object_literal_language,
+                                          is_xml_literal);
+    } else {
+      node = librdf_new_node_from_typed_literal(world,
+                                                (const unsigned char*)rstatement->object,
+                                                (const char*)rstatement->object_literal_language,
+                                                datatype_uri);
+    }
   } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
     node=librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->object);
-    librdf_statement_set_object(statement, node);
   } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
     node=librdf_new_node_from_uri(world, (librdf_uri*)rstatement->object);
-    librdf_statement_set_object(statement, node);
   } else {
     librdf_log(world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
@@ -254,6 +267,15 @@ librdf_parser_raptor_new_statement_handler(void *context,
     return;
   }
 
+  if(!node) {
+    librdf_log(world,
+               0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
+               "Cannot create object node");
+    librdf_free_statement(statement);
+    return;
+  }
+
+  librdf_statement_set_object(statement, node);
 
 #ifdef LIBRDF_DEBUG
 #if LIBRDF_DEBUG > 1
@@ -264,10 +286,18 @@ librdf_parser_raptor_new_statement_handler(void *context,
 #endif
 
   if(scontext->model) {
-    librdf_model_add_statement(scontext->model, statement);
+    rc=librdf_model_add_statement(scontext->model, statement);
     librdf_free_statement(statement);
-  } else
-    librdf_list_add(scontext->statements, statement);
+  } else {
+    rc=librdf_list_add(scontext->statements, statement);
+    if(rc)
+      librdf_free_statement(statement);
+  }
+  if(rc) {
+    librdf_log(world,
+               0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
+               "Cannot add statement to model");
+  }
 }
 
 
