@@ -197,26 +197,17 @@ static int
 librdf_storage_list_close(librdf_storage* storage)
 {
   librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
-  int status=0;
   librdf_iterator* iterator;
   
   if(context->list) {
-    iterator=librdf_list_get_iterator(context->list);
-    status=(iterator != 0);
-    if(iterator) {
-      while(!librdf_iterator_end(iterator)) {
-        librdf_storage_list_node* sln=(librdf_storage_list_node*)librdf_iterator_get_object(iterator);
-        librdf_free_statement(sln->statement);
-        if(sln->context)
-          librdf_free_node(sln->context);
-        LIBRDF_FREE(librdf_storage_list_node, sln);
-
-        librdf_iterator_next(iterator);
-      }
-      librdf_free_iterator(iterator);
+    librdf_storage_list_node* sln;
+    while((sln=(librdf_storage_list_node*)librdf_list_pop(context->list))) {
+      librdf_free_statement(sln->statement);
+      if(sln->context)
+        librdf_free_node(sln->context);
+      LIBRDF_FREE(librdf_storage_list_node, sln);
     }
     librdf_free_list(context->list);
-
     context->list=NULL;
   }
 
@@ -227,7 +218,7 @@ librdf_storage_list_close(librdf_storage* storage)
     }
   }
   
-  return status;
+  return 0;
 }
 
 
