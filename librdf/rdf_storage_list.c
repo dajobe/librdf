@@ -197,7 +197,6 @@ static int
 librdf_storage_list_close(librdf_storage* storage)
 {
   librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
-  librdf_iterator* iterator;
   
   if(context->list) {
     librdf_storage_list_node* sln;
