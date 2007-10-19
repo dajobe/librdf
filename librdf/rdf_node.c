@@ -719,8 +719,7 @@ librdf_free_node(librdf_node *node)
   librdf_world *world;
 #endif
 
-  if(!node)
-    return;
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(node, librdf_node);
 
 #ifdef WITH_THREADS
   world = node->world;

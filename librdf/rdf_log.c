@@ -209,7 +209,7 @@ librdf_fatal(librdf_world* world, int facility,
   snprintf(buffer, length, "%s:%d:%s: fatal error: %s", 
            file, line, function, message);
   librdf_log(world, 0, LIBRDF_LOG_FATAL, (librdf_log_facility)facility, NULL,
-             buffer);
+             "%s", buffer);
   LIBRDF_FREE(cstring, buffer);
   abort();
 }
