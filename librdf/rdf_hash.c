@@ -464,16 +464,15 @@ librdf_new_hash_from_hash(librdf_hash* old_hash)
     hash->identifier=librdf_heuristic_gen_name(old_hash->identifier);
     if(!hash->identifier) {
       librdf_free_hash(hash);
-      LIBRDF_FREE(librdf_hash_context, hash->identifier);
       return NULL;
     }
   }
 
   if(hash->factory->clone(hash, hash->context, hash->identifier,
                           old_hash->context)) {
-    librdf_free_hash(hash);
     if(hash->identifier)
       LIBRDF_FREE(cstring, hash->identifier);
+    librdf_free_hash(hash);
     return NULL;
   }
 
