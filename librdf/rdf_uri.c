@@ -166,7 +166,7 @@ librdf_new_uri (librdf_world *world,
   new_uri->world=world;
   new_uri->string_length=length;
 
-  new_string=(unsigned char*)LIBRDF_MALLOC(librdf_uri, length+1);
+  new_string=(unsigned char*)LIBRDF_MALLOC(cstring, length+1);
   if(!new_string) {
     LIBRDF_FREE(librdf_uri, new_uri);
     new_uri=NULL;
@@ -185,7 +185,7 @@ librdf_new_uri (librdf_world *world,
   
   /* store in hash: URI-string => (librdf_uri*) */
   if(librdf_hash_put(world->uris_hash, &key, &value)) {
-    LIBRDF_FREE(librdf_uri, new_string);
+    LIBRDF_FREE(cstring, new_string);
     LIBRDF_FREE(librdf_uri, new_uri);
     new_uri=NULL;
   }
