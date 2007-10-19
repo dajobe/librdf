@@ -98,6 +98,46 @@ if MEMCMP
 librdf_la_SOURCES += memcmp.c
 endif
 
+plugindir = $(libdir)/redland
+
+if MODULAR_LIBRDF
+
+plugin_LTLIBRARIES =
+
+if STORAGE_TSTORE
+plugin_LTLIBRARIES += librdf_storage_tstore.la
+librdf_storage_tstore_la_SOURCES = rdf_storage_tstore.c
+librdf_storage_tstore_la_CPPFLAGS = @TSTORE_CPPFLAGS@
+librdf_storage_tstore_la_LIBADD = @TSTORE_LIBS@
+librdf_storage_tstore_la_LDFLAGS = -module -avoid-version
+endif
+
+if STORAGE_MYSQL
+plugin_LTLIBRARIES += librdf_storage_mysql.la
+librdf_storage_mysql_la_SOURCES = rdf_storage_mysql.c
+librdf_storage_mysql_la_CPPFLAGS = @MYSQL_CPPFLAGS@
+librdf_storage_mysql_la_LIBADD = @MYSQL_LIBS@
+librdf_storage_mysql_la_LDFLAGS = -module -avoid-version
+endif
+
+if STORAGE_SQLITE
+plugin_LTLIBRARIES += librdf_storage_sqlite.la
+librdf_storage_sqlite_la_SOURCES = rdf_storage_sqlite.c
+librdf_storage_sqlite_la_CPPFLAGS = @SQLITE_CPPFLAGS@
+librdf_storage_sqlite_la_LIBADD = @SQLITE_LIBS@
+librdf_storage_sqlite_la_LDFLAGS = -module -avoid-version
+endif
+
+if STORAGE_POSTGRESQL
+plugin_LTLIBRARIES += librdf_storage_postgresql.la
+librdf_storage_postgresql_la_SOURCES = rdf_storage_postgresql.c
+librdf_storage_postgresql_la_CPPFLAGS = @POSTGRESQL_CPPFLAGS@
+librdf_storage_postgresql_la_LIBADD = @POSTGRESQL_LIBS@
+librdf_storage_postgresql_la_LDFLAGS = -module -avoid-version
+endif
+
+else
+
 if STORAGE_FILE
 librdf_la_SOURCES += rdf_storage_file.c
 endif
@@ -116,6 +156,8 @@ endif
 
 if STORAGE_POSTGRESQL
 librdf_la_SOURCES += rdf_storage_postgresql.c
+endif
+
 endif
 
 librdf_la_LIBADD = \
@@ -187,6 +229,9 @@ STANDARD_CFLAGS=@STANDARD_CFLAGS@ $(MEM)
 AM_LDFLAGS=@LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ $(MEM_LIBS)
 
 AM_CPPFLAGS += -DPKGDATADIR="\"$(pkgdatadir)\""
+if MODULAR_LIBRDF
+AM_CFLAGS += -DLIBRDF_MODULE_DIR="\"$(libdir)/redland\""
+endif
 
 LOCAL_LIB_DIR=lib
 

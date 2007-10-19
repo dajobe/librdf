@@ -63,6 +63,13 @@ struct librdf_world_s
   /* Sequence of model factories */
   raptor_sequence* models;
   
+#ifdef MODULAR_LIBRDF
+  /* Sequence of storage modules */
+  raptor_sequence* storage_modules;
+  
+  int ltdl_opened;
+#endif
+  
   /* Sequence of storage factories */
   raptor_sequence* storages;
   

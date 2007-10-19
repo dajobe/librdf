@@ -77,7 +77,7 @@ main(int argc, char *argv[])
     if(config) {
       const char* value=config->values[DBCONFIG_CREATE_TABLE_BNODES];
       if(value)
-        fprintf(stderr, "%s: Bnode table declaration found of %d bytes size\n",
+        fprintf(stderr, "%s: Bnode table declaration found of %zu bytes size\n",
                 program, strlen(value));
       else {
         fprintf(stderr, "%s: FAILED Bnode table declaration not found\n",

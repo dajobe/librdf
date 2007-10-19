@@ -68,7 +68,7 @@ swig_min_vers=010324
 # Default program arguments
 automake_args="--add-missing"
 autoconf_args=
-libtoolize_args="--force --copy --automake"
+libtoolize_args="--ltdl --force --copy --automake"
 gtkdocize_args="--copy"
 aclocal_args=
 automake_args="--gnu --add-missing --force --copy"
@@ -246,6 +246,9 @@ done
 
 echo "$program: Dependencies satisfied"
 
+if test -d $SRCDIR/libltdl; then
+  touch $SRCDIR/libltdl/NO-AUTO-GEN
+fi
 
 config_dir=
 if test -d $CONFIG_DIR; then

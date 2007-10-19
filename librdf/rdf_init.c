@@ -64,6 +64,7 @@
 #include <unistd.h>
 #endif
 
+#include <ltdl.h>
 
 #ifndef STANDALONE
 
@@ -155,6 +156,14 @@ librdf_new_world(void) {
 #endif
   world->genid_counter=1;
   
+#ifdef MODULAR_LIBRDF
+  world->ltdl_opened = !(lt_dlinit());
+  if (world->ltdl_opened)
+    lt_dlsetsearchpath(LIBRDF_MODULE_DIR);
+  else
+    LIBRDF_DEBUG1("lt_dlinit() failed\n");
+#endif
+
   return world;
   
 }
@@ -206,6 +215,11 @@ librdf_free_world(librdf_world *world)
      SYSTEM_FREE(world->mutex);
      world->mutex = NULL;
    }
+#endif
+
+#ifdef MODULAR_LIBRDF
+  if (world->ltdl_opened)
+    lt_dlexit();
 #endif
 
   LIBRDF_FREE(librdf_world, world);

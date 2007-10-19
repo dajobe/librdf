@@ -104,6 +104,8 @@ m4_undefine([AC_PROG_CXX])
 m4_defun([AC_PROG_CXX],[])
 m4_undefine([AC_PROG_F77])
 m4_defun([AC_PROG_F77],[])
+AC_LIBTOOL_DLOPEN
+AC_LIBLTDL_INSTALLABLE
 AC_PROG_LIBTOOL
 
 # Find a tar command for 'make dist'
@@ -124,6 +126,12 @@ release_version=no
 AC_ARG_ENABLE(release, [  --enable-release        Turn on optimizations (for maintainer).  ], \
  if test "$enableval" = "yes"; then \
 	  release_version=yes
+fi;)	
+
+modular=no
+AC_ARG_ENABLE(modular, [  --enable-modular        Modularize storage backends.  ], \
+ if test "$enableval" = "yes"; then \
+	  modular=yes
 fi;)	
 
 dnl compiler checks
@@ -846,20 +854,20 @@ AM_CONDITIONAL(STORAGE_TSTORE, test $tstore_storage = yes)
 AM_CONDITIONAL(STORAGE_POSTGRESQL, test $postgresql_storage = yes)
 
 if test $mysql_storage  = yes; then
-  LIBRDF_LIBS="$LIBRDF_LIBS $mysql_libs"
-  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $mysql_cflags"
+  MYSQL_CPPFLAGS=`$MYSQL_CONFIG --cflags | sed -e "s/'//g" -e "s/-O[A-Za-z0-9]*//" `
+  MYSQL_LIBS="$LIBRDF_LIBS $mysql_libs"
 fi
 if test $sqlite_storage  = yes; then
-  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$SQLITE_CONFIG --cflags`"
-  LIBRDF_LIBS="$LIBRDF_LIBS `$SQLITE_CONFIG --libs`"
+  SQLITE_CPPFLAGS="$LIBRDF_CPPFLAGS `$SQLITE_CONFIG --cflags`"
+  SQLITE_LIBS="$LIBRDF_LIBS `$SQLITE_CONFIG --libs`"
 fi
 if test $tstore_storage  = yes; then
-  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS `$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
-  LIBRDF_LIBS="$LIBRDF_LIBS `$TSTORE_CONFIG --libs` `$PKG_CONFIG glib --libs`"
+  TSTORE_CPPFLAGS="$LIBRDF_CPPFLAGS `$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
+  TSTORE_LIBS="$LIBRDF_LIBS `$TSTORE_CONFIG --libs` `$PKG_CONFIG glib --libs`"
 fi
 if test $postgresql_storage  = yes; then
-  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS -I`$PG_CONFIG --includedir`"
-  LIBRDF_LIBS="$LIBRDF_LIBS -L`$PG_CONFIG --libdir` -lpq"
+  POSTGRESQL_CPPFLAGS="$LIBRDF_CPPFLAGS -I`$PG_CONFIG --includedir`"
+  POSTGRESQL_LIBS="$LIBRDF_LIBS -L`$PG_CONFIG --libdir` -lpq"
 fi
 
 
@@ -867,7 +875,25 @@ if test "$persistent_store" = no; then
   AC_MSG_WARN(No persistant storage is available or enabled)
 fi
 
+AC_SUBST(MYSQL_CPPFLAGS)
+AC_SUBST(MYSQL_LIBS)
+AC_SUBST(SQLITE_CPPFLAGS)
+AC_SUBST(SQLITE_LIBS)
+AC_SUBST(TSTORE_CPPFLAGS)
+AC_SUBST(TSTORE_LIBS)
+AC_SUBST(POSTGRESQL_CPPFLAGS)
+AC_SUBST(POSTGRESQL_LIBS)
 
+if test "$modular" = yes; then
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $INCLTDL"
+  LIBRDF_LIBS="$LIBRDF_LIBS $LIBLTDL"
+  AC_DEFINE(MODULAR_LIBRDF, 1, [Build storage backends as modules])
+else
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $MYSQL_CPPFLAGS $SQLITE_CPPFLAGS $TSTORE_CPPFLAGS $POSTGRESQL_CPPFLAGS"
+  LIBRDF_LIBS="$LIBRDF_LIBS $MYSQL_LIBS $SQLITE_LIBS $TSTORE_LIBS $POSTGRESQL_LIBS"
+fi
+
+AM_CONDITIONAL(MODULAR_LIBRDF, test $modular = yes)
 
 CPPFLAGS="$LIBRDF_CPPFLAGS"
 LDFLAGS="$LIBRDF_LDFLAGS"
@@ -1078,6 +1104,15 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 Redland build summary:
+])
+
+if test "$modular" = yes; then
+  AC_MSG_RESULT([  Using modular storage backends])
+else
+  AC_MSG_RESULT([  Using monolithic storage backends])
+fi
+
+AC_MSG_RESULT([
   Berkeley/Sleepycat DB   : $bdb_available
   Triple stores available : $storages_available
   Triple stores enabled   :$storages_enabled

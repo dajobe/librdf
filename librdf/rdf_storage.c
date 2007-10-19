@@ -41,6 +41,10 @@
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
 
+#ifdef MODULAR_LIBRDF
+#include <ltdl.h>
+#endif
+
 #include <redland.h>
 #include <rdf_storage.h>
 
@@ -58,6 +62,14 @@ static void librdf_storage_stream_to_node_iterator_finished(void* iterator);
 /* helper function for creating iterators for get sources, targets, arcs */
 static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage* storage, librdf_node* node1, librdf_node *node2, librdf_statement_part want);
 
+#ifdef MODULAR_LIBRDF
+/* helper function for dynamically loading storage modules */
+static lt_dlhandle
+librdf_load_storage_module(librdf_world *world,
+                           const char* lib_name,
+                           const char* init_func_name);
+#endif
+
 
 /**
  * librdf_init_storage:
@@ -72,26 +84,75 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
 void
 librdf_init_storage(librdf_world *world)
 {
+#ifdef MODULAR_LIBRDF
+  lt_dlhandle module = NULL;
+
+  if (!world->storage_modules)
+    world->storage_modules = raptor_new_sequence(
+        (raptor_sequence_free_handler *)lt_dlclose, NULL);
+#endif
+
   /* Always have storage memory - must always be the default storage */
   librdf_init_storage_list(world);
 
   /* Always have storage list, hashes, file implementations available */
   librdf_init_storage_hashes(world);
-#ifdef STORAGE_FILE
-  librdf_init_storage_file(world);
-#endif
 
-#ifdef STORAGE_MYSQL
-  librdf_init_storage_mysql(world);
-#endif
-#ifdef STORAGE_POSTGRESQL
-  librdf_init_storage_postgresql(world);
-#endif
-#ifdef STORAGE_TSTORE
-  librdf_init_storage_tstore(world);
-#endif
-#ifdef STORAGE_SQLITE
-  librdf_init_storage_sqlite(world);
+#ifdef MODULAR_LIBRDF
+
+  #ifdef STORAGE_FILE
+    module = librdf_load_storage_module(world, "librdf_storage_file",
+                                        "librdf_init_storage_file");
+    if (module)
+      raptor_sequence_push(world->storage_modules, module);
+  #endif
+  
+  #ifdef STORAGE_MYSQL
+    module = librdf_load_storage_module(world, "librdf_storage_mysql",
+                                        "librdf_init_storage_mysql");
+    if (module)
+      raptor_sequence_push(world->storage_modules, module);
+  #endif
+  
+  #ifdef STORAGE_POSTGRESQL
+    module = librdf_load_storage_module(world, "librdf_storage_postgresql",
+                                        "librdf_init_storage_postgresql");
+    if (module)
+      raptor_sequence_push(world->storage_modules, module);
+  #endif
+  
+  #ifdef STORAGE_TSTORE
+    module = librdf_load_storage_module(world, "librdf_storage_tstore",
+                                        "librdf_init_storage_tstore");
+    if (module)
+      raptor_sequence_push(world->storage_modules, module);
+  #endif
+  
+  #ifdef STORAGE_SQLITE
+    module = librdf_load_storage_module(world, "librdf_storage_sqlite",
+                                        "librdf_init_storage_sqlite");
+    if (module)
+      raptor_sequence_push(world->storage_modules, module);
+  #endif
+
+#else /* if !MODULAR_LIBRDF */
+  
+  #ifdef STORAGE_FILE
+    librdf_init_storage_file(world);
+  #endif
+  #ifdef STORAGE_MYSQL
+    librdf_init_storage_mysql(world);
+  #endif
+  #ifdef STORAGE_POSTGRESQL
+    librdf_init_storage_postgresql(world);
+  #endif
+  #ifdef STORAGE_TSTORE
+    librdf_init_storage_tstore(world);
+  #endif
+  #ifdef STORAGE_SQLITE
+    librdf_init_storage_sqlite(world);
+  #endif
+
 #endif
 }
 
@@ -106,6 +167,13 @@ librdf_init_storage(librdf_world *world)
 void
 librdf_finish_storage(librdf_world *world) 
 {
+#ifdef MODULAR_LIBRDF
+  if(world->storage_modules) {
+    raptor_free_sequence(world->storage_modules);
+    world->storage_modules=NULL;
+  }
+#endif
+  
   if(world->storages) {
     raptor_free_sequence(world->storages);
     world->storages=NULL;
@@ -127,6 +195,41 @@ librdf_free_storage_factory(librdf_storage_factory* factory)
   LIBRDF_FREE(librdf_storage_factory, factory);
 }
 
+
+#ifdef MODULAR_LIBRDF
+/**
+ * librdf_load_storage_module:
+ * @world: redland world object
+ * @lib_name: base name of shared library file
+ * @init_func_name: name of initialization function in library
+ *
+ * INTERNAL - Load and initialize/register a storage module
+ **/
+static lt_dlhandle
+librdf_load_storage_module(librdf_world *world,
+                           const char* lib_name,
+                           const char* init_func_name)
+{
+  typedef void init_func_t(librdf_world* world);
+  init_func_t* init;
+
+  lt_dlhandle module = lt_dlopenext(lib_name);
+  if (module) {
+    init = (init_func_t*)lt_dlsym(module, init_func_name);
+    if (init) {
+      init(world);
+    } else {
+      LIBRDF_DEBUG2("Failed to initialize storage module %s\n", lib_name);
+      lt_dlclose(module);
+      module = NULL;
+    }
+  } else {
+    LIBRDF_DEBUG2("Failed to load storage module %s\n", lib_name);
+  }
+
+  return module;
+}
+#endif
 
 
 /* class methods */
@@ -1728,37 +1831,68 @@ main(int argc, char *argv[])
   const char *program=librdf_basename((const char*)argv[0]);
   librdf_world *world;
   
+  /* triples of arguments to librdf_new_storage */
+  const char* const storages[] = {
+	"memory", NULL, "contexts='yes'",
+	"hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'",
+	"uri", "http://librdf.org/redland.rdf", NULL,
+    #ifdef STORAGE_FILE
+      "file", "file://../redland.rdf", NULL,
+    #endif
+    #ifdef STORAGE_MYSQL
+      "mysql", "test", "host='localhost',database='test'",
+    #endif
+    #ifdef STORAGE_POSTGRESQL
+      "postgresql", "test", "host='localhost',database='test'",
+    #endif
+    #ifdef STORAGE_TSTORE
+      "tstore", "test", "host='localhost',database='test'",
+    #endif
+    #ifdef STORAGE_SQLITE
+      "sqlite", "test", "new='yes'",
+    #endif
+	NULL, NULL, NULL
+  };
+
+  int test = 0;
+  int ret  = 0;
+  
   world=librdf_new_world();
   librdf_world_open(world);
-  
-  fprintf(stdout, "%s: Creating storage\n", program);
-  storage=librdf_new_storage(world, NULL, "test", NULL);
-  if(!storage) {
-    fprintf(stderr, "%s: Failed to create new storage\n", program);
-    return(1);
+
+  for ( ; storages[test] != NULL; test += 3) {
+
+    fprintf(stdout, "%s: Creating storage %s\n", program, storages[test]);
+    storage=librdf_new_storage(world, storages[test], storages[test+1], storages[test+2]);
+    if(!storage) {
+      fprintf(stderr, "%s: Failed to create new storage %s\n", program, storages[test]);
+	  ret = 1;
+	  continue;
+    }
+
+
+    fprintf(stdout, "%s: Opening storage\n", program);
+    if(librdf_storage_open(storage, NULL)) {
+      fprintf(stderr, "%s: Failed to open storage\n", program);
+	  ret = 1;
+	  continue;
+    }
+
+
+    /* Can do nothing here since need model and storage working */
+
+    fprintf(stdout, "%s: Closing storage\n", program);
+    librdf_storage_close(storage);
+
+    fprintf(stdout, "%s: Freeing storage\n", program);
+    librdf_free_storage(storage);
+
   }
-
-  
-  fprintf(stdout, "%s: Opening storage\n", program);
-  if(librdf_storage_open(storage, NULL)) {
-    fprintf(stderr, "%s: Failed to open storage\n", program);
-    return(1);
-  }
-
-
-  /* Can do nothing here since need model and storage working */
-
-  fprintf(stdout, "%s: Closing storage\n", program);
-  librdf_storage_close(storage);
-
-  fprintf(stdout, "%s: Freeing storage\n", program);
-  librdf_free_storage(storage);
   
 
   librdf_free_world(world);
   
-  /* keep gcc -Wall happy */
-  return(0);
+  return ret;
 }
 
 #endif
