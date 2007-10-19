@@ -642,10 +642,10 @@ librdf_model_add_typed_literal_statement(librdf_model* model,
  **/
 int
 librdf_model_add_string_literal_statement(librdf_model* model, 
-					  librdf_node* subject, 
-					  librdf_node* predicate, 
+                                          librdf_node* subject, 
+                                          librdf_node* predicate, 
                                           const unsigned char* literal,
-					  const char *xml_language,
+                                          const char *xml_language,
                                           int is_wf_xml)
 {
   librdf_node* object;
