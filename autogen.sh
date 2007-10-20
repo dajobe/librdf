@@ -52,6 +52,10 @@ fi
 if grep "^AC_CHECK_PROGS.SWIG" $confs >/dev/null; then
   programs="$programs swig"
 fi
+ltdl=
+if grep "^AC_LIBLTDL_" $confs >/dev/null; then
+  ltdl="--ltdl"
+fi
 
 # Some dependencies for autotools:
 # automake 1.9 requires autoconf 2.58
@@ -68,7 +72,7 @@ swig_min_vers=010324
 # Default program arguments
 automake_args="--add-missing"
 autoconf_args=
-libtoolize_args="--ltdl --force --copy --automake"
+libtoolize_args="$ltdl --force --copy --automake"
 gtkdocize_args="--copy"
 aclocal_args=
 automake_args="--gnu --add-missing --force --copy"
