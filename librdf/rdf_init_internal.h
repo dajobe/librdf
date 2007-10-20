@@ -63,13 +63,6 @@ struct librdf_world_s
   /* Sequence of model factories */
   raptor_sequence* models;
   
-#ifdef MODULAR_LIBRDF
-  /* Sequence of storage modules */
-  raptor_sequence* storage_modules;
-  
-  int ltdl_opened;
-#endif
-  
   /* Sequence of storage factories */
   raptor_sequence* storages;
   
@@ -109,9 +102,26 @@ struct librdf_world_s
 
   /* mutex to lock the statements class */
   pthread_mutex_t* statements_mutex;
+#else
+  /* !WITH_THREADS - pad structure to same size */
+  void* mutex_fake;
+  void* nodes_mutex_fake;
+  void* statements_mutex_fake;
 #endif
 
+  /* non-0 if librdf_world_open() has been called */
   int opened;
+
+  /* Sequence of storage modules
+   * Used with --enable-modular / MODULAR_LIBRDF
+   */
+  raptor_sequence* storage_modules;
+
+  /* If libtdl has been opened with lt_dlinit()
+   * Used with --enable-modular / MODULAR_LIBRDF
+   */
+  int ltdl_opened;
+  
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);
