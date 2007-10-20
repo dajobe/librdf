@@ -65,7 +65,7 @@ static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage
 #ifdef MODULAR_LIBRDF
 /* helper function for dynamically loading storage modules */
 static lt_dlhandle
-librdf_load_storage_module(librdf_world *world,
+librdf_storage_load_module(librdf_world *world,
                            const char* lib_name,
                            const char* init_func_name);
 #endif
@@ -101,35 +101,35 @@ librdf_init_storage(librdf_world *world)
 #ifdef MODULAR_LIBRDF
 
   #ifdef STORAGE_FILE
-    module = librdf_load_storage_module(world, "librdf_storage_file",
+    module = librdf_storage_load_module(world, "librdf_storage_file",
                                         "librdf_init_storage_file");
     if (module)
       raptor_sequence_push(world->storage_modules, module);
   #endif
   
   #ifdef STORAGE_MYSQL
-    module = librdf_load_storage_module(world, "librdf_storage_mysql",
+    module = librdf_storage_load_module(world, "librdf_storage_mysql",
                                         "librdf_init_storage_mysql");
     if (module)
       raptor_sequence_push(world->storage_modules, module);
   #endif
   
   #ifdef STORAGE_POSTGRESQL
-    module = librdf_load_storage_module(world, "librdf_storage_postgresql",
+    module = librdf_storage_load_module(world, "librdf_storage_postgresql",
                                         "librdf_init_storage_postgresql");
     if (module)
       raptor_sequence_push(world->storage_modules, module);
   #endif
   
   #ifdef STORAGE_TSTORE
-    module = librdf_load_storage_module(world, "librdf_storage_tstore",
+    module = librdf_storage_load_module(world, "librdf_storage_tstore",
                                         "librdf_init_storage_tstore");
     if (module)
       raptor_sequence_push(world->storage_modules, module);
   #endif
   
   #ifdef STORAGE_SQLITE
-    module = librdf_load_storage_module(world, "librdf_storage_sqlite",
+    module = librdf_storage_load_module(world, "librdf_storage_sqlite",
                                         "librdf_init_storage_sqlite");
     if (module)
       raptor_sequence_push(world->storage_modules, module);
@@ -198,7 +198,7 @@ librdf_free_storage_factory(librdf_storage_factory* factory)
 
 #ifdef MODULAR_LIBRDF
 /**
- * librdf_load_storage_module:
+ * librdf_storage_load_module:
  * @world: redland world object
  * @lib_name: base name of shared library file
  * @init_func_name: name of initialization function in library
@@ -206,7 +206,7 @@ librdf_free_storage_factory(librdf_storage_factory* factory)
  * INTERNAL - Load and initialize/register a storage module
  **/
 static lt_dlhandle
-librdf_load_storage_module(librdf_world *world,
+librdf_storage_load_module(librdf_world *world,
                            const char* lib_name,
                            const char* init_func_name)
 {
