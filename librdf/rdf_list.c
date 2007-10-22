@@ -495,6 +495,10 @@ librdf_list_get_iterator(librdf_list* list)
   context->current=list->first;
   context->next=context->current != NULL ? context->current->next : NULL;
 
+  /* librdf_list_iterator_finished() calls librdf_list_remove_iterator_context(),
+   * librdf_list_iterator_finished() is called if librdf_new_iterator() fails */
+  librdf_list_add_iterator_context(list, context);
+
   iterator=librdf_new_iterator(list->world, 
                                (void*)context,
                                librdf_list_iterator_is_end,
@@ -502,14 +506,8 @@ librdf_list_get_iterator(librdf_list* list)
                                librdf_list_iterator_get_method,
                                librdf_list_iterator_finished);
 
-  librdf_list_add_iterator_context(list, context);
-  if(iterator) {
-    context->iterator=iterator;
-  } else {
-    /* librdf_list_iterator_finished() calls librdf_list_remove_iterator_context() */
-    librdf_list_iterator_finished(context);
-  }
-    
+  context->iterator=iterator;
+
   return iterator;
 }
 

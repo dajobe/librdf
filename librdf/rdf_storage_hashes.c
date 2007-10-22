@@ -1243,7 +1243,6 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
 {
   librdf_storage_hashes_context *scontext=(librdf_storage_hashes_context*)storage->context;
   librdf_storage_hashes_node_iterator_context* icontext;
-  librdf_iterator *iterator;
   librdf_hash *hash;
   librdf_statement_part fields;
   unsigned char *key_buffer;
@@ -1346,17 +1345,12 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
 
   LIBRDF_FREE(data, key_buffer);
 
-
-  iterator=librdf_new_iterator(storage->world,
-                               (void*)icontext,
-                               librdf_storage_hashes_node_iterator_is_end,
-                               librdf_storage_hashes_node_iterator_next_method,
-                               librdf_storage_hashes_node_iterator_get_method,
-                               librdf_storage_hashes_node_iterator_finished);
-  if(!iterator)
-    librdf_storage_hashes_node_iterator_finished(icontext);
-
-  return iterator;
+  return librdf_new_iterator(storage->world,
+                             (void*)icontext,
+                             librdf_storage_hashes_node_iterator_is_end,
+                             librdf_storage_hashes_node_iterator_next_method,
+                             librdf_storage_hashes_node_iterator_get_method,
+                             librdf_storage_hashes_node_iterator_finished);
 }
 
 
@@ -1786,7 +1780,6 @@ librdf_storage_hashes_get_contexts(librdf_storage* storage)
 {
   librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
   librdf_storage_hashes_get_contexts_iterator_context* icontext;
-  librdf_iterator* iterator;
 
   if(context->index_contexts <0) {
     librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
@@ -1813,18 +1806,12 @@ librdf_storage_hashes_get_contexts(librdf_storage* storage)
   icontext->storage=storage;
   librdf_storage_add_reference(icontext->storage);
 
-  iterator=librdf_new_iterator(storage->world,
-                               (void*)icontext,
-                               &librdf_storage_hashes_get_contexts_is_end,
-                               &librdf_storage_hashes_get_contexts_next_method,
-                               &librdf_storage_hashes_get_contexts_get_method,
-                               &librdf_storage_hashes_get_contexts_finished);
-  if(!iterator) {
-    librdf_storage_hashes_get_contexts_finished((void*)icontext);
-    return NULL;
-  }
-  
-  return iterator;  
+  return librdf_new_iterator(storage->world,
+                             (void*)icontext,
+                             &librdf_storage_hashes_get_contexts_is_end,
+                             &librdf_storage_hashes_get_contexts_next_method,
+                             &librdf_storage_hashes_get_contexts_get_method,
+                             &librdf_storage_hashes_get_contexts_finished);
 }
 
 

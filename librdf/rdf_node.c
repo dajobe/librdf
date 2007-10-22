@@ -1741,7 +1741,6 @@ librdf_node_static_iterator_create(librdf_node** nodes,
                                    int size)
 {
   librdf_node_static_iterator_context* context;
-  librdf_iterator *iterator;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(nodes, librdf_node**, NULL);
 
@@ -1753,16 +1752,12 @@ librdf_node_static_iterator_create(librdf_node** nodes,
   context->size=size;
   context->current=0;
 
-  iterator=librdf_new_iterator(nodes[0]->world,
-                               (void*)context,
-                               librdf_node_static_iterator_is_end,
-                               librdf_node_static_iterator_next_method,
-                               librdf_node_static_iterator_get_method,
-                               librdf_node_static_iterator_finished);
-  if(!iterator)
-    librdf_node_static_iterator_finished(context);
-
-  return iterator;
+  return librdf_new_iterator(nodes[0]->world,
+                             (void*)context,
+                             librdf_node_static_iterator_is_end,
+                             librdf_node_static_iterator_next_method,
+                             librdf_node_static_iterator_get_method,
+                             librdf_node_static_iterator_finished);
 }
 
 #endif

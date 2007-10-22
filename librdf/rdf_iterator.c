@@ -53,6 +53,7 @@ static void* librdf_iterator_update_current_element(librdf_iterator* iterator);
  * @finished_method: function to destroy the iterator context (or NULL if not needed)
  *
  * Constructor - create a new #librdf_iterator object.
+ * The iterator object takes ownership of @context and frees it with @finished_method.
  * 
  * Return value: a new #librdf_iterator object or NULL on failure
 **/
