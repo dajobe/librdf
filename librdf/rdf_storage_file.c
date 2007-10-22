@@ -89,6 +89,7 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
   librdf_storage_file_context *context=(librdf_storage_file_context*)storage->context;
   char *name_copy;
   char *contexts;
+  int rc=1;
 
   int is_uri=!strcmp(storage->factory->name, "uri");
 
@@ -103,7 +104,7 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
     context->name_len=strlen(name);
     name_copy=(char*)LIBRDF_MALLOC(cstring, context->name_len+1);
     if(!name_copy)
-      return 1;
+      goto done;
     strcpy(name_copy,name);
     context->name=name_copy;
     context->uri=librdf_new_uri_from_filename(storage->world, context->name);
@@ -113,11 +114,11 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
                                                    NULL, NULL, 
                                                    options);
   if(!context->storage)
-    return 1;
+    goto done;
   
   context->model=librdf_new_model(storage->world, context->storage, NULL);
   if(!context->model)
-    return 1;
+    goto done;
 
   if(is_uri || !access((const char*)context->name, F_OK)) {
     librdf_parser* parser;
@@ -127,13 +128,17 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
     librdf_free_parser(parser);
   }
 
+  context->changed=0;
+
+  rc=0;
+
+  done:
+
   /* no more options, might as well free them now */
   if(options)
     librdf_free_hash(options);
 
-  context->changed=0;
-  
-  return 0;
+  return rc;
 }
 
 
