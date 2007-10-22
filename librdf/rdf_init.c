@@ -62,7 +62,9 @@
 #include <unistd.h>
 #endif
 
+#ifdef MODULAR_LIBRDF
 #include <ltdl.h>
+#endif
 
 #ifndef STANDALONE
 
