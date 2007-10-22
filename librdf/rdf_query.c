@@ -137,61 +137,54 @@ librdf_query_register_factory(librdf_world *world, const char *name,
                               const unsigned char *uri_string,
                               void (*factory) (librdf_query_factory*)) 
 {
-  librdf_query_factory *query, *h;
-  char *name_copy;
-  int name_length;
-  
+  librdf_query_factory *query;
+
   librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for query name %s\n", name);
 #endif
-  
-  query=(librdf_query_factory*)LIBRDF_CALLOC(librdf_query_factory, 1,
-                                             sizeof(librdf_query_factory));
-  if(!query)
-    goto tidy_noquery;
 
-  name_length=strlen(name);
-  
-  name_copy=(char*)LIBRDF_CALLOC(cstring, name_length+1, 1);
-  if(!name_copy)
-    goto tidy;
-  query->name=strcpy(name_copy, name);
-  if(uri_string) {
-    librdf_uri *uri;
-
-    uri=librdf_new_uri(world, uri_string);
-    if(!uri)
-      goto tidy;
-    query->uri=uri;
-  }
-        
-  for(h = world->query_factories; h; h = h->next ) {
-    if(!strcmp(h->name, name_copy)) {
-      librdf_free_query_factory(query);
+  for(query = world->query_factories; query; query = query->next ) {
+    if(!strcmp(query->name, name)) {
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
-                 "query language %s already registered", h->name);
+                 "query language %s already registered", query->name);
       return;
     }
   }
-  
-  /* Call the query registration function on the new object */
-  (*factory)(query);
-  
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3("%s has context size %d\n", name, query->context_length);
-#endif
-  
+
+  query=(librdf_query_factory*)LIBRDF_CALLOC(librdf_query_factory, 1,
+                                             sizeof(librdf_query_factory));
+  if(!query)
+    goto oom;
+
+  query->name=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
+  if(!query->name)
+    goto oom_tidy;
+  strcpy(query->name, name);
+
+  if(uri_string) {
+    query->uri=librdf_new_uri(world, uri_string);
+    if(!query->uri)
+      goto oom_tidy;
+  }
+
   query->next = world->query_factories;
   world->query_factories = query;
 
+  /* Call the query registration function on the new object */
+  (*factory)(query);
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG3("%s has context size %d\n", name, query->context_length);
+#endif
+
   return;
 
-  tidy:
+  oom_tidy:
   librdf_free_query_factory(query);
-  tidy_noquery:
+  oom:
   LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "Out of memory");
 }
 

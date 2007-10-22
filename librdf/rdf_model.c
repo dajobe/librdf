@@ -113,11 +113,9 @@ librdf_model_register_factory(librdf_world *world,
                               const char *name, const char *label,
                               void (*factory) (librdf_model_factory*)) 
 {
-  librdf_model_factory *model, *h;
-  char *name_copy;
-  char *label_copy;
+  librdf_model_factory *model;
   int i;
-  
+
   librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
@@ -127,42 +125,37 @@ librdf_model_register_factory(librdf_world *world,
   if(!world->models) {
     world->models=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_model_factory, NULL);
     if(!world->models)
-      LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
+      goto oom;
   }
   
   for(i=0;
-      (h=(librdf_model_factory*)raptor_sequence_get_at(world->models, i));
+      (model=(librdf_model_factory*)raptor_sequence_get_at(world->models, i));
       i++) {
-    if(!strcmp(h->name, name)) {
+    if(!strcmp(model->name, name)) {
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_MODEL, NULL,
-                 "model %s already registered", h->name);
+                 "model %s already registered", model->name);
       return;
     }
   }
-  
+
   model=(librdf_model_factory*)LIBRDF_CALLOC(librdf_model_factory, 1,
                                              sizeof(librdf_model_factory));
   if(!model)
-    LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
+    goto oom;
 
-  name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
-  if(!name_copy) {
-    librdf_free_model_factory(model);
-    LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
-  }
-  strcpy(name_copy, name);
-  model->name=name_copy;
-        
-  label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
-  if(!label_copy) {
-    librdf_free_model_factory(model);
-    LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
-  }
-  strcpy(label_copy, label);
-  model->label=label_copy;
+  model->name=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
+  if(!model->name)
+    goto oom_tidy;
+  strcpy(model->name, name);
 
-  raptor_sequence_push(world->models, model);
+  model->label=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+  if(!model->label)
+    goto oom_tidy;
+  strcpy(model->label, label);
+
+  if(raptor_sequence_push(world->models, model))
+    goto oom;
 
   /* Call the model registration function on the new object */
   (*factory)(model);
@@ -170,6 +163,13 @@ librdf_model_register_factory(librdf_world *world,
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, model->context_length);
 #endif
+
+  return;
+
+  oom_tidy:
+  librdf_free_model_factory(model);
+  oom:
+  LIBRDF_FATAL1(world, LIBRDF_FROM_MODEL, "Out of memory");
 }
 
 

@@ -117,63 +117,54 @@ librdf_serializer_register_factory(librdf_world *world,
                                    void (*factory) (librdf_serializer_factory*))
 {
   librdf_serializer_factory *serializer;
-  char *name_copy;
-  char *label_copy;
 
   librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for serializer %s\n", name);
 #endif
-  
+
   if(!world->serializers) {
     world->serializers=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_serializer_factory, NULL);
     if(!world->serializers)
-      goto tidy_noserializer;
+      goto oom;
   }
-  
+
   serializer=(librdf_serializer_factory*)LIBRDF_CALLOC(librdf_serializer_factory, 1,
                                                        sizeof(librdf_serializer_factory));
   if(!serializer)
-    goto tidy_noserializer;
-  
-  name_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
-  if(!name_copy)
-    goto tidy;
-  strcpy(name_copy, name);
-  serializer->name=name_copy;
+    goto oom;
+
+  serializer->name=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
+  if(!serializer->name)
+    goto oom_tidy;
+  strcpy(serializer->name, name);
 
   if(label) {
-    label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
-    if(!label_copy)
-      goto tidy;
-    strcpy(label_copy, label);
-    serializer->label=label_copy;
+    serializer->label=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+    if(!serializer->label)
+      goto oom_tidy;
+    strcpy(serializer->label, label);
   }
-        
+
   /* register mime type if any */
   if(mime_type) {
-    char *mime_type_copy;
-    mime_type_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
-    if(!mime_type_copy)
-      goto tidy;
-    strcpy(mime_type_copy, mime_type);
-    serializer->mime_type=mime_type_copy;
+    serializer->mime_type=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
+    if(!serializer->mime_type)
+      goto oom_tidy;
+    strcpy(serializer->mime_type, mime_type);
   }
 
   /* register URI if any */
   if(uri_string) {
-    librdf_uri *uri;
-
-    uri=librdf_new_uri(world, uri_string);
-    if(!uri)
-      goto tidy;
-    serializer->type_uri=uri;
+    serializer->type_uri=librdf_new_uri(world, uri_string);
+    if(!serializer->type_uri)
+      goto oom_tidy;
   }
-  
+
   if(raptor_sequence_push(world->serializers, serializer)) 
-    goto tidy_noserializer; /* on error, the serializer was already freed by the sequence */
-        
+    goto oom;
+
   /* Call the serializer registration function on the new object */
   (*factory)(serializer);
 
@@ -183,9 +174,9 @@ librdf_serializer_register_factory(librdf_world *world,
 
   return;
 
-  tidy:
+  oom_tidy:
   librdf_free_serializer_factory(serializer);
-  tidy_noserializer:
+  oom:
   LIBRDF_FATAL1(world, LIBRDF_FROM_SERIALIZER, "Out of memory");
 }
 

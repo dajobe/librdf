@@ -217,37 +217,34 @@ void
 librdf_hash_register_factory(librdf_world *world, const char *name,
                              void (*factory) (librdf_hash_factory*)) 
 {
-  librdf_hash_factory *hash, *h;
-  char *name_copy;
-  
+  librdf_hash_factory *hash;
+
   librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for hash %s\n", name);
 #endif
   
-  hash=(librdf_hash_factory*)LIBRDF_CALLOC(librdf_hash_factory, 1,
-                                           sizeof(librdf_hash_factory));
-  if(!hash)
-    LIBRDF_FATAL1(world, LIBRDF_FROM_HASH, "Out of memory");
-  
-  name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
-  if(!name_copy) {
-    LIBRDF_FREE(librdf_hash, hash);
-    LIBRDF_FATAL1(world, LIBRDF_FROM_HASH, "Out of memory");
-  }
-  strcpy(name_copy, name);
-  hash->name=name_copy;
-  
-  for(h = world->hashes; h; h = h->next ) {
-    if(!strcmp(h->name, name_copy)) {
-      LIBRDF_FREE(cstring, name_copy); 
-      LIBRDF_FREE(librdf_hash_factory, hash);
+  for(hash = world->hashes; hash; hash = hash->next ) {
+    if(!strcmp(hash->name, name)) {
       librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
-                 "hash %s already registered", h->name);
+                 "hash %s already registered", hash->name);
       return;
     }
   }
+
+  hash=(librdf_hash_factory*)LIBRDF_CALLOC(librdf_hash_factory, 1,
+                                           sizeof(librdf_hash_factory));
+  if(!hash)
+    goto oom;
+  
+  hash->name=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
+  if(!hash->name)
+    goto oom_tidy;
+  strcpy(hash->name, name);
+  
+  hash->next = world->hashes;
+  world->hashes = hash;
   
   /* Call the hash registration function on the new object */
   (*factory)(hash);
@@ -255,9 +252,13 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, hash->context_length);
 #endif
-  
-  hash->next = world->hashes;
-  world->hashes = hash;
+
+  return;
+
+  oom_tidy:
+  LIBRDF_FREE(librdf_hash, hash);
+  oom:
+  LIBRDF_FATAL1(world, LIBRDF_FROM_HASH, "Out of memory");
 }
 
 

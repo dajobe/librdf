@@ -110,79 +110,70 @@ librdf_parser_register_factory(librdf_world *world,
                                const char *name, const char *label, 
                                const char *mime_type,
                                const unsigned char *uri_string,
-			       void (*factory) (librdf_parser_factory*))
+                               void (*factory) (librdf_parser_factory*))
 {
   librdf_parser_factory *parser;
-  char *name_copy;
-  char *label_copy;
 
   librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for parser %s\n", name);
 #endif
-  
+
   if(!world->parsers) {
     world->parsers=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_parser_factory, NULL);
     if(!world->parsers)
-      LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
+      goto oom;
   }
 
   parser=(librdf_parser_factory*)LIBRDF_CALLOC(librdf_parser_factory, 1,
-					       sizeof(librdf_parser_factory));
+                                               sizeof(librdf_parser_factory));
   if(!parser)
-    LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
-  
-  name_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
-  if(!name_copy) {
-    librdf_free_parser_factory(parser);
-    LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
-  }
-  strcpy(name_copy, name);
-  parser->name=name_copy;
+    goto oom;
+
+  parser->name=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
+  if(!parser->name)
+    goto oom_tidy;
+  strcpy(parser->name, name);
 
   if(label) {
-    label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
-    if(!label_copy) {
-      librdf_free_parser_factory(parser);
-      LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
-    }
-    strcpy(label_copy, label);
-    parser->label=label_copy;
+    parser->label=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+    if(!parser->label)
+      goto oom_tidy;
+    strcpy(parser->label, label);
   }
-        
+
   /* register mime type if any */
   if(mime_type) {
-    char *mime_type_copy;
-    mime_type_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
-    if(!mime_type_copy) {
-      librdf_free_parser_factory(parser);
-      LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
-    }
-    strcpy(mime_type_copy, mime_type);
-    parser->mime_type=mime_type_copy;
+    parser->mime_type=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
+    if(!parser->mime_type)
+      goto oom_tidy;
+    strcpy(parser->mime_type, mime_type);
   }
 
   /* register URI if any */
   if(uri_string) {
-    librdf_uri *uri;
-
-    uri=librdf_new_uri(world, uri_string);
-    if(!uri) {
-      librdf_free_parser_factory(parser);
-      LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
-    }
-    parser->type_uri=uri;
+    parser->type_uri=librdf_new_uri(world, uri_string);
+    if(!parser->type_uri)
+      goto oom_tidy;
   }
-  
-  raptor_sequence_push(world->parsers, parser);
-        
+
+  if(raptor_sequence_push(world->parsers, parser))
+    goto oom;
+
   /* Call the parser registration function on the new object */
   (*factory)(parser);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, parser->context_length);
 #endif
+
+  return;
+
+  oom_tidy:
+  librdf_free_parser_factory(parser);
+  oom:
+  LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "Out of memory");
 }
 
 

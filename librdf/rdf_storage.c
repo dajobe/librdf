@@ -246,11 +246,9 @@ librdf_storage_load_module(librdf_world *world,
 void
 librdf_storage_register_factory(librdf_world* world,
                                 const char *name, const char *label,
-				void (*factory) (librdf_storage_factory*)) 
+                                void (*factory) (librdf_storage_factory*)) 
 {
-  librdf_storage_factory *storage, *h;
-  char *name_copy;
-  char *label_copy;
+  librdf_storage_factory *storage;
   int i;
 
   librdf_world_open(world);
@@ -258,54 +256,55 @@ librdf_storage_register_factory(librdf_world* world,
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for storage %s\n", name);
 #endif
-  
+
   if(!world->storages) {
     world->storages=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_storage_factory, NULL);
-    if(!world->storages) {
-      LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
-    }
+    if(!world->storages)
+      goto oom;
   }
-  
+
   for(i=0;
-      (h=(librdf_storage_factory*)raptor_sequence_get_at(world->storages, i));
+      (storage=(librdf_storage_factory*)raptor_sequence_get_at(world->storages, i));
       i++) {
-    if(!strcmp(h->name, name)) {
+    if(!strcmp(storage->name, name)) {
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "storage %s already registered", h->name);
+                 "storage %s already registered", storage->name);
       return;
     }
   }
-  
+
   storage=(librdf_storage_factory*)LIBRDF_CALLOC(librdf_storage_factory, 1,
                                                  sizeof(librdf_storage_factory));
   if(!storage)
-    LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
+    goto oom;
 
-  name_copy=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
-  if(!name_copy) {
-    librdf_free_storage_factory(storage);
-    LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
-  }
-  strcpy(name_copy, name);
-  storage->name=name_copy;
+  storage->name=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
+  if(!storage->name)
+    goto oom_tidy;
+  strcpy(storage->name, name);
 
-  label_copy=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
-  if(!label_copy) {
-    librdf_free_storage_factory(storage);
-    LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
-  }
-  strcpy(label_copy, label);
-  storage->label=label_copy;
+  storage->label=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+  if(!storage->label)
+    goto oom_tidy;
+  strcpy(storage->label, label);
 
-  raptor_sequence_push(world->storages, storage);
-        
+  if(raptor_sequence_push(world->storages, storage))
+    goto oom;
+
   /* Call the storage registration function on the new object */
   (*factory)(storage);
-  
+
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("%s has context size %d\n", name, storage->context_length);
 #endif
+
+  return;
+
+  oom_tidy:
+  librdf_free_storage_factory(storage);
+  oom:
+  LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
 }
 
 

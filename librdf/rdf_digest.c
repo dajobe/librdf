@@ -74,50 +74,50 @@ librdf_delete_digest_factories(librdf_world *world)
  **/
 void
 librdf_digest_register_factory(librdf_world *world, const char *name,
-			       void (*factory) (librdf_digest_factory*))
+                               void (*factory) (librdf_digest_factory*))
 {
-  librdf_digest_factory *d, *digest;
-  char *name_copy;
+  librdf_digest_factory *digest;
 
   librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG2("Received registration for digest %s\n", name);
 #endif
-  digest=(librdf_digest_factory*)LIBRDF_CALLOC(librdf_digest_factory, 1,
-					       sizeof(librdf_digest_factory));
-  if(!digest)
-    LIBRDF_FATAL1(world, LIBRDF_FROM_DIGEST, "Out of memory");
-  
-  name_copy=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
-  if(!name_copy) {
-    LIBRDF_FREE(librdf_digest, digest);
-    LIBRDF_FATAL1(world, LIBRDF_FROM_DIGEST, "Out of memory");
-  }
-  strcpy(name_copy, name);
-  digest->name=name_copy;
-        
-  for(d = world->digests; d; d = d->next ) {
-    if(!strcmp(d->name, name_copy)) {
+
+  for(digest = world->digests; digest; digest = digest->next ) {
+    if(!strcmp(digest->name, name)) {
       librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_DIGEST, NULL,
-                 "digest %s already registered", d->name);
+                 "digest %s already registered", digest->name);
       return;
     }
   }
 
-  
-        
+  digest=(librdf_digest_factory*)LIBRDF_CALLOC(librdf_digest_factory, 1,
+                                               sizeof(librdf_digest_factory));
+  if(!digest)
+    goto oom;
+
+  digest->name=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
+  if(!digest->name)
+    goto oom_tidy;
+  strcpy(digest->name, name);
+
+  digest->next = world->digests;
+  world->digests = digest;        
+
   /* Call the digest registration function on the new object */
   (*factory)(digest);
-
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG4("%s has context size %d and digest size %d\n", name, digest->context_length, digest->digest_length);
 #endif
-  
-  digest->next = world->digests;
-  world->digests = digest;
-  
+
+  return;
+
+  oom_tidy:
+  LIBRDF_FREE(librdf_digest, digest);
+  oom:
+  LIBRDF_FATAL1(world, LIBRDF_FROM_DIGEST, "Out of memory");
 }
 
 
