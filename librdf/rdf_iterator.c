@@ -59,10 +59,10 @@ static void* librdf_iterator_update_current_element(librdf_iterator* iterator);
 librdf_iterator*
 librdf_new_iterator(librdf_world *world,
                     void* context,
-		    int (*is_end_method)(void*),
-		    int (*next_method)(void*),
-		    void* (*get_method)(void*, int),
-		    void (*finished_method)(void*))
+                    int (*is_end_method)(void*),
+                    int (*next_method)(void*),
+                    void* (*get_method)(void*, int),
+                    void (*finished_method)(void*))
 {
   librdf_iterator* new_iterator;
   
@@ -70,8 +70,11 @@ librdf_new_iterator(librdf_world *world,
 
   new_iterator=(librdf_iterator*)LIBRDF_CALLOC(librdf_iterator, 1, 
                                                sizeof(librdf_iterator));
-  if(!new_iterator)
+  if(!new_iterator) {
+    if(finished_method)
+      finished_method(context);
     return NULL;
+  }
   
   new_iterator->world=world;
 
