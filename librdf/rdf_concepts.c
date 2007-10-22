@@ -192,8 +192,10 @@ librdf_finish_concepts(librdf_world *world)
 
   for (i=0; i< LIBRDF_CONCEPT_LAST; i++) {
     /* deletes associated URI too */
-    librdf_free_node(librdf_concept_resources[i]);
-    librdf_concept_resources[i]=NULL;
+    if(librdf_concept_resources[i]) {
+      librdf_free_node(librdf_concept_resources[i]);
+      librdf_concept_resources[i]=NULL;
+    }
     librdf_concept_uris[i]=NULL;
   }
 }
