@@ -240,7 +240,7 @@ librdf_new_uri_from_uri_local_name (librdf_uri* old_uri,
   
   len=old_uri->string_length + strlen((const char*)local_name) +1 ; /* +1 for \0 */
 
-  new_string=(unsigned char*)LIBRDF_CALLOC(cstring, 1, len);
+  new_string=(unsigned char*)LIBRDF_MALLOC(cstring, len);
   if(!new_string)
     return NULL;
 
