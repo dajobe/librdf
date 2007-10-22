@@ -125,7 +125,7 @@ static command commands[]={
   {CMD_CONTEXTS, "contexts", 0, 0, 0},
   {CMD_MATCH, "match", 3, 4, 0},
   {CMD_SIZE, "size", 0, 0, 0},
-  {(enum command_type)-1, NULL}  
+  {(enum command_type)-1, NULL, 0, 0, 0}  
 };
  
 
