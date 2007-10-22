@@ -135,13 +135,13 @@ librdf_serializer_register_factory(librdf_world *world,
   if(!serializer)
     goto oom;
 
-  serializer->name=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
+  serializer->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
   if(!serializer->name)
     goto oom_tidy;
   strcpy(serializer->name, name);
 
   if(label) {
-    serializer->label=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+    serializer->label=(char*)LIBRDF_MALLOC(cstring, strlen(label)+1);
     if(!serializer->label)
       goto oom_tidy;
     strcpy(serializer->label, label);
@@ -149,7 +149,7 @@ librdf_serializer_register_factory(librdf_world *world,
 
   /* register mime type if any */
   if(mime_type) {
-    serializer->mime_type=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
+    serializer->mime_type=(char*)LIBRDF_MALLOC(cstring, strlen(mime_type)+1);
     if(!serializer->mime_type)
       goto oom_tidy;
     strcpy(serializer->mime_type, mime_type);

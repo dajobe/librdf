@@ -159,7 +159,7 @@ librdf_query_register_factory(librdf_world *world, const char *name,
   if(!query)
     goto oom;
 
-  query->name=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
+  query->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
   if(!query->name)
     goto oom_tidy;
   strcpy(query->name, name);

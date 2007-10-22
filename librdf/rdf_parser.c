@@ -131,13 +131,13 @@ librdf_parser_register_factory(librdf_world *world,
   if(!parser)
     goto oom;
 
-  parser->name=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
+  parser->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
   if(!parser->name)
     goto oom_tidy;
   strcpy(parser->name, name);
 
   if(label) {
-    parser->label=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+    parser->label=(char*)LIBRDF_MALLOC(cstring, strlen(label)+1);
     if(!parser->label)
       goto oom_tidy;
     strcpy(parser->label, label);
@@ -145,7 +145,7 @@ librdf_parser_register_factory(librdf_world *world,
 
   /* register mime type if any */
   if(mime_type) {
-    parser->mime_type=(char*)LIBRDF_CALLOC(cstring, 1, strlen(mime_type)+1);
+    parser->mime_type=(char*)LIBRDF_MALLOC(cstring, strlen(mime_type)+1);
     if(!parser->mime_type)
       goto oom_tidy;
     strcpy(parser->mime_type, mime_type);

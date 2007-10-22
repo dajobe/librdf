@@ -144,12 +144,12 @@ librdf_model_register_factory(librdf_world *world,
   if(!model)
     goto oom;
 
-  model->name=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
+  model->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
   if(!model->name)
     goto oom_tidy;
   strcpy(model->name, name);
 
-  model->label=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+  model->label=(char*)LIBRDF_MALLOC(cstring, strlen(label)+1);
   if(!model->label)
     goto oom_tidy;
   strcpy(model->label, label);

@@ -97,7 +97,7 @@ librdf_digest_register_factory(librdf_world *world, const char *name,
   if(!digest)
     goto oom;
 
-  digest->name=(char*)LIBRDF_CALLOC(cstring, 1, strlen(name)+1);
+  digest->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
   if(!digest->name)
     goto oom_tidy;
   strcpy(digest->name, name);

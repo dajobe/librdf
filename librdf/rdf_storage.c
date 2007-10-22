@@ -279,12 +279,12 @@ librdf_storage_register_factory(librdf_world* world,
   if(!storage)
     goto oom;
 
-  storage->name=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
+  storage->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
   if(!storage->name)
     goto oom_tidy;
   strcpy(storage->name, name);
 
-  storage->label=(char*)LIBRDF_CALLOC(cstring, strlen(label)+1, 1);
+  storage->label=(char*)LIBRDF_MALLOC(cstring, strlen(label)+1);
   if(!storage->label)
     goto oom_tidy;
   strcpy(storage->label, label);

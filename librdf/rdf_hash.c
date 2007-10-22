@@ -238,7 +238,7 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
   if(!hash)
     goto oom;
   
-  hash->name=(char*)LIBRDF_CALLOC(cstring, strlen(name)+1, 1);
+  hash->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
   if(!hash->name)
     goto oom_tidy;
   strcpy(hash->name, name);
