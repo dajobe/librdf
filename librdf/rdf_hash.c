@@ -827,7 +827,8 @@ librdf_hash_get_all_iterator_finished(void* iterator)
   if(context->cursor)
     librdf_free_hash_cursor(context->cursor);
 
-  context->key->data=NULL;
+  if(context->key)
+    context->key->data=NULL;
 
   if(context->value)
     context->value->data=NULL;
