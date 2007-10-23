@@ -224,7 +224,7 @@ librdf_get_parser_factory(librdf_world *world,
         i++) {
       /* next if name does not match */
       if(name && strcmp(factory->name, name))
-	continue;
+        continue;
 
       /* MIME type may need to match */
       if(mime_type) {
