@@ -125,6 +125,8 @@ librdf_parser_raptor_init(librdf_parser *parser, void *context)
 
   /* New in-memory hash for mapping bnode IDs */
   pcontext->bnode_hash=librdf_new_hash(parser->world, NULL);
+  if(!pcontext->bnode_hash)
+    return 1;
 
   pcontext->rdf_parser=raptor_new_parser(pcontext->parser_name);
   if(!pcontext->rdf_parser)
