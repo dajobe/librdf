@@ -684,8 +684,9 @@ librdf_parser_guess_name(const char *mime_type,
                          const unsigned char *buffer, 
                          const unsigned char *identifier)
 {
+  int len = buffer ? strlen((const char *)buffer) : 0;
   return raptor_guess_parser_name(NULL, mime_type, buffer,
-                                  strlen((const char*)buffer),
+                                  len,
                                   identifier);
 }
 
