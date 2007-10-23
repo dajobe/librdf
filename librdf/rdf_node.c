@@ -621,18 +621,23 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   pthread_mutex_lock(world->nodes_mutex);
 #endif
 
-  if(!identifier)
-    identifier=librdf_world_get_genid(world);
-
-  len=strlen((const char*)identifier);
-  
-  new_identifier=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
-  if(!new_identifier) {
-    new_node=NULL;
-    goto unlock;
+  if(!identifier) {
+    new_identifier=librdf_world_get_genid(world);
+    if(!new_identifier) {
+      new_node=NULL;
+      goto unlock;
+    }
+    len=strlen((const char *)new_identifier);
+  } else {
+    len=strlen((const char*)identifier);
+    
+    new_identifier=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
+    if(!new_identifier) {
+      new_node=NULL;
+      goto unlock;
+    }
+    strcpy((char*)new_identifier, (const char*)identifier);
   }
-  strcpy((char*)new_identifier, (const char*)identifier);
-
 
   key.data=new_identifier;
   key.size=len;
