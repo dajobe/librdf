@@ -80,7 +80,6 @@ typedef struct {
   /* when storing into a model - librdf_parser_raptor_parse_uri_into_model */
   librdf_model *model;
   
-  librdf_uri *source_uri;   /* source URI */
   librdf_uri *base_uri;     /* base URI */
 
   /* The set of statements pending is a sequence, with 'current'
@@ -665,12 +664,6 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   
   scontext->pcontext=pcontext;
 
-  if(uri) {
-    if(scontext->source_uri)
-      librdf_free_uri(scontext->source_uri); 
-    scontext->source_uri = librdf_new_uri_from_uri(uri);
-  }
-
   if(base_uri)
     base_uri=librdf_new_uri_from_uri(base_uri);
   if(scontext->base_uri)
@@ -883,12 +876,6 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   
   
   scontext->pcontext=pcontext;
-
-  if(uri) {
-    if(scontext->source_uri)
-      librdf_free_uri(scontext->source_uri); 
-    scontext->source_uri=librdf_new_uri_from_uri(uri);
-  }
 
   if(base_uri)
     base_uri=librdf_new_uri_from_uri(base_uri);
@@ -1105,9 +1092,6 @@ librdf_parser_raptor_serialise_finished(void* context)
     if(scontext->current)
       librdf_free_statement(scontext->current);
 
-    if(scontext->source_uri)
-      librdf_free_uri(scontext->source_uri); 
- 
     if(scontext->base_uri)
       librdf_free_uri(scontext->base_uri); 
  
