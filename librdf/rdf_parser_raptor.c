@@ -65,6 +65,7 @@ typedef struct {
   int warnings;
 
   raptor_www *www;              /* raptor stream */
+  void *stream_context;         /* librdf_parser_raptor_stream_context* */
 } librdf_parser_raptor_context;
 
 
@@ -144,6 +145,9 @@ static void
 librdf_parser_raptor_terminate(void *context) 
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+
+  if(pcontext->stream_context)
+    librdf_parser_raptor_serialise_finished(pcontext->stream_context);
 
   if(pcontext->www)
     raptor_www_free(pcontext->www);
@@ -477,6 +481,9 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   if(!scontext)
     goto oom;
 
+  scontext->pcontext=pcontext;
+  pcontext->stream_context=scontext;
+
   scontext->statements=librdf_new_list(world);
   if(!scontext->statements)
     goto oom;
@@ -507,7 +514,6 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
                                  librdf_parser_raptor_generate_id_handler);
   
   
-  scontext->pcontext=pcontext;
   scontext->fh=fh;
   scontext->close_fh=close_fh;
 
@@ -629,6 +635,9 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   if(!scontext)
     goto oom;
 
+  scontext->pcontext=pcontext;
+  pcontext->stream_context=scontext;
+
   scontext->statements=librdf_new_list(pcontext->parser->world);
   if(!scontext->statements)
     goto oom;
@@ -658,9 +667,6 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   raptor_set_generate_id_handler(pcontext->rdf_parser, pcontext,
                                  librdf_parser_raptor_generate_id_handler);
   
-  
-  scontext->pcontext=pcontext;
-
   if(pcontext->parser->uri_filter)
     raptor_parser_set_uri_filter(pcontext->rdf_parser,
                                  librdf_parser_raptor_relay_filter,
@@ -842,6 +848,9 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   if(!scontext)
     goto oom;
 
+  scontext->pcontext=pcontext;
+  pcontext->stream_context=scontext;
+
   if(pcontext->nspace_prefixes)
     raptor_free_sequence(pcontext->nspace_prefixes);
   pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
@@ -866,9 +875,6 @@ librdf_parser_raptor_parse_into_model_common(void *context,
 
   raptor_set_generate_id_handler(pcontext->rdf_parser, pcontext,
                                  librdf_parser_raptor_generate_id_handler);
-  
-  
-  scontext->pcontext=pcontext;
 
   /* direct into model */
   scontext->model=model;
@@ -1087,6 +1093,9 @@ librdf_parser_raptor_serialise_finished(void* context)
 
     if(scontext->fh && scontext->close_fh)
       fclose(scontext->fh); 
+
+    if(scontext->pcontext)
+      scontext->pcontext->stream_context=NULL;
 
     LIBRDF_FREE(librdf_parser_raptor_context, scontext);
   }
