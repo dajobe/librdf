@@ -80,8 +80,6 @@ typedef struct {
   /* when storing into a model - librdf_parser_raptor_parse_uri_into_model */
   librdf_model *model;
   
-  librdf_uri *base_uri;     /* base URI */
-
   /* The set of statements pending is a sequence, with 'current'
    * as the first entry and any remaining ones held in 'statements'.
    * The latter are filled by the parser
@@ -505,12 +503,6 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   
   
   scontext->pcontext=pcontext;
-  if(base_uri)
-    base_uri=librdf_new_uri_from_uri(base_uri);
-  if(scontext->base_uri)
-    librdf_free_uri(scontext->base_uri); 
-  scontext->base_uri=base_uri;
-
   scontext->fh=fh;
   scontext->close_fh=close_fh;
 
@@ -664,17 +656,10 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   
   scontext->pcontext=pcontext;
 
-  if(base_uri)
-    base_uri=librdf_new_uri_from_uri(base_uri);
-  if(scontext->base_uri)
-    librdf_free_uri(scontext->base_uri); 
-  scontext->base_uri=base_uri;
-
   if(pcontext->parser->uri_filter)
     raptor_parser_set_uri_filter(pcontext->rdf_parser,
                                  librdf_parser_raptor_relay_filter,
                                  pcontext->parser);
-  
 
   if(uri) {
     raptor_www *www;
@@ -876,12 +861,6 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   
   
   scontext->pcontext=pcontext;
-
-  if(base_uri)
-    base_uri=librdf_new_uri_from_uri(base_uri);
-  if(scontext->base_uri)
-    librdf_free_uri(scontext->base_uri); 
-  scontext->base_uri=base_uri;
 
   /* direct into model */
   scontext->model=model;
@@ -1092,9 +1071,6 @@ librdf_parser_raptor_serialise_finished(void* context)
     if(scontext->current)
       librdf_free_statement(scontext->current);
 
-    if(scontext->base_uri)
-      librdf_free_uri(scontext->base_uri); 
- 
     if(scontext->statements) {
       while((statement=(librdf_statement*)librdf_list_pop(scontext->statements)))
         librdf_free_statement(statement);
