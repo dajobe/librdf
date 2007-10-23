@@ -494,6 +494,8 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
     buffer=NULL;
   
   if(!buffer) {
+    if(new_xml_language)
+      LIBRDF_FREE(cstring, new_xml_language);
     if(datatype_uri)
       librdf_free_uri(datatype_uri);
     LIBRDF_FREE(cstring, new_value);
