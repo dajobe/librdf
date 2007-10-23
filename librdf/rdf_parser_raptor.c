@@ -435,6 +435,8 @@ librdf_parser_raptor_generate_id_handler(void *user_data,
     unsigned char *mapped_id=(unsigned char*)librdf_hash_get(pcontext->bnode_hash, (const char*)user_bnodeid);
     if(!mapped_id) {
       mapped_id=librdf_world_get_genid(pcontext->parser->world);
+      if(!mapped_id)
+        return NULL;
       if(librdf_hash_put_strings(pcontext->bnode_hash, (char*)user_bnodeid, (char*)mapped_id))
         return NULL;
     }
