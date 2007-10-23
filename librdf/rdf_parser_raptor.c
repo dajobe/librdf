@@ -473,16 +473,23 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   
   scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
   if(!scontext)
-    return NULL;
+    goto oom;
 
   scontext->statements=librdf_new_list(world);
+  if(!scontext->statements)
+    goto oom;
 
   if(pcontext->nspace_prefixes)
     raptor_free_sequence(pcontext->nspace_prefixes);
+  pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
+  if(!pcontext->nspace_prefixes)
+    goto oom;
+
   if(pcontext->nspace_uris)
     raptor_free_sequence(pcontext->nspace_uris);
-  pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
   pcontext->nspace_uris=raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
+  if(!pcontext->nspace_uris)
+    goto oom;
   
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
@@ -500,10 +507,10 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   
   scontext->pcontext=pcontext;
   if(base_uri)
-    base_uri = librdf_new_uri_from_uri(base_uri);
+    base_uri=librdf_new_uri_from_uri(base_uri);
   if(scontext->base_uri)
     librdf_free_uri(scontext->base_uri); 
-  scontext->base_uri = base_uri;
+  scontext->base_uri=base_uri;
 
   scontext->fh=fh;
   scontext->close_fh=close_fh;
@@ -527,12 +534,18 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
                              &librdf_parser_raptor_serialise_get_statement,
                              &librdf_parser_raptor_serialise_finished);
   }
-  if(!stream) {
-    librdf_parser_raptor_serialise_finished((void*)scontext);
-    return NULL;
-  }
+  if(!stream)
+    goto oom;
 
-  return stream;  
+  return stream;
+
+  /* Clean up and report an error on OOM */
+  oom:
+  librdf_parser_raptor_serialise_finished((void*)scontext);
+  librdf_log(world,
+             0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
+             "Out of memory");
+  return NULL;
 }
 
 
@@ -618,16 +631,23 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
 
   scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
   if(!scontext)
-    return NULL;
+    goto oom;
 
   scontext->statements=librdf_new_list(pcontext->parser->world);
+  if(!scontext->statements)
+    goto oom;
 
   if(pcontext->nspace_prefixes)
     raptor_free_sequence(pcontext->nspace_prefixes);
+  pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
+  if(!pcontext->nspace_prefixes)
+    goto oom;
+
   if(pcontext->nspace_uris)
     raptor_free_sequence(pcontext->nspace_uris);
-  pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
   pcontext->nspace_uris=raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
+  if(!pcontext->nspace_uris)
+    goto oom;
   
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
@@ -652,10 +672,10 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   }
 
   if(base_uri)
-    base_uri= librdf_new_uri_from_uri(base_uri);
+    base_uri=librdf_new_uri_from_uri(base_uri);
   if(scontext->base_uri)
     librdf_free_uri(scontext->base_uri); 
-  scontext->base_uri = base_uri;
+  scontext->base_uri=base_uri;
 
   if(pcontext->parser->uri_filter)
     raptor_parser_set_uri_filter(pcontext->rdf_parser,
@@ -668,10 +688,8 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     const char *accept_h;
 
     www=raptor_www_new();
-    if(!www) {
-      LIBRDF_FREE(librdf_parser_raptor_stream_context, scontext);
-      return NULL;
-    }
+    if(!www)
+      goto oom;
     
     accept_h=raptor_parser_get_accept_header(pcontext->rdf_parser);
     if(accept_h) {
@@ -685,6 +703,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
 
     if(raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri)) {
       raptor_www_free(www);
+      librdf_parser_raptor_serialise_finished((void*)scontext);
       return NULL;
     }
     
@@ -693,8 +712,10 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
 
     raptor_www_free(www);
   } else {
-    if(raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri))
+    if(raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri)) {
+      librdf_parser_raptor_serialise_finished((void*)scontext);
       return NULL;
+    }
     
     if(!length)
       length=strlen((const char*)string);
@@ -711,12 +732,18 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
                            &librdf_parser_raptor_serialise_next_statement,
                            &librdf_parser_raptor_serialise_get_statement,
                            &librdf_parser_raptor_serialise_finished);
-  if(!stream) {
-    librdf_parser_raptor_serialise_finished((void*)scontext);
-    return NULL;
-  }
+  if(!stream)
+    goto oom;
 
-  return stream;  
+  return stream;
+
+  /* Clean up and report an error on OOM */
+  oom:
+  librdf_parser_raptor_serialise_finished((void*)scontext);
+  librdf_log(pcontext->parser->world,
+             0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
+             "Out of memory");
+  return NULL;
 }
 
 
@@ -827,14 +854,19 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   
   scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
   if(!scontext)
-    return 1;
+    goto oom;
 
   if(pcontext->nspace_prefixes)
     raptor_free_sequence(pcontext->nspace_prefixes);
+  pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
+  if(!pcontext->nspace_prefixes)
+    goto oom;
+
   if(pcontext->nspace_uris)
     raptor_free_sequence(pcontext->nspace_uris);
-  pcontext->nspace_prefixes=raptor_new_sequence(free, NULL);
   pcontext->nspace_uris=raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
+  if(!pcontext->nspace_uris)
+    goto oom;
   
   raptor_set_statement_handler(pcontext->rdf_parser, scontext, 
                                librdf_parser_raptor_new_statement_handler);
@@ -855,17 +887,17 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   if(uri) {
     if(scontext->source_uri)
       librdf_free_uri(scontext->source_uri); 
-    scontext->source_uri = librdf_new_uri_from_uri(uri);
+    scontext->source_uri=librdf_new_uri_from_uri(uri);
   }
 
   if(base_uri)
-    base_uri = librdf_new_uri_from_uri(base_uri);
+    base_uri=librdf_new_uri_from_uri(base_uri);
   if(scontext->base_uri)
     librdf_free_uri(scontext->base_uri); 
-  scontext->base_uri = base_uri;
+  scontext->base_uri=base_uri;
 
   /* direct into model */
-  scontext->model = model;
+  scontext->model=model;
 
   if(pcontext->parser->uri_filter)
     raptor_parser_set_uri_filter(pcontext->rdf_parser,
@@ -890,6 +922,14 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   librdf_parser_raptor_serialise_finished((void*)scontext);
 
   return status;
+
+  /* Clean up and report an error on OOM */
+  oom:
+  librdf_parser_raptor_serialise_finished((void*)scontext);
+  librdf_log(pcontext->parser->world,
+             0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
+             "Out of memory");
+  return -1;
 }
 
 
