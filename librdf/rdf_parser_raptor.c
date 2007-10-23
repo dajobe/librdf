@@ -63,6 +63,8 @@ typedef struct {
   
   int errors;
   int warnings;
+
+  raptor_www *www;              /* raptor stream */
 } librdf_parser_raptor_context;
 
 
@@ -142,6 +144,9 @@ static void
 librdf_parser_raptor_terminate(void *context) 
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
+
+  if(pcontext->www)
+    raptor_www_free(pcontext->www);
   
   if(pcontext->rdf_parser)
     raptor_free_parser(pcontext->rdf_parser);
@@ -662,33 +667,36 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
                                  pcontext->parser);
 
   if(uri) {
-    raptor_www *www;
     const char *accept_h;
 
-    www=raptor_www_new();
-    if(!www)
+    if(pcontext->www)
+      raptor_www_free(pcontext->www);
+    pcontext->www=raptor_www_new();
+    if(!pcontext->www)
       goto oom;
     
     accept_h=raptor_parser_get_accept_header(pcontext->rdf_parser);
     if(accept_h) {
-      raptor_www_set_http_accept(www, accept_h);
+      raptor_www_set_http_accept(pcontext->www, accept_h);
       raptor_free_memory((char*)accept_h);
     }
 
-    raptor_www_set_write_bytes_handler(www, 
+    raptor_www_set_write_bytes_handler(pcontext->www, 
                                        librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler,
                                        scontext);
 
     if(raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri)) {
-      raptor_www_free(www);
+      raptor_www_free(pcontext->www);
+      pcontext->www=NULL;
       librdf_parser_raptor_serialise_finished((void*)scontext);
       return NULL;
     }
     
-    raptor_www_fetch(www, (raptor_uri*)uri);
+    raptor_www_fetch(pcontext->www, (raptor_uri*)uri);
     raptor_parse_chunk(pcontext->rdf_parser, NULL, 0, 1);
 
-    raptor_www_free(www);
+    raptor_www_free(pcontext->www);
+    pcontext->www=NULL;
   } else {
     if(raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri)) {
       librdf_parser_raptor_serialise_finished((void*)scontext);
