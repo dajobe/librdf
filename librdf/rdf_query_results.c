@@ -284,6 +284,7 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
   void *string=NULL;
   size_t string_length=0;
   raptor_iostream *iostr;
+  int error=0;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
@@ -294,20 +295,29 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
   formatter=librdf_new_query_results_formatter(query_results,
                                                NULL /* name */,
                                                format_uri);
-  if(!formatter)
+  if(!formatter) {
+    error=1;
     goto tidy;
+  }
 
   if(librdf_query_results_formatter_write(iostr, formatter,
                                           query_results, base_uri))
-    string=NULL;
+    error=1;
 
   librdf_free_query_results_formatter(formatter);
 
  tidy:
-  if(iostr)
-    raptor_free_iostream(iostr);
+  raptor_free_iostream(iostr);
 
-  if(length_p)
+  /* string is available only after the iostream is finished
+   * - clean it up here on error */
+  if(error) {
+    if(string) {
+      raptor_free_memory(string);
+      string=NULL;
+    }
+  }
+  else if(length_p)
     *length_p=string_length;
   
   return (unsigned char *)string;
