@@ -202,11 +202,6 @@ void librdf_finish_storage(librdf_world *world);
 librdf_storage_factory* librdf_get_storage_factory(librdf_world* world, const char *name);
 
 
-#ifdef HAVE_SQLITE
-void librdf_init_storage_sqlite(librdf_world *world);
-#endif
-
-
 /* rdf_storage_sql.c */
 typedef struct  
 {
