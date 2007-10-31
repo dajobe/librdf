@@ -622,12 +622,28 @@ librdf_free_storage (librdf_storage* storage)
 }
 
 
+/**
+ * librdf_storage_add_reference:
+ * @storage: #librdf_storage object
+ *
+ * Increment storage reference count by one.
+ * This function is intended to be internal to librdf storage modules.
+ **/
 void
 librdf_storage_add_reference(librdf_storage *storage)
 {
   storage->usage++;
 }
 
+
+/**
+ * librdf_storage_remove_reference(libdf_storage *storage)
+ * @storage: #librdf_storage object
+ *
+ * Decrement storage reference count by one.
+ * Free the storage if reference count becomes zero.
+ * This function is intended to be internal to librdf storage modules.
+ **/
 void
 librdf_storage_remove_reference(librdf_storage *storage)
 {

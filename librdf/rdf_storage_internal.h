@@ -201,8 +201,6 @@ void librdf_finish_storage(librdf_world *world);
 /* class methods */
 librdf_storage_factory* librdf_get_storage_factory(librdf_world* world, const char *name);
 
-void librdf_storage_add_reference(librdf_storage *storage);
-void librdf_storage_remove_reference(librdf_storage *storage);
 
 #ifdef HAVE_SQLITE
 void librdf_init_storage_sqlite(librdf_world *world);
