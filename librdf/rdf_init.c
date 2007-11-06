@@ -504,7 +504,9 @@ librdf_world_get_genid(librdf_world* world)
 /* OLD INTERFACES BELOW HERE */
 
 /* For old interfaces below ONLY */
+#ifndef NO_STATIC_DATA
 static librdf_world* RDF_World;
+#endif
 
 /**
  * librdf_init_world:
@@ -521,12 +523,17 @@ static librdf_world* RDF_World;
 void
 librdf_init_world(char *digest_factory_name, void* not_used2)
 {
+#ifndef NO_STATIC_DATA
   RDF_World=librdf_new_world();
   if(!RDF_World)
     return;
   if(digest_factory_name)
     librdf_world_set_digest(RDF_World, digest_factory_name);
   librdf_world_open(RDF_World);
+#else
+  /* fail if NO_STATIC_DATA is defined */
+  abort();
+#endif
 }
 
 
@@ -543,7 +550,12 @@ librdf_init_world(char *digest_factory_name, void* not_used2)
 void
 librdf_destroy_world(void)
 {
+#ifndef NO_STATIC_DATA
   librdf_free_world(RDF_World);
+#else
+  /* fail if NO_STATIC_DATA is defined */
+  abort();
+#endif
 }
 
 
