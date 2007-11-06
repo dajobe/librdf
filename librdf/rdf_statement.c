@@ -442,7 +442,7 @@ librdf_statement_to_string(librdf_statement *statement)
   int statement_string_len=0;
   const char *format;
 #define NULL_STRING_LENGTH 6
-  static const unsigned char *null_string=(const unsigned char *)"(null)";
+  static const unsigned char * const null_string=(const unsigned char *)"(null)";
   size_t len;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
