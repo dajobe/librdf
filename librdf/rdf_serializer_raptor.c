@@ -103,7 +103,7 @@ librdf_serializer_raptor_terminate(void *context)
 static librdf_node*
 librdf_serializer_raptor_get_feature(void *context, librdf_uri* feature) {
   librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
-  static unsigned char intbuffer[20]; /* FIXME */
+  unsigned char intbuffer[20]; /* FIXME */
   unsigned char *uri_string;
   raptor_feature feature_i;
   

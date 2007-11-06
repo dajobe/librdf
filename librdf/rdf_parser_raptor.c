@@ -220,7 +220,7 @@ librdf_parser_raptor_new_statement_handler(void *context,
      * Do I really need to do log10(ordinal) [or /10 and count] + 1 ? 
      * See also librdf_heuristic_gen_name for some code to repurpose.
      */
-    static char ordinal_buffer[100]; 
+    char ordinal_buffer[100]; 
     int ordinal=*(int*)rstatement->predicate;
     sprintf(ordinal_buffer, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_%d", ordinal);
     
@@ -1114,7 +1114,7 @@ static librdf_node*
 librdf_parser_raptor_get_feature(void* context, librdf_uri *feature) 
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
-  static unsigned char intbuffer[20]; /* FIXME */
+  unsigned char intbuffer[20]; /* FIXME */
   unsigned char *uri_string;
 
   if(!feature)
