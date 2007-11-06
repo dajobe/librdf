@@ -1310,7 +1310,7 @@ librdf_parser_raptor_get_namespaces_seen_count(void* context)
 }
 
 
-static raptor_uri_handler librdf_raptor_uri_handler = {
+static const raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_new_uri,
   librdf_raptor_new_uri_from_uri_local_name,
   librdf_raptor_new_uri_relative_to_base,
@@ -1367,7 +1367,8 @@ librdf_parser_raptor_constructor(librdf_world *world)
   unsigned int i;
   raptor_init();
 
-  raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
+  /* FIXME: casting away constness from raptor_uri_handler */
+  raptor_uri_set_handler((raptor_uri_handler*)&librdf_raptor_uri_handler, world);
 
   /* enumerate from parser 1, so the default parser 0 is done last */
   for(i=1; 1; i++) {
