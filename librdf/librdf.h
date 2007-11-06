@@ -34,28 +34,24 @@ extern "C" {
 
 #include <stdio.h>
 
-#ifdef WIN32
-#  ifdef __GNUC__
-#    undef _declspec
-#    define _declspec(x) __declspec(x)
-#  endif
-#  ifdef REDLAND_STATIC
-#    define REDLAND_API
-#  else
-#    ifdef LIBRDF_INTERNAL
-#      define REDLAND_API _declspec(dllexport)
-#    else
-#      define REDLAND_API _declspec(dllimport)
+#ifndef REDLAND_API
+#  ifdef WIN32
+#    ifdef __GNUC__
+#      undef _declspec
+#      define _declspec(x) __declspec(x)
 #    endif
-#  endif
-#elif defined(__SYMBIAN32__)
-#  ifdef LIBRDF_INTERNAL
-#    define REDLAND_API __declspec(dllexport)
+#    ifdef REDLAND_STATIC
+#      define REDLAND_API
+#    else
+#      ifdef LIBRDF_INTERNAL
+#        define REDLAND_API _declspec(dllexport)
+#      else
+#        define REDLAND_API _declspec(dllimport)
+#      endif
+#    endif
 #  else
-#    define REDLAND_API __declspec(dllimport)
+#    define REDLAND_API
 #  endif
-#else
-#  define REDLAND_API
 #endif
 
 /* Use gcc 3.1+ feature to allow marking of deprecated API calls.
