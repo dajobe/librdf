@@ -57,7 +57,7 @@
 #include <redland.h>
 
 
-static const char *log_level_names[LIBRDF_LOG_LAST+1]={
+static const char * const log_level_names[LIBRDF_LOG_LAST+1]={
   "none", "debug", "info", "warning", "error", "fatal"
 };
 
