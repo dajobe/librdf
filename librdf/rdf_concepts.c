@@ -78,9 +78,8 @@ static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
 };
 
 
-
-static const unsigned char * librdf_concept_ms_namespace=(const unsigned char *)"http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-static const unsigned char * librdf_concept_schema_namespace=(const unsigned char *)"http://www.w3.org/2000/01/rdf-schema#";
+static const unsigned char * const librdf_concept_ms_namespace=(const unsigned char *)"http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+static const unsigned char * const librdf_concept_schema_namespace=(const unsigned char *)"http://www.w3.org/2000/01/rdf-schema#";
 
 librdf_uri* librdf_concept_ms_namespace_uri = NULL;
 librdf_uri* librdf_concept_schema_namespace_uri = NULL;
