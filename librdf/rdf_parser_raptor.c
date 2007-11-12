@@ -1367,8 +1367,7 @@ librdf_parser_raptor_constructor(librdf_world *world)
   unsigned int i;
   raptor_init();
 
-  /* FIXME: casting away constness from raptor_uri_handler */
-  raptor_uri_set_handler((raptor_uri_handler*)&librdf_raptor_uri_handler, world);
+  raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
 
   /* enumerate from parser 1, so the default parser 0 is done last */
   for(i=1; 1; i++) {
