@@ -121,7 +121,14 @@ struct librdf_world_s
    * Used with --enable-modular / MODULAR_LIBRDF
    */
   int ltdl_opened;
-  
+
+  /* librdf_concepts RDF syntax and Schema namespace uris */
+  librdf_uri* concept_ms_namespace_uri;
+  librdf_uri* concept_schema_namespace_uri;
+
+  /* librdf_concepts nodes and uris */
+  librdf_uri** concept_uris;
+  librdf_node** concept_resources;
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);

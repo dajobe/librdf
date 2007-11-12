@@ -392,7 +392,7 @@ librdf_new_node_from_literal(librdf_world *world,
                                                     xml_language,
                                                     xml_language_len,
                                                     (is_wf_xml ? 
-                                                     LIBRDF_RS_XMLLiteral_URI : NULL)
+                                                     LIBRDF_RS_XMLLiteral_URI(world) : NULL)
                                                     );
 }
 
@@ -989,7 +989,7 @@ librdf_node_get_literal_value_is_wf_xml(librdf_node* node)
     return 0;
   
   return librdf_uri_equals(node->value.literal.datatype_uri,
-                           LIBRDF_RS_XMLLiteral_URI);
+                           LIBRDF_RS_XMLLiteral_URI(node->world));
 }
 
 
@@ -1559,7 +1559,7 @@ librdf_node_decode(librdf_world *world,
                                                       string_length,
                                                       (const char*)language,
                                                       language_length,
-                                                      is_wf_xml ? LIBRDF_RS_XMLLiteral_URI : NULL);
+                                                      is_wf_xml ? LIBRDF_RS_XMLLiteral_URI(world) : NULL);
     
     break;
 
