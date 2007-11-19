@@ -80,7 +80,7 @@ typedef enum {
  * @LIBRDF_FROM_NONE: Associated with no part.
  * @LIBRDF_FROM_LAST: Internal, never returned.
  *
- * Indicates the part of the system that generated the log message
+ * Indicates the part of the system that generated the log message.
  */
 typedef enum {
   LIBRDF_FROM_NONE = 0,
