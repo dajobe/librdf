@@ -168,8 +168,10 @@ librdf_stream_update_current_statement(librdf_stream* stream)
       break;
     
     map_iterator=librdf_list_get_iterator(stream->map_list);
-    if(!map_iterator)
+    if(!map_iterator) {
+      statement=NULL;
       break;
+    }
     
     while(!librdf_iterator_end(map_iterator)) {
       librdf_stream_map *map=(librdf_stream_map*)librdf_iterator_get_object(map_iterator);
