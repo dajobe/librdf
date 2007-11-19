@@ -443,9 +443,15 @@ librdf_storage_list_find_statements(librdf_storage* storage, librdf_statement* s
     return NULL;
   
   stream=librdf_storage_list_serialise(storage);
-  if(stream)
-    librdf_stream_add_map(stream, &librdf_stream_statement_find_map,
-                          (librdf_stream_map_free_context_handler)&librdf_free_statement, (void*)statement);
+  if(stream) {
+    if(librdf_stream_add_map(stream, &librdf_stream_statement_find_map,
+                             (librdf_stream_map_free_context_handler)&librdf_free_statement,
+                             (void*)statement)) {
+      /* error - stream_add_map failed */
+      librdf_free_stream(stream);
+      stream=NULL;
+    }
+  }
   else
     librdf_free_statement(statement);
 
