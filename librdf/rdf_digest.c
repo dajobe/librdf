@@ -146,13 +146,10 @@ librdf_get_digest_factory(librdf_world *world, const char *name)
     }
   } else {
     for(factory=world->digests; factory; factory=factory->next) {
-      if(!strcmp(factory->name, name)) {
-	break;
-      }
+      if(!strcmp(factory->name, name))
+        break;
     }
-    /* else FACTORY with name digest_name not found */
-    if(!factory)
-      return NULL;
+    /* else FACTORY with name digest_name not found -> return NULL */
   }
   
   return factory;
