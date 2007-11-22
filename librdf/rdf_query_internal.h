@@ -55,8 +55,6 @@ struct librdf_query_results_s
 };
 
 
-typedef struct rasqal_query_results_formatter_s rasqal_query_results_formatter;
-
 struct librdf_query_results_formatter_s
 {
   /* query result that this is formatting */
