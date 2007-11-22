@@ -75,10 +75,10 @@ static librdf_statement* librdf_stream_update_current_statement(librdf_stream* s
 librdf_stream*
 librdf_new_stream(librdf_world *world, 
                   void* context,
-		  int (*is_end_method)(void*),
-		  int (*next_method)(void*),
+                  int (*is_end_method)(void*),
+                  int (*next_method)(void*),
                   void* (*get_method)(void*, int),
-		  void (*finished_method)(void*))
+                  void (*finished_method)(void*))
 {
   librdf_stream* new_stream;
   
