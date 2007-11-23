@@ -170,7 +170,6 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
 {
   librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
   char *name_copy;
-  int is_new;
   char* synchronous;
   
   if(!name)
@@ -185,7 +184,7 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
   strncpy(name_copy, name, context->name_len+1);
   context->name=name_copy;
   
-  if((is_new=librdf_hash_get_as_boolean(options, "new"))>0)
+  if(librdf_hash_get_as_boolean(options, "new")>0)
     context->is_new=1; /* default is NOT NEW */
 
   /* Redland default is "PRAGMA synchronous normal" */
@@ -747,6 +746,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 #endif
 #if SQLITE_API == 3
     sqlite_CLOSE(context->db);
+    context->db=NULL;
 #endif
     return 1;
   }
