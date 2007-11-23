@@ -80,7 +80,7 @@
 #endif
 
 
-static const char* sqlite_synchronous_flags[4] = {
+static const char* const sqlite_synchronous_flags[4] = {
   "off", "normal", "full", NULL
 };
 
@@ -275,7 +275,7 @@ typedef enum {
   TRIPLE_NONE   =3,
 } triple_node_type;
 
-static const char * triples_fields[4][3] = {
+static const char * const triples_fields[4][3] = {
   { "subjectUri",   "subjectBlank", NULL },
   { "predicateUri", NULL,           NULL },
   { "objectUri",    "objectBlank",  "objectLiteral" },
@@ -471,7 +471,7 @@ librdf_storage_sqlite_uri_helper(librdf_storage* storage,
   unsigned char *uri_e;
   size_t uri_e_len;
   int id;
-  static const char *field="uri";
+  static const char * const field="uri";
 
   uri_string=librdf_uri_as_counted_string(uri, &uri_len);
   uri_e=sqlite_string_escape(uri_string, uri_len, &uri_e_len);
@@ -504,7 +504,7 @@ librdf_storage_sqlite_blank_helper(librdf_storage* storage,
   unsigned char *blank_e;
   size_t blank_e_len;
   int id;
-  static const char *field="blank";
+  static const char * const field="blank";
 
   blank_len=strlen((const char*)blank);
   blank_e=sqlite_string_escape(blank, blank_len, &blank_e_len);
