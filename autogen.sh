@@ -105,6 +105,8 @@ my(\$path,\$name)=@ARGV;
 exit 0 if !-f \$path;
 die "\$prog: \$path not found\n" if !-r \$path;
 
+my \$mname=\$name; \$mname =~ s/^g(libtoolize)\$/\$1/;
+
 my(@vnums);
 for my \$varg (qw(--version -version)) {
   my \$cmd="\$path \$varg";
@@ -112,7 +114,7 @@ for my \$varg (qw(--version -version)) {
   while(<PIPE>) {
     chomp;
     next if @vnums; # drain pipe if we got a vnums
-    next unless /^\$name/;
+    next unless /^\$mname/;
     my(\$v)=/(\S+)\$/i; \$v =~ s/-.*\$//;
     @vnums=grep { defined \$_ && !/^\s*\$/} map { s/\D//g; \$_; } split(/\./, \$v);
   }
