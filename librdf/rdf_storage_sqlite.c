@@ -290,7 +290,7 @@ librdf_storage_sqlite_get_1int_callback(void *arg,
   int* count_p=(int*)arg;
   
   if(argc == 1) {
-    *count_p=atoi(argv[0]);
+    *count_p=argv[0] ? atoi(argv[0]) : 0;
   }
   return 0;
 }
