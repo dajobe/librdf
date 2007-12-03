@@ -1159,6 +1159,9 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   if(!scontext)
     return NULL;
 
+  scontext->storage=storage;
+  librdf_storage_add_reference(scontext->storage);
+
   scontext->sqlite_context=context;
   context->in_stream++;
 
@@ -1199,9 +1202,6 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   }
   raptor_free_stringbuffer(sb);
   
-  scontext->storage=storage;
-  librdf_storage_add_reference(scontext->storage);
-
   stream=librdf_new_stream(storage->world,
                            (void*)scontext,
                            &librdf_storage_sqlite_serialise_end_of_stream,
@@ -1547,9 +1547,11 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
   if(!scontext)
     return NULL;
 
+  scontext->storage=storage;
+  librdf_storage_add_reference(scontext->storage);
+
   scontext->sqlite_context=context;
   context->in_stream++;
-
 
   scontext->query_statement=librdf_new_statement_from_statement(statement);
   if(!scontext->query_statement) {
@@ -1624,9 +1626,6 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
   }
   raptor_free_stringbuffer(sb);
   
-  scontext->storage=storage;
-  librdf_storage_add_reference(scontext->storage);
-
   stream=librdf_new_stream(storage->world,
                            (void*)scontext,
                            &librdf_storage_sqlite_find_statements_end_of_stream,
@@ -1994,6 +1993,9 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
   if(!scontext)
     return NULL;
 
+  scontext->storage=storage;
+  librdf_storage_add_reference(scontext->storage);
+
   scontext->sqlite_context=context;
   context->in_stream++;
 
@@ -2053,9 +2055,6 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
     return NULL;
   }
   raptor_free_stringbuffer(sb);
-
-  scontext->storage=storage;
-  librdf_storage_add_reference(scontext->storage);
 
   stream=librdf_new_stream(storage->world,
                            (void*)scontext,
