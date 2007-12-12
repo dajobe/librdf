@@ -108,6 +108,7 @@ typedef struct
   int in_stream;
   librdf_storage_sqlite_query *in_stream_queries;
 
+  int in_transaction;
 } librdf_storage_sqlite_context;
 
 
@@ -156,6 +157,11 @@ static int librdf_storage_sqlite_get_contexts_is_end(void* iterator);
 static int librdf_storage_sqlite_get_contexts_next_method(void* iterator);
 static void* librdf_storage_sqlite_get_contexts_get_method(void* iterator, int);
 static void librdf_storage_sqlite_get_contexts_finished(void* iterator);
+
+/* transactions */
+static int librdf_storage_sqlite_transaction_start(librdf_storage *storage);
+static int librdf_storage_sqlite_transaction_commit(librdf_storage *storage);
+static int librdf_storage_sqlite_transaction_rollback(librdf_storage *storage);
 
 static void librdf_storage_sqlite_query_flush(librdf_storage *storage);
 
@@ -777,9 +783,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
     unsigned char request[200];
     int begin;
 
-    begin=librdf_storage_sqlite_exec(storage,
-                                     (unsigned char *)"BEGIN TRANSACTION;",
-                                     NULL, NULL, 0);
+    begin=librdf_storage_sqlite_transaction_start(storage);
 
     for(i=0; i < NTABLES; i++) {
 
@@ -801,9 +805,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                                     NULL, /* arg */
                                     0)) {
         if(!begin)
-          librdf_storage_sqlite_exec(storage,
-                                     (unsigned char *) "END TRANSACTION;",
-                                     NULL, NULL, 0);
+          librdf_storage_sqlite_transaction_rollback(storage);
         return 1;
       }
 
@@ -817,9 +819,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                                   NULL, /* arg */
                                   0)) {
       if(!begin)
-        librdf_storage_sqlite_exec(storage,
-                                   (unsigned char *) "END TRANSACTION;",
-                                   NULL, NULL, 0);
+        librdf_storage_sqlite_transaction_rollback(storage);
       return 1;
     }
     
@@ -831,17 +831,12 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                                   NULL, /* arg */
                                   0)) {
       if(!begin)
-        librdf_storage_sqlite_exec(storage,
-                                   (unsigned char *) "END TRANSACTION;",
-                                   NULL, NULL, 0);
+        librdf_storage_sqlite_transaction_rollback(storage);
       return 1;
     }
     
     if(!begin)
-      librdf_storage_sqlite_exec(storage,
-                                 (unsigned char *) "END TRANSACTION;",
-                                 NULL, NULL, 0);
-    
+      librdf_storage_sqlite_transaction_commit(storage);    
   } /* end if is new */
 
   return 0;
@@ -905,6 +900,10 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
 {
   /* librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context; */
   int status=0;
+  int begin;
+
+  /* returns non-0 if a transaction is already active */
+  begin=librdf_storage_sqlite_transaction_start(storage);
 
   for(; !librdf_stream_end(statement_stream);
       librdf_stream_next(statement_stream)) {
@@ -931,8 +930,11 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
     if(librdf_storage_sqlite_statement_helper(storage,
                                               statement,
                                               context_node,
-                                              node_types, node_ids, fields))
+                                              node_types, node_ids, fields)) {
+      if(!begin)
+        librdf_storage_sqlite_transaction_rollback(storage);
       return -1;
+    }
     
     if(context_node)
       max++;
@@ -973,10 +975,16 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
 
     raptor_free_stringbuffer(sb);
 
-    if(rc)
+    if(rc) {
+      if(!begin)
+        librdf_storage_sqlite_transaction_rollback(storage);
       return 1;
+    }
 
   }
+
+  if(!begin)
+    librdf_storage_sqlite_transaction_commit(storage);
   
   return status;
 }
@@ -1046,9 +1054,8 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
   int count=0;
   int rc, begin;
 
-  begin=librdf_storage_sqlite_exec(storage,
-                                   (unsigned char *) "BEGIN TRANSACTION;",
-                                   NULL, NULL, 0);
+  /* returns non-0 if a transaction is already active */
+  begin=librdf_storage_sqlite_transaction_start(storage);
 
   sb=raptor_new_stringbuffer();
   raptor_stringbuffer_append_string(sb, 
@@ -1057,9 +1064,7 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
   if(librdf_storage_sqlite_statement_operator_helper(storage, statement, 
                                                      NULL, sb)) {
     if(!begin)
-      librdf_storage_sqlite_exec(storage,
-                                 (unsigned char *) "END TRANSACTION;",
-                                 NULL, NULL, 0);
+      librdf_storage_sqlite_transaction_rollback(storage);
     raptor_free_stringbuffer(sb);
     return -1;
   }
@@ -1076,9 +1081,7 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
   raptor_free_stringbuffer(sb);
 
   if(!begin)
-    librdf_storage_sqlite_exec(storage,
-                               (unsigned char *) "END TRANSACTION;",
-                               NULL, NULL, 0);
+    librdf_storage_transaction_commit(storage);
 
   if(rc)  
     return -1;
@@ -1783,10 +1786,9 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   int i;
   int rc, begin;
   int max=3;
-  
-  begin=librdf_storage_sqlite_exec(storage,
-                                   (unsigned char *) "BEGIN TRANSACTION;",
-                                   NULL, NULL, 0);
+
+  /* returns non-0 if transaction is already active */
+  begin=librdf_storage_sqlite_transaction_start(storage);
 
   if(librdf_storage_sqlite_statement_helper(storage,
                                             statement,
@@ -1794,9 +1796,7 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
                                             node_types, node_ids, fields)) {
 
     if(!begin)
-      librdf_storage_sqlite_exec(storage,
-                                 (unsigned char *) "END TRANSACTION;",
-                                 NULL, NULL, 0);
+      librdf_storage_sqlite_transaction_rollback(storage);
     return -1;
   }
   
@@ -1838,14 +1838,14 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   
   raptor_free_stringbuffer(sb);
   
+  if(rc) {
+    if(!begin)
+      librdf_storage_transaction_rollback(storage);
+    return rc;
+  }
+
   if(!begin)
-    librdf_storage_sqlite_exec(storage,
-                               (unsigned char *) "END TRANSACTION;",
-                               NULL, NULL, 0);
-
-  if(rc)
-    return 1;
-
+    librdf_storage_transaction_commit(storage);
   return 0;
 }
 
@@ -2525,6 +2525,79 @@ librdf_storage_sqlite_get_feature(librdf_storage* storage, librdf_uri* feature)
   return NULL;
 }
 
+
+/**
+ * librdf_storage_sqlite_transaction_start:
+ * @storage: #librdf_storage object
+ *
+ * Start a new transaction unless one is already active.
+ * 
+ * Return value: 0 if transaction successfully started, non-0 on error
+ * (including a transaction already active)
+ **/
+static int
+librdf_storage_sqlite_transaction_start(librdf_storage *storage)
+{
+  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context *)storage->context;
+
+  if(context->in_transaction)
+    return 1;
+  context->in_transaction++;
+
+  return librdf_storage_sqlite_exec(storage,
+                                    (unsigned char *)"BEGIN;",
+                                    NULL, NULL, 0);
+}
+
+
+/**
+ * librdf_storage_sqlite_transaction_commit:
+ * @storage: #librdf_storage object
+ *
+ * Commit an active transaction.
+ * 
+ * Return value: 0 if transaction successfully committed, non-0 on error
+ * (including no transaction active)
+ **/
+static int
+librdf_storage_sqlite_transaction_commit(librdf_storage *storage)
+{
+  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context *)storage->context;
+
+  if(!context->in_transaction)
+    return 1;
+  context->in_transaction--;
+
+  return librdf_storage_sqlite_exec(storage,
+                                    (unsigned char *)"END",
+                                    NULL, NULL, 0);
+}
+
+
+/**
+ * librdf_storage_sqlite_transaction_rollback:
+ * @storage: #librdf_storage object
+ *
+ * Roll back an active transaction.
+ * 
+ * Return value: 0 if transaction successfully committed, non-0 on error
+ * (including no transaction active)
+ **/
+static int
+librdf_storage_sqlite_transaction_rollback(librdf_storage *storage)
+{
+  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context *)storage->context;
+
+  if(!context->in_transaction)
+    return 1;
+  context->in_transaction--;
+
+  return librdf_storage_sqlite_exec(storage,
+                                    (unsigned char *)"ROLLBACK;",
+                                    NULL, NULL, 0);
+}
+
+
 static void
 librdf_storage_sqlite_query_flush(librdf_storage *storage)
 {
@@ -2535,9 +2608,8 @@ librdf_storage_sqlite_query_flush(librdf_storage *storage)
   if(!context->in_stream_queries)
     return;
 
-  begin=librdf_storage_sqlite_exec(storage,
-                                   (unsigned char *) "BEGIN TRANSACTION;",
-                                   NULL, NULL, 0);
+  /* returns non-0 if a transaction is already active */  
+  begin=librdf_storage_sqlite_transaction_start(storage);
 
   while(context->in_stream_queries) {
     query=context->in_stream_queries;
@@ -2550,9 +2622,7 @@ librdf_storage_sqlite_query_flush(librdf_storage *storage)
   }
 
   if(!begin)
-    librdf_storage_sqlite_exec(storage,
-                               (unsigned char *) "END TRANSACTION;",
-                               NULL, NULL, 0);
+    librdf_storage_sqlite_transaction_commit(storage);
 }
 
 /* local function to register sqlite storage functions */
@@ -2579,6 +2649,9 @@ librdf_storage_sqlite_register_factory(librdf_storage_factory *factory)
   factory->context_serialise        = librdf_storage_sqlite_context_serialise;
   factory->get_contexts             = librdf_storage_sqlite_get_contexts;
   factory->get_feature              = librdf_storage_sqlite_get_feature;
+  factory->transaction_start        = librdf_storage_sqlite_transaction_start;
+  factory->transaction_commit       = librdf_storage_sqlite_transaction_commit;
+  factory->transaction_rollback     = librdf_storage_sqlite_transaction_rollback;
 }
 
 
