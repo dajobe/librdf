@@ -1061,6 +1061,15 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
   raptor_stringbuffer_append_string(sb, 
                                     (const unsigned char*)"SELECT 1",
                                     1);
+  /* FIXME:
+   * librdf_storage_sqlite_statement_operator_helper()
+   * calls librdf_storage_sqlite_statement_helper()
+   * which calls librdf_storage_sqlite_node_helper()
+   * which calls librdf_storage_sqlite_{uri,literal,blank}_helper() 
+   * which call librdf_storage_sqlite_set_helper() 
+   * which creates new rows for unseen uris/literals/blanks
+   * - should not need to insert new data if merely testing for existence.
+   */
   if(librdf_storage_sqlite_statement_operator_helper(storage, statement, 
                                                      NULL, sb)) {
     if(!begin)
