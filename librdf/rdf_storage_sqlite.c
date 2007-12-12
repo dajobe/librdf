@@ -1052,7 +1052,7 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
 
   sb=raptor_new_stringbuffer();
   raptor_stringbuffer_append_string(sb, 
-                                    (const unsigned char*)"SELECT subjectUri",
+                                    (const unsigned char*)"SELECT 1",
                                     1);
   if(librdf_storage_sqlite_statement_operator_helper(storage, statement, 
                                                      NULL, sb)) {
