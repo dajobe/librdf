@@ -19,6 +19,7 @@ BuildRequires: libxml2-devel >= 2.4.0
 BuildRequires: curl-devel
 BuildRequires: raptor-devel >= @RAPTOR_MIN_VERSION@
 BuildRequires: rasqal-devel >= @RASQAL_MIN_VERSION@
+BuildRequires: rasqal-devel <= @RASQAL_MAX_VERSION@
 BuildRequires: perl >= 5.8.0
 BuildRequires: db4-devel
 BuildRequires: mysql-devel

@@ -517,7 +517,9 @@ AC_CHECK_PROG(RASQAL_CONFIG, rasqal-config, rasqal-config)
 AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/internal (default=auto)], with_rasqal="$withval", with_rasqal="auto")
 
 RASQAL_MIN_VERSION=0.9.15
+RASQAL_MAX_VERSION=0.9.15
 AC_SUBST(RASQAL_MIN_VERSION)
+AC_SUBST(RASQAL_MAX_VERSION)
 if test "X$RASQAL_CONFIG" = "X"; then
   with_rasqal=internal
 else
@@ -525,16 +527,18 @@ else
 
   RASQAL_VERSION_DEC=`$RASQAL_CONFIG --version-decimal`
   RASQAL_MIN_VERSION_DEC=`echo $RASQAL_MIN_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  RASQAL_MAX_VERSION_DEC=`echo $RASQAL_MAX_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
 
   if test "X$with_rasqal" = Xauto; then
-    if test "X$RASQAL_VERSION" -a $RASQAL_VERSION_DEC -ge $RASQAL_MIN_VERSION_DEC; then
+    if test "X$RASQAL_VERSION" -a $RASQAL_VERSION_DEC -ge $RASQAL_MIN_VERSION_DEC -a $RASQAL_VERSION_DEC -le $RASQAL_MAX_VERSION_DEC; then
       with_rasqal=system
     else
       with_rasqal=internal
     fi
   elif test $with_rasqal = system; then
-    if test $RASQAL_VERSION_DEC -lt $RASQAL_MIN_VERSION_DEC; then
-      AC_MSG_WARN(System rasqal $RASQAL_VERSION is too old - need $RASQAL_MIN_VERSION)
+    if test $RASQAL_VERSION_DEC -lt $RASQAL_MIN_VERSION_DEC -o
+            $RASQAL_VERSION_DEC -gt $RASQAL_MAX_VERSION_DEC; then
+      AC_MSG_WARN(System rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
       AC_MSG_WARN(Proceeding anyway since --with-rasqal=system was given)
       AC_MSG_WARN(To use the internal rasqal use --with-rasqal=internal)
       AC_MSG_WARN(or omit any --with-rasqal argument.)
