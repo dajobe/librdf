@@ -536,8 +536,7 @@ else
       with_rasqal=internal
     fi
   elif test $with_rasqal = system; then
-    if test $RASQAL_VERSION_DEC -lt $RASQAL_MIN_VERSION_DEC -o
-            $RASQAL_VERSION_DEC -gt $RASQAL_MAX_VERSION_DEC; then
+    if test $RASQAL_VERSION_DEC -lt $RASQAL_MIN_VERSION_DEC -o $RASQAL_VERSION_DEC -gt $RASQAL_MAX_VERSION_DEC; then
       AC_MSG_WARN(System rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
       AC_MSG_WARN(Proceeding anyway since --with-rasqal=system was given)
       AC_MSG_WARN(To use the internal rasqal use --with-rasqal=internal)
