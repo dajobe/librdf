@@ -42,7 +42,7 @@ extern "C" {
  *
  * See librdf_stream_add_map().
  *
- * Returns; item in keep the iteration or NULL to remove it
+ * Returns: item in keep the iteration or NULL to remove it
  */
 typedef librdf_statement* (*librdf_stream_map_handler)(librdf_stream *stream, void *map_context, librdf_statement *item);
 

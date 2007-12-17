@@ -43,7 +43,7 @@ extern "C" {
  *
  * See librdf_iterator_add_map().
  *
- * Returns; item in keep the iteration or NULL to remove it
+ * Returns: item in keep the iteration or NULL to remove it
  */
 typedef void* (*librdf_iterator_map_handler)(librdf_iterator *iterator, void *map_context, void *item);
 
