@@ -55,9 +55,14 @@ struct librdf_query_results_s
 };
 
 
+#ifdef RASQAL_API
+/* rasqal.h will have defined this */
+#else
+/* provide a forward reference */
 #ifndef RASQAL_QUERY_RESULTS_FORMATTER_DECLARED
 #define RASQAL_QUERY_RESULTS_FORMATTER_DECLARED 1
 typedef struct rasqal_query_results_formatter_s rasqal_query_results_formatter;
+#endif
 #endif
 
 struct librdf_query_results_formatter_s
