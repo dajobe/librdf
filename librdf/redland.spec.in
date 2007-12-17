@@ -10,7 +10,7 @@ Name:      %{name}
 Version:   %{version}
 Release:   %{release}
 Prefix:    %{_prefix}
-License:   LGPL/Apache 2
+License:   LGPLv2+ or ASL 2.0
 Group:     Development/Libraries
 Source:    http://download.librdf.org/source/%{name}-%{version}.tar.gz
 URL:       http://librdf.org/
@@ -23,6 +23,9 @@ BuildRequires: perl >= 5.8.0
 BuildRequires: db4-devel
 BuildRequires: mysql-devel
 BuildRequires: sqlite-devel
+BuildRequires: postgresql-devel
+BuildRequires: gtk-doc
+BuildRequires:  libtool
 Packager:  Dave Beckett <dave@dajobe.org>
 Docdir: %{prefix}/doc
 Requires:  libxml2
@@ -43,25 +46,26 @@ for RDF developers to start with.
 %package devel
 Summary: Libraries and header files for programs that use Redland.
 Group: Development/Libraries
-Requires: redland
+Requires: %{name} = %{version}-%{release}
 Requires: raptor >= @RAPTOR_MIN_VERSION@
-Requires: rasqal >= @RASQAL_MIN_VERSION@
+Requires: rasqal >= @RASQAL_MIN_VERSION@, rasqal <= @RASQAL_MAX_VERSION@
 
 %description devel
 Header files for development with Redland
 
 %prep
-%setup
+%setup -q
 
 %build
-# Force use of default python even if 2.0 is present
-PYTHON=python
-export PYTHON
 
-%configure --enable-release --with-raptor=system --with-rasqal=system --with-threestore=no
+%configure \
+  --enable-release \
+  --with-raptor=system --with-rasqal=system --with-threestore=no
 
 %{__make} OPTIMIZE="$RPM_OPT_FLAGS"
 
+%check
+make check
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -75,41 +79,35 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(0555, bin, bin)
-
+%defattr(-,root,root,-)
 %{_libdir}/librdf*.so.*
-%{prefix}/bin/rdfproc
-%{prefix}/bin/redland-db-upgrade
-
-%{_datadir}/%{name}/mysql-v1.ttl
-%{_datadir}/%{name}/mysql-v2.ttl
-
-%defattr (0444, bin, bin, 0555)
+%{_bindir}/rdfproc
+%{_bindir}/redland-db-upgrade
+%dir %{_datadir}/redland
+%{_datadir}/redland/mysql-v1.ttl
+%{_datadir}/redland/mysql-v2.ttl
 
 %doc AUTHORS COPYING COPYING.LIB ChangeLog LICENSE.txt NEWS README
 %doc LICENSE-2.0.txt NOTICE
-
 %doc *.html
 
-%doc %{_mandir}/man1/redland-config.1*
 %doc %{_mandir}/man1/redland-db-upgrade.1*
 %doc %{_mandir}/man1/rdfproc.1*
 %doc %{_mandir}/man3/redland.3*
 
 %files devel
-%defattr(-, root, root)
-
-%{prefix}/bin/redland-config
+%defattr(-, root, root,-)
+%{_bindir}/redland-config
 %{_libdir}/librdf*.a
 %{_libdir}/librdf*.la
 %{_libdir}/librdf*.so
 %{_libdir}/pkgconfig/redland.pc
+%dir %{_datadir}/redland
+%{_datadir}/redland/Redland.i
 
-%{_datadir}/%{name}/Redland.i
-
-%{prefix}/include/redland.h
-%{prefix}/include/librdf.h 
-%{prefix}/include/rdf_*.h
+%{_includedir}/redland.h
+%{_includedir}/librdf.h
+%{_includedir}/rdf_*.h
 
 %doc AUTHORS COPYING COPYING.LIB ChangeLog LICENSE.txt NEWS README
 %doc LICENSE-2.0.txt NOTICE
@@ -117,15 +115,18 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 %doc docs/README.html
 %doc %{_datadir}/gtk-doc/html
 
-%post
-/sbin/ldconfig
+%doc %{_mandir}/man1/redland-config.1*
 
-%postun
-/sbin/ldconfig
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %changelog
 * Sun Dec 16 2007  Dave Beckett <dave@dajobe.org>
 - rasqal-devel has a max and a min version now
+- use macros like %{_bindir} and %{_includedir}
+- add postgresql-devel, gtk-doc and libtool to BuildRequires
+- create some new dirs explicitly
 
 * Sat May  5 2007  Dave Beckett <dave@dajobe.org>
 - Add /usr/share/redland/mysql-v1.ttl and /usr/share/redland/mysql-v2.ttl
