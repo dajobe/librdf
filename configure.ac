@@ -858,16 +858,16 @@ if test $mysql_storage  = yes; then
   MYSQL_LIBS="$LIBRDF_LIBS $mysql_libs"
 fi
 if test $sqlite_storage  = yes; then
-  SQLITE_CPPFLAGS="$LIBRDF_CPPFLAGS `$SQLITE_CONFIG --cflags`"
-  SQLITE_LIBS="$LIBRDF_LIBS `$SQLITE_CONFIG --libs`"
+  SQLITE_CPPFLAGS="`$SQLITE_CONFIG --cflags`"
+  SQLITE_LIBS="`$SQLITE_CONFIG --libs`"
 fi
 if test $tstore_storage  = yes; then
-  TSTORE_CPPFLAGS="$LIBRDF_CPPFLAGS `$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
-  TSTORE_LIBS="$LIBRDF_LIBS `$TSTORE_CONFIG --libs` `$PKG_CONFIG glib --libs`"
+  TSTORE_CPPFLAGS="`$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
+  TSTORE_LIBS="`$TSTORE_CONFIG --libs` `$PKG_CONFIG glib --libs`"
 fi
 if test $postgresql_storage  = yes; then
-  POSTGRESQL_CPPFLAGS="$LIBRDF_CPPFLAGS -I`$PG_CONFIG --includedir`"
-  POSTGRESQL_LIBS="$LIBRDF_LIBS -L`$PG_CONFIG --libdir` -lpq"
+  POSTGRESQL_CPPFLAGS="-I`$PG_CONFIG --includedir`"
+  POSTGRESQL_LIBS="-L`$PG_CONFIG --libdir` -lpq"
 fi
 
 
