@@ -158,7 +158,7 @@ librdf_get_concept_by_name(librdf_world *world, int is_ms,
  *
  * Get Redland node object for RDF concepts.
  *
- * @return #librdf_node pointer or NULL on failure. 
+ * Return value: #librdf_node pointer or NULL on failure. 
  **/
 librdf_node*
 librdf_get_concept_resource_by_index(librdf_world *world,
@@ -180,7 +180,7 @@ librdf_get_concept_resource_by_index(librdf_world *world,
  *
  * Get Redland uri object for RDF concepts.
  *
- * @return #librdf_uri pointer or NULL on failure. 
+ * Return value: #librdf_uri pointer or NULL on failure. 
  **/
 librdf_uri*
 librdf_get_concept_uri_by_index(librdf_world *world,
