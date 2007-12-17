@@ -525,6 +525,4 @@ REDLAND_API
 REDLAND_PRINTF_FORMAT
 librdf_basename
 librdf_concepts_index
-librdf_concept_ms_namespace_uri
-librdf_concept_schema_namespace_uri
 </SECTION>
