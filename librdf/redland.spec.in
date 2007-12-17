@@ -18,8 +18,7 @@ BuildRoot: /tmp/%{name}-%{version}
 BuildRequires: libxml2-devel >= 2.4.0
 BuildRequires: curl-devel
 BuildRequires: raptor-devel >= @RAPTOR_MIN_VERSION@
-BuildRequires: rasqal-devel >= @RASQAL_MIN_VERSION@
-BuildRequires: rasqal-devel <= @RASQAL_MAX_VERSION@
+BuildRequires: rasqal-devel >= @RASQAL_MIN_VERSION@, rasqal-devel <= @RASQAL_MAX_VERSION@
 BuildRequires: perl >= 5.8.0
 BuildRequires: db4-devel
 BuildRequires: mysql-devel
@@ -125,6 +124,9 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 /sbin/ldconfig
 
 %changelog
+* Sun Dec 16 2007  Dave Beckett <dave@dajobe.org>
+- rasqal-devel has a max and a min version now
+
 * Sat May  5 2007  Dave Beckett <dave@dajobe.org>
 - Add /usr/share/redland/mysql-v1.ttl and /usr/share/redland/mysql-v2.ttl
 
