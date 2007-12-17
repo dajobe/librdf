@@ -199,7 +199,7 @@ rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
 rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test \
 rdf_init_test
 
-CLEANFILES=$(TESTS) $(local_tests) test test.db test1.db test.rdf
+CLEANFILES=$(TESTS) $(local_tests) test test*.db test.rdf
 
 # Memory debugging alternatives
 MEM=@MEM@
