@@ -1873,19 +1873,23 @@ main(int argc, char *argv[])
   for ( ; storages[test] != NULL; test += 3) {
 
     fprintf(stdout, "%s: Creating storage %s\n", program, storages[test]);
-    storage=librdf_new_storage(world, storages[test], storages[test+1], storages[test+2]);
+    storage=librdf_new_storage(world,
+                               storages[test], /* type */
+                               storages[test+1], /* name */
+                               storages[test+2]); /* options */
     if(!storage) {
-      fprintf(stderr, "%s: Failed to create new storage %s\n", program, storages[test]);
-	  ret = 1;
-	  continue;
+      fprintf(stderr, "%s: WARNING: Failed to create new storage %s\n",
+              program, storages[test]);
+      continue;
     }
 
 
     fprintf(stdout, "%s: Opening storage\n", program);
     if(librdf_storage_open(storage, NULL)) {
-      fprintf(stderr, "%s: Failed to open storage\n", program);
-	  ret = 1;
-	  continue;
+      fprintf(stderr, "%s: Failed to open storage type %s\n",
+              program, storages[test]);
+      ret++;
+      continue;
     }
 
 
