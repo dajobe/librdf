@@ -765,6 +765,8 @@ librdf_parser_set_uri_filter(librdf_parser* parser,
  * @user_data_p: Pointer to user data to return
  * 
  * Get the current URI filter function for retrieval during parsing.
+ *
+ * Return value: current URI filter function
 **/
 librdf_uri_filter_func
 librdf_parser_get_uri_filter(librdf_parser* parser, void** user_data_p)
