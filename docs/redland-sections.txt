@@ -238,6 +238,11 @@ LIBRDF_PARSER_FEATURE_WARNING_COUNT
 librdf_parser_get_feature
 librdf_parser_set_feature
 librdf_parser_get_accept_header
+librdf_parser_get_namespaces_seen_count
+librdf_parser_get_namespaces_seen_prefix
+librdf_parser_get_namespaces_seen_uri
+librdf_parser_get_uri_filter
+librdf_parser_set_uri_filter
 </SECTION>
 
 <SECTION>
@@ -387,6 +392,8 @@ librdf_storage_transaction_get_handle
 librdf_storage_transaction_rollback
 librdf_storage_transaction_start
 librdf_storage_transaction_start_with_handle
+librdf_storage_add_reference
+librdf_storage_remove_reference
 </SECTION>
 
 <SECTION>
@@ -434,10 +441,14 @@ librdf_uri_to_filename
 librdf_new_uri_normalised_to_base
 librdf_new_uri_relative_to_base
 librdf_new_uri_from_filename
+librdf_uri_compare
+librdf_uri_filter_func
 </SECTION>
 
 <SECTION>
 <FILE>concepts</FILE>
+librdf_get_concept_resource_by_index
+librdf_get_concept_uri_by_index
 LIBRDF_MS_Alt
 LIBRDF_MS_Alt_URI
 LIBRDF_MS_Bag
