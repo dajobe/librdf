@@ -55,7 +55,7 @@ struct librdf_query_results_s
 };
 
 
-#ifdef RASQAL_API
+#ifdef RASQAL_H
 /* rasqal.h will have defined this */
 #else
 /* provide a forward reference */
