@@ -792,10 +792,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 #if SQLITE_API == 2
     sqlite_FREE(errmsg);
 #endif
-#if SQLITE_API == 3
-    sqlite_CLOSE(context->db);
-    context->db=NULL;
-#endif
+    librdf_storage_sqlite_close(storage);
     return 1;
   }
 
@@ -805,6 +802,11 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
     unsigned char *request;
 
     sb=raptor_new_stringbuffer();
+    if(!sb) {
+      librdf_storage_sqlite_close(storage);
+      return 1;
+    }
+
     raptor_stringbuffer_append_string(sb, 
                                       (const unsigned char*)"PRAGMA synchronous=", 1);
     raptor_stringbuffer_append_string(sb, 
@@ -813,10 +815,14 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
     
     request=raptor_stringbuffer_as_string(sb);
 
-    librdf_storage_sqlite_exec(storage, 
-                               request,
-                               NULL, NULL, 0);
+    rc=librdf_storage_sqlite_exec(storage, 
+                                  request,
+                                  NULL, NULL, 0);
     raptor_free_stringbuffer(sb);
+    if(rc) {
+      librdf_storage_sqlite_close(storage);
+      return 1;
+    }
   }
 
   
@@ -848,6 +854,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                                     0)) {
         if(!begin)
           librdf_storage_sqlite_transaction_rollback(storage);
+        librdf_storage_sqlite_close(storage);
         return 1;
       }
 
@@ -862,6 +869,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                                   0)) {
       if(!begin)
         librdf_storage_sqlite_transaction_rollback(storage);
+      librdf_storage_sqlite_close(storage);
       return 1;
     }
     
@@ -874,6 +882,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
                                   0)) {
       if(!begin)
         librdf_storage_sqlite_transaction_rollback(storage);
+      librdf_storage_sqlite_close(storage);
       return 1;
     }
     
