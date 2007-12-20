@@ -422,6 +422,9 @@ librdf_storage_sqlite_set_helper(librdf_storage *storage,
   unsigned char *request;
 
   sb=raptor_new_stringbuffer();
+  if(!sb)
+    return -1;
+
   raptor_stringbuffer_append_string(sb, 
                                     (const unsigned char*)"INSERT INTO ", 1);
   raptor_stringbuffer_append_string(sb,  
@@ -463,6 +466,9 @@ librdf_storage_sqlite_get_helper(librdf_storage *storage,
   unsigned char *request;
 
   sb=raptor_new_stringbuffer();
+  if(!sb)
+    return -1;
+
   raptor_stringbuffer_append_string(sb,  
                                     (const unsigned char*)"SELECT id FROM ", 1);
   raptor_stringbuffer_append_string(sb,  
@@ -499,15 +505,17 @@ librdf_storage_sqlite_uri_helper(librdf_storage* storage,
   unsigned char *expression=NULL;
   unsigned char *uri_e;
   size_t uri_e_len;
-  int id;
+  int id=-1;
   static const char * const field="uri";
 
   uri_string=librdf_uri_as_counted_string(uri, &uri_len);
   uri_e=sqlite_string_escape(uri_string, uri_len, &uri_e_len);
   if(!uri_e)
-    return -1;
+    goto tidy;
   
   expression=(unsigned char*)LIBRDF_MALLOC(cstring, strlen(field)+3+uri_e_len+1);
+  if(!expression)
+    goto tidy;
   sprintf((char*)expression, "%s = %s", field, uri_e);
   id=librdf_storage_sqlite_get_helper(storage, TABLE_URIS, expression);
   if(id >=0)
@@ -518,7 +526,8 @@ librdf_storage_sqlite_uri_helper(librdf_storage* storage,
   tidy:
   if(expression)
     LIBRDF_FREE(cstring, expression);
-  LIBRDF_FREE(cstring, uri_e);
+  if(uri_e)
+    LIBRDF_FREE(cstring, uri_e);
 
   return id;
 }
@@ -532,15 +541,17 @@ librdf_storage_sqlite_blank_helper(librdf_storage* storage,
   unsigned char *expression=NULL;
   unsigned char *blank_e;
   size_t blank_e_len;
-  int id;
+  int id=-1;
   static const char * const field="blank";
 
   blank_len=strlen((const char*)blank);
   blank_e=sqlite_string_escape(blank, blank_len, &blank_e_len);
   if(!blank_e)
-    return -1;
+    goto tidy;
   
   expression=(unsigned char*)LIBRDF_MALLOC(cstring, strlen(field)+3+blank_e_len+1);
+  if(!expression)
+    goto tidy;
   sprintf((char*)expression, "%s = %s", field, blank_e);
   id=librdf_storage_sqlite_get_helper(storage, TABLE_BLANKS, expression);
   if(id >=0)
@@ -551,7 +562,8 @@ librdf_storage_sqlite_blank_helper(librdf_storage* storage,
   tidy:
   if(expression)
     LIBRDF_FREE(cstring, expression);
-  LIBRDF_FREE(cstring, blank_e);
+  if(blank_e)
+    LIBRDF_FREE(cstring, blank_e);
 
   return id;
 }
@@ -564,21 +576,23 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
                                      const char *language,
                                      librdf_uri *datatype) 
 {
-  int id;
+  int id=-1;
   size_t len;
   unsigned char *value_e;
   size_t value_e_len;
   unsigned char *language_e=NULL;
   size_t language_e_len;
   int datatype_id= -1;
-  raptor_stringbuffer *sb;
+  raptor_stringbuffer *sb=NULL;
   unsigned char *expression;
 
   value_e=sqlite_string_escape(value, value_len, &value_e_len);
   if(!value_e)
-    return -1;
+    goto tidy;
 
   sb=raptor_new_stringbuffer();
+  if(!sb)
+    goto tidy;
 
   raptor_stringbuffer_append_counted_string(sb,  
                                             (const unsigned char*)"text = ",
@@ -589,7 +603,7 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
     len=strlen(language);
     language_e=sqlite_string_escape((unsigned const char*)language, len, &language_e_len);
     if(!language_e)
-      return -1;
+      goto tidy;
     raptor_stringbuffer_append_string(sb, (const unsigned char*)"AND language = ", 1);
     raptor_stringbuffer_append_counted_string(sb, language_e, language_e_len, 1);
   } else
@@ -604,12 +618,16 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
   
   expression=raptor_stringbuffer_as_string(sb);
   id=librdf_storage_sqlite_get_helper(storage, TABLE_LITERALS, expression);
-  raptor_free_stringbuffer(sb);
   
   if(id >=0)
     goto tidy;
   
+  raptor_free_stringbuffer(sb);
   sb=raptor_new_stringbuffer();
+  if(!sb) {
+    id=-1;
+    goto tidy;
+  }
 
   raptor_stringbuffer_append_counted_string(sb, value_e, value_e_len, 1);
 
@@ -628,11 +646,12 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
   expression=raptor_stringbuffer_as_string(sb);
   id=librdf_storage_sqlite_set_helper(storage, TABLE_LITERALS, expression,
                                       raptor_stringbuffer_length(sb));
-  raptor_free_stringbuffer(sb);
 
   tidy:
-  LIBRDF_FREE(cstring, value_e);
-
+  if(sb)
+    raptor_free_stringbuffer(sb);
+  if(value_e)
+    LIBRDF_FREE(cstring, value_e);
   if(language_e)
     LIBRDF_FREE(cstring, language_e);
   
