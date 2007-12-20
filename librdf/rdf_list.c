@@ -505,8 +505,10 @@ librdf_list_get_iterator(librdf_list* list)
                                librdf_list_iterator_next_method,
                                librdf_list_iterator_get_method,
                                librdf_list_iterator_finished);
-
-  context->iterator=iterator;
+  if(!iterator)
+    librdf_list_iterator_finished(context);
+  else
+    context->iterator=iterator;
 
   return iterator;
 }

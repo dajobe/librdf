@@ -54,6 +54,7 @@ static void* librdf_iterator_update_current_element(librdf_iterator* iterator);
  *
  * Constructor - create a new #librdf_iterator object.
  * The iterator object takes ownership of @context and frees it with @finished_method.
+ * The finished method is not called if librdf_new_iterator fails and returns NULL.
  * 
  * Return value: a new #librdf_iterator object or NULL on failure
 **/
@@ -71,11 +72,8 @@ librdf_new_iterator(librdf_world *world,
 
   new_iterator=(librdf_iterator*)LIBRDF_CALLOC(librdf_iterator, 1, 
                                                sizeof(librdf_iterator));
-  if(!new_iterator) {
-    if(finished_method)
-      finished_method(context);
+  if(!new_iterator)
     return NULL;
-  }
   
   new_iterator->world=world;
 

@@ -2439,6 +2439,7 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
   char *errmsg=NULL;
   raptor_stringbuffer *sb;
   unsigned char *request;
+  librdf_iterator* iterator;
 
   icontext=(librdf_storage_sqlite_get_contexts_iterator_context*)LIBRDF_CALLOC(librdf_storage_sqlite_get_contexts_iterator_context, 1, sizeof(librdf_storage_sqlite_get_contexts_iterator_context));
   if(!icontext)
@@ -2492,12 +2493,15 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
   icontext->storage=storage;
   librdf_storage_add_reference(icontext->storage);
 
-  return librdf_new_iterator(storage->world,
-                             (void*)icontext,
-                             &librdf_storage_sqlite_get_contexts_is_end,
-                             &librdf_storage_sqlite_get_contexts_next_method,
-                             &librdf_storage_sqlite_get_contexts_get_method,
-                             &librdf_storage_sqlite_get_contexts_finished);
+  iterator=librdf_new_iterator(storage->world,
+                               (void*)icontext,
+                               &librdf_storage_sqlite_get_contexts_is_end,
+                               &librdf_storage_sqlite_get_contexts_next_method,
+                               &librdf_storage_sqlite_get_contexts_get_method,
+                               &librdf_storage_sqlite_get_contexts_finished);
+  if(!iterator)
+    librdf_storage_sqlite_get_contexts_finished(icontext);
+  return iterator;
 }
 
 

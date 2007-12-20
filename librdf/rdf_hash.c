@@ -707,6 +707,7 @@ librdf_hash_get_all(librdf_hash* hash,
 {
   librdf_hash_get_all_iterator_context* context;
   int status;
+  librdf_iterator* iterator;
   
   context=(librdf_hash_get_all_iterator_context*)LIBRDF_CALLOC(librdf_hash_get_all_iterator_context, 1, sizeof(librdf_hash_get_all_iterator_context));
   if(!context)
@@ -733,12 +734,15 @@ librdf_hash_get_all(librdf_hash* hash,
 
   context->is_end=(status != 0);
   
-  return librdf_new_iterator(hash->world,
-                             (void*)context,
-                             librdf_hash_get_all_iterator_is_end,
-                             librdf_hash_get_all_iterator_next_method,
-                             librdf_hash_get_all_iterator_get_method,
-                             librdf_hash_get_all_iterator_finished);
+  iterator=librdf_new_iterator(hash->world,
+                               (void*)context,
+                               librdf_hash_get_all_iterator_is_end,
+                               librdf_hash_get_all_iterator_next_method,
+                               librdf_hash_get_all_iterator_get_method,
+                               librdf_hash_get_all_iterator_finished);
+  if(!iterator)
+    librdf_hash_get_all_iterator_finished(context);
+  return iterator;
 }
 
 
@@ -971,6 +975,7 @@ librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key)
 {
   librdf_hash_keys_iterator_context* context;
   int status;
+  librdf_iterator* iterator;
   
   context=(librdf_hash_keys_iterator_context*)LIBRDF_CALLOC(librdf_hash_keys_iterator_context, 1, sizeof(librdf_hash_keys_iterator_context));
   if(!context)
@@ -989,12 +994,15 @@ librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key)
                                       NULL);
   context->is_end=(status != 0);
   
-  return librdf_new_iterator(hash->world, 
-                             (void*)context,
-                             librdf_hash_keys_iterator_is_end,
-                             librdf_hash_keys_iterator_next_method,
-                             librdf_hash_keys_iterator_get_method,
-                             librdf_hash_keys_iterator_finished);
+  iterator=librdf_new_iterator(hash->world, 
+                               (void*)context,
+                               librdf_hash_keys_iterator_is_end,
+                               librdf_hash_keys_iterator_next_method,
+                               librdf_hash_keys_iterator_get_method,
+                               librdf_hash_keys_iterator_finished);
+  if(!iterator)
+    librdf_hash_keys_iterator_finished(context);
+  return iterator;
 }
 
 

@@ -1069,6 +1069,7 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   librdf_statement *partial_statement;
   librdf_stream *stream;
   librdf_storage_stream_to_node_iterator_context* context;
+  librdf_iterator* iterator;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
   LIBRDF_ASSERT_RETURN(node1 == NULL && node2 == NULL, "both node objects are NULL", NULL);
@@ -1128,12 +1129,15 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   context->storage=storage;
   librdf_storage_add_reference(context->storage);
 
-  return librdf_new_iterator(storage->world,
-                             (void*)context,
-                             librdf_storage_stream_to_node_iterator_is_end,
-                             librdf_storage_stream_to_node_iterator_next_method,
-                             librdf_storage_stream_to_node_iterator_get_method,
-                             librdf_storage_stream_to_node_iterator_finished);
+  iterator=librdf_new_iterator(storage->world,
+                               (void*)context,
+                               librdf_storage_stream_to_node_iterator_is_end,
+                               librdf_storage_stream_to_node_iterator_next_method,
+                               librdf_storage_stream_to_node_iterator_get_method,
+                               librdf_storage_stream_to_node_iterator_finished);
+  if(!iterator)
+    librdf_storage_stream_to_node_iterator_finished(context);
+  return iterator;
 }
 
 

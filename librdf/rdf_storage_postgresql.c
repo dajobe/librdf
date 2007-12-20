@@ -1977,6 +1977,7 @@ LEFT JOIN Resources AS R ON S.Context=R.ID \
 LEFT JOIN Bnodes AS B ON S.Context=B.ID \
 LEFT JOIN Literals AS L ON S.Context=L.ID";
   char *query;
+  librdf_iterator *iterator;
 
   /* Initialize get_contexts context */
   if(!(gccontext=(librdf_storage_postgresql_get_contexts_context*)
@@ -2024,11 +2025,14 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
     return librdf_new_empty_iterator(storage->world);
   }
 
-  return librdf_new_iterator(storage->world,(void*)gccontext,
-                             &librdf_storage_postgresql_get_contexts_end_of_iterator,
-                             &librdf_storage_postgresql_get_contexts_next_context,
-                             &librdf_storage_postgresql_get_contexts_get_context,
-                             &librdf_storage_postgresql_get_contexts_finished);
+  iterator=librdf_new_iterator(storage->world,(void*)gccontext,
+                               &librdf_storage_postgresql_get_contexts_end_of_iterator,
+                               &librdf_storage_postgresql_get_contexts_next_context,
+                               &librdf_storage_postgresql_get_contexts_get_context,
+                               &librdf_storage_postgresql_get_contexts_finished);
+  if(!iterator)
+    librdf_storage_postgresql_get_contexts_finished(gccontext);
+  return iterator;
 }
 
 
