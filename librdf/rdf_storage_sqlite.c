@@ -353,6 +353,10 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
   int status=SQLITE_OK;
   char *errmsg=NULL;
 
+  /* sqlite crashes if passed in a NULL sql string */
+  if(!request)
+    return 1;
+
   LIBRDF_DEBUG2("SQLite exec '%s'\n", request);
   
   status=sqlite_EXEC(context->db, (const char*)request, callback, arg, &errmsg);
@@ -361,31 +365,44 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
   
   if(status != SQLITE_OK) {
     if(status == SQLITE_LOCKED && !callback && context->in_stream) {
-       librdf_storage_sqlite_query *query;
-       query=(librdf_storage_sqlite_query*)LIBRDF_CALLOC(librdf_storage_sqlite_query, 1, sizeof(librdf_storage_sqlite_query));
+      librdf_storage_sqlite_query *query;
+      /* error message from sqlite_EXEC needs to be freed on both sqlite 2 and 3 */
+      if(errmsg)
+        sqlite_FREE(errmsg);
 
-       query->query=(unsigned char*)LIBRDF_MALLOC(cstring, strlen((char *)request)+1);
-       strcpy((char*)query->query, (char *)request);
 
-       if(!context->in_stream_queries)
-         context->in_stream_queries=query;
-       else {
-         librdf_storage_sqlite_query *q=context->in_stream_queries;
+      query=(librdf_storage_sqlite_query*)LIBRDF_CALLOC(librdf_storage_sqlite_query, 1, sizeof(librdf_storage_sqlite_query));
+      if(!query)
+        return 1;
 
-         while(q->next)
-           q=q->next;
+      query->query=(unsigned char*)LIBRDF_MALLOC(cstring, strlen((char *)request)+1);
+      if(!query->query) {
+        LIBRDF_FREE(librdf_storage_sqlite_query, query);
+        return 1;
+      }
 
-         q->next=query;
-       }
+      strcpy((char*)query->query, (char *)request);
 
-       status = SQLITE_OK;
+      if(!context->in_stream_queries)
+        context->in_stream_queries=query;
+      else {
+        librdf_storage_sqlite_query *q=context->in_stream_queries;
+
+        while(q->next)
+          q=q->next;
+
+        q->next=query;
+      }
+
+      status = SQLITE_OK;
 
     } else {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s SQL exec '%s' failed - %s (%d)",
                  context->name, request, errmsg, status);
-      sqlite_CLOSE(context->db);
-      context->db=NULL;
+      /* error message from sqlite_EXEC needs to be freed on both sqlite 2 and 3 */
+      if(errmsg)
+        sqlite_FREE(errmsg);
     }
   }
 
