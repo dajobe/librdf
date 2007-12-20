@@ -1888,13 +1888,13 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
 
     if(!begin)
       librdf_storage_sqlite_transaction_rollback(storage);
+    raptor_free_stringbuffer(sb);
     return -1;
   }
   
   if(context_node)
     max++;
 
-  sb=raptor_new_stringbuffer();
   raptor_stringbuffer_append_string(sb, 
                                     (unsigned char*)"INSERT INTO ", 1);
   raptor_stringbuffer_append_string(sb, 
