@@ -321,6 +321,8 @@ sqlite_string_escape(const unsigned char *raw, size_t raw_len, size_t *len_p)
 
   len= raw_len+escapes+2; /* for '' */
   escaped=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
+  if(!escaped)
+    return NULL;
 
   p=escaped;
   *p++='\'';
