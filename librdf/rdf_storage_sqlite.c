@@ -1386,12 +1386,18 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
       node=librdf_new_node_from_blank_identifier(scontext->storage->world,
                                                  blank);
     }
+    if(!node)
+      /* finished on error */
+      return 1;
     librdf_statement_set_subject(*statement, node);
 
 
     uri_string=GET_COLUMN_VALUE_TEXT(vm, 2);
     node=librdf_new_node_from_uri_string(scontext->storage->world,
                                          uri_string);
+    if(!node)
+      /* finished on error */
+      return 1;
     librdf_statement_set_predicate(*statement, node);
 
     uri_string=GET_COLUMN_VALUE_TEXT(vm, 3);
@@ -1409,8 +1415,12 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
       
       /* int datatype_id= GET_COLUMN_VALUE_INT(vm, 7); */
       uri_string=GET_COLUMN_VALUE_TEXT(vm, 8);
-      if(uri_string)
+      if(uri_string) {
         datatype=librdf_new_uri(scontext->storage->world, uri_string);
+        if(!datatype)
+          /* finished on error */
+          return 1;
+      }
       
       node=librdf_new_node_from_typed_literal(scontext->storage->world,
                                               literal, 
@@ -1420,12 +1430,20 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
         librdf_free_uri(datatype);
       
     }
+    if(!node)
+      /* finished on error */
+      return 1;
     librdf_statement_set_object(*statement, node);
 
     uri_string=GET_COLUMN_VALUE_TEXT(vm, 9);
-    if(uri_string)
-      *context_node=librdf_new_node_from_uri_string(scontext->storage->world,
-                                                    uri_string);
+    if(uri_string) {
+      node=librdf_new_node_from_uri_string(scontext->storage->world,
+                                           uri_string);
+      if(!node)
+        /* finished on error */
+        return 1;
+      *context_node=node;
+    }
   }
 
   if(status != SQLITE_ROW)
@@ -2363,10 +2381,15 @@ librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_context* sco
 
     uri_string=GET_COLUMN_VALUE_TEXT(vm, 0);
     if(uri_string) {
+      librdf_node *node;
+      node=librdf_new_node_from_uri_string(scontext->storage->world,
+                                           uri_string);
+      if(!node)
+        /* finished on error */
+        return 1;
       if(*context_node)
-        librdf_free_node(*context_node);      
-      *context_node=librdf_new_node_from_uri_string(scontext->storage->world,
-                                                    uri_string);
+        librdf_free_node(*context_node);
+      *context_node=node;
     }
   }
 
