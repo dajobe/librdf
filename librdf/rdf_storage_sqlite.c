@@ -992,6 +992,11 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
     
     /* FIXME no context field used */
     sb=raptor_new_stringbuffer();
+    if(!sb) {
+      if(!begin)
+        librdf_storage_sqlite_transaction_rollback(storage);
+      return -1;
+    }
     raptor_stringbuffer_append_string(sb,
                                       (unsigned char*)"INSERT INTO ", 1);
     raptor_stringbuffer_append_string(sb, 
@@ -1105,10 +1110,13 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
   int count=0;
   int rc, begin;
 
+  sb=raptor_new_stringbuffer();
+  if(!sb)
+    return -1;
+
   /* returns non-0 if a transaction is already active */
   begin=librdf_storage_sqlite_transaction_start(storage);
 
-  sb=raptor_new_stringbuffer();
   raptor_stringbuffer_append_string(sb, 
                                     (const unsigned char*)"SELECT 1",
                                     1);
@@ -1229,6 +1237,10 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   context->in_stream++;
 
   sb=raptor_new_stringbuffer();
+  if(!sb) {
+    librdf_storage_sqlite_serialise_finished((void*)scontext);
+    return NULL;
+  }
   sqlite_construct_select_helper(sb);
   raptor_stringbuffer_append_counted_string(sb, 
                                             (unsigned char*)";", 1, 1);
@@ -1631,6 +1643,11 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
   }
 
   sb=raptor_new_stringbuffer();
+  if(!sb) {
+    librdf_storage_sqlite_find_statements_finished((void*)scontext);
+    return NULL;
+  }
+
   sqlite_construct_select_helper(sb);
 
   for(i=0; i < 3; i++) {
@@ -1847,6 +1864,10 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   int rc, begin;
   int max=3;
 
+  sb=raptor_new_stringbuffer();
+  if(!sb)
+    return -1;
+
   /* returns non-0 if transaction is already active */
   begin=librdf_storage_sqlite_transaction_start(storage);
 
@@ -1931,6 +1952,8 @@ librdf_storage_sqlite_context_remove_statement(librdf_storage* storage,
   unsigned char *request;
 
   sb=raptor_new_stringbuffer();
+  if(!sb)
+    return -1;
   raptor_stringbuffer_append_string(sb, (const unsigned char*)"DELETE", 1);
   if(librdf_storage_sqlite_statement_operator_helper(storage, statement,
                                                      context_node, sb)) {
@@ -1974,6 +1997,8 @@ librdf_storage_sqlite_context_remove_statements(librdf_storage* storage,
     return -1;
     
   sb=raptor_new_stringbuffer();
+  if(!sb)
+    return -1;
   raptor_stringbuffer_append_counted_string(sb,
                                     (unsigned char*)"DELETE FROM ", 12, 1);
   raptor_stringbuffer_append_string(sb, 
@@ -2070,6 +2095,10 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
   }
 
   sb=raptor_new_stringbuffer();
+  if(!sb) {
+    librdf_storage_sqlite_context_serialise_finished((void*)scontext);
+    return NULL;
+  }
   sqlite_construct_select_helper(sb);
   raptor_stringbuffer_append_counted_string(sb, 
                                             (unsigned char*)" WHERE ", 7, 1);
@@ -2499,6 +2528,10 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
   icontext->sqlite_context=context;
 
   sb=raptor_new_stringbuffer();
+  if(!sb) {
+    LIBRDF_FREE(librdf_storage_sqlite_get_contexts_iterator_context, icontext);
+    return NULL;
+  }
 
   raptor_stringbuffer_append_string(sb, (unsigned char*)
                                     "SELECT DISTINCT uris.uri", 1);
