@@ -178,15 +178,19 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
   char *name_copy;
   char* synchronous;
   
-  if(!name)
+  if(!name) {
+    librdf_free_hash(options);
     return 1;
+  }
   
   context->storage=storage;
 
   context->name_len=strlen(name);
   name_copy=(char*)LIBRDF_MALLOC(cstring, context->name_len+1);
-  if(!name_copy)
+  if(!name_copy) {
+    librdf_free_hash(options);
     return 1;
+  }
   strncpy(name_copy, name, context->name_len+1);
   context->name=name_copy;
   
