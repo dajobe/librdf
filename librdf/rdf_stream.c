@@ -316,10 +316,10 @@ librdf_stream_get_context(librdf_stream* stream)
  * this method is called.
  *
  * Several mapping functions can be added and they are applied in
- * the order given
+ * the order given.
  *
- * The mapping function should return non 0 to allow the element to be
- * returned.
+ * The mapping function should return the statement to return, or NULL
+ * to remove it from the stream.
  *
  * Return value: Non 0 on failure
  **/
