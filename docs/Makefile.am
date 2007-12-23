@@ -102,7 +102,7 @@ redland.pod \
 $(man_MANS) \
 version.xml.in
 
-CLEANFILES+=README pod2htm*
+CLEANFILES+=README pod2htm* redland-decl.txt redland-decl-list.txt
 
 # Create some text files from HTML sources
 LYNX=lynx
