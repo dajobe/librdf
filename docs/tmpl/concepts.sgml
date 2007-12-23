@@ -49,6 +49,26 @@ or #librdf_uri class copy constructors before use.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### FUNCTION librdf_get_concept_resource_by_index ##### -->
+<para>
+
+</para>
+
+@world: 
+@idx: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_get_concept_uri_by_index ##### -->
+<para>
+
+</para>
+
+@world: 
+@idx: 
+@Returns: 
+
+
 <!-- ##### MACRO LIBRDF_MS_Alt ##### -->
 <para>
 

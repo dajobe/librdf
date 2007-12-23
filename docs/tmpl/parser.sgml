@@ -234,3 +234,52 @@ by callbacks.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_parser_get_namespaces_seen_count ##### -->
+<para>
+
+</para>
+
+@parser: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_parser_get_namespaces_seen_prefix ##### -->
+<para>
+
+</para>
+
+@parser: 
+@offset: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_parser_get_namespaces_seen_uri ##### -->
+<para>
+
+</para>
+
+@parser: 
+@offset: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_parser_get_uri_filter ##### -->
+<para>
+
+</para>
+
+@parser: 
+@user_data_p: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_parser_set_uri_filter ##### -->
+<para>
+
+</para>
+
+@parser: 
+@Param2: 
+@user_data: 
+
+

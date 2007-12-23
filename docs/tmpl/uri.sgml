@@ -170,3 +170,23 @@ filenames.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_uri_compare ##### -->
+<para>
+
+</para>
+
+@uri1: 
+@uri2: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION librdf_uri_filter_func ##### -->
+<para>
+
+</para>
+
+@user_data: 
+@uri: 
+@Returns: 
+
+

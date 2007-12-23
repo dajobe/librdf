@@ -460,3 +460,19 @@ the RDF model API and have the same name.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_storage_add_reference ##### -->
+<para>
+
+</para>
+
+@storage: 
+
+
+<!-- ##### FUNCTION librdf_storage_remove_reference ##### -->
+<para>
+
+</para>
+
+@storage: 
+
+
