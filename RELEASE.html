@@ -21,6 +21,108 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<h2 id="rel1_0_7"><a name="rel1_0_7">Redland 1.0.7 Changes</a></h2>
+
+<p>The main changes in this release are:</p>
+
+<p>Updated to use 
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.15
+(<a href="http://librdf.org/rasqal/RELEASE.html#rel0_9_15">Rasqal 0.9.15 release notes</a>)
+from 0.9.14.  NOTE: Rasqal's API will change in 0.9.16 so Redland 1.0.7
+requires 0.9.15 exactly - no newer, no older.
+</p>
+
+<p>Updated to use
+<a href="http://librdf.org/raptor/">Raptor</a> 1.4.16
+(<a href="http://librdf.org/raptor/RELEASE.html#rel1_4_16">Raptor 1.4.16 release notes</a>)
+from 1.4.15.
+</p>
+
+
+<p>Added modular storage backends.  When
+<code>--enable-modular</code> is given to configure, all the storage
+major backends are compiled as dynamically loadable modules.  The
+memory, file and uri storages are always available.  This is not
+enabled by default as it is a new feature.
+</p>
+
+
+<p>Issues Fixed:</p>
+<ul>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000187">0000187</a>: "rdf_query_results.c", line 630: void function cannot return value</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000189">0000189</a>: librdf_uri_is_file_uri: wrong return value</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000203">0000203</a>: API declarations for Symbian portability</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000205">0000205</a>: Memory leak in rdf_query_rasqal.c</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000209">0000209</a>: Null dereference + assertion failures in minimal librdf setup-cleanup</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000213">0000213</a>: Multiple instances of world object make trouble</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000215">0000215</a>: librdf_new_node_from_typed_counted_literal() does not respect parameter lengths</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000218">0000218</a>: librdf_query_execute does not assert model parameter</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000229">0000229</a>: Segmentation fault when invoking librdf_new_model_from_model()</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000230">0000230</a>: on Gentoo/FreeBSD redland fails compilation due to a missing #define pthread.h</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000234">0000234</a>: autogen.sh $dir quoting</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000235">0000235</a>: $(EXEEXT) in tests</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=0000236">0000236</a>: EOL issues when building svn version on cygwin</li>
+</ul>
+
+
+<h3>General Changes</h3>
+
+<p><code>configure</code> was updated to ensure that redland 1.0.7
+will work with rasqal 0.9.15 only due to the future API change coming
+in the next rasqal version.
+</p>
+
+<p>Make lots of writable static data truly constant especially from
+writable static data from rdf_concepts.  This causes a <strong>SOURCE
+COMPATIBILITY BREAK</strong>: the rdf_concepts.h public API node/uri
+macros now require a librdf_world* parameter.
+</p>
+
+
+<h3>Parser Class Changes</h3>
+
+<p>Added <code>librdf_parser_set_uri_filter()</code> and
+<code>librdf_parser_get_uri_filter()</code> to set and get parser
+URI filters, passed on into raptor.
+</p>
+
+<h3>Storage Class Changes</h3>
+
+<p>Several SQLite storage improvements and fixes were made:</p>
+<ul>
+<li>Added transaction support</li>
+<li>Handle SQL errors more gracefully</li>
+<li>the contains_statement method now works with a blank subject node.</li>
+<li>Resource allocation and low mwmory fixes</li>
+</ul>
+
+<h3>URI Class Changes</h3>
+
+<p>Added <code>librdf_uri_compare()</code> to compare uri objects
+rather than rely on stringifying them and comparing the strings.
+</p>
+
+
+<h3>Internal and Other Changes</h3>
+
+<p>Many low memory and error path, resource leak fixes for parsers,
+streams, module factory construction and module initialising.
+</p>
+
+<p><code>librdf_serializer_set_namespace()</code> now allows NULL uri
+and prefix to be given.
+</p>
+
+<p><code>librdf_storage_mysql_transaction_commit()</code> now
+terminates if there is no work to commit.
+</p>
+
+<p>autogen.sh version comparsion was fixed so that 1.10 is seen as
+newer than 1.9.
+</p>
+
+
+
 <h2 id="rel1_0_6"><a name="rel1_0_6">Redland 1.0.6 Changes</a></h2>
 
 <p>The main changes in this release are:</p>
