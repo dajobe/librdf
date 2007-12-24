@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
-<chapter id="storage-modules">
+<chapter id="redland-storage-modules">
 
 <title>Storage Modules</title>
 
-<section id="storage-module-intro">
+<section id="redland-storage-module-intro">
 
 <title>Introduction</title>
 
@@ -20,20 +20,20 @@ the storage options used.
 <para>Storage modules:</para>
 
 <itemizedlist spacing="compact">
-  <listitem><para><link linkend="storage-module-hashes">hashes</link></para></listitem>
-  <listitem><para><link linkend="storage-module-file">file</link></para></listitem>
-  <listitem><para><link linkend="storage-module-mysql">mysql</link></para></listitem>
-  <listitem><para><link linkend="storage-module-memory">memory</link></para></listitem>
-  <listitem><para><link linkend="storage-module-postgresql">postgresql</link></para></listitem>
-  <listitem><para><link linkend="storage-module-sqlite">sqlite</link></para></listitem>
-  <listitem><para><link linkend="storage-module-tstore">tstore</link></para></listitem>
-  <listitem><para><link linkend="storage-module-uri">uri</link></para></listitem>
+  <listitem><para><link linkend="redland-storage-module-hashes">hashes</link></para></listitem>
+  <listitem><para><link linkend="redland-storage-module-file">file</link></para></listitem>
+  <listitem><para><link linkend="redland-storage-module-mysql">mysql</link></para></listitem>
+  <listitem><para><link linkend="redland-storage-module-memory">memory</link></para></listitem>
+  <listitem><para><link linkend="redland-storage-module-postgresql">postgresql</link></para></listitem>
+  <listitem><para><link linkend="redland-storage-module-sqlite">sqlite</link></para></listitem>
+  <listitem><para><link linkend="redland-storage-module-tstore">tstore</link></para></listitem>
+  <listitem><para><link linkend="redland-storage-module-uri">uri</link></para></listitem>
 </itemizedlist>
 
 </section>
 
 
-<section id="storage-module-hashes">
+<section id="redland-storage-module-hashes">
 
 <title>Store 'hashes'</title>
 
@@ -110,7 +110,7 @@ can be used with any hash type.</para>
 </section>
 
 
-<section id="storage-module-memory">
+<section id="redland-storage-module-memory">
 
 <title>Store 'memory'</title>
 
@@ -121,7 +121,7 @@ constructors.</para>
 
 <para>The memory store is not suitable for large in-memory models since
 it does not do any indexing.  For that, use the
-<xref linkend="storage-module-hashes"/> with
+<xref linkend="redland-storage-module-hashes"/> with
 <literal>hash-type</literal> of <literal>memory</literal>.</para>
 
 <para>The module provides optional contexts support enabled when
@@ -152,12 +152,12 @@ boolean storage option <literal>contexts</literal> is set.</para>
 </section>
 
 
-<section id="storage-module-file">
+<section id="redland-storage-module-file">
 
 <title>Store 'file'</title>
 
 <para>This module provides an in-memory model (internally,
-using a <xref linkend="storage-module-memory"/>) initialised from the
+using a <xref linkend="redland-storage-module-memory"/>) initialised from the
 RDF/XML content in a file.  The file is given as the storage name and
 assumed to exist on opening.  When a model or storage sync method
 is called or the model or store is closed, a new file is created, the
@@ -183,7 +183,7 @@ This store was added in Redland 0.9.15</para>
 </section>
 
 
-<section id="storage-module-mysql">
+<section id="redland-storage-module-mysql">
 
 <title>Store 'mysql'</title>
 
@@ -280,7 +280,7 @@ is dropped, MySQL will attempt to reconnect.
 </section>
 
 
-<section id="storage-module-postgresql">
+<section id="redland-storage-module-postgresql">
 
 <title>Store 'postgresql'</title>
 
@@ -376,7 +376,7 @@ work.</para>
 </section>
 
 
-<section id="storage-module-sqlite">
+<section id="redland-storage-module-sqlite">
 
 <title>Store 'sqlite'</title>
 
@@ -404,7 +404,7 @@ existing store.
 
 
 
-<section id="storage-module-tstore">
+<section id="redland-storage-module-tstore">
 
 <title>Store 'tstore'</title>
 
@@ -452,12 +452,12 @@ The rdfproc utility source code demonstrates this.
 </section>
 
 
-<section id="storage-module-uri">
+<section id="redland-storage-module-uri">
 
 <title>Store 'uri'</title>
 
 <para>This module provides an in-memory model (internally,
-using a <xref linkend="storage-module-memory"/>) initialised from the
+using a <xref linkend="redland-storage-module-memory"/>) initialised from the
 RDF/XML content in a URI.  The URI is given as the storage name and
 on closing, the model is destroyed.  This store was added in
 Redland 1.0.15.  In future it may be
