@@ -83,6 +83,7 @@ MKTMPL_OPTIONS=
 content_files =	\
 	redland-chapter-intro.xml \
 	redland-chapter-objects.xml \
+	redland-chapter-storage.xml \
 	version.xml
 
 # Images to copy into HTML directory

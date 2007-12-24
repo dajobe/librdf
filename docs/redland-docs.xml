@@ -117,6 +117,7 @@ library providing APIs to the RDF model and it's concepts.
     <xi:include href="xml/serializer.xml"/>
     <xi:include href="xml/statement.xml"/>
     <xi:include href="xml/storage.xml"/>
+    <xi:include href="redland-chapter-storage.xml"/>
     <xi:include href="xml/stream.xml"/>
     <xi:include href="xml/unicode.xml"/>
     <xi:include href="xml/uri.xml"/>
