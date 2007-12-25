@@ -1,3 +1,7 @@
+2007-12-24  Dave Beckett <dave@dajobe.org>
+
+	* Snapshotted redland_1_0_7 for 1.0.7 release (SVN 13317)
+
 2007-12-23  Dave Beckett <dave@dajobe.org>
 
 	* docs/Makefile.am, docs/redland-chapter-storage-modules.xml,
@@ -288,7 +292,6 @@
 
 	* librdf/rdf_node.c: (librdf_new_node_from_typed_counted_literal):
 	Free xml_language copy on buffer alloc failure
-
 
 	* librdf/rdf_node.c: (librdf_new_node_from_blank_identifier): On
 	error, free identifier generated with librdf_world_get_genid(). No
