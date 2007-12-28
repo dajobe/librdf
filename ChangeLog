@@ -1,3 +1,9 @@
+2007-12-28  Dave Beckett <dave@dajobe.org>
+
+	* NEWS.html, RELEASE.html, configure.ac,
+	librdf/win32_rdf_config.h: Bump version to 1.0.8.
+	Require rasqal 0.9.16
+
 2007-12-24  Dave Beckett <dave@dajobe.org>
 
 	* Snapshotted redland_1_0_7 for 1.0.7 release (SVN 13317)
