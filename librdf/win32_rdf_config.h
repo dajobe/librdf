@@ -2,8 +2,6 @@
  *
  * win32_rdf_config.h - redland WIN32 hard-coded config
  *
- * $Id$
- *
  * Copyright (C) 2004-2007, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2004-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
@@ -221,7 +219,7 @@ extern "C" {
 /* #undef LIBRDF_DISABLE_ASSERT_MESSAGES */
 
 /* Release version as a decimal */
-#define LIBRDF_VERSION_DECIMAL 10007
+#define LIBRDF_VERSION_DECIMAL 10008
 
 /* Major version number */
 #define LIBRDF_VERSION_MAJOR 1
@@ -230,7 +228,7 @@ extern "C" {
 #define LIBRDF_VERSION_MINOR 0
 
 /* Release version number */
-#define LIBRDF_VERSION_RELEASE 7
+#define LIBRDF_VERSION_RELEASE 8
 
 /* The size of a `unsigned char', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_CHAR 1
@@ -272,7 +270,7 @@ extern "C" {
 /* #define TIME_WITH_SYS_TIME*/
 
 /* Version number of package */
-#define VERSION "1.0.7"
+#define VERSION "1.0.8"
 
 /* Use POSIX threads */
 /* #undef WITH_THREADS */

@@ -3,8 +3,6 @@ dnl
 dnl configure.in - top level autoconf file for Redland
 dnl (Process this file with autoconf to produce a configure script.)
 dnl
-dnl $Id$
-dnl
 dnl Copyright (C) 2000-2007 David Beckett http://purl.org/net/dajobe/
 dnl Copyright (C) 2000-2005 University of Bristol, UK http://www.bristol.ac.uk/
 dnl 
@@ -25,7 +23,7 @@ dnl
 dnl 
 
 
-AC_INIT([Redland RDF Application Framework], 1.0.7, http://bugs.librdf.org/, redland)
+AC_INIT([Redland RDF Application Framework], 1.0.8, http://bugs.librdf.org/, redland)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR(librdf/rdf_node.c)
 AC_REVISION($Revision$)dnl
@@ -516,8 +514,8 @@ fi
 AC_CHECK_PROG(RASQAL_CONFIG, rasqal-config, rasqal-config)
 AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/internal (default=auto)], with_rasqal="$withval", with_rasqal="auto")
 
-RASQAL_MIN_VERSION=0.9.15
-RASQAL_MAX_VERSION=0.9.15
+RASQAL_MIN_VERSION=0.9.16
+RASQAL_MAX_VERSION=0.9.16
 AC_SUBST(RASQAL_MIN_VERSION)
 AC_SUBST(RASQAL_MAX_VERSION)
 if test "X$RASQAL_CONFIG" = "X"; then
