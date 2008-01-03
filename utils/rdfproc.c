@@ -423,10 +423,10 @@ main(int argc, char *argv[])
             for(i=0; 1; i++) {
               const char *format_name;
               const char *format_label;
-              if(rasqal_query_results_formats_enumerate_full(i,
-                                                             &format_name, 
-                                                             &format_label,
-                                                             NULL, NULL))
+              if(rasqal_query_results_formats_enumerate(i,
+                                                        &format_name, 
+                                                        &format_label,
+                                                        NULL, NULL, NULL))
                 break;
               printf("  %-20s  %s\n", format_name, format_label);
             }
