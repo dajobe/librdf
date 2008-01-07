@@ -80,7 +80,7 @@ librdf_init_query(librdf_world *world)
 void
 librdf_finish_query(librdf_world *world) 
 {
-  librdf_query_rasqal_destructor();
+  librdf_query_rasqal_destructor(world);
   librdf_delete_query_factories(world);
 }
 

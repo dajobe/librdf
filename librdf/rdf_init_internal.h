@@ -36,6 +36,16 @@ extern "C" {
 #include <pthread.h>
 #endif
 
+#ifdef RASQAL_H
+/* rasqal.h will have defined this */
+#else
+/* provide a forward reference */
+#ifndef RASQAL_WORLD_DECLARED
+#define RASQAL_WORLD_DECLARED 1
+typedef struct rasqal_world_s rasqal_world;
+#endif
+#endif
+
 struct librdf_world_s
 {
   void *error_user_data;
@@ -129,6 +139,9 @@ struct librdf_world_s
   /* librdf_concepts nodes and uris */
   librdf_uri** concept_uris;
   librdf_node** concept_resources;
+
+  /* rasqal world object */
+  rasqal_world* rasqal_world;
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);

@@ -112,7 +112,7 @@ librdf_query_rasqal_init(librdf_query* query,
   context->query = query;
   context->language=context->query->factory->name;
 
-  context->rq=rasqal_new_query(context->language, NULL);
+  context->rq=rasqal_new_query2(query->world->rasqal_world, context->language, NULL);
   if(!context->rq)
     return 1;
 
@@ -1179,7 +1179,9 @@ librdf_query_rasqal_constructor(librdf_world *world)
 {
   unsigned int i;
 
-  rasqal_init();
+  world->rasqal_world=rasqal_new_world();
+  if(!world->rasqal_world)
+    return;
   
   rasqal_set_triples_source_factory(rasqal_redland_register_triples_source_factory, world);
 
@@ -1188,10 +1190,10 @@ librdf_query_rasqal_constructor(librdf_world *world)
     const char *language_name=NULL;
     const unsigned char *uri_string=NULL;
 
-    if(rasqal_languages_enumerate(i, &language_name, NULL, &uri_string)) {
+    if(rasqal_languages_enumerate2(world->rasqal_world, i, &language_name, NULL, &uri_string)) {
       /* reached the end of the parsers, now register the default one */
       i=0;
-      if(rasqal_languages_enumerate(i, &language_name, NULL, &uri_string)) {
+      if(rasqal_languages_enumerate2(world->rasqal_world, i, &language_name, NULL, &uri_string)) {
         /* error - should really return an error code or fail with librdf_fatal() */
         return;
       }
@@ -1234,7 +1236,10 @@ librdf_query_rasqal_constructor(librdf_world *world)
 
 
 void
-librdf_query_rasqal_destructor(void)
+librdf_query_rasqal_destructor(librdf_world *world)
 {
-  rasqal_finish();
+  if(world->rasqal_world) {
+    rasqal_free_world(world->rasqal_world);
+    world->rasqal_world=NULL;
+  }
 }
