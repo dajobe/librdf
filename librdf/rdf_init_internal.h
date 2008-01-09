@@ -141,7 +141,7 @@ struct librdf_world_s
   librdf_node** concept_resources;
 
   /* rasqal world object */
-  rasqal_world* rasqal_world;
+  rasqal_world* rasqal_world_ptr;
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);
