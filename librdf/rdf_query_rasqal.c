@@ -1074,7 +1074,8 @@ librdf_query_rasqal_new_results_formatter(librdf_query_results* query_results,
   rasqal_query_results_formatter* formatter;
   librdf_query_results_formatter* qrf;
 
-  formatter=rasqal_new_query_results_formatter(name, (raptor_uri*)uri);
+  formatter=rasqal_new_query_results_formatter2(query_results->query->world->rasqal_world_ptr,
+                                                name, (raptor_uri*)uri);
   if(!formatter)
     return NULL;
 
@@ -1097,7 +1098,8 @@ librdf_query_rasqal_new_results_formatter_by_mime_type(librdf_query_results* que
   rasqal_query_results_formatter* formatter;
   librdf_query_results_formatter* qrf;
 
-  formatter=rasqal_new_query_results_formatter_by_mime_type(mime_type);
+  formatter=rasqal_new_query_results_formatter_by_mime_type2(query_results->query->world->rasqal_world_ptr,
+                                                             mime_type);
   if(!formatter)
     return NULL;
 

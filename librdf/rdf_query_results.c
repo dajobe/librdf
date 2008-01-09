@@ -692,7 +692,8 @@ librdf_query_results_formats_check(librdf_world* world,
   /* FIXME - this should use some kind of registration but for now
    * it is safe to assume Rasqal does it all
    */
-  return rasqal_query_results_formats_check(name, (raptor_uri*)uri, mime_type);
+  return rasqal_query_results_formats_check2(world->rasqal_world_ptr,
+                                             name, (raptor_uri*)uri, mime_type);
 }
 
 
@@ -725,8 +726,9 @@ librdf_query_results_formats_enumerate(librdf_world* world,
   /* FIXME - this should use some kind of registration but for now
    * it is safe to assume Rasqal does it all
    */
-  return rasqal_query_results_formats_enumerate(counter, name, label,
-                                                uri_string, mime_type,
-                                                /*flags=*/ NULL);
+  return rasqal_query_results_formats_enumerate2(world->rasqal_world_ptr,
+                                                 counter, name, label,
+                                                 uri_string, mime_type,
+                                                 /*flags=*/ NULL);
 }
 
