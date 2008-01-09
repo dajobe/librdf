@@ -1185,7 +1185,7 @@ librdf_query_rasqal_constructor(librdf_world *world)
   if(!world->rasqal_world_ptr)
     return;
   
-  rasqal_set_triples_source_factory(rasqal_redland_register_triples_source_factory, world);
+  rasqal_set_triples_source_factory2(world->rasqal_world_ptr, rasqal_redland_register_triples_source_factory, world);
 
   /* enumerate from query language 1, so the default parser 0 is done last */
   for(i=1; 1; i++) {
