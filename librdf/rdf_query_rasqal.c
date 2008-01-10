@@ -112,7 +112,7 @@ librdf_query_rasqal_init(librdf_query* query,
   context->query = query;
   context->language=context->query->factory->name;
 
-  context->rq=rasqal_new_query2(query->world->rasqal_world_ptr, context->language, NULL);
+  context->rq=rasqal_new_query(query->world->rasqal_world_ptr, context->language, NULL);
   if(!context->rq)
     return 1;
 
@@ -1074,8 +1074,8 @@ librdf_query_rasqal_new_results_formatter(librdf_query_results* query_results,
   rasqal_query_results_formatter* formatter;
   librdf_query_results_formatter* qrf;
 
-  formatter=rasqal_new_query_results_formatter2(query_results->query->world->rasqal_world_ptr,
-                                                name, (raptor_uri*)uri);
+  formatter=rasqal_new_query_results_formatter(query_results->query->world->rasqal_world_ptr,
+                                               name, (raptor_uri*)uri);
   if(!formatter)
     return NULL;
 
@@ -1098,8 +1098,8 @@ librdf_query_rasqal_new_results_formatter_by_mime_type(librdf_query_results* que
   rasqal_query_results_formatter* formatter;
   librdf_query_results_formatter* qrf;
 
-  formatter=rasqal_new_query_results_formatter_by_mime_type2(query_results->query->world->rasqal_world_ptr,
-                                                             mime_type);
+  formatter=rasqal_new_query_results_formatter_by_mime_type(query_results->query->world->rasqal_world_ptr,
+                                                            mime_type);
   if(!formatter)
     return NULL;
 
@@ -1185,17 +1185,17 @@ librdf_query_rasqal_constructor(librdf_world *world)
   if(!world->rasqal_world_ptr)
     return;
   
-  rasqal_set_triples_source_factory2(world->rasqal_world_ptr, rasqal_redland_register_triples_source_factory, world);
+  rasqal_set_triples_source_factory(world->rasqal_world_ptr, rasqal_redland_register_triples_source_factory, world);
 
   /* enumerate from query language 1, so the default parser 0 is done last */
   for(i=1; 1; i++) {
     const char *language_name=NULL;
     const unsigned char *uri_string=NULL;
 
-    if(rasqal_languages_enumerate2(world->rasqal_world_ptr, i, &language_name, NULL, &uri_string)) {
+    if(rasqal_languages_enumerate(world->rasqal_world_ptr, i, &language_name, NULL, &uri_string)) {
       /* reached the end of the parsers, now register the default one */
       i=0;
-      if(rasqal_languages_enumerate2(world->rasqal_world_ptr, i, &language_name, NULL, &uri_string)) {
+      if(rasqal_languages_enumerate(world->rasqal_world_ptr, i, &language_name, NULL, &uri_string)) {
         /* error - should really return an error code or fail with librdf_fatal() */
         return;
       }
