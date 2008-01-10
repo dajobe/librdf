@@ -423,7 +423,8 @@ main(int argc, char *argv[])
             for(i=0; 1; i++) {
               const char *format_name;
               const char *format_label;
-              if(rasqal_query_results_formats_enumerate(i,
+              if(rasqal_query_results_formats_enumerate(world->rasqal_world_ptr,
+                                                        i,
                                                         &format_name, 
                                                         &format_label,
                                                         NULL, NULL, NULL))
@@ -432,7 +433,7 @@ main(int argc, char *argv[])
             }
             exit(0);
           } else {
-            if(rasqal_query_results_formats_check(optarg, NULL, NULL))
+            if(rasqal_query_results_formats_check(world->rasqal_world_ptr, optarg, NULL, NULL))
               results_format=optarg;
             else {
               fprintf(stderr, "%s: invalid argument `%s' for `" HELP_ARG(r, results) "'\nTry '%s " HELP_ARG(r, results) " help' for a list of valid formats\n",
