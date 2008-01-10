@@ -1182,8 +1182,10 @@ librdf_query_rasqal_constructor(librdf_world *world)
   unsigned int i;
 
   world->rasqal_world_ptr=rasqal_new_world();
-  if(!world->rasqal_world_ptr)
+  if(!world->rasqal_world_ptr) {
+    LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
     return;
+  }
   
   rasqal_set_triples_source_factory(world->rasqal_world_ptr, rasqal_redland_register_triples_source_factory, world);
 
