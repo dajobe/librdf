@@ -550,7 +550,7 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
  *
  * Write a #librdf_stream to a counted string.
  * 
- * Return value: non 0 on failure
+ * Return value: stream as string or NULL on failure
  **/
 unsigned char*
 librdf_serializer_serialize_stream_to_counted_string(librdf_serializer* serializer,
