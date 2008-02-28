@@ -737,7 +737,7 @@ librdf_storage_add_statement(librdf_storage* storage,
      !librdf_node_is_blank(statement->subject))
     return 1;
   
-  /* subject can only be a URI */
+  /* predicate can only be a URI */
   if(!librdf_node_is_resource(statement->predicate))
      return 1;
 
