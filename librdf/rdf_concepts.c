@@ -117,6 +117,38 @@ librdf_init_concepts(librdf_world *world)
 
 
 /**
+ * librdf_get_concept_ms_namespace:
+ * @world: librdf world object
+ *
+ * Get a shared #librdf_uri for the RDF Syntax namespace.
+ *
+ * Return value: #librdf_uri pointer or NULL on failure.
+ */
+librdf_uri *
+librdf_get_concept_ms_namespace(librdf_world *world)
+{
+  librdf_world_open(world);
+  return world->concept_ms_namespace_uri;
+}
+
+
+/**
+ * librdf_get_concept_schema_namespace:
+ * @world: librdf world object
+ *
+ * Get a shared #librdf_uri for the RDF Schema namespace.
+ *
+ * Return value: #librdf_uri pointer or NULL on failure.
+ */
+librdf_uri *
+librdf_get_concept_schema_namespace(librdf_world *world)
+{
+  librdf_world_open(world);
+  return world->concept_schema_namespace_uri;
+}
+
+
+/**
  * librdf_get_concept_by_name:
  * @world: redland world object
  * @is_ms: non zero if name is a RDF namespace concept (else is RDF schema)

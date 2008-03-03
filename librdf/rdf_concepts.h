@@ -95,6 +95,12 @@ typedef enum {
  * by simple 'sort' order 
  */
 
+/* Get Redland uri object for RDF Syntax/Schema namespaces */
+REDLAND_API
+librdf_uri* librdf_get_concept_ms_namespace(librdf_world *world);
+REDLAND_API
+librdf_uri* librdf_get_concept_schema_namespace(librdf_world *world);
+
 /* Get Redland node/uri object for RDF concepts */
 REDLAND_API
 librdf_node* librdf_get_concept_resource_by_index(librdf_world *world, librdf_concepts_index idx);
@@ -702,7 +708,7 @@ librdf_uri* librdf_get_concept_uri_by_index(librdf_world *world, librdf_concepts
  * #librdf_uri for <literal>rdf:</literal> namespace.  Copy with
  * librdf_new_uri_from_uri() before using.
  */
-#define LIBRDF_URI_RDF_MS (librdf_concept_ms_namespace_uri)
+#define LIBRDF_URI_RDF_MS(world) librdf_get_concept_ms_namespace(world)
 
 /**
  * LIBRDF_URI_RDF_SCHEMA:
@@ -710,7 +716,7 @@ librdf_uri* librdf_get_concept_uri_by_index(librdf_world *world, librdf_concepts
  * #librdf_uri for <literal>rdfs:</literal> namespace.  Copy with
  * librdf_new_uri_from_uri() before using.
  */
-#define LIBRDF_URI_RDF_SCHEMA (librdf_concept_schema_namespace_uri)
+#define LIBRDF_URI_RDF_SCHEMA(world) librdf_get_concept_schema_namespace(world)
 
 #ifdef __cplusplus
 }
