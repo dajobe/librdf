@@ -101,7 +101,7 @@ librdf_init_concepts(librdf_world *world)
     LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Out of memory creating node/uri arrays");
 
   /* Create the M&S and Schema resource nodes */
-  for (i=0; i< LIBRDF_CONCEPT_LAST; i++) {
+  for (i=0; i<= LIBRDF_CONCEPT_LAST; i++) {
     librdf_uri* ns_uri=(i < LIBRDF_CONCEPT_FIRST_S_ID) ? world->concept_ms_namespace_uri :
       world->concept_schema_namespace_uri;
     const unsigned char * token=(const unsigned char *)librdf_concept_tokens[i];
@@ -253,7 +253,7 @@ librdf_finish_concepts(librdf_world *world)
   }
 
   if(world->concept_resources) {
-    for (i=0; i< LIBRDF_CONCEPT_LAST; i++) {
+    for (i=0; i<= LIBRDF_CONCEPT_LAST; i++) {
       /* deletes associated URI too */
       if(world->concept_resources[i])
         librdf_free_node(world->concept_resources[i]);
@@ -305,7 +305,13 @@ main(int argc, char *argv[])
             EXPECTED_STRING, actual);
     exit(1);
   }
-  
+
+  uri=librdf_get_concept_resource_by_index(world, LIBRDF_CONCEPT_LAST);
+  if(!uri) {
+    fprintf(stderr, "%s: Got no concept URI for the last concept\n", program);
+    exit(1);
+  }
+
   librdf_free_world(world);
 
   /* keep gcc -Wall happy */
