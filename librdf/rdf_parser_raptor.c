@@ -1153,7 +1153,7 @@ librdf_parser_raptor_set_feature(void* context,
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   raptor_feature feature_i;
-  int value_i;
+  const unsigned char* value_s;
   
   if(!feature)
     return 1;
@@ -1166,9 +1166,10 @@ librdf_parser_raptor_set_feature(void* context,
   if(!librdf_node_is_literal(value))
     return 1;
   
-  value_i=atoi((const char*)librdf_node_get_literal_value(value));
+  value_s=(const unsigned char*)librdf_node_get_literal_value(value);
 
-  return raptor_set_feature(pcontext->rdf_parser, feature_i, value_i);
+  return raptor_parser_set_feature_string(pcontext->rdf_parser, feature_i,
+                                          value_s);
 }
 
 

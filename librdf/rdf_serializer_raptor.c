@@ -132,7 +132,7 @@ librdf_serializer_raptor_set_feature(void *context,
 {
   librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
   raptor_feature feature_i;
-  int value_i;
+  const unsigned char* value_s;
   
   if(!feature)
     return 1;
@@ -145,9 +145,10 @@ librdf_serializer_raptor_set_feature(void *context,
   if(!librdf_node_is_literal(value))
     return 1;
   
-  value_i=atoi((const char*)librdf_node_get_literal_value(value));
+  value_s=(const unsigned char*)librdf_node_get_literal_value(value);
 
-  return raptor_serializer_set_feature(scontext->rdf_serializer, feature_i, value_i);
+  return raptor_serializer_set_feature_string(scontext->rdf_serializer,
+                                              feature_i, value_s);
 }
 
 
