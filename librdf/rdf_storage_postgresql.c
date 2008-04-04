@@ -587,8 +587,6 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   librdf_free_hash(options);
 
   librdf_storage_postgresql_release_handle(storage, handle);
-  if(status)
-    librdf_storage_postgresql_terminate(storage);
 
   return status;
 }

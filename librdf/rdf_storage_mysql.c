@@ -691,8 +691,6 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   librdf_free_hash(options);
 
   librdf_storage_mysql_release_handle(storage, handle);
-  if(status)
-    librdf_storage_mysql_terminate(storage);
 
   return status;
 }
