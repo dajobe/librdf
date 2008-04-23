@@ -97,6 +97,7 @@ librdf_init_storage(librdf_world *world)
 
   /* Always have storage list, hashes, file implementations available */
   librdf_init_storage_hashes(world);
+  librdf_init_storage_trees(world);
 
 #ifdef MODULAR_LIBRDF
 
@@ -840,7 +841,7 @@ librdf_storage_contains_statement(librdf_storage* storage,
       !librdf_node_is_blank(statement->subject)))
     return 1;
   
-  /* subject can only be a URI */
+  /* predicate can only be a URI */
   if(!statement->predicate || !librdf_node_is_resource(statement->predicate))
      return 1;
 
@@ -896,8 +897,7 @@ librdf_storage_find_statements(librdf_storage* storage,
   /* try to pick the most efficient storage back end */
 
   /* only subject/source field blank -> use find_sources */
-  if(!subject && predicate && object &&
-     storage->factory->find_sources) {
+  if(storage->factory->find_sources && !subject && predicate && object) {
     iterator=storage->factory->find_sources(storage, predicate, object);
     if(iterator)
       return librdf_new_stream_from_node_iterator(iterator, statement,
@@ -906,8 +906,7 @@ librdf_storage_find_statements(librdf_storage* storage,
   }
   
   /* only predicate/arc field blank -> use find_arcs */
-  if(subject && !predicate && object &&
-     storage->factory->find_arcs) {
+  if(storage->factory->find_arcs && subject && !predicate && object) {
     iterator=storage->factory->find_arcs(storage, subject, object);
     if(iterator)
       return librdf_new_stream_from_node_iterator(iterator, statement,
@@ -916,8 +915,7 @@ librdf_storage_find_statements(librdf_storage* storage,
   }
   
   /* only object/target field blank -> use find_targets */
-  if(subject && predicate && !object &&
-     storage->factory->find_targets) {
+  if(storage->factory->find_targets && subject && predicate && !object) {
     iterator=storage->factory->find_targets(storage, subject, predicate);
     if(iterator)
       return librdf_new_stream_from_node_iterator(iterator, statement,
@@ -1849,9 +1847,10 @@ main(int argc, char *argv[])
   const char* const storages[] = {
 	"memory", NULL, "contexts='yes'",
 	"hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'",
-	"uri", "http://librdf.org/redland.rdf", NULL,
+	"trees", "test", "contexts='yes'",
     #ifdef STORAGE_FILE
       "file", "file://../redland.rdf", NULL,
+	    "uri", "http://librdf.org/redland.rdf", NULL,
     #endif
     #ifdef STORAGE_MYSQL
       "mysql", "test", "host='localhost',database='test'",

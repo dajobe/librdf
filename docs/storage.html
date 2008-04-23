@@ -21,6 +21,7 @@ the storage options used.
 
 <ul>
 <li><a href="#hashes">hashes</a></li>
+<li><a href="#trees">trees</a></li>
 <li><a href="#file">file</a></li>
 <li><a href="#mysql">mysql</a></li>
 <li><a href="#memory">memory</a></li>
@@ -103,6 +104,66 @@ can be used with any hash type.</p>
 <li>Indexed</li>
 <li>Large disk usage with BDB</li>
 <li>Optional contexts (with option <code>contexts</code> set)</li>
+</ul>
+
+
+<h2><a name="trees">Store 'trees'</a></h2>
+
+<p>This module is always present (cannot be removed) and provides
+indexed storage using several balanced trees to store statements
+for fast querying.  This store is not persistent, but is suitable
+for large models capable of fitting in main memory.</p>
+
+<p>By default, the store is fully indexed providing good performance
+for all types of queries.  Options can be used to select only specific
+indices to save memory and make insertion and deletion of statements
+faster.  The four boolean indexing options are <code>index-spo</code>, 
+<code>index-sop</code>, <code>index-ops</code> and <code>index-pso</code>.
+An index is fast for triple patterns where the variables are on the right
+hand side of the index ordering, e.g. the spo (subject, predicate, object)
+index will be fast for (s p o) (s p ?o) and (s ?p ?o) queries.  The ideal
+index for every type of triple pattern is:
+</p>
+<dl>
+	<dt>Any index:</dt><dd>(s p o)<br/><br/></dd>
+	<dt>(s p o):</dt><dd>(s p ?o), (s ?p ?o)<br/><br/></dd>
+	<dt>(o p s):</dt><dd>(?s p o), (?s ?p o)<br/><br/></dd>
+	<dt>(s o p):</dt><dd>(s ?p o)<br/><br/></dd>
+	<dt>(p s o):</dt><dd>(?s p ?o)<br/><br/></dd>
+</dl>
+
+<p>
+With full indexing the space used is roughly equivalent to the hashes
+store.  Insertion and deletion with 2 indices will be roughly twice as
+fast as with 4 indices, etc.  In the majority of cases, full indexing
+will be fine and there is no need to worry about selecting the right
+index for queries.
+</p>
+
+<p>Examples:</p>
+<pre>
+  /* A fully indexed tree store */
+  storage=librdf_new_storage(world, "trees", NULL, NULL);
+
+  /* A tree store with only a (s p o) index */
+  storage=librdf_new_storage(world, "trees", NULL, "index-spo='yes'");
+  
+  /* A tree store with only (s p o) and (o p s) indices
+   * (fast for everything but queries with predicate variables */
+  storage=librdf_new_storage(world, "trees", NULL,
+    "index-spo='yes',index-ops='yes'");
+
+</pre>
+
+<p>Summary:</p>
+
+<ul>
+<li>In-memory only</li>
+<li>Suitable for larger models</li>
+<li>Indexed, with selectable levels of indexing</li>
+<li>No contexts</li>
+<li>Significantly faster than hashes for most queries</li>
+<li>Slower than hashes for exact statement search (librdf_model_contains_statement)</li>
 </ul>
 
 

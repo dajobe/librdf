@@ -173,6 +173,8 @@ void librdf_init_storage_list(librdf_world *world);
 
 void librdf_init_storage_hashes(librdf_world *world);
 
+void librdf_init_storage_trees(librdf_world *world);
+
 void librdf_init_storage_file(librdf_world *world);
 
 #ifdef STORAGE_MYSQL

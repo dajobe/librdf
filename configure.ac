@@ -636,8 +636,8 @@ AC_SUBST(HASH_SRCS)
 dnl Storages
 persistent_storages="/file/tstore/mysql/sqlite/"
 persistent_store=no
-all_storages="memory file hashes mysql sqlite tstore postgresql"
-always_available_storages="memory file hashes"
+all_storages="memory file hashes trees mysql sqlite tstore postgresql"
+always_available_storages="memory file hashes trees"
 
 dnl default availabilities and enablements
 for storage in $all_storages; do
@@ -650,7 +650,7 @@ for storage in $always_available_storages; do
 done
 
 
-storages_available="file hashes(memory)"
+storages_available="file hashes(memory) trees"
 if test "$have_libdb" = yes; then
   storages_available="$storages_available hashes(bdb $bdb_version)"
 fi
@@ -807,6 +807,7 @@ fi
 if test "x" = "y"; then
   AC_DEFINE(STORAGE_FILE,   1, [Building file storage])
   AC_DEFINE(STORAGE_HASHES, 1, [Building hashes storage])
+  AC_DEFINE(STORAGE_TREES,  1, [Building trees storage])
   AC_DEFINE(STORAGE_MEMORY, 1, [Building memory storage])
   AC_DEFINE(STORAGE_MYSQL,  1, [Building MySQL storage])
   AC_DEFINE(STORAGE_SQLITE, 1, [Building SQLite storage])
@@ -848,6 +849,7 @@ done
 
 AM_CONDITIONAL(STORAGE_FILE,   test $file_storage   = yes)
 AM_CONDITIONAL(STORAGE_HASHES, test $hashes_storage = yes)
+AM_CONDITIONAL(STORAGE_TREES,  test $trees_storage  = yes)
 AM_CONDITIONAL(STORAGE_MEMORY, test $memory_storage = yes)
 AM_CONDITIONAL(STORAGE_MYSQL,  test $mysql_storage  = yes)
 AM_CONDITIONAL(STORAGE_SQLITE, test $sqlite_storage = yes)
