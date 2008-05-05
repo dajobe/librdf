@@ -485,7 +485,7 @@ librdf_stream_from_node_iterator_get_statement(void* context, int flags)
       return scontext->current;
 
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
-      return (librdf_statement*)librdf_iterator_get_context(scontext->iterator);
+      return librdf_iterator_get_context(scontext->iterator);
     default:
       librdf_log(scontext->iterator->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STREAM, NULL,
