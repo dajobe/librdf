@@ -974,7 +974,7 @@ librdf_avltree_print(librdf_world* world, librdf_avltree* tree, FILE* stream,
                      librdf_avltree_data_print_function print_fn)
 {
   int i;
-  int rv;
+  int rv=0;
   librdf_iterator* iter;
 
   fprintf(stream, "AVL Tree size %zu\n", tree->size);
