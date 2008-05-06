@@ -173,7 +173,8 @@ librdf_log(librdf_world* world, int code,
 
   buffer=raptor_vsnprintf(message, arguments);
   librdf_log_simple(world, code, level, facility, locator, buffer);
-  raptor_free_memory(buffer);
+  if(buffer)
+    raptor_free_memory(buffer);
 
   va_end(arguments);
 }
