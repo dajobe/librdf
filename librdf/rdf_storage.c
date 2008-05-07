@@ -97,7 +97,10 @@ librdf_init_storage(librdf_world *world)
 
   /* Always have storage list, hashes, file implementations available */
   librdf_init_storage_hashes(world);
+
+#ifdef STORAGE_TREES
   librdf_init_storage_trees(world);
+#endif
 
 #ifdef MODULAR_LIBRDF
 
@@ -1847,7 +1850,9 @@ main(int argc, char *argv[])
   const char* const storages[] = {
 	"memory", NULL, "contexts='yes'",
 	"hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'",
-	"trees", "test", "contexts='yes'",
+    #ifdef STORAGE_TREES
+	    "trees", "test", "contexts='yes'",
+    #endif
     #ifdef STORAGE_FILE
       "file", "file://../redland.rdf", NULL,
 	    "uri", "http://librdf.org/redland.rdf", NULL,
