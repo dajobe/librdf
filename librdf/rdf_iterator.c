@@ -169,7 +169,7 @@ librdf_iterator_update_current_element(librdf_iterator* iterator)
         break;
       
       /* apply the map to the element  */
-      element=map->fn(iterator, element, map->context);
+      element=map->fn(iterator, map->context, element);
       if(!element)
         break;
 
