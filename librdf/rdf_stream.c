@@ -140,7 +140,7 @@ librdf_free_stream(librdf_stream* stream)
 
 
 /*
- * librdf_stream_get_next_mapped_element - helper function to get the next element with map applied
+ * librdf_stream_update_current_statement - helper function to get the next element with map applied
  * @stream: #librdf_stream object
  * 
  * A helper function that gets the next element subject to the user
