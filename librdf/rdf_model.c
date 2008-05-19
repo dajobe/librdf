@@ -1892,6 +1892,10 @@ main(int argc, char *argv[])
   unsigned char *string;
   size_t string_length=0;
   int remove_count=0;
+  int status=0;
+  const char* storage_type;
+  const char* storage_name;
+  const char* storage_options;
 
   librdf_world_open(world);
 
@@ -1899,22 +1903,24 @@ main(int argc, char *argv[])
   if(test_model_cloning(program, world))
     return(1);
   
-  fprintf(stderr, "%s: Creating storage\n", program);
-  if(1) {
-    /* test in memory */
-    storage=librdf_new_storage(world, NULL, NULL, "contexts='yes'");
-  } else {
-    /* test on disk */
-    storage=librdf_new_storage(world, "sqlite", "test", "new='yes',contexts='yes'");
-    if(!storage)
-      storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
-    if(!storage)
-      storage=librdf_new_storage(world, NULL, NULL, "contexts='yes'");
+  /* Get storage configuration */
+  storage_type=getenv("REDLAND_TEST_STORAGE_TYPE");
+  storage_name=getenv("REDLAND_TEST_STORAGE_NAME");
+  storage_options=getenv("REDLAND_TEST_STORAGE_OPTIONS");
+  if(!(storage_type && storage_name && storage_options)) {
+    /* default is to test in memory */
+    storage_type="memory";
+    storage_name=NULL;
+    storage_options="write='yes',new='yes',contexts='yes'";
   }
+
+  fprintf(stderr, "%s: Creating new %s storage\n", program, storage_type);
+  storage=librdf_new_storage(world, storage_type, storage_name, storage_options);
   if(!storage) {
-    fprintf(stderr, "%s: Failed to create new storage\n", program);
+    fprintf(stderr, "%s: Failed to create new %s storage name %s with options %s\n", program, storage_type, storage_name, storage_options);
     return(1);
   }
+
   fprintf(stderr, "%s: Creating model\n", program);
   model=librdf_new_model(world, storage, NULL);
   if(!model) {
@@ -2000,7 +2006,7 @@ main(int argc, char *argv[])
   iterator=librdf_model_get_sources(model, n1, n2);
   if(!iterator) {
     fprintf(stderr, "%s: librdf_model_get_sources failed\n", program);
-    exit(1);
+    status=1;
   }
 
   expected_count=3;
@@ -2013,7 +2019,7 @@ main(int argc, char *argv[])
   librdf_free_iterator(iterator);
   if(count != expected_count) {
     fprintf(stderr, "%s: librdf_model_get_sources returned %d nodes, expected %d\n", program, count, expected_count);
-    exit(1);
+    status=1;
   }
   librdf_free_node(n1);
   librdf_free_node(n2);
@@ -2032,7 +2038,7 @@ main(int argc, char *argv[])
   iterator=librdf_model_get_targets(model, n1, n2);
   if(!iterator) {
     fprintf(stderr, "%s: librdf_model_get_targets failed\n", program);
-    exit(1);
+    status=1;
   }
 
   expected_count=2;
@@ -2045,7 +2051,7 @@ main(int argc, char *argv[])
   librdf_free_iterator(iterator);
   if(count != expected_count) {
     fprintf(stderr, "%s: librdf_model_get_targets returned %d nodes, expected %d\n", program, count, expected_count);
-    exit(1);
+    status=1;
   }
   librdf_free_node(n1);
   librdf_free_node(n2);
@@ -2064,7 +2070,7 @@ main(int argc, char *argv[])
   iterator=librdf_model_get_arcs(model, n1, n2);
   if(!iterator) {
     fprintf(stderr, "%s: librdf_model_get_arcs failed\n", program);
-    exit(1);
+    status=1;
   }
 
   expected_count=2;
@@ -2077,7 +2083,7 @@ main(int argc, char *argv[])
   librdf_free_iterator(iterator);
   if(count != expected_count) {
     fprintf(stderr, "%s: librdf_model_get_arcs returned %d nodes, expected %d\n", program, count, expected_count);
-    exit(1);
+    status=1;
   }
   librdf_free_node(n1);
   librdf_free_node(n2);
@@ -2098,7 +2104,7 @@ main(int argc, char *argv[])
     librdf_free_iterator(iterator);
     if(count != expected_count) {
       fprintf(stderr, "%s: librdf_model_get_contexts returned %d context nodes, expected %d\n", program, count, expected_count);
-      exit(1);
+      status=1;
     }
   }
 
@@ -2110,7 +2116,7 @@ main(int argc, char *argv[])
   } else {
     fprintf(stderr, "%s: librdf_model_contains_contexts failed to find context URI %s\n", 
             program, librdf_uri_as_string(uris[TEST_CONTEXT_URI_INDEX]));
-    exit(1);
+    status=1;
   }
   
 
@@ -2163,7 +2169,7 @@ main(int argc, char *argv[])
   iterator=librdf_model_get_targets(model, n1, n2);
   if(!iterator) {
     fprintf(stderr, "%s: librdf_model_get_targets failed\n", program);
-    exit(1);
+    status=1;
   }
 
   fprintf(stderr, "%s: iterating similar statements again\n", program);
@@ -2218,7 +2224,7 @@ main(int argc, char *argv[])
   librdf_free_iterator(iterator);
   if(count != expected_count) {
     fprintf(stderr, "%s: librdf_model_get_targets returned %d nodes, expected %d\n", program, count, expected_count);
-    exit(1);
+    status=1;
   }
   librdf_free_node(n1);
   librdf_free_node(n2);
@@ -2240,8 +2246,7 @@ main(int argc, char *argv[])
 
   librdf_free_world(world);
   
-  /* keep gcc -Wall happy */
-  return(0);
+  return status;
 }
 
 int test_model_cloning(char const *program, librdf_world *world) {
@@ -2249,14 +2254,27 @@ int test_model_cloning(char const *program, librdf_world *world) {
   librdf_model *model1;
   librdf_model *model2;
   librdf_model *model3;
+  const char* storage_type;
+  const char* storage_name;
+  const char* storage_options;
 
   fprintf(stderr, "%s: Testing model cloning\n", program);
 
-  fprintf(stderr, "%s: Creating hashes storage for cloning\n", program);
-  /* only the hashes storage supports cloning */
-  storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
+  /* Get storage configuration */
+  storage_type=getenv("REDLAND_TEST_CLONING_STORAGE_TYPE");
+  storage_name=getenv("REDLAND_TEST_CLONING_STORAGE_NAME");
+  storage_options=getenv("REDLAND_TEST_CLONING_STORAGE_OPTIONS");
+  if(!(storage_type && storage_name && storage_options)) {
+    /* default is to test bdb disk hashes for cloning */
+    storage_type="hashes";
+    storage_name="test";
+    storage_options="hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'";
+  }
+
+  fprintf(stderr, "%s: Creating new %s storage\n", program, storage_type);
+  storage=librdf_new_storage(world, storage_type, storage_name, storage_options);
   if(!storage) {
-    fprintf(stderr, "%s: Failed to create new hashes storage\n", program);    
+    fprintf(stderr, "%s: Failed to create new %s storage name %s with options %s\n", program, storage_type, storage_name, storage_options);
     return 1;
   }
   
