@@ -511,6 +511,55 @@ librdf_model_storage_context_serialize(librdf_model* model,
 
 
 /**
+ * librdf_model_storage_find_statements_in_context:
+ * @model: #librdf_model object
+ * @statement: #librdf_statement partial statement to find
+ * @context_node: context #librdf_node (or NULL)
+ *
+ * Search the model for matching statements in a given context.
+ * 
+ * Searches the model for a (partial) statement as described in
+ * librdf_statement_match() in the given context and returns a
+ * #librdf_stream of matching #librdf_statement objects.  If
+ * context is NULL, this is equivalent to librdf_model_find_statements.
+ * 
+ * Return value: #librdf_stream of matching statements (may be empty) or NULL on failure
+ **/
+static librdf_stream*
+librdf_model_storage_find_statements_in_context(librdf_model* model,
+                                                librdf_statement* statement,
+                                                librdf_node* context_node) 
+{
+  librdf_model_storage_context *mcontext=(librdf_model_storage_context *)model->context;
+  librdf_stream *stream;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
+  if(mcontext->storage->factory->find_statements_in_context)
+    return mcontext->storage->factory->find_statements_in_context(mcontext->storage,
+                                                                  statement,
+                                                                  context_node);
+
+  statement=librdf_new_statement_from_statement(statement);
+  if(!statement)
+    return NULL;
+
+  stream=librdf_model_context_as_stream(model, context_node);
+  if(!stream) {
+    librdf_free_statement(statement);
+    return librdf_new_empty_stream(model->world);
+  }
+
+  librdf_stream_add_map(stream,
+                        &librdf_stream_statement_find_map,
+                        (librdf_stream_map_free_context_handler)&librdf_free_statement, (void*)statement);
+
+  return stream;
+}
+
+
+/**
  * librdf_model_storage_query_execute:
  * @model: #librdf_model object
  * @query: #librdf_query object
@@ -751,6 +800,7 @@ librdf_model_storage_register_factory(librdf_model_factory *factory)
   factory->context_remove_statement = librdf_model_storage_context_remove_statement;
   factory->context_remove_statements    = librdf_model_storage_context_remove_statements;
   factory->context_serialize        = librdf_model_storage_context_serialize;
+  factory->find_statements_in_context = librdf_model_storage_find_statements_in_context;
 
 
   factory->query_execute      = librdf_model_storage_query_execute;
