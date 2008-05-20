@@ -2310,10 +2310,11 @@ int test_model_cloning(char const *program, librdf_world *world) {
   librdf_free_model(model3);
   librdf_free_model(model2);
   
-  fprintf(stderr, "%s: Freeing hashes storage\n", program);  
+  fprintf(stderr, "%s: Freeing %s storage\n", program, storage_type);  
   librdf_free_storage(storage);
   
   return 0;
 }
 
 #endif
+
