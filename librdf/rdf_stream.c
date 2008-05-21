@@ -155,7 +155,9 @@ librdf_stream_update_current_statement(librdf_stream* stream)
 
   if(stream->is_updated)
     return stream->current;
-  
+
+  stream->is_updating=1;
+
   /* find next statement subject to map */
   while(!stream->is_end_method(stream->context)) {
     librdf_iterator* map_iterator; /* Iterator over stream->map_list librdf_list */
@@ -200,6 +202,7 @@ librdf_stream_update_current_statement(librdf_stream* stream)
     stream->is_finished=1;
 
   stream->is_updated=1;
+  stream->is_updating=0;
 
   return statement;
 }
@@ -286,7 +289,7 @@ librdf_stream_get_object(librdf_stream* stream)
  * is moved on librdf_stream_next or if it should last after the
  * stream is closed.
  * 
- * Return value: The context node or NULL if the stream has finished.
+ * Return value: The context node (can be NULL) or NULL if the stream has finished.
  **/
 void*
 librdf_stream_get_context(librdf_stream* stream) 
@@ -294,7 +297,10 @@ librdf_stream_get_context(librdf_stream* stream)
   if(stream->is_finished)
     return NULL;
 
-  if(!librdf_stream_update_current_statement(stream))
+  /* Update current statement only if we are not already in the middle of the
+     statement update process.
+     Allows inspection of context nodes in stream map callbacks. */
+  if(!stream->is_updating && !librdf_stream_update_current_statement(stream))
     return NULL;
 
   return stream->get_method(stream->context, 

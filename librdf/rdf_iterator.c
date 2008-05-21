@@ -147,6 +147,8 @@ librdf_iterator_update_current_element(librdf_iterator* iterator)
 
   if(iterator->is_updated)
     return iterator->current;
+
+  iterator->is_updating=1;
   
   /* find next element subject to map */
   while(!iterator->is_end_method(iterator->context)) {
@@ -190,6 +192,7 @@ librdf_iterator_update_current_element(librdf_iterator* iterator)
     iterator->is_finished=1;
 
   iterator->is_updated=1;
+  iterator->is_updating=0;
 
   return element;
 }
@@ -292,7 +295,7 @@ librdf_iterator_get_object(librdf_iterator* iterator)
  * is moved on librdf_iterator_next or if it should last after the
  * iterator is closed.
  * 
- * Return value: The context or NULL if the iterator has finished.
+ * Return value: The context (can be NULL) or NULL if the iterator has finished.
  **/
 void*
 librdf_iterator_get_context(librdf_iterator* iterator) 
@@ -300,7 +303,10 @@ librdf_iterator_get_context(librdf_iterator* iterator)
   if(iterator->is_finished)
     return NULL;
 
-  if(!librdf_iterator_update_current_element(iterator))
+  /* Update current element only if we are not already in the middle of the
+     element update process.
+     Allows inspection of context in iterator map callbacks. */
+  if(!iterator->is_updating && !librdf_iterator_update_current_element(iterator))
     return NULL;
 
   return iterator->get_method(iterator->context, 
