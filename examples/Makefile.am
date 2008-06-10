@@ -7,7 +7,7 @@
 
 EXAMPLES=example1 example2 example3 example4 example5 example6 example7
 
-OTHER_EXAMPLES=redland_dbus rss2ical
+OTHER_EXAMPLES=redland_dbus rss2ical rss2atom
 
 EXTRA_PROGRAMS = $(EXAMPLES) $(OTHER_EXAMPLES)
 
@@ -34,6 +34,8 @@ example6_SOURCES = example6.c
 example7_SOURCES = example7.c
 
 rss2ical_SOURCES = rss2ical.c
+
+rss2atom_SOURCES = rss2atom.c
 
 redland_dbus_SOURCES = redland_dbus.c
 redland_dbus_CFLAGS=`pkg-config --cflags dbus-1 glib-2.0 dbus-glib-1 gthread`
