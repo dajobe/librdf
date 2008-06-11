@@ -367,8 +367,6 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
   }
   raptor_serialize_end(scontext->rdf_serializer);
 
-  raptor_free_iostream(iostr);
-
   if(rc) {
     free(string);
     return NULL;
