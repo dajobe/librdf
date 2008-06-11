@@ -65,6 +65,7 @@ redland.h librdf.h \
 rdf_internal.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
+rdf_avltree.h \
 rdf_digest.h rdf_hash.h \
 rdf_types.h \
 rdf_model.h \
