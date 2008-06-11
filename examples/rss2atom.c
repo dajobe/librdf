@@ -37,7 +37,7 @@ static struct
   const char* ns_uri;
   librdf_uri* uri;
 } local_nspaces[NSPACE_COUNT]= {
-  { "chs",  "http://names.media.yahoo.com:4080/2006/08/chs#" },
+  { "my",  "http://example.org/my-ns#" },
   { "owl",  "http://www.w3.org/2002/07/owl#",  },
   { "rdfs", "http://www.w3.org/2000/01/rdf-schema#" }
 };
