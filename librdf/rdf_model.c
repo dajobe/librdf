@@ -483,10 +483,6 @@ librdf_model_add_statement(librdf_model* model, librdf_statement* statement)
   if(!librdf_statement_is_complete(statement))
     return 1;
 
-  /* Do not add duplicate statements */
-  if(librdf_model_contains_statement(model, statement))
-    return 0;
-  
   return model->factory->add_statement(model, statement);
 }
 
