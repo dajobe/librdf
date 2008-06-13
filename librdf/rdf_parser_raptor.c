@@ -1200,7 +1200,7 @@ librdf_raptor_new_uri_relative_to_base(void *context,
 static raptor_uri*
 librdf_raptor_new_uri_for_rdf_concept(void *context, const char *name) 
 {
-  librdf_uri *uri;
+  librdf_uri *uri=NULL;
   librdf_get_concept_by_name((librdf_world*)context, 1, name, &uri, NULL);
   if(!uri)
     return NULL;
