@@ -1097,7 +1097,7 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
   const table_info *table;
   MYSQL *handle;
   unsigned char *uri;
-  unsigned char *value, *datatype=0;
+  unsigned char *value, *datatype=NULL;
   char *lang, *nodestring;
   librdf_uri *dt;
   size_t valuelen, langlen=0, datatypelen=0;
