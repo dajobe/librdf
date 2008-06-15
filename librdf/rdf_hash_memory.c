@@ -486,7 +486,7 @@ typedef struct {
  * 
  * Return value: non 0 on failure
  **/
-int
+static int
 librdf_hash_memory_cursor_init(void *cursor_context, void *hash_context) 
 {
   librdf_hash_memory_cursor_context *cursor=(librdf_hash_memory_cursor_context*)cursor_context;
