@@ -627,8 +627,8 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
       case LIBRDF_NODE_TYPE_BLANK:
         return strcmp((char*)n1->value.blank.identifier, (char*)n2->value.blank.identifier);
       case LIBRDF_NODE_TYPE_UNKNOWN:
-	  default:
-        return n2-n1; /* ? */
+      default:
+        return (void*)n2-(void*)n1; /* ? */
     }
   }
 }
@@ -636,7 +636,7 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
 
 /* Compare two statements in (s, p, o) order.
  * NULL fields act as wildcards. */
-int
+static int
 librdf_statement_compare_spo(const void* data1, const void* data2)
 {
   librdf_statement* a = (librdf_statement*)data1;
@@ -673,7 +673,7 @@ librdf_statement_compare_spo(const void* data1, const void* data2)
 
 /* Compare two statements in (o, s, p) order.
  * NULL fields act as wildcards. */
-int
+static int
 librdf_statement_compare_sop(const void* data1, const void* data2)
 {
   librdf_statement* a = (librdf_statement*)data1;
@@ -710,7 +710,7 @@ librdf_statement_compare_sop(const void* data1, const void* data2)
 
 /* Compare two statements in (o, p, s) order.
  * NULL fields act as wildcards. */
-int
+static int
 librdf_statement_compare_ops(const void* data1, const void* data2)
 {
   librdf_statement* a = (librdf_statement*)data1;
@@ -747,7 +747,7 @@ librdf_statement_compare_ops(const void* data1, const void* data2)
 
 /* Compare two statements in (p, s, o) order.
  * NULL fields act as wildcards. */
-int
+static int
 librdf_statement_compare_pso(const void* data1, const void* data2)
 {
   librdf_statement* a = (librdf_statement*)data1;
@@ -782,7 +782,7 @@ librdf_statement_compare_pso(const void* data1, const void* data2)
 }
 
 
-void
+static void
 librdf_storage_trees_avl_free(void* data)
 {
   librdf_statement* stmnt=(librdf_statement*)data;
