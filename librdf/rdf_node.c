@@ -1006,10 +1006,10 @@ librdf_node_get_literal_value_datatype_uri(librdf_node* node)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
   LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_LITERAL),
-                       "node is not type literal", 0);
+                       "node is not type literal", NULL);
 
   if(node->type != LIBRDF_NODE_TYPE_LITERAL)
-    return 0;
+    return NULL;
   return node->value.literal.datatype_uri;
 }
 
