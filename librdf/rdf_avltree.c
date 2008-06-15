@@ -294,6 +294,7 @@ librdf_avltree_print_node(librdf_avltree_node* node)
 }
 
 
+#if LIBRDF_DEBUG > 1
 static void
 librdf_avltree_check_node(librdf_avltree* tree, librdf_avltree_node* node,
                           const char* fn, const char* where) 
@@ -321,6 +322,8 @@ librdf_avltree_check_node(librdf_avltree* tree, librdf_avltree_node* node,
     }
   }
 }
+#endif
+
 #endif
 
 
@@ -871,6 +874,7 @@ librdf_avltree_node_search_right(librdf_avltree* tree, librdf_avltree_node* node
 }
 
 
+#if 0
 static librdf_avltree_node*
 librdf_avltree_node_prev(librdf_avltree* tree, librdf_avltree_node* node)
 {
@@ -897,6 +901,7 @@ librdf_avltree_node_prev(librdf_avltree* tree, librdf_avltree_node* node)
     
   return node;
 }
+#endif
 
 
 static librdf_avltree_node*
@@ -1150,7 +1155,7 @@ librdf_avltree_dump_internal(librdf_avltree* tree, librdf_avltree_node* node,
 int
 librdf_avltree_dump(librdf_avltree* tree, FILE* stream, librdf_avltree_data_print_function print_fn)
 {
-  fprintf(stream, "Dumping avltree %p  size %d\n", tree, tree->size);
+  fprintf(stream, "Dumping avltree %p  size %z\n", tree, tree->size);
   return librdf_avltree_dump_internal(tree, tree->root, 0, stream, print_fn);
 }
 
