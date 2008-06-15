@@ -196,9 +196,9 @@ LIBRDF_EXTERNAL_CPPFLAGS=
 LIBRDF_EXTERNAL_LIBS=
 
 # do these first because somehow they get messed up by bdb checks
-AC_CHECK_TYPE(byte)
-AC_CHECK_TYPE(u32)
-AC_CHECK_TYPE(u64)
+AC_CHECK_TYPES([byte])
+AC_CHECK_TYPES([u32])
+AC_CHECK_TYPES([u64])
 
 AC_CHECK_SIZEOF(unsigned char, 1)
 AC_CHECK_SIZEOF(unsigned int, 4)

@@ -35,8 +35,7 @@ extern "C" {
 
 #include <sys/types.h>
 
-#if u64 == MISSING
-  #undef u64
+#ifndef HAVE_U64
   #if SIZEOF_UNSIGNED_INT == 8
     typedef unsigned int u64;
   #elif SIZEOF_UNSIGNED_LONG == 8
@@ -52,8 +51,7 @@ extern "C" {
   #endif
 #endif
 
-#if u32 == MISSING
-  #undef u32
+#ifndef HAVE_U32
   #if SIZEOF_UNSIGNED_INT == 4
     typedef unsigned int u32;
   #elif SIZEOF_UNSIGNED_LONG == 4
@@ -64,8 +62,7 @@ extern "C" {
 #endif
 
 
-#if byte == MISSING
-  #undef byte
+#ifndef HAVE_BYTE
   #if SIZEOF_UNSIGNED_CHAR == 1
     typedef unsigned char byte;
   #else
