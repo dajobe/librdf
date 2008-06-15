@@ -288,6 +288,7 @@ main(int argc, char *argv[])
   const char *program=librdf_basename((const char*)argv[0]);
   librdf_world *world;
   librdf_uri* uri;
+  librdf_node* node;
   unsigned char* actual;
   
   world=librdf_new_world();
@@ -306,9 +307,9 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-  uri=librdf_get_concept_resource_by_index(world, LIBRDF_CONCEPT_LAST);
-  if(!uri) {
-    fprintf(stderr, "%s: Got no concept URI for the last concept\n", program);
+  node=librdf_get_concept_resource_by_index(world, LIBRDF_CONCEPT_LAST);
+  if(!node) {
+    fprintf(stderr, "%s: Got no concept node for the last concept\n", program);
     exit(1);
   }
 
