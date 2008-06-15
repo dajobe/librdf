@@ -610,7 +610,7 @@ librdf_new_storage_from_factory(librdf_world *world,
  * Destructor - destroy a #librdf_storage object.
  **/
 void
-librdf_free_storage (librdf_storage* storage) 
+librdf_free_storage(librdf_storage* storage) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(storage, librdf_storage);
 
