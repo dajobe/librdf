@@ -628,7 +628,7 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
         return strcmp((char*)n1->value.blank.identifier, (char*)n2->value.blank.identifier);
       case LIBRDF_NODE_TYPE_UNKNOWN:
       default:
-        return (void*)n2-(void*)n1; /* ? */
+        return (char*)n2-(char*)n1; /* ? */
     }
   }
 }
