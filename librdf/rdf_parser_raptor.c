@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2008, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -461,8 +461,7 @@ librdf_parser_raptor_generate_id_handler(void *user_data,
  *
  **/
 static librdf_stream*
-librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
-                                                 void *context, 
+librdf_parser_raptor_parse_file_handle_as_stream(void *context,
                                                  FILE *fh, int close_fh,
                                                  librdf_uri *base_uri)
 {
@@ -471,10 +470,10 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   librdf_stream *stream;
   int rc;
 
-  librdf_world_open(world);
+  librdf_world_open(pcontext->parser->world);
 
   if(raptor_get_need_base_uri(pcontext->rdf_parser) && !base_uri) {
-    librdf_log(world,
+    librdf_log(pcontext->parser->world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
                "Missing base URI for %s parser", 
                pcontext->parser_name);
@@ -492,7 +491,7 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   scontext->pcontext=pcontext;
   pcontext->stream_context=scontext;
 
-  scontext->statements=librdf_new_list(world);
+  scontext->statements=librdf_new_list(pcontext->parser->world);
   if(!scontext->statements)
     goto oom;
 
@@ -537,7 +536,7 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
     /* start parsing; initialises scontext->statements, scontext->current */
     librdf_parser_raptor_get_next_statement(scontext);
     
-    stream=librdf_new_stream(world,
+    stream=librdf_new_stream(pcontext->parser->world,
                              (void*)scontext,
                              &librdf_parser_raptor_serialise_end_of_stream,
                              &librdf_parser_raptor_serialise_next_statement,
@@ -552,7 +551,7 @@ librdf_parser_raptor_parse_file_handle_as_stream(librdf_world* world,
   /* Clean up and report an error on OOM */
   oom:
   librdf_parser_raptor_serialise_finished((void*)scontext);
-  librdf_log(world,
+  librdf_log(pcontext->parser->world,
              0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
              "Out of memory");
   return NULL;
@@ -630,8 +629,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     }
 
     /* stream will close FH */
-    stream=librdf_parser_raptor_parse_file_handle_as_stream(pcontext->parser->world,
-                                                            context, fh, 1,
+    stream=librdf_parser_raptor_parse_file_handle_as_stream(context, fh, 1,
                                                             base_uri);
 
     SYSTEM_FREE(filename);
@@ -811,24 +809,26 @@ librdf_parser_raptor_parse_counted_string_as_stream(void *context,
 }
 
 /*
- * librdf_parser_raptor_parse_uri_into_model_common:
+ * librdf_parser_raptor_parse_into_model_common:
  * @context: parser context
- * @uri: #librdf_uri URI of RDF content source or NULL if from a string
- * @string: string content to parser or NULL if from a URI
+ * @uri: #librdf_uri URI of RDF content source or NULL if from a string or a file handler
+ * @string: string content to parser or NULL if from a URI or a file handler
+ * @fh: FILE* content source or NULL if from a URI or a string
  * @length: length of the string or 0 if not yet counted
  * @base_uri: #librdf_uri URI of the content location or NULL
  * @model: #librdf_model of model
  *
  * Retrieve the RDF content at URI and store it into a librdf_model.
  *
- * Parses the content at @uri or @string and store it in the given model.
+ * Parses the content at @uri, @string or @fh and store it in the given model.
  *
  * Return value: non 0 on failure
  **/
 static int
 librdf_parser_raptor_parse_into_model_common(void *context,
-                                             librdf_uri *uri, 
+                                             librdf_uri *uri,
                                              const unsigned char *string,
+					     FILE *fh,
                                              size_t length,
                                              librdf_uri *base_uri,
                                              librdf_model* model)
@@ -896,14 +896,15 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   if(uri) {
     status=raptor_parse_uri(pcontext->rdf_parser, (raptor_uri*)uri, 
                             (raptor_uri*)base_uri);
-  } else {
+  } else if (string != NULL) {
     status=raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
     if(!status) {
       if(!length)
         length=strlen((const char*)string);
       status=raptor_parse_chunk(pcontext->rdf_parser, string, length, 1);
     }
-    
+  } else {
+    status=raptor_parse_file_stream(pcontext->rdf_parser, fh, NULL, (raptor_uri*)base_uri);
   }
   
 
@@ -940,7 +941,7 @@ librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri,
                                           librdf_model* model)
 {
   return librdf_parser_raptor_parse_into_model_common(context, uri, 
-                                                      NULL, 0,
+                                                      NULL, NULL, 0,
                                                       base_uri, model);}
 
 
@@ -964,8 +965,38 @@ librdf_parser_raptor_parse_string_into_model(void *context,
                                              librdf_model* model)
 {
   return librdf_parser_raptor_parse_into_model_common(context, NULL,
-                                                      string, 0,
+                                                      string, NULL, 0,
                                                       base_uri, model);
+}
+
+/**
+ * librdf_parser_raptor_parse_file_handle_into_model:
+ * @context: parser context
+ * @fh: FILE* of content source
+ * @close_fh: non-0 to fclose(fh) on finish
+ * @base_uri: #librdf_uri URI of the content location (or NULL)
+ * @model: #librdf_model of model
+ *
+ * INTERNAL - Retrieve the RDF content from a FILE* handle and store it into a #librdf_model.
+ *
+ * Retrieves all statements and stores them in the given model.
+ *
+ * Return value: non 0 on failure
+ **/
+static int
+librdf_parser_raptor_parse_file_handle_into_model(void *context, FILE *fh,
+                                                  int close_fh,
+                                                  librdf_uri *base_uri,
+                                                  librdf_model* model)
+{
+  int status=librdf_parser_raptor_parse_into_model_common(context, NULL,
+                                                          NULL, fh, 0,
+                                                          base_uri, model);
+
+  if (close_fh)
+    fclose(fh);
+
+  return status;
 }
 
 
@@ -977,7 +1008,7 @@ librdf_parser_raptor_parse_string_into_model(void *context,
  * @base_uri: the base URI to use
  * @model: the model to use
  *
- * Parse a counted string of content into an librdf_model.
+ * INTERNAL - Parse a counted string of content into an #librdf_model.
  * 
  * Return value: non 0 on failure
  **/
@@ -989,7 +1020,7 @@ librdf_parser_raptor_parse_counted_string_into_model(void *context,
                                                      librdf_model* model)
 {
   return librdf_parser_raptor_parse_into_model_common(context, NULL,
-                                                      string, length,
+                                                      string, NULL, length,
                                                       base_uri, model);
 }
 
@@ -1346,6 +1377,8 @@ librdf_parser_raptor_register_factory(librdf_parser_factory *factory)
   factory->parse_string_into_model = librdf_parser_raptor_parse_string_into_model;
   factory->parse_counted_string_as_stream = librdf_parser_raptor_parse_counted_string_as_stream;
   factory->parse_counted_string_into_model = librdf_parser_raptor_parse_counted_string_into_model;
+  factory->parse_file_handle_as_stream = librdf_parser_raptor_parse_file_handle_as_stream;
+  factory->parse_file_handle_into_model = librdf_parser_raptor_parse_file_handle_into_model;
   factory->get_feature = librdf_parser_raptor_get_feature;
   factory->set_feature = librdf_parser_raptor_set_feature;
   factory->get_accept_header = librdf_parser_raptor_get_accept_header;
