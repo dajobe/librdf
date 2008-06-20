@@ -1,3 +1,268 @@
+2008-06-20  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c:
+	(librdf_parser_raptor_parse_file_handle_as_stream): Take a
+	close_fh flag, remove world arg to match factory method.  Use
+	world from parser object.
+	(librdf_parser_raptor_parse_into_model_common): Renamed from
+	librdf_parser_raptor_parse_uri_into_model_common and also take a
+	FILE* to use if URI and string are NULL.
+	(librdf_parser_raptor_parse_file_handle_into_model): Added
+	(librdf_parser_raptor_parse_counted_string_into_model): Use
+	librdf_parser_raptor_parse_into_model_common
+	(librdf_parser_raptor_register_factory): Register
+	librdf_parser_raptor_parse_file_handle_as_stream and
+	librdf_parser_raptor_parse_file_handle_into_model
+
+	* librdf/rdf_parser.c: (librdf_parser_parse_file_handle_as_stream,
+	librdf_parser_parse_file_handle_into_model): Added.
+
+	* librdf/rdf_parser_internal.h: struct librdf_parser_factory_s
+	gains parse_file_handle_into_model and parse_file_handle_as_stream
+	methods
+
+	* librdf/rdf_parser.h: Added
+	librdf_parser_parse_file_handle_as_stream and
+	librdf_parser_parse_file_handle_into_model
+
+2008-06-15  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_concepts.c: (main):
+	librdf_get_concept_resource_by_index returns a librdf_node, not
+	librdf_uri
+
+	* librdf/rdf_storage_trees.c: (librdf_storage_trees_node_compare):
+	Use char* pointer subtraction.
+
+	* librdf/rdf_avltree.c: (librdf_avltree_dump): Use %zd for size_t
+	(librdf_avltree_print_node): Not need unless LIBRDF_DEBUG > 1
+	(librdf_avltree_node_rightmost): Not needed yet.
+
+	* librdf/rdf_storage_mysql.c:
+	(librdf_storage_mysql_node_hash_common): Init pointer datatype to
+	NULL [sparse]l
+
+	* librdf/rdf_storage_trees.c: (librdf_storage_trees_node_compare):
+	Try to avoid what gcc calls "potentially expensive pointer subtraction"
+	(librdf_statement_compare_spo, librdf_statement_compare_sop,
+	librdf_statement_compare_ops, librdf_statement_compare_pso,
+	librdf_storage_trees_avl_free): Declare static.
+
+	* librdf/rdf_avltree.c: (librdf_avltree_dump): Use %z for size_t
+	(librdf_avltree_check_node): Not need unless LIBRDF_DEBUG > 1
+	(librdf_avltree_node_prev): Not used yet
+
+	* librdf/rdf_hash_memory.c: (librdf_hash_memory_cursor_init):
+	Should be declared static. [sparse]
+
+	* librdf/rdf_node.c: (librdf_node_get_literal_value_datatype_uri):
+	Return NULL [sparse]
+
+	* configure.ac, librdf/rdf_types.h: Use autoconf 2.5.x
+	AC_CHECK_TYPES for byte u32 and u64
+
+2008-06-13  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_model.c: (librdf_model_add_statement): Remove
+	contains statement check since it is already part of the storage
+	add statement API and it can be expensive.
+
+2008-06-12  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c:
+	(librdf_raptor_new_uri_for_rdf_concept): Prevent use of NULL uri
+
+2008-06-11  Dave Beckett <dave@dajobe.org>
+
+	* librdf/Makefile.am: Add rdf_avltree.h to dist
+
+	* librdf/rdf_serializer_raptor.c:
+	(librdf_serializer_raptor_serialize_stream_to_counted_string):
+	Revert r13840: remove call to raptor_free_iostream() as
+	raptor_serialize_start has old (<1.4.18) semantics again.
+
+2008-06-10  Dave Beckett <dave@dajobe.org>
+
+	* examples/rss2atom.c: my ns
+
+	* examples/Makefile.am, examples/rss2atom.c: Added rss2atom example
+
+2008-05-21  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_iterator.c, librdf/rdf_iterator_internal.h,
+	librdf/rdf_stream.c, librdf/rdf_stream_internal.h: Allow
+	get_context calls in stream/iterator map functions. Use
+	is_updating flag to prevent infinite looping.
+	Originally reported in
+	http://lists.usefulinc.com/pipermail/redland-dev/2008-May/001756.html
+
+2008-05-19  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_model.c: (test_model_cloning): Use parametrized
+	storage type for message
+
+2008-05-19  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_model_storage.c:
+	(librdf_model_storage_find_statements_in_context): Added to use
+	storage factory method find_statements_in_context if it exists
+
+	* librdf/rdf_model.c: Get the storage parameters from envariables
+	for testing
+
+2008-05-06  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage.c: (librdf_init_storage): Do not init trees
+	storage unless STORAGE_TREES is defined.
+	(main): Do not test trees storage unless STORAGE_TREES is defined.
+
+	* librdf/rdf_stream.c: (librdf_stream_update_current_statement):
+	Fixed comment
+
+	* librdf/rdf_iterator.c: (librdf_iterator_update_current_element):
+	Fixed iterator map function callback
+	params. http://lists.usefulinc.com/pipermail/redland-dev/2008-May/001756.html
+
+	* librdf/rdf_serializer_raptor.c:
+	(librdf_serializer_raptor_serialize_stream_to_counted_string):
+	Memory leak fix - raptor_serializer does not take ownership of the
+	passed in raptor_iostream anymore after r13820
+
+	* librdf/rdf_log.c: (librdf_log): Resiliency fix: avoid
+	raptor_free_memory(0)
+
+	* librdf/rdf_avltree.c: (librdf_avltree_print): Compiler warning
+	fix: initialize rv before use.
+
+2008-05-05  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_stream.c: (librdf_stream_from_node_iterator_get_statement):
+	Removed useless and incorrect typecast.
+
+2008-04-23  Dave Robillard <dave@drobilla.net>
+
+	* configure.ac, docs/storage.html, librdf/Makefile.am,
+	librdf/rdf_avltree.c, librdf/rdf_avltree.h, librdf/rdf_storage.c,
+	librdf/rdf_storage_internal.h, librdf/rdf_storage_trees.c: Add new
+	in-memory store, "trees".
+	(librdf_storage_find_statements): Test for storage methods before
+	triple pattern
+	(less comparisons via short circuiting for storages without find_arcs etc.).
+
+2008-04-03  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_postgresql.c:
+	(librdf_storage_mysql_init,librdf_storage_postgresql_init): Do not
+	call terminate factory method on failure, caller will do that
+
+2008-03-27  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c,
+	librdf/rdf_serializer_raptor.c: (librdf_parser_raptor_set_feature,
+	librdf_serializer_raptor_set_feature): Use
+	raptor_parser_set_feature_string and
+	raptor_serializer_set_feature_string to set feature values to
+	integer or string as appropriate.
+
+2008-03-04  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_concepts.c:
+	(librdf_init_concepts,librdf_finish_concepts): Init/finish also
+	the last concept (rdfs:subPropertyOf).
+	(main): Added test for LIBRDF_CONCEPT_LAST uri.
+
+2008-03-03  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_concepts.c, librdf/rdf_concepts.h: Source
+	compatibility break: Fixed LIBRDF_URI_RDF_MS,
+	LIBRDF_URI_RDF_SCHEMA public API macros broken in r13171.
+	(librdf_get_concept_ms_namespace,librdf_get_concept_schema_namespace):
+	Added two new getters to make the API macros work - cannot access
+	librdf_world_s members outside the API.
+
+2008-02-28  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage.c: (librdf_storage_add_statement): fixed
+	comment
+
+2008-02-16  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh, autogen.sh, autogen.sh, autogen.sh, autogen.sh:
+	autogen checks when env prog version is empty. Update all packages
+	to latest autogen.sh
+
+2008-02-07  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_serializer_raptor.c:
+	(librdf_serializer_raptor_serialize_stream_to_counted_string):
+	Fixed memory leak. Ensure any string placed to the passed in
+	string pointer by raptor_write_string_iostream_finish() is freed
+	if not returned to caller.
+
+	* librdf/rdf_serializer_raptor.c:
+	(librdf_serializer_raptor_serialize_stream_to_counted_string):
+	Should not free passed in stream.
+
+	* librdf/rdf_query_rasqal.c:
+	(librdf_query_rasqal_query_results_update_statement): Check for
+	statement node allocation failures.
+
+2008-01-14  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_serializer.c:
+	(librdf_serializer_serialize_stream_to_counted_string) Docs
+
+	* autogen.sh: Do not branch autogen.sh scripts but keep them identical
+
+2008-01-13  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh: automake 1.0 docs
+
+2008-01-10  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_query_rasqal.c: (librdf_query_rasqal_constructor) Die
+	with a fatal error if rasqal_new_world() returns NULL, do not
+	leave the system in a partially initialized state.
+
+	* utils/rdfproc.c: Updated rdfproc to new rasqal api
+
+	* librdf/rdf_query_rasqal.c, librdf/rdf_query_results.c: Updated
+	to new rasqal apis.
+
+	* librdf/rdf_query_rasqal.c: (redland_node_to_rasqal_literal)
+	Updated to new rasqal literal API.
+
+2008-01-09  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_query_rasqal.c: (librdf_query_rasqal_constructor) Use
+	non-deprecated rasqal_set_triples_source_factory2().
+
+	* librdf/rdf_query_rasqal.c, librdf/rdf_query_results.c: Updated
+	to non-deprecated rasqal query results API.
+
+	* librdf/rdf_init_internal.h, librdf/rdf_query_rasqal.c: Renamed
+	rasqal_query variable to rasqal_query_ptr to prevent type<->name
+	problems in C++.
+
+2008-01-07  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_init_internal.h, librdf/rdf_query.c,
+	librdf/rdf_query_internal.h, librdf/rdf_query_rasqal.c: Changed
+	rdf_query_rasqal to use non-deprecated rasqal functions with
+	rasqal_world support.
+
+2008-01-03  Lauri Aalto <laalto@iki.fi>
+
+	* utils/rdfproc.c: Replaced call to removed function
+	rasqal_query_results_formats_enumerate_full() with
+	rasqal_query_results_formats_enumerate().
+
+	* librdf/rdf_query_results.c: (librdf_query_results_formats_enumerate)
+	Replaced call to removed function
+	rasqal_query_results_formats_enumerate_full() with
+	rasqal_query_results_formats_enumerate().
+
 2007-12-28  Dave Beckett <dave@dajobe.org>
 
 	* NEWS.html, RELEASE.html, configure.ac,
