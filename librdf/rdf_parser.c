@@ -566,6 +566,61 @@ librdf_parser_parse_counted_string_into_model(librdf_parser* parser,
 
 
 /**
+ * librdf_parser_parse_file_handle_as_stream:
+ * @parser: the parser
+ * @fh: FILE* to read content source
+ * @close_fh: non-0 to fclose() the file handle on finishing
+ * @base_uri: the base URI to use (or NULL)
+ *
+ * Parse a FILE* handle of content to a #librdf_stream of statements.
+ * 
+ * Return value: #librdf_stream of statements or NULL
+ **/
+librdf_stream*
+librdf_parser_parse_file_handle_as_stream(librdf_parser* parser, FILE *fh,
+                                          int close_fh, librdf_uri* base_uri)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(fh, FILE, NULL);
+
+  if(parser->factory->parse_file_handle_as_stream)
+    return parser->factory->parse_file_handle_as_stream(parser->context, fh,
+                                                        close_fh, base_uri);
+
+  return NULL;
+}
+
+
+/**
+ * librdf_parser_parse_into_model:
+ * @parser: the parser
+ * @uri: the URI to read the content course
+ * @base_uri: the base URI to use (or NULL)
+ * @model: the model to write to
+ *
+ * Parse a FILE* handle of content into an #librdf_model.
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_parser_parse_file_handle_into_model(librdf_parser* parser, FILE *fh,
+                                           int close_fh, librdf_uri* base_uri,
+					   librdf_model* model) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(fh, FILE, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+
+  if(parser->factory->parse_file_handle_into_model)
+    return parser->factory->parse_file_handle_into_model(parser->context, fh,
+                                                         close_fh, base_uri,
+							 model);
+
+  return 1;
+}
+
+
+/**
  * librdf_parser_set_error:
  * @parser: the parser
  * @user_data: user data to pass to function
