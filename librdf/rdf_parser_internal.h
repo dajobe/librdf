@@ -75,6 +75,8 @@ struct librdf_parser_factory_s
   const char* (*get_namespaces_seen_prefix)(void* context, int offset);
   librdf_uri* (*get_namespaces_seen_uri)(void* context, int offset);
   int (*get_namespaces_seen_count)(void* context);
+  int (*parse_file_handle_into_model)(void *_context, FILE *fh, int close_fh, librdf_uri* base_uri, librdf_model *model);
+  librdf_stream* (*parse_file_handle_as_stream)(void *_context, FILE *fh, int close_fh, librdf_uri *base_uri);
 };
 
 
