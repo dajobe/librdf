@@ -828,7 +828,7 @@ static int
 librdf_parser_raptor_parse_into_model_common(void *context,
                                              librdf_uri *uri,
                                              const unsigned char *string,
-					     FILE *fh,
+                                             FILE *fh,
                                              size_t length,
                                              librdf_uri *base_uri,
                                              librdf_model* model)
