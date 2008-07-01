@@ -92,8 +92,9 @@ LIBRDF_LIBTOOL_VERSION=0:0:0
 AC_SUBST(LIBRDF_LIBTOOL_VERSION)
 
 dnl Checks for programs.
-AM_PROG_CC_STDC
 AM_SANITY_CHECK
+AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -716,6 +717,15 @@ if test "X$MYSQL_CONFIG" != X; then
     storages_available="$storages_available mysql($LIBMYSQL_VERSION)"
     mysql_storage_available=yes
   fi
+
+AC_MSG_CHECKING(whether MYSQL_OPT_RECONNECT is declared)
+AC_COMPILE_IFELSE([#include <mysql.h>
+int x=MYSQL_OPT_RECONNECT;],
+   AC_DEFINE(HAVE_MYSQL_OPT_RECONNECT, 1, [have MYSQL_OPT_RECONNECT declared])
+   AC_MSG_RESULT(yes),
+   AC_MSG_RESULT(no))
+
+
   LIBS="$LIBRDF_LIBS"
   CPPFLAGS="$LIBRDF_CPPFLAGS"
 fi
