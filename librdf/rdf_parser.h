@@ -65,7 +65,7 @@ int librdf_parser_parse_string_into_model(librdf_parser* parser, const unsigned 
 REDLAND_API
 librdf_stream* librdf_parser_parse_file_handle_as_stream(librdf_parser* parser, FILE* handle, int close_fh, librdf_uri* base_uri);
 REDLAND_API
-int librdf_parser_parse_file_handle_into_model(librdf_parser* parser, FILE *handle, int close_fh, librdf_uri* base_uri, librdf_model* model);
+int librdf_parser_parse_file_handle_into_model(librdf_parser* parser, FILE *fh, int close_fh, librdf_uri* base_uri, librdf_model* model);
 REDLAND_API REDLAND_DEPRECATED
 void librdf_parser_set_error(librdf_parser* parser, void *user_data, void (*error_fn)(void *user_data, const char *msg, ...));
 REDLAND_API REDLAND_DEPRECATED
