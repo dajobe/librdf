@@ -30,7 +30,7 @@ pre
 <p>Updated to use 
 <a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.16
 (<a href="http://librdf.org/rasqal/RELEASE.html#rel0_9_16">Rasqal 0.9.16 release notes</a>)
-from 0.9.15.  NOTE: Rasqal's ABI and API changed so Redland 1.0.
+from 0.9.15.  NOTE: Rasqal's ABI and API changed so Redland 1.0.8
 requires 0.9.16 or newer.
 </p>
 
@@ -40,6 +40,20 @@ requires 0.9.16 or newer.
 from 1.4.16.
 </p>
 
+<p>Added a new in-memory indexed storage 'trees' using AVL Trees</p>
+
+
+<p>Issues Fixed:</p>
+<ul>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=256">0000256</a>: mysql reconnect not working (MySQL v5 only?)</li>
+</ul>
+
+<h3>General Changes</h3>
+
+<p><code>configure</code> was updated to ensure that redland 1.0.8+
+will work with rasqal 0.9.16 to 0.9.99 only.
+</p>
+
 <h3>Parser Class Changes</h3>
 
 <p><code>librdf_parser_set_feature()</code>  now handles setting
@@ -47,10 +61,9 @@ feature values as strings or integers, depending on the required
 type (although Raptor will handle this too).
 </p>
 
-<p>Added
-<code>librdf_parser_parse_file_handle_as_stream()</code> and
-<code>librdf_parser_parse_file_handle_into_model()</code>
-helper methods.
+<p>Added <code>librdf_parser_parse_file_handle_as_stream()</code> and
+<code>librdf_parser_parse_file_handle_into_model()</code> helper
+methods.
 </p>
 
 <h3>Serializer Class Changes</h3>
