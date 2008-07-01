@@ -21,6 +21,7 @@
 #
 
 prefix=@prefix@
+datarootdir=@datarootdir@
 exec_prefix=@exec_prefix@
 
 if test "@includedir@" != /usr/include ; then
