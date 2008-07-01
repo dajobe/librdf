@@ -2,8 +2,6 @@
  *
  * rdf_storage_sqlite.c - RDF Storage using SQLite implementation
  *
- * $Id$
- *
  * Copyright (C) 2004-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2004-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

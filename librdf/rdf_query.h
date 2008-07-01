@@ -2,8 +2,6 @@
  *
  * rdf_query.h - RDF Query Adaptor Factory and Query interfaces and definitions
  *
- * $Id$
- *
  * Copyright (C) 2002-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2002-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

@@ -2,8 +2,6 @@
  *
  * rdf_storage_postgresql.c - RDF Storage in PostgreSQL DB interface definition.
  *
- * $Id$
- *
  * Based in part on rdf_storage_mysql.
  *
  * Copyright (C) 2003-2005 Shi Wenzhong - email to shiwenzhong@hz.cn

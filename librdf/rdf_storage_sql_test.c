@@ -2,8 +2,6 @@
  *
  * rdf_storage.c - RDF Storage SQL config test program
  *
- * $Id:$
- *
  * Copyright (C) 2006, David Beckett http://purl.org/net/dajobe/
  * 
  * This package is Free Software and part of Redland http://librdf.org/

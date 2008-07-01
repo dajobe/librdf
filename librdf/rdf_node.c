@@ -2,8 +2,6 @@
  *
  * rdf_node.c - RDF Node (RDF URI, Literal, Blank Node) Interface
  *
- * $Id$
- *
  * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

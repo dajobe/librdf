@@ -2,8 +2,6 @@
  *
  * rdf_serializer.c - RDF Serializer (RDF triples to syntax) interface
  *
- * $Id$
- *
  * Copyright (C) 2002-2007, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2002-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

@@ -2,8 +2,6 @@
  *
  * rdf_statement.c - RDF Triple (Statement) interface
  *
- * $Id$
- *
  * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, Copyright (C) 2000-2006, Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
  * 

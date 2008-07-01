@@ -2,8 +2,6 @@
  *
  * rdf_init_internal.h - Internal library initialisation / termination
  *
- * $Id$
- *
  * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

@@ -2,8 +2,6 @@
  *
  * rdf_query.c - RDF Query Language/Syntax and Execution Interface
  *
- * $Id$
- *
  * Copyright (C) 2002-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2002-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

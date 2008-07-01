@@ -2,8 +2,6 @@
  *
  * rdf_init.h - Overall library initialisation / termination prototypes
  *
- * $Id$
- *
  * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 

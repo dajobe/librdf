@@ -5,8 +5,6 @@
  * Compile with:
  * gcc -o example7 `redland-config --cflags` example7.c `redland-config --libs`
  *
- * $Id$
- *
  * Copyright (C) 2005-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2005-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

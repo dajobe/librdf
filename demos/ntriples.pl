@@ -2,8 +2,6 @@
 #
 # ntriples.pl - Redland N-Triples validator demo
 #
-# $Id$
-#
 # Copyright (C) 2002-2004, David Beckett http://purl.org/net/dajobe/
 # Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
 # University of Bristol, UK http://www.bristol.ac.uk/

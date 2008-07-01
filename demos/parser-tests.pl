@@ -2,8 +2,6 @@
 #
 # parser-tests.pl - Redland OLD RDF Parser Tests Web Interface
 #
-# $Id$
-#
 # Copyright (C) 2001-2004, David Beckett http://purl.org/net/dajobe/
 # Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
 # University of Bristol, UK http://www.bristol.ac.uk/

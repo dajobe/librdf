@@ -2,8 +2,6 @@
  *
  * rdf_storage_file.c - RDF Storage in a file, using an in-memory store
  *
- * $Id$
- *
  * Copyright (C) 2004-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2004-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 

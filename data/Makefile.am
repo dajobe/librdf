@@ -2,8 +2,6 @@
 #
 # Makefile.am - data automake file for Redland
 #
-# $Id$
-#
 # Copyright (C) 2004-2006, David Beckett http://purl.org/net/dajobe/
 # Copyright (C) 2004-2004, University of Bristol, UK http://www.bristol.ac.uk/
 # 

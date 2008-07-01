@@ -2,8 +2,6 @@
  *
  * rdf_storage_mysql.c - RDF Storage in MySQL DB interface definition.
  *
- * $Id$
- *
  * Based in part on rdf_storage_list and rdf_storage_parka.
  *
  * Copyright (C) 2003-2005 Morten Frederiksen - http://purl.org/net/morten/

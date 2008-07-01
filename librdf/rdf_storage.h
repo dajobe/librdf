@@ -2,8 +2,6 @@
  *
  * rdf_storage.h - RDF Storage Factory and Storage interfaces and definitions
  *
- * $Id$
- *
  * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

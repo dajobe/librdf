@@ -2,8 +2,6 @@
  *
  * rdf_digest_md5.c - MD5 Message Digest Algorithm
  *
- * $Id$
- *
  * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 

@@ -2,8 +2,6 @@
  *
  * rdf_uri.c - RDF URI interface
  *
- * $Id$
- *
  * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

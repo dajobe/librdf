@@ -2,8 +2,6 @@
  *
  * example6.c - Redland example code using model methods load and to_string
  *
- * $Id$
- *
  * Copyright (C) 2004-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2004-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 

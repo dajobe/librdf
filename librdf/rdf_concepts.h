@@ -2,8 +2,6 @@
  *
  * rdf_concepts.h - Definitions of RDF concept URIs and nodes
  *
- * $Id$
- *
  * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 

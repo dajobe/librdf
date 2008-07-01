@@ -2,8 +2,6 @@
  *
  * rdf_digest_sha1.c - SHA1 Message Digest Algorithm
  *
- * $Id$
- *
  * Copyright (C) 2003-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2003-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 

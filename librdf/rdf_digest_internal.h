@@ -2,8 +2,6 @@
  *
  * rdf_digest_internal.h - Internal RDF Digest Factory / Digest definitions
  *
- * $Id$
- *
  * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 

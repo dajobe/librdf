@@ -2,8 +2,6 @@
  *
  * rdf_storage_trees.c - RDF Storage in memory using balanced trees
  *
- * $Id: rdf_storage_trees.c 13287 2007-12-20 12:00:50Z laalto $
- *
  * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
