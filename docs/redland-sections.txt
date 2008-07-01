@@ -227,6 +227,8 @@ librdf_new_parser_from_factory
 librdf_free_parser
 librdf_parser_parse_as_stream
 librdf_parser_parse_into_model
+librdf_parser_parse_file_handle_as_stream
+librdf_parser_parse_file_handle_into_model
 librdf_parser_parse_string_as_stream
 librdf_parser_parse_string_into_model
 librdf_parser_set_error
@@ -449,6 +451,8 @@ librdf_uri_filter_func
 <FILE>concepts</FILE>
 librdf_get_concept_resource_by_index
 librdf_get_concept_uri_by_index
+librdf_get_concept_ms_namespace
+librdf_get_concept_schema_namespace
 LIBRDF_MS_Alt
 LIBRDF_MS_Alt_URI
 LIBRDF_MS_Bag
