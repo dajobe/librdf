@@ -46,7 +46,7 @@
 #endif
 
 #include <redland.h>
-#include "rdf_avltree.h"
+#include "rdf_avltree_internal.h"
 
 #if LIBRDF_DEBUG > 1
 #define LIBRDF_AVLTREE_DEBUG1(msg) LIBRDF_DEBUG1(msg)

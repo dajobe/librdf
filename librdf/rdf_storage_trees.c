@@ -39,7 +39,7 @@
 #include <sys/types.h>
 
 #include <redland.h>
-#include "rdf_avltree.h"
+#include "rdf_avltree_internal.h"
 
 /* Not yet fully implemented (namely iteration) */
 /*#define RDF_STORAGE_TREES_WITH_CONTEXTS 1*/
