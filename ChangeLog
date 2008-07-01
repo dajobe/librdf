@@ -1,3 +1,117 @@
+2008-06-30  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_storage_mysql.c: (librdf_storage_mysql_get_handle):
+	Use HAVE_MYSQL_OPT_RECONNECT to known when to apply reconnections
+	Fixes Issue#0000256 http://bugs.librdf.org/mantis/view.php?id=256
+
+	* configure.ac: Update checks for programs to use AC_PROG_CC and
+	AM_PROG_CC_C_O
+	Add a compile test for MYSQL_OPT_RECONNECT since newer mysql versions
+	have it as an enum, not a macro.
+	Fixes Issue#0000256 http://bugs.librdf.org/mantis/view.php?id=256
+
+	* redland-config.in: Add datarootdir
+
+	* Redland.i, FAQS.html, INSTALL.html, LICENSE.html, NEWS.html,
+	README.html, RELEASE.html, TODO.html, redland-config.1,
+	redland-config.in, redland-src-config.in, redland.rdf.in,
+	demos/demo.pl, demos/ntriples.pl, demos/parser-tests.pl,
+	demos/rss-show.pl, examples/example1.c, examples/example2.c,
+	examples/example3.c, examples/example4.c, examples/example5.c,
+	examples/example6.c, examples/example7.c, examples/redland_dbus.c,
+	examples/rss2ical.c, librdf/librdf.h, librdf/rdf_concepts.c,
+	librdf/rdf_concepts.h, librdf/rdf_concepts_internal.h,
+	librdf/rdf_digest.c, librdf/rdf_digest.h,
+	librdf/rdf_digest_internal.h, librdf/rdf_digest_md5.c,
+	librdf/rdf_digest_openssl.c, librdf/rdf_digest_sha1.c,
+	librdf/rdf_files.c, librdf/rdf_files.h, librdf/rdf_hash.c,
+	librdf/rdf_hash.h, librdf/rdf_hash_bdb.c,
+	librdf/rdf_hash_cursor.c, librdf/rdf_hash_internal.h,
+	librdf/rdf_hash_memory.c, librdf/rdf_heuristics.c,
+	librdf/rdf_heuristics.h, librdf/rdf_init.c, librdf/rdf_init.h,
+	librdf/rdf_init_internal.h, librdf/rdf_internal.h,
+	librdf/rdf_iterator.c, librdf/rdf_iterator.h,
+	librdf/rdf_iterator_internal.h, librdf/rdf_list.c,
+	librdf/rdf_list.h, librdf/rdf_list_internal.h, librdf/rdf_log.c,
+	librdf/rdf_log.h, librdf/rdf_log_internal.h, librdf/rdf_model.c,
+	librdf/rdf_model.h, librdf/rdf_model_internal.h,
+	librdf/rdf_model_storage.c, librdf/rdf_node.c, librdf/rdf_node.h,
+	librdf/rdf_node_internal.h, librdf/rdf_parser.c,
+	librdf/rdf_parser.h, librdf/rdf_parser_internal.h,
+	librdf/rdf_parser_raptor.c, librdf/rdf_query.c,
+	librdf/rdf_query.h, librdf/rdf_query_internal.h,
+	librdf/rdf_query_rasqal.c, librdf/rdf_query_results.c,
+	librdf/rdf_query_triples.c, librdf/rdf_serializer.c,
+	librdf/rdf_serializer.h, librdf/rdf_serializer_internal.h,
+	librdf/rdf_serializer_raptor.c, librdf/rdf_statement.c,
+	librdf/rdf_statement.h, librdf/rdf_statement_internal.h,
+	librdf/rdf_storage.c, librdf/rdf_storage.h,
+	librdf/rdf_storage_file.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_internal.h, librdf/rdf_storage_list.c,
+	librdf/rdf_storage_mysql.c, librdf/rdf_storage_postgresql.c,
+	librdf/rdf_storage_sql.c, librdf/rdf_storage_sql_test.c,
+	librdf/rdf_storage_sqlite.c, librdf/rdf_storage_trees.c,
+	librdf/rdf_storage_tstore.c, librdf/rdf_stream.c,
+	librdf/rdf_stream.h, librdf/rdf_stream_internal.h,
+	librdf/rdf_types.h, librdf/rdf_uri.c, librdf/rdf_uri.h,
+	librdf/rdf_uri_internal.h, librdf/rdf_utf8.c, librdf/rdf_utf8.h,
+	librdf/redland.h, librdf/win32_rdf_config.h: 2008
+
+	* examples/Makefile.am, utils/db_upgrade.c, utils/rdfproc.1,
+	Redland.i, data/Makefile.am, demos/demo.pl, demos/ntriples.pl,
+	demos/parser-tests.pl, examples/example1.c, examples/example3.c,
+	examples/example4.c, examples/example5.c, examples/example6.c,
+	examples/example7.c, librdf/Makefile.am, librdf/librdf.h,
+	librdf/rdf_concepts.c, librdf/rdf_concepts.h,
+	librdf/rdf_concepts_internal.h, librdf/rdf_digest.c,
+	librdf/rdf_digest.h, librdf/rdf_digest_internal.h,
+	librdf/rdf_digest_md5.c, librdf/rdf_digest_openssl.c,
+	librdf/rdf_digest_sha1.c, librdf/rdf_files.c, librdf/rdf_files.h,
+	librdf/rdf_hash.c, librdf/rdf_hash.h, librdf/rdf_hash_bdb.c,
+	librdf/rdf_hash_cursor.c, librdf/rdf_hash_internal.h,
+	librdf/rdf_hash_memory.c, librdf/rdf_heuristics.c,
+	librdf/rdf_heuristics.h, librdf/rdf_init.h,
+	librdf/rdf_init_internal.h, librdf/rdf_internal.h,
+	librdf/rdf_iterator.c, librdf/rdf_iterator.h,
+	librdf/rdf_iterator_internal.h, librdf/rdf_list.c,
+	librdf/rdf_list.h, librdf/rdf_list_internal.h, librdf/rdf_log.c,
+	librdf/rdf_log.h, librdf/rdf_log_internal.h, librdf/rdf_model.c,
+	librdf/rdf_model.h, librdf/rdf_model_internal.h,
+	librdf/rdf_model_storage.c, librdf/rdf_node.c, librdf/rdf_node.h,
+	librdf/rdf_node_internal.h, librdf/rdf_parser.c,
+	librdf/rdf_parser.h, librdf/rdf_parser_internal.h,
+	librdf/rdf_parser_raptor.c, librdf/rdf_query.c,
+	librdf/rdf_query.h, librdf/rdf_query_internal.h,
+	librdf/rdf_query_rasqal.c, librdf/rdf_query_results.c,
+	librdf/rdf_query_triples.c, librdf/rdf_serializer.c,
+	librdf/rdf_serializer.h, librdf/rdf_serializer_internal.h,
+	librdf/rdf_serializer_raptor.c, librdf/rdf_statement.c,
+	librdf/rdf_statement.h, librdf/rdf_statement_internal.h,
+	librdf/rdf_storage.c, librdf/rdf_storage.h,
+	librdf/rdf_storage_file.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_internal.h, librdf/rdf_storage_list.c,
+	librdf/rdf_storage_mysql.c, librdf/rdf_storage_postgresql.c,
+	librdf/rdf_storage_sql.c, librdf/rdf_storage_sql_test.c,
+	librdf/rdf_storage_sqlite.c, librdf/rdf_storage_trees.c,
+	librdf/rdf_storage_tstore.c, librdf/rdf_stream.c,
+	librdf/rdf_stream.h, librdf/rdf_stream_internal.h,
+	librdf/rdf_types.h, librdf/rdf_uri.c, librdf/rdf_uri.h,
+	librdf/rdf_uri_internal.h, librdf/rdf_utf8.c, librdf/rdf_utf8.h,
+	librdf/redland.h, redland-config.in, utils/getopt.c,
+	utils/rdfproc.c, utils/rdfproc_getopt.h,
+	utils/redland-db-upgrade.1: Remove old CVS Id: from sources
+
+	* configure.ac: boost RASQAL_MAX_VERSION to 0.9.99 to allow for
+	future compatible versions
+
+2008-06-22  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_query_rasqal.c: (rasqal_literal_to_redland_node):
+	RASQAL_LITERAL_FLOATING removed from Rasqal API in r14084,
+	replaced with RASQAL_LITERAL_DOUBLE.
+
+	* librdf/rdf_parser_raptor.c: indent tabs->spaces
+
 2008-06-20  Dave Beckett <dave@dajobe.org>
 
 	* librdf/rdf_parser_raptor.c:
