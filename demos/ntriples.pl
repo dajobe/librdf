@@ -2,9 +2,8 @@
 #
 # ntriples.pl - Redland N-Triples validator demo
 #
-# Copyright (C) 2002-2004, David Beckett http://purl.org/net/dajobe/
-# Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
-# University of Bristol, UK http://www.bristol.ac.uk/
+# Copyright (C) 2002-2004, David Beckett http://www.dajobe.org/
+# Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
 # 
 # This package is Free Software and part of Redland http://librdf.org/
 # 
@@ -94,7 +93,7 @@ distribution as <tt>demos/ntriples.pl</tt> or from the
 EOT
 
 
-  print qq{<hr />\n\n<p class="copyright"><a href="http://purl.org/net/dajobe/">Dave Beckett</a></p>\n\n</body></html>};
+  print qq{<hr />\n\n<p class="copyright"><a href="http://www.dajobe.org/">Dave Beckett</a></p>\n\n</body></html>};
 }
 
 

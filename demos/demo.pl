@@ -2,9 +2,8 @@
 #
 # demo.pl - Redland CGI database and query demo Perl program
 #
-# Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
-# Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
-# University of Bristol, UK http://www.bristol.ac.uk/
+# Copyright (C) 2000-2004, David Beckett http://www.dajobe.org/
+# Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
 # 
 # This package is Free Software and part of Redland http://librdf.org/
 # 
@@ -114,7 +113,7 @@ distribution as <tt>demos/demo.pl</tt> or from the
 <a href="http://librdf.org/">Redland</a> website</p>
 EOT
 
-  print qq{<hr />\n\n<p class="copyright"><a href="http://purl.org/net/dajobe/">Dave Beckett</a></p>\n\n</body>\n</html>\n};
+  print qq{<hr />\n\n<p class="copyright"><a href="http://www.dajobe.org/">Dave Beckett</a></p>\n\n</body>\n</html>\n};
 }
 
 ######################################################################

@@ -2,11 +2,8 @@
 #
 # rss-view.pl - Redland CGI RSS validator and viewer demo
 #
-# $Id$
-#
-# Copyright (C) 2000-2004, David Beckett http://purl.org/net/dajobe/
-# Institute for Learning and Research Technology http://www.ilrt.bristol.ac.uk/
-# University of Bristol, UK http://www.bristol.ac.uk/
+# Copyright (C) 2000-2004, David Beckett http://www.dajobe.org/
+# Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
 # 
 # This package is Free Software and part of Redland http://librdf.org/
 # 
@@ -136,7 +133,7 @@ distribution as <tt>demos/rss-show.pl</tt> or from the
 EOT
 
 
-  print qq{<hr />\n\n<p class="copyright"><a href="http://purl.org/net/dajobe/">Dave Beckett</a></p>\n\n</body></html>};
+  print qq{<hr />\n\n<p class="copyright"><a href="http://www.dajobe.org/">Dave Beckett</a></p>\n\n</body></html>};
 }
 
 sub format_term ($) {
@@ -331,7 +328,7 @@ print qq{</td>\n</tr></table>\n\n};
 
 print <<"EOT";
 <p><small>(Want to use the
-<a href="http://purl.org/net/dajobe/2001/04/rdf-icon/">RDF PNG Icon</a>?
+<a href="http://www.dajobe.org/2001/04/rdf-icon/">RDF PNG Icon</a>?
 Follow the previous link for terms of use.)
 </small></p>
 
