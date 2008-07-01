@@ -25,6 +25,83 @@ pre
 
 <p>NOT YET RELEASED.</p>
 
+<p>The main changes in this release are:</p>
+
+<p>Updated to use 
+<a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.16
+(<a href="http://librdf.org/rasqal/RELEASE.html#rel0_9_16">Rasqal 0.9.16 release notes</a>)
+from 0.9.15.  NOTE: Rasqal's ABI and API changed so Redland 1.0.
+requires 0.9.16 or newer.
+</p>
+
+<p>Updated to use
+<a href="http://librdf.org/raptor/">Raptor</a> 1.4.18
+(<a href="http://librdf.org/raptor/RELEASE.html#rel1_4_18">Raptor 1.4.18 release notes</a>)
+from 1.4.16.
+</p>
+
+<h3>Parser Class Changes</h3>
+
+<p><code>librdf_parser_set_feature()</code>  now handles setting
+feature values as strings or integers, depending on the required
+type (although Raptor will handle this too).
+</p>
+
+<p>Added
+<code>librdf_parser_parse_file_handle_as_stream()</code> and
+<code>librdf_parser_parse_file_handle_into_model()</code>
+helper methods.
+</p>
+
+<h3>Serializer Class Changes</h3>
+<p><code>librdf_serializer_set_feature()</code> now handles setting
+feature values as strings or integers, depending on the required
+type (although Raptor will handle this too).
+</p>
+
+<h3>Storage Class Changes</h3>
+<p>Added a new in-memory storage named "trees" by Dave Robillard that
+uses AVLTrees internally for faster indexed triple store/querying.
+This is an alpha quality storage since it is brand new and it may be
+changed in future.
+</p>
+
+<h3>Other Changes</h3>
+
+<p><code>LIBRDF_URI_RDF_MS</code>, <code>LIBRDF_URI_RDF_SCHEMA</code>
+public API macros changed definition to pass in a world parameter.
+</p>
+
+<p>Added <code>librdf_get_concept_ms_namespace()</code> and
+<code>librdf_get_concept_schema_namespace()</code> to make the
+concept macros above work.
+</p>
+
+<p>Added an rss2atom example program.</p>
+
+<p>Update configure to use autoconf 2.5.x <code>AC_CHECK_TYPES</code>
+for testing byte, u32 and u64.</p>
+
+<p>Fixes for resilence under low memory and allocation failures.</p>
+
+
+<h3>Internal Changes</h3>
+
+<p>Applied some updates from running the Linux 'sparse' utility.</p>
+
+<p>Allow get_context method calls in stream/iterator map functions.
+Originally
+<a href="http://lists.usefulinc.com/pipermail/redland-dev/2008-May/001756.html">reported on redland-dev 6 May 2008</a>
+by John Fieber.
+</p>
+
+<p>The storage method
+<code>librdf_storage_find_statements_in_context()</code> now uses the
+storage factory method find_statements_in_context if it exists,
+instead of always using the find_statements factory method and
+filtering.
+</p>
+
 
 <h2 id="rel1_0_7"><a name="rel1_0_7">Redland 1.0.7 Changes</a></h2>
 
