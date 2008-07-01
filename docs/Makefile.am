@@ -49,6 +49,7 @@ IGNORE_HFILES= \
 	rdf_types.h \
 	redland.h \
 	rdf_internal.h \
+	rdf_avltree_internal.h \
 	rdf_concepts_internal.h \
 	rdf_digest_internal.h \
 	rdf_hash_internal.h \
