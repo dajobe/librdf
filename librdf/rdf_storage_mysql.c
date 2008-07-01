@@ -442,7 +442,7 @@ librdf_storage_mysql_get_handle(librdf_storage* storage)
   /* Initialize closed MySQL connection handle */
   connection->handle=mysql_init(connection->handle);
 
-#ifdef MYSQL_OPT_RECONNECT
+#ifdef HAVE_MYSQL_OPT_RECONNECT
   if(1) {
     my_bool value=(context->reconnect) ? 1 : 0;
     mysql_options(connection->handle, MYSQL_OPT_RECONNECT, &value);
