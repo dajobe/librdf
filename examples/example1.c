@@ -2,7 +2,7 @@
  *
  * example.c - Redland example parsing RDF from a URI, storing on disk as BDB hashes and querying the results
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -98,7 +98,7 @@ main(int argc, char *argv[])
   librdf_free_parser(parser);
 
   
-  statement2=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/"),
+  statement2=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://www.dajobe.org/"),
                                              librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/title"),
                                              librdf_new_node_from_literal(world, (const unsigned char*)"My Home Page", NULL, 0)
                                              );
@@ -117,7 +117,7 @@ main(int argc, char *argv[])
   /* Construct the query predicate (arc) and object (target) 
    * and partial statement bits
    */
-  subject=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/");
+  subject=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://www.dajobe.org/");
   predicate=librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/title");
   if(!subject || !predicate) {
     fprintf(stderr, "%s: Failed to create nodes for searching\n", program);

@@ -2,7 +2,7 @@
  *
  * example3.c - Redland example code creating model, statement and storing it in 10 lines
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -48,7 +48,7 @@ main(int argc, char *argv[])
   model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.'"), NULL);
 
   librdf_model_add_statement(model, 
-                             statement=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/"),
+                             statement=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://www.dajobe.org/"),
                                                              librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"),
                                                              librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0)
                                                              )

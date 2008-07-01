@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -41,7 +41,7 @@ static unsigned const char *rdfxml_content=(unsigned const char *)
 "<?xml version=\"1.0\"?>\
 <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\
      xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\
-  <rdf:Description rdf:about=\"http://purl.org/net/dajobe/\">\
+  <rdf:Description rdf:about=\"http://www.dajobe.org/\">\
     <dc:title>Dave Beckett's Home Page</dc:title>\
     <dc:creator>Dave Beckett</dc:creator>\
     <dc:description>The generic home page of Dave Beckett.</dc:description>\

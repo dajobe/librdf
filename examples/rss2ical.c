@@ -1,6 +1,6 @@
 /* rss2ical.c: Turn RSS into ical 
  *
- * Copyright (C) 2006, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2008, David Beckett http://www.dajobe.org/
  *
  * This package is Free Software and part of Redland http://librdf.org/
  * 
