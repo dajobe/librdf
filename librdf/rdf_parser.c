@@ -590,9 +590,10 @@ librdf_parser_parse_file_handle_as_stream(librdf_parser* parser, FILE *fh,
 
 
 /**
- * librdf_parser_parse_into_model:
+ * librdf_parser_parse_file_handle_into_model:
  * @parser: the parser
- * @uri: the URI to read the content course
+ * @fh: FILE* to read content source
+ * @close_fh: non-0 to fclose() the file handle on finishing
  * @base_uri: the base URI to use (or NULL)
  * @model: the model to write to
  *
