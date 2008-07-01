@@ -5,7 +5,7 @@
  * Based in part on rdf_storage_list and rdf_storage_parka.
  *
  * Copyright (C) 2003-2005 Morten Frederiksen - http://purl.org/net/morten/
- * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/

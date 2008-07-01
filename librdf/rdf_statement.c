@@ -2,8 +2,8 @@
  *
  * rdf_statement.c - RDF Triple (Statement) interface
  *
- * Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
- * Copyright (C) 2000-2005, Copyright (C) 2000-2006, Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
