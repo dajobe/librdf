@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_storage.c - RDF Storage SQL config test program
+ * rdf_storage_sql_test.c - RDF Storage SQL config test program
  *
  * Copyright (C) 2008, David Beckett http://www.dajobe.org/
  * 
