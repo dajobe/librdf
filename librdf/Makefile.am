@@ -63,7 +63,6 @@ redland.h librdf.h \
 rdf_internal.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
-rdf_avltree.h \
 rdf_digest.h rdf_hash.h \
 rdf_types.h \
 rdf_model.h \
@@ -76,6 +75,7 @@ rdf_heuristics.h rdf_files.h rdf_utf8.h \
 rdf_query.h \
 rdf_serializer.h \
 rdf_log.h \
+rdf_avltree_internal.h \
 rdf_concepts_internal.h \
 rdf_digest_internal.h \
 rdf_hash_internal.h \
