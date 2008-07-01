@@ -2,8 +2,6 @@
  *
  * db_upgrade.c - Upgrade a redland on-disk BDB store
  *
- * $Id$
- *
  * Copyright (C) 2003-2006, David Beckett http://purl.org/net/dajobe/
  * Copyright (C) 2003-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
