@@ -257,14 +257,16 @@ if test "x$bdb_prefix" != "xno" ; then
 	    header_bdbc_version=`sed -ne 's/^.*DB_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $bdbc_incdir/db.h`
 	    if test "X$header_bdbc_version" = "X$bdbc_version" ; then 
 	      for bdbc_name in db-$bdbc_version db$bdbc_version db-$bdbc_version2 db$bdbc_version2; do
-		if test -r $bdbc_libdir/lib$bdbc_name.a -o -r $bdbc_libdir/lib$bdbc_name.so -o -r $bdbc_libdir/lib$bdbc_name.dylib; then
-		  bdb_version=$bdbc_version
-		  bdb_prefix=$bdbc_prefix
-		  bdb_include_dir=$bdbc_incdir
-		  bdb_lib_dir=$bdbc_libdir
-		  bdb_dbname=$bdbc_name
-		  break 4
-		fi
+	        for bdbc_libdir2 in $bdbc_libdir $bdbc_libdir/db$bdbc_version $bdbc_libdir/db$bdbc_version2; do
+		  if test -r $bdbc_libdir2/lib$bdbc_name.a -o -r $bdbc_libdir2/lib$bdbc_name.so -o -r $bdbc_libdir2/lib$bdbc_name.dylib; then
+		    bdb_version=$bdbc_version
+		    bdb_prefix=$bdbc_prefix
+		    bdb_include_dir=$bdbc_incdir
+		    bdb_lib_dir=$bdbc_libdir2
+		    bdb_dbname=$bdbc_name
+		    break 5
+		  fi
+	        done
 	      done
 	    fi
 	  fi
