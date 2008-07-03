@@ -1094,12 +1094,12 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
   triple_node_type node_type;
   const table_info *table;
   MYSQL *handle;
-  unsigned char *uri;
-  unsigned char *value, *datatype=NULL;
-  char *lang, *nodestring;
+  unsigned char *uri=NULL;
+  unsigned char *value=NULL, *datatype=NULL;
+  char *lang=NULL, *nodestring;
   librdf_uri *dt;
   size_t valuelen, langlen=0, datatypelen=0;
-  unsigned char *name;
+  unsigned char *name=NULL;
   /* Escape URI for db query */
   char *escaped_uri;
   /* Escape value, lang and datatype for db query */
