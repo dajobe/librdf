@@ -994,7 +994,7 @@ LIBRDF_EXTERNAL_LIBS="$LIBRDF_EXTERNAL_LIBS $LIBRDF_LIBS"
 
 # Everything except things with .pc files (raptor and rasqal)
 # 3store uses it but is optional and thus tricky to specify this way
-LIBRDF_PKGCONFIG_LIBS=$LIBRDF_LIBS
+LIBRDF_PKGCONFIG_PRIVATE_LIBS=$LIBRDF_LIBS
 
 dnl Local sub-packages in sub directories needed to build librdf
 dnl Ordering constraints: rasqal needs raptor
@@ -1086,7 +1086,7 @@ AC_SUBST(LIBRDF_INTERNAL_LIBS)
 AC_SUBST(LIBRDF_CPPFLAGS)
 AC_SUBST(LIBRDF_LDFLAGS)
 AC_SUBST(LIBRDF_LIBTOOLLIBS)
-AC_SUBST(LIBRDF_PKGCONFIG_LIBS)
+AC_SUBST(LIBRDF_PKGCONFIG_PRIVATE_LIBS)
 
 AC_SUBST(MEM)
 AC_SUBST(MEM_LIBS)
@@ -1108,7 +1108,7 @@ examples/Makefile
 utils/Makefile
 demos/Makefile
 data/Makefile
-librdf/redland.pc])
+redland.pc])
 AC_CONFIG_FILES([redland-config], [chmod +x redland-config])
 AC_CONFIG_FILES([redland-src-config], [chmod +x redland-src-config])
 

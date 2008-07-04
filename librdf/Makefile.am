@@ -173,14 +173,10 @@ rdf_digest_md5.c rdf_digest_sha1.c rdf_digest_openssl.c \
 rdf_parser_raptor.c
 
 EXTRA_DIST=\
-redland.spec redland.spec.in \
-redland.pc.in
+redland.spec redland.spec.in
 
 librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@ \
 @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ $(MEM_LIBS)
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = redland.pc
 
 pkgdata_DATA=
 if STORAGE_MYSQL

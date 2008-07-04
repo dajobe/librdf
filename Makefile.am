@@ -59,7 +59,12 @@ redland-config.in \
 redland-src-config.in \
 $(man_MANS) \
 redland.sln \
-gtk-doc.make
+gtk-doc.make \
+redland.pc.in
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = redland.pc
+
 
 if MAINTAINER_MODE
 # Create some text files from HTML sources
