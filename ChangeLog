@@ -1,4 +1,60 @@
+2008-07-04  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_log.c: (librdf_log_simple): Do not format and print
+	locator string if raptor_format_locator() returns an error (or 0)
+	when getting the locator string length.
+
+2008-07-04  Dave Beckett <dave@dajobe.org>
+
+	* redland.pc.in: Add swig variable
+
+2008-07-03  Dave Beckett <dave@dajobe.org>
+
+	* Makefile.am: re-order pkgconfig
+
+	* Makefile.am, configure.ac, librdf/Makefile.am,
+	librdf/redland.pc.in, redland.pc.in (from
+	/librdf/trunk/librdf/redland.pc.in:14197): Move redland.pc to root
+	dir
+
+	* RELEASE.html: deprecate redland-config
+
+	* configure.ac: RAPTOR_MIN_VERSION now 1.4.17 to match rasqal
+
+	* configure.ac: Add another way to find berkeleydb / sleepycatdb
+	with libs in subdirs named after major versions
+
+2008-07-02  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_storage_mysql.c:
+	(librdf_storage_mysql_node_hash_common): Init some variables to
+	NULL to prevent GCC warnings
+
+2008-07-01  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage_sql_test.c: Fixed file name in boilerplate
+	comments
+
 2008-06-30  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_parser.h: Make
+	librdf_parser_parse_file_handle_as_stream arg be fh to match docs.
+
+	* librdf/rdf_parser.h: Make
+	librdf_parser_parse_file_handle_into_model arg be fh to match
+	docs.
+
+	* docs/redland-sections.txt: Added
+	librdf_get_concept_ms_namespace,
+	librdf_get_concept_schema_namespace,
+	librdf_parser_parse_file_handle_as_stream and
+	librdf_parser_parse_file_handle_into_model
+
+	* docs/Makefile.am: Exclude rdf_avltree_internal.h
+
+	* librdf/Makefile.am, librdf/rdf_avltree.c, librdf/rdf_avltree.h,
+	librdf/rdf_avltree_internal.h: Rename rdf_avltree.h to
+	rdf_avltree_internal.h
 
 	* librdf/rdf_storage_mysql.c: (librdf_storage_mysql_get_handle):
 	Use HAVE_MYSQL_OPT_RECONNECT to known when to apply reconnections
