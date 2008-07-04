@@ -30,6 +30,9 @@ man_MANS = redland-config.1
 
 dist_pkgdata_DATA = Redland.i
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = redland.pc
+
 DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
 
 # Subdirectories to build/install/distribute etc.
@@ -61,10 +64,6 @@ $(man_MANS) \
 redland.sln \
 gtk-doc.make \
 redland.pc.in
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = redland.pc
-
 
 if MAINTAINER_MODE
 # Create some text files from HTML sources
