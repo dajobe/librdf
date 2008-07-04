@@ -130,13 +130,13 @@ librdf_log_simple(librdf_world* world, int code,
   fputs(log_level_names[level], stderr);
   if(locator) {
     int locator_len=raptor_format_locator(NULL, 0, (raptor_locator*)locator);
-    char *buffer;
-
-    buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+2);
-    *buffer=' ';
-    raptor_format_locator(buffer+1, locator_len, (raptor_locator*)locator);
-    fputs(buffer, stderr);
-    LIBRDF_FREE(cstring, buffer);
+    if(locator_len>0) {
+      char *buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+2);
+      *buffer=' ';
+      raptor_format_locator(buffer+1, locator_len, (raptor_locator*)locator);
+      fputs(buffer, stderr);
+      LIBRDF_FREE(cstring, buffer);
+    }
   }
   
   fputs(" - ", stderr);
