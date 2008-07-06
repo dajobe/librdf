@@ -122,6 +122,31 @@ by callbacks.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_parser_parse_file_handle_as_stream ##### -->
+<para>
+
+</para>
+
+@parser: 
+@fh: 
+@close_fh: 
+@base_uri: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_parser_parse_file_handle_into_model ##### -->
+<para>
+
+</para>
+
+@parser: 
+@fh: 
+@close_fh: 
+@base_uri: 
+@model: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_parser_parse_string_as_stream ##### -->
 <para>
 

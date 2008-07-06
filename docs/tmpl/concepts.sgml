@@ -69,6 +69,24 @@ or #librdf_uri class copy constructors before use.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_get_concept_ms_namespace ##### -->
+<para>
+
+</para>
+
+@world: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_get_concept_schema_namespace ##### -->
+<para>
+
+</para>
+
+@world: 
+@Returns: 
+
+
 <!-- ##### MACRO LIBRDF_MS_Alt ##### -->
 <para>
 
