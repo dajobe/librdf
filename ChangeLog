@@ -1,4 +1,10 @@
-2008-07-04  Lauri Aalto <laalto@iki.fi>
+2008-07-05  Dave Beckett  <dajobe@yahoo-inc.com>
+
+	* Snapshotted redland_1_0_8 for 1.0.8 release (SVN 14222)
+
+2008-07-04  Dave Beckett <dave@dajobe.org>
+
+	* /librdf/trunk, librdf: props
 
 	* librdf/rdf_log.c: (librdf_log_simple): Do not format and print
 	locator string if raptor_format_locator() returns an error (or 0)
