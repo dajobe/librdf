@@ -1,9 +1,8 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_uri.c - RDF URI interface
+ * rdf_cache.c - Object Cache interface
  *
- * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
- * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
+ * Copyright (C) 2008, David Beckett http://www.dajobe.org/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -46,146 +45,101 @@
 
 #ifndef STANDALONE
 
-/* class methods */
 
+#define DEFAULT_FLUSH_PERCENT 70
 
-/**
- * librdf_init_uri:
- * @world: redland world object
- *
- * INTERNAL - Initialise the uri module.
- *
- **/
-void
-librdf_init_uri(librdf_world *world)
+typedef struct
 {
-  /* If no default given, create an in memory hash */
-  if(!world->uris_hash) {
-    world->uris_hash=librdf_new_hash(world, NULL);
-    if(!world->uris_hash)
-      LIBRDF_FATAL1(world, LIBRDF_FROM_URI, "Failed to create URI hash from factory");
-    
-    /* remember to free it later */
-    world->uris_hash_allocated_here=1;
+  /* these are shared - the librdf_hash owns these */
+  void* key;
+  size_t key_size;
+  void* value;
+  size_t value_size;
 
-    if(librdf_hash_open(world->uris_hash, NULL, 0, 1, 1, NULL))
-      LIBRDF_FATAL1(world, LIBRDF_FROM_URI, "Failed to open URI hash");
-  }
-}
+  int id;
+  int usage;
+} librdf_cache_node;
 
-
-
-/**
- * librdf_finish_uri:
- * @world: redland world object
- *
- * INTERNAL - Terminate the uri module.
- *
- **/
-void
-librdf_finish_uri(librdf_world *world)
+typedef struct
 {
-  if (world->uris_hash) {
-    librdf_hash_close(world->uris_hash);
+  int id;
+  int usage;
+} librdf_cache_hist_node;
 
-    if(world->uris_hash_allocated_here)
-      librdf_free_hash(world->uris_hash);
-  }
-}
-
+struct librdf_cache_s
+{
+  librdf_world *world;
+  int size;
+  int capacity;
+  int flush_count;
+  int flags;
+  librdf_hash* hash;
+  librdf_cache_node* nodes;
+  librdf_cache_hist_node* hists;
+};
 
 
 /**
- * librdf_new_uri:
+ * librdf_new_cache:
  * @world: redland world object
- * @uri_string: URI in string form
+ * @capacity: cache maximum number of objects
+ * @flush_percent: % (out of 100) to remove when cache is full
  *
- * Constructor - create a new #librdf_uri object from a URI string.
+ * Constructor - create a new #librdf_cache object
  * 
- * A new URI is constructed from a copy of the string.  If the
- * string is a NULL pointer or empty (0 length) then the result is NULL.
+ * A new cache is constructed
  *
- * Return value: a new #librdf_uri object or NULL on failure
+ * Return value: a new #librdf_cache object or NULL on failure
  **/
-librdf_uri*
-librdf_new_uri (librdf_world *world, 
-                const unsigned char *uri_string)
+librdf_cache*
+librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
+                 int flags)
 {
-  librdf_uri* new_uri;
-  unsigned char *new_string;
-  int length;
-  librdf_hash_datum key, value; /* on stack - not allocated */
-  librdf_hash_datum *old_value;
-
-  librdf_world_open(world);
-
-  if(!uri_string || !*uri_string)
-    return NULL;
+  librdf_cache* new_cache=NULL;
 
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->mutex);
 #endif
   
-  length=strlen((const char*)uri_string);
+  new_cache=(librdf_cache*)LIBRDF_CALLOC(librdf_cache, 1, sizeof(librdf_cache));
+  if(!new_cache)
+    goto unlock;
 
-  key.data=(char*)uri_string;
-  key.size=length;
-
-  /* if existing URI found in hash, return it */
-  if((old_value=librdf_hash_get_one(world->uris_hash, &key))) {
-    new_uri=*(librdf_uri**)old_value->data;
-
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3("Found existing URI %s in hash with current usage %d\n", uri_string, new_uri->usage);
-#endif
-
-    librdf_free_hash_datum(old_value);
-    new_uri->usage++;
-
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    if(new_uri->usage > new_uri->max_usage)
-      new_uri->max_usage=new_uri->usage;
-#endif    
-
+  if(flush_percent < 1 || flush_percent > 100)
+    flush_percent= DEFAULT_FLUSH_PERCENT;
+  
+  new_cache->world=world;
+  new_cache->capacity=capacity;
+  new_cache->size=0; /* empty */
+  new_cache->flush_count= (capacity * flush_percent) / 100;
+  new_cache->flags=flags;
+  
+  new_cache->hash=librdf_new_hash(world, NULL);
+  if(!new_cache->hash) {
+    LIBRDF_FREE(librdf_cache, new_cache);
+    new_cache=NULL;
+    LIBRDF_FATAL1(world, LIBRDF_FROM_URI, "Failed to create cache hash");
     goto unlock;
   }
-  
-
-  /* otherwise create a new one */
-
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG2("Creating new URI %s in hash\n", uri_string);
-#endif
-
-  new_uri = (librdf_uri*)LIBRDF_CALLOC(librdf_uri, 1, sizeof(librdf_uri));
-  if(!new_uri)
-    goto unlock;
-
-  new_uri->world=world;
-  new_uri->string_length=length;
-
-  new_string=(unsigned char*)LIBRDF_MALLOC(cstring, length+1);
-  if(!new_string) {
-    LIBRDF_FREE(librdf_uri, new_uri);
-    new_uri=NULL;
+  if(librdf_hash_open(new_cache->hash, NULL, 0, 1, 1, NULL)) {
+    librdf_free_cache(new_cache);
+    new_cache=NULL;
     goto unlock;
   }
-  
-  strcpy((char*)new_string, (const char*)uri_string);
-  new_uri->string=new_string;
 
-  new_uri->usage=1;
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  new_uri->max_usage=1;
-#endif
+  new_cache->nodes=LIBRDF_CALLOC(array, capacity, sizeof(librdf_cache_node));
+  if(!new_cache->nodes) {
+    librdf_free_cache(new_cache);
+    new_cache=NULL;
+    goto unlock;
+  }
 
-  value.data=&new_uri; value.size=sizeof(librdf_uri*);
-  
-  /* store in hash: URI-string => (librdf_uri*) */
-  if(librdf_hash_put(world->uris_hash, &key, &value)) {
-    LIBRDF_FREE(cstring, new_string);
-    LIBRDF_FREE(librdf_uri, new_uri);
-    new_uri=NULL;
+  new_cache->hists=LIBRDF_CALLOC(array, capacity, 
+                                 sizeof(librdf_cache_hist_node));
+  if(!new_cache->hists) {
+    librdf_free_cache(new_cache);
+    new_cache=NULL;
+    goto unlock;
   }
 
  unlock:
@@ -193,489 +147,335 @@ librdf_new_uri (librdf_world *world,
   pthread_mutex_unlock(world->mutex);
 #endif
 
-  return new_uri;
+  return new_cache;
 }
 
 
 /**
- * librdf_new_uri_from_uri:
- * @old_uri: #librdf_uri object
+ * librdf_free_cache:
+ * @cache: #librdf_cache object
  *
- * Copy constructor - create a new librdf_uri object from an existing librdf_uri object.
- * 
- * Return value: a new #librdf_uri object or NULL on failure
- **/
-librdf_uri*
-librdf_new_uri_from_uri (librdf_uri* old_uri) {
-
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(old_uri, librdf_uri, NULL);
-  
-  old_uri->usage++;
-  return old_uri;
-}
-
-
-/**
- * librdf_new_uri_from_uri_local_name:
- * @old_uri: #librdf_uri object
- * @local_name: local name to append to URI
- *
- * Copy constructor - create a new librdf_uri object from an existing librdf_uri object and a local name.
- * 
- * Return value: a new #librdf_uri object or NULL on failure
- **/
-librdf_uri*
-librdf_new_uri_from_uri_local_name (librdf_uri* old_uri, 
-                                    const unsigned char *local_name) {
-  int len;
-  unsigned char *new_string;
-  librdf_uri* new_uri;
-
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(old_uri, librdf_uri, NULL);
-  
-  if(!old_uri)
-    return NULL;
-  
-  len=old_uri->string_length + strlen((const char*)local_name) +1 ; /* +1 for \0 */
-
-  new_string=(unsigned char*)LIBRDF_MALLOC(cstring, len);
-  if(!new_string)
-    return NULL;
-
-  strcpy((char*)new_string, (const char*)old_uri->string);
-  strcat((char*)new_string, (const char*)local_name);
-
-  new_uri=librdf_new_uri (old_uri->world, new_string);
-  LIBRDF_FREE(cstring, new_string);
-
-  return new_uri;
-}
-
-
-/**
- * librdf_new_uri_normalised_to_base:
- * @uri_string: URI in string form
- * @source_uri: source URI to remove
- * @base_uri: base URI to add
- *
- * Constructor - create a new #librdf_uri object from a URI string stripped of the source URI, made relative to the base URI.
- * 
- * Return value: a new #librdf_uri object or NULL on failure
- **/
-librdf_uri*
-librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
-                                  librdf_uri* source_uri,
-                                  librdf_uri* base_uri) 
-{
-  int uri_string_len;
-  int len;
-  unsigned char *new_uri_string;
-  librdf_uri *new_uri;
-  librdf_world *world=source_uri->world;
-                                    
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(source_uri, librdf_uri, NULL);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
-  
-  if(!uri_string)
-    return NULL;
-
-  /* empty URI - easy, just make from base_uri */
-  if(!*uri_string && base_uri)
-    return librdf_new_uri_from_uri(base_uri);
-
-  /* not a fragment, and no match - easy */
-  if(*uri_string != '#' &&
-     strncmp((const char*)uri_string, (const char*)source_uri->string, source_uri->string_length))
-    return librdf_new_uri(world, uri_string);
-
-  /* darn - is a fragment or matches, is a prefix of the source URI */
-
-  /* move uri_string pointer to first non-matching char 
-   * unless a fragment, when all of the uri_string will 
-   * be appended
-   */
-  if(*uri_string != '#')
-    uri_string += source_uri->string_length;
-
-  /* size of remaining bytes to copy from uri_string */
-  uri_string_len=strlen((const char*)uri_string);
-
-  /* total bytes */
-  len=uri_string_len + 1 + base_uri->string_length;
-
-  new_uri_string=(unsigned char*)LIBRDF_MALLOC(cstring, len);
-  if(!new_uri_string)
-    return NULL;
-  strncpy((char*)new_uri_string, (const char*)base_uri->string, base_uri->string_length);
-  /* strcpy not strncpy since I want a \0 on the end */
-  strcpy((char*)new_uri_string + base_uri->string_length, (const char*)uri_string);
-  
-  new_uri=librdf_new_uri(world, new_uri_string);
-  LIBRDF_FREE(cstring, new_uri_string); /* always free this even on failure */
-
-  return new_uri; /* new URI or NULL from librdf_new_uri failure */
-}
-
-
-
-/**
- * librdf_new_uri_relative_to_base:
- * @base_uri: absolute base URI
- * @uri_string: relative URI string
- *
- * Constructor - create a new #librdf_uri object from a URI string relative to a base URI.
- *
- * An empty uri_string or NULL is equivalent to 
- * librdf_new_uri_from_uri(base_uri)
- * 
- * Return value: a new #librdf_uri object or NULL on failure
- **/
-librdf_uri*
-librdf_new_uri_relative_to_base(librdf_uri* base_uri,
-                                const unsigned char *uri_string) {
-  unsigned char *buffer;
-  int buffer_length;
-  librdf_uri* new_uri;
-  librdf_world *world=base_uri->world;
-                                  
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
-
-  if(!uri_string)
-    return NULL;
-  
-  /* If URI string is empty, just copy base URI */
-  if(!*uri_string)
-    return librdf_new_uri_from_uri(base_uri);
-  
-  /* +2 is for \0 plus an extra 1 for adding any missing URI path '/' */
-  buffer_length=base_uri->string_length + strlen((const char*)uri_string) +2;
-  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, buffer_length);
-  if(!buffer)
-    return NULL;
-  
-  raptor_uri_resolve_uri_reference(base_uri->string, uri_string,
-                                   buffer, buffer_length);
-
-  new_uri=librdf_new_uri(world, buffer);
-  LIBRDF_FREE(cstring, buffer);
-  return new_uri;
-}
-
-
-/**
- * librdf_new_uri_from_filename:
- * @world: Redland #librdf_world object
- * @filename: filename
- *
- * Constructor - create a new #librdf_uri object from a filename.
- *
- * Return value: a new #librdf_uri object or NULL on failure
- **/
-librdf_uri*
-librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
-  librdf_uri* new_uri;
-  unsigned char *uri_string;
-
-  librdf_world_open(world);
-
-  if(!filename)
-    return NULL;
-  
-  uri_string=raptor_uri_filename_to_uri_string(filename);
-  if(!uri_string)
-    return NULL;
-  
-  new_uri=librdf_new_uri(world, uri_string);
-  raptor_free_memory(uri_string);
-  return new_uri;
-}
-
-
-
-/**
- * librdf_free_uri:
- * @uri: #librdf_uri object
- *
- * Destructor - destroy a #librdf_uri object.
+ * Destructor - destroy a #librdf_cache object.
  * 
  **/
 void
-librdf_free_uri (librdf_uri* uri) 
+librdf_free_cache(librdf_cache* cache) 
 {
-  librdf_hash_datum key; /* on stack */
 #ifdef WITH_THREADS
   librdf_world *world;
 #endif
 
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(uri, librdf_uri);
-
 #ifdef WITH_THREADS
-  world = uri->world;
-  pthread_mutex_lock(world->mutex);
+  world = cache->world;
+  pthread_mutex_lock(cache->world->mutex);
 #endif
 
-  uri->usage--;
-  
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3("URI %s usage count now %d\n", uri->string, uri->usage);
-#endif
-
-  /* decrement usage, don't free if not 0 yet*/
-  if(uri->usage) {
-#ifdef WITH_THREADS
-    pthread_mutex_unlock(world->mutex);
-#endif
-    return;
+  if(cache->hash) {
+    librdf_hash_close(cache->hash);
+    librdf_free_hash(cache->hash);
   }
 
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3("Deleting URI %s from hash, max usage was %d\n", uri->string, uri->max_usage);
-#endif
+  if(cache->nodes)
+    LIBRDF_FREE(array, cache->nodes);
 
-  key.data=uri->string;
-  key.size=uri->string_length;
-  /* Hash deletion fails only if the key is not found.
-     This is not a fatal error so do not check for return value. */
-  librdf_hash_delete_all(uri->world->uris_hash, &key);
+  if(cache->hists)
+    LIBRDF_FREE(array, cache->hists);
 
-  if(uri->string)
-    LIBRDF_FREE(cstring, uri->string);
-  LIBRDF_FREE(librdf_uri, uri);
+  LIBRDF_FREE(librdf_cache, cache);
 
 #ifdef WITH_THREADS
   pthread_mutex_unlock(world->mutex);
 #endif
+};
+
+
+static int
+librdf_hist_node_compare(const void* a_p, const void* b_p) 
+{
+  return *(int*)b_p - *(int*)a_p;
 }
 
 
-/**
- * librdf_uri_as_string:
- * @uri: #librdf_uri object
- *
- * Get a pointer to the string representation of the URI.
- * 
- * Returns a shared pointer to the URI string representation. 
- * Note: does not allocate a new string so the caller must not free it.
- * 
- * Return value: string representation of URI
- **/
-unsigned char*
-librdf_uri_as_string (librdf_uri *uri) 
+
+static int
+librdf_cache_cleanup(librdf_cache *cache)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
-
-  return uri->string;
-}
-
-
-/**
- * librdf_uri_as_counted_string:
- * @uri: #librdf_uri object
- * @len_p: pointer to location to store length
- *
- * Get a pointer to the string representation of the URI with length.
- * 
- * Returns a shared pointer to the URI string representation. 
- * Note: does not allocate a new string so the caller must not free it.
- * 
- * Return value: string representation of URI
- **/
-unsigned char*
-librdf_uri_as_counted_string(librdf_uri *uri, size_t* len_p) 
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
-
-  if(len_p)
-    *len_p=uri->string_length;
-  return uri->string;
-}
-
-
-/**
- * librdf_uri_get_digest:
- * @uri: #librdf_uri object
- *
- * Get a digest for the URI.
- * 
- * Generates a digest object for the URI.  The digest factory used is
- * determined at class initialisation time by librdf_init_uri().
- * 
- * Return value: new #librdf_digest object or NULL on failure.
- **/
-librdf_digest*
-librdf_uri_get_digest(librdf_uri* uri) 
-{
-  librdf_world *world=uri->world;
-  librdf_digest* d;
+  int i;
   
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
+  for(i=0; i < cache->size; i++) {
+    cache->hists[i].id= cache->nodes[i].id;
+    cache->hists[i].usage= cache->nodes[i].usage;
+  }
 
-  d=librdf_new_digest_from_factory(world, world->digest_factory);
-  if(!d)
-    return NULL;
+  qsort(&cache->hists, cache->size, sizeof(librdf_cache_hist_node),
+        librdf_hist_node_compare);
+
+  for(i=0; i < cache->flush_count; i++) {
+    librdf_cache_node* node=&cache->nodes[cache->hists[i].id];
+    /* this will zero out *node */
+    librdf_cache_delete(cache, node->key, node->key_size);
+  }
+
   
-  librdf_digest_update(d, (unsigned char*)uri->string, uri->string_length);
-  librdf_digest_final(d);
+  return 0;
+}
+
+
+#define SET_FLAG_OVERWRITE 1
+
+static int
+librdf_cache_set_common(librdf_cache *cache,
+                        void* key, size_t key_size,
+                        void* value, size_t value_size,
+                        void** existing_value_p, int flags)
+{
+  void* new_object;
+  librdf_hash_datum key_hd, value_hd; /* on stack - not allocated */
+  librdf_hash_datum *old_value;
+  int i;
+  int id= -1;
+  librdf_cache_node* node;
+  int rc=0;
   
-  return d;
-}
-
-
-/**
- * librdf_uri_print:
- * @uri: #librdf_uri object
- * @fh: file handle
- *
- * Print the URI to the given file handle.
- *
- **/
-void
-librdf_uri_print (librdf_uri* uri, FILE *fh) 
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(uri, librdf_uri);
-
-  fputs((const char*)uri->string, fh);
-}
-
-
-/**
- * librdf_uri_to_string:
- * @uri: #librdf_uri object
- *
- * Format the URI as a string.
- * 
- * Note: this method allocates a new string since this is a _to_ method
- * and the caller must free the resulting memory.
- *
- * Return value: string representation of the URI or NULL on failure
- **/
-unsigned char*
-librdf_uri_to_string (librdf_uri* uri)
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
-
-  return librdf_uri_to_counted_string(uri, NULL);
-}
-
-
-/**
- * librdf_uri_to_counted_string:
- * @uri: #librdf_uri object
- * @len_p: pointer to location to store length
- *
- * Format the URI as a counted string.
- * 
- * Note: this method allocates a new string since this is a _to_ method
- * and the caller must free the resulting memory.
- *
- * Return value: string representation of the URI or NULL on failure
- **/
-unsigned char*
-librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p)
-{
-  unsigned char *s;
-
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
-
-  if(!uri)
-    return NULL;
-  
-  if(len_p)
-    *len_p=uri->string_length;
-
-  s=(unsigned char*)LIBRDF_MALLOC(cstring, uri->string_length+1);
-  if(!s)
-    return NULL;
-
-  strcpy((char*)s, (const char*)uri->string);
-  return s;
-}
-
-
-/**
- * librdf_uri_equals:
- * @first_uri: #librdf_uri object 1
- * @second_uri: #librdf_uri object 2
- *
- * Compare two librdf_uri objects for equality.
- * 
- * Return value: non 0 if the objects are equal
- **/
-int
-librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri) 
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(first_uri, librdf_uri, 0);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(second_uri, librdf_uri, 0);
-
-  if(!first_uri || !second_uri)
-    return 0;
-  return (first_uri == second_uri);
-}
-
-
-/**
- * librdf_uri_is_file_uri:
- * @uri: #librdf_uri object
- *
- * Test if a URI points to a filename.
- * 
- * Return value: Non zero if the URI points to a file
- **/
-int
-librdf_uri_is_file_uri(librdf_uri* uri) 
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, 1);
-
-  return raptor_uri_uri_string_is_file_uri(uri->string);
-}
-
-
-/**
- * librdf_uri_to_filename:
- * @uri: #librdf_uri object
- *
- * Return pointer to filename of URI.
- * 
- * Returns a pointer to a newly allocated buffer that
- * the caller must free.  This will fail if the URI
- * is not a file: URI.  This can be checked with #librdf_uri_is_file_uri
- *
- * Return value: pointer to filename or NULL on failure
- **/
-const char*
-librdf_uri_to_filename(librdf_uri* uri) 
-{
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
-
-  return raptor_uri_uri_string_to_filename(uri->string);
-  
-}
-
-
-/**
- * librdf_uri_compare:
- * @uri1: #librdf_uri object 1 or NULL
- * @uri2: #librdf_uri object 2 or NULL
- * 
- * Compare two librdf_uri objects lexicographically.
- * 
- * A NULL URI is always less than (never equal to) a non-NULL URI.
- *
- * Return value: <0 if @uri1 is less than @uri2, 0 if equal, >0 if @uri1 is greater than @uri2
- **/
-int
-librdf_uri_compare(librdf_uri* uri1, librdf_uri* uri2)
-{
-  if(uri1 == uri2)
-    return 0;
-  else if(!uri1)
+  if(!key || !value || !key_size || !value_size)
     return -1;
-  else if(!uri2)
-    return 1;
-  else
-    return strcmp((const char*)uri1->string, (const char*)uri2->string);
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(cache->world->mutex);
+#endif
+  
+  key_hd.data=key;
+  key_hd.size=key_size;
+
+  if(!(flags & SET_FLAG_OVERWRITE)) {
+    /* if existing object found in hash, return it */
+    if((old_value=librdf_hash_get_one(cache->hash, &key_hd))) {
+      node=*(librdf_cache_node**)old_value->data;
+      new_object=node->value;
+      
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+      LIBRDF_DEBUG2("Found existing object %p in hash\n", new_object);
+#endif
+      
+      librdf_free_hash_datum(old_value);
+      /* value already present */
+      rc=1;
+      goto unlock;
+    }
+  }
+  
+
+  /* otherwise store it */
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG1("Need to add new object to cache\n");
+#endif
+
+  if(cache->size == cache->capacity) {
+    if(librdf_cache_cleanup(cache)) {
+      rc=1;
+      goto unlock;
+    }
+  }
+  
+  for(i=0; i < cache->capacity; i++) {
+    node=&cache->nodes[i];
+    if(!node->value) {
+      id=i;
+      break;
+    }
+  }
+
+  node->key=key;
+  node->key_size=key_size;
+  node->value=value;
+  node->value_size=value_size;
+  node->id=id;
+  
+  value_hd.data=node; value_hd.size=sizeof(*node);
+  
+  /* store in hash: key => (librdf_cache_node*) */
+  if(librdf_hash_put(cache->hash, &key_hd, &value_hd)) {
+    memset(&node, '\0', sizeof(*node));
+    LIBRDF_FREE(void, new_object);
+    rc= -1;
+  }
+
+  /* succeeded */
+  cache->size++;
+  
+ unlock:
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(cache->mutex);
+#endif
+
+  return rc;
 }
 
+
+/**
+ * librdf_cache_set:
+ * @cache: redland cache object
+ * @key: key data
+ * @key_size: key data size
+ * @value: value data
+ * @value_size: value data size
+ *
+ * Store an item to the cache with given key and value
+ *
+ * Overwrites any existing value and returns it.
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_cache_set(librdf_cache *cache,
+                 void* key, size_t key_size,
+                 void* value, size_t value_size)
+{
+  int rc=librdf_cache_set_common(cache, key, key_size, value, value_size,
+                                 NULL, SET_FLAG_OVERWRITE);
+  return (rc != 0);
+}
+
+
+
+/**
+ * librdf_cache_add:
+ * @cache: redland cache object
+ * @key: key data
+ * @key_size: key data size
+ * @value: value data
+ * @value_size: value data size
+ *
+ * Store an item to the cache with given key and value
+ *
+ * Fails if any value exists for the key
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_cache_add(librdf_cache *cache,
+                 void* key, size_t key_size,
+                 void* value, size_t value_size)
+{
+  int rc=librdf_cache_set_common(cache, key, key_size, value, value_size,
+                                 NULL, 0);
+  return (rc != 0);
+}
+
+
+
+/**
+ * librdf_cache_get:
+ * @cache: redland cache object
+ * @key: key data
+ * @key_size: key data size
+ * @value_size_p: pointer to store value size or NULL
+ *
+ * Get an item from the cache with given key
+ * 
+ * Return value: value pointer on success or NULL or failure/not found
+ **/
+void*
+librdf_cache_get(librdf_cache *cache, void* key, size_t key_size,
+                 size_t* value_size_p)
+{
+  librdf_cache_node* an_object=NULL;
+  librdf_hash_datum key_hd; /* on stack - not allocated */
+  librdf_hash_datum *value;
+
+  if(!key || !key_size)
+    return NULL;
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(cache->world->mutex);
+#endif
+  
+  key_hd.data=key;
+  key_hd.size=key_size;
+
+  /* if existing object found in hash, return it */
+  value=librdf_hash_get_one(cache->hash, &key_hd);
+  if(value) {
+    librdf_cache_node* node=*(librdf_cache_node**)value->data;
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    LIBRDF_DEBUG3("Found object %p in cache of size %d usage %d\n", 
+                  node->value, node->value_size, node->usage);
+#endif
+
+    node->usage++;
+    
+    an_object=node->value;
+    if(value_size_p)
+      *value_size_p=node->value_size;
+
+    librdf_free_hash_datum(value);
+    /* value present */
+    goto unlock;
+  }
+
+ unlock:
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(world->mutex);
+#endif
+
+  return an_object;
+}
+
+
+/**
+ * librdf_cache_delete:
+ * @cache: redland cache object
+ * @key: key data
+ * @key_size: key data size
+ *
+ * Delte an item from the cache with given key
+ * 
+ * Return value: non-0 on failure
+ **/
+int
+librdf_cache_delete(librdf_cache *cache, void* key, size_t key_size)
+{
+  librdf_hash_datum key_hd; /* on stack - not allocated */
+  int rc=0;
+  
+  if(!key || !key_size)
+    return -1;
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(cache->world->mutex);
+#endif
+  
+  key_hd.data=key;
+  key_hd.size=key_size;
+
+  if(librdf_hash_delete_all(cache->hash, &key_hd)) {
+    rc=1;
+    goto unlock;
+  }
+  
+ unlock:
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(cache->world->mutex);
+#endif
+
+  return rc;
+}
+
+
+/**
+ * librdf_cache_delete:
+ * @cache: redland cache object
+ *
+ * Get size of cache
+ * 
+ * Return value: cache siez
+ **/
+int
+librdf_cache_size(librdf_cache *cache)
+{
+  return cache->size;
+}
 
 #endif
 
@@ -692,106 +492,89 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[]) 
 {
-  const unsigned char *hp_string=(const unsigned char*)"http://purl.org/net/dajobe/";
-  librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5, *uri6, *uri7, *uri8, *uri9;
-  librdf_digest *d;
   const char *program=librdf_basename((const char*)argv[0]);
-  const char *file_string="/big/long/directory/file";
-  const unsigned char *file_uri_string=(const unsigned char*)"file:///big/long/directory/file";
-  const unsigned char *uri_string=(const unsigned char*)"http://example.com/big/long/directory/blah#frag";
-  const unsigned char *relative_uri_string1=(const unsigned char*)"#foo";
-  const unsigned char *relative_uri_string2=(const unsigned char*)"bar";
-  librdf_world *world;
+  librdf_world *world=NULL;
+  librdf_cache *cache=NULL;
+  int failures=0;
+  librdf_hash_datum hd_key, hd_value; /* on stack */
+  const char *test_cache_values[]={"colour","yellow", /* Made in UK, can you guess? */
+			    "age", "new",
+			    "size", "large",
+                            "colour", "green",
+			    "fruit", "banana",
+                            "colour", "yellow",
+			    NULL, NULL};
+  const char *test_cache_delete_key="size";
+  int i;
   
   world=librdf_new_world();
+  if(!world) {
+    fprintf(stderr, "%s: Failed to open world\n", program);
+    failures++;
+    goto tidy;
+  }
   librdf_world_open(world);
 
-  fprintf(stderr, "%s: Creating new URI from string\n", program);
-  uri1=librdf_new_uri(world, hp_string);
-  if(!uri1) {
-    fprintf(stderr, "%s: Failed to create URI from string '%s'\n", program, 
-	    hp_string);
-    return(1);
-  }
-  
-  fprintf(stderr, "%s: Home page URI is ", program);
-  librdf_uri_print(uri1, stderr);
-  fputs("\n", stderr);
-  
-  fprintf(stderr, "%s: Creating URI from URI\n", program);
-  uri2=librdf_new_uri_from_uri(uri1);
-  if(!uri2) {
-    fprintf(stderr, "%s: Failed to create new URI from old one\n", program);
-    return(1);
+  cache=librdf_new_cache(world, 10, 70, 0);
+  if(!cache) {
+    fprintf(stderr, "%s: Failed to create cache\n", program);
+    failures++;
+    goto tidy;
   }
 
-  fprintf(stderr, "%s: New URI is ", program);
-  librdf_uri_print(uri2, stderr);
-  fputs("\n", stderr);
 
-  
-  fprintf(stderr, "%s: Getting digest for URI\n", program);
-  d=librdf_uri_get_digest(uri2);
-  if(!d) {
-    fprintf(stderr, "%s: Failed to get digest for URI %s\n", program, 
-	    librdf_uri_as_string(uri2));
-    return(1);
+  for(i=0; test_cache_values[i]; i+=2) {
+    void* value=NULL;
+    size_t value_size=0;
+    char* expected_value=(char*)test_cache_values[i+1];
+    
+    hd_key.data=(char*)test_cache_values[i];
+    hd_value.data=(char*)test_cache_values[i+1];
+    fprintf(stdout, "%s: Adding key/value pair: %s=%s\n", program,
+            (char*)hd_key.data, (char*)hd_value.data);
+    
+    hd_key.size=strlen((char*)hd_key.data);
+    hd_value.size=strlen((char*)hd_value.data); 
+    librdf_cache_set(cache, hd_key.data, hd_key.size,
+                     hd_value.data, hd_value.size);
+    
+    fprintf(stdout, "%s: cache size %d\n", program, librdf_cache_size(cache));
+
+    value=librdf_cache_get(cache, hd_key.data, hd_key.size, &value_size);
+    if(!value) {
+      fprintf(stderr, "%s: Failed to get value\n", program);
+      failures++;
+      break;
+    }
+    if(strcmp(value, expected_value)) {
+      fprintf(stderr, "%s: librdf_cache_get returned '%s' expected '%s'\n",
+              program, (char*)value, expected_value);
+      failures++;
+      break;
+    }
   }
-  fprintf(stderr, "%s: Digest is: ", program);
-  librdf_digest_print(d, stderr);
-  fputs("\n", stderr);
-  librdf_free_digest(d);
-
-  uri3=librdf_new_uri(world, (const unsigned char*)"file:/big/long/directory/");
-  uri4=librdf_new_uri(world, (const unsigned char*)"http://somewhere/dir/");
-  fprintf(stderr, "%s: Source URI is ", program);
-  librdf_uri_print(uri3, stderr);
-  fputs("\n", stderr);
-  fprintf(stderr, "%s: Base URI is ", program);
-  librdf_uri_print(uri4, stderr);
-  fputs("\n", stderr);
-  fprintf(stderr, "%s: URI string is '%s'\n", program, uri_string);
-
-  uri5=librdf_new_uri_normalised_to_base(uri_string, uri3, uri4);
-  fprintf(stderr, "%s: Normalised URI is ", program);
-  librdf_uri_print(uri5, stderr);
-  fputs("\n", stderr);
-
-
-  uri6=librdf_new_uri_relative_to_base(uri5, relative_uri_string1);
-  fprintf(stderr, "%s: URI + Relative URI %s gives ", program, 
-          relative_uri_string1);
-  librdf_uri_print(uri6, stderr);
-  fputs("\n", stderr);
-
-  uri7=librdf_new_uri_relative_to_base(uri5, relative_uri_string2);
-  fprintf(stderr, "%s: URI + Relative URI %s gives ", program, 
-          relative_uri_string2);
-  librdf_uri_print(uri7, stderr);
-  fputs("\n", stderr);
-
-  uri8=librdf_new_uri_from_filename(world, file_string);
-  uri9=librdf_new_uri(world, file_uri_string);
-  if(!librdf_uri_equals(uri8, uri9)) {
-    fprintf(stderr, "%s: URI string from filename %s returned %s, expected %s\n", program, file_string, librdf_uri_as_string(uri8), file_uri_string);
-    return(1);
+  if(failures)
+    goto tidy;
+  
+  
+  fprintf(stdout, "%s: Deleting key '%s'\n", program, test_cache_delete_key);
+  hd_key.data=(char*)test_cache_delete_key;
+  hd_key.size=strlen((char*)hd_key.data);
+  if(librdf_cache_delete(cache, hd_key.data, hd_key.size)) {
+    fprintf(stderr, "%s: librdf_cache_delete failed\n", program);
+    failures++;
+    goto tidy;
   }
 
-  fprintf(stderr, "%s: Freeing URIs\n", program);
-  librdf_free_uri(uri1);
-  librdf_free_uri(uri2);
-  librdf_free_uri(uri3);
-  librdf_free_uri(uri4);
-  librdf_free_uri(uri5);
-  librdf_free_uri(uri6);
-  librdf_free_uri(uri7);
-  librdf_free_uri(uri8);
-  librdf_free_uri(uri9);
-  
-  librdf_free_world(world);
 
-  /* keep gcc -Wall happy */
-  return(0);
+  tidy:
+  if(cache)
+    librdf_free_cache(cache);
+  
+  if(world)
+    librdf_free_world(world);
+
+  return failures;
 }
 
 #endif
