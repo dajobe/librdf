@@ -1,4 +1,46 @@
-2008-07-05  Dave Beckett  <dajobe@yahoo-inc.com>
+2008-07-17  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_cache.c: tidy WITH_THREADS code
+
+	* librdf/rdf_cache.c: DEFAULT_FLUSH_PERCENT 20 is more realistic
+
+	* librdf/Makefile.am: Add rdf_cache_test to tests
+
+	* librdf/rdf_cache.c: (librdf_hist_node_compare): Invert order to
+	eject low use objects.
+	(main): Update tests
+
+2008-07-16  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_cache.c: (librdf_cache_delete): Adjust size.
+
+	* librdf/rdf_cache.c: (librdf_cache_cleanup): Sort hists array not
+	hists array pointer
+
+	* librdf/rdf_cache.c: (librdf_hist_node_compare): Try to fix compare
+
+	* librdf/rdf_cache.c: small cache for testing
+
+	* librdf/rdf_cache.c: tests pass
+
+	* librdf/rdf_cache.c, librdf/rdf_cache.h: Initial object cache
+	impl - tests fail
+
+	* librdf/Makefile.am: Add rdf_cache_test
+
+	* librdf/rdf_internal.h: Add rdf_cache.h
+
+	* librdf/Makefile.am: Added rdf_cache.c rdf_cache.h
+
+	* librdf/rdf_cache.c (from /librdf/trunk/librdf/rdf_uri.c:14278),
+	librdf/rdf_cache.h (from /librdf/trunk/librdf/rdf_uri.h:14278):
+	Copy rdf_uri* to rdf_cache.[ch]
+
+2008-07-05  Dave Beckett <dave@dajobe.org>
+
+	* docs/tmpl/concepts.sgml, docs/tmpl/parser.sgml: tmpl docs
+
+2008-07-05  Dave Beckett  <dave@dajobe.org>
 
 	* Snapshotted redland_1_0_8 for 1.0.8 release (SVN 14222)
 
