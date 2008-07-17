@@ -208,7 +208,7 @@ librdf_cache_cleanup(librdf_cache *cache)
     cache->hists[i].usage= cache->nodes[i].usage;
   }
 
-  qsort(&cache->hists, cache->size, sizeof(librdf_cache_hist_node),
+  qsort(cache->hists, cache->size, sizeof(librdf_cache_hist_node),
         librdf_hist_node_compare);
 
   for(i=0; i < cache->flush_count; i++) {
