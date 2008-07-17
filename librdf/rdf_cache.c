@@ -454,6 +454,9 @@ librdf_cache_delete(librdf_cache *cache, void* key, size_t key_size)
     rc=1;
     goto unlock;
   }
+
+  /* succeeded */
+  cache->size--;
   
  unlock:
 #ifdef WITH_THREADS
