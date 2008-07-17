@@ -48,6 +48,7 @@ rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
 rdf_model.c rdf_model_storage.c \
 rdf_iterator.c rdf_concepts.c \
 rdf_avltree.c \
+rdf_cache.c \
 rdf_list.c \
 rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c rdf_storage_trees.c \
 rdf_storage_sql.c \
@@ -63,6 +64,7 @@ redland.h librdf.h \
 rdf_internal.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
+rdf_cache.h \
 rdf_digest.h rdf_hash.h \
 rdf_types.h \
 rdf_model.h \
