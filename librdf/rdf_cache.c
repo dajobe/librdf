@@ -291,7 +291,7 @@ librdf_cache_set_common(librdf_cache *cache,
   node->value_size=value_size;
   node->id=id;
   
-  value_hd.data=node; value_hd.size=sizeof(*node);
+  value_hd.data=&node; value_hd.size=sizeof(node);
   
   /* store in hash: key => (librdf_cache_node*) */
   if(librdf_hash_put(cache->hash, &key_hd, &value_hd)) {
