@@ -162,11 +162,6 @@ void
 librdf_free_cache(librdf_cache* cache) 
 {
 #ifdef WITH_THREADS
-  librdf_world *world;
-#endif
-
-#ifdef WITH_THREADS
-  world = cache->world;
   pthread_mutex_lock(cache->world->mutex);
 #endif
 
@@ -184,7 +179,7 @@ librdf_free_cache(librdf_cache* cache)
   LIBRDF_FREE(librdf_cache, cache);
 
 #ifdef WITH_THREADS
-  pthread_mutex_unlock(world->mutex);
+  pthread_mutex_unlock(cache->world->mutex);
 #endif
 };
 
@@ -312,7 +307,7 @@ librdf_cache_set_common(librdf_cache *cache,
   
  unlock:
 #ifdef WITH_THREADS
-  pthread_mutex_unlock(cache->mutex);
+  pthread_mutex_unlock(cache->world->mutex);
 #endif
 
   return rc;
@@ -423,7 +418,7 @@ librdf_cache_get(librdf_cache *cache, void* key, size_t key_size,
 
  unlock:
 #ifdef WITH_THREADS
-  pthread_mutex_unlock(world->mutex);
+  pthread_mutex_unlock(cache->world->mutex);
 #endif
 
   return an_object;
