@@ -192,7 +192,8 @@ librdf_free_cache(librdf_cache* cache)
 static int
 librdf_hist_node_compare(const void* a_p, const void* b_p) 
 {
-  return *(int*)b_p - *(int*)a_p;
+  return ((librdf_cache_hist_node*)b_p)->usage - 
+         ((librdf_cache_hist_node*)a_p)->usage;
 }
 
 
