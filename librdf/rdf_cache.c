@@ -192,8 +192,8 @@ librdf_free_cache(librdf_cache* cache)
 static int
 librdf_hist_node_compare(const void* a_p, const void* b_p) 
 {
-  return ((librdf_cache_hist_node*)b_p)->usage - 
-         ((librdf_cache_hist_node*)a_p)->usage;
+  return ((librdf_cache_hist_node*)a_p)->usage - 
+         ((librdf_cache_hist_node*)b_p)->usage;
 }
 
 
@@ -203,6 +203,12 @@ librdf_cache_cleanup(librdf_cache *cache)
 {
   int i;
   
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG3("Running cache cleanup - cache size is %d out of capacity %d\n",
+                cache->size, cache->capacity);
+#endif
+
+
   for(i=0; i < cache->size; i++) {
     cache->hists[i].id= cache->nodes[i].id;
     cache->hists[i].usage= cache->nodes[i].usage;
@@ -501,14 +507,17 @@ main(int argc, char *argv[])
   librdf_cache *cache=NULL;
   int failures=0;
   librdf_hash_datum hd_key, hd_value; /* on stack */
-  const char *test_cache_values[]={"colour","yellow", /* Made in UK, can you guess? */
-			    "age", "new",
-			    "size", "large",
-                            "colour", "green",
-			    "fruit", "banana",
-                            "colour", "yellow",
-			    NULL, NULL};
-  const char *test_cache_delete_key="size";
+  const int test_cache_counts[]={4, 0, 1, 2, 0, 0, 0};
+  const char *test_cache_values[]={
+    "colour","yellow", /* 4: should stay in cache */
+    "age", "new",
+    "size", "large",
+    "width", "small",
+    "fruit", "banana",
+    "parity", "even",
+    "shape", "square",
+    NULL, NULL};
+  const char *test_cache_delete_key="shape";
   int i;
   
   world=librdf_new_world();
@@ -531,41 +540,52 @@ main(int argc, char *argv[])
     void* value=NULL;
     size_t value_size=0;
     char* expected_value=(char*)test_cache_values[i+1];
+    int j;
+    int test_cache_count=test_cache_counts[i/2];
     
     hd_key.data=(char*)test_cache_values[i];
     hd_value.data=(char*)test_cache_values[i+1];
-    fprintf(stdout, "%s: Adding key/value pair: %s=%s\n", program,
-            (char*)hd_key.data, (char*)hd_value.data);
     
     hd_key.size=strlen((char*)hd_key.data);
     hd_value.size=strlen((char*)hd_value.data); 
-    librdf_cache_set(cache, hd_key.data, hd_key.size,
-                     hd_value.data, hd_value.size);
+    if(librdf_cache_set(cache, hd_key.data, hd_key.size,
+                        hd_value.data, hd_value.size)) {
+      fprintf(stderr, "%s: Adding key/value pair: %s=%s failed\n", program,
+              (char*)hd_key.data, (char*)hd_value.data);
+      failures++;
+      break;
+    }
     
-    fprintf(stdout, "%s: cache size %d\n", program, librdf_cache_size(cache));
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    fprintf(stderr, "%s: cache size %d\n", program, librdf_cache_size(cache));
+#endif
 
-    value=librdf_cache_get(cache, hd_key.data, hd_key.size, &value_size);
-    if(!value) {
-      fprintf(stderr, "%s: Failed to get value\n", program);
-      failures++;
-      break;
+    for(j=0; j < test_cache_count; j++) {
+      value=librdf_cache_get(cache, hd_key.data, hd_key.size, &value_size);
+      if(!value) {
+        fprintf(stderr, "%s: Failed to get value\n", program);
+        failures++;
+        break;
+      }
+      if(strcmp(value, expected_value)) {
+        fprintf(stderr, "%s: librdf_cache_get returned '%s' expected '%s'\n",
+                program, (char*)value, expected_value);
+        failures++;
+        break;
+      }
     }
-    if(strcmp(value, expected_value)) {
-      fprintf(stderr, "%s: librdf_cache_get returned '%s' expected '%s'\n",
-              program, (char*)value, expected_value);
-      failures++;
+    if(failures)
       break;
-    }
   }
   if(failures)
     goto tidy;
   
   
-  fprintf(stdout, "%s: Deleting key '%s'\n", program, test_cache_delete_key);
   hd_key.data=(char*)test_cache_delete_key;
   hd_key.size=strlen((char*)hd_key.data);
   if(librdf_cache_delete(cache, hd_key.data, hd_key.size)) {
-    fprintf(stderr, "%s: librdf_cache_delete failed\n", program);
+    fprintf(stderr, "%s: Deleting key '%s' failed\n", program,
+            test_cache_delete_key);
     failures++;
     goto tidy;
   }
