@@ -268,6 +268,9 @@ COMPILE_LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(DEFS) $(DEFAULT_INCLUDE
 rdf_node_test: rdf_node.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_node.c librdf.la
 
+rdf_cache_test: rdf_cache.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_cache.c librdf.la
+
 rdf_digest_test: rdf_digest.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_digest.c librdf.la
 
