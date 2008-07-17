@@ -515,7 +515,7 @@ main(int argc, char *argv[])
   }
   librdf_world_open(world);
 
-  cache=librdf_new_cache(world, 10, 70, 0);
+  cache=librdf_new_cache(world, 5, 70, 0);
   if(!cache) {
     fprintf(stderr, "%s: Failed to create cache\n", program);
     failures++;
