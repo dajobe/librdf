@@ -46,7 +46,7 @@
 #ifndef STANDALONE
 
 
-#define DEFAULT_FLUSH_PERCENT 70
+#define DEFAULT_FLUSH_PERCENT 20
 
 typedef struct
 {
