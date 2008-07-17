@@ -211,7 +211,8 @@ static int
 librdf_cache_cleanup(librdf_cache *cache)
 {
   int i;
-
+  int largest_ejected_usage;
+  
   /* never cleanup if capacity is not limited */
   if(!cache->capacity)
     return 0;
@@ -230,12 +231,21 @@ librdf_cache_cleanup(librdf_cache *cache)
   qsort(cache->hists, cache->size, sizeof(librdf_cache_hist_node),
         librdf_hist_node_compare);
 
+  largest_ejected_usage=cache->nodes[cache->hists[cache->flush_count].id].usage;
+
   for(i=0; i < cache->flush_count; i++) {
     librdf_cache_node* node=&cache->nodes[cache->hists[i].id];
     /* this will zero out *node */
     librdf_cache_delete(cache, node->key, node->key_size);
   }
 
+  /* adjust usage after cleanup */
+  for(i=0; i < cache->size; i++) {
+    if(cache->nodes[i].usage >= largest_ejected_usage)
+      cache->nodes[i].usage -= largest_ejected_usage;
+    else
+      cache->nodes[i].usage=0;
+  }
   
   return 0;
 }
