@@ -82,12 +82,15 @@ struct librdf_cache_s
 /**
  * librdf_new_cache:
  * @world: redland world object
- * @capacity: cache maximum number of objects
- * @flush_percent: % (out of 100) to remove when cache is full
+ * @capacity: cache maximum number of objects (1 or more)
+ * @flush_percent: percentage (1-100) to remove when cache is full
  *
  * Constructor - create a new #librdf_cache object
  * 
- * A new cache is constructed
+ * A new cache is constructed from the parameters.  If flush_percent
+ * is out of the range 1-100, it is set to a default value.  if set
+ * to 100, it means all objects will be removed when the cache is
+ * full.
  *
  * Return value: a new #librdf_cache object or NULL on failure
  **/
@@ -96,6 +99,9 @@ librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
                  int flags)
 {
   librdf_cache* new_cache=NULL;
+
+  if(!world || capacity < 1)
+    return NULL;
 
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->mutex);
