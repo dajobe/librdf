@@ -82,15 +82,19 @@ struct librdf_cache_s
 /**
  * librdf_new_cache:
  * @world: redland world object
- * @capacity: cache maximum number of objects (1 or more)
+ * @capacity: cache maximum number of objects
  * @flush_percent: percentage (1-100) to remove when cache is full
  *
  * Constructor - create a new #librdf_cache object
  * 
- * A new cache is constructed from the parameters.  If flush_percent
- * is out of the range 1-100, it is set to a default value.  if set
- * to 100, it means all objects will be removed when the cache is
- * full.
+ * A new cache is constructed from the parameters.
+ *
+ * If capacity is 0, the cache is not limited in size; no cache
+ * ejection will be done.
+ *
+ * If flush_percent is out of the range 1-100, it is set to a
+ * default value.  if set to 100, it means all objects will be
+ * removed when the cache is full.
  *
  * Return value: a new #librdf_cache object or NULL on failure
  **/
@@ -100,7 +104,7 @@ librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
 {
   librdf_cache* new_cache=NULL;
 
-  if(!world || capacity < 1)
+  if(!world || capacity < 0)
     return NULL;
 
 #ifdef WITH_THREADS
@@ -117,9 +121,10 @@ librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
   new_cache->world=world;
   new_cache->capacity=capacity;
   new_cache->size=0; /* empty */
-  new_cache->flush_count= (capacity * flush_percent) / 100;
+  if(capacity)
+    new_cache->flush_count= (capacity * flush_percent) / 100;
   new_cache->flags=flags;
-  
+
   new_cache->hash=librdf_new_hash(world, NULL);
   if(!new_cache->hash) {
     LIBRDF_FREE(librdf_cache, new_cache);
@@ -133,19 +138,22 @@ librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
     goto unlock;
   }
 
-  new_cache->nodes=LIBRDF_CALLOC(array, capacity, sizeof(librdf_cache_node));
-  if(!new_cache->nodes) {
-    librdf_free_cache(new_cache);
-    new_cache=NULL;
-    goto unlock;
-  }
-
-  new_cache->hists=LIBRDF_CALLOC(array, capacity, 
-                                 sizeof(librdf_cache_hist_node));
-  if(!new_cache->hists) {
-    librdf_free_cache(new_cache);
-    new_cache=NULL;
-    goto unlock;
+  /* allocate static nodes and histogram nodes if capacity is fixed */
+  if(capacity) {
+    new_cache->nodes=LIBRDF_CALLOC(array, capacity, sizeof(librdf_cache_node));
+    if(!new_cache->nodes) {
+      librdf_free_cache(new_cache);
+      new_cache=NULL;
+      goto unlock;
+    }
+  
+    new_cache->hists=LIBRDF_CALLOC(array, capacity, 
+                                   sizeof(librdf_cache_hist_node));
+    if(!new_cache->hists) {
+      librdf_free_cache(new_cache);
+      new_cache=NULL;
+      goto unlock;
+    }
   }
 
  unlock:
@@ -203,6 +211,10 @@ static int
 librdf_cache_cleanup(librdf_cache *cache)
 {
   int i;
+
+  /* never cleanup if capacity is not limited */
+  if(!cache->capacity)
+    return 0;
   
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("Running cache cleanup - cache size is %d out of capacity %d\n",
@@ -278,26 +290,38 @@ librdf_cache_set_common(librdf_cache *cache,
   LIBRDF_DEBUG1("Need to add new object to cache\n");
 #endif
 
-  if(cache->size == cache->capacity) {
-    if(librdf_cache_cleanup(cache)) {
+  if(!cache->capacity) {
+    /* dynamic cache capacity */
+    node=LIBRDF_CALLOC(librdf_cache_node, 1, sizeof(librdf_cache_node));
+    if(!node) {
       rc=1;
       goto unlock;
     }
-  }
-  
-  for(i=0; i < cache->capacity; i++) {
-    node=&cache->nodes[i];
-    if(!node->value) {
-      id=i;
-      break;
+    id= -1;
+  } else {
+    /* fixed cache capacity so eject some (static) nodes */
+    if(cache->size == cache->capacity) {
+      if(librdf_cache_cleanup(cache)) {
+        rc=1;
+        goto unlock;
+      }
+    }
+    
+    for(i=0; i < cache->capacity; i++) {
+      node=&cache->nodes[i];
+      if(!node->value) {
+        id=i;
+        break;
+      }
     }
   }
-
+  
   node->key=key;
   node->key_size=key_size;
   node->value=value;
   node->value_size=value_size;
   node->id=id;
+  node->usage=0;
   
   value_hd.data=&node; value_hd.size=sizeof(node);
   
@@ -407,11 +431,13 @@ librdf_cache_get(librdf_cache *cache, void* key, size_t key_size,
     librdf_cache_node* node=*(librdf_cache_node**)value->data;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    LIBRDF_DEBUG3("Found object %p in cache of size %d usage %d\n", 
-                  node->value, node->value_size, node->usage);
+    LIBRDF_DEBUG4("Found object %p in cache of size %d usage %d\n", 
+                  node->value, (int)node->value_size, node->usage);
 #endif
 
-    node->usage++;
+    /* no need to track usage for dynamic nodes */
+    if(cache->capacity)
+      node->usage++;
     
     an_object=node->value;
     if(value_size_p)
@@ -507,7 +533,9 @@ main(int argc, char *argv[])
   librdf_world *world=NULL;
   librdf_cache *cache=NULL;
   int failures=0;
-  librdf_hash_datum hd_key, hd_value; /* on stack */
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+  const char *test_id_params[]={ "fixed size 5, 70% eject", "unlimited" };
+#endif
   const int test_cache_counts[]={4, 0, 1, 2, 0, 0, 0};
   const char *test_cache_values[]={
     "colour","yellow", /* 4: should stay in cache */
@@ -519,7 +547,7 @@ main(int argc, char *argv[])
     "shape", "square",
     NULL, NULL};
   const char *test_cache_delete_key="shape";
-  int i;
+  int test_id;
   
   world=librdf_new_world();
   if(!world) {
@@ -529,68 +557,90 @@ main(int argc, char *argv[])
   }
   librdf_world_open(world);
 
-  cache=librdf_new_cache(world, 5, 70, 0);
-  if(!cache) {
-    fprintf(stderr, "%s: Failed to create cache\n", program);
-    failures++;
-    goto tidy;
-  }
 
-
-  for(i=0; test_cache_values[i]; i+=2) {
-    void* value=NULL;
-    size_t value_size=0;
-    char* expected_value=(char*)test_cache_values[i+1];
+  for(test_id=0; test_id < 2; test_id++) {
+    librdf_hash_datum hd_key, hd_value; /* on stack */
     int j;
-    int test_cache_count=test_cache_counts[i/2];
-    
-    hd_key.data=(char*)test_cache_values[i];
-    hd_value.data=(char*)test_cache_values[i+1];
-    
-    hd_key.size=strlen((char*)hd_key.data);
-    hd_value.size=strlen((char*)hd_value.data); 
-    if(librdf_cache_set(cache, hd_key.data, hd_key.size,
-                        hd_value.data, hd_value.size)) {
-      fprintf(stderr, "%s: Adding key/value pair: %s=%s failed\n", program,
-              (char*)hd_key.data, (char*)hd_value.data);
-      failures++;
-      break;
-    }
     
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-    fprintf(stderr, "%s: cache size %d\n", program, librdf_cache_size(cache));
+    fprintf(stderr, "%s: Testing cache with parameters: %s\n", program,
+              test_id_params[test_id]);
 #endif
+    if(test_id == 0)
+      cache=librdf_new_cache(world, 5, 70, 0); /* fixed size 5, 70% eject */
+    else
+      cache=librdf_new_cache(world, 0, 0, 0); /* unlimited size */
 
-    for(j=0; j < test_cache_count; j++) {
-      value=librdf_cache_get(cache, hd_key.data, hd_key.size, &value_size);
-      if(!value) {
-        fprintf(stderr, "%s: Failed to get value\n", program);
+    if(!cache) {
+      fprintf(stderr, "%s: Failed to create cache for test #%d\n", program,
+              test_id);
+      failures++;
+      goto tidy;
+    }
+
+
+    for(j=0; test_cache_values[j]; j+=2) {
+      void* value=NULL;
+      size_t value_size=0;
+      char* expected_value=(char*)test_cache_values[j+1];
+      int count;
+      int test_cache_count=test_cache_counts[j/2];
+
+      hd_key.data=(char*)test_cache_values[j];
+      hd_value.data=(char*)test_cache_values[j+1];
+
+      hd_key.size=strlen((char*)hd_key.data);
+      hd_value.size=strlen((char*)hd_value.data); 
+
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+      fprintf(stderr, "%s: Adding key/value pair: %s=%s\n", program,
+              (char*)hd_key.data, (char*)hd_value.data);
+#endif
+      if(librdf_cache_set(cache, hd_key.data, hd_key.size,
+                          hd_value.data, hd_value.size)) {
+        fprintf(stderr, "%s: Adding key/value pair: %s=%s failed\n", program,
+                (char*)hd_key.data, (char*)hd_value.data);
         failures++;
         break;
       }
-      if(strcmp(value, expected_value)) {
-        fprintf(stderr, "%s: librdf_cache_get returned '%s' expected '%s'\n",
-                program, (char*)value, expected_value);
-        failures++;
-        break;
+
+  #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+      fprintf(stderr, "%s: cache size %d\n", program, librdf_cache_size(cache));
+  #endif
+
+      for(count=0; count < test_cache_count; count++) {
+        value=librdf_cache_get(cache, hd_key.data, hd_key.size, &value_size);
+        if(!value) {
+          fprintf(stderr, "%s: Failed to get value\n", program);
+          failures++;
+          break;
+        }
+        if(strcmp(value, expected_value)) {
+          fprintf(stderr, "%s: librdf_cache_get returned '%s' expected '%s'\n",
+                  program, (char*)value, expected_value);
+          failures++;
+          break;
+        }
       }
+      if(failures)
+        break;
     }
     if(failures)
-      break;
-  }
-  if(failures)
-    goto tidy;
+      goto tidy;
   
-  
-  hd_key.data=(char*)test_cache_delete_key;
-  hd_key.size=strlen((char*)hd_key.data);
-  if(librdf_cache_delete(cache, hd_key.data, hd_key.size)) {
-    fprintf(stderr, "%s: Deleting key '%s' failed\n", program,
-            test_cache_delete_key);
-    failures++;
-    goto tidy;
-  }
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+    fprintf(stderr, "%s: Deleting key '%s'\n", program, test_cache_delete_key);
+#endif
+    hd_key.data=(char*)test_cache_delete_key;
+    hd_key.size=strlen((char*)hd_key.data);
+    if(librdf_cache_delete(cache, hd_key.data, hd_key.size)) {
+      fprintf(stderr, "%s: Deleting key '%s' failed\n", program,
+              test_cache_delete_key);
+      failures++;
+      goto tidy;
+    }
 
+  }
 
   tidy:
   if(cache)
