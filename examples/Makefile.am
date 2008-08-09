@@ -3,7 +3,7 @@
 # Makefile.am - example automake file for Redland
 #
 
-EXAMPLES=example1 example2 example3 example4 example5 example6 example7
+EXAMPLES=example1$(EXEEXT) example2$(EXEEXT) example3$(EXEEXT) example4$(EXEEXT) example5$(EXEEXT) example6$(EXEEXT) example7$(EXEEXT)
 
 OTHER_EXAMPLES=redland_dbus rss2ical rss2atom
 
