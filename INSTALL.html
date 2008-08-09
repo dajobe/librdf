@@ -412,9 +412,16 @@ several C example programs that can be used.  They are
 in the <code>examples</code> sub-directory and can be built with:</p>
 <pre>
    cd examples
-   make
+
+   make EXAMPLE
+   # or on cygwin
+   make EXAMPLE.exe
 </pre>
-<p>(This may be done by the initial 'make' automatically).</p>
+
+<p>or to build all of them</p>
+<xpre>
+   make examples
+</pre>
 
 
 <p>If no Berkeley DB was found by configure, some of the examples will fail
