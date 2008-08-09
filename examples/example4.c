@@ -50,14 +50,14 @@ main(int argc, char *argv[])
   model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.'"), NULL);
 
   parser=librdf_new_parser(world,"rdfxml","application/rdf+xml",NULL);
-  uri=librdf_new_uri(world,"file:../data/dc.rdf");
+  uri=librdf_new_uri(world, (const unsigned char*)"file:../data/dc.rdf");
   librdf_parser_parse_into_model(parser,uri,uri,model);
   librdf_free_uri(uri);
   librdf_free_parser(parser);
 
   serializer=librdf_new_serializer(world, "rdfxml", NULL, NULL);
-  base_uri=librdf_new_uri(world,"http://exampe.org/base.rdf");
-  librdf_serializer_serialize_model(serializer, stdout, base_uri, model);
+  base_uri=librdf_new_uri(world, (const unsigned char*)"http://exampe.org/base.rdf");
+  librdf_serializer_serialize_model_to_file_handle(serializer, stdout, base_uri, model);
   librdf_free_serializer(serializer);
   librdf_free_uri(base_uri);
   
