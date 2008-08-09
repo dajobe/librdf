@@ -46,7 +46,7 @@ main(int argc, char *argv[])
   librdf_query* query;
   librdf_query_results* results;
   librdf_uri *uri;
-  char *query_string=NULL;
+  const unsigned char *query_string=NULL;
   
   world=librdf_new_world();
   librdf_world_open(world);
@@ -56,8 +56,8 @@ main(int argc, char *argv[])
     return 1; 
   }
   
-  uri=librdf_new_uri(world, argv[1]);
-  query_string=argv[2];
+  uri=librdf_new_uri(world, (const unsigned char*)argv[1]);
+  query_string=(const unsigned char*)argv[2];
   
   model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "new='yes',hash-type='bdb',dir='.'"), NULL);
   if(!model || !storage) {
