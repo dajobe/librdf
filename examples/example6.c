@@ -48,7 +48,7 @@ main(int argc, char *argv[])
 
   model=librdf_new_model(world, storage=librdf_new_storage(world, "memory", NULL, NULL), NULL);
 
-  uri=librdf_new_uri(world,"http://planetrdf.com/index.rdf");
+  uri=librdf_new_uri(world, (const unsigned char*)"http://planetrdf.com/index.rdf");
   librdf_model_load(model, uri, NULL, NULL, NULL);
 
   string=librdf_model_to_string(model, uri, "ntriples", NULL, NULL);
