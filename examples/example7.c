@@ -52,4 +52,6 @@ main(int argc, char *argv[])
   librdf_free_model(model);
   librdf_free_storage(storage);
   librdf_free_world(world);
+
+  return(0);
 }
