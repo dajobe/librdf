@@ -451,108 +451,85 @@ dnl Checks for RDF parsers
 parser_modules=raptor
 rdf_parsers_available=
 
-# raptor is REQUIRED despite the checking here
-AC_CHECK_PROG(RAPTOR_CONFIG, raptor-config, raptor-config)
-AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick raptor source - system/internal (default=auto)], with_raptor="$withval", with_raptor="auto")
+# Check for raptor
+AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick maintainer raptor source - system/internal (default=internal)], with_raptor="$withval", with_raptor="internal")
+AC_MSG_CHECKING(for raptor)
+raptor_dir=../raptor
 
 RAPTOR_MIN_VERSION=1.4.17
 AC_SUBST(RAPTOR_MIN_VERSION)
-if test "X$RAPTOR_CONFIG" = "X"; then
-  with_raptor=internal
-else
-  RAPTOR_VERSION=`$RAPTOR_CONFIG --version 2>/dev/null`
+if test "$USE_MAINTAINER_MODE" = yes -a -f $raptor_dir/raptor-src-config -a $with_raptor = internal; then
+  RAPTOR_VERSION=`$raptor_dir/raptor-src-config --version 2>/dev/null`
 
-  # FIXME - could use raptor-config --decimal-version at some point
-  RAPTOR_VERSION_DEC=`echo $RAPTOR_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
-  RAPTOR_MIN_VERSION_DEC=`echo $RAPTOR_MIN_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/$raptor_dir/src $LIBRDF_INTERNAL_CPPFLAGS"
+  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/$raptor_dir/src/libraptor.la $LIBRDF_INTERNAL_LIBS"
 
-  if test "X$with_raptor" = Xauto; then
-    if test "X$RAPTOR_VERSION" -a $RAPTOR_VERSION_DEC -ge $RAPTOR_MIN_VERSION_DEC; then
-      with_raptor=system
-    else
-      with_raptor=internal
-    fi
-  elif test $with_raptor = system; then
-    if test $RAPTOR_VERSION_DEC -lt $RAPTOR_MIN_VERSION_DEC; then
-      AC_MSG_WARN(System raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
-      AC_MSG_WARN(Proceeding anyway since --with-raptor=system was given)
-      AC_MSG_WARN(To use the internal raptor use --with-raptor=internal)
-      AC_MSG_WARN(or omit any --with-raptor argument.)
-    fi
-  fi
-fi
-
-AC_MSG_CHECKING(raptor library source)
-if test $with_raptor = system; then
-  AC_MSG_RESULT(system $RAPTOR_VERSION)
-  rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
-else
-  with_raptor=internal
-  AC_MSG_RESULT(internal)
   rdf_parsers_available="$parser_available raptor(internal)"
+  AC_MSG_RESULT(maintainer $RAPTOR_VERSION)
+else
+  with_raptor=system
+  if $PKG_CONFIG raptor --exists; then
+    :
+  else
+    AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
+  fi
+
+  RAPTOR_VERSION=`$PKG_CONFIG raptor --modversion 2>/dev/null`
+
+  if $PKG_CONFIG raptor --atleast-version=$RAPTOR_MIN_VERSION; then
+    :
+  else
+    AC_MSG_ERROR(Installed raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
+  fi
+
+  LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG raptor --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+  LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG raptor --libs` $LIBRDF_EXTERNAL_LIBS"
+
+  rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
+  AC_MSG_RESULT(system $RAPTOR_VERSION)
 fi
 AC_SUBST(with_raptor)
 
-
-# Always have these
-raptor_dir=raptor
-
-config_subdir_raptor=no
-if test $with_raptor = internal; then
-  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/raptor/src $LIBRDF_INTERNAL_CPPFLAGS"
-  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/raptor/src/libraptor.la $LIBRDF_INTERNAL_LIBS"
-  config_subdir_raptor=yes
-else
-  LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
-  LIBRDF_EXTERNAL_LIBS="`$RAPTOR_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
-  raptor_dir=
-fi
-
-if test "$config_subdir_raptor" = yes -o "$USE_MAINTAINER_MODE" = yes; then
-  AC_CONFIG_SUBDIRS(raptor)
-fi
-
-
-# rasqal is REQUIRED despite the checking here
-AC_CHECK_PROG(RASQAL_CONFIG, rasqal-config, rasqal-config)
-AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick rasqal source - system/internal (default=auto)], with_rasqal="$withval", with_rasqal="auto")
+# Check for rasqal
+AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick maintainer rasqal source - system/internal (default=internal)], with_rasqal="$withval", with_rasqal="internal")
+AC_MSG_CHECKING(for rasqal)
+rasqal_dir=../rasqal
 
 RASQAL_MIN_VERSION=0.9.16
 RASQAL_MAX_VERSION=0.9.99
 AC_SUBST(RASQAL_MIN_VERSION)
 AC_SUBST(RASQAL_MAX_VERSION)
-if test "X$RASQAL_CONFIG" = "X"; then
-  with_rasqal=internal
-else
-  RASQAL_VERSION=`$RASQAL_CONFIG --version 2>/dev/null`
+if test "$USE_MAINTAINER_MODE" = yes -a -f $rasqal_dir/rasqal-src-config -a $with_rasqal = internal; then
+  RASQAL_VERSION=`$rasqal_dir/rasqal-src-config --version 2>/dev/null`
 
-  RASQAL_VERSION_DEC=`$RASQAL_CONFIG --version-decimal`
-  RASQAL_MIN_VERSION_DEC=`echo $RASQAL_MIN_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
-  RASQAL_MAX_VERSION_DEC=`echo $RASQAL_MAX_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/$rasqal_dir/src $LIBRDF_INTERNAL_CPPFLAGS"
+  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/$rasqal_dir/src/librasqal.la $LIBRDF_INTERNAL_LIBS"
 
-  if test "X$with_rasqal" = Xauto; then
-    if test "X$RASQAL_VERSION" -a $RASQAL_VERSION_DEC -ge $RASQAL_MIN_VERSION_DEC -a $RASQAL_VERSION_DEC -le $RASQAL_MAX_VERSION_DEC; then
-      with_rasqal=system
-    else
-      with_rasqal=internal
-    fi
-  elif test $with_rasqal = system; then
-    if test $RASQAL_VERSION_DEC -lt $RASQAL_MIN_VERSION_DEC -o $RASQAL_VERSION_DEC -gt $RASQAL_MAX_VERSION_DEC; then
-      AC_MSG_WARN(System rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
-      AC_MSG_WARN(Proceeding anyway since --with-rasqal=system was given)
-      AC_MSG_WARN(To use the internal rasqal use --with-rasqal=internal)
-      AC_MSG_WARN(or omit any --with-rasqal argument.)
-    fi
-  fi
-fi
-
-if test "X$with_rasqal" = Xinternal; then
   rdf_query="rasqal(internal)"
+  AC_MSG_RESULT(maintainer $RASQAL_VERSION)
 else
+  with_rasqal=system
+  if $PKG_CONFIG rasqal --exists; then
+    :
+  else
+    AC_MSG_ERROR(Rasqal is not installed - see http://librdf.org/rasqal/ to get a version in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
+  fi
+
+  RASQAL_VERSION=`$PKG_CONFIG rasqal --modversion 2>/dev/null`
+
+  if $PKG_CONFIG rasqal --atleast-version=$RASQAL_MIN_VERSION --max-version=$RASQAL_MAX_VERSION; then
+    :
+  else
+    AC_MSG_ERROR(Installed rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
+  fi
+
+  LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG rasqal --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+  LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG rasqal --libs` $LIBRDF_EXTERNAL_LIBS"
+
   rdf_query="rasqal(system $RASQAL_VERSION)"
+  AC_MSG_RESULT(system $RASQAL_VERSION)
 fi
 AC_SUBST(with_rasqal)
-
 
 
 dnl Checks for modules
@@ -969,25 +946,6 @@ if test "x" = "y"; then
 fi
 
 
-dnl RDF query
-rasqal_dir=
-config_subdir_rasqal=no
-
-if test $with_rasqal = internal; then
-  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/rasqal/src $LIBRDF_INTERNAL_CPPFLAGS"
-  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/rasqal/src/librasqal.la $LIBRDF_INTERNAL_LIBS"
-  rasqal_dir=rasqal
-  config_subdir_rasqal=yes
-else
-  LIBRDF_EXTERNAL_CPPFLAGS="`$RASQAL_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
-  LIBRDF_EXTERNAL_LIBS="`$RASQAL_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
-fi
-
-if test "$config_subdir_rasqal" = yes -o "$USE_MAINTAINER_MODE" = yes; then
-  AC_CONFIG_SUBDIRS(rasqal)
-fi
-
-
 
 #LIBRDF_EXTERNAL_CPPFLAGS="$LIBRDF_EXTERNAL_CPPFLAGS $LIBRDF_CPPFLAGS"
 LIBRDF_EXTERNAL_LIBS="$LIBRDF_EXTERNAL_LIBS $LIBRDF_LIBS"
@@ -995,17 +953,6 @@ LIBRDF_EXTERNAL_LIBS="$LIBRDF_EXTERNAL_LIBS $LIBRDF_LIBS"
 # Everything except things with .pc files (raptor and rasqal)
 # 3store uses it but is optional and thus tricky to specify this way
 LIBRDF_PKGCONFIG_PRIVATE_LIBS=$LIBRDF_LIBS
-
-dnl Local sub-packages in sub directories needed to build librdf
-dnl Ordering constraints: rasqal needs raptor
-if test "$USE_MAINTAINER_MODE" = yes; then 
-  LOCAL_SUBDIRS="raptor rasqal"
-else
-  LOCAL_SUBDIRS="$raptor_dir $rasqal_dir"
-fi
-
-AC_SUBST(LOCAL_SUBDIRS)
-
 
 # Make final changes to cflags
 CFLAGS="-DLIBRDF_INTERNAL=1 $CFLAGS"
