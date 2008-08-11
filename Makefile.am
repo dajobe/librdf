@@ -36,19 +36,7 @@ pkgconfig_DATA = redland.pc
 DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
 
 # Subdirectories to build/install/distribute etc.
-#
-# NOTE: A full distribution tarball cannot be made inside a 'make distcheck'
-# when raptor and rasqal are installed system wide, since then the
-# subdirs are not configured or included in the build tree, when it
-# is separate from the source tree.
-#
-# always make the release tarball from the top level and
-# use configure --with-raptor=internal and --with-rasqal=internal
-# OR --enable-maintainer-mode
-# to ensure that the raptor and rasqal subdirectories are called
-# as CONFIG_SUBDIR directories.
-#
-SUBDIRS=@LOCAL_SUBDIRS@ librdf examples utils demos docs data
+SUBDIRS=librdf examples utils demos docs data
 
 EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
 ChangeLog.5 ChangeLog.6 ChangeLog.7 \
