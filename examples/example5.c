@@ -71,7 +71,7 @@ main(int argc, char *argv[])
   librdf_free_parser(parser);
   librdf_free_uri(uri);
 
-  query=librdf_new_query(world, "rdql", NULL, NULL, query_string);
+  query=librdf_new_query(world, "rdql", NULL, query_string, NULL);
   
   results=librdf_model_query_execute(model, query);
   if(!results) {
