@@ -140,14 +140,14 @@ librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
 
   /* allocate static nodes and histogram nodes if capacity is fixed */
   if(capacity) {
-    new_cache->nodes=LIBRDF_CALLOC(array, capacity, sizeof(librdf_cache_node));
+    new_cache->nodes=(librdf_cache_node*)LIBRDF_CALLOC(array, capacity, sizeof(librdf_cache_node));
     if(!new_cache->nodes) {
       librdf_free_cache(new_cache);
       new_cache=NULL;
       goto unlock;
     }
   
-    new_cache->hists=LIBRDF_CALLOC(array, capacity, 
+    new_cache->hists=(librdf_cache_hist_node*)LIBRDF_CALLOC(array, capacity, 
                                    sizeof(librdf_cache_hist_node));
     if(!new_cache->hists) {
       librdf_free_cache(new_cache);
@@ -302,7 +302,7 @@ librdf_cache_set_common(librdf_cache *cache,
 
   if(!cache->capacity) {
     /* dynamic cache capacity */
-    node=LIBRDF_CALLOC(librdf_cache_node, 1, sizeof(librdf_cache_node));
+    node=(librdf_cache_node*)LIBRDF_CALLOC(librdf_cache_node, 1, sizeof(librdf_cache_node));
     if(!node) {
       rc=1;
       goto unlock;
@@ -449,7 +449,7 @@ librdf_cache_get(librdf_cache *cache, void* key, size_t key_size,
     if(cache->capacity)
       node->usage++;
     
-    an_object=node->value;
+    an_object=(librdf_cache_node*)node->value;
     if(value_size_p)
       *value_size_p=node->value_size;
 

@@ -92,9 +92,9 @@ librdf_init_concepts(librdf_world *world)
 
   /* Create arrays for the M&S and Schema resource nodes and uris */
   world->concept_uris=
-    LIBRDF_CALLOC(ptrarray, LIBRDF_CONCEPT_LAST+1, sizeof(librdf_uri*));
+    (librdf_uri**)LIBRDF_CALLOC(ptrarray, LIBRDF_CONCEPT_LAST+1, sizeof(librdf_uri*));
   world->concept_resources=
-    LIBRDF_CALLOC(ptrarray, LIBRDF_CONCEPT_LAST+1, sizeof(librdf_node*));
+    (librdf_node**)LIBRDF_CALLOC(ptrarray, LIBRDF_CONCEPT_LAST+1, sizeof(librdf_node*));
   if(!world->concept_uris || !world->concept_resources)
     LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Out of memory creating node/uri arrays");
 
