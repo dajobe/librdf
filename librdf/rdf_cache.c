@@ -625,7 +625,7 @@ main(int argc, char *argv[])
           failures++;
           break;
         }
-        if(strcmp(value, expected_value)) {
+        if(strcmp((const char*)value, expected_value)) {
           fprintf(stderr, "%s: librdf_cache_get returned '%s' expected '%s'\n",
                   program, (char*)value, expected_value);
           failures++;
