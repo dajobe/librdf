@@ -32,6 +32,12 @@
 #ifndef RDF_INTERNAL_H
 #define RDF_INTERNAL_H
 
+#ifdef __cplusplus
+#define REDLAND_EXTERN_C extern "C"
+#else
+#define REDLAND_EXTERN_C
+#endif
+
 /* Can be over-ridden or undefined in a config.h file or -Ddefine */
 #ifndef REDLAND_INLINE
 #define REDLAND_INLINE inline

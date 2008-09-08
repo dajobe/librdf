@@ -28,9 +28,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#define REDLAND_EXTERN_C extern "C"
-#else
-#define REDLAND_EXTERN_C
 #endif
 
 #include <stdio.h>
