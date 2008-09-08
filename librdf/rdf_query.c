@@ -130,6 +130,7 @@ librdf_delete_query_factories(librdf_world *world)
  * Register a query factory.
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_query_register_factory(librdf_world *world, const char *name,
                               const unsigned char *uri_string,

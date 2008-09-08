@@ -211,6 +211,7 @@ librdf_free_hash_datum(librdf_hash_datum *datum)
  * Register a hash factory.
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_hash_register_factory(librdf_world *world, const char *name,
                              void (*factory) (librdf_hash_factory*)) 

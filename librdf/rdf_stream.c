@@ -70,6 +70,7 @@ static librdf_statement* librdf_stream_update_current_statement(librdf_stream* s
  *
  * Return value:  a new #librdf_stream object or NULL on failure
  **/
+REDLAND_EXTERN_C
 librdf_stream*
 librdf_new_stream(librdf_world *world, 
                   void* context,

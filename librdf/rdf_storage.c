@@ -245,6 +245,7 @@ librdf_storage_load_module(librdf_world *world,
  *
  * Register a storage factory.
  **/
+REDLAND_EXTERN_C
 void
 librdf_storage_register_factory(librdf_world* world,
                                 const char *name, const char *label,

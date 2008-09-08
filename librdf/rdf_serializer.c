@@ -107,6 +107,7 @@ librdf_free_serializer_factory(librdf_serializer_factory *factory)
  * Register a serializer factory .
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_serializer_register_factory(librdf_world *world,
                                    const char *name, const char *label,
@@ -712,6 +713,7 @@ librdf_serializer_serialize_model_to_iostream(librdf_serializer* serializer,
  * Set the serializer error handling function.
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_serializer_set_error(librdf_serializer* serializer, void *user_data,
                             void (*error_fn)(void *user_data, const char *msg, ...))
@@ -730,6 +732,7 @@ librdf_serializer_set_error(librdf_serializer* serializer, void *user_data,
  * Set the serializer warning handling function.
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data,
                               void (*warning_fn)(void *user_data, const char *msg, ...))

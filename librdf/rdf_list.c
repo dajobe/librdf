@@ -395,6 +395,7 @@ librdf_list_size(librdf_list* list)
  * librdf_list_contains().
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_list_set_equals(librdf_list* list, 
                        int (*equals) (void* data1, void *data2)) 
@@ -581,6 +582,7 @@ librdf_list_iterator_finished(void* iterator)
  * Apply a function for each data item in a librdf_list.
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_list_foreach(librdf_list* list, void (*fn)(void *, void *),
                     void *user_data) 

@@ -103,6 +103,7 @@ librdf_free_parser_factory(librdf_parser_factory *factory)
  * Register a parser factory .
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_parser_register_factory(librdf_world *world,
                                const char *name, const char *label, 
@@ -630,6 +631,7 @@ librdf_parser_parse_file_handle_into_model(librdf_parser* parser, FILE *fh,
  * Set the parser error handling function.
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_parser_set_error(librdf_parser* parser, void *user_data,
                         void (*error_fn)(void *user_data, const char *msg, ...))
@@ -648,6 +650,7 @@ librdf_parser_set_error(librdf_parser* parser, void *user_data,
  * Set the parser warning handling function.
  *
  **/
+REDLAND_EXTERN_C
 void
 librdf_parser_set_warning(librdf_parser* parser, void *user_data,
                           void (*warning_fn)(void *user_data, const char *msg, ...))

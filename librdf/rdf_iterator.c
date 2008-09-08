@@ -56,6 +56,7 @@ static void* librdf_iterator_update_current_element(librdf_iterator* iterator);
  * 
  * Return value: a new #librdf_iterator object or NULL on failure
 **/
+REDLAND_EXTERN_C
 librdf_iterator*
 librdf_new_iterator(librdf_world *world,
                     void* context,

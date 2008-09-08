@@ -106,6 +106,7 @@ librdf_free_model_factory(librdf_model_factory* factory)
  * Register a model factory.
  * 
  **/
+REDLAND_EXTERN_C
 void
 librdf_model_register_factory(librdf_world *world, 
                               const char *name, const char *label,
