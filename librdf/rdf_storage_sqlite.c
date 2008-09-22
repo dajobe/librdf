@@ -1440,6 +1440,8 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
       if(!node)
         /* finished on error */
         return 1;
+      if(*context_node)
+        librdf_free_node(*context_node);
       *context_node=node;
     }
   }
