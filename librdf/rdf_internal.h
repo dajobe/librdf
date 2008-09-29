@@ -80,7 +80,7 @@ void librdf_system_free(void *ptr);
 #define SYSTEM_FREE(ptr)   free(ptr)
 
 #ifndef LIBRDF_ASSERT_DIE
-#define LIBRDF_ASSERT_DIE abort();
+#define LIBRDF_ASSERT_DIE
 #endif
 
 #endif
