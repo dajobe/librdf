@@ -220,7 +220,9 @@ librdf_storage_trees_add_statement_internal(librdf_storage* storage,
     
   /* spo_tree owns statement */
   status = librdf_avltree_add(graph->spo_tree, statement);
-  if (status) /* LIBRDF_AVLTREE_ENOMEM or LIBRDF_AVLTREE_EXISTS */
+  if (status == LIBRDF_AVLTREE_EXISTS)
+    return 0;
+  else if (status != 0) /* LIBRDF_AVLTREE_ENOMEM */
     return status;
     
   /* others have null deleters */

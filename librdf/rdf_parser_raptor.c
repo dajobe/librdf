@@ -299,6 +299,11 @@ librdf_parser_raptor_new_statement_handler(void *context,
     if(rc)
       librdf_free_statement(statement);
   }
+  if(rc) {
+    librdf_log(world,
+               0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
+               "Cannot add statement to model");
+  }
 }
 
 
