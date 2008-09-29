@@ -317,7 +317,7 @@ rdf_iterator_test: rdf_iterator.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_iterator.c librdf.la
 
 rdf_avltree_test: rdf_avltree.c librdf.la
-	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_avltree.c librdf.la
+	$(COMPILE_LINK) -DLIBRDF_DEBUG=2 -DSTANDALONE $(srcdir)/rdf_avltree.c librdf.la
 
 rdf_init_test: rdf_init.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_init.c librdf.la

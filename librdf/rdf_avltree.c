@@ -54,8 +54,6 @@
 #define LIBRDF_AVLTREE_DEBUG1(msg)
 #endif
 
-
-#ifndef STANDALONE
 typedef struct librdf_avltree_node_s librdf_avltree_node;
 
 /* AVL-tree node */
@@ -285,7 +283,7 @@ librdf_avltree_visit(librdf_avltree* tree,
 }
 
 
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+#if STANDALONG || defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
 static void
 librdf_avltree_print_node(librdf_avltree_node* node) 
 {
@@ -320,8 +318,6 @@ librdf_avltree_check_node(librdf_avltree* tree, librdf_avltree_node* node,
     }
   }
 }
-#endif
-
 #endif
 
 
@@ -1252,7 +1248,7 @@ main(int argc, char *argv[])
 #define ITEM_COUNT 8
   const char *items[ITEM_COUNT+1] = { "ron", "amy", "jen", "bij", "jib", "daj", "jim", "def", NULL };
 #define DELETE_COUNT 2
-  const char *delete_items[DELETE_COUNT+1] = { "jen", "jim", NULL };
+  const char *delete_items[DELETE_COUNT+1] = { "jen", "ron", NULL };
 #define RESULT_COUNT (ITEM_COUNT-DELETE_COUNT)
   const char *results[RESULT_COUNT+1] = { "amy", "bij", "daj", "def", "jib", "ron", NULL};
 
@@ -1305,8 +1301,8 @@ main(int argc, char *argv[])
   vs.count=0;
   librdf_avltree_visit(tree, print_string, &vs);
 
-  fprintf(stderr, "%s: Dumping tree\n", program);
-  librdf_avltree_dump(tree, stderr);
+  //fprintf(stderr, "%s: Dumping tree\n", program);
+  //librdf_avltree_dump(tree, stderr, print_string);
 #endif
 
 
