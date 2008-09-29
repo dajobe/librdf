@@ -600,10 +600,14 @@ librdf_avltree_delete_internal(librdf_avltree* tree,
     if(pr_q->right == NULL) {
       LIBRDF_AVLTREE_DEBUG1("right subtree null\n");
       *node_pp= pr_q->left;
+      if(*node_pp)
+        (*node_pp)->parent = pr_q->parent;
       *rebalancing_p= TRUE;
     } else if(pr_q->left == NULL) {
       LIBRDF_AVLTREE_DEBUG1("right subtree non-null, left subtree null\n");
       *node_pp= pr_q->right;
+      if(*node_pp)
+        (*node_pp)->parent = pr_q->parent;
       *rebalancing_p= TRUE;
     } else {
       LIBRDF_AVLTREE_DEBUG1("neither subtree null\n");
@@ -639,11 +643,14 @@ librdf_avltree_delete_internal2(librdf_avltree* tree,
       librdf_avltree_balance_right(tree, ppr_r, rebalancing_p);
 
   } else {
+    librdf_avltree_node* parent = (*ppr_r)->parent;
     rdata=(*ppr_q)->data;
 
     (*ppr_q)->data= (*ppr_r)->data;
     *ppr_q= *ppr_r;
     *ppr_r= (*ppr_r)->left;
+    if (*ppr_r)
+      (*ppr_r)->parent = parent;
     *rebalancing_p= TRUE;
   }
 
@@ -1248,9 +1255,9 @@ main(int argc, char *argv[])
 #define ITEM_COUNT 8
   const char *items[ITEM_COUNT+1] = { "ron", "amy", "jen", "bij", "jib", "daj", "jim", "def", NULL };
 #define DELETE_COUNT 2
-  const char *delete_items[DELETE_COUNT+1] = { "jen", "ron", NULL };
+  const char *delete_items[DELETE_COUNT+1] = { "daj", "jim", NULL };
 #define RESULT_COUNT (ITEM_COUNT-DELETE_COUNT)
-  const char *results[RESULT_COUNT+1] = { "amy", "bij", "daj", "def", "jib", "ron", NULL};
+  const char *results[RESULT_COUNT+1] = { "amy", "bij", /*"daj",*/ "def", "jen", "jib", /*"jim",*/"ron", NULL};
 
   librdf_world* world;
   librdf_avltree* tree;
