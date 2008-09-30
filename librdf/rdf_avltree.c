@@ -283,7 +283,7 @@ librdf_avltree_visit(librdf_avltree* tree,
 }
 
 
-#if STANDALONG || defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+#if STANDALONE || defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
 static void
 librdf_avltree_print_node(librdf_avltree_node* node) 
 {
