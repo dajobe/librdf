@@ -1207,6 +1207,20 @@ librdf_query_rasqal_constructor(librdf_world *world)
     LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
     return;
   }
+
+  /* Make sure rasqal works with the same raptor instance as everyone else.
+   * In ifndef RAPTOR_V2_AVAILABLE case, raptor_world_ptr is NULL
+   * -> ok to use with rasqal_world_set_raptor(),
+   * rasqal should also have been built without RAPTOR_V2_AVAILABLE ->
+   * rasqal_world_open() uses raptor_init() which just increments
+   * the refcount on raptor instance already created in librdf_raptor_init().
+   */
+  rasqal_world_set_raptor(world->rasqal_world_ptr, world->raptor_world_ptr);
+  
+  if(rasqal_world_open(world->rasqal_world_ptr)) {
+    LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
+    return;
+  }
   
   rasqal_set_triples_source_factory(world->rasqal_world_ptr, rasqal_redland_register_triples_source_factory, world);
 

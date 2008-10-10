@@ -64,7 +64,11 @@ librdf_serializer_raptor_init(librdf_serializer *serializer, void *context)
   scontext->serializer = serializer;
   scontext->serializer_name=scontext->serializer->factory->name;
 
-  scontext->rdf_serializer=raptor_new_serializer(scontext->serializer_name);
+#ifdef RAPTOR_V2_AVAILABLE
+  scontext->rdf_serializer = raptor_new_serializer_v2(serializer->world->raptor_world_ptr, scontext->serializer_name);
+#else
+  scontext->rdf_serializer = raptor_new_serializer(scontext->serializer_name);
+#endif
   if(!scontext->rdf_serializer)
     return 1;
 
@@ -112,7 +116,11 @@ librdf_serializer_raptor_get_feature(void *context, librdf_uri* feature) {
   if(!uri_string)
     return NULL;
   
-  feature_i=raptor_feature_from_uri((raptor_uri*)feature);
+#ifdef RAPTOR_V2_AVAILABLE
+  feature_i = raptor_feature_from_uri_v2(scontext->serializer->world->raptor_world_ptr, (raptor_uri*)feature);
+#else
+  feature_i = raptor_feature_from_uri((raptor_uri*)feature);
+#endif
   if((int)feature_i >= 0) {
     int value=raptor_serializer_get_feature(scontext->rdf_serializer, feature_i);
     sprintf((char*)intbuffer, "%d", value);
@@ -136,7 +144,11 @@ librdf_serializer_raptor_set_feature(void *context,
     return 1;
 
   /* try a raptor feature */
-  feature_i=raptor_feature_from_uri((raptor_uri*)feature);
+#ifdef RAPTOR_V2_AVAILABLE
+  feature_i = raptor_feature_from_uri_v2(scontext->serializer->world->raptor_world_ptr, (raptor_uri*)feature);
+#else
+  feature_i = raptor_feature_from_uri((raptor_uri*)feature);
+#endif
   if((int)feature_i < 0)
     return 1;
   
@@ -517,6 +529,17 @@ librdf_serializer_raptor_constructor(librdf_world *world)
     const char *mime_type=NULL;
     const unsigned char *uri_string=NULL;
 
+#ifdef RAPTOR_V2_AVAILABLE
+    if(raptor_serializers_enumerate_v2(world->raptor_world_ptr,
+                                       i, &syntax_name, &syntax_label, 
+                                       &mime_type, &uri_string)) {
+      /* reached the end of the serializers, now register the default one */
+      i=0;
+      raptor_serializers_enumerate_v2(world->raptor_world_ptr,
+                                      i, &syntax_name, &syntax_label,
+                                      &mime_type, &uri_string);
+    }
+#else
     if(raptor_serializers_enumerate(i, &syntax_name, &syntax_label, 
                                     &mime_type, &uri_string)) {
       /* reached the end of the serializers, now register the default one */
@@ -524,6 +547,7 @@ librdf_serializer_raptor_constructor(librdf_world *world)
       raptor_serializers_enumerate(i, &syntax_name, &syntax_label,
                                    &mime_type, &uri_string);
     }
+#endif
     
     librdf_serializer_register_factory(world, syntax_name, syntax_label,
                                        mime_type, uri_string,

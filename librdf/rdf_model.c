@@ -1629,8 +1629,14 @@ librdf_model_load(librdf_model* model, librdf_uri *uri,
     mime_type=NULL;
 
   if(!name)
-    name=raptor_guess_parser_name((raptor_uri*)type_uri, mime_type,
-                                  NULL, 0, librdf_uri_as_string(uri));
+#ifdef RAPTOR_V2_AVAILABLE
+    name = raptor_guess_parser_name_v2(model->world->raptor_world_ptr,
+                                       (raptor_uri*)type_uri, mime_type,
+                                       NULL, 0, librdf_uri_as_string(uri));
+#else
+    name = raptor_guess_parser_name((raptor_uri*)type_uri, mime_type,
+                                    NULL, 0, librdf_uri_as_string(uri));
+#endif
   parser=librdf_new_parser(model->world, name, NULL, NULL);
   if(!parser)
     return 1;

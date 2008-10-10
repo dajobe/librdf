@@ -27,6 +27,7 @@ lib_LTLIBRARIES = librdf.la
 
 include_HEADERS = redland.h librdf.h \
 rdf_init.h \
+rdf_raptor.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
 rdf_model.h \
 rdf_iterator.h \
@@ -42,7 +43,7 @@ rdf_hash.h
 
 noinst_HEADERS = win32_rdf_config.h
 
-librdf_la_SOURCES = rdf_init.c \
+librdf_la_SOURCES = rdf_init.c rdf_raptor.c \
 rdf_uri.c rdf_node.c rdf_statement.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
 rdf_model.c rdf_model_storage.c \
@@ -89,6 +90,7 @@ rdf_model_internal.h \
 rdf_node_internal.h \
 rdf_parser_internal.h \
 rdf_query_internal.h \
+rdf_raptor_internal.h \
 rdf_serializer_internal.h \
 rdf_statement_internal.h \
 rdf_storage_internal.h \

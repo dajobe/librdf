@@ -141,18 +141,31 @@ librdf_new_sql_config(librdf_world* world,
   }
   
   uri_string=raptor_uri_filename_to_uri_string(config->filename);
-  uri=raptor_new_uri(uri_string);
-  base_uri=raptor_uri_copy(uri);
+#ifdef RAPTOR_V2_AVAILABLE
+  uri = raptor_new_uri_v2(world->raptor_world_ptr, uri_string);
+  base_uri = raptor_uri_copy_v2(world->raptor_world_ptr, uri);
+
+  rdf_parser = raptor_new_parser_v2(world->raptor_world_ptr, "turtle");
+#else
+  uri = raptor_new_uri(uri_string);
+  base_uri = raptor_uri_copy(uri);
+
+  rdf_parser = raptor_new_parser("turtle");
+#endif
   
-  rdf_parser=raptor_new_parser("turtle");
   raptor_set_statement_handler(rdf_parser, config,
                                librdf_sql_config_store_triple);
   raptor_parse_file(rdf_parser, uri, base_uri);
   raptor_free_parser(rdf_parser);
   
+#ifdef RAPTOR_V2_AVAILABLE
+  raptor_free_uri_v2(world->raptor_world_ptr, base_uri);
+  raptor_free_uri_v2(world->raptor_world_ptr, uri);
+#else
   raptor_free_uri(base_uri);
-  raptor_free_memory(uri_string);
   raptor_free_uri(uri);
+#endif
+  raptor_free_memory(uri_string);
 
   /* Check all values are given */
   for(i=0; i < config->predicates_count; i++) {

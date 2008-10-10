@@ -285,6 +285,7 @@ extern const unsigned int librdf_version_decimal;
 #include <rdf_model.h>
 #include <rdf_storage.h>
 #include <rdf_parser.h>
+#include <rdf_raptor.h>
 #include <rdf_serializer.h>
 #include <rdf_stream.h>
 #include <rdf_query.h>
@@ -301,6 +302,7 @@ extern const unsigned int librdf_version_decimal;
 #include <Redland/rdf_model.h>
 #include <Redland/rdf_storage.h>
 #include <Redland/rdf_parser.h>
+#include <Redland/rdf_raptor.h>
 #include <Redland/rdf_serializer.h>
 #include <Redland/rdf_stream.h>
 #include <Redland/rdf_query.h>

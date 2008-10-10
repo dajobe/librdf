@@ -140,6 +140,10 @@ struct librdf_world_s
 
   /* rasqal world object */
   rasqal_world* rasqal_world_ptr;
+  
+  /* raptor world object */
+  raptor_world* raptor_world_ptr;
+  int raptor_world_allocated_here;
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);

@@ -165,6 +165,10 @@ static const char *default_storage_options="hash-type='bdb',dir='.'";
 static int
 log_handler(void *user_data, librdf_log_message *message) 
 {
+#ifdef RAPTOR_V2_AVAILABLE
+  librdf_world* world = (librdf_world*)user_data;
+#endif
+
   /* int code=message->code; */ /* The error code */
   raptor_locator *locator=(raptor_locator*)(message->locator);
 
@@ -178,7 +182,11 @@ log_handler(void *user_data, librdf_log_message *message)
     fprintf(stderr, "%s: Error - ", program);
 
   if(locator) { /* && message->facility == LIBRDF_FROM_PARSER) */
+#ifdef RAPTOR_V2_AVAILABLE
+    raptor_print_locator_v2(librdf_world_get_raptor(world), stderr, locator);
+#else
     raptor_print_locator(stderr, locator); 
+#endif
     fputc(':', stderr);
     fputc(' ', stderr);
  }
@@ -295,7 +303,7 @@ main(int argc, char *argv[])
 
   world=librdf_new_world();
 
-  librdf_world_set_logger(world, NULL, log_handler);
+  librdf_world_set_logger(world, world, log_handler);
 
   librdf_world_open(world);
 

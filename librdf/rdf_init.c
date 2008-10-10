@@ -178,11 +178,6 @@ librdf_new_world(void) {
 void
 librdf_free_world(librdf_world *world)
 {
-  /* NOTE: raptor is always initialised as a parser and may
-   * be also used as a serializer, but it is NOT finished
-   * in the serializer_raptor registration.  Therefore, always
-   * keep the parser class finishing after the serializer.
-   */
   librdf_finish_serializer(world);
   librdf_finish_parser(world);
 
@@ -199,6 +194,8 @@ librdf_free_world(librdf_world *world)
   librdf_finish_hash(world);
 
   librdf_finish_digest(world);
+
+  librdf_finish_raptor(world);
 
 #ifdef WITH_THREADS
    if (world->mutex)
@@ -262,8 +259,12 @@ librdf_world_open(librdf_world *world)
     return;
   
   librdf_world_init_mutex(world);
+
+  /* Initialize raptor library first. Used by many other classes. */
+  if(librdf_init_raptor(world))
+    return;
   
-  /* Digests first, lots of things use these */
+  /* Digests second, lots of things use these */
   librdf_init_digest(world);
 
   /* Hash next, needed for URIs */
@@ -278,24 +279,9 @@ librdf_world_open(librdf_world *world)
   librdf_init_model(world);
   librdf_init_storage(world);
 
-  /* NOTE: raptor is always initialised as a parser and may
-   * be also used as a serializer, but it is NOT initialised
-   * in the serializer_raptor registration.  Therefore, always
-   * keep the parser class initialising before the serializer.
-   */
   librdf_init_parser(world);
   librdf_init_serializer(world);
 
-  /* NOTE: Since initialising rasqal calls raptor to create URIs,
-   * rasqal must be initialised after raptor so that the raptor URI
-   * implementation is changed with raptor_uri_set_handler() in
-   * librdf_parser_raptor_constructor() before rasqal tries to create
-   * URIs.
-   *
-   * Otherwise URIs would be allocated with raptor as char* strings
-   * and then attempted to be freed later as librdf_uri*.  Which
-   * would be bad.
-   */
   librdf_init_query(world);
 }
 

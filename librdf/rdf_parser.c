@@ -728,23 +728,32 @@ librdf_parser_get_accept_header(librdf_parser* parser)
 
 /**
  * librdf_parser_guess_name:
+ * @world: librdf_world object
  * @mime_type: MIME type of syntax or NULL
  * @buffer: content buffer or NULL
  * @identifier: content identifier or NULL
  * 
- * Get a parser name for content with type or identiifer
+ * Get a parser name for content with type or identifier
  * 
  * Return value: a parser name or NULL if nothing was guessable
  **/
 const char*
-librdf_parser_guess_name(const char *mime_type,
+librdf_parser_guess_name(librdf_world* world,
+                         const char *mime_type,
                          const unsigned char *buffer, 
                          const unsigned char *identifier)
 {
   int len = buffer ? strlen((const char *)buffer) : 0;
+#ifdef RAPTOR_V2_AVAILABLE
+  return raptor_guess_parser_name_v2(world->raptor_world_ptr,
+                                     NULL, mime_type, buffer,
+                                     len,
+                                     identifier);
+#else
   return raptor_guess_parser_name(NULL, mime_type, buffer,
                                   len,
                                   identifier);
+#endif
 }
 
 
