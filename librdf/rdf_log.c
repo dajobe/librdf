@@ -69,7 +69,7 @@ static const char * const log_level_names[LIBRDF_LOG_LAST+1]={
  * @locator: raptor_locator if available or NULL
  * @message: message to record
  *
- * INTERNAL - Log a message.
+ * Log a message.
  *
  * If world is NULL, the error ocurred in redland startup before
  * the world was created.
@@ -163,7 +163,7 @@ librdf_log_simple(librdf_world* world, int code,
  * @locator: raptor_locator if available or NULL
  * @message: message to record
  *
- * INTERNAL - Log a message.
+ * Log a message.
  *
  * If world is NULL, the error ocurred in redland startup before
  * the world was created.

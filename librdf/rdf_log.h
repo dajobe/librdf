@@ -161,6 +161,11 @@ const char * librdf_log_message_message(librdf_log_message *message);
 REDLAND_API
 raptor_locator* librdf_log_message_locator(librdf_log_message *message);
 
+/* logging functions */
+REDLAND_API
+void librdf_log_simple(librdf_world* world, int code, librdf_log_level level, librdf_log_facility facility, void *locator, const char *message);
+REDLAND_API
+void librdf_log(librdf_world* world, int code, librdf_log_level level, librdf_log_facility facility, void *locator, const char *message, ...) REDLAND_PRINTF_FORMAT(6, 7);
 
 #ifdef __cplusplus
 }
