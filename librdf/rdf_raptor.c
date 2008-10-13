@@ -30,6 +30,10 @@
 #include <win32_rdf_config.h>
 #endif
 
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h> /* for abort() as used in errors */
+#endif
+
 #include <redland.h>
 
 
@@ -172,7 +176,7 @@ static const raptor_uri_handler librdf_raptor_uri_handler = {
  * externally with librdf_world_set_raptor() (and using raptor v2 APIs).
  * Sets raptor uri handlers to work with #librdf_uri objects.
  **/
-int
+void
 librdf_init_raptor(librdf_world* world)
 {
 #ifdef RAPTOR_V2_AVAILABLE
@@ -180,15 +184,13 @@ librdf_init_raptor(librdf_world* world)
     world->raptor_world_ptr = raptor_new_world();
     world->raptor_world_allocated_here = 1;
     if(!world->raptor_world_ptr || raptor_world_open(world->raptor_world_ptr))
-      return 1;
+      abort();
     raptor_uri_set_handler_v2(world->raptor_world_ptr, &librdf_raptor_uri_handler, world);
   }
 #else
   raptor_init();
   raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
 #endif
-
-  return 0;
 }
 
 

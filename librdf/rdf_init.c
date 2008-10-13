@@ -261,8 +261,7 @@ librdf_world_open(librdf_world *world)
   librdf_world_init_mutex(world);
 
   /* Initialize raptor library first. Used by many other classes. */
-  if(librdf_init_raptor(world))
-    return;
+  librdf_init_raptor(world);
   
   /* Digests second, lots of things use these */
   librdf_init_digest(world);

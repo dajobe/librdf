@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-int librdf_init_raptor(librdf_world* world);
+void librdf_init_raptor(librdf_world* world);
 void librdf_finish_raptor(librdf_world* world);
 
 #ifdef __cplusplus
