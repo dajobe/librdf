@@ -493,6 +493,7 @@ librdf_world_get_genid(librdf_world* world)
 static librdf_world* RDF_World;
 #endif
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_init_world:
  * @digest_factory_name: Name of digest factory to use
@@ -542,7 +543,7 @@ librdf_destroy_world(void)
   abort();
 #endif
 }
-
+#endif
 
 /**
  * librdf_basename:

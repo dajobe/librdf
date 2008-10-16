@@ -386,6 +386,8 @@ librdf_free_serializer(librdf_serializer *serializer)
 
 /* methods */
 
+
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_serializer_serialize_model:
  * @serializer: the serializer
@@ -408,6 +410,7 @@ librdf_serializer_serialize_model(librdf_serializer* serializer,
                                                           handle, base_uri,
                                                           model);
 }
+#endif
 
 
 /**
@@ -701,7 +704,7 @@ librdf_serializer_serialize_model_to_iostream(librdf_serializer* serializer,
 }
 
 
-
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_serializer_set_error:
  * @serializer: the serializer
@@ -719,8 +722,10 @@ librdf_serializer_set_error(librdf_serializer* serializer, void *user_data,
                             void (*error_fn)(void *user_data, const char *msg, ...))
 {
 }
+#endif
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_serializer_set_warning:
  * @serializer: the serializer
@@ -738,6 +743,7 @@ librdf_serializer_set_warning(librdf_serializer* serializer, void *user_data,
                               void (*warning_fn)(void *user_data, const char *msg, ...))
 {
 }
+#endif
 
 
 /**

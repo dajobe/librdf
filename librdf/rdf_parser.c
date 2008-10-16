@@ -620,6 +620,7 @@ librdf_parser_parse_file_handle_into_model(librdf_parser* parser, FILE *fh,
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_parser_set_error:
  * @parser: the parser
@@ -637,8 +638,10 @@ librdf_parser_set_error(librdf_parser* parser, void *user_data,
                         void (*error_fn)(void *user_data, const char *msg, ...))
 {
 }
+#endif
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_parser_set_warning:
  * @parser: the parser
@@ -656,6 +659,7 @@ librdf_parser_set_warning(librdf_parser* parser, void *user_data,
                           void (*warning_fn)(void *user_data, const char *msg, ...))
 {
 }
+#endif
 
 
 /**

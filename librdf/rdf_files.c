@@ -53,7 +53,7 @@
 #ifndef STANDALONE
 
 
-
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_files_temporary_file_name:
  * 
@@ -122,6 +122,7 @@ HELP
 #endif
 #endif
 }
+#endif
 
 #endif
 

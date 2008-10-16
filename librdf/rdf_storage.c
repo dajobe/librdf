@@ -1505,6 +1505,7 @@ librdf_storage_context_as_stream(librdf_storage* storage, librdf_node* context)
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_storage_context_serialise:
  * @storage: #librdf_storage object
@@ -1525,6 +1526,7 @@ librdf_storage_context_serialise(librdf_storage* storage,
 
   return librdf_storage_context_as_stream(storage, context);
 }
+#endif
 
 
 /**

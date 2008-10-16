@@ -197,6 +197,7 @@ librdf_iterator_update_current_element(librdf_iterator* iterator)
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_iterator_have_elements:
  * @iterator: the #librdf_iterator object
@@ -212,6 +213,7 @@ librdf_iterator_have_elements(librdf_iterator* iterator)
 {
   return !librdf_iterator_end(iterator);
 }
+#endif
 
 
 /**

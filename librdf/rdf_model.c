@@ -749,6 +749,7 @@ librdf_model_as_stream(librdf_model* model)
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_model_serialise:
  * @model: the model object
@@ -767,6 +768,7 @@ librdf_model_serialise(librdf_model* model)
 
   return model->factory->serialise(model);
 }
+#endif
 
 
 /**
@@ -1342,6 +1344,7 @@ librdf_model_context_as_stream(librdf_model* model, librdf_node* context)
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_model_context_serialize:
  * @model: #librdf_model object
@@ -1368,6 +1371,7 @@ librdf_model_context_serialize(librdf_model* model, librdf_node* context)
 
   return model->factory->context_serialize(model, context);
 }
+#endif
 
 
 /**
