@@ -162,6 +162,8 @@ librdf_storage_file_terminate(librdf_storage* storage)
 
   if(context->storage)
      librdf_free_storage(context->storage);
+
+  LIBRDF_FREE(librdf_storage_file_instance, context);
 }
 
 

@@ -162,7 +162,7 @@ librdf_storage_trees_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_trees_terminate(librdf_storage* storage)
 {
-  /* nop */  
+  LIBRDF_FREE(librdf_storage_trees_instance, storage->instance);
 }
 
 

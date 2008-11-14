@@ -705,6 +705,8 @@ librdf_storage_postgresql_terminate(librdf_storage* storage)
 
   if(context->transaction_handle)
     librdf_storage_postgresql_transaction_rollback(storage);
+  
+  LIBRDF_FREE(librdf_storage_postgresql_instance, storage->instance);
 }
 
 /**

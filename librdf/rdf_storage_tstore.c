@@ -124,7 +124,7 @@ librdf_storage_tstore_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_tstore_terminate(librdf_storage* storage)
 {
-  /* nop */  
+  LIBRDF_FREE(context);
 }
 
 

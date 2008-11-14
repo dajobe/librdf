@@ -442,6 +442,8 @@ librdf_storage_hashes_terminate(librdf_storage* storage)
 
   if(context->name)
     LIBRDF_FREE(cstring, context->name);
+
+  LIBRDF_FREE(librdf_storage_hashes_instance, context);
 }
 
 

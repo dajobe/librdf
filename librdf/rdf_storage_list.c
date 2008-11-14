@@ -133,7 +133,7 @@ librdf_storage_list_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_list_terminate(librdf_storage* storage)
 {
-  /* nop */  
+  LIBRDF_FREE(librdf_storage_list_instance, storage->instance);
 }
 
 

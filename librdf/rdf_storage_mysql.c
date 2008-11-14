@@ -825,6 +825,8 @@ librdf_storage_mysql_terminate(librdf_storage* storage)
 
   if(context->transaction_handle)
     librdf_storage_mysql_transaction_rollback(storage);
+  
+  LIBRDF_FREE(librdf_storage_mysql_instance, storage->instance);
 }
 
 /**
