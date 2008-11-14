@@ -180,7 +180,7 @@ typedef struct {
    * librdf_new_sql_config_for_storage
    */
   char *config_dir;
-} librdf_storage_mysql_context;
+} librdf_storage_mysql_instance;
 
 /* prototypes for local functions */
 static int librdf_storage_mysql_init(librdf_storage* storage, const char *name,
@@ -303,7 +303,7 @@ static u64
 librdf_storage_mysql_hash(librdf_storage* storage, const char *type,
                           const char *string, int length)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   u64 hash;
   byte* digest;
   uint i;
@@ -340,7 +340,7 @@ librdf_storage_mysql_hash(librdf_storage* storage, const char *type,
 static int
 librdf_storage_mysql_init_connections(librdf_storage* storage)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
 
   /* Reset connection pool */
   context->connections=NULL;
@@ -358,7 +358,7 @@ librdf_storage_mysql_init_connections(librdf_storage* storage)
 static void
 librdf_storage_mysql_finish_connections(librdf_storage* storage)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   int i;
 
   /* Loop through connections and close */
@@ -390,7 +390,7 @@ librdf_storage_mysql_finish_connections(librdf_storage* storage)
 static MYSQL*
 librdf_storage_mysql_get_handle(librdf_storage* storage)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   librdf_storage_mysql_connection* connection= NULL;
   int i;
 
@@ -475,7 +475,7 @@ librdf_storage_mysql_get_handle(librdf_storage* storage)
 static void
 librdf_storage_mysql_release_handle(librdf_storage* storage, MYSQL *handle)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   int i;
 
   if(handle == context->transaction_handle)
@@ -518,7 +518,7 @@ static int
 librdf_storage_mysql_init(librdf_storage* storage, const char *name,
                           librdf_hash* options)
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context;
   const char create_model[]="INSERT INTO Models (ID,Name) VALUES (" UINT64_T_FMT ",'%s')";
   const char check_model[]="SELECT 1 FROM Models WHERE ID=" UINT64_T_FMT " AND Name='%s'";
   int status=0;
@@ -531,6 +531,11 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   /* Must have connection parameters passed as options */
   if(!options)
     return 1;
+  
+  context=(librdf_storage_mysql_instance*)LIBRDF_CALLOC(
+    librdf_storage_mysql_instance, 1, sizeof(librdf_storage_mysql_instance));
+
+  librdf_storage_set_instance(storage, context);
 
   /* Create digest */
   if(!(context->digest=librdf_new_digest(storage->world,"MD5")))
@@ -787,7 +792,7 @@ librdf_storage_mysql_merge(librdf_storage* storage)
 static void
 librdf_storage_mysql_terminate(librdf_storage* storage)
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
 
   librdf_storage_mysql_finish_connections(storage);
 
@@ -868,7 +873,7 @@ librdf_storage_mysql_close(librdf_storage* storage)
 static int
 librdf_storage_mysql_sync(librdf_storage* storage)
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
 
   /* Make sure optimizing for bulk operations is stopped? */
   if(context->bulk)
@@ -890,7 +895,7 @@ librdf_storage_mysql_sync(librdf_storage* storage)
 static int
 librdf_storage_mysql_size(librdf_storage* storage)
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   char model_size[]="SELECT COUNT(*) FROM Statements" UINT64_T_FMT;
   char *query;
   MYSQL_RES *res;
@@ -1086,7 +1091,7 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
                                       librdf_node* node,
                                       int mode)
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance* )storage->instance;
   librdf_node_type type=librdf_node_get_type(node);
   u64 hash;
   size_t nodelen;
@@ -1353,7 +1358,7 @@ librdf_storage_mysql_store_node(librdf_storage* storage,
 static int
 librdf_storage_mysql_start_bulk(librdf_storage* storage)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   char disable_statement_keys[]="ALTER TABLE Statements" UINT64_T_FMT " DISABLE KEYS";
   char disable_literal_keys[]="ALTER TABLE Literals DISABLE KEYS";
   char lock_tables[]="LOCK TABLES Statements" UINT64_T_FMT " WRITE, Resources WRITE, Bnodes WRITE, Literals WRITE";
@@ -1433,7 +1438,7 @@ librdf_storage_mysql_start_bulk(librdf_storage* storage)
 static int
 librdf_storage_mysql_stop_bulk(librdf_storage* storage)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   char enable_statement_keys[]="ALTER TABLE Statements" UINT64_T_FMT " ENABLE KEYS";
   char enable_literal_keys[]="ALTER TABLE Literals ENABLE KEYS";
   char unlock_tables[]="UNLOCK TABLES";
@@ -1522,7 +1527,7 @@ librdf_storage_mysql_context_add_statements(librdf_storage* storage,
                                             librdf_node* context_node,
                                             librdf_stream* statement_stream)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   u64 ctxt=0;
   int helper=0;
 
@@ -1591,7 +1596,7 @@ static int
 librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
                                           u64 ctxt, librdf_statement* statement)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   char insert_statement[]="INSERT INTO Statements" UINT64_T_FMT " (Subject,Predicate,Object,Context) VALUES (" UINT64_T_FMT "," UINT64_T_FMT "," UINT64_T_FMT "," UINT64_T_FMT ")";
   u64 subject, predicate, object;
   char *query=NULL;
@@ -1671,7 +1676,7 @@ static int
 librdf_storage_mysql_contains_statement(librdf_storage* storage,
                                         librdf_statement* statement)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   char find_statement[]="SELECT 1 FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " limit 1";
   u64 subject, predicate, object;
   char *query;
@@ -1763,7 +1768,7 @@ librdf_storage_mysql_context_remove_statement(librdf_storage* storage,
                                              librdf_node* context_node,
                                              librdf_statement* statement)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   char delete_statement[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT;
   char delete_statement_with_context[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " AND Context=" UINT64_T_FMT;
   u64 subject, predicate, object, ctxt=0;
@@ -1844,7 +1849,7 @@ static int
 librdf_storage_mysql_context_remove_statements(librdf_storage* storage,
                                                librdf_node* context_node)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   char delete_context[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Context=" UINT64_T_FMT;
   char delete_model[]="DELETE FROM Statements" UINT64_T_FMT;
   char flush_statements[]="FLUSH TABLE Statements";
@@ -2013,7 +2018,7 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
                                                   librdf_node* context_node,
                                                   librdf_hash* options)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   librdf_storage_mysql_sos_context* sos;
   librdf_node *subject=NULL, *predicate=NULL, *object=NULL;
   char *query;
@@ -2472,7 +2477,7 @@ librdf_storage_mysql_find_statements_in_context_finished(void* context)
 static librdf_iterator*
 librdf_storage_mysql_get_contexts(librdf_storage* storage)
 {
-  librdf_storage_mysql_context* context=(librdf_storage_mysql_context*)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   librdf_storage_mysql_get_contexts_context* gccontext;
   const char select_contexts[]="\
 SELECT DISTINCT R.URI AS CoR, B.Name AS CoB, \
@@ -2676,7 +2681,7 @@ librdf_storage_mysql_get_feature(librdf_storage* storage, librdf_uri* feature)
 static int
 librdf_storage_mysql_transaction_start(librdf_storage* storage) 
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance* )storage->instance;
   int i;
   
   if(context->transaction_handle) {
@@ -2730,7 +2735,7 @@ librdf_storage_mysql_transaction_start_with_handle(librdf_storage* storage,
 static
 void librdf_storage_mysql_transaction_terminate(librdf_storage *storage) 
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance* )storage->instance;
   MYSQL* handle=context->transaction_handle;
   int i;
   
@@ -2773,7 +2778,7 @@ void librdf_storage_mysql_transaction_terminate(librdf_storage *storage)
 static int
 librdf_storage_mysql_transaction_commit(librdf_storage* storage) 
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance* )storage->instance;
   const char* query;
   MYSQL* handle;
   int status;
@@ -2945,7 +2950,7 @@ librdf_storage_mysql_transaction_commit(librdf_storage* storage)
 static int
 librdf_storage_mysql_transaction_rollback(librdf_storage* storage)
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance* )storage->instance;
   MYSQL* handle;
   int status;
   
@@ -2975,7 +2980,7 @@ librdf_storage_mysql_transaction_rollback(librdf_storage* storage)
 static void*
 librdf_storage_mysql_transaction_get_handle(librdf_storage* storage) 
 {
-  librdf_storage_mysql_context *context=(librdf_storage_mysql_context *)storage->context;
+  librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance* )storage->instance;
 
   return context->transaction_handle;
 }
@@ -2986,7 +2991,6 @@ librdf_storage_mysql_transaction_get_handle(librdf_storage* storage)
 static void
 librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
 {
-  factory->context_length     = sizeof(librdf_storage_mysql_context);
   factory->init               = librdf_storage_mysql_init;
   factory->terminate          = librdf_storage_mysql_terminate;
   factory->open               = librdf_storage_mysql_open;

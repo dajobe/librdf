@@ -84,7 +84,7 @@ typedef struct {
 
   PGconn* transaction_handle;
   
-} librdf_storage_postgresql_context;
+} librdf_storage_postgresql_instance;
 
 /* prototypes for local functions */
 static int librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
@@ -208,7 +208,7 @@ static u64
 librdf_storage_postgresql_hash(librdf_storage* storage, const char *type,
                                const char *string, int length)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   u64 hash;
   byte* digest;
   int i;
@@ -245,7 +245,7 @@ librdf_storage_postgresql_hash(librdf_storage* storage, const char *type,
 static int
 librdf_storage_postgresql_init_connections(librdf_storage* storage)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
 
   /* Reset connection pool */
   context->connections=NULL;
@@ -263,7 +263,7 @@ librdf_storage_postgresql_init_connections(librdf_storage* storage)
 static void
 librdf_storage_postgresql_finish_connections(librdf_storage* storage)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   int i;
 
   /* Loop through connections and close */
@@ -291,7 +291,7 @@ librdf_storage_postgresql_finish_connections(librdf_storage* storage)
 static PGconn*
 librdf_storage_postgresql_get_handle(librdf_storage* storage)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   librdf_storage_postgresql_connection* connection= NULL;
   int i;
   char conninfo[256];
@@ -376,7 +376,7 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
 static void
 librdf_storage_postgresql_release_handle(librdf_storage* storage, PGconn *handle)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   int i;
 
   /* Look for busy connection handle to drop */
@@ -414,7 +414,7 @@ static int
 librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
                                librdf_hash* options)
 {
-  librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context;
   const char create_table_statements[]="\
   CREATE TABLE Statements" UINT64_T_FMT " (\
   Subject numeric(20) NOT NULL,\
@@ -455,6 +455,11 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   char *query=NULL;
   PGresult *res;
   PGconn *handle;
+  
+  context=(librdf_storage_postgresql_instance*)LIBRDF_CALLOC(
+    librdf_storage_postgresql_instance, 1, sizeof(librdf_storage_postgresql_instance));
+
+  librdf_storage_set_instance(storage, context);
 
   /* Must have connection parameters passed as options */
   if(!options)
@@ -676,7 +681,7 @@ librdf_storage_postgresql_merge(librdf_storage* storage)
 static void
 librdf_storage_postgresql_terminate(librdf_storage* storage)
 {
-  librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
 
   librdf_storage_postgresql_finish_connections(storage);
 
@@ -742,7 +747,7 @@ librdf_storage_postgresql_close(librdf_storage* storage)
 static int
 librdf_storage_postgresql_sync(librdf_storage* storage)
 {
-  librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
 
   /* Make sure optimizing for bulk operations is stopped? */
   if(context->bulk)
@@ -762,7 +767,7 @@ librdf_storage_postgresql_sync(librdf_storage* storage)
 static int
 librdf_storage_postgresql_size(librdf_storage* storage)
 {
-  librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   char model_size[]="SELECT COUNT(*) FROM Statements" UINT64_T_FMT;
   char *query;
   PGresult *res;
@@ -1057,7 +1062,7 @@ librdf_storage_postgresql_context_add_statements(librdf_storage* storage,
                                             librdf_node* context_node,
                                             librdf_stream* statement_stream)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   u64 ctxt=0;
   int helper=0;
 
@@ -1132,7 +1137,7 @@ static int
 librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
                                           u64 ctxt, librdf_statement* statement)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   char insert_statement[]="INSERT INTO Statements" UINT64_T_FMT " (Subject,Predicate,Object,Context) VALUES (" UINT64_T_FMT "," UINT64_T_FMT "," UINT64_T_FMT "," UINT64_T_FMT ")";
   u64 subject, predicate, object;
   char *query;
@@ -1189,7 +1194,7 @@ static int
 librdf_storage_postgresql_contains_statement(librdf_storage* storage,
                                         librdf_statement* statement)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   char find_statement[]="SELECT 1 FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " limit 1";
   u64 subject, predicate, object;
   char *query;
@@ -1269,7 +1274,7 @@ librdf_storage_postgresql_context_remove_statement(librdf_storage* storage,
                                              librdf_node* context_node,
                                              librdf_statement* statement)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   char delete_statement[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT;
   char delete_statement_with_context[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " AND Context=" UINT64_T_FMT;
   u64 subject, predicate, object, ctxt=0;
@@ -1342,7 +1347,7 @@ static int
 librdf_storage_postgresql_context_remove_statements(librdf_storage* storage,
                                                librdf_node* context_node)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   char delete_context[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Context=" UINT64_T_FMT;
   char delete_model[]="DELETE FROM Statements" UINT64_T_FMT;
   u64 ctxt=0;
@@ -1479,7 +1484,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
                                                   librdf_node* context_node,
                                                   librdf_hash* options)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   librdf_storage_postgresql_sos_context* sos;
   librdf_node *subject=NULL, *predicate=NULL, *object=NULL;
   char *query;
@@ -1963,7 +1968,7 @@ librdf_storage_postgresql_find_statements_in_context_finished(void* context)
 static librdf_iterator*
 librdf_storage_postgresql_get_contexts(librdf_storage* storage)
 {
-  librdf_storage_postgresql_context* context=(librdf_storage_postgresql_context*)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   librdf_storage_postgresql_get_contexts_context* gccontext;
   const char select_contexts[]="\
 SELECT DISTINCT R.URI AS CoR, B.Name AS CoB, \
@@ -2199,7 +2204,7 @@ librdf_storage_postgresql_get_feature(librdf_storage* storage, librdf_uri* featu
 static int
 librdf_storage_postgresql_transaction_start(librdf_storage* storage) 
 {
-  librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context *)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance* )storage->instance;
   const char query[]="START TRANSACTION";
   
   if(context->transaction_handle) {
@@ -2253,7 +2258,7 @@ librdf_storage_postgresql_transaction_start_with_handle(librdf_storage* storage,
 static int
 librdf_storage_postgresql_transaction_commit(librdf_storage* storage) 
 {
-  librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context *)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance* )storage->instance;
   const char query[]="COMMIT TRANSACTION";
   PGconn* handle;
   int status;
@@ -2288,7 +2293,7 @@ librdf_storage_postgresql_transaction_commit(librdf_storage* storage)
 static int
 librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
 {
-  librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context *)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance* )storage->instance;
   const char query[]="ROLLBACK TRANSACTION";
   PGconn* handle;
   int status;
@@ -2323,7 +2328,7 @@ librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
 static void*
 librdf_storage_postgresql_transaction_get_handle(librdf_storage* storage) 
 {
-  librdf_storage_postgresql_context *context=(librdf_storage_postgresql_context *)storage->context;
+  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance* )storage->instance;
 
   return context->transaction_handle;
 }
@@ -2333,7 +2338,6 @@ librdf_storage_postgresql_transaction_get_handle(librdf_storage* storage)
 static void
 librdf_storage_postgresql_register_factory(librdf_storage_factory *factory)
 {
-  factory->context_length     = sizeof(librdf_storage_postgresql_context);
   factory->init               = librdf_storage_postgresql_init;
   factory->terminate          = librdf_storage_postgresql_terminate;
   factory->open               = librdf_storage_postgresql_open;

@@ -27,23 +27,27 @@
 extern "C" {
 #endif
 
+
+/** Opaque instance handle. */
+typedef void* librdf_storage_instance;
+
+
 /** A Storage Factory */
 struct librdf_storage_factory_s {
   /** Interface version */
   int version;
 
-  /** Name of this storage, e.g. "megastore" */
+  /** Name (ID) of this storage, e.g. "megastore" (FIXME: this needs to become a URI) */
   char* name;
 
   /** Label of this storage, e.g. "Megastore Storage" */
   char* label;
 
-  size_t context_length;
-  
-
   /* The rest of this structure is populated by the storage-specific register function */
 
-  /** Create a new storage */
+  /** Create a new storage.
+   * This method should create the required instance data and store it with
+   * librdf_storage_set_instance so it can be used in other methods. */
   int (*init)(librdf_storage* storage, const char *name, librdf_hash* options);
   
   /** Copy a storage.
@@ -52,7 +56,8 @@ struct librdf_storage_factory_s {
    */
   int (*clone)(librdf_storage* new_storage, librdf_storage* old_storage);
 
-  /** Destroy a storage */
+  /** Destroy a storage.
+   * This method is responsible for freeing all memory allocated in the init method. */
   void (*terminate)(librdf_storage* storage);
   
   /** Make storage be associated with model */

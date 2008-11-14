@@ -64,7 +64,7 @@ typedef struct
   int index_sop;
   int index_ops;
   int index_pso;
-} librdf_storage_trees_context;
+} librdf_storage_trees_instance;
 
 /* prototypes for local functions */
 static int librdf_storage_trees_init(librdf_storage* storage, const char *name, librdf_hash* options);
@@ -116,7 +116,15 @@ static int
 librdf_storage_trees_init(librdf_storage* storage, const char *name,
                          librdf_hash* options)
 {
-  librdf_storage_trees_context *context=(librdf_storage_trees_context*)storage->context;
+  const int index_spo_option = librdf_hash_get_as_boolean(options, "index-spo") > 0;
+  const int index_sop_option = librdf_hash_get_as_boolean(options, "index-sop") > 0;
+  const int index_ops_option = librdf_hash_get_as_boolean(options, "index-ops") > 0;
+  const int index_pso_option = librdf_hash_get_as_boolean(options, "index-pso") > 0;
+
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)LIBRDF_CALLOC(
+    librdf_storage_trees_instance, 1, sizeof(librdf_storage_trees_instance));
+
+  librdf_storage_set_instance(storage, context);
 
 #ifdef RDF_STORAGE_TREES_WITH_CONTEXTS
   /* Support contexts if option given */
@@ -127,11 +135,6 @@ librdf_storage_trees_init(librdf_storage* storage, const char *name,
     context->contexts=NULL;
   }
 #endif
-
-  const int index_spo_option = librdf_hash_get_as_boolean(options, "index-spo") > 0;
-  const int index_sop_option = librdf_hash_get_as_boolean(options, "index-sop") > 0;
-  const int index_ops_option = librdf_hash_get_as_boolean(options, "index-ops") > 0;
-  const int index_pso_option = librdf_hash_get_as_boolean(options, "index-pso") > 0;
 
   /* No indexing options given, index all by default */
   if (!index_spo_option && !index_sop_option && !index_ops_option && !index_pso_option) {
@@ -184,7 +187,7 @@ librdf_storage_trees_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_trees_close(librdf_storage* storage)
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
   
   librdf_storage_trees_graph_free(context->graph);
   context->graph=NULL;
@@ -201,7 +204,7 @@ librdf_storage_trees_close(librdf_storage* storage)
 static int
 librdf_storage_trees_size(librdf_storage* storage)
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
 
   return librdf_avltree_size(context->graph->spo_tree);
 }
@@ -212,7 +215,7 @@ librdf_storage_trees_add_statement_internal(librdf_storage* storage,
                                             librdf_storage_trees_graph* graph,
                                             librdf_statement* statement) 
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
   int status = 0;
   
   /* copy statement (store single copy in all trees) */
@@ -256,7 +259,7 @@ static int
 librdf_storage_trees_add_statement(librdf_storage* storage,
                                    librdf_statement* statement) 
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
   return librdf_storage_trees_add_statement_internal(storage, context->graph, statement);
 }
 
@@ -314,7 +317,7 @@ static int
 librdf_storage_trees_remove_statement(librdf_storage* storage, 
                                       librdf_statement* statement) 
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
 
   return librdf_storage_trees_remove_statement_internal(context->graph, statement);
 }
@@ -322,7 +325,7 @@ librdf_storage_trees_remove_statement(librdf_storage* storage,
 static int
 librdf_storage_trees_contains_statement(librdf_storage* storage, librdf_statement* statement)
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
 
   return (librdf_avltree_search(context->graph->spo_tree, statement) != NULL);
 }
@@ -340,7 +343,7 @@ typedef struct {
 static librdf_stream*
 librdf_storage_trees_serialise_range(librdf_storage* storage, librdf_statement* range)
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
   librdf_storage_trees_serialise_stream_context* scontext;
   librdf_stream* stream;
   int filter = 0;
@@ -503,7 +506,7 @@ librdf_storage_trees_context_add_statement(librdf_storage* storage,
                                            librdf_node* context_node,
                                            librdf_statement* statement) 
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
   
   librdf_storage_trees_graph* key=librdf_storage_trees_graph_new(storage, context_node);
   librdf_storage_trees_graph* graph=(librdf_storage_trees_graph*)
@@ -535,7 +538,7 @@ librdf_storage_trees_context_remove_statement(librdf_storage* storage,
                                               librdf_node* context_node,
                                               librdf_statement* statement) 
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
   librdf_storage_trees_graph* key=librdf_storage_trees_graph_new(storage, context_node);
   librdf_storage_trees_graph* graph=(librdf_storage_trees_graph*)
     librdf_avltree_search(context->contexts, &key);
@@ -795,7 +798,7 @@ librdf_storage_trees_avl_free(void* data)
 static librdf_storage_trees_graph*
 librdf_storage_trees_graph_new(librdf_storage* storage, librdf_node* context_node)
 {
-  librdf_storage_trees_context* context=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
   librdf_storage_trees_graph* graph=(librdf_storage_trees_graph*)LIBRDF_MALLOC(
     librdf_storage_trees_graph, sizeof(librdf_storage_trees_graph));
   
@@ -883,7 +886,7 @@ static librdf_node*
 librdf_storage_trees_get_feature(librdf_storage* storage, librdf_uri* feature)
 {
 #ifdef RDF_STORAGE_TREES_WITH_CONTEXTS
-  librdf_storage_trees_context* scontext=(librdf_storage_trees_context*)storage->context;
+  librdf_storage_trees_instance* scontext=(librdf_storage_trees_instance*)storage->instance;
   unsigned char *uri_string;
 
   if(!feature)
@@ -911,8 +914,6 @@ librdf_storage_trees_get_feature(librdf_storage* storage, librdf_uri* feature)
 static void
 librdf_storage_trees_register_factory(librdf_storage_factory *factory) 
 {
-  factory->context_length           = sizeof(librdf_storage_trees_context);
-
   factory->init                     = librdf_storage_trees_init;
   factory->clone                    = NULL;
   factory->terminate                = librdf_storage_trees_terminate;

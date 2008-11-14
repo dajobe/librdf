@@ -126,7 +126,7 @@ typedef struct
   size_t key_buffer_len;
   unsigned char *value_buffer;
   size_t value_buffer_len;
-} librdf_storage_hashes_context;
+} librdf_storage_hashes_instance;
 
 
 
@@ -187,7 +187,7 @@ librdf_storage_hashes_register(librdf_storage *storage,
                                const char *name,
                                const librdf_hash_descriptor *source_desc) 
 {
-  librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   int len;
   char *full_name=NULL;
   int hash_index;
@@ -234,12 +234,17 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
                                   int mode, int is_writable, int is_new,
                                   librdf_hash* options)
 {
-  librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context;
   int i;
   int status=0;
   int index_predicates=0;
   int index_contexts=0;
   int hash_count=0;
+  
+  context=(librdf_storage_hashes_instance*)LIBRDF_CALLOC(
+    librdf_storage_hashes_instance, 1, sizeof(librdf_storage_hashes_instance));
+  
+  librdf_storage_set_instance(storage, context);
   
   context->name=(char*)name;
   
@@ -397,7 +402,7 @@ librdf_storage_hashes_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_hashes_terminate(librdf_storage* storage)
 {
-  librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   int i;
   
   for(i=0; i<context->hash_count; i++) {
@@ -443,8 +448,14 @@ librdf_storage_hashes_terminate(librdf_storage* storage)
 static int
 librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_storage)
 {
-  librdf_storage_hashes_context *old_context=(librdf_storage_hashes_context*)old_storage->context;
-  librdf_storage_hashes_context *new_context=(librdf_storage_hashes_context*)new_storage->context;
+  librdf_storage_hashes_instance* old_context=(librdf_storage_hashes_instance*)old_storage->instance;
+  
+  librdf_storage_hashes_instance* new_context=(librdf_storage_hashes_instance*)LIBRDF_CALLOC(
+    librdf_storage_hashes_instance, 1, sizeof(librdf_storage_hashes_instance));
+  
+  librdf_storage_set_instance(new_storage, new_context);
+  
+  fprintf(stderr, "************** HASHES CLONE **********\n");
 
   /* Bump up old context name if any */
   if(old_context->name) {  
@@ -482,7 +493,7 @@ librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_sto
 static int
 librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
 {
-  librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   int i;
   int result=0;
   
@@ -525,7 +536,7 @@ librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_hashes_close(librdf_storage* storage)
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   int i;
   
   for(i=0; i<context->hash_count; i++) {
@@ -540,7 +551,7 @@ librdf_storage_hashes_close(librdf_storage* storage)
 static int
 librdf_storage_hashes_size(librdf_storage* storage)
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_hash* any_hash=context->hashes[context->all_statements_hash_index];
 
   if(!any_hash)
@@ -573,7 +584,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
                                            librdf_node* context_node,
                                            int is_addition)
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   int i;
   int status=0;
 
@@ -706,7 +717,7 @@ librdf_storage_hashes_remove_statement(librdf_storage* storage, librdf_statement
 static int
 librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_statement* statement)
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_hash_datum hd_key, hd_value; /* on stack */
   unsigned char *key_buffer, *value_buffer;
   int key_len, value_len;
@@ -787,7 +798,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
 
 typedef struct {
   librdf_storage *storage;
-  librdf_storage_hashes_context *hash_context;
+  librdf_storage_hashes_instance* hash_context;
   int index;
   librdf_iterator* iterator;
   librdf_hash_datum *key;
@@ -804,7 +815,7 @@ static librdf_stream*
 librdf_storage_hashes_serialise_common(librdf_storage* storage, int hash_index,
                                        librdf_node* search_node, int want)
 {
-  librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_storage_hashes_serialise_stream_context *scontext;
   librdf_hash *hash;
   librdf_stream *stream;
@@ -870,7 +881,7 @@ librdf_storage_hashes_serialise_common(librdf_storage* storage, int hash_index,
 static librdf_stream*
 librdf_storage_hashes_serialise(librdf_storage* storage)
 {
-  librdf_storage_hashes_context *context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   return librdf_storage_hashes_serialise_common(storage, 
                                                 context->all_statements_hash_index,
                                                 NULL, 0);
@@ -1016,7 +1027,7 @@ librdf_storage_hashes_serialise_finished(void* context)
 static librdf_stream*
 librdf_storage_hashes_find_statements(librdf_storage* storage, librdf_statement* statement)
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_stream* stream;
 
   if(!librdf_statement_get_subject(statement) &&
@@ -1239,7 +1250,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
                                            int hash_index,
                                            int want) 
 {
-  librdf_storage_hashes_context *scontext=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* scontext=(librdf_storage_hashes_instance*)storage->instance;
   librdf_storage_hashes_node_iterator_context* icontext;
   librdf_hash *hash;
   librdf_statement_part fields;
@@ -1360,7 +1371,7 @@ static librdf_iterator*
 librdf_storage_hashes_find_sources(librdf_storage* storage, 
                                    librdf_node* arc, librdf_node *target) 
 {
-  librdf_storage_hashes_context *scontext=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* scontext=(librdf_storage_hashes_instance*)storage->instance;
   return librdf_storage_hashes_node_iterator_create(storage, arc, target,
                                                     scontext->sources_index,
                                                     LIBRDF_STATEMENT_SUBJECT);
@@ -1371,7 +1382,7 @@ static librdf_iterator*
 librdf_storage_hashes_find_arcs(librdf_storage* storage,
                                 librdf_node* source, librdf_node *target) 
 {
-  librdf_storage_hashes_context *scontext=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* scontext=(librdf_storage_hashes_instance*)storage->instance;
   return librdf_storage_hashes_node_iterator_create(storage, source, target,
                                                     scontext->arcs_index,
                                                     LIBRDF_STATEMENT_PREDICATE);
@@ -1381,7 +1392,7 @@ static librdf_iterator*
 librdf_storage_hashes_find_targets(librdf_storage* storage,
                                    librdf_node* source, librdf_node *arc) 
 {
-  librdf_storage_hashes_context *scontext=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* scontext=(librdf_storage_hashes_instance*)storage->instance;
   return librdf_storage_hashes_node_iterator_create(storage, source, arc,
                                                     scontext->targets_index,
                                                     LIBRDF_STATEMENT_OBJECT);
@@ -1402,7 +1413,7 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
                                             librdf_node* context_node,
                                             librdf_statement* statement) 
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_hash_datum key, value; /* on stack - not allocated */
   int size;
   int status;
@@ -1450,7 +1461,7 @@ librdf_storage_hashes_context_remove_statement(librdf_storage* storage,
                                                librdf_node* context_node,
                                                librdf_statement* statement) 
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_hash_datum key, value; /* on stack - not allocated */
   int size;
   int status;
@@ -1508,7 +1519,7 @@ static librdf_stream*
 librdf_storage_hashes_context_serialise(librdf_storage* storage,
                                         librdf_node* context_node) 
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_storage_hashes_context_serialise_stream_context* scontext;
   librdf_stream* stream;
   size_t size;
@@ -1675,7 +1686,7 @@ librdf_storage_hashes_context_serialise_finished(void* context)
 static int
 librdf_storage_hashes_sync(librdf_storage *storage)
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   int i;
   
   for(i=0; i<context->hash_count; i++)
@@ -1780,7 +1791,7 @@ librdf_storage_hashes_get_contexts_finished(void* iterator)
 static librdf_iterator*
 librdf_storage_hashes_get_contexts(librdf_storage* storage) 
 {
-  librdf_storage_hashes_context* context=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_storage_hashes_get_contexts_iterator_context* icontext;
   librdf_iterator* iterator;
 
@@ -1835,7 +1846,7 @@ librdf_storage_hashes_get_contexts(librdf_storage* storage)
 static librdf_node*
 librdf_storage_hashes_get_feature(librdf_storage* storage, librdf_uri* feature)
 {
-  librdf_storage_hashes_context* scontext=(librdf_storage_hashes_context*)storage->context;
+  librdf_storage_hashes_instance* scontext=(librdf_storage_hashes_instance*)storage->instance;
   unsigned char *uri_string;
 
   if(!feature)
@@ -1862,8 +1873,6 @@ librdf_storage_hashes_get_feature(librdf_storage* storage, librdf_uri* feature)
 static void
 librdf_storage_hashes_register_factory(librdf_storage_factory *factory) 
 {
-  factory->context_length     = sizeof(librdf_storage_hashes_context);
-  
   factory->init               = librdf_storage_hashes_init;
   factory->clone              = librdf_storage_hashes_clone;
   factory->terminate          = librdf_storage_hashes_terminate;

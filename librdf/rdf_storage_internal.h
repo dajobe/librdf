@@ -45,7 +45,7 @@ struct librdf_storage_s
   int usage;
   
   librdf_model *model;
-  void *context;
+  void *instance;
   int index_contexts;
   struct librdf_storage_factory_s* factory;
 };

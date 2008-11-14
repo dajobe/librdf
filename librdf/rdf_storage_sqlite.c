@@ -107,7 +107,7 @@ typedef struct
   librdf_storage_sqlite_query *in_stream_queries;
 
   int in_transaction;
-} librdf_storage_sqlite_context;
+} librdf_storage_sqlite_instance;
 
 
 
@@ -172,14 +172,19 @@ static int
 librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
                            librdf_hash* options)
 {
-  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
   char *name_copy;
   char* synchronous;
+  librdf_storage_sqlite_instance* context;
   
   if(!name) {
     librdf_free_hash(options);
     return 1;
   }
+  
+  context=(librdf_storage_sqlite_instance*)LIBRDF_CALLOC(
+    librdf_storage_sqlite_instance, 1, sizeof(librdf_storage_sqlite_instance));
+
+  librdf_storage_set_instance(storage, context);
   
   context->storage=storage;
 
@@ -224,7 +229,7 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_sqlite_terminate(librdf_storage* storage)
 {
-  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
 
   if(context->name)
     LIBRDF_FREE(cstring, context->name);
@@ -347,7 +352,7 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
                            sqlite_callback callback, void *arg,
                            int fail_ok)
 {
-  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
   int status=SQLITE_OK;
   char *errmsg=NULL;
 
@@ -414,7 +419,7 @@ librdf_storage_sqlite_set_helper(librdf_storage *storage,
                                  const unsigned char *values,
                                  size_t values_len) 
 {
-  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
   int rc;
   raptor_stringbuffer *sb;
   unsigned char *request;
@@ -756,7 +761,7 @@ librdf_storage_sqlite_statement_helper(librdf_storage* storage,
 static int
 librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 {
-  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
   int rc=SQLITE_OK;
   char *errmsg=NULL;
 #if SQLITE_API == 2
@@ -903,7 +908,7 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_sqlite_close(librdf_storage* storage)
 {
-  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
   int status=0;
   
   if(context->db) {
@@ -947,7 +952,7 @@ static int
 librdf_storage_sqlite_add_statements(librdf_storage* storage,
                                      librdf_stream* statement_stream)
 {
-  /* librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context; */
+  /* librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance; */
   int status=0;
   int begin;
 
@@ -1059,7 +1064,7 @@ librdf_storage_sqlite_statement_operator_helper(librdf_storage* storage,
                                                 librdf_node* context_node,
                                                 raptor_stringbuffer* sb)
 {
-  /* librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context; */
+  /* librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance; */
   triple_node_type node_types[4];
   int node_ids[4];
   const unsigned char* fields[4];
@@ -1200,7 +1205,7 @@ sqlite_construct_select_helper(raptor_stringbuffer* sb)
 
 typedef struct {
   librdf_storage *storage;
-  librdf_storage_sqlite_context* sqlite_context;
+  librdf_storage_sqlite_instance* sqlite_context;
 
   int finished;
 
@@ -1216,7 +1221,7 @@ typedef struct {
 static librdf_stream*
 librdf_storage_sqlite_serialise(librdf_storage* storage)
 {
-  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
   librdf_storage_sqlite_serialise_stream_context* scontext;
   librdf_stream* stream;
   int status;
@@ -1296,7 +1301,7 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 
 
 static int
-librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_context* scontext,
+librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
                                       sqlite_STATEMENT *vm,
                                       librdf_statement **statement,
                                       librdf_node **context_node) {
@@ -1594,7 +1599,7 @@ librdf_storage_sqlite_serialise_finished(void* context)
 
 typedef struct {
   librdf_storage *storage;
-  librdf_storage_sqlite_context* sqlite_context;
+  librdf_storage_sqlite_instance* sqlite_context;
 
   int finished;
 
@@ -1627,7 +1632,7 @@ static librdf_stream*
 librdf_storage_sqlite_find_statements(librdf_storage* storage,
                                       librdf_statement* statement)
 {
-  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
   librdf_storage_sqlite_find_statements_stream_context* scontext;
   librdf_stream* stream;
   unsigned char* request;
@@ -1882,7 +1887,7 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
                                             librdf_node* context_node,
                                             librdf_statement* statement) 
 {
-  /* librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context; */
+  /* librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance; */
   triple_node_type node_types[4];
   int node_ids[4];
   const unsigned char* fields[4];
@@ -1974,7 +1979,7 @@ librdf_storage_sqlite_context_remove_statement(librdf_storage* storage,
                                                librdf_node* context_node,
                                                librdf_statement* statement) 
 {
-  /* librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context; */
+  /* librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance; */
   int rc;
   raptor_stringbuffer *sb;
   unsigned char *request;
@@ -2063,7 +2068,7 @@ librdf_storage_sqlite_context_remove_statements(librdf_storage* storage,
 
 typedef struct {
   librdf_storage *storage;
-  librdf_storage_sqlite_context* sqlite_context;
+  librdf_storage_sqlite_instance* sqlite_context;
 
   int finished;
 
@@ -2091,7 +2096,7 @@ static librdf_stream*
 librdf_storage_sqlite_context_serialise(librdf_storage* storage,
                                         librdf_node* context_node) 
 {
-  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
   librdf_storage_sqlite_context_serialise_stream_context* scontext;
   librdf_stream* stream;
   int status;
@@ -2312,7 +2317,7 @@ librdf_storage_sqlite_context_serialise_finished(void* context)
 
 typedef struct {
   librdf_storage *storage;
-  librdf_storage_sqlite_context* sqlite_context;
+  librdf_storage_sqlite_instance* sqlite_context;
 
   int finished;
   
@@ -2326,7 +2331,7 @@ typedef struct {
 
 
 static int
-librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_context* scontext,
+librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_instance* scontext,
                                               sqlite_STATEMENT *vm,
                                               librdf_node **context_node) {
   int status=SQLITE_BUSY;
@@ -2551,7 +2556,7 @@ librdf_storage_sqlite_get_contexts_finished(void* iterator)
 static librdf_iterator*
 librdf_storage_sqlite_get_contexts(librdf_storage* storage) 
 {
-  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
   librdf_storage_sqlite_get_contexts_iterator_context* icontext;
   int status;
   char *errmsg=NULL;
@@ -2646,7 +2651,7 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
 static librdf_node*
 librdf_storage_sqlite_get_feature(librdf_storage* storage, librdf_uri* feature)
 {
-  /* librdf_storage_sqlite_context* scontext=(librdf_storage_sqlite_context*)storage->context; */
+  /* librdf_storage_sqlite_instance* scontext=(librdf_storage_sqlite_instance*)storage->instance; */
   unsigned char *uri_string;
 
   if(!feature)
@@ -2678,7 +2683,7 @@ librdf_storage_sqlite_get_feature(librdf_storage* storage, librdf_uri* feature)
 static int
 librdf_storage_sqlite_transaction_start(librdf_storage *storage)
 {
-  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context *)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance* )storage->instance;
   int rc;
   
   if(context->in_transaction)
@@ -2706,7 +2711,7 @@ librdf_storage_sqlite_transaction_start(librdf_storage *storage)
 static int
 librdf_storage_sqlite_transaction_commit(librdf_storage *storage)
 {
-  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context *)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance* )storage->instance;
   int rc;
 
   if(!context->in_transaction)
@@ -2734,7 +2739,7 @@ librdf_storage_sqlite_transaction_commit(librdf_storage *storage)
 static int
 librdf_storage_sqlite_transaction_rollback(librdf_storage *storage)
 {
-  librdf_storage_sqlite_context *context=(librdf_storage_sqlite_context *)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance* )storage->instance;
   int rc;
 
   if(!context->in_transaction)
@@ -2754,7 +2759,7 @@ static void
 librdf_storage_sqlite_query_flush(librdf_storage *storage)
 {
   librdf_storage_sqlite_query *query;
-  librdf_storage_sqlite_context* context=(librdf_storage_sqlite_context*)storage->context;
+  librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
   int begin;
 
   if(!context->in_stream_queries)
@@ -2782,8 +2787,6 @@ librdf_storage_sqlite_query_flush(librdf_storage *storage)
 static void
 librdf_storage_sqlite_register_factory(librdf_storage_factory *factory) 
 {
-  factory->context_length     = sizeof(librdf_storage_sqlite_context);
-  
   factory->init               = librdf_storage_sqlite_init;
   factory->terminate          = librdf_storage_sqlite_terminate;
   factory->open               = librdf_storage_sqlite_open;

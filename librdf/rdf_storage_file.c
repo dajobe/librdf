@@ -58,7 +58,7 @@ typedef struct
   /* 'name' factory only */
   size_t name_len;  
   char *name;
-} librdf_storage_file_context;
+} librdf_storage_file_instance;
 
 
 /* prototypes for local functions */
@@ -84,12 +84,16 @@ static int
 librdf_storage_file_init(librdf_storage* storage, const char *name,
                          librdf_hash* options)
 {
-  librdf_storage_file_context *context=(librdf_storage_file_context*)storage->context;
   char *name_copy;
   char *contexts;
   int rc=1;
 
   int is_uri=!strcmp(storage->factory->name, "uri");
+  
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)LIBRDF_CALLOC(
+    librdf_storage_file_instance, 1, sizeof(librdf_storage_file_instance));
+
+  librdf_storage_set_instance(storage, context);
 
   /* Cannot save contexts in a file; pass everything else on */
   contexts=librdf_hash_get_del(options, "contexts");
@@ -143,7 +147,7 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_file_terminate(librdf_storage* storage)
 {
-  librdf_storage_file_context *context=(librdf_storage_file_context*)storage->context;
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
 
   librdf_storage_file_sync(storage);
 
@@ -178,7 +182,7 @@ librdf_storage_file_close(librdf_storage* storage)
 static int
 librdf_storage_file_size(librdf_storage* storage)
 {
-  librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
   return librdf_model_size(context->model);
 }
 
@@ -186,7 +190,7 @@ librdf_storage_file_size(librdf_storage* storage)
 static int
 librdf_storage_file_add_statement(librdf_storage* storage, librdf_statement* statement)
 {
-  librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
   context->changed=1;
   return librdf_model_add_statement(context->model, statement);
 }
@@ -196,7 +200,7 @@ static int
 librdf_storage_file_add_statements(librdf_storage* storage,
                                    librdf_stream* statement_stream)
 {
-  librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
   context->changed=1;
   return librdf_model_add_statements(context->model, statement_stream);
 }
@@ -205,7 +209,7 @@ librdf_storage_file_add_statements(librdf_storage* storage,
 static int
 librdf_storage_file_remove_statement(librdf_storage* storage, librdf_statement* statement)
 {
-  librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
   context->changed=1;
   return librdf_model_remove_statement(context->model, statement);
 }
@@ -214,7 +218,7 @@ librdf_storage_file_remove_statement(librdf_storage* storage, librdf_statement* 
 static int
 librdf_storage_file_contains_statement(librdf_storage* storage, librdf_statement* statement)
 {
-  librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
   return librdf_model_contains_statement(context->model, statement);
 }
 
@@ -222,7 +226,7 @@ librdf_storage_file_contains_statement(librdf_storage* storage, librdf_statement
 static librdf_stream*
 librdf_storage_file_serialise(librdf_storage* storage)
 {
-  librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
   return librdf_model_as_stream(context->model);
 }
 
@@ -230,7 +234,7 @@ librdf_storage_file_serialise(librdf_storage* storage)
 static librdf_stream*
 librdf_storage_file_find_statements(librdf_storage* storage, librdf_statement* statement)
 {
-  librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
   return librdf_model_find_statements(context->model, statement);
 }
 
@@ -238,7 +242,7 @@ librdf_storage_file_find_statements(librdf_storage* storage, librdf_statement* s
 static int
 librdf_storage_file_sync(librdf_storage *storage)
 {
-  librdf_storage_file_context* context=(librdf_storage_file_context*)storage->context;
+  librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
   char *backup_name;
   char *new_name;
   librdf_serializer* serializer;
@@ -342,8 +346,6 @@ librdf_storage_file_get_feature(librdf_storage* storage, librdf_uri* feature)
 static void
 librdf_storage_file_register_factory(librdf_storage_factory *factory) 
 {
-  factory->context_length     = sizeof(librdf_storage_file_context);
-  
   factory->init               = librdf_storage_file_init;
   factory->terminate          = librdf_storage_file_terminate;
   factory->open               = librdf_storage_file_open;

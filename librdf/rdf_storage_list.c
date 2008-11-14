@@ -49,7 +49,7 @@ typedef struct
   int index_contexts;
   librdf_hash* contexts;
   
-} librdf_storage_list_context;
+} librdf_storage_list_instance;
 
 
 /* These are stored in the list */
@@ -110,8 +110,12 @@ static int
 librdf_storage_list_init(librdf_storage* storage, const char *name,
                          librdf_hash* options)
 {
-  librdf_storage_list_context *context=(librdf_storage_list_context*)storage->context;
   int index_contexts=0;
+  
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)LIBRDF_CALLOC(
+    librdf_storage_list_instance, 1, sizeof(librdf_storage_list_instance));
+
+  librdf_storage_set_instance(storage, context);
   
   if((index_contexts=librdf_hash_get_as_boolean(options, "contexts"))<0)
     index_contexts=0; /* default is no contexts */
@@ -157,7 +161,7 @@ librdf_storage_list_node_equals(librdf_storage_list_node *first,
 static int
 librdf_storage_list_open(librdf_storage* storage, librdf_model* model)
 {
-  librdf_storage_list_context *context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
 
   context->list=librdf_new_list(storage->world);
   if(!context->list)
@@ -194,7 +198,7 @@ librdf_storage_list_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_list_close(librdf_storage* storage)
 {
-  librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
   
   if(context->list) {
     librdf_storage_list_node* sln;
@@ -222,7 +226,7 @@ librdf_storage_list_close(librdf_storage* storage)
 static int
 librdf_storage_list_size(librdf_storage* storage)
 {
-  librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
 
   return librdf_list_size(context->list);
 }
@@ -243,7 +247,7 @@ static int
 librdf_storage_list_add_statements(librdf_storage* storage,
                                    librdf_stream* statement_stream)
 {
-  librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
   int status=0;
 
   for(; !librdf_stream_end(statement_stream);
@@ -291,7 +295,7 @@ librdf_storage_list_remove_statement(librdf_storage* storage, librdf_statement* 
 static int
 librdf_storage_list_contains_statement(librdf_storage* storage, librdf_statement* statement)
 {
-  librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
   librdf_storage_list_node sln; /* STATIC */
   sln.statement=statement;
   sln.context=NULL;
@@ -327,7 +331,7 @@ typedef struct {
 static librdf_stream*
 librdf_storage_list_serialise(librdf_storage* storage)
 {
-  librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
   librdf_storage_list_serialise_stream_context* scontext;
   librdf_stream* stream;
   
@@ -472,7 +476,7 @@ librdf_storage_list_context_add_statement(librdf_storage* storage,
                                           librdf_node* context_node,
                                           librdf_statement* statement) 
 {
-  librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
   librdf_hash_datum key, value; /* on stack - not allocated */
   size_t size;
   librdf_storage_list_node* sln;
@@ -548,7 +552,7 @@ librdf_storage_list_context_remove_statement(librdf_storage* storage,
                                              librdf_node* context_node,
                                              librdf_statement* statement) 
 {
-  librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_storage_list_node* sln;
   librdf_storage_list_node search_sln; /* on stack - not allocated */
@@ -618,7 +622,7 @@ static librdf_stream*
 librdf_storage_list_context_serialise(librdf_storage* storage,
                                       librdf_node* context_node) 
 {
-  librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
   librdf_storage_list_context_serialise_stream_context* scontext;
   librdf_stream* stream;
   size_t size;
@@ -858,7 +862,7 @@ librdf_storage_list_get_contexts_finished(void* iterator)
 static librdf_iterator*
 librdf_storage_list_get_contexts(librdf_storage* storage) 
 {
-  librdf_storage_list_context* context=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* context=(librdf_storage_list_instance*)storage->instance;
   librdf_storage_list_get_contexts_iterator_context* icontext;
   librdf_iterator* iterator;
 
@@ -912,7 +916,7 @@ librdf_storage_list_get_contexts(librdf_storage* storage)
 static librdf_node*
 librdf_storage_list_get_feature(librdf_storage* storage, librdf_uri* feature)
 {
-  librdf_storage_list_context* scontext=(librdf_storage_list_context*)storage->context;
+  librdf_storage_list_instance* scontext=(librdf_storage_list_instance*)storage->instance;
   unsigned char *uri_string;
 
   if(!feature)
@@ -939,8 +943,6 @@ librdf_storage_list_get_feature(librdf_storage* storage, librdf_uri* feature)
 static void
 librdf_storage_list_register_factory(librdf_storage_factory *factory) 
 {
-  factory->context_length     = sizeof(librdf_storage_list_context);
-  
   factory->init               = librdf_storage_list_init;
   factory->terminate          = librdf_storage_list_terminate;
   factory->open               = librdf_storage_list_open;

@@ -512,13 +512,8 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
   /* set usage to 1 early to allow cleanup with librdf_free_storage() */
   new_storage->usage=1;
 
-  new_storage->context=(char*)LIBRDF_CALLOC(librdf_storage_context, 1,
-                                            old_storage->factory->context_length);
-  if(!new_storage->context) {
-    librdf_free_storage(new_storage);
-    return NULL;
-  }
-
+  new_storage->instance=NULL;
+  
   new_storage->world=old_storage->world;
 
   /* do this now so librdf_free_storage won't call new factory on
@@ -583,14 +578,7 @@ librdf_new_storage_from_factory(librdf_world *world,
   /* set usage to 1 early to allow cleanup with librdf_free_storage() */
   storage->usage=1; 
   
-  storage->context=(char*)LIBRDF_CALLOC(librdf_storage_context, 1,
-                                        factory->context_length);
-  if(!storage->context) {
-    librdf_free_hash(options);
-    librdf_free_storage(storage);
-    return NULL;
-  }
-  
+  storage->instance=NULL;
   storage->factory=factory;
 
   if(factory->init(storage, name, options)) {
@@ -619,8 +607,6 @@ librdf_free_storage(librdf_storage* storage)
   if(storage->factory)
     storage->factory->terminate(storage);
 
-  if(storage->context)
-    LIBRDF_FREE(librdf_storage_context, storage->context);
   LIBRDF_FREE(librdf_storage, storage);
 }
 
@@ -651,6 +637,39 @@ void
 librdf_storage_remove_reference(librdf_storage *storage)
 {
   librdf_free_storage(storage);
+}
+
+
+/**
+ * librdf_storage_set_instance:
+ * @storage: #librdf_storage object
+ * @instance: Opaque instance pointer
+ *
+ * Set the instance data for this storage.
+ * This function is intended for use by the 'init' method of storage implementations
+ * to set instance data which can be retrived with librdf_storage_get_instance and
+ * used in other methods of that storage.
+ * The instance is completely opaque to librdf, including allocation and deallocation.
+ */
+void
+librdf_storage_set_instance(librdf_storage *storage, librdf_storage_instance instance)
+{
+  storage->instance = instance;
+}
+
+
+/**
+ * librdf_storage_remove_reference(libdf_storage *storage)
+ * @storage: #librdf_storage object
+ *
+ * Decrement storage reference count by one.
+ * Free the storage if reference count becomes zero.
+ * This function is intended to be internal to librdf storage modules.
+ **/
+librdf_storage_instance
+librdf_storage_get_instance(librdf_storage *storage)
+{
+  return storage->instance;
 }
 
 

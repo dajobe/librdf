@@ -64,6 +64,11 @@ REDLAND_API
 void librdf_storage_remove_reference(librdf_storage *storage);
 
 REDLAND_API
+void librdf_storage_set_instance(librdf_storage *storage, librdf_storage_instance instance);
+REDLAND_API
+librdf_storage_instance librdf_storage_get_instance(librdf_storage *storage);
+
+REDLAND_API
 int librdf_storage_open(librdf_storage* storage, librdf_model *model);
 REDLAND_API
 int librdf_storage_close(librdf_storage* storage);
