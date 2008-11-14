@@ -455,8 +455,6 @@ librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_sto
   
   librdf_storage_set_instance(new_storage, new_context);
   
-  fprintf(stderr, "************** HASHES CLONE **********\n");
-
   /* Bump up old context name if any */
   if(old_context->name) {  
     new_context->name=librdf_heuristic_gen_name(old_context->name);
