@@ -44,11 +44,6 @@ typedef struct rasqal_world_s rasqal_world;
 #endif
 #endif
 
-#ifndef RAPTOR_WORLD_DECLARED
-#define RAPTOR_WORLD_DECLARED 1
-typedef struct raptor_world_s raptor_world;
-#endif
-
 struct librdf_world_s
 {
   void *error_user_data;
