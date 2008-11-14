@@ -355,8 +355,8 @@ librdf_storage_file_register_factory(librdf_storage_factory *factory)
   factory->contains_statement = librdf_storage_file_contains_statement;
   factory->serialise          = librdf_storage_file_serialise;
   factory->find_statements    = librdf_storage_file_find_statements;
-  factory->sync                     = librdf_storage_file_sync;
-  factory->get_feature              = librdf_storage_file_get_feature;
+  factory->sync               = librdf_storage_file_sync;
+  factory->get_feature        = librdf_storage_file_get_feature;
 }
 
 

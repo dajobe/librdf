@@ -26,6 +26,8 @@
 #ifndef LIBRDF_STORAGE_INTERNAL_H
 #define LIBRDF_STORAGE_INTERNAL_H
 
+#include "rdf_storage_factory.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,125 +48,6 @@ struct librdf_storage_s
   void *context;
   int index_contexts;
   struct librdf_storage_factory_s* factory;
-};
-
-
-/** A Storage Factory */
-struct librdf_storage_factory_s {
-  char* name;
-  char* label;
-  
-  /* the rest of this structure is populated by the
-     storage-specific register function */
-  size_t context_length;
-  
-  /* create a new storage */
-  int (*init)(librdf_storage* storage, const char *name, librdf_hash* options);
-  
-  /* copy a storage */
-  /* clone is assumed to do leave the new storage in the same state
-   * after an init() method on an existing storage - i.e ready to
-   * use but closed.
-   */
-  int (*clone)(librdf_storage* new_storage, librdf_storage* old_storage);
-
-  /* destroy a storage */
-  void (*terminate)(librdf_storage* storage);
-  
-  /* make storage be associated with model */
-  int (*open)(librdf_storage* storage, librdf_model* model);
-  
-  /* close storage/model context */
-  int (*close)(librdf_storage* storage);
-  
-  /* return the number of statements in the storage for model */
-  int (*size)(librdf_storage* storage);
-  
-  /* add a statement to the storage from the given model - OPTIONAL */
-  int (*add_statement)(librdf_storage* storage, librdf_statement* statement);
-  
-  /* add a statement to the storage from the given model - OPTIONAL */
-  int (*add_statements)(librdf_storage* storage, librdf_stream* statement_stream);
-  
-  /* remove a statement from the storage - OPTIONAL */
-  int (*remove_statement)(librdf_storage* storage, librdf_statement* statement);
-  
-  /* check if statement in storage  */
-  int (*contains_statement)(librdf_storage* storage, librdf_statement* statement);
-  /* check for [node, property, ?] */
-  int (*has_arc_in)(librdf_storage *storage, librdf_node *node, librdf_node *property);
-  /* check for [?, property, node] */
-  int (*has_arc_out)(librdf_storage *storage, librdf_node *node, librdf_node *property);
-
-  
-  /* serialise the model in storage  */
-  librdf_stream* (*serialise)(librdf_storage* storage);
-  
-  /* serialise the results of a query */
-  librdf_stream* (*find_statements)(librdf_storage* storage, librdf_statement* statement);
-  /* OPTIONAL */
-  librdf_stream* (*find_statements_with_options)(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node, librdf_hash* options);
-
-  /* return a list of Nodes marching given arc, target */
-  librdf_iterator* (*find_sources)(librdf_storage* storage, librdf_node *arc, librdf_node *target);
-
-  /* return a list of Nodes marching given source, target */
-  librdf_iterator* (*find_arcs)(librdf_storage* storage, librdf_node *source, librdf_node *target);
-
-  /* return a list of Nodes marching given source, target */
-  librdf_iterator* (*find_targets)(librdf_storage* storage, librdf_node *source, librdf_node *target);
-
-  /* return list of properties to/from a node */
-  librdf_iterator* (*get_arcs_in)(librdf_storage *storage, librdf_node *node);
-  librdf_iterator* (*get_arcs_out)(librdf_storage *storage, librdf_node *node);
-
-
-  /* add a statement to the storage from the context - OPTIONAL */
-  /* NOTE: if context is NULL, this MUST be equivalent to add_statement */
-  int (*context_add_statement)(librdf_storage* storage, librdf_node* context, librdf_statement *statement);
-  
-  /* remove a statement from the context - OPTIONAL */
-  /* NOTE: if context is NULL, this MUST be equivalent to remove_statement */
-  int (*context_remove_statement)(librdf_storage* storage, librdf_node* context, librdf_statement *statement);
-
-  /* list statements in a context - OPTIONAL */
-  librdf_stream* (*context_serialise)(librdf_storage* storage, librdf_node* context);
-
-  /* synchronise to underlying storage - OPTIONAL */
-  int (*sync)(librdf_storage* storage);
-
-  /* add statements to the context - OPTIONAL (rdf_storage will do it
-   * using context_add_statement if missing)
-   * NOTE: if context is NULL, this MUST be equivalent to add_statements
-  */
-  int (*context_add_statements)(librdf_storage* storage, librdf_node* context, librdf_stream *stream);
-
-  /* remove statements from the context - OPTIONAL (rdf_storage will do it
-   * using context_remove_statement if missing)
-   */
-  int (*context_remove_statements)(librdf_storage* storage, librdf_node* context);
-
-  /* search for statement in a context - OPTIONAL (rdf_storage will do
-   * it using find_statements if missing)
-   */
-  librdf_stream* (*find_statements_in_context)(librdf_storage* storage, librdf_statement* statement, librdf_node* context_node);
-
-  /* return an iterator of context nodes in the store - OPTIONAL
-   * (returning NULL)
-   */
-  librdf_iterator* (*get_contexts)(librdf_storage* storage);
-
-  /* features - OPTIONAL */
-  librdf_node* (*get_feature)(librdf_storage* storaage, librdf_uri* feature);
-  int (*set_feature)(librdf_storage* storage, librdf_uri* feature, librdf_node* value);
-
-  /* transactions - OPTIONAL */
-  int (*transaction_start)(librdf_storage* storage);
-  int (*transaction_start_with_handle)(librdf_storage* storage, void* handle);
-  int (*transaction_commit)(librdf_storage* storage);
-  int (*transaction_rollback)(librdf_storage* storage);
-  void* (*transaction_get_handle)(librdf_storage* storage);
-
 };
 
 void librdf_init_storage_list(librdf_world *world);
