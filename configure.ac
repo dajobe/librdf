@@ -127,10 +127,10 @@ AC_ARG_ENABLE(release, [  --enable-release        Turn on optimizations (for mai
 	  release_version=yes
 fi;)	
 
-modular=no
-AC_ARG_ENABLE(modular, [  --enable-modular        Modularize storage backends.  ], \
- if test "$enableval" = "yes"; then \
-	  modular=yes
+modular=yes
+AC_ARG_ENABLE(modular, [  --disable-modular       Build storage backends into librdf library.  ], \
+ if test "$enableval" = "no"; then \
+	  modular=no
 fi;)	
 
 dnl compiler checks
@@ -806,7 +806,7 @@ fi
 
 
 AC_MSG_CHECKING(storages required)
-AC_ARG_ENABLE(storages, [  --enable-storages=LIST   Use storages (default=all)], storages="$enableval") 
+AC_ARG_ENABLE(storages, [  --enable-storages=LIST  Use storages (default=all)], storages="$enableval") 
 if test "X$storages" = Xall -o "X$storages" = X; then
   storages="$all_storages"
   AC_MSG_RESULT(all)
@@ -987,7 +987,7 @@ if test $use_memory_signing = yes; then
 fi
 
 assert=yes
-AC_ARG_ENABLE(assertions, [  --enable-assertions    Perform run time assertion checks (default yes).  ], assert=$enableval)
+AC_ARG_ENABLE(assertions, [  --enable-assertions     Perform run time assertion checks (default yes).  ], assert=$enableval)
 if test "$assert" = "yes"; then
   AC_DEFINE(LIBRDF_ASSERT, 1, [Run time assertion checks.])
 fi
