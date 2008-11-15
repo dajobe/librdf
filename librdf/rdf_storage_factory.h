@@ -173,8 +173,18 @@ struct librdf_storage_factory_s {
 };
 
 
+/** A storage module must define and export a function of this type
+ * with name "librdf_storage_module_register_factory" to be found by librdf.
+ *
+ * This function will be called by librdf and must call librdf_storage_register_factory
+ * to register whatever storage backends are implemented in the module.
+ */
+typedef void (*librdf_storage_module_register_function)(librdf_world *world);
+
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+
