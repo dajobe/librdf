@@ -32,6 +32,7 @@ rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
 rdf_model.h \
 rdf_iterator.h \
 rdf_storage.h \
+rdf_storage_module.h \
 rdf_stream.h \
 rdf_parser.h \
 rdf_utf8.h \
