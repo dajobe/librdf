@@ -231,8 +231,6 @@ static librdf_stream* librdf_storage_mysql_find_statements_in_context(librdf_sto
                                                librdf_node* context_node);
 static librdf_iterator* librdf_storage_mysql_get_contexts(librdf_storage* storage);
 
-static void librdf_storage_mysql_register(librdf_storage_factory *factory);
-
 /* "private" helper definitions */
 typedef struct {
   librdf_storage *storage;
@@ -2996,7 +2994,7 @@ librdf_storage_mysql_transaction_get_handle(librdf_storage* storage)
 
 /** Local entry point for dynamically loaded storage module */
 static void
-librdf_storage_mysql_register(librdf_storage_factory *factory)
+librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
 {
   LIBRDF_ASSERT_CONDITION(!strcmp(factory->name, "mysql"));
 
@@ -3037,7 +3035,7 @@ void
 librdf_storage_module_register_factory(librdf_world *world)
 {
   librdf_storage_register_factory(world, "mysql", "MySQL database store",
-                                  &librdf_storage_mysql_register);
+                                  &librdf_storage_mysql_register_factory);
 }
 
 #else
@@ -3049,7 +3047,7 @@ void
 librdf_init_storage_mysql(librdf_world *world)
 {
   librdf_storage_register_factory(world, "mysql", "MySQL database store",
-                                  &librdf_storage_mysql_register);
+                                  &librdf_storage_mysql_register_factory);
 }
 
 #endif

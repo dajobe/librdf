@@ -350,7 +350,7 @@ librdf_storage_file_get_feature(librdf_storage* storage, librdf_uri* feature)
 
 /** Local entry point for dynamically loaded storage module */
 static void
-librdf_storage_list_register_factory(librdf_storage_factory *factory) 
+librdf_storage_file_register_factory(librdf_storage_factory *factory) 
 {
   factory->version            = LIBRDF_STORAGE_INTERFACE_VERSION;
   factory->init               = librdf_storage_file_init;
@@ -375,9 +375,9 @@ static void
 librdf_storage_module_register_factory(librdf_world *world)
 {
   librdf_storage_register_factory(world, "file", "Local file based store",
-                                  &librdf_storage_list_register_factory);
+                                  &librdf_storage_file_register_factory);
   librdf_storage_register_factory(world, "uri",  "URI store (read-only)",
-                                  &librdf_storage_list_register_factory);
+                                  &librdf_storage_file_register_factory);
 }
 
 #else
@@ -389,9 +389,9 @@ void
 librdf_init_storage_file(librdf_world *world)
 {
   librdf_storage_register_factory(world, "file", "Local file based store",
-                                  &librdf_storage_list_register_factory);
+                                  &librdf_storage_file_register_factory);
   librdf_storage_register_factory(world, "uri",  "URI store (read-only)",
-                                  &librdf_storage_list_register_factory);
+                                  &librdf_storage_file_register_factory);
 }
 
 #endif
