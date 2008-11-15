@@ -630,7 +630,7 @@ for storage in $always_available_storages; do
 done
 
 
-storages_available="file hashes(memory) trees"
+storages_available="memory file hashes(memory) trees"
 if test "$have_libdb" = yes; then
   storages_available="$storages_available hashes(bdb $bdb_version)"
 fi
@@ -875,6 +875,8 @@ AC_SUBST(TSTORE_CPPFLAGS)
 AC_SUBST(TSTORE_LIBS)
 AC_SUBST(POSTGRESQL_CPPFLAGS)
 AC_SUBST(POSTGRESQL_LIBS)
+
+AC_DEFINE_UNQUOTED(LIBRDF_STORAGE_INTERFACE_VERSION, 1, [Storage module interface version])
 
 if test "$modular" = yes; then
   LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $INCLTDL"

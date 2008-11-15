@@ -170,6 +170,9 @@ static void* librdf_storage_hashes_context_serialise_get_statement(void* context
 static void librdf_storage_hashes_context_serialise_finished(void* context);
 
 static void librdf_storage_hashes_register_factory(librdf_storage_factory *factory);
+#ifdef MODULAR_LIBRDF
+void librdf_storage_module_register_factory(librdf_world *world);
+#endif
 
 
 /* node iterator implementing functions for get sources, targets, arcs methods */
@@ -245,7 +248,7 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
     librdf_storage_hashes_instance, 1, sizeof(librdf_storage_hashes_instance));
   
   librdf_storage_set_instance(storage, context);
-  
+
   context->name=(char*)name;
   
   context->hash_type=hash_type;
@@ -404,6 +407,9 @@ librdf_storage_hashes_terminate(librdf_storage* storage)
 {
   librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   int i;
+  
+  if (context == NULL)
+    return;
   
   for(i=0; i<context->hash_count; i++) {
     if(context->hash_descriptions && context->hash_descriptions[i])
@@ -1868,11 +1874,13 @@ librdf_storage_hashes_get_feature(librdf_storage* storage, librdf_uri* feature)
 }
 
 
-/* local function to register hashes storage functions */
-
+/** Local entry point for dynamically loaded storage module */
 static void
 librdf_storage_hashes_register_factory(librdf_storage_factory *factory) 
 {
+  LIBRDF_ASSERT_CONDITION(!strcmp(factory->name, "hashes"));
+
+  factory->version            = LIBRDF_STORAGE_INTERFACE_VERSION;
   factory->init               = librdf_storage_hashes_init;
   factory->clone              = librdf_storage_hashes_clone;
   factory->terminate          = librdf_storage_hashes_terminate;
@@ -1898,16 +1906,27 @@ librdf_storage_hashes_register_factory(librdf_storage_factory *factory)
   factory->get_feature              = librdf_storage_hashes_get_feature;
 }
 
+#ifdef MODULAR_LIBRDF
 
-/**
- * librdf_init_storage_hashes:
+/** Entry point for dynamically loaded storage module */
+void
+librdf_storage_module_register_factory(librdf_world *world)
+{
+  librdf_storage_register_factory(world, "hashes", "Indexed hashes",
+                                  &librdf_storage_hashes_register_factory);
+}
+
+#else
+
+/** INTERNAL - Initialise the built-in storage_hashes module.
  * @world: world object
- * 
- * INTERNAL - initialise the storage_hashes module.
- **/
+ */
 void
 librdf_init_storage_hashes(librdf_world *world)
 {
   librdf_storage_register_factory(world, "hashes", "Indexed hashes",
                                   &librdf_storage_hashes_register_factory);
 }
+
+#endif
+

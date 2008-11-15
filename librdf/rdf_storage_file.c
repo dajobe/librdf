@@ -76,7 +76,9 @@ static librdf_stream* librdf_storage_file_find_statements(librdf_storage* storag
 static int librdf_storage_file_sync(librdf_storage *storage);
 
 static void librdf_storage_file_register_factory(librdf_storage_factory *factory);
-
+#ifdef MODULAR_LIBRDF
+void librdf_storage_module_register_factory(librdf_world *world);
+#endif
 
 
 /* functions implementing storage api */
@@ -148,6 +150,9 @@ static void
 librdf_storage_file_terminate(librdf_storage* storage)
 {
   librdf_storage_file_instance* context=(librdf_storage_file_instance*)storage->instance;
+  
+  if (context == NULL)
+    return;
 
   librdf_storage_file_sync(storage);
 
@@ -343,11 +348,11 @@ librdf_storage_file_get_feature(librdf_storage* storage, librdf_uri* feature)
 }
 
 
-/* local function to register list storage functions */
-
+/** Local entry point for dynamically loaded storage module */
 static void
-librdf_storage_file_register_factory(librdf_storage_factory *factory) 
+librdf_storage_list_register_factory(librdf_storage_factory *factory) 
 {
+  factory->version            = LIBRDF_STORAGE_INTERFACE_VERSION;
   factory->init               = librdf_storage_file_init;
   factory->terminate          = librdf_storage_file_terminate;
   factory->open               = librdf_storage_file_open;
@@ -363,18 +368,31 @@ librdf_storage_file_register_factory(librdf_storage_factory *factory)
   factory->get_feature        = librdf_storage_file_get_feature;
 }
 
+#ifdef MODULAR_LIBRDF
 
-/**
- * librdf_init_storage_file:
+/** Entry point for dynamically loaded storage module */
+static void
+librdf_storage_module_register_factory(librdf_world *world)
+{
+  librdf_storage_register_factory(world, "file", "Local file based store",
+                                  &librdf_storage_list_register_factory);
+  librdf_storage_register_factory(world, "uri",  "URI store (read-only)",
+                                  &librdf_storage_list_register_factory);
+}
+
+#else
+
+/** INTERNAL - Initialise the built-in storage_file module.
  * @world: world object
- * 
- * INTERNAL - initialise the storage_file module.
- **/
+ */
 void
 librdf_init_storage_file(librdf_world *world)
 {
   librdf_storage_register_factory(world, "file", "Local file based store",
-                                  &librdf_storage_file_register_factory);
+                                  &librdf_storage_list_register_factory);
   librdf_storage_register_factory(world, "uri",  "URI store (read-only)",
-                                  &librdf_storage_file_register_factory);
+                                  &librdf_storage_list_register_factory);
 }
+
+#endif
+

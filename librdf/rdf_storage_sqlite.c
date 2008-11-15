@@ -164,7 +164,9 @@ static int librdf_storage_sqlite_transaction_rollback(librdf_storage *storage);
 static void librdf_storage_sqlite_query_flush(librdf_storage *storage);
 
 static void librdf_storage_sqlite_register_factory(librdf_storage_factory *factory);
-
+#ifdef MODULAR_LIBRDF
+void librdf_storage_module_register_factory(librdf_world *world);
+#endif
 
 
 /* functions implementing storage api */
@@ -230,6 +232,9 @@ static void
 librdf_storage_sqlite_terminate(librdf_storage* storage)
 {
   librdf_storage_sqlite_instance* context=(librdf_storage_sqlite_instance*)storage->instance;
+  
+  if (context == NULL)
+    return;
 
   if(context->name)
     LIBRDF_FREE(cstring, context->name);
@@ -2784,11 +2789,14 @@ librdf_storage_sqlite_query_flush(librdf_storage *storage)
     librdf_storage_sqlite_transaction_commit(storage);
 }
 
-/* local function to register sqlite storage functions */
 
+/** Local entry point for dynamically loaded storage module */
 static void
 librdf_storage_sqlite_register_factory(librdf_storage_factory *factory) 
 {
+  LIBRDF_ASSERT_CONDITION(!strcmp(factory->name, "sqlite"));
+
+  factory->version            = LIBRDF_STORAGE_INTERFACE_VERSION;
   factory->init               = librdf_storage_sqlite_init;
   factory->terminate          = librdf_storage_sqlite_terminate;
   factory->open               = librdf_storage_sqlite_open;
@@ -2811,16 +2819,27 @@ librdf_storage_sqlite_register_factory(librdf_storage_factory *factory)
   factory->transaction_rollback     = librdf_storage_sqlite_transaction_rollback;
 }
 
+#ifdef MODULAR_LIBRDF
 
-/**
- * librdf_init_storage_sqlite:
+/** Entry point for dynamically loaded storage module */
+void
+librdf_storage_module_register_factory(librdf_world *world)
+{
+  librdf_storage_register_factory(world, "sqlite", "SQLite",
+                                  &librdf_storage_sqlite_register_factory);
+}
+
+#else
+
+/** INTERNAL - Initialise the built-in storage_sqlite module.
  * @world: world object
- * 
- * INTERNAL - initialise the storage_sqlite module.
- **/
+ */
 void
 librdf_init_storage_sqlite(librdf_world *world)
 {
   librdf_storage_register_factory(world, "sqlite", "SQLite",
                                   &librdf_storage_sqlite_register_factory);
 }
+
+#endif
+

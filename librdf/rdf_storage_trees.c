@@ -108,7 +108,9 @@ static void librdf_storage_trees_avl_free(void* data);
 
 
 static void librdf_storage_trees_register_factory(librdf_storage_factory *factory);
-
+#ifdef MODULAR_LIBRDF
+void librdf_storage_module_register_factory(librdf_world *world);
+#endif
 
 
 /* functions implementing storage api */
@@ -162,7 +164,8 @@ librdf_storage_trees_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_trees_terminate(librdf_storage* storage)
 {
-  LIBRDF_FREE(librdf_storage_trees_instance, storage->instance);
+  if (storage->instance != NULL)
+    LIBRDF_FREE(librdf_storage_trees_instance, storage->instance);
 }
 
 
@@ -909,11 +912,13 @@ librdf_storage_trees_get_feature(librdf_storage* storage, librdf_uri* feature)
 }
 
 
-/* local function to register tree storage functions */
-
+/** Local entry point for dynamically loaded storage module */
 static void
 librdf_storage_trees_register_factory(librdf_storage_factory *factory) 
 {
+  LIBRDF_ASSERT_CONDITION(!strncmp(factory->name, "trees", 5));
+
+  factory->version                  = LIBRDF_STORAGE_INTERFACE_VERSION;
   factory->init                     = librdf_storage_trees_init;
   factory->clone                    = NULL;
   factory->terminate                = librdf_storage_trees_terminate;
@@ -953,17 +958,27 @@ librdf_storage_trees_register_factory(librdf_storage_factory *factory)
   factory->get_feature              = librdf_storage_trees_get_feature;
 }
 
+#ifdef MODULAR_LIBRDF
 
-/**
- * librdf_init_storage_trees:
+/** Entry point for dynamically loaded storage module */
+void
+librdf_storage_module_register_factory(librdf_world *world)
+{
+  librdf_storage_register_factory(world, "trees", "Balanced trees",
+                                  &librdf_storage_trees_register_factory);
+}
+
+#else
+
+/** INTERNAL - Initialise the built-in storage_trees module.
  * @world: world object
- * 
- * INTERNAL - initialise the storage_trees module.
- **/
+ */
 void
 librdf_init_storage_trees(librdf_world *world)
 {
   librdf_storage_register_factory(world, "trees", "Balanced trees",
                                   &librdf_storage_trees_register_factory);
 }
+
+#endif
 

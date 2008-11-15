@@ -136,7 +136,9 @@ static librdf_stream* librdf_storage_postgresql_find_statements_in_context(librd
 static librdf_iterator* librdf_storage_postgresql_get_contexts(librdf_storage* storage);
 
 static void librdf_storage_postgresql_register_factory(librdf_storage_factory *factory);
-
+#ifdef MODULAR_LIBRDF
+void librdf_storage_module_register_factory(librdf_world *world);
+#endif
 
 /* "private" helper definitions */
 typedef struct {
@@ -682,6 +684,9 @@ static void
 librdf_storage_postgresql_terminate(librdf_storage* storage)
 {
   librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
+  
+  if (context == NULL)
+    return;
 
   librdf_storage_postgresql_finish_connections(storage);
 
@@ -2340,6 +2345,9 @@ librdf_storage_postgresql_transaction_get_handle(librdf_storage* storage)
 static void
 librdf_storage_postgresql_register_factory(librdf_storage_factory *factory)
 {
+  LIBRDF_ASSERT_CONDITION(!strcmp(factory->name, "postgresql"));
+
+  factory->version            = LIBRDF_STORAGE_INTERFACE_VERSION;
   factory->init               = librdf_storage_postgresql_init;
   factory->terminate          = librdf_storage_postgresql_terminate;
   factory->open               = librdf_storage_postgresql_open;
@@ -2369,17 +2377,28 @@ librdf_storage_postgresql_register_factory(librdf_storage_factory *factory)
   factory->transaction_get_handle        = librdf_storage_postgresql_transaction_get_handle;
 }
 
+#ifdef MODULAR_LIBRDF
 
-/**
- * librdf_init_storage_postgresql:
+/** Entry point for dynamically loaded storage module */
+void
+librdf_storage_module_register_factory(librdf_world *world)
+{
+  librdf_storage_register_factory(world, "postgresql", "postgresql database store",
+                                  &librdf_storage_postgresql_register_factory);
+}
+
+#else
+
+/** INTERNAL - Initialise the built-in storage_postgresql module.
  * @world: world object
- * 
- * INTERNAL - initialise the storage_postgresql module.
- **/
+ */
 void
 librdf_init_storage_postgresql(librdf_world *world)
 {
   librdf_storage_register_factory(world, "postgresql", "postgresql database store",
                                   &librdf_storage_postgresql_register_factory);
 }
+
+#endif
+
 

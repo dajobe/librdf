@@ -53,7 +53,7 @@ typedef struct
   
   RDFSQL* rdfsql;
   
-} librdf_storage_tstore_context;
+} librdf_storage_tstore_instance;
 
 
 /* prototypes for local functions */
@@ -97,7 +97,9 @@ static librdf_statement* librdf_storage_tstore_statement_from_rs_triple(librdf_w
 static rs_triple* librdf_storage_tstore_statement_as_rs_triple(librdf_statement *statement);
 
 static void librdf_storage_tstore_register_factory(librdf_storage_factory *factory);
-
+#ifdef MODULAR_LIBRDF
+void librdf_storage_module_register_factory(librdf_world *world);
+#endif
 
 
 /* functions implementing storage api */
@@ -105,7 +107,10 @@ static int
 librdf_storage_tstore_init(librdf_storage* storage, const char *name,
                            librdf_hash* options)
 {
-  librdf_storage_tstore_context *context=(librdf_storage_tstore_context*)storage->context;
+  librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)LIBRDF_CALLOC(
+    librdf_storage_tstore_instance, 1, sizeof(librdf_storage_tstore_instance));
+
+  librdf_storage_set_instance(storage, context);
   
   context->host=librdf_hash_get_del(options, "host");
   context->db=librdf_hash_get_del(options, "database");
@@ -124,6 +129,9 @@ librdf_storage_tstore_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_tstore_terminate(librdf_storage* storage)
 {
+  if (context == NULL)
+    return;
+
   LIBRDF_FREE(context);
 }
 
@@ -132,7 +140,7 @@ librdf_storage_tstore_terminate(librdf_storage* storage)
 static int
 librdf_storage_tstore_open(librdf_storage* storage, librdf_model* model)
 {
-  librdf_storage_tstore_context *context=(librdf_storage_tstore_context*)storage->context;
+  librdf_storage_tstore_instance *context=(librdf_storage_tstore_instance*)storage->instance;
 
   if(context->host)
     context->rdfsql=rs_connect_remote(context->host,
@@ -162,7 +170,7 @@ librdf_storage_tstore_open(librdf_storage* storage, librdf_model* model)
 static int
 librdf_storage_tstore_close(librdf_storage* storage)
 {
-  /* librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context; */
+  /* librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)storage->instance; */
 
   return 0;
 }
@@ -195,7 +203,7 @@ librdf_storage_tstore_remove_statement(librdf_storage* storage, librdf_statement
 static int
 librdf_storage_tstore_contains_statement(librdf_storage* storage, librdf_statement* statement)
 {
-  /*librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context; */
+  /*librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)storage->instance; */
   /* FIXME */
   return 0;
 }
@@ -308,7 +316,7 @@ typedef struct {
 static librdf_stream*
 librdf_storage_tstore_serialise(librdf_storage* storage)
 {
-  librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context;
+  librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)storage->instance;
   librdf_storage_tstore_serialise_stream_context* scontext;
   librdf_stream* stream;
   
@@ -438,7 +446,7 @@ typedef struct {
 static librdf_stream*
 librdf_storage_tstore_find_statements(librdf_storage* storage, librdf_statement* statement)
 {
-  librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context;
+  librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)storage->instance;
   librdf_storage_tstore_find_stream_context* scontext;
   librdf_stream* stream;
   rs_triple* triple;
@@ -582,7 +590,7 @@ librdf_storage_tstore_context_add_statement(librdf_storage* storage,
                                             librdf_node* context_node,
                                             librdf_statement* statement) 
 {
-  librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context;
+  librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)storage->instance;
   librdf_node *subject_node=statement->subject;
   librdf_node *predicate_node=statement->predicate;
   librdf_node *object_node=statement->object;
@@ -635,7 +643,7 @@ librdf_storage_tstore_context_remove_statement(librdf_storage* storage,
                                              librdf_node* context_node,
                                              librdf_statement* statement) 
 {
-  /* librdf_storage_tstore_context* context=(librdf_storage_tstore_context*)storage->context; */
+  /* librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)storage->instance; */
 
   /* FIXME */
 
@@ -706,13 +714,13 @@ librdf_storage_tstore_context_serialise_finished(void* context)
 #endif
 
 
-/* local function to register list storage functions */
-
+/** Local entry point for dynamically loaded storage module */
 static void
-librdf_storage_tstore_register_factory(librdf_storage_factory *factory) 
+librdf_storage_register_factory(librdf_storage_factory *factory) 
 {
-  factory->context_length     = sizeof(librdf_storage_tstore_context);
+  assert(factory->name    == "tstore");
   
+  factory->version            = LIBRDF_STORAGE_INTERFACE_VERSION;
   factory->init               = librdf_storage_tstore_init;
   factory->terminate          = librdf_storage_tstore_terminate;
   factory->open               = librdf_storage_tstore_open;
@@ -728,16 +736,27 @@ librdf_storage_tstore_register_factory(librdf_storage_factory *factory)
   factory->context_serialise        = librdf_storage_tstore_context_serialise;
 }
 
+#ifdef MODULAR_LIBRDF
 
-/**
- * librdf_init_storage_tstore:
+/** Entry point for dynamically loaded storage module */
+static void
+librdf_storage_module_register_factory(librdf_world *world)
+{
+  librdf_storage_register_factory(world, "tstore", "AKT triplestore",
+                                  &librdf_storage_tstore_register_factory);
+}
+
+#else
+
+/** INTERNAL - Initialise the built-in storage_tstore module.
  * @world: world object
- * 
- * INTERNAL - initialise the storage_tstore module.
- **/
+ */
 void
 librdf_init_storage_tstore(librdf_world *world)
 {
   librdf_storage_register_factory(world, "tstore", "AKT triplestore",
                                   &librdf_storage_tstore_register_factory);
 }
+
+#endif
+

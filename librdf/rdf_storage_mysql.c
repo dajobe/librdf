@@ -231,7 +231,7 @@ static librdf_stream* librdf_storage_mysql_find_statements_in_context(librdf_sto
                                                librdf_node* context_node);
 static librdf_iterator* librdf_storage_mysql_get_contexts(librdf_storage* storage);
 
-static void librdf_storage_mysql_register_factory(librdf_storage_factory *factory);
+static void librdf_storage_mysql_register(librdf_storage_factory *factory);
 
 /* "private" helper definitions */
 typedef struct {
@@ -281,9 +281,12 @@ static int librdf_storage_mysql_get_contexts_next_context(void* context);
 static void* librdf_storage_mysql_get_contexts_get_context(void* context, int flags);
 static void librdf_storage_mysql_get_contexts_finished(void* context);
 
-
 static int librdf_storage_mysql_transaction_rollback(librdf_storage* storage);
 
+static void librdf_storage_mysql_register_factory(librdf_storage_factory *factory);
+#ifdef MODULAR_LIBRDF
+void librdf_storage_module_register_factory(librdf_world *world);
+#endif
 
 
 /* functions implementing storage api */
@@ -793,6 +796,9 @@ static void
 librdf_storage_mysql_terminate(librdf_storage* storage)
 {
   librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
+  
+  if (context == NULL)
+    return;
 
   librdf_storage_mysql_finish_connections(storage);
 
@@ -2988,11 +2994,13 @@ librdf_storage_mysql_transaction_get_handle(librdf_storage* storage)
 }
 
 
-
-/* local function to register MySQL storage functions */
+/** Local entry point for dynamically loaded storage module */
 static void
-librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
+librdf_storage_mysql_register(librdf_storage_factory *factory)
 {
+  LIBRDF_ASSERT_CONDITION(!strcmp(factory->name, "mysql"));
+
+  factory->version            = LIBRDF_STORAGE_INTERFACE_VERSION;
   factory->init               = librdf_storage_mysql_init;
   factory->terminate          = librdf_storage_mysql_terminate;
   factory->open               = librdf_storage_mysql_open;
@@ -3022,16 +3030,27 @@ librdf_storage_mysql_register_factory(librdf_storage_factory *factory)
   factory->transaction_get_handle        = librdf_storage_mysql_transaction_get_handle;
 }
 
+#ifdef MODULAR_LIBRDF
 
-/**
- * librdf_init_storage_mysql:
+/** Entry point for dynamically loaded storage module */
+void
+librdf_storage_module_register_factory(librdf_world *world)
+{
+  librdf_storage_register_factory(world, "mysql", "MySQL database store",
+                                  &librdf_storage_mysql_register);
+}
+
+#else
+
+/** INTERNAL - Initialise the built-in storage_mysql module.
  * @world: world object
- * 
- * INTERNAL - initialise the storage_mysql module.
- **/
+ */
 void
 librdf_init_storage_mysql(librdf_world *world)
 {
   librdf_storage_register_factory(world, "mysql", "MySQL database store",
-                                  &librdf_storage_mysql_register_factory);
+                                  &librdf_storage_mysql_register);
 }
+
+#endif
+

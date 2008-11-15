@@ -100,9 +100,10 @@ static int librdf_storage_list_get_contexts_next_method(void* iterator);
 static void* librdf_storage_list_get_contexts_get_method(void* iterator, int);
 static void librdf_storage_list_get_contexts_finished(void* iterator);
 
-
 static void librdf_storage_list_register_factory(librdf_storage_factory *factory);
-
+#ifdef MODULAR_LIBRDF
+void librdf_storage_module_register_factory(librdf_world *world);
+#endif
 
 
 /* functions implementing storage api */
@@ -133,6 +134,8 @@ librdf_storage_list_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_list_terminate(librdf_storage* storage)
 {
+  if (storage->instance == NULL)
+    return;
   LIBRDF_FREE(librdf_storage_list_instance, storage->instance);
 }
 
@@ -938,11 +941,13 @@ librdf_storage_list_get_feature(librdf_storage* storage, librdf_uri* feature)
 }
 
 
-/* local function to register list storage functions */
-
+/** Local entry point for dynamically loaded storage module */
 static void
 librdf_storage_list_register_factory(librdf_storage_factory *factory) 
 {
+  LIBRDF_ASSERT_CONDITION(!strcmp(factory->name, "memory"));
+
+  factory->version            = LIBRDF_STORAGE_INTERFACE_VERSION;
   factory->init               = librdf_storage_list_init;
   factory->terminate          = librdf_storage_list_terminate;
   factory->open               = librdf_storage_list_open;
@@ -961,16 +966,26 @@ librdf_storage_list_register_factory(librdf_storage_factory *factory)
   factory->get_feature              = librdf_storage_list_get_feature;
 }
 
+#ifdef MODULAR_LIBRDF
 
-/**
- * librdf_init_storage_list:
+/** Entry point for dynamically loaded storage module */
+void
+librdf_storage_module_register_factory(librdf_world *world)
+{
+  librdf_storage_register_factory(world, "memory", "In memory lists",
+                                  &librdf_storage_list_register_factory);
+}
+
+#else
+
+/** INTERNAL - Initialise the built-in storage_list module.
  * @world: world object
- * 
- * INTERNAL - initialise the storage_list module.
- **/
+ */
 void
 librdf_init_storage_list(librdf_world *world)
 {
-  librdf_storage_register_factory(world, "memory", "In memory",
+  librdf_storage_register_factory(world, "memory", "In memory lists",
                                   &librdf_storage_list_register_factory);
 }
+
+#endif

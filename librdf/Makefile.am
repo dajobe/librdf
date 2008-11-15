@@ -51,7 +51,7 @@ rdf_iterator.c rdf_concepts.c \
 rdf_avltree.c \
 rdf_cache.c \
 rdf_list.c \
-rdf_storage.c rdf_storage_list.c rdf_storage_hashes.c rdf_storage_trees.c \
+rdf_storage.c \
 rdf_storage_sql.c \
 rdf_stream.c \
 rdf_parser.c rdf_parser_raptor.c \
@@ -106,7 +106,25 @@ plugindir = $(libdir)/redland
 
 if MODULAR_LIBRDF
 
-plugin_LTLIBRARIES =
+plugin_LTLIBRARIES = 
+
+if STORAGE_MEMORY
+plugin_LTLIBRARIES += librdf_storage_list.la
+librdf_storage_list_la_SOURCES = rdf_storage_list.c
+librdf_storage_list_la_LDFLAGS = -module -avoid-version
+endif
+
+if STORAGE_HASHES
+plugin_LTLIBRARIES += librdf_storage_hashes.la
+librdf_storage_hashes_la_SOURCES = rdf_storage_hashes.c
+librdf_storage_hashes_la_LDFLAGS = -module -avoid-version
+endif
+
+if STORAGE_TREES
+plugin_LTLIBRARIES += librdf_storage_trees.la
+librdf_storage_trees_la_SOURCES = rdf_storage_trees.c
+librdf_storage_trees_la_LDFLAGS = -module -avoid-version
+endif
 
 if STORAGE_TSTORE
 plugin_LTLIBRARIES += librdf_storage_tstore.la
@@ -141,6 +159,8 @@ librdf_storage_postgresql_la_LDFLAGS = -module -avoid-version
 endif
 
 else
+
+librdf_la_SOURCES += rdf_storage_list.c rdf_storage_hashes.c rdf_storage_trees.c
 
 if STORAGE_FILE
 librdf_la_SOURCES += rdf_storage_file.c

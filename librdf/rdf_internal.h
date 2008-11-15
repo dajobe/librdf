@@ -95,6 +95,14 @@ void librdf_system_free(void *ptr);
 
 #ifdef LIBRDF_ASSERT
 
+#define LIBRDF_ASSERT_CONDITION(condition) do { \
+  if(!condition) { \
+    LIBRDF_ASSERT_REPORT("assertion " #condition " failed.") \
+    LIBRDF_ASSERT_DIE \
+    return; \
+  } \
+} while(0)
+
 #define LIBRDF_ASSERT_RETURN(condition, msg, ret) do { \
   if(condition) { \
     LIBRDF_ASSERT_REPORT(msg) \
@@ -121,6 +129,7 @@ void librdf_system_free(void *ptr);
 
 #else
 
+#define LIBRDF_ASSERT_CONDITION(condition)
 #define LIBRDF_ASSERT_RETURN(condition, msg, ret) 
 #define LIBRDF_ASSERT_OBJECT_POINTER_RETURN(pointer, type)
 #define LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(pointer, type, ret)

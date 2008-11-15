@@ -60,8 +60,11 @@ static void librdf_storage_stream_to_node_iterator_finished(void* iterator);
 /* helper function for creating iterators for get sources, targets, arcs */
 static librdf_iterator* librdf_storage_node_stream_to_node_create(librdf_storage* storage, librdf_node* node1, librdf_node *node2, librdf_statement_part want);
 
+/* helper functions for dynamically loading storage modules */
 #ifdef MODULAR_LIBRDF
-/* helper function for dynamically loading storage modules */
+void
+librdf_storage_load_all_modules(librdf_world *world);
+
 static lt_dlhandle
 librdf_storage_load_module(librdf_world *world,
                            const char* lib_name,
@@ -83,62 +86,24 @@ void
 librdf_init_storage(librdf_world *world)
 {
 #ifdef MODULAR_LIBRDF
-  lt_dlhandle module = NULL;
 
   if (!world->storage_modules)
     world->storage_modules = raptor_new_sequence(
-        (raptor_sequence_free_handler *)lt_dlclose, NULL);
-#endif
+        (raptor_sequence_free_handler*)lt_dlclose, NULL);
 
-  /* Always have storage memory - must always be the default storage */
-  librdf_init_storage_list(world);
+  librdf_storage_load_all_modules(world);
 
-  /* Always have storage list, hashes, file implementations available */
-  librdf_init_storage_hashes(world);
-
-#ifdef STORAGE_TREES
-  librdf_init_storage_trees(world);
-#endif
-
-#ifdef MODULAR_LIBRDF
-
-  #ifdef STORAGE_FILE
-    module = librdf_storage_load_module(world, "librdf_storage_file",
-                                        "librdf_init_storage_file");
-    if (module)
-      raptor_sequence_push(world->storage_modules, module);
-  #endif
+#else /* monolithic */
   
-  #ifdef STORAGE_MYSQL
-    module = librdf_storage_load_module(world, "librdf_storage_mysql",
-                                        "librdf_init_storage_mysql");
-    if (module)
-      raptor_sequence_push(world->storage_modules, module);
+  #ifdef STORAGE_MEMORY
+    librdf_init_storage_list(world);
   #endif
-  
-  #ifdef STORAGE_POSTGRESQL
-    module = librdf_storage_load_module(world, "librdf_storage_postgresql",
-                                        "librdf_init_storage_postgresql");
-    if (module)
-      raptor_sequence_push(world->storage_modules, module);
+  #ifdef STORAGE_HASHES
+    librdf_init_storage_hashes(world);
   #endif
-  
-  #ifdef STORAGE_TSTORE
-    module = librdf_storage_load_module(world, "librdf_storage_tstore",
-                                        "librdf_init_storage_tstore");
-    if (module)
-      raptor_sequence_push(world->storage_modules, module);
+  #ifdef STORAGE_TREES
+    librdf_init_storage_trees(world);
   #endif
-  
-  #ifdef STORAGE_SQLITE
-    module = librdf_storage_load_module(world, "librdf_storage_sqlite",
-                                        "librdf_init_storage_sqlite");
-    if (module)
-      raptor_sequence_push(world->storage_modules, module);
-  #endif
-
-#else /* if !MODULAR_LIBRDF */
-  
   #ifdef STORAGE_FILE
     librdf_init_storage_file(world);
   #endif
@@ -169,6 +134,11 @@ librdf_init_storage(librdf_world *world)
 void
 librdf_finish_storage(librdf_world *world) 
 {
+  if(world->storages) {
+    raptor_free_sequence(world->storages);
+    world->storages=NULL;
+  }
+
 #ifdef MODULAR_LIBRDF
   if(world->storage_modules) {
     raptor_free_sequence(world->storage_modules);
@@ -176,10 +146,6 @@ librdf_finish_storage(librdf_world *world)
   }
 #endif
   
-  if(world->storages) {
-    raptor_free_sequence(world->storages);
-    world->storages=NULL;
-  }
 }
 
 
@@ -199,6 +165,30 @@ librdf_free_storage_factory(librdf_storage_factory* factory)
 
 
 #ifdef MODULAR_LIBRDF
+  
+static int
+ltdl_module_callback(const char* filename, void* data)
+{
+  librdf_world* world = (librdf_world*)data;
+  lt_dlhandle module = librdf_storage_load_module(world, filename,
+      "librdf_storage_module_register_factory");
+  if (module)
+    raptor_sequence_push(world->storage_modules, module);
+  return 0;
+}
+
+/**
+ * librdf_storage_load_all_modules:
+ * @world: redland world object
+ *
+ * INTERNAL - Load and initialize/register all installed storage modules
+ **/
+void
+librdf_storage_load_all_modules(librdf_world *world)
+{
+  lt_dlforeachfile(lt_dlgetsearchpath(), ltdl_module_callback, world);
+}
+
 /**
  * librdf_storage_load_module:
  * @world: redland world object
@@ -214,7 +204,7 @@ librdf_storage_load_module(librdf_world *world,
 {
   typedef void init_func_t(librdf_world* world);
   init_func_t* init;
-
+  
   lt_dlhandle module = lt_dlopenext(lib_name);
   if (module) {
     init = (init_func_t*)lt_dlsym(module, init_func_name);
@@ -323,33 +313,29 @@ librdf_storage_register_factory(librdf_world* world,
 librdf_storage_factory*
 librdf_get_storage_factory(librdf_world* world, const char *name) 
 {
+  int i;
+
   librdf_storage_factory *factory;
 
   librdf_world_open(world);
 
-  /* return 1st storage if no particular one wanted - why? */
-  if(!name) {
-    factory=(librdf_storage_factory *)raptor_sequence_get_at(world->storages, 0);
-    if(!factory) {
-      LIBRDF_DEBUG1("No (default) storages registered\n");
-      return NULL;
-    }
-  } else {
-    int i;
-    
-    for(i=0;
-        (factory=(librdf_storage_factory*)raptor_sequence_get_at(world->storages, i));
-        i++) {
-      if(!strcmp(factory->name, name))
-        break;
-    }
-    /* else FACTORY name not found */
-    if(!factory) {
-      LIBRDF_DEBUG2("No storage with name %s found\n", name);
-      return NULL;
-    }
+  /* use "memory" if nothing is specified (FIXME: probably not the best choice) */
+  if (!name)
+    name = "memory";
+
+  /* search for factory */
+  for(i=0;
+      (factory=(librdf_storage_factory*)raptor_sequence_get_at(world->storages, i));
+      i++) {
+    if(!strcmp(factory->name, name))
+      break;
   }
-        
+
+  if(!factory) {
+    LIBRDF_DEBUG2("No storage with name %s found\n", name);
+    return NULL;
+  }
+
   return factory;
 }
 
@@ -582,8 +568,8 @@ librdf_new_storage_from_factory(librdf_world *world,
   storage->factory=factory;
 
   if(factory->init(storage, name, options)) {
-    librdf_free_hash(options);
     librdf_free_storage(storage);
+    librdf_free_hash(options);
     return NULL;
   }
   
