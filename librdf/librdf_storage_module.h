@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_storage_factory.h - Interface for an RDF Storage factory
+ * librdf_storage_module.h - Interface for a Redland storage module
  *
  * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
