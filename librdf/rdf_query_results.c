@@ -122,7 +122,7 @@ librdf_query_results_finished(librdf_query_results *query_results)
  * to the librdf_node* of the results.  These nodes must be freed
  * by the caller.  The size of the array is determined by the
  * number of names of bindings, returned by
- * librdf_query_get_bindings_count dynamically or
+ * librdf_query_results_get_bindings_count dynamically or
  * will be known in advanced if hard-coded into the query string.
  * 
  * Example
