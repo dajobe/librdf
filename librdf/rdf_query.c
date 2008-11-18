@@ -646,8 +646,9 @@ main(int argc, char *argv[])
     fputs("result: [", stdout);
     if(names) {
       int i;
+      int count = librdf_query_results_get_bindings_count(results);
       
-      for(i=0; names[i]; i++) {
+      for(i = 0; i < count; i++) {
         fprintf(stdout, "%s=", names[i]);
         if(values[i]) {
           librdf_node_print(values[i], stdout);
