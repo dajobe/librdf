@@ -569,7 +569,6 @@ librdf_new_storage_from_factory(librdf_world *world,
 
   if(factory->init(storage, name, options)) {
     librdf_free_storage(storage);
-    librdf_free_hash(options);
     return NULL;
   }
   
