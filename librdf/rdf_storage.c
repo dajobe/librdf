@@ -657,6 +657,19 @@ librdf_storage_get_instance(librdf_storage *storage)
 }
 
 
+/**
+ * librdf_storage_get_world:
+ * @storage: #librdf_storage object
+ *
+ * Get the #librdf_world object associated with this storage.
+ **/
+librdf_world *
+librdf_storage_get_world(librdf_storage *storage)
+{
+  return storage->world;
+}
+
+
 /* methods */
 
 /**

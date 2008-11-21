@@ -71,6 +71,9 @@ REDLAND_API
 librdf_storage_instance librdf_storage_get_instance(librdf_storage *storage);
 
 REDLAND_API
+librdf_world *librdf_storage_get_world(librdf_storage *storage);
+
+REDLAND_API
 int librdf_storage_open(librdf_storage* storage, librdf_model *model);
 REDLAND_API
 int librdf_storage_close(librdf_storage* storage);
