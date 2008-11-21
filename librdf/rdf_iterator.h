@@ -60,6 +60,15 @@ typedef void (*librdf_iterator_map_free_context_handler)(void *map_context);
 #include <rdf_iterator_internal.h>
 #endif
 
+/* iterator get_method flags */
+
+/* FIXME - should all short lists be enums */
+#define LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  0
+#define LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT 1
+#define LIBRDF_ITERATOR_GET_METHOD_GET_KEY     2
+#define LIBRDF_ITERATOR_GET_METHOD_GET_VALUE   3
+
+
 REDLAND_API
 librdf_iterator* librdf_new_iterator(librdf_world *world, void *context, int (*is_end_method)(void*), int (*next_method)(void*), void* (*get_method)(void*, int), void (*finished_method)(void*));
 

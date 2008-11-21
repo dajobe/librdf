@@ -55,11 +55,6 @@ struct librdf_iterator_s {
   void (*finished_method)(void*);
 };
 
-/* FIXME - should all short lists be enums */
-#define LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  0
-#define LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT 1
-#define LIBRDF_ITERATOR_GET_METHOD_GET_KEY     2
-#define LIBRDF_ITERATOR_GET_METHOD_GET_VALUE   3
 
 #ifdef __cplusplus
 }

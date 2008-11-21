@@ -58,6 +58,12 @@ typedef void (*librdf_stream_map_free_context_handler)(void *map_context);
 #include <rdf_stream_internal.h>
 #endif
 
+/* stream get_method flags */
+
+/* FIXME - should all short lists be enums */
+#define LIBRDF_STREAM_GET_METHOD_GET_OBJECT  LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  
+#define LIBRDF_STREAM_GET_METHOD_GET_CONTEXT LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT
+
 
 /* constructor */
 

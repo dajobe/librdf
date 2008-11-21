@@ -54,10 +54,6 @@ struct librdf_stream_s {
   void (*finished_method)(void*);
 };
 
-/* FIXME - should all short lists be enums */
-#define LIBRDF_STREAM_GET_METHOD_GET_OBJECT  LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  
-#define LIBRDF_STREAM_GET_METHOD_GET_CONTEXT LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT
-
 librdf_statement* librdf_stream_statement_find_map(librdf_stream *stream, void* context, librdf_statement* statement);
 
 #ifdef __cplusplus
