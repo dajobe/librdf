@@ -645,12 +645,10 @@ librdf_storage_set_instance(librdf_storage *storage, librdf_storage_instance ins
 
 
 /**
- * librdf_storage_remove_reference(libdf_storage *storage)
+ * librdf_storage_get_instance(libdf_storage *storage)
  * @storage: #librdf_storage object
  *
- * Decrement storage reference count by one.
- * Free the storage if reference count becomes zero.
- * This function is intended to be internal to librdf storage modules.
+ * Return the instance data for this storage, as set with librdf_storage_set_instance.
  **/
 librdf_storage_instance
 librdf_storage_get_instance(librdf_storage *storage)
