@@ -38,7 +38,7 @@ the storage options used.
 indexed storage using Redland <a href="api/storage.html">hashes</a>
 to store various combinations of subject, predicate and object for
 faster access. Context nodes are also stored in a hash when used.
-The hashes may be in-memory (always availabe) or persistent via
+The hashes may be in-memory (always available) or persistent via
 Sleepycat/Berkeley DB (BDB) versions 2-4.  It is the most mature and
 primary persistent store and suitable for large models, tested in the
 2-3 million range..</p>
@@ -186,7 +186,7 @@ boolean storage option <code>contexts</code> is set.</p>
 
 <p>Examples:</p>
 <pre>
-  /* Explictly named memory storage */
+  /* Explicitly named memory storage */
   storage=librdf_new_storage(world, "memory", NULL, NULL);
 
   /* Default storage type, which is memory */
@@ -203,7 +203,7 @@ boolean storage option <code>contexts</code> is set.</p>
 <li>Fast</li>
 <li>Suitable for small models</li>
 <li>No indexing</li>
-<li>No persistance</li>
+<li>No persistence</li>
 <li>Optional contexts (with option <code>contexts</code> set)</li>
 </ul>
 
@@ -282,11 +282,11 @@ database named by the storage option <code>database</code>, say
 <em>db</em> will be dropped and the appropriate new tables created.
 The MySQL database <em>db</em> must already exist, such as made with
 the MySQL <code>create database </code><em>db</em> command and the
-appropriate priviledges set so that the user and password work.
+appropriate privileges set so that the user and password work.
 </p>
 
 <p>If boolean option <code>reconnect</code> is given, MySQL
-reconnection will be enabled so that if the database conneciton
+reconnection will be enabled so that if the database connection
 is dropped, MySQL will attempt to reconnect.
 </p>
 
@@ -381,7 +381,7 @@ database named by the storage option <code>database</code>, say
 <em>db</em> will be dropped and the appropriate new tables created.
 The PostgreSQL database <em>db</em> must already exist, such as made with
 the PostgreSQL <code>create database </code><em>db</em> command and the
-appropriate priviledges set so that the user and password work.</p>
+appropriate privileges set so that the user and password work.</p>
 
 <p>This store always provides contexts; the boolean storage option
 <code>contexts</code> is not checked.</p>

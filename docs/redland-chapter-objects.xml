@@ -69,7 +69,7 @@ examples could be:
 </programlisting>
 </para>
 
-<para>It is often convienent to get a string representation of an
+<para>It is often convenient to get a string representation of an
 object for further processing, debugging or serialisation.  There are
 two conventions for methods that provide this functionality - the
 first is when a pointer is returned to a <emphasis>shared</emphasis>

@@ -41,7 +41,7 @@ the storage options used.
 indexed storage using Redland <xref linkend="redland-storage"/> to
 store various combinations of subject, predicate and object for
 faster access. Context nodes are also stored in a hash when used.
-The hashes may be in-memory (always availabe) or persistent via
+The hashes may be in-memory (always available) or persistent via
 Sleepycat/Berkeley DB (BDB) versions 2-4.  It is the most mature and
 primary persistent store and suitable for large models, tested in the
 2-3 million range..</para>
@@ -129,7 +129,7 @@ boolean storage option <literal>contexts</literal> is set.</para>
 
 <para>Examples:</para>
 <programlisting>
-  /* Explictly named memory storage */
+  /* Explicitly named memory storage */
   storage=librdf_new_storage(world, "memory", NULL, NULL);
 
   /* Default storage type, which is memory */
@@ -145,7 +145,7 @@ boolean storage option <literal>contexts</literal> is set.</para>
   <listitem><para>Fast</para></listitem>
   <listitem><para>Suitable for small models</para></listitem>
   <listitem><para>No indexing</para></listitem>
-  <listitem><para>No persistance</para></listitem>
+  <listitem><para>No persistence</para></listitem>
   <listitem><para>Optional contexts (with option <literal>contexts</literal> set)</para></listitem>
 </itemizedlist>
 
@@ -219,18 +219,18 @@ The rdfproc utility source code demonstrates this.
 <para>The storage name parameter given to the storage constructor
 <literal>librdf_new_storage</literal> is used inside the mysql store to
 allow multiple stores inside one MySQL database instance as
-parameterised with the above optiosn.</para>
+parameterised with the above options.</para>
 
 <para>If boolean option <literal>new</literal> is given, any existing MySQL
 database named by the storage option <literal>database</literal>, say
 <emphasis>db</emphasis> will be dropped and the appropriate new tables created.
 The MySQL database <emphasis>db</emphasis> must already exist, such as made with
 the MySQL <literal>create database </literal><emphasis>db</emphasis> command and the
-appropriate priviledges set so that the user and password work.
+appropriate privileges set so that the user and password work.
 </para>
 
 <para>If boolean option <literal>reconnect</literal> is given, MySQL
-reconnection will be enabled so that if the database conneciton
+reconnection will be enabled so that if the database connection
 is dropped, MySQL will attempt to reconnect.
 </para>
 
@@ -270,7 +270,7 @@ is dropped, MySQL will attempt to reconnect.
 <itemizedlist>
   <listitem><para>Persistent</para></listitem>
   <listitem><para>Suitable for very large models</para></listitem>
-  <listitem><para>Indexed but not optimised</para></listitem>
+  <listitem><para>Indexed but not optimized</para></listitem>
   <listitem><para>Smaller disk usage than BDB</para></listitem>
   <listitem><para>Possibility of free text searching</para></listitem>
   <listitem><para>Contexts always provided</para>
@@ -328,7 +328,7 @@ option <literal>database</literal>, say
 tables created.  The PostgreSQL database <emphasis>db</emphasis> must
 already exist, such as made with the PostgreSQL <literal>create
 database </literal><emphasis>db</emphasis> command and the
-appropriate priviledges set so that the user and password
+appropriate privileges set so that the user and password
 work.</para>
 
 <para>This store always provides contexts; the boolean storage option
@@ -368,7 +368,7 @@ work.</para>
 <itemizedlist>
   <listitem><para>Persistent</para></listitem>
   <listitem><para>Suitable for very large models</para></listitem>
-  <listitem><para>Indexed but not optimised</para></listitem>
+  <listitem><para>Indexed but not optimized</para></listitem>
   <listitem><para>Smaller disk usage than BDB</para></listitem>
   <listitem><para>Contexts always provided</para></listitem>
 </itemizedlist>
@@ -444,7 +444,7 @@ The rdfproc utility source code demonstrates this.
 <itemizedlist>
   <listitem><para>Persistent</para></listitem>
   <listitem><para>Suitable for very large models</para></listitem>
-  <listitem><para>Indexed and optimised by the AKT project</para></listitem>
+  <listitem><para>Indexed and optimized by the AKT project</para></listitem>
   <listitem><para>No Redland contexts</para></listitem>
   <listitem><para>Alpha quality</para></listitem>
 </itemizedlist>
