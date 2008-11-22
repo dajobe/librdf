@@ -101,9 +101,6 @@ static void* librdf_storage_list_get_contexts_get_method(void* iterator, int);
 static void librdf_storage_list_get_contexts_finished(void* iterator);
 
 static void librdf_storage_list_register_factory(librdf_storage_factory *factory);
-#ifdef MODULAR_LIBRDF
-void librdf_storage_module_register_factory(librdf_world *world);
-#endif
 
 
 /* functions implementing storage api */
@@ -966,17 +963,6 @@ librdf_storage_list_register_factory(librdf_storage_factory *factory)
   factory->get_feature              = librdf_storage_list_get_feature;
 }
 
-#ifdef MODULAR_LIBRDF
-
-/** Entry point for dynamically loaded storage module */
-void
-librdf_storage_module_register_factory(librdf_world *world)
-{
-  librdf_storage_register_factory(world, "memory", "In memory lists",
-                                  &librdf_storage_list_register_factory);
-}
-
-#else
 
 /** INTERNAL - Initialise the built-in storage_list module.
  * @world: world object
@@ -987,5 +973,3 @@ librdf_init_storage_list(librdf_world *world)
   librdf_storage_register_factory(world, "memory", "In memory lists",
                                   &librdf_storage_list_register_factory);
 }
-
-#endif

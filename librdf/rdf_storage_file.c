@@ -76,9 +76,6 @@ static librdf_stream* librdf_storage_file_find_statements(librdf_storage* storag
 static int librdf_storage_file_sync(librdf_storage *storage);
 
 static void librdf_storage_file_register_factory(librdf_storage_factory *factory);
-#ifdef MODULAR_LIBRDF
-void librdf_storage_module_register_factory(librdf_world *world);
-#endif
 
 
 /* functions implementing storage api */
@@ -368,19 +365,6 @@ librdf_storage_file_register_factory(librdf_storage_factory *factory)
   factory->get_feature        = librdf_storage_file_get_feature;
 }
 
-#ifdef MODULAR_LIBRDF
-
-/** Entry point for dynamically loaded storage module */
-static void
-librdf_storage_module_register_factory(librdf_world *world)
-{
-  librdf_storage_register_factory(world, "file", "Local file based store",
-                                  &librdf_storage_file_register_factory);
-  librdf_storage_register_factory(world, "uri",  "URI store (read-only)",
-                                  &librdf_storage_file_register_factory);
-}
-
-#else
 
 /** INTERNAL - Initialise the built-in storage_file module.
  * @world: world object
@@ -393,6 +377,4 @@ librdf_init_storage_file(librdf_world *world)
   librdf_storage_register_factory(world, "uri",  "URI store (read-only)",
                                   &librdf_storage_file_register_factory);
 }
-
-#endif
 

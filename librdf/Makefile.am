@@ -105,27 +105,15 @@ endif
 
 plugindir = $(libdir)/redland
 
+# Storages always built-in
+librdf_la_SOURCES += rdf_storage_list.c rdf_storage_hashes.c rdf_storage_trees.c
+if STORAGE_FILE
+librdf_la_SOURCES += rdf_storage_file.c
+endif
+
 if MODULAR_LIBRDF
 
 plugin_LTLIBRARIES = 
-
-if STORAGE_MEMORY
-plugin_LTLIBRARIES += librdf_storage_list.la
-librdf_storage_list_la_SOURCES = rdf_storage_list.c
-librdf_storage_list_la_LDFLAGS = -module -avoid-version
-endif
-
-if STORAGE_HASHES
-plugin_LTLIBRARIES += librdf_storage_hashes.la
-librdf_storage_hashes_la_SOURCES = rdf_storage_hashes.c
-librdf_storage_hashes_la_LDFLAGS = -module -avoid-version
-endif
-
-if STORAGE_TREES
-plugin_LTLIBRARIES += librdf_storage_trees.la
-librdf_storage_trees_la_SOURCES = rdf_storage_trees.c
-librdf_storage_trees_la_LDFLAGS = -module -avoid-version
-endif
 
 if STORAGE_TSTORE
 plugin_LTLIBRARIES += librdf_storage_tstore.la
@@ -160,12 +148,6 @@ librdf_storage_postgresql_la_LDFLAGS = -module -avoid-version
 endif
 
 else
-
-librdf_la_SOURCES += rdf_storage_list.c rdf_storage_hashes.c rdf_storage_trees.c
-
-if STORAGE_FILE
-librdf_la_SOURCES += rdf_storage_file.c
-endif
 
 if STORAGE_TSTORE
 librdf_la_SOURCES += rdf_storage_tstore.c
@@ -219,6 +201,8 @@ rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
 rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test \
 rdf_init_test rdf_cache_test
+
+TESTS_ENVIRONMENT=REDLAND_MODULE_PATH=
 
 CLEANFILES=$(TESTS) $(local_tests) test test*.db test.rdf
 

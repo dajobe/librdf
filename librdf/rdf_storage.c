@@ -85,6 +85,21 @@ librdf_storage_load_module(librdf_world *world,
 void
 librdf_init_storage(librdf_world *world)
 {
+  /* built-in storages */
+
+  #ifdef STORAGE_HASHES
+    librdf_init_storage_hashes(world);
+  #endif
+  #ifdef STORAGE_TREES
+    librdf_init_storage_trees(world);
+  #endif
+  #ifdef STORAGE_MEMORY
+    librdf_init_storage_list(world);
+  #endif
+  #ifdef STORAGE_FILE
+    librdf_init_storage_file(world);
+  #endif
+
 #ifdef MODULAR_LIBRDF
 
   if (!world->storage_modules)
@@ -95,18 +110,6 @@ librdf_init_storage(librdf_world *world)
 
 #else /* monolithic */
   
-  #ifdef STORAGE_MEMORY
-    librdf_init_storage_list(world);
-  #endif
-  #ifdef STORAGE_HASHES
-    librdf_init_storage_hashes(world);
-  #endif
-  #ifdef STORAGE_TREES
-    librdf_init_storage_trees(world);
-  #endif
-  #ifdef STORAGE_FILE
-    librdf_init_storage_file(world);
-  #endif
   #ifdef STORAGE_MYSQL
     librdf_init_storage_mysql(world);
   #endif
@@ -165,17 +168,55 @@ librdf_free_storage_factory(librdf_storage_factory* factory)
 
 
 #ifdef MODULAR_LIBRDF
+
+/* pulled from raptor_memstr.c */
+static const char *  
+librdf_memstr(const char *haystack, size_t haystack_len, const char *needle)
+{
+  char c;
+  size_t needle_len;
+  const char *p;
   
+  if(!haystack || !needle)
+    return NULL;
+  
+  if(!*needle)
+    return haystack;
+  
+  needle_len=strlen(needle);
+
+  /* loop invariant: haystack_len is always length of remaining buffer at *p */
+  for(p=haystack;
+      (haystack_len >= needle_len) && (c=*p);
+      p++, haystack_len--) {
+
+    /* check match */
+    if(!memcmp(p, needle, needle_len))
+      return p;
+  }
+  
+  return NULL;
+}
+
+
 static int
 ltdl_module_callback(const char* filename, void* data)
 {
   librdf_world* world = (librdf_world*)data;
-  lt_dlhandle module = librdf_storage_load_module(world, filename,
-      "librdf_storage_module_register_factory");
-  if (module)
-    raptor_sequence_push(world->storage_modules, module);
+
+  /* FIXME: Currently requiring that modules to be loaded contain "librdf_storage".
+     Not all files in .libs that contain librdf_storage are storage modules.
+     (Relevant when running "make check" locally before installing the modules.)
+     Also tries to load some storage modules multiple times. */
+  if (librdf_memstr(filename, strlen(filename), "librdf_storage")) {
+    lt_dlhandle module = librdf_storage_load_module(world, filename,
+                                                    "librdf_storage_module_register_factory");
+    if (module)
+      raptor_sequence_push(world->storage_modules, module);
+  }
   return 0;
 }
+
 
 /**
  * librdf_storage_load_all_modules:
@@ -186,8 +227,24 @@ ltdl_module_callback(const char* filename, void* data)
 void
 librdf_storage_load_all_modules(librdf_world *world)
 {
-  lt_dlforeachfile(lt_dlgetsearchpath(), ltdl_module_callback, world);
+  char const *path;
+
+  /* Figure out a path to load modules from */
+
+  /* Try environment variable first - required e.g. for local "make check" tests before install */
+  path = getenv("REDLAND_MODULE_PATH");
+
+  /* If path defined in env but empty, use libtool default paths (e.g. DYLD_LIBRARY_PATH) */
+  if (path && !*path)
+    path = NULL;
+
+  /* If path not defined in env, use libtool user-specified paths (install dir) */
+  else if (!path)
+    path = lt_dlgetsearchpath();
+
+  lt_dlforeachfile(path, ltdl_module_callback, world);
 }
+
 
 /**
  * librdf_storage_load_module:
@@ -202,7 +259,7 @@ librdf_storage_load_module(librdf_world *world,
                            const char* lib_name,
                            const char* init_func_name)
 {
-  typedef void init_func_t(librdf_world* world);
+  typedef void init_func_t(librdf_world*);
   init_func_t* init;
   
   lt_dlhandle module = lt_dlopenext(lib_name);

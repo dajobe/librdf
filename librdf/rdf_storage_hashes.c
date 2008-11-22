@@ -170,9 +170,6 @@ static void* librdf_storage_hashes_context_serialise_get_statement(void* context
 static void librdf_storage_hashes_context_serialise_finished(void* context);
 
 static void librdf_storage_hashes_register_factory(librdf_storage_factory *factory);
-#ifdef MODULAR_LIBRDF
-void librdf_storage_module_register_factory(librdf_world *world);
-#endif
 
 
 /* node iterator implementing functions for get sources, targets, arcs methods */
@@ -1906,17 +1903,6 @@ librdf_storage_hashes_register_factory(librdf_storage_factory *factory)
   factory->get_feature              = librdf_storage_hashes_get_feature;
 }
 
-#ifdef MODULAR_LIBRDF
-
-/** Entry point for dynamically loaded storage module */
-void
-librdf_storage_module_register_factory(librdf_world *world)
-{
-  librdf_storage_register_factory(world, "hashes", "Indexed hashes",
-                                  &librdf_storage_hashes_register_factory);
-}
-
-#else
 
 /** INTERNAL - Initialise the built-in storage_hashes module.
  * @world: world object
@@ -1927,6 +1913,3 @@ librdf_init_storage_hashes(librdf_world *world)
   librdf_storage_register_factory(world, "hashes", "Indexed hashes",
                                   &librdf_storage_hashes_register_factory);
 }
-
-#endif
-
