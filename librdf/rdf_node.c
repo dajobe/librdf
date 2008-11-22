@@ -646,12 +646,12 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   if((old_value=librdf_hash_get_one(world->nodes_hash[H_BLANK], &key))) {
     new_node=*(librdf_node**)old_value->data;
 
-    LIBRDF_FREE(cstring, new_identifier);
-    
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG3("Found existing blank node identifier %s in hash with current usage %d\n", new_identifier, new_node->usage);
 #endif
 
+    LIBRDF_FREE(cstring, new_identifier);
+    
     librdf_free_hash_datum(old_value);
     new_node->usage++;
 
