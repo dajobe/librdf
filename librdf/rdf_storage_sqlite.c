@@ -613,6 +613,7 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
                                             (const unsigned char*)"text = ",
                                             7, 1);
   raptor_stringbuffer_append_counted_string(sb, value_e, value_e_len, 1);
+  raptor_stringbuffer_append_counted_string(sb, (const unsigned char*)" ", 1, 1);
 
   if(language) {
     len=strlen(language);
