@@ -92,6 +92,9 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
   librdf_storage_file_instance* context=(librdf_storage_file_instance*)LIBRDF_CALLOC(
     librdf_storage_file_instance, 1, sizeof(librdf_storage_file_instance));
 
+  if(!context)
+    goto done;
+
   librdf_storage_set_instance(storage, context);
 
   /* Cannot save contexts in a file; pass everything else on */

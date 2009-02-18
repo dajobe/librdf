@@ -536,6 +536,10 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   context=(librdf_storage_mysql_instance*)LIBRDF_CALLOC(
     librdf_storage_mysql_instance, 1, sizeof(librdf_storage_mysql_instance));
 
+  if(!context) {
+    librdf_free_hash(options);
+    return 1;
+  }
   librdf_storage_set_instance(storage, context);
 
   /* Create digest */

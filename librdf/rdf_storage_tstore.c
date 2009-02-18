@@ -110,6 +110,12 @@ librdf_storage_tstore_init(librdf_storage* storage, const char *name,
   librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)LIBRDF_CALLOC(
     librdf_storage_tstore_instance, 1, sizeof(librdf_storage_tstore_instance));
 
+  if(!context) {
+    if(options)
+      librdf_free_hash(options);
+    return 1;
+  }
+
   librdf_storage_set_instance(storage, context);
   
   context->host=librdf_hash_get_del(options, "host");

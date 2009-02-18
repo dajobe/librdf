@@ -179,12 +179,19 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
   librdf_storage_sqlite_instance* context;
   
   if(!name) {
-    librdf_free_hash(options);
+    if(options)
+      librdf_free_hash(options);
     return 1;
   }
   
   context=(librdf_storage_sqlite_instance*)LIBRDF_CALLOC(
     librdf_storage_sqlite_instance, 1, sizeof(librdf_storage_sqlite_instance));
+
+  if(!context) {
+    if(options)
+      librdf_free_hash(options);
+    return 1;
+  }
 
   librdf_storage_set_instance(storage, context);
   
@@ -193,7 +200,8 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
   context->name_len=strlen(name);
   name_copy=(char*)LIBRDF_MALLOC(cstring, context->name_len+1);
   if(!name_copy) {
-    librdf_free_hash(options);
+    if(options)
+      librdf_free_hash(options);
     return 1;
   }
   strncpy(name_copy, name, context->name_len+1);

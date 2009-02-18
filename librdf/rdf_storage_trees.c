@@ -123,6 +123,12 @@ librdf_storage_trees_init(librdf_storage* storage, const char *name,
   librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)LIBRDF_CALLOC(
     librdf_storage_trees_instance, 1, sizeof(librdf_storage_trees_instance));
 
+  if(!context) {
+    if(options)
+      librdf_free_hash(options);
+    return 1;
+  }
+
   librdf_storage_set_instance(storage, context);
 
 #ifdef RDF_STORAGE_TREES_WITH_CONTEXTS

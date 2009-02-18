@@ -243,6 +243,9 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
   
   context=(librdf_storage_hashes_instance*)LIBRDF_CALLOC(
     librdf_storage_hashes_instance, 1, sizeof(librdf_storage_hashes_instance));
+
+  if(!context)
+    return 1;
   
   librdf_storage_set_instance(storage, context);
 

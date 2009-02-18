@@ -458,14 +458,20 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   PGresult *res;
   PGconn *handle;
   
-  context=(librdf_storage_postgresql_instance*)LIBRDF_CALLOC(
-    librdf_storage_postgresql_instance, 1, sizeof(librdf_storage_postgresql_instance));
-
-  librdf_storage_set_instance(storage, context);
-
   /* Must have connection parameters passed as options */
   if(!options)
     return 1;
+
+  context=(librdf_storage_postgresql_instance*)LIBRDF_CALLOC(
+    librdf_storage_postgresql_instance, 1, sizeof(librdf_storage_postgresql_instance));
+
+  if(!context) {
+    librdf_free_hash(options);
+    return 1;
+  }
+
+  librdf_storage_set_instance(storage, context);
+
 
   /* Create digest */
   if(!(context->digest=librdf_new_digest(storage->world,"MD5")))

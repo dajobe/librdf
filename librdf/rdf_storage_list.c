@@ -113,6 +113,12 @@ librdf_storage_list_init(librdf_storage* storage, const char *name,
   librdf_storage_list_instance* context=(librdf_storage_list_instance*)LIBRDF_CALLOC(
     librdf_storage_list_instance, 1, sizeof(librdf_storage_list_instance));
 
+  if(!context) {
+    if(options)
+      librdf_free_hash(options);
+    return 1;
+  }
+
   librdf_storage_set_instance(storage, context);
   
   if((index_contexts=librdf_hash_get_as_boolean(options, "contexts"))<0)
