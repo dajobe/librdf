@@ -2029,7 +2029,7 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   LIBRDF_FREE(cstring, query);
 
   gccontext->current_rowno=0;
-  if(!(gccontext->row=(char**)LIBRDF_MALLOC(cstring, PQnfields(gccontext->results)+1)))
+  if(!(gccontext->row=(char**)LIBRDF_CALLOC(cstring, sizeof(char*), PQnfields(gccontext->results)+1)))
       return NULL;
 
   /* Get first context, if any, and initialize iterator */
@@ -2128,22 +2128,6 @@ librdf_storage_postgresql_get_contexts_get_context(void* context, int flags)
 
   return gccontext->current_context;
 }
-
-
-#if 0
-/* FIXME: why is this not used ? */
-static void
-librdf_storage_postgresql_free_gccontext_row(void* context)
-{
-  librdf_storage_postgresql_get_contexts_context* gccontext=(librdf_storage_postgresql_get_contexts_context*)context;
-
-/*
-  for(i=0;i<PQnfields(gccontext->results);i++) 
-     if( gccontext->row[i] )
-         LIBRDF_FREE(cstring, gccontext->row[i]);
-*/
-}
-#endif
 
 
 static void
