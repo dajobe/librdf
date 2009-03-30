@@ -108,14 +108,18 @@ librdf_finish_uri(librdf_world *world)
  * Return value: a new #librdf_uri object or NULL on failure
  **/
 librdf_uri*
-librdf_new_uri (librdf_world *world, 
-                const unsigned char *uri_string)
+librdf_new_uri(librdf_world *world, 
+               const unsigned char *uri_string)
 {
   librdf_uri* new_uri;
   unsigned char *new_string;
   int length;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
+
+  /* just to be safe */
+  memset(&key, 0, sizeof(key));
+  memset(&value, 0, sizeof(value));
 
   librdf_world_open(world);
 
