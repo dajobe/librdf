@@ -215,6 +215,9 @@ librdf_storage_postgresql_hash(librdf_storage* storage, const char *type,
   byte* digest;
   int i;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, char*, 0);
+
   /* (Re)initialize digest object */
   librdf_digest_init(context->digest);
   
@@ -249,6 +252,8 @@ librdf_storage_postgresql_init_connections(librdf_storage* storage)
 {
   librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 0);
+
   /* Reset connection pool */
   context->connections=NULL;
   context->connections_count=0;
@@ -267,6 +272,8 @@ librdf_storage_postgresql_finish_connections(librdf_storage* storage)
 {
   librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   int i;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(storage, librdf_storage);
 
   /* Loop through connections and close */
   for(i=0; i < context->connections_count; i++) {
@@ -296,7 +303,12 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
   librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   librdf_storage_postgresql_connection* connection= NULL;
   int i;
-  char conninfo[256];
+  const int pool_increment = 2;
+  char coninfo_template[] = "host=%s port=%s dbname=%s user=%s password=%s";
+  size_t coninfo_size;
+  char *conninfo;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
 
   if(context->transaction_handle)
     return context->transaction_handle;
@@ -319,10 +331,11 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
   /* Expand connection pool if no closed connection was found */
   if (!connection) {
     /* Allocate new buffer with two extra slots */
+    int new_pool_size = context->connections_count+pool_increment;
     librdf_storage_postgresql_connection* connections;
     if(!(connections=(librdf_storage_postgresql_connection*)
         LIBRDF_CALLOC(librdf_storage_postgresql_connection,
-                      context->connections_count+2,
+                      new_pool_size,
                       sizeof(librdf_storage_postgresql_connection))))
       return NULL;
 
@@ -333,37 +346,42 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
       LIBRDF_FREE(librdf_storage_postgresql_connection*, context->connections);
     }
 
-    /* Update buffer size and reset new connections */
-    context->connections_count+=2;
-    connection=&connections[context->connections_count-2];
-    connection->status=LIBRDF_STORAGE_POSTGRESQL_CONNECTION_CLOSED;
-    connection->handle=NULL;
-    connections[context->connections_count-1].status=LIBRDF_STORAGE_POSTGRESQL_CONNECTION_CLOSED;
-    connections[context->connections_count-1].handle=NULL;
+    /* Initialize expanded pool */
     context->connections=connections;
+    connection=&(context->connections[context->connections_count]);
+    while (context->connections_count < new_pool_size) {
+      context->connections[context->connections_count].status=LIBRDF_STORAGE_POSTGRESQL_CONNECTION_CLOSED;
+      context->connections[context->connections_count].handle=NULL;
+      context->connections_count++;
+    }
   }
 
   /* Initialize closed postgresql connection handle */
-
-  /* Create connection to database for handle */
-  sprintf(conninfo,"host=%s port=%s dbname=%s user=%s password=%s",
-          context->host,context->port,context->dbname,context->user,context->password);
-
-  connection->handle=PQconnectdb(conninfo);
-
-	if( PQstatus(connection->handle) != CONNECTION_OK ) {
-    fprintf(stdout,"Connection to postgresql database %s:%s name %s as user %s failed: %s",
-            context->host, context->port, context->dbname,
-            context->user, PQerrorMessage(connection->handle));
-
-    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Connection to postgresql database %s:%s name %s as user %s failed: %s",
-               context->host, context->port, context->dbname,
-               context->user, PQerrorMessage(connection->handle));
-    return NULL;
+  coninfo_size = strlen(coninfo_template) 
+    + strlen(context->host)
+    + strlen(context->port)
+    + strlen(context->dbname)
+    + strlen(context->user)
+    + strlen(context->password);
+  conninfo=LIBRDF_MALLOC(cstring,coninfo_size);
+  if (conninfo) {
+    sprintf(conninfo,coninfo_template,context->host,context->port,context->dbname,context->user,context->password);
+    connection->handle=PQconnectdb(conninfo);
+    if(connection->handle) {
+    	if( PQstatus(connection->handle) == CONNECTION_OK ) {
+        connection->status=LIBRDF_STORAGE_POSTGRESQL_CONNECTION_BUSY;
+      } else {
+        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                   "Connection to postgresql database %s:%s name %s as user %s failed: %s",
+                   context->host, context->port, context->dbname,
+                   context->user, PQerrorMessage(connection->handle));
+        PQfinish(connection->handle);
+        connection->handle=NULL;
+      }
+    }
+    LIBRDF_FREE(cstring,conninfo);
   }
-  /* Update status and return */
-  connection->status=LIBRDF_STORAGE_POSTGRESQL_CONNECTION_BUSY;
+
   return connection->handle;
 }
 
@@ -380,6 +398,9 @@ librdf_storage_postgresql_release_handle(librdf_storage* storage, PGconn *handle
 {
   librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   int i;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(storage, librdf_storage);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(handle, PGconn*);
 
   /* Look for busy connection handle to drop */
   for(i=0; i < context->connections_count; i++) {
@@ -416,7 +437,7 @@ static int
 librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
                                librdf_hash* options)
 {
-  librdf_storage_postgresql_instance* context;
+  librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
   const char create_table_statements[]="\
   CREATE TABLE Statements" UINT64_T_FMT " (\
   Subject numeric(20) NOT NULL,\
@@ -450,6 +471,17 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   Name text NOT NULL,\
   PRIMARY KEY (ID)\
 ) ";
+
+  const char *create_tables[] = {
+    create_table_statements,
+    create_table_literals,
+    create_table_resources,
+    create_table_bnodes,
+    create_table_models,
+    NULL,
+  };
+
+
   const char create_model[]="INSERT INTO Models (ID,Name) VALUES (" UINT64_T_FMT ",'%s')";
   const char check_model[]="SELECT 1 FROM Models WHERE ID=" UINT64_T_FMT " AND Name='%s'";
   int status=0;
@@ -458,6 +490,9 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   PGresult *res;
   PGconn *handle;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, char*, 1);
+
   /* Must have connection parameters passed as options */
   if(!options)
     return 1;
@@ -517,32 +552,40 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   /* Create tables, if new and not existing */
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) 
   {
-    query=(char*)LIBRDF_MALLOC(cstring, strlen(create_table_statements)+20);
-    if(! query)  
+    query=(char*)LIBRDF_MALLOC(cstring, strlen(create_table_statements)+(20*1)+1);
+    if(! query) {
       status=1;
-    else 
-     {
+    } else {
+      int i;
       sprintf(query, create_table_statements, context->model);
-      if(! PQexec(handle, query) ||
-         ! PQexec(handle, create_table_literals) ||
-         ! PQexec(handle, create_table_resources) ||
-         ! PQexec(handle, create_table_bnodes) ||
-         ! PQexec(handle, create_table_models)) 
-        {
-         librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "postgresql table creation failed: %s",
-                   PQerrorMessage(handle));
-         status=-1;
+      create_tables[0] = query;
+      for (i = 0; !status && NULL != create_tables[i]; i++) {
+        PGresult *res2 = PQexec(handle, create_tables[i]);
+        if (res2) {
+          if (PQresultStatus(res2) != PGRES_COMMAND_OK) {
+            if (0 != strncmp("42P07", PQresultErrorField(res, PG_DIAG_SQLSTATE), strlen("42P07"))) {
+              librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                       "postgresql table creation failed with error %s", PQresultErrorMessage(res2));
+              status = -1;
+            }
+          }
+          PQclear(res2);
+        } else {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "postgresql table creation failed with error: %s", PQerrorMessage(handle));
+          status = -1;
         }
-      LIBRDF_FREE(cstring, query);
-     }
+      }
+      LIBRDF_FREE(cstring,query);
+      query=NULL;
+    }
   }
-
 
   /* Create model if new and not existing, or check for existence */
   if(!status) {
     if(!(escaped_name=(char*)LIBRDF_MALLOC(cstring,strlen(name)*2+1)))
       status=1;
+    else
      PQescapeString(escaped_name,(const char*)name, strlen(name));
   }
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) {
@@ -550,13 +593,25 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
     if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(create_model)+20+
                                     strlen(escaped_name)+1)))
       status=1;
-    sprintf(query, create_model, context->model, escaped_name);
-    if(!status && !(res=(PQexec(handle, query))) 
-         && PQresultStatus(res) != PGRES_COMMAND_OK) {  
-      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "postgresql insert into Models table failed: %s",
-                 PQresultErrorMessage(res));
-      status=-1;
+    else {
+      sprintf(query, create_model, context->model, escaped_name);
+      if((res=PQexec(handle, query))) {
+        if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+          if (0 != strncmp("23505", PQresultErrorField(res, PG_DIAG_SQLSTATE), strlen("23505"))) {
+            librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "postgresql table creation failed with error %s", PQresultErrorMessage(res));
+            status = -1;
+          }
+        }
+        PQclear(res);
+      } else {
+        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                   "postgresql insert into Models table failed: %s",
+                   PQerrorMessage(handle));
+        status=-1;
+      }
+      LIBRDF_FREE(cstring,query);
+      query=NULL;
     }
     /* Maintain merge table? */
     if(!status && context->merge)
@@ -566,24 +621,30 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
     if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(check_model)+20+
                                     strlen(escaped_name)+1)))
       status=1;
-    sprintf(query, check_model, context->model, name);
-    res=NULL;
-    if( !status && !(res=(PQexec(handle, query))) ) {
-      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "postgresql select from Models table failed: %s",
-                 PQresultErrorMessage(res));
-      status=-1;
+    else {
+      sprintf(query, check_model, context->model, name);
+      res=NULL;
+      if((res=PQexec(handle, query))) {
+        if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "postgresql insert into Models table failed: %s", PQresultErrorMessage(res));
+          status=-1;
+        }
+        if(!status && !(PQntuples(res))) {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "Unknown model: %s",name);
+          status=1;
+        }
+        PQclear(res);
+      } else {
+        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                   "postgresql select from Models table failed: %s", PQerrorMessage(handle));
+        status=-1;
+      }
+      LIBRDF_FREE(cstring,query);
+      query=NULL;
     }
-    if(!status && !(PQntuples(res))) {
-      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Unknown model: %s",name);
-      status=1;
-    }
-    if(res)
-      PQclear(res);
   }
-  if(query)
-    LIBRDF_FREE(cstring, query);
   if(escaped_name)
     LIBRDF_FREE(cstring, escaped_name);
 
@@ -626,6 +687,8 @@ librdf_storage_postgresql_merge(librdf_storage* storage)
   int i;
   PGconn *handle;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
+
   /* Get postgresql connection handle */
   handle=librdf_storage_postgresql_get_handle(storage);
   if(!handle)
@@ -653,6 +716,7 @@ librdf_storage_postgresql_merge(librdf_storage* storage)
   /* Allocate space for merge table generation query. */
   if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(insert_statements)+
                                   50))) {
+    PQclear(res);
     librdf_storage_postgresql_release_handle(storage, handle);
     return 1;
   }
@@ -666,6 +730,8 @@ librdf_storage_postgresql_merge(librdf_storage* storage)
         librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "postgresql merge table insert failed: %s",
                PQerrorMessage(handle));
+        LIBRDF_FREE(cstring, query);
+        PQclear(res);
         librdf_storage_postgresql_release_handle(storage, handle);
         return -1;
      }
@@ -689,10 +755,9 @@ librdf_storage_postgresql_merge(librdf_storage* storage)
 static void
 librdf_storage_postgresql_terminate(librdf_storage* storage)
 {
-  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
-  
-  if (context == NULL)
-    return;
+  librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(storage, librdf_storage);
 
   librdf_storage_postgresql_finish_connections(storage);
 
@@ -760,7 +825,9 @@ librdf_storage_postgresql_close(librdf_storage* storage)
 static int
 librdf_storage_postgresql_sync(librdf_storage* storage)
 {
-  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
+  librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
 
   /* Make sure optimizing for bulk operations is stopped? */
   if(context->bulk)
@@ -780,12 +847,14 @@ librdf_storage_postgresql_sync(librdf_storage* storage)
 static int
 librdf_storage_postgresql_size(librdf_storage* storage)
 {
-  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
+  librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
   char model_size[]="SELECT COUNT(*) FROM Statements" UINT64_T_FMT;
   char *query;
   PGresult *res;
   int count;
   PGconn *handle;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, -1);
 
   /* Get postgresql connection handle */
   handle=librdf_storage_postgresql_get_handle(storage);
@@ -793,15 +862,21 @@ librdf_storage_postgresql_size(librdf_storage* storage)
     return -1;
 
   /* Query for number of statements */
-  if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(model_size)+21))) {
+  if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(model_size)+20+1))) {
     librdf_storage_postgresql_release_handle(storage, handle);
     return -1;
   }
   sprintf(query, model_size, context->model);
   if(!(res=PQexec(handle, query)) || !(PQntuples(res))) {
-    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "postgresql query for model size failed: %s",
-               PQresultErrorMessage(res));
+    if (res) {
+      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "postgresql query for model size failed: %s", PQresultErrorMessage(res));
+      PQclear(res);
+    }
+    else {
+      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "postgresql query for model size failed: %s", PQerrorMessage(handle));
+    }
     LIBRDF_FREE(cstring,query);
     librdf_storage_postgresql_release_handle(storage, handle);
     return -1;
@@ -865,6 +940,9 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
   PGconn *handle;
   PGresult *res;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+
   /* Get postgresql connection handle */
   handle=librdf_storage_postgresql_get_handle(storage);
   if(!handle)
@@ -877,32 +955,38 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
 
     if(add) {
       char create_resource[]="INSERT INTO Resources (ID,URI) VALUES (" UINT64_T_FMT ",'%s')";
-      /* Escape URI for db query */
+      int add_status = 0;
       char *escaped_uri;
-      if(!(escaped_uri=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1))) {
-        librdf_storage_postgresql_release_handle(storage, handle);
-        return 0;
-      }
-      PQescapeString(escaped_uri,(const char*)uri, nodelen);
 
-      /* Create new resource, ignore if existing */
-      if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(create_resource)+
-                                      20+nodelen+1))) {
-        LIBRDF_FREE(cstring,escaped_uri);
+      if((escaped_uri=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1))) {
+        PQescapeString(escaped_uri,(const char*)uri, nodelen);
+        if((query=(char*)LIBRDF_MALLOC(cstring, strlen(create_resource)+20+nodelen+1))) {
+          sprintf(query, create_resource, hash, escaped_uri);
+          if((res=PQexec(handle, query))) {
+            if(PQresultStatus(res) == PGRES_COMMAND_OK) {
+              add_status = 1;
+            } else {
+              if (0 == strncmp("23505", PQresultErrorField(res, PG_DIAG_SQLSTATE), strlen("23505"))) {
+                /* Don't care about unique key viloations */
+                add_status = 1;
+              } else {
+                librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                         "postgresql insert into Resources failed with error %s", PQresultErrorMessage(res));
+              }
+            }
+            PQclear(res);
+          } else {
+            librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                       "postgresql insert into Resources failed");
+          }
+          LIBRDF_FREE(cstring, query);
+        }
+        LIBRDF_FREE(cstring, escaped_uri);
+      }
+      if(!add_status) {
         librdf_storage_postgresql_release_handle(storage, handle);
         return 0;
       }
-      sprintf(query, create_resource, hash, escaped_uri);
-      LIBRDF_FREE(cstring,escaped_uri);
-      if(!(res=PQexec(handle, query))
-           && PQresultStatus(res) != PGRES_COMMAND_OK) { 
-        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "postgresql insert into Resources failed with error %s", PQresultErrorMessage(res));
-        LIBRDF_FREE(cstring,query);
-        librdf_storage_postgresql_release_handle(storage, handle);
-        return 0;
-      }
-      LIBRDF_FREE(cstring,query);
     }
 
   } else if(type==LIBRDF_NODE_TYPE_LITERAL) {
@@ -940,50 +1024,56 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
 
     if(add) {
       char create_literal[]="INSERT INTO Literals (ID,Value,Language,Datatype) VALUES (" UINT64_T_FMT ",'%s','%s','%s')";
-      /* Escape value, lang and datatype for db query */
+      int add_status = 0;
       char *escaped_value, *escaped_lang, *escaped_datatype;
-      if(!(escaped_value=(char*)LIBRDF_MALLOC(cstring, valuelen*2+1)) ||
-          !(escaped_lang=(char*)LIBRDF_MALLOC(cstring, langlen*2+1)) ||
-          !(escaped_datatype=(char*)LIBRDF_MALLOC(cstring, datatypelen*2+1))) {
+      
+      if((escaped_value=(char*)LIBRDF_MALLOC(cstring, valuelen*2+1))) {
+        PQescapeString(escaped_value, (const char*)value, valuelen);
+        if((escaped_lang=(char*)LIBRDF_MALLOC(cstring, langlen*2+1))) {
+          if(lang)
+            PQescapeString( escaped_lang, (const char*)lang, langlen);
+          else
+            strcpy(escaped_lang,"");
+          if ((escaped_datatype=(char*)LIBRDF_MALLOC(cstring, datatypelen*2+1))) {
+            if(datatype)
+              PQescapeString( escaped_datatype, (const char*)datatype, datatypelen);
+            else
+              strcpy(escaped_datatype,"");
+            if ((query=(char*)LIBRDF_MALLOC(cstring, strlen(create_literal)+
+                                            strlen(escaped_value)+
+                                            strlen(escaped_lang)+
+                                            strlen(escaped_datatype)+21))) {
+              sprintf(query, create_literal, hash, escaped_value, escaped_lang, escaped_datatype);
+              if((res=PQexec(handle, query))) {
+                if(PQresultStatus(res) == PGRES_COMMAND_OK) {
+                  add_status = 1;
+                } else {
+                  if (0 == strncmp("23505", PQresultErrorField(res, PG_DIAG_SQLSTATE), strlen("23505"))) {
+                    /* Don't care about unique key viloations */
+                    add_status = 1;
+                  } else {
+                    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                             "postgresql insert into Resources failed with error %s", PQresultErrorMessage(res));
+                  }
+                }
+                PQclear(res);
+              } else {
+                librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                           "postgresql insert into Resources failed");
+              }
+              LIBRDF_FREE(cstring, query);
+            }
+            LIBRDF_FREE(cstring, escaped_datatype);
+          }
+          LIBRDF_FREE(cstring, escaped_lang);
+        }
+        LIBRDF_FREE(cstring, escaped_value);
+      }
+      if(!add_status) {
         librdf_storage_postgresql_release_handle(storage, handle);
         return 0;
       }
-      PQescapeString(escaped_value, (const char*)value, valuelen);
-      if(lang)
-        PQescapeString( escaped_lang, (const char*)lang, langlen);
-      else
-        strcpy(escaped_lang,"");
-      if(datatype)
-        PQescapeString( escaped_datatype, (const char*)datatype, datatypelen);
-      else
-        strcpy(escaped_datatype,"");
-
-      /* Create new literal, ignore if existing */
-      if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(create_literal)+
-                                      strlen(escaped_value)+
-                                      strlen(escaped_lang)+
-                                      strlen(escaped_datatype)+21))) {
-        LIBRDF_FREE(cstring,escaped_value);
-        LIBRDF_FREE(cstring,escaped_lang);
-        LIBRDF_FREE(cstring,escaped_datatype);
-        librdf_storage_postgresql_release_handle(storage, handle);
-        return 0;
-      }
-      sprintf(query, create_literal, hash, escaped_value, escaped_lang, escaped_datatype);
-      LIBRDF_FREE(cstring,escaped_value);
-      LIBRDF_FREE(cstring,escaped_lang);
-      LIBRDF_FREE(cstring,escaped_datatype);
-      if(!(res=PQexec(handle, query)) &&
-         PQresultStatus(res) != PGRES_COMMAND_OK) {
-        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "postgresql insert into Literals failed: %s",
-                   PQresultErrorMessage(res));
-        LIBRDF_FREE(cstring,query);
-        librdf_storage_postgresql_release_handle(storage, handle);
-        return 0;
-      }
-      LIBRDF_FREE(cstring,query);
-    }
+    }      
 
   } else if(type==LIBRDF_NODE_TYPE_BLANK) {
     /* Get hash */
@@ -993,36 +1083,41 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
 
     if(add) {
       char create_bnode[]="INSERT INTO Bnodes (ID,Name) VALUES (" UINT64_T_FMT ",'%s')";
-      /* Escape name for db query */
+      int add_status = 0;
       char *escaped_name;
-      if(!(escaped_name=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1))) {
-        librdf_storage_postgresql_release_handle(storage, handle);
-        return 0;
-      }
-     PQescapeString(escaped_name, (const char*)name, nodelen);
 
-      /* Create new bnode, ignore if existing */
-      if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(create_bnode)+
-                                      strlen(escaped_name)+21))) {
-        LIBRDF_FREE(cstring,escaped_name);
+      if((escaped_name=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1))) {
+        PQescapeString(escaped_name,(const char*)name, nodelen);
+        if((query=(char*)LIBRDF_MALLOC(cstring, strlen(create_bnode)+20+nodelen+1))) {
+          sprintf(query, create_bnode, hash, escaped_name);
+          if((res=PQexec(handle, query))) {
+            if(PQresultStatus(res) == PGRES_COMMAND_OK) {
+              add_status = 1;
+            } else {
+              if (0 == strncmp("23505", PQresultErrorField(res, PG_DIAG_SQLSTATE), strlen("23505"))) {
+                /* Don't care about unique key viloations */
+                add_status = 1;
+              } else {
+                librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                         "postgresql insert into Resources failed with error %s", PQresultErrorMessage(res));
+              }
+            }
+            PQclear(res);
+          } else {
+            librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                       "postgresql insert into Bnodes failed");
+          }
+          LIBRDF_FREE(cstring, query);
+        }
+        LIBRDF_FREE(cstring, escaped_name);
+      }
+      if(!add_status) {
         librdf_storage_postgresql_release_handle(storage, handle);
         return 0;
       }
-      sprintf(query, create_bnode, hash, escaped_name);
-      LIBRDF_FREE(cstring,escaped_name);
-      if(!(res=PQexec(handle, query)) &&
-         PQresultStatus(res) != PGRES_COMMAND_OK) {
-        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "postgresql insert into Bnodes failed: %s",
-                   PQresultErrorMessage(res));
-        LIBRDF_FREE(cstring,query);
-        librdf_storage_postgresql_release_handle(storage, handle);
-        return 0;
-      }
-      LIBRDF_FREE(cstring,query);
     }
-
   } else {
+    /* Some node type we don't know about? */
     librdf_storage_postgresql_release_handle(storage, handle);
     return 0;
   }
@@ -1079,6 +1174,9 @@ librdf_storage_postgresql_context_add_statements(librdf_storage* storage,
   u64 ctxt=0;
   int helper=0;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement_stream, librdf_stream, 1);
+
   /* Optimize for bulk loads? */
   if(context->bulk) {
     if(librdf_storage_postgresql_start_bulk(storage))
@@ -1126,6 +1224,9 @@ librdf_storage_postgresql_context_add_statement(librdf_storage* storage,
 {
   u64 ctxt=0;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
+
   /* Find hash for context, creating if necessary */
   if(context_node) {
     ctxt=librdf_storage_postgresql_node_hash(storage,context_node,1);
@@ -1153,46 +1254,47 @@ librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
   librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   char insert_statement[]="INSERT INTO Statements" UINT64_T_FMT " (Subject,Predicate,Object,Context) VALUES (" UINT64_T_FMT "," UINT64_T_FMT "," UINT64_T_FMT "," UINT64_T_FMT ")";
   u64 subject, predicate, object;
-  char *query;
   PGconn *handle;
-  PGresult *res;
+  int status = 1;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
 
   /* Get postgresql connection handle */
-  handle=librdf_storage_postgresql_get_handle(storage);
-  if(!handle)
-    return 1;
+  if ((handle=librdf_storage_postgresql_get_handle(storage))) {
 
-  /* Find hashes for nodes, creating if necessary */
-  subject=librdf_storage_postgresql_node_hash(storage,
-                                         librdf_statement_get_subject(statement),1);
-  predicate=librdf_storage_postgresql_node_hash(storage,
-                                           librdf_statement_get_predicate(statement),1);
-  object=librdf_storage_postgresql_node_hash(storage,
-                                        librdf_statement_get_object(statement),1);
-  if(!subject || !predicate || !object) {
+    /* Find hashes for nodes, creating if necessary */
+    subject=librdf_storage_postgresql_node_hash(storage,
+                                           librdf_statement_get_subject(statement),1);
+    predicate=librdf_storage_postgresql_node_hash(storage,
+                                             librdf_statement_get_predicate(statement),1);
+    object=librdf_storage_postgresql_node_hash(storage,
+                                          librdf_statement_get_object(statement),1);
+    if(subject && predicate && object) {
+      char *query;
+      PGresult *res;
+
+      if ((query=(char*)LIBRDF_MALLOC(cstring, strlen(insert_statement)+(20*5)+1))) {
+        sprintf(query, insert_statement, context->model, subject, predicate, object, ctxt);
+        if((res=PQexec(handle, query))) {
+          if(PQresultStatus(res) == PGRES_COMMAND_OK) {
+            status = 0;
+          } else {
+            librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "postgresql insert into Statements failed with error %s", PQresultErrorMessage(res));
+          }
+          PQclear(res);
+        } else {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "postgresql insert into Statements failed with error %s", PQerrorMessage(handle));
+        }
+        LIBRDF_FREE(cstring,query);
+      }
+    }
     librdf_storage_postgresql_release_handle(storage, handle);
-    return 1;
   }
 
-  /* Add statement to storage */
-  if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(insert_statement)+101))) {
-    librdf_storage_postgresql_release_handle(storage, handle);
-    return 1;
-  }
-  sprintf(query, insert_statement, context->model, subject, predicate, object, ctxt);
-
-  if(!(res=PQexec(handle, query))) {
-    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "postgresql insert into Statements failed: %s",
-               PQresultErrorMessage(res));
-    LIBRDF_FREE(cstring,query);
-    librdf_storage_postgresql_release_handle(storage, handle);
-    return -1;
-  }
-  LIBRDF_FREE(cstring,query);
-  librdf_storage_postgresql_release_handle(storage, handle);
-
-  return 0;
+  return status;
 }
 
 
@@ -1207,56 +1309,47 @@ static int
 librdf_storage_postgresql_contains_statement(librdf_storage* storage,
                                         librdf_statement* statement)
 {
-  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
   char find_statement[]="SELECT 1 FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " limit 1";
   u64 subject, predicate, object;
-  char *query;
-  PGresult *res;
   PGconn *handle;
+  int status = 0;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
   /* Get postgresql connection handle */
-  handle=librdf_storage_postgresql_get_handle(storage);
-  if(!handle)
-    return 0;
+  if ((handle=librdf_storage_postgresql_get_handle(storage))) {
 
-  /* Find hashes for nodes */
-  subject=librdf_storage_postgresql_node_hash(storage,
-                                         librdf_statement_get_subject(statement),0);
-  predicate=librdf_storage_postgresql_node_hash(storage,
-                                           librdf_statement_get_predicate(statement),0);
-  object=librdf_storage_postgresql_node_hash(storage,
-                                        librdf_statement_get_object(statement),0);
-  if(!subject || !predicate || !object) {
-    librdf_storage_postgresql_release_handle(storage, handle);
-    return 0;
-  }
+    /* Find hashes for nodes */
+    subject=librdf_storage_postgresql_node_hash(storage,
+                                           librdf_statement_get_subject(statement),0);
+    predicate=librdf_storage_postgresql_node_hash(storage,
+                                             librdf_statement_get_predicate(statement),0);
+    object=librdf_storage_postgresql_node_hash(storage,
+                                          librdf_statement_get_object(statement),0);
 
-  /* Check for statement */
-  if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(find_statement)+81))) {
+    if(subject && predicate && object) {
+      char *query;
+      if((query=(char*)LIBRDF_MALLOC(cstring, strlen(find_statement)+(20*4)+1))) {
+        PGresult *res;
+        if((res=PQexec(handle, query))) {
+          if(PQresultStatus(res) == PGRES_TUPLES_OK) {
+            if(PQntuples(res)) {
+              status = 1;
+            }
+          } else {
+            librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "postgresql insert into Statements failed with error %s", PQresultErrorMessage(res));
+          }
+          PQclear(res);
+        }
+        LIBRDF_FREE(cstring,query);
+      }
+    }
     librdf_storage_postgresql_release_handle(storage, handle);
-    return 0;
-  }
-  sprintf(query, find_statement, context->model, subject, predicate, object);
-  if(!(res=PQexec(handle, query)) ) {
-    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "postgresql query for statement failed: %s",
-               PQerrorMessage(handle));
-    LIBRDF_FREE(cstring,query);
-    librdf_storage_postgresql_release_handle(storage, handle);
-    return 0;
-  }
-  LIBRDF_FREE(cstring, query);
-  if(!(PQntuples(res))) {
-    if(res)
-      PQclear(res);
-    librdf_storage_postgresql_release_handle(storage, handle);
-    return 0;
-  }
-  if(res)
-    PQclear(res);
-  librdf_storage_postgresql_release_handle(storage, handle);
+  }    
 
-  return 1;
+  return status;
 }
 
 
@@ -1291,61 +1384,59 @@ librdf_storage_postgresql_context_remove_statement(librdf_storage* storage,
   char delete_statement[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT;
   char delete_statement_with_context[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " AND Context=" UINT64_T_FMT;
   u64 subject, predicate, object, ctxt=0;
-  char *query;
-  PGconn *handle;
+  PGconn *handle=NULL;
+  int status = 1;
 
-  /* Get postgresql connection handle */
-  handle=librdf_storage_postgresql_get_handle(storage);
-  if(!handle)
-    return 1;
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
 
-  /* Find hashes for nodes */
-  subject=librdf_storage_postgresql_node_hash(storage,
-                                         librdf_statement_get_subject(statement),0);
-  predicate=librdf_storage_postgresql_node_hash(storage,
-                                           librdf_statement_get_predicate(statement),0);
-  object=librdf_storage_postgresql_node_hash(storage,
-                                        librdf_statement_get_object(statement),0);
-  if(context_node) {
-    ctxt=librdf_storage_postgresql_node_hash(storage,context_node,0);
-    if(!ctxt) {
-      librdf_storage_postgresql_release_handle(storage, handle);
-      return 1;
+  if((handle=librdf_storage_postgresql_get_handle(storage))) {
+    
+    /* Find hashes for nodes */
+    subject=librdf_storage_postgresql_node_hash(storage,
+                                           librdf_statement_get_subject(statement),0);
+    predicate=librdf_storage_postgresql_node_hash(storage,
+                                             librdf_statement_get_predicate(statement),0);
+    object=librdf_storage_postgresql_node_hash(storage,
+                                          librdf_statement_get_object(statement),0);
+
+    if (subject && predicate && object) {
+      char *query=NULL;
+      if(context_node) {
+        ctxt=librdf_storage_postgresql_node_hash(storage,context_node,0);
+        if(ctxt) {
+          if((query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement_with_context)+(20*5)+1))) {
+            sprintf(query, delete_statement_with_context, context->model, subject, predicate, object, ctxt);
+          }
+        }
+      } else {
+        if((query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement)+(20*4)+1))) {
+          sprintf(query, delete_statement, context->model, subject, predicate, object);
+        }
+      }
+      if(query) {
+        PGresult *res=NULL;
+        if((res=PQexec(handle, query))) {
+          if(PQresultStatus(res) == PGRES_COMMAND_OK) {
+            status = 0;
+          } else {
+            librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "postgresql delete from Statements failed with error %s", PQresultErrorMessage(res));
+          }
+          PQclear(res);
+        } else {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                   "postgresql delete from Statements failed");
+        }
+        
+        LIBRDF_FREE(cstring,query);
+      }    
     }
-  }
-  if(!subject || !predicate || !object || (context_node && !ctxt)) {
+
     librdf_storage_postgresql_release_handle(storage, handle);
-    return 1;
   }
-
-  /* Remove statement(s) from storage */
-  if(context_node) {
-    if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement_with_context)+101))) {
-      librdf_storage_postgresql_release_handle(storage, handle);
-      return 1;
-    }
-    sprintf(query, delete_statement_with_context, context->model, subject,
-            predicate, object, ctxt);
-  } else {
-    if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement)+81))) {
-      librdf_storage_postgresql_release_handle(storage, handle);
-      return 1;
-    }
-    sprintf(query, delete_statement, context->model, subject, predicate,
-            object);
-  }
-  if(! PQexec(handle, query)) {
-    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "postgresql delete from Statements failed: %s",
-               PQerrorMessage(handle));
-    LIBRDF_FREE(cstring,query);
-    librdf_storage_postgresql_release_handle(storage, handle);
-    return -1;
-  }
-  LIBRDF_FREE(cstring,query);
-  librdf_storage_postgresql_release_handle(storage, handle);
-
-  return 0;
+  
+  return status;
 }
 
 
@@ -1364,50 +1455,47 @@ librdf_storage_postgresql_context_remove_statements(librdf_storage* storage,
   char delete_context[]="DELETE FROM Statements" UINT64_T_FMT " WHERE Context=" UINT64_T_FMT;
   char delete_model[]="DELETE FROM Statements" UINT64_T_FMT;
   u64 ctxt=0;
-  char *query;
-  PGconn *handle;
+  PGconn *handle=NULL;
+  int status = 1;
 
-  /* Get postgresql connection handle */
-  handle=librdf_storage_postgresql_get_handle(storage);
-  if(!handle)
-    return 1;
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
 
-  /* Find hash for context */
-  if(context_node) {
-    ctxt=librdf_storage_postgresql_node_hash(storage,context_node,0);
-    if(!ctxt) {
-      librdf_storage_postgresql_release_handle(storage, handle);
-      return 1;
+  if((handle=librdf_storage_postgresql_get_handle(storage))) {
+    char *query=NULL;
+    if(context_node) {
+      ctxt=librdf_storage_postgresql_node_hash(storage,context_node,0);
+      if(ctxt) {
+        if((query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_context)+(20*2)+1))) {
+          sprintf(query, delete_context, context->model, ctxt);
+        }
+      }
+    } else {
+      if((query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_model)+(20)+1))) {
+        sprintf(query, delete_model, context->model);
+      }
     }
-  }
+    if(query) {
+      PGresult *res=NULL;
+      if((res=PQexec(handle, query))) {
+        if(PQresultStatus(res) == PGRES_COMMAND_OK) {
+          status = 0;
+        } else {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                   "postgresql delete from Statements failed with error %s", PQresultErrorMessage(res));
+        }
+        PQclear(res);
+      } else {
+        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "postgresql delete from Statements failed");
+      }
+      
+      LIBRDF_FREE(cstring,query);
+    }    
 
-  /* Remove statement(s) from storage */
-  if(context_node) {
-    if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_context)+61))) {
-      librdf_storage_postgresql_release_handle(storage, handle);
-      return 1;
-    }
-    sprintf(query, delete_context, context->model, ctxt);
-  } else {
-    if(!(query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_model)+21))) {
-      librdf_storage_postgresql_release_handle(storage, handle);
-      return 1;
-    }
-    sprintf(query, delete_model, context->model);
-  }
-  if(! PQexec(handle,query)) {
-    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "postgresql delete of context from Statements failed: %s",
-               PQerrorMessage(handle));
-    LIBRDF_FREE(cstring,query);
     librdf_storage_postgresql_release_handle(storage, handle);
-    return -1;
   }
-  LIBRDF_FREE(cstring,query);
-
-  librdf_storage_postgresql_release_handle(storage, handle);
-
-  return 0;
+  
+  return status;
 }
 
 
@@ -1505,6 +1593,8 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
   char where[256];
   char joins[640];
   librdf_stream *stream;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
 
   /* Initialize sos context */
   if(!(sos=(librdf_storage_postgresql_sos_context*)
@@ -1692,18 +1782,27 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
 
 
   /* Start query... */
-  if(!(sos->results=PQexec(sos->handle, query) )) {
+  sos->results=PQexec(sos->handle, query);
+  LIBRDF_FREE(cstring,query);
+  if (sos->results) {
+    if (PQresultStatus(sos->results) != PGRES_TUPLES_OK) {
+      librdf_log(sos->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "postgresql query failed: %s", PQresultErrorMessage(sos->results));
+      librdf_storage_postgresql_find_statements_in_context_finished((void*)sos);
+      return NULL;
+    }
+  } else {
     librdf_log(sos->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "postgresql query failed: %s",
-               PQresultErrorMessage(sos->results));
+               "postgresql query failed: %s", PQerrorMessage(sos->handle));
     librdf_storage_postgresql_find_statements_in_context_finished((void*)sos);
     return NULL;
   }
-  LIBRDF_FREE(cstring, query);
 
   sos->current_rowno=0;
-  if(!(sos->row=(char**)LIBRDF_CALLOC(cstring,sizeof(char *),PQnfields(sos->results)+1)))  
-      return NULL;
+  if(!(sos->row=(char**)LIBRDF_CALLOC(cstring,sizeof(char *),PQnfields(sos->results)+1))) {
+    librdf_storage_postgresql_find_statements_in_context_finished((void*)sos);
+    return NULL;
+  }
 
   /* Get first statement, if any, and initialize stream */
   if(librdf_storage_postgresql_find_statements_in_context_next_statement(sos) ) {
@@ -1730,6 +1829,9 @@ librdf_storage_postgresql_find_statements_in_context_augment_query(char **query,
 {
   char *newquery;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, char, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(addition, char, 1);
+
   /* Augment existing query, returning 0 on success. */
   if(!(newquery=(char*)LIBRDF_MALLOC(cstring, strlen(*query)+strlen(addition)+1)))
       return 1;
@@ -1747,6 +1849,8 @@ librdf_storage_postgresql_find_statements_in_context_end_of_stream(void* context
 {
   librdf_storage_postgresql_sos_context* sos=(librdf_storage_postgresql_sos_context*)context;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, void, 1);
+
   return sos->current_statement==NULL;
 }
 
@@ -1760,6 +1864,8 @@ librdf_storage_postgresql_find_statements_in_context_next_statement(void* contex
   char **row=sos->row;
   int i;
  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, void, 1);
+
   if( sos->current_rowno < PQntuples(sos->results) ) {
      for(i=0;i<PQnfields(sos->results);i++) {
        if(PQgetlength(sos->results,sos->current_rowno,i) > 0 ) {
@@ -1924,6 +2030,8 @@ librdf_storage_postgresql_find_statements_in_context_get_statement(void* context
 {
   librdf_storage_postgresql_sos_context* sos=(librdf_storage_postgresql_sos_context*)context;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, void, NULL);
+
   switch(flags) {
     case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
       return sos->current_statement;
@@ -1939,6 +2047,8 @@ static void
 librdf_storage_postgresql_find_statements_in_context_finished(void* context)
 {
   librdf_storage_postgresql_sos_context* sos=(librdf_storage_postgresql_sos_context*)context;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(context, void);
 
   if( sos->row )
      LIBRDF_FREE(cstring,sos->row);
@@ -1993,6 +2103,8 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   char *query;
   librdf_iterator *iterator;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
+
   /* Initialize get_contexts context */
   if(!(gccontext=(librdf_storage_postgresql_get_contexts_context*)
       LIBRDF_CALLOC(librdf_storage_postgresql_get_contexts_context,1,
@@ -2019,18 +2131,27 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   sprintf(query, select_contexts, context->model);
 
   /* Start query... */
-  if(!(gccontext->results=PQexec(gccontext->handle, query))) {
+  gccontext->results=PQexec(gccontext->handle, query);
+  LIBRDF_FREE(cstring,query);
+  if (gccontext->results) {
+    if (PQresultStatus(gccontext->results) != PGRES_TUPLES_OK) {
+      librdf_log(gccontext->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "postgresql query failed: %s", PQresultErrorMessage(gccontext->results));
+      librdf_storage_postgresql_get_contexts_finished((void*)gccontext);
+      return NULL;
+    }
+  } else {
     librdf_log(gccontext->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "postgresql query failed: %s",
-               PQresultErrorMessage(gccontext->results));
+               "postgresql query failed: %s", PQerrorMessage(gccontext->handle));
     librdf_storage_postgresql_get_contexts_finished((void*)gccontext);
     return NULL;
   }
-  LIBRDF_FREE(cstring, query);
 
   gccontext->current_rowno=0;
-  if(!(gccontext->row=(char**)LIBRDF_CALLOC(cstring, sizeof(char*), PQnfields(gccontext->results)+1)))
-      return NULL;
+  if(!(gccontext->row=(char**)LIBRDF_CALLOC(cstring, sizeof(char*), PQnfields(gccontext->results)+1))) {
+    librdf_storage_postgresql_get_contexts_finished((void*)gccontext);
+    return NULL;
+  }
 
   /* Get first context, if any, and initialize iterator */
   if(librdf_storage_postgresql_get_contexts_next_context(gccontext) ||
@@ -2055,6 +2176,8 @@ librdf_storage_postgresql_get_contexts_end_of_iterator(void* context)
 {
   librdf_storage_postgresql_get_contexts_context* gccontext=(librdf_storage_postgresql_get_contexts_context*)context;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, void, 1);
+
   return gccontext->current_context==NULL;
 }
 
@@ -2067,6 +2190,8 @@ librdf_storage_postgresql_get_contexts_next_context(void* context)
   char **row=gccontext->row;
   int i;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, void, 1);
+
   if( gccontext->current_rowno < PQntuples(gccontext->results) ) {
      for(i=0;i<PQnfields(gccontext->results);i++) {
        if(PQgetlength(gccontext->results,gccontext->current_rowno,i) > 0 ) {
@@ -2126,14 +2251,34 @@ librdf_storage_postgresql_get_contexts_get_context(void* context, int flags)
 {
   librdf_storage_postgresql_get_contexts_context* gccontext=(librdf_storage_postgresql_get_contexts_context*)context;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, void, NULL);
+
   return gccontext->current_context;
 }
+
+
+#if 0
+/* FIXME: why is this not used ? */
+static void
+librdf_storage_postgresql_free_gccontext_row(void* context)
+{
+  librdf_storage_postgresql_get_contexts_context* gccontext=(librdf_storage_postgresql_get_contexts_context*)context;
+
+/*
+  for(i=0;i<PQnfields(gccontext->results);i++) 
+     if( gccontext->row[i] )
+         LIBRDF_FREE(cstring, gccontext->row[i]);
+*/
+}
+#endif
 
 
 static void
 librdf_storage_postgresql_get_contexts_finished(void* context)
 {
   librdf_storage_postgresql_get_contexts_context* gccontext=(librdf_storage_postgresql_get_contexts_context*)context;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(context, void);
 
   if( gccontext->row )
       LIBRDF_FREE(cstring, gccontext->row);
@@ -2168,6 +2313,9 @@ librdf_storage_postgresql_get_feature(librdf_storage* storage, librdf_uri* featu
 {
   unsigned char *uri_string;
 
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(feature, librdf_uri, NULL);
+
   if(!feature)
     return NULL;
 
@@ -2201,29 +2349,46 @@ librdf_storage_postgresql_get_feature(librdf_storage* storage, librdf_uri* featu
 static int
 librdf_storage_postgresql_transaction_start(librdf_storage* storage) 
 {
-  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance* )storage->instance;
+  librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
   const char query[]="START TRANSACTION";
+  int status = 1;
+  PGresult *res;
   
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
+
   if(context->transaction_handle) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "Postgresql transaction already started");
-    return 1;
+    return status;
   }
   
   context->transaction_handle=librdf_storage_postgresql_get_handle(storage);
-  if(!context->transaction_handle) 
-    return 1;
-
-  if(!PQexec(context->transaction_handle, query)) {
+  if(!context->transaction_handle) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Postgresql query failed: %s", 
-               PQerrorMessage(context->transaction_handle));
-    librdf_storage_postgresql_release_handle(storage, context->transaction_handle);
-    context->transaction_handle=NULL;
-    return 1;
+               "Failed to establish transaction handle");
+    return status;
   }
 
-  return 0;
+  res = PQexec(context->transaction_handle, query);
+  if (res) {
+    if (PQresultStatus(res) == PGRES_COMMAND_OK) {
+      status = 0;
+    } else {
+      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "Postgresql query failed: %s", PQresultErrorMessage(res));
+    }
+    PQclear(res);
+  } else {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "Postgresql query failed: %s", PQerrorMessage(context->transaction_handle));
+  }
+
+  if (0 != status) {
+    librdf_storage_postgresql_release_handle(storage, context->transaction_handle);
+    context->transaction_handle=NULL;
+  }
+
+  return status;
 }
 
 
@@ -2255,27 +2420,34 @@ librdf_storage_postgresql_transaction_start_with_handle(librdf_storage* storage,
 static int
 librdf_storage_postgresql_transaction_commit(librdf_storage* storage) 
 {
-  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance* )storage->instance;
+  librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
   const char query[]="COMMIT TRANSACTION";
-  PGconn* handle;
-  int status;
+  int status = 1;
+  PGresult *res;
   
-  if(!context->transaction_handle)
-    return 1;
-  
-  handle=context->transaction_handle;
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
 
-  status=(PQexec(context->transaction_handle, query) == NULL);
-  if(status) {
-    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Postgresql query failed: %s", 
-               PQerrorMessage(context->transaction_handle));
-  }
+  if(!context->transaction_handle)
+    return status;
   
-  librdf_storage_postgresql_release_handle(storage, handle);
+  res = PQexec(context->transaction_handle, query);
+  if (res) {
+    if (PQresultStatus(res) == PGRES_COMMAND_OK) {
+      status = 0;
+    } else {
+      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "Postgresql commit query failed: %s", PQresultErrorMessage(res));
+    }
+    PQclear(res);
+  } else {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "Postgresql commit query failed: %s", PQerrorMessage(context->transaction_handle));
+  }
+
+  librdf_storage_postgresql_release_handle(storage, context->transaction_handle);
   context->transaction_handle=NULL;
   
-  return (status != 0);
+  return status;
 }
 
 
@@ -2290,27 +2462,34 @@ librdf_storage_postgresql_transaction_commit(librdf_storage* storage)
 static int
 librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
 {
-  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance* )storage->instance;
+  librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
   const char query[]="ROLLBACK TRANSACTION";
-  PGconn* handle;
-  int status;
+  int status = 1;
+  PGresult *res;
   
-  if(!context->transaction_handle)
-    return 1;
-  
-  handle=context->transaction_handle;
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
 
-  status=(PQexec(context->transaction_handle, query) == NULL);
-  if(status) {
+  if(!context->transaction_handle)
+    return status;
+  
+  res = PQexec(context->transaction_handle, query);
+  if (res) {
+    if (PQresultStatus(res) == PGRES_COMMAND_OK) {
+      status = 0;
+    } else {
+      librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                 "Postgresql commit query failed: %s", PQresultErrorMessage(res));
+    }
+    PQclear(res);
+  } else {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Postgresql query failed: %s", 
-               PQerrorMessage(context->transaction_handle));
+               "Postgresql commit query failed: %s", PQerrorMessage(context->transaction_handle));
   }
 
-  librdf_storage_postgresql_release_handle(storage, handle);
+  librdf_storage_postgresql_release_handle(storage, context->transaction_handle);
   context->transaction_handle=NULL;
   
-  return (status != 0);
+  return status;
 }
 
 
@@ -2320,12 +2499,14 @@ librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
  * 
  * Get the current transaction handle.
  * 
- * Return value: non-0 on failure 
+ * Return value: non-0 on success 
  **/
 static void*
 librdf_storage_postgresql_transaction_get_handle(librdf_storage* storage) 
 {
-  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance* )storage->instance;
+  librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
 
   return context->transaction_handle;
 }
