@@ -36,7 +36,7 @@ pkgconfig_DATA = redland.pc
 DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
 
 # Subdirectories to build/install/distribute etc.
-SUBDIRS=librdf examples utils demos docs data
+SUBDIRS=$(subdirs) librdf examples utils demos docs data
 
 EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
 ChangeLog.5 ChangeLog.6 ChangeLog.7 \
