@@ -110,11 +110,15 @@ struct librdf_world_s
 
   /* mutex to lock the statements class */
   pthread_mutex_t* statements_mutex;
+
+  /* mutex to lock the hash_datums class */
+  pthread_mutex_t* hash_datums_mutex;
 #else
   /* !WITH_THREADS - pad structure to same size */
   void* mutex_fake;
   void* nodes_mutex_fake;
   void* statements_mutex_fake;
+  void* hash_datums_mutex_fake;
 #endif
 
   /* non-0 if librdf_world_open() has been called */
