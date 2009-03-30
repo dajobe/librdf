@@ -52,6 +52,14 @@ extern "C" {
 #  endif
 #endif
 
+#ifndef REDLAND_CALLBACK_STDCALL
+#  if defined(WIN32) && defined(USE_STDCALL_CALLBACKS)
+#    define REDLAND_CALLBACK_STDCALL _stdcall
+#  else
+#    define REDLAND_CALLBACK_STDCALL
+#  endif
+#endif
+
 /* Use gcc 3.1+ feature to allow marking of deprecated API calls.
  * This gives a warning during compiling.
  */
