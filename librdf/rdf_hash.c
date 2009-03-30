@@ -211,7 +211,9 @@ void
 librdf_free_hash_datum(librdf_hash_datum *datum) 
 {
   if(datum->data) {
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG2("Freeing datum data, %p\n", datum);
+#endif
     LIBRDF_FREE(cstring, datum->data);
     datum->data = NULL;
   }
