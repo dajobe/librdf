@@ -692,6 +692,8 @@ librdf_statement_encode_parts(librdf_statement* statement,
   if((fields & LIBRDF_STATEMENT_SUBJECT) && statement->subject) {
     /* 's' + subject */
     if(p) {
+      if(length < 1)
+        return 0;
       *p++='s';
       length--;
     }
@@ -713,6 +715,9 @@ librdf_statement_encode_parts(librdf_statement* statement,
   if((fields & LIBRDF_STATEMENT_PREDICATE) && statement->predicate) {
     /* 'p' + predicate */
     if(p) {
+      if(length < 1)
+        return 0;
+      
       *p++='p';
       length--;
     }
@@ -732,6 +737,9 @@ librdf_statement_encode_parts(librdf_statement* statement,
   if((fields & LIBRDF_STATEMENT_OBJECT) && statement->object) {
     /* 'o' object */
     if(p) {
+      if(length < 1)
+        return 0;
+      
       *p++='o';
       length--;
     }
