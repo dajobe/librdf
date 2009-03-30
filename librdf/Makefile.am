@@ -331,8 +331,5 @@ rdf_init_test: rdf_init.c librdf.la
 
 @SET_MAKE@
 
-$(top_builddir)/raptor/src/libraptor.la:
-	cd $(top_builddir)/raptor/src && $(MAKE) $(AM_MAKEFLAGS) libraptor.la
-
-$(top_builddir)/rasqal/src/librasqal.la:
-	cd $(top_builddir)/rasqal/src && $(MAKE) $(AM_MAKEFLAGS) librasqal.la
+${top_build_prefix}libltdl/libltdlc.la:
+	cd  ${top_build_prefix}libltdl && R(MAKE) libltdlc.la
