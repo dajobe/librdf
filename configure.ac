@@ -454,84 +454,56 @@ parser_modules=raptor
 rdf_parsers_available=
 
 # Check for raptor
-AC_ARG_WITH(raptor, [  --with-raptor=SOURCE    Pick maintainer raptor source - system/internal (default=internal)], with_raptor="$withval", with_raptor="internal")
 AC_MSG_CHECKING(for raptor)
-raptor_dir=../raptor
 
 RAPTOR_MIN_VERSION=1.4.17
 AC_SUBST(RAPTOR_MIN_VERSION)
-if test "$USE_MAINTAINER_MODE" = yes -a -f $raptor_dir/raptor-src-config -a $with_raptor = internal; then
-  RAPTOR_VERSION=`$raptor_dir/raptor-src-config --version 2>/dev/null`
-
-  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/$raptor_dir/src $LIBRDF_INTERNAL_CPPFLAGS"
-  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/$raptor_dir/src/libraptor.la $LIBRDF_INTERNAL_LIBS"
-
-  rdf_parsers_available="$parser_available raptor(internal)"
-  AC_MSG_RESULT(maintainer $RAPTOR_VERSION)
+if $PKG_CONFIG raptor --exists; then
+  :
 else
-  with_raptor=system
-  if $PKG_CONFIG raptor --exists; then
-    :
-  else
-    AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
-  fi
-
-  RAPTOR_VERSION=`$PKG_CONFIG raptor --modversion 2>/dev/null`
-
-  if $PKG_CONFIG raptor --atleast-version=$RAPTOR_MIN_VERSION; then
-    :
-  else
-    AC_MSG_ERROR(Installed raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
-  fi
-
-  LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG raptor --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
-  LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG raptor --libs` $LIBRDF_EXTERNAL_LIBS"
-
-  rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
-  AC_MSG_RESULT(system $RAPTOR_VERSION)
+  AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
 fi
-AC_SUBST(with_raptor)
+
+RAPTOR_VERSION=`$PKG_CONFIG raptor --modversion 2>/dev/null`
+
+if $PKG_CONFIG raptor --atleast-version=$RAPTOR_MIN_VERSION; then
+  :
+else
+  AC_MSG_ERROR(Installed raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
+fi
+
+LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG raptor --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG raptor --libs` $LIBRDF_EXTERNAL_LIBS"
+
+rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
+AC_MSG_RESULT(system $RAPTOR_VERSION)
 
 # Check for rasqal
-AC_ARG_WITH(rasqal, [  --with-rasqal=SOURCE    Pick maintainer rasqal source - system/internal (default=internal)], with_rasqal="$withval", with_rasqal="internal")
 AC_MSG_CHECKING(for rasqal)
-rasqal_dir=../rasqal
 
 RASQAL_MIN_VERSION=0.9.16
 RASQAL_MAX_VERSION=0.9.99
 AC_SUBST(RASQAL_MIN_VERSION)
 AC_SUBST(RASQAL_MAX_VERSION)
-if test "$USE_MAINTAINER_MODE" = yes -a -f $rasqal_dir/rasqal-src-config -a $with_rasqal = internal; then
-  RASQAL_VERSION=`$rasqal_dir/rasqal-src-config --version 2>/dev/null`
-
-  LIBRDF_INTERNAL_CPPFLAGS="-I\$(top_srcdir)/$rasqal_dir/src $LIBRDF_INTERNAL_CPPFLAGS"
-  LIBRDF_INTERNAL_LIBS="\$(top_builddir)/$rasqal_dir/src/librasqal.la $LIBRDF_INTERNAL_LIBS"
-
-  rdf_query="rasqal(internal)"
-  AC_MSG_RESULT(maintainer $RASQAL_VERSION)
+if $PKG_CONFIG rasqal --exists; then
+  :
 else
-  with_rasqal=system
-  if $PKG_CONFIG rasqal --exists; then
-    :
-  else
-    AC_MSG_ERROR(Rasqal is not installed - see http://librdf.org/rasqal/ to get a version in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
-  fi
-
-  RASQAL_VERSION=`$PKG_CONFIG rasqal --modversion 2>/dev/null`
-
-  if $PKG_CONFIG rasqal --atleast-version=$RASQAL_MIN_VERSION --max-version=$RASQAL_MAX_VERSION; then
-    :
-  else
-    AC_MSG_ERROR(Installed rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
-  fi
-
-  LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG rasqal --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
-  LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG rasqal --libs` $LIBRDF_EXTERNAL_LIBS"
-
-  rdf_query="rasqal(system $RASQAL_VERSION)"
-  AC_MSG_RESULT(system $RASQAL_VERSION)
+  AC_MSG_ERROR(Rasqal is not installed - see http://librdf.org/rasqal/ to get a version in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
 fi
-AC_SUBST(with_rasqal)
+
+RASQAL_VERSION=`$PKG_CONFIG rasqal --modversion 2>/dev/null`
+
+if $PKG_CONFIG rasqal --atleast-version=$RASQAL_MIN_VERSION --max-version=$RASQAL_MAX_VERSION; then
+  :
+else
+  AC_MSG_ERROR(Installed rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
+fi
+
+LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG rasqal --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG rasqal --libs` $LIBRDF_EXTERNAL_LIBS"
+
+rdf_query="rasqal(system $RASQAL_VERSION)"
+AC_MSG_RESULT(system $RASQAL_VERSION)
 
 
 dnl Checks for modules

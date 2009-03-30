@@ -76,18 +76,10 @@ while test $# -gt 0; do
         lpath=".libs:$lpath"
       fi
 
-      if test @with_raptor@ = internal; then
-        ldir="@abs_top_builddir@/../raptor/.libs"
-      else
-        ldir=`pkg-config raptor --variable=libdir`
-      fi
+      ldir=`pkg-config raptor --variable=libdir`
       lpath="$lpath:$ldir"
 
-      if test @with_rasqal@ = internal; then
-        ldir="@abs_top_builddir@/../rasqal/.libs"
-      else
-        ldir=`pkg-config rasqal --variable=libdir`
-      fi
+      ldir=`pkg-config rasqal --variable=libdir`
       lpath="$lpath:$ldir"
 
       if test `uname` = Darwin; then
@@ -123,25 +115,9 @@ while test $# -gt 0; do
   shift
 done
 
-if test @with_raptor@ = internal; then
-  raptor_config=@abs_top_builddir@/../raptor/raptor-src-config
-  if test ! -r $raptor_config; then
-    echo "redland-src-config: Source tree not configured - no raptor-src-config, exiting" 1>&2
-    exit 0
-  fi
-else
-  raptor_config="pkg-config raptor-config"
-fi
+raptor_config="pkg-config raptor-config"
 
-if test @with_rasqal@ = internal; then
-  rasqal_config=@abs_top_builddir@/../rasqal/rasqal-src-config
-  if test ! -r $rasqal_config; then
-    echo "redland-src-config: Source tree not configured - no rasqal-src-config, exiting" 1>&2
-    exit 0
-  fi
-else
-  rasqal_config="pkg-config rasqal-config"
-fi
+rasqal_config="pkg-config rasqal-config"
 
 if test "$echo_cflags" = "yes"; then
   echo -I@abs_top_srcdir@/librdf `$rasqal_config --cflags` `$raptor_config --cflags`
