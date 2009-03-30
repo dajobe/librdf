@@ -131,7 +131,7 @@ typedef struct
  *
  * Return value: non-zero to indicate log message has been handled 
  */
-typedef int (*librdf_log_level_func)(void *user_data, const char *message, va_list arguments);
+typedef int (REDLAND_CALLBACK_STDCALL *librdf_log_level_func)(void *user_data, const char *message, va_list arguments);
 
 /**
  * librdf_log_func:
@@ -142,7 +142,7 @@ typedef int (*librdf_log_level_func)(void *user_data, const char *message, va_li
  *
  * Return value: non-zero to indicate log message has been handled 
  */
-typedef int (*librdf_log_func)(void *user_data, librdf_log_message *message);
+typedef int (REDLAND_CALLBACK_STDCALL *librdf_log_func)(void *user_data, librdf_log_message *message);
 
 #ifdef LIBRDF_INTERNAL
 #include <rdf_log_internal.h>
