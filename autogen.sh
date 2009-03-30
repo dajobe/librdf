@@ -257,9 +257,9 @@ done
 
 echo "$program: Dependencies satisfied"
 
-if test -d $SRCDIR/libltdl; then
-  touch $SRCDIR/libltdl/NO-AUTO-GEN
-fi
+# Delete this libtoolize- generated directory now so that it is never
+# considered by autogen.sh
+$DRURUN rm -rf libltdl
 
 config_dir=
 if test -d $CONFIG_DIR; then
