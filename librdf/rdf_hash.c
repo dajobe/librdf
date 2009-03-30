@@ -140,11 +140,19 @@ librdf_free_hash_datums(librdf_world *world)
 {
   librdf_hash_datum *datum, *next;
   
-  for(datum=world->hash_datums_list; datum; datum=next) {
-    next=datum->next;
+#ifdef WITH_THREADS
+  pthread_mutex_lock(world->hash_datums_mutex);
+#endif
+
+  for(datum = world->hash_datums_list; datum; datum = next) {
+    next = datum->next;
     LIBRDF_FREE(librdf_hash_datum, datum);
   }
-  world->hash_datums_list=NULL;
+  world->hash_datums_list = NULL;
+
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(world->hash_datums_mutex);
+#endif
 }
 
 
@@ -165,18 +173,27 @@ librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
 
   librdf_world_open(world);
 
+#ifdef WITH_THREADS
+  pthread_mutex_lock(world->hash_datums_mutex);
+#endif
+
   /* get one from free list, or allocate new one */ 
-  if((datum=world->hash_datums_list)) {
-    world->hash_datums_list=datum->next;
+  if((datum = world->hash_datums_list)) {
+    world->hash_datums_list = datum->next;
   } else {
-    datum=(librdf_hash_datum*)LIBRDF_CALLOC(librdf_hash_datum, 1, sizeof(librdf_hash_datum));
+    datum = (librdf_hash_datum*)LIBRDF_CALLOC(librdf_hash_datum, 1,
+                                              sizeof(librdf_hash_datum));
     if(datum)
-      datum->world=world;
+      datum->world = world;
   }
-  
+
+#ifdef WITH_THREADS
+   pthread_mutex_unlock(world->hash_datums_mutex);
+#endif
+
   if(datum) {
-    datum->data=data;
-    datum->size=size;
+    datum->data = data;
+    datum->size = size;
   }
 
   return datum;
@@ -193,10 +210,22 @@ librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
 void
 librdf_free_hash_datum(librdf_hash_datum *datum) 
 {
-  if(datum->data)
+  if(datum->data) {
+    LIBRDF_DEBUG2("Freeing datum data, %p\n", datum);
     LIBRDF_FREE(cstring, datum->data);
-  datum->next=datum->world->hash_datums_list;
-  datum->world->hash_datums_list=datum;
+    datum->data = NULL;
+  }
+
+#ifdef WITH_THREADS
+  pthread_mutex_lock(datum->world->hash_datums_mutex);
+#endif
+
+  datum->next = datum->world->hash_datums_list;
+  datum->world->hash_datums_list = datum;
+
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(datum->world->hash_datums_mutex);
+#endif
 }
 
 
