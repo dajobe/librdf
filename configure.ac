@@ -522,56 +522,9 @@ AC_MSG_RESULT($digest_modules)
 DIGEST_OBJS=
 DIGEST_SRCS=
 
-AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests (default=yes)], enable_openssl_digests="$withval", enable_openssl_digests="yes") 
-
-# This is needed because autoheader can't work out which computed
-# symbols must be pulled from acconfig.h into config.h.in
-if test "x" = "y"; then
-  AC_DEFINE(HAVE_OPENSSL_CRYPTO_MD5_DIGEST, 1, [Have openssl MD5 digest])
-  AC_DEFINE(HAVE_OPENSSL_CRYPTO_SHA1_DIGEST, 1, [Have openssl SHA1 digest])
-  AC_DEFINE(HAVE_OPENSSL_CRYPTO_RIPEMD160_DIGEST, 1, [Have openssl RIPEMD160 digest])
-fi
+AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests (default=yes)], enable_openssl_digests="no", enable_openssl_digests="no") 
 
 digest_modules_available=
-AC_MSG_CHECKING(whether to use openssl digests)
-if test "$enable_openssl_digests" = yes ; then
-  AC_MSG_RESULT(yes)
-  AC_CHECK_HEADERS(openssl/crypto.h)
-  if test "$ac_cv_header_openssl_crypto_h" = yes ; then
-    AC_DEFINE(HAVE_OPENSSL_DIGESTS, 1, [Have openssl digests])
-    new_digest_modules=
-    LIBS="$LIBRDF_LIBS -lcrypto"
-    have_libcrypto=no
-
-    for module in $digest_modules; do
-      func=`echo $module | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
-      found=
-      AC_MSG_CHECKING(for openssl $func digest module)
-      AC_CACHE_VAL(ac_cv_lib_crypto_$func,
-                   [AC_TRY_LINK(, $func(),
-                   [eval "ac_cv_lib_crypto_$func=yes"],
-                   [eval "ac_cv_lib_crypto_$func=no"])])
-      if eval "test \"`echo '$ac_cv_lib_crypto_'$func`\" = yes"; then
-	AC_MSG_RESULT(yes)
-	n=HAVE_OPENSSL_CRYPTO_${func}_DIGEST
-	AC_DEFINE_UNQUOTED($n)
-        have_libcrypto=yes
-        digest_modules_available="$digest_modules_available $module(openssl)"
-      else
-	AC_MSG_RESULT(no)
-	new_digest_modules="${new_digest_modules} $module"
-      fi
-    done
-    if test "$have_libcrypto" = yes; then
-      LIBRDF_LIBS="$LIBRDF_LIBS -lcrypto"
-    fi
-    DIGEST_OBJS="$DIGEST_OBJS rdf_digest_openssl.lo"
-    DIGEST_SRCS="$DIGEST_SRCS rdf_digest_openssl.c"
-    digest_modules=$new_digest_modules
-  fi
-else
-  AC_MSG_RESULT(no)
-fi
 
 
 dnl hashes

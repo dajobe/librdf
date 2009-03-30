@@ -176,7 +176,7 @@ librdf_la_DEPENDENCIES = \
 @LIBRDF_INTERNAL_LIBS@
 
 EXTRA_librdf_la_SOURCES = rdf_hash_bdb.c \
-rdf_digest_md5.c rdf_digest_sha1.c rdf_digest_openssl.c \
+rdf_digest_md5.c rdf_digest_sha1.c \
 rdf_parser_raptor.c
 
 EXTRA_DIST=\
