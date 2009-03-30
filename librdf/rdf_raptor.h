@@ -41,10 +41,12 @@ typedef struct raptor_world_s raptor_world;
 #endif
 
 
+#ifdef RAPTOR_V2_AVAILABLE
 REDLAND_API
 void librdf_world_set_raptor(librdf_world* world, raptor_world* raptor_world_ptr);
 REDLAND_API
 raptor_world* librdf_world_get_raptor(librdf_world* world);
+#endif
 
 
 #ifdef __cplusplus

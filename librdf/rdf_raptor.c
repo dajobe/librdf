@@ -52,12 +52,14 @@
  * free it.
  *
  **/
+#ifdef RAPTOR_V2_AVAILABLE
 void
 librdf_world_set_raptor(librdf_world* world, raptor_world* raptor_world_ptr)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(world, librdf_world);
   world->raptor_world_ptr = raptor_world_ptr;
 }
+#endif
 
 
 /**
@@ -68,12 +70,14 @@ librdf_world_set_raptor(librdf_world* world, raptor_world* raptor_world_ptr)
  *
  * Return value: raptor_world object or NULL on failure (e.g. not initialized)
  **/
+#ifdef RAPTOR_V2_AVAILABLE
 raptor_world*
 librdf_world_get_raptor(librdf_world* world)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
   return world->raptor_world_ptr;
 }
+#endif
 
 
 static raptor_uri*

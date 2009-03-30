@@ -1215,12 +1215,14 @@ librdf_query_rasqal_constructor(librdf_world *world)
    * rasqal_world_open() uses raptor_init() which just increments
    * the refcount on raptor instance already created in librdf_raptor_init().
    */
+#ifdef RAPTOR_V2_AVAILABLE
   rasqal_world_set_raptor(world->rasqal_world_ptr, world->raptor_world_ptr);
   
   if(rasqal_world_open(world->rasqal_world_ptr)) {
     LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
     return;
   }
+#endif
   
   rasqal_set_triples_source_factory(world->rasqal_world_ptr, rasqal_redland_register_triples_source_factory, world);
 
