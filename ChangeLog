@@ -1,4 +1,18 @@
+2009-03-30  Dave Beckett <dave@dajobe.org>
+
+	* docs/Makefile.am: (redland.3): Adjust sed to make NAME section
+	of generated manual more debian lintian friendly
+
+	* librdf/Makefile.am: Add rule to build
+	${top_build_prefix}libltdl/libltdlc.la and remove those to try to
+	build raptor and rasqal locally.
+
 2009-03-29  Dave Beckett <dave@dajobe.org>
+
+	* INSTALL.html, configure.ac, librdf/Makefile.am,
+	librdf/rdf_digest_openssl.c: Removed openssl digest support - not
+	used much and an extra large dependency. MD5 and SHA1 remain
+	builtin.
 
 	* librdf/rdf_hash.c:
 	(librdf_free_hash_datum): Debug print at level 2 or more
