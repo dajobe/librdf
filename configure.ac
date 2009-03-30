@@ -1048,7 +1048,6 @@ AC_SUBST(abs_top_builddir)
 
 AC_CONFIG_FILES([Makefile
 redland.rdf
-libltdl/Makefile
 librdf/redland.spec
 docs/Makefile
 docs/version.xml
