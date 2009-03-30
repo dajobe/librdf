@@ -11,7 +11,8 @@ man_MANS = redland-db-upgrade.1 rdfproc.1
 
 EXTRA_DIST= rdfproc.html \
 $(man_MANS) \
-touch-mtime.pl
+touch-mtime.pl \
+fix-groff-xhtml
 
 CLEANFILES=*.db $(EXTRA_PROGRAMS)
 
