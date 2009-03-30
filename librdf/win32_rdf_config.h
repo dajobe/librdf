@@ -54,6 +54,9 @@ extern "C" {
 
 #define HAVE_C99_VSNPRINTF 1
 
+/* Define the following if you are calling the librdf from C# or any language which uses stdcall */
+#define USE_STDCALL_CALLBACKS 1
+
 /* for access() which is POSIX but doesn't seem to have the defines in VC */
 #ifndef R_OK
 #define F_OK 0
@@ -255,7 +258,7 @@ extern "C" {
 #define STORAGE_FILE 1
 
 /* Building MySQL storage */
-#define STORAGE_MYSQL 1
+/* #define STORAGE_MYSQL 1 */
 
 /* Building PostgreSQL storage */
 /*#undef STORAGE_POSTGRESQL*/
@@ -273,7 +276,7 @@ extern "C" {
 #define VERSION "1.0.8"
 
 /* Use POSIX threads */
-/* #undef WITH_THREADS */
+#define WITH_THREADS
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
