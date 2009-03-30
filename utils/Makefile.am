@@ -29,6 +29,6 @@ rdfproc_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la
 
 mysql-utils: $(MYSQL_UTILS)
 
-@MAINT@rdfproc.html: $(srcdir)/rdfproc.1 $(top_srcdir)/raptor/fix-groff-xhtml
-@MAINT@	-groff -man -Thtml -P-l $< | tidy -asxml -wrap 1000 2>/dev/null | $(PERL) $(top_srcdir)/raptor/fix-groff-xhtml $@
+@MAINT@rdfproc.html: $(srcdir)/rdfproc.1 $(srcdir)/fix-groff-xhtml
+@MAINT@	-groff -man -Thtml -P-l $< | tidy -asxml -wrap 1000 2>/dev/null | $(PERL) $(srcdir)/fix-groff-xhtml $@
 
