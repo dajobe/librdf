@@ -198,20 +198,32 @@ librdf_free_world(librdf_world *world)
   librdf_finish_raptor(world);
 
 #ifdef WITH_THREADS
-   if (world->mutex)
-   {
-     pthread_mutex_destroy(world->statements_mutex);
-     SYSTEM_FREE(world->statements_mutex);
-     world->statements_mutex = NULL;
 
-     pthread_mutex_destroy(world->nodes_mutex);
-     SYSTEM_FREE(world->nodes_mutex);
-     world->nodes_mutex = NULL;
+  if(world->hash_datums_mutex) {
+    pthread_mutex_destroy(world->hash_datums_mutex);
+    SYSTEM_FREE(world->hash_datums_mutex);
+    world->hash_datums_mutex = NULL;
+  }
 
-     pthread_mutex_destroy(world->mutex);
-     SYSTEM_FREE(world->mutex);
-     world->mutex = NULL;
-   }
+  if(world->statements_mutex) {
+    pthread_mutex_destroy(world->statements_mutex);
+    SYSTEM_FREE(world->statements_mutex);
+    world->statements_mutex = NULL;
+  }
+
+  if(world->nodes_mutex) {
+    pthread_mutex_destroy(world->nodes_mutex);
+    SYSTEM_FREE(world->nodes_mutex);
+    world->nodes_mutex = NULL;
+  }
+
+  if(world->mutex) {
+    pthread_mutex_destroy(world->mutex);
+    SYSTEM_FREE(world->mutex);
+    world->mutex = NULL;
+  }
+
+
 #endif
 
 #ifdef MODULAR_LIBRDF
@@ -241,6 +253,10 @@ librdf_world_init_mutex(librdf_world* world)
 
   world->statements_mutex = (pthread_mutex_t *) SYSTEM_MALLOC(sizeof(pthread_mutex_t));
   pthread_mutex_init(world->statements_mutex, NULL);
+
+  world->hash_datums_mutex = (pthread_mutex_t *) SYSTEM_MALLOC(sizeof(pthread_mutex_t));
+  pthread_mutex_init(world->hash_datums_mutex, NULL);
+
 #else
 #endif
 }
