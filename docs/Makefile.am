@@ -114,7 +114,8 @@ if MAINTAINER_MODE
 redland.3: redland.pod
 	pod2man --section=3 --center="Redland RDF Application Framework" \
 	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @PACKAGE_VERSION@" $< | \
-	sed -e "s;REDLAND_VERSION_STRING;@PACKAGE_VERSION@;" > $@
+	sed -e "s;REDLAND_VERSION_STRING;@PACKAGE_VERSION@;" \
+	    -e 's;^Redland Resource;redland \\- Resource;' > $@
 	rm -f pod2htm*
 else
 redland.3: redland.pod
