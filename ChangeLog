@@ -1,3 +1,78 @@
+2009-03-29  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_hash.c:
+	(librdf_free_hash_datum): Debug print at level 2 or more
+
+	* librdf/rdf_storage_postgresql.c: Applied fixes from
+	Issue#0000286 to fix "Numerous leaks, potential NULL pointer use,
+	and dropped postgresql errors and buffer overruns in the
+	postgresql storage module" Rebased from original patch around
+	about SVN r14170 to current head, applied recent changes and fixed
+	ISO C90 problems by moving declarations and assertions to start of
+	blocks.
+	Fixes Issue#0000286 http://bugs.librdf.org/mantis/view.php?id=286
+
+	* librdf/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_get_contexts): Fix allocation of N
+	bytes not N x size_t bytes using patch from bug:
+	Fixes Issue#0000285 http://bugs.librdf.org/mantis/view.php?id=285
+	May also fix issue 102 according to bug.
+
+	(librdf_storage_postgresql_free_gccontext_row): Removes unused
+	function.  Unused because the memory the function frees belongs to a
+	PGresult struct and is freed when that struct is freed with the
+	appropriate postgresql API.
+
+	* librdf/rdf_statement.c:
+	(librdf_statement_encode_parts): Fix a buffer overrun error that
+	could occur with certain size buffers. 	A buffer size of 1 is sure
+	to write past the end of the buffer.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/rdf_hash.c: Protect world->hash_datums_list with
+	hash_datums_mutex when threading.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/rdf_init.c: 
+	(librdf_free_world): Destroy hash_datums_mutex and others in
+	reverse order when threading.
+	(librdf_world_init_mutex): Init hash_datums_mutex.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/rdf_init_internal.h: Add hash_datums_mutex for locking
+	hash_datums class when with threads.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/rdf_log.h: librdf_log_level_func and librdf_log_func
+	functions gain REDLAND_CALLBACK_STDCALL before function pointer to
+	allow windows to adjust the calling convention for C#
+	compatibility.
+	Based on patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/librdf.h: Added REDLAND_CALLBACK_STDCALL macro to prefix
+	selected callback function pointer definitions.  Enabled for
+	windows when USE_STDCALL_CALLBACKS is defined.
+
+	* librdf/rdf_uri.c: (librdf_new_uri): Clear key and value to all
+	zeros before use to make it easier to debug since not all fields
+	of the structure were used.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/win32_rdf_config.h: win32: Add STDCALL_CALLBACKS
+	Enable HAVE_PTHREADS
+	Disable mysql storage
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* configure.ac: hello Berkeley DB 4.7
+
+	* utils/Makefile.am: Add fix-groff-xhtml to dist
+
+	* utils/Makefile.am, utils/fix-groff-xhtml (from
+	/raptor/trunk/fix-groff-xhtml:15041): Copy in fix-groff-xhtml from
+	raptor
+
+	* configure.ac: libtool ltdl config that seems to work for V1 and V2
+
 2009-03-29  Dave Robillard <dave@drobilla.net>
 
 	* configure.ac, redland-src-config.in: Remove vestigial
