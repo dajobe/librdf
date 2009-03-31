@@ -66,7 +66,7 @@ automake_min_vers=010700
 aclocal_min_vers=$automake_min_vers
 autoconf_min_vers=025400
 autoheader_min_vers=$autoconf_min_vers
-libtoolize_min_vers=010400
+libtoolize_min_vers=020200
 gtkdocize_min_vers=010300
 swig_min_vers=010324
 

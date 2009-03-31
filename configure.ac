@@ -105,15 +105,9 @@ m4_undefine([AC_PROG_F77])
 m4_defun([AC_PROG_F77],[])
 
 # Libtool and LTDL initialising
-LT_INIT
-# With libtool V2 this should be
-#   LT_CONFIG_LTDL_DIR([libltdl])
-# for V1 compatibility, using the following
-# since the V2-to-V1 backwards compatibility makes it equivalent to the above
-AC_LIBLTDL_INSTALLABLE([libltdl])
-AC_LIBTOOL_DLOPEN
-LTDL_INIT
-AC_PROG_LIBTOOL
+LT_CONFIG_LTDL_DIR([libltdl])
+LT_INIT([dlopen])
+LTDL_INIT([convenience])
 
 # Find a tar command for 'make dist'
 AC_CHECK_PROGS(TAR, gnutar gtar tar)
