@@ -962,8 +962,11 @@ librdf_storage_trees_register_factory(librdf_storage_factory *factory)
 }
 
 
-/** INTERNAL - Initialise the built-in storage_trees module.
+/*
+ * librdf_init_storage_trees:
  * @world: world object
+ *
+ * INTERNAL - Initialise the built-in storage_trees module.
  */
 void
 librdf_init_storage_trees(librdf_world *world)

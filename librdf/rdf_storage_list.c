@@ -970,8 +970,11 @@ librdf_storage_list_register_factory(librdf_storage_factory *factory)
 }
 
 
-/** INTERNAL - Initialise the built-in storage_list module.
+/*
+ * librdf_init_storage_list:
  * @world: world object
+ *
+ * INTERNAL - Initialise the built-in storage_list module.
  */
 void
 librdf_init_storage_list(librdf_world *world)

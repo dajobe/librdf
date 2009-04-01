@@ -3044,8 +3044,11 @@ librdf_storage_module_register_factory(librdf_world *world)
 
 #else
 
-/** INTERNAL - Initialise the built-in storage_mysql module.
+/*
+ * librdf_init_storage_mysql:
  * @world: world object
+ *
+ * INTERNAL - Initialise the built-in storage_mysql module.
  */
 void
 librdf_init_storage_mysql(librdf_world *world)

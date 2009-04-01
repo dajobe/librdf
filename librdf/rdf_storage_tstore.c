@@ -754,8 +754,11 @@ librdf_storage_module_register_factory(librdf_world *world)
 
 #else
 
-/** INTERNAL - Initialise the built-in storage_tstore module.
+/*
+ * librdf_init_storage_tstore:
  * @world: world object
+ *
+ * INTERNAL - Initialise the built-in storage_tstore module.
  */
 void
 librdf_init_storage_tstore(librdf_world *world)

@@ -2560,8 +2560,11 @@ librdf_storage_module_register_factory(librdf_world *world)
 
 #else
 
-/** INTERNAL - Initialise the built-in storage_postgresql module.
+/*
+ * librdf_init_storage_postgresql:
  * @world: world object
+ *
+ * INTERNAL - Initialise the built-in storage_postgresql module.
  */
 void
 librdf_init_storage_postgresql(librdf_world *world)

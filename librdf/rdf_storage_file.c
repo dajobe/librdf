@@ -369,8 +369,11 @@ librdf_storage_file_register_factory(librdf_storage_factory *factory)
 }
 
 
-/** INTERNAL - Initialise the built-in storage_file module.
+/*
+ * librdf_init_storage_file:
  * @world: world object
+ *
+ * INTERNAL - Initialise the built-in storage_file module.
  */
 void
 librdf_init_storage_file(librdf_world *world)
