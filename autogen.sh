@@ -53,7 +53,7 @@ if grep "^AC_CHECK_PROGS.SWIG" $confs >/dev/null; then
   programs="$programs swig"
 fi
 ltdl=
-if grep "^AC_LIBLTDL_" $confs >/dev/null; then
+if grep "^LTDL_INIT" $confs >/dev/null; then
   ltdl="--ltdl"
 fi
 
