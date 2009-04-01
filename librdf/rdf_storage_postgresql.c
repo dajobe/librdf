@@ -195,6 +195,7 @@ static int librdf_storage_postgresql_transaction_rollback(librdf_storage* storag
 
 /* functions implementing storage api */
 
+
 /*
  * librdf_storage_postgresql_hash - Find hash value of string.
  * @storage: the storage
@@ -288,9 +289,12 @@ librdf_storage_postgresql_finish_connections(librdf_storage* storage)
   }
 }
 
+
 /*
- * librdf_storage_postgresql_get_handle - get a connection handle to the postgresql server
+ * librdf_storage_postgresql_get_handle:
  * @storage: the storage
+ *
+ * INTERNAL - get a connection handle to the postgresql server
  *
  * This attempts to reuses any existing available pooled connection
  * otherwise creates a new connection to the server.
@@ -387,9 +391,11 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
 
 
 /*
- * librdf_storage_postgresql_release_handle - Release a connection handle to postgresql server back to the pool
+ * librdf_storage_postgresql_release_handle:
  * @storage: the storage
  * @handle: the postgresql handle to release
+ *
+ * INTERNAL - Release a connection handle to postgresql server back to the pool
  *
  * Return value: None.
  **/
@@ -416,13 +422,13 @@ librdf_storage_postgresql_release_handle(librdf_storage* storage, PGconn *handle
 }
 
 
-/**
+/*
  * librdf_storage_postgresql_init:
  * @storage: the storage
  * @name: model name
  * @options: host, port, database, user, password [, new] [, bulk] [, merge].
  *
- * Create connection to database.  Defaults to port 5432 if not given.
+ * INTERNAL - Create connection to database.  Defaults to port 5432 if not given.
  *
  * The boolean bulk option can be set to true if optimized inserts (table
  * locks and temporary key disabling) is wanted. Note that this will block
@@ -663,9 +669,12 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   return status;
 }
 
+
 /*
- * librdf_storage_postgresql_merge - (re)create merged "view" of all models
+ * librdf_storage_postgresql_merge:
  * @storage: the storage
+ *
+ * INTERNAL - (re)create merged "view" of all models
  *
  * Return value: Non-zero on failure.
  */
@@ -744,11 +753,12 @@ librdf_storage_postgresql_merge(librdf_storage* storage)
   return 0;
 }
 
-/**
+
+/*
  * librdf_storage_postgresql_terminate:
  * @storage: the storage
  *
- * Close the storage and database connections.
+ * INTERNAL - Close the storage and database connections.
  *
  * Return value: None.
  **/
@@ -785,12 +795,13 @@ librdf_storage_postgresql_terminate(librdf_storage* storage)
   LIBRDF_FREE(librdf_storage_postgresql_instance, storage->instance);
 }
 
-/**
+
+/*
  * librdf_storage_postgresql_open:
  * @storage: the storage
  * @model: the model
  *
- * Create or open model in database (nop).
+ * INTERNAL - Create or open model in database (nop).
  *
  * Return value: Non-zero on failure.
  **/
@@ -800,11 +811,12 @@ librdf_storage_postgresql_open(librdf_storage* storage, librdf_model* model)
   return 0;
 }
 
-/**
+
+/*
  * librdf_storage_postgresql_close:
  * @storage: the storage
  *
- * Close model (nop).
+ * INTERNAL - Close model (nop).
  *
  * Return value: Non-zero on failure.
  **/
@@ -816,9 +828,12 @@ librdf_storage_postgresql_close(librdf_storage* storage)
   return librdf_storage_postgresql_sync(storage);
 }
 
-/**
- * librdf_storage_postgresql_sync - Flush all tables, making sure they are saved on disk.
+
+/*
+ * librdf_storage_postgresql_sync
  * @storage: the storage
+ *
+ * INTERNAL - Flush all tables, making sure they are saved on disk.
  *
  * Return value: Non-zero on failure.
  **/
@@ -836,11 +851,12 @@ librdf_storage_postgresql_sync(librdf_storage* storage)
   return 0;
 }
 
-/**
+
+/*
  * librdf_storage_postgresql_size:
  * @storage: the storage
  *
- * Close model (nop).
+ * INTERNAL - Close model (nop).
  *
  * Return value: Negative on failure.
  **/
@@ -903,12 +919,12 @@ librdf_storage_postgresql_add_statement(librdf_storage* storage,
 }
 
 
-/**
+/*
  * librdf_storage_postgresql_add_statements:
  * @storage: the storage
  * @statement_stream: the stream of statements
  *
- * Add statements in stream to storage, without context.
+ * INTERNAL - Add statements in stream to storage, without context.
  *
  * Return value: Non-zero on failure.
  **/
@@ -1129,8 +1145,10 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
 
 
 /*
- * librdf_storage_postgresql_start_bulk - Prepare for bulk insert operation
+ * librdf_storage_postgresql_start_bulk:
  * @storage: the storage
+ *
+ * INTERNAL - Prepare for bulk insert operation
  *
  * Return value: Non-zero on failure.
  */
@@ -1143,8 +1161,10 @@ librdf_storage_postgresql_start_bulk(librdf_storage* storage)
 
 
 /*
- * librdf_storage_postgresql_stop_bulk - End bulk insert operation
+ * librdf_storage_postgresql_stop_bulk:
  * @storage: the storage
+ *
+ * INTERNAL - End bulk insert operation
  *
  * Return value: Non-zero on failure.
  */
@@ -1155,13 +1175,13 @@ librdf_storage_postgresql_stop_bulk(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_postgresql_context_add_statements:
  * @storage: the storage
  * @context_node: #librdf_node object
  * @statement_stream: the stream of statements
  *
- * Add statements in stream to storage, with context.
+ * INTERNAL - Add statements in stream to storage, with context.
  *
  * Return value: Non-zero on failure.
  **/
@@ -1209,11 +1229,13 @@ librdf_storage_postgresql_context_add_statements(librdf_storage* storage,
 }
 
 
-/**
- * librdf_storage_postgresql_context_add_statement - Add a statement to a storage context
+/*
+ * librdf_storage_postgresql_context_add_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to add
+ *
+ * INTERNAL - Add a statement to a storage context
  *
  * Return value: non 0 on failure
  **/
@@ -1240,10 +1262,12 @@ librdf_storage_postgresql_context_add_statement(librdf_storage* storage,
 
 
 /*
- * librdf_storage_postgresql_context_add_statement_helper - Perform actual addition of a statement to a storage context
+ * librdf_storage_postgresql_context_add_statement_helper
  * @storage: #librdf_storage object
  * @ctxt: u64 context hash
  * @statement: #librdf_statement statement to add
+ *
+ * INTERNAL - Perform actual addition of a statement to a storage context
  *
  * Return value: non-zero on failure
  **/
@@ -1298,10 +1322,12 @@ librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
 }
 
 
-/**
- * librdf_storage_postgresql_contains_statement - Test if a given complete statement is present in the model
+/*
+ * librdf_storage_postgresql_contains_statement:
  * @storage: the storage
  * @statement: a complete statement
+ *
+ * INTERNAL - Test if a given complete statement is present in the model
  *
  * Return value: Non-zero if the model contains the statement.
  **/
@@ -1353,10 +1379,12 @@ librdf_storage_postgresql_contains_statement(librdf_storage* storage,
 }
 
 
-/**
- * librdf_storage_postgresql_remove_statement - Remove a statement from storage
+/*
+ * librdf_storage_postgresql_remove_statement:
  * @storage: #librdf_storage object
  * @statement: #librdf_statement statement to remove
+ *
+ * INTERNAL - Remove a statement from storage
  *
  * Return value: non-zero on failure
  **/
@@ -1367,11 +1395,13 @@ librdf_storage_postgresql_remove_statement(librdf_storage* storage, librdf_state
 }
 
 
-/**
- * librdf_storage_postgresql_context_remove_statement - Remove a statement from a storage context
+/*
+ * librdf_storage_postgresql_context_remove_statement:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to remove
+ *
+ * INTERNAL - Remove a statement from a storage context
  *
  * Return value: non-zero on failure
  **/
@@ -1440,10 +1470,12 @@ librdf_storage_postgresql_context_remove_statement(librdf_storage* storage,
 }
 
 
-/**
- * librdf_storage_postgresql_context_remove_statements - Remove all statement from a storage context
+/*
+ * librdf_storage_postgresql_context_remove_statements:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
+ *
+ * INTERNAL - Remove all statement from a storage context
  *
  * Return value: non-zero on failure
  **/
@@ -1499,11 +1531,11 @@ librdf_storage_postgresql_context_remove_statements(librdf_storage* storage,
 }
 
 
-/**
- * librdf_storage_postgresql_serialise - Return a stream of all statements in a storage
+/*
+ * librdf_storage_postgresql_serialise:
  * @storage: the storage
  *
- * Return a stream of all statements in a storage.
+ * INTERNAL - Return a stream of all statements in a storage.
  *
  * Return value: a #librdf_stream or NULL on failure
  **/
@@ -1513,10 +1545,12 @@ librdf_stream* librdf_storage_postgresql_serialise(librdf_storage* storage)
 }
 
 
-/**
- * librdf_storage_postgresql_find_statements - Find a graph of statements in storage.
+/*
+ * librdf_storage_postgresql_find_statements:
  * @storage: the storage
  * @statement: the statement to match
+ *
+ * INTERNAL - Find a graph of statements in storage.
  *
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
@@ -1532,10 +1566,12 @@ librdf_storage_postgresql_find_statements(librdf_storage* storage,
 }
 
 
-/**
- * librdf_storage_postgresql_context_serialise - List all statements in a storage context
+/*
+ * librdf_storage_postgresql_context_serialise:
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
+ *
+ * INTERNAL - List all statements in a storage context
  *
  * Return value: #librdf_stream of statements or NULL on failure or context is empty
  **/
@@ -1547,11 +1583,13 @@ librdf_storage_postgresql_context_serialise(librdf_storage* storage,
 }
 
 
-/**
- * librdf_storage_postgresql_find_statements_in_context - Find a graph of statements in a storage context.
+/*
+ * librdf_storage_postgresql_find_statements_in_context:
  * @storage: the storage
  * @statement: the statement to match
  * @context_node: the context to search
+ *
+ * INTERNAL - Find a graph of statements in a storage context.
  *
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
@@ -1566,12 +1604,14 @@ librdf_storage_postgresql_find_statements_in_context(librdf_storage* storage, li
 }
 
 
-/**
- * librdf_storage_postgresql_find_statements_with_options - Find a graph of statements in a storage context with options.
+/*
+ * librdf_storage_postgresql_find_statements_with_options:
  * @storage: the storage
  * @statement: the statement to match
  * @context_node: the context to search
  * @options: #librdf_hash of match options or NULL
+ *
+ * INTERNAL - Find a graph of statements in a storage context with options.
  *
  * Return a stream of statements matching the given statement (or
  * all statements if NULL).  Parts (subject, predicate, object) of the
@@ -2080,11 +2120,11 @@ librdf_storage_postgresql_find_statements_in_context_finished(void* context)
 }
 
 
-/**
+/*
  * librdf_storage_postgresql_get_contexts:
  * @storage: the storage
  *
- * Return an iterator with the context nodes present in storage.
+ * INTERNAL - Return an iterator with the context nodes present in storage.
  *
  * Return value: a #librdf_iterator or NULL on failure
  **/
@@ -2300,11 +2340,13 @@ librdf_storage_postgresql_get_contexts_finished(void* context)
 }
 
 
-/**
- * librdf_storage_postgresql_get_feature - get the value of a storage feature
+/*
+ * librdf_storage_postgresql_get_feature:
  * @storage: #librdf_storage object
  * @feature: #librdf_uri feature property
  * 
+ * INTERNAL - get the value of a storage feature
+ *
  * Return value: #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
@@ -2338,11 +2380,11 @@ librdf_storage_postgresql_get_feature(librdf_storage* storage, librdf_uri* featu
 
 
 
-/**
+/*
  * librdf_storage_postgresql_transaction_start:
  * @storage: the storage object
  * 
- * Start a transaction
+ * INTERNAL - Start a transaction
  * 
  * Return value: non-0 on failure
  **/
@@ -2392,12 +2434,12 @@ librdf_storage_postgresql_transaction_start(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_postgresql_transaction_start_with_handle:
  * @storage: the storage object
  * @handle: the transaction object
  * 
- * Start a transaction using an existing external transaction object.
+ * INTERNAL - Start a transaction using an existing external transaction object.
  * 
  * Return value: non-0 on failure
  **/
@@ -2409,11 +2451,11 @@ librdf_storage_postgresql_transaction_start_with_handle(librdf_storage* storage,
 }
 
 
-/**
+/*
  * librdf_storage_postgresql_transaction_commit:
  * @storage: the storage object
  * 
- * Commit a transaction.
+ * INTERNAL - Commit a transaction.
  * 
  * Return value: non-0 on failure 
  **/
@@ -2451,11 +2493,11 @@ librdf_storage_postgresql_transaction_commit(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_postgresql_transaction_rollback:
  * @storage: the storage object
  * 
- * Rollback a transaction.
+ * INTERNAL - Rollback a transaction.
  * 
  * Return value: non-0 on failure 
  **/
@@ -2493,11 +2535,11 @@ librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_postgresql_transaction_get_handle:
  * @storage: the storage object
  * 
- * Get the current transaction handle.
+ * INTERNAL - Get the current transaction handle.
  * 
  * Return value: non-0 on success 
  **/
@@ -2550,7 +2592,7 @@ librdf_storage_postgresql_register_factory(librdf_storage_factory *factory)
 
 #ifdef MODULAR_LIBRDF
 
-/** Entry point for dynamically loaded storage module */
+/* Entry point for dynamically loaded storage module */
 void
 librdf_storage_module_register_factory(librdf_world *world)
 {
