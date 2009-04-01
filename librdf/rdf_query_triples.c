@@ -123,7 +123,7 @@ librdf_query_triples_find_next_term(unsigned char *string)
  *   uri       : '[' URI-string ']'
  *   literal   : ''' string '''
  * 
- * Return value: 
+ * Return value: non-0 on failure
  **/
 static int
 librdf_query_triples_init(librdf_query* query, 
