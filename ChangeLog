@@ -1,3 +1,10 @@
+2009-03-31  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac, NEWS.html, librdf/win32_rdf_config.h: Bump version
+	to 1.0.9
+
+	* autogen.sh, configure.ac: libtool V2 only. Minimum 2.2.0
+
 2009-03-30  Dave Beckett <dave@dajobe.org>
 
 	* docs/Makefile.am: (redland.3): Adjust sed to make NAME section
