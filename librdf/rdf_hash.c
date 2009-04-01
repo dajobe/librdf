@@ -592,7 +592,7 @@ librdf_hash_close(librdf_hash* hash)
 
 /**
  * librdf_hash_values_count:
- * @hash: 
+ * @hash: hash object
  *
  * Get the number of values in the hash.
  * 
