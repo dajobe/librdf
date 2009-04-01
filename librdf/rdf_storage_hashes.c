@@ -528,14 +528,11 @@ librdf_storage_hashes_open(librdf_storage* storage, librdf_model* model)
 }
 
 
-/**
+/*
  * librdf_storage_hashes_close:
- * @storage: 
+ * @storage: storage object
  *
- * .
- * 
- * Close the storage hashes storage, and free all content since there is no 
- * persistance.
+ * INTERNAL - Close the storage hashes storage, and free all content since there is no persistance.
  * 
  * Return value: non 0 on failure
  **/
