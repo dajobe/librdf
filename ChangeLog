@@ -1,4 +1,31 @@
+2009-04-07  Dave Beckett <dave@dajobe.org>
+
+	* docs/Makefile.am: Fix DOC_SOURCE_DIR
+
+	* Makefile.am, configure.ac, docs/Makefile.am,
+	examples/Makefile.am, librdf, redland-src-config.in, src,
+	utils/Makefile.am: Renamed dir librdf/ to src/
+
 2009-03-31  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh: Use LTDL_INIT in configure.ac to trigger --ltdl
+
+	* librdf/rdf_storage_postgresql.c: make postgresql storage
+	autodocs internal
+
+	* librdf/rdf_hash.c: librdf_hash_values_count autodocs
+
+	* librdf/rdf_storage_hashes.c: autodocs for
+	librdf_storage_hashes_close are internal
+
+	* librdf/rdf_storage_module.h: autodocs for storage factory types
+
+	* librdf/rdf_storage_file.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_list.c, librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_postgresql.c, librdf/rdf_storage_sqlite.c,
+	librdf/rdf_storage_trees.c, librdf/rdf_storage_tstore.c:
+	Fix autodocs for storage module registration functions to make them
+	internal
 
 	* configure.ac, NEWS.html, librdf/win32_rdf_config.h: Bump version
 	to 1.0.9
