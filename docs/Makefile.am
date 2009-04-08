@@ -34,7 +34,7 @@ DOC_MAIN_SGML_FILE=redland-docs.xml
 SCAN_OPTIONS=
 
 # The directory containing the source code. Relative to $(srcdir)
-DOC_SOURCE_DIR=../librdf
+DOC_SOURCE_DIR=../src
 
 # Used for dependencies
 HFILE_GLOB=$(top_srcdir)/src/*.h
