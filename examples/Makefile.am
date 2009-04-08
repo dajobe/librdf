@@ -39,9 +39,5 @@ redland_dbus_SOURCES = redland_dbus.c
 redland_dbus_CFLAGS=`pkg-config --cflags dbus-1 glib-2.0 dbus-glib-1 gthread`
 redland_dbus_LDFLAGS=`pkg-config --libs dbus-1 glib-2.0 dbus-glib-1 gthread`
 
-
-$(top_builddir)/raptor/libraptor.la:
-	cd $(top_builddir)/raptor && $(MAKE) $(AM_MAKEFLAGS) libraptor.la
-
-$(top_builddir)/rasqal/librasqal.la:
-	cd $(top_builddir)/rasqal && $(MAKE) $(AM_MAKEFLAGS) librasqal.la
+$(top_builddir)/src/librdf.la:
+	cd $(top_builddir)/src && $(MAKE) librdf.la 
