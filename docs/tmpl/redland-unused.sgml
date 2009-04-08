@@ -10,3 +10,22 @@ Internal.
 </para>
 
 
+<!-- ##### USER_FUNCTION librdf_log_func ##### -->
+<para>
+
+</para>
+
+@user_data: 
+@message: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION librdf_log_level_func ##### -->
+<para>
+
+</para>
+
+@user_data: 
+@message: 
+@arguments: 
+@Returns: 
+

@@ -21,27 +21,6 @@ librdf_log_message_locator() on the #librdf_log_message.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### USER_FUNCTION librdf_log_level_func ##### -->
-<para>
-
-</para>
-
-@user_data: 
-@message: 
-@arguments: 
-@Returns: 
-
-
-<!-- ##### USER_FUNCTION librdf_log_func ##### -->
-<para>
-
-</para>
-
-@user_data: 
-@message: 
-@Returns: 
-
-
 <!-- ##### ENUM librdf_log_level ##### -->
 <para>
 
