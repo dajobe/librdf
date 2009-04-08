@@ -71,7 +71,7 @@ while test $# -gt 0; do
       usage 0
       ;;
     --run)
-      lpath=@abs_top_builddir@/librdf/.libs
+      lpath=@abs_top_builddir@/src/.libs
       if test -d .libs; then
         lpath=".libs:$lpath"
       fi
@@ -123,11 +123,11 @@ if test "$echo_cflags" = "yes"; then
   echo -I@abs_top_srcdir@/librdf `$rasqal_config --cflags` `$raptor_config --cflags`
 fi
 if test "$echo_libtool_libs" = "yes"; then
-  echo @abs_top_builddir@/librdf/librdf.la
+  echo @abs_top_builddir@/src/librdf.la
 fi
 
 if test "$echo_libs" = "yes"; then
-  echo -L@abs_top_builddir@/librdf/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ `$rasqal_config --libs` `$raptor_config --libs`
+  echo -L@abs_top_builddir@/src/.libs -lrdf @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ `$rasqal_config --libs` `$raptor_config --libs`
 fi
 
 if test "$echo_swig" = "yes"; then  

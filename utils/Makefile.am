@@ -20,13 +20,13 @@ AM_CPPFLAGS=@LIBRDF_INTERNAL_CPPFLAGS@ @LIBRDF_CPPFLAGS@ -I$(top_srcdir)/librdf 
 AM_CFLAGS=@CFLAGS@ $(MEM)
 
 redland_db_upgrade_SOURCES = db_upgrade.c
-redland_db_upgrade_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la
+redland_db_upgrade_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/src/librdf.la
 
 rdfproc_SOURCES = rdfproc.c
 if GETOPT
 rdfproc_SOURCES += getopt.c rdfproc_getopt.h
 endif
-rdfproc_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/librdf/librdf.la
+rdfproc_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/src/librdf.la
 
 mysql-utils: $(MYSQL_UTILS)
 

@@ -25,11 +25,11 @@ dnl
 
 AC_INIT([Redland RDF Application Framework], 1.0.9, http://bugs.librdf.org/, redland)
 AC_PREREQ(2.53)
-AC_CONFIG_SRCDIR(librdf/rdf_node.c)
+AC_CONFIG_SRCDIR(src/rdf_node.c)
 AC_REVISION($Revision$)dnl
 
 AM_INIT_AUTOMAKE([1.7 check-news std-options -Wobsolete -Wportability -Wsyntax -Wunsupported])
-AM_CONFIG_HEADER(librdf/rdf_config.h)
+AM_CONFIG_HEADER(src/rdf_config.h)
 AM_MAINTAINER_MODE
 
 AC_CANONICAL_HOST
@@ -850,7 +850,7 @@ for module in $digest_modules; do
   module_u=`echo $module | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
   AC_MSG_CHECKING(for local $module digest module)
   base=rdf_digest_$module
-  if test -r $srcdir/librdf/$base.c; then
+  if test -r $srcdir/src/$base.c; then
     AC_MSG_RESULT(yes)
 
     n=HAVE_LOCAL_${module_u}_DIGEST
@@ -976,12 +976,12 @@ AC_SUBST(abs_top_builddir)
 
 AC_CONFIG_FILES([Makefile
 redland.rdf
-librdf/redland.spec
 docs/Makefile
 docs/version.xml
-librdf/Makefile
-librdf/win32/Makefile
 examples/Makefile
+src/Makefile
+src/redland.spec
+src/win32/Makefile
 utils/Makefile
 demos/Makefile
 data/Makefile

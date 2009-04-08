@@ -37,8 +37,8 @@ SCAN_OPTIONS=
 DOC_SOURCE_DIR=../librdf
 
 # Used for dependencies
-HFILE_GLOB=$(top_srcdir)/librdf/*.h
-CFILE_GLOB=$(top_srcdir)/librdf/*.c
+HFILE_GLOB=$(top_srcdir)/src/*.h
+CFILE_GLOB=$(top_srcdir)/src/*.c
 
 IGNORE_CFILES=
 
