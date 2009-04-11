@@ -32,6 +32,11 @@
 extern "C" {
 #endif
 
+/**
+ * librdf_cache:
+ *
+ * Cache object
+ **/
 typedef struct librdf_cache_s librdf_cache;
 
 librdf_cache* librdf_new_cache(librdf_world* world, int capacity, int flush_percent, int flags);
