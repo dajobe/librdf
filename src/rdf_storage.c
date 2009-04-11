@@ -697,7 +697,7 @@ librdf_storage_remove_reference(librdf_storage *storage)
  *
  * The instance is completely opaque to librdf, including allocation
  * and deallocation.
- */
+ **/
 void
 librdf_storage_set_instance(librdf_storage *storage,
                             librdf_storage_instance instance)
@@ -710,8 +710,9 @@ librdf_storage_set_instance(librdf_storage *storage,
  * librdf_storage_get_instance:
  * @storage: #librdf_storage object
  *
- * Return value: instance data for this storage, as set with
- * librdf_storage_set_instance()
+ * Get instance data for this storage
+ *
+ * Return value: opaque instance data for this storage
  **/
 librdf_storage_instance
 librdf_storage_get_instance(librdf_storage *storage)
