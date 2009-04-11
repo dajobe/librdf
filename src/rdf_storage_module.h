@@ -40,9 +40,14 @@ extern "C" {
 typedef void* librdf_storage_instance;
 
 
+#define LIBRDF_STORAGE_MIN_INTERFACE_VERSION 1
+#define LIBRDF_STORAGE_MAX_INTERFACE_VERSION 1
+
+#define LIBRDF_STORAGE_INTERFACE_VERSION LIBRDF_STORAGE_MAX_INTERFACE_VERSION
+
 /**
  * librdf_storage_factory:
- * @version: Interface version
+ * @version: Interface version.  Only version 1 is defined.
  * @name: Name (ID) of this storage, e.g. "megastore" 
  * @label: Label of this storage, e.g. "Megastore Storage"
  * @init: Create a new storage.
