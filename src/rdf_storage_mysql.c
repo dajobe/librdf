@@ -2739,7 +2739,10 @@ librdf_storage_mysql_transaction_start_with_handle(librdf_storage* storage,
 }
 
 
-/**
+/*
+ * librdf_storage_mysql_transaction_terminate:
+ * @storage: storage object
+ *
  * INTERNAL - free transaction state
  */
 static
