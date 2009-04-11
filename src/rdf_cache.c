@@ -474,7 +474,7 @@ librdf_cache_get(librdf_cache *cache, void* key, size_t key_size,
  * @key: key data
  * @key_size: key data size
  *
- * Delte an item from the cache with given key
+ * Delete an item from the cache with given key
  * 
  * Return value: non-0 on failure
  **/
@@ -512,7 +512,7 @@ librdf_cache_delete(librdf_cache *cache, void* key, size_t key_size)
 
 
 /**
- * librdf_cache_delete:
+ * librdf_cache_size:
  * @cache: redland cache object
  *
  * Get size of cache
