@@ -37,6 +37,14 @@ typedef struct {
   librdf_stream_map_free_context_handler free_context;
 } librdf_stream_map;
 
+
+/* stream get_method flags */
+typedef enum {
+  LIBRDF_STREAM_GET_METHOD_GET_OBJECT = LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT,
+  LIBRDF_STREAM_GET_METHOD_GET_CONTEXT = LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT
+} librdf_stream_get_method_flags;
+
+
 struct librdf_stream_s {
   librdf_world *world;
   void *context;
