@@ -1,3 +1,39 @@
+<!-- ##### MACRO LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO LIBRDF_ITERATOR_GET_METHOD_GET_KEY ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO LIBRDF_ITERATOR_GET_METHOD_GET_VALUE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO LIBRDF_STREAM_GET_METHOD_GET_CONTEXT ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO LIBRDF_STREAM_GET_METHOD_GET_OBJECT ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### VARIABLE librdf_concept_ms_namespace_uri ##### -->
 <para>
 Internal.
@@ -9,23 +45,4 @@ Internal.
 Internal.
 </para>
 
-
-<!-- ##### USER_FUNCTION librdf_log_func ##### -->
-<para>
-
-</para>
-
-@user_data: 
-@message: 
-@Returns: 
-
-<!-- ##### USER_FUNCTION librdf_log_level_func ##### -->
-<para>
-
-</para>
-
-@user_data: 
-@message: 
-@arguments: 
-@Returns: 
 

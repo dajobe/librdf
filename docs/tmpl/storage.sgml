@@ -476,3 +476,44 @@ the RDF model API and have the same name.
 @storage: 
 
 
+<!-- ##### TYPEDEF librdf_storage_instance ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION librdf_storage_get_instance ##### -->
+<para>
+
+</para>
+
+@storage: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_storage_set_instance ##### -->
+<para>
+
+</para>
+
+@storage: 
+@instance: 
+
+
+<!-- ##### FUNCTION librdf_storage_get_world ##### -->
+<para>
+
+</para>
+
+@storage: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION librdf_storage_module_register_function ##### -->
+<para>
+
+</para>
+
+@world: 
+
+

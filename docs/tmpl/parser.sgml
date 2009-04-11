@@ -305,7 +305,7 @@ by callbacks.
 </para>
 
 @parser: 
-@Param2: 
+@filter: 
 @user_data: 
 
 

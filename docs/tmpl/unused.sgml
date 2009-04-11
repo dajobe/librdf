@@ -42,6 +42,82 @@ Internal.  You should not be reading this.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_new_cache ##### -->
+<para>
+
+</para>
+
+@world: 
+@capacity: 
+@flush_percent: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### TYPEDEF librdf_cache ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION librdf_cache_add ##### -->
+<para>
+
+</para>
+
+@cache: 
+@key: 
+@key_size: 
+@value: 
+@value_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_cache_delete ##### -->
+<para>
+
+</para>
+
+@cache: 
+@key: 
+@key_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_cache_get ##### -->
+<para>
+
+</para>
+
+@cache: 
+@key: 
+@key_size: 
+@value_size_p: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_cache_set ##### -->
+<para>
+
+</para>
+
+@cache: 
+@key: 
+@key_size: 
+@value: 
+@value_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_cache_size ##### -->
+<para>
+
+</para>
+
+@cache: 
+@Returns: 
+
+
 <!-- ##### ENUM librdf_concepts_index ##### -->
 <para>
 Internal.
@@ -85,4 +161,73 @@ Internal.
 @LIBRDF_CONCEPT_S_subPropertyOf: offset
 @LIBRDF_CONCEPT_FIRST_S_ID: offset
 @LIBRDF_CONCEPT_LAST: offset
+
+<!-- ##### FUNCTION librdf_finish_raptor ##### -->
+<para>
+
+</para>
+
+@world: 
+
+
+<!-- ##### FUNCTION librdf_free_cache ##### -->
+<para>
+
+</para>
+
+@cache: 
+
+
+<!-- ##### FUNCTION librdf_init_raptor ##### -->
+<para>
+
+</para>
+
+@world: 
+
+
+<!-- ##### FUNCTION librdf_log ##### -->
+<para>
+
+</para>
+
+@world: 
+@code: 
+@level: 
+@facility: 
+@locator: 
+@message: 
+@Varargs: 
+
+
+<!-- ##### FUNCTION librdf_log_simple ##### -->
+<para>
+
+</para>
+
+@world: 
+@code: 
+@level: 
+@facility: 
+@locator: 
+@message: 
+
+
+<!-- ##### FUNCTION librdf_world_get_raptor ##### -->
+<para>
+
+</para>
+
+@world: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_world_set_raptor ##### -->
+<para>
+
+</para>
+
+@world: 
+@raptor_world_ptr: 
+
 
