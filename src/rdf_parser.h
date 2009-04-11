@@ -99,8 +99,10 @@ REDLAND_API
 int librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature, librdf_node* value);
 REDLAND_API
 char* librdf_parser_get_accept_header(librdf_parser* parser);
+REDLAND_API REDLAND_DEPRECATED
+const char* librdf_parser_guess_name(const char *mime_type, const unsigned char *buffer, const unsigned char *identifier);
 REDLAND_API
-const char* librdf_parser_guess_name(librdf_world* world, const char *mime_type, const unsigned char *buffer, const unsigned char *identifier);
+const char* librdf_parser_guess_name2(librdf_world* world, const char *mime_type, const unsigned char *buffer, const unsigned char *identifier);
 REDLAND_API
 const char* librdf_parser_get_namespaces_seen_prefix(librdf_parser* parser, int offset);
 REDLAND_API

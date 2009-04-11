@@ -731,7 +731,7 @@ librdf_parser_get_accept_header(librdf_parser* parser)
 
 
 /**
- * librdf_parser_guess_name:
+ * librdf_parser_guess_name2:
  * @world: librdf_world object
  * @mime_type: MIME type of syntax or NULL
  * @buffer: content buffer or NULL
@@ -742,13 +742,17 @@ librdf_parser_get_accept_header(librdf_parser* parser)
  * Return value: a parser name or NULL if nothing was guessable
  **/
 const char*
-librdf_parser_guess_name(librdf_world* world,
-                         const char *mime_type,
-                         const unsigned char *buffer, 
-                         const unsigned char *identifier)
+librdf_parser_guess_name2(librdf_world* world,
+                          const char *mime_type,
+                          const unsigned char *buffer, 
+                          const unsigned char *identifier)
 {
   int len = buffer ? strlen((const char *)buffer) : 0;
 #ifdef RAPTOR_V2_AVAILABLE
+  /* can do nothing if called with no world */
+  if(!world || !world->raptor_world_ptr)
+    return NULL;
+  
   return raptor_guess_parser_name_v2(world->raptor_world_ptr,
                                      NULL, mime_type, buffer,
                                      len,
@@ -759,6 +763,27 @@ librdf_parser_guess_name(librdf_world* world,
                                   identifier);
 #endif
 }
+
+
+#ifndef REDLAND_DISABLE_DEPRECATED
+/**
+ * librdf_parser_guess_name:
+ * @mime_type: MIME type of syntax or NULL
+ * @buffer: content buffer or NULL
+ * @identifier: content identifier or NULL
+ * 
+ * Get a parser name for content with type or identifier
+ * 
+ * Return value: a parser name or NULL if nothing was guessable
+ **/
+const char*
+librdf_parser_guess_name(const char *mime_type,
+                         const unsigned char *buffer, 
+                         const unsigned char *identifier)
+{
+  return librdf_parser_guess_name2(NULL, mime_type, buffer, identifier);
+}
+#endif
 
 
 /**
