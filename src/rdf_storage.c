@@ -689,23 +689,29 @@ librdf_storage_remove_reference(librdf_storage *storage)
  * @instance: Opaque instance pointer
  *
  * Set the instance data for this storage.
- * This function is intended for use by the 'init' method of storage implementations
- * to set instance data which can be retrived with librdf_storage_get_instance and
- * used in other methods of that storage.
- * The instance is completely opaque to librdf, including allocation and deallocation.
+ *
+ * This function is intended for use by the 'init' method of storage
+ * implementations to set instance data which can be retrived with
+ * librdf_storage_get_instance() and used in other methods of that
+ * storage.
+ *
+ * The instance is completely opaque to librdf, including allocation
+ * and deallocation.
  */
 void
-librdf_storage_set_instance(librdf_storage *storage, librdf_storage_instance instance)
+librdf_storage_set_instance(librdf_storage *storage,
+                            librdf_storage_instance instance)
 {
   storage->instance = instance;
 }
 
 
 /**
- * librdf_storage_get_instance(libdf_storage *storage)
+ * librdf_storage_get_instance:
  * @storage: #librdf_storage object
  *
- * Return the instance data for this storage, as set with librdf_storage_set_instance.
+ * Return value: instance data for this storage, as set with
+ * librdf_storage_set_instance()
  **/
 librdf_storage_instance
 librdf_storage_get_instance(librdf_storage *storage)
@@ -719,8 +725,10 @@ librdf_storage_get_instance(librdf_storage *storage)
  * @storage: #librdf_storage object
  *
  * Get the #librdf_world object associated with this storage.
+ *
+ * Return value: world object for this storage
  **/
-librdf_world *
+librdf_world*
 librdf_storage_get_world(librdf_storage *storage)
 {
   return storage->world;
