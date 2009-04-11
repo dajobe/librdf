@@ -2,9 +2,7 @@
 #
 # Makefile.am - docs automake file for Redland
 #
-# $Id$
-#
-# Copyright (C) 2000-2006, David Beckett http://purl.org/net/dajobe/
+# Copyright (C) 2000-2009, David Beckett http://www.dajobe.org/
 # Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
 # 
 # This package is Free Software and part of Redland http://librdf.org/
@@ -36,14 +34,19 @@ SCAN_OPTIONS=
 # The directory containing the source code. Relative to $(srcdir)
 DOC_SOURCE_DIR=../src
 
+# Header files that are filtered from the originals which
+# are added to IGNORE_HFILES
+FILTERED_HS=$(top_srcdir)/src/filtered_rdf_log.h
+
 # Used for dependencies
-HFILE_GLOB=$(top_srcdir)/src/*.h
+HFILE_GLOB=$(top_srcdir)/src/*.h $(FILTERED_HS)
 CFILE_GLOB=$(top_srcdir)/src/*.c
 
 IGNORE_CFILES=
 
 # Headers to ignore
 IGNORE_HFILES= \
+	rdf_log.h \
 	rdf_config.h \
 	win32_rdf_config.h \
 	rdf_types.h \
@@ -104,7 +107,9 @@ redland.pod \
 $(man_MANS) \
 version.xml.in
 
-CLEANFILES+=README pod2htm* redland-decl.txt redland-decl-list.txt
+CLEANFILES+=README pod2htm* redland-decl.txt redland-decl-list.txt \
+$(FILTERED_HS)
+
 
 # Create some text files from HTML sources
 LYNX=lynx
@@ -117,10 +122,25 @@ redland.3: redland.pod
 	sed -e "s;REDLAND_VERSION_STRING;@PACKAGE_VERSION@;" \
 	    -e 's;^Redland Resource;redland \\- Resource;' > $@
 	rm -f pod2htm*
+
+# Used to remove things that gtkdoc-scan just cannot understand
+#
+# The
+#   gtkdoc-scan --ignore-decorators=DECS
+# feature does not help here.
+$(top_srcdir)/src/filtered_rdf_log.h:
+	cd $(top_srcdir)/src && \
+	$(SED) -e 's/REDLAND_CALLBACK_STDCALL *//' -e 's/REDLAND_PRINTF_FORMAT.*;/;/' rdf_log.h > filtered_rdf_log.h
+
 else
 redland.3: redland.pod
 	@echo "Creating fake $@ since maintainer mode is not enabled"
 	touch $@
+
+$(top_srcdir)/src/filtered_rdf_log.h:
+	@echo "Creating fake $@ since maintainer mode is not enabled"
+	touch $@
+
 endif
 
 README: README.html
