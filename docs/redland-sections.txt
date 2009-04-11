@@ -536,8 +536,23 @@ librdf_files_temporary_file_name
 
 <SECTION>
 <FILE>unused</FILE>
+LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT
+LIBRDF_ITERATOR_GET_METHOD_GET_KEY
+LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT
+LIBRDF_ITERATOR_GET_METHOD_GET_VALUE
+LIBRDF_STREAM_GET_METHOD_GET_CONTEXT
+LIBRDF_STREAM_GET_METHOD_GET_OBJECT
 REDLAND_API
 REDLAND_PRINTF_FORMAT
 librdf_basename
+librdf_cache
+librdf_cache_add
+librdf_cache_delete
+librdf_cache_get
+librdf_cache_set
+librdf_cache_size
 librdf_concepts_index
+librdf_finish_raptor
+librdf_free_cache
+librdf_init_raptor
 </SECTION>
