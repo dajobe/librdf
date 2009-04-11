@@ -84,6 +84,7 @@ struct librdf_cache_s
  * @world: redland world object
  * @capacity: cache maximum number of objects
  * @flush_percent: percentage (1-100) to remove when cache is full
+ * @flags: cache flags - none defined at present
  *
  * Constructor - create a new #librdf_cache object
  * 
@@ -516,7 +517,7 @@ librdf_cache_delete(librdf_cache *cache, void* key, size_t key_size)
  *
  * Get size of cache
  * 
- * Return value: cache siez
+ * Return value: cache size
  **/
 int
 librdf_cache_size(librdf_cache *cache)
