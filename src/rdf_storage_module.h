@@ -28,7 +28,15 @@ extern "C" {
 #endif
 
 
-/** Opaque instance handle. */
+/**
+ * librdf_storage_instance:
+ *
+ * Opaque storage module instance handle.
+ *
+ * For use with a storage module and the librdf_storage_get_instance()
+ * and librdf_storage_set_instance() functions.  The instance handle
+ * should be set in the #librdf_storage_factory init factory method.
+ */
 typedef void* librdf_storage_instance;
 
 
