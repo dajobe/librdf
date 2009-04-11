@@ -61,12 +61,12 @@ typedef void (*librdf_iterator_map_free_context_handler)(void *map_context);
 #endif
 
 /* iterator get_method flags */
-
-/* FIXME - should all short lists be enums */
-#define LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  0
-#define LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT 1
-#define LIBRDF_ITERATOR_GET_METHOD_GET_KEY     2
-#define LIBRDF_ITERATOR_GET_METHOD_GET_VALUE   3
+typedef enum {
+  LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  = 0,
+  LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT = 1,
+  LIBRDF_ITERATOR_GET_METHOD_GET_KEY     = 2,
+  LIBRDF_ITERATOR_GET_METHOD_GET_VALUE   = 3
+} librdf_iterator_get_method_flags;
 
 
 REDLAND_API
