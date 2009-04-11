@@ -291,9 +291,14 @@ librdf_storage_load_module(librdf_world *world,
  * @factory: pointer to function to call to register the factory
  *
  * Register a storage factory.
+ *
+ * Registration will fail if any of the parameters or NULL, if the factory
+ * API version is out of the known range or if out of memory.
+ *
+ * Return value: non-0 on failure
  **/
 REDLAND_EXTERN_C
-void
+int
 librdf_storage_register_factory(librdf_world* world,
                                 const char *name, const char *label,
                                 void (*factory) (librdf_storage_factory*)) 
@@ -301,6 +306,15 @@ librdf_storage_register_factory(librdf_world* world,
   librdf_storage_factory *storage;
   int i;
 
+  if(!world)
+    return 1;
+  
+  if(!name || !label || !factory){
+    librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "failed to register storage with missing parameters to librdf_storage_register_factory()");
+    return 1;
+  }
+  
   librdf_world_open(world);
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
@@ -310,7 +324,7 @@ librdf_storage_register_factory(librdf_world* world,
   if(!world->storages) {
     world->storages=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_storage_factory, NULL);
     if(!world->storages)
-      goto oom;
+      goto failed;
   }
 
   for(i=0;
@@ -320,27 +334,24 @@ librdf_storage_register_factory(librdf_world* world,
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "storage %s already registered", storage->name);
-      return;
+      return 1;
     }
   }
 
   storage=(librdf_storage_factory*)LIBRDF_CALLOC(librdf_storage_factory, 1,
                                                  sizeof(librdf_storage_factory));
   if(!storage)
-    goto oom;
+    goto failed;
 
   storage->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
   if(!storage->name)
-    goto oom_tidy;
+    goto tidy;
   strcpy(storage->name, name);
 
   storage->label=(char*)LIBRDF_MALLOC(cstring, strlen(label)+1);
   if(!storage->label)
-    goto oom_tidy;
+    goto tidy;
   strcpy(storage->label, label);
-
-  if(raptor_sequence_push(world->storages, storage))
-    goto oom;
 
   /* Call the storage registration function on the new object */
   (*factory)(storage);
@@ -349,12 +360,27 @@ librdf_storage_register_factory(librdf_world* world,
   LIBRDF_DEBUG3("%s has context size %d\n", name, storage->context_length);
 #endif
 
-  return;
+  if(storage->version < LIBRDF_STORAGE_MIN_INTERFACE_VERSION ||
+     storage->version > LIBRDF_STORAGE_MAX_INTERFACE_VERSION) {
+    librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "storage %s interface version %d is not in supported range %d-%d",
+               name, storage->version,
+               LIBRDF_STORAGE_MIN_INTERFACE_VERSION,
+               LIBRDF_STORAGE_MAX_INTERFACE_VERSION);
+    goto failed;
+  }
+  
+  if(raptor_sequence_push(world->storages, storage))
+    goto failed;
 
-  oom_tidy:
+  return 0;
+
+  tidy:
   librdf_free_storage_factory(storage);
-  oom:
-  LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Out of memory");
+
+  failed:
+  LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Registering storage failed");
+  return 1;
 }
 
 
