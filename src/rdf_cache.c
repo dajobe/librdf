@@ -260,7 +260,7 @@ librdf_cache_set_common(librdf_cache *cache,
                         void* value, size_t value_size,
                         void** existing_value_p, int flags)
 {
-  void* new_object;
+  void* new_object = NULL;
   librdf_hash_datum key_hd, value_hd; /* on stack - not allocated */
   librdf_hash_datum *old_value;
   int i;
@@ -339,7 +339,8 @@ librdf_cache_set_common(librdf_cache *cache,
   /* store in hash: key => (librdf_cache_node*) */
   if(librdf_hash_put(cache->hash, &key_hd, &value_hd)) {
     memset(&node, '\0', sizeof(*node));
-    LIBRDF_FREE(void, new_object);
+    if(new_object)
+      LIBRDF_FREE(void, new_object);
     rc= -1;
   }
 
