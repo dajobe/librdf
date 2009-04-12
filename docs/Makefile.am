@@ -35,8 +35,9 @@ SCAN_OPTIONS=
 DOC_SOURCE_DIR=../src
 
 # Header files that are filtered from the originals which
-# are added to IGNORE_HFILES
-FILTERED_HS=$(top_srcdir)/src/filtered_rdf_log.h
+# are added to IGNORE_HFILES.  These must be absolute paths to
+# prevent issues with VPATH and 'make distcheck' (see below)
+FILTERED_HS=$(abs_top_srcdir)/src/filtered_rdf_log.h
 
 # Used for dependencies
 HFILE_GLOB=$(top_srcdir)/src/*.h $(FILTERED_HS)
@@ -121,7 +122,12 @@ LYNXARGS=-dump -nolist
 # The
 #   gtkdoc-scan --ignore-decorators=DECS
 # feature does not help here.
-$(top_srcdir)/src/filtered_rdf_log.h: $(top_srcdir)/src/rdf_log.h
+#
+# Fixes for 'make distcheck':
+# - Use absolute file path to prevent VPATH issues
+# - chmod dir writable to allow writing to the normally read-only src dir
+$(abs_top_srcdir)/src/filtered_rdf_log.h: $(top_srcdir)/src/rdf_log.h
+	chmod u+w $(abs_top_srcdir)/src
 	$(SED) -e 's/REDLAND_CALLBACK_STDCALL *//' \
 	       -e 's/REDLAND_PRINTF_FORMAT.*;/;/' \
 	  $< > $@
