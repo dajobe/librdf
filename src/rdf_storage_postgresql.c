@@ -493,7 +493,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   int status=0;
   char *escaped_name=NULL;
   char *query=NULL;
-  PGresult *res;
+  PGresult *res=NULL;
   PGconn *handle;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
