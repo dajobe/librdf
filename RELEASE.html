@@ -21,6 +21,130 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+<h2 id="rel1_0_9"><a name="rel1_0_9">Redland 1.0.9 Changes</a></h2>
+
+<p>Not yet released.</p>
+
+<p>The main changes in this release are:</p>
+
+<p>Made storages modular by default - separate dynamically loaded
+modules discovered from presence in the
+<em>PREFIX</em><code>/lib/redland</code> directory.
+or from the directory defined in the
+<code>REDLAND_MODULE_PATH</code> environment variable directory.
+</p>
+
+<p>Building requires installed Raptor (1.4.18 or newer) and Rasqal libraries.
+</p>
+
+<p>Issues Fixed:</p>
+<ul>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=272">Issue #0000272</a>: Casts for g++</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=282">Issue #0000282</a>: Documentation fixes</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=283">Issue #0000283</a>: <code>librdf_new_node_from_blank_identifier()</code> read memory after free bug.</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=285">Issue #0000285</a>: <code>librdf_storage_postgresql_get_contexts()</code> fix</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=286">Issue #0000286</a>: multiple postgresql storage fixes.</li>
+</ul>
+
+
+<h3>General Changes</h3>
+
+<p>Developer builds from Subversion now require libtool 2.2.0 or
+newer to <code>libtoolize</code> from <code>configure.ac</code>.</p>
+
+<p><code>configure</code> now discovers Berkeley DB 4.7</p>
+
+<p><code>configure</code> options <code>--with-raptor=internal</code>
+and <code>--with-rasqal=internal</code> were removed.
+</p>
+
+<p>Removed openssl digest support - not used much and an extra large
+dependency. MD5 and SHA1 remain builtin.
+</p>
+
+
+<h3>Statement Class Changes</h3>
+
+<p>Fix to <code>librdf_statement_encode_parts()</code> for buffer
+overrun error that could occur with certain size buffers.  Patch from
+Lou Sakey - thanks.
+</p>
+
+
+<h3>Storage Class Changes</h3>
+
+<p>Made the redland storage module API
+<code>librdf_storage_factory</code> public.  What was called the
+storage <em>context</em> is now less confusingly called the storage
+<em>instance</em>.
+</p>
+
+<p>Moved iterator and stream <code>get_method</code> flags to public
+API as new enums since they are used by the storage modules API.
+</p>
+
+<p>Moved <code>librdf_log()</code> and <code>librdf_log_simple()</code>
+into public API to allow external storage modules to log messages.
+</p>
+
+<p>More checks for failure during storage instance allocation.
+</p>
+
+<p>postgresql storage: Fixes for "Numerous leaks, potential NULL
+pointer use, and dropped postgresql errors and buffer overruns in the
+postgresql storage module" based on patches in Issue #0000286.
+</p>
+
+<p>sqlite storage: Fixes to prevent deadlocks with <code>BEGIN
+IMMEDIATE</code> instead of the default <code>BEGIN DEFERRED</code>.
+No longer writes to the sqlite database when just querying.  Several
+other fixes.
+</p>
+
+<p>trees storage: Several fixes.
+</p>
+
+
+<h3>Other Changes</h3>
+
+<p>Multiple Win32 build fixes based on patches from Lou Sakey - thanks.
+</p>
+
+
+<h3>Internal Changes</h3>
+
+<p>Added LRU cache for internal use.</p>
+
+<p>Several autogen.sh updates for libltdl.</p>
+
+<p>Use libtool's <code>libltdl</code> to dynamially load storage
+modules.  Will link in a copy from sources if not present in the
+system from libtool.
+</p>
+
+<p>Internal raptor and rasqal sources removed - now use
+<code>pkg-config(1)</code> to find external libraries to compile and
+link to.
+</p>
+
+<p>Fixes for AVL Tree: update parent pointers when deleting - patch
+from Aymeric Barthe - thanks.
+</p>
+
+<p>Added internal support for upcoming Raptor V2 API.  Not yet enabled.
+Added <code>librdf_world_get_raptor()</code> and
+<code>librdf_world_set_raptor()</code> methods.
+Added <code>librdf_parser_guess_name2()</code> with librdf_world parameter
+and deprecated <code>librdf_parser_guess_name()</code> without it.
+</p>
+
+<p>Wrapped deprecated functions with <code>REDLAND_DISABLE_DEPRECATED</code>
+blocks.
+</p>
+
+
+
+
 <h2 id="rel1_0_8"><a name="rel1_0_8">Redland 1.0.8 Changes</a></h2>
 
 <p>The main changes in this release are:</p>
