@@ -56,6 +56,18 @@ by callbacks.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_parser_guess_name2 ##### -->
+<para>
+
+</para>
+
+@world: 
+@mime_type: 
+@buffer: 
+@identifier: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_parser_register_factory ##### -->
 <para>
 

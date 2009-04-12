@@ -26,6 +26,16 @@ return sequence of #librdf_node objects such as librdf_model_get_sources().
 </para>
 
 
+<!-- ##### ENUM librdf_iterator_get_method_flags ##### -->
+<para>
+
+</para>
+
+@LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT: 
+@LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT: 
+@LIBRDF_ITERATOR_GET_METHOD_GET_KEY: 
+@LIBRDF_ITERATOR_GET_METHOD_GET_VALUE: 
+
 <!-- ##### USER_FUNCTION librdf_iterator_map_handler ##### -->
 <para>
 
