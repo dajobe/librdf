@@ -121,9 +121,10 @@ LYNXARGS=-dump -nolist
 # The
 #   gtkdoc-scan --ignore-decorators=DECS
 # feature does not help here.
-$(top_srcdir)/src/filtered_rdf_log.h:
-	cd $(top_srcdir)/src && \
-	$(SED) -e 's/REDLAND_CALLBACK_STDCALL *//' -e 's/REDLAND_PRINTF_FORMAT.*;/;/' rdf_log.h > filtered_rdf_log.h
+$(top_srcdir)/src/filtered_rdf_log.h: $(top_srcdir)/src/rdf_log.h
+	$(SED) -e 's/REDLAND_CALLBACK_STDCALL *//' \
+	       -e 's/REDLAND_PRINTF_FORMAT.*;/;/' \
+	  $< > $@
 
 
 if MAINTAINER_MODE
