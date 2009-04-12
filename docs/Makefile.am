@@ -115,13 +115,6 @@ $(FILTERED_HS)
 LYNX=lynx
 LYNXARGS=-dump -nolist
 
-if MAINTAINER_MODE
-redland.3: redland.pod
-	pod2man --section=3 --center="Redland RDF Application Framework" \
-	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @PACKAGE_VERSION@" $< | \
-	sed -e "s;REDLAND_VERSION_STRING;@PACKAGE_VERSION@;" \
-	    -e 's;^Redland Resource;redland \\- Resource;' > $@
-	rm -f pod2htm*
 
 # Used to remove things that gtkdoc-scan just cannot understand
 #
@@ -132,12 +125,16 @@ $(top_srcdir)/src/filtered_rdf_log.h:
 	cd $(top_srcdir)/src && \
 	$(SED) -e 's/REDLAND_CALLBACK_STDCALL *//' -e 's/REDLAND_PRINTF_FORMAT.*;/;/' rdf_log.h > filtered_rdf_log.h
 
+
+if MAINTAINER_MODE
+redland.3: redland.pod
+	pod2man --section=3 --center="Redland RDF Application Framework" \
+	--release="`date +%d-%b-%Y`" --date="@PACKAGE@ @PACKAGE_VERSION@" $< | \
+	sed -e "s;REDLAND_VERSION_STRING;@PACKAGE_VERSION@;" \
+	    -e 's;^Redland Resource;redland \\- Resource;' > $@
+	rm -f pod2htm*
 else
 redland.3: redland.pod
-	@echo "Creating fake $@ since maintainer mode is not enabled"
-	touch $@
-
-$(top_srcdir)/src/filtered_rdf_log.h:
 	@echo "Creating fake $@ since maintainer mode is not enabled"
 	touch $@
 
