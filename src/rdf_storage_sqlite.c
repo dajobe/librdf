@@ -604,7 +604,7 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
   unsigned char *value_e;
   size_t value_e_len;
   unsigned char *language_e=NULL;
-  size_t language_e_len;
+  size_t language_e_len = 0;
   int datatype_id= -1;
   raptor_stringbuffer *sb=NULL;
   unsigned char *expression;
