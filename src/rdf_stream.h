@@ -59,7 +59,13 @@ typedef void (*librdf_stream_map_free_context_handler)(void *map_context);
 #endif
 
 
-/* stream get_method flags */
+/**
+ * librdf_stream_get_method_flags:
+ * @LIBRDF_STREAM_GET_METHOD_GET_OBJECT: get object from iterator - implementing librdf_stream_get_object()
+ * @LIBRDF_STREAM_GET_METHOD_GET_CONTEXT: get context from iterator - implementing librdf_stream_get_context()
+ *
+ * Flags for librdf_new_stream() get_method function pointer.
+*/
 typedef enum {
   LIBRDF_STREAM_GET_METHOD_GET_OBJECT = LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT,
   LIBRDF_STREAM_GET_METHOD_GET_CONTEXT = LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT

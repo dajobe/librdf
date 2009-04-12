@@ -60,6 +60,16 @@ typedef void (*librdf_iterator_map_free_context_handler)(void *map_context);
 #include <rdf_iterator_internal.h>
 #endif
 
+
+/**
+ * librdf_iterator_get_method_flags:
+ * @LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT: get context from iterator - implementing librdf_iterator_get_object()
+ * @LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT: get object from iterator - implementing librdf_iterator_get_context()
+ * @LIBRDF_ITERATOR_GET_METHOD_GET_KEY: get iterator key object from iterator - implementing librdf_iterator_get_key()
+ * @LIBRDF_ITERATOR_GET_METHOD_GET_VALUE: get iterator value from iterator - implementing librdf_iterator_get_value()
+ *
+ * Flags for librdf_new_iterator() get_method function pointer.
+*/
 /* iterator get_method flags */
 typedef enum {
   LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT  = 0,
