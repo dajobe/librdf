@@ -1,4 +1,88 @@
+2009-04-12  Dave Beckett <dave@dajobe.org>
+
+	* docs/Makefile.am: Final filter build rule fix to make it works
+	with 'make distcheck'.
+	
+	This took hours of tricky make and VPATH debugging - info recorded
+	in makefile comments.
+
+2009-04-11  Dave Beckett <dave@dajobe.org>
+
+	* docs/Makefile.am: Adjust filter header rule to ensure it builds
+
+	* docs/Makefile.am: Make $(top_srcdir)/src/filtered_rdf_log.h rule
+	public
+
+	* src/rdf_storage.c, src/rdf_storage.h:
+	(librdf_storage_register_factory): Passes back an int status
+	value. Now checks for the interface version in the supported range
+	and fails if not.  Added some more parameter validation.
+
+	* configure.ac, src/rdf_storage_module.h: Move
+	LIBRDF_STORAGE_INTERFACE_VERSION to a macro and define max an min
+	storage interface versions LIBRDF_STORAGE_MIN_INTERFACE_VERSION
+	and LIBRDF_STORAGE_MAX_INTERFACE_VERSION
+
+	* src/rdf_parser.c, src/rdf_parser.h:
+	(librdf_parser_guess_name2): Added with new librdf_world* world
+	argument.
+	(librdf_parser_guess_name): Restored, but deprecated and uses the
+	above to do the work.  Makes existing librdf API the same as 1.0.8
+	in the absence of raptor V2 released.
+
+	* src/rdf_stream.h, src/rdf_stream_internal.h: Move
+	librdf_stream_get_method_flags public
+
+	* src/rdf_stream_internal.h: librdf_stream_get_method_flags added
+	for flags arg of stream get_method: aliases of iterator get_method
+	flags for the day that iterator and stream are merged.
+
+	* src/rdf_iterator.h: librdf_iterator_get_method_flags added for
+	flags arg of iterator get_method
+
+	* docs/tmpl/log.sgml, docs/tmpl/parser.sgml,
+	docs/tmpl/redland-unused.sgml, docs/tmpl/storage.sgml,
+	docs/tmpl/unused.sgml: Update sgml templates
+
+2009-04-10  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_mysql.c:
+	(librdf_storage_mysql_transaction_terminate): internal autodocs
+
+	* docs/redland-sections.txt: Remove internal macros from unused section
+
+	* src/rdf_cache.h: librdf_cache - autodoc
+
+	* src/rdf_storage_module.h: librdf_storage_instance - autodocs
+
+	* src/rdf_storage.c: (librdf_storage_set_instance,
+	librdf_storage_get_instance): autodocs
+
+	* docs/Makefile.am: Filter rdf_log.h before gtkdoc-scan gets there
+
+	* src/rdf_parser.h: autodocs - format librdf_parser_set_uri_filter
+	prototype so gtkdoc-scan can scan it
+
+	* src/rdf_log.c: (librdf_log): autodocs - document .../Varargs
+
+	* src/rdf_cache.c, src/rdf_storage.c: autodocs
+
+	* docs/redland-sections.txt: More docs
+
+	* docs/redland-sections.txt: update sections
+
+	* src/rdf_raptor.c, src/rdf_raptor.h, src/rdf_raptor_internal.h:
+	Convert to Unix LF
+
 2009-04-07  Dave Beckett <dave@dajobe.org>
+
+	* examples/Makefile.am, utils/Makefile.am: Split linker libs and
+	flags between LDADD and AM_LDFLAGS
+
+	* examples/Makefile.am: Add rule to make librdf.la
+
+	* docs/tmpl/log.sgml, docs/tmpl/parser.sgml,
+	docs/tmpl/redland-unused.sgml: Update templates
 
 	* docs/Makefile.am: Fix DOC_SOURCE_DIR
 
