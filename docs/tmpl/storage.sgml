@@ -40,6 +40,7 @@ the RDF model API and have the same name.
 @name: 
 @label: 
 @factory: 
+@Returns: 
 
 
 <!-- ##### FUNCTION librdf_storage_enumerate ##### -->

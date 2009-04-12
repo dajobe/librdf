@@ -85,6 +85,7 @@ librdf_heuristic_object_is_literal
 <SECTION>
 <FILE>iterator</FILE>
 librdf_iterator
+librdf_iterator_get_method_flags
 librdf_iterator_map_handler
 librdf_iterator_map_free_context_handler
 librdf_new_iterator
@@ -221,6 +222,7 @@ librdf_parser
 librdf_parser_factory
 librdf_parser_enumerate
 librdf_parser_guess_name
+librdf_parser_guess_name2
 librdf_parser_register_factory
 librdf_new_parser
 librdf_new_parser_from_factory
@@ -406,6 +408,7 @@ librdf_storage_module_register_function
 <SECTION>
 <FILE>stream</FILE>
 librdf_stream
+librdf_stream_get_method_flags
 librdf_stream_map_handler
 librdf_stream_map_free_context_handler
 librdf_new_stream
