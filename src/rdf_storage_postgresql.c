@@ -569,7 +569,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
         PGresult *res2 = PQexec(handle, create_tables[i]);
         if (res2) {
           if (PQresultStatus(res2) != PGRES_COMMAND_OK) {
-            if (0 != strncmp("42P07", PQresultErrorField(res, PG_DIAG_SQLSTATE), strlen("42P07"))) {
+            if (0 != strncmp("42P07", PQresultErrorField(res2, PG_DIAG_SQLSTATE), strlen("42P07"))) {
               librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                        "postgresql table creation failed with error %s", PQresultErrorMessage(res2));
               status = -1;
