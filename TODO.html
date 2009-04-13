@@ -8,8 +8,9 @@
 
 <h1>Redland RDF Application Framework - To Do list</h1>
 
-<p>Bugs should be reported at the
+<p>New bug and feature requests should be reported at the
 <a href="http://bugs.librdf.org/">Redland Issue Tracker</a>.
+This list is mostly historical.
 </p>
 
 
@@ -28,13 +29,11 @@ the documentation, or what values to use.</li>
 <li>Update the RDF/RDFS terms/labels for the latest RDF Schema revision</li>
 <li>In-memory storage uses more memory than needed</li>
 <li>Defensive code - check object types are correct by adding magic fields to start of all objects</li>
-<li>Docs: note that compiling redland may also build raptor and rasqal, if they are needed</li>
 <li>Document the storage constructor hash options under the main class</li>
 <li>RFE: make add_statement method on model take URIs</li>
 <li>Add arcs_in/arcs_out model methods</li>
 <li>Add container class for manipulating RDF containers - Seq, Bag, Alt, ...</li>
 <li>If LGPL/Apache license, include compatible code OR add separate package?</li>
-<li>Write a C++ interface</li>
 <li>Provide any necessary support for RDF Schema (fast rdf:type lookups)</li>
 <li>Write some better example code</li>
 <li>Write a quickstart / howto document</li>
@@ -55,6 +54,7 @@ Some utility functions have been written for UTF-8 to/from ISO Latin-1.</li>
 release version where appropriate.</p>
 
 <ul>
+<li>Write a C++ interface - redland++ under development and three other external ones are also available (1.0.9).</li>
 <li>Consider an AVL-tree in-memory store (<a href="http://www.msu.edu/user/pfaffben/avl/">libavl</a>) - done with 'trees' storage (1.0.8)</li>
 <li>Initialise the default genid base in <code>librdf_new_world</code> with something more fine-grained than seconds.  Add some microseconds digits (1.0.3)</li>
 <li>RFE: consider how to add parser guessing (via raptor) into the
@@ -161,6 +161,7 @@ style, but for C</li>
 
 <p>I reserve the right to change my mind again!</p>
 <ul>
+<li>Docs: note that compiling redland may also build raptor and rasqal, if they are needed (1.0.9 no longer relevant)</li>
 <li>RFE: model.parseString(format, "string"), model.parseURI(format, URI, baseURI=URI) creating and destroying temporary parser objects for <em>format</em>.
 Means no need to care about parser class if you just want simple things.  Similarly
 for model.serialize() and Serializer class, however take care with serialise() method.  Better as model.load(), model.save() or write()?  Addressed by the guess parser in raptor 1.4.7+.</li>
