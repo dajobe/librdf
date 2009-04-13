@@ -1,4 +1,6 @@
-2009-04-12  Dave Beckett <dave@dajobe.org>
+2009-04-12  Dave Beckett  <dave@dajobe.org>
+
+	* Snapshotted redland_1_0_9 for 1.0.9 release (SVN 15143)
 
 	* INSTALL.html: Document --enable-debug
 
