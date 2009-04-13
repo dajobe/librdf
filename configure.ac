@@ -1,9 +1,9 @@
 dnl -*- Mode: autoconf -*-
 dnl
-dnl configure.in - top level autoconf file for Redland
+dnl configure.ac - top level autoconf file for Redland
 dnl (Process this file with autoconf to produce a configure script.)
 dnl
-dnl Copyright (C) 2000-2007 David Beckett http://purl.org/net/dajobe/
+dnl Copyright (C) 2000-2009 David Beckett http://www.dajobe.org/
 dnl Copyright (C) 2000-2005 University of Bristol, UK http://www.bristol.ac.uk/
 dnl 
 dnl This package is Free Software and part of Redland http://librdf.org/
