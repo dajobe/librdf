@@ -23,6 +23,15 @@ the snapshot releases.</p>
 <p>The source bundle and package files contain all the HTML files and
 documentation provided on the web site.</p>
 
+<p>Redland (librdf) requires the Raptor and Rasqal to be already
+built and installed (libraries, headers and pkg-config .pc files).
+See the
+<a href="http://librdf.org/raptor/INSTALL.html">Raptor install document</a>
+and
+<a href="http://librdf.org/rasqal/INSTALL.html">Rasqal install document</a>
+for the details of installing them.
+</p>
+
 
 <h3>1.1. Getting released sources</h3>
 
@@ -32,32 +41,11 @@ documentation provided on the web site.</p>
 </p>
 
 
-<h3>1.2. Getting nightly source snapshots</h3>
-
-<p><strong>NOTE</strong>: Redland switched to use
-<a href="http://subversion.tigris.org/">Subversion</a>
-for version control after the 1.0.3 release.  If you were
-using CVS, you will need to re-check out the sources.</p>
-
-<p>Each night a snapshot distribution is attempted using the current
-development sources (that may not even be commited to subversion), using the
-<code>make dist</code> target of the automake system.  If this target
-completes, these snapshots are then made available from:
-<a href="http://download.librdf.org/snapshots/source/">http://download.librdf.org/snapshots/source/</a>
-(binary snapshot releases are also attempted each night from the
-same sources).
-</p>
-
-<h3>1.3. Getting the sources from Subversion</h3>
+<h3>1.2. Getting the sources from Subversion</h3>
 
 <pre>
-  svn checkout http://svn.librdf.org/repository/raptor/trunk/ raptor
-  svn checkout http://svn.librdf.org/repository/rasqal/trunk/ rasqal
   svn checkout http://svn.librdf.org/repository/librdf/trunk/ librdf
-
   cd librdf
-  ln -s ../raptor
-  ln -s ../rasqal
 </pre>
 
 
@@ -68,12 +56,7 @@ by using the <code>autogen.sh</code> script.</p>
 
 <p>Building Redland in this way requires some particular development
 tools not needed when building from snapshot releases - automake,
-autoconf, swig and those also required by Raptor and Rasqal if they are built
-See the
-<a href="http://librdf.org/raptor/INSTALL.html">Raptor install document</a>
-and
-<a href="http://librdf.org/rasqal/INSTALL.html">Rasqal install document</a>
-for the details of requirements.
+autoconf, libtool and dependencies.
 The <code>autogen.sh</code> script looks for the newest versions
 of the auto* tools and checks that they meet the minimum versions.</p>
 
@@ -83,21 +66,17 @@ of the auto* tools and checks that they meet the minimum versions.</p>
 
 <p>Redland uses the GNU automake and autoconf to handle system
 dependency checking.  It is developed and built on x86 Linux
-but is also tested on multiple systems locally and via
-<a href="http://sourceforge.net/">SourceForge</a>s'
-compile farm where it currently builds on Debian/RedHat Linux (x86,
-Alpha, PPC and Sparc), FreeBSD (x86), NetBSD (x86), OpenBSD
-(x86) and Apple OSX (PowerPC).</p>
+and x86 OSX but is also tested on other systems occasionally.
+</p>
 
 
-<p>Configure tries very hard to find several programs and libraries
-that Redland might need.  These include
-the storage modules (Berkeley/Sleepycat DB, MySQL, PostgreSQL
-3store), the XML parsers -- via Raptor's configure -- and various
-others.  A summary of the modular parts found is given at the end of
-the configure run.  Several options to configure given below can be
-used to point to locations or names of dependencies that cannot
-be automatically determined.</p>
+<p>configure tries very hard to find several programs and libraries
+that Redland might need.  These include the storage modules
+(Berkeley/Sleepycat DB, MySQL, PostgreSQL 3store) and various others.
+A summary of the modular parts found is given at the end of the
+configure run.  Several options to configure given below can be used
+to point to locations or names of dependencies that cannot be
+automatically determined.</p>
 
 
 <h3><a id="sec-create-configure" name="sec-create-configure"></a>2.1. Create <code>configure</code> program</h3>
@@ -119,9 +98,10 @@ below for what these are):</p>
 <blockquote>
 <p>On OSX you may have to explicitly set the <code>LIBTOOLIZE</code>
 variable for the <code>libtoolize</code> utility since on
-OSX <code>libtoolize</code> is a different program:</p>
+OSX <code>libtoolize</code> is a different program.  The full
+path to the utility should be given:</p>
 <pre>
-  LIBTOOLIZE=glibtoolize ./autogen.sh
+  LIBTOOLIZE=/opt/local/bin/glibtoolize ./autogen.sh
 </pre>
 </blockquote>
 
@@ -132,12 +112,11 @@ hand with:</p>
 </pre>
 
 <p>The automake and autoconf tools have many different versions and
-at present development is being done with automake 1.8.3 (minimum
-version 1.7), autoconf 2.59 (minimum version 2.54) and libtool 1.5.4
-(minimum version 1.4).  These are only needed when compiling from Subversion
-sources.  autogen.sh enforces the requirements.  In future
-development will move to require automake 1.8, autoconf 2.58 and
-libtool 1.5.</p>
+<code>autogen.sh</code> enforces the minimums. At present development
+is being done with automake 1.10.2 (minimum version 1.7), autoconf
+2.63 (minimum version 2.54) and libtool 2.2.6 (minimum version 2.2.0).
+These are only needed when compiling from Subversion sources.
+autogen.sh enforces the requirements.</p>
 
 
 <h3>2.2. Options for <code>configure</code></h3>
@@ -356,7 +335,8 @@ giving the installation location of Berkeley/Sleeypcat DB:</p>
 </pre>
 
 <p>If you are having problems with configuring several times when
-adding or removing options, you may have to tidy up first with either of these:</p>
+adding or removing options, you may have to tidy up first with either
+of these:</p>
 <pre>
    make clean
    rm -f config.cache
@@ -414,7 +394,7 @@ in the <code>examples</code> sub-directory and can be built with:</p>
 </pre>
 
 <p>or to build all of them</p>
-<xpre>
+<pre>
    make examples
 </pre>
 
@@ -472,7 +452,7 @@ serialize an RDF model to a syntax.</p>
 
 <hr />
 
-<p>Copyright (C) 2000-2008 <a href="http://www.dajobe.org/">Dave Beckett</a><br />Copyright (C) 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright (C) 2000-2009 <a href="http://www.dajobe.org/">Dave Beckett</a><br />Copyright (C) 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>
