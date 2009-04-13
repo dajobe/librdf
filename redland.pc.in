@@ -3,6 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
+plugindir=${libdir}/redland
+
 swig=${prefix}/share/redland/Redland.i
 
 Name: Redland RDF API Library
