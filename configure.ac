@@ -172,7 +172,6 @@ if test "$USE_MAINTAINER_MODE" = yes; then
   AC_MSG_RESULT($warning_cflags)
 fi
 
-STANDARD_CFLAGS=
 MAINTAINER_CFLAGS="$warning_cflags"
 
 
@@ -925,11 +924,16 @@ if test "$assert_messages" = "yes"; then
   AC_DEFINE(LIBRDF_ASSERT_MESSAGES, 1, [Print run time assertion check failure messages.])
 fi
 
+debug_messages=no
 if test "$USE_MAINTAINER_MODE" = yes; then
+  debug_messages=yes;
+fi
+
+AC_ARG_ENABLE(debug, [  --enable-debug          Enable debug messages (default no).  ], debug_messages=$enableval)	
+if test "$debug_messages" = "yes"; then
   LIBRDF_CPPFLAGS="-g -DLIBRDF_DEBUG=1 $LIBRDF_CPPFLAGS"
 fi
 
-STANDARD_CFLAGS="$STANDARD_CFLAGS $CFLAGS"
 if test "$USE_MAINTAINER_MODE" = yes; then
   CFLAGS="$MAINTAINER_CFLAGS $CFLAGS"
 fi
@@ -939,7 +943,6 @@ if test "$USE_MAINTAINER_MODE" = yes -a $release_version = no; then
   changequote(<<, >>)dnl
   CFLAGS=`echo $CFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
   CXXFLAGS=`echo $CXXFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
-  STANDARD_CFLAGS=`echo $STANDARD_CFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
   LIBRDF_CPPFLAGS=`echo $LIBRDF_CPPFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
   LIBRDF_EXTERNAL_CPPFLAGS=`echo $LIBRDF_EXTERNAL_CPPFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
   LIBRDF_INTERNAL_CPPFLAGS=`echo $LIBRDF_INTERNAL_CPPFLAGS | sed -e "s/-O[A-Za-z0-9]*//"`
@@ -966,7 +969,6 @@ AC_SUBST(LIBRDF_PKGCONFIG_PRIVATE_LIBS)
 
 AC_SUBST(MEM)
 AC_SUBST(MEM_LIBS)
-AC_SUBST(STANDARD_CFLAGS)
 
 abs_top_srcdir=`cd $srcdir; pwd`
 AC_SUBST(abs_top_srcdir)
