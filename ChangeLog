@@ -1,5 +1,24 @@
 2009-04-12  Dave Beckett <dave@dajobe.org>
 
+	* src/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_literal_helper): Init language_e_len to
+	prevent gcc warning about used when not initialised.
+
+	* docs/tmpl/iterator.sgml, docs/tmpl/parser.sgml,
+	docs/tmpl/stream.sgml: update sgml templates
+
+	* src/rdf_cache.c:
+	(librdf_cache_set_common): Initialise new_object to NULL and check
+	before freeing.
+
+	* src/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_init): Init res to NULL
+
+	* src/rdf_iterator.h, src/rdf_stream.h: autodocs
+
+	* docs/redland-sections.txt, docs/tmpl/parser.sgml,
+	docs/tmpl/storage.sgml: Update doc templates and sections
+
 	* docs/Makefile.am: Final filter build rule fix to make it works
 	with 'make distcheck'.
 	
