@@ -1,5 +1,23 @@
 2009-04-12  Dave Beckett <dave@dajobe.org>
 
+	* INSTALL.html: Document --enable-debug
+
+	* configure.ac: Add --enable-debug to turn on LIBRDF_DEBUG without
+	the need for maintainer mode.
+	Removed unused STANDARD_CFLAGS subst.
+
+	* src/Makefile.am: Removed unused STANDARD_CFLAGS
+
+	* redland.pc.in: Add plugindir variable for the directory where
+	modules go
+
+	* Redland.i: Added librdf_parser_guess_name2() to SWIG API
+
+	* AUTHORS: Added Dave Robillard and Lauri Aalto
+
+	* INSTALL.html: Update to remove mention of raptor and rasqal
+	building inside.
+
 	* src/rdf_storage_sqlite.c:
 	(librdf_storage_sqlite_literal_helper): Init language_e_len to
 	prevent gcc warning about used when not initialised.
