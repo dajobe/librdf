@@ -202,7 +202,8 @@ rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
 rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test \
 rdf_init_test rdf_cache_test
 
-TESTS_ENVIRONMENT=REDLAND_MODULE_PATH=
+# Set the place to find storage modules for testing
+TESTS_ENVIRONMENT=REDLAND_MODULE_PATH=$(abs_builddir)/.libs
 
 CLEANFILES=$(TESTS) $(local_tests) test test*.db test.rdf
 
