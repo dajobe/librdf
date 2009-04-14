@@ -203,15 +203,29 @@ static int
 ltdl_module_callback(const char* filename, void* data)
 {
   librdf_world* world = (librdf_world*)data;
+  size_t filename_len = strlen(filename);
+  
+  /* FIXME: Currently requiring that storage modules to be loaded
+   * contain the string "librdf_storage". 
+   *
+   * When compiling and testing against uninstalled modules, not all
+   * files in .libs that contain librdf_storage are storage modules.
+   * (Relevant when running "make check" locally before installing
+   * the modules.)
+   *
+   * The extra LIBRDF_DEBUG check only attempts to load .so files
+   * when running in the source tree.
+   */
 
-  /* FIXME: Currently requiring that modules to be loaded contain "librdf_storage".
-     Not all files in .libs that contain librdf_storage are storage modules.
-     (Relevant when running "make check" locally before installing the modules.)
-     Also tries to load some storage modules multiple times. */
-  if (librdf_memstr(filename, strlen(filename), "librdf_storage")) {
+#ifdef LIBRDF_DEBUG
+  if(strncmp(&filename[filename_len-3], ".so", 3))
+    return 0;
+#endif
+
+  if (librdf_memstr(filename, filename_len, "librdf_storage")) {
     lt_dlhandle module = librdf_storage_load_module(world, filename,
                                                     "librdf_storage_module_register_factory");
-    if (module)
+    if(module)
       raptor_sequence_push(world->storage_modules, module);
   }
   return 0;
@@ -263,6 +277,7 @@ librdf_storage_load_module(librdf_world *world,
   init_func_t* init;
   
   lt_dlhandle module = lt_dlopenext(lib_name);
+
   if (module) {
     init = (init_func_t*)lt_dlsym(module, init_func_name);
     if (init) {
