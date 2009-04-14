@@ -377,7 +377,7 @@ librdf_storage_register_factory(librdf_world* world,
                name, storage->version,
                LIBRDF_STORAGE_MIN_INTERFACE_VERSION,
                LIBRDF_STORAGE_MAX_INTERFACE_VERSION);
-    goto failed;
+    goto tidy;
   }
   
   if(raptor_sequence_push(world->storages, storage))
