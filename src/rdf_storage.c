@@ -169,65 +169,64 @@ librdf_free_storage_factory(librdf_storage_factory* factory)
 
 #ifdef MODULAR_LIBRDF
 
-/* pulled from raptor_memstr.c */
-static const char *  
-librdf_memstr(const char *haystack, size_t haystack_len, const char *needle)
-{
-  char c;
-  size_t needle_len;
-  const char *p;
-  
-  if(!haystack || !needle)
-    return NULL;
-  
-  if(!*needle)
-    return haystack;
-  
-  needle_len=strlen(needle);
-
-  /* loop invariant: haystack_len is always length of remaining buffer at *p */
-  for(p=haystack;
-      (haystack_len >= needle_len) && (c=*p);
-      p++, haystack_len--) {
-
-    /* check match */
-    if(!memcmp(p, needle, needle_len))
-      return p;
-  }
-  
-  return NULL;
-}
-
-
 static int
 ltdl_module_callback(const char* filename, void* data)
 {
   librdf_world* world = (librdf_world*)data;
-  size_t filename_len = strlen(filename);
-  
-  /* FIXME: Currently requiring that storage modules to be loaded
-   * contain the string "librdf_storage". 
-   *
+  const char* name = librdf_basename(filename);
+  size_t name_len = strlen(name);
+  lt_dlhandle module;
+
+  /* Currently require that storage module files to be loaded start
+   * with the string "librdf_storage_".
+   */
+
+  if(name_len < 15 || strncmp(name, "librdf_storage_", 15)) {
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
+    LIBRDF_DEBUG3("not storage module file %s (%s)\n", name, filename);
+#endif
+    return 0;
+  }
+
+  /*
    * When compiling and testing against uninstalled modules, not all
    * files in .libs that contain librdf_storage are storage modules.
    * (Relevant when running "make check" locally before installing
    * the modules.)
    *
-   * The extra LIBRDF_DEBUG check only attempts to load .so files
-   * when running in the source tree.
+   * This check when debugging LIBRDF_DEBUG attempts to load .so
+   * files when running in the source tree.  This is likely very
+   * libtool and unix specific.
+   *
+   * Rules:
+   * - Must end in '.so' or have no suffix (no . in last 3 chars)
+   * - Must not include "-" (libtool intermediate file such as
+   *   librdf_storage_mysql_la-rdf_storage_mysql)
    */
-
 #ifdef LIBRDF_DEBUG
-  if(strncmp(&filename[filename_len-3], ".so", 3))
+  if(!(
+       strncmp(&name[name_len-3], ".so", 3) ||
+       (name[name_len-3]!='.' && name[name_len-2]!='.' && name[name_len-1]!='.')
+       )
+     || strchr(name, '-')
+     ) {
+#if LIBRDF_DEBUG > 2
+    LIBRDF_DEBUG3("not storage module file %s (%s)\n", name, filename);
+#endif
     return 0;
+  }
+
+#if LIBRDF_DEBUG > 1
+  LIBRDF_DEBUG3("LOADING storage module file %s (%s)\n", name, filename);
 #endif
 
-  if (librdf_memstr(filename, filename_len, "librdf_storage")) {
-    lt_dlhandle module = librdf_storage_load_module(world, filename,
-                                                    "librdf_storage_module_register_factory");
-    if(module)
-      raptor_sequence_push(world->storage_modules, module);
-  }
+#endif
+
+  module = librdf_storage_load_module(world, filename,
+                                      "librdf_storage_module_register_factory");
+  if(module)
+    raptor_sequence_push(world->storage_modules, module);
+
   return 0;
 }
 
@@ -370,10 +369,6 @@ librdf_storage_register_factory(librdf_world* world,
 
   /* Call the storage registration function on the new object */
   (*factory)(storage);
-
-#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  LIBRDF_DEBUG3("%s has context size %d\n", name, storage->context_length);
-#endif
 
   if(storage->version < LIBRDF_STORAGE_MIN_INTERFACE_VERSION ||
      storage->version > LIBRDF_STORAGE_MAX_INTERFACE_VERSION) {
