@@ -331,8 +331,9 @@ export AUTOMAKE AUTOCONF ACLOCAL
 
 echo " "
 if test -z "$*"; then
-  echo "$program: WARNING: Running \`configure' with no arguments."
-  echo "If you wish to pass any to it, please specify them on the"
+  echo "$program: WARNING: Running \`configure' with arguments:"
+  echo "$configure_args"
+  echo "If you wish to pass others to it, please specify them on the"
   echo "\`$program' command line."
 fi
 
