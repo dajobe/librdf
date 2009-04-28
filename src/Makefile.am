@@ -119,7 +119,7 @@ if STORAGE_TSTORE
 plugin_LTLIBRARIES += librdf_storage_tstore.la
 librdf_storage_tstore_la_SOURCES = rdf_storage_tstore.c
 librdf_storage_tstore_la_CPPFLAGS = @TSTORE_CPPFLAGS@
-librdf_storage_tstore_la_LIBADD = @TSTORE_LIBS@
+librdf_storage_tstore_la_LIBADD = @TSTORE_LIBS@ librdf.la
 librdf_storage_tstore_la_LDFLAGS = -module -avoid-version
 endif
 
@@ -127,7 +127,7 @@ if STORAGE_MYSQL
 plugin_LTLIBRARIES += librdf_storage_mysql.la
 librdf_storage_mysql_la_SOURCES = rdf_storage_mysql.c
 librdf_storage_mysql_la_CPPFLAGS = @MYSQL_CPPFLAGS@
-librdf_storage_mysql_la_LIBADD = @MYSQL_LIBS@
+librdf_storage_mysql_la_LIBADD = @MYSQL_LIBS@ librdf.la
 librdf_storage_mysql_la_LDFLAGS = -module -avoid-version
 endif
 
@@ -135,7 +135,7 @@ if STORAGE_SQLITE
 plugin_LTLIBRARIES += librdf_storage_sqlite.la
 librdf_storage_sqlite_la_SOURCES = rdf_storage_sqlite.c
 librdf_storage_sqlite_la_CPPFLAGS = @SQLITE_CPPFLAGS@
-librdf_storage_sqlite_la_LIBADD = @SQLITE_LIBS@
+librdf_storage_sqlite_la_LIBADD = @SQLITE_LIBS@ librdf.la
 librdf_storage_sqlite_la_LDFLAGS = -module -avoid-version
 endif
 
@@ -143,7 +143,7 @@ if STORAGE_POSTGRESQL
 plugin_LTLIBRARIES += librdf_storage_postgresql.la
 librdf_storage_postgresql_la_SOURCES = rdf_storage_postgresql.c
 librdf_storage_postgresql_la_CPPFLAGS = @POSTGRESQL_CPPFLAGS@
-librdf_storage_postgresql_la_LIBADD = @POSTGRESQL_LIBS@
+librdf_storage_postgresql_la_LIBADD = @POSTGRESQL_LIBS@ librdf.la
 librdf_storage_postgresql_la_LDFLAGS = -module -avoid-version
 endif
 
