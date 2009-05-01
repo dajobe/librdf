@@ -308,7 +308,7 @@ librdf_parser_check_name(librdf_world* world, const char *name)
   for(i = 0;
       (factory = (librdf_parser_factory*)raptor_sequence_get_at(world->parsers, i));
       i++) {
-    if(strcmp(factory->name, name))
+    if(!strcmp(factory->name, name))
       return 1;
   }
   
