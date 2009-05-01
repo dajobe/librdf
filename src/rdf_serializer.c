@@ -306,7 +306,7 @@ librdf_serializer_check_name(librdf_world* world, const char *name)
   librdf_serializer_factory *factory;
   int i;
   
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(name, char*);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, char*, 0);
 
   librdf_world_open(world);
 
