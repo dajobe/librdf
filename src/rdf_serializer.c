@@ -292,6 +292,36 @@ librdf_serializer_enumerate(librdf_world* world,
 
 
 /**
+ * librdf_serializer_check_name:
+ * @world: redland world object
+ * @name: name of serializer
+ *
+ * Check if a serializer name is known
+ * 
+ * Return value: non 0 if name is a known serializer
+ **/
+int
+librdf_serializer_check_name(librdf_world* world, const char *name)
+{
+  librdf_serializer_factory *factory;
+  int i;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(name, char*);
+
+  librdf_world_open(world);
+
+  for(i = 0;
+      (factory = (librdf_serializer_factory*)raptor_sequence_get_at(world->serializers, i));
+      i++) {
+    if(strcmp(factory->name, name))
+      return 1;
+  }
+  
+  return 0;
+}
+
+
+/**
  * librdf_new_serializer:
  * @world: redland world object
  * @name: the serializer factory name

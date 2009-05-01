@@ -2,7 +2,7 @@
  *
  * rdf_serializer.h - RDF Serializer Factory / Serializer interfaces and definition
  *
- * Copyright (C) 2002-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2002-2009, David Beckett http://www.dajobe.org/
  * Copyright (C) 2002-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -44,6 +44,8 @@ void librdf_serializer_register_factory(librdf_world *world, const char *name, c
 
 REDLAND_API
 int librdf_serializer_enumerate(librdf_world* world, const unsigned int counter, const char **name, const char **label);
+REDLAND_API
+int librdf_serializer_check_name(librdf_world* world, const char *name);
 
 /* constructor */
 REDLAND_API
