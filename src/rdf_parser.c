@@ -291,7 +291,7 @@ librdf_parser_enumerate(librdf_world* world,
  * @world: redland world object
  * @name: name of parser
  *
- * Get information on parsers.
+ * Check if a parser name is known
  * 
  * Return value: non 0 if name is a known parser
  **/
