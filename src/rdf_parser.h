@@ -2,7 +2,7 @@
  *
  * rdf_parser.h - RDF Parser Factory / Parser interfaces and definition
  *
- * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2009, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -41,6 +41,8 @@ void librdf_parser_register_factory(librdf_world *world, const char *name, const
 
 REDLAND_API
 int librdf_parser_enumerate(librdf_world* world, const unsigned int counter, const char **name, const char **label);
+REDLAND_API
+int librdf_parser_check_name(librdf_world* world, const char *name);
 
 /* constructor */
 REDLAND_API

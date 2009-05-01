@@ -287,6 +287,36 @@ librdf_parser_enumerate(librdf_world* world,
 
 
 /**
+ * librdf_parser_check_name:
+ * @world: redland world object
+ * @name: name of parser
+ *
+ * Get information on parsers.
+ * 
+ * Return value: non 0 if name is a known parser
+ **/
+int
+librdf_parser_check_name(librdf_world* world, const char *name)
+{
+  librdf_parser_factory *factory;
+  int i;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(name, char*);
+
+  librdf_world_open(world);
+
+  for(i = 0;
+      (factory = (librdf_parser_factory*)raptor_sequence_get_at(world->parsers, i));
+      i++) {
+    if(strcmp(factory->name, name))
+      return 1;
+  }
+  
+  return 0;
+}
+
+
+/**
  * librdf_new_parser:
  * @world: redland world object
  * @name: the parser factory name
