@@ -55,9 +55,12 @@ typedef struct
 
   /* 'uri' factory only */
   librdf_uri* uri;
-  /* 'name' factory only */
+  /* 'file' factory only */
   size_t name_len;  
   char *name;
+
+  /* serializing format ('file' factory only) */
+  char *format_name;
 } librdf_storage_file_instance;
 
 
@@ -85,56 +88,78 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
 {
   char *name_copy;
   char *contexts;
-  int rc=1;
+  int rc = 1;
+  int is_uri = !strcmp(storage->factory->name, "uri");
+  const char *format_name = (is_uri ? "guess" : "rdfxml");
+  librdf_storage_file_instance* context;
 
-  int is_uri=!strcmp(storage->factory->name, "uri");
-  
-  librdf_storage_file_instance* context=(librdf_storage_file_instance*)LIBRDF_CALLOC(
-    librdf_storage_file_instance, 1, sizeof(librdf_storage_file_instance));
-
+  context = (librdf_storage_file_instance*)LIBRDF_CALLOC(librdf_storage_file_instance, 1, sizeof(librdf_storage_file_instance));
   if(!context)
     goto done;
 
   librdf_storage_set_instance(storage, context);
 
   /* Cannot save contexts in a file; pass everything else on */
-  contexts=librdf_hash_get_del(options, "contexts");
+  contexts = librdf_hash_get_del(options, "contexts");
   if(contexts)
     LIBRDF_FREE(cstring, contexts);
+
+  context->format_name = librdf_hash_get_del(options, "format");
+  if(context->format_name) {
+    /* for 'file' and 'uri' storage, check this is a valid parser
+     * for 'file' storage, also check this is a valid serializer 
+     */
+    if(!librdf_parser_check_name(storage->world, context->format_name) ||
+       (!is_uri && !librdf_serializer_check_name(storage->world, context->format_name))) {
+      librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
+                 "Ignoring storage %s format option '%s' - using default format '%s'",
+                 storage->factory->name, context->format_name, format_name);
+      LIBRDF_FREE(cstring, context->format_name);
+      context->format_name = NULL;
+    }
+
+    if(context->format_name)
+      format_name = context->format_name;
+  }
   
+
   if(is_uri)
-    context->uri=librdf_new_uri(storage->world, (const unsigned char*)name);
+    context->uri = librdf_new_uri(storage->world, (const unsigned char*)name);
   else {
-    context->name_len=strlen(name);
-    name_copy=(char*)LIBRDF_MALLOC(cstring, context->name_len+1);
+    context->name_len = strlen(name);
+    name_copy = (char*)LIBRDF_MALLOC(cstring, context->name_len+1);
     if(!name_copy)
       goto done;
     strcpy(name_copy,name);
-    context->name=name_copy;
-    context->uri=librdf_new_uri_from_filename(storage->world, context->name);
+    context->name = name_copy;
+    context->uri = librdf_new_uri_from_filename(storage->world, context->name);
   }
   
-  context->storage=librdf_new_storage_with_options(storage->world, 
-                                                   NULL, NULL, 
-                                                   options);
+  context->storage = librdf_new_storage_with_options(storage->world, 
+                                                     NULL, NULL, 
+                                                     options);
   if(!context->storage)
     goto done;
   
-  context->model=librdf_new_model(storage->world, context->storage, NULL);
+  context->model = librdf_new_model(storage->world, context->storage, NULL);
   if(!context->model)
     goto done;
 
   if(is_uri || !access((const char*)context->name, F_OK)) {
-    librdf_parser* parser;
+    librdf_parser *parser;
 
-    parser=librdf_new_parser(storage->world, "rdfxml", NULL, NULL);
+    parser = librdf_new_parser(storage->world, format_name, NULL, NULL);
+    if(!parser) {
+      rc = 1;
+      goto done;
+    }
     librdf_parser_parse_into_model(parser, context->uri, NULL, context->model);
     librdf_free_parser(parser);
   }
 
-  context->changed=0;
+  context->changed = 0;
 
-  rc=0;
+  rc = 0;
 
   done:
 
@@ -155,6 +180,9 @@ librdf_storage_file_terminate(librdf_storage* storage)
     return;
 
   librdf_storage_file_sync(storage);
+
+  if(context->format_name)
+    LIBRDF_FREE(cstring, context->format_name);
 
   if(context->name)
     LIBRDF_FREE(cstring, context->name);
@@ -292,7 +320,8 @@ librdf_storage_file_sync(librdf_storage *storage)
   strcpy(new_name, (const char*)context->name);
   strcpy(new_name+context->name_len, ".new");
 
-  serializer=librdf_new_serializer(storage->world, "rdfxml", NULL, NULL);
+  serializer = librdf_new_serializer(storage->world, context->format_name,
+                                     NULL, NULL);
   if(!serializer) {
     LIBRDF_FREE(cstring, new_name);
     if(backup_name)
