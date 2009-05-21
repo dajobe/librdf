@@ -880,7 +880,7 @@ LIBRDF_EXTERNAL_LIBS="$LIBRDF_EXTERNAL_LIBS $LIBRDF_LIBS"
 
 # Everything except things with .pc files (raptor and rasqal)
 # 3store uses it but is optional and thus tricky to specify this way
-LIBRDF_PKGCONFIG_PRIVATE_LIBS=$LIBRDF_LIBS
+LIBRDF_PKGCONFIG_PRIVATE_LIBS=`echo $LIBRDF_LIBS | sed -e 's, ..top_build_prefix.libltdl/libltdlc.la, ,'`
 
 # Make final changes to cflags
 CFLAGS="-DLIBRDF_INTERNAL=1 $CFLAGS"
