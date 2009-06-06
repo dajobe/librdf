@@ -950,9 +950,9 @@ if test "$USE_MAINTAINER_MODE" = yes -a $release_version = no; then
 fi
 
 
-LIBS=
-CPPFLAGS=
-LDFLAGS=
+LIBS="$LIBS"
+CPPFLAGS="$CPPFLAGS"
+LDFLAGS="$LDFLAGS"
 
 LIBRDF_LIBTOOLLIBS=librdf.la
 
