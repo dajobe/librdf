@@ -675,7 +675,7 @@ if test "X$sqlite_api_version" != Xno ; then
     SQLITE_CONFIG="$PKG_CONFIG sqlite"
   fi
   sqlite_version=`$SQLITE_CONFIG --modversion 2>/dev/null`
-  AC_DEFINE_UNQUOTED(SQLITE_API, $sqlite_api_version, [SQLite API version])
+  AC_DEFINE_UNQUOTED(REDLAND_SQLITE_API, $sqlite_api_version, [SQLite API version])
 
   storages_available="$storages_available sqlite($sqlite_version)"
   sqlite_storage_available=yes

@@ -249,7 +249,7 @@ extern "C" {
 #define SIZEOF_UNSIGNED_LONG_LONG 8
 
 /* SQLite API version */
-#define SQLITE_API 3
+#define REDLAND_SQLITE_API 3
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
