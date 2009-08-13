@@ -40,7 +40,8 @@ rdf_query.h \
 rdf_serializer.h \
 rdf_log.h \
 rdf_digest.h \
-rdf_hash.h
+rdf_hash.h \
+rdf_list.h
 
 noinst_HEADERS = win32_rdf_config.h
 

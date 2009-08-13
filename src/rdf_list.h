@@ -37,26 +37,39 @@
 extern "C" {
 #endif
 
+REDLAND_API
 librdf_list* librdf_new_list(librdf_world *world);
+REDLAND_API
 void librdf_free_list(librdf_list* list);
 
+REDLAND_API
 void librdf_list_clear(librdf_list* list);
 /* add to end of list (push) */
+REDLAND_API
 int librdf_list_add(librdf_list* list, void *data);
 /* add to start of list */
+REDLAND_API
 int librdf_list_unshift(librdf_list* list, void *data);
 /* remove from start of list */
+REDLAND_API
 void* librdf_list_shift(librdf_list* list);
 /* remove from end of list (pop) */
+REDLAND_API
 void* librdf_list_pop(librdf_list* list);
+REDLAND_API
 void *librdf_list_remove(librdf_list* list, void *data);
+REDLAND_API
 int librdf_list_contains(librdf_list* list, void *data);
+REDLAND_API
 int librdf_list_size(librdf_list* list);
 
+REDLAND_API
 void librdf_list_set_equals(librdf_list* list, int (*equals) (void* data1, void *data2));
 
+REDLAND_API
 librdf_iterator* librdf_list_get_iterator(librdf_list* list);
 
+REDLAND_API
 void librdf_list_foreach(librdf_list* list, void (*fn)(void *, void *), void *user_data);
 
 #ifdef __cplusplus
