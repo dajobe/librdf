@@ -115,9 +115,9 @@ while test $# -gt 0; do
   shift
 done
 
-raptor_config="pkg-config raptor-config"
+raptor_config="pkg-config raptor"
 
-rasqal_config="pkg-config rasqal-config"
+rasqal_config="pkg-config rasqal"
 
 if test "$echo_cflags" = "yes"; then
   echo -I@abs_top_srcdir@/librdf `$rasqal_config --cflags` `$raptor_config --cflags`
