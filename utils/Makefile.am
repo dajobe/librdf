@@ -33,3 +33,5 @@ mysql-utils: $(MYSQL_UTILS)
 @MAINT@rdfproc.html: $(srcdir)/rdfproc.1 $(srcdir)/fix-groff-xhtml
 @MAINT@	-groff -man -Thtml -P-l $< | tidy -asxml -wrap 1000 2>/dev/null | $(PERL) $(srcdir)/fix-groff-xhtml $@
 
+$(top_builddir)/src/librdf.la:
+	cd $(top_builddir)/src && $(MAKE) librdf.la 
