@@ -120,7 +120,7 @@ raptor_config="pkg-config raptor"
 rasqal_config="pkg-config rasqal"
 
 if test "$echo_cflags" = "yes"; then
-  echo -I@abs_top_srcdir@/librdf `$rasqal_config --cflags` `$raptor_config --cflags`
+  echo -I@abs_top_srcdir@/src `$rasqal_config --cflags` `$raptor_config --cflags`
 fi
 if test "$echo_libtool_libs" = "yes"; then
   echo @abs_top_builddir@/src/librdf.la
