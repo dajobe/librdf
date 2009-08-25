@@ -1,3 +1,114 @@
+2009-08-25  Dave Beckett <dave@dajobe.org>
+
+	* src/Makefile.am: typo $
+
+	* configure.ac: Put modular build libltdl includes and libs into
+	INTERNAL macros
+
+	* redland-src-config.in: update for moved includes to src dir
+
+	* utils/Makefile.am: Add rule for librdf.la
+
+	* redland-src-config.in: make redland-src-config work for external
+	raptor and rasqal again
+
+2009-08-13  Lauri Aalto <laalto@iki.fi>
+
+	* src/Makefile.am, src/rdf_list.h: Install rdf_list.h header and
+	export its functions so that they can be used e.g. in external
+	storage modules.
+
+2009-08-12  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac, src/rdf_storage_sqlite.c, src/win32_rdf_config.h:
+	Change define SQLITE_API to REDLAND_SQLITE_API to allow redland to
+	compile with sqlite 3.6.17 or newer where the SQLITE_API macro is
+	defined.  Thanks to Samuli Suominen for the report and fix.
+
+2009-07-17  Dave Beckett <dave@dajobe.org>
+
+	* COPYING: Update GPL2 to latest version (white space changes)
+	used by rasqal, raptor
+
+2009-06-06  Lauri Aalto <laalto@iki.fi>
+
+	* configure.ac: Default to environment LIBS, CPPFLAGS,
+	LDFLAGS. Addresses issue at
+	http://bugs.gentoo.org/show_bug.cgi?id=267405
+
+2009-05-20  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac: Remove libltdlc.la from
+	LIBRDF_PKGCONFIG_PRIVATE_LIBS which ends up in pkgconfig
+	Libs.private field
+
+2009-05-01  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_file.c: Add storage option 'format' for uri and
+	file storages librdf_storage_file_instance gains format_name
+	field.
+	(librdf_storage_file_init): Validate the format values as legal
+	parser name and for file-storage, serializer name too.  Log a
+	warning if the type given is wrong.
+	(librdf_storage_file_terminate): Free format_name
+	(librdf_storage_file_sync): Use format_name for serializer for
+	file storage.
+
+	* src/rdf_parser.c, src/rdf_serializer.c:
+	(librdf_parser_check_name, librdf_serializer_check_name): fix
+	strcmp.
+
+	* src/rdf_parser.c:
+	(librdf_parser_check_name): fix assert
+
+	* src/rdf_serializer.c:
+	(librdf_serializer_check_name): fix assert
+
+	* src/rdf_serializer.c, src/rdf_serializer.h:
+	(librdf_serializer_check_name): Added to check if a serializer
+	name is known.
+
+	* src/rdf_parser.c, src/rdf_parser.h:
+	(librdf_parser_check_name): Added to check if a parser name is
+	valid.
+
+2009-04-28  Dave Robillard <dave@drobilla.net>
+
+	* src/Makefile.am: Make modular storage backends depend on librdf
+	library to avoid unresolved symbol errors when librdf itself is
+	dynamically loaded.
+
+	* autogen.sh: Don't lie about configure arguments.
+
+2009-04-14  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_storage.c:
+	(librdf_storage_register_factory): Clean up storage factory if
+	version check fails.
+
+2009-04-13  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage.c:
+	(librdf_memstr): Removed, no longer used
+	(ltdl_module_callback): More constrained tests for what is a legal
+	storage module name especially with debugging, to prevent false
+	warnings during 'make check'.
+
+	* src/Makefile.am:
+	Set storage module test dir to $(abs_builddir)/.libs
+
+	* src/rdf_storage.c:
+	(ltdl_module_callback): Only attempt to load .so files when
+	debugging. This should aid false error messages when testing with
+	'make check' in the source tree
+
+	* ChangeLog.1, ChangeLog.2, ChangeLog.3, ChangeLog.4, ChangeLog.6:
+	Add old changelogs
+
+	* src/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_init): Use res2 in PQresultErrorField()
+	call after setting it to the error code.
+
 2009-04-12  Dave Beckett  <dave@dajobe.org>
 
 	* Snapshotted redland_1_0_9 for 1.0.9 release (SVN 15143)
