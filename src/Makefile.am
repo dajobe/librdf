@@ -333,4 +333,4 @@ rdf_init_test: rdf_init.c librdf.la
 @SET_MAKE@
 
 ${top_build_prefix}libltdl/libltdlc.la:
-	cd  ${top_build_prefix}libltdl && R(MAKE) libltdlc.la
+	cd  ${top_build_prefix}libltdl && $(MAKE) libltdlc.la
