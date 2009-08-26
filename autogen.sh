@@ -46,18 +46,25 @@ CONFIG_DIR=${CONFIG_DIR-../config}
 #
 programs="automake aclocal autoconf autoheader libtoolize"
 confs=`find . -name configure.ac -print`
+gtkdoc_args=
 if grep "^GTK_DOC_CHECK" $confs >/dev/null; then
   programs="$programs gtkdocize"
+  gtkdoc_args="--enable-gtk-doc"
 fi
 if grep "^AC_CHECK_PROGS.SWIG" $confs >/dev/null; then
   programs="$programs swig"
 fi
-ltdl=
-if grep "^LTDL_INIT" $confs >/dev/null; then
-  ltdl="--ltdl"
+ltdl_args=
+if grep "^AC_LIBLTDL_" $confs >/dev/null; then
+  ltdl_args="--ltdl"
+fi
+shave_args=
+if grep "^SHAVE_INIT" $confs >/dev/null; then
+  shave_args="--enable-shave"
 fi
 
 # Some dependencies for autotools:
+# automake 1.11 requires autoconf 2.62
 # automake 1.10 requires autoconf 2.60
 # automake 1.9 requires autoconf 2.58
 # automake 1.8 requires autoconf 2.58
@@ -71,14 +78,12 @@ gtkdocize_min_vers=010300
 swig_min_vers=010324
 
 # Default program arguments
-automake_args="--add-missing"
-autoconf_args=
-libtoolize_args="$ltdl --force --copy --automake"
-gtkdocize_args="--copy"
+automake_args="--gnu --add-missing --force --copy -Wall"
 aclocal_args=
-automake_args="--gnu --add-missing --force --copy"
-# --enable-gtk-doc does no harm if it's not available
-configure_args="--enable-maintainer-mode --enable-gtk-doc"
+autoconf_args=
+libtoolize_args="--force --copy --automake $ltdl_args"
+gtkdocize_args="--copy"
+configure_args="--enable-maintainer-mode $gtkdoc_args $shave_args"
 
 
 # You should not need to edit below here
@@ -166,7 +171,11 @@ update_prog_version() {
   cd "$dir"
   PATH=".:$PATH"
 
-  names=`ls $prog* 2>/dev/null`
+  nameglob="$prog*"
+  if [ -x /usr/bin/uname -a `/usr/bin/uname` = 'Darwin' -a $prog = 'libtoolize' ] ; then
+    nameglob="g$nameglob"
+  fi
+  names=`ls $nameglob 2>/dev/null`
   if [ "X$names" != "X" ]; then
     for name in $names; do
       vers=`perl $autogen_get_version $dir/$name $prog`
@@ -257,9 +266,9 @@ done
 
 echo "$program: Dependencies satisfied"
 
-# Delete this libtoolize- generated directory now so that it is never
-# considered by autogen.sh
-$DRURUN rm -rf libltdl
+if test -d $SRCDIR/libltdl; then
+  touch $SRCDIR/libltdl/NO-AUTO-GEN
+fi
 
 config_dir=
 if test -d $CONFIG_DIR; then
@@ -285,13 +294,26 @@ do
       # automake junk
       $DRYRUN rm -rf autom4te*.cache
 
+      config_macro_dir=`sed -ne 's/^AC_CONFIG_MACRO_DIR(\([^)]*\).*/\1/p' configure.ac`
+      if test "X$config_macro_dir" = X; then
+	config_macro_dir=.
+      else
+        aclocal_args="$aclocal_args -I $config_macro_dir "
+      fi
+
+      config_aux_dir=`sed -ne 's/^AC_CONFIG_AUX_DIR(\([^)]*\).*/\1/p' configure.ac`
+      if test "X$config_aux_dir" = X; then
+	config_aux_dir=.
+      fi
+
       if test "X$config_dir" != X; then
         echo "$program: Updating config.guess and config.sub"
 	for file in config.guess config.sub; do
 	  cfile=$config_dir/$file
+          xfile=$config_aux_dir/$file
 	  if test -f $cfile; then
-	    $DRYRUN rm -f $file
-	    $DRYRUN cp -p $cfile $file
+	    $DRYRUN rm -f $xfile
+	    $DRYRUN cp -p $cfile $xfile
 	  fi
 	done
       fi
@@ -331,9 +353,8 @@ export AUTOMAKE AUTOCONF ACLOCAL
 
 echo " "
 if test -z "$*"; then
-  echo "$program: WARNING: Running \`configure' with arguments:"
-  echo "$configure_args"
-  echo "If you wish to pass others to it, please specify them on the"
+  echo "$program: WARNING: Running \`configure' with no arguments."
+  echo "If you wish to pass any to it, please specify them on the"
   echo "\`$program' command line."
 fi
 
