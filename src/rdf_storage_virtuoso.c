@@ -100,6 +100,9 @@ static int rdf_virtuoso_ODBC_Errors(const char *where, librdf_world *world, libr
 static int librdf_storage_virtuoso_context_add_statement_helper(librdf_storage* storage, librdf_node* context_node, librdf_statement* statement);
 static void librdf_storage_virtuoso_release_handle(librdf_storage* storage, librdf_storage_virtuoso_connection *handle);
 
+#ifdef MODULAR_LIBRDF
+void librdf_storage_module_register_factory(librdf_world *world);
+#endif
 
 
 static int
@@ -2608,67 +2611,6 @@ librdf_storage_virtuoso_transaction_get_handle(librdf_storage* storage)
 }
 
 
-/**
- * librdf_storage_virtuoso_supports_query:
- * @storage: #librdf_storage object
- * @query: #librdf_query query object
- *
- * Check if a storage system supports a query language.
- *
- * Not implemented.
- *
- * Return value: non-0 if the query is supported.
- **/
-static int
-librdf_storage_virtuoso_supports_query(librdf_storage* storage, librdf_query *query)
-{
-  librdf_uri *uri=librdf_new_uri(storage->world,(unsigned char *)"http://www.w3.org/TR/rdf-vsparql-query/");
-
-  if(uri && query->factory->uri && librdf_uri_equals(query->factory->uri, uri)) {
-    librdf_free_uri(uri);
-    return 1;
-  }
-
-  librdf_free_uri(uri);
-
-  if(!strcmp(query->factory->name, "vsparql"))
-    return 1;
-  else
-    return 0;
-}
-
-
-/**
- * librdf_storage_query_execute:
- * @storage: #librdf_storage object
- * @query: #librdf_query query object
- *
- * Run the given query against the storage.
- *
- * Not implemented.
- *
- * Return value: #librdf_query_results or NULL on failure
- **/
-static librdf_query_results*
-librdf_storage_virtuoso_query_execute(librdf_storage* storage, librdf_query *query)
-{
-  librdf_query_virtuoso_context *qcontext=(librdf_query_virtuoso_context*)query->context;
-  librdf_query_results* results=NULL;
-
-  qcontext->storage=storage;
-  librdf_storage_add_reference(storage);
-  qcontext->vc=librdf_storage_virtuoso_get_handle(storage);
-
-  if(query->factory->execute) {
-    if((results=query->factory->execute(query, NULL)))
-      librdf_query_add_query_result(query, results);
-  }
-
-  return results;
-
-}
-
-
 /* local function to register Virtuoso storage functions */
 static void
 librdf_storage_virtuoso_register_factory(librdf_storage_factory *factory)
@@ -2700,10 +2642,21 @@ librdf_storage_virtuoso_register_factory(librdf_storage_factory *factory)
   factory->transaction_commit			= librdf_storage_virtuoso_transaction_commit;
   factory->transaction_rollback			= librdf_storage_virtuoso_transaction_rollback;
   factory->transaction_get_handle		= librdf_storage_virtuoso_transaction_get_handle;
-  factory->supports_query			= librdf_storage_virtuoso_supports_query;
-  factory->query_execute			= librdf_storage_virtuoso_query_execute;
 }
 
+
+#ifdef MODULAR_LIBRDF
+
+/** Entry point for dynamically loaded storage module */
+void
+librdf_storage_module_register_factory(librdf_world *world)
+{
+  librdf_storage_register_factory(world, "virtuoso",
+                                  "OpenLink Virtuoso Universal Server store",
+                                  &librdf_storage_virtuoso_register_factory);
+}
+
+#else
 
 /**
  * librdf_init_storage_virtuoso:
@@ -2714,6 +2667,10 @@ librdf_storage_virtuoso_register_factory(librdf_storage_factory *factory)
 void
 librdf_init_storage_virtuoso(librdf_world *world)
 {
-  librdf_storage_register_factory(world, "virtuoso", "OpenLink Virtuoso Universal Server store", &librdf_storage_virtuoso_register_factory);
-  librdf_init_query_virtuoso(world);
+  librdf_storage_register_factory(world, "virtuoso",
+                                  "OpenLink Virtuoso Universal Server store",
+                                  &librdf_storage_virtuoso_register_factory);
 }
+
+#endif
+

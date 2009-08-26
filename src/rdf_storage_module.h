@@ -215,10 +215,6 @@ struct librdf_storage_factory_s {
 
   /* Get opaque data handle passed to transaction_start_with_handle */
   void* (*transaction_get_handle)(librdf_storage* storage);
-
-  /** Storage engine supports querying - OPTIONAL */
-  int (*supports_query)(librdf_storage* storage, librdf_query *query);
-  librdf_query_results* (*query_execute)(librdf_storage* storage, librdf_query *query);
 };
 
 
