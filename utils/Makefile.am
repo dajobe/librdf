@@ -3,6 +3,10 @@ MYSQL_UTILS=rdf-tree
 bin_PROGRAMS=redland-db-upgrade rdfproc
 noinst_SCRIPTS=touch-mtime.pl
 
+if STORAGE_VIRTUOSO
+noinst_PROGRAMS=redland-virtuoso-test
+endif
+
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=redland-db-upgrade 
 
 EXTRA_PROGRAMS=$(MYSQL_UTILS)
@@ -22,6 +26,9 @@ LDADD=$(top_builddir)/src/librdf.la
 AM_LDFLAGS=@LIBRDF_LDFLAGS@
 
 redland_db_upgrade_SOURCES = db_upgrade.c
+
+redland_virtuoso_test_SOURCES = redland-virtuoso-test.c
+redland_virtuoso_test_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/src/librdf.la
 
 rdfproc_SOURCES = rdfproc.c
 if GETOPT

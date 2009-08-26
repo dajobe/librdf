@@ -542,7 +542,7 @@ AC_SUBST(HASH_SRCS)
 dnl Storages
 persistent_storages="/file/tstore/mysql/sqlite/"
 persistent_store=no
-all_storages="memory file hashes trees mysql sqlite tstore postgresql"
+all_storages="memory file hashes trees mysql sqlite tstore postgresql virtuoso"
 always_available_storages="memory file hashes trees"
 
 dnl default availabilities and enablements
@@ -717,6 +717,266 @@ else
 fi
 
 
+##########################################################################
+#                                                                        #
+# OpenLink Virtuoso storage support                                      #
+#                                                                        #
+##########################################################################
+
+AC_ARG_WITH(virtuoso, [  --with-virtuoso(=yes|no) Enable Virtuoso RDF store (default=auto)], with_virtuoso="$withval", with_virtuoso="auto")
+
+##
+##  Checkout ODBC situation
+##
+
+#
+#  Initialize variables
+#
+found_odbc=no
+ODBC_CFLAGS=
+ODBC_LIBS=
+
+
+#
+#  Check for iODBC support
+#
+if test "$found_odbc" = "no"
+then
+AC_ARG_WITH(iodbc, [dnl
+AC_HELP_STRING([--with-iodbc(=DIR)], [Select iODBC support])
+  AC_HELP_STRING([], [DIR is the iODBC base install directory])
+  AC_HELP_STRING([], [(default=/usr/local)])
+] , [
+    if test "$withval" = "yes"
+    then
+	withval=/usr/local
+    fi
+
+    PATH_IODBC="$withval/bin:$PATH"
+    AC_PATH_PROG(IODBC_CONFIG, iodbc-config, no, [$PATH_IODBC])
+
+    AC_MSG_CHECKING([for iODBC support])
+    if test -f "$withval/lib/libiodbc.dylib"
+    then
+	found_odbc=iODBC				# Mac OS X
+	ODBC_CFLAGS="-I$withval/include"
+	ODBC_LIBS="-L$withval/lib -liodbc"
+	AC_MSG_RESULT(yes)
+    elif test -x "$IODBC_CONFIG"
+    then
+	found_odbc=iODBC
+	ODBC_CFLAGS=`$IODBC_CONFIG --cflags`
+	ODBC_LIBS=`$IODBC_CONFIG --libs`
+	AC_MSG_RESULT(yes)
+    elif test -f "$withval/lib/libiodbc.a"
+    then
+	found_odbc=iODBC
+	ODBC_CFLAGS="-I$withval/include"
+	ODBC_LIBS="-L$withval/lib -liodbc"
+	AC_MSG_RESULT(yes)
+    else
+	AC_MSG_RESULT(no)
+    fi
+])
+fi
+
+
+#
+#  Check for UnixODBC support
+#
+if test "$found_odbc" = "no"
+then
+AC_ARG_WITH(unixodbc, [dnl
+AC_HELP_STRING([--with-unixodbc(=DIR)], [Select UnixODBC support])
+  AC_HELP_STRING([], [DIR is the UnixODBC base install directory])
+  AC_HELP_STRING([], [(default=/usr/local)])
+], [
+    if test "$withval" = "yes"
+    then
+	withval=/usr/local
+    fi
+
+    AC_MSG_CHECKING([for UnixODBC support])
+    if test -f "$withval/lib/libodbc.a"
+    then
+	found_odbc=unixODBC
+	ODBC_CFLAGS="-I$withval/include"
+	ODBC_LIBS="-L$withval/lib -lodbc"
+	AC_MSG_RESULT(yes)
+    else
+	AC_MSG_RESULT(no)
+    fi
+])
+fi
+
+
+#
+#  Check for DataDirect support
+#
+if test "$found_odbc" = "no"
+then
+AC_ARG_WITH(datadirect, [dnl
+AC_HELP_STRING([--with-datadirect(=DIR)], [Select DataDirect support])
+  AC_HELP_STRING([], [DIR is the DataDirect base install directory])
+  AC_HELP_STRING([], [(default=/usr/local)])
+], [
+    if test "$withval" = "yes"
+    then
+	withval=/usr/local
+    fi
+
+    AC_MSG_CHECKING([for DataDirect support])
+    if test -f "$withval/lib/libodbc.a"
+    then
+	found_odbc=DataDirect
+	ODBC_CFLAGS="-I$withval/include"
+	ODBC_LIBS="-L$withval/lib -lodbc"
+	AC_MSG_RESULT(yes)
+    else
+	AC_MSG_RESULT(no)
+    fi
+])
+fi
+
+
+#
+#  Check for custom ODBC support
+#
+if test "$found_odbc" = "no"
+then
+AC_ARG_WITH(odbc-include, [dnl
+AC_HELP_STRING([--with-odbc-inc=DIR], [Specify custom ODBC include directory])
+  AC_HELP_STRING([], [(default=/usr/local/include)])
+], [
+    if test "$withval" = "yes"
+    then
+	withval=/usr/local/include
+    fi
+
+    AC_MSG_CHECKING([for sql.h])
+    if test -f "$withval/sql.h"
+    then
+	ODBC_CFLAGS="-I$withval"
+	AC_MSG_RESULT(yes)
+    else
+	AC_MSG_RESULT(no)
+    fi
+])
+
+
+AC_ARG_WITH(odbc-lib, [dnl
+AC_HELP_STRING([--with-odbc-lib=DIR], [Specify custom ODBC lib directory])
+  AC_HELP_STRING([], [(default=/usr/local/lib)])dnl
+], [
+    if test "$withval" = "yes"
+    then
+	    withval=/usr/local/lib
+    fi
+
+    ac_save_LDFLAGS=$LDFLAGS
+    test -n "$withval" && LDFLAGS="$LDFLAGS -L$withval"
+    AC_CHECK_LIB(iodbc, SQLConnect, 
+    [
+	ODBC_LIBS="-L$withval -liodbc"; found_odbc=iODBC
+    ],
+    [
+	AC_CHECK_LIB(odbc, SQLConnect,
+	[
+	    ODBC_LIBS="-L$withval -lodbc"; found_odbc=ODBC
+	])
+    ])
+    LDFLAGS=$ac_save_LDFLAGS
+])
+fi
+
+
+#
+#  Maybe the libraries are in some default directory
+#
+if test "$found_odbc" = "no"
+then
+    AC_PATH_PROG(IODBC_CONFIG, iodbc-config, no)
+
+    AC_MSG_CHECKING([for iODBC support])
+    if test -x "$IODBC_CONFIG"
+    then
+	found_odbc=iODBC
+	ODBC_CFLAGS=`$IODBC_CONFIG --cflags`
+	ODBC_LIBS=`$IODBC_CONFIG --libs`
+	AC_MSG_RESULT(yes)
+    fi
+fi 
+
+
+#
+#  Maybe the libraries are in some default directory
+#
+if test "$found_odbc" = "no"
+then
+    AC_CHECK_LIB(iodbc, SQLConnect, 
+    [
+	ODBC_LIBS="-liodbc"; found_odbc=iODBC
+    ],
+    [
+	AC_CHECK_LIB(odbc, SQLConnect,
+	[
+	    ODBC_LIBS="-lodbc"; found_odbc=ODBC
+	])
+    ])
+fi
+
+
+#
+#  Expand our compile flags
+#
+AC_SUBST(ODBC_CFLAGS)
+AC_SUBST(ODBC_LIBS)
+
+#
+#  Check if SQLLEN, SQLULEN, SQLBIGINT, SQLUBIGINT are defined
+#
+save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $ODBC_CFLAGS"
+AC_CHECK_TYPE(SQLLEN, ,
+	AC_DEFINE(SQLLEN, SQLINTEGER,
+		[define to SQLINTEGER if not defined in the ODBC headers])
+	AC_DEFINE(SQLULEN, SQLUINTEGER,
+		[define to SQLUINTEGER if not defined in the ODBC headers]),
+[
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+])
+
+
+if test "x$with_virtuoso" != "xno" 
+then
+    AC_MSG_CHECKING([virtuoso storage dependencies])
+
+    if test "$found_odbc" = "no"
+    then
+	AC_MSG_RESULT(no)
+	AC_MSG_WARN([Disabled virtuoso storage:])
+        AC_MSG_WARN([   could not find ODBC header files and/or libraries])
+        virtuoso_storage_available=no
+    else
+	AC_MSG_RESULT(yes)
+        storages_available="$storages_available virtuoso"
+        virtuoso_storage_available=yes
+    fi
+
+fi
+
+
+##########################################################################
+#                                                                        #
+# OpenLink Virtuoso storage support   ***END***                          #
+#                                                                        #
+##########################################################################
+
+
+
+
 # This is needed because autoheader can't work out which computed
 # symbols must be pulled from acconfig.h into config.h.in
 if test "x" = "y"; then
@@ -728,6 +988,7 @@ if test "x" = "y"; then
   AC_DEFINE(STORAGE_SQLITE, 1, [Building SQLite storage])
   AC_DEFINE(STORAGE_TSTORE, 1, [Building 3store storage])
   AC_DEFINE(STORAGE_POSTGRESQL, 1, [Building PostgreSQL storage])
+  AC_DEFINE(STORAGE_VIRTUOSO, 1, [Building Virtuoso storage])
 fi
 
 
@@ -770,6 +1031,7 @@ AM_CONDITIONAL(STORAGE_MYSQL,  test $mysql_storage  = yes)
 AM_CONDITIONAL(STORAGE_SQLITE, test $sqlite_storage = yes)
 AM_CONDITIONAL(STORAGE_TSTORE, test $tstore_storage = yes)
 AM_CONDITIONAL(STORAGE_POSTGRESQL, test $postgresql_storage = yes)
+AM_CONDITIONAL(STORAGE_VIRTUOSO,  test $virtuoso_storage  = yes)
 
 if test $mysql_storage  = yes; then
   MYSQL_CPPFLAGS=`$MYSQL_CONFIG --cflags | sed -e "s/'//g" -e "s/-O[A-Za-z0-9]*//" `
@@ -787,6 +1049,10 @@ if test $postgresql_storage  = yes; then
   POSTGRESQL_CPPFLAGS="-I`$PG_CONFIG --includedir`"
   POSTGRESQL_LIBS="-L`$PG_CONFIG --libdir` -lpq"
 fi
+if test $virtuoso_storage  = yes; then
+  VIRTUOSO_CPPFLAGS="$ODBC_CFLAGS"
+  VIRTUOSO_LIBS="$ODBC_LIBS"
+fi
 
 
 if test "$persistent_store" = no; then
@@ -801,6 +1067,8 @@ AC_SUBST(TSTORE_CPPFLAGS)
 AC_SUBST(TSTORE_LIBS)
 AC_SUBST(POSTGRESQL_CPPFLAGS)
 AC_SUBST(POSTGRESQL_LIBS)
+AC_SUBST(VIRTUOSO_CPPFLAGS)
+AC_SUBST(VIRTUOSO_LIBS)
 
 
 if test "$modular" = yes; then
@@ -809,8 +1077,8 @@ if test "$modular" = yes; then
   AC_DEFINE(MODULAR_LIBRDF, 1, [Build storage backends as modules])
 #  AC_CONFIG_SUBDIRS([libltdl])
 else
-  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $MYSQL_CPPFLAGS $SQLITE_CPPFLAGS $TSTORE_CPPFLAGS $POSTGRESQL_CPPFLAGS"
-  LIBRDF_LIBS="$LIBRDF_LIBS $MYSQL_LIBS $SQLITE_LIBS $TSTORE_LIBS $POSTGRESQL_LIBS"
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $MYSQL_CPPFLAGS $SQLITE_CPPFLAGS $TSTORE_CPPFLAGS $POSTGRESQL_CPPFLAGS $VIRTUOSO_CPPFLAGS"
+  LIBRDF_LIBS="$LIBRDF_LIBS $MYSQL_LIBS $SQLITE_LIBS $TSTORE_LIBS $POSTGRESQL_LIBS $VIRTUOSO_LIBS"
 fi
 
 AM_CONDITIONAL(MODULAR_LIBRDF, test $modular = yes)

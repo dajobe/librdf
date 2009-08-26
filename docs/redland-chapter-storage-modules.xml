@@ -28,6 +28,7 @@ the storage options used.
   <listitem><para><link linkend="redland-storage-module-sqlite">sqlite</link></para></listitem>
   <listitem><para><link linkend="redland-storage-module-tstore">tstore</link></para></listitem>
   <listitem><para><link linkend="redland-storage-module-uri">uri</link></para></listitem>
+  <listitem><para><link linkend="redland-storage-module-virtuoso">Virtuoso</link></para></listitem>
 </itemizedlist>
 
 </section>
@@ -481,6 +482,102 @@ supported.</para>
   <listitem><para>Easy access to web content in RDF/XML</para></listitem>
   <listitem><para>Not indexed</para></listitem>
   <listitem><para>No contexts</para>
+</listitem>
+</itemizedlist>
+
+</section>
+
+<section id="redland-storage-module-virtuoso">
+
+<title>Store 'virtuoso'</title>
+
+<para>
+The Virtuoso Redland RDF Provider is an implementation of the Storage
+API, Model and Query interfaces of the Redland framework for RDF. This
+provider enables the execution of queries via the Redland Rasqal query
+engine or via Virtuoso query engine directly against the
+<ulink url="http://virtuoso.openlinksw.com/wiki/main">Virtuoso OpenSource</ulink> 
+Quad Store. 
+</para>
+
+<para>
+The Virtuoso Redland RDF Provider uses ODBC as the data access mechanism
+for communicating the Virtuoso Quad Store and requires the Virtuoso
+ODBC Driver be installed on the Redland client and a suitable ODBC DSN
+be configured for connecting to the target Virtuoso Quad Store instance.
+</para>
+
+<para>
+The provider has been tested against the Redland 1.0.8 version currently
+available for download. Virtuoso is capable of efficiently handle large
+amounts of data and has been tested with upto 1B triples.
+</para>
+
+<para>There are several options required with the virtuoso storage
+in order to connect to the database.  These are:</para>
+<itemizedlist>
+  <listitem><para><literal>dsn</literal> for the ODBC datasource name</para></listitem>
+  <listitem><para><literal>user</literal> for the database server user name</para></listitem>
+  <listitem><para><literal>password</literal> for the database server password</para></listitem>
+  <listitem><para><literal>database</literal> for the database name (not the storage name)</para></listitem>
+  <listitem><para><literal>host</literal> for the database server hostname</para></listitem>
+  <listitem><para><literal>charset</literal> for the database charset to use</para></listitem>
+</itemizedlist>
+
+<para>NOTE: Take care exposing the password as for example, program
+arguments or environment variables.  The rdfproc
+utility can with help this by reading the password from standard
+input.  Inside programs, one way to prevent storing the password in a
+string is to construct a Redland hash of the storage options such as
+via <literal>librdf_hash_from_string</literal> and use
+<literal>librdf_new_storage_with_options</literal> to create a storage.
+The rdfproc utility source code demonstrates this.
+</para>
+
+<para>The storage name parameter given to the storage constructor
+<literal>librdf_new_storage</literal> is used inside the virtuoso store to
+allow multiple stores inside one Virtuoso database instance as
+parameterised with the above options.</para>
+
+<para>This store always provides contexts; the boolean storage option
+<literal>contexts</literal> is not checked.</para>
+
+<para>Examples:</para>
+<programlisting>
+  /* A new Virtuoso store */
+  storage=librdf_new_storage(world, "virtuoso", "db1",
+      "dsn='Local Virtuoso',user='demo',password='demo'");
+
+  /* A different, existing Virtuoso store in the same database as above */
+  storage=librdf_new_storage(world, "virtuoso", "db2",
+      "dsn='Local Virtuoso',user='demo',password='demo'");
+
+  /* An existing Virtuoso store on a different database server */
+  storage=librdf_new_storage(world, "virtuoso", "http://red3",
+      "dsn='Remote Virtuoso',user='demo',password='demo'");
+
+  /* Opening with an options hash */
+  options=librdf_new_hash(world, NULL);
+  librdf_hash_from_string(options, 
+      "dsn='Local Virtuoso',user='demo'");
+  librdf_hash_put_strings(options, "password", user_password);
+  storage=librdf_new_storage_with_options(world, "virtuoso", "http://red3", options);
+</programlisting>
+
+<para>In PHP:</para>
+<programlisting>
+  # An existing store
+  $storage=librdf_new_storage($world, 'virtuoso', 'db4', 
+      "dsn='Local Virtuoso',user='demo',password='demo'");
+
+</programlisting>
+<para>Summary:</para>
+<itemizedlist>
+  <listitem><para>Persistent</para></listitem>
+  <listitem><para>Suitable for extremely large models, 1B+ triples</para></listitem>
+  <listitem><para>Indexed and optimized</para></listitem>
+  <listitem><para>Possibility of free text searching</para></listitem>
+  <listitem><para>Contexts always provided</para>
 </listitem>
 </itemizedlist>
 

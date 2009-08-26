@@ -113,6 +113,9 @@ librdf_init_storage(librdf_world *world)
   #ifdef STORAGE_MYSQL
     librdf_init_storage_mysql(world);
   #endif
+  #ifdef STORAGE_VIRTUOSO
+    librdf_init_storage_virtuoso(world);
+  #endif
   #ifdef STORAGE_POSTGRESQL
     librdf_init_storage_postgresql(world);
   #endif
@@ -1654,8 +1657,6 @@ librdf_storage_context_serialise(librdf_storage* storage,
  * 
  * Check if a storage system supports a query language.
  * 
- * Not implemented.
- *
  * Return value: non-0 if the query is supported.
  **/
 int
@@ -1664,7 +1665,10 @@ librdf_storage_supports_query(librdf_storage* storage, librdf_query *query)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 0);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 0);
 
-  return 0;
+  if(storage->factory->supports_query)
+    return storage->factory->supports_query(storage, query);
+  else
+    return 0;
 }
 
 
@@ -1675,8 +1679,6 @@ librdf_storage_supports_query(librdf_storage* storage, librdf_query *query)
  * 
  * Run the given query against the storage.
  * 
- * Not implemented.
- *
  * Return value: #librdf_query_results or NULL on failure
  **/
 librdf_query_results*
@@ -1685,7 +1687,10 @@ librdf_storage_query_execute(librdf_storage* storage, librdf_query *query)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
 
-  return NULL;
+  if(storage->factory->supports_query)
+    return storage->factory->query_execute(storage, query);
+  else
+    return NULL;
 }
 
 

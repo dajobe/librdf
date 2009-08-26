@@ -165,6 +165,10 @@ librdf_query_factory* librdf_get_query_factory(librdf_world *world, const char *
 void librdf_query_triples_constructor(librdf_world *world);
 void librdf_query_rasqal_constructor(librdf_world *world);
 
+#ifdef STORAGE_VIRTUOSO
+void librdf_init_query_virtuoso(librdf_world *world);
+#endif
+
 void librdf_query_rasqal_destructor(librdf_world *world);
 
 void librdf_query_add_query_result(librdf_query *query, librdf_query_results* query_results);

@@ -148,6 +148,14 @@ librdf_storage_postgresql_la_LIBADD = @POSTGRESQL_LIBS@ librdf.la
 librdf_storage_postgresql_la_LDFLAGS = -module -avoid-version
 endif
 
+if STORAGE_VIRTUOSO
+plugin_LTLIBRARIES += librdf_storage_virtuoso.la 
+librdf_storage_virtuoso_la_SOURCES = rdf_storage_virtuoso.c rdf_query_virtuoso.c rdf_storage_virtuoso_internal.h
+librdf_storage_virtuoso_la_CPPFLAGS = @ODBC_CFLAGS@
+librdf_storage_virtuoso_la_LIBADD = @ODBC_LIBS@
+librdf_storage_virtuoso_la_LDFLAGS = -module -avoid-version
+endif
+
 else
 
 if STORAGE_TSTORE
@@ -164,6 +172,10 @@ endif
 
 if STORAGE_POSTGRESQL
 librdf_la_SOURCES += rdf_storage_postgresql.c
+endif
+
+if STORAGE_VIRTUOSO
+librdf_la_SOURCES += rdf_storage_virtuoso.c rdf_query_virtuoso.c rdf_storage_virtuoso_internal.h
 endif
 
 endif

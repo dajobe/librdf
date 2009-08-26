@@ -62,6 +62,10 @@ void librdf_init_storage_file(librdf_world *world);
 void librdf_init_storage_mysql(librdf_world *world);
 #endif
 
+#ifdef STORAGE_VIRTUOSO
+void librdf_init_storage_virtuoso(librdf_world *world);
+#endif
+
 #ifdef STORAGE_POSTGRESQL
 void librdf_init_storage_postgresql(librdf_world *world);
 #endif
