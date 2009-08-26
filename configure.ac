@@ -172,7 +172,7 @@ if test "$USE_MAINTAINER_MODE" = yes; then
   AC_MSG_RESULT($warning_cflags)
 fi
 
-MAINTAINER_CFLAGS="$warning_cflags"
+MAINTAINER_CPPFLAGS="$warning_cflags"
 
 
 # Externally linked libraries - appear in redland-config
@@ -935,7 +935,7 @@ if test "$debug_messages" = "yes"; then
 fi
 
 if test "$USE_MAINTAINER_MODE" = yes; then
-  CFLAGS="$MAINTAINER_CFLAGS $CFLAGS"
+  CPPFLAGS="$MAINTAINER_CPPFLAGS $CPPFLAGS"
 fi
 
 if test "$USE_MAINTAINER_MODE" = yes -a $release_version = no; then 
