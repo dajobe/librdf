@@ -3,7 +3,7 @@
 # Makefile.am - top level automake file for Redland
 #
 # Copyright (C) 2000-2009, David Beckett http://www.dajobe.org/
-# Copyright (C) 2000-2004, Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
+# Copyright (C) 2000-2006, University of Bristol, UK http://www.bristol.ac.uk/
 # 
 # This package is Free Software and part of Redland http://librdf.org/
 # 
