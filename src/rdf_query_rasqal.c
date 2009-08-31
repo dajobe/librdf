@@ -1240,11 +1240,11 @@ librdf_query_rasqal_constructor(librdf_world *world)
       }
     }
 
-  librdf_query_register_factory(world, language_name, uri_string,
-                                &librdf_query_rasqal_register_factory);
-  
-  if(!i) /* registered default query, end */
-    break;
+    librdf_query_register_factory(world, language_name, uri_string,
+                                  &librdf_query_rasqal_register_factory);
+    
+    if(!i) /* registered default query, end */
+      break;
   }
 
 
