@@ -1,4 +1,45 @@
+2009-08-30  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_rasqal.c: ws/indenting
+
+2009-08-26  Dave Beckett <dave@dajobe.org>
+
+	* utils: props
+
 2009-08-25  Dave Beckett <dave@dajobe.org>
+
+	* src/Makefile.am, src/rdf_query_virtuoso.c, src/rdf_storage.c,
+	src/rdf_storage_module.h, src/rdf_storage_virtuoso.c:
+	Remove virtuoso vsparql query part for now - should use some
+	rasqal parts that are not yet public
+
+	* utils/redland-virtuoso-test.c: cut the source down so it
+	compiles.  body seems to have been repeated, possibly by multiple
+	rebasing of original patches
+
+	* src/Makefile.am: copyright years
+
+	* utils/redland-virtuoso-test.c:
+	Add redland-virtuoso-test.c
+
+	* src/rdf_query_virtuoso.c, src/rdf_storage_virtuoso.c,
+	src/rdf_storage_virtuoso_internal.h:
+	Also add new Virtuoso storage files also from
+	http://bugs.librdf.org/mantis/view.php?id=284
+
+	* configure.ac, docs/redland-chapter-storage-modules.xml,
+	src/Makefile.am, src/rdf_query_internal.h, src/rdf_storage.c,
+	src/rdf_storage_internal.h, src/rdf_storage_module.h,
+	utils/Makefile.am:
+	Applied raw Virtuoso storage patch from
+	http://bugs.librdf.org/mantis/view.php?id=284 - does not compile
+	at this commit due to use of rasqal internals that are no longer
+	available to librdf.
+
+	* autogen.sh: Update common autogen.sh
+
+	* configure.ac: Add -W to CPPFLAGS not CFLAGS, so they are not
+	used in link lines
 
 	* src/Makefile.am: typo $
 
