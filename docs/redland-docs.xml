@@ -47,6 +47,7 @@
       <year>2006</year>
       <year>2007</year>
       <year>2008</year>
+      <year>2009</year>
       <holder>Dave Beckett</holder>
     </copyright>
     <copyright>
@@ -64,22 +65,40 @@
   <chapter id="redland">
     <title>Redland Overview</title>
     <para>
-Redland is a general-purpose Resource Description Framework (RDF)
-library providing APIs to the RDF model and it's concepts.
+      Redland is a general-purpose Resource Description Framework (RDF)
+      library providing APIs to the RDF model and it's concepts.
     </para>
 
   </chapter>
 
-   <xi:include href="redland-chapter-intro.xml"/>
+  <xi:include href="redland-chapter-intro.xml"/>
 
   <part id="tutorial"> 
     <title>Tutorial</title>
-    <partintro id="tutorial-introduction">
+    <partintro id="tutorial-overview">
       <para>This part will describe how to use the
       <ulink url="http://librdf.org/">Redland</ulink> APIs.
       once it is written.
       </para>
+
+      <para>The next part contains the
+      <link linkend="tutorial">Redland Reference Manual</link>
+      explaining the API in detail.
+      </para>
+
+      <para>For the latest information, see the
+      <ulink url="http://librdf.org/">Redland Home Page</ulink>
+      </para>
     </partintro>
+
+    <chapter id="tutorial-introduction">
+      <title>Tutorial Introduction</title>
+      <para>
+	This chapter will describe how to use the
+	<ulink url="http://librdf.org/">Redland</ulink> APIs.
+	once it is written. 
+      </para>
+    </chapter>
   </part>				  
 
   <part id="reference-manual">
