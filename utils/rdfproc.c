@@ -769,7 +769,7 @@ main(int argc, char *argv[])
 
         warning_count_node=librdf_parser_get_feature(parser, warning_count_uri);
         if(warning_count_node) {
-          warning_count=atoi((const char*)librdf_node_get_literal_value(error_count_node));
+          warning_count=atoi((const char*)librdf_node_get_literal_value(warning_count_node));
           librdf_free_node(warning_count_node);
         } else {
           fprintf(stderr, "%s: Could not get parsing warning count\n", program);
