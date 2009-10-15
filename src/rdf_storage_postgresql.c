@@ -5,7 +5,7 @@
  * Based in part on rdf_storage_mysql.
  *
  * Copyright (C) 2003-2005 Shi Wenzhong - email to shiwenzhong@hz.cn
- * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2009, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -591,8 +591,18 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   if(!status) {
     if(!(escaped_name=(char*)LIBRDF_MALLOC(cstring,strlen(name)*2+1)))
       status=1;
-    else
-     PQescapeString(escaped_name,(const char*)name, strlen(name));
+    else {
+      int error = 0;
+      PQescapeStringConn(handle, escaped_name,
+                         (const char*)name, strlen(name),
+                         &error);
+      if(error) {
+        librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                   "postgresql escapeStringConn() failed with error %s",
+                   PQerrorMessage(handle));
+        status = 1;
+      }
+    }
   }
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) {
     /* Create new model */
@@ -975,7 +985,16 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
       char *escaped_uri;
 
       if((escaped_uri=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1))) {
-        PQescapeString(escaped_uri,(const char*)uri, nodelen);
+        int error = 0;
+        PQescapeStringConn(handle, escaped_uri,
+                           (const char*)uri, nodelen,
+                           &error);
+        if(error) {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "postgresql escapeStringConn() failed with error : %s",
+                     PQerrorMessage(handle));
+        }
+
         if((query=(char*)LIBRDF_MALLOC(cstring, strlen(create_resource)+20+nodelen+1))) {
           sprintf(query, create_resource, hash, escaped_uri);
           if((res=PQexec(handle, query))) {
@@ -1044,17 +1063,42 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
       char *escaped_value, *escaped_lang, *escaped_datatype;
       
       if((escaped_value=(char*)LIBRDF_MALLOC(cstring, valuelen*2+1))) {
-        PQescapeString(escaped_value, (const char*)value, valuelen);
+        int error = 0;
+        PQescapeStringConn(handle, escaped_value,
+                           (const char*)value, valuelen,
+                           &error);
+        if(error) {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "postgresql escapeStringConn() failed with error %s",
+                     PQerrorMessage(handle));
+        }
+
         if((escaped_lang=(char*)LIBRDF_MALLOC(cstring, langlen*2+1))) {
-          if(lang)
-            PQescapeString( escaped_lang, (const char*)lang, langlen);
-          else
+          if(lang) {
+            PQescapeStringConn(handle, escaped_lang,
+                               (const char*)lang, langlen,
+                               &error);
+            if(error) {
+              librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                         "postgresql escapeStringConn() failed with error %s",
+                         PQerrorMessage(handle));
+            }
+          } else
             strcpy(escaped_lang,"");
-          if ((escaped_datatype=(char*)LIBRDF_MALLOC(cstring, datatypelen*2+1))) {
-            if(datatype)
-              PQescapeString( escaped_datatype, (const char*)datatype, datatypelen);
-            else
+
+          if((escaped_datatype=(char*)LIBRDF_MALLOC(cstring, datatypelen*2+1))) {
+            if(datatype) {
+              PQescapeStringConn(handle, escaped_datatype, 
+                                 (const char*)datatype, datatypelen,
+                                 &error);
+              if(error) {
+                librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                           "postgresql escapeStringConn() failed with error %s",
+                           PQerrorMessage(handle));
+              }
+            } else
               strcpy(escaped_datatype,"");
+
             if ((query=(char*)LIBRDF_MALLOC(cstring, strlen(create_literal)+
                                             strlen(escaped_value)+
                                             strlen(escaped_lang)+
@@ -1103,7 +1147,16 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
       char *escaped_name;
 
       if((escaped_name=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1))) {
-        PQescapeString(escaped_name,(const char*)name, nodelen);
+        int error = 0;
+        PQescapeStringConn(handle, escaped_name,
+                           (const char*)name, nodelen, 
+                           &error);
+        if(error) {
+          librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+                     "postgresql escapeStringConn() failed with error %s",
+                     PQerrorMessage(handle));
+        }
+
         if((query=(char*)LIBRDF_MALLOC(cstring, strlen(create_bnode)+20+nodelen+1))) {
           sprintf(query, create_bnode, hash, escaped_name);
           if((res=PQexec(handle, query))) {
