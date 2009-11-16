@@ -163,7 +163,8 @@ rasqal_literal_to_redland_node(librdf_world *world, rasqal_literal* l)
   else if (l->type == RASQAL_LITERAL_STRING ||
            l->type == RASQAL_LITERAL_INTEGER ||
            l->type == RASQAL_LITERAL_DOUBLE ||
-           l->type == RASQAL_LITERAL_BOOLEAN)
+           l->type == RASQAL_LITERAL_BOOLEAN ||
+           l->type == RASQAL_LITERAL_UDT)
     return librdf_new_node_from_typed_literal(world, 
                                               (unsigned char*)l->string, 
                                               l->language, 
