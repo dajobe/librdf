@@ -152,28 +152,54 @@ librdf_query_rasqal_terminate(librdf_query* query)
 }
 
 
+/*
+ * This function and RASQAL_LITERAL_UDT first appears in Rasqal 0.9.17
+ *
+ * FIXME: Remove this code when minimum rasqal version >= 0.9.17
+ */
+#ifndef RASQAL_LITERAL_UDT
+static int
+rasqal_literal_get_rdf_term_type(rasqal_literal* l)
+{
+  rasqal_literal_type type = l->type;
+  
+  /* squash literal datatypes into one type: RDF Literal */
+  if(type >= RASQAL_LITERAL_FIRST_XSD &&
+     type <= RASQAL_LITERAL_LAST_XSD)
+    type = RASQAL_LITERAL_STRING;
+
+  if(type != RASQAL_LITERAL_URI &&
+     type != RASQAL_LITERAL_STRING &&
+     type != RASQAL_LITERAL_BLANK)
+    type = RASQAL_LITERAL_UNKNOWN;
+
+  return type;
+}
+#endif
+
+
 static librdf_node*
 rasqal_literal_to_redland_node(librdf_world *world, rasqal_literal* l)
 {
+  rasqal_literal_type type;
+
   if(!l)
     return NULL;
   
-  if(l->type == RASQAL_LITERAL_URI)
+  type = rasqal_literal_get_rdf_term_type(l);
+
+  if(type == RASQAL_LITERAL_URI)
     return librdf_new_node_from_uri(world, (librdf_uri*)l->value.uri);
-  else if (l->type == RASQAL_LITERAL_STRING ||
-           l->type == RASQAL_LITERAL_INTEGER ||
-           l->type == RASQAL_LITERAL_DOUBLE ||
-           l->type == RASQAL_LITERAL_BOOLEAN ||
-           l->type == RASQAL_LITERAL_UDT)
+  else if (type == RASQAL_LITERAL_STRING)
     return librdf_new_node_from_typed_literal(world, 
                                               (unsigned char*)l->string, 
                                               l->language, 
                                               (librdf_uri*)l->datatype);
-  else if (l->type == RASQAL_LITERAL_BLANK)
+  else if (type == RASQAL_LITERAL_BLANK)
     return librdf_new_node_from_blank_identifier(world,
                                                  (unsigned char*)l->string);
   else {
-    LIBRDF_DEBUG2("Could not convert literal type %d to librdf_node", l->type);
+    LIBRDF_DEBUG2("Could not convert literal type %d to librdf_node", type);
     abort();
   }
 
