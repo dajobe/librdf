@@ -157,7 +157,7 @@ librdf_query_rasqal_terminate(librdf_query* query)
  *
  * FIXME: Remove this code when minimum rasqal version >= 0.9.17
  */
-#ifndef RASQAL_LITERAL_UDT
+#ifndef RASQAL_LITERAL_UDT_DEFINED
 static rasqal_literal_type
 rasqal_literal_get_rdf_term_type(rasqal_literal* l)
 {
