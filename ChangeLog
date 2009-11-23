@@ -1,3 +1,48 @@
+2009-11-17  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_query_rasqal.c:
+	(rasqal_literal_get_rdf_term_type): Cannot use enum
+	(RASQAL_LITERAL_UDT) with preprocessor, use
+	RASQAL_LITERAL_UDT_DEFINED instead.
+
+	* src/rdf_query_rasqal.c:
+	(rasqal_literal_get_rdf_term_type): Changed return type from int
+	to rasqal_literal_type enum to prevent int-enum conversion
+	warnings.
+
+2009-11-16  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_rasqal.c:
+	(rasqal_literal_get_rdf_term_type): Added when RASQAL_LITERAL_UDT
+	is not defined - rasqal is 0.9.16 or older.
+	(rasqal_literal_to_redland_node): Use above to replace
+	ever-growing if condition that is fragile when new literal types
+	are added.
+
+2009-11-16  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_query_rasqal.c:
+	(rasqal_literal_to_redland_node): Support RASQAL_LITERAL_UDT
+	user-defined datatype literals introduced in rasqal r15608.
+
+2009-10-14  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_postgresql.c:
+	Replace deprecated PQescapeString with PQescapeStringConn that
+	takes a PGconn connection handle and when encoding takes into
+	consideration any connection properties such as character
+	encodings in force.
+
+2009-10-10  Dave Beckett <dave@dajobe.org>
+
+	* utils/rdfproc.c:
+	CMD_PARSE: get the warning count from the warning_count_node, not
+	the (just freed) error_count_node
+
+2009-09-07  Dave Beckett <dave@dajobe.org>
+
+	* docs/redland-docs.xml: Make this newer legal docbook
+
 2009-08-30  Dave Beckett <dave@dajobe.org>
 
 	* src/rdf_query_rasqal.c: ws/indenting
