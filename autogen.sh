@@ -173,7 +173,7 @@ update_prog_version() {
 
   nameglob="$prog*"
   if [ -x /usr/bin/uname ]; then
-    if [`/usr/bin/uname`x = 'Darwinx' -a $prog = 'libtoolize' ] ; then
+    if [ `/usr/bin/uname`x = 'Darwinx' -a $prog = 'libtoolize' ] ; then
       nameglob="g$nameglob"
     fi
   fi
