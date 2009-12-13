@@ -338,7 +338,7 @@ librdf_cache_set_common(librdf_cache *cache,
   
   /* store in hash: key => (librdf_cache_node*) */
   if(librdf_hash_put(cache->hash, &key_hd, &value_hd)) {
-    memset(&node, '\0', sizeof(*node));
+    memset(node, '\0', sizeof(*node));
     if(new_object)
       LIBRDF_FREE(void, new_object);
     rc= -1;
