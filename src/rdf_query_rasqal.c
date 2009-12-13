@@ -297,6 +297,10 @@ rasqal_redland_new_triples_source(rasqal_query* rdf_query,
   context=(librdf_query_rasqal_context*)rtsc->query->context;
   rtsc->model=context->model;
 
+#ifdef RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION
+  rts->version = 1;
+#endif
+
   rts->init_triples_match=rasqal_redland_init_triples_match;
   rts->triple_present=rasqal_redland_triple_present;
   rts->free_triples_source=rasqal_redland_free_triples_source;
@@ -336,11 +340,24 @@ rasqal_redland_free_triples_source(void *user_data)
 }
 
 
-static void
+#ifdef RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION
+#define RTS_RET int
+#else
+#define RTS_RET void
+#endif
+
+static RTS_RET
 rasqal_redland_register_triples_source_factory(rasqal_triples_source_factory *factory) 
 {
+#ifdef RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION
+  factory->version = 1;
+#endif
   factory->user_data_size=sizeof(rasqal_redland_triples_source_user_data);
   factory->new_triples_source=rasqal_redland_new_triples_source;
+
+#ifdef RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION
+  return 0;
+#endif
 }
 
 
