@@ -21,6 +21,115 @@ pre
 
   <h1>Redland RDF Application Framework - Release Notes</h1>
 
+
+<h2 id="rel1_0_10"><a name="rel1_0_10">Redland 1.0.10 Changes</a></h2>
+
+<p>The main changes in this release are:</p>
+
+<p>Added a <a href="http://sourceforge.net/projects/virtuoso/">Virtuoso</a> storage by Patrick van Kleef<br />
+Support <a href="http://librdf.org/rasqal/">Rasqal</a> 0.9.17 API<br />
+Fix compiling against sqlite 3.6.17 or newer<br />
+Fix modular storage dynamic loading linking problems.
+</p>
+
+<p>Building requires installed Raptor (1.4.17 or newer) and Rasqal
+(0.9.16 or newer) libraries, preferably with <code>pkg-config</code>
+to provide the compile/link details.
+</p>
+
+<p>Issues Fixed:</p>
+<ul>
+</ul>
+
+
+<h3>Configuration and build changes</h3>
+
+<p>Default to environment LIBS, CPPFLAGS, LDFLAGS in
+<code>configure</code> to address Gentoo issue
+<a href="http://bugs.gentoo.org/show_bug.cgi?id=267405">267405</a>
+</p>
+
+<p>Make redland-src-config work for external raptor and rasqal again.
+This is for the maintainers only.
+</p>
+
+<p>Put modular build libltdl includes and libs into INTERNAL macros
+</p>
+
+
+<h3>Parser Class Changes</h3>
+
+<p><code>librdf_parser_check_name()</code> added to check if a parser name is
+valid:</p>
+<pre>
+  int librdf_parser_check_name(librdf_world* world, const char *name);
+</pre>
+
+<h3>Query Class Changes</h3>
+
+<p>Support Rasqal 0.9.17 API changes including versioned triple
+factory and triple sources, <code>RASQAL_LITERAL_UDT</code>
+user-defined datatype literals.  Use
+<code>rasqal_literal_get_rdf_term_type</code> when available or
+fall back to internal version.
+</p>
+
+<h3>Serializer Class Changes</h3>
+
+<p><code>librdf_serializer_check_name()</code> added to check if a
+serializer name is valid:</p>
+<pre>
+  int librdf_serializer_check_name(librdf_world* world, const char *name);
+</pre>
+
+<h3>Storage Class Changes</h3>
+
+<p>Update storage module link dependencies so that they depend on
+librdf library to prevent unresolved symbol errors.
+</p>
+
+<p>More validation of storage module names.</p>
+
+<p>Storages 'file' and 'uri'.  These get new storage option
+<code>format</code> with a name value to set the on disk / remote
+URI) syntax format.  For the both storages it has to be a legal
+parser name and for the file storage it has to be a legal serializer
+name too.  This pretty much limits the values to ntriples, rdfxml and
+turtle for the file storage (depending on how raptor is built).
+</p>
+
+<p>Storage 'postgresql'. Replace deprecated PQescapeString with
+PQescapeStringConn that takes a PGconn connection handle and when
+encoding takes into consideration any connection properties such as
+character encodings in force.</p>
+
+<p>Storage 'sqlite'. Change define SQLITE_API to REDLAND_SQLITE_API
+to allow redland to compile with sqlite 3.6.17 or newer where the
+SQLITE_API macro is defined.  Thanks to Samuli Suominen for the
+report and fix.
+</p>
+
+<p>Storage 'virtuoso'.  Added a <a href="http://sourceforge.net/projects/virtuoso/">Virtuoso</a> storage patch from
+<a href="http://bugs.librdf.org/mantis/view.php?id=284">Issue#0000284</a>
+by Patrick van Kleef with some parts omitted for passing through
+SPARQL queries that used rasqal internals.
+</p>
+
+
+<h3>Other changes</h3>
+
+<p>Export the list helper class to the public API, primarily for use
+by external storage modules.
+</p>
+
+<p><code>rdfproc</code> utility: for the 'parse' command, get the
+warning count from the warning_count_node, not the (just freed)
+error_count_node.</p>
+
+<p>Fix totally bogus memset in <code>librdf_cache_set_common()</code>
+that zeroed junk on the stack rather than the memory expected.
+</p>
+
 <h2 id="rel1_0_9"><a name="rel1_0_9">Redland 1.0.9 Changes</a></h2>
 
 <p>The main changes in this release are:</p>
