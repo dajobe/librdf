@@ -823,6 +823,8 @@ librdf_storage_virtuoso_init(librdf_storage* storage, const char *name, librdf_h
 
   int len=0;
 
+  storage->instance = context;
+
   /* Must have connection parameters passed as options */
   if(!options)
     return 1;
@@ -1281,7 +1283,7 @@ error:
 
 
 static int
-BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle, SQLUSMALLINT col, librdf_node *node, char **data, int *iData, SQLLEN *ind1, SQLLEN *ind2, SQLLEN *ind3)
+BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle, SQLUSMALLINT col, librdf_node *node, char **data, long *iData, SQLLEN *ind1, SQLLEN *ind2, SQLLEN *ind3)
 {
   librdf_node_type type=librdf_node_get_type(node);
   SQLUINTEGER ulen;
@@ -1424,7 +1426,7 @@ librdf_storage_virtuoso_context_add_statement_helper(librdf_storage* storage, li
   librdf_node* nobject=NULL;
   SQLLEN ind, ind1, ind2;
   SQLLEN ind31, ind32, ind33;
-  int iData;
+  long iData;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_storage_virtuoso_context_add_statement_helper \n");
@@ -1675,7 +1677,7 @@ librdf_storage_virtuoso_context_remove_statement(librdf_storage* storage, librdf
   librdf_node* nobject=NULL;
   SQLLEN ind, ind1, ind2;
   SQLLEN ind31, ind32, ind33;
-  int iData;
+  long iData;
 
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
