@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2000-2008 David Beckett http://www.dajobe.org/
+# Copyright (C) 2000-2009 David Beckett http://www.dajobe.org/
 # Copyright (C) 2000-2004 University of Bristol, UK http://www.bristol.ac.uk/
 # 
 # This package is Free Software and part of Redland http://librdf.org/
@@ -20,32 +20,24 @@
 # 
 #
 
-prefix=@prefix@
-datarootdir=@datarootdir@
-exec_prefix=@exec_prefix@
-
-if test "@includedir@" != /usr/include ; then
-  includes="-I@includedir@"
-else
-  includes=
-fi
-
+PACKAGE=@PACKAGE@
+PKGCONFIG=pkg-config
 
 usage()
 {
 	cat<<EOF
-Usage: redland-config [OPTION]
+Usage: $PACKAGE-config [OPTION]
 
-known values for OPTION are:
+Known values for OPTION are:
 
-  --prefix[=DIR]        change redland prefix [default $prefix]
-
-  --cflags              print pre-processor and compiler flags
-  --help                display this help and exit
+  --prefix              print installation prefix path
+  --prefix=DIR          IGNORED
   --libs                print library linking information
-  --libtool-libs        print linking information for use with libtool
+  --libtool-libs        IGNORED
   --private-libs        print library private/static linking information
   --swig                display the SWIG interface file
+  --cflags		print pre-processor and compiler flags
+  --help                display this help and exit
   --version             output version information
   --version-decimal     output version as a decimal integer
 EOF
@@ -58,6 +50,14 @@ if test $# -eq 0; then
 fi
 
 
+if $PKGCONFIG $PACKAGE --exists; then
+  : # exists
+else
+  echo "$0: $PKGCONFIG does not know about package $PACKAGE"
+  exit 1
+fi
+
+args=""
 while test $# -gt 0; do
   case "$1" in
     -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
@@ -65,76 +65,50 @@ while test $# -gt 0; do
   esac
 
   case $1 in
-    --prefix=*)
-        prefix=$optarg
-        ;;
-
-    --prefix)
-      echo_prefix=yes
-      ;;
-
-    --version)
-      echo @VERSION@
-      exit 0
-      ;;
-
-    --version-decimal)
-      echo @LIBRDF_VERSION_DECIMAL@
-      exit 0
-      ;;
-
-    --cflags)
-      echo_cflags=yes
-      ;;
-
-    --libs)
-      echo_libs=yes
-      ;;
-
-    --libtool-libs)
-      echo_libtool_libs=yes
-      ;;
-
-    --private-libs)
-      echo_private_libs=yes
-      ;;
-
-    --swig)
-      echo_swig=yes
-      ;;
-
+# GNU standards require this
     --help|--usage)
       usage 0
       ;;
-    *)
-      usage 1 1>&2
+# Ignored options
+    --libtool-libs|--prefix=*)
+      echo "$0: $1 option ignored" 1>&2
+      ;;
+# Altered options
+    --prefix)
+      args="$args --variable=prefix";
+      ;;
+    --swig)
+      args="$args --variable=swig";
+      ;;
+    --version)
+      args="$args --modversion";
+      ;;
+    --private-libs)
+      args="$args --static --libs";
+      ;;
+# Computed here
+    --version-decimal)
+      version=`$PKGCONFIG $PACKAGE --modversion`
+      version_dec=0
+      for multiplier in 10000 100 1; do
+        version_part=`echo $version | sed -e 's/\..*$//'`
+        version_dec=`expr $multiplier \* $version_part + $version_dec`
+	if [ $version = $version_part ]; then
+          version=0
+        else
+          version=`echo $version | sed -e 's/^[^.]*\.//'`
+        fi
+      done
+      echo $version_dec
+      exit 0
+      ;;
+# Other options are passed through
+      *)
+      args="$args $1"
       ;;
   esac
 
   shift
 done
-  
 
-if test "$echo_prefix" = "yes"; then
-  echo $prefix
-fi
-
-if test "$echo_cflags" = "yes"; then
-  echo $includes @LIBRDF_EXTERNAL_CPPFLAGS@
-fi
-
-if test "$echo_libs" = "yes"; then
-  echo -L@libdir@ -lrdf
-fi
-
-if test "$echo_libtool_libs" = "yes"; then
-  echo @libdir@/@LIBRDF_LIBTOOLLIBS@
-fi
-
-if test "$echo_private_libs" = "yes"; then
-  echo @LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@
-fi
-
-if test "$echo_swig" = "yes"; then  
-  echo @datadir@/@PACKAGE@/Redland.i
-fi
+$PKGCONFIG $PACKAGE $args
