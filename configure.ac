@@ -498,10 +498,6 @@ else
   AC_MSG_ERROR(Installed rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
 fi
 
-if $PKG_CONFIG rasqal --atleast-version=0.9.17; then
-  AC_DEFINE(RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION, 1, [Rasqal triple source structures have an API version])
-fi
-
 LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG rasqal --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
 LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG rasqal --libs` $LIBRDF_EXTERNAL_LIBS"
 
