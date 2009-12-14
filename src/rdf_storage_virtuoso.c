@@ -6,7 +6,7 @@
  *
  * Based in part on rdf_storage_mysql
  *
- * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2009, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  *
  * This package is Free Software and part of Redland http://librdf.org/
@@ -434,7 +434,7 @@ rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle, sh
 	break;
 
     default:
-	return NULL; /***printf("*unexpected result type %d*", dtp);***/
+	return NULL; /* printf("*unexpected result type %d*", dtp); */
   }
 
   return node;
@@ -799,7 +799,7 @@ librdf_storage_virtuoso_release_handle(librdf_storage* storage, librdf_storage_v
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_init:
  * @storage: the storage
  * @name: model name
@@ -931,7 +931,7 @@ librdf_storage_virtuoso_init(librdf_storage* storage, const char *name, librdf_h
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_terminate:
  * @storage: the storage
  *
@@ -989,7 +989,7 @@ librdf_storage_virtuoso_terminate(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_open:
  * @storage: the storage
  * @model: the model
@@ -1010,7 +1010,7 @@ librdf_storage_virtuoso_open(librdf_storage* storage, librdf_model* model)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_close:
  * @storage: the storage
  *
@@ -1033,7 +1033,7 @@ librdf_storage_virtuoso_close(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_sync:
  * @storage: the storage
  *
@@ -1058,7 +1058,7 @@ librdf_storage_virtuoso_sync(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_size:
  * @storage: the storage
  *
@@ -1130,8 +1130,8 @@ librdf_storage_virtuoso_add_statement(librdf_storage* storage, librdf_statement*
 }
 
 
-/**
- * librdf_storage_postgresql_context_add_statement - Add a statement to a storage context
+/*
+ * librdf_storage_virtuoso_context_add_statement - Add a statement to a storage context
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
  * @statement: #librdf_statement statement to add
@@ -1148,7 +1148,7 @@ librdf_storage_virtuoso_context_add_statement(librdf_storage* storage, librdf_no
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_add_statements:
  * @storage: the storage
  * @statement_stream: the stream of statements
@@ -1178,7 +1178,7 @@ librdf_storage_virtuoso_add_statements(librdf_storage* storage, librdf_stream* s
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_context_add_statements:
  * @storage: the storage
  * @statement_stream: the stream of statements
@@ -1523,7 +1523,7 @@ librdf_storage_virtuoso_stop_bulk(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_contains_statement:
  * @storage: the storage
  * @statement: a complete statement
@@ -1539,7 +1539,7 @@ librdf_storage_virtuoso_contains_statement(librdf_storage* storage, librdf_state
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_contains_statement:
  * @storage: the storage
  * @statement: a complete statement
@@ -1632,7 +1632,7 @@ end:
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_remove_statement:
  * @storage: #librdf_storage object
  * @statement: #librdf_statement statement to remove
@@ -1648,7 +1648,7 @@ librdf_storage_virtuoso_remove_statement(librdf_storage* storage, librdf_stateme
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_context_remove_statement - Remove a statement from a storage context
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
@@ -1794,7 +1794,7 @@ end:
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_context_remove_statements - Remove all statement from a storage context
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
@@ -1861,7 +1861,7 @@ end:
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_serialise - Return a stream of all statements in a storage
  * @storage: the storage
  *
@@ -1881,7 +1881,7 @@ librdf_storage_virtuoso_serialise(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_context_serialise - List all statements in a storage context
  * @storage: #librdf_storage object
  * @context_node: #librdf_node object
@@ -1902,7 +1902,7 @@ static int librdf_storage_virtuoso_find_statements_in_context_next_statement(voi
 static void* librdf_storage_virtuoso_find_statements_in_context_get_statement(void* context, int flags);
 static void librdf_storage_virtuoso_find_statements_in_context_finished(void* context);
 
-/**
+/*
  * librdf_storage_virtuoso_find_statements - Find a graph of statements in storage.
  * @storage: the storage
  * @statement: the statement to match
@@ -1925,7 +1925,7 @@ librdf_storage_virtuoso_find_statements(librdf_storage* storage, librdf_statemen
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_find_statements_in_context - Find a graph of statements in a storage context.
  * @storage: the storage
  * @statement: the statement to match
@@ -2075,7 +2075,7 @@ end:
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_find_statements_with_options - Find a graph of statements in a storage context with options.
  * @storage: the storage
  * @statement: the statement to match
@@ -2314,7 +2314,7 @@ static int librdf_storage_virtuoso_get_contexts_next_context(void* context);
 static void* librdf_storage_virtuoso_get_contexts_get_context(void* context, int flags);
 static void librdf_storage_virtuoso_get_contexts_finished(void* context);
 
-/**
+/*
  * librdf_storage_virtuoso_get_contexts:
  * @storage: the storage
  *
@@ -2470,7 +2470,7 @@ librdf_storage_virtuoso_get_contexts_finished(void* context)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_transaction_start:
  * @storage: the storage object
  *
@@ -2509,7 +2509,7 @@ librdf_storage_virtuoso_transaction_start(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_transaction_start_with_handle:
  * @storage: the storage object
  * @handle: the transaction object
@@ -2528,7 +2528,7 @@ librdf_storage_virtuoso_transaction_start_with_handle(librdf_storage* storage, v
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_transaction_commit:
  * @storage: the storage object
  *
@@ -2560,7 +2560,7 @@ librdf_storage_virtuoso_transaction_commit(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_transaction_rollback:
  * @storage: the storage object
  *
@@ -2592,7 +2592,7 @@ librdf_storage_virtuoso_transaction_rollback(librdf_storage* storage)
 }
 
 
-/**
+/*
  * librdf_storage_virtuoso_transaction_get_handle:
  * @storage: the storage object
  *
@@ -2649,7 +2649,7 @@ librdf_storage_virtuoso_register_factory(librdf_storage_factory *factory)
 
 #ifdef MODULAR_LIBRDF
 
-/** Entry point for dynamically loaded storage module */
+/* Entry point for dynamically loaded storage module */
 void
 librdf_storage_module_register_factory(librdf_world *world)
 {
@@ -2660,7 +2660,7 @@ librdf_storage_module_register_factory(librdf_world *world)
 
 #else
 
-/**
+/*
  * librdf_init_storage_virtuoso:
  * @world: world object
  * 
