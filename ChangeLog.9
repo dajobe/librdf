@@ -1,0 +1,793 @@
+2008-12-01  Dave Beckett <dave@dajobe.org>
+
+	* docs/redland-docs.xml: 2008
+
+2008-11-22  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_node.c: (librdf_new_node_from_blank_identifier):
+	Fixed a read memory after free bug.
+	Fixes Issue #0000283 http://bugs.librdf.org/mantis/view.php?id=283
+
+	* docs/redland-chapter-objects.xml,
+	docs/redland-chapter-storage-modules.xml, docs/storage.html:
+	Documentation fixes from
+	Issue #0000282 http://bugs.librdf.org/mantis/view.php?id=282 
+
+	* librdf/Makefile.am, librdf/rdf_storage.c,
+	librdf/rdf_storage_file.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_list.c, librdf/rdf_storage_trees.c: Fixes to
+	modular storages to get "make check" pass before install.
+
+	"memory", "hashes", "trees", "file", "uri" storages now always
+	built-in regardless of MODULAR_LIBRDF. Not building them as
+	storage modules and removed the storage module entry point as
+	unnecessary.
+	(ltdl_module_callback): Check that storage module file name
+	contains the string "librdf_storage" to prevent lots of module
+	loading failure messages.
+	(librdf_memstr): Pulled helper function from raptor_memstr.c.
+	(librdf_storage_load_all_modules): Added logic for figuring out a
+	reasonable module path. Uses REDLAND_MODULE_PATH environment
+	variable if defined. If env var defined but empty, uses libtool
+	defaults (used in local "make check" tests through
+	TESTS_ENVIRONMENT). If env var not defined, use the install target
+	dir.
+	(librdf_storage_load_module): Fixed compiler warning about
+	shadowing world variable.
+
+2008-11-21  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage.c,
+	librdf/rdf_storage.h: (librdf_storage_get_world): New API function
+	for accessing the librdf_world associated with a storage. Required
+	e.g. by storage modules not build with LIBRDF_INTERNAL.
+
+	* librdf/rdf_iterator.h, librdf/rdf_iterator_internal.h,
+	librdf/rdf_stream.h, librdf/rdf_stream_internal.h: Moved
+	iterator/stream get_method flags to public API. They are required
+	e.g. for storage modules not built with LIBRDF_INTERNAL.
+
+2008-11-20  Dave Robillard <dave@drobilla.net>
+
+	* librdf/rdf_storage.c:
+	(librdf_storage_get_instance): Fix documentation.
+
+2008-11-20  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage.c:
+	(librdf_new_storage_from_factory): Fixed double deletion. storage
+	init() always takes ownership of the options hash.
+
+2008-11-18  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_query_results.c:
+	(librdf_query_results_get_bindings): Fixed docs.
+
+	* librdf/rdf_query.c:
+	(main): Fixed rdf_query_test. Do not assume get_bindings returns
+	bindings_count names in a NULL-terminated array (current rasqal
+	HEAD returns all variables, not just bindings; array not NULL
+	terminated)
+
+2008-11-14  Dave Robillard <dave@drobilla.net>
+
+	* librdf/Makefile.am, librdf/librdf_storage_module.h,
+	librdf/rdf_storage.h, librdf/rdf_storage_internal.h,
+	librdf/rdf_storage_module.h (from
+	/librdf/trunk/librdf/librdf_storage_module.h:14904):
+	Publicly install storage module interface
+	redland/rdf_storage_module.h.
+
+	* librdf/librdf_storage_module.h (from
+	/librdf/trunk/librdf/rdf_storage_factory.h:14903),
+	librdf/rdf_storage_factory.h, librdf/rdf_storage_internal.h:
+	Give storage module interface header a more standalone-sensible
+	name. External projects should now be able to implement this
+	header and install a module to PREFIX/lib/redland and be
+	discovered/used by redland at runtime.
+
+	* librdf/rdf_storage_factory.h: Document discovery mechanism in
+	rdf_storage_factory.h
+
+	* configure.ac: Make modular backends the default.
+
+	* librdf/rdf_storage_file.c, librdf/rdf_storage_mysql.c:
+	Fix forward declarations.
+
+	* configure.ac, librdf/Makefile.am, librdf/rdf_internal.h,
+	librdf/rdf_storage.c, librdf/rdf_storage_file.c,
+	librdf/rdf_storage_hashes.c, librdf/rdf_storage_list.c,
+	librdf/rdf_storage_mysql.c, librdf/rdf_storage_postgresql.c,
+	librdf/rdf_storage_sqlite.c, librdf/rdf_storage_trees.c,
+	librdf/rdf_storage_tstore.c:
+	Dynamically discover storage backends at runtime. 
+
+	* librdf/rdf_storage.c, librdf/rdf_storage_file.c,
+	librdf/rdf_storage_hashes.c, librdf/rdf_storage_list.c,
+	librdf/rdf_storage_mysql.c, librdf/rdf_storage_postgresql.c,
+	librdf/rdf_storage_sqlite.c, librdf/rdf_storage_trees.c,
+	librdf/rdf_storage_tstore.c:
+	Make storages clean up after themselves.
+
+	* librdf/rdf_storage_hashes.c: Oops:
+	(librdf_storage_hashes_clone): Remove debug printf.
+
+	* librdf/rdf_storage.c, librdf/rdf_storage.h,
+	librdf/rdf_storage_factory.h, librdf/rdf_storage_file.c,
+	librdf/rdf_storage_hashes.c, librdf/rdf_storage_internal.h,
+	librdf/rdf_storage_list.c, librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_postgresql.c, librdf/rdf_storage_sqlite.c,
+	librdf/rdf_storage_trees.c:
+	What was called the storage "context" is now less confusingly
+	called the storage "instance".
+	Make the storage instance opaque to librdf.
+	Remove context_length from librdf_storage_factory interface
+	(abstraction violation).
+	Add instance getter/setter method to librdf_storage so storages
+	can be implemented without access to internals.
+	Rework existing storages to use the above scheme.
+
+	* librdf/rdf_storage_factory.h, librdf/rdf_storage_file.c,
+	librdf/rdf_storage_internal.h: Separate storage "factory"
+	interface from storage internals.
+
+	* librdf/rdf_init_internal.h: Revert previous commit (unnecessary).
+
+	* librdf/rdf_init_internal.h: Forward declare raptor_world if necessary.
+
+2008-10-16  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_files.c, librdf/rdf_init.c, librdf/rdf_iterator.c,
+	librdf/rdf_model.c, librdf/rdf_parser.c, librdf/rdf_serializer.c,
+	librdf/rdf_storage.c: Wrapped deprecated function definitions in
+	#ifndef REDLAND_DISABLE_DEPRECATED ... #endif
+
+2008-10-13  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_init.c, librdf/rdf_raptor.c,
+	librdf/rdf_raptor_internal.h:
+	(librdf_world_open,librdf_init_raptor): Changed
+	librdf_init_raptor() to not return anything and abort() on failure
+	to be consistent with error handling in other librdf init
+	functions. 
+
+2008-10-09  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_log.c, librdf/rdf_log.h,
+	librdf/rdf_log_internal.h:
+	(librdf_log,librdf_log_simple): Pulled librdf_log(),
+	librdf_log_simple() from library internals to API so that
+	e.g. external storage modules can log messages.
+
+	* librdf/Makefile.am, librdf/librdf.h, librdf/rdf_init.c,
+	librdf/rdf_init_internal.h, librdf/rdf_log.c, librdf/rdf_model.c,
+	librdf/rdf_parser.c, librdf/rdf_parser.h,
+	librdf/rdf_parser_raptor.c, librdf/rdf_query_rasqal.c,
+	librdf/rdf_raptor.c, librdf/rdf_raptor.h,
+	librdf/rdf_raptor_internal.h, librdf/rdf_serializer_raptor.c,
+	librdf/rdf_storage_sql.c, utils/rdfproc.c: Refactored librdf to
+	use Raptor v2 APIs if available. Flagged with RAPTOR_V2_AVAILABLE.
+
+	Pulled Raptor init/finish and librdf_uri adaptation code from
+	rdf_parser_raptor to a new rdf_raptor module.
+
+	API/ABI break:
+	(librdf_parser_guess_name): API function now requires a
+	librdf_world param.
+
+	Other API changes:
+	(librdf_world_get_raptor,librdf_world_set_raptor): New API functions.
+
+	Other changes:
+	(librdf_init_raptor,librdf_finish_raptor): New internal functions.
+	(librdf_free_world,librdf_world_open): Use
+	librdf_init_raptor(),librdf_finish_raptor(). Removed outdated
+	comments related to raptor init order.
+	(librdf_world_s): Internal struct gains raptor_world_ptr,
+	raptor_world_allocated_here.
+	(librdf_query_rasqal_constructor): Use rasqal_world_set_raptor()
+	to set the raptor library instance before rasqal_world_open().
+	(log_handler): Pass librdf_world to rdfproc log handler in
+	user_data.
+
+2008-09-30  Dave Robillard <dave@drobilla.net>
+
+	* librdf/rdf_avltree.c: 'Fix' entirely irrelevant preprocessor
+	macro, again.
+
+	* librdf/rdf_avltree.c: Everyone's a critic.
+
+	* librdf/rdf_avltree.c: Fix typo.
+
+2008-09-29  Dave Robillard <dave@drobilla.net>
+
+	* librdf/rdf_parser_raptor.c, librdf/rdf_storage_trees.c: Revert
+	warning removal from r14573.  Make trees storage only return
+	failure on actual failure (not when triple already exists), like
+	other storages.
+
+	* librdf/rdf_internal.h: Revert accidentally committed change to
+	LIBRDF_ASSERT_DIE.
+
+	* librdf/rdf_internal.h, librdf/rdf_parser_raptor.c:
+	(librdf_parser_raptor_new_statement_handler): Remove unnecessary
+	"fatal" error message when encountering duplicate triples.
+
+	* librdf/rdf_avltree.c: Fix test case (last commit) to be
+	correct (previous commit failed falsely, test now exposes segfault
+	bug).
+	(librdf_avltree_delete_internal): update parent pointers when
+	deleting (courtesy Aymeric Barthe).
+
+	* librdf/Makefile.am, librdf/rdf_avltree.c: Fix compilation of
+	rdf_avltree_test. Change elements deleted in rdf_avl_tree_test to
+	cause failure and expose bug.
+
+2008-09-22  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_get_next_common): Do not leak context
+	nodes.
+
+2008-09-08  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/librdf.h, librdf/rdf_internal.h: Moved EXTERN_C
+	definitions to internal header - no need to expose in API.
+
+	* librdf/librdf.h, librdf/rdf_hash.c, librdf/rdf_iterator.c,
+	librdf/rdf_list.c, librdf/rdf_model.c, librdf/rdf_parser.c,
+	librdf/rdf_query.c, librdf/rdf_serializer.c, librdf/rdf_storage.c,
+	librdf/rdf_stream.c: Workaround for an armcc c++ mode issue
+	regarding function pointers as arguments: Need explicit extern "C"
+	to get C linkage for C function pointers.
+
+2008-09-07  Dave Beckett <dave@dajobe.org>
+
+	* redland-config.1: manpage .l is bad
+
+2008-09-06  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_cache.c: (main): Cast for c++
+
+2008-09-05  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_cache.c, librdf/rdf_concepts.c: Casts for g++ from
+	Issue#0000272 http://bugs.librdf.org/mantis/view.php?id=272
+
+2008-08-12  Lauri Aalto <laalto@iki.fi>
+
+	* examples/example5.c: Switch query_string,base_uri to correct
+	order in example5
+
+2008-08-11  Dave Beckett <dave@dajobe.org>
+
+	* Makefile.am: Remove raptor and rasqal subdir possibilities
+
+	* configure.ac: Use pkg-config to find raptor and rasqal unless in
+	maintainer mode in which case --with-raptor / --with-rasqal allows
+	a choice of system or sibling dirs ../raptor and ../rasqal
+
+	* redland-src-config.in: prefer pkg-config raptor and adjust src
+	dirs to be siblings of this, not children
+
+2008-08-09  Dave Beckett <dave@dajobe.org>
+
+	* INSTALL.html: Note how to build examples on cygwin.
+	FIxes Issue#0000267
+
+	* examples/Makefile.am: Add EXE suffix to
+
+	* examples/example7.c: Return from main
+
+	* examples/example6.c: Casts
+
+	* examples/example5.c: Casts
+
+	* examples/example4.c: Replace use of deprecated
+	librdf_serializer_serialize_model() with
+	librdf_serializer_serialize_model_to_file_handle()
+
+2008-08-07  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_transaction_start): Prevent deadlocks with
+	BEGIN IMMEDIATE instead of the default BEGIN DEFERRED. Set
+	in_transaction flag only if the SQL exec returns success.
+
+	(librdf_storage_sqlite_transaction_commit,
+	librdf_storage_sqlite_transaction_rollback): Clear in_transaction
+	flag only if the SQL exec returns success. Added missing semicolon
+	to END.
+
+2008-07-17  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_cache.c:
+	(librdf_cache_cleanup): Adjust usage after cache cleanup by
+	largest ejected node usage count seen.
+
+	* librdf/rdf_cache.c: If capacity is 0, handle a cache that grows
+	and dynamically allocate the nodes.
+	(main): Update tests to try this.
+
+	* librdf/rdf_cache.c: autodocs
+
+	* librdf/rdf_cache.c: tidy WITH_THREADS code
+
+	* librdf/rdf_cache.c: DEFAULT_FLUSH_PERCENT 20 is more realistic
+
+	* librdf/Makefile.am: Add rdf_cache_test to tests
+
+	* librdf/rdf_cache.c: (librdf_hist_node_compare): Invert order to
+	eject low use objects.
+	(main): Update tests
+
+2008-07-16  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_cache.c: (librdf_cache_delete): Adjust size.
+
+	* librdf/rdf_cache.c: (librdf_cache_cleanup): Sort hists array not
+	hists array pointer
+
+	* librdf/rdf_cache.c: (librdf_hist_node_compare): Try to fix compare
+
+	* librdf/rdf_cache.c: small cache for testing
+
+	* librdf/rdf_cache.c: tests pass
+
+	* librdf/rdf_cache.c, librdf/rdf_cache.h: Initial object cache
+	impl - tests fail
+
+	* librdf/Makefile.am: Add rdf_cache_test
+
+	* librdf/rdf_internal.h: Add rdf_cache.h
+
+	* librdf/Makefile.am: Added rdf_cache.c rdf_cache.h
+
+	* librdf/rdf_cache.c (from /librdf/trunk/librdf/rdf_uri.c:14278),
+	librdf/rdf_cache.h (from /librdf/trunk/librdf/rdf_uri.h:14278):
+	Copy rdf_uri* to rdf_cache.[ch]
+
+2008-07-05  Dave Beckett <dave@dajobe.org>
+
+	* docs/tmpl/concepts.sgml, docs/tmpl/parser.sgml: tmpl docs
+
+2008-07-05  Dave Beckett  <dave@dajobe.org>
+
+	* Snapshotted redland_1_0_8 for 1.0.8 release (SVN 14222)
+
+2008-07-04  Dave Beckett <dave@dajobe.org>
+
+	* /librdf/trunk, librdf: props
+
+	* librdf/rdf_log.c: (librdf_log_simple): Do not format and print
+	locator string if raptor_format_locator() returns an error (or 0)
+	when getting the locator string length.
+
+2008-07-04  Dave Beckett <dave@dajobe.org>
+
+	* redland.pc.in: Add swig variable
+
+2008-07-03  Dave Beckett <dave@dajobe.org>
+
+	* Makefile.am: re-order pkgconfig
+
+	* Makefile.am, configure.ac, librdf/Makefile.am,
+	librdf/redland.pc.in, redland.pc.in (from
+	/librdf/trunk/librdf/redland.pc.in:14197): Move redland.pc to root
+	dir
+
+	* RELEASE.html: deprecate redland-config
+
+	* configure.ac: RAPTOR_MIN_VERSION now 1.4.17 to match rasqal
+
+	* configure.ac: Add another way to find berkeleydb / sleepycatdb
+	with libs in subdirs named after major versions
+
+2008-07-02  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_storage_mysql.c:
+	(librdf_storage_mysql_node_hash_common): Init some variables to
+	NULL to prevent GCC warnings
+
+2008-07-01  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage_sql_test.c: Fixed file name in boilerplate
+	comments
+
+2008-06-30  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_parser.h: Make
+	librdf_parser_parse_file_handle_as_stream arg be fh to match docs.
+
+	* librdf/rdf_parser.h: Make
+	librdf_parser_parse_file_handle_into_model arg be fh to match
+	docs.
+
+	* docs/redland-sections.txt: Added
+	librdf_get_concept_ms_namespace,
+	librdf_get_concept_schema_namespace,
+	librdf_parser_parse_file_handle_as_stream and
+	librdf_parser_parse_file_handle_into_model
+
+	* docs/Makefile.am: Exclude rdf_avltree_internal.h
+
+	* librdf/Makefile.am, librdf/rdf_avltree.c, librdf/rdf_avltree.h,
+	librdf/rdf_avltree_internal.h: Rename rdf_avltree.h to
+	rdf_avltree_internal.h
+
+	* librdf/rdf_storage_mysql.c: (librdf_storage_mysql_get_handle):
+	Use HAVE_MYSQL_OPT_RECONNECT to known when to apply reconnections
+	Fixes Issue#0000256 http://bugs.librdf.org/mantis/view.php?id=256
+
+	* configure.ac: Update checks for programs to use AC_PROG_CC and
+	AM_PROG_CC_C_O
+	Add a compile test for MYSQL_OPT_RECONNECT since newer mysql versions
+	have it as an enum, not a macro.
+	Fixes Issue#0000256 http://bugs.librdf.org/mantis/view.php?id=256
+
+	* redland-config.in: Add datarootdir
+
+	* Redland.i, FAQS.html, INSTALL.html, LICENSE.html, NEWS.html,
+	README.html, RELEASE.html, TODO.html, redland-config.1,
+	redland-config.in, redland-src-config.in, redland.rdf.in,
+	demos/demo.pl, demos/ntriples.pl, demos/parser-tests.pl,
+	demos/rss-show.pl, examples/example1.c, examples/example2.c,
+	examples/example3.c, examples/example4.c, examples/example5.c,
+	examples/example6.c, examples/example7.c, examples/redland_dbus.c,
+	examples/rss2ical.c, librdf/librdf.h, librdf/rdf_concepts.c,
+	librdf/rdf_concepts.h, librdf/rdf_concepts_internal.h,
+	librdf/rdf_digest.c, librdf/rdf_digest.h,
+	librdf/rdf_digest_internal.h, librdf/rdf_digest_md5.c,
+	librdf/rdf_digest_openssl.c, librdf/rdf_digest_sha1.c,
+	librdf/rdf_files.c, librdf/rdf_files.h, librdf/rdf_hash.c,
+	librdf/rdf_hash.h, librdf/rdf_hash_bdb.c,
+	librdf/rdf_hash_cursor.c, librdf/rdf_hash_internal.h,
+	librdf/rdf_hash_memory.c, librdf/rdf_heuristics.c,
+	librdf/rdf_heuristics.h, librdf/rdf_init.c, librdf/rdf_init.h,
+	librdf/rdf_init_internal.h, librdf/rdf_internal.h,
+	librdf/rdf_iterator.c, librdf/rdf_iterator.h,
+	librdf/rdf_iterator_internal.h, librdf/rdf_list.c,
+	librdf/rdf_list.h, librdf/rdf_list_internal.h, librdf/rdf_log.c,
+	librdf/rdf_log.h, librdf/rdf_log_internal.h, librdf/rdf_model.c,
+	librdf/rdf_model.h, librdf/rdf_model_internal.h,
+	librdf/rdf_model_storage.c, librdf/rdf_node.c, librdf/rdf_node.h,
+	librdf/rdf_node_internal.h, librdf/rdf_parser.c,
+	librdf/rdf_parser.h, librdf/rdf_parser_internal.h,
+	librdf/rdf_parser_raptor.c, librdf/rdf_query.c,
+	librdf/rdf_query.h, librdf/rdf_query_internal.h,
+	librdf/rdf_query_rasqal.c, librdf/rdf_query_results.c,
+	librdf/rdf_query_triples.c, librdf/rdf_serializer.c,
+	librdf/rdf_serializer.h, librdf/rdf_serializer_internal.h,
+	librdf/rdf_serializer_raptor.c, librdf/rdf_statement.c,
+	librdf/rdf_statement.h, librdf/rdf_statement_internal.h,
+	librdf/rdf_storage.c, librdf/rdf_storage.h,
+	librdf/rdf_storage_file.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_internal.h, librdf/rdf_storage_list.c,
+	librdf/rdf_storage_mysql.c, librdf/rdf_storage_postgresql.c,
+	librdf/rdf_storage_sql.c, librdf/rdf_storage_sql_test.c,
+	librdf/rdf_storage_sqlite.c, librdf/rdf_storage_trees.c,
+	librdf/rdf_storage_tstore.c, librdf/rdf_stream.c,
+	librdf/rdf_stream.h, librdf/rdf_stream_internal.h,
+	librdf/rdf_types.h, librdf/rdf_uri.c, librdf/rdf_uri.h,
+	librdf/rdf_uri_internal.h, librdf/rdf_utf8.c, librdf/rdf_utf8.h,
+	librdf/redland.h, librdf/win32_rdf_config.h: 2008
+
+	* examples/Makefile.am, utils/db_upgrade.c, utils/rdfproc.1,
+	Redland.i, data/Makefile.am, demos/demo.pl, demos/ntriples.pl,
+	demos/parser-tests.pl, examples/example1.c, examples/example3.c,
+	examples/example4.c, examples/example5.c, examples/example6.c,
+	examples/example7.c, librdf/Makefile.am, librdf/librdf.h,
+	librdf/rdf_concepts.c, librdf/rdf_concepts.h,
+	librdf/rdf_concepts_internal.h, librdf/rdf_digest.c,
+	librdf/rdf_digest.h, librdf/rdf_digest_internal.h,
+	librdf/rdf_digest_md5.c, librdf/rdf_digest_openssl.c,
+	librdf/rdf_digest_sha1.c, librdf/rdf_files.c, librdf/rdf_files.h,
+	librdf/rdf_hash.c, librdf/rdf_hash.h, librdf/rdf_hash_bdb.c,
+	librdf/rdf_hash_cursor.c, librdf/rdf_hash_internal.h,
+	librdf/rdf_hash_memory.c, librdf/rdf_heuristics.c,
+	librdf/rdf_heuristics.h, librdf/rdf_init.h,
+	librdf/rdf_init_internal.h, librdf/rdf_internal.h,
+	librdf/rdf_iterator.c, librdf/rdf_iterator.h,
+	librdf/rdf_iterator_internal.h, librdf/rdf_list.c,
+	librdf/rdf_list.h, librdf/rdf_list_internal.h, librdf/rdf_log.c,
+	librdf/rdf_log.h, librdf/rdf_log_internal.h, librdf/rdf_model.c,
+	librdf/rdf_model.h, librdf/rdf_model_internal.h,
+	librdf/rdf_model_storage.c, librdf/rdf_node.c, librdf/rdf_node.h,
+	librdf/rdf_node_internal.h, librdf/rdf_parser.c,
+	librdf/rdf_parser.h, librdf/rdf_parser_internal.h,
+	librdf/rdf_parser_raptor.c, librdf/rdf_query.c,
+	librdf/rdf_query.h, librdf/rdf_query_internal.h,
+	librdf/rdf_query_rasqal.c, librdf/rdf_query_results.c,
+	librdf/rdf_query_triples.c, librdf/rdf_serializer.c,
+	librdf/rdf_serializer.h, librdf/rdf_serializer_internal.h,
+	librdf/rdf_serializer_raptor.c, librdf/rdf_statement.c,
+	librdf/rdf_statement.h, librdf/rdf_statement_internal.h,
+	librdf/rdf_storage.c, librdf/rdf_storage.h,
+	librdf/rdf_storage_file.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_internal.h, librdf/rdf_storage_list.c,
+	librdf/rdf_storage_mysql.c, librdf/rdf_storage_postgresql.c,
+	librdf/rdf_storage_sql.c, librdf/rdf_storage_sql_test.c,
+	librdf/rdf_storage_sqlite.c, librdf/rdf_storage_trees.c,
+	librdf/rdf_storage_tstore.c, librdf/rdf_stream.c,
+	librdf/rdf_stream.h, librdf/rdf_stream_internal.h,
+	librdf/rdf_types.h, librdf/rdf_uri.c, librdf/rdf_uri.h,
+	librdf/rdf_uri_internal.h, librdf/rdf_utf8.c, librdf/rdf_utf8.h,
+	librdf/redland.h, redland-config.in, utils/getopt.c,
+	utils/rdfproc.c, utils/rdfproc_getopt.h,
+	utils/redland-db-upgrade.1: Remove old CVS Id: from sources
+
+	* configure.ac: boost RASQAL_MAX_VERSION to 0.9.99 to allow for
+	future compatible versions
+
+2008-06-22  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_query_rasqal.c: (rasqal_literal_to_redland_node):
+	RASQAL_LITERAL_FLOATING removed from Rasqal API in r14084,
+	replaced with RASQAL_LITERAL_DOUBLE.
+
+	* librdf/rdf_parser_raptor.c: indent tabs->spaces
+
+2008-06-20  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c:
+	(librdf_parser_raptor_parse_file_handle_as_stream): Take a
+	close_fh flag, remove world arg to match factory method.  Use
+	world from parser object.
+	(librdf_parser_raptor_parse_into_model_common): Renamed from
+	librdf_parser_raptor_parse_uri_into_model_common and also take a
+	FILE* to use if URI and string are NULL.
+	(librdf_parser_raptor_parse_file_handle_into_model): Added
+	(librdf_parser_raptor_parse_counted_string_into_model): Use
+	librdf_parser_raptor_parse_into_model_common
+	(librdf_parser_raptor_register_factory): Register
+	librdf_parser_raptor_parse_file_handle_as_stream and
+	librdf_parser_raptor_parse_file_handle_into_model
+
+	* librdf/rdf_parser.c: (librdf_parser_parse_file_handle_as_stream,
+	librdf_parser_parse_file_handle_into_model): Added.
+
+	* librdf/rdf_parser_internal.h: struct librdf_parser_factory_s
+	gains parse_file_handle_into_model and parse_file_handle_as_stream
+	methods
+
+	* librdf/rdf_parser.h: Added
+	librdf_parser_parse_file_handle_as_stream and
+	librdf_parser_parse_file_handle_into_model
+
+2008-06-15  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_concepts.c: (main):
+	librdf_get_concept_resource_by_index returns a librdf_node, not
+	librdf_uri
+
+	* librdf/rdf_storage_trees.c: (librdf_storage_trees_node_compare):
+	Use char* pointer subtraction.
+
+	* librdf/rdf_avltree.c: (librdf_avltree_dump): Use %zd for size_t
+	(librdf_avltree_print_node): Not need unless LIBRDF_DEBUG > 1
+	(librdf_avltree_node_rightmost): Not needed yet.
+
+	* librdf/rdf_storage_mysql.c:
+	(librdf_storage_mysql_node_hash_common): Init pointer datatype to
+	NULL [sparse]l
+
+	* librdf/rdf_storage_trees.c: (librdf_storage_trees_node_compare):
+	Try to avoid what gcc calls "potentially expensive pointer subtraction"
+	(librdf_statement_compare_spo, librdf_statement_compare_sop,
+	librdf_statement_compare_ops, librdf_statement_compare_pso,
+	librdf_storage_trees_avl_free): Declare static.
+
+	* librdf/rdf_avltree.c: (librdf_avltree_dump): Use %z for size_t
+	(librdf_avltree_check_node): Not need unless LIBRDF_DEBUG > 1
+	(librdf_avltree_node_prev): Not used yet
+
+	* librdf/rdf_hash_memory.c: (librdf_hash_memory_cursor_init):
+	Should be declared static. [sparse]
+
+	* librdf/rdf_node.c: (librdf_node_get_literal_value_datatype_uri):
+	Return NULL [sparse]
+
+	* configure.ac, librdf/rdf_types.h: Use autoconf 2.5.x
+	AC_CHECK_TYPES for byte u32 and u64
+
+2008-06-13  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_model.c: (librdf_model_add_statement): Remove
+	contains statement check since it is already part of the storage
+	add statement API and it can be expensive.
+
+2008-06-12  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c:
+	(librdf_raptor_new_uri_for_rdf_concept): Prevent use of NULL uri
+
+2008-06-11  Dave Beckett <dave@dajobe.org>
+
+	* librdf/Makefile.am: Add rdf_avltree.h to dist
+
+	* librdf/rdf_serializer_raptor.c:
+	(librdf_serializer_raptor_serialize_stream_to_counted_string):
+	Revert r13840: remove call to raptor_free_iostream() as
+	raptor_serialize_start has old (<1.4.18) semantics again.
+
+2008-06-10  Dave Beckett <dave@dajobe.org>
+
+	* examples/rss2atom.c: my ns
+
+	* examples/Makefile.am, examples/rss2atom.c: Added rss2atom example
+
+2008-05-21  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_iterator.c, librdf/rdf_iterator_internal.h,
+	librdf/rdf_stream.c, librdf/rdf_stream_internal.h: Allow
+	get_context calls in stream/iterator map functions. Use
+	is_updating flag to prevent infinite looping.
+	Originally reported in
+	http://lists.usefulinc.com/pipermail/redland-dev/2008-May/001756.html
+
+2008-05-19  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_model.c: (test_model_cloning): Use parametrized
+	storage type for message
+
+2008-05-19  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_model_storage.c:
+	(librdf_model_storage_find_statements_in_context): Added to use
+	storage factory method find_statements_in_context if it exists
+
+	* librdf/rdf_model.c: Get the storage parameters from envariables
+	for testing
+
+2008-05-06  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage.c: (librdf_init_storage): Do not init trees
+	storage unless STORAGE_TREES is defined.
+	(main): Do not test trees storage unless STORAGE_TREES is defined.
+
+	* librdf/rdf_stream.c: (librdf_stream_update_current_statement):
+	Fixed comment
+
+	* librdf/rdf_iterator.c: (librdf_iterator_update_current_element):
+	Fixed iterator map function callback
+	params. http://lists.usefulinc.com/pipermail/redland-dev/2008-May/001756.html
+
+	* librdf/rdf_serializer_raptor.c:
+	(librdf_serializer_raptor_serialize_stream_to_counted_string):
+	Memory leak fix - raptor_serializer does not take ownership of the
+	passed in raptor_iostream anymore after r13820
+
+	* librdf/rdf_log.c: (librdf_log): Resiliency fix: avoid
+	raptor_free_memory(0)
+
+	* librdf/rdf_avltree.c: (librdf_avltree_print): Compiler warning
+	fix: initialize rv before use.
+
+2008-05-05  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_stream.c: (librdf_stream_from_node_iterator_get_statement):
+	Removed useless and incorrect typecast.
+
+2008-04-23  Dave Robillard <dave@drobilla.net>
+
+	* configure.ac, docs/storage.html, librdf/Makefile.am,
+	librdf/rdf_avltree.c, librdf/rdf_avltree.h, librdf/rdf_storage.c,
+	librdf/rdf_storage_internal.h, librdf/rdf_storage_trees.c: Add new
+	in-memory store, "trees".
+	(librdf_storage_find_statements): Test for storage methods before
+	triple pattern
+	(less comparisons via short circuiting for storages without find_arcs etc.).
+
+2008-04-03  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_postgresql.c:
+	(librdf_storage_mysql_init,librdf_storage_postgresql_init): Do not
+	call terminate factory method on failure, caller will do that
+
+2008-03-27  Dave Beckett <dave@dajobe.org>
+
+	* librdf/rdf_parser_raptor.c,
+	librdf/rdf_serializer_raptor.c: (librdf_parser_raptor_set_feature,
+	librdf_serializer_raptor_set_feature): Use
+	raptor_parser_set_feature_string and
+	raptor_serializer_set_feature_string to set feature values to
+	integer or string as appropriate.
+
+2008-03-04  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_concepts.c:
+	(librdf_init_concepts,librdf_finish_concepts): Init/finish also
+	the last concept (rdfs:subPropertyOf).
+	(main): Added test for LIBRDF_CONCEPT_LAST uri.
+
+2008-03-03  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_concepts.c, librdf/rdf_concepts.h: Source
+	compatibility break: Fixed LIBRDF_URI_RDF_MS,
+	LIBRDF_URI_RDF_SCHEMA public API macros broken in r13171.
+	(librdf_get_concept_ms_namespace,librdf_get_concept_schema_namespace):
+	Added two new getters to make the API macros work - cannot access
+	librdf_world_s members outside the API.
+
+2008-02-28  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage.c: (librdf_storage_add_statement): fixed
+	comment
+
+2008-02-16  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh, autogen.sh, autogen.sh, autogen.sh, autogen.sh:
+	autogen checks when env prog version is empty. Update all packages
+	to latest autogen.sh
+
+2008-02-07  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_serializer_raptor.c:
+	(librdf_serializer_raptor_serialize_stream_to_counted_string):
+	Fixed memory leak. Ensure any string placed to the passed in
+	string pointer by raptor_write_string_iostream_finish() is freed
+	if not returned to caller.
+
+	* librdf/rdf_serializer_raptor.c:
+	(librdf_serializer_raptor_serialize_stream_to_counted_string):
+	Should not free passed in stream.
+
+	* librdf/rdf_query_rasqal.c:
+	(librdf_query_rasqal_query_results_update_statement): Check for
+	statement node allocation failures.
+
+2008-01-14  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_serializer.c:
+	(librdf_serializer_serialize_stream_to_counted_string) Docs
+
+	* autogen.sh: Do not branch autogen.sh scripts but keep them identical
+
+2008-01-13  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh: automake 1.0 docs
+
+2008-01-10  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_query_rasqal.c: (librdf_query_rasqal_constructor) Die
+	with a fatal error if rasqal_new_world() returns NULL, do not
+	leave the system in a partially initialized state.
+
+	* utils/rdfproc.c: Updated rdfproc to new rasqal api
+
+	* librdf/rdf_query_rasqal.c, librdf/rdf_query_results.c: Updated
+	to new rasqal apis.
+
+	* librdf/rdf_query_rasqal.c: (redland_node_to_rasqal_literal)
+	Updated to new rasqal literal API.
+
+2008-01-09  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_query_rasqal.c: (librdf_query_rasqal_constructor) Use
+	non-deprecated rasqal_set_triples_source_factory2().
+
+	* librdf/rdf_query_rasqal.c, librdf/rdf_query_results.c: Updated
+	to non-deprecated rasqal query results API.
+
+	* librdf/rdf_init_internal.h, librdf/rdf_query_rasqal.c: Renamed
+	rasqal_query variable to rasqal_query_ptr to prevent type<->name
+	problems in C++.
+
+2008-01-07  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_init_internal.h, librdf/rdf_query.c,
+	librdf/rdf_query_internal.h, librdf/rdf_query_rasqal.c: Changed
+	rdf_query_rasqal to use non-deprecated rasqal functions with
+	rasqal_world support.
+
+2008-01-03  Lauri Aalto <laalto@iki.fi>
+
+	* utils/rdfproc.c: Replaced call to removed function
+	rasqal_query_results_formats_enumerate_full() with
+	rasqal_query_results_formats_enumerate().
+
+	* librdf/rdf_query_results.c: (librdf_query_results_formats_enumerate)
+	Replaced call to removed function
+	rasqal_query_results_formats_enumerate_full() with
+	rasqal_query_results_formats_enumerate().

@@ -37,7 +37,7 @@ DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
 SUBDIRS=$(subdirs) src examples utils demos docs data
 
 EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
-ChangeLog.5 ChangeLog.6 ChangeLog.7 ChangeLog.8 \
+ChangeLog.5 ChangeLog.6 ChangeLog.7 ChangeLog.8 ChangeLog.9 \
 README      NEWS      LICENSE.txt  TODO \
 README.html NEWS.html LICENSE.html TODO.html \
 RELEASE.html INSTALL.html FAQS.html \
