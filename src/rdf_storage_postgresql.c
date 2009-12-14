@@ -367,8 +367,8 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
     + strlen(context->dbname)
     + strlen(context->user)
     + strlen(context->password);
-  conninfo=LIBRDF_MALLOC(cstring,coninfo_size);
-  if (conninfo) {
+  conninfo = (char*)LIBRDF_MALLOC(cstring,coninfo_size);
+  if(conninfo) {
     sprintf(conninfo,coninfo_template,context->host,context->port,context->dbname,context->user,context->password);
     connection->handle=PQconnectdb(conninfo);
     if(connection->handle) {
