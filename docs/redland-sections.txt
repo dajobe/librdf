@@ -220,6 +220,7 @@ librdf_node_static_iterator_create
 <FILE>parser</FILE>
 librdf_parser
 librdf_parser_factory
+librdf_parser_check_name
 librdf_parser_enumerate
 librdf_parser_guess_name
 librdf_parser_guess_name2
@@ -305,6 +306,7 @@ librdf_serializer_register_factory
 librdf_new_serializer
 librdf_new_serializer_from_factory
 librdf_free_serializer
+librdf_serializer_check_name
 librdf_serializer_serialize_model
 librdf_serializer_serialize_model_to_file_handle
 librdf_serializer_serialize_model_to_file
