@@ -574,9 +574,9 @@ librdf_basename(const char *name)
 {
   const char *p;
   if((p = strrchr(name, '/')))
-    name=p+1;
+    name = p+1;
   else if((p = strrchr(name, '\\')))
-    name=p+1;
+    name = p+1;
 
   return name;
 }
