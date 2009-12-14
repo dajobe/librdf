@@ -305,7 +305,9 @@ librdf_storage_trees_remove_statement_internal(librdf_storage_trees_graph* graph
   if (graph->pso_tree)
     librdf_avltree_delete(graph->pso_tree, statement);
   
-  return librdf_avltree_delete(graph->spo_tree, statement);
+  librdf_avltree_delete(graph->spo_tree, statement);
+  
+  return 0;
 }
 
 
