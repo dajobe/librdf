@@ -33,6 +33,16 @@ by callbacks.
 </para>
 
 
+<!-- ##### FUNCTION librdf_parser_check_name ##### -->
+<para>
+
+</para>
+
+@world: 
+@name: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_parser_enumerate ##### -->
 <para>
 

@@ -87,6 +87,16 @@ can be retrieved by callbacks.
 @serializer: 
 
 
+<!-- ##### FUNCTION librdf_serializer_check_name ##### -->
+<para>
+
+</para>
+
+@world: 
+@name: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_serializer_serialize_model ##### -->
 <para>
 
