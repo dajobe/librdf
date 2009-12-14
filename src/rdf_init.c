@@ -572,10 +572,10 @@ librdf_destroy_world(void)
 const char*
 librdf_basename(const char *name)
 {
-  char *p;
-  if((p=strrchr(name, '/')))
+  const char *p;
+  if((p = strrchr(name, '/')))
     name=p+1;
-  else if((p=strrchr(name, '\\')))
+  else if((p = strrchr(name, '\\')))
     name=p+1;
 
   return name;
