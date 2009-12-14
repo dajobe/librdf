@@ -1,3 +1,37 @@
+2009-12-13  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_virtuoso.c: Applied patch from 'lenrek' to "fix
+	seg fault on x86_64 machines" with virtuoso storage.
+
+	* src/rdf_query_rasqal.c: Use #ifdef
+	RASQAL_TRIPLES_SOURCE_MIN_VERSION and #ifdef
+	RASQAL_TRIPLES_SOURCE_FACTORY_MIN_VERSION from rasqal.h instead of
+	RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION defined locally by redland
+	configure.
+
+	* configure.ac: No need to define
+	RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION, can use other macros from
+	rasqal.h
+
+2009-12-12  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_cache.c: (librdf_cache_set_common): Call memset with
+	address of buffer, not address of pointer to buffer.
+
+	* src/rdf_query_rasqal.c: Use
+	RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION to set API version fields
+	when using rasqal 0.9.17+
+
+	* configure.ac: Define RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION for
+	rasqal 0.9.17+
+
+	* autogen.sh: add space
+
+2009-11-29  Lauri Aalto <laalto@iki.fi>
+
+	* autogen.sh: Reduce autogen noise on systems where uname is not
+	in /usr/bin
+
 2009-11-17  Lauri Aalto <laalto@iki.fi>
 
 	* src/rdf_query_rasqal.c:
