@@ -688,7 +688,8 @@ main(int argc, char *argv[])
   librdf_world *world;
 
   /* Minimal setup-cleanup test */
-  world=librdf_new_world();
+  world = librdf_new_world();
+  librdf_world_open(world);
   librdf_free_world(world);
 
   /* keep gcc -Wall happy */
