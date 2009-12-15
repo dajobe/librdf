@@ -48,6 +48,11 @@
 
 #define DEFAULT_FLUSH_PERCENT 20
 
+
+static void librdf_free_cache_internal(librdf_cache* cache);
+static int librdf_cache_delete_internal(librdf_cache *cache, void* key, size_t key_size);
+
+
 typedef struct
 {
   /* these are shared - the librdf_hash owns these */
@@ -134,7 +139,7 @@ librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
     goto unlock;
   }
   if(librdf_hash_open(new_cache->hash, NULL, 0, 1, 1, NULL)) {
-    librdf_free_cache(new_cache);
+    librdf_free_cache_internal(new_cache);
     new_cache=NULL;
     goto unlock;
   }
@@ -143,7 +148,7 @@ librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
   if(capacity) {
     new_cache->nodes=(librdf_cache_node*)LIBRDF_CALLOC(array, capacity, sizeof(librdf_cache_node));
     if(!new_cache->nodes) {
-      librdf_free_cache(new_cache);
+      librdf_free_cache_internal(new_cache);
       new_cache=NULL;
       goto unlock;
     }
@@ -151,7 +156,7 @@ librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
     new_cache->hists=(librdf_cache_hist_node*)LIBRDF_CALLOC(array, capacity, 
                                    sizeof(librdf_cache_hist_node));
     if(!new_cache->hists) {
-      librdf_free_cache(new_cache);
+      librdf_free_cache_internal(new_cache);
       new_cache=NULL;
       goto unlock;
     }
@@ -180,6 +185,23 @@ librdf_free_cache(librdf_cache* cache)
   pthread_mutex_lock(cache->world->mutex);
 #endif
 
+  librdf_free_cache_internal(cache);
+
+#ifdef WITH_THREADS
+  pthread_mutex_unlock(cache->world->mutex);
+#endif
+}
+
+
+/*
+ * librdf_free_cache_internal:
+ * @cache: #librdf_cache object
+ *
+ * INTERNAL - Destructor - destroy a #librdf_cache object without mutex locking.
+ */
+static void
+librdf_free_cache_internal(librdf_cache* cache)
+{
   if(cache->hash) {
     librdf_hash_close(cache->hash);
     librdf_free_hash(cache->hash);
@@ -192,11 +214,7 @@ librdf_free_cache(librdf_cache* cache)
     LIBRDF_FREE(array, cache->hists);
 
   LIBRDF_FREE(librdf_cache, cache);
-
-#ifdef WITH_THREADS
-  pthread_mutex_unlock(cache->world->mutex);
-#endif
-};
+}
 
 
 static int
@@ -237,7 +255,7 @@ librdf_cache_cleanup(librdf_cache *cache)
   for(i=0; i < cache->flush_count; i++) {
     librdf_cache_node* node=&cache->nodes[cache->hists[i].id];
     /* this will zero out *node */
-    librdf_cache_delete(cache, node->key, node->key_size);
+    librdf_cache_delete_internal(cache, node->key, node->key_size);
   }
 
   /* adjust usage after cleanup */
@@ -482,33 +500,50 @@ librdf_cache_get(librdf_cache *cache, void* key, size_t key_size,
 int
 librdf_cache_delete(librdf_cache *cache, void* key, size_t key_size)
 {
-  librdf_hash_datum key_hd; /* on stack - not allocated */
-  int rc=0;
+  int rc = 0;
   
-  if(!key || !key_size)
-    return -1;
-
 #ifdef WITH_THREADS
   pthread_mutex_lock(cache->world->mutex);
 #endif
   
-  key_hd.data=key;
-  key_hd.size=key_size;
-
-  if(librdf_hash_delete_all(cache->hash, &key_hd)) {
-    rc=1;
-    goto unlock;
-  }
-
-  /* succeeded */
-  cache->size--;
+  rc = librdf_cache_delete_internal(cache, key, key_size);
   
- unlock:
 #ifdef WITH_THREADS
   pthread_mutex_unlock(cache->world->mutex);
 #endif
 
   return rc;
+}
+
+
+/*
+ * librdf_cache_delete_internal:
+ * @cache: redland cache object
+ * @key: key data
+ * @key_size: key data size
+ *
+ * INTERNAL - Delete an item from the cache with given key without mutex locking
+ * 
+ * Return value: non-0 on failure
+ **/
+static int
+librdf_cache_delete_internal(librdf_cache *cache, void* key, size_t key_size)
+{
+  librdf_hash_datum key_hd; /* on stack - not allocated */
+  
+  if(!key || !key_size)
+    return -1;
+
+  key_hd.data=key;
+  key_hd.size=key_size;
+
+  if(librdf_hash_delete_all(cache->hash, &key_hd))
+    return 1;
+
+  /* succeeded */
+  cache->size--;
+  
+  return 0;
 }
 
 
