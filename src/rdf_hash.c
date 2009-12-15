@@ -141,7 +141,8 @@ librdf_free_hash_datums(librdf_world *world)
   librdf_hash_datum *datum, *next;
   
 #ifdef WITH_THREADS
-  pthread_mutex_lock(world->hash_datums_mutex);
+  if(world->hash_datums_mutex)
+    pthread_mutex_lock(world->hash_datums_mutex);
 #endif
 
   for(datum = world->hash_datums_list; datum; datum = next) {
@@ -151,7 +152,8 @@ librdf_free_hash_datums(librdf_world *world)
   world->hash_datums_list = NULL;
 
 #ifdef WITH_THREADS
-  pthread_mutex_unlock(world->hash_datums_mutex);
+  if(world->hash_datums_mutex)
+    pthread_mutex_unlock(world->hash_datums_mutex);
 #endif
 }
 
