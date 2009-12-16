@@ -671,7 +671,7 @@ main(int argc, char *argv[])
       }
       if(failures)
         break;
-    }
+    } /* next test cache value */
     if(failures)
       goto tidy;
   
@@ -687,7 +687,13 @@ main(int argc, char *argv[])
       goto tidy;
     }
 
-  }
+    if(cache) {
+      librdf_free_cache(cache);
+      cache = NULL;
+    }
+
+  } /* next cache parameter set */
+
 
   tidy:
   if(cache)
