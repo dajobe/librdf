@@ -1,4 +1,66 @@
+2009-12-16  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_cache.c: (main): Free cache inside test loop
+
+2009-12-15  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_cache.c: Fixed rdf_cache_test deadlock with WITH_THREADS.
+	(librdf_free_cache_internal,librdf_cache_delete_internal): Pulled
+	functionality from librdf_free_cache(), librdf_cache_delete()
+	without mutex locking.
+	(librdf_new_cache): Call librdf_free_cache_internal() when already
+	holding a mutex lock.
+	(librdf_cache_cleanup): Call librdf_cache_delete_internal(), mutex
+	lock already held by librdf_cache_set_common().
+
+	* src/rdf_hash.c, src/rdf_init.c: (librdf_free_hash_datums): Do
+	not assume hash_datums mutex is initialized.
+	(main): Remove librdf_world_open() from minimum init-finish test
+	case.
+	Fixes issue http://bugs.librdf.org/mantis/view.php?id=317
+
+2009-12-14  Dave Beckett <dave@dajobe.org>
+
+	* NEWS.html, RELEASE.html: 1.0.10 notes updated for issue 317 fix
+
+	* src/rdf_init.c: (main): Call librdf_world_open(world) to make
+	the test run when threads are enabled.
+	Fixes Issue#0000317 http://bugs.librdf.org/mantis/view.php?id=317
+
+	* src/rdf_storage_trees.c: (librdf_storage_trees_node_compare):
+	Check language and datatype URI when comparing literals.
+	Fixes Issue#000311 http://bugs.librdf.org/mantis/view.php?id=311
+	with patch from Gregory Williams - Thanks!
+
+	* src/rdf_storage_trees.c:
+	(librdf_storage_trees_remove_statement_internal): Return 0 on
+	success (always).
+	Fixes Issue#000304 http://bugs.librdf.org/mantis/view.php?id=304
+
 2009-12-13  Dave Beckett <dave@dajobe.org>
+
+	* redland-config.in: Now a wrapper around pkg-config redland
+
+	* src/rdf_storage_postgresql.c: Casts for C++
+
+	* src/rdf_init.c: (librdf_basename): Casts for C++
+
+	* docs/tmpl/parser.sgml, docs/tmpl/serializer.sgml: Update docbook
+	tmpls
+
+	* build, build/shave-libtool.in, build/shave.in, build/shave.m4,
+	configure.ac: Enable SHAVE support for maintainer; move aux files
+	to build dir
+
+	* docs/redland-sections.txt: Add librdf_parser_check_name and
+	librdf_serializer_check_name
+
+	* src/rdf_storage_virtuoso.c: remove public autodocs from scanning
+
+	* configure.ac: Berkeley DB 4.8
+
+	* NEWS.html, RELEASE.html, configure.ac, src/win32_rdf_config.h:
+	Bump version to 1.0.10
 
 	* src/rdf_storage_virtuoso.c: Applied patch from 'lenrek' to "fix
 	seg fault on x86_64 machines" with virtuoso storage.
