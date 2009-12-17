@@ -1,6 +1,6 @@
 2009-12-16  Dave Beckett  <dave@dajobe.org>
 
-	* Snapshotted redland_1_0_10 for 1.0.10 release (SVN 15913)
+	* Snapshotted redland_1_0_10 for 1.0.10 release (SVN 15919)
 
 	* src/rdf_cache.c: (main): Free cache inside test loop
 
