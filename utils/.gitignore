@@ -1,4 +1,5 @@
 *.db
+*.o
 .deps
 .libs
 TAGS

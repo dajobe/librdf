@@ -1,6 +1,7 @@
 *.db
 *.la
 *.lo
+*.o
 .deps
 .libs
 TAGS
