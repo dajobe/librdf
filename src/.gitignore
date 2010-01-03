@@ -1,0 +1,15 @@
+*.db
+*.la
+*.lo
+.deps
+.libs
+TAGS
+dmalloc*
+rdf_*_test
+rdf_*_test.exe
+rdf_config.h*
+redland.spec
+run*
+stamp-h*
+test
+filtered_rdf_log.h

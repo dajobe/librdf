@@ -1,0 +1,12 @@
+*.db
+.deps
+.libs
+TAGS
+rdfproc
+rdfproc.exe
+rdfproc.html
+redland-db-upgrade
+redland-db-upgrade.exe
+redland-virtuoso-test
+redland-virtuoso-test.exe
+run*
