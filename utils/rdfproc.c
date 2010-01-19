@@ -429,17 +429,17 @@ main(int argc, char *argv[])
             for(i=0; 1; i++) {
               const char *format_name;
               const char *format_label;
-              if(rasqal_query_results_formats_enumerate(world->rasqal_world_ptr,
+              if(librdf_query_results_formats_enumerate(world,
                                                         i,
                                                         &format_name, 
                                                         &format_label,
-                                                        NULL, NULL, NULL))
+                                                        NULL, NULL))
                 break;
               printf("  %-20s  %s\n", format_name, format_label);
             }
             exit(0);
           } else {
-            if(rasqal_query_results_formats_check(world->rasqal_world_ptr, optarg, NULL, NULL))
+            if(librdf_query_results_formats_check(world, optarg, NULL, NULL))
               results_format=optarg;
             else {
               fprintf(stderr, "%s: invalid argument `%s' for `" HELP_ARG(r, results) "'\nTry '%s " HELP_ARG(r, results) " help' for a list of valid formats\n",
