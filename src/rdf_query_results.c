@@ -254,16 +254,17 @@ librdf_free_query_results(librdf_query_results* query_results)
 
 
 /**
- * librdf_query_results_to_counted_string:
+ * librdf_query_results_to_counted_string2:
  * @query_results: #librdf_query_results object
+ * @name: name of syntax to format to
+ * @mime_type: mime type of syntax to format to
  * @format_uri: URI of syntax to format to
  * @base_uri: Base URI of output formatted syntax  or NULL
  * @length_p: Pointer to where to store length of string or NULL
  *
  * Turn a query results into a string.
  * 
- * Values of format_uri currently supported (via Rasqal) are:
- *  http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/
+ * One of @name, @mime_type or @format_uri must be given.
  *
  * The base URI may be used for the generated syntax, depending
  * on the format.
@@ -273,10 +274,12 @@ librdf_free_query_results(librdf_query_results* query_results)
  * Return value: new string value or NULL on failure
  **/
 unsigned char*
-librdf_query_results_to_counted_string(librdf_query_results *query_results,
-                                       librdf_uri *format_uri,
-                                       librdf_uri *base_uri,
-                                       size_t *length_p)
+librdf_query_results_to_counted_string2(librdf_query_results *query_results,
+                                        const char *name,
+                                        const char *mime_type,
+                                        librdf_uri *format_uri,
+                                        librdf_uri *base_uri,
+                                        size_t *length_p)
 {
   librdf_query_results_formatter *formatter;
   void *string=NULL;
@@ -286,13 +289,19 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
-  iostr=raptor_new_iostream_to_string(&string, &string_length, malloc);
+  if(!name && !mime_type && !format_uri)
+    return NULL;
+
+  iostr = raptor_new_iostream_to_string(&string, &string_length, malloc);
   if(!iostr)
     return NULL;
               
-  formatter=librdf_new_query_results_formatter(query_results,
-                                               NULL /* name */,
-                                               format_uri);
+  if(mime_type)
+    formatter = librdf_new_query_results_formatter_by_mime_type(query_results,
+                                                                mime_type);
+  else
+    formatter = librdf_new_query_results_formatter(query_results,
+                                                   name, format_uri);
   if(!formatter) {
     error=1;
     goto tidy;
@@ -316,9 +325,79 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
     }
   }
   else if(length_p)
-    *length_p=string_length;
+    *length_p = string_length;
   
   return (unsigned char *)string;
+}
+
+
+/**
+ * librdf_query_results_to_counted_string:
+ * @query_results: #librdf_query_results object
+ * @format_uri: URI of syntax to format to
+ * @base_uri: Base URI of output formatted syntax  or NULL
+ * @length_p: Pointer to where to store length of string or NULL
+ *
+ * Turn a query results into a string.
+ * 
+ * Values of format_uri currently supported (via Rasqal) are:
+ *  http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/
+ *
+ * The base URI may be used for the generated syntax, depending
+ * on the format.
+ *
+ * The returned string must be freed by the caller
+ *
+ * @deprecated: Use librdf_query_results_to_counted_string() with extra
+ * name and mime-type args.
+ *
+ * Return value: new string value or NULL on failure
+ **/
+unsigned char*
+librdf_query_results_to_counted_string(librdf_query_results *query_results,
+                                       librdf_uri *format_uri,
+                                       librdf_uri *base_uri,
+                                       size_t *length_p)
+{
+  return librdf_query_results_to_counted_string2(query_results,
+                                                 NULL /* name */,
+                                                 NULL /* mime type */,
+                                                 format_uri,
+                                                 base_uri,
+                                                 length_p);
+}
+
+
+/**
+ * librdf_query_results_to_string2:
+ * @query_results: #librdf_query_results object
+ * @name: format name
+ * @mime_type: format mime type
+ * @format_uri: URI of syntax to format to
+ * @base_uri: Base URI of output formatted syntax 
+ *
+ * Turn a query results into a string.
+ * 
+ * See librdf_query_results_to_counted_string for information on the
+ * format_uri and base_uri parameters.
+ *
+ * The returned string must be freed by the caller
+ *
+ * Return value: new string value or NULL on failure
+ **/
+unsigned char*
+librdf_query_results_to_string2(librdf_query_results *query_results,
+                                const char* name,
+                                const char* mime_type,
+                                librdf_uri *format_uri,
+                                librdf_uri *base_uri)
+{
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
+
+  return librdf_query_results_to_counted_string2(query_results,
+                                                 name, mime_type, format_uri,
+                                                 base_uri, NULL);
 }
 
 
@@ -335,22 +414,27 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
  *
  * The returned string must be freed by the caller
  *
+ * @Deprecated: use librdf_query_results_to_string2() with extra name
+ * and mime_type args.
+ *
  * Return value: new string value or NULL on failure
  **/
 unsigned char*
 librdf_query_results_to_string(librdf_query_results *query_results,
                                librdf_uri *format_uri,
-                               librdf_uri *base_uri) {
+                               librdf_uri *base_uri)
+{
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
-  return librdf_query_results_to_counted_string(query_results, 
-                                                format_uri, base_uri, NULL);
+  return librdf_query_results_to_string2(query_results,
+                                         NULL, NULL, format_uri,
+                                         base_uri);
 }
 
 
 /**
- * librdf_query_results_to_file_handle:
+ * librdf_query_results_to_file_handle2:
  * @query_results: #librdf_query_results object
  * @handle: file handle to write to
  * @format_uri: URI of syntax to format to
@@ -364,10 +448,12 @@ librdf_query_results_to_string(librdf_query_results *query_results,
  * Return value: non 0 on failure
  **/
 int
-librdf_query_results_to_file_handle(librdf_query_results *query_results, 
-                                    FILE *handle, 
-                                    librdf_uri *format_uri,
-                                    librdf_uri *base_uri)
+librdf_query_results_to_file_handle2(librdf_query_results *query_results, 
+                                     FILE *handle, 
+                                     const char *name,
+                                     const char *mime_type,
+                                     librdf_uri *format_uri,
+                                     librdf_uri *base_uri)
 {
   raptor_iostream *iostr;
   librdf_query_results_formatter *formatter;
@@ -377,26 +463,61 @@ librdf_query_results_to_file_handle(librdf_query_results *query_results,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(handle, FILE*, 1);
 
 
-  iostr=raptor_new_iostream_to_file_handle(handle);
+  iostr = raptor_new_iostream_to_file_handle(handle);
   if(!iostr)
     return 1;
-              
-  formatter=librdf_new_query_results_formatter(query_results,
-                                               NULL /* name */,
-                                               format_uri);
+
+  if(mime_type)
+    formatter = librdf_new_query_results_formatter_by_mime_type(query_results,
+                                                                mime_type);
+  else
+    formatter = librdf_new_query_results_formatter(query_results,
+                                                   name, format_uri);
   if(!formatter) {
     raptor_free_iostream(iostr);
     return 1;
   }
 
-  status=librdf_query_results_formatter_write(iostr, formatter,
-                                              query_results, base_uri);
+  status = librdf_query_results_formatter_write(iostr, formatter,
+                                                query_results, base_uri);
 
   librdf_free_query_results_formatter(formatter);
 
   raptor_free_iostream(iostr);
 
   return status;
+}
+
+
+/**
+ * librdf_query_results_to_file_handle2:
+ * @query_results: #librdf_query_results object
+ * @handle: file handle to write to
+ * @format_uri: URI of syntax to format to
+ * @base_uri: Base URI of output formatted syntax 
+ *
+ * Write a query results to a FILE*.
+ * 
+ * See librdf_query_results_to_counted_string for information on the
+ * format_uri and base_uri parameters.
+ *
+ * @Deprecated: use librdf_query_results_to_file_handle() with extra
+ * name and mime_type args.
+ *
+ * Return value: non 0 on failure
+ **/
+int
+librdf_query_results_to_file_handle(librdf_query_results *query_results, 
+                                     FILE *handle, 
+                                     librdf_uri *format_uri,
+                                     librdf_uri *base_uri)
+{
+  return librdf_query_results_to_file_handle2(query_results, 
+                                              handle,
+                                              NULL /* name */,
+                                              NULL /* mime type */,
+                                              format_uri,
+                                              base_uri);
 }
 
 
@@ -415,17 +536,19 @@ librdf_query_results_to_file_handle(librdf_query_results *query_results,
  * Return value: non 0 on failure
  **/
 int
-librdf_query_results_to_file(librdf_query_results *query_results, 
+librdf_query_results_to_file2(librdf_query_results *query_results, 
                              const char *name,
+                             const char *mime_type,
                              librdf_uri *format_uri,
-                             librdf_uri *base_uri) {
+                             librdf_uri *base_uri)
+{
   FILE* fh;
   int status;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, string, 1);
 
-  fh=fopen(name, "w+");
+  fh = fopen(name, "w+");
   if(!fh) {
     librdf_log(query_results->query->world, 0, LIBRDF_LOG_ERROR, 
                LIBRDF_FROM_QUERY, NULL, 
@@ -434,10 +557,42 @@ librdf_query_results_to_file(librdf_query_results *query_results,
     return 1;
   }
 
-  status=librdf_query_results_to_file_handle(query_results, fh, 
-                                             format_uri, base_uri);
+  status = librdf_query_results_to_file_handle2(query_results, fh, 
+                                                name, mime_type,
+                                                format_uri, base_uri);
   fclose(fh);
   return status;
+}
+
+
+/**
+ * librdf_query_results_to_file:
+ * @query_results: #librdf_query_results object
+ * @name: filename to write to
+ * @format_uri: URI of syntax to format to
+ * @base_uri: Base URI of output formatted syntax 
+ *
+ * Write a query results to a file.
+ * 
+ * See librdf_query_results_to_counted_string for information on the
+ * format_uri and base_uri parameters.
+ *
+ * @Deprecated: use librdf_query_results_to_file2() with extra mime_type
+ * arg.
+ *
+ * Return value: non 0 on failure
+ **/
+int
+librdf_query_results_to_file(librdf_query_results *query_results, 
+                             const char *name,
+                             librdf_uri *format_uri,
+                             librdf_uri *base_uri)
+{
+  return librdf_query_results_to_file2(query_results,
+                                       name,
+                                       NULL /* mime type */,
+                                       format_uri,
+                                       base_uri);
 }
 
 
