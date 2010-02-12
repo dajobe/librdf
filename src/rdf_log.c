@@ -131,7 +131,7 @@ librdf_log_simple(librdf_world* world, int code,
   if(locator) {
     int locator_len;
 #ifdef RAPTOR_V2_AVAILABLE
-    locator_len = raptor_format_locator_v2(world->raptor_world_ptr, NULL, 0, (raptor_locator*)locator);
+    locator_len = raptor_locator_format(NULL, 0, (raptor_locator*)locator);
 #else
     locator_len = raptor_format_locator(NULL, 0, (raptor_locator*)locator);
 #endif
@@ -139,7 +139,7 @@ librdf_log_simple(librdf_world* world, int code,
       char *buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+2);
       *buffer=' ';
 #ifdef RAPTOR_V2_AVAILABLE
-      raptor_format_locator_v2(world->raptor_world_ptr, buffer+1, locator_len, (raptor_locator*)locator);
+      raptor_locator_format(buffer+1, locator_len, (raptor_locator*)locator);
 #else
       raptor_format_locator(buffer+1, locator_len, (raptor_locator*)locator);
 #endif

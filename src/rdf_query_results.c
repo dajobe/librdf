@@ -292,7 +292,12 @@ librdf_query_results_to_counted_string2(librdf_query_results *query_results,
   if(!name && !mime_type && !format_uri)
     return NULL;
 
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_string(query_results->query->world->raptor_world_ptr,
+                                        &string, &string_length, malloc);
+#else
   iostr = raptor_new_iostream_to_string(&string, &string_length, malloc);
+#endif
   if(!iostr)
     return NULL;
               
@@ -463,7 +468,12 @@ librdf_query_results_to_file_handle2(librdf_query_results *query_results,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(handle, FILE*, 1);
 
 
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_file_handle(query_results->query->world->raptor_world_ptr,
+                                             handle);
+#else
   iostr = raptor_new_iostream_to_file_handle(handle);
+#endif
   if(!iostr)
     return 1;
 

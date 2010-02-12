@@ -934,16 +934,31 @@ librdf_query_rasqal_query_results_update_statement(void* context)
 
   /* subject */
   
+#ifdef RAPTOR_V2_AVAILABLE
+  if(rstatement->subject->type == RAPTOR_TERM_TYPE_BLANK) {
+    node = librdf_new_node_from_blank_identifier(world, rstatement->subject->value.blank);
+  } else if(rstatement->subject->type == RAPTOR_TERM_TYPE_URI) {
+    node = librdf_new_node_from_uri_string(world,
+                                           librdf_uri_as_string((librdf_uri*)rstatement->subject->value.uri));
+  }
+#else
   if(rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
-    node=librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->subject);
+    node = librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->subject);
   } else if (rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
-    node=librdf_new_node_from_uri_string(world,
-                                         librdf_uri_as_string((librdf_uri*)rstatement->subject));
-  } else {
+    node = librdf_new_node_from_uri_string(world,
+                                           librdf_uri_as_string((librdf_uri*)rstatement->subject));
+  }
+#endif
+  else {
     librdf_log(world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
                "Unknown Raptor subject identifier type %d",
-               rstatement->subject_type);
+#ifdef RAPTOR_V2_AVAILABLE
+               rstatement->subject->type
+#else
+               rstatement->subject_type
+#endif
+               );
     goto fail;
   }
 
@@ -957,25 +972,39 @@ librdf_query_rasqal_query_results_update_statement(void* context)
   librdf_statement_set_subject(scontext->statement, node);
 
   /* predicate */
-  
+
+#ifdef RAPTOR_V2_AVAILABLE
+  if(rstatement->predicate->type == RAPTOR_TERM_TYPE_URI) {
+    node = librdf_new_node_from_uri_string(world,
+                                           librdf_uri_as_string((librdf_uri*)rstatement->predicate->value.uri));
+  }
+#else
   if(rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_ORDINAL) {
     /* FIXME - but only a little
      * Do I really need to do log10(ordinal) [or /10 and count] + 1 ? 
      * See also librdf_heuristic_gen_name for some code to repurpose.
      */
     char ordinal_buffer[100]; 
-    int ordinal=*(int*)rstatement->predicate;
+    int ordinal = *(int*)rstatement->predicate;
     sprintf(ordinal_buffer, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_%d", ordinal);
     
-    node=librdf_new_node_from_uri_string(world, (const unsigned char*)ordinal_buffer);
+    node = librdf_new_node_from_uri_string(world, (const unsigned char*)ordinal_buffer);
   } else if (rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_PREDICATE ||
              rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
-    node=librdf_new_node_from_uri_string(world,
-                                         librdf_uri_as_string((librdf_uri*)rstatement->predicate));
-  } else {
+    node = librdf_new_node_from_uri_string(world,
+                                           librdf_uri_as_string((librdf_uri*)rstatement->predicate));
+  }
+#endif
+  else {
     librdf_log(world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
-               "Unknown Raptor predicate identifier type %d", rstatement->predicate_type);
+               "Unknown Raptor predicate identifier type %d",
+#ifdef RAPTOR_V2_AVAILABLE
+               rstatement->predicate->type
+#else
+               rstatement->predicate_type
+#endif
+               );
     goto fail;
   }
 
@@ -989,32 +1018,53 @@ librdf_query_rasqal_query_results_update_statement(void* context)
   librdf_statement_set_predicate(scontext->statement, node);
   
   /* object */
-  
+
+#ifdef RAPTOR_V2_AVAILABLE
+  if(rstatement->object->type == RAPTOR_TERM_TYPE_LITERAL) {
+    node = librdf_new_node_from_typed_literal(world,
+                                              rstatement->object->value.literal.string,
+                                              (const char*)rstatement->object->value.literal.language,
+                                              (librdf_uri*)rstatement->object->value.literal.datatype);
+  } else if(rstatement->object->type == RAPTOR_TERM_TYPE_BLANK) {
+    node = librdf_new_node_from_blank_identifier(world, rstatement->object->value.blank);
+  } else if(rstatement->object->type == RAPTOR_TERM_TYPE_URI) {
+    node = librdf_new_node_from_uri_string(world,
+                                           librdf_uri_as_string((librdf_uri*)rstatement->object->value.uri));
+  }
+#else
   if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_LITERAL ||
      rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL) {
     int is_xml_literal = (rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL);
-    librdf_uri *datatype_uri=(librdf_uri*)rstatement->object_literal_datatype;
-    
+    librdf_uri *datatype_uri = (librdf_uri*)rstatement->object_literal_datatype;
+
     if(is_xml_literal)
-      node=librdf_new_node_from_literal(world,
-                                        (const unsigned char*)rstatement->object,
-                                        (const char*)rstatement->object_literal_language,
-                                        is_xml_literal);
+      node = librdf_new_node_from_literal(world,
+                                          (const unsigned char*)rstatement->object,
+                                          (const char*)rstatement->object_literal_language,
+                                          is_xml_literal);
     else
-      node=librdf_new_node_from_typed_literal(world,
-                                              (const unsigned char*)rstatement->object,
-                                              (const char*)rstatement->object_literal_language,
-                                              datatype_uri);
+      node = librdf_new_node_from_typed_literal(world,
+                                                (const unsigned char*)rstatement->object,
+                                                (const char*)rstatement->object_literal_language,
+                                                datatype_uri);
     
   } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
-    node=librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->object);
+    node = librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->object);
   } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
-    node=librdf_new_node_from_uri_string(world,
-                                         librdf_uri_as_string((librdf_uri*)rstatement->object));
-  } else {
+    node = librdf_new_node_from_uri_string(world,
+                                           librdf_uri_as_string((librdf_uri*)rstatement->object));
+  }
+#endif
+  else {
     librdf_log(world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
-               "Unknown Raptor object identifier type %d", rstatement->object_type);
+               "Unknown Raptor object identifier type %d",
+#ifdef RAPTOR_V2_AVAILABLE
+               rstatement->object->type
+#else
+               rstatement->object_type
+#endif
+               );
     goto fail;
   }
 

@@ -103,8 +103,13 @@ librdf_init_storage(librdf_world *world)
 #ifdef MODULAR_LIBRDF
 
   if (!world->storage_modules)
+#ifdef RAPTOR_V2_AVAILABLE
+    world->storage_modules = raptor_new_sequence(
+        (raptor_data_free_handler*)lt_dlclose, NULL);
+#else
     world->storage_modules = raptor_new_sequence(
         (raptor_sequence_free_handler*)lt_dlclose, NULL);
+#endif
 
   librdf_storage_load_all_modules(world);
 
@@ -339,7 +344,11 @@ librdf_storage_register_factory(librdf_world* world,
 #endif
 
   if(!world->storages) {
-    world->storages=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_storage_factory, NULL);
+#ifdef RAPTOR_V2_AVAILABLE
+    world->storages = raptor_new_sequence((raptor_data_free_handler *)librdf_free_storage_factory, NULL);
+#else
+    world->storages = raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_storage_factory, NULL);
+#endif
     if(!world->storages)
       goto failed;
   }

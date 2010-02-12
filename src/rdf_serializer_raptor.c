@@ -65,7 +65,7 @@ librdf_serializer_raptor_init(librdf_serializer *serializer, void *context)
   scontext->serializer_name=scontext->serializer->factory->name;
 
 #ifdef RAPTOR_V2_AVAILABLE
-  scontext->rdf_serializer = raptor_new_serializer_v2(serializer->world->raptor_world_ptr, scontext->serializer_name);
+  scontext->rdf_serializer = raptor_new_serializer(serializer->world->raptor_world_ptr, scontext->serializer_name);
 #else
   scontext->rdf_serializer = raptor_new_serializer(scontext->serializer_name);
 #endif
@@ -107,7 +107,11 @@ librdf_serializer_raptor_get_feature(void *context, librdf_uri* feature) {
   librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
   unsigned char intbuffer[20]; /* FIXME */
   unsigned char *uri_string;
+#ifdef RAPTOR_V2_AVAILABLE
+  raptor_option feature_i;
+#else
   raptor_feature feature_i;
+#endif
   
   if(!feature)
     return NULL;
@@ -117,12 +121,17 @@ librdf_serializer_raptor_get_feature(void *context, librdf_uri* feature) {
     return NULL;
   
 #ifdef RAPTOR_V2_AVAILABLE
-  feature_i = raptor_feature_from_uri_v2(scontext->serializer->world->raptor_world_ptr, (raptor_uri*)feature);
+  feature_i = raptor_world_get_option_from_uri(scontext->serializer->world->raptor_world_ptr, (raptor_uri*)feature);
 #else
   feature_i = raptor_feature_from_uri((raptor_uri*)feature);
 #endif
   if((int)feature_i >= 0) {
-    int value=raptor_serializer_get_feature(scontext->rdf_serializer, feature_i);
+    int value;
+#ifdef RAPTOR_V2_AVAILABLE
+    value = raptor_serializer_get_option(scontext->rdf_serializer, feature_i);
+#else
+    value = raptor_serializer_get_feature(scontext->rdf_serializer, feature_i);
+#endif
     sprintf((char*)intbuffer, "%d", value);
     return librdf_new_node_from_typed_literal(scontext->serializer->world,
                                               intbuffer, NULL, NULL);
@@ -137,7 +146,11 @@ librdf_serializer_raptor_set_feature(void *context,
                                      librdf_uri *feature, librdf_node* value) 
 {
   librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
+#ifdef RAPTOR_V2_AVAILABLE
+  raptor_option feature_i;
+#else
   raptor_feature feature_i;
+#endif
   const unsigned char* value_s;
   
   if(!feature)
@@ -145,7 +158,7 @@ librdf_serializer_raptor_set_feature(void *context,
 
   /* try a raptor feature */
 #ifdef RAPTOR_V2_AVAILABLE
-  feature_i = raptor_feature_from_uri_v2(scontext->serializer->world->raptor_world_ptr, (raptor_uri*)feature);
+  feature_i = raptor_world_get_option_from_uri(scontext->serializer->world->raptor_world_ptr, (raptor_uri*)feature);
 #else
   feature_i = raptor_feature_from_uri((raptor_uri*)feature);
 #endif
@@ -157,8 +170,13 @@ librdf_serializer_raptor_set_feature(void *context,
   
   value_s=(const unsigned char*)librdf_node_get_literal_value(value);
 
+#ifdef RAPTOR_V2_AVAILABLE
+  return raptor_serializer_set_option_string(scontext->rdf_serializer,
+                                             feature_i, value_s);
+#else
   return raptor_serializer_set_feature_string(scontext->rdf_serializer,
                                               feature_i, value_s);
+#endif
 }
 
 
@@ -176,23 +194,40 @@ static int
 librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
                                              librdf_statement* statement)
 {
+  int rc = 1;
   raptor_statement rstatement;
-  librdf_node *subject=librdf_statement_get_subject(statement);
-  librdf_node *predicate=librdf_statement_get_predicate(statement);
-  librdf_node *object=librdf_statement_get_object(statement);
+  librdf_node *subject, *predicate, *object;
+
+#ifdef RAPTOR_V2_AVAILABLE
+  raptor_statement_init(&rstatement, raptor_serializer_get_world(rserializer));
+#endif
+
+  subject = librdf_statement_get_subject(statement);
+  predicate = librdf_statement_get_predicate(statement);
+  object = librdf_statement_get_object(statement);
 
   if(librdf_node_is_blank(subject)) {
-    rstatement.subject=librdf_node_get_blank_identifier(subject);
-    rstatement.subject_type=RAPTOR_IDENTIFIER_TYPE_ANONYMOUS;
+#ifdef RAPTOR_V2_AVAILABLE
+    rstatement.subject = raptor_new_term_from_blank(raptor_serializer_get_world(rserializer),
+                                                    librdf_node_get_blank_identifier(subject));
+#else
+    rstatement.subject = librdf_node_get_blank_identifier(subject);
+    rstatement.subject_type = RAPTOR_IDENTIFIER_TYPE_ANONYMOUS;
+#endif
   } else if(librdf_node_is_resource(subject)) {
-    rstatement.subject=(raptor_uri*)librdf_node_get_uri(subject);
-    rstatement.subject_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
+#ifdef RAPTOR_V2_AVAILABLE
+    rstatement.subject = raptor_new_term_from_uri(raptor_serializer_get_world(rserializer),
+                                                  (raptor_uri*)librdf_node_get_uri(subject));
+#else
+    rstatement.subject = (raptor_uri*)librdf_node_get_uri(subject);
+    rstatement.subject_type = RAPTOR_IDENTIFIER_TYPE_RESOURCE;
+#endif
   } else {
     librdf_log(statement->world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
                "Do not know how to serialize triple subject type %d",
                librdf_node_get_type(subject));
-    return 1;
+    goto exit;
   }
 
   if(!librdf_node_is_resource(predicate)) {
@@ -200,31 +235,55 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
                "Do not know how to serialize triple predicate type %d",
                librdf_node_get_type(predicate));
-    return 1;
+    goto exit;
   }
 
-  rstatement.predicate=(raptor_uri*)librdf_node_get_uri(predicate);
-  rstatement.predicate_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
+#ifdef RAPTOR_V2_AVAILABLE
+  rstatement.predicate = raptor_new_term_from_uri(raptor_serializer_get_world(rserializer),
+                                                  (raptor_uri*)librdf_node_get_uri(predicate));
+#else
+  rstatement.predicate = (raptor_uri*)librdf_node_get_uri(predicate);
+  rstatement.predicate_type = RAPTOR_IDENTIFIER_TYPE_RESOURCE;
+#endif
 
-  rstatement.object_literal_language=NULL;
-  rstatement.object_literal_datatype=NULL;
+#ifndef RAPTOR_V2_AVAILABLE
+  rstatement.object_literal_language = NULL;
+  rstatement.object_literal_datatype = NULL;
+#endif
   switch(librdf_node_get_type(object)) {
     case LIBRDF_NODE_TYPE_LITERAL:
-      rstatement.object=librdf_node_get_literal_value(object);
-      rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_LITERAL;
+#ifdef RAPTOR_V2_AVAILABLE
+      rstatement.object = raptor_new_term_from_literal(raptor_serializer_get_world(rserializer),
+                                                       librdf_node_get_literal_value(object),
+                                                       (raptor_uri*)librdf_node_get_literal_value_datatype_uri(object),
+                                                       (const unsigned char*)librdf_node_get_literal_value_language(object));
+#else
+      rstatement.object = librdf_node_get_literal_value(object);
+      rstatement.object_type = RAPTOR_IDENTIFIER_TYPE_LITERAL;
       
-      rstatement.object_literal_language=(const unsigned char*)librdf_node_get_literal_value_language(object);
-      rstatement.object_literal_datatype=(raptor_uri*)librdf_node_get_literal_value_datatype_uri(object);
+      rstatement.object_literal_language = (const unsigned char*)librdf_node_get_literal_value_language(object);
+      rstatement.object_literal_datatype = (raptor_uri*)librdf_node_get_literal_value_datatype_uri(object);
+#endif
       break;
 
     case LIBRDF_NODE_TYPE_BLANK:
-      rstatement.object=librdf_node_get_blank_identifier(object);
-      rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_ANONYMOUS;
+#ifdef RAPTOR_V2_AVAILABLE
+      rstatement.object = raptor_new_term_from_blank(raptor_serializer_get_world(rserializer),
+                                                     librdf_node_get_blank_identifier(object));
+#else
+      rstatement.object = librdf_node_get_blank_identifier(object);
+      rstatement.object_type = RAPTOR_IDENTIFIER_TYPE_ANONYMOUS;
+#endif
       break;
 
     case LIBRDF_NODE_TYPE_RESOURCE:
-      rstatement.object=librdf_node_get_uri(object);
-      rstatement.object_type=RAPTOR_IDENTIFIER_TYPE_RESOURCE;
+#ifdef RAPTOR_V2_AVAILABLE
+      rstatement.object = raptor_new_term_from_uri(raptor_serializer_get_world(rserializer),
+                                                   (raptor_uri*)librdf_node_get_uri(object));
+#else
+      rstatement.object = librdf_node_get_uri(object);
+      rstatement.object_type = RAPTOR_IDENTIFIER_TYPE_RESOURCE;
+#endif
       break;
 
     case LIBRDF_NODE_TYPE_UNKNOWN:
@@ -233,13 +292,20 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
                  "Do not know how to serialize triple object type %d",
                  librdf_node_get_type(object));
-      return 1;
+      goto exit;
   }
 
-  return raptor_serialize_statement(rserializer, &rstatement);
+  rc = raptor_serialize_statement(rserializer, &rstatement);
+
+  exit:
+#ifdef RAPTOR_V2_AVAILABLE
+  raptor_free_statement(&rstatement);
+#endif
+  return rc;
 }
 
 
+#ifndef RAPTOR_V2_AVAILABLE
 static void
 librdf_serializer_raptor_error_handler(void *data, raptor_locator *locator,
                                        const char *message) 
@@ -249,8 +315,10 @@ librdf_serializer_raptor_error_handler(void *data, raptor_locator *locator,
 
   librdf_log_simple(scontext->serializer->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, locator, message);
 }
+#endif
 
 
+#ifndef RAPTOR_V2_AVAILABLE
 static void
 librdf_serializer_raptor_warning_handler(void *data, raptor_locator *locator,
                                          const char *message) 
@@ -260,6 +328,7 @@ librdf_serializer_raptor_warning_handler(void *data, raptor_locator *locator,
 
   librdf_log_simple(scontext->serializer->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_SERIALIZER, locator, message);
 }
+#endif
 
 
 static int
@@ -285,10 +354,12 @@ librdf_serializer_raptor_serialize_stream_to_file_handle(void *context,
 
   scontext->errors=0;
   scontext->warnings=0;
+#ifndef RAPTOR_V2_AVAILABLE
   raptor_serializer_set_error_handler(scontext->rdf_serializer, scontext, 
                                       librdf_serializer_raptor_error_handler);
   raptor_serializer_set_warning_handler(scontext->rdf_serializer, scontext, 
                                         librdf_serializer_raptor_warning_handler);
+#endif
 
   rc=0;
   while(!librdf_stream_end(stream)) {
@@ -343,15 +414,26 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
     return NULL;
 
   /* start the serialize */
-  iostr=raptor_new_iostream_to_string(&string, &string_length,
-                                      malloc);
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_string(raptor_serializer_get_world(scontext->rdf_serializer),
+                                        &string, &string_length,
+                                        malloc);
+#else
+  iostr = raptor_new_iostream_to_string(&string, &string_length,
+                                        malloc);
+#endif
   if(!iostr) {
     free(string);
     return NULL;
   }
-    
-  rc=raptor_serialize_start(scontext->rdf_serializer, 
-                            (raptor_uri*)base_uri, iostr);
+
+#ifdef RAPTOR_V2_AVAILABLE
+  rc = raptor_serialize_start_to_iostream(scontext->rdf_serializer,
+                                          (raptor_uri*)base_uri, iostr);
+#else
+  rc = raptor_serialize_start(scontext->rdf_serializer,
+                              (raptor_uri*)base_uri, iostr);
+#endif
 
   if(rc) {
     raptor_free_iostream(iostr);
@@ -361,10 +443,12 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
     
   scontext->errors=0;
   scontext->warnings=0;
+#ifndef RAPTOR_V2_AVAILABLE
   raptor_serializer_set_error_handler(scontext->rdf_serializer, scontext, 
                                       librdf_serializer_raptor_error_handler);
   raptor_serializer_set_warning_handler(scontext->rdf_serializer, scontext, 
                                         librdf_serializer_raptor_warning_handler);
+#endif
 
   rc=0;    
   while(!librdf_stream_end(stream)) {
@@ -428,8 +512,13 @@ librdf_serializer_raptor_serialize_stream_to_iostream(void *context,
     return 1;
 
   /* start the serialize */
-  rc=raptor_serialize_start(scontext->rdf_serializer, 
-                            (raptor_uri*)base_uri, iostr);
+#ifdef RAPTOR_V2_AVAILABLE
+  rc = raptor_serialize_start_to_iostream(scontext->rdf_serializer,
+                                          (raptor_uri*)base_uri, iostr);
+#else
+  rc = raptor_serialize_start(scontext->rdf_serializer,
+                              (raptor_uri*)base_uri, iostr);
+#endif
 
   if(rc) {
     raptor_free_iostream(iostr);
@@ -438,10 +527,12 @@ librdf_serializer_raptor_serialize_stream_to_iostream(void *context,
     
   scontext->errors=0;
   scontext->warnings=0;
+#ifndef RAPTOR_V2_AVAILABLE
   raptor_serializer_set_error_handler(scontext->rdf_serializer, scontext, 
                                       librdf_serializer_raptor_error_handler);
   raptor_serializer_set_warning_handler(scontext->rdf_serializer, scontext, 
                                         librdf_serializer_raptor_warning_handler);
+#endif
 
   rc=0;
   while(!librdf_stream_end(stream)) {
@@ -530,14 +621,14 @@ librdf_serializer_raptor_constructor(librdf_world *world)
     const unsigned char *uri_string=NULL;
 
 #ifdef RAPTOR_V2_AVAILABLE
-    if(raptor_serializers_enumerate_v2(world->raptor_world_ptr,
-                                       i, &syntax_name, &syntax_label, 
-                                       &mime_type, &uri_string)) {
+    if(raptor_world_enumerate_serializers(world->raptor_world_ptr,
+                                          i, &syntax_name, &syntax_label,
+                                          &mime_type, &uri_string)) {
       /* reached the end of the serializers, now register the default one */
       i=0;
-      raptor_serializers_enumerate_v2(world->raptor_world_ptr,
-                                      i, &syntax_name, &syntax_label,
-                                      &mime_type, &uri_string);
+      raptor_world_enumerate_serializers(world->raptor_world_ptr,
+                                         i, &syntax_name, &syntax_label,
+                                         &mime_type, &uri_string);
     }
 #else
     if(raptor_serializers_enumerate(i, &syntax_name, &syntax_label, 

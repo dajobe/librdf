@@ -120,7 +120,11 @@ librdf_parser_register_factory(librdf_world *world,
 #endif
 
   if(!world->parsers) {
-    world->parsers=raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_parser_factory, NULL);
+#ifdef RAPTOR_V2_AVAILABLE
+    world->parsers = raptor_new_sequence((raptor_data_free_handler *)librdf_free_parser_factory, NULL);
+#else
+    world->parsers = raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_parser_factory, NULL);
+#endif
     if(!world->parsers)
       goto oom;
   }
@@ -783,10 +787,10 @@ librdf_parser_guess_name2(librdf_world* world,
   if(!world || !world->raptor_world_ptr)
     return NULL;
   
-  return raptor_guess_parser_name_v2(world->raptor_world_ptr,
-                                     NULL, mime_type, buffer,
-                                     len,
-                                     identifier);
+  return raptor_world_guess_parser_name(world->raptor_world_ptr,
+                                        NULL, mime_type, buffer,
+                                        len,
+                                        identifier);
 #else
   return raptor_guess_parser_name(NULL, mime_type, buffer,
                                   len,
