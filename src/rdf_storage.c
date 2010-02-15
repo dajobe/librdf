@@ -567,8 +567,10 @@ librdf_new_storage_with_options(librdf_world *world,
 
 
 /**
- * librdf_new_storage_from_storage - Copy constructor - create a new librdf_storage object from an existing one
+ * librdf_new_storage_from_storage:
  * @old_storage: the existing storage #librdf_storage to use
+ *
+ * Copy constructor - create a new librdf_storage object from an existing one
  *
  * Should create a new storage in the same context as the existing one
  * as appropriate for the storage.  For example, in a RDBMS storage
@@ -707,6 +709,7 @@ librdf_free_storage(librdf_storage* storage)
  * @storage: #librdf_storage object
  *
  * Increment storage reference count by one.
+ *
  * This function is intended to be internal to librdf storage modules.
  **/
 void
@@ -717,11 +720,11 @@ librdf_storage_add_reference(librdf_storage *storage)
 
 
 /**
- * librdf_storage_remove_reference(libdf_storage *storage)
+ * librdf_storage_remove_reference:
  * @storage: #librdf_storage object
  *
- * Decrement storage reference count by one.
- * Free the storage if reference count becomes zero.
+ * Decrement storage reference count by one and free the storage if reference count becomes zero.
+ *
  * This function is intended to be internal to librdf storage modules.
  **/
 void
