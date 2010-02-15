@@ -87,6 +87,19 @@ int PASSED=0;
 int FAILED=0;
 
 
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+#define FORMAT_ATTR(string_index, first_to_check_index) \
+  __attribute__((__format__(__printf__, string_index, first_to_check_index)))
+#else
+#define FORMAT_ATTR(string_index, first_to_check_index)
+#endif
+
+
+/* make GCC happier by having 'printf' format attribute in prototype */
+static void endTest(int OK, const char *message, ...) FORMAT_ATTR(2, 3);
+static void startTest(int testID, const char *message, ...) FORMAT_ATTR(2, 3);
+
+
 static void
 endTest(int OK, const char *message, ...)
 {
