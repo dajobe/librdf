@@ -1118,6 +1118,79 @@ fail:
 
 
 /**
+ * librdf_new_query_results_formatter:
+ * @query_results: #librdf_query_results query_results
+ * @name: the query results format name(or NULL)
+ * @uri: #librdf_uri query results format uri(or NULL)
+ *
+ * Constructor - create a new librdf_query_results_formatter object by identified format.
+ *
+ * A query results format can be named or identified by a URI, both
+ * of which are optional.  The default query results format will be used
+ * if both are NULL.  librdf_query_results_formats_enumerate() returns
+ * information on the known query results names, labels and URIs.
+ *
+ * Return value: a new #librdf_query_results_formatter object or NULL on failure
+ */
+static librdf_query_results_formatter*
+librdf_query_virtuoso_new_results_formatter(librdf_query_results* query_results, const char *name, librdf_uri* uri)
+{
+#ifdef VIRTUOSO_STORAGE_DEBUG
+  fprintf(stderr, "librdf_query_virtuoso_new_results_formatter \n");
+#endif
+  return virtuoso_new_results_formatter(query_results, name, uri, NULL);
+}
+
+
+/**
+ * librdf_new_query_results_formatter_by_mime_type:
+ * @query_results: #librdf_query_results query_results
+ * @mime_type: mime type name
+ *
+ * Constructor - create a new librdf_query_results_formatter object by mime type.
+ *
+ * A query results format generates a syntax with a mime type which
+ * may be requested with this constructor.
+
+ * Note that there may be several formatters that generate the same
+ * MIME Type(such as SPARQL XML results format drafts) and in thot
+ * case the librdf_new_query_results_formatter() constructor allows
+ * selecting of a specific one by name or URI.
+ *
+ * Return value: a new #librdf_query_results_formatter object or NULL on failure
+ */
+static librdf_query_results_formatter*
+librdf_query_virtuoso_new_results_formatter_by_mime_type(librdf_query_results* query_results, const char *mime_type)
+{
+#ifdef VIRTUOSO_STORAGE_DEBUG
+  fprintf(stderr, "librdf_query_virtuoso_new_results_formatter_by_mime_type \n");
+#endif
+  return virtuoso_new_results_formatter(query_results, NULL, NULL, mime_type);
+}
+
+
+/**
+ * librdf_free_query_results_formatter:
+ * @formatter: #librdf_query_results_formatter object
+ *
+ * Destructor - destroy a #librdf_query_results_formatter object.
+ **/
+static void
+librdf_query_virtuoso_free_results_formatter(librdf_query_results_formatter* qrf)
+{
+#ifdef VIRTUOSO_STORAGE_DEBUG
+  fprintf(stderr, "librdf_query_virtuoso_free_results_formatter \n");
+#endif
+
+  if(qrf->formatter) {
+    RASQAL_FREE(rasqal_query_results_format_factory, qrf->formatter->factory);
+    rasqal_free_query_results_formatter(qrf->formatter);
+  }
+  LIBRDF_FREE(librdf_query_results, qrf);
+}
+
+
+/**
  * librdf_query_results_formatter_write:
  * @iostr: #raptor_iostream to write the query to
  * @formatter: #librdf_query_results_formatter object
