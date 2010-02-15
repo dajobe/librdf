@@ -849,7 +849,9 @@ main(int argc, char *argv[])
         fprintf(stderr, "**: Formatting query result as '%s':\n", results_format);
 
         iostr=raptor_new_iostream_to_file_handle(stdout);
-        formatter=librdf_new_query_results_formatter(results, results_format, NULL);
+        formatter = librdf_new_query_results_formatter2(results, results_format,
+                                                        NULL /* mime type */,
+                                                        NULL /* format_uri */);
 
         librdf_query_results_formatter_write(iostr, formatter, results, base_uri);
 
