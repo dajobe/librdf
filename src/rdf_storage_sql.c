@@ -47,20 +47,33 @@
 #include <redland.h>
 
 
-static void librdf_sql_config_store_triple(void *user_data,  const raptor_statement *triple);
-
+static void librdf_sql_config_store_triple(void *user_data,
+#ifndef RAPTOR_V2_AVAILABLE
+                                           const
+#endif
+                                           raptor_statement *triple);
 
 
 static void
 librdf_sql_config_store_triple(void *user_data,
-                               const raptor_statement *triple) 
+#ifndef RAPTOR_V2_AVAILABLE
+                               const
+#endif
+                               raptor_statement *triple)
 {
   librdf_sql_config* config=(librdf_sql_config*)user_data;
   int i;
   
   for(i=0; i < config->predicates_count; i++) {
-    if(triple->predicate_type != RAPTOR_IDENTIFIER_TYPE_RESOURCE ||
-       triple->object_type != RAPTOR_IDENTIFIER_TYPE_LITERAL)
+    if(
+#ifdef RAPTOR_V2_AVAILABLE
+       triple->predicate->type != RAPTOR_TERM_TYPE_URI ||
+       triple->object->type != RAPTOR_TERM_TYPE_LITERAL
+#else
+       triple->predicate_type != RAPTOR_IDENTIFIER_TYPE_RESOURCE ||
+       triple->object_type != RAPTOR_IDENTIFIER_TYPE_LITERAL
+#endif
+       )
       continue;
     
     if(!strcmp((const char*)librdf_uri_as_string((librdf_uri*)triple->predicate),
@@ -142,29 +155,29 @@ librdf_new_sql_config(librdf_world* world,
   
   uri_string=raptor_uri_filename_to_uri_string(config->filename);
 #ifdef RAPTOR_V2_AVAILABLE
-  uri = raptor_new_uri_v2(world->raptor_world_ptr, uri_string);
-  base_uri = raptor_uri_copy_v2(world->raptor_world_ptr, uri);
+  uri = raptor_new_uri(world->raptor_world_ptr, uri_string);
+  base_uri = raptor_uri_copy( uri);
 
-  rdf_parser = raptor_new_parser_v2(world->raptor_world_ptr, "turtle");
+  rdf_parser = raptor_new_parser(world->raptor_world_ptr, "turtle");
+
+  raptor_parser_set_statement_handler(rdf_parser, config,
+                                      librdf_sql_config_store_triple);
 #else
   uri = raptor_new_uri(uri_string);
   base_uri = raptor_uri_copy(uri);
 
   rdf_parser = raptor_new_parser("turtle");
-#endif
-  
+
   raptor_set_statement_handler(rdf_parser, config,
                                librdf_sql_config_store_triple);
+#endif
+
   raptor_parse_file(rdf_parser, uri, base_uri);
   raptor_free_parser(rdf_parser);
   
-#ifdef RAPTOR_V2_AVAILABLE
-  raptor_free_uri_v2(world->raptor_world_ptr, base_uri);
-  raptor_free_uri_v2(world->raptor_world_ptr, uri);
-#else
   raptor_free_uri(base_uri);
   raptor_free_uri(uri);
-#endif
+
   raptor_free_memory(uri_string);
 
   /* Check all values are given */
