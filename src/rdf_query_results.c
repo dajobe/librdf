@@ -350,7 +350,7 @@ librdf_query_results_to_counted_string2(librdf_query_results *query_results,
  *
  * The returned string must be freed by the caller
  *
- * @deprecated: Use librdf_query_results_to_counted_string() with extra
+ * @deprecated: Use librdf_query_results_to_counted_string2() with extra
  * name and mime-type args.
  *
  * Return value: new string value or NULL on failure
