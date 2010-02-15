@@ -3,7 +3,7 @@ dnl
 dnl configure.ac - top level autoconf file for Redland
 dnl (Process this file with autoconf to produce a configure script.)
 dnl
-dnl Copyright (C) 2000-2009 David Beckett http://www.dajobe.org/
+dnl Copyright (C) 2000-2010 David Beckett http://www.dajobe.org/
 dnl Copyright (C) 2000-2005 University of Bristol, UK http://www.bristol.ac.uk/
 dnl 
 dnl This package is Free Software and part of Redland http://librdf.org/
@@ -23,7 +23,7 @@ dnl
 dnl 
 
 
-AC_INIT([Redland RDF Application Framework], 1.0.10, http://bugs.librdf.org/, redland)
+AC_INIT([Redland RDF Application Framework], 1.0.11, http://bugs.librdf.org/, redland)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR(src/rdf_node.c)
 AC_REVISION($Revision$)dnl
