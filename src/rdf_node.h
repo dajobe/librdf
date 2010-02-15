@@ -170,6 +170,8 @@ unsigned char* librdf_node_to_counted_string(librdf_node* node, size_t* len_p);
 
 /* pretty print it */
 REDLAND_API
+int librdf_node_write(librdf_node* node, raptor_iostream *iostr);
+REDLAND_API
 void librdf_node_print(librdf_node* node, FILE *fh);
 
 

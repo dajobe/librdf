@@ -1220,6 +1220,74 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
 
 
 /**
+ * librdf_node_write:
+ * @node: the node
+ * @iostream: iostream to write to
+ *
+ * Write the node to an iostream
+ * 
+ * This method is for debugging and the format of the output should
+ * not be relied on.
+ *
+ * Return value: non-0 on failure
+ **/
+int
+librdf_node_write(librdf_node* node, raptor_iostream *iostr)
+{
+  const unsigned char* term;
+  size_t len;
+
+#if 0
+ int raptor_iostream_write_string_ntriples(raptor_iostream *iostr, const unsigned char *string, size_t len, const char delim, 0 /* N-Triples */);
+#endif
+
+  switch(node->type) {
+    case LIBRDF_NODE_TYPE_LITERAL:
+      raptor_iostream_write_byte(iostr, '"');
+      raptor_iostream_write_string_ntriples(iostr, 
+                                            node->value.literal.string,
+                                            node->value.literal.string_len,
+                                            '"');
+      raptor_iostream_write_byte(iostr, '"');
+      if(node->value.literal.xml_language) {
+        raptor_iostream_write_byte(iostr, '@');
+        raptor_iostream_write_string(iostr, node->value.literal.xml_language);
+      }
+      if(node->value.literal.datatype_uri) {
+        raptor_iostream_write_counted_string(iostr, "^^<", 3);
+        term = librdf_uri_as_counted_string(node->value.literal.datatype_uri,
+                                            &len);
+        raptor_iostream_write_string_ntriples(iostr, term, len, '>');
+        raptor_iostream_write_byte(iostr, '>');
+      }
+
+      break;
+      
+    case LIBRDF_NODE_TYPE_BLANK:
+      raptor_iostream_write_counted_string(iostr, "_:", 2);
+      term = (unsigned char*)node->value.blank.identifier;
+      len = node->value.blank.identifier_len;
+      raptor_iostream_write_counted_string(iostr, term, len);
+      break;
+      
+    case LIBRDF_NODE_TYPE_RESOURCE:
+      raptor_iostream_write_byte(iostr, '<');
+      term = librdf_uri_as_counted_string(node->value.resource.uri, &len);
+      raptor_iostream_write_string_ntriples(iostr, term, len, '>');
+      raptor_iostream_write_byte(iostr, '>');
+      break;
+      
+    case LIBRDF_NODE_TYPE_UNKNOWN:
+    default:
+      LIBRDF_FATAL1(node->world, LIBRDF_FROM_NODE, "Unknown node type");
+      return 1;
+  }
+
+  return 0;
+}
+
+
+/**
  * librdf_node_print:
  * @node: the node
  * @fh: file handle
@@ -1233,19 +1301,21 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
 void
 librdf_node_print(librdf_node* node, FILE *fh)
 {
-  unsigned char* s;
-
+  raptor_iostream *iostr;
+  
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(node, librdf_node);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(fh, FILE*);
 
   if(!node)
     return;
-  
-  s=librdf_node_to_string(node);
-  if(!s)
+
+  iostr = raptor_new_iostream_to_file_handle(fh);
+  if(!iostr)
     return;
-  fputs((const char*)s, fh);
-  LIBRDF_FREE(cstring, s);
+  
+  librdf_node_write(node, iostr);
+
+  raptor_free_iostream(iostr);
 }
 
 
