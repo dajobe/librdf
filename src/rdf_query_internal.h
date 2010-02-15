@@ -150,6 +150,8 @@ struct librdf_query_factory_s {
   librdf_query_results_formatter* (*new_results_formatter_by_mime_type)(librdf_query_results* query_results, const char *mime_type);
   void (*free_results_formatter)(librdf_query_results_formatter* formatter);
   int (*results_formatter_write)(raptor_iostream *iostr, librdf_query_results_formatter* formatter, librdf_query_results* results, librdf_uri *base_uri);
+  /* 1.0.11+ for rasqal 0.9.18+ style API */
+  librdf_query_results_formatter* (*new_results_formatter2)(librdf_query_results* query_results, const char *name, const char *mime_type, librdf_uri* format_uri);
 };
 
 
