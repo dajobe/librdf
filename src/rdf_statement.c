@@ -439,83 +439,22 @@ librdf_statement_is_complete(librdf_statement *statement)
 unsigned char *
 librdf_statement_to_string(librdf_statement *statement)
 {
-  unsigned char *subject_string, *predicate_string, *object_string;
+  raptor_iostream* iostr;
   unsigned char *s;
-  int statement_string_len=0;
-  const char *format;
-#define NULL_STRING_LENGTH 6
-  static const unsigned char * const null_string=(const unsigned char *)"(null)";
-  size_t len;
-
+  int rc;
+  
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
-  if(statement->subject) {
-    subject_string=librdf_node_to_counted_string(statement->subject, &len);
-    if(!subject_string)
-      return NULL;
-    statement_string_len += len;
-  } else {
-    subject_string=(unsigned char*)null_string;
-    statement_string_len += NULL_STRING_LENGTH;
-  }
-
+  iostr = raptor_new_iostream_to_string((void**)&s, NULL, malloc);
+  if(!iostr)
+    return NULL;
   
-  if(statement->predicate) {
-    predicate_string=librdf_node_to_counted_string(statement->predicate, &len);
-    if(!predicate_string) {
-      if(subject_string != null_string)
-        LIBRDF_FREE(cstring, subject_string);
-      return NULL;
-    }
-    statement_string_len += len;
-  } else {
-    predicate_string=(unsigned char*)null_string;
-    statement_string_len += NULL_STRING_LENGTH;
+  rc = librdf_statement_write(statement, iostr);
+  raptor_free_iostream(iostr);
+  if(rc) {
+    free(s);
+    s = NULL;
   }
-  
-
-  if(statement->object) {
-    object_string=librdf_node_to_counted_string(statement->object, &len);
-    if(!object_string) {
-      if(subject_string != null_string)
-        LIBRDF_FREE(cstring, subject_string);
-      if(predicate_string != null_string)
-        LIBRDF_FREE(cstring, predicate_string);
-      return NULL;
-    }
-    statement_string_len += len;
-  } else {
-    object_string=(unsigned char*)null_string;
-    statement_string_len += NULL_STRING_LENGTH;
-  }
-  
-
-
-#define LIBRDF_STATEMENT_FORMAT_STRING_LITERAL "{%s, %s, \"%s\"}"
-#define LIBRDF_STATEMENT_FORMAT_RESOURCE_LITERAL "{%s, %s, %s}"
-  statement_string_len += + 1 + /* "{" %s */
-                            2 + /* ", " %s */
-                            2 + /* ", " %s */
-                            1; /* "}" */
-  if(statement->object &&
-     librdf_node_get_type(statement->object) == LIBRDF_NODE_TYPE_LITERAL) {
-    format=LIBRDF_STATEMENT_FORMAT_STRING_LITERAL;
-    statement_string_len+=2; /* Extra "" around literal */
-  } else {
-    format=LIBRDF_STATEMENT_FORMAT_RESOURCE_LITERAL;
-  }
-    
-  s=(unsigned char*)LIBRDF_MALLOC(cstring, statement_string_len+1);
-  if(s)
-    sprintf((char*)s, format, subject_string, predicate_string, object_string);
-
-  /* always free allocated intermediate strings */
-  if(subject_string != null_string)
-    LIBRDF_FREE(cstring, subject_string);
-  if(predicate_string != null_string)
-    LIBRDF_FREE(cstring, predicate_string);
-  if(object_string != null_string)
-    LIBRDF_FREE(cstring, object_string);
 
   return s;
 }
