@@ -1237,9 +1237,15 @@ librdf_node_write(librdf_node* node, raptor_iostream *iostr)
   const unsigned char* term;
   size_t len;
 
-#if 0
- int raptor_iostream_write_string_ntriples(raptor_iostream *iostr, const unsigned char *string, size_t len, const char delim, 0 /* N-Triples */);
-#endif
+#define NULL_STRING_LENGTH 6
+  static const unsigned char * const null_string = (const unsigned char *)"(null)";
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(iostr, raptor_iostream, 1);
+
+  if(!node) {
+    raptor_iostream_write_counted_string(iostr, null_string, NULL_STRING_LENGTH);
+    return 0;
+  }
 
   switch(node->type) {
     case LIBRDF_NODE_TYPE_LITERAL:
