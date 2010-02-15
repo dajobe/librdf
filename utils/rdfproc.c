@@ -165,10 +165,6 @@ static const char *default_storage_options="hash-type='bdb',dir='.'";
 static int
 log_handler(void *user_data, librdf_log_message *message) 
 {
-#ifdef RAPTOR_V2_AVAILABLE
-  librdf_world* world = (librdf_world*)user_data;
-#endif
-
   /* int code=message->code; */ /* The error code */
   raptor_locator *locator=(raptor_locator*)(message->locator);
 
@@ -183,7 +179,7 @@ log_handler(void *user_data, librdf_log_message *message)
 
   if(locator) { /* && message->facility == LIBRDF_FROM_PARSER) */
 #ifdef RAPTOR_V2_AVAILABLE
-    raptor_print_locator_v2(librdf_world_get_raptor(world), stderr, locator);
+    raptor_locator_print(locator, stderr);
 #else
     raptor_print_locator(stderr, locator); 
 #endif
@@ -923,7 +919,11 @@ main(int argc, char *argv[])
         fprintf(stdout, "%s: Formatting query result as '%s':\n", program,
                 results_format);
 
-        iostr=raptor_new_iostream_to_file_handle(stdout);
+#ifdef RAPTOR_V2_AVAILABLE
+        iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stdout);
+#else
+        iostr = raptor_new_iostream_to_file_handle(stdout);
+#endif
         formatter=librdf_new_query_results_formatter(results,
                                                      results_format, NULL);
 
