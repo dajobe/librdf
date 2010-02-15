@@ -52,7 +52,6 @@
 
 #include <rdf_storage_virtuoso_internal.h>
 
-static librdf_query_results_formatter* virtuoso_new_results_formatter(librdf_query_results* query_results, const char *name, const char *mime_type, librdf_uri* format_uri);
 
 static int librdf_query_virtuoso_results_next(librdf_query_results *query_results);
 
@@ -184,17 +183,20 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name,
   context->row_count = 0;
   context->result_type = VQUERY_RESULTS_UNKNOWN;
 
-  len=strlen((const char*)query_string);
+  context->results = NULL; /* FIXME */
+
+  len = strlen((const char*)query_string);
   query_string_copy = (unsigned char*)LIBRDF_MALLOC(cstring, len+1);
   if(!query_string_copy)
     return 1;
   strcpy((char*)query_string_copy, (const char*)query_string);
 
-  token=strtok((char*)query_string_copy, seps);
+  token = strtok((char*)query_string_copy, seps);
 
   while(token != NULL) {
     if(strexpect("SELECT", (const char*)token)) {
       context->result_type = VQUERY_RESULTS_BINDINGS;
+      context->results = NULL; /* FIXME */
       break;
     } else if(strexpect("ASK", (const char*)token)) {
       context->result_type = VQUERY_RESULTS_BOOLEAN;
@@ -206,7 +208,7 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name,
       context->result_type = VQUERY_RESULTS_GRAPH | VQUERY_RESULTS_BINDINGS;
       break;
     }
-    token=strtok(NULL, seps);
+    token = strtok(NULL, seps);
   }
 
   strcpy((char*)query_string_copy, (const char*)query_string);
@@ -228,6 +230,9 @@ librdf_query_virtuoso_terminate(librdf_query* query)
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_terminate \n");
 #endif
+  if(context->results)
+    rasqal_free_query_results(context->results);
+  
   virtuoso_free_result(query);
   SQLCloseCursor(context->vc->hstmt);
 
@@ -332,6 +337,8 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
     context->result_type |= VQUERY_RESULTS_BINDINGS;
     context->eof = 0;
   }
+
+  context->results = rasqal_new_query_results(query->world->rasqal_world_ptr, NULL, RASQAL_QUERY_RESULTS_BINDINGS, NULL /* vars_table */);
 
   results = (librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, 
                                                  sizeof(*results));
@@ -480,7 +487,7 @@ librdf_query_virtuoso_results_next(librdf_query_results *query_results)
   }
 
   for(col = 1; col <= context->numCols; col++) {
-    data=context->vc->v_GetDataCHAR(context->storage->world, context->vc,
+    data = context->vc->v_GetDataCHAR(context->storage->world, context->vc,
                                     col, &is_null);
     if(!data && !is_null)
       return 2;
@@ -488,7 +495,7 @@ librdf_query_virtuoso_results_next(librdf_query_results *query_results)
     if(!data || is_null) {
       node = NULL;
     } else {
-      node=context->vc->v_rdf2node(context->storage, context->vc, col, data);
+      node = context->vc->v_rdf2node(context->storage, context->vc, col, data);
       LIBRDF_FREE(cstring, (char *) data);
       if(!node)
 	return 2;
@@ -965,10 +972,10 @@ librdf_query_virtuoso_query_results_update_statement(void* context)
     goto fail;
 
   if(scontext->numCols > 3) {
-    data=qcontext->vc->v_GetDataCHAR(world, qcontext->vc, colNum, &is_null);
+    data = qcontext->vc->v_GetDataCHAR(world, qcontext->vc, colNum, &is_null);
     if(!data || is_null)
       goto fail;
-    node=qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
+    node = qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
     LIBRDF_FREE(cstring, (char *)data);
     if(!node)
       goto fail;
@@ -976,10 +983,10 @@ librdf_query_virtuoso_query_results_update_statement(void* context)
     colNum++;
   }
 
-  data=qcontext->vc->v_GetDataCHAR(world, qcontext->vc, colNum, &is_null);
+  data = qcontext->vc->v_GetDataCHAR(world, qcontext->vc, colNum, &is_null);
   if(!data || is_null)
     goto fail;
-  node=qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
+  node = qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
   LIBRDF_FREE(cstring, (char *)data);
   if(!node)
     goto fail;
@@ -990,10 +997,10 @@ librdf_query_virtuoso_query_results_update_statement(void* context)
   if(colNum > scontext->numCols)
     goto fail;
 
-  data=qcontext->vc->v_GetDataCHAR(world, qcontext->vc, colNum, &is_null);
+  data = qcontext->vc->v_GetDataCHAR(world, qcontext->vc, colNum, &is_null);
   if(!data || is_null)
     goto fail;
-  node=qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
+  node = qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
   LIBRDF_FREE(cstring, (char *)data);
   if(!node)
     goto fail;
@@ -1004,10 +1011,10 @@ librdf_query_virtuoso_query_results_update_statement(void* context)
   if(colNum > scontext->numCols)
     goto fail;
 
-  data=qcontext->vc->v_GetDataCHAR(world, qcontext->vc, colNum, &is_null);
+  data = qcontext->vc->v_GetDataCHAR(world, qcontext->vc, colNum, &is_null);
   if(!data || is_null)
     goto fail;
-  node=qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
+  node = qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
   LIBRDF_FREE(cstring, (char *)data);
   if(!node)
     goto fail;
@@ -1198,85 +1205,6 @@ fail:
 
 
 /**
- * librdf_new_query_results_formatter:
- * @query_results: #librdf_query_results query_results
- * @name: the query results format name(or NULL)
- * @uri: #librdf_uri query results format uri(or NULL)
- *
- * Constructor - create a new librdf_query_results_formatter object by identified format.
- *
- * A query results format can be named or identified by a URI, both
- * of which are optional.  The default query results format will be used
- * if both are NULL.  librdf_query_results_formats_enumerate() returns
- * information on the known query results names, labels and URIs.
- *
- * Return value: a new #librdf_query_results_formatter object or NULL on failure
- */
-static librdf_query_results_formatter*
-librdf_query_virtuoso_new_results_formatter(librdf_query_results* query_results, 
-                                            const char *name, librdf_uri* uri)
-{
-#ifdef VIRTUOSO_STORAGE_DEBUG
-  fprintf(stderr, "librdf_query_virtuoso_new_results_formatter \n");
-#endif
-  return virtuoso_new_results_formatter(query_results, name, 
-                                        NULL /* mime type */,
-                                        uri);
-}
-
-
-/**
- * librdf_new_query_results_formatter_by_mime_type:
- * @query_results: #librdf_query_results query_results
- * @mime_type: mime type name
- *
- * Constructor - create a new librdf_query_results_formatter object by mime type.
- *
- * A query results format generates a syntax with a mime type which
- * may be requested with this constructor.
-
- * Note that there may be several formatters that generate the same
- * MIME Type(such as SPARQL XML results format drafts) and in thot
- * case the librdf_new_query_results_formatter() constructor allows
- * selecting of a specific one by name or URI.
- *
- * Return value: a new #librdf_query_results_formatter object or NULL on failure
- */
-static librdf_query_results_formatter*
-librdf_query_virtuoso_new_results_formatter_by_mime_type(librdf_query_results* query_results,
-                                                         const char *mime_type)
-{
-#ifdef VIRTUOSO_STORAGE_DEBUG
-  fprintf(stderr, "librdf_query_virtuoso_new_results_formatter_by_mime_type \n");
-#endif
-  return virtuoso_new_results_formatter(query_results,
-                                        NULL /* name */, mime_type,
-                                        NULL /* uri */);
-}
-
-
-/**
- * librdf_free_query_results_formatter:
- * @formatter: #librdf_query_results_formatter object
- *
- * Destructor - destroy a #librdf_query_results_formatter object.
- **/
-static void
-librdf_query_virtuoso_free_results_formatter(librdf_query_results_formatter* qrf)
-{
-#ifdef VIRTUOSO_STORAGE_DEBUG
-  fprintf(stderr, "librdf_query_virtuoso_free_results_formatter \n");
-#endif
-
-  if(qrf->formatter) {
-    RASQAL_FREE(rasqal_query_results_format_factory, qrf->formatter->factory);
-    rasqal_free_query_results_formatter(qrf->formatter);
-  }
-  LIBRDF_FREE(librdf_query_results, qrf);
-}
-
-
-/**
  * librdf_query_results_formatter_write:
  * @iostr: #raptor_iostream to write the query to
  * @formatter: #librdf_query_results_formatter object
@@ -1296,15 +1224,18 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
                                               librdf_query_results* query_results, 
                                               librdf_uri *base_uri)
 {
+  librdf_query *query = query_results->query;
+  librdf_query_virtuoso_context *context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_formatter_write \n");
 #endif
-  if(!qrf->formatter->factory->writer)
-     return 1;
-  return qrf->formatter->factory->writer(iostr, 
-                                         (rasqal_query_results *)query_results,
-                                         (raptor_uri *)base_uri);
+
+  context = (librdf_query_virtuoso_context*)query->context;
+
+  return rasqal_query_results_formatter_write(iostr, qrf->formatter,
+                                              context->results, 
+                                              (raptor_uri*)base_uri);
 }
 
 
@@ -1348,603 +1279,7 @@ librdf_query_virtuoso_register_factory(librdf_query_factory *factory)
 void
 librdf_init_query_virtuoso(librdf_world *world)
 {
-  librdf_query_register_factory(world, "vsparql", (const unsigned char*)"http://www.w3.org/TR/rdf-vsparql-query/", &librdf_query_virtuoso_register_factory);
-}
-
-
-
-/*
- * NOTICE: The following code was duplicated from
- *
- *   rasqal_result_formats.c
- *   Copyright (C) 2003-2008, David Beckett http://www.dajobe.org/
- *   Copyright (C) 2003-2005, University of Bristol, UK http://www.bristol.ac.uk/
- *
- *   rasqal_sparql_xml.c
- *   Copyright (C) 2007-2008, David Beckett http://www.dajobe.org/
- *
- * and modified to use the librdf_ interfaces rather than the internal rasqal
- * structures.
- *
- * This code should be abstracted to avoid such duplication on future interfaces
- */
-static void
-virtuoso_query_simple_error(void* user_data, const char *message, ...)
-{
-  librdf_query* query = (librdf_query*)user_data;
-  librdf_query_virtuoso_context *context;
-
-  context = (librdf_query_virtuoso_context*)query->context;
-
-  va_list arguments;
-
-  va_start(arguments, message);
-
-  context->failed = 1;
-  librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
-             message, arguments);
-  va_end(arguments);
-}
-
-
-static int
-virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr,
-                                        librdf_query_results* results,
-                                        raptor_uri *base_uri)
-{
-  int rc = 1;
-  librdf_query* query=results->query;
-#ifndef RAPTOR_V2_AVAILABLE
-  const raptor_uri_handler *uri_handler;
-  void *uri_context;
-#endif
-  raptor_xml_writer* xml_writer = NULL;
-  raptor_namespace *res_ns = NULL;
-  raptor_namespace_stack *nstack = NULL;
-  raptor_xml_element *sparql_element = NULL;
-  raptor_xml_element *results_element = NULL;
-  raptor_xml_element *result_element = NULL;
-  raptor_xml_element *element1 = NULL;
-  raptor_xml_element *binding_element = NULL;
-  raptor_xml_element *variable_element = NULL;
-  raptor_qname **attrs = NULL;
-  int i;
-
-  if(!librdf_query_results_is_bindings(results) &&
-     !librdf_query_results_is_boolean(results)) {
-    librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
-               "Can only write XML format v3 for variable binding and boolean results");
-    return 1;
-  }
-
-#ifdef RAPTOR_V2_AVAILABLE
-  nstack = raptor_new_namespaces_v2(query->world->raptor_world_ptr, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
-#else
-  raptor_uri_get_handler(&uri_handler, &uri_context);
-  nstack = raptor_new_namespaces(uri_handler, uri_context, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
-#endif
-  if(!nstack)
-    return 1;
-
-#ifdef RAPTOR_V2_AVAILABLE
-  xml_writer = raptor_new_xml_writer_v2(query->world->raptor_world_ptr, nstack, iostr, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
-#else
-  xml_writer = raptor_new_xml_writer(nstack, uri_handler, uri_context, iostr, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
-#endif
-  if(!xml_writer)
-    goto tidy;
-
-  res_ns = raptor_new_namespace(nstack, NULL, (const unsigned char*)"http://www.w3.org/2005/sparql-results#", 0);
-  if(!res_ns)
-    goto tidy;
-
-  sparql_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"sparql", NULL, base_uri);
-  if(!sparql_element)
-    goto tidy;
-
-  if(librdf_query_results_is_bindings(results)) {
-#if 0
-    /* FIXME - consider when to write the XSD.  Need the XSD URI too. */
-    raptor_namespace* xsi_ns;
-    xsi_ns = raptor_new_namespace(nstack, (const unsigned char*)"xsi", (const unsigned char*)"http://www.w3.org/2001/XMLSchema-instance", 0);
-    raptor_xml_element_declare_namespace(sparql_element, xsi_ns);
-
-    attrs = (raptor_qname **)raptor_alloc_memory(sizeof(raptor_qname*));
-    attrs[0] = raptor_new_qname_from_namespace_local_name(xsi_ns, (const unsigned char*)"schemaLocation", (const unsigned char*)"http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd");
-    raptor_xml_element_set_attributes(sparql_element, attrs, 1);
-#endif
-  }
-
-  raptor_xml_writer_start_element(xml_writer, sparql_element);
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-
-  /*   <head> */
-  element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"head", NULL, base_uri);
-  if(!element1)
-    goto tidy;
-
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"  ", 2);
-  raptor_xml_writer_start_element(xml_writer, element1);
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-
-  if(librdf_query_results_is_bindings(results)) {
-    for(i = 0; 1; i++) {
-      const unsigned char *name;
-      name = (const unsigned char*)librdf_query_results_get_binding_name(results, i);
-      if(!name)
-        break;
-
-      /*     <variable name="x"/> */
-      variable_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"variable", NULL, base_uri);
-      if(!variable_element)
-        goto tidy;
-
-      attrs = (raptor_qname **)raptor_alloc_memory(sizeof(raptor_qname*));
-      if(!attrs)
-        goto tidy;
-#ifdef RAPTOR_V2_AVAILABLE
-      attrs[0] = raptor_new_qname_from_namespace_local_name_v2(query->world->raptor_world_ptr, res_ns, (const unsigned char*)"name", (const unsigned char*)name); /* attribute value */
-#else
-      attrs[0] = raptor_new_qname_from_namespace_local_name(res_ns, (const unsigned char*)"name", (const unsigned char*)name); /* attribute value */
-#endif
-      if(!attrs[0]) {
-        raptor_free_memory((void*)attrs);
-        goto tidy;
-      }
-
-      raptor_xml_element_set_attributes(variable_element, attrs, 1);
-
-      raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"    ", 4);
-      raptor_xml_writer_empty_element(xml_writer, variable_element);
-      raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-
-      raptor_free_xml_element(variable_element);
-      variable_element = NULL;
-    }
-  }
-
-  /* FIXME - could add <link> inside <head> */
-
-
-  /*   </head> */
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"  ", 2);
-  raptor_xml_writer_end_element(xml_writer, element1);
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-
-  raptor_free_xml_element(element1);
-  element1 = NULL;
-
-
-  /* Boolean Results */
-  if(librdf_query_results_is_boolean(results)) {
-    result_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"boolean", NULL, base_uri);
-    if(!result_element)
-      goto tidy;
-
-    raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"  ", 2);
-    raptor_xml_writer_start_element(xml_writer, result_element);
-    if(librdf_query_results_get_boolean(results))
-      raptor_xml_writer_raw(xml_writer, RASQAL_XSD_BOOLEAN_TRUE);
-    else
-      raptor_xml_writer_raw(xml_writer, RASQAL_XSD_BOOLEAN_FALSE);
-    raptor_xml_writer_end_element(xml_writer, result_element);
-    raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-
-    goto results3done;
-  }
-
-
-  /* Variable Binding Results */
-
-  /*   <results> */
-  results_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"results", NULL, base_uri);
-  if(!results_element)
-    goto tidy;
-
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"  ", 2);
-  raptor_xml_writer_start_element(xml_writer, results_element);
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-
-  /* declare result element for later multiple use */
-  result_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"result", NULL, base_uri);
-  if(!result_element)
-    goto tidy;
-
-  while(!librdf_query_results_finished(results)) {
-    /*     <result> */
-    raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"    ", 4);
-    raptor_xml_writer_start_element(xml_writer, result_element);
-    raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-
-    for(i = 0; i<librdf_query_results_get_bindings_count(results); i++) {
-      const char *name=librdf_query_results_get_binding_name(results, i);
-      librdf_node *node=librdf_query_results_get_binding_value(results, i);
-
-      /*       <binding> */
-      binding_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"binding", NULL, base_uri);
-      if(!binding_element)
-        goto tidy;
-
-      attrs = (raptor_qname **)raptor_alloc_memory(sizeof(raptor_qname*));
-      if(!attrs)
-        goto tidy;
-#ifdef RAPTOR_V2_AVAILABLE
-      attrs[0] = raptor_new_qname_from_namespace_local_name_v2(query->world->raptor_world_ptr, res_ns, (const unsigned char*)"name", (const unsigned char *) name);
-
-#else
-      attrs[0] = raptor_new_qname_from_namespace_local_name(res_ns, (const unsigned char*)"name", (const unsigned char *) name);
-#endif
-      if(!attrs[0]) {
-        raptor_free_memory((void*)attrs);
-        goto tidy;
-      }
-
-      raptor_xml_element_set_attributes(binding_element, attrs, 1);
-
-      raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"      ", 6);
-      raptor_xml_writer_start_element(xml_writer, binding_element);
-
-      if(!node) {
-        element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"unbound", NULL, base_uri);
-        if(!element1)
-          goto tidy;
-        raptor_xml_writer_empty_element(xml_writer, element1);
-
-      } else switch(librdf_node_get_type(node)) {
-        case LIBRDF_NODE_TYPE_RESOURCE:
-          element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"uri", NULL, base_uri);
-          if(!element1)
-            goto tidy;
-
-          raptor_xml_writer_start_element(xml_writer, element1);
-          raptor_xml_writer_cdata(xml_writer, (const unsigned char*)librdf_uri_as_string(librdf_node_get_uri(node)));
-          raptor_xml_writer_end_element(xml_writer, element1);
-          break;
-
-        case LIBRDF_NODE_TYPE_BLANK:
-          element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"bnode", NULL, base_uri);
-          if(!element1)
-            goto tidy;
-
-          raptor_xml_writer_start_element(xml_writer, element1);
-          raptor_xml_writer_cdata(xml_writer, (const unsigned char*)librdf_node_get_blank_identifier(node));
-          raptor_xml_writer_end_element(xml_writer, element1);
-          break;
-
-        case LIBRDF_NODE_TYPE_LITERAL:
-          element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"literal", NULL, base_uri);
-          if(!element1)
-            goto tidy;
-          {
-	    char *value, *datatype = NULL;
-	    char *lang = NULL;
-	    librdf_uri *dt;
-	    size_t valuelen;
-
-	    value = (char *)librdf_node_get_literal_value_as_counted_string(node, &valuelen);
-	    lang=librdf_node_get_literal_value_language(node);
-	    dt=librdf_node_get_literal_value_datatype_uri(node);
-	    if(dt)
-      	      datatype = (char *)librdf_uri_as_string(dt);
-
-            if(lang || dt) {
-              attrs = (raptor_qname **)raptor_alloc_memory(sizeof(raptor_qname*));
-              if(!attrs)
-                goto tidy;
-
-              if(lang)
-                attrs[0] = raptor_new_qname(nstack, (const unsigned char*)"xml:lang", (const unsigned char*)lang, (raptor_simple_message_handler)virtuoso_query_simple_error, query);
-              else
-#ifdef RAPTOR_V2_AVAILABLE
-                attrs[0] = raptor_new_qname_from_namespace_local_name_v2(query->world->raptor_world_ptr, res_ns, (const unsigned char*)"datatype", (const unsigned char*)datatype);
-#else
-                attrs[0] = raptor_new_qname_from_namespace_local_name(res_ns, (const unsigned char*)"datatype", (const unsigned char*)datatype);
-#endif
-              if(!attrs[0]) {
-                raptor_free_memory((void*)attrs);
-                goto tidy;
-              }
-
-              raptor_xml_element_set_attributes(element1, attrs, 1);
-            }
-
-            raptor_xml_writer_start_element(xml_writer, element1);
-            raptor_xml_writer_cdata_counted(xml_writer, (const unsigned char*)value, valuelen);
-            raptor_xml_writer_end_element(xml_writer, element1);
-          }
-          break;
-
-        case LIBRDF_NODE_TYPE_UNKNOWN:
-        default:
-          virtuoso_query_simple_error(query, "Cannot turn literal type %d into XML", librdf_node_get_type(node));
-      }
-
-      if(element1) {
-        raptor_free_xml_element(element1);
-        element1 = NULL;
-      }
-
-      /*       </binding> */
-      raptor_xml_writer_end_element(xml_writer, binding_element);
-      raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-      raptor_free_xml_element(binding_element);
-      binding_element = NULL;
-      librdf_free_node(node);
-    }
-
-    raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"    ", 4);
-    raptor_xml_writer_end_element(xml_writer, result_element);
-    raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-    librdf_query_results_next(results);
-  }
-
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"  ", 2);
-  raptor_xml_writer_end_element(xml_writer, results_element);
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-
-results3done:
-  rc = 0;
-  raptor_xml_writer_end_element(xml_writer, sparql_element);
-  raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
-
-tidy:
-  if(element1)
-    raptor_free_xml_element(element1);
-  if(variable_element)
-    raptor_free_xml_element(variable_element);
-  if(binding_element)
-    raptor_free_xml_element(binding_element);
-  if(result_element)
-    raptor_free_xml_element(result_element);
-  if(results_element)
-    raptor_free_xml_element(results_element);
-  if(sparql_element)
-    raptor_free_xml_element(sparql_element);
-  if(res_ns)
-    raptor_free_namespace(res_ns);
-  if(xml_writer)
-    raptor_free_xml_writer(xml_writer);
-  if(nstack)
-    raptor_free_namespaces(nstack);
-  return rc;
-}
-
-
-static void
-virtuoso_iostream_write_json_boolean(raptor_iostream* iostr, const char* name, int json_bool)
-{
-  raptor_iostream_write_byte(iostr, '\"');
-  raptor_iostream_write_string(iostr, name);
-  raptor_iostream_write_counted_string(iostr, "\" : ",4);
-
-  if(json_bool)
-    raptor_iostream_write_counted_string(iostr, "true", 4);
-  else
-    raptor_iostream_write_counted_string(iostr, "false", 5);
-
-}
-
-
-static int
-virtuoso_query_results_write_json1(raptor_iostream *iostr, librdf_query_results* results, raptor_uri *base_uri)
-{
-  librdf_query* query=results->query;
-  int i;
-  int row_comma;
-  int column_comma = 0;
-
-  if(!librdf_query_results_is_bindings(results) && !librdf_query_results_is_boolean(results)) {
-    virtuoso_query_simple_error(query, "Can only write JSON format for variable binding and boolean results");
-    return 1;
-  }
-
-  raptor_iostream_write_counted_string(iostr, "{\n", 2);
-  /* Header */
-  raptor_iostream_write_counted_string(iostr, "  \"head\": {\n", 12);
-
-  if(librdf_query_results_is_bindings(results)) {
-    raptor_iostream_write_counted_string(iostr, "    \"vars\": [ ", 14);
-    for(i = 0; 1; i++) {
-      const char *name;
-
-      name=librdf_query_results_get_binding_name(results, i);
-      if(!name)
-        break;
-
-      /*     'x', */
-      if(i > 0)
-        raptor_iostream_write_counted_string(iostr, ", ", 2);
-      raptor_iostream_write_byte(iostr, '\"');
-      raptor_iostream_write_string(iostr, name);
-      raptor_iostream_write_byte(iostr, '\"');
-    }
-    raptor_iostream_write_counted_string(iostr, " ]\n", 3);
-  }
-
-  /* FIXME - could add link inside 'head': */
-  /*   End Header */
-  raptor_iostream_write_counted_string(iostr, "  },\n", 5);
-  /* Boolean Results */
-  if(librdf_query_results_is_boolean(results)) {
-    raptor_iostream_write_counted_string(iostr, "  ", 2);
-    virtuoso_iostream_write_json_boolean(iostr, "boolean", librdf_query_results_get_boolean(results));
-    goto results3done;
-  }
-
-  /* Variable Binding Results */
-  raptor_iostream_write_counted_string(iostr, "  \"results\": {\n", 15);
-#if 1
-  raptor_iostream_write_counted_string(iostr, "    \"ordered\" : false,\n", 23);
-#else
-  /*FIXME*/
-  rasqal_iostream_write_json_boolean(iostr, "ordered", (rasqal_query_get_order_condition(query, 0) != NULL));
-#endif
-
-#if 1
-  raptor_iostream_write_counted_string(iostr, "    \"distinct\" : false,\n", 24);
-#else
-  /*FIXME*/
-  rasqal_iostream_write_json_boolean(iostr, "distinct", rasqal_query_get_distinct(query));
-#endif
-
-  raptor_iostream_write_counted_string(iostr, "    \"bindings\" : [\n", 19);
-  row_comma = 0;
-  while(!librdf_query_results_finished(results)) {
-    if(row_comma)
-      raptor_iostream_write_counted_string(iostr, ",\n", 2);
-
-    /* Result row */
-    raptor_iostream_write_counted_string(iostr, "      {\n", 8);
-    column_comma = 0;
-    for(i = 0; i<librdf_query_results_get_bindings_count(results); i++) {
-      const char *name=librdf_query_results_get_binding_name(results, i);
-      librdf_node *node=librdf_query_results_get_binding_value(results, i);
-
-      if(column_comma)
-        raptor_iostream_write_counted_string(iostr, ",\n", 2);
-
-      /*       <binding> */
-      raptor_iostream_write_counted_string(iostr, "        \"", 9);
-      raptor_iostream_write_string(iostr, name);
-      raptor_iostream_write_counted_string(iostr, "\" : { ", 6);
-
-      if(!node) {
-        raptor_iostream_write_string(iostr, "\"type\": \"unbound\", \"value\": null");
-      } else switch(librdf_node_get_type(node)) {
-        const unsigned char* str;
-        size_t len;
-        char *lang;
-        librdf_uri *dt;
-
-        case LIBRDF_NODE_TYPE_RESOURCE:
-          raptor_iostream_write_string(iostr, "\"type\": \"uri\", \"value\": \"");
-          str = (const unsigned char*)librdf_uri_as_counted_string(librdf_node_get_uri(node), &len);
-          raptor_iostream_write_string_ntriples(iostr, str, len, '"');
-          raptor_iostream_write_byte(iostr, '"');
-          break;
-
-        case LIBRDF_NODE_TYPE_BLANK:
-          str = (const unsigned char*)librdf_node_get_blank_identifier(node);
-
-          raptor_iostream_write_string(iostr, "\"type\": \"bnode\", \"value\": \"");
-          raptor_iostream_write_string_ntriples(iostr, str, strlen((char *)str), '"');
-          raptor_iostream_write_byte(iostr, '"');
-          break;
-
-        case LIBRDF_NODE_TYPE_LITERAL:
-          str = (const unsigned char *)librdf_node_get_literal_value_as_counted_string(node,&len);
-          raptor_iostream_write_string(iostr, "\"type\": \"literal\", \"value\": \"");
-          raptor_iostream_write_string_ntriples(iostr, str, len, '"');
-          raptor_iostream_write_byte(iostr, '"');
-
-          lang=librdf_node_get_literal_value_language(node);
-          if(lang) {
-            raptor_iostream_write_string(iostr, ",\n      \"xml:lang\" : \"");
-            raptor_iostream_write_string(iostr, (const unsigned char*)lang);
-            raptor_iostream_write_byte(iostr, '"');
-          }
-
-          dt=librdf_node_get_literal_value_datatype_uri(node);
-          if(dt) {
-            raptor_iostream_write_string(iostr, ",\n      \"datatype\" : \"");
-            str = (const unsigned char*)librdf_uri_as_counted_string(dt, &len);
-            raptor_iostream_write_string_ntriples(iostr, str, len, '"');
-            raptor_iostream_write_byte(iostr, '"');
-          }
-
-          break;
-
-        case LIBRDF_NODE_TYPE_UNKNOWN:
-        default:
-          virtuoso_query_simple_error(query, "Cannot turn literal type %d into XML", librdf_node_get_type(node));
-      }
-
-      /* End Binding */
-      raptor_iostream_write_counted_string(iostr, " }", 2);
-      column_comma = 1;
-      librdf_free_node(node);
-
-    }
-
-    /* End Result Row */
-    raptor_iostream_write_counted_string(iostr, "\n      }", 8);
-    row_comma = 1;
-    librdf_query_results_next(results);
-  }
-
-  raptor_iostream_write_counted_string(iostr, "\n    ]\n  }", 10);
-results3done:
-
-  /* end sparql */
-  raptor_iostream_write_counted_string(iostr, "\n}\n", 3);
-
-  return 0;
-}
-
-
-static librdf_query_results_formatter*
-virtuoso_new_results_formatter(librdf_query_results* query_results,
-                               const char *name,
-                               const char *mime_type,
-                               librdf_uri* format_uri)
-{
-  rasqal_query_results_format_factory* factory;
-  rasqal_query_results_formatter* formatter;
-  librdf_query_results_formatter* qrf;
-  rasqal_query_results_formatter_func writer_fn = (rasqal_query_results_formatter_func)virtuoso_query_results_write_sparql_xml;
-  int is_json = 0;
-
-
-  if(name) {
-     if(!strcmp(name, "json")) {
-        writer_fn  = (rasqal_query_results_formatter_func)virtuoso_query_results_write_json1;
-        is_json = 1;
-     }
-  } else if(uri) {
-     char *s_uri  = (char *)librdf_uri_as_string(format_uri);
-     if(!strcmp(s_uri, "http://www.w3.org/2001/sw/DataAccess/json-sparql/")) {
-        writer_fn  = (rasqal_query_results_formatter_func)virtuoso_query_results_write_json1;
-        is_json = 1;
-     } else if(!strcmp(s_uri, "http://www.mindswap.org/%7Ekendall/sparql-results-json/")) {
-        writer_fn  = (rasqal_query_results_formatter_func)virtuoso_query_results_write_json1;
-        is_json = 1;
-     }
-  } else if(mime_type)  {
-     if(!strcmp(name, "text/json")) {
-        writer_fn  = (rasqal_query_results_formatter_func)virtuoso_query_results_write_json1;
-        is_json = 1;
-     }
-  }
-
-  factory = (rasqal_query_results_format_factory*)RASQAL_CALLOC(query_results_format_factory, 1, sizeof(*factory));
-  if(!factory)
-    return NULL;
-
-  factory->name = NULL;
-  factory->label = NULL;
-  factory->uri_string = NULL;
-  factory->writer=writer_fn;
-  factory->reader = NULL;
-  factory->get_rowsource = NULL;
-  factory->mime_type = NULL;
-
-  formatter = (rasqal_query_results_formatter*)RASQAL_CALLOC(rasqal_query_results_formatter, 1, sizeof(*formatter));
-  if(!formatter) {
-    RASQAL_FREE(query_results_format_factory, factory);
-    return NULL;
-  }
-
-  formatter->factory=factory;
-  formatter->mime_type = NULL;
-
-  qrf = (librdf_query_results_formatter*)LIBRDF_MALLOC(query_results_formatter, sizeof(*qrf));
-  if(!qrf) {
-    RASQAL_FREE(query_results_format_factory, factory);
-    rasqal_free_query_results_formatter(formatter);
-    return NULL;
-  }
-
-  qrf->query_results = query_results;
-  qrf->formatter = formatter;
-  return qrf;
+  librdf_query_register_factory(world, "vsparql",
+                                (const unsigned char*)"http://www.w3.org/TR/rdf-vsparql-query/",
+                                &librdf_query_virtuoso_register_factory);
 }
