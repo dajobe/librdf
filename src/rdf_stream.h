@@ -98,8 +98,10 @@ void* librdf_stream_get_context(librdf_stream* stream);
 REDLAND_API
 int librdf_stream_add_map(librdf_stream* stream, librdf_stream_map_handler map_function, librdf_stream_map_free_context_handler free_context, void *map_context);
 
-REDLAND_API
+REDLAND_API REDLAND_DEPRECATED
 void librdf_stream_print(librdf_stream *stream, FILE *fh);
+REDLAND_API
+int librdf_stream_write(librdf_stream *stream, raptor_iostream *iostr);
 
 REDLAND_API
 librdf_stream* librdf_new_empty_stream(librdf_world *world);

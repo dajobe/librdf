@@ -550,7 +550,11 @@ librdf_stream_from_node_iterator_finished(void* context)
  * 
  * This method is for debugging and the format of the output should
  * not be relied on.
- * 
+ *
+ * @Deprecated: Use librdf_stream_write() to write to
+ * #raptor_iostream which can be made to write to a string.  Use a
+ * #librdf_serializer to write proper syntax formats.
+ *
  **/
 void
 librdf_stream_print(librdf_stream *stream, FILE *fh)
@@ -565,8 +569,8 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
     return;
   
   while(!librdf_stream_end(stream)) {
-    librdf_statement* statement=librdf_stream_get_object(stream);
-    librdf_node* context_node=(librdf_node*)librdf_stream_get_context(stream);
+    librdf_statement* statement = librdf_stream_get_object(stream);
+    librdf_node* context_node = (librdf_node*)librdf_stream_get_context(stream);
     if(!statement)
       break;
 
@@ -582,6 +586,60 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
   }
 
   raptor_free_iostream(iostr);
+}
+
+
+/**
+ * librdf_stream_write:
+ * @stream: the stream object
+ * @iostr: the iostream to write to
+ *
+ * Write a stream of triples to an iostream in a debug format.
+ *
+ * This prints the remaining statements of the stream to the given
+ * #raptor_iostream in a debug format.
+ *
+ * Note that after this method is called the stream will be empty so
+ * that librdf_stream_end() will always be true and
+ * librdf_stream_next() will always return NULL.  The only useful
+ * operation is to dispose of the stream with the
+ * librdf_free_stream() destructor.
+ * 
+ * This method is for debugging and the format of the output should
+ * not be relied on.  In particular, when contexts are used the
+ * result may be 4 nodes.
+ *
+ * Return value: non-0 on failure
+ **/
+int
+librdf_stream_write(librdf_stream *stream, raptor_iostream *iostr)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(stream, librdf_stream, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(iostr, raptor_iostream, 1);
+
+  while(!librdf_stream_end(stream)) {
+    librdf_statement* statement;
+    librdf_node* context_node;
+
+    statement = librdf_stream_get_object(stream);
+    if(!statement)
+      break;
+
+    raptor_iostream_write_counted_string(iostr, "  ", 2);
+    if(librdf_statement_write(statement, iostr))
+      return 1;
+    
+    context_node = (librdf_node*)librdf_stream_get_context(stream);
+    if(context_node) {
+      raptor_iostream_write_counted_string(iostr, " with context", 13);
+      librdf_node_write(context_node, iostr);
+    }
+    raptor_iostream_write_counted_string(iostr, ". \n", 3);
+
+    librdf_stream_next(stream);
+  }
+
+  return 0;
 }
 
 
