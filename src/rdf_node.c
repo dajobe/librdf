@@ -1110,10 +1110,14 @@ librdf_node_is_blank(librdf_node* node) {
  * librdf_node_to_string:
  * @node: the node object
  *
- * Format the node as a string.
+ * Format the node as a string in a debugging format.
  * 
  * Note a new string is allocated which must be freed by the caller.
  * 
+ * @Deprecated: Use librdf_node_write() to write to #raptor_iostream
+ * which can be made to write to a string.  Use a #librdf_serializer
+ * to write proper syntax formats.
+ *
  * Return value: a string value representing the node or NULL on failure
  **/
 unsigned char*
@@ -1130,10 +1134,14 @@ librdf_node_to_string(librdf_node* node)
  * @node: the node object
  * @len_p: pointer to location to store length
  *
- * Format the node as a counted string.
+ * Format the node as a counted string in a debugging format.
  * 
  * Note a new string is allocated which must be freed by the caller.
- * 
+ *
+ * @Deprecated: Use librdf_node_write() to write to #raptor_iostream
+ * which can be made to write to a string.  Use a #librdf_serializer
+ * to write proper syntax formats.
+ *
  * Return value: a string value representing the node or NULL on failure
  **/
 unsigned char*
