@@ -1,8 +1,8 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_query.c - RDF Query Results
+ * rdf_query.c - RDF Query Results and Query Results Formatter classes
  *
- * Copyright (C) 2004-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2004-2010, David Beckett http://www.dajobe.org/
  * Copyright (C) 2004-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -756,7 +756,7 @@ librdf_new_query_results_formatter(librdf_query_results* query_results,
                                    const char *name, librdf_uri* uri)
 {
   if(query_results->query->factory->new_results_formatter)
-    return query_results->query->factory->new_results_formatter(query_results, name, uri);
+    return query_results->query->factory->new_results_formatter(query_results, name, NULL, uri);
   else
     return NULL;
 }
@@ -777,14 +777,17 @@ librdf_new_query_results_formatter(librdf_query_results* query_results,
  * case the librdf_new_query_results_formatter() constructor allows
  * selecting of a specific one by name or URI.
  *
+ * @Deprecated: for librdf_new_query_results_formatter2() with the
+ * name, mime_type and format_uri args.
+ *
  * Return value: a new #librdf_query_results_formatter object or NULL on failure
  */
 librdf_query_results_formatter*
 librdf_new_query_results_formatter_by_mime_type(librdf_query_results* query_results,
                                                 const char *mime_type)
 {
-  if(query_results->query->factory->new_results_formatter_by_mime_type)
-    return query_results->query->factory->new_results_formatter_by_mime_type(query_results, mime_type);
+  if(query_results->query->factory->new_results_formatter)
+    return query_results->query->factory->new_results_formatter(query_results, NULL, mime_type, NULL);
   else
     return NULL;
 }
