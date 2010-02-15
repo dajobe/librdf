@@ -83,30 +83,37 @@ static const char *strexpect(const char *keyword, const char *source)
 
 
 static int
-rdf_virtuoso_ODBC_Errors(const char *where, librdf_world *world, librdf_storage_virtuoso_connection* handle)
+rdf_virtuoso_ODBC_Errors(const char *where, librdf_world *world,
+                         librdf_storage_virtuoso_connection* handle)
 {
   SQLCHAR buf[512];
   SQLCHAR sqlstate[15];
 
-  while(SQLError(handle->henv, handle->hdbc, handle->hstmt, sqlstate, NULL, buf, sizeof(buf), NULL) == SQL_SUCCESS) {
+  while(SQLError(handle->henv, handle->hdbc, handle->hstmt, sqlstate, NULL,
+                 buf, sizeof(buf), NULL) == SQL_SUCCESS) {
 #ifdef VIRTUOSO_STORAGE_DEBUG
     fprintf(stderr, "%s ||%s, SQLSTATE=%s\n", where, buf, sqlstate);
 #endif
-    librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL, "Virtuoso %s failed [%s] %s", where, sqlstate, buf);
+    librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+               "Virtuoso %s failed [%s] %s", where, sqlstate, buf);
   }
 
-  while(SQLError(handle->henv, handle->hdbc, SQL_NULL_HSTMT, sqlstate, NULL, buf, sizeof(buf), NULL) == SQL_SUCCESS) {
+  while(SQLError(handle->henv, handle->hdbc, SQL_NULL_HSTMT, sqlstate, NULL,
+                 buf, sizeof(buf), NULL) == SQL_SUCCESS) {
 #ifdef VIRTUOSO_STORAGE_DEBUG
     fprintf(stderr, "%s ||%s, SQLSTATE=%s\n", where, buf, sqlstate);
 #endif
-    librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL, "Virtuoso %s failed [%s] %s", where, sqlstate, buf);
+    librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+               "Virtuoso %s failed [%s] %s", where, sqlstate, buf);
   }
 
-  while(SQLError(handle->henv, SQL_NULL_HDBC, SQL_NULL_HSTMT, sqlstate, NULL, buf, sizeof(buf), NULL) == SQL_SUCCESS) {
+  while(SQLError(handle->henv, SQL_NULL_HDBC, SQL_NULL_HSTMT, sqlstate, NULL,
+                 buf, sizeof(buf), NULL) == SQL_SUCCESS) {
 #ifdef VIRTUOSO_STORAGE_DEBUG
     fprintf(stderr, "%s ||%s, SQLSTATE=%s\n", where, buf, sqlstate);
 #endif
-    librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL, "Virtuoso %s failed [%s] %s", where, sqlstate, buf);
+    librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+               "Virtuoso %s failed [%s] %s", where, sqlstate, buf);
   }
 
   return -1;
@@ -151,7 +158,9 @@ virtuoso_free_result(librdf_query* query)
 
 
 static int
-librdf_query_virtuoso_init(librdf_query* query, const char *name, librdf_uri* uri, const unsigned char* query_string, librdf_uri *base_uri)
+librdf_query_virtuoso_init(librdf_query* query, const char *name,
+                           librdf_uri* uri, const unsigned char* query_string,
+                           librdf_uri *base_uri)
 {
   librdf_query_virtuoso_context *context;
   int len;
@@ -171,9 +180,9 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name, librdf_uri* ur
   context->colValues = 0;
   context->numCols = 0;
   context->failed = 0;
-  context->eof=1;
+  context->eof = 1;
   context->row_count = 0;
-  context->result_type=VQUERY_RESULTS_UNKNOWN;
+  context->result_type = VQUERY_RESULTS_UNKNOWN;
 
   len=strlen((const char*)query_string);
   query_string_copy = (unsigned char*)LIBRDF_MALLOC(cstring, len+1);
@@ -185,16 +194,16 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name, librdf_uri* ur
 
   while(token != NULL) {
     if(strexpect("SELECT", (const char*)token)) {
-      context->result_type=VQUERY_RESULTS_BINDINGS;
+      context->result_type = VQUERY_RESULTS_BINDINGS;
       break;
     } else if(strexpect("ASK", (const char*)token)) {
-      context->result_type=VQUERY_RESULTS_BOOLEAN;
+      context->result_type = VQUERY_RESULTS_BOOLEAN;
       break;
     } else if(strexpect("CONSTRUCT", (const char*)token)) {
-      context->result_type=VQUERY_RESULTS_GRAPH | VQUERY_RESULTS_BINDINGS;
+      context->result_type = VQUERY_RESULTS_GRAPH | VQUERY_RESULTS_BINDINGS;
       break;
     } else if(strexpect("DESCRIBE", (const char*)token)) {
-      context->result_type=VQUERY_RESULTS_GRAPH | VQUERY_RESULTS_BINDINGS;
+      context->result_type = VQUERY_RESULTS_GRAPH | VQUERY_RESULTS_BINDINGS;
       break;
     }
     token=strtok(NULL, seps);
@@ -212,7 +221,9 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name, librdf_uri* ur
 static void
 librdf_query_virtuoso_terminate(librdf_query* query)
 {
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_terminate \n");
@@ -237,12 +248,14 @@ librdf_query_virtuoso_terminate(librdf_query* query)
 static librdf_query_results*
 librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
 {
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
   librdf_query_results* results;
   int rc = 0;
   SQLUSMALLINT icol;
   char pref[]="sparql define output:format '_JAVA_' ";
   char *cmd = NULL;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_execute \n");
@@ -250,14 +263,15 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
   context->model=model;
   context->numCols = 0;
   context->failed = 0;
-  context->eof=1;
+  context->eof = 1;
   context->row_count = 0;
   context->limit= -1;
   context->offset= -1;
   virtuoso_free_result(query);
   SQLCloseCursor(context->vc->hstmt);
 
-  if(!(cmd = (char*)LIBRDF_MALLOC(cstring, strlen(pref)+	strlen((char *)context->query_string) +1))) {
+  if(!(cmd = (char*)LIBRDF_MALLOC(cstring, strlen(pref)+
+                                  strlen((char *)context->query_string) +1))) {
       goto error;
     }
   strcpy(cmd, pref);
@@ -266,41 +280,48 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "SQL>>%s\n", cmd);
 #endif
-  rc=SQLExecDirect(context->vc->hstmt, (SQLCHAR *)cmd, SQL_NTS);
+  rc = SQLExecDirect(context->vc->hstmt, (SQLCHAR *)cmd, SQL_NTS);
   if(!SQL_SUCCEEDED(rc)) {
-    context->result_type=VQUERY_RESULTS_SYNTAX;
-    rdf_virtuoso_ODBC_Errors("SQLExecDirect()", context->storage->world, context->vc);
+    context->result_type = VQUERY_RESULTS_SYNTAX;
+    rdf_virtuoso_ODBC_Errors("SQLExecDirect()", context->storage->world,
+                             context->vc);
     goto error;
   }
 
-  rc=SQLNumResultCols(context->vc->hstmt, &context->numCols);
+  rc = SQLNumResultCols(context->vc->hstmt, &context->numCols);
   if(!SQL_SUCCEEDED(rc)) {
-    rdf_virtuoso_ODBC_Errors("SQLNumResultCols()", context->storage->world, context->vc);
+    rdf_virtuoso_ODBC_Errors("SQLNumResultCols()", context->storage->world,
+                             context->vc);
     goto error;
   }
 
   if(context->numCols > 0) {
-    context->colNames  = (char**)LIBRDF_CALLOC(cstrings, context->numCols+1, sizeof(char*));
+    context->colNames  = (char**)LIBRDF_CALLOC(cstrings, context->numCols+1,
+                                               sizeof(char*));
     if(!context->colNames) {
       goto error;
     }
 
-    context->colValues  = (librdf_node **)LIBRDF_CALLOC(librdf_node**, context->numCols+1, sizeof(librdf_node*));
+    context->colValues  = (librdf_node **)LIBRDF_CALLOC(librdf_node**,
+                                                        context->numCols+1,
+                                                        sizeof(librdf_node*));
     if(!context->colValues) {
       goto error;
     }
 
-    for(icol=1; icol<= context->numCols; icol++) {
+    for(icol = 1; icol<= context->numCols; icol++) {
       SQLSMALLINT namelen;
       SQLCHAR name[255];
 
-      rc=SQLColAttributes(context->vc->hstmt, icol, SQL_COLUMN_LABEL, name, sizeof(name), &namelen, NULL);
+      rc = SQLColAttributes(context->vc->hstmt, icol, SQL_COLUMN_LABEL, name,
+                            sizeof(name), &namelen, NULL);
       if(!SQL_SUCCEEDED(rc)) {
-        rdf_virtuoso_ODBC_Errors("SQLColAttributes()", context->storage->world, context->vc);
+        rdf_virtuoso_ODBC_Errors("SQLColAttributes()", context->storage->world,
+                                 context->vc);
         goto error;
       }
 
-      context->colNames[icol-1]  = (char*)LIBRDF_CALLOC(cstring, 1, namelen+1);
+      context->colNames[icol-1]  = (char*)LIBRDF_CALLOC(cstring, 1, namelen + 1);
       if(!context->colNames[icol-1])
         goto error;
 
@@ -312,14 +333,15 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
     context->eof = 0;
   }
 
-  results = (librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, sizeof(librdf_query_results));
+  results = (librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, 
+                                                 sizeof(*results));
   if(!results) {
     SQLCloseCursor(context->vc->hstmt);
   } else {
     results->query = query;
   }
 
-  rc=librdf_query_virtuoso_results_next(results);
+  rc = librdf_query_virtuoso_results_next(results);
   if(rc == 2) /* ERROR */
     goto error;
 
@@ -334,7 +356,7 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
 error:
   if(cmd)
     LIBRDF_FREE(cstring, (char *)cmd);
-  context->failed=1;
+  context->failed = 1;
   virtuoso_free_result(query);
   return NULL;
 }
@@ -343,7 +365,8 @@ error:
 static int
 librdf_query_virtuoso_get_limit(librdf_query* query)
 {
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+  context = (librdf_query_virtuoso_context*)query->context;
   return context->limit;
 }
 
@@ -351,8 +374,10 @@ librdf_query_virtuoso_get_limit(librdf_query* query)
 static int
 librdf_query_virtuoso_set_limit(librdf_query* query, int limit)
 {
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
-  context->limit=limit;
+  librdf_query_virtuoso_context *context;
+  context = (librdf_query_virtuoso_context*)query->context;
+
+  context->limit = limit;
   return 0;
 }
 
@@ -360,7 +385,9 @@ librdf_query_virtuoso_set_limit(librdf_query* query, int limit)
 static int
 librdf_query_virtuoso_get_offset(librdf_query* query)
 {
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+  context = (librdf_query_virtuoso_context*)query->context;
+
   return context->offset;
 }
 
@@ -368,8 +395,10 @@ librdf_query_virtuoso_get_offset(librdf_query* query)
 static int
 librdf_query_virtuoso_set_offset(librdf_query* query, int offset)
 {
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
-  context->offset=offset;
+  librdf_query_virtuoso_context *context;
+  context = (librdf_query_virtuoso_context*)query->context;
+
+  context->offset = offset;
   return 0;
 }
 
@@ -418,13 +447,15 @@ static int
 librdf_query_virtuoso_results_next(librdf_query_results *query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
   int rc;
   short col;
   short numCols=context->numCols;
   librdf_node *node;
   char *data;
   int is_null;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_next \n");
@@ -438,17 +469,19 @@ librdf_query_virtuoso_results_next(librdf_query_results *query_results)
       context->colValues[col] = NULL;
     }
 
-  rc=SQLFetch(context->vc->hstmt);
+  rc = SQLFetch(context->vc->hstmt);
   if(rc == SQL_NO_DATA_FOUND) {
-    context->eof=1;
+    context->eof = 1;
     return 1;
   } else if(rc != SQL_SUCCESS && rc != SQL_SUCCESS_WITH_INFO) {
-    rdf_virtuoso_ODBC_Errors((char *)"SQLFetch", context->storage->world, context->vc);
+    rdf_virtuoso_ODBC_Errors((char *)"SQLFetch", context->storage->world,
+                             context->vc);
     return 2;
   }
 
-  for(col=1; col <= context->numCols; col++) {
-    data=context->vc->v_GetDataCHAR(context->storage->world, context->vc, col, &is_null);
+  for(col = 1; col <= context->numCols; col++) {
+    data=context->vc->v_GetDataCHAR(context->storage->world, context->vc,
+                                    col, &is_null);
     if(!data && !is_null)
       return 2;
 
@@ -480,7 +513,9 @@ static int
 librdf_query_virtuoso_results_finished(librdf_query_results *query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_finished \n");
@@ -525,8 +560,10 @@ static int
 librdf_query_virtuoso_results_get_bindings(librdf_query_results *query_results, const char ***names, librdf_node **values)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
   short col;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_get_bindings \n");
@@ -562,8 +599,10 @@ static librdf_node*
 librdf_query_virtuoso_results_get_binding_value(librdf_query_results *query_results, int offset)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
   librdf_node *retVal;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_get_binding_value \n");
@@ -593,7 +632,9 @@ static const char*
 librdf_query_virtuoso_results_get_binding_name(librdf_query_results *query_results, int offset)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_get_binding_name \n");
@@ -621,8 +662,10 @@ static librdf_node*
 librdf_query_virtuoso_results_get_binding_value_by_name(librdf_query_results *query_results, const char *name)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
   short col;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_get_binding_value_by_name \n");
@@ -656,7 +699,9 @@ static int
 librdf_query_virtuoso_results_get_bindings_count(librdf_query_results *query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_get_bindings_count \n");
@@ -682,7 +727,9 @@ static void
 librdf_query_virtuoso_free_results(librdf_query_results* query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_free_results \n");
@@ -692,10 +739,10 @@ librdf_query_virtuoso_free_results(librdf_query_results* query_results)
   }
 
   virtuoso_free_result(query);
-  context->eof=1;
+  context->eof = 1;
   context->numCols = 0;
   context->row_count = 0;
-  context->result_type=VQUERY_RESULTS_UNKNOWN;
+  context->result_type = VQUERY_RESULTS_UNKNOWN;
 }
 
 
@@ -711,7 +758,9 @@ static int
 librdf_query_virtuoso_results_is_bindings(librdf_query_results* query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_is_bindings \n");
@@ -738,7 +787,9 @@ static int
 librdf_query_virtuoso_results_is_boolean(librdf_query_results* query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_is_boolean \n");
@@ -762,7 +813,9 @@ static int
 librdf_query_virtuoso_results_is_graph(librdf_query_results* query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+  
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_is_graph \n");
@@ -792,7 +845,9 @@ static int
 librdf_query_virtuoso_results_is_syntax(librdf_query_results* query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_is_syntax \n");
@@ -819,10 +874,12 @@ static int
 librdf_query_virtuoso_results_get_boolean(librdf_query_results* query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
   int rc;
   int data;
   int is_null;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_get_boolean \n");
@@ -830,18 +887,20 @@ librdf_query_virtuoso_results_get_boolean(librdf_query_results* query_results)
   if(context->failed || context->numCols <= 0)
     return -1;
 
-  rc=SQLFetch(context->vc->hstmt);
+  rc = SQLFetch(context->vc->hstmt);
   if(rc == SQL_NO_DATA_FOUND) {
-    context->eof=1;
+    context->eof = 1;
     return 0;
   } else if(rc != SQL_SUCCESS && rc != SQL_SUCCESS_WITH_INFO) {
-    rdf_virtuoso_ODBC_Errors((char *)"SQLFetch", context->storage->world, context->vc);
+    rdf_virtuoso_ODBC_Errors((char *)"SQLFetch", context->storage->world,
+                             context->vc);
     return -1;
   }
 
-  rc=context->vc->v_GetDataINT(context->storage->world, context->vc, 1, &is_null, &data);
+  rc = context->vc->v_GetDataINT(context->storage->world, context->vc, 1,
+                                 &is_null, &data);
 
-  context->eof=1;
+  context->eof = 1;
 
   if(rc == -1)
     return -1;
@@ -874,13 +933,17 @@ librdf_query_virtuoso_query_results_end_of_stream(void* context)
 static int
 librdf_query_virtuoso_query_results_update_statement(void* context)
 {
-  librdf_query_virtuoso_stream_context* scontext = (librdf_query_virtuoso_stream_context*)context;
-  librdf_query_virtuoso_context *qcontext=scontext->qcontext;
-  librdf_world* world=scontext->query->world;
+  librdf_query_virtuoso_stream_context* scontext;
+  librdf_query_virtuoso_context *qcontext;
+  librdf_world* world;
   librdf_node* node;
   short colNum;
   char *data;
   int is_null;
+
+  scontext = (librdf_query_virtuoso_stream_context*)context;
+  qcontext = scontext->qcontext;
+  world = scontext->query->world;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_query_results_update_statement \n");
@@ -897,7 +960,7 @@ librdf_query_virtuoso_query_results_update_statement(void* context)
   if(!(qcontext->result_type & VQUERY_RESULTS_GRAPH))
     goto fail;
 
-  colNum=1;
+  colNum = 1;
   if(colNum > scontext->numCols)
     goto fail;
 
@@ -962,10 +1025,14 @@ fail:
 static int
 librdf_query_virtuoso_query_results_next_statement(void* context)
 {
-  librdf_query_virtuoso_stream_context* scontext = (librdf_query_virtuoso_stream_context*)context;
-  librdf_query_virtuoso_context *qcontext=scontext->qcontext;
-  librdf_world* world=scontext->query->world;
+  librdf_query_virtuoso_stream_context* scontext;
+  librdf_query_virtuoso_context *qcontext;
+  librdf_world* world;
   int rc;
+
+  scontext = (librdf_query_virtuoso_stream_context*)context;
+  qcontext = scontext->qcontext;
+  world =scontext->query->world;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_query_results_next_statement \n");
@@ -978,12 +1045,12 @@ librdf_query_virtuoso_query_results_next_statement(void* context)
     scontext->statement = NULL;
   }
 
-  rc=SQLFetch(qcontext->vc->hstmt);
+  rc = SQLFetch(qcontext->vc->hstmt);
   if(rc == SQL_NO_DATA_FOUND) {
-    scontext->finished=1;
+    scontext->finished = 1;
   } else if(rc != SQL_SUCCESS && rc != SQL_SUCCESS_WITH_INFO) {
     rdf_virtuoso_ODBC_Errors((char *)"SQLFetch", world, qcontext->vc);
-    scontext->finished=1;
+    scontext->finished = 1;
   }
 
   if(!scontext->finished)
@@ -996,7 +1063,9 @@ librdf_query_virtuoso_query_results_next_statement(void* context)
 static void*
 librdf_query_virtuoso_query_results_get_statement(void* context, int flags)
 {
-  librdf_query_virtuoso_stream_context* scontext = (librdf_query_virtuoso_stream_context*)context;
+  librdf_query_virtuoso_stream_context* scontext;
+
+  scontext = (librdf_query_virtuoso_stream_context*)context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_query_results_get_statement \n");
@@ -1009,7 +1078,9 @@ librdf_query_virtuoso_query_results_get_statement(void* context, int flags)
       return scontext->graph;
 
     default:
-      librdf_log(scontext->query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL, "Unknown iterator method flag %d", flags);
+      librdf_log(scontext->query->world, 0, LIBRDF_LOG_ERROR,
+                 LIBRDF_FROM_QUERY, NULL,
+                 "Unknown iterator method flag %d", flags);
       return NULL;
   }
 }
@@ -1018,7 +1089,9 @@ librdf_query_virtuoso_query_results_get_statement(void* context, int flags)
 static void
 librdf_query_virtuoso_query_results_finished(void* context)
 {
-  librdf_query_virtuoso_stream_context* scontext = (librdf_query_virtuoso_stream_context*)context;
+  librdf_query_virtuoso_stream_context* scontext;
+
+  scontext = (librdf_query_virtuoso_stream_context*)context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_query_results_finished \n");
@@ -1050,10 +1123,12 @@ static librdf_stream*
 librdf_query_virtuoso_results_as_stream(librdf_query_results* query_results)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
   librdf_query_virtuoso_stream_context* scontext;
   librdf_stream *stream;
   int col;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_as_stream \n");
@@ -1138,7 +1213,8 @@ fail:
  * Return value: a new #librdf_query_results_formatter object or NULL on failure
  */
 static librdf_query_results_formatter*
-librdf_query_virtuoso_new_results_formatter(librdf_query_results* query_results, const char *name, librdf_uri* uri)
+librdf_query_virtuoso_new_results_formatter(librdf_query_results* query_results, 
+                                            const char *name, librdf_uri* uri)
 {
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_new_results_formatter \n");
@@ -1167,7 +1243,8 @@ librdf_query_virtuoso_new_results_formatter(librdf_query_results* query_results,
  * Return value: a new #librdf_query_results_formatter object or NULL on failure
  */
 static librdf_query_results_formatter*
-librdf_query_virtuoso_new_results_formatter_by_mime_type(librdf_query_results* query_results, const char *mime_type)
+librdf_query_virtuoso_new_results_formatter_by_mime_type(librdf_query_results* query_results,
+                                                         const char *mime_type)
 {
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_new_results_formatter_by_mime_type \n");
@@ -1214,7 +1291,10 @@ librdf_query_virtuoso_free_results_formatter(librdf_query_results_formatter* qrf
  * Return value: non-0 on failure
  **/
 static int
-librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr, librdf_query_results_formatter* qrf, librdf_query_results* query_results, librdf_uri *base_uri)
+librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
+                                              librdf_query_results_formatter* qrf,
+                                              librdf_query_results* query_results, 
+                                              librdf_uri *base_uri)
 {
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
@@ -1292,22 +1372,27 @@ static void
 virtuoso_query_simple_error(void* user_data, const char *message, ...)
 {
   librdf_query* query = (librdf_query*)user_data;
-  librdf_query_virtuoso_context *context = (librdf_query_virtuoso_context*)query->context;
+  librdf_query_virtuoso_context *context;
+
+  context = (librdf_query_virtuoso_context*)query->context;
 
   va_list arguments;
 
   va_start(arguments, message);
 
-  context->failed=1;
-  librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL, message, arguments);
+  context->failed = 1;
+  librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+             message, arguments);
   va_end(arguments);
 }
 
 
 static int
-virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_results* results, raptor_uri *base_uri)
+virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr,
+                                        librdf_query_results* results,
+                                        raptor_uri *base_uri)
 {
-  int rc=1;
+  int rc = 1;
   librdf_query* query=results->query;
 #ifndef RAPTOR_V2_AVAILABLE
   const raptor_uri_handler *uri_handler;
@@ -1325,33 +1410,35 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
   raptor_qname **attrs = NULL;
   int i;
 
-  if(!librdf_query_results_is_bindings(results) && !librdf_query_results_is_boolean(results)) {
-    librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL, "Can only write XML format v3 for variable binding and boolean results");
+  if(!librdf_query_results_is_bindings(results) &&
+     !librdf_query_results_is_boolean(results)) {
+    librdf_log(query->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_QUERY, NULL,
+               "Can only write XML format v3 for variable binding and boolean results");
     return 1;
   }
 
 #ifdef RAPTOR_V2_AVAILABLE
-  nstack=raptor_new_namespaces_v2(query->world->raptor_world_ptr, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
+  nstack = raptor_new_namespaces_v2(query->world->raptor_world_ptr, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
 #else
   raptor_uri_get_handler(&uri_handler, &uri_context);
-  nstack=raptor_new_namespaces(uri_handler, uri_context, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
+  nstack = raptor_new_namespaces(uri_handler, uri_context, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
 #endif
   if(!nstack)
     return 1;
 
 #ifdef RAPTOR_V2_AVAILABLE
-  xml_writer=raptor_new_xml_writer_v2(query->world->raptor_world_ptr, nstack, iostr, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
+  xml_writer = raptor_new_xml_writer_v2(query->world->raptor_world_ptr, nstack, iostr, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
 #else
-  xml_writer=raptor_new_xml_writer(nstack, uri_handler, uri_context, iostr, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
+  xml_writer = raptor_new_xml_writer(nstack, uri_handler, uri_context, iostr, (raptor_simple_message_handler)virtuoso_query_simple_error, query, 1);
 #endif
   if(!xml_writer)
     goto tidy;
 
-  res_ns=raptor_new_namespace(nstack, NULL, (const unsigned char*)"http://www.w3.org/2005/sparql-results#", 0);
+  res_ns = raptor_new_namespace(nstack, NULL, (const unsigned char*)"http://www.w3.org/2005/sparql-results#", 0);
   if(!res_ns)
     goto tidy;
 
-  sparql_element=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"sparql", NULL, base_uri);
+  sparql_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"sparql", NULL, base_uri);
   if(!sparql_element)
     goto tidy;
 
@@ -1359,11 +1446,11 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
 #if 0
     /* FIXME - consider when to write the XSD.  Need the XSD URI too. */
     raptor_namespace* xsi_ns;
-    xsi_ns=raptor_new_namespace(nstack, (const unsigned char*)"xsi", (const unsigned char*)"http://www.w3.org/2001/XMLSchema-instance", 0);
+    xsi_ns = raptor_new_namespace(nstack, (const unsigned char*)"xsi", (const unsigned char*)"http://www.w3.org/2001/XMLSchema-instance", 0);
     raptor_xml_element_declare_namespace(sparql_element, xsi_ns);
 
     attrs = (raptor_qname **)raptor_alloc_memory(sizeof(raptor_qname*));
-    attrs[0]=raptor_new_qname_from_namespace_local_name(xsi_ns, (const unsigned char*)"schemaLocation", (const unsigned char*)"http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd");
+    attrs[0] = raptor_new_qname_from_namespace_local_name(xsi_ns, (const unsigned char*)"schemaLocation", (const unsigned char*)"http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd");
     raptor_xml_element_set_attributes(sparql_element, attrs, 1);
 #endif
   }
@@ -1372,7 +1459,7 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
   raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
 
   /*   <head> */
-  element1=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"head", NULL, base_uri);
+  element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"head", NULL, base_uri);
   if(!element1)
     goto tidy;
 
@@ -1388,7 +1475,7 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
         break;
 
       /*     <variable name="x"/> */
-      variable_element=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"variable", NULL, base_uri);
+      variable_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"variable", NULL, base_uri);
       if(!variable_element)
         goto tidy;
 
@@ -1396,9 +1483,9 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
       if(!attrs)
         goto tidy;
 #ifdef RAPTOR_V2_AVAILABLE
-      attrs[0]=raptor_new_qname_from_namespace_local_name_v2(query->world->raptor_world_ptr, res_ns, (const unsigned char*)"name", (const unsigned char*)name); /* attribute value */
+      attrs[0] = raptor_new_qname_from_namespace_local_name_v2(query->world->raptor_world_ptr, res_ns, (const unsigned char*)"name", (const unsigned char*)name); /* attribute value */
 #else
-      attrs[0]=raptor_new_qname_from_namespace_local_name(res_ns, (const unsigned char*)"name", (const unsigned char*)name); /* attribute value */
+      attrs[0] = raptor_new_qname_from_namespace_local_name(res_ns, (const unsigned char*)"name", (const unsigned char*)name); /* attribute value */
 #endif
       if(!attrs[0]) {
         raptor_free_memory((void*)attrs);
@@ -1430,7 +1517,7 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
 
   /* Boolean Results */
   if(librdf_query_results_is_boolean(results)) {
-    result_element=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"boolean", NULL, base_uri);
+    result_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"boolean", NULL, base_uri);
     if(!result_element)
       goto tidy;
 
@@ -1450,7 +1537,7 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
   /* Variable Binding Results */
 
   /*   <results> */
-  results_element=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"results", NULL, base_uri);
+  results_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"results", NULL, base_uri);
   if(!results_element)
     goto tidy;
 
@@ -1459,7 +1546,7 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
   raptor_xml_writer_raw_counted(xml_writer, (const unsigned char*)"\n", 1);
 
   /* declare result element for later multiple use */
-  result_element=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"result", NULL, base_uri);
+  result_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"result", NULL, base_uri);
   if(!result_element)
     goto tidy;
 
@@ -1474,7 +1561,7 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
       librdf_node *node=librdf_query_results_get_binding_value(results, i);
 
       /*       <binding> */
-      binding_element=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"binding", NULL, base_uri);
+      binding_element = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"binding", NULL, base_uri);
       if(!binding_element)
         goto tidy;
 
@@ -1482,10 +1569,10 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
       if(!attrs)
         goto tidy;
 #ifdef RAPTOR_V2_AVAILABLE
-      attrs[0]=raptor_new_qname_from_namespace_local_name_v2(query->world->raptor_world_ptr, res_ns, (const unsigned char*)"name", (const unsigned char *) name);
+      attrs[0] = raptor_new_qname_from_namespace_local_name_v2(query->world->raptor_world_ptr, res_ns, (const unsigned char*)"name", (const unsigned char *) name);
 
 #else
-      attrs[0]=raptor_new_qname_from_namespace_local_name(res_ns, (const unsigned char*)"name", (const unsigned char *) name);
+      attrs[0] = raptor_new_qname_from_namespace_local_name(res_ns, (const unsigned char*)"name", (const unsigned char *) name);
 #endif
       if(!attrs[0]) {
         raptor_free_memory((void*)attrs);
@@ -1498,14 +1585,14 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
       raptor_xml_writer_start_element(xml_writer, binding_element);
 
       if(!node) {
-        element1=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"unbound", NULL, base_uri);
+        element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"unbound", NULL, base_uri);
         if(!element1)
           goto tidy;
         raptor_xml_writer_empty_element(xml_writer, element1);
 
       } else switch(librdf_node_get_type(node)) {
         case LIBRDF_NODE_TYPE_RESOURCE:
-          element1=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"uri", NULL, base_uri);
+          element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"uri", NULL, base_uri);
           if(!element1)
             goto tidy;
 
@@ -1515,7 +1602,7 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
           break;
 
         case LIBRDF_NODE_TYPE_BLANK:
-          element1=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"bnode", NULL, base_uri);
+          element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"bnode", NULL, base_uri);
           if(!element1)
             goto tidy;
 
@@ -1525,7 +1612,7 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
           break;
 
         case LIBRDF_NODE_TYPE_LITERAL:
-          element1=raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"literal", NULL, base_uri);
+          element1 = raptor_new_xml_element_from_namespace_local_name(res_ns, (const unsigned char*)"literal", NULL, base_uri);
           if(!element1)
             goto tidy;
           {
@@ -1546,12 +1633,12 @@ virtuoso_query_results_write_sparql_xml(raptor_iostream *iostr, librdf_query_res
                 goto tidy;
 
               if(lang)
-                attrs[0]=raptor_new_qname(nstack, (const unsigned char*)"xml:lang", (const unsigned char*)lang, (raptor_simple_message_handler)virtuoso_query_simple_error, query);
+                attrs[0] = raptor_new_qname(nstack, (const unsigned char*)"xml:lang", (const unsigned char*)lang, (raptor_simple_message_handler)virtuoso_query_simple_error, query);
               else
 #ifdef RAPTOR_V2_AVAILABLE
-                attrs[0]=raptor_new_qname_from_namespace_local_name_v2(query->world->raptor_world_ptr, res_ns, (const unsigned char*)"datatype", (const unsigned char*)datatype);
+                attrs[0] = raptor_new_qname_from_namespace_local_name_v2(query->world->raptor_world_ptr, res_ns, (const unsigned char*)"datatype", (const unsigned char*)datatype);
 #else
-                attrs[0]=raptor_new_qname_from_namespace_local_name(res_ns, (const unsigned char*)"datatype", (const unsigned char*)datatype);
+                attrs[0] = raptor_new_qname_from_namespace_local_name(res_ns, (const unsigned char*)"datatype", (const unsigned char*)datatype);
 #endif
               if(!attrs[0]) {
                 raptor_free_memory((void*)attrs);
@@ -1774,14 +1861,14 @@ virtuoso_query_results_write_json1(raptor_iostream *iostr, librdf_query_results*
 
       /* End Binding */
       raptor_iostream_write_counted_string(iostr, " }", 2);
-      column_comma=1;
+      column_comma = 1;
       librdf_free_node(node);
 
     }
 
     /* End Result Row */
     raptor_iostream_write_counted_string(iostr, "\n      }", 8);
-    row_comma=1;
+    row_comma = 1;
     librdf_query_results_next(results);
   }
 
@@ -1811,21 +1898,21 @@ virtuoso_new_results_formatter(librdf_query_results* query_results,
   if(name) {
      if(!strcmp(name, "json")) {
         writer_fn  = (rasqal_query_results_formatter_func)virtuoso_query_results_write_json1;
-        is_json=1;
+        is_json = 1;
      }
   } else if(uri) {
      char *s_uri  = (char *)librdf_uri_as_string(format_uri);
      if(!strcmp(s_uri, "http://www.w3.org/2001/sw/DataAccess/json-sparql/")) {
         writer_fn  = (rasqal_query_results_formatter_func)virtuoso_query_results_write_json1;
-        is_json=1;
+        is_json = 1;
      } else if(!strcmp(s_uri, "http://www.mindswap.org/%7Ekendall/sparql-results-json/")) {
         writer_fn  = (rasqal_query_results_formatter_func)virtuoso_query_results_write_json1;
-        is_json=1;
+        is_json = 1;
      }
   } else if(mime_type)  {
      if(!strcmp(name, "text/json")) {
         writer_fn  = (rasqal_query_results_formatter_func)virtuoso_query_results_write_json1;
-        is_json=1;
+        is_json = 1;
      }
   }
 
