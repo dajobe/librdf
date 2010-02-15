@@ -1139,22 +1139,71 @@ librdf_model_has_arc_out(librdf_model *model, librdf_node *node,
  * 
  * This method is for debugging and the format of the output should
  * not be relied on.
+ *
+ * @Deprecated: Use librdf_model_write() to write to #raptor_iostream
+ * which can be made to write to a string.  Use a #librdf_serializer
+ * to write proper syntax formats.
+ *
  **/
 void
 librdf_model_print(librdf_model *model, FILE *fh)
 {
-  librdf_stream* stream;
+  raptor_iostream *iostr;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(model, librdf_model);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(fh, FILE*);
 
-  stream=librdf_model_as_stream(model);
-  if(!stream)
+  iostr = raptor_new_iostream_to_file_handle(fh);
+  if(!iostr)
     return;
-  fputs("[[\n", fh);
-  librdf_stream_print(stream, fh);
-  fputs("]]\n", fh);
-  librdf_free_stream(stream);
+  
+  librdf_model_write(model, iostr);
+  
+  raptor_free_iostream(iostr);
+}
+
+
+/**
+ * librdf_model_write:
+ * @model: the model object
+ * @iostream: the iostream to write to
+ *
+ * Write a model to an iostream in a debug format.
+ * 
+ * This method is for debugging and the format of the output should
+ * not be relied on.  In particular, when contexts are used the
+ * result may be 4 nodes.
+ *
+ * Return value: non-0 on failure
+ **/
+int
+librdf_model_write(librdf_model *model, raptor_iostream* iostr)
+{
+  int rc = 1;
+  librdf_stream* stream;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(iostr, raptor_iostream, 1);
+
+  stream = librdf_model_as_stream(model);
+  if(!stream)
+    goto tidy;
+  
+  if(raptor_iostream_write_counted_string(iostr, "[[\n", 3))
+    goto tidy;
+  if(librdf_stream_write(stream, iostr))
+    goto tidy;
+  if(raptor_iostream_write_counted_string(iostr, "]]\n", 3))
+    goto tidy;
+  
+  /* success */
+  rc = 0;
+
+  tidy:
+  if(stream)
+    librdf_free_stream(stream);
+
+  return rc;
 }
 
 
@@ -1905,8 +1954,11 @@ main(int argc, char *argv[])
   const char* storage_type;
   const char* storage_name;
   const char* storage_options;
+  raptor_iostream* iostr;
 
   librdf_world_open(world);
+
+  iostr = raptor_new_iostream_to_file_handle(stderr);
 
   /* Test model cloning first */
   if(test_model_cloning(program, world))
@@ -1965,7 +2017,7 @@ main(int argc, char *argv[])
   librdf_free_statement(statement);
 
   fprintf(stderr, "%s: Printing model\n", program);
-  librdf_model_print(model, stderr);
+  librdf_model_write(model, iostr);
   
   parser=librdf_new_parser(world, parser_name, NULL, NULL);
   if(!parser) {
@@ -1990,7 +2042,7 @@ main(int argc, char *argv[])
     librdf_free_stream(stream);
 
     fprintf(stderr, "%s: Printing model\n", program);
-    librdf_model_print(model, stderr);
+    librdf_model_write(model, iostr);
   }
 
 
@@ -2135,7 +2187,7 @@ main(int argc, char *argv[])
     librdf_model_context_remove_statements(model, nodes[i]);
 
     fprintf(stderr, "%s: Printing model\n", program);
-    librdf_model_print(model, stderr);
+    librdf_model_write(model, iostr);
   }
 
   fprintf(stderr, "%s: Serializing model\n", program);

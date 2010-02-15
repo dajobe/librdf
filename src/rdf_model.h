@@ -146,8 +146,10 @@ REDLAND_API
 int librdf_model_remove_submodel(librdf_model* model, librdf_model* sub_model);
 
 
-REDLAND_API
+REDLAND_API REDLAND_DEPRECATED
 void librdf_model_print(librdf_model *model, FILE *fh);
+REDLAND_API
+int librdf_model_write(librdf_model *model, raptor_iostream* iostr);
 
 /* statement contexts */
 REDLAND_API
