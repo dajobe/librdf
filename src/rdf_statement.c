@@ -445,7 +445,12 @@ librdf_statement_to_string(librdf_statement *statement)
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_string(statement->world->raptor_world_ptr,
+                                        (void**)&s, NULL, malloc);
+#else
   iostr = raptor_new_iostream_to_string((void**)&s, NULL, malloc);
+#endif
   if(!iostr)
     return NULL;
   
@@ -515,7 +520,11 @@ librdf_statement_print(librdf_statement *statement, FILE *fh)
   if(!statement)
     return;
   
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_file_handle(statement->world->raptor_world_ptr, fh);
+#else
   iostr = raptor_new_iostream_to_file_handle(fh);
+#endif
   if(!iostr)
     return;
   
