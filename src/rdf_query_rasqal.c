@@ -1189,8 +1189,17 @@ librdf_query_rasqal_new_results_formatter(librdf_query_results* query_results,
   rasqal_query_results_formatter* formatter;
   librdf_query_results_formatter* qrf;
 
-  formatter=rasqal_new_query_results_formatter(query_results->query->world->rasqal_world_ptr,
-                                               name, (raptor_uri*)uri);
+#if RASQAL_VERSION >= 918
+  formatter = rasqal_new_query_results_formatter2(query_results->query->world->rasqal_world_ptr,
+                                                  name,
+                                                  NULL /* mime_type */,
+                                                  (raptor_uri*)uri);
+#else
+  formatter = rasqal_new_query_results_formatter(query_results->query->world->rasqal_world_ptr,
+                                                 name, 
+                                                 (raptor_uri*)uri);
+#endif
+
   if(!formatter)
     return NULL;
 
@@ -1206,6 +1215,7 @@ librdf_query_rasqal_new_results_formatter(librdf_query_results* query_results,
   return qrf;
 }
 
+
 static librdf_query_results_formatter*
 librdf_query_rasqal_new_results_formatter_by_mime_type(librdf_query_results* query_results,
                                                        const char *mime_type)
@@ -1213,8 +1223,16 @@ librdf_query_rasqal_new_results_formatter_by_mime_type(librdf_query_results* que
   rasqal_query_results_formatter* formatter;
   librdf_query_results_formatter* qrf;
 
-  formatter=rasqal_new_query_results_formatter_by_mime_type(query_results->query->world->rasqal_world_ptr,
-                                                            mime_type);
+#if RASQAL_VERSION >= 918
+  formatter = rasqal_new_query_results_formatter2(query_results->query->world->rasqal_world_ptr,
+                                                  NULL /* name */,
+                                                  mime_type,
+                                                  NULL /* format_uri */);
+#else
+  formatter = rasqal_new_query_results_formatter_by_mime_type(query_results->query->world->rasqal_world_ptr,
+                                                              mime_type);
+#endif
+
   if(!formatter)
     return NULL;
 
