@@ -1677,7 +1677,10 @@ librdf_storage_supports_query(librdf_storage* storage, librdf_query *query)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 0);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, 0);
 
-  return 0;
+  if(storage->factory->supports_query)
+    return storage->factory->supports_query(storage, query);
+  else
+    return 0;
 }
 
 
@@ -1696,7 +1699,10 @@ librdf_storage_query_execute(librdf_storage* storage, librdf_query *query)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query, librdf_query, NULL);
 
-  return NULL;
+  if(storage->factory->supports_query)
+    return storage->factory->query_execute(storage, query);
+  else
+    return NULL;
 }
 
 
