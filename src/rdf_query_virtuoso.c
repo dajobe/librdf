@@ -3,6 +3,7 @@
  * rdf_query_virtuoso.c - RDF Query with Virtuoso
  *
  * Copyright (C) 2008, Openlink Software http://www.openlinksw.com/
+ * Copyright (C) 2010, Dave Beckett http://www.dajobe.org/
  *
  * Based in part on rasqal_result_formats.c and rasqal_sparql_xml.c
  * (see NOTICE later in code)
