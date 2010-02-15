@@ -564,7 +564,11 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
   if(!stream)
     return;
 
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_file_handle(stream->world->raptor_world_ptr, fh);
+#else
   iostr = raptor_new_iostream_to_file_handle(fh);
+#endif
   if(!iostr)
     return;
   

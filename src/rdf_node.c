@@ -1129,7 +1129,12 @@ librdf_node_to_string(librdf_node* node)
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_string(node->world->raptor_world_ptr,
+                                        (void**)&s, NULL, malloc);
+#else
   iostr = raptor_new_iostream_to_string((void**)&s, NULL, malloc);
+#endif
   if(!iostr)
     return NULL;
   
@@ -1168,7 +1173,12 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_string(node->world->raptor_world_ptr,
+                                        (void**)&s, len_p, malloc);
+#else
   iostr = raptor_new_iostream_to_string((void**)&s, len_p, malloc);
+#endif
   if(!iostr)
     return NULL;
   

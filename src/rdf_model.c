@@ -1153,7 +1153,11 @@ librdf_model_print(librdf_model *model, FILE *fh)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(model, librdf_model);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(fh, FILE*);
 
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_file_handle(model->world->raptor_world_ptr, fh);
+#else
   iostr = raptor_new_iostream_to_file_handle(fh);
+#endif
   if(!iostr)
     return;
   
