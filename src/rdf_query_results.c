@@ -301,12 +301,9 @@ librdf_query_results_to_counted_string2(librdf_query_results *query_results,
   if(!iostr)
     return NULL;
               
-  if(mime_type)
-    formatter = librdf_new_query_results_formatter_by_mime_type(query_results,
-                                                                mime_type);
-  else
-    formatter = librdf_new_query_results_formatter(query_results,
-                                                   name, format_uri);
+  formatter = librdf_new_query_results_formatter2(query_results,
+                                                  name, mime_type,
+                                                  format_uri);
   if(!formatter) {
     error=1;
     goto tidy;
@@ -477,12 +474,9 @@ librdf_query_results_to_file_handle2(librdf_query_results *query_results,
   if(!iostr)
     return 1;
 
-  if(mime_type)
-    formatter = librdf_new_query_results_formatter_by_mime_type(query_results,
-                                                                mime_type);
-  else
-    formatter = librdf_new_query_results_formatter(query_results,
-                                                   name, format_uri);
+  formatter = librdf_new_query_results_formatter2(query_results,
+                                                  name, mime_type,
+                                                  format_uri);
   if(!formatter) {
     raptor_free_iostream(iostr);
     return 1;
