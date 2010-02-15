@@ -737,6 +737,35 @@ librdf_query_results_as_stream(librdf_query_results* query_results) {
 
 
 /**
+ * librdf_new_query_results_formatter2:
+ * @query_results: #librdf_query_results query_results
+ * @name: the query results format name (or NULL)
+ * @mime_type: the query results format mime type (or NULL)
+ * @uri: #librdf_uri query results format uri (or NULL)
+ *
+ * Constructor - create a new librdf_query_results_formatter object by identified format.
+ *
+ * A query results format can be named, have a mime type, or
+ * identified by a URI, both of which are optional.  The default
+ * query results format will be used if all are NULL.
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
+ *
+ * Return value: a new #librdf_query_results_formatter object or NULL on failure
+ */
+librdf_query_results_formatter*
+librdf_new_query_results_formatter2(librdf_query_results* query_results,
+                                    const char *name, const char *mime_type,
+                                    librdf_uri* uri)
+{
+  if(query_results->query->factory->new_results_formatter)
+    return query_results->query->factory->new_results_formatter(query_results, name, mime_type, uri);
+  else
+    return NULL;
+}
+
+
+/**
  * librdf_new_query_results_formatter:
  * @query_results: #librdf_query_results query_results
  * @name: the query results format name (or NULL)
@@ -748,6 +777,9 @@ librdf_query_results_as_stream(librdf_query_results* query_results) {
  * of which are optional.  The default query results format will be used
  * if both are NULL.  librdf_query_results_formats_enumerate() returns
  * information on the known query results names, labels and URIs.
+ *
+ * @Deprecated: for librdf_new_query_results_formatter2() with the
+ * name, mime_type and format_uri args.
  *
  * Return value: a new #librdf_query_results_formatter object or NULL on failure
  */

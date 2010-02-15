@@ -117,8 +117,10 @@ int librdf_query_results_get_boolean(librdf_query_results *query_results);
 
 /* query results formatter class */
 REDLAND_API
+librdf_query_results_formatter* librdf_new_query_results_formatter2(librdf_query_results* query_results, const char *name, const char* mime_type, librdf_uri* format_uri);
+REDLAND_API REDLAND_DEPRECATED
 librdf_query_results_formatter* librdf_new_query_results_formatter(librdf_query_results* query_results, const char *name, librdf_uri* uri);
-REDLAND_API
+REDLAND_API REDLAND_DEPRECATED
 librdf_query_results_formatter* librdf_new_query_results_formatter_by_mime_type(librdf_query_results* query_results, const char *mime_type);
 REDLAND_API
 void librdf_free_query_results_formatter(librdf_query_results_formatter* formatter);
