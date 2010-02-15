@@ -1323,7 +1323,11 @@ librdf_node_print(librdf_node* node, FILE *fh)
   if(!node)
     return;
 
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_file_handle(node->world->raptor_world_ptr, fh);
+#else
   iostr = raptor_new_iostream_to_file_handle(fh);
+#endif
   if(!iostr)
     return;
   
