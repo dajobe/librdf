@@ -340,9 +340,11 @@ librdf_parser_raptor_new_statement_handler(void *context,
 
 #ifdef LIBRDF_DEBUG
 #if LIBRDF_DEBUG > 1
-  s=librdf_statement_to_string(statement);
-  fprintf(stderr, "Got new statement: %s\n", s);
-  LIBRDF_FREE(cstring, s);
+  if(1) {
+    raptor_iostream *iostr = raptor_new_iostream_to_file_handle(stderr);
+    librdf_statement_write(statement, iostr);
+    raptor_free_iostream(iostr);
+  }
 #endif
 #endif
 

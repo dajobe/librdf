@@ -430,6 +430,10 @@ librdf_statement_is_complete(librdf_statement *statement)
  * Formats the statement as a newly allocate string that must be freed by
  * the caller.
  * 
+ * @Deprecated: Use librdf_statement_write() to write to
+ * #raptor_iostream which can be made to write to a string.  Use a
+ * #librdf_serializer to write proper syntax formats.
+ *
  * Return value: the string or NULL on failure.
  **/
 unsigned char *
@@ -516,6 +520,41 @@ librdf_statement_to_string(librdf_statement *statement)
   return s;
 }
 
+
+/**
+ * librdf_statement_write:
+ * @statement: the statement
+ * @iostream: raptor iostream to write to
+ *
+ * Write the statement to an iostream
+ * 
+ * This method is for debugging and the format of the output should
+ * not be relied on.
+ *
+ * Return value: non-0 on failure
+ **/
+int
+librdf_statement_write(librdf_statement *statement, raptor_iostream *iostr) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
+
+  if(!statement)
+    return 1;
+  
+  if(librdf_node_write(statement->subject, iostr))
+    return 1;
+  raptor_iostream_write_byte(iostr, ' ');
+  if(librdf_node_write(statement->predicate, iostr))
+    return 1;
+  raptor_iostream_write_byte(iostr, ' ');
+  if(librdf_node_write(statement->object, iostr))
+    return 1;
+
+  return 0;
+}
+
+
+
 /**
  * librdf_statement_print:
  * @statement: the statement
@@ -530,18 +569,20 @@ librdf_statement_to_string(librdf_statement *statement)
 void
 librdf_statement_print(librdf_statement *statement, FILE *fh) 
 {
-  unsigned char *s;
-
+  raptor_iostream *iostr;
+  
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
 
   if(!statement)
     return;
   
-  s=librdf_statement_to_string(statement);
-  if(!s)
+  iostr = raptor_new_iostream_to_file_handle(fh);
+  if(!iostr)
     return;
-  fputs((const char*)s, fh);
-  LIBRDF_FREE(cstring, s);
+  
+  librdf_statement_write(statement, iostr);
+
+  raptor_free_iostream(iostr);
 }
 
 
@@ -917,24 +958,25 @@ main(int argc, char *argv[])
   const char *program=librdf_basename((const char*)argv[0]);
   char *s, *buffer;
   librdf_world *world;
+  raptor_iostream *iostr = raptor_new_iostream_to_file_handle(stdout);
   
   world=librdf_new_world();
   librdf_world_open(world);
 
-  fprintf(stderr, "%s: Creating statement\n", program);
+  fprintf(stdout, "%s: Creating statement\n", program);
   statement=librdf_new_statement(world);
 
-  s=(char*)librdf_statement_to_string(statement);
-  fprintf(stderr, "%s: Empty statement: %s\n", program, s);
-  LIBRDF_FREE(cstring, s);
+  fprintf(stdout, "%s: Empty statement: ", program);
+  librdf_statement_write(statement, iostr);
+  fputs("\n", stdout);
 
   librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/net/dajobe/"));
   librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/#Creator"));
   librdf_statement_set_object(statement, librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0));
 
-  s=(char*)librdf_statement_to_string(statement);
-  fprintf(stderr, "%s: Resulting statement: %s\n", program, s);
-  LIBRDF_FREE(cstring, s);
+  fprintf(stdout, "%s: Resulting statement: ", program);
+  librdf_statement_write(statement, iostr);
+  fputs("\n", stdout);
 
   size=librdf_statement_encode(statement, NULL, 0);
   fprintf(stdout, "%s: Encoding statement requires %d bytes\n", program, size);
@@ -943,7 +985,7 @@ main(int argc, char *argv[])
   fprintf(stdout, "%s: Encoding statement in buffer\n", program);
   size2=librdf_statement_encode(statement, (unsigned char*)buffer, size);
   if(size2 != size) {
-    fprintf(stderr, "%s: Encoding statement used %d bytes, expected it to use %d\n", program, size2, size);
+    fprintf(stdout, "%s: Encoding statement used %d bytes, expected it to use %d\n", program, size2, size);
     return(1);
   }
   
@@ -953,13 +995,13 @@ main(int argc, char *argv[])
 
   fprintf(stdout, "%s: Decoding statement from buffer\n", program);
   if(!librdf_statement_decode(statement2, (unsigned char*)buffer, size)) {
-    fprintf(stderr, "%s: Decoding statement failed\n", program);
+    fprintf(stdout, "%s: Decoding statement failed\n", program);
     return(1);
   }
   LIBRDF_FREE(cstring, buffer);
    
   fprintf(stdout, "%s: New statement is: ", program);
-  librdf_statement_print(statement2, stdout);
+  librdf_statement_write(statement, iostr);
   fputs("\n", stdout);
  
   

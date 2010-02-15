@@ -109,9 +109,11 @@ REDLAND_API
 int librdf_statement_is_complete(librdf_statement *statement);
 
 /* convert to a string */
-REDLAND_API
+REDLAND_API REDLAND_DEPRECATED
 unsigned char *librdf_statement_to_string(librdf_statement *statement);
 /* print it prettily */
+REDLAND_API
+int librdf_statement_write(librdf_statement *statement, raptor_iostream *iostr);
 REDLAND_API
 void librdf_statement_print(librdf_statement *statement, FILE *fh);
 

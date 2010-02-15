@@ -555,29 +555,33 @@ librdf_stream_from_node_iterator_finished(void* context)
 void
 librdf_stream_print(librdf_stream *stream, FILE *fh)
 {
+  raptor_iostream *iostr;
+
   if(!stream)
     return;
 
+  iostr = raptor_new_iostream_to_file_handle(fh);
+  if(!iostr)
+    return;
+  
   while(!librdf_stream_end(stream)) {
-    unsigned char *s;
     librdf_statement* statement=librdf_stream_get_object(stream);
     librdf_node* context_node=(librdf_node*)librdf_stream_get_context(stream);
     if(!statement)
       break;
 
-    s=librdf_statement_to_string(statement);
-    if(s) {
-      fputs("  ", fh);
-      fputs((const char*)s, fh);
-      if(context_node) {
-        fputs(" with context ", fh);
-        librdf_node_print(context_node, fh);
-      }
-      fputs("\n", fh);
-      LIBRDF_FREE(cstring, s);
+    fputs("  ", fh);
+    librdf_statement_write(statement, iostr);
+    if(context_node) {
+      fputs(" with context ", fh);
+      librdf_node_print(context_node, fh);
     }
+    fputs("\n", fh);
+
     librdf_stream_next(stream);
   }
+
+  raptor_free_iostream(iostr);
 }
 
 
