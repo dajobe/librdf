@@ -267,8 +267,10 @@ librdf_new_query(librdf_world *world,
 
 
 /**
- * librdf_new_query_from_query - Copy constructor - create a new librdf_query object from an existing one
+ * librdf_new_query_from_query:
  * @old_query: the existing query #librdf_query to use
+ *
+ * Copy constructor - create a new librdf_query object from an existing one
  *
  * Should create a new query in the same context as the existing one
  * as appropriate.
