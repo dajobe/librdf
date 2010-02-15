@@ -80,6 +80,8 @@ typedef struct
   char **colNames;
   librdf_node **colValues;
 
+  /* RASQAL result set */
+  rasqal_query_results *results;
 } librdf_query_virtuoso_context;
 
 
