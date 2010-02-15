@@ -1123,9 +1123,24 @@ librdf_node_is_blank(librdf_node* node) {
 unsigned char*
 librdf_node_to_string(librdf_node* node) 
 {
+  raptor_iostream* iostr;
+  unsigned char *s;
+  int rc;
+  
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
-  return librdf_node_to_counted_string(node, NULL);
+  iostr = raptor_new_iostream_to_string((void**)&s, NULL, malloc);
+  if(!iostr)
+    return NULL;
+  
+  rc = librdf_node_write(node, iostr);
+  raptor_free_iostream(iostr);
+  if(rc) {
+    free(s);
+    s = NULL;
+  }
+
+  return s;
 }
 
 
@@ -1147,82 +1162,24 @@ librdf_node_to_string(librdf_node* node)
 unsigned char*
 librdf_node_to_counted_string(librdf_node* node, size_t* len_p) 
 {
-  unsigned char *uri_string;
-  unsigned char *datatype_uri_string=NULL;
-  size_t len, datatype_len, language_len=0;
-  unsigned char *s, *d;
-
+  raptor_iostream* iostr;
+  unsigned char *s;
+  int rc;
+  
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
-  switch(node->type) {
-  case LIBRDF_NODE_TYPE_RESOURCE:
-    uri_string=librdf_uri_to_counted_string(node->value.resource.uri, &len);
-    if(!uri_string)
-      return NULL;
-    len +=2;
-    if(len_p)
-      *len_p=len;
-    s=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
-    if(!s) {
-      LIBRDF_FREE(cstring, uri_string);
-      return NULL;
-    }
-    sprintf((char*)s, "[%s]", uri_string);
-    LIBRDF_FREE(cstring, uri_string);
-    break;
-  case LIBRDF_NODE_TYPE_LITERAL:
-    len=node->value.literal.string_len;
-    if(node->value.literal.xml_language) {
-      language_len=node->value.literal.xml_language_len;
-      len+=1+language_len;
-    }
-    
-    if(node->value.literal.datatype_uri) {
-      datatype_uri_string=librdf_uri_to_counted_string(node->value.literal.datatype_uri, &datatype_len);
-      len+=4+datatype_len;
-    }
-    if(len_p)
-      *len_p=len;
-    s=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
-    if(!s)
-      return NULL;
-    /* use strcpy here to add \0 to end of literal string */
-    d=s;
-    strncpy((char*)d, (const char*)node->value.literal.string, node->value.literal.string_len);
-    d+= node->value.literal.string_len;
-    
-    if(node->value.literal.xml_language) {
-      *d++='@';
-      strncpy((char*)d, node->value.literal.xml_language, language_len);
-      d+= language_len;
-    }
-    if(datatype_uri_string) {
-      strncpy((char*)d, "^^<", 3);
-      d+= 3;
-      strncpy((char*)d, (const char*)datatype_uri_string, datatype_len);
-      LIBRDF_FREE(cstring, datatype_uri_string);
-      d+= datatype_len;
-      *d++='>';
-    }
-    *d='\0';
-    break;
-  case LIBRDF_NODE_TYPE_BLANK:
-    len=node->value.blank.identifier_len + 2;
-    if(len_p)
-      *len_p=len;
-    s=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
-    if(!s)
-      return NULL;
-    sprintf((char*)s, "(%s)", node->value.blank.identifier);
-    break;
-
-  case LIBRDF_NODE_TYPE_UNKNOWN:
-  default:
-      librdf_log(node->world,
-                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
-                 "Do not know how to print node type %d", node->type);
+  iostr = raptor_new_iostream_to_string((void**)&s, len_p, malloc);
+  if(!iostr)
     return NULL;
+  
+  rc = librdf_node_write(node, iostr);
+  raptor_free_iostream(iostr);
+
+  if(rc) {
+    free(s);
+    s = NULL;
   }
+
   return s;
 }
 
