@@ -65,6 +65,10 @@ librdf_init_query(librdf_world *world)
   /* Always have query triple, rasqal implementations available */
   librdf_query_triples_constructor(world);
   librdf_query_rasqal_constructor(world);
+
+#ifdef STORAGE_VIRTUOSO
+  librdf_init_query_virtuoso(world);
+#endif
 }
 
 
