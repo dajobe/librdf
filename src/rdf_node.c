@@ -1318,20 +1318,20 @@ librdf_node_print(librdf_node* node, FILE *fh)
 librdf_digest*
 librdf_node_get_digest(librdf_node* node) 
 {
-  librdf_digest* d=NULL;
+  librdf_digest* d = NULL;
   unsigned char *s;
-  librdf_world* world=node->world;
+  librdf_world* world = node->world;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
   switch(node->type) {
     case LIBRDF_NODE_TYPE_RESOURCE:
-      d=librdf_uri_get_digest(node->value.resource.uri);
+      d = librdf_uri_get_digest(world, node->value.resource.uri);
       break;
       
     case LIBRDF_NODE_TYPE_LITERAL:
-      s=node->value.literal.string;
-      d=librdf_new_digest_from_factory(world, world->digest_factory);
+      s = node->value.literal.string;
+      d = librdf_new_digest_from_factory(world, world->digest_factory);
       if(!d)
         return NULL;
       

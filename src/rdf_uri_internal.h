@@ -56,7 +56,7 @@ void librdf_init_uri(librdf_world *world);
 void librdf_finish_uri(librdf_world *world);
 
 /* exported public in error but never usable */
-librdf_digest* librdf_uri_get_digest (librdf_uri *uri);
+librdf_digest* librdf_uri_get_digest (librdf_world *world, librdf_uri *uri);
 
 #ifdef __cplusplus
 }

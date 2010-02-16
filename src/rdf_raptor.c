@@ -80,6 +80,7 @@ librdf_world_get_raptor(librdf_world* world)
 #endif
 
 
+#ifndef RAPTOR_V2_AVAILABLE
 static raptor_uri*
 librdf_raptor_new_uri(void *context, const unsigned char *uri_string) 
 {
@@ -155,9 +156,6 @@ librdf_raptor_uri_as_counted_string(void *context, raptor_uri *uri, size_t *len_
 }
 
 
-#ifdef RAPTOR_V2_AVAILABLE
-#warning FIXME: raptor2 does not support custom uri_handlers
-#else
 static const raptor_uri_handler librdf_raptor_uri_handler = {
   librdf_raptor_new_uri,
   librdf_raptor_new_uri_from_uri_local_name,
@@ -171,7 +169,7 @@ static const raptor_uri_handler librdf_raptor_uri_handler = {
   2,
   librdf_raptor_uri_compare
 };
-#endif
+#endif /* #ifndef RAPTOR_V2_AVAILABLE */
 
 
 /**
@@ -193,7 +191,6 @@ librdf_init_raptor(librdf_world* world)
     world->raptor_world_allocated_here = 1;
     if(!world->raptor_world_ptr || raptor_world_open(world->raptor_world_ptr))
       abort();
-    /*raptor_uri_set_handler_v2(world->raptor_world_ptr, &librdf_raptor_uri_handler, world);*/
   }
 #else
   raptor_init();
