@@ -426,13 +426,13 @@ rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
   int flag = 0;
   int rc;
 
-  /* Get row description */
+  /* Get row descriptor for this statement */
   rc = SQLGetStmtAttr(handle->hstmt, SQL_ATTR_IMP_ROW_DESC, &hdesc,
                       SQL_IS_POINTER, NULL);
   if(!SQL_SUCCEEDED(rc))
       return NULL;
 
-  /* Get value DV type for column 'col' in row */
+  /* Get datatype of column 'col' in row */
   rc = SQLGetDescField(hdesc, col, SQL_DESC_COL_DV_TYPE, &dvtype, 
                        SQL_IS_INTEGER, NULL);
   if(!SQL_SUCCEEDED(rc))
