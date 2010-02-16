@@ -871,7 +871,7 @@ main(int argc, char *argv[])
         librdf_query_results_formatter_write(iostr, formatter, results, base_uri);
         librdf_free_query_results_formatter(formatter);
         raptor_free_iostream(iostr);
-        librdf_free_base_uri(base_uri);
+        librdf_free_uri(base_uri);
 
         endTest(1, "\n");
         librdf_free_query_results(results);
