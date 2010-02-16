@@ -186,11 +186,6 @@ librdf_parser_raptor_new_statement_handler(void *context,
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)context;
   librdf_node* node;
   librdf_statement* statement;
-#ifdef LIBRDF_DEBUG
-#if LIBRDF_DEBUG > 1
-  char *s;
-#endif
-#endif
   librdf_world* world=scontext->pcontext->parser->world;
   int rc;
 
@@ -341,7 +336,12 @@ librdf_parser_raptor_new_statement_handler(void *context,
 #ifdef LIBRDF_DEBUG
 #if LIBRDF_DEBUG > 1
   if(1) {
-    raptor_iostream *iostr = raptor_new_iostream_to_file_handle(stderr);
+    raptor_iostream *iostr;
+#ifdef RAPTOR_V2_AVAILABLE
+    iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stderr);
+#else
+    iostr = raptor_new_iostream_to_file_handle(stderr);
+#endif
     librdf_statement_write(statement, iostr);
     raptor_free_iostream(iostr);
   }
