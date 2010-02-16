@@ -1962,7 +1962,11 @@ main(int argc, char *argv[])
 
   librdf_world_open(world);
 
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stderr);
+#else
   iostr = raptor_new_iostream_to_file_handle(stderr);
+#endif
 
   /* Test model cloning first */
   if(test_model_cloning(program, world))

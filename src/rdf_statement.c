@@ -906,10 +906,16 @@ main(int argc, char *argv[])
   const char *program=librdf_basename((const char*)argv[0]);
   char *s, *buffer;
   librdf_world *world;
-  raptor_iostream *iostr = raptor_new_iostream_to_file_handle(stdout);
-  
+  raptor_iostream *iostr;
+
   world=librdf_new_world();
   librdf_world_open(world);
+
+#ifdef RAPTOR_V2_AVAILABLE
+  iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stdout);
+#else
+  iostr = raptor_new_iostream_to_file_handle(stdout);
+#endif
 
   fprintf(stdout, "%s: Creating statement\n", program);
   statement=librdf_new_statement(world);
