@@ -483,7 +483,9 @@ main(int argc, char *argv[])
   /**** Test 3 *******/
   startTest(3, " Print all triples in <%s> context\n", context);
   {
-    librdf_model_print(model, stdout);
+    raptor_iostream* iostr = raptor_new_iostream_to_file_handle(stdout);
+    librdf_model_write(model, iostr);
+    raptor_free_iostream(iostr);
     endTest(1, "\n");
   }
 
