@@ -406,7 +406,19 @@ rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
          short col, char *data)
 {
   librdf_node *node = NULL;
-  short l_lang, l_type;
+#if 0
+#ifdef SQL_DESC_COL_LITERAL_LANG
+  SQLCHAR langbuf[100];
+  SQLINTEGER lang_len = 0;
+#endif
+#ifdef SQL_DESC_COL_LITERAL_TYPE
+  SQLCHAR typebuff[100];
+  SQLINTEGER type_len = 0;
+#endif
+#else
+  short l_lang;
+  short l_type;
+#endif
   SQLHDESC hdesc = NULL;
   librdf_uri *u_type = NULL;
   int dvtype = 0;
@@ -414,28 +426,63 @@ rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
   int flag = 0;
   int rc;
 
+  /* Get row description */
   rc = SQLGetStmtAttr(handle->hstmt, SQL_ATTR_IMP_ROW_DESC, &hdesc,
                       SQL_IS_POINTER, NULL);
   if(!SQL_SUCCEEDED(rc))
       return NULL;
 
+  /* Get value DV type for column 'col' in row */
   rc = SQLGetDescField(hdesc, col, SQL_DESC_COL_DV_TYPE, &dvtype, 
                        SQL_IS_INTEGER, NULL);
   if(!SQL_SUCCEEDED(rc))
      return NULL;
 
+  /* Try to get timestamp / date / time / datetime value for column 'col' */
   rc = SQLGetDescField(hdesc, col, SQL_DESC_COL_DT_DT_TYPE, &dv_dt_type,
                        SQL_IS_INTEGER, NULL);
   if(!SQL_SUCCEEDED(rc))
      return NULL;
 
+  /* FIXME Should be converted to these:
+   *   SQL_DESC_COL_LITERAL_LANG and SQL_DESC_COL_LITERAL_TYPE
+   *
+   * The docs says about SQL_DESC_COL_LITERAL_ATTR:
+   *   "This call is deprecated in favor of using the
+   *    SQL_DESC_COL_LITERAL_LANG and SQL_DESC_LITERAL_TYPE options
+   *    of SQLGetDescField which caches these lookups to speed up
+   *    describe operations."
+   * -- http://docs.openlinksw.com/virtuoso/odbcimplementation.html
+   *
+   * instead of doing the lookup here then rdf_type2string() and
+   * rdf_lang2string() on the decoded flags.
+   */
+#if 0
+#ifdef SQL_DESC_COL_LITERAL_LANG
+    rc = SQLGetDescField(hdesc, colNum, SQL_DESC_COL_LITERAL_LANG, langbuf,
+                         sizeof(langbuf), &lang_len);
+  if(!SQL_SUCCEEDED(rc))
+     return NULL;
+#endif
+#ifdef SQL_DESC_COL_LITERAL_TYPE
+    rc = SQLGetDescField(hdesc, colNum, SQL_DESC_COL_LITERAL_TYPE, typebuf,
+                         sizeof(typebuff), &type_len);
+  if(!SQL_SUCCEEDED(rc))
+     return NULL;
+#endif
+#else
+  /* Get RDF literal attributes flags */
   rc = SQLGetDescField(hdesc, col, SQL_DESC_COL_LITERAL_ATTR, &flag,
                        SQL_IS_INTEGER, NULL);
   if(!SQL_SUCCEEDED(rc))
      return NULL;
 
+  /* literal language ID (16 bits) */
   l_lang = (short)((flag >> 16) & 0xFFFF);
+  /* literal datatype ID (16 bits) */
   l_type = (short)(flag & 0xFFFF);
+#endif
+
   rc = SQLGetDescField(hdesc, col, SQL_DESC_COL_BOX_FLAGS, &flag,
                        SQL_IS_INTEGER, NULL);
   if(!SQL_SUCCEEDED(rc))
