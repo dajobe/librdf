@@ -2963,8 +2963,8 @@ librdf_storage_virtuoso_query_execute(librdf_storage* storage,
   librdf_query_results* results = NULL;
 
   /* This storage only accepts query languages that it executes
-   * ('vsparql') so we know the context is a pointer to a
-   * #librdf_query_virtuoso_context objec as initialised by
+   * ('vsparql') so we know the query context is a pointer to a
+   * #librdf_query_virtuoso_context object as initialised by
    * librdf_query_virtuoso_init()
    */
   qcontext = (librdf_query_virtuoso_context*)query->context;
@@ -2976,7 +2976,9 @@ librdf_storage_virtuoso_query_execute(librdf_storage* storage,
   qcontext->vc = librdf_storage_virtuoso_get_handle(storage);
 
   if(query->factory->execute) {
-    /* calls librdf_query_virtuoso_execute() with NULL model */
+    /* calls librdf_query_virtuoso_execute() with NULL model
+     * having tied the query to this storage.
+     */
     if((results = query->factory->execute(query, NULL)))
       librdf_query_add_query_result(query, results);
   }
