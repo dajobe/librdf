@@ -654,7 +654,16 @@ main(int argc, char *argv[])
 
   switch(type) {
     case CMD_PRINT:
-      librdf_model_print(model, stdout);
+      {
+        raptor_iostream *iostr;
+#ifdef RAPTOR_V2_AVAILABLE
+        iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stdout);
+#else
+        iostr = raptor_new_iostream_to_file_handle(stdout);
+#endif
+        librdf_model_write(model, iostr);
+        raptor_free_iostream(iostr);
+      }
       break;
 
 
