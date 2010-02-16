@@ -890,12 +890,12 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
   }
 
   /* Update status and return */
-  connection->h_lang=context->h_lang;
-  connection->h_type=context->h_type;
+  connection->h_lang = context->h_lang;
+  connection->h_type = context->h_type;
   connection->v_release_connection = librdf_storage_virtuoso_release_handle;
   connection->v_rdf2node = rdf2node;
-  connection->v_GetDataCHAR=vGetDataCHAR;
-  connection->v_GetDataINT=vGetDataINT;
+  connection->v_GetDataCHAR = vGetDataCHAR;
+  connection->v_GetDataINT = vGetDataINT;
   connection->status = VIRTUOSO_CONNECTION_BUSY;
   return connection;
 
@@ -2205,7 +2205,7 @@ librdf_storage_virtuoso_find_statements_in_context(librdf_storage* storage,
 #endif
   /* Initialize sos context */
   sos = (librdf_storage_virtuoso_sos_context*)
-    LIBRDF_CALLOC(librdf_storage_virtuoso_sos_context,1, sizeof(*sos));
+    LIBRDF_CALLOC(librdf_storage_virtuoso_sos_context, 1, sizeof(*sos));
   if(!sos)
     return NULL;
 
@@ -2602,7 +2602,7 @@ librdf_storage_virtuoso_get_contexts(librdf_storage* storage)
   /* Initialize get_contexts context */
   gccontext = (librdf_storage_virtuoso_get_contexts_context*)
     LIBRDF_CALLOC(librdf_storage_virtuoso_get_contexts_context, 1,
-                  sizeof(librdf_storage_virtuoso_get_contexts_context));
+                  sizeof(*gccontext));
   if(!gccontext)
     return NULL;
 
