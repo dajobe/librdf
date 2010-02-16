@@ -183,8 +183,6 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name,
   context->row_count = 0;
   context->result_type = VQUERY_RESULTS_UNKNOWN;
 
-  context->results = NULL; /* FIXME */
-
   len = strlen((const char*)query_string);
   query_string_copy = (unsigned char*)LIBRDF_MALLOC(cstring, len+1);
   if(!query_string_copy)
@@ -196,7 +194,6 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name,
   while(token != NULL) {
     if(strexpect("SELECT", (const char*)token)) {
       context->result_type = VQUERY_RESULTS_BINDINGS;
-      context->results = NULL; /* FIXME */
       break;
     } else if(strexpect("ASK", (const char*)token)) {
       context->result_type = VQUERY_RESULTS_BOOLEAN;
@@ -230,9 +227,6 @@ librdf_query_virtuoso_terminate(librdf_query* query)
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_terminate \n");
 #endif
-  if(context->results)
-    rasqal_free_query_results(context->results);
-  
   virtuoso_free_result(query);
   SQLCloseCursor(context->vc->hstmt);
 
@@ -337,8 +331,6 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
     context->result_type |= VQUERY_RESULTS_BINDINGS;
     context->eof = 0;
   }
-
-  context->results = rasqal_new_query_results(query->world->rasqal_world_ptr, NULL, RASQAL_QUERY_RESULTS_BINDINGS, NULL /* vars_table */);
 
   results = (librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, 
                                                  sizeof(*results));
@@ -457,12 +449,14 @@ librdf_query_virtuoso_results_next(librdf_query_results *query_results)
   librdf_query_virtuoso_context *context;
   int rc;
   short col;
-  short numCols=context->numCols;
+  short numCols;
   librdf_node *node;
   char *data;
   int is_null;
 
   context = (librdf_query_virtuoso_context*)query->context;
+
+  numCols = context->numCols;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_next \n");
@@ -1204,6 +1198,57 @@ fail:
 
 
 
+static librdf_query_results_formatter*
+librdf_query_virtuoso_new_results_formatter(librdf_query_results* query_results,
+                                          const char *name,
+                                          const char *mime_type, 
+                                          librdf_uri* format_uri)
+{
+  rasqal_world* rasqal_world_ptr;
+  rasqal_query_results_formatter* formatter;
+  librdf_query_results_formatter* qrf;
+
+  rasqal_world_ptr = query_results->query->world->rasqal_world_ptr;
+  
+#if RASQAL_VERSION >= 918
+  formatter = rasqal_new_query_results_formatter2(rasqal_world_ptr,
+                                                  name,
+                                                  mime_type,
+                                                  (raptor_uri*)format_uri);
+#else
+  if(mime_type)
+    formatter = rasqal_new_query_results_formatter_by_mime_type(rasqal_world_ptr,
+                                                                mime_type);
+  else
+    formatter = rasqal_new_query_results_formatter(rasqal_world_ptr,
+                                                   name, 
+                                                   (raptor_uri*)format_uri);
+#endif
+
+  if(!formatter)
+    return NULL;
+
+  qrf = (librdf_query_results_formatter*)LIBRDF_MALLOC(query_results_formatter, 
+                                                       sizeof(*qrf));
+  if(!qrf) {
+    rasqal_free_query_results_formatter(formatter);
+    return NULL;
+  }
+
+  qrf->query_results = query_results;
+  qrf->formatter = formatter;
+  return qrf;
+}
+
+
+static void
+librdf_query_virtuoso_free_results_formatter(librdf_query_results_formatter* qrf) 
+{
+  rasqal_free_query_results_formatter(qrf->formatter);
+  LIBRDF_FREE(librdf_query_results, qrf);
+}
+
+
 /**
  * librdf_query_results_formatter_write:
  * @iostr: #raptor_iostream to write the query to
@@ -1226,16 +1271,85 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
 {
   librdf_query *query = query_results->query;
   librdf_query_virtuoso_context *context;
-
+  rasqal_variables_table *vt;
+  rasqal_query_results *rasqal_qr;
+  int rc;
+  int row_size;
+  int i;
+  
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_formatter_write \n");
 #endif
 
   context = (librdf_query_virtuoso_context*)query->context;
 
-  return rasqal_query_results_formatter_write(iostr, qrf->formatter,
-                                              context->results, 
+  row_size = librdf_query_results_get_bindings_count(query_results);
+  
+  /* Set up query results variables table */
+  vt = rasqal_new_variables_table(query->world->rasqal_world_ptr);
+  for(i = 0 ; i < row_size; i++) {
+    const char *name;
+    unsigned char *name_copy;
+
+    name = librdf_query_results_get_binding_name(query_results, i);
+    name_copy = (unsigned char *)LIBRDF_MALLOC(cstring, strlen(name)+1);
+    strcpy((char*)name_copy, (const char*)name);
+    rasqal_variables_table_add(vt, RASQAL_VARIABLE_TYPE_NORMAL,
+                               name_copy, NULL);
+  }
+
+  rasqal_qr = rasqal_new_query_results(query->world->rasqal_world_ptr,
+                                       NULL,
+                                       RASQAL_QUERY_RESULTS_BINDINGS,
+                                       vt);
+
+  while(!librdf_query_results_finished(query_results)) {
+    rasqal_row* row;
+    int offset;
+    
+    row = rasqal_new_row_for_size(query->world->rasqal_world_ptr, row_size);
+    if(!row) {
+      rc = 1;
+      break;
+    }
+    
+    for(offset = 0 ; offset < row_size; offset++) {
+      librdf_node *node;
+      rasqal_literal* literal;
+
+      node = librdf_query_results_get_binding_value(query_results, offset);
+      if(!node) {
+        rc = 1;
+        break;
+      }
+      
+      literal = redland_node_to_rasqal_literal(node);
+      if(!literal) {
+        rc = 1;
+        break;
+      }
+      
+      rasqal_row_set_value_at(row, offset, literal);
+      rasqal_free_literal(literal);
+    }
+
+    if(rc)
+      break;
+    
+    rasqal_query_results_add_row(rasqal_qr, row);
+
+    librdf_query_results_next(query_results);
+  }
+
+  if(!rc)
+    rc = rasqal_query_results_formatter_write(iostr, qrf->formatter,
+                                              rasqal_qr, 
                                               (raptor_uri*)base_uri);
+
+  rasqal_free_query_results(rasqal_qr);
+  rasqal_free_variables_table(vt);
+
+  return rc;
 }
 
 
@@ -1272,6 +1386,8 @@ librdf_query_virtuoso_register_factory(librdf_query_factory *factory)
   factory->results_get_boolean			= librdf_query_virtuoso_results_get_boolean;
   factory->results_as_stream			= librdf_query_virtuoso_results_as_stream;
 
+  factory->new_results_formatter              = librdf_query_virtuoso_new_results_formatter;
+  factory->free_results_formatter             = librdf_query_virtuoso_free_results_formatter;
   factory->results_formatter_write		= librdf_query_virtuoso_results_formatter_write;
 }
 

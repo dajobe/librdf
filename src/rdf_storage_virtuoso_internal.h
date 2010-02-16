@@ -79,9 +79,6 @@ typedef struct
 
   char **colNames;
   librdf_node **colValues;
-
-  /* RASQAL result set */
-  rasqal_query_results *results;
 } librdf_query_virtuoso_context;
 
 
@@ -139,6 +136,11 @@ typedef struct {
 
 /******************* Virtuoso ODBC Extensions *******************/
 
+/* See
+ * http://docs.openlinksw.com/virtuoso/odbcimplementation.html#virtodbcsparql
+ */
+
+
 /*
  *  ODBC extensions for SQLGetDescField
  */
@@ -146,7 +148,8 @@ typedef struct {
 #define SQL_DESC_COL_DT_DT_TYPE		1058L
 #define SQL_DESC_COL_LITERAL_ATTR	1059L
 #define SQL_DESC_COL_BOX_FLAGS		1060L
-
+#define SQL_DESC_COL_LITERAL_LANG       1061L
+#define SQL_DESC_COL_LITERAL_TYPE       1062L
 
 /*
  *  Virtuoso - ODBC SQL_DESC_COL_DV_TYPE
@@ -171,5 +174,13 @@ typedef struct {
 #define VIRTUOSO_DT_TYPE_DATETIME	1
 #define VIRTUOSO_DT_TYPE_DATE		2
 #define VIRTUOSO_DT_TYPE_TIME		3
+
+
+/*
+ *  Virtuoso - ODBC SQL_DESC_COL_BOX_FLAGS
+ */
+#define VIRTUOSO_BF_IRI			0x1
+#define VIRTUOSO_BF_UTF8                0x2
+#define VIRTUOSO_BF_DEFAULT_ENC         0x4
 
 #endif

@@ -483,7 +483,9 @@ main(int argc, char *argv[])
   /**** Test 3 *******/
   startTest(3, " Print all triples in <%s> context\n", context);
   {
-    librdf_model_print(model, stdout);
+    raptor_iostream* iostr = raptor_new_iostream_to_file_handle(stdout);
+    librdf_model_write(model, iostr);
+    raptor_free_iostream(iostr);
     endTest(1, "\n");
   }
 
@@ -866,10 +868,13 @@ main(int argc, char *argv[])
                                                         NULL /* mime type */,
                                                         NULL /* format_uri */);
 
+        base_uri = librdf_new_uri(world, (const unsigned char*)"http://example.org/");
+        
         librdf_query_results_formatter_write(iostr, formatter, results, base_uri);
-
         librdf_free_query_results_formatter(formatter);
         raptor_free_iostream(iostr);
+        librdf_free_uri(base_uri);
+
         endTest(1, "\n");
         librdf_free_query_results(results);
     }
