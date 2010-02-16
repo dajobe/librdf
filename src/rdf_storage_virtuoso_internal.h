@@ -175,4 +175,12 @@ typedef struct {
 #define VIRTUOSO_DT_TYPE_DATE		2
 #define VIRTUOSO_DT_TYPE_TIME		3
 
+
+/*
+ *  Virtuoso - ODBC SQL_DESC_COL_BOX_FLAGS
+ */
+#define VIRTUOSO_BF_IRI			0x1
+#define VIRTUOSO_BF_UTF8                0x2
+#define VIRTUOSO_BF_DEFAULT_ENC         0x4
+
 #endif
