@@ -858,15 +858,19 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
   /* Initialize closed Virtuoso connection handle */
   rc = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &connection->henv);
   if(!SQL_SUCCEEDED(rc)) {
-    rdf_virtuoso_ODBC_Errors("SQLAllocHandle(henv)", storage->world, connection);
+    rdf_virtuoso_ODBC_Errors("SQLAllocHandle(henv)", storage->world,
+                             connection);
     goto end;
   }
 
-  SQLSetEnvAttr(connection->henv, SQL_ATTR_ODBC_VERSION,(SQLPOINTER) SQL_OV_ODBC3, SQL_IS_UINTEGER);
+  SQLSetEnvAttr(connection->henv,
+                SQL_ATTR_ODBC_VERSION,(SQLPOINTER) SQL_OV_ODBC3,
+                SQL_IS_UINTEGER);
 
   rc = SQLAllocHandle(SQL_HANDLE_DBC, connection->henv, &connection->hdbc);
   if(!SQL_SUCCEEDED(rc)) {
-    rdf_virtuoso_ODBC_Errors("SQLAllocHandle(hdbc)", storage->world, connection);
+    rdf_virtuoso_ODBC_Errors("SQLAllocHandle(hdbc)", storage->world,
+                             connection);
     goto end;
   }
 
