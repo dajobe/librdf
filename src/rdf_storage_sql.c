@@ -85,7 +85,7 @@ librdf_sql_config_store_triple(void *user_data,
 # endif
     }
 #else
-    if(!strcmp(librdf_uri_as_string((librdf_uri*)triple->predicate),
+    if(!strcmp((const char*)librdf_uri_as_string((librdf_uri*)triple->predicate),
                config->predicate_uri_strings[i])) {
       config->values[i] = strdup((char*)triple->object);
 # if LIBRDF_DEBUG > 1
