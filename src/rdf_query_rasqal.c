@@ -207,7 +207,7 @@ rasqal_literal_to_redland_node(librdf_world *world, rasqal_literal* l)
 }
 
 
-static rasqal_literal*
+rasqal_literal*
 redland_node_to_rasqal_literal(librdf_node *node)
 {
   rasqal_literal* l;
