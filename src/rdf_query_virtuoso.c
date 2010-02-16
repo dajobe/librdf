@@ -1303,7 +1303,6 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
                                        RASQAL_QUERY_RESULTS_BINDINGS,
                                        vt);
 
-  row_size = librdf_query_results_get_bindings_count(query_results);
   while(!librdf_query_results_finished(query_results)) {
     rasqal_row* row;
     int offset;
