@@ -172,6 +172,32 @@ static const raptor_uri_handler librdf_raptor_uri_handler = {
 #endif /* #ifndef RAPTOR_V2_AVAILABLE */
 
 
+#ifdef RAPTOR_V2_AVAILABLE
+static void
+librdf_raptor_fatal_error_handler(void *data, raptor_locator *locator,
+                                  const char *message)
+{
+  librdf_log_simple((librdf_world *)data, 0, LIBRDF_LOG_FATAL, LIBRDF_FROM_RAPTOR, locator, message);
+}
+
+
+static void
+librdf_raptor_error_handler(void *data, raptor_locator *locator,
+                            const char *message)
+{
+  librdf_log_simple((librdf_world *)data, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_RAPTOR, locator, message);
+}
+
+
+static void
+librdf_raptor_warning_handler(void *data, raptor_locator *locator,
+                              const char *message)
+{
+  librdf_log_simple((librdf_world *)data, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_RAPTOR, locator, message);
+}
+#endif /* RAPTOR_V2_AVAILABLE */
+
+
 /**
  * librdf_init_raptor:
  * @world: librdf_world object
@@ -191,6 +217,11 @@ librdf_init_raptor(librdf_world* world)
     world->raptor_world_allocated_here = 1;
     if(!world->raptor_world_ptr || raptor_world_open(world->raptor_world_ptr))
       abort();
+
+    /* set up error/warning handlers */
+    raptor_world_set_fatal_error_handler(world->raptor_world_ptr, world, librdf_raptor_fatal_error_handler);
+    raptor_world_set_error_handler(world->raptor_world_ptr, world, librdf_raptor_error_handler);
+    raptor_world_set_warning_handler(world->raptor_world_ptr, world, librdf_raptor_warning_handler);
   }
 #else
   raptor_init();

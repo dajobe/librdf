@@ -76,6 +76,7 @@ typedef enum {
  * @LIBRDF_FROM_UTF8: UTF8
  * @LIBRDF_FROM_MEMORY: Memory
  * @LIBRDF_FROM_NONE: Associated with no part.
+ * @LIBRDF_FROM_RAPTOR: Raptor library (parser or serializer; raptor2 and later).
  * @LIBRDF_FROM_LAST: Internal, never returned.
  *
  * Indicates the part of the system that generated the log message.
@@ -100,7 +101,8 @@ typedef enum {
   LIBRDF_FROM_URI,
   LIBRDF_FROM_UTF8,
   LIBRDF_FROM_MEMORY,
-  LIBRDF_FROM_LAST=LIBRDF_FROM_MEMORY
+  LIBRDF_FROM_RAPTOR,
+  LIBRDF_FROM_LAST=LIBRDF_FROM_RAPTOR
 } librdf_log_facility;
   
 
