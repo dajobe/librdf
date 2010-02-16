@@ -316,11 +316,22 @@ end:
 }
 
 
+/*
+ * rdf_type2string:
+ * @world: redland world
+ * @handle: virtoso storage connection handle
+ * @key: type ID key
+ *
+ * INTERNAL - turn an rdf_type ID into a URI string
+ *
+ * Return value: type URI string or NULL on failure.
+ */
 static char*
-rdf_type2string(librdf_world *world, librdf_storage_virtuoso_connection *handle, short key)
+rdf_type2string(librdf_world *world,
+                librdf_storage_virtuoso_connection *handle, short key)
 {
   char *val = NULL;
-  char query[]="select RDT_QNAME from DB.DBA.RDF_DATATYPE where RDT_TWOBYTE=?";
+  char query[] = "select RDT_QNAME from DB.DBA.RDF_DATATYPE where RDT_TWOBYTE=?";
   int rc;
   HSTMT hstmt;
   SQLLEN m_ind = 0;
@@ -380,7 +391,18 @@ end:
 }
 
 
-static librdf_node *
+/*
+ * rdf2node:
+ * @storage: storage object
+ * @handle: virtoso storage connection handle
+ * @col: column
+ * @data: data at column
+ *
+ * INTERNAL - turn result data from a column cell into an #librdf_node
+ *
+ * Return value: node or NULL on failure.
+ */
+static librdf_node*
 rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
          short col, char *data)
 {
@@ -422,29 +444,27 @@ rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
 
   switch(dvtype) {
     case VIRTUOSO_DV_STRING:
-      {
-	if(flag) {
-	  if(strncmp((char*)data, "_:",2) == 0) {
-	    node = librdf_new_node_from_blank_identifier(storage->world,
-                                                         (const unsigned char*)data+2);
-	  } else {
-	    node = librdf_new_node_from_uri_string(storage->world,
-                                                   (const unsigned char*)data);
-	  }
-	} else {
-	  if(strncmp((char*)data, "nodeID://",9) == 0) {
-	    node = librdf_new_node_from_blank_identifier(storage->world,
-                                                         (const unsigned char*)data+9);
-	  } else {
-	    node = librdf_new_node_from_literal(storage->world,
-                                                (const unsigned char *)data, NULL, 0);
-	  }
-	}
-	break;
+      if(flag) {
+        if(strncmp((char*)data, "_:",2) == 0) {
+          node = librdf_new_node_from_blank_identifier(storage->world,
+                                                       (const unsigned char*)data+2);
+        } else {
+          node = librdf_new_node_from_uri_string(storage->world,
+                                                 (const unsigned char*)data);
+        }
+      } else {
+        if(strncmp((char*)data, "nodeID://",9) == 0) {
+          node = librdf_new_node_from_blank_identifier(storage->world,
+                                                       (const unsigned char*)data+9);
+        } else {
+          node = librdf_new_node_from_literal(storage->world,
+                                              (const unsigned char *)data, NULL, 0);
+        }
       }
+      break;
 
     case VIRTUOSO_DV_RDF:
-      {
+      if(1) {
 	char *s_type = rdf_type2string(storage->world, handle, l_type);
 	char *s_lang = rdf_lang2string(storage->world, handle, l_lang);
 
@@ -459,85 +479,84 @@ rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
       }
 
     case VIRTUOSO_DV_LONG_INT: /* integer */
-	u_type = librdf_new_uri(storage->world,
-                                (unsigned char *)"http://www.w3.org/2001/XMLSchema#integer");
-
-	node = librdf_new_node_from_typed_literal(storage->world,
-                                                  (const unsigned char *)data,
-                                                  NULL, 
-                                                  u_type);
-	break;
+      u_type = librdf_new_uri(storage->world,
+                              (unsigned char *)"http://www.w3.org/2001/XMLSchema#integer");
+      
+      node = librdf_new_node_from_typed_literal(storage->world,
+                                                (const unsigned char *)data,
+                                                NULL, 
+                                                u_type);
+      break;
 
     case VIRTUOSO_DV_SINGLE_FLOAT: /* float */
-	u_type = librdf_new_uri(storage->world,
-                                (unsigned char *)"http://www.w3.org/2001/XMLSchema#float");
-
-	node = librdf_new_node_from_typed_literal(storage->world,
-                                                  (const unsigned char *)data, NULL,
-                                                  u_type);
+      u_type = librdf_new_uri(storage->world,
+                              (unsigned char *)"http://www.w3.org/2001/XMLSchema#float");
+      
+      node = librdf_new_node_from_typed_literal(storage->world,
+                                                (const unsigned char *)data, NULL,
+                                                u_type);
 	break;
 
     case VIRTUOSO_DV_DOUBLE_FLOAT: /* double */
-	u_type = librdf_new_uri(storage->world, 
-                                (unsigned char *)"http://www.w3.org/2001/XMLSchema#double");
-
-	node = librdf_new_node_from_typed_literal(storage->world,
-                                                  (const unsigned char *)data, 
-                                                  NULL,
-                                                  u_type);
-	break;
+      u_type = librdf_new_uri(storage->world, 
+                              (unsigned char *)"http://www.w3.org/2001/XMLSchema#double");
+      
+      node = librdf_new_node_from_typed_literal(storage->world,
+                                                (const unsigned char *)data, 
+                                                NULL,
+                                                u_type);
+      break;
 
     case VIRTUOSO_DV_NUMERIC: /* decimal */
-	u_type = librdf_new_uri(storage->world,
-                                (unsigned char *)"http://www.w3.org/2001/XMLSchema#decimal");
-
-	node = librdf_new_node_from_typed_literal(storage->world,
-                                                  (const unsigned char *)data,
-                                                  NULL,
-                                                  u_type);
-	break;
+      u_type = librdf_new_uri(storage->world,
+                              (unsigned char *)"http://www.w3.org/2001/XMLSchema#decimal");
+      
+      node = librdf_new_node_from_typed_literal(storage->world,
+                                                (const unsigned char *)data,
+                                                NULL,
+                                                u_type);
+      break;
 
     case VIRTUOSO_DV_TIMESTAMP: /* datetime */
     case VIRTUOSO_DV_DATE:
     case VIRTUOSO_DV_TIME:
     case VIRTUOSO_DV_DATETIME:
-	switch(dv_dt_type)
-	  {
-	  case VIRTUOSO_DT_TYPE_DATE:
-	    u_type = librdf_new_uri(storage->world,
-                                    (unsigned char *)"http://www.w3.org/2001/XMLSchema#date");
-	    break;
-	  case VIRTUOSO_DT_TYPE_TIME:
-	    u_type = librdf_new_uri(storage->world,
-                                    (unsigned char *)"http://www.w3.org/2001/XMLSchema#time");
-	    break;
-	  default:
-	      u_type = librdf_new_uri(storage->world,
-                                      (unsigned char *)"http://www.w3.org/2001/XMLSchema#dateTime");
-	    break;
-	  }
-	node = librdf_new_node_from_typed_literal(storage->world,
-                                                  (const unsigned char *)data,
-                                                  NULL,
-                                                  u_type);
-	break;
+      switch(dv_dt_type) {
+        case VIRTUOSO_DT_TYPE_DATE:
+          u_type = librdf_new_uri(storage->world,
+                                  (unsigned char *)"http://www.w3.org/2001/XMLSchema#date");
+          break;
+        case VIRTUOSO_DT_TYPE_TIME:
+          u_type = librdf_new_uri(storage->world,
+                                  (unsigned char *)"http://www.w3.org/2001/XMLSchema#time");
+          break;
+        default:
+          u_type = librdf_new_uri(storage->world,
+                                  (unsigned char *)"http://www.w3.org/2001/XMLSchema#dateTime");
+          break;
+      }
+      node = librdf_new_node_from_typed_literal(storage->world,
+                                                (const unsigned char *)data,
+                                                NULL,
+                                                u_type);
+      break;
 
     case VIRTUOSO_DV_IRI_ID:
-	node = librdf_new_node_from_literal(storage->world,
-                                            (const unsigned char *)data,
-                                            NULL,
-                                            0);
-	break;
+      node = librdf_new_node_from_literal(storage->world,
+                                          (const unsigned char *)data,
+                                          NULL,
+                                          0);
+      break;
 
     default:
-	return NULL; /* printf("*unexpected result type %d*", dtp); */
+      return NULL; /* printf("*unexpected result type %d*", dtp); */
   }
 
   return node;
 }
 
 
-static char *
+static char*
 librdf_storage_virtuoso_node2string(librdf_storage *storage, librdf_node *node)
 {
   librdf_node_type type = librdf_node_get_type(node);
