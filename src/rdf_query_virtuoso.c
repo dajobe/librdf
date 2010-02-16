@@ -1198,6 +1198,57 @@ fail:
 
 
 
+static librdf_query_results_formatter*
+librdf_query_virtuoso_new_results_formatter(librdf_query_results* query_results,
+                                          const char *name,
+                                          const char *mime_type, 
+                                          librdf_uri* format_uri)
+{
+  rasqal_world* rasqal_world_ptr;
+  rasqal_query_results_formatter* formatter;
+  librdf_query_results_formatter* qrf;
+
+  rasqal_world_ptr = query_results->query->world->rasqal_world_ptr;
+  
+#if RASQAL_VERSION >= 918
+  formatter = rasqal_new_query_results_formatter2(rasqal_world_ptr,
+                                                  name,
+                                                  mime_type,
+                                                  (raptor_uri*)format_uri);
+#else
+  if(mime_type)
+    formatter = rasqal_new_query_results_formatter_by_mime_type(rasqal_world_ptr,
+                                                                mime_type);
+  else
+    formatter = rasqal_new_query_results_formatter(rasqal_world_ptr,
+                                                   name, 
+                                                   (raptor_uri*)format_uri);
+#endif
+
+  if(!formatter)
+    return NULL;
+
+  qrf = (librdf_query_results_formatter*)LIBRDF_MALLOC(query_results_formatter, 
+                                                       sizeof(*qrf));
+  if(!qrf) {
+    rasqal_free_query_results_formatter(formatter);
+    return NULL;
+  }
+
+  qrf->query_results = query_results;
+  qrf->formatter = formatter;
+  return qrf;
+}
+
+
+static void
+librdf_query_virtuoso_free_results_formatter(librdf_query_results_formatter* qrf) 
+{
+  rasqal_free_query_results_formatter(qrf->formatter);
+  LIBRDF_FREE(librdf_query_results, qrf);
+}
+
+
 /**
  * librdf_query_results_formatter_write:
  * @iostr: #raptor_iostream to write the query to
@@ -1334,6 +1385,8 @@ librdf_query_virtuoso_register_factory(librdf_query_factory *factory)
   factory->results_get_boolean			= librdf_query_virtuoso_results_get_boolean;
   factory->results_as_stream			= librdf_query_virtuoso_results_as_stream;
 
+  factory->new_results_formatter              = librdf_query_virtuoso_new_results_formatter;
+  factory->free_results_formatter             = librdf_query_virtuoso_free_results_formatter;
   factory->results_formatter_write		= librdf_query_virtuoso_results_formatter_write;
 }
 
