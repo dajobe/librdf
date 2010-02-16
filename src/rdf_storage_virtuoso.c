@@ -6,7 +6,7 @@
  *
  * Based in part on rdf_storage_mysql
  *
- * Copyright (C) 2000-2009, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2010, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  *
  * This package is Free Software and part of Redland http://librdf.org/
@@ -434,8 +434,8 @@ rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
   if(!SQL_SUCCEEDED(rc))
      return NULL;
 
-  l_lang  = (short)((flag >> 16) & 0xFFFF);
-  l_type  = (short)(flag & 0xFFFF);
+  l_lang = (short)((flag >> 16) & 0xFFFF);
+  l_type = (short)(flag & 0xFFFF);
   rc = SQLGetDescField(hdesc, col, SQL_DESC_COL_BOX_FLAGS, &flag,
                        SQL_IS_INTEGER, NULL);
   if(!SQL_SUCCEEDED(rc))
@@ -444,17 +444,17 @@ rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
   switch(dvtype) {
     case VIRTUOSO_DV_STRING:
       if(flag) {
-        if(strncmp((char*)data, "_:",2) == 0) {
+        if(!strncmp((char*)data, "_:", 2)) {
           node = librdf_new_node_from_blank_identifier(storage->world,
-                                                       (const unsigned char*)data+2);
+                                                       (const unsigned char*)data + 2);
         } else {
           node = librdf_new_node_from_uri_string(storage->world,
                                                  (const unsigned char*)data);
         }
       } else {
-        if(strncmp((char*)data, "nodeID://",9) == 0) {
+        if(!strncmp((char*)data, "nodeID://", 9)) {
           node = librdf_new_node_from_blank_identifier(storage->world,
-                                                       (const unsigned char*)data+9);
+                                                       (const unsigned char*)data + 9);
         } else {
           node = librdf_new_node_from_literal(storage->world,
                                               (const unsigned char *)data, NULL, 0);
@@ -567,7 +567,7 @@ librdf_storage_virtuoso_node2string(librdf_storage *storage, librdf_node *node)
     char *uri = (char*)librdf_uri_as_counted_string(librdf_node_get_uri(node),
                                                     &nodelen);
 
-    ret = (char*)LIBRDF_MALLOC(cstring, nodelen+3);
+    ret = (char*)LIBRDF_MALLOC(cstring, nodelen + 3);
     if(!ret)
       goto end;
 
@@ -843,15 +843,15 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
 
     /* Update buffer size and reset new connections */
     context->connections_count += 2;
-    connection = connections[context->connections_count-2];
+    connection = connections[context->connections_count - 2];
     connection->status = VIRTUOSO_CONNECTION_CLOSED;
     connection->henv = NULL;
     connection->hdbc = NULL;
     connection->hstmt = NULL;
-    connections[context->connections_count-1]->status = VIRTUOSO_CONNECTION_CLOSED;
-    connections[context->connections_count-1]->henv = NULL;
-    connections[context->connections_count-1]->hdbc = NULL;
-    connections[context->connections_count-1]->hstmt = NULL;
+    connections[context->connections_count - 1]->status = VIRTUOSO_CONNECTION_CLOSED;
+    connections[context->connections_count - 1]->henv = NULL;
+    connections[context->connections_count - 1]->hdbc = NULL;
+    connections[context->connections_count - 1]->hstmt = NULL;
     context->connections=connections;
   }
 
@@ -1275,7 +1275,7 @@ librdf_storage_virtuoso_size(librdf_storage* storage)
   rc = SQLExecDirect(handle->hstmt,(UCHAR *) query, SQL_NTS);
   if(!SQL_SUCCEEDED(rc)) {
     rdf_virtuoso_ODBC_Errors("SQLExecDirect()", storage->world, handle);
-    count= -1;
+    count = -1;
     goto end;
   }
 
@@ -1283,7 +1283,7 @@ librdf_storage_virtuoso_size(librdf_storage* storage)
   if(SQL_SUCCEEDED(rc)) {
     int is_null;
     if(vGetDataINT(storage->world, handle, 1, &is_null, &count) == -1)
-      count= -1;
+      count = -1;
   }
   SQLCloseCursor(handle->hstmt);
 
@@ -1453,7 +1453,7 @@ BindSP(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
     char *value = (char *)librdf_node_get_blank_identifier(node);
     char *bnode = NULL;
 
-    bnode = (char*)LIBRDF_MALLOC(cstring, strlen(value)+5);
+    bnode = (char*)LIBRDF_MALLOC(cstring, strlen(value) + 5);
     if(!bnode)
       return -1;
 
@@ -1503,7 +1503,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
      if(!SQL_SUCCEEDED(rc))
        goto error;
      *ind3 = SQL_NULL_DATA;
-     rc = SQLBindParameter(handle->hstmt, col+2, SQL_PARAM_INPUT, SQL_C_CHAR,
+     rc = SQLBindParameter(handle->hstmt, col + 2, SQL_PARAM_INPUT, SQL_C_CHAR,
                            SQL_VARCHAR, ulen, 0, NULL, 0, ind3);
      if(!SQL_SUCCEEDED(rc))
        goto error;
@@ -1512,7 +1512,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
      char *value = (char *)librdf_node_get_blank_identifier(node);
      char *bnode = NULL;
 
-     bnode = (char*)LIBRDF_MALLOC(cstring, strlen(value)+5);
+     bnode = (char*)LIBRDF_MALLOC(cstring, strlen(value) + 5);
      if(!bnode)
        return -1;
 
@@ -1534,7 +1534,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
      if(!SQL_SUCCEEDED(rc))
        goto error;
      *ind3 = SQL_NULL_DATA;
-     rc = SQLBindParameter(handle->hstmt, col+2, SQL_PARAM_INPUT, SQL_C_CHAR,
+     rc = SQLBindParameter(handle->hstmt, col + 2, SQL_PARAM_INPUT, SQL_C_CHAR,
                            SQL_VARCHAR, ulen, 0, NULL, 0, ind3);
      if(!SQL_SUCCEEDED(rc))
        goto error;
@@ -1562,7 +1562,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
          goto error;
        ulen = strlen(lang);
        *ind3 = SQL_NTS;
-       rc = SQLBindParameter(handle->hstmt, col+2, SQL_PARAM_INPUT, SQL_C_CHAR,
+       rc = SQLBindParameter(handle->hstmt, col + 2, SQL_PARAM_INPUT, SQL_C_CHAR,
                              SQL_VARCHAR, ulen, 0, lang, 0, ind3);
        if(!SQL_SUCCEEDED(rc))
          goto error;
@@ -1583,7 +1583,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
        datatype = (char *)librdf_uri_as_string(dt);
        ulen = strlen(datatype);
        *ind3 = SQL_NTS;
-       rc = SQLBindParameter(handle->hstmt, col+2, SQL_PARAM_INPUT, SQL_C_CHAR,
+       rc = SQLBindParameter(handle->hstmt, col + 2, SQL_PARAM_INPUT, SQL_C_CHAR,
                              SQL_VARCHAR, ulen, 0, datatype, 0, ind3);
        if(!SQL_SUCCEEDED(rc))
          goto error;
@@ -1602,7 +1602,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
        if(!SQL_SUCCEEDED(rc))
          goto error;
        *ind3 = SQL_NULL_DATA;
-       rc = SQLBindParameter(handle->hstmt, col+2, SQL_PARAM_INPUT, SQL_C_CHAR,
+       rc = SQLBindParameter(handle->hstmt, col + 2, SQL_PARAM_INPUT, SQL_C_CHAR,
                              SQL_VARCHAR, 0, 0, NULL, 0, ind3);
        if(!SQL_SUCCEEDED(rc))
          goto error;
@@ -1696,7 +1696,7 @@ librdf_storage_virtuoso_context_add_statement_helper(librdf_storage* storage,
   rc = SQLExecDirect(handle->hstmt,(SQLCHAR *)insert_statement, SQL_NTS);
   if(!SQL_SUCCEEDED(rc)) {
     rdf_virtuoso_ODBC_Errors("SQLExecDirect()", storage->world, handle);
-    ret= -1;
+    ret = -1;
     goto end;
   }
 
@@ -1939,7 +1939,7 @@ librdf_storage_virtuoso_context_remove_statement(librdf_storage* storage,
     rc = SQLExecDirect(handle->hstmt,(SQLCHAR *)sdelete_graph, SQL_NTS);
     if(!SQL_SUCCEEDED(rc)) {
       rdf_virtuoso_ODBC_Errors("SQLExecDirect()", storage->world, handle);
-      ret= -1;
+      ret = -1;
       goto end;
     }
   } else if(nsubject != NULL && npredicate != NULL && nobject != NULL &&
@@ -1974,7 +1974,7 @@ librdf_storage_virtuoso_context_remove_statement(librdf_storage* storage,
     rc = SQLExecDirect(handle->hstmt,(SQLCHAR *)sdelete, SQL_NTS);
     if(!SQL_SUCCEEDED(rc)) {
       rdf_virtuoso_ODBC_Errors("SQLExecDirect()", storage->world, handle);
-      ret= -1;
+      ret = -1;
       goto end;
     }
   } else {
@@ -2003,7 +2003,7 @@ librdf_storage_virtuoso_context_remove_statement(librdf_storage* storage,
     rc = SQLExecDirect(handle->hstmt,(SQLCHAR *)query, SQL_NTS);
     if(!SQL_SUCCEEDED(rc)) {
       rdf_virtuoso_ODBC_Errors("SQLExecDirect()", storage->world, handle);
-      ret= -1;
+      ret = -1;
       goto end;
     }
   }
@@ -2080,7 +2080,7 @@ librdf_storage_virtuoso_context_remove_statements(librdf_storage* storage,
   rc = SQLExecDirect(handle->hstmt,(SQLCHAR *)remove_statements, SQL_NTS);
   if(!SQL_SUCCEEDED(rc)) {
     rdf_virtuoso_ODBC_Errors("SQLExecDirect()", storage->world, handle);
-    ret= -1;
+    ret = -1;
     goto end;
   }
 
