@@ -461,6 +461,12 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
   }
   raptor_serialize_end(scontext->rdf_serializer);
 
+#ifdef RAPTOR_V2_AVAILABLE
+  /* raptor1 raptor_serialize_start() takes ownership of iostream,
+     raptor2 raptor_serialize_start_to_iostream() does not */
+  raptor_free_iostream(iostr);
+#endif
+
   if(rc) {
     free(string);
     return NULL;
@@ -544,6 +550,12 @@ librdf_serializer_raptor_serialize_stream_to_iostream(void *context,
     librdf_stream_next(stream);
   }
   raptor_serialize_end(scontext->rdf_serializer);
+
+#ifdef RAPTOR_V2_AVAILABLE
+  /* raptor1 raptor_serialize_start() takes ownership of iostream,
+     raptor2 raptor_serialize_start_to_iostream() does not */
+  raptor_free_iostream(iostr);
+#endif
 
   return rc;
 }
