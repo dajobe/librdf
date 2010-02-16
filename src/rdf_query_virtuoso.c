@@ -1337,6 +1337,8 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
       break;
     
     rasqal_query_results_add_row(rasqal_qr, row);
+
+    librdf_query_results_next(query_results);
   }
 
   if(!rc)
