@@ -1167,7 +1167,7 @@ librdf_avltree_dump(librdf_avltree* tree, FILE* stream, librdf_avltree_data_prin
 
 static void
 librdf_avltree_check_internal(librdf_avltree* tree, librdf_avltree_node* node,
-                              int* count_p)
+                              size_t* count_p)
 {
   if(!node)
     return;
@@ -1185,7 +1185,7 @@ librdf_avltree_check_internal(librdf_avltree* tree, librdf_avltree_node* node,
 void
 librdf_avltree_check(librdf_avltree* tree)
 {
-  int count=0;
+  size_t count = 0;
   
   librdf_avltree_check_internal(tree, tree->root, &count);
   if(count != tree->size) {
