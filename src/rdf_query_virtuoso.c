@@ -449,12 +449,14 @@ librdf_query_virtuoso_results_next(librdf_query_results *query_results)
   librdf_query_virtuoso_context *context;
   int rc;
   short col;
-  short numCols=context->numCols;
+  short numCols;
   librdf_node *node;
   char *data;
   int is_null;
 
   context = (librdf_query_virtuoso_context*)query->context;
+
+  numCols = context->numCols;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_next \n");
@@ -1230,6 +1232,8 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
 
   context = (librdf_query_virtuoso_context*)query->context;
 
+  row_size = librdf_query_results_get_bindings_count(query_results);
+  
   /* Set up query results variables table */
   vt = rasqal_new_variables_table(query->world->rasqal_world_ptr);
   for(i = 0 ; i < row_size; i++) {
