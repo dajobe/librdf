@@ -136,6 +136,11 @@ typedef struct {
 
 /******************* Virtuoso ODBC Extensions *******************/
 
+/* See
+ * http://docs.openlinksw.com/virtuoso/odbcimplementation.html#virtodbcsparql
+ */
+
+
 /*
  *  ODBC extensions for SQLGetDescField
  */
@@ -143,7 +148,8 @@ typedef struct {
 #define SQL_DESC_COL_DT_DT_TYPE		1058L
 #define SQL_DESC_COL_LITERAL_ATTR	1059L
 #define SQL_DESC_COL_BOX_FLAGS		1060L
-
+#define SQL_DESC_COL_LITERAL_LANG       1061L
+#define SQL_DESC_COL_LITERAL_TYPE       1062L
 
 /*
  *  Virtuoso - ODBC SQL_DESC_COL_DV_TYPE
