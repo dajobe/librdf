@@ -184,9 +184,14 @@ static int
 librdf_serializer_raptor_set_namespace(void* context,
                                        librdf_uri *uri, const char *prefix) 
 {
-  librdf_serializer_raptor_context* scontext=(librdf_serializer_raptor_context*)context;
-  return raptor_serialize_set_namespace(scontext->rdf_serializer, 
+  librdf_serializer_raptor_context* scontext = (librdf_serializer_raptor_context*)context;
+#ifdef RAPTOR_V2_AVAILABLE
+  return raptor_serializer_set_namespace(scontext->rdf_serializer,
+                                         (raptor_uri*)uri, (const unsigned char*)prefix);
+#else
+  return raptor_serialize_set_namespace(scontext->rdf_serializer,
                                         (raptor_uri*)uri, (const unsigned char*)prefix);
+#endif
 }
   
 
@@ -295,7 +300,11 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
       goto exit;
   }
 
+#ifdef RAPTOR_V2_AVAILABLE
+  rc = raptor_serializer_serialize_statement(rserializer, &rstatement);
+#else
   rc = raptor_serialize_statement(rserializer, &rstatement);
+#endif
 
   exit:
 #ifdef RAPTOR_V2_AVAILABLE
@@ -344,11 +353,20 @@ librdf_serializer_raptor_serialize_stream_to_file_handle(void *context,
     return 1;
 
   /* start the serialize */
-  rc=raptor_serialize_start_to_file_handle(scontext->rdf_serializer, 
-                                           (raptor_uri*)base_uri, handle);
+#ifdef RAPTOR_V2_AVAILABLE
+  rc = raptor_serializer_start_to_file_handle(scontext->rdf_serializer,
+                                              (raptor_uri*)base_uri, handle);
+#else
+  rc = raptor_serialize_start_to_file_handle(scontext->rdf_serializer,
+                                             (raptor_uri*)base_uri, handle);
+#endif
   if(rc) {
     /* free up resources on error */
+#ifdef RAPTOR_V2_AVAILABLE
+    raptor_serializer_serialize_end(scontext->rdf_serializer);
+#else
     raptor_serialize_end(scontext->rdf_serializer);
+#endif
     return 1;
   }
 
@@ -370,7 +388,11 @@ librdf_serializer_raptor_serialize_stream_to_file_handle(void *context,
       break;
     librdf_stream_next(stream);
   }
+#ifdef RAPTOR_V2_AVAILABLE
+  raptor_serializer_serialize_end(scontext->rdf_serializer);
+#else
   raptor_serialize_end(scontext->rdf_serializer);
+#endif
 
   return rc;
 }
@@ -428,8 +450,8 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
   }
 
 #ifdef RAPTOR_V2_AVAILABLE
-  rc = raptor_serialize_start_to_iostream(scontext->rdf_serializer,
-                                          (raptor_uri*)base_uri, iostr);
+  rc = raptor_serializer_start_to_iostream(scontext->rdf_serializer,
+                                           (raptor_uri*)base_uri, iostr);
 #else
   rc = raptor_serialize_start(scontext->rdf_serializer,
                               (raptor_uri*)base_uri, iostr);
@@ -459,7 +481,11 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
       break;
     librdf_stream_next(stream);
   }
+#ifdef RAPTOR_V2_AVAILABLE
+  raptor_serializer_serialize_end(scontext->rdf_serializer);
+#else
   raptor_serialize_end(scontext->rdf_serializer);
+#endif
 
 #ifdef RAPTOR_V2_AVAILABLE
   /* raptor1 raptor_serialize_start() takes ownership of iostream,
@@ -519,8 +545,8 @@ librdf_serializer_raptor_serialize_stream_to_iostream(void *context,
 
   /* start the serialize */
 #ifdef RAPTOR_V2_AVAILABLE
-  rc = raptor_serialize_start_to_iostream(scontext->rdf_serializer,
-                                          (raptor_uri*)base_uri, iostr);
+  rc = raptor_serializer_start_to_iostream(scontext->rdf_serializer,
+                                           (raptor_uri*)base_uri, iostr);
 #else
   rc = raptor_serialize_start(scontext->rdf_serializer,
                               (raptor_uri*)base_uri, iostr);
@@ -549,7 +575,11 @@ librdf_serializer_raptor_serialize_stream_to_iostream(void *context,
       break;
     librdf_stream_next(stream);
   }
+#ifdef RAPTOR_V2_AVAILABLE
+  raptor_serializer_serialize_end(scontext->rdf_serializer);
+#else
   raptor_serialize_end(scontext->rdf_serializer);
+#endif
 
 #ifdef RAPTOR_V2_AVAILABLE
   /* raptor1 raptor_serialize_start() takes ownership of iostream,

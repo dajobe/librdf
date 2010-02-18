@@ -1225,10 +1225,18 @@ librdf_node_write(librdf_node* node, raptor_iostream *iostr)
   switch(node->type) {
     case LIBRDF_NODE_TYPE_LITERAL:
       raptor_iostream_write_byte(iostr, '"');
+#ifdef RAPTOR_V2_AVAILABLE
+      raptor_string_ntriples_write(node->value.literal.string,
+                                   node->value.literal.string_len,
+                                   '"',
+                                   iostr);
+
+#else
       raptor_iostream_write_string_ntriples(iostr, 
                                             node->value.literal.string,
                                             node->value.literal.string_len,
                                             '"');
+#endif
       raptor_iostream_write_byte(iostr, '"');
       if(node->value.literal.xml_language) {
         raptor_iostream_write_byte(iostr, '@');
@@ -1238,7 +1246,11 @@ librdf_node_write(librdf_node* node, raptor_iostream *iostr)
         raptor_iostream_write_counted_string(iostr, "^^<", 3);
         term = librdf_uri_as_counted_string(node->value.literal.datatype_uri,
                                             &len);
+#ifdef RAPTOR_V2_AVAILABLE
+        raptor_string_ntriples_write(term, len, '>', iostr);
+#else
         raptor_iostream_write_string_ntriples(iostr, term, len, '>');
+#endif
         raptor_iostream_write_byte(iostr, '>');
       }
 
@@ -1254,7 +1266,11 @@ librdf_node_write(librdf_node* node, raptor_iostream *iostr)
     case LIBRDF_NODE_TYPE_RESOURCE:
       raptor_iostream_write_byte(iostr, '<');
       term = librdf_uri_as_counted_string(node->value.resource.uri, &len);
+#ifdef RAPTOR_V2_AVAILABLE
+      raptor_string_ntriples_write(term, len, '>', iostr);
+#else
       raptor_iostream_write_string_ntriples(iostr, term, len, '>');
+#endif
       raptor_iostream_write_byte(iostr, '>');
       break;
       

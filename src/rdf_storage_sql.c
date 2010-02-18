@@ -172,6 +172,8 @@ librdf_new_sql_config(librdf_world* world,
 
   raptor_parser_set_statement_handler(rdf_parser, config,
                                       librdf_sql_config_store_triple);
+
+  raptor_parser_parse_file(rdf_parser, uri, base_uri);
 #else
   uri = raptor_new_uri(uri_string);
   base_uri = raptor_uri_copy(uri);
@@ -180,9 +182,10 @@ librdf_new_sql_config(librdf_world* world,
 
   raptor_set_statement_handler(rdf_parser, config,
                                librdf_sql_config_store_triple);
-#endif
 
   raptor_parse_file(rdf_parser, uri, base_uri);
+#endif
+
   raptor_free_parser(rdf_parser);
   
   raptor_free_uri(base_uri);

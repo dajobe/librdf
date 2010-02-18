@@ -154,7 +154,11 @@ librdf_parser_raptor_terminate(void *context)
     librdf_parser_raptor_serialise_finished(pcontext->stream_context);
 
   if(pcontext->www)
+#ifdef RAPTOR_V2_AVAILABLE
+    raptor_free_www(pcontext->www);
+#else
     raptor_www_free(pcontext->www);
+#endif
   
   if(pcontext->rdf_parser)
     raptor_free_parser(pcontext->rdf_parser);
@@ -801,11 +805,13 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   if(uri) {
     const char *accept_h;
 
+#ifdef RAPTOR_V2_AVAILABLE
+    if(pcontext->www)
+      raptor_free_www(pcontext->www);
+    pcontext->www = raptor_new_www(pcontext->parser->world->raptor_world_ptr);
+#else
     if(pcontext->www)
       raptor_www_free(pcontext->www);
-#ifdef RAPTOR_V2_AVAILABLE
-    pcontext->www = raptor_www_new(pcontext->parser->world->raptor_world_ptr);
-#else
     pcontext->www = raptor_www_new();
 #endif
     if(!pcontext->www)
@@ -827,7 +833,11 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     status = raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
 #endif
     if(status) {
+#ifdef RAPTOR_V2_AVAILABLE
+      raptor_free_www(pcontext->www);
+#else
       raptor_www_free(pcontext->www);
+#endif
       pcontext->www=NULL;
       librdf_parser_raptor_serialise_finished((void*)scontext);
       return NULL;
@@ -836,12 +846,15 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     raptor_www_fetch(pcontext->www, (raptor_uri*)uri);
 #ifdef RAPTOR_V2_AVAILABLE
     raptor_parser_parse_chunk(pcontext->rdf_parser, NULL, 0, 1);
+
+    raptor_free_www(pcontext->www);
 #else
     raptor_parse_chunk(pcontext->rdf_parser, NULL, 0, 1);
-#endif
 
     raptor_www_free(pcontext->www);
-    pcontext->www=NULL;
+#endif
+
+    pcontext->www = NULL;
   } else {
 #ifdef RAPTOR_V2_AVAILABLE
     status = raptor_parser_parse_start(pcontext->rdf_parser, (raptor_uri*)base_uri);
@@ -1055,29 +1068,35 @@ librdf_parser_raptor_parse_into_model_common(void *context,
                                  librdf_parser_raptor_relay_filter,
                                  pcontext->parser);
     
-
-  if(uri) {
-    status=raptor_parse_uri(pcontext->rdf_parser, (raptor_uri*)uri, 
-                            (raptor_uri*)base_uri);
-  } else if (string != NULL) {
 #ifdef RAPTOR_V2_AVAILABLE
+  if(uri) {
+    status = raptor_parser_parse_uri(pcontext->rdf_parser, (raptor_uri*)uri,
+                                     (raptor_uri*)base_uri);
+  } else if (string != NULL) {
     status = raptor_parser_parse_start(pcontext->rdf_parser, (raptor_uri*)base_uri);
-#else
-    status = raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
-#endif
     if(!status) {
       if(!length)
-        length=strlen((const char*)string);
-#ifdef RAPTOR_V2_AVAILABLE
+        length = strlen((const char*)string);
       status = raptor_parser_parse_chunk(pcontext->rdf_parser, string, length, 1);
-#else
-      status = raptor_parse_chunk(pcontext->rdf_parser, string, length, 1);
-#endif
     }
   } else {
-    status=raptor_parse_file_stream(pcontext->rdf_parser, fh, NULL, (raptor_uri*)base_uri);
+    status = raptor_parser_parse_file_stream(pcontext->rdf_parser, fh, NULL, (raptor_uri*)base_uri);
   }
-  
+#else
+  if(uri) {
+    status = raptor_parse_uri(pcontext->rdf_parser, (raptor_uri*)uri,
+                              (raptor_uri*)base_uri);
+  } else if (string != NULL) {
+    status = raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
+    if(!status) {
+      if(!length)
+        length = strlen((const char*)string);
+      status = raptor_parse_chunk(pcontext->rdf_parser, string, length, 1);
+    }
+  } else {
+    status = raptor_parse_file_stream(pcontext->rdf_parser, fh, NULL, (raptor_uri*)base_uri);
+  }
+#endif
 
   librdf_parser_raptor_serialise_finished((void*)scontext);
 
