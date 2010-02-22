@@ -46,6 +46,9 @@ void librdf_finish_raptor(librdf_world* world);
 
 #define raptor_string_ntriples_write(str, len, delim, iostr) raptor_iostream_write_string_ntriples(iostr, str, len, delim)
 
+#define raptor_locator_format(buffer, length, locator) raptor_format_locator(buffer, length, locator)
+#define raptor_locator_print(locator, fh) raptor_print_locator(fh, locator)
+
 #endif /* !RAPTOR_V2_AVAILABLE */
 
 

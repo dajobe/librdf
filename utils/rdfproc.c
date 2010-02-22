@@ -178,11 +178,7 @@ log_handler(void *user_data, librdf_log_message *message)
     fprintf(stderr, "%s: Error - ", program);
 
   if(locator) { /* && message->facility == LIBRDF_FROM_PARSER) */
-#ifdef RAPTOR_V2_AVAILABLE
     raptor_locator_print(locator, stderr);
-#else
-    raptor_print_locator(stderr, locator); 
-#endif
     fputc(':', stderr);
     fputc(' ', stderr);
  }
