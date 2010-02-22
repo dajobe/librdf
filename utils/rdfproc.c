@@ -656,11 +656,7 @@ main(int argc, char *argv[])
     case CMD_PRINT:
       {
         raptor_iostream *iostr;
-#ifdef RAPTOR_V2_AVAILABLE
         iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stdout);
-#else
-        iostr = raptor_new_iostream_to_file_handle(stdout);
-#endif
         librdf_model_write(model, iostr);
         raptor_free_iostream(iostr);
       }
@@ -928,11 +924,7 @@ main(int argc, char *argv[])
         fprintf(stdout, "%s: Formatting query result as '%s':\n", program,
                 results_format);
 
-#ifdef RAPTOR_V2_AVAILABLE
         iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stdout);
-#else
-        iostr = raptor_new_iostream_to_file_handle(stdout);
-#endif
         formatter = librdf_new_query_results_formatter2(results,
                                                         results_format,
                                                         NULL /* mime type */,

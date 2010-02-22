@@ -1153,11 +1153,7 @@ librdf_model_print(librdf_model *model, FILE *fh)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(model, librdf_model);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(fh, FILE*);
 
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_file_handle(model->world->raptor_world_ptr, fh);
-#else
-  iostr = raptor_new_iostream_to_file_handle(fh);
-#endif
   if(!iostr)
     return;
   
@@ -1193,11 +1189,11 @@ librdf_model_write(librdf_model *model, raptor_iostream* iostr)
   if(!stream)
     goto tidy;
   
-  if(raptor_iostream_write_counted_string(iostr, "[[\n", 3))
+  if(raptor_iostream_counted_string_write("[[\n", 3, iostr))
     goto tidy;
   if(librdf_stream_write(stream, iostr))
     goto tidy;
-  if(raptor_iostream_write_counted_string(iostr, "]]\n", 3))
+  if(raptor_iostream_counted_string_write("]]\n", 3, iostr))
     goto tidy;
   
   /* success */
@@ -1962,11 +1958,7 @@ main(int argc, char *argv[])
 
   librdf_world_open(world);
 
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stderr);
-#else
-  iostr = raptor_new_iostream_to_file_handle(stderr);
-#endif
 
   /* Test model cloning first */
   if(test_model_cloning(program, world))

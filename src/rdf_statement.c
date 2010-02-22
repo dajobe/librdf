@@ -445,12 +445,8 @@ librdf_statement_to_string(librdf_statement *statement)
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_string(statement->world->raptor_world_ptr,
                                         (void**)&s, NULL, malloc);
-#else
-  iostr = raptor_new_iostream_to_string((void**)&s, NULL, malloc);
-#endif
   if(!iostr)
     return NULL;
   
@@ -487,10 +483,10 @@ librdf_statement_write(librdf_statement *statement, raptor_iostream *iostr)
   
   if(librdf_node_write(statement->subject, iostr))
     return 1;
-  raptor_iostream_write_byte(iostr, ' ');
+  raptor_iostream_write_byte(' ', iostr);
   if(librdf_node_write(statement->predicate, iostr))
     return 1;
-  raptor_iostream_write_byte(iostr, ' ');
+  raptor_iostream_write_byte(' ', iostr);
   if(librdf_node_write(statement->object, iostr))
     return 1;
 
@@ -520,11 +516,7 @@ librdf_statement_print(librdf_statement *statement, FILE *fh)
   if(!statement)
     return;
   
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_file_handle(statement->world->raptor_world_ptr, fh);
-#else
-  iostr = raptor_new_iostream_to_file_handle(fh);
-#endif
   if(!iostr)
     return;
   
@@ -911,11 +903,7 @@ main(int argc, char *argv[])
   world=librdf_new_world();
   librdf_world_open(world);
 
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stdout);
-#else
-  iostr = raptor_new_iostream_to_file_handle(stdout);
-#endif
 
   fprintf(stdout, "%s: Creating statement\n", program);
   statement=librdf_new_statement(world);

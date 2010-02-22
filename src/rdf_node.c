@@ -1129,12 +1129,8 @@ librdf_node_to_string(librdf_node* node)
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_string(node->world->raptor_world_ptr,
                                         (void**)&s, NULL, malloc);
-#else
-  iostr = raptor_new_iostream_to_string((void**)&s, NULL, malloc);
-#endif
   if(!iostr)
     return NULL;
   
@@ -1173,12 +1169,8 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_string(node->world->raptor_world_ptr,
                                         (void**)&s, len_p, malloc);
-#else
-  iostr = raptor_new_iostream_to_string((void**)&s, len_p, malloc);
-#endif
   if(!iostr)
     return NULL;
   
@@ -1218,60 +1210,44 @@ librdf_node_write(librdf_node* node, raptor_iostream *iostr)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(iostr, raptor_iostream, 1);
 
   if(!node) {
-    raptor_iostream_write_counted_string(iostr, null_string, NULL_STRING_LENGTH);
+    raptor_iostream_counted_string_write(null_string, NULL_STRING_LENGTH, iostr);
     return 0;
   }
 
   switch(node->type) {
     case LIBRDF_NODE_TYPE_LITERAL:
-      raptor_iostream_write_byte(iostr, '"');
-#ifdef RAPTOR_V2_AVAILABLE
+      raptor_iostream_write_byte('"', iostr);
       raptor_string_ntriples_write(node->value.literal.string,
                                    node->value.literal.string_len,
                                    '"',
                                    iostr);
-
-#else
-      raptor_iostream_write_string_ntriples(iostr, 
-                                            node->value.literal.string,
-                                            node->value.literal.string_len,
-                                            '"');
-#endif
-      raptor_iostream_write_byte(iostr, '"');
+      raptor_iostream_write_byte('"', iostr);
       if(node->value.literal.xml_language) {
-        raptor_iostream_write_byte(iostr, '@');
-        raptor_iostream_write_string(iostr, node->value.literal.xml_language);
+        raptor_iostream_write_byte('@', iostr);
+        raptor_iostream_string_write(node->value.literal.xml_language, iostr);
       }
       if(node->value.literal.datatype_uri) {
-        raptor_iostream_write_counted_string(iostr, "^^<", 3);
+        raptor_iostream_counted_string_write("^^<", 3, iostr);
         term = librdf_uri_as_counted_string(node->value.literal.datatype_uri,
                                             &len);
-#ifdef RAPTOR_V2_AVAILABLE
         raptor_string_ntriples_write(term, len, '>', iostr);
-#else
-        raptor_iostream_write_string_ntriples(iostr, term, len, '>');
-#endif
-        raptor_iostream_write_byte(iostr, '>');
+        raptor_iostream_write_byte('>', iostr);
       }
 
       break;
       
     case LIBRDF_NODE_TYPE_BLANK:
-      raptor_iostream_write_counted_string(iostr, "_:", 2);
+      raptor_iostream_counted_string_write("_:", 2, iostr);
       term = (unsigned char*)node->value.blank.identifier;
       len = node->value.blank.identifier_len;
-      raptor_iostream_write_counted_string(iostr, term, len);
+      raptor_iostream_counted_string_write(term, len, iostr);
       break;
       
     case LIBRDF_NODE_TYPE_RESOURCE:
-      raptor_iostream_write_byte(iostr, '<');
+      raptor_iostream_write_byte('<', iostr);
       term = librdf_uri_as_counted_string(node->value.resource.uri, &len);
-#ifdef RAPTOR_V2_AVAILABLE
       raptor_string_ntriples_write(term, len, '>', iostr);
-#else
-      raptor_iostream_write_string_ntriples(iostr, term, len, '>');
-#endif
-      raptor_iostream_write_byte(iostr, '>');
+      raptor_iostream_write_byte('>', iostr);
       break;
       
     case LIBRDF_NODE_TYPE_UNKNOWN:
@@ -1306,11 +1282,7 @@ librdf_node_print(librdf_node* node, FILE *fh)
   if(!node)
     return;
 
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_file_handle(node->world->raptor_world_ptr, fh);
-#else
-  iostr = raptor_new_iostream_to_file_handle(fh);
-#endif
   if(!iostr)
     return;
   

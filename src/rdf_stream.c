@@ -564,11 +564,7 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
   if(!stream)
     return;
 
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_file_handle(stream->world->raptor_world_ptr, fh);
-#else
-  iostr = raptor_new_iostream_to_file_handle(fh);
-#endif
   if(!iostr)
     return;
   
@@ -629,16 +625,16 @@ librdf_stream_write(librdf_stream *stream, raptor_iostream *iostr)
     if(!statement)
       break;
 
-    raptor_iostream_write_counted_string(iostr, "  ", 2);
+    raptor_iostream_counted_string_write("  ", 2, iostr);
     if(librdf_statement_write(statement, iostr))
       return 1;
     
     context_node = (librdf_node*)librdf_stream_get_context(stream);
     if(context_node) {
-      raptor_iostream_write_counted_string(iostr, " with context", 13);
+      raptor_iostream_counted_string_write(" with context", 13, iostr);
       librdf_node_write(context_node, iostr);
     }
-    raptor_iostream_write_counted_string(iostr, ". \n", 3);
+    raptor_iostream_counted_string_write(". \n", 3, iostr);
 
     librdf_stream_next(stream);
   }

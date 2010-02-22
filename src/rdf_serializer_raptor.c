@@ -436,14 +436,9 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
     return NULL;
 
   /* start the serialize */
-#ifdef RAPTOR_V2_AVAILABLE
   iostr = raptor_new_iostream_to_string(raptor_serializer_get_world(scontext->rdf_serializer),
                                         &string, &string_length,
                                         malloc);
-#else
-  iostr = raptor_new_iostream_to_string(&string, &string_length,
-                                        malloc);
-#endif
   if(!iostr) {
     free(string);
     return NULL;
