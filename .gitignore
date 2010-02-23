@@ -39,3 +39,4 @@ releases
 saved
 stamp-h*
 test*
+*.stackdump
