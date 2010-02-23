@@ -329,6 +329,7 @@ librdf_query_results_to_counted_string2(librdf_query_results *query_results,
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_query_results_to_counted_string:
  * @query_results: #librdf_query_results object
@@ -364,6 +365,7 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
                                                  base_uri,
                                                  length_p);
 }
+#endif
 
 
 /**
@@ -399,6 +401,7 @@ librdf_query_results_to_string2(librdf_query_results *query_results,
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_query_results_to_string:
  * @query_results: #librdf_query_results object
@@ -429,6 +432,7 @@ librdf_query_results_to_string(librdf_query_results *query_results,
                                          NULL, NULL, format_uri,
                                          base_uri);
 }
+#endif
 
 
 /**
@@ -485,6 +489,7 @@ librdf_query_results_to_file_handle2(librdf_query_results *query_results,
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_query_results_to_file_handle2:
  * @query_results: #librdf_query_results object
@@ -515,6 +520,7 @@ librdf_query_results_to_file_handle(librdf_query_results *query_results,
                                               format_uri,
                                               base_uri);
 }
+#endif
 
 
 /**
@@ -561,6 +567,7 @@ librdf_query_results_to_file2(librdf_query_results *query_results,
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_query_results_to_file:
  * @query_results: #librdf_query_results object
@@ -590,6 +597,7 @@ librdf_query_results_to_file(librdf_query_results *query_results,
                                        format_uri,
                                        base_uri);
 }
+#endif
 
 
 /**
@@ -751,6 +759,7 @@ librdf_new_query_results_formatter2(librdf_query_results* query_results,
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_new_query_results_formatter:
  * @query_results: #librdf_query_results query_results
@@ -778,8 +787,10 @@ librdf_new_query_results_formatter(librdf_query_results* query_results,
   else
     return NULL;
 }
+#endif
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_new_query_results_formatter_by_mime_type:
  * @query_results: #librdf_query_results query_results
@@ -809,6 +820,7 @@ librdf_new_query_results_formatter_by_mime_type(librdf_query_results* query_resu
   else
     return NULL;
 }
+#endif
 
 
 /**

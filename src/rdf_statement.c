@@ -421,6 +421,7 @@ librdf_statement_is_complete(librdf_statement *statement)
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_statement_to_string:
  * @statement: the statement
@@ -459,6 +460,7 @@ librdf_statement_to_string(librdf_statement *statement)
 
   return s;
 }
+#endif
 
 
 /**

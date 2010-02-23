@@ -1106,6 +1106,7 @@ librdf_node_is_blank(librdf_node* node) {
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_node_to_string:
  * @node: the node object
@@ -1143,8 +1144,10 @@ librdf_node_to_string(librdf_node* node)
 
   return s;
 }
+#endif
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_node_to_counted_string:
  * @node: the node object
@@ -1184,6 +1187,7 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
 
   return s;
 }
+#endif
 
 
 /**

@@ -534,6 +534,7 @@ librdf_stream_from_node_iterator_finished(void* context)
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_stream_print:
  * @stream: the stream object
@@ -587,6 +588,7 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
 
   raptor_free_iostream(iostr);
 }
+#endif
 
 
 /**

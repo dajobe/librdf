@@ -1130,6 +1130,7 @@ librdf_model_has_arc_out(librdf_model *model, librdf_node *node,
 
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_model_print:
  * @model: the model object
@@ -1161,6 +1162,7 @@ librdf_model_print(librdf_model *model, FILE *fh)
   
   raptor_free_iostream(iostr);
 }
+#endif
 
 
 /**
