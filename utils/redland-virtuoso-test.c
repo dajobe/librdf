@@ -143,10 +143,6 @@ getTotal(void)
 static int
 log_handler(void *user_data, librdf_log_message *message)
 {
-#ifdef RAPTOR_V2_AVAILABLE
-  librdf_world* world=(librdf_world*)user_data;
-#endif
-
   /* int code=message->code; */ /* The error code */
   raptor_locator *locator=(raptor_locator*)(message->locator);
 
@@ -160,11 +156,7 @@ log_handler(void *user_data, librdf_log_message *message)
     fprintf(stderr, ": Error - ");
 
   if(locator) { /* && message->facility == LIBRDF_FROM_PARSER) */
-#ifdef RAPTOR_V2_AVAILABLE
-    raptor_print_locator_v2(librdf_world_get_raptor(world), stderr, locator);
-#else
-    raptor_print_locator(stderr, locator);
-#endif
+    raptor_locator_print(locator, stderr);
     fputc(':', stderr);
     fputc(' ', stderr);
   }
@@ -483,7 +475,7 @@ main(int argc, char *argv[])
   /**** Test 3 *******/
   startTest(3, " Print all triples in <%s> context\n", context);
   {
-    raptor_iostream* iostr = raptor_new_iostream_to_file_handle(stdout);
+    raptor_iostream* iostr = raptor_new_iostream_to_file_handle(librdf_world_get_raptor(world), stdout);
     librdf_model_write(model, iostr);
     raptor_free_iostream(iostr);
     endTest(1, "\n");
@@ -863,7 +855,7 @@ main(int argc, char *argv[])
 
         fprintf(stderr, "**: Formatting query result as '%s':\n", results_format);
 
-        iostr=raptor_new_iostream_to_file_handle(stdout);
+        iostr = raptor_new_iostream_to_file_handle(librdf_world_get_raptor(world), stdout);
         formatter = librdf_new_query_results_formatter2(results, results_format,
                                                         NULL /* mime type */,
                                                         NULL /* format_uri */);
