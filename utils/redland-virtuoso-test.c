@@ -381,7 +381,6 @@ main(int argc, char *argv[])
   librdf_statement* statement=NULL;
   char* query_cmd=NULL;
   char* s;
-  raptor_world* rworld;
 
 
   /*
@@ -409,12 +408,6 @@ main(int argc, char *argv[])
   librdf_world_set_logger(world, world, log_handler);
 
   librdf_world_open(world);
-
-#ifdef RAPTOR_V2_AVAILABLE
-  rworld = world->raptor_world_ptr;
-#else
-  rworld = NULL;
-#endif
 
   options=librdf_new_hash(world, NULL);
   librdf_hash_open(options, NULL, 0, 1, 1, NULL);
@@ -490,7 +483,7 @@ main(int argc, char *argv[])
   /**** Test 3 *******/
   startTest(3, " Print all triples in <%s> context\n", context);
   {
-    raptor_iostream* iostr = raptor_new_iostream_to_file_handle(rworld, stdout);
+    raptor_iostream* iostr = raptor_new_iostream_to_file_handle(stdout);
     librdf_model_write(model, iostr);
     raptor_free_iostream(iostr);
     endTest(1, "\n");
@@ -870,7 +863,7 @@ main(int argc, char *argv[])
 
         fprintf(stderr, "**: Formatting query result as '%s':\n", results_format);
 
-        iostr = raptor_new_iostream_to_file_handle(rworld, stdout);
+        iostr=raptor_new_iostream_to_file_handle(stdout);
         formatter = librdf_new_query_results_formatter2(results, results_format,
                                                         NULL /* mime type */,
                                                         NULL /* format_uri */);
