@@ -79,6 +79,7 @@ librdf_log_message_locator() on the #librdf_log_message.
 @LIBRDF_FROM_URI: 
 @LIBRDF_FROM_UTF8: 
 @LIBRDF_FROM_MEMORY: 
+@LIBRDF_FROM_RAPTOR: 
 @LIBRDF_FROM_LAST: 
 
 <!-- ##### FUNCTION librdf_log_message_code ##### -->
