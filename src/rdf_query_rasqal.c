@@ -67,6 +67,40 @@ static int rasqal_redland_triple_present(rasqal_triples_source *rts, void *user_
 static void rasqal_redland_free_triples_source(void *user_data);
 
 
+#ifdef RAPTOR_V2_AVAILABLE
+static void
+librdf_query_rasqal_log_handler(void *data, raptor_log_message *message)
+{
+  librdf_world *world = (librdf_world *)data;
+  librdf_log_level level;
+
+  /* Map raptor2 fatal/error/warning log levels to librdf log levels,
+     ignore others */
+  switch(message->level) {
+    case RAPTOR_LOG_LEVEL_FATAL:
+      level = LIBRDF_LOG_FATAL;
+      break;
+
+    case RAPTOR_LOG_LEVEL_ERROR:
+      level = LIBRDF_LOG_ERROR;
+      break;
+
+    case RAPTOR_LOG_LEVEL_WARN:
+      level = LIBRDF_LOG_WARN;
+      break;
+
+    case RAPTOR_LOG_LEVEL_INFO:
+    case RAPTOR_LOG_LEVEL_DEBUG:
+    case RAPTOR_LOG_LEVEL_TRACE:
+    case RAPTOR_LOG_LEVEL_NONE:
+    default:
+      return;
+  }
+
+  librdf_log_simple(world, 0, level, LIBRDF_FROM_QUERY, message->locator,
+                    message->text);
+}
+#else
 static void
 librdf_query_rasqal_error_handler(void *data, raptor_locator *locator,
                                   const char *message) 
@@ -91,7 +125,7 @@ librdf_query_rasqal_warning_handler(void *data, raptor_locator *locator,
 
   librdf_log_simple(query->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_QUERY, locator, message);
 }
-
+#endif
 
 
 /* functions implementing query api */
@@ -116,11 +150,15 @@ librdf_query_rasqal_init(librdf_query* query,
 
   rasqal_query_set_user_data(context->rq, query);
 
+#ifdef RAPTOR_V2_AVAILABLE
+  rasqal_world_set_log_handler(query->world->rasqal_world_ptr, query->world,
+                               librdf_query_rasqal_log_handler);
+#else
   rasqal_query_set_error_handler(context->rq, query,
-                           librdf_query_rasqal_error_handler);
+                                 librdf_query_rasqal_error_handler);
   rasqal_query_set_warning_handler(context->rq, query,
-                             librdf_query_rasqal_warning_handler);
-
+                                   librdf_query_rasqal_warning_handler);
+#endif
 
   len=strlen((const char*)query_string);
   query_string_copy=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);

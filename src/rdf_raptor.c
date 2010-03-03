@@ -174,26 +174,36 @@ static const raptor_uri_handler librdf_raptor_uri_handler = {
 
 #ifdef RAPTOR_V2_AVAILABLE
 static void
-librdf_raptor_fatal_error_handler(void *data, raptor_locator *locator,
-                                  const char *message)
+librdf_raptor_log_handler(void *data, raptor_log_message *message)
 {
-  librdf_log_simple((librdf_world *)data, 0, LIBRDF_LOG_FATAL, LIBRDF_FROM_RAPTOR, locator, message);
-}
+  librdf_world *world = (librdf_world *)data;
+  librdf_log_level level;
 
+  /* Map raptor2 fatal/error/warning log levels to librdf log levels,
+     ignore others */
+  switch(message->level) {
+    case RAPTOR_LOG_LEVEL_FATAL:
+      level = LIBRDF_LOG_FATAL;
+      break;
 
-static void
-librdf_raptor_error_handler(void *data, raptor_locator *locator,
-                            const char *message)
-{
-  librdf_log_simple((librdf_world *)data, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_RAPTOR, locator, message);
-}
+    case RAPTOR_LOG_LEVEL_ERROR:
+      level = LIBRDF_LOG_ERROR;
+      break;
 
+    case RAPTOR_LOG_LEVEL_WARN:
+      level = LIBRDF_LOG_WARN;
+      break;
 
-static void
-librdf_raptor_warning_handler(void *data, raptor_locator *locator,
-                              const char *message)
-{
-  librdf_log_simple((librdf_world *)data, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_RAPTOR, locator, message);
+    case RAPTOR_LOG_LEVEL_INFO:
+    case RAPTOR_LOG_LEVEL_DEBUG:
+    case RAPTOR_LOG_LEVEL_TRACE:
+    case RAPTOR_LOG_LEVEL_NONE:
+    default:
+      return;
+  }
+
+  librdf_log_simple(world, 0, level, LIBRDF_FROM_RAPTOR, message->locator,
+                    message->text);
 }
 #endif /* RAPTOR_V2_AVAILABLE */
 
@@ -218,10 +228,8 @@ librdf_init_raptor(librdf_world* world)
     if(!world->raptor_world_ptr || raptor_world_open(world->raptor_world_ptr))
       abort();
 
-    /* set up error/warning handlers */
-    raptor_world_set_fatal_error_handler(world->raptor_world_ptr, world, librdf_raptor_fatal_error_handler);
-    raptor_world_set_error_handler(world->raptor_world_ptr, world, librdf_raptor_error_handler);
-    raptor_world_set_warning_handler(world->raptor_world_ptr, world, librdf_raptor_warning_handler);
+    /* set up log handler */
+    raptor_world_set_log_handler(world->raptor_world_ptr, world, librdf_raptor_log_handler);
   }
 #else
   raptor_init();
