@@ -301,6 +301,7 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
   }
 
 #ifdef RAPTOR_V2_AVAILABLE
+  rstatement.graph = NULL;
   rc = raptor_serializer_serialize_statement(rserializer, &rstatement);
 #else
   rc = raptor_serialize_statement(rserializer, &rstatement);
