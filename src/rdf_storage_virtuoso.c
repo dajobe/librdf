@@ -2640,8 +2640,7 @@ librdf_storage_virtuoso_get_contexts(librdf_storage* storage)
   librdf_storage_virtuoso_get_contexts_context* gccontext;
   char find_statement[]="DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()";
   int rc = 0;
-
-  librdf_iterator *iterator;
+  librdf_iterator *iterator = NULL;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_storage_virtuoso_get_contexts \n");
