@@ -634,20 +634,32 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
       case LIBRDF_NODE_TYPE_RESOURCE:
         return librdf_uri_compare(n1->value.resource.uri, n2->value.resource.uri);
       case LIBRDF_NODE_TYPE_LITERAL:
-        if(1) {
-          int r;
-          r = librdf_uri_compare(n1->value.literal.datatype_uri,
-                                 n2->value.literal.datatype_uri);
-          if(!r) {
-            unsigned char l1 = n1->value.literal.xml_language_len;
-            unsigned char l2 = n2->value.literal.xml_language_len;
-            unsigned l = (l1 < l2) ? l1 : l2;
-            r = strncmp(n1->value.literal.xml_language,
-                        n2->value.literal.xml_language, l);
+        if (1) {
+          const unsigned char l1 = n1->value.literal.xml_language_len;
+          const unsigned char l2 = n2->value.literal.xml_language_len;
+          const unsigned char l  = (l1 < l2) ? l1 : l2;
+
+          /* compare first by data type */
+          int r = librdf_uri_compare(n1->value.literal.datatype_uri,
+                                     n2->value.literal.datatype_uri);
+          if (r)
+            return r;
+
+          /* if data type is equal, compare by value */
+          r = strcmp((const char*)n1->value.literal.string,
+                     (const char*)n2->value.literal.string);
+          if (r)
+            return r;
+
+          /* if both data type and value are equal, compare by language */
+          if (l) {
+            return strncmp(n1->value.literal.xml_language,
+                           n2->value.literal.xml_language, (size_t)l);
+          } else {
+            /* if l == 0 strncmp will always return 0; in that case
+             * consider the node with no language to be lesser. */
+            return l1 - l2;
           }
-          r = r || strcmp((const char*)n1->value.literal.string,
-                          (const char*)n2->value.literal.string);
-          return r;
         }
       case LIBRDF_NODE_TYPE_BLANK:
         return strcmp((char*)n1->value.blank.identifier, (char*)n2->value.blank.identifier);
