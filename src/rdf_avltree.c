@@ -1189,7 +1189,7 @@ librdf_avltree_check(librdf_avltree* tree)
   
   librdf_avltree_check_internal(tree, tree->root, &count);
   if(count != tree->size) {
-    fprintf(stderr, "Tree %p nodes count is %d.  actual count %d\n",
+    fprintf(stderr, "Tree %p nodes count is %zu.  actual count %zu\n",
             tree, tree->size, count);
     abort();
   }
