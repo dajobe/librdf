@@ -128,7 +128,7 @@ librdf_serializer_raptor_get_feature(void *context, librdf_uri* feature) {
   if((int)feature_i >= 0) {
     int value;
 #ifdef RAPTOR_V2_AVAILABLE
-    value = raptor_serializer_get_option(scontext->rdf_serializer, feature_i);
+    raptor_serializer_get_option(scontext->rdf_serializer, feature_i, NULL, &value);
 #else
     value = raptor_serializer_get_feature(scontext->rdf_serializer, feature_i);
 #endif
@@ -171,8 +171,8 @@ librdf_serializer_raptor_set_feature(void *context,
   value_s=(const unsigned char*)librdf_node_get_literal_value(value);
 
 #ifdef RAPTOR_V2_AVAILABLE
-  return raptor_serializer_set_option_string(scontext->rdf_serializer,
-                                             feature_i, value_s);
+  return raptor_serializer_set_option(scontext->rdf_serializer, feature_i,
+                                      (const char *)value_s, 0);
 #else
   return raptor_serializer_set_feature_string(scontext->rdf_serializer,
                                               feature_i, value_s);

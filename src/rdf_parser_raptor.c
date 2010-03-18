@@ -1362,7 +1362,7 @@ librdf_parser_raptor_get_feature(void* context, librdf_uri *feature)
     if((int)feature_i >= 0) {
       int value;
 #ifdef RAPTOR_V2_AVAILABLE
-      value = raptor_parser_get_option(pcontext->rdf_parser, feature_i);
+      raptor_parser_get_option(pcontext->rdf_parser, feature_i, NULL, &value);
 #else
       value = raptor_get_feature(pcontext->rdf_parser, feature_i);
 #endif
@@ -1406,8 +1406,8 @@ librdf_parser_raptor_set_feature(void* context,
   value_s=(const unsigned char*)librdf_node_get_literal_value(value);
 
 #ifdef RAPTOR_V2_AVAILABLE
-  return raptor_parser_set_option_string(pcontext->rdf_parser, feature_i,
-                                         value_s);
+  return raptor_parser_set_option(pcontext->rdf_parser, feature_i,
+                                  (const char *)value_s, 0);
 #else
   return raptor_parser_set_feature_string(pcontext->rdf_parser, feature_i,
                                           value_s);
