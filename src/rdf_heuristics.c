@@ -107,14 +107,14 @@ librdf_heuristic_object_is_literal(const char *object)
   
   /* Find first non alphanumeric */
   for(;*object; object++)
-    if(!isalnum(*object))
+    if(!isalnum((int)*object))
        break;
 
   /* Better be a ':' */
   if(*object && *object == ':') {
     /* check rest of string has no spaces */
     for(;*object; object++)
-      if(isspace(*object))
+      if(isspace((int)*object))
         break;
 
     /* reached end, not a literal (by this heuristic) */
@@ -155,8 +155,8 @@ librdf_heuristic_gen_name(const char *name)
   p=name+offset;
 
   /* Move p to last non number char */
-  if(isdigit(*p)) {
-    while(p>name && isdigit(*p))
+  if(isdigit((int)*p)) {
+    while(p>name && isdigit((int)*p))
       p--;
     l=strtol(p+1, (char**)NULL, 10);
     offset=p-name;
