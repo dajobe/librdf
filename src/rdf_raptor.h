@@ -34,8 +34,7 @@
 extern "C" {
 #endif
 
-#ifndef RAPTOR_WORLD_DECLARED
-#define RAPTOR_WORLD_DECLARED 1
+#ifndef RAPTOR_V2_AVAILABLE
 /* Declare raptor_world type unless it is declared in raptor.h */
 typedef struct raptor_world_s raptor_world;
 #endif
