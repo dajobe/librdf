@@ -456,7 +456,7 @@ rdf_parsers_available=
 # Check for raptor
 AC_MSG_CHECKING(for raptor)
 
-RAPTOR_MIN_VERSION=1.4.17
+RAPTOR_MIN_VERSION=1.4.19
 AC_SUBST(RAPTOR_MIN_VERSION)
 if $PKG_CONFIG raptor --exists; then
   :

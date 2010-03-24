@@ -34,12 +34,6 @@
 extern "C" {
 #endif
 
-#ifndef RAPTOR_V2_AVAILABLE
-/* Declare raptor_world type unless it is declared in raptor.h */
-typedef struct raptor_world_s raptor_world;
-#endif
-
-
 #ifdef RAPTOR_V2_AVAILABLE
 REDLAND_API
 void librdf_world_set_raptor(librdf_world* world, raptor_world* raptor_world_ptr);
