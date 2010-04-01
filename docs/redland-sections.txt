@@ -255,6 +255,7 @@ librdf_parser_set_uri_filter
 librdf_query
 librdf_query_factory
 librdf_query_register_factory
+librdf_query_languages_enumerate
 librdf_new_query
 librdf_new_query_from_query
 librdf_new_query_from_factory
