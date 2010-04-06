@@ -537,10 +537,22 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
   int rc;
   int need_base_uri;
 
+#ifdef RAPTOR_V2_AVAILABLE
+  const raptor_syntax_description *desc;
+#endif
+
   librdf_world_open(pcontext->parser->world);
 
 #ifdef RAPTOR_V2_AVAILABLE
-  need_base_uri = raptor_parser_get_need_base_uri(pcontext->rdf_parser);
+  desc = raptor_parser_get_description(pcontext->rdf_parser);
+  if(!desc) {
+    librdf_log(pcontext->parser->world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+               "Could not get description for %s parser",
+               pcontext->parser_name);
+    return NULL;
+  }
+  need_base_uri = desc->need_base_uri;
 #else
   need_base_uri = raptor_get_need_base_uri(pcontext->rdf_parser);
 #endif
@@ -696,11 +708,23 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   int need_base_uri;
   int status;
 
+#ifdef RAPTOR_V2_AVAILABLE
+  const raptor_syntax_description *desc;
+#endif
+
   if(!base_uri && uri)
     base_uri=uri;
   
 #ifdef RAPTOR_V2_AVAILABLE
-  need_base_uri = raptor_parser_get_need_base_uri(pcontext->rdf_parser);
+  desc = raptor_parser_get_description(pcontext->rdf_parser);
+  if(!desc) {
+    librdf_log(pcontext->parser->world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+               "Could not get description for %s parser",
+               pcontext->parser_name);
+    return NULL;
+  }
+  need_base_uri = desc->need_base_uri;
 #else
   need_base_uri = raptor_get_need_base_uri(pcontext->rdf_parser);
 #endif
@@ -989,11 +1013,23 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   librdf_parser_raptor_stream_context* scontext;
   int need_base_uri;
 
+#ifdef RAPTOR_V2_AVAILABLE
+  const raptor_syntax_description *desc;
+#endif
+
   if(!base_uri)
     base_uri=uri;
 
 #ifdef RAPTOR_V2_AVAILABLE
-  need_base_uri = raptor_parser_get_need_base_uri(pcontext->rdf_parser);
+  desc = raptor_parser_get_description(pcontext->rdf_parser);
+  if(!desc) {
+    librdf_log(pcontext->parser->world,
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+               "Could not get description for %s parser",
+               pcontext->parser_name);
+    return -1;
+  }
+  need_base_uri = desc->need_base_uri;
 #else
   need_base_uri = raptor_get_need_base_uri(pcontext->rdf_parser);
 #endif
@@ -1524,22 +1560,26 @@ librdf_parser_raptor_constructor(librdf_world *world)
   unsigned int i;
 
   /* enumerate from parser 1, so the default parser 0 is done last */
-  for(i=1; 1; i++) {
-    const char *syntax_name=NULL;
-    const char *syntax_label=NULL;
-    const char *mime_type=NULL;
-    const unsigned char *uri_string=NULL;
-
+  for(i = 1; 1; i++) {
+    const char *syntax_name = NULL;
+    const char *syntax_label = NULL;
+    const char *mime_type = NULL;
+    const unsigned char *uri_string = NULL;
 #ifdef RAPTOR_V2_AVAILABLE
-    if(raptor_world_enumerate_parsers(world->raptor_world_ptr,
-                                      i, &syntax_name, &syntax_label,
-                                      &mime_type, &uri_string)) {
+    const raptor_syntax_description *desc;
+
+    desc = raptor_world_get_parser_description(world->raptor_world_ptr, i);
+
+    if(!desc) {
       /* reached the end of the parsers, now register the default one */
       i = 0;
-      raptor_world_enumerate_parsers(world->raptor_world_ptr,
-                                     i, &syntax_name, &syntax_label,
-                                     &mime_type, &uri_string);
+      desc = raptor_world_get_parser_description(world->raptor_world_ptr, i);
     }
+    syntax_name = desc->names[0];
+    syntax_label = desc->label;
+    if(desc->mime_types)
+      mime_type = desc->mime_types[0].mime_type;
+    uri_string = (const unsigned char *)desc->uri_string;
 #else
     if(raptor_syntaxes_enumerate(i, &syntax_name, &syntax_label, 
                                  &mime_type, &uri_string)) {
