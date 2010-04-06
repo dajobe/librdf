@@ -458,22 +458,26 @@ AC_MSG_CHECKING(for raptor)
 
 RAPTOR_MIN_VERSION=1.4.19
 AC_SUBST(RAPTOR_MIN_VERSION)
-if $PKG_CONFIG raptor --exists; then
-  :
+if $PKG_CONFIG raptor2 --exists; then
+  RAPTOR_CONFIG="$PKG_CONFIG raptor2"
 else
-  AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
+  if $PKG_CONFIG raptor --exists; then
+    RAPTOR_CONFIG="$PKG_CONFIG raptor"
+  else
+    AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
+  fi
 fi
 
-RAPTOR_VERSION=`$PKG_CONFIG raptor --modversion 2>/dev/null`
+RAPTOR_VERSION=`$RAPTOR_CONFIG --modversion 2>/dev/null`
 
-if $PKG_CONFIG raptor --atleast-version=$RAPTOR_MIN_VERSION; then
+if $RAPTOR_CONFIG --atleast-version=$RAPTOR_MIN_VERSION; then
   :
 else
   AC_MSG_ERROR(Installed raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
 fi
 
-LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG raptor --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
-LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG raptor --libs` $LIBRDF_EXTERNAL_LIBS"
+LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+LIBRDF_EXTERNAL_LIBS="`$RAPTOR_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
 
 rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
 AC_MSG_RESULT(system $RAPTOR_VERSION)
