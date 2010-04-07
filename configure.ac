@@ -460,13 +460,16 @@ RAPTOR_MIN_VERSION=1.4.19
 AC_SUBST(RAPTOR_MIN_VERSION)
 if $PKG_CONFIG raptor2 --exists; then
   RAPTOR_CONFIG="$PKG_CONFIG raptor2"
+  RAPTOR_PACKAGE="raptor2"
 else
   if $PKG_CONFIG raptor --exists; then
     RAPTOR_CONFIG="$PKG_CONFIG raptor"
+    RAPTOR_PACKAGE="raptor"
   else
     AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
   fi
 fi
+AC_SUBST(RAPTOR_PACKAGE)
 
 RAPTOR_VERSION=`$RAPTOR_CONFIG --modversion 2>/dev/null`
 
