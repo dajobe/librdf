@@ -846,6 +846,9 @@ librdf_free_query_results_formatter(librdf_query_results_formatter* formatter)
  *
  * Write the query results using the given formatter to an iostream
  * 
+ * Note that after calling this method, the query results will be
+ * empty and librdf_query_results_finished() will return true (non-0)
+ *
  * See librdf_query_results_formats_enumerate() to get the
  * list of syntax URIs and their description. 
  *
