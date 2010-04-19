@@ -10,7 +10,7 @@
 <title>Introduction</title>
 
 <para>Redland includes several modules that implement the
-<ulink url="api/storage.html">storage API</ulink> and provide a variety of
+<link linkend="redland-storage">storage API</link> and provide a variety of
 different features and functionality.  This document gives the
 details of what each implementation module provides and
 the storage options used.
