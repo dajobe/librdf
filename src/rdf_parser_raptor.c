@@ -552,7 +552,7 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
                pcontext->parser_name);
     return NULL;
   }
-  need_base_uri = desc->need_base_uri;
+  need_base_uri = desc->flags & RAPTOR_SYNTAX_NEED_BASE_URI;
 #else
   need_base_uri = raptor_get_need_base_uri(pcontext->rdf_parser);
 #endif
@@ -724,7 +724,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
                pcontext->parser_name);
     return NULL;
   }
-  need_base_uri = desc->need_base_uri;
+  need_base_uri = desc->flags & RAPTOR_SYNTAX_NEED_BASE_URI;
 #else
   need_base_uri = raptor_get_need_base_uri(pcontext->rdf_parser);
 #endif
@@ -1029,7 +1029,7 @@ librdf_parser_raptor_parse_into_model_common(void *context,
                pcontext->parser_name);
     return -1;
   }
-  need_base_uri = desc->need_base_uri;
+  need_base_uri = desc->flags & RAPTOR_SYNTAX_NEED_BASE_URI;
 #else
   need_base_uri = raptor_get_need_base_uri(pcontext->rdf_parser);
 #endif
