@@ -434,6 +434,9 @@ librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
 void
 librdf_free_uri (librdf_uri* uri) 
 {
+  if(!uri)
+    return;
+  
 #ifdef USE_RAPTOR_URI
   raptor_free_uri(uri);
 #else

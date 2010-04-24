@@ -253,8 +253,9 @@ librdf_free_statement(librdf_statement* statement)
   librdf_world *world;
 #endif
 
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(statement, librdf_statement);
-
+  if(!statement)
+    return;
+  
 #ifdef WITH_THREADS
   world = statement->world;
   pthread_mutex_lock(world->statements_mutex);

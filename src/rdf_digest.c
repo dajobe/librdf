@@ -242,12 +242,15 @@ librdf_new_digest_from_factory(librdf_world *world,
  * librdf_free_digest:
  * @digest: the digest
  *
- * Destructor- destroy a #librdf_digest object.
+ * Destructor - destroy a #librdf_digest object.
  * 
  **/
 void
 librdf_free_digest(librdf_digest *digest) 
 {
+  if(!digest)
+    return;
+  
   if(digest->context)
     LIBRDF_FREE(digest_context, digest->context);
   if(digest->digest)

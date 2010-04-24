@@ -212,6 +212,9 @@ librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
 void
 librdf_free_hash_datum(librdf_hash_datum *datum) 
 {
+  if(!datum)
+    return;
+  
   if(datum->data) {
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG2("Freeing datum data, %p\n", datum);
@@ -522,6 +525,9 @@ librdf_new_hash_from_hash(librdf_hash* old_hash)
 void
 librdf_free_hash(librdf_hash* hash) 
 {
+  if(!hash)
+    return;
+  
   if(hash->context) {
     if(hash->is_open)
       librdf_hash_close(hash);

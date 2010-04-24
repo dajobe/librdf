@@ -181,6 +181,9 @@ librdf_new_cache(librdf_world* world, int capacity, int flush_percent,
 void
 librdf_free_cache(librdf_cache* cache) 
 {
+  if(!cache)
+    return;
+  
 #ifdef WITH_THREADS
   pthread_mutex_lock(cache->world->mutex);
 #endif

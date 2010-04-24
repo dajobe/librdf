@@ -445,8 +445,9 @@ librdf_new_query_from_factory(librdf_world *world,
 void
 librdf_free_query(librdf_query* query) 
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(query, librdf_query);
-
+  if(!query)
+    return;
+  
   if(--query->usage)
     return;
   

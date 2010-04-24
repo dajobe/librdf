@@ -95,6 +95,9 @@ librdf_new_hash_cursor (librdf_hash* hash)
 void
 librdf_free_hash_cursor (librdf_hash_cursor* cursor) 
 {
+  if(!cursor)
+    return;
+  
   if(cursor->context) {
     cursor->hash->factory->cursor_finish(cursor->context);
     LIBRDF_FREE(librdf_hash_cursor_context, cursor->context);

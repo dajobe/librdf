@@ -125,6 +125,9 @@ librdf_stream_free_stream_map(void *list_data, void *user_data)
 void
 librdf_free_stream(librdf_stream* stream) 
 {
+  if(!stream)
+    return;
+  
   if(stream->finished_method)
     stream->finished_method(stream->context);
 

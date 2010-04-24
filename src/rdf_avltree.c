@@ -136,6 +136,9 @@ librdf_new_avltree(librdf_avltree_data_compare_function compare_fn,
 void
 librdf_free_avltree(librdf_avltree* tree)
 {
+  if(!tree)
+    return;
+  
   librdf_free_avltree_internal(tree, tree->root);
   LIBRDF_FREE(librdf_avltree, tree);
 }

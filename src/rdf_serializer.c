@@ -406,8 +406,9 @@ librdf_new_serializer_from_factory(librdf_world *world,
 void
 librdf_free_serializer(librdf_serializer *serializer) 
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(serializer, librdf_serializer);
-
+  if(!serializer)
+    return;
+  
   if(serializer->context) {
     if(serializer->factory->terminate)
       serializer->factory->terminate(serializer->context);

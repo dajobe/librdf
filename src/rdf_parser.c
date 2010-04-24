@@ -404,8 +404,9 @@ librdf_new_parser_from_factory(librdf_world *world,
 void
 librdf_free_parser(librdf_parser *parser) 
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(parser, librdf_parser);
-
+  if(!parser)
+    return;
+  
   if(parser->context) {
     if(parser->factory->terminate)
       parser->factory->terminate(parser->context);
