@@ -72,6 +72,7 @@ librdf_hash_print
 librdf_hash_print_keys
 librdf_hash_print_values
 librdf_hash_interpret_template
+librdf_hash_from_string
 </SECTION>
 
 <SECTION>
@@ -177,6 +178,7 @@ librdf_model_transaction_get_handle
 librdf_model_transaction_rollback
 librdf_model_transaction_start
 librdf_model_transaction_start_with_handle
+librdf_model_write
 </SECTION>
 
 <SECTION>
@@ -214,6 +216,7 @@ librdf_node_to_counted_string
 librdf_node_print
 librdf_node_equals
 librdf_node_static_iterator_create
+librdf_node_write
 </SECTION>
 
 <SECTION>
@@ -356,6 +359,7 @@ librdf_statement_encode
 librdf_statement_encode_parts
 librdf_statement_decode
 librdf_statement_decode_parts
+librdf_statement_write
 </SECTION>
 
 <SECTION>
