@@ -1573,7 +1573,7 @@ librdf_storage_context_remove_statement(librdf_storage* storage,
                                         librdf_statement* statement) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_statement, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
 
   if(!storage->factory->context_remove_statement)
     return 1;
