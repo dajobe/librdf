@@ -30,7 +30,7 @@ AC_REVISION($Revision$)dnl
 AM_CONFIG_HEADER(src/rdf_config.h)
 AC_CONFIG_AUX_DIR(build)
 AC_CONFIG_MACRO_DIR(build)
-AM_INIT_AUTOMAKE([1.7 check-news std-options -Wobsolete -Wportability -Wsyntax -Wunsupported])
+AM_INIT_AUTOMAKE([1.11 check-news std-options -Wobsolete -Wportability -Wsyntax -Wunsupported])
 AM_MAINTAINER_MODE
 
 AC_CANONICAL_HOST
@@ -1251,12 +1251,8 @@ AC_SUBST(abs_top_srcdir)
 abs_top_builddir=`pwd`
 AC_SUBST(abs_top_builddir)
 
-dnl Shave "make autotools output sane" - disabled by default
-dnl http://git.lespiau.name/cgit/shave/  git clone git://git.lespiau.name/shave
-SHAVE_INIT([build], [disable])
-
-dnl when automake 1.11 is more widespread can use this:
-dnl m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],)
+dnl automake 1.11
+AM_SILENT_RULES([no])
 
 AC_CONFIG_FILES([Makefile
 build/shave
