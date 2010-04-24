@@ -1255,8 +1255,6 @@ dnl automake 1.11
 AM_SILENT_RULES([no])
 
 AC_CONFIG_FILES([Makefile
-build/shave
-build/shave-libtool
 redland.rdf
 docs/Makefile
 docs/version.xml
