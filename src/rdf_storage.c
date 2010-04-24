@@ -1184,11 +1184,13 @@ librdf_storage_stream_to_node_iterator_finished(void* iterator)
 
 
 /*
- * librdf_storage_node_stream_to_node_create - Create a stream for get sources, targets or arcs methods using find_statements method
+ * librdf_storage_node_stream_to_node_create:
  * @storage: the storage object to use
  * @node1: the first node to encode in the key (or NULL if not needed)
  * @node2: the second node to encode in the key (or NULL if not needed)
  * @want: the field required from the statement
+ *
+ * INTERNAL - Create a stream for get sources, targets or arcs methods using find_statements method
  *
  * node1 and node2 cannot both be NULL
  * 
