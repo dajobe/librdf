@@ -1386,8 +1386,9 @@ librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
  **/
 static int
 librdf_storage_postgresql_contains_statement(librdf_storage* storage,
-                                        librdf_statement* statement)
+                                             librdf_statement* statement)
 {
+  librdf_storage_postgresql_instance* context = (librdf_storage_postgresql_instance*)storage->instance; 
   char find_statement[]="SELECT 1 FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " limit 1";
   u64 subject, predicate, object;
   PGconn *handle;
@@ -1409,8 +1410,11 @@ librdf_storage_postgresql_contains_statement(librdf_storage* storage,
 
     if(subject && predicate && object) {
       char *query;
-      if((query=(char*)LIBRDF_MALLOC(cstring, strlen(find_statement)+(20*4)+1))) {
+      size_t len = strlen(find_statement)+(20*4)+1;
+      if((query=(char*)LIBRDF_MALLOC(cstring, len))) {
         PGresult *res;
+        snprintf(query, len, find_statement, context->model,
+                 subject, predicate, object); 
         if((res=PQexec(handle, query))) {
           if(PQresultStatus(res) == PGRES_TUPLES_OK) {
             if(PQntuples(res)) {
