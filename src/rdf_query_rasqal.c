@@ -1199,11 +1199,8 @@ librdf_query_rasqal_results_as_stream(librdf_query_results* query_results)
   scontext->query=query;
   scontext->qcontext=context;
 
-  if(librdf_query_rasqal_query_results_update_statement(scontext)) {
-    librdf_query_rasqal_query_results_finished((void*)scontext);
-    return NULL;
-  }
-  
+  librdf_query_rasqal_query_results_update_statement(scontext);
+
   stream=librdf_new_stream(query->world,
                            (void*)scontext,
                            &librdf_query_rasqal_query_results_end_of_stream,
