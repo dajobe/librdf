@@ -123,7 +123,7 @@ librdf_model_register_factory(librdf_world *world,
 
   if(!world->models) {
 #ifdef RAPTOR_V2_AVAILABLE
-    world->models = raptor_new_sequence((raptor_data_free_handler *)librdf_free_model_factory, NULL);
+    world->models = raptor_new_sequence((raptor_data_free_handler)librdf_free_model_factory, NULL);
 #else
     world->models = raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_model_factory, NULL);
 #endif

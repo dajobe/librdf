@@ -121,7 +121,7 @@ librdf_parser_register_factory(librdf_world *world,
 
   if(!world->parsers) {
 #ifdef RAPTOR_V2_AVAILABLE
-    world->parsers = raptor_new_sequence((raptor_data_free_handler *)librdf_free_parser_factory, NULL);
+    world->parsers = raptor_new_sequence((raptor_data_free_handler)librdf_free_parser_factory, NULL);
 #else
     world->parsers = raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_parser_factory, NULL);
 #endif

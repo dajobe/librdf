@@ -589,7 +589,7 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
   if(pcontext->nspace_uris)
     raptor_free_sequence(pcontext->nspace_uris);
 #ifdef RAPTOR_V2_AVAILABLE
-  pcontext->nspace_uris = raptor_new_sequence((raptor_data_free_handler*)librdf_free_uri, NULL);
+  pcontext->nspace_uris = raptor_new_sequence((raptor_data_free_handler)librdf_free_uri, NULL);
 #else
   pcontext->nspace_uris = raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
 #endif
@@ -787,7 +787,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   if(pcontext->nspace_uris)
     raptor_free_sequence(pcontext->nspace_uris);
 #ifdef RAPTOR_V2_AVAILABLE
-  pcontext->nspace_uris = raptor_new_sequence((raptor_data_free_handler*)librdf_free_uri, NULL);
+  pcontext->nspace_uris = raptor_new_sequence((raptor_data_free_handler)librdf_free_uri, NULL);
 #else
   pcontext->nspace_uris = raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
 #endif
@@ -1062,7 +1062,7 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   if(pcontext->nspace_uris)
     raptor_free_sequence(pcontext->nspace_uris);
 #ifdef RAPTOR_V2_AVAILABLE
-  pcontext->nspace_uris = raptor_new_sequence((raptor_data_free_handler*)librdf_free_uri, NULL);
+  pcontext->nspace_uris = raptor_new_sequence((raptor_data_free_handler)librdf_free_uri, NULL);
 #else
   pcontext->nspace_uris = raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
 #endif

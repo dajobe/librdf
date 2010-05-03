@@ -125,7 +125,7 @@ librdf_serializer_register_factory(librdf_world *world,
 
   if(!world->serializers) {
 #ifdef RAPTOR_V2_AVAILABLE
-    world->serializers = raptor_new_sequence((raptor_data_free_handler *)librdf_free_serializer_factory, NULL);
+    world->serializers = raptor_new_sequence((raptor_data_free_handler)librdf_free_serializer_factory, NULL);
 #else
     world->serializers = raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_serializer_factory, NULL);
 #endif
