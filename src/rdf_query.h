@@ -37,6 +37,8 @@ extern "C" {
 /* class methods */
 REDLAND_API
 void librdf_query_register_factory(librdf_world *world, const char *name, const unsigned char *uri_string, void (*factory) (librdf_query_factory*));
+REDLAND_API
+int librdf_query_languages_enumerate(librdf_world* world, const unsigned int counter, const char **name, const unsigned char **uri_string);
 
 /* constructor */
 REDLAND_API

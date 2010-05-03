@@ -72,6 +72,7 @@ librdf_hash_print
 librdf_hash_print_keys
 librdf_hash_print_values
 librdf_hash_interpret_template
+librdf_hash_from_string
 </SECTION>
 
 <SECTION>
@@ -177,6 +178,7 @@ librdf_model_transaction_get_handle
 librdf_model_transaction_rollback
 librdf_model_transaction_start
 librdf_model_transaction_start_with_handle
+librdf_model_write
 </SECTION>
 
 <SECTION>
@@ -214,6 +216,7 @@ librdf_node_to_counted_string
 librdf_node_print
 librdf_node_equals
 librdf_node_static_iterator_create
+librdf_node_write
 </SECTION>
 
 <SECTION>
@@ -255,6 +258,7 @@ librdf_parser_set_uri_filter
 librdf_query
 librdf_query_factory
 librdf_query_register_factory
+librdf_query_languages_enumerate
 librdf_new_query
 librdf_new_query_from_query
 librdf_new_query_from_factory
@@ -279,9 +283,13 @@ librdf_query_results_get_binding_name
 librdf_query_results_get_binding_value_by_name
 librdf_query_results_get_bindings_count
 librdf_query_results_to_counted_string
+librdf_query_results_to_counted_string2
 librdf_query_results_to_string
+librdf_query_results_to_string2
 librdf_query_results_to_file_handle
+librdf_query_results_to_file_handle2
 librdf_query_results_to_file
+librdf_query_results_to_file2
 librdf_free_query_results
 librdf_query_results_is_bindings
 librdf_query_results_is_boolean
@@ -290,6 +298,7 @@ librdf_query_results_is_syntax
 librdf_query_results_get_boolean
 librdf_new_query_results_formatter
 librdf_new_query_results_formatter_by_mime_type
+librdf_new_query_results_formatter2
 librdf_free_query_results_formatter
 librdf_query_results_formats_check
 librdf_query_results_formats_enumerate
@@ -350,6 +359,7 @@ librdf_statement_encode
 librdf_statement_encode_parts
 librdf_statement_decode
 librdf_statement_decode_parts
+librdf_statement_write
 </SECTION>
 
 <SECTION>
@@ -423,6 +433,7 @@ librdf_stream_get_object
 librdf_stream_get_context
 librdf_stream_add_map
 librdf_stream_print
+librdf_stream_write
 </SECTION>
 
 <SECTION>

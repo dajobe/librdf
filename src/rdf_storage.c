@@ -692,8 +692,9 @@ librdf_new_storage_from_factory(librdf_world *world,
 void
 librdf_free_storage(librdf_storage* storage) 
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(storage, librdf_storage);
-
+  if(!storage)
+    return;
+  
   if(--storage->usage)
     return;
 
@@ -1183,11 +1184,13 @@ librdf_storage_stream_to_node_iterator_finished(void* iterator)
 
 
 /*
- * librdf_storage_node_stream_to_node_create - Create a stream for get sources, targets or arcs methods using find_statements method
+ * librdf_storage_node_stream_to_node_create:
  * @storage: the storage object to use
  * @node1: the first node to encode in the key (or NULL if not needed)
  * @node2: the second node to encode in the key (or NULL if not needed)
  * @want: the field required from the statement
+ *
+ * INTERNAL - Create a stream for get sources, targets or arcs methods using find_statements method
  *
  * node1 and node2 cannot both be NULL
  * 
@@ -1572,7 +1575,7 @@ librdf_storage_context_remove_statement(librdf_storage* storage,
                                         librdf_statement* statement) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, librdf_statement, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
 
   if(!storage->factory->context_remove_statement)
     return 1;

@@ -240,6 +240,55 @@ librdf_get_query_factory(librdf_world *world,
   return factory;
 }
 
+/**
+ * librdf_query_languages_enumerate:
+ * @world: #librdf_world
+ * @counter: index into the list of query language syntaxes
+ * @name: pointer to store the name of the query language syntax (or NULL)
+ * @uri_string: pointer to store query language syntax URI string (or NULL)
+ *
+ * Get information on query language syntaxes.
+ * 
+ * All returned strings are shared and must be copied if needed to be
+ * used dynamically.
+ * 
+ * Return value: non 0 on failure of if counter is out of range
+ */
+int
+librdf_query_languages_enumerate(librdf_world* world,
+                                 const unsigned int counter,
+                                 const char **name,
+                                 const unsigned char **uri_string)
+{
+  unsigned int i;
+  librdf_query_factory *factory;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, 1);
+  if(!name && !uri_string)
+    return 1;
+
+  librdf_world_open(world);
+  
+  factory = world->query_factories;
+  if(!factory)
+    return 1;
+
+  for(i=0; factory && i<=counter ; i++, factory=factory->next) {
+    if(i == counter) {
+      if(name)
+        *name=factory->name;
+      if(uri_string) {
+        if (factory->uri)
+          *uri_string=librdf_uri_as_string(factory->uri);
+        else
+          *uri_string=NULL;
+      }
+      return 0;
+    }
+  }
+        
+  return 1;
+}
 
 
 /**
@@ -396,8 +445,9 @@ librdf_new_query_from_factory(librdf_world *world,
 void
 librdf_free_query(librdf_query* query) 
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(query, librdf_query);
-
+  if(!query)
+    return;
+  
   if(--query->usage)
     return;
   
@@ -596,9 +646,22 @@ main(int argc, char *argv[])
   size_t string_length;
   unsigned char *string;
   const char *query_string=QUERY_STRING;
-
+  int i;
+  
   world=librdf_new_world();
   librdf_world_open(world);
+  
+  /* list available query languages */
+  fprintf(stdout, "%s: Enumerating query languages:\n", program);
+  for (i = 0; 1; i++) {
+    const char *name;
+    const unsigned char *uri;
+    
+    if (librdf_query_languages_enumerate(world, i, &name, &uri))
+      break;
+      
+    fprintf(stdout, " %s <%s>\n", name, (uri == NULL ? "" : (char*)uri));
+  }
 
   /* create model and storage */
   if(1) {

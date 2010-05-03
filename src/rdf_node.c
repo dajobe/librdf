@@ -724,8 +724,9 @@ librdf_free_node(librdf_node *node)
   librdf_world *world;
 #endif
 
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(node, librdf_node);
-
+  if(!node)
+    return;
+  
 #ifdef WITH_THREADS
   world = node->world;
   pthread_mutex_lock(world->nodes_mutex);

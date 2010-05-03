@@ -30,7 +30,7 @@ AC_REVISION($Revision$)dnl
 AM_CONFIG_HEADER(src/rdf_config.h)
 AC_CONFIG_AUX_DIR(build)
 AC_CONFIG_MACRO_DIR(build)
-AM_INIT_AUTOMAKE([1.7 check-news std-options -Wobsolete -Wportability -Wsyntax -Wunsupported])
+AM_INIT_AUTOMAKE([1.11 check-news std-options -Wobsolete -Wportability -Wsyntax -Wunsupported])
 AM_MAINTAINER_MODE
 
 AC_CANONICAL_HOST
@@ -458,22 +458,29 @@ AC_MSG_CHECKING(for raptor)
 
 RAPTOR_MIN_VERSION=1.4.19
 AC_SUBST(RAPTOR_MIN_VERSION)
-if $PKG_CONFIG raptor --exists; then
-  :
+if $PKG_CONFIG raptor2 --exists; then
+  RAPTOR_CONFIG="$PKG_CONFIG raptor2"
+  RAPTOR_PACKAGE="raptor2"
 else
-  AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
+  if $PKG_CONFIG raptor --exists; then
+    RAPTOR_CONFIG="$PKG_CONFIG raptor"
+    RAPTOR_PACKAGE="raptor"
+  else
+    AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
+  fi
 fi
+AC_SUBST(RAPTOR_PACKAGE)
 
-RAPTOR_VERSION=`$PKG_CONFIG raptor --modversion 2>/dev/null`
+RAPTOR_VERSION=`$RAPTOR_CONFIG --modversion 2>/dev/null`
 
-if $PKG_CONFIG raptor --atleast-version=$RAPTOR_MIN_VERSION; then
+if $RAPTOR_CONFIG --atleast-version=$RAPTOR_MIN_VERSION; then
   :
 else
   AC_MSG_ERROR(Installed raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
 fi
 
-LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG raptor --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
-LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG raptor --libs` $LIBRDF_EXTERNAL_LIBS"
+LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+LIBRDF_EXTERNAL_LIBS="`$RAPTOR_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
 
 rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
 AC_MSG_RESULT(system $RAPTOR_VERSION)
@@ -1253,16 +1260,10 @@ AC_SUBST(abs_top_srcdir)
 abs_top_builddir=`pwd`
 AC_SUBST(abs_top_builddir)
 
-dnl Shave "make autotools output sane" - disabled by default
-dnl http://git.lespiau.name/cgit/shave/  git clone git://git.lespiau.name/shave
-SHAVE_INIT([build], [disable])
-
-dnl when automake 1.11 is more widespread can use this:
-dnl m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],)
+dnl automake 1.11
+AM_SILENT_RULES([no])
 
 AC_CONFIG_FILES([Makefile
-build/shave
-build/shave-libtool
 redland.rdf
 docs/Makefile
 docs/version.xml

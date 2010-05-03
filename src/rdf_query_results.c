@@ -242,8 +242,9 @@ librdf_query_results_get_bindings_count(librdf_query_results *query_results)
 void
 librdf_free_query_results(librdf_query_results* query_results)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(query_results, librdf_query_results);
-
+  if(!query_results)
+    return;
+  
   if(query_results->query->factory->free_results)
     query_results->query->factory->free_results(query_results);
 
@@ -832,6 +833,9 @@ librdf_new_query_results_formatter_by_mime_type(librdf_query_results* query_resu
 void
 librdf_free_query_results_formatter(librdf_query_results_formatter* formatter) 
 {
+  if(!formatter)
+    return;
+  
   if(formatter->query_results->query->factory->free_results_formatter)
     formatter->query_results->query->factory->free_results_formatter(formatter);
 }
@@ -846,6 +850,9 @@ librdf_free_query_results_formatter(librdf_query_results_formatter* formatter)
  *
  * Write the query results using the given formatter to an iostream
  * 
+ * Note that after calling this method, the query results will be
+ * empty and librdf_query_results_finished() will return true (non-0)
+ *
  * See librdf_query_results_formats_enumerate() to get the
  * list of syntax URIs and their description. 
  *

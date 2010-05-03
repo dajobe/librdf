@@ -396,6 +396,9 @@ librdf_free_model(librdf_model *model)
   librdf_iterator* iterator;
   librdf_model* m;
 
+  if(!model)
+    return;
+  
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(model, librdf_model);
 
   if(--model->usage)

@@ -106,6 +106,9 @@ librdf_new_list(librdf_world *world)
 void
 librdf_free_list(librdf_list* list) 
 {
+  if(!list)
+    return;
+  
   LIBRDF_ASSERT_RETURN(list->iterator_count,
                        "Iterators were active on freeing list", );
 

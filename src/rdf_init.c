@@ -178,6 +178,9 @@ librdf_new_world(void) {
 void
 librdf_free_world(librdf_world *world)
 {
+  if(!world)
+    return;
+  
   librdf_finish_serializer(world);
   librdf_finish_parser(world);
 

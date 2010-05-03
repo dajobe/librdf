@@ -432,9 +432,12 @@ librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
  * 
  **/
 void
-librdf_free_uri (librdf_uri* uri) 
+librdf_free_uri(librdf_uri* uri) 
 {
 #ifdef USE_RAPTOR_URI
+  if(!uri)
+    return;
+  
   raptor_free_uri(uri);
 #else
   librdf_hash_datum key; /* on stack */
@@ -442,8 +445,9 @@ librdf_free_uri (librdf_uri* uri)
   librdf_world *world;
 #endif
 
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(uri, librdf_uri);
-
+  if(!uri)
+    return;
+  
 #ifdef WITH_THREADS
   world = uri->world;
   pthread_mutex_lock(world->mutex);

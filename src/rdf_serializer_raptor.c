@@ -652,22 +652,28 @@ librdf_serializer_raptor_constructor(librdf_world *world)
   int i;
   
   /* enumerate from serializer 1, so the default serializer 0 is done last */
-  for(i=1; 1; i++) {
-    const char *syntax_name=NULL;
-    const char *syntax_label=NULL;
-    const char *mime_type=NULL;
-    const unsigned char *uri_string=NULL;
+  for(i = 1; 1; i++) {
+    const char *syntax_name = NULL;
+    const char *syntax_label = NULL;
+    const char *mime_type = NULL;
+    const unsigned char *uri_string = NULL;
 
 #ifdef RAPTOR_V2_AVAILABLE
-    if(raptor_world_enumerate_serializers(world->raptor_world_ptr,
-                                          i, &syntax_name, &syntax_label,
-                                          &mime_type, &uri_string)) {
+    const raptor_syntax_description *desc;
+
+    desc = raptor_world_get_serializer_description(world->raptor_world_ptr, i);
+
+    if(!desc) {
       /* reached the end of the serializers, now register the default one */
-      i=0;
-      raptor_world_enumerate_serializers(world->raptor_world_ptr,
-                                         i, &syntax_name, &syntax_label,
-                                         &mime_type, &uri_string);
+      i = 0;
+      desc = raptor_world_get_serializer_description(world->raptor_world_ptr, i);
     }
+    syntax_name = desc->names[0];
+    syntax_label = desc->label;
+    if(desc->mime_types)
+      mime_type = desc->mime_types[0].mime_type;
+    uri_string = (const unsigned char *)desc->uri_string;
+
 #else
     if(raptor_serializers_enumerate(i, &syntax_name, &syntax_label, 
                                     &mime_type, &uri_string)) {
