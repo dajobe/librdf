@@ -159,7 +159,7 @@ librdf_new_world(void) {
 #ifdef MODULAR_LIBRDF
   world->ltdl_opened = !(lt_dlinit());
   if (world->ltdl_opened)
-    lt_dlsetsearchpath(LIBRDF_MODULE_DIR);
+    lt_dlsetsearchpath(REDLAND_MODULE_PATH);
   else
     LIBRDF_DEBUG1("lt_dlinit() failed\n");
 #endif

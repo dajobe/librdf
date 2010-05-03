@@ -556,6 +556,15 @@ for storage in $always_available_storages; do
   eval $storage'_storage=yes'
 done
 
+REDLAND_MODULE_PATH=""
+AC_ARG_WITH(module-path, [  --with-module-path=PATH Default search path for modules (default=/usr/local/lib/redland:${libdir}/redland], REDLAND_MODULE_PATH="$witheval")
+if test "x$REDLAND_MODULE_PATH" == "x"; then
+	REDLAND_MODULE_PATH=$libdir"/redland"
+	if test "x$prefix" != "xNONE"; then
+		REDLAND_MODULE_PATH="/usr/local/lib/redland:"$REDLAND_MODULE_PATH
+	fi
+fi
+AC_SUBST(REDLAND_MODULE_PATH)
 
 storages_available="memory file hashes(memory) trees"
 if test "$have_libdb" = yes; then
@@ -1278,7 +1287,7 @@ Redland build summary:
 ])
 
 if test "$modular" = yes; then
-  AC_MSG_RESULT([  Using modular storage backends])
+  AC_MSG_RESULT([  Using modular storage backends in $REDLAND_MODULE_PATH])
 else
   AC_MSG_RESULT([  Using monolithic storage backends])
 fi
