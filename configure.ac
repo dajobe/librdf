@@ -454,13 +454,25 @@ parser_modules=raptor
 rdf_parsers_available=
 
 # Check for raptor
+RAPTOR_MIN_VERSION=1.4.19
+RAPTOR2_MIN_VERSION=1.9.0
+
+raptor2=no
+AC_ARG_ENABLE(raptor2, [  --enable-raptor2  Enable use of raptor2], raptor2="$enableval", raptor2="no")
+
 AC_MSG_CHECKING(for raptor)
 
-RAPTOR_MIN_VERSION=1.4.19
-AC_SUBST(RAPTOR_MIN_VERSION)
-if $PKG_CONFIG raptor2 --exists; then
-  RAPTOR_CONFIG="$PKG_CONFIG raptor2"
-  RAPTOR_PACKAGE="raptor2"
+# When raptor2 is stable, this can be changed to prefer raptor2
+# For now an explicit configure --enable-raptor2 is required.
+if test "X$raptor2" = "Xyes"; then
+  RAPTOR_MIN_VERSION=$RAPTOR2_MIN_VERSION
+
+  if $PKG_CONFIG raptor2 --exists; then
+    RAPTOR_CONFIG="$PKG_CONFIG raptor2"
+    RAPTOR_PACKAGE="raptor2"
+  else
+    AC_MSG_ERROR(Raptor2 is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
+  fi
 else
   if $PKG_CONFIG raptor --exists; then
     RAPTOR_CONFIG="$PKG_CONFIG raptor"
@@ -469,7 +481,6 @@ else
     AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
   fi
 fi
-AC_SUBST(RAPTOR_PACKAGE)
 
 RAPTOR_VERSION=`$RAPTOR_CONFIG --modversion 2>/dev/null`
 
@@ -484,6 +495,15 @@ LIBRDF_EXTERNAL_LIBS="`$RAPTOR_CONFIG --libs` $LIBRDF_EXTERNAL_LIBS"
 
 rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
 AC_MSG_RESULT(system $RAPTOR_VERSION)
+
+AC_SUBST(RAPTOR_MIN_VERSION)
+AC_SUBST(RAPTOR_PACKAGE)
+
+AM_CONDITIONAL(RAPTOR2, test "X$raptor2" = "Xyes")
+if test "X$raptor2" = "Xyes"; then
+  AC_DEFINE(HAVE_RAPTOR2_API, 1, [Raptor2 API is available])
+fi
+
 
 # Check for rasqal
 AC_MSG_CHECKING(for rasqal)
