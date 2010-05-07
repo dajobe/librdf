@@ -18,6 +18,9 @@ generating a name, guessing if a string is a URI or RDF literal.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### FUNCTION librdf_heuristic_gen_name ##### -->
 <para>
 

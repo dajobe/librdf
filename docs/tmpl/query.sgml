@@ -19,6 +19,9 @@ Query result limits and offsets can be set.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_query ##### -->
 <para>
 
@@ -39,7 +42,21 @@ Query result limits and offsets can be set.
 @world: 
 @name: 
 @uri_string: 
-@factory: 
+@librdf_query_factory*:
+@librdf_query_factory*:
+@librdf_query_factory*: 
+
+
+<!-- ##### FUNCTION librdf_query_languages_enumerate ##### -->
+<para>
+
+</para>
+
+@world: 
+@counter: 
+@name: 
+@uri_string: 
+@Returns: 
 
 
 <!-- ##### FUNCTION librdf_new_query ##### -->

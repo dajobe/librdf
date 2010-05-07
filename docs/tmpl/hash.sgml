@@ -18,6 +18,9 @@ disk and with persistence.  Keys may have multiple and duplicate values.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_hash ##### -->
 <para>
 

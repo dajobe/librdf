@@ -21,6 +21,9 @@ librdf_log_message_locator() on the #librdf_log_message.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### USER_FUNCTION librdf_log_level_func ##### -->
 <para>
 

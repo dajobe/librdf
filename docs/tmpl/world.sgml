@@ -18,6 +18,9 @@ the library and cleanup of all allocated resources.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_world ##### -->
 <para>
 
@@ -29,6 +32,7 @@ the library and cleanup of all allocated resources.
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -144,5 +148,6 @@ the library and cleanup of all allocated resources.
 
 </para>
 
+@void: 
 
 

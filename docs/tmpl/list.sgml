@@ -17,6 +17,9 @@ A simple list class used internally.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_list ##### -->
 <para>
 
@@ -121,7 +124,9 @@ A simple list class used internally.
 </para>
 
 @list: 
-@equals: 
+@void* data1, void *data2:
+@void* data1, void *data2:
+@void* data1, void *data2: 
 
 
 <!-- ##### FUNCTION librdf_list_get_iterator ##### -->
@@ -139,7 +144,9 @@ A simple list class used internally.
 </para>
 
 @list: 
-@fn: 
+@void *, void *:
+@void *, void *:
+@void *, void *: 
 @user_data: 
 
 

@@ -20,6 +20,9 @@ can be retrieved by callbacks.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_serializer ##### -->
 <para>
 
@@ -54,7 +57,9 @@ can be retrieved by callbacks.
 @label: 
 @mime_type: 
 @uri_string: 
-@factory: 
+@librdf_serializer_factory*:
+@librdf_serializer_factory*:
+@librdf_serializer_factory*: 
 
 
 <!-- ##### FUNCTION librdf_new_serializer ##### -->
@@ -234,7 +239,9 @@ can be retrieved by callbacks.
 
 @serializer: 
 @user_data: 
-@error_fn: 
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...: 
 
 
 <!-- ##### FUNCTION librdf_serializer_set_warning ##### -->
@@ -244,7 +251,9 @@ can be retrieved by callbacks.
 
 @serializer: 
 @user_data: 
-@warning_fn: 
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...: 
 
 
 <!-- ##### FUNCTION librdf_serializer_get_feature ##### -->

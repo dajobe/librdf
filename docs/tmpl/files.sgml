@@ -17,11 +17,15 @@ Portable utility functions for handling files.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### FUNCTION librdf_files_temporary_file_name ##### -->
 <para>
 
 </para>
 
+@void: 
 @Returns: 
 
 

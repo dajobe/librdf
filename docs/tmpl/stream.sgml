@@ -24,6 +24,9 @@ and are usually lazily generated and consumed.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_stream ##### -->
 <para>
 
@@ -64,10 +67,18 @@ and are usually lazily generated and consumed.
 
 @world: 
 @context: 
-@is_end_method: 
-@next_method: 
-@get_method: 
-@finished_method: 
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*: 
 @Returns: 
 
 
@@ -154,5 +165,15 @@ and are usually lazily generated and consumed.
 
 @stream: 
 @fh: 
+
+
+<!-- ##### FUNCTION librdf_stream_write ##### -->
+<para>
+
+</para>
+
+@stream: 
+@iostr: 
+@Returns: 
 
 

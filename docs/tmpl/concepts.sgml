@@ -49,6 +49,9 @@ or #librdf_uri class copy constructors before use.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### FUNCTION librdf_get_concept_resource_by_index ##### -->
 <para>
 

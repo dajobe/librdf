@@ -24,6 +24,9 @@ based on the SPARQL XML results format which can also be written to a file.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_query_results ##### -->
 <para>
 
@@ -128,12 +131,39 @@ based on the SPARQL XML results format which can also be written to a file.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_query_results_to_counted_string2 ##### -->
+<para>
+
+</para>
+
+@query_results: 
+@name: 
+@mime_type: 
+@format_uri: 
+@base_uri: 
+@length_p: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_query_results_to_string ##### -->
 <para>
 
 </para>
 
 @query_results: 
+@format_uri: 
+@base_uri: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_query_results_to_string2 ##### -->
+<para>
+
+</para>
+
+@query_results: 
+@name: 
+@mime_type: 
 @format_uri: 
 @base_uri: 
 @Returns: 
@@ -151,6 +181,20 @@ based on the SPARQL XML results format which can also be written to a file.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_query_results_to_file_handle2 ##### -->
+<para>
+
+</para>
+
+@query_results: 
+@handle: 
+@name: 
+@mime_type: 
+@format_uri: 
+@base_uri: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_query_results_to_file ##### -->
 <para>
 
@@ -158,6 +202,19 @@ based on the SPARQL XML results format which can also be written to a file.
 
 @query_results: 
 @name: 
+@format_uri: 
+@base_uri: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_query_results_to_file2 ##### -->
+<para>
+
+</para>
+
+@query_results: 
+@name: 
+@mime_type: 
 @format_uri: 
 @base_uri: 
 @Returns: 
@@ -234,6 +291,18 @@ based on the SPARQL XML results format which can also be written to a file.
 
 @query_results: 
 @mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_new_query_results_formatter2 ##### -->
+<para>
+
+</para>
+
+@query_results: 
+@name: 
+@mime_type: 
+@format_uri: 
 @Returns: 
 
 
