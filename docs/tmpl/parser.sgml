@@ -21,6 +21,9 @@ by callbacks.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_parser ##### -->
 <para>
 
@@ -88,7 +91,9 @@ by callbacks.
 @label: 
 @mime_type: 
 @uri_string: 
-@factory: 
+@librdf_parser_factory*:
+@librdf_parser_factory*:
+@librdf_parser_factory*: 
 
 
 <!-- ##### FUNCTION librdf_new_parser ##### -->
@@ -199,7 +204,9 @@ by callbacks.
 
 @parser: 
 @user_data: 
-@error_fn: 
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...: 
 
 
 <!-- ##### FUNCTION librdf_parser_set_warning ##### -->
@@ -209,7 +216,9 @@ by callbacks.
 
 @parser: 
 @user_data: 
-@warning_fn: 
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...: 
 
 
 <!-- ##### FUNCTION librdf_parser_parse_counted_string_as_stream ##### -->

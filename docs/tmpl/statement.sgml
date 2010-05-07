@@ -19,6 +19,9 @@ form for use in storage.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_statement ##### -->
 <para>
 
@@ -235,6 +238,16 @@ form for use in storage.
 @context_node: 
 @buffer: 
 @length: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_statement_write ##### -->
+<para>
+
+</para>
+
+@statement: 
+@iostr: 
 @Returns: 
 
 

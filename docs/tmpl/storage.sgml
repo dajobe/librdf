@@ -19,6 +19,9 @@ the RDF model API and have the same name.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_storage ##### -->
 <para>
 
@@ -39,7 +42,9 @@ the RDF model API and have the same name.
 @world: 
 @name: 
 @label: 
-@factory: 
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*: 
 @Returns: 
 
 

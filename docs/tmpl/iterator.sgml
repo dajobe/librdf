@@ -20,6 +20,9 @@ return sequence of #librdf_node objects such as librdf_model_get_sources().
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_iterator ##### -->
 <para>
 
@@ -62,10 +65,18 @@ return sequence of #librdf_node objects such as librdf_model_get_sources().
 
 @world: 
 @context: 
-@is_end_method: 
-@next_method: 
-@get_method: 
-@finished_method: 
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*: 
 @Returns: 
 
 

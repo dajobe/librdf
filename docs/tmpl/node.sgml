@@ -17,6 +17,9 @@ The (subject, predicate, object) parts of an RDF triple.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_node ##### -->
 <para>
 
@@ -337,6 +340,16 @@ The (subject, predicate, object) parts of an RDF triple.
 
 @nodes: 
 @size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_node_write ##### -->
+<para>
+
+</para>
+
+@node: 
+@iostr: 
 @Returns: 
 
 

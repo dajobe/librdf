@@ -19,6 +19,9 @@ serializing and querying.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF librdf_model ##### -->
 <para>
 
@@ -587,6 +590,16 @@ serializing and querying.
 
 @model: 
 @handle: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_model_write ##### -->
+<para>
+
+</para>
+
+@model: 
+@iostr: 
 @Returns: 
 
 
