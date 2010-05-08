@@ -98,6 +98,8 @@ librdf_new_node_from_uri_string(librdf_world *world,
 librdf_node*
 librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
 {
+  librdf_world_open(world);
+
   return raptor_new_term_from_uri(world->raptor_world_ptr, uri);
 }
 
@@ -129,6 +131,8 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
                                            librdf_uri *source_uri,
                                            librdf_uri *base_uri)
 {
+  librdf_world_open(world);
+
   return NULL;
 }
 
@@ -139,6 +143,8 @@ librdf_new_node_from_literal(librdf_world *world,
                              const char *xml_language,
                              int is_wf_xml)
 {
+  librdf_world_open(world);
+
   return NULL;
 }
 
@@ -149,6 +155,8 @@ librdf_new_node_from_typed_literal(librdf_world *world,
                                    const char *xml_language,
                                    librdf_uri *datatype_uri)
 {
+  librdf_world_open(world);
+
   return NULL;
 }
 
@@ -161,6 +169,8 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
                                            size_t xml_language_len,
                                            librdf_uri *datatype_uri)
 {
+  librdf_world_open(world);
+
   return NULL;
 }
 
@@ -169,6 +179,8 @@ librdf_node*
 librdf_new_node_from_blank_identifier(librdf_world *world,
                                       const unsigned char *identifier)
 {
+  librdf_world_open(world);
+
   return NULL;
 }
 
