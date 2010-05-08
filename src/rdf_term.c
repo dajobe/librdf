@@ -70,18 +70,6 @@ librdf_finish_node(librdf_world* world)
 
 /* constructors */
 
-/**
- * librdf_new_node:
- * @world: redland world object
- *
- * Constructor - create a new #librdf_node object with a private identifier.
- * 
- * Calls librdf_new_node_from_blank_identifier(world, NULL) to
- * construct a new redland blank node identifier and make a
- * new librdf_node object for it.
- *
- * Return value: a new #librdf_node object or NULL on failure
- **/
 librdf_node*
 librdf_new_node(librdf_world *world)
 {
