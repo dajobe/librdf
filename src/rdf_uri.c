@@ -287,11 +287,6 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
                                   librdf_uri* source_uri,
                                   librdf_uri* base_uri) 
 {
-#ifdef USE_RAPTOR_URI
-  return raptor_new_uri_relative_to_base(raptor_uri_get_world(source_uri),
-                                         base_uri,
-                                         raptor_uri_as_string(source_uri));
-#else
   int uri_string_len;
   int len;
   unsigned char *new_uri_string;
@@ -305,8 +300,14 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
     return NULL;
 
   /* empty URI - easy, just make from base_uri */
-  if(!*uri_string && base_uri)
+  if(!*uri_string && base_uri) {
+#ifdef USE_RAPTOR_URI
+    return raptor_uri_copy(base_uri);
+#else
     return librdf_new_uri_from_uri(base_uri);
+#endif /* !USE_RAPTOR_URI */
+  }
+  
 
   /* not a fragment, and no match - easy */
   if(*uri_string != '#' &&
@@ -335,11 +336,14 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
   /* strcpy not strncpy since I want a \0 on the end */
   strcpy((char*)new_uri_string + base_uri->string_length, (const char*)uri_string);
   
+#ifdef USE_RAPTOR_URI
+  new_uri = raptor_new_uri(raptor_uri_get_world(source_uri), new_uri_string);
+#else
   new_uri=librdf_new_uri(world, new_uri_string);
+#endif /* !USE_RAPTOR_URI */
   LIBRDF_FREE(cstring, new_uri_string); /* always free this even on failure */
 
   return new_uri; /* new URI or NULL from librdf_new_uri failure */
-#endif /* !USE_RAPTOR_URI */
 }
 
 
