@@ -356,11 +356,10 @@ librdf_node_get_li_ordinal(librdf_node *node)
 }
 
 
-unsigned char *
+unsigned char*
 librdf_node_get_blank_identifier(librdf_node *node)
 {
-  /* FIXME */
-  return NULL;
+  return node->value.blank;
 }
 
 
