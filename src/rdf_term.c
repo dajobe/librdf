@@ -359,7 +359,7 @@ librdf_node_get_li_ordinal(librdf_node *node)
 unsigned char*
 librdf_node_get_blank_identifier(librdf_node *node)
 {
-  return node->value.blank;
+  return node->value.blank.string;
 }
 
 
