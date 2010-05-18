@@ -1178,7 +1178,7 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
       
     case LIBRDF_NODE_TYPE_UNKNOWN:
     default:
-      librdf_log(node->world,
+      librdf_log(storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "Do not know how to store node type %d", node->type);
       hash=0;
@@ -1287,7 +1287,7 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
       
     case LIBRDF_NODE_TYPE_UNKNOWN:
     default:
-      librdf_log(node->world,
+      librdf_log(storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "Do not know how to store node type %d", node->type);
       hash=0;

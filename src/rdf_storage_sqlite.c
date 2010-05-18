@@ -731,7 +731,7 @@ librdf_storage_sqlite_node_helper(librdf_storage* storage,
 
     case LIBRDF_NODE_TYPE_UNKNOWN:
     default:
-      librdf_log(node->world,
+      librdf_log(storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "Do not know how to store node type %d", node->type);
     return 1;
