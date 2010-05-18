@@ -630,6 +630,9 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
   } else if (n1->type != n2->type) {
     return n2->type - n1->type;
   } else {
+#ifdef HAVE_RAPTOR2_API
+    return raptor_term_compare(n1, n2);
+#else
     switch (n1->type) {
       case LIBRDF_NODE_TYPE_RESOURCE:
         return librdf_uri_compare(n1->value.resource.uri, n2->value.resource.uri);
@@ -662,11 +665,13 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
           }
         }
       case LIBRDF_NODE_TYPE_BLANK:
-        return strcmp((char*)n1->value.blank.identifier, (char*)n2->value.blank.identifier);
+        return strcmp((char*)n1->value.blank.identifier,
+                      (char*)n2->value.blank.identifier);
       case LIBRDF_NODE_TYPE_UNKNOWN:
       default:
         return (char*)n2-(char*)n1; /* ? */
     }
+#endif
   }
 }
 
