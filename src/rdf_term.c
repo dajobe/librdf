@@ -36,7 +36,6 @@
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
 
-#include </Users/dajobe/dev/redland/raptor/src/raptor.h>
 #define RAPTOR_WORLD_DECLARED 1
 #define RAPTOR_V2_AVAILABLE 1
 
