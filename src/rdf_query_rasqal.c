@@ -246,13 +246,14 @@ rasqal_literal_to_redland_node(librdf_world *world, rasqal_literal* l)
 
 
 rasqal_literal*
-redland_node_to_rasqal_literal(librdf_node *node)
+redland_node_to_rasqal_literal(librdf_node *node, librdf_world *world)
 {
   rasqal_literal* l;
   
   if(librdf_node_is_resource(node)) {
     raptor_uri* uri=(raptor_uri*)librdf_new_uri_from_uri(librdf_node_get_uri(node));
-    l=rasqal_new_uri_literal(node->world->rasqal_world_ptr, uri); /* transfer uri ownership to literal */
+    l = rasqal_new_uri_literal(world->rasqal_world_ptr,
+                               uri); /* transfer uri ownership to literal */
   } else if(librdf_node_is_literal(node)) {
     unsigned char *string;
     librdf_uri *uri;
@@ -280,7 +281,11 @@ redland_node_to_rasqal_literal(librdf_node *node)
     if(uri)
       new_datatype=(raptor_uri*)librdf_new_uri_from_uri(uri);
     /* transfer new_string,new_language,new_datatype ownership to literal */
-    l=rasqal_new_string_literal(node->world->rasqal_world_ptr, (const unsigned char*)new_string, new_language, new_datatype, NULL);
+    l = rasqal_new_string_literal(world->rasqal_world_ptr,
+                                  (const unsigned char*)new_string,
+                                  new_language,
+                                  new_datatype,
+                                  NULL);
   } else {
     unsigned char *blank=librdf_node_get_blank_identifier(node);
     unsigned char *new_blank;
@@ -291,7 +296,9 @@ redland_node_to_rasqal_literal(librdf_node *node)
       return NULL;
     strcpy((char*)new_blank, (const char*)blank);
     /* transfer new_blank ownership to literal */
-    l=rasqal_new_simple_literal(node->world->rasqal_world_ptr, RASQAL_LITERAL_BLANK, (const unsigned char*)new_blank);
+    l = rasqal_new_simple_literal(world->rasqal_world_ptr,
+                                  RASQAL_LITERAL_BLANK,
+                                  (const unsigned char*)new_blank);
   }
 
   return l;
@@ -418,6 +425,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
   rasqal_literal* l;
   librdf_statement* statement;
   rasqal_triple_parts result=(rasqal_triple_parts)0;
+  librdf_world *world = rtmc->qstatement->world;
 
   statement=librdf_stream_get_object(rtmc->stream);
   if(!statement)
@@ -433,7 +441,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
 
   if(bindings[0] && (parts & RASQAL_TRIPLE_SUBJECT)) {
     LIBRDF_DEBUG1("binding subject to variable\n");
-    l=redland_node_to_rasqal_literal(librdf_statement_get_subject(statement));
+    l = redland_node_to_rasqal_literal(librdf_statement_get_subject(statement), world);
     rasqal_variable_set_value(bindings[0], l);
     result= RASQAL_TRIPLE_SUBJECT;
   }
@@ -447,7 +455,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
       LIBRDF_DEBUG1("subject and predicate values match\n");
     } else {
       LIBRDF_DEBUG1("binding predicate to variable\n");
-      l=redland_node_to_rasqal_literal(librdf_statement_get_predicate(statement));
+      l = redland_node_to_rasqal_literal(librdf_statement_get_predicate(statement), world);
       rasqal_variable_set_value(bindings[1], l);
       result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_PREDICATE);
     }
@@ -479,7 +487,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     
     if(bind) {
       LIBRDF_DEBUG1("binding object to variable\n");
-      l=redland_node_to_rasqal_literal(librdf_statement_get_object(statement));
+      l = redland_node_to_rasqal_literal(librdf_statement_get_object(statement), world);
       rasqal_variable_set_value(bindings[2], l);
       result= (rasqal_triple_parts)(result | RASQAL_TRIPLE_OBJECT);
     }
@@ -520,7 +528,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
     if(bind) {
       LIBRDF_DEBUG1("binding origin to variable\n");
       if(context_node)
-        l=redland_node_to_rasqal_literal(context_node);
+        l = redland_node_to_rasqal_literal(context_node, world);
       else
         l=NULL;
       rasqal_variable_set_value(bindings[3], l);

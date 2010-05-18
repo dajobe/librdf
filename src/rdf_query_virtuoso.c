@@ -1323,7 +1323,7 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
         break;
       }
       
-      literal = redland_node_to_rasqal_literal(node);
+      literal = redland_node_to_rasqal_literal(node, query->world);
       if(!literal) {
         rc = 1;
         break;
