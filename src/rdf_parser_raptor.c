@@ -199,7 +199,7 @@ librdf_parser_raptor_new_statement_handler(void *context,
 
 #ifdef RAPTOR_V2_AVAILABLE
   if(rstatement->subject->type == RAPTOR_TERM_TYPE_BLANK) {
-    node = librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->subject->value.blank);
+    node = librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->subject->value.blank.string);
   } else if (rstatement->subject->type == RAPTOR_TERM_TYPE_URI) {
     node = librdf_new_node_from_uri(world, (librdf_uri*)rstatement->subject->value.uri);
   }
@@ -286,7 +286,7 @@ librdf_parser_raptor_new_statement_handler(void *context,
                                               (const char *)rstatement->object->value.literal.language,
                                               (librdf_uri*)rstatement->object->value.literal.datatype);
   } else if(rstatement->object->type == RAPTOR_TERM_TYPE_BLANK) {
-    node = librdf_new_node_from_blank_identifier(world, rstatement->object->value.blank);
+    node = librdf_new_node_from_blank_identifier(world, rstatement->object->value.blank.string);
   } else if(rstatement->object->type == RAPTOR_TERM_TYPE_URI) {
     node = librdf_new_node_from_uri(world, (librdf_uri*)rstatement->object->value.uri);
   }
