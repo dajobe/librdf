@@ -1347,11 +1347,11 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   }
   
   stream = librdf_new_stream(storage->world,
-                           (void*)scontext,
-                           &librdf_storage_sqlite_serialise_end_of_stream,
-                           &librdf_storage_sqlite_serialise_next_statement,
-                           &librdf_storage_sqlite_serialise_get_statement,
-                           &librdf_storage_sqlite_serialise_finished);
+                             (void*)scontext,
+                             &librdf_storage_sqlite_serialise_end_of_stream,
+                             &librdf_storage_sqlite_serialise_next_statement,
+                             &librdf_storage_sqlite_serialise_get_statement,
+                             &librdf_storage_sqlite_serialise_finished);
   if(!stream) {
     librdf_storage_sqlite_serialise_finished((void*)scontext);
     return NULL;
