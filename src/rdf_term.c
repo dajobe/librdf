@@ -237,9 +237,9 @@ librdf_node_get_uri(librdf_node *node)
 librdf_node_type
 librdf_node_get_type(librdf_node *node)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, RAPTOR_TERM_TYPE_UNKNOWN);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, LIBRDF_NODE_TYPE_UNKNOWN);
 
-  return node->type;
+  return (librdf_node_type)node->type;
 }
 
 
