@@ -175,7 +175,7 @@ void librdf_query_add_query_result(librdf_query *query, librdf_query_results* qu
 void librdf_query_remove_query_result(librdf_query *query, librdf_query_results* query_results);
 
 /* rdf_query_rasqal.c */
-rasqal_literal* redland_node_to_rasqal_literal(librdf_node *node, librdf_world *world);
+rasqal_literal* redland_node_to_rasqal_literal(librdf_world* world, librdf_node *node);
 
 
 #ifdef __cplusplus

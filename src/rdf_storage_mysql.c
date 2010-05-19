@@ -1221,7 +1221,7 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
     seq=context->pending_inserts[node_type];
   } else {
     /* not a transaction - store in temporary sequence */
-    seq=raptor_new_sequence((raptor_sequence_free_handler*)free_pending_row, NULL);
+    seq = raptor_new_sequence((raptor_data_free_handler)free_pending_row, NULL);
   }
 
 
@@ -2705,7 +2705,7 @@ librdf_storage_mysql_transaction_start(librdf_storage* storage)
     return 1;
 
   for(i=0; i<= TABLE_STATEMENTS; i++)
-    context->pending_inserts[i]=raptor_new_sequence((raptor_sequence_free_handler*)free_pending_row, NULL);
+    context->pending_inserts[i] = raptor_new_sequence((raptor_data_free_handler)free_pending_row, NULL);
 
   context->pending_insert_hash_nodes=librdf_new_hash(storage->world, NULL);
   if(!context->pending_insert_hash_nodes)
@@ -2716,7 +2716,7 @@ librdf_storage_mysql_transaction_start(librdf_storage* storage)
     LIBRDF_FATAL1(storage->world, LIBRDF_FROM_STORAGE,
                   "Failed to open MySQL seen nodes hash");
 
-  context->pending_statements=raptor_new_sequence((raptor_sequence_free_handler*)free_pending_row, NULL);
+  context->pending_statements = raptor_new_sequence((raptor_data_free_handler)free_pending_row, NULL);
 
   return 0;
 }

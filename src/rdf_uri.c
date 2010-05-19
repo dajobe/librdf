@@ -291,13 +291,15 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
   int len;
   unsigned char *new_uri_string;
   librdf_uri *new_uri;
-  unsigned char *source_uri_str;
-  size_t source_uri_len;
-  unsigned char *base_uri_str;
-  size_t base_uri_len;
-#ifndef USE_RAPTOR_URI
+#ifdef USE_RAPTOR_URI
+#else
   librdf_world *world = source_uri->world;
 #endif
+  unsigned char* source_uri_string;
+  size_t source_uri_string_length;
+  unsigned char* base_uri_string;
+  size_t base_uri_string_length;
+
                                     
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(source_uri, librdf_uri, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
@@ -314,12 +316,18 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
 #endif /* !USE_RAPTOR_URI */
   }
   
+  source_uri_string = librdf_uri_as_counted_string(source_uri,
+                                                   &source_uri_string_length);
+  base_uri_string = librdf_uri_as_counted_string(base_uri,
+                                                 &base_uri_string_length);
+
   /* not a fragment, and no match - easy */
-  source_uri_str = librdf_uri_as_counted_string(source_uri, &source_uri_len);
   if(*uri_string != '#' &&
-     strncmp((const char*)uri_string, (const char*)source_uri_str, source_uri_len)) {
+     strncmp((const char*)uri_string, (const char*)source_uri_string,
+             source_uri_string_length)) {
 #ifdef USE_RAPTOR_URI
-    return raptor_new_uri(raptor_uri_get_world(source_uri), uri_string);
+    raptor_world* rworld = raptor_uri_get_world(base_uri);
+    return raptor_new_uri(rworld, uri_string);
 #else
     return librdf_new_uri(world, uri_string);
 #endif
@@ -327,27 +335,27 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
 
   /* darn - is a fragment or matches, is a prefix of the source URI */
 
-  base_uri_str = librdf_uri_as_counted_string(base_uri, &base_uri_len);
-
   /* move uri_string pointer to first non-matching char 
    * unless a fragment, when all of the uri_string will 
    * be appended
    */
   if(*uri_string != '#')
-    uri_string += source_uri_len;
+    uri_string += source_uri_string_length;
 
   /* size of remaining bytes to copy from uri_string */
-  uri_string_len=strlen((const char*)uri_string);
+  uri_string_len = strlen((const char*)uri_string);
 
   /* total bytes */
-  len = uri_string_len + 1 + base_uri_len;
+  len = uri_string_len + 1 + base_uri_string_length;
 
   new_uri_string=(unsigned char*)LIBRDF_MALLOC(cstring, len);
   if(!new_uri_string)
     return NULL;
-  strncpy((char*)new_uri_string, (const char*)base_uri_str, base_uri_len);
+  strncpy((char*)new_uri_string, (const char*)base_uri_string,
+          base_uri_string_length);
   /* strcpy not strncpy since I want a \0 on the end */
-  strcpy((char*)new_uri_string + base_uri_len, (const char*)uri_string);
+  strcpy((char*)new_uri_string + base_uri_string_length,
+         (const char*)uri_string);
   
 #ifdef USE_RAPTOR_URI
   new_uri = raptor_new_uri(raptor_uri_get_world(source_uri), new_uri_string);

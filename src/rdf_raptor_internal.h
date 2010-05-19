@@ -49,6 +49,7 @@ void librdf_finish_raptor(librdf_world* world);
 #define raptor_locator_format(buffer, length, locator) raptor_format_locator(buffer, length, locator)
 #define raptor_locator_print(locator, fh) raptor_print_locator(fh, locator)
 
+#define raptor_data_free_handler raptor_sequence_free_handler*
 #endif /* !RAPTOR_V2_AVAILABLE */
 
 

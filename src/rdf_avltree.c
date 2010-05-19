@@ -119,14 +119,14 @@ librdf_new_avltree(librdf_avltree_data_compare_function compare_fn,
 {
   librdf_avltree* tree;
   
-  tree=(librdf_avltree*)LIBRDF_MALLOC(librdf_avltree, sizeof(*tree));
+  tree = (librdf_avltree*)LIBRDF_MALLOC(librdf_avltree, sizeof(*tree));
   if(!tree)
     return NULL;
   
-  tree->root=NULL;
-  tree->compare_fn=compare_fn;
-  tree->free_fn=free_fn;
-  tree->size=0;
+  tree->root = NULL;
+  tree->compare_fn = compare_fn;
+  tree->free_fn = free_fn;
+  tree->size = 0;
   
   return tree;
 }
@@ -167,7 +167,7 @@ librdf_avltree_search_internal(librdf_avltree* tree, librdf_avltree_node* node,
                                const void* p_data)
 {
   if(node) {
-    int cmp= tree->compare_fn(p_data, node->data);
+    int cmp = tree->compare_fn(p_data, node->data);
 
     if(cmp > 0)
       return librdf_avltree_search_internal(tree, node->right, p_data);
@@ -188,7 +188,8 @@ void*
 librdf_avltree_search(librdf_avltree* tree, const void* p_data)
 {
   librdf_avltree_node* node;
-  node=librdf_avltree_search_internal(tree, tree->root, p_data);
+
+  node = librdf_avltree_search_internal(tree, tree->root, p_data);
   return node ? node->data : NULL;
 }
 
@@ -202,11 +203,11 @@ librdf_avltree_search(librdf_avltree* tree, const void* p_data)
 int
 librdf_avltree_add(librdf_avltree* tree, void* p_data)
 {
-  int rebalancing= FALSE;
+  int rebalancing = FALSE;
   int rv;
 
-  rv=librdf_avltree_sprout(tree, NULL, &tree->root, p_data,
-                           &rebalancing);
+  rv = librdf_avltree_sprout(tree, NULL, &tree->root, p_data,
+                             &rebalancing);
 #if LIBRDF_DEBUG > 1
   librdf_avltree_check(tree);
 #endif
@@ -219,11 +220,11 @@ librdf_avltree_add(librdf_avltree* tree, void* p_data)
 void*
 librdf_avltree_remove(librdf_avltree* tree, void* p_data)
 {
-  int rebalancing= FALSE;
+  int rebalancing = FALSE;
   void* rdata;
   
-  rdata=librdf_avltree_delete_internal(tree, &tree->root, p_data,
-                                       &rebalancing);
+  rdata = librdf_avltree_delete_internal(tree, &tree->root, p_data,
+                                         &rebalancing);
   if(rdata)
     tree->size--;
 
@@ -241,7 +242,7 @@ librdf_avltree_delete(librdf_avltree* tree, void* p_data)
 {
   void* rdata;
 
-  rdata=librdf_avltree_remove(tree, p_data);
+  rdata = librdf_avltree_remove(tree, p_data);
   if(rdata) {
     if(tree->free_fn)
       tree->free_fn(rdata);
@@ -260,14 +261,14 @@ librdf_avltree_visit_internal(librdf_avltree* tree, librdf_avltree_node* node,
   if(!node)
     return TRUE;
 
-  if(!librdf_avltree_visit_internal(tree, node->left, depth+1, 
+  if(!librdf_avltree_visit_internal(tree, node->left, depth + 1, 
                                     visit_fn, user_data))
     return FALSE;
 
   if(!visit_fn(depth, node->data, user_data))
     return FALSE;
 
-  if(!librdf_avltree_visit_internal(tree, node->right, depth+1,
+  if(!librdf_avltree_visit_internal(tree, node->right, depth + 1,
                                     visit_fn, user_data))
     return FALSE;
 
@@ -293,6 +294,7 @@ librdf_avltree_print_node(librdf_avltree_node* node)
   fprintf(stderr, "%p: parent %p  left %p  right %p  data %p",
           node, node->parent, node->left, node->right, node->data);
 }
+
 
 static void
 librdf_avltree_check_node(librdf_avltree* tree, librdf_avltree_node* node,
@@ -333,10 +335,10 @@ librdf_avltree_sprout_left(librdf_avltree* tree, librdf_avltree_node** node_pp,
 
   LIBRDF_AVLTREE_DEBUG1("LESS. librdf_avltree_sprouting left.\n");
 
-  p_parent=(*node_pp)->parent;
+  p_parent = (*node_pp)->parent;
   
-  rc=librdf_avltree_sprout(tree, *node_pp, &(*node_pp)->left, p_data,
-                           rebalancing_p);
+  rc = librdf_avltree_sprout(tree, *node_pp, &(*node_pp)->left, p_data,
+                             rebalancing_p);
   if(rc)
     return rc;
 
@@ -349,66 +351,72 @@ librdf_avltree_sprout_left(librdf_avltree* tree, librdf_avltree_node** node_pp,
     case 1:
       /* right branch WAS longer; balance is ok now */
       LIBRDF_AVLTREE_DEBUG1("LESS: case 1.. balance restored implicitly\n");
-      (*node_pp)->balance= 0;
-      *rebalancing_p= FALSE;
+      (*node_pp)->balance = 0;
+      *rebalancing_p = FALSE;
       break;
 
     case 0:
       /* balance WAS okay; now left branch longer */
       LIBRDF_AVLTREE_DEBUG1("LESS: case 0.. balance bad but still ok\n");
-      (*node_pp)->balance= -1;
+      (*node_pp)->balance = -1;
       break;
 
     case -1:
       /* left branch was already too long. rebalance */
       LIBRDF_AVLTREE_DEBUG1("LESS: case -1: rebalancing\n");
-      p1= (*node_pp)->left;
+      p1 = (*node_pp)->left;
 
       if(p1->balance == -1) {
         /* LL */
         LIBRDF_AVLTREE_DEBUG1("LESS: single LL\n");
-        (*node_pp)->left= p1->right;
+
+        (*node_pp)->left = p1->right;
         if((*node_pp)->left)
-          (*node_pp)->left->parent=(*node_pp);
+          (*node_pp)->left->parent = (*node_pp);
+
         p1->right = *node_pp;
         if(p1->right)
-          p1->right->parent=p1;
-        (*node_pp)->balance= 0;
-        *node_pp= p1;
-        (*node_pp)->parent=p_parent;
+          p1->right->parent = p1;
+
+        (*node_pp)->balance = 0;
+        *node_pp = p1;
+        (*node_pp)->parent = p_parent;
       } else {
         /* double LR */
         LIBRDF_AVLTREE_DEBUG1("LESS: double LR\n");
-        p2= p1->right;
-        p1->right= p2->left;
-        if(p1->right)
-          p1->right->parent=p1;
-        p2->left= p1;
-        if(p2->left)
-          p2->left->parent=p2;
+        p2 = p1->right;
 
-        (*node_pp)->left= p2->right;
+        p1->right = p2->left;
+        if(p1->right)
+          p1->right->parent = p1;
+
+        p2->left = p1;
+        if(p2->left)
+          p2->left->parent = p2;
+
+        (*node_pp)->left = p2->right;
         if((*node_pp)->left)
-          (*node_pp)->left->parent= (*node_pp);
-        p2->right= *node_pp;
+          (*node_pp)->left->parent =  (*node_pp);
+
+        p2->right = *node_pp;
         if(p2->right)
-          p2->right->parent=p2;
+          p2->right->parent = p2;
 
         if(p2->balance == -1)
-          (*node_pp)->balance= 1;
+          (*node_pp)->balance = 1;
         else
-          (*node_pp)->balance= 0;
+          (*node_pp)->balance = 0;
 
         if(p2->balance == 1)
-          p1->balance= -1;
+          p1->balance = -1;
         else
-          p1->balance= 0;
+          p1->balance = 0;
         *node_pp = p2;
-        (*node_pp)->parent=p_parent;
+        (*node_pp)->parent = p_parent;
       } /* end else */
 
-      (*node_pp)->balance= 0;
-      *rebalancing_p= FALSE;
+      (*node_pp)->balance = 0;
+      *rebalancing_p = FALSE;
   } /* end switch */
 
   return FALSE;
@@ -425,82 +433,89 @@ librdf_avltree_sprout_right(librdf_avltree* tree,
 
   LIBRDF_AVLTREE_DEBUG1("MORE: librdf_avltree_sprouting to the right\n");
 
-  p_parent=(*node_pp)->parent;
+  p_parent = (*node_pp)->parent;
   
-  rc=librdf_avltree_sprout(tree, *node_pp, &(*node_pp)->right, p_data,
-                           rebalancing_p);
+  rc = librdf_avltree_sprout(tree, *node_pp, &(*node_pp)->right, p_data,
+                             rebalancing_p);
   if(rc)
     return rc;
 
   if(!*rebalancing_p)
     return FALSE;
   
+
   /* right branch has grown longer */
   LIBRDF_AVLTREE_DEBUG1("MORE: right branch has grown\n");
   
   switch((*node_pp)->balance) {
     case -1:
       LIBRDF_AVLTREE_DEBUG1("MORE: balance was off, fixed implicitly\n");
-      (*node_pp)->balance= 0;
-      *rebalancing_p= FALSE;
+      (*node_pp)->balance = 0;
+      *rebalancing_p = FALSE;
       break;
       
     case 0:
       LIBRDF_AVLTREE_DEBUG1("MORE: balance was okay, now off but ok\n");
-      (*node_pp)->balance= 1;
+      (*node_pp)->balance = 1;
       break;
       
     case 1:
       LIBRDF_AVLTREE_DEBUG1("MORE: balance was off, need to rebalance\n");
-      p1= (*node_pp)->right;
+      p1 = (*node_pp)->right;
       
       if(p1->balance == 1) {
         /* RR */
         LIBRDF_AVLTREE_DEBUG1("MORE: single RR\n");
-        (*node_pp)->right= p1->left;
+
+        (*node_pp)->right = p1->left;
         if((*node_pp)->right)
-          (*node_pp)->right->parent= (*node_pp);
-        p1->left= *node_pp;
+          (*node_pp)->right->parent =  (*node_pp);
+
+        p1->left = *node_pp;
         if(p1->left)
-          p1->left->parent= p1;
-        (*node_pp)->balance= 0;
-        *node_pp= p1;
-        (*node_pp)->parent=p_parent;
+          p1->left->parent = p1;
+
+        (*node_pp)->balance = 0;
+        *node_pp = p1;
+        (*node_pp)->parent = p_parent;
       } else {
         /* double RL */
         LIBRDF_AVLTREE_DEBUG1("MORE: double RL\n");
         
-        p2= p1->left;
-        p1->left= p2->right;
+        p2 = p1->left;
+
+        p1->left = p2->right;
         if(p1->left)
-          p1->left->parent=p1;
-        p2->right= p1;
+          p1->left->parent = p1;
+
+        p2->right = p1;
         if(p2->right)
-          p2->right->parent=p2;
+          p2->right->parent = p2;
         
-        (*node_pp)->right= p2->left;
+        (*node_pp)->right = p2->left;
         if((*node_pp)->right)
-          (*node_pp)->right->parent= (*node_pp);
-        p2->left= *node_pp;
+          (*node_pp)->right->parent =  (*node_pp);
+
+        p2->left = *node_pp;
         if(p2->left)
-          p2->left->parent=p2;
+          p2->left->parent = p2;
         
         if(p2->balance == 1)
-          (*node_pp)->balance= -1;
+          (*node_pp)->balance = -1;
         else
-          (*node_pp)->balance= 0;
+          (*node_pp)->balance = 0;
         
         if(p2->balance == -1)
-          p1->balance= 1;
+          p1->balance = 1;
         else
-          p1->balance= 0;
+          p1->balance = 0;
         
-        *node_pp= p2;
-        (*node_pp)->parent=p_parent;
+        *node_pp = p2;
+        (*node_pp)->parent = p_parent;
       } /* end else */
       
-      (*node_pp)->balance= 0;
-      *rebalancing_p= FALSE;
+      (*node_pp)->balance = 0;
+      *rebalancing_p = FALSE;
   } /* end switch */
 
   return FALSE;
@@ -519,16 +534,17 @@ librdf_avltree_sprout(librdf_avltree* tree, librdf_avltree_node* parent,
   /* If grounded, add the node here, set the rebalance flag and return */
   if(!*node_pp) {
     LIBRDF_AVLTREE_DEBUG1("grounded. adding new node, setting rebalancing flag true\n");
-    *node_pp= (librdf_avltree_node*)LIBRDF_MALLOC(librdf_avltree_node, sizeof(**node_pp));
+    *node_pp = (librdf_avltree_node*)LIBRDF_MALLOC(librdf_avltree_node, 
+                                                   sizeof(**node_pp));
     if(!*node_pp)
       return LIBRDF_AVLTREE_ENOMEM;
     
-    (*node_pp)->parent= parent;
-    (*node_pp)->left= NULL;
-    (*node_pp)->right= NULL;
-    (*node_pp)->balance= 0;
-    (*node_pp)->data= p_data;
-    *rebalancing_p= TRUE;
+    (*node_pp)->parent =  parent;
+    (*node_pp)->left = NULL;
+    (*node_pp)->right = NULL;
+    (*node_pp)->balance = 0;
+    (*node_pp)->data = p_data;
+    *rebalancing_p = TRUE;
 
     tree->size++;
     
@@ -536,7 +552,7 @@ librdf_avltree_sprout(librdf_avltree* tree, librdf_avltree_node* parent,
   }
 
   /* compare the data */
-  cmp= tree->compare_fn(p_data, (*node_pp)->data);
+  cmp = tree->compare_fn(p_data, (*node_pp)->data);
   if(cmp < 0)
     /* if LESS, prepare to move to the left. */
     return librdf_avltree_sprout_left(tree, node_pp, p_data, rebalancing_p);
@@ -545,7 +561,7 @@ librdf_avltree_sprout(librdf_avltree* tree, librdf_avltree_node* parent,
     return librdf_avltree_sprout_right(tree, node_pp, p_data, rebalancing_p);
 
   /* otherwise same key */
-  *rebalancing_p= FALSE;
+  *rebalancing_p = FALSE;
 
   /* replace */
   /*if(tree->free_fn)
@@ -567,7 +583,7 @@ librdf_avltree_delete_internal(librdf_avltree* tree,
                                int *rebalancing_p)
 {
   int cmp;
-  void* rdata=NULL;
+  void* rdata = NULL;
 
   LIBRDF_AVLTREE_DEBUG1("Enter\n");
 
@@ -576,19 +592,19 @@ librdf_avltree_delete_internal(librdf_avltree* tree,
     return rdata;
   }
 
-  cmp= tree->compare_fn((*node_pp)->data, p_data);
+  cmp = tree->compare_fn((*node_pp)->data, p_data);
 
   if(cmp > 0) {
     LIBRDF_AVLTREE_DEBUG1("too high - scan left\n");
-    rdata= librdf_avltree_delete_internal(tree, &(*node_pp)->left, p_data,
-                                          rebalancing_p);
+    rdata = librdf_avltree_delete_internal(tree, &(*node_pp)->left, p_data,
+                                           rebalancing_p);
     if(*rebalancing_p)
       librdf_avltree_balance_left(tree, node_pp, rebalancing_p);
 
   } else if(cmp < 0) {
     LIBRDF_AVLTREE_DEBUG1("too low - scan right\n");
-    rdata= librdf_avltree_delete_internal(tree, &(*node_pp)->right, p_data,
-                                          rebalancing_p);
+    rdata = librdf_avltree_delete_internal(tree, &(*node_pp)->right, p_data,
+                                           rebalancing_p);
     if(*rebalancing_p)
       librdf_avltree_balance_right(tree, node_pp, rebalancing_p);
 
@@ -596,26 +612,30 @@ librdf_avltree_delete_internal(librdf_avltree* tree,
     librdf_avltree_node *pr_q;
 
     LIBRDF_AVLTREE_DEBUG1("equal\n");
-    pr_q= *node_pp;
+    pr_q = *node_pp;
     
-    rdata=pr_q->data;
+    rdata = pr_q->data;
     
     if(pr_q->right == NULL) {
       LIBRDF_AVLTREE_DEBUG1("right subtree null\n");
-      *node_pp= pr_q->left;
+
+      *node_pp = pr_q->left;
       if(*node_pp)
         (*node_pp)->parent = pr_q->parent;
-      *rebalancing_p= TRUE;
+
+      *rebalancing_p = TRUE;
     } else if(pr_q->left == NULL) {
       LIBRDF_AVLTREE_DEBUG1("right subtree non-null, left subtree null\n");
-      *node_pp= pr_q->right;
+
+      *node_pp = pr_q->right;
       if(*node_pp)
         (*node_pp)->parent = pr_q->parent;
-      *rebalancing_p= TRUE;
+
+      *rebalancing_p = TRUE;
     } else {
       LIBRDF_AVLTREE_DEBUG1("neither subtree null\n");
-      rdata=librdf_avltree_delete_internal2(tree, &pr_q->left, rebalancing_p,
-                                            &pr_q);
+      rdata = librdf_avltree_delete_internal2(tree, &pr_q->left, rebalancing_p,
+                                              &pr_q);
       if(*rebalancing_p)
         librdf_avltree_balance_left(tree, node_pp, rebalancing_p);
     }
@@ -633,28 +653,28 @@ librdf_avltree_delete_internal2(librdf_avltree* tree,
                                 int *rebalancing_p,
                                 librdf_avltree_node** ppr_q)
 {
-  void* rdata=NULL;
+  void* rdata = NULL;
   
   LIBRDF_AVLTREE_DEBUG1("Enter\n");
 
   if((*ppr_r)->right != NULL) {
-    rdata=librdf_avltree_delete_internal2(tree,
-                                          &(*ppr_r)->right, 
-                                          rebalancing_p,
-                                          ppr_q);
+    rdata = librdf_avltree_delete_internal2(tree,
+                                            &(*ppr_r)->right, 
+                                            rebalancing_p,
+                                            ppr_q);
     if(*rebalancing_p)
       librdf_avltree_balance_right(tree, ppr_r, rebalancing_p);
 
   } else {
     librdf_avltree_node* parent = (*ppr_r)->parent;
-    rdata=(*ppr_q)->data;
+    rdata = (*ppr_q)->data;
 
-    (*ppr_q)->data= (*ppr_r)->data;
-    *ppr_q= *ppr_r;
-    *ppr_r= (*ppr_r)->left;
-    if (*ppr_r)
+    (*ppr_q)->data = (*ppr_r)->data;
+    *ppr_q = *ppr_r;
+    *ppr_r = (*ppr_r)->left;
+    if(*ppr_r)
       (*ppr_r)->parent = parent;
-    *rebalancing_p= TRUE;
+    *rebalancing_p = TRUE;
   }
 
   return rdata;
@@ -670,72 +690,83 @@ librdf_avltree_balance_left(librdf_avltree* tree,
 
   LIBRDF_AVLTREE_DEBUG1("left branch has shrunk\n");
 
-  p_parent=(*node_pp)->parent;
+  p_parent = (*node_pp)->parent;
 
   switch((*node_pp)->balance) {
     case -1:
       LIBRDF_AVLTREE_DEBUG1("was imbalanced, fixed implicitly\n");
-      (*node_pp)->balance= 0;
+      (*node_pp)->balance = 0;
       break;
 
     case 0:
       LIBRDF_AVLTREE_DEBUG1("was okay, is now one off\n");
-      (*node_pp)->balance= 1;
-      *rebalancing_p= FALSE;
+      (*node_pp)->balance = 1;
+      *rebalancing_p = FALSE;
       break;
 
     case 1:
       LIBRDF_AVLTREE_DEBUG1("was already off, this is too much\n");
-      p1= (*node_pp)->right;
-      b1= p1->balance;
+      p1 = (*node_pp)->right;
+      b1 = p1->balance;
 
       if(b1 >= 0) {
         LIBRDF_AVLTREE_DEBUG1("single RR\n");
-        (*node_pp)->right= p1->left;
+
+        (*node_pp)->right = p1->left;
         if((*node_pp)->right)
-          (*node_pp)->right->parent= (*node_pp);
-        p1->left= *node_pp;
+          (*node_pp)->right->parent =  (*node_pp);
+
+        p1->left = *node_pp;
         if(p1->left)
-          p1->left->parent= p1;
+          p1->left->parent = p1;
+
         if(b1 == 0) {
           LIBRDF_AVLTREE_DEBUG1("b1 == 0\n");
-          (*node_pp)->balance= 1;
-          p1->balance= -1;
-          *rebalancing_p= FALSE;
+          (*node_pp)->balance = 1;
+          p1->balance = -1;
+          *rebalancing_p = FALSE;
         } else {
           LIBRDF_AVLTREE_DEBUG1("b1 != 0\n");
-          (*node_pp)->balance= 0;
-          p1->balance= 0;
+          (*node_pp)->balance = 0;
+          p1->balance = 0;
         }
-        *node_pp= p1;
-        (*node_pp)->parent=p_parent;
+
+        *node_pp = p1;
+        (*node_pp)->parent = p_parent;
       } else {
         LIBRDF_AVLTREE_DEBUG1("double RL\n");
-        p2= p1->left;
-        b2= p2->balance;
-        p1->left= p2->right;
+        p2 = p1->left;
+        b2 = p2->balance;
+
+        p1->left = p2->right;
         if(p1->left)
-          p1->left->parent=p1;
-        p2->right= p1;
+          p1->left->parent = p1;
+
+        p2->right = p1;
         if(p2->right)
-          p2->right->parent=p2;
-        (*node_pp)->right= p2->left;
+          p2->right->parent = p2;
+
+        (*node_pp)->right = p2->left;
         if((*node_pp)->right)
-          (*node_pp)->right->parent= (*node_pp);
-        p2->left= *node_pp;
+          (*node_pp)->right->parent =  (*node_pp);
+
+        p2->left = *node_pp;
         if(p2->left)
-          p2->left->parent= p2;
+          p2->left->parent = p2;
+
         if(b2 == 1)
-          (*node_pp)->balance= -1;
+          (*node_pp)->balance = -1;
         else
-          (*node_pp)->balance= 0;
+          (*node_pp)->balance = 0;
+
         if(b2 == -1)
-          p1->balance= 1;
+          p1->balance = 1;
         else
-          p1->balance= 0;
-        *node_pp= p2;
-        (*node_pp)->parent=p_parent;
-        p2->balance= 0;
+          p1->balance = 0;
+
+        *node_pp = p2;
+        (*node_pp)->parent = p_parent;
+        p2->balance = 0;
       }
       break;
   } /* end switch */
@@ -752,72 +783,83 @@ librdf_avltree_balance_right(librdf_avltree* tree,
 
   LIBRDF_AVLTREE_DEBUG1("right branch has shrunk\n");
 
-  p_parent=(*node_pp)->parent;
+  p_parent = (*node_pp)->parent;
 
   switch((*node_pp)->balance) {
     case 1:
       LIBRDF_AVLTREE_DEBUG1("was imbalanced, fixed implicitly\n");
-      (*node_pp)->balance= 0;
+      (*node_pp)->balance = 0;
       break;
 
     case 0:
       LIBRDF_AVLTREE_DEBUG1("was okay, is now one off\n");
-      (*node_pp)->balance= -1;
-      *rebalancing_p= FALSE;
+      (*node_pp)->balance = -1;
+      *rebalancing_p = FALSE;
       break;
 
     case -1:
       LIBRDF_AVLTREE_DEBUG1("was already off, this is too much\n");
-      p1= (*node_pp)->left;
-      b1= p1->balance;
+      p1 = (*node_pp)->left;
+      b1 = p1->balance;
 
       if(b1 <= 0) {
         LIBRDF_AVLTREE_DEBUG1("single LL\n");
-        (*node_pp)->left= p1->right;
+
+        (*node_pp)->left = p1->right;
         if((*node_pp)->left)
-          (*node_pp)->left->parent= (*node_pp);
-        p1->right= *node_pp;
+          (*node_pp)->left->parent =  (*node_pp);
+
+        p1->right = *node_pp;
         if(p1->right)
-          p1->right->parent= p1;
+          p1->right->parent = p1;
+
         if(b1 == 0) {
           LIBRDF_AVLTREE_DEBUG1("b1 == 0\n");
-          (*node_pp)->balance= -1;
-          p1->balance= 1;
-          *rebalancing_p= FALSE;
+          (*node_pp)->balance = -1;
+          p1->balance = 1;
+          *rebalancing_p = FALSE;
         } else {
           LIBRDF_AVLTREE_DEBUG1("b1 != 0\n");
-          (*node_pp)->balance= 0;
-          p1->balance= 0;
+          (*node_pp)->balance = 0;
+          p1->balance = 0;
         }
-        *node_pp= p1;
-        (*node_pp)->parent=p_parent;
+
+        *node_pp = p1;
+        (*node_pp)->parent = p_parent;
       } else {
         LIBRDF_AVLTREE_DEBUG1("double LR\n");
-        p2= p1->right;
-        b2= p2->balance;
-        p1->right= p2->left;
+        p2 = p1->right;
+        b2 = p2->balance;
+
+        p1->right = p2->left;
         if(p1->right)
-          p1->right->parent= p1;
-        p2->left= p1;
+          p1->right->parent = p1;
+
+        p2->left = p1;
         if(p2->left)
-          p2->left->parent= p2;
-        (*node_pp)->left= p2->right;
+          p2->left->parent = p2;
+
+        (*node_pp)->left = p2->right;
         if((*node_pp)->left)
-          (*node_pp)->left->parent= (*node_pp);
-        p2->right= *node_pp;
+          (*node_pp)->left->parent = (*node_pp);
+
+        p2->right = *node_pp;
         if(p2->right)
-          p2->right->parent= p2;
+          p2->right->parent = p2;
+
         if(b2 == -1)
-          (*node_pp)->balance= 1;
+          (*node_pp)->balance = 1;
         else
-          (*node_pp)->balance= 0;
+          (*node_pp)->balance = 0;
+
         if(b2 == 1)
-          p1->balance= -1;
+          p1->balance = -1;
         else
-          p1->balance= 0;
-        *node_pp= p2;
-        (*node_pp)->parent=p_parent;
-        p2->balance= 0;
+          p1->balance = 0;
+
+        *node_pp = p2;
+        (*node_pp)->parent = p_parent;
+        p2->balance = 0;
       }
   } /* end switch */
 
@@ -833,16 +875,17 @@ librdf_avltree_size(librdf_avltree* tree)
 
 
 static librdf_avltree_node*
-librdf_avltree_node_leftmost(librdf_avltree* tree, librdf_avltree_node* node, void* range)
+librdf_avltree_node_leftmost(librdf_avltree* tree, librdf_avltree_node* node,
+                             void* range)
 {
   /*assert(node);
   assert(!range || tree->compare_fn(range, node->data) == 0);*/
-  if (range)
+  if(range)
     while(node && node->left && tree->compare_fn(range, node->left->data) == 0)
-      node=node->left;
+      node = node->left;
   else
     while(node && node->left)
-      node=node->left;
+      node = node->left;
   
   return node;
 }
@@ -853,23 +896,25 @@ static librdf_avltree_node*
 librdf_avltree_node_rightmost(librdf_avltree* tree, librdf_avltree_node* node)
 {
   while(node && node->right)
-    node=node->right;
+    node = node->right;
   return node;
 }
 #endif
 
+
 /* Follow right children until a match for range is found */
 static librdf_avltree_node*
-librdf_avltree_node_search_right(librdf_avltree* tree, librdf_avltree_node* node, void* range)
+librdf_avltree_node_search_right(librdf_avltree* tree,
+                                 librdf_avltree_node* node, void* range)
 {
   librdf_avltree_node* result;
   
-  if (node == NULL)
+  if(node == NULL)
     return NULL;
 
-  result=node->right;
+  result = node->right;
   while(result) {
-    if (tree->compare_fn(range, result->data) == 0) {
+    if(tree->compare_fn(range, result->data) == 0) {
       return result;
     } else {
       result = result->right;
@@ -885,11 +930,11 @@ static librdf_avltree_node*
 librdf_avltree_node_prev(librdf_avltree* tree, librdf_avltree_node* node)
 {
   if(node->left) {
-    node=librdf_avltree_node_rightmost(tree, node->left);
+    node = librdf_avltree_node_rightmost(tree, node->left);
   } else {
-    librdf_avltree_node* last=node;
+    librdf_avltree_node* last = node;
     /* Need to go up */
-    node=node->parent;
+    node = node->parent;
     while(node) {
       /* moving from right subtree to this node */
       if(node->right && last == node->right)
@@ -897,11 +942,11 @@ librdf_avltree_node_prev(librdf_avltree* tree, librdf_avltree_node* node)
       
       /* moved up to find an unvisited left subtree */
       if(node->left && last != node->left) {
-        node=librdf_avltree_node_rightmost(tree, node->left);
+        node = librdf_avltree_node_rightmost(tree, node->left);
         break;
       }
-      last=node;
-      node=node->parent;
+      last = node;
+      node = node->parent;
     }
   }
     
@@ -911,17 +956,20 @@ librdf_avltree_node_prev(librdf_avltree* tree, librdf_avltree_node* node)
 
 
 static librdf_avltree_node*
-librdf_avltree_node_next(librdf_avltree* tree, librdf_avltree_node* node, void* range)
+librdf_avltree_node_next(librdf_avltree* tree, librdf_avltree_node* node,
+                         void* range)
 {
-  int up=0;
+  int up = 0;
 
   /*assert(!range || tree->compare_fn(range, node->data) == 0);*/
 
   if(node->right) {
     /* Should never go right if the current node is already > range */
-    librdf_avltree_node* next=librdf_avltree_node_leftmost(tree, node->right, NULL);
+    librdf_avltree_node* next;
+
+    next = librdf_avltree_node_leftmost(tree, node->right, NULL);
     /*assert(!range ||tree->compare_fn(range, node->data) <= 0);*/
-    if (range) {
+    if(range) {
       if(tree->compare_fn(range, next->data) == 0) {
         up = 0;
         node = next;
@@ -936,10 +984,10 @@ librdf_avltree_node_next(librdf_avltree* tree, librdf_avltree_node* node, void* 
     up = 1;
   }
   
-  if (up) {
-    librdf_avltree_node* last=node;
+  if(up) {
+    librdf_avltree_node* last = node;
     /* Need to go up */
-    node=node->parent;
+    node = node->parent;
     while(node) {
     
       /* moving from left subtree to this node */
@@ -951,16 +999,16 @@ librdf_avltree_node_next(librdf_avltree* tree, librdf_avltree_node* node, void* 
       if(node->right && last != node->right) {
         /* Should never go right if the current node is already > range */
         /*assert(!range ||tree->compare_fn(range, node->data) <= 0);*/
-        node=librdf_avltree_node_leftmost(tree, node->right, range);
+        node = librdf_avltree_node_leftmost(tree, node->right, range);
         break;
       }
-      last=node;
-      node=node->parent;
+      last = node;
+      node = node->parent;
     }
   }
 
-  if (node && range) {
-    if (tree->compare_fn(range, node->data) == 0)
+  if(node && range) {
+    if(tree->compare_fn(range, node->data) == 0)
       return node;
     else
       return NULL;
@@ -985,16 +1033,17 @@ librdf_avltree_print(librdf_world* world, librdf_avltree* tree, FILE* stream,
                      librdf_avltree_data_print_function print_fn)
 {
   int i;
-  int rv=0;
+  int rv = 0;
   librdf_iterator* iter;
 
   fprintf(stream, "AVL Tree size %zu\n", tree->size);
-  for(i=0, (iter=librdf_avltree_get_iterator_start(world, tree, NULL, NULL));
+  for(i = 0, (iter = librdf_avltree_get_iterator_start(world, tree, NULL, NULL));
       iter && !rv;
-      i++, (rv=librdf_iterator_next(iter))) {
-    const void* data=librdf_iterator_get_object(iter);
+      i++, (rv = librdf_iterator_next(iter))) {
+    const void* data = librdf_iterator_get_object(iter);
     if(!data)
       continue;
+
     fprintf(stream, "%d) ", i);
     if(print_fn)
       print_fn(stream, data);
@@ -1008,8 +1057,11 @@ librdf_avltree_print(librdf_world* world, librdf_avltree* tree, FILE* stream,
 static int
 librdf_avltree_iterator_is_end(void* iterator) 
 {
-  librdf_avltree_iterator_context* context=(librdf_avltree_iterator_context*)iterator;
-  librdf_avltree_node *node=context->current;
+  librdf_avltree_iterator_context* context;
+  librdf_avltree_node *node;
+
+  context = (librdf_avltree_iterator_context*)iterator;
+  node = context->current;
   
   return (node == NULL);
 }
@@ -1017,15 +1069,19 @@ librdf_avltree_iterator_is_end(void* iterator)
 static int
 librdf_avltree_iterator_next_method(void* iterator) 
 {
-  librdf_avltree_iterator_context* context=(librdf_avltree_iterator_context*)iterator;
-  librdf_avltree_node *node=context->current;
+  librdf_avltree_iterator_context* context;
+  librdf_avltree_node *node;
+
+  context = (librdf_avltree_iterator_context*)iterator;
+  node = context->current;
   
   if(!node)
     return 1;
   
-  context->current=librdf_avltree_node_next(context->tree, node, context->range);
+  context->current = librdf_avltree_node_next(context->tree, node,
+                                              context->range);
   // Stay within rooted subtree
-  if (context->root->parent == context->current)
+  if(context->root->parent == context->current)
     context->current = NULL;
 
   return (context->current == NULL);
@@ -1035,14 +1091,17 @@ librdf_avltree_iterator_next_method(void* iterator)
 static void*
 librdf_avltree_iterator_get_method(void* iterator, int flags) 
 {
-  librdf_avltree_iterator_context* context=(librdf_avltree_iterator_context*)iterator;
-  librdf_avltree_node *node=context->current;
+  librdf_avltree_iterator_context* context;
+  librdf_avltree_node *node;
   
+  context = (librdf_avltree_iterator_context*)iterator;
+  node = context->current;
+
   switch(flags) {
-  case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
-    return node->data;
-  default:
-    return NULL;
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      return node->data;
+    default:
+      return NULL;
   }
 }
 
@@ -1050,7 +1109,9 @@ librdf_avltree_iterator_get_method(void* iterator, int flags)
 static void
 librdf_avltree_iterator_finished(void* iterator)
 {
-  librdf_avltree_iterator_context* context=(librdf_avltree_iterator_context*)iterator;
+  librdf_avltree_iterator_context* context;
+
+  context = (librdf_avltree_iterator_context*)iterator;
 
   if(!context)
     return;
@@ -1060,6 +1121,7 @@ librdf_avltree_iterator_finished(void* iterator)
 
   LIBRDF_FREE(librdf_avltree_iterator_context, context);
 }
+
 
 /**
  * librdf_avltree_get_iterator_start:
@@ -1075,14 +1137,14 @@ librdf_avltree_iterator_finished(void* iterator)
  * Return value: a new #librdf_iterator object or NULL on failure
  **/
 librdf_iterator*
-librdf_avltree_get_iterator_start(librdf_world* world, librdf_avltree* tree, void* range,
-    librdf_avltree_data_free_function range_free_fn)
+librdf_avltree_get_iterator_start(librdf_world* world, librdf_avltree* tree,
+                                  void* range,
+                                  librdf_avltree_data_free_function range_free_fn)
 {
   librdf_avltree_iterator_context* context;
   librdf_iterator* iterator;
 
-  context=(librdf_avltree_iterator_context*)LIBRDF_CALLOC(librdf_avltree_iterator_context,
-      1, sizeof(librdf_avltree_iterator_context));
+  context = (librdf_avltree_iterator_context*)LIBRDF_CALLOC(librdf_avltree_iterator_context, 1, sizeof(*context));
   if(!context)
     return NULL;
 
@@ -1090,9 +1152,9 @@ librdf_avltree_get_iterator_start(librdf_world* world, librdf_avltree* tree, voi
   context->range = range;
   context->range_free_fn = range_free_fn;
 
-  if (range != NULL) {
+  if(range != NULL) {
     /* find the topmost match (range is contained entirely in tree rooted here) */
-    context->current=librdf_avltree_search_internal(tree, tree->root, range);
+    context->current = librdf_avltree_search_internal(tree, tree->root, range);
   } else {
     context->current=tree->root;
   }
@@ -1100,12 +1162,15 @@ librdf_avltree_get_iterator_start(librdf_world* world, librdf_avltree* tree, voi
   context->root = context->current;
   
   /* go down to find start of range (or tree) */
-  if (context->current) {
-    while (1) {
+  if(context->current) {
+    while(1) {
       librdf_avltree_node* pred;
-      context->current=librdf_avltree_node_leftmost(tree, context->current, range);
+
+      context->current = librdf_avltree_node_leftmost(tree, context->current,
+                                                      range);
       /* right until we find a match */
-      pred=librdf_avltree_node_search_right(tree, context->current->left, range);
+      pred = librdf_avltree_node_search_right(tree, context->current->left,
+                                              range);
 
       if(pred && tree->compare_fn(range, pred->data) == 0)
         context->current = pred;
@@ -1128,6 +1193,7 @@ librdf_avltree_get_iterator_start(librdf_world* world, librdf_avltree* tree, voi
   return iterator;
 }
 
+
 //#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
 
 static int
@@ -1139,18 +1205,20 @@ librdf_avltree_dump_internal(librdf_avltree* tree, librdf_avltree_node* node,
   if(!node)
     return TRUE;
 
-  for(i=0; i < depth; i++)
+  for(i = 0; i < depth; i++)
     fputs("  ", stream);
   if(print_fn) {
-    for(i= 0; i < depth; i++)
+    for(i = 0; i < depth; i++)
       fputs("  ", stream);
     print_fn(stream, node->data);
   }
   
-  if(!librdf_avltree_dump_internal(tree, node->left, depth+1, stream, print_fn))
+  if(!librdf_avltree_dump_internal(tree, node->left, depth + 1, stream,
+                                   print_fn))
     return FALSE;
 
-  if(!librdf_avltree_dump_internal(tree, node->right, depth+1, stream, print_fn))
+  if(!librdf_avltree_dump_internal(tree, node->right, depth + 1, stream,
+                                   print_fn))
     return FALSE;
 
   return TRUE;
@@ -1159,7 +1227,8 @@ librdf_avltree_dump_internal(librdf_avltree* tree, librdf_avltree_node* node,
 
 /* debugging tree dump with pointers and depth indenting */
 int
-librdf_avltree_dump(librdf_avltree* tree, FILE* stream, librdf_avltree_data_print_function print_fn)
+librdf_avltree_dump(librdf_avltree* tree, FILE* stream,
+                    librdf_avltree_data_print_function print_fn)
 {
   fprintf(stream, "Dumping avltree %p  size %zd\n", tree, tree->size);
   return librdf_avltree_dump_internal(tree, tree->root, 0, stream, print_fn);
@@ -1217,7 +1286,7 @@ typedef struct
 static int
 print_string(int depth, void* data, void *user_data) 
 {
-  visit_state* vs=(visit_state*)user_data;
+  visit_state* vs = (visit_state*)user_data;
   
   fprintf(vs->fh, "%3d: %s\n", vs->count, (char*) data);
   vs->count++;
@@ -1225,21 +1294,23 @@ print_string(int depth, void* data, void *user_data)
 }
 #endif
 
+
 static int
 check_string(int depth, void* data, void *user_data) 
 {
-  visit_state* vs=(visit_state*)user_data;
-  const char* result=vs->results[vs->count];
+  visit_state* vs = (visit_state*)user_data;
+  const char* result = vs->results[vs->count];
   
   if(strcmp((const char*)data, result)) {
     fprintf(vs->fh, "%3d: Expected '%s' but found '%s'\n", vs->count,
             result, (char*)data);
-    vs->failed=1;
+    vs->failed = 1;
   }
   vs->count++;
   
   return 1;
 }
+
 
 static int
 compare_strings(const void *l, const void *r)
@@ -1254,7 +1325,7 @@ int main(int argc, char *argv[]);
 int
 main(int argc, char *argv[])
 {
-  const char *program=librdf_basename(argv[0]);
+  const char *program = librdf_basename(argv[0]);
 #define ITEM_COUNT 8
   const char *items[ITEM_COUNT+1] = { "ron", "amy", "jen", "bij", "jib", "daj", "jim", "def", NULL };
 #define DELETE_COUNT 2
@@ -1268,15 +1339,15 @@ main(int argc, char *argv[])
   visit_state vs;
   int i;
   
-  world=librdf_new_world();
-  tree=librdf_new_avltree(compare_strings,
-                          NULL); /* no free as they are static pointers above */
+  world = librdf_new_world();
+  tree = librdf_new_avltree(compare_strings,
+                            NULL); /* no free as they are static pointers above */
   
   if(!tree) {
     fprintf(stderr, "%s: Failed to create tree\n", program);
     exit(1);
   }
-  for(i=0; items[i]; i++) {
+  for(i = 0; items[i]; i++) {
     int rc;
     void* node;
 
@@ -1284,7 +1355,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Adding tree item '%s'\n", program, items[i]);
 #endif
   
-    rc=librdf_avltree_add(tree, (void*)items[i]);
+    rc = librdf_avltree_add(tree, (void*)items[i]);
     if(rc) {
       fprintf(stderr,
               "%s: Adding tree item %d '%s' failed, returning error %d\n",
@@ -1296,7 +1367,7 @@ main(int argc, char *argv[])
     librdf_avltree_check(tree);
 #endif
 
-    node=librdf_avltree_search(tree, (void*)items[i]);
+    node = librdf_avltree_search(tree, (void*)items[i]);
     if(!node) {
       fprintf(stderr,
               "%s: Tree did NOT contain item %d '%s' as expected\n",
@@ -1307,8 +1378,8 @@ main(int argc, char *argv[])
 
 #if LIBRDF_DEBUG > 1
   fprintf(stderr, "%s: Printing tree\n", program);
-  vs.fh=stderr;
-  vs.count=0;
+  vs.fh = stderr;
+  vs.count = 0;
   librdf_avltree_visit(tree, print_string, &vs);
 
   //fprintf(stderr, "%s: Dumping tree\n", program);
@@ -1316,14 +1387,14 @@ main(int argc, char *argv[])
 #endif
 
 
-  for(i=0; delete_items[i]; i++) {
+  for(i = 0; delete_items[i]; i++) {
     int rc;
 
 #if LIBRDF_DEBUG > 1
     fprintf(stderr, "%s: Deleting tree item '%s'\n", program, delete_items[i]);
 #endif
   
-    rc=librdf_avltree_delete(tree, (void*)delete_items[i]);
+    rc = librdf_avltree_delete(tree, (void*)delete_items[i]);
     if(!rc) {
       fprintf(stderr,
               "%s: Deleting tree item %d '%s' failed, returning error %d\n",
@@ -1340,10 +1411,10 @@ main(int argc, char *argv[])
 #if LIBRDF_DEBUG > 1
   fprintf(stderr, "%s: Walking tree forwards via iterator\n", program);
 #endif
-  iter=librdf_avltree_get_iterator_start(world, tree, NULL, NULL);
-  for(i=0; 1; i++) {
-    const char* data=(const char*)librdf_iterator_get_object(iter);
-    const char* result=results[i];
+  iter = librdf_avltree_get_iterator_start(world, tree, NULL, NULL);
+  for(i = 0; 1; i++) {
+    const char* data = (const char*)librdf_iterator_get_object(iter);
+    const char* result = results[i];
     if((!data && data != result) || (data && strcmp(data, result))) {
       fprintf(stderr, "%3d: Forwards iterator expected '%s' but found '%s'\n",
               i, result, data);
@@ -1354,6 +1425,7 @@ main(int argc, char *argv[])
 #endif
     if(librdf_iterator_next(iter))
       break;
+
     if(i > RESULT_COUNT) {
       fprintf(stderr, "Forward iterator did not end on result %i as expected\n", i);
       exit(1);
@@ -1364,9 +1436,9 @@ main(int argc, char *argv[])
 #if LIBRDF_DEBUG > 1
   fprintf(stderr, "%s: Checking tree\n", program);
 #endif
-  vs.count=0;
+  vs.count = 0;
   vs.results=results;
-  vs.failed=0;
+  vs.failed = 0;
   librdf_avltree_visit(tree, check_string, &vs);
   if(vs.failed) {
     fprintf(stderr, "%s: Checking tree failed\n", program);
@@ -1374,9 +1446,9 @@ main(int argc, char *argv[])
   }
 
   
-  for(i=0; results[i]; i++) {
-    const char* result=results[i];
-    char* data=(char*)librdf_avltree_remove(tree, (void*)result);
+  for(i = 0; results[i]; i++) {
+    const char* result = results[i];
+    char* data = (char*)librdf_avltree_remove(tree, (void*)result);
     if(!data) {
       fprintf(stderr, "%s: remove %i failed at item '%s'\n", program, i,
               result);

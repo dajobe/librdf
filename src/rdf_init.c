@@ -2,7 +2,7 @@
  *
  * rdf_init.c - Redland library initialisation / termination
  *
- * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2010, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -68,9 +68,9 @@
 
 #ifndef STANDALONE
 
-const char * const librdf_short_copyright_string = "Copyright 2000-2008 David Beckett. Copyright 2000-2005 University of Bristol";
+const char * const librdf_short_copyright_string = "Copyright 2000-2010 David Beckett. Copyright 2000-2005 University of Bristol";
 
-const char * const librdf_copyright_string = "Copyright (C) 2000-2008 David Beckett - http://www.dajobe.org/\nCopyright (C) 2000-2005 University of Bristol - http://www.bristol.ac.uk/";
+const char * const librdf_copyright_string = "Copyright (C) 2000-2010 David Beckett - http://www.dajobe.org/\nCopyright (C) 2000-2005 University of Bristol - http://www.bristol.ac.uk/";
 
 /**
  * librdf_version_string:
@@ -134,27 +134,28 @@ const unsigned int librdf_version_decimal = LIBRDF_VERSION_DECIMAL;
  * Returns: a new #librdf_world or NULL on failure
  */
 librdf_world*
-librdf_new_world(void) {
+librdf_new_world(void)
+{
   librdf_world *world;
 #ifdef HAVE_GETTIMEOFDAY
   struct timeval tv;
   struct timezone tz;
 #endif
 
-  world=(librdf_world*)LIBRDF_CALLOC(librdf_world, sizeof(librdf_world), 1);
+  world = (librdf_world*)LIBRDF_CALLOC(librdf_world, sizeof(*world), 1);
 
   if(!world)
     return NULL;
 
 #ifdef HAVE_GETTIMEOFDAY
   if(!gettimeofday(&tv, &tz)) {
-    world->genid_base=tv.tv_sec;
+    world->genid_base = tv.tv_sec;
   } else
-    world->genid_base=1;
+    world->genid_base = 1;
 #else
-  world->genid_base=1;
+  world->genid_base = 1;
 #endif
-  world->genid_counter=1;
+  world->genid_counter = 1;
   
 #ifdef MODULAR_LIBRDF
   world->ltdl_opened = !(lt_dlinit());
@@ -320,8 +321,8 @@ void
 librdf_world_set_error(librdf_world* world, void *user_data,
                        librdf_log_level_func error_handler)
 {
-  world->error_user_data=user_data;
-  world->error_handler=error_handler;
+  world->error_user_data = user_data;
+  world->error_handler = error_handler;
 }
 
 
@@ -341,8 +342,8 @@ void
 librdf_world_set_warning(librdf_world* world, void *user_data,
                          librdf_log_level_func warning_handler)
 {
-  world->warning_user_data=user_data;
-  world->warning_handler=warning_handler;
+  world->warning_user_data = user_data;
+  world->warning_handler = warning_handler;
 }
 
 
@@ -361,8 +362,8 @@ void
 librdf_world_set_logger(librdf_world* world, void *user_data,
                         librdf_log_func log_handler)
 {
-  world->log_user_data=user_data;
-  world->log_handler=log_handler;
+  world->log_user_data = user_data;
+  world->log_handler = log_handler;
 }
 
 
@@ -378,8 +379,9 @@ librdf_world_set_logger(librdf_world* world, void *user_data,
  * digests of their objects.
  */
 void
-librdf_world_set_digest(librdf_world* world, const char *name) {
-  world->digest_factory_name=(char*)name;
+librdf_world_set_digest(librdf_world* world, const char *name)
+{
+  world->digest_factory_name = (char*)name;
 }
 
 
@@ -414,41 +416,48 @@ int
 librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
                          librdf_node* value) 
 {
-  librdf_uri* genid_base=librdf_new_uri(world, (const unsigned char*)LIBRDF_WORLD_FEATURE_GENID_BASE);
-  librdf_uri* genid_counter=librdf_new_uri(world, (const unsigned char*)LIBRDF_WORLD_FEATURE_GENID_COUNTER);
+  librdf_uri* genid_base;
+  librdf_uri* genid_counter;
   int rc= -1;
+
+  genid_counter = librdf_new_uri(world,
+                                 (const unsigned char*)LIBRDF_WORLD_FEATURE_GENID_COUNTER);
+  genid_base = librdf_new_uri(world,
+                              (const unsigned char*)LIBRDF_WORLD_FEATURE_GENID_BASE);
 
   if(librdf_uri_equals(feature, genid_base)) {
     if(!librdf_node_is_resource(value))
       rc=1;
     else {
-      int i=atoi((const char*)librdf_node_get_literal_value(value));
-      if(i<1)
-        i=1;
+      int i = atoi((const char*)librdf_node_get_literal_value(value));
+      if(i < 1)
+        i = 1;
+
 #ifdef WITH_THREADS
       pthread_mutex_lock(world->mutex);
 #endif
-      world->genid_base=1;
+      world->genid_base = 1;
 #ifdef WITH_THREADS
       pthread_mutex_unlock(world->mutex);
 #endif
-      rc=0;
+      rc = 0;
     }
   } else if(librdf_uri_equals(feature, genid_counter)) {
     if(!librdf_node_is_resource(value))
-      rc=1;
+      rc = 1;
     else {
-      int i=atoi((const char*)librdf_node_get_literal_value(value));
-      if(i<1)
-        i=1;
+      int i = atoi((const char*)librdf_node_get_literal_value(value));
+      if(i < 1)
+        i = 1;
+
 #ifdef WITH_THREADS
       pthread_mutex_lock(world->mutex);
 #endif
-      world->genid_counter=1;
+      world->genid_counter = 1;
 #ifdef WITH_THREADS
       pthread_mutex_unlock(world->mutex);
 #endif
-      rc=0;
+      rc = 0;
     }
   }
 
@@ -468,12 +477,12 @@ librdf_world_get_genid(librdf_world* world)
   unsigned char *buffer;
 
   /* This is read-only and thread safe */
-  tmpid= (id= world->genid_base);
+  tmpid = (id = world->genid_base);
 
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->mutex);
 #endif
-  tmpcounter=(counter=world->genid_counter++);
+  tmpcounter = (counter = world->genid_counter++);
 #ifdef WITH_THREADS
   pthread_mutex_unlock(world->mutex);
 #endif
@@ -481,21 +490,23 @@ librdf_world_get_genid(librdf_world* world)
   /* Add the process ID to the seed to differentiate between
    * simultaneously executed child processes.
    */
-  pid=(int) getpid();
+  pid = (int) getpid();
   if(!pid)
-    pid=1;
-  tmppid=pid;
+    pid = 1;
+  tmppid = pid;
 
 
-  length=7;  /* min length 1 + "r" + min length 1 + "r" + min length 1 + "r" \0 */
-  while(tmpid/=10)
+  /* min length 1 + "r" + min length 1 + "r" + min length 1 + "r" \0 */
+  length = 7;
+
+  while(tmpid /= 10)
     length++;
-  while(tmpcounter/=10)
+  while(tmpcounter /= 10)
     length++;
-  while(tmppid/=10)
+  while(tmppid /= 10)
     length++;
   
-  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, length);
+  buffer = (unsigned char*)LIBRDF_MALLOC(cstring, length);
   if(!buffer)
     return NULL;
 
@@ -529,9 +540,10 @@ void
 librdf_init_world(char *digest_factory_name, void* not_used2)
 {
 #ifndef NO_STATIC_DATA
-  RDF_World=librdf_new_world();
+  RDF_World = librdf_new_world();
   if(!RDF_World)
     return;
+
   if(digest_factory_name)
     librdf_world_set_digest(RDF_World, digest_factory_name);
   librdf_world_open(RDF_World);
@@ -593,7 +605,7 @@ librdf_sign_malloc(size_t size)
   
   size += sizeof(int);
   
-  p=(int*)malloc(size);
+  p = (int*)malloc(size);
   *p++ = LIBRDF_SIGN_KEY;
   return p;
 }
@@ -606,7 +618,7 @@ librdf_sign_calloc(size_t nmemb, size_t size)
   /* turn into bytes */
   size = nmemb*size + sizeof(int);
   
-  p=(int*)calloc(1, size);
+  p = (int*)calloc(1, size);
   *p++ = LIBRDF_SIGN_KEY;
   return p;
 }
@@ -619,7 +631,7 @@ librdf_sign_realloc(void *ptr, size_t size)
   if(!ptr)
     return librdf_sign_malloc(size);
   
-  p=(int*)ptr;
+  p = (int*)ptr;
   p--;
 
   if(*p != LIBRDF_SIGN_KEY)
@@ -627,8 +639,8 @@ librdf_sign_realloc(void *ptr, size_t size)
 
   size += sizeof(int);
   
-  p=(int*)realloc(p, size);
-  *p++= LIBRDF_SIGN_KEY;
+  p = (int*)realloc(p, size);
+  *p++ = LIBRDF_SIGN_KEY;
   return p;
 }
 
@@ -640,7 +652,7 @@ librdf_sign_free(void *ptr)
   if(!ptr)
     return;
   
-  p=(int*)ptr;
+  p = (int*)ptr;
   p--;
 
   if(*p != LIBRDF_SIGN_KEY)
