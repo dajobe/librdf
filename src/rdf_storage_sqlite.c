@@ -2819,8 +2819,8 @@ librdf_storage_sqlite_transaction_start(librdf_storage *storage)
     return 1;
 
   rc = librdf_storage_sqlite_exec(storage,
-                                (unsigned char *)"BEGIN IMMEDIATE;",
-                                NULL, NULL, 0);
+                                  (unsigned char *)"BEGIN IMMEDIATE;",
+                                  NULL, NULL, 0);
   if(!rc)
     context->in_transaction = 1;      
   
@@ -2849,8 +2849,8 @@ librdf_storage_sqlite_transaction_commit(librdf_storage *storage)
     return 1;
     
   rc = librdf_storage_sqlite_exec(storage,
-                                (unsigned char *)"END;",
-                                NULL, NULL, 0);
+                                  (unsigned char *)"END;",
+                                  NULL, NULL, 0);
   if(!rc)
     context->in_transaction = 0;
 
@@ -2879,8 +2879,8 @@ librdf_storage_sqlite_transaction_rollback(librdf_storage *storage)
     return 1;
 
   rc = librdf_storage_sqlite_exec(storage,
-                                (unsigned char *)"ROLLBACK;",
-                                NULL, NULL, 0);
+                                  (unsigned char *)"ROLLBACK;",
+                                  NULL, NULL, 0);
   if(!rc)
     context->in_transaction = 0;
 
