@@ -1006,11 +1006,11 @@ static int
 librdf_storage_sqlite_add_statements(librdf_storage* storage,
                                      librdf_stream* statement_stream)
 {
-  librdf_storage_sqlite_instance* context;
+  /*librdf_storage_sqlite_instance* context;*/
   int status = 0;
   int begin;
 
-  context = (librdf_storage_sqlite_instance*)storage->instance;
+  /*context = (librdf_storage_sqlite_instance*)storage->instance;*/
 
   /* returns non-0 if a transaction is already active */
   begin = librdf_storage_sqlite_transaction_start(storage);
