@@ -418,6 +418,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
   rasqal_literal* l;
   librdf_statement* statement;
   rasqal_triple_parts result=(rasqal_triple_parts)0;
+  librdf_world *world = rtmc->qstatement->world;
 
   statement=librdf_stream_get_object(rtmc->stream);
   if(!statement)

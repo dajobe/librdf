@@ -686,29 +686,38 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
   } else {
     switch (n1->type) {
       case LIBRDF_NODE_TYPE_RESOURCE:
-        return librdf_uri_compare(n1->value.resource.uri, n2->value.resource.uri);
+        return librdf_uri_compare(librdf_node_get_uri(n1), librdf_node_get_uri(n2));
       case LIBRDF_NODE_TYPE_LITERAL:
         if (1) {
-          const unsigned char l1 = n1->value.literal.xml_language_len;
-          const unsigned char l2 = n2->value.literal.xml_language_len;
-          const unsigned char l  = (l1 < l2) ? l1 : l2;
+          const char *s;
+          size_t l1;
+          size_t l2;
+          size_t l;
+
+          s = (const char *)librdf_node_get_language(n1);
+          l1 = s ? strlen(s) : 0;
+          s = (const char *)librdf_node_get_language(n2);
+          l2 = s ? strlen(s) : 0;
+
+          l = (l1 < l2) ? l1 : l2;
 
           /* compare first by data type */
-          int r = librdf_uri_compare(n1->value.literal.datatype_uri,
-                                     n2->value.literal.datatype_uri);
+          int r = librdf_uri_compare(librdf_node_get_literal_value_datatype_uri(n1),
+                                     librdf_node_get_literal_value_datatype_uri(n2));
           if (r)
             return r;
 
           /* if data type is equal, compare by value */
-          r = strcmp((const char*)n1->value.literal.string,
-                     (const char*)n2->value.literal.string);
+          r = strcmp((const char*)librdf_node_get_literal_value(n1),
+                     (const char*)librdf_node_get_literal_value(n2));
           if (r)
             return r;
 
           /* if both data type and value are equal, compare by language */
           if (l) {
-            return strncmp(n1->value.literal.xml_language,
-                           n2->value.literal.xml_language, (size_t)l);
+            return strncmp((const char *)librdf_node_get_language(n1),
+                           (const char *)librdf_node_get_language(n2),
+                           (size_t)l);
           } else {
             /* if l == 0 strncmp will always return 0; in that case
              * consider the node with no language to be lesser. */

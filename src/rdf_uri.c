@@ -299,6 +299,7 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
   size_t source_uri_string_length;
   unsigned char* base_uri_string;
   size_t base_uri_string_length;
+
                                     
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(source_uri, librdf_uri, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(base_uri, librdf_uri, NULL);
@@ -315,7 +316,6 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
 #endif /* !USE_RAPTOR_URI */
   }
   
-
   source_uri_string = librdf_uri_as_counted_string(source_uri,
                                                    &source_uri_string_length);
   base_uri_string = librdf_uri_as_counted_string(base_uri,

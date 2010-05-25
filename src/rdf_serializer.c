@@ -694,6 +694,7 @@ librdf_serializer_serialize_model_to_string(librdf_serializer* serializer,
  * @iostr: the #raptor_iostream to write to
  *
  * Write a #librdf_stream to a #raptor_iostream.
+ * This function takes ownership of the iostream and frees it.
  * 
  * Return value: non-0 on failure
  **/
@@ -721,6 +722,7 @@ librdf_serializer_serialize_stream_to_iostream(librdf_serializer* serializer,
  * @iostr: the #raptor_iostream to write to
  *
  * Write a serialized #librdf_model to a #raptor_iostream.
+ * This function takes ownership of the iostream and frees it.
  * 
  * Return value: non-0 on failure
  **/
