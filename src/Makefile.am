@@ -46,7 +46,7 @@ rdf_list.h
 noinst_HEADERS = win32_rdf_config.h
 
 librdf_la_SOURCES = rdf_init.c rdf_raptor.c \
-rdf_uri.c rdf_statement.c \
+rdf_uri.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
 rdf_model.c rdf_model_storage.c \
 rdf_iterator.c rdf_concepts.c \
@@ -100,9 +100,9 @@ rdf_stream_internal.h \
 rdf_uri_internal.h
 
 if RAPTOR2
-librdf_la_SOURCES += rdf_term.c
+librdf_la_SOURCES += rdf_term.c rdf_raptor_statement.c
 else
-librdf_la_SOURCES += rdf_node.c
+librdf_la_SOURCES += rdf_node.c rdf_statement.c
 endif
 
 if MEMCMP

@@ -87,6 +87,7 @@ extern "C" {
 #ifdef RAPTOR_V2_AVAILABLE
 #define USE_RAPTOR_URI
 #define USE_RAPTOR_TERM
+#define USE_RAPTOR_STATEMENT
 #endif
 
 /* Public typedefs (references to private structures) */
@@ -167,7 +168,11 @@ typedef struct librdf_node_s librdf_node;
  *
  * Redland statement class.
  */
+#ifdef USE_RAPTOR_STATEMENT
+typedef raptor_statement librdf_statement;
+#else
 typedef struct librdf_statement_s librdf_statement;
+#endif
 
 /**
  * librdf_model:
