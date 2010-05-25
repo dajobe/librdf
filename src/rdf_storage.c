@@ -1129,7 +1129,7 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
 
           case LIBRDF_STATEMENT_ALL:
             default: /* error */
-              librdf_log(statement->world,
+              librdf_log(context->storage->world,
                          0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                          "Unknown statement part %d", context->want);
               node=NULL;
@@ -1148,7 +1148,7 @@ librdf_storage_stream_to_node_iterator_get_method(void* iterator, int flags)
       break;
       
     default:
-      librdf_log(statement->world,
+      librdf_log(context->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "Unknown iterator method flag %d", flags);
       node=NULL;

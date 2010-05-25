@@ -228,18 +228,26 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
     rstatement.subject_type = RAPTOR_IDENTIFIER_TYPE_RESOURCE;
 #endif
   } else {
+#ifdef RAPTOR_V2_AVAILABLE
+    /* FIXME - what to log here if anything? */
+#else
     librdf_log(statement->world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
                "Do not know how to serialize triple subject type %d",
                librdf_node_get_type(subject));
+#endif
     goto exit;
   }
 
   if(!librdf_node_is_resource(predicate)) {
+#ifdef RAPTOR_V2_AVAILABLE
+    /* FIXME - what to log here if anything? */
+#else
     librdf_log(statement->world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
                "Do not know how to serialize triple predicate type %d",
                librdf_node_get_type(predicate));
+#endif
     goto exit;
   }
 
@@ -293,10 +301,14 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
 
     case LIBRDF_NODE_TYPE_UNKNOWN:
     default:
+#ifdef RAPTOR_V2_AVAILABLE
+    /* FIXME - what to log here if anything? */
+#else
       librdf_log(statement->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_SERIALIZER, NULL,
                  "Do not know how to serialize triple object type %d",
                  librdf_node_get_type(object));
+#endif
       goto exit;
   }
 
