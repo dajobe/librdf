@@ -384,8 +384,125 @@ size_t
 librdf_node_encode(librdf_node *node,
                    unsigned char *buffer, size_t length)
 {
-  /* FIXME */
-  return 0;
+  size_t total_length = 0;
+  unsigned char *string;
+  size_t string_length;
+  unsigned char language_length = 0;
+  unsigned char *datatype_uri_string = NULL;
+  size_t datatype_uri_length = 0;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, 0);
+
+  switch(node->type) {
+    case RAPTOR_TERM_TYPE_URI:
+      string = (unsigned char*)librdf_uri_as_counted_string(node->value.uri,
+                                                            &string_length);
+      
+      total_length = 3 + string_length + 1; /* +1 for \0 at end */
+      
+      if(length && total_length > length)
+        return 0;    
+
+      if(string_length > 0xFFFF)
+        return 0;
+
+      if(buffer) {
+        buffer[0] = 'R';
+        buffer[1] = (string_length & 0xff00) >> 8;
+        buffer[2] = (string_length & 0x00ff);
+        memcpy((char*)buffer + 3, string, string_length);
+      }
+      break;
+      
+    case RAPTOR_TERM_TYPE_LITERAL:
+      string = (unsigned char*)node->value.literal.string;
+      string_length = node->value.literal.string_len;
+      if(node->value.literal.language)
+        language_length = node->value.literal.language_len;
+
+      if(node->value.literal.datatype) {
+        datatype_uri_string = librdf_uri_as_counted_string(node->value.literal.datatype, &datatype_uri_length);
+      }
+      
+      total_length = 6 + string_length + 1; /* +1 for \0 at end */
+      if(string_length > 0xFFFF) /* for long literal - type 'N' */
+        total_length += 2;
+
+      if(language_length)
+        total_length += language_length + 1;
+
+      if(datatype_uri_length)
+        total_length += datatype_uri_length + 1;
+      
+      if(length && total_length > length)
+        return 0;    
+
+      if(datatype_uri_length > 0xFFFF)
+        return 0;
+
+
+      if(buffer) {
+        if(string_length > 0xFFFF) {
+          /* long literal type N (string length > 0x10000) */
+          buffer[0] = 'N';
+          buffer[1] = (string_length & 0xff000000) >> 24;
+          buffer[2] = (string_length & 0x00ff0000) >> 16;
+          buffer[3] = (string_length & 0x0000ff00) >> 8;
+          buffer[4] = (string_length & 0x000000ff);
+          buffer[5] = (datatype_uri_length & 0xff00) >> 8;
+          buffer[6] = (datatype_uri_length & 0x00ff);
+          buffer[7] = (language_length & 0x00ff);
+          buffer += 8;
+        } else {
+          /* short literal type M (string length <= 0xFFFF) */
+          buffer[0] = 'M';
+          buffer[1] = (string_length & 0xff00) >> 8;
+          buffer[2] = (string_length & 0x00ff);
+          buffer[3] = (datatype_uri_length & 0xff00) >> 8;
+          buffer[4] = (datatype_uri_length & 0x00ff);
+          buffer[5] = (language_length & 0x00ff);
+          buffer += 6;
+        }
+        memcpy(buffer, string, string_length + 1);
+        buffer += string_length + 1;
+
+        if(datatype_uri_length) {
+          memcpy(buffer, datatype_uri_string, datatype_uri_length + 1);
+          buffer += datatype_uri_length + 1;
+        }
+
+        if(language_length)
+          memcpy(buffer, node->value.literal.language, language_length + 1);
+      } /* end if buffer */
+
+      break;
+      
+    case RAPTOR_TERM_TYPE_BLANK:
+      string = (unsigned char*)node->value.blank.string;
+      string_length = node->value.blank.string_len;
+      
+      total_length = 3 + string_length + 1; /* +1 for \0 at end */
+      
+      if(length && total_length > length)
+        return 0;    
+      
+      if(string_length > 0xFFFF)
+        return 0;
+
+      if(buffer) {
+        buffer[0] = 'B';
+        buffer[1] = (string_length & 0xff00) >> 8;
+        buffer[2] = (string_length & 0x00ff);
+        memcpy((char*)buffer + 3, string, string_length + 1);
+      }
+      break;
+      
+    case RAPTOR_TERM_TYPE_UNKNOWN:
+    default:
+      return 0;
+  }
+  
+  return total_length;
 }
 
 
@@ -393,39 +510,233 @@ librdf_node*
 librdf_node_decode(librdf_world *world, size_t *size_p,
                    unsigned char *buffer, size_t length)
 {
-  /* FIXME */
-  return NULL;
+  int is_wf_xml;
+  size_t string_length;
+  size_t total_length;
+  unsigned char language_length;
+  unsigned char *datatype_uri_string = NULL;
+  size_t datatype_uri_length;
+  librdf_uri* datatype_uri = NULL;
+  unsigned char *language = NULL;
+  int status = 0;
+  librdf_node* node = NULL;
+
+  librdf_world_open(world);
+
+  /* absolute minimum - first byte is type */
+  if (length < 1)
+    return NULL;
+
+  total_length = 0;
+  switch(buffer[0]) {
+    case 'R': /* URI / Resource */
+      /* min */
+      if(length < 3)
+        return NULL;
+
+      string_length = (buffer[1] << 8) | buffer[2];
+      total_length = 3 + string_length + 1;
+      
+      node = librdf_new_node_from_uri_string(world, buffer + 3);
+
+      break;
+
+    case 'L': /* Old encoding form for Literal */
+      /* min */
+      if(length < 6)
+        return NULL;
+      
+      is_wf_xml = (buffer[1] & 0xf0)>>8;
+      string_length = (buffer[2] << 8) | buffer[3];
+      language_length = buffer[5];
+
+      total_length = 6 + string_length + 1; /* +1 for \0 at end */
+      if(language_length) {
+        language = buffer + total_length;
+        total_length += language_length + 1;
+      }
+      
+      node = librdf_new_node_from_typed_counted_literal(world,
+                                                        buffer + 6,
+                                                        string_length,
+                                                        (const char*)language,
+                                                        language_length,
+                                                        is_wf_xml ? LIBRDF_RS_XMLLiteral_URI(world) : NULL);
+    
+    break;
+
+    case 'M': /* Literal for Redland 0.9.12+ */
+      /* min */
+      if(length < 6)
+        return NULL;
+      
+      string_length = (buffer[1] << 8) | buffer[2];
+      datatype_uri_length = (buffer[3] << 8) | buffer[4];
+      language_length =buffer[5];
+
+      total_length = 6 + string_length + 1; /* +1 for \0 at end */
+      if(datatype_uri_length) {
+        datatype_uri_string = buffer + total_length;
+        total_length += datatype_uri_length + 1;
+      }
+      if(language_length) {
+        language = buffer + total_length;
+        total_length += language_length + 1;
+      }
+
+      if(datatype_uri_string)
+        datatype_uri = librdf_new_uri(world, datatype_uri_string);
+      
+      node = librdf_new_node_from_typed_counted_literal(world,
+                                                        buffer + 6,
+                                                        string_length,
+                                                        (const char*)language,
+                                                        language_length,
+                                                        datatype_uri);
+      if(datatype_uri)
+        librdf_free_uri(datatype_uri);
+      
+      if(status)
+        return NULL;
+      
+    break;
+
+    case 'N': /* Literal for redland 1.0.5+ (long literal) */
+      /* min */
+      if(length < 8)
+        return NULL;
+      
+      string_length = (buffer[1] << 24) | (buffer[2] << 16) | (buffer[3] << 8) | buffer[4];
+      datatype_uri_length = (buffer[5] << 8) | buffer[6];
+      language_length = buffer[7];
+
+      total_length = 8 + string_length + 1; /* +1 for \0 at end */
+      if(datatype_uri_length) {
+        datatype_uri_string = buffer + total_length;
+        total_length += datatype_uri_length + 1;
+      }
+      if(language_length) {
+        language = buffer + total_length;
+        total_length += language_length + 1;
+      }
+
+      if(datatype_uri_string)
+        datatype_uri = librdf_new_uri(world, datatype_uri_string);
+      
+      node = librdf_new_node_from_typed_counted_literal(world,
+                                                        buffer + 8,
+                                                        string_length,
+                                                        (const char*)language,
+                                                        language_length,
+                                                        datatype_uri);
+      if(datatype_uri)
+        librdf_free_uri(datatype_uri);
+      
+      if(status)
+        return NULL;
+      
+    break;
+
+    case 'B': /* RAPTOR_TERM_TYPE_BLANK */
+      /* min */
+      if(length < 3)
+        return NULL;
+      
+      string_length = (buffer[1] << 8) | buffer[2];
+
+      total_length = 3 + string_length + 1; /* +1 for \0 at end */
+      
+      node = librdf_new_node_from_blank_identifier(world, buffer+3);
+    
+    break;
+
+  default:
+    return NULL;
+  }
+  
+  if(size_p)
+    *size_p = total_length;
+
+  return node;
 }
 
 
 unsigned char*
 librdf_node_to_string(librdf_node *node)
 {
-  /* FIXME */
-  return NULL;
+  raptor_iostream* iostr;
+  unsigned char *s;
+  int rc;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+
+  iostr = raptor_new_iostream_to_string(node->world,
+                                        (void**)&s, NULL, malloc);
+  if(!iostr)
+    return NULL;
+  
+  rc = librdf_node_write(node, iostr);
+  raptor_free_iostream(iostr);
+  if(rc) {
+    free(s);
+    s = NULL;
+  }
+
+  return s;
 }
 
 
 unsigned char*
 librdf_node_to_counted_string(librdf_node *node, size_t *len_p)
 {
-  /* FIXME */
-  return NULL;
+  raptor_iostream* iostr;
+  unsigned char *s;
+  int rc;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+
+  iostr = raptor_new_iostream_to_string(node->world,
+                                        (void**)&s, len_p, malloc);
+  if(!iostr)
+    return NULL;
+  
+  rc = librdf_node_write(node, iostr);
+  raptor_free_iostream(iostr);
+
+  if(rc) {
+    free(s);
+    s = NULL;
+  }
+
+  return s;
 }
 
 
 void
 librdf_node_print(librdf_node *node, FILE *fh)
 {
-  /* FIXME */
+  raptor_iostream *iostr;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(node, librdf_node);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(fh, FILE*);
+
+  if(!node)
+    return;
+
+  iostr = raptor_new_iostream_to_file_handle(node->world, fh);
+  if(!iostr)
+    return;
+  
+  librdf_node_write(node, iostr);
+
+  raptor_free_iostream(iostr);
 }
 
 
 int
 librdf_node_equals(librdf_node *first_node, librdf_node *second_node)
 {
-  /* FIXME */
-  return 0;
+  return raptor_term_equals(first_node, second_node);
 }
 
 
@@ -475,7 +786,7 @@ librdf_node_write(librdf_node* node, raptor_iostream *iostr)
   }
 
   switch(node->type) {
-    case LIBRDF_NODE_TYPE_LITERAL:
+    case RAPTOR_TERM_TYPE_LITERAL:
       raptor_iostream_write_byte('"', iostr);
       raptor_string_ntriples_write(node->value.literal.string,
                                    node->value.literal.string_len,
@@ -496,21 +807,21 @@ librdf_node_write(librdf_node* node, raptor_iostream *iostr)
 
       break;
       
-    case LIBRDF_NODE_TYPE_BLANK:
+    case RAPTOR_TERM_TYPE_BLANK:
       raptor_iostream_counted_string_write("_:", 2, iostr);
       term = (unsigned char*)node->value.blank.string;
       len = node->value.blank.string_len;
       raptor_iostream_counted_string_write(term, len, iostr);
       break;
       
-    case LIBRDF_NODE_TYPE_RESOURCE:
+    case RAPTOR_TERM_TYPE_URI:
       raptor_iostream_write_byte('<', iostr);
       term = librdf_uri_as_counted_string(node->value.uri, &len);
       raptor_string_ntriples_write(term, len, '>', iostr);
       raptor_iostream_write_byte('>', iostr);
       break;
       
-    case LIBRDF_NODE_TYPE_UNKNOWN:
+    case RAPTOR_TERM_TYPE_UNKNOWN:
     default:
       /*LIBRDF_FATAL1(node->world, LIBRDF_FROM_NODE, "Unknown node type");*/
       return 1;
