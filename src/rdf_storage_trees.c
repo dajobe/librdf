@@ -694,9 +694,9 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
           size_t l2;
           size_t l;
 
-          s = (const char *)librdf_node_get_language(n1);
+          s = librdf_node_get_literal_value_language(n1);
           l1 = s ? strlen(s) : 0;
-          s = (const char *)librdf_node_get_language(n2);
+          s = librdf_node_get_literal_value_language(n2);
           l2 = s ? strlen(s) : 0;
 
           l = (l1 < l2) ? l1 : l2;
@@ -715,8 +715,8 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
 
           /* if both data type and value are equal, compare by language */
           if (l) {
-            return strncmp((const char *)librdf_node_get_language(n1),
-                           (const char *)librdf_node_get_language(n2),
+            return strncmp(librdf_node_get_literal_value_language(n1),
+                           librdf_node_get_literal_value_language(n2),
                            (size_t)l);
           } else {
             /* if l == 0 strncmp will always return 0; in that case
