@@ -487,6 +487,9 @@ librdf_storage_list_context_add_statement(librdf_storage* storage,
   size_t size;
   librdf_storage_list_node* sln;
   int status;
+  librdf_world* world;
+
+  world = storage->world;
 
   if(context_node && !context->index_contexts) {
     librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
@@ -531,9 +534,9 @@ librdf_storage_list_context_add_statement(librdf_storage* storage,
   key.data=(char*)LIBRDF_MALLOC(cstring, size);
   key.size=librdf_node_encode(context_node, (unsigned char*)key.data, size);
 
-  size=librdf_statement_encode(statement, NULL, 0);
+  size=librdf_statement_encode2(world, statement, NULL, 0);
   value.data=(char*)LIBRDF_MALLOC(cstring, size);
-  value.size=librdf_statement_encode(statement, (unsigned char*)value.data, size);
+  value.size=librdf_statement_encode2(world, statement, (unsigned char*)value.data, size);
 
   status=librdf_hash_put(context->contexts, &key, &value);
   LIBRDF_FREE(data, key.data);
@@ -564,6 +567,9 @@ librdf_storage_list_context_remove_statement(librdf_storage* storage,
   librdf_storage_list_node search_sln; /* on stack - not allocated */
   size_t size;
   int status;
+  librdf_world* world;
+
+  world = storage->world;
 
   if(context_node && !context->index_contexts) {
     librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
@@ -592,9 +598,9 @@ librdf_storage_list_context_remove_statement(librdf_storage* storage,
   key.data=(char*)LIBRDF_MALLOC(cstring, size);
   key.size=librdf_node_encode(context_node, (unsigned char*)key.data, size);
 
-  size=librdf_statement_encode(statement, NULL, 0);
+  size=librdf_statement_encode2(world, statement, NULL, 0);
   value.data=(char*)LIBRDF_MALLOC(cstring, size);
-  value.size=librdf_statement_encode(statement, (unsigned char*)value.data, size);
+  value.size=librdf_statement_encode2(world, statement, (unsigned char*)value.data, size);
 
   status=librdf_hash_delete(context->contexts, &key, &value);
   LIBRDF_FREE(data, key.data);
@@ -710,6 +716,9 @@ librdf_storage_list_context_serialise_get_statement(void* context, int flags)
 {
   librdf_storage_list_context_serialise_stream_context* scontext=(librdf_storage_list_context_serialise_stream_context*)context;
   librdf_hash_datum* v;
+  librdf_world* world;
+
+  world = scontext->storage->world;
   
   switch(flags) {
     case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
@@ -719,7 +728,7 @@ librdf_storage_list_context_serialise_get_statement(void* context, int flags)
       librdf_statement_clear(&scontext->current);
 
       /* decode value content */
-      if(!librdf_statement_decode(&scontext->current,
+      if(!librdf_statement_decode2(world, &scontext->current, NULL,
                                   (unsigned char*)v->data, v->size)) {
         return NULL;
       }

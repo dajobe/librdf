@@ -590,6 +590,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
   librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   int i;
   int status=0;
+  librdf_world* world = storage->world;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   if(is_addition)
@@ -610,7 +611,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     if(!fields)
       continue;
     
-    key_len=librdf_statement_encode_parts(statement, NULL, NULL, 0, fields);
+    key_len=librdf_statement_encode_parts2(world, statement, NULL, NULL, 0, fields);
     if(!key_len)
       return 1;
     if(librdf_storage_hashes_grow_buffer(&context->key_buffer, 
@@ -619,7 +620,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
       break;
     }
        
-    if(!librdf_statement_encode_parts(statement, NULL,
+    if(!librdf_statement_encode_parts2(world, statement, NULL,
                                       context->key_buffer,
                                       context->key_buffer_len, fields)) {
       status=1;
@@ -633,7 +634,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     if(!fields)
       continue;
     
-    value_len=librdf_statement_encode_parts(statement, context_node,
+    value_len=librdf_statement_encode_parts2(world, statement, context_node,
                                             NULL, 0, fields);
     if(!value_len) {
       status=1;
@@ -646,7 +647,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
       break;
     }
        
-    if(!librdf_statement_encode_parts(statement, context_node,
+    if(!librdf_statement_encode_parts2(world, statement, context_node,
                                       context->value_buffer,
                                       context->value_buffer_len, fields)) {
       status=1;
@@ -727,6 +728,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   int hash_index=context->all_statements_hash_index;
   librdf_statement_part fields;
   int status;
+  librdf_world* world = storage->world;
   
   if(storage->index_contexts) {
     /* When we have contexts, we have to use find_statements for contains
@@ -746,14 +748,14 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
 
   /* ENCODE KEY */
   fields=(librdf_statement_part)context->hash_descriptions[hash_index]->key_fields;
-  key_len=librdf_statement_encode_parts(statement, NULL,
+  key_len=librdf_statement_encode_parts2(world, statement, NULL,
                                         NULL, 0, fields);
   if(!key_len)
     return 1;
   if(!(key_buffer=(unsigned char*)LIBRDF_MALLOC(data, key_len)))
     return 1;
        
-  if(!librdf_statement_encode_parts(statement, NULL,
+  if(!librdf_statement_encode_parts2(world, statement, NULL,
                                     key_buffer, key_len, fields)) {
     LIBRDF_FREE(data, key_buffer);
     return 1;
@@ -761,7 +763,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
 
   /* ENCODE VALUE */
   fields=(librdf_statement_part)context->hash_descriptions[hash_index]->value_fields;
-  value_len=librdf_statement_encode_parts(statement, NULL,
+  value_len=librdf_statement_encode_parts2(world, statement, NULL,
                                           NULL, 0, fields);
   if(!value_len) {
     LIBRDF_FREE(data, key_buffer);
@@ -774,7 +776,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   }
 
        
-  if(!librdf_statement_encode_parts(statement, NULL,
+  if(!librdf_statement_encode_parts2(world, statement, NULL,
                                     value_buffer, value_len, fields)) {
     LIBRDF_FREE(data, key_buffer);
     LIBRDF_FREE(data, value_buffer);
@@ -1176,7 +1178,7 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
   if(!value)
     return NULL;
 
-  if(!librdf_statement_decode(&context->statement, 
+  if(!librdf_statement_decode2(world, &context->statement, NULL,
                               (unsigned char*)value->data,
                               value->size))
     return NULL;
@@ -1265,6 +1267,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
   librdf_statement_part fields;
   unsigned char *key_buffer;
   librdf_iterator* iterator;
+  librdf_world* world = storage->world;
   
   icontext=(librdf_storage_hashes_node_iterator_context*)LIBRDF_CALLOC(librdf_storage_hashes_node_iterator_context, 1, sizeof(librdf_storage_hashes_node_iterator_context));
   if(!icontext)
@@ -1329,7 +1332,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
 
   /* ENCODE KEY */
   fields=(librdf_statement_part)scontext->hash_descriptions[hash_index]->key_fields;
-  icontext->key.size=librdf_statement_encode_parts(&icontext->statement, NULL,
+  icontext->key.size=librdf_statement_encode_parts2(world, &icontext->statement, NULL,
                                                    NULL, 0, fields);
   if(!icontext->key.size) {
     LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
@@ -1345,7 +1348,7 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
    */
   librdf_storage_add_reference(icontext->storage);
 
-  if(!librdf_statement_encode_parts(&icontext->statement, NULL,
+  if(!librdf_statement_encode_parts2(world, &icontext->statement, NULL,
                                     key_buffer, icontext->key.size, fields)) {
     LIBRDF_FREE(data, key_buffer);
     librdf_storage_hashes_node_iterator_finished(icontext);
@@ -1426,6 +1429,7 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
   librdf_hash_datum key, value; /* on stack - not allocated */
   int size;
   int status;
+  librdf_world* world = storage->world;
   
   if(context->contexts_index <0) {
     librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
@@ -1442,10 +1446,10 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
   key.size=librdf_node_encode(context_node, 
                                (unsigned char*)key.data, size);
 
-  size=librdf_statement_encode(statement, NULL, 0);
+  size=librdf_statement_encode2(world, statement, NULL, 0);
 
   value.data=(char*)LIBRDF_MALLOC(cstring, size);
-  value.size=librdf_statement_encode(statement, (unsigned char*)value.data, size);
+  value.size=librdf_statement_encode2(world, statement, (unsigned char*)value.data, size);
 
   status=librdf_hash_put(context->hashes[context->contexts_index], &key, &value);
   LIBRDF_FREE(data, key.data);
@@ -1474,6 +1478,7 @@ librdf_storage_hashes_context_remove_statement(librdf_storage* storage,
   librdf_hash_datum key, value; /* on stack - not allocated */
   int size;
   int status;
+  librdf_world* world = storage->world;
   
   if(context_node && context->contexts_index <0) {
     librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
@@ -1489,10 +1494,10 @@ librdf_storage_hashes_context_remove_statement(librdf_storage* storage,
   key.size=librdf_node_encode(context_node,
                                (unsigned char*)key.data, size);
 
-  size=librdf_statement_encode(statement, NULL, 0);
+  size=librdf_statement_encode2(world, statement, NULL, 0);
 
   value.data=(char*)LIBRDF_MALLOC(cstring, size);
-  value.size=librdf_statement_encode(statement, (unsigned char*)value.data, size);
+  value.size=librdf_statement_encode2(world, statement, (unsigned char*)value.data, size);
 
   status=librdf_hash_delete(context->hashes[context->contexts_index], &key, &value);
   LIBRDF_FREE(data, key.data);

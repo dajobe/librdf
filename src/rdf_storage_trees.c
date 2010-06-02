@@ -693,6 +693,7 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
           size_t l1;
           size_t l2;
           size_t l;
+          int r;
 
           s = librdf_node_get_literal_value_language(n1);
           l1 = s ? strlen(s) : 0;
@@ -702,8 +703,8 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
           l = (l1 < l2) ? l1 : l2;
 
           /* compare first by data type */
-          int r = librdf_uri_compare(librdf_node_get_literal_value_datatype_uri(n1),
-                                     librdf_node_get_literal_value_datatype_uri(n2));
+          r = librdf_uri_compare(librdf_node_get_literal_value_datatype_uri(n1),
+                                 librdf_node_get_literal_value_datatype_uri(n2));
           if (r)
             return r;
 

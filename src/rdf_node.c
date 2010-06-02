@@ -1727,7 +1727,7 @@ librdf_node_decode(librdf_world *world,
 librdf_iterator*
 librdf_node_static_iterator_create(librdf_node** nodes, int size)
 {
-  return librdf_node_new_static_node_iterator(nodes->[0]->world, nodes, size);
+  return librdf_node_new_static_node_iterator(nodes[0]->world, nodes, size);
 }
 
 
