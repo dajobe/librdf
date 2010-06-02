@@ -203,9 +203,11 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
   
   librdf_world_open(world);
 
-  return raptor_new_term_from_literal(world->raptor_world_ptr,
-                                      value, datatype_uri,
-                                      (const unsigned char*)xml_language);
+  return raptor_new_term_from_counted_literal(world->raptor_world_ptr,
+                                              value, value_len,
+                                              datatype_uri,
+                                              (const unsigned char*)xml_language,
+                                              (unsigned char)xml_language_len);
 }
 
 
