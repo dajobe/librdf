@@ -468,7 +468,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
     if(!length)
       return 0;
     
-#ifdef USE_RAPTOR_STATEMENT
+#ifdef LIBRDF_USE_RAPTOR_STATEMENT
     if(!(node = librdf_node_decode(NULL, &node_len, p, length)))
       return 0;
 #else
@@ -505,7 +505,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
       break;
 
     default:
-#ifdef USE_RAPTOR_STATEMENT
+#ifdef LIBRDF_USE_RAPTOR_STATEMENT
       /* FIXME - report this or not? */
 #else
       librdf_log(statement->world,

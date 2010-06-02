@@ -85,13 +85,13 @@ extern "C" {
 
 /* Use raptor_uris in place of librdf_uris for raptor2 */
 #ifdef RAPTOR_V2_AVAILABLE
-#define USE_RAPTOR_URI 1
-#define USE_RAPTOR_TERM 1
-#define USE_RAPTOR_STATEMENT 1
+#define LIBRDF_USE_RAPTOR_URI 1
+#define LIBRDF_USE_RAPTOR_TERM 1
+#define LIBRDF_USE_RAPTOR_STATEMENT 1
 #else
-#undef USE_RAPTOR_URI
-#undef USE_RAPTOR_TERM
-#undef USE_RAPTOR_STATEMENT
+#undef LIBRDF_USE_RAPTOR_URI
+#undef LIBRDF_USE_RAPTOR_TERM
+#undef LIBRDF_USE_RAPTOR_STATEMENT
 #endif
 
 /* Public typedefs (references to private structures) */
@@ -136,7 +136,7 @@ typedef struct librdf_digest_factory_s librdf_digest_factory;
  *
  * Redland URI class.
  */
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
 typedef struct raptor_uri_s librdf_uri;
 #else
 typedef struct librdf_uri_s librdf_uri;
@@ -161,7 +161,7 @@ typedef struct librdf_iterator_s librdf_iterator;
  *
  * Redland node class.
  */
-#ifdef USE_RAPTOR_TERM
+#ifdef LIBRDF_USE_RAPTOR_TERM
 typedef raptor_term librdf_node;
 #else
 typedef struct librdf_node_s librdf_node;
@@ -172,7 +172,7 @@ typedef struct librdf_node_s librdf_node;
  *
  * Redland statement class.
  */
-#ifdef USE_RAPTOR_STATEMENT
+#ifdef LIBRDF_USE_RAPTOR_STATEMENT
 typedef raptor_statement librdf_statement;
 #else
 typedef struct librdf_statement_s librdf_statement;

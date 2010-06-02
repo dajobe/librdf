@@ -62,7 +62,7 @@ extern "C" {
  * librdf_node_is_literal() or librdf_node_is_blank().
  *
  */
-#ifdef USE_RAPTOR_TERM
+#ifdef LIBRDF_USE_RAPTOR_TERM
 typedef enum {
   LIBRDF_NODE_TYPE_UNKNOWN   = RAPTOR_TERM_TYPE_UNKNOWN,
   LIBRDF_NODE_TYPE_RESOURCE  = RAPTOR_TERM_TYPE_URI,

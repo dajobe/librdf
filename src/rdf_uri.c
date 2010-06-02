@@ -59,7 +59,7 @@
 void
 librdf_init_uri(librdf_world *world)
 {
-#ifndef USE_RAPTOR_URI
+#ifndef LIBRDF_USE_RAPTOR_URI
   /* If no default given, create an in memory hash */
   if(!world->uris_hash) {
     world->uris_hash=librdf_new_hash(world, NULL);
@@ -87,7 +87,7 @@ librdf_init_uri(librdf_world *world)
 void
 librdf_finish_uri(librdf_world *world)
 {
-#ifndef USE_RAPTOR_URI
+#ifndef LIBRDF_USE_RAPTOR_URI
   if (world->uris_hash) {
     librdf_hash_close(world->uris_hash);
 
@@ -115,7 +115,7 @@ librdf_uri*
 librdf_new_uri(librdf_world *world, 
                const unsigned char *uri_string)
 {
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   return raptor_new_uri(world->raptor_world_ptr, uri_string);
 #else
   librdf_uri* new_uri;
@@ -205,7 +205,7 @@ librdf_new_uri(librdf_world *world,
 #endif
 
   return new_uri;
-#endif /* !USE_RAPTOR_URI */
+#endif /* !LIBRDF_USE_RAPTOR_URI */
 }
 
 
@@ -222,7 +222,7 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(old_uri, librdf_uri, NULL);
 
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   return raptor_uri_copy(old_uri);
 #else
   old_uri->usage++;
@@ -243,7 +243,7 @@ librdf_new_uri_from_uri (librdf_uri* old_uri) {
 librdf_uri*
 librdf_new_uri_from_uri_local_name (librdf_uri* old_uri, 
                                     const unsigned char *local_name) {
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   return raptor_new_uri_from_uri_local_name(raptor_uri_get_world(old_uri), old_uri, local_name);
 #else
   int len;
@@ -268,7 +268,7 @@ librdf_new_uri_from_uri_local_name (librdf_uri* old_uri,
   LIBRDF_FREE(cstring, new_string);
 
   return new_uri;
-#endif /* !USE_RAPTOR_URI */
+#endif /* !LIBRDF_USE_RAPTOR_URI */
 }
 
 
@@ -291,7 +291,7 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
   int len;
   unsigned char *new_uri_string;
   librdf_uri *new_uri;
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
 #else
   librdf_world *world = source_uri->world;
 #endif
@@ -309,11 +309,11 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
 
   /* empty URI - easy, just make from base_uri */
   if(!*uri_string && base_uri) {
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
     return raptor_uri_copy(base_uri);
 #else
     return librdf_new_uri_from_uri(base_uri);
-#endif /* !USE_RAPTOR_URI */
+#endif /* !LIBRDF_USE_RAPTOR_URI */
   }
   
   source_uri_string = librdf_uri_as_counted_string(source_uri,
@@ -325,7 +325,7 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
   if(*uri_string != '#' &&
      strncmp((const char*)uri_string, (const char*)source_uri_string,
              source_uri_string_length)) {
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
     raptor_world* rworld = raptor_uri_get_world(base_uri);
     return raptor_new_uri(rworld, uri_string);
 #else
@@ -357,11 +357,11 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
   strcpy((char*)new_uri_string + base_uri_string_length,
          (const char*)uri_string);
   
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   new_uri = raptor_new_uri(raptor_uri_get_world(source_uri), new_uri_string);
 #else
   new_uri=librdf_new_uri(world, new_uri_string);
-#endif /* !USE_RAPTOR_URI */
+#endif /* !LIBRDF_USE_RAPTOR_URI */
   LIBRDF_FREE(cstring, new_uri_string); /* always free this even on failure */
 
   return new_uri; /* new URI or NULL from librdf_new_uri failure */
@@ -384,7 +384,7 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
 librdf_uri*
 librdf_new_uri_relative_to_base(librdf_uri* base_uri,
                                 const unsigned char *uri_string) {
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   return raptor_new_uri_relative_to_base(raptor_uri_get_world(base_uri),
                                          base_uri,
                                          uri_string);
@@ -415,7 +415,7 @@ librdf_new_uri_relative_to_base(librdf_uri* base_uri,
   new_uri=librdf_new_uri(world, buffer);
   LIBRDF_FREE(cstring, buffer);
   return new_uri;
-#endif /* !USE_RAPTOR_URI */
+#endif /* !LIBRDF_USE_RAPTOR_URI */
 }
 
 
@@ -459,7 +459,7 @@ librdf_new_uri_from_filename(librdf_world* world, const char *filename) {
 void
 librdf_free_uri(librdf_uri* uri) 
 {
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   if(!uri)
     return;
   
@@ -509,7 +509,7 @@ librdf_free_uri(librdf_uri* uri)
 #ifdef WITH_THREADS
   pthread_mutex_unlock(world->mutex);
 #endif
-#endif /* !USE_RAPTOR_URI */
+#endif /* !LIBRDF_USE_RAPTOR_URI */
 }
 
 
@@ -528,7 +528,7 @@ unsigned char*
 librdf_uri_as_string (librdf_uri *uri) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   return raptor_uri_as_string(uri);
 #else
   return uri->string;
@@ -552,7 +552,7 @@ unsigned char*
 librdf_uri_as_counted_string(librdf_uri *uri, size_t* len_p) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   return raptor_uri_as_counted_string(uri, len_p);
 #else
   if(len_p)
@@ -648,7 +648,7 @@ librdf_uri_to_string (librdf_uri* uri)
 unsigned char*
 librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p)
 {
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   return raptor_uri_to_counted_string(uri, len_p);
 #else
   unsigned char *s;
@@ -683,7 +683,7 @@ librdf_uri_to_counted_string (librdf_uri* uri, size_t* len_p)
 int
 librdf_uri_equals(librdf_uri* first_uri, librdf_uri* second_uri) 
 {
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   return raptor_uri_equals(first_uri, second_uri);
 #else
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(first_uri, librdf_uri, 0);
@@ -749,7 +749,7 @@ librdf_uri_to_filename(librdf_uri* uri)
 int
 librdf_uri_compare(librdf_uri* uri1, librdf_uri* uri2)
 {
-#ifdef USE_RAPTOR_URI
+#ifdef LIBRDF_USE_RAPTOR_URI
   return raptor_uri_compare(uri1, uri2);
 #else
   if(uri1 == uri2)
