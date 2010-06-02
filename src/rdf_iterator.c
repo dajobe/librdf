@@ -492,7 +492,7 @@ main(int argc, char *argv[])
   }
   
   fprintf(stdout, "%s: Creating static node iterator\n", program);
-  iterator=librdf_node_static_iterator_create(nodes, ITERATOR_NODES_COUNT);
+  iterator = librdf_node_new_static_node_iterator(world, nodes, ITERATOR_NODES_COUNT);
   if(!iterator) {
     fprintf(stderr, "%s: Failed to createstatic  node iterator\n", program);
     return(1);
