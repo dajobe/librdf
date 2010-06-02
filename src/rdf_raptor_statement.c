@@ -424,16 +424,15 @@ size_t
 librdf_statement_decode(librdf_statement* statement, 
                         unsigned char *buffer, size_t length)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
-
-  return librdf_statement_decode_parts(statement, NULL, buffer, length);
+  return 0;
 }
 
 
 size_t
-librdf_statement_decode_parts(librdf_statement* statement, 
-                              librdf_node** context_node,
-                              unsigned char *buffer, size_t length)
+librdf_statement_decode2(librdf_world* world,
+                         librdf_statement* statement,
+                         librdf_node** context_node,
+                         unsigned char *buffer, size_t length)
 {
   unsigned char *p;
   librdf_node* node;

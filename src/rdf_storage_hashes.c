@@ -916,7 +916,10 @@ librdf_storage_hashes_serialise_get_statement(void* context, int flags)
   librdf_storage_hashes_serialise_stream_context* scontext=(librdf_storage_hashes_serialise_stream_context*)context;
   librdf_hash_datum* hd;
   librdf_node** cnp=NULL;
-
+  librdf_world* world;
+  
+  world = scontext->storage->world;
+  
   if(scontext->search_node) {
     switch(flags) {
       case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
@@ -955,16 +958,16 @@ librdf_storage_hashes_serialise_get_statement(void* context, int flags)
       hd=(librdf_hash_datum*)librdf_iterator_get_key(scontext->iterator);
       
       /* decode key content */
-      if(!librdf_statement_decode_parts(&scontext->current, NULL,
-                                        (unsigned char*)hd->data, hd->size)) {
+      if(!librdf_statement_decode2(world, &scontext->current, NULL,
+                                   (unsigned char*)hd->data, hd->size)) {
         return NULL;
       }
       
       hd=(librdf_hash_datum*)librdf_iterator_get_value(scontext->iterator);
       
       /* decode value content and optional context */
-      if(!librdf_statement_decode_parts(&scontext->current, cnp,
-                                        (unsigned char*)hd->data, hd->size)) {
+      if(!librdf_statement_decode2(world, &scontext->current, cnp,
+                                   (unsigned char*)hd->data, hd->size)) {
         return NULL;
       }
 
@@ -1100,6 +1103,9 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
   librdf_storage_hashes_node_iterator_context* context=(librdf_storage_hashes_node_iterator_context*)iterator;
   librdf_node* node;
   librdf_hash_datum* value;
+  librdf_world* world;
+  
+  world = context->storage->world;
   
   if(librdf_iterator_end(context->iterator))
     return NULL;
@@ -1116,9 +1122,9 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
     context->context_node=NULL;
       
     /* decode value content and optional context */
-    if(!librdf_statement_decode_parts(&context->statement,
-                                      &context->context_node,
-                                      (unsigned char*)value->data, value->size))
+    if(!librdf_statement_decode2(world, &context->statement,
+                                 &context->context_node,
+                                 (unsigned char*)value->data, value->size))
       return NULL;
     librdf_statement_clear(&context->statement);
     
@@ -1608,6 +1614,9 @@ librdf_storage_hashes_context_serialise_get_statement(void* context, int flags)
   librdf_storage_hashes_context_serialise_stream_context* scontext=(librdf_storage_hashes_context_serialise_stream_context*)context;
   librdf_hash_datum* v;
   librdf_node** cnp=NULL;
+  librdf_world* world;
+
+  world = scontext->storage->world;
 
   switch(flags) {
     case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
@@ -1633,8 +1642,8 @@ librdf_storage_hashes_context_serialise_get_statement(void* context, int flags)
       v=(librdf_hash_datum*)librdf_iterator_get_value(scontext->iterator);
       
       /* decode value content and optional context */
-      if(!librdf_statement_decode_parts(&scontext->current, cnp,
-                                        (unsigned char*)v->data, v->size)) {
+      if(!librdf_statement_decode2(world, &scontext->current, cnp,
+                                   (unsigned char*)v->data, v->size)) {
         return NULL;
       }
       

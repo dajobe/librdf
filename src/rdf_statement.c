@@ -600,7 +600,8 @@ librdf_statement_match(librdf_statement* statement,
 
 
 /**
- * librdf_statement_encode:
+ * librdf_statement_encode2:
+ * @world: redland world
  * @statement: the statement to serialise
  * @buffer: the buffer to use
  * @length: buffer size
@@ -614,20 +615,52 @@ librdf_statement_match(librdf_statement* statement,
  * Return value: the number of bytes written or 0 on failure.
  **/
 size_t
+librdf_statement_encode2(librdf_world *world,
+                         librdf_statement* statement, 
+                         unsigned char *buffer, 
+                         size_t length)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
+
+  return librdf_statement_encode_parts2(world, statement,
+                                        NULL,
+                                        buffer, length,
+                                        LIBRDF_STATEMENT_ALL);
+}
+
+
+/**
+ * librdf_statement_encode:
+ * @statement: the statement to serialise
+ * @buffer: the buffer to use
+ * @length: buffer size
+ *
+ * Serialise a statement into a buffer.
+ * 
+ * Encodes the given statement in the buffer, which must be of sufficient
+ * size.  If buffer is NULL, no work is done but the size of buffer
+ * required is returned.
+ * 
+ * @Deprecated: Use librdf_statement_encode2()
+ *
+ * Return value: the number of bytes written or 0 on failure.
+ **/
+size_t
 librdf_statement_encode(librdf_statement* statement, 
                         unsigned char *buffer, 
                         size_t length)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
-  return librdf_statement_encode_parts(statement, NULL,
-                                       buffer, length,
-                                       LIBRDF_STATEMENT_ALL);
+  return librdf_statement_encode_parts2(statement->world, statement,
+                                        NULL,
+                                        buffer, length,
+                                        LIBRDF_STATEMENT_ALL);
 }
 
 
 /**
- * librdf_statement_encode_parts:
+ * librdf_statement_encode_parts2:
  * @statement: statement to serialise
  * @context_node: #librdf_node context node (can be NULL)
  * @buffer: the buffer to use
@@ -641,19 +674,20 @@ librdf_statement_encode(librdf_statement* statement,
  * required is returned.
  *
  * The fields values are or-ed combinations of:
- * LIBRDF_STATEMENT_SUBJECT LIBRDF_STATEMENT_PREDICATE
- * LIBRDF_STATEMENT_OBJECT
- * or LIBRDF_STATEMENT_ALL for subject,prdicate,object fields
+ * #LIBRDF_STATEMENT_SUBJECT #LIBRDF_STATEMENT_PREDICATE
+ * #LIBRDF_STATEMENT_OBJECT
+ * or #LIBRDF_STATEMENT_ALL for subject,prdicate,object fields
  * 
  * If context_node is given, it is encoded also
  *
  * Return value: the number of bytes written or 0 on failure.
  **/
 size_t
-librdf_statement_encode_parts(librdf_statement* statement, 
-                              librdf_node* context_node,
-                              unsigned char *buffer, size_t length,
-                              librdf_statement_part fields)
+librdf_statement_encode_parts2(librdf_world* world,
+                               librdf_statement* statement, 
+                               librdf_node* context_node,
+                               unsigned char *buffer, size_t length,
+                               librdf_statement_part fields)
 {
   size_t total_length=0;
   size_t node_len;
@@ -764,30 +798,48 @@ librdf_statement_encode_parts(librdf_statement* statement,
 
 
 /**
- * librdf_statement_decode:
- * @statement: the statement to deserialise into
+ * librdf_statement_encode_parts:
+ * @statement: statement to serialise
+ * @context_node: #librdf_node context node (can be NULL)
  * @buffer: the buffer to use
  * @length: buffer size
+ * @fields: fields to encode
  *
- * Decodes a statement from a buffer.
+ * Serialise parts of a statement into a buffer.
  * 
- * Decodes the serialised statement (as created by librdf_statement_encode() )
- * from the given buffer.
+ * Encodes the given statement in the buffer, which must be of sufficient
+ * size.  If buffer is NULL, no work is done but the size of buffer
+ * required is returned.
+ *
+ * The fields values are or-ed combinations of:
+ * #LIBRDF_STATEMENT_SUBJECT #LIBRDF_STATEMENT_PREDICATE
+ * #LIBRDF_STATEMENT_OBJECT
+ * or #LIBRDF_STATEMENT_ALL for subject,prdicate,object fields
  * 
- * Return value: number of bytes used or 0 on failure (bad encoding, allocation failure)
+ * If context_node is given, it is encoded also
+ *
+ * @Deprecated: This will no longer be a public API
+ * 
+ * Return value: the number of bytes written or 0 on failure.
  **/
 size_t
-librdf_statement_decode(librdf_statement* statement, 
-                        unsigned char *buffer, size_t length)
+librdf_statement_encode_parts(librdf_statement* statement, 
+                              librdf_node* context_node,
+                              unsigned char *buffer, size_t length,
+                              librdf_statement_part fields)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
-  return librdf_statement_decode_parts(statement, NULL, buffer, length);
+  return librdf_statement_encode_parts2(statement->world, statement, 
+                                        context_node,
+                                        buffer, length,
+                                        fields);
 }
 
 
 /**
- * librdf_statement_decode_parts:
+ * librdf_statement_decode2:
+ * @world: redland world
  * @statement: the statement to deserialise into
  * @context_node: pointer to #librdf_node context_node to deserialise into
  * @buffer: the buffer to use
@@ -802,9 +854,10 @@ librdf_statement_decode(librdf_statement* statement,
  * Return value: number of bytes used or 0 on failure (bad encoding, allocation failure)
  **/
 size_t
-librdf_statement_decode_parts(librdf_statement* statement, 
-                              librdf_node** context_node,
-                              unsigned char *buffer, size_t length)
+librdf_statement_decode2(librdf_world* world,
+                         librdf_statement* statement, 
+                         librdf_node** context_node,
+                         unsigned char *buffer, size_t length)
 {
   unsigned char *p;
   librdf_node* node;
@@ -839,7 +892,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
     if(!length)
       return 0;
     
-    if(!(node=librdf_node_decode(statement->world, &node_len, p, length)))
+    if(!(node=librdf_node_decode(world, &node_len, p, length)))
       return 0;
 
     p += node_len;
@@ -871,7 +924,7 @@ librdf_statement_decode_parts(librdf_statement* statement,
       break;
 
     default:
-      librdf_log(statement->world,
+      librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STATEMENT, NULL,
                  "Illegal statement encoding '%c' seen", p[-1]);
       return 0;
@@ -880,6 +933,33 @@ librdf_statement_decode_parts(librdf_statement* statement,
 
   return total_length;
 }
+
+
+/**
+ * librdf_statement_decode:
+ * @statement: the statement to deserialise into
+ * @buffer: the buffer to use
+ * @length: buffer size
+ *
+ * Decodes a statement from a buffer.
+ * 
+ * Decodes the serialised statement (as created by librdf_statement_encode() )
+ * from the given buffer.
+ *
+ * @Deprecated: Replaced by librdf_statement_decode2()
+ * 
+ * Return value: number of bytes used or 0 on failure (bad encoding, allocation failure)
+ **/
+size_t
+librdf_statement_decode(librdf_statement* statement, 
+                        unsigned char *buffer, size_t length)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
+
+  return librdf_statement_decode2(statement->world, statement,
+                                  NULL, buffer, length);
+}
+
 
 #endif
 

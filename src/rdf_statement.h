@@ -125,13 +125,19 @@ REDLAND_API
 int librdf_statement_match(librdf_statement* statement, librdf_statement* partial_statement);
 
 /* serialising/deserialising */
-REDLAND_API
+REDLAND_API REDLAND_DEPRECATED
 size_t librdf_statement_encode(librdf_statement* statement, unsigned char *buffer, size_t length);
 REDLAND_API
+size_t librdf_statement_encode2(librdf_world* world, librdf_statement* statement, unsigned char *buffer, size_t length);
+REDLAND_API REDLAND_DEPRECATED
 size_t librdf_statement_encode_parts(librdf_statement* statement, librdf_node* context_node, unsigned char *buffer, size_t length, librdf_statement_part fields);
 REDLAND_API
+size_t librdf_statement_encode_parts2(librdf_world* world, librdf_statement* statement, librdf_node* context_node, unsigned char *buffer, size_t length, librdf_statement_part fields);
+REDLAND_API REDLAND_DEPRECATED
 size_t librdf_statement_decode(librdf_statement* statement, unsigned char *buffer, size_t length);
 REDLAND_API
+size_t librdf_statement_decode2(librdf_world* world, librdf_statement* statement, librdf_node** context_node, unsigned char *buffer, size_t length);
+REDLAND_API REDLAND_DEPRECATED
 size_t librdf_statement_decode_parts(librdf_statement* statement, librdf_node** context_node, unsigned char *buffer, size_t length);
 
 
