@@ -762,10 +762,10 @@ librdf_node_equals(librdf_node *first_node, librdf_node *second_node)
 }
 
 
+/* Deprecated. Always fails - use librdf_node_new_static_node_iterator()  */
 librdf_iterator*
 librdf_node_static_iterator_create(librdf_node **nodes, int size)
 {
-  /* FIXME */
   return NULL;
 }
 

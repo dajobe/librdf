@@ -191,8 +191,10 @@ int librdf_node_equals(librdf_node* first_node, librdf_node* second_node);
 
 
 /* create an iterator for a static array of nodes */
-REDLAND_API
+REDLAND_API REDLAND_DEPRECATED
 librdf_iterator* librdf_node_static_iterator_create(librdf_node** nodes, int size);
+REDLAND_API
+librdf_iterator* librdf_node_new_static_node_iterator(librdf_world* world, librdf_node** nodes, int size);
 
 
 #ifdef __cplusplus

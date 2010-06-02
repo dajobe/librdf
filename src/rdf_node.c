@@ -1709,74 +1709,6 @@ librdf_node_decode(librdf_world *world,
 
 
 
-/* iterator over a static array of nodes; - mostly for testing */
-static int librdf_node_static_iterator_is_end(void* iterator);
-static int librdf_node_static_iterator_next_method(void* iterator);
-static void* librdf_node_static_iterator_get_method(void* iterator, int flags);
-static void librdf_node_static_iterator_finished(void* iterator);
-
-typedef struct {
-  librdf_world *world;
-  librdf_node** nodes; /* static array of nodes; shared */
-  int size;            /* size of above array */
-  int current;         /* index into above array */
-} librdf_node_static_iterator_context;
-
-
-static int
-librdf_node_static_iterator_is_end(void* iterator)
-{
-  librdf_node_static_iterator_context* context=(librdf_node_static_iterator_context*)iterator;
-
-  return (context->current > context->size-1);
-}
-
-
-static int
-librdf_node_static_iterator_next_method(void* iterator) 
-{
-  librdf_node_static_iterator_context* context=(librdf_node_static_iterator_context*)iterator;
-
-  if(context->current > context->size-1)
-    return 1;
-
-  context->current++;
-  return 0;
-}
-
-
-static void*
-librdf_node_static_iterator_get_method(void* iterator, int flags) 
-{
-  librdf_node_static_iterator_context* context=(librdf_node_static_iterator_context*)iterator;
-  
-  if(context->current > context->size-1)
-    return NULL;
-
-  switch(flags) {
-    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
-       return (void*)context->nodes[context->current];
-
-    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
-      return NULL;
-
-    default:
-      librdf_log(context->world,
-                 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_NODE, NULL,
-                 "Unknown iterator method flag %d", flags);
-      return NULL;
-  }
-}
-
-
-static void
-librdf_node_static_iterator_finished(void* iterator) 
-{
-  librdf_node_static_iterator_context* context=(librdf_node_static_iterator_context*)iterator;
-  LIBRDF_FREE(librdf_node_static_iterator_context, context);
-}
-
-
 /**
  * librdf_node_static_iterator_create:
  * @nodes: static array of #librdf_node objects
@@ -1787,35 +1719,17 @@ librdf_node_static_iterator_finished(void* iterator)
  * This creates an iterator for an existing static array of librdf_node
  * objects.  It is mostly intended for testing iterator code.
  * 
+ * @deprecated: This will break when Redland is built with Raptor 2.  Use 
+ * librdf_new_static_node_iterator() with a world argument.
+ *
  * Return value: a #librdf_iterator serialization of the nodes or NULL on failure
  **/
 librdf_iterator*
-librdf_node_static_iterator_create(librdf_node** nodes,
-                                   int size)
+librdf_node_static_iterator_create(librdf_node** nodes, int size)
 {
-  librdf_node_static_iterator_context* context;
-  librdf_iterator* iterator;
-  
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(nodes, librdf_node**, NULL);
-
-  context=(librdf_node_static_iterator_context*)LIBRDF_CALLOC(librdf_node_static_iterator_context, 1, sizeof(librdf_node_static_iterator_context));
-  if(!context)
-    return NULL;
-
-  context->nodes=nodes;
-  context->size=size;
-  context->current=0;
-
-  iterator=librdf_new_iterator(nodes[0]->world,
-                               (void*)context,
-                               librdf_node_static_iterator_is_end,
-                               librdf_node_static_iterator_next_method,
-                               librdf_node_static_iterator_get_method,
-                               librdf_node_static_iterator_finished);
-  if(!iterator)
-    librdf_node_static_iterator_finished(context);
-  return iterator;
+  return librdf_node_new_static_node_iterator(nodes->[0]->world, nodes, size);
 }
+
 
 #endif
 

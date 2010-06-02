@@ -99,6 +99,7 @@ rdf_storage_internal.h \
 rdf_stream_internal.h \
 rdf_uri_internal.h
 
+librdf_la_SOURCES += rdf_node_common.c
 if RAPTOR2
 librdf_la_SOURCES += rdf_term.c rdf_raptor_statement.c
 else
