@@ -85,9 +85,13 @@ extern "C" {
 
 /* Use raptor_uris in place of librdf_uris for raptor2 */
 #ifdef RAPTOR_V2_AVAILABLE
-#define USE_RAPTOR_URI
-#define USE_RAPTOR_TERM
-#define USE_RAPTOR_STATEMENT
+#define USE_RAPTOR_URI 1
+#define USE_RAPTOR_TERM 1
+#define USE_RAPTOR_STATEMENT 1
+#else
+#undef USE_RAPTOR_URI
+#undef USE_RAPTOR_TERM
+#undef USE_RAPTOR_STATEMENT
 #endif
 
 /* Public typedefs (references to private structures) */
