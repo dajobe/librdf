@@ -212,6 +212,20 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
 
 
 librdf_node*
+librdf_new_node_from_counted_blank_identifier(librdf_world *world,
+                                              const unsigned char *identifier,
+                                              size_t identifier_len)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
+  
+  librdf_world_open(world);
+
+  return raptor_new_term_from_counted_blank(world->raptor_world_ptr,
+                                            identifier, identifier_len);
+}
+
+
+librdf_node*
 librdf_new_node_from_blank_identifier(librdf_world *world,
                                       const unsigned char *identifier)
 {
