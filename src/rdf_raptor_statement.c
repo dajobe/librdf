@@ -294,6 +294,19 @@ librdf_statement_match(librdf_statement* statement,
 
 
 size_t
+librdf_statement_encode2(librdf_world *world,
+                         librdf_statement* statement, 
+                         unsigned char *buffer, 
+                         size_t length)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
+
+  return librdf_statement_encode_parts(statement, NULL,
+                                       buffer, length,
+                                       LIBRDF_STATEMENT_ALL);
+}
+
+size_t
 librdf_statement_encode(librdf_statement* statement, 
                         unsigned char *buffer, 
                         size_t length)
