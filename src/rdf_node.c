@@ -1076,10 +1076,11 @@ librdf_node_get_li_ordinal(librdf_node* node) {
  *
  * Get the blank node identifier.
  *
- * Return value: the identifier value
+ * Return value: the identifier value or NULL on failure
  **/
 unsigned char *
-librdf_node_get_blank_identifier(librdf_node* node) {
+librdf_node_get_blank_identifier(librdf_node* node)
+{
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
   LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_BLANK),
                        "node is not type blank", NULL);
@@ -1087,6 +1088,28 @@ librdf_node_get_blank_identifier(librdf_node* node) {
   return node->value.blank.identifier;
 }
 
+
+/**
+ * librdf_node_get_blank_identifier:
+ * @node: the node object
+ * @len_p: pointer to variable to store length (or NULL)
+ *
+ * Get the blank node identifier with length.
+ *
+ * Return value: the identifier value or NULL on failure
+ **/
+unsigned char *
+librdf_node_get_counted_blank_identifier(librdf_node* node, size_t* len_p)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
+  LIBRDF_ASSERT_RETURN((node->type != LIBRDF_NODE_TYPE_BLANK),
+                       "node is not type blank", NULL);
+
+  if(len_p)
+    *len_p = strlen(node->value.blank.identifier);
+  
+  return node->value.blank.identifier;
+}
 
 /**
  * librdf_node_is_resource:
