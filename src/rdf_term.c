@@ -393,6 +393,14 @@ librdf_node_get_blank_identifier(librdf_node *node)
 }
 
 
+unsigned char*
+librdf_node_get_counted_blank_identifier(librdf_node* node, size_t* len_p)
+{
+  if(len_p)
+    *len_p = node->value.blank.string_len;
+  return node->value.blank.string;
+}
+
 int
 librdf_node_is_resource(librdf_node *node)
 {

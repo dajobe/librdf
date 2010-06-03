@@ -161,6 +161,8 @@ int librdf_node_get_li_ordinal(librdf_node* node);
 REDLAND_API
 unsigned char *librdf_node_get_blank_identifier(librdf_node* node);
 REDLAND_API
+unsigned char *librdf_node_get_counted_blank_identifier(librdf_node* node, size_t* len_p);
+REDLAND_API
 int librdf_node_is_resource(librdf_node* node);
 REDLAND_API
 int librdf_node_is_literal(librdf_node* node);
