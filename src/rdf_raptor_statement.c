@@ -481,7 +481,7 @@ librdf_statement_decode2(librdf_world* world,
       return 0;
     
 #ifdef LIBRDF_USE_RAPTOR_STATEMENT
-    if(!(node = librdf_node_decode(NULL, &node_len, p, length)))
+    if(!(node = librdf_node_decode(world, &node_len, p, length)))
       return 0;
 #else
     if(!(node = librdf_node_decode(statement->world, &node_len, p, length)))
