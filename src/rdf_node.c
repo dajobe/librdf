@@ -1090,7 +1090,7 @@ librdf_node_get_blank_identifier(librdf_node* node)
 
 
 /**
- * librdf_node_get_blank_identifier:
+ * librdf_node_get_counted_blank_identifier:
  * @node: the node object
  * @len_p: pointer to variable to store length (or NULL)
  *
@@ -1106,7 +1106,7 @@ librdf_node_get_counted_blank_identifier(librdf_node* node, size_t* len_p)
                        "node is not type blank", NULL);
 
   if(len_p)
-    *len_p = strlen(node->value.blank.identifier);
+    *len_p = node->value.blank.identifier_len;
   
   return node->value.blank.identifier;
 }
