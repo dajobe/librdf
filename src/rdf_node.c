@@ -713,9 +713,9 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   librdf_world_open(world);
 
   if(identifier)
-    identifier_len = strlen(identifier);
+    identifier_len = strlen((const char*)identifier);
   
-  return librdf_new_node_from_blank_counted_identifier(world, identifier,
+  return librdf_new_node_from_counted_blank_identifier(world, identifier,
                                                        identifier_len);
 }
 
