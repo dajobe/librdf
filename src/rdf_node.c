@@ -2,7 +2,7 @@
  *
  * rdf_node.c - RDF Node (RDF URI, Literal, Blank Node) Interface
  *
- * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2010, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -594,24 +594,25 @@ librdf_new_node_from_typed_literal(librdf_world *world,
 }
 
 /**
- * librdf_new_node_from_blank_identifier:
+ * librdf_new_node_from_counted_blank_identifier:
  * @world: redland world object
  * @identifier: blank node identifier or NULL
+ * @identifier_len: length of @identifier
  *
- * Constructor - create a new blank node #librdf_node object from a blank node identifier.
+ * Constructor - create a new blank node #librdf_node object from a blank node counted length identifier.
  *
- * If no identifier string is given, creates a new internal identifier
+ * If no @identifier string is given, creates a new internal identifier
  * and assigns it.
  * 
  * Return value: new #librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_blank_identifier(librdf_world *world,
-                                      const unsigned char *identifier)
+librdf_new_node_from_counted_blank_identifier(librdf_world *world,
+                                              const unsigned char *identifier,
+                                              size_t identifier_len)
 {
   librdf_node* new_node;
   unsigned char *new_identifier;
-  int len;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
 
@@ -622,29 +623,27 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
 #endif
 
   if(!identifier) {
-    new_identifier=librdf_world_get_genid(world);
+    new_identifier = librdf_world_get_genid(world);
     if(!new_identifier) {
-      new_node=NULL;
+      new_node = NULL;
       goto unlock;
     }
-    len=strlen((const char *)new_identifier);
+    identifier_len = strlen((const char *)new_identifier);
   } else {
-    len=strlen((const char*)identifier);
-    
-    new_identifier=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
+    new_identifier = (unsigned char*)LIBRDF_MALLOC(cstring, identifier_len + 1);
     if(!new_identifier) {
       new_node=NULL;
       goto unlock;
     }
-    strcpy((char*)new_identifier, (const char*)identifier);
+    memcpy(new_identifier, identifier, identifier_len + 1);
   }
 
-  key.data=new_identifier;
-  key.size=len;
+  key.data = new_identifier;
+  key.size = identifier_len;
 
   /* if the existing node found in resource hash, return it */
-  if((old_value=librdf_hash_get_one(world->nodes_hash[H_BLANK], &key))) {
-    new_node=*(librdf_node**)old_value->data;
+  if((old_value = librdf_hash_get_one(world->nodes_hash[H_BLANK], &key))) {
+    new_node = *(librdf_node**)old_value->data;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG3("Found existing blank node identifier %s in hash with current usage %d\n", new_identifier, new_node->usage);
@@ -665,20 +664,20 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
     goto unlock;
   }
 
-  new_node->world=world;
-  new_node->value.blank.identifier=new_identifier;
-  new_node->value.blank.identifier_len=len;
-  new_node->type=LIBRDF_NODE_TYPE_BLANK;
+  new_node->world = world;
+  new_node->value.blank.identifier = new_identifier;
+  new_node->value.blank.identifier_len = identifier_len;
+  new_node->type = LIBRDF_NODE_TYPE_BLANK;
 
-  new_node->usage=1;
+  new_node->usage = 1;
 
-  value.data=&new_node; value.size=sizeof(librdf_node*);
+  value.data = &new_node; value.size = sizeof(librdf_node*);
 
   /* store in hash: (blank node ID string) => (librdf_node*) */
   if(librdf_hash_put(world->nodes_hash[H_BLANK], &key, &value)) {
     LIBRDF_FREE(librdf_node, new_node);
     LIBRDF_FREE(cstring, new_identifier);
-    new_node=NULL;
+    new_node = NULL;
   }
 
 
@@ -688,6 +687,36 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
 #endif
 
   return new_node;
+}
+
+
+/**
+ * librdf_new_node_from_blank_identifier:
+ * @world: redland world object
+ * @identifier: blank node identifier or NULL
+ *
+ * Constructor - create a new blank node #librdf_node object from a blank node identifier.
+ *
+ * If no identifier string is given, creates a new internal identifier
+ * and assigns it.
+ * 
+ * Return value: new #librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_new_node_from_blank_identifier(librdf_world *world,
+                                      const unsigned char *identifier)
+{
+  size_t identifier_len = 0;
+  
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
+
+  librdf_world_open(world);
+
+  if(identifier)
+    identifier_len = strlen(identifier);
+  
+  return librdf_new_node_from_blank_counted_identifier(world, identifier,
+                                                       identifier_len);
 }
 
 

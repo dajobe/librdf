@@ -121,6 +121,8 @@ librdf_node* librdf_new_node_from_typed_counted_literal(librdf_world *world, con
 /* Create a new Node from blank node identifier. */
 REDLAND_API
 librdf_node* librdf_new_node_from_blank_identifier(librdf_world* world, const unsigned char *identifier);
+REDLAND_API
+librdf_node* librdf_new_node_from_blank_counted_identifier(librdf_world* world, const unsigned char *identifier, size_t identifier_len);
 
 /* Create a new Node from an existing Node - CLONE */
 REDLAND_API
