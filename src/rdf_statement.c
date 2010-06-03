@@ -1019,7 +1019,7 @@ main(int argc, char *argv[])
   statement2=librdf_new_statement(world);
 
   fprintf(stdout, "%s: Decoding statement from buffer\n", program);
-  if(!librdf_statement_decode2(world, statement2,
+  if(!librdf_statement_decode2(world, statement2, NULL,
                                (unsigned char*)buffer, size)) {
     fprintf(stdout, "%s: Decoding statement failed\n", program);
     return(1);
