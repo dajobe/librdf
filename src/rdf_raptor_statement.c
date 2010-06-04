@@ -1,6 +1,6 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_statement.c - RDF Statement Class
+ * rdf_raptor_statement.c - RDF Statement Class using raptor_statement
  *
  * Copyright (C) 2010, David Beckett http://www.dajobe.org/
  * 
