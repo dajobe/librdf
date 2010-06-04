@@ -729,7 +729,7 @@ librdf_storage_list_context_serialise_get_statement(void* context, int flags)
 
       /* decode value content */
       if(!librdf_statement_decode2(world, &scontext->current, NULL,
-                                  (unsigned char*)v->data, v->size)) {
+                                   (unsigned char*)v->data, v->size)) {
         return NULL;
       }
 
