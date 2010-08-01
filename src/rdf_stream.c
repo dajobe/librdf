@@ -636,7 +636,7 @@ librdf_stream_write(librdf_stream *stream, raptor_iostream *iostr)
     
     context_node = (librdf_node*)librdf_stream_get_context(stream);
     if(context_node) {
-      raptor_iostream_counted_string_write(" with context", 13, iostr);
+      raptor_iostream_counted_string_write(" with context ", 14, iostr);
       librdf_node_write(context_node, iostr);
     }
     raptor_iostream_counted_string_write(". \n", 3, iostr);
