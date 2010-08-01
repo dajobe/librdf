@@ -452,7 +452,7 @@ librdf_node_encode(librdf_node *node,
         buffer[0] = 'R';
         buffer[1] = (string_length & 0xff00) >> 8;
         buffer[2] = (string_length & 0x00ff);
-        memcpy((char*)buffer + 3, string, string_length);
+        memcpy((char*)buffer + 3, string, string_length + 1);
       }
       break;
       
