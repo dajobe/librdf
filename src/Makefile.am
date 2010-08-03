@@ -141,7 +141,10 @@ endif
 if STORAGE_SQLITE
 plugin_LTLIBRARIES += librdf_storage_sqlite.la
 librdf_storage_sqlite_la_SOURCES = rdf_storage_sqlite.c
-librdf_storage_sqlite_la_CPPFLAGS = @SQLITE_CPPFLAGS@
+# This extra substitution is to ensure general -I paths appear before
+# ones for SQLITE headers.  There is no other way to adjust the
+# automake-generated rule to ensure this.
+librdf_storage_sqlite_la_CPPFLAGS = $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) @SQLITE_CPPFLAGS@
 librdf_storage_sqlite_la_LIBADD = @SQLITE_LIBS@ librdf.la
 librdf_storage_sqlite_la_LDFLAGS = -module -avoid-version
 endif
