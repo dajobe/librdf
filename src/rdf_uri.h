@@ -50,6 +50,8 @@ typedef int (*librdf_uri_filter_func)(void *user_data, librdf_uri* uri);
 /* constructors */
 REDLAND_API
 librdf_uri* librdf_new_uri (librdf_world *world, const unsigned char *uri_string);
+REDLAND_API
+librdf_uri* librdf_new_uri2 (librdf_world *world, const unsigned char *uri_string, size_t length);
 /* Create a new URI from an existing URI - CLONE */
 REDLAND_API
 librdf_uri* librdf_new_uri_from_uri (librdf_uri* old_uri);

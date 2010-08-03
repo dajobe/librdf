@@ -100,27 +100,30 @@ librdf_finish_uri(librdf_world *world)
 
 
 /**
- * librdf_new_uri:
+ * librdf_new_uri2:
  * @world: redland world object
  * @uri_string: URI in string form
+ * @length: length of string
  *
- * Constructor - create a new #librdf_uri object from a URI string.
+ * Constructor - create a new #librdf_uri object from a counted URI string.
  * 
- * A new URI is constructed from a copy of the string.  If the
- * string is a NULL pointer or empty (0 length) then the result is NULL.
+ * A new URI is constructed from a copy of the string.  If the string
+ * is a NULL pointer or 0 length or empty (first byte is 0) then the
+ * result is NULL.
  *
  * Return value: a new #librdf_uri object or NULL on failure
  **/
 librdf_uri*
-librdf_new_uri(librdf_world *world, 
-               const unsigned char *uri_string)
+librdf_new_uri2(librdf_world *world, 
+                const unsigned char *uri_string,
+                size_t length)
 {
 #ifdef LIBRDF_USE_RAPTOR_URI
-  return raptor_new_uri(world->raptor_world_ptr, uri_string);
+  return raptor_new_uri_from_counted_string(world->raptor_world_ptr,
+                                            uri_string, length);
 #else
   librdf_uri* new_uri;
   unsigned char *new_string;
-  int length;
   librdf_hash_datum key, value; /* on stack - not allocated */
   librdf_hash_datum *old_value;
 
@@ -130,21 +133,19 @@ librdf_new_uri(librdf_world *world,
 
   librdf_world_open(world);
 
-  if(!uri_string || !*uri_string)
+  if(!uri_string || !length || !*uri_string)
     return NULL;
 
 #ifdef WITH_THREADS
   pthread_mutex_lock(world->mutex);
 #endif
   
-  length=strlen((const char*)uri_string);
-
-  key.data=(char*)uri_string;
-  key.size=length;
+  key.data = (char*)uri_string;
+  key.size = length;
 
   /* if existing URI found in hash, return it */
-  if((old_value=librdf_hash_get_one(world->uris_hash, &key))) {
-    new_uri=*(librdf_uri**)old_value->data;
+  if((old_value = librdf_hash_get_one(world->uris_hash, &key))) {
+    new_uri = *(librdf_uri**)old_value->data;
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG3("Found existing URI %s in hash with current usage %d\n", uri_string, new_uri->usage);
@@ -155,7 +156,7 @@ librdf_new_uri(librdf_world *world,
 
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     if(new_uri->usage > new_uri->max_usage)
-      new_uri->max_usage=new_uri->usage;
+      new_uri->max_usage = new_uri->usage;
 #endif    
 
     goto unlock;
@@ -172,31 +173,31 @@ librdf_new_uri(librdf_world *world,
   if(!new_uri)
     goto unlock;
 
-  new_uri->world=world;
-  new_uri->string_length=length;
+  new_uri->world = world;
+  new_uri->string_length = length;
 
-  new_string=(unsigned char*)LIBRDF_MALLOC(cstring, length+1);
+  new_string = (unsigned char*)LIBRDF_MALLOC(cstring, length+1);
   if(!new_string) {
     LIBRDF_FREE(librdf_uri, new_uri);
-    new_uri=NULL;
+    new_uri = NULL;
     goto unlock;
   }
   
   strcpy((char*)new_string, (const char*)uri_string);
-  new_uri->string=new_string;
+  new_uri->string = new_string;
 
-  new_uri->usage=1;
+  new_uri->usage = 1;
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
-  new_uri->max_usage=1;
+  new_uri->max_usage = 1;
 #endif
 
-  value.data=&new_uri; value.size=sizeof(librdf_uri*);
+  value.data = &new_uri; value.size = sizeof(librdf_uri*);
   
   /* store in hash: URI-string => (librdf_uri*) */
   if(librdf_hash_put(world->uris_hash, &key, &value)) {
     LIBRDF_FREE(cstring, new_string);
     LIBRDF_FREE(librdf_uri, new_uri);
-    new_uri=NULL;
+    new_uri = NULL;
   }
 
  unlock:
@@ -206,6 +207,31 @@ librdf_new_uri(librdf_world *world,
 
   return new_uri;
 #endif /* !LIBRDF_USE_RAPTOR_URI */
+}
+
+
+/**
+ * librdf_new_uri:
+ * @world: redland world object
+ * @uri_string: URI in string form
+ *
+ * Constructor - create a new #librdf_uri object from a URI string.
+ * 
+ * A new URI is constructed from a copy of the string.  If the
+ * string is a NULL pointer or empty (0 length) then the result is NULL.
+ *
+ * Return value: a new #librdf_uri object or NULL on failure
+ **/
+librdf_uri*
+librdf_new_uri(librdf_world *world, 
+               const unsigned char *uri_string)
+{
+  librdf_world_open(world);
+
+  if(!uri_string || !*uri_string)
+    return NULL;
+
+  return librdf_new_uri2(world, uri_string, strlen((const char*)uri_string));
 }
 
 
