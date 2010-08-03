@@ -129,16 +129,20 @@ librdf_new_node(librdf_world *world)
 /**
  * librdf_new_node_from_uri_string_or_uri:
  * @world: redland world object
- * @uri_string: string representing a URI
- * @uri: #librdf_uri object
+ * @uri_string: string representing a URI (or NULL)
+ * @len: length of string if @uri_string is not NULL
+ * @uri: #librdf_uri object (or NULL)
  *
  * INTERNAL Constructor - create a new #librdf_node object from a URI string or URI object.
+ *
+ * Either but not both of @uri_string or @uri must be given.
  * 
  * Return value: a new #librdf_node object or NULL on failure
  **/
 static librdf_node*
 librdf_new_node_from_uri_string_or_uri(librdf_world *world, 
-                                       const unsigned char *uri_string, 
+                                       const unsigned char *uri_string,
+                                       size_t len,
                                        librdf_uri *uri) 
 {
   librdf_node* new_node;
@@ -150,6 +154,8 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
 
   LIBRDF_ASSERT_RETURN((uri_string == NULL && uri == NULL), 
                        "both uri_string and uri are NULL", NULL);
+  LIBRDF_ASSERT_RETURN((uri_string && uri), 
+                       "both uri_string and uri are not-NULL", NULL);
 
   if(!uri_string && !uri)
     return NULL;
@@ -160,7 +166,7 @@ librdf_new_node_from_uri_string_or_uri(librdf_world *world,
   }
 
   if(uri_string) {
-    new_uri=librdf_new_uri(world, uri_string);
+    new_uri = librdf_new_uri(world, uri_string);
     if(!new_uri)
       return NULL;
   } else
@@ -246,7 +252,32 @@ librdf_new_node_from_uri_string(librdf_world *world,
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri_string, string, NULL);
 
-  return librdf_new_node_from_uri_string_or_uri(world, uri_string, NULL);
+  return librdf_new_node_from_uri_string_or_uri(world, uri_string, 
+                                                strlen(uri_string), NULL);
+}
+
+    
+
+/**
+ * librdf_new_node_from_counted_uri_string:
+ * @world: redland world object
+ * @uri_string: string representing a URI
+ * @len: length of string
+ *
+ * Constructor - create a new #librdf_node object from a counted URI string.
+ * 
+ * Return value: a new #librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_new_node_from_uri_string(librdf_world *world, 
+                                const unsigned char *uri_string,
+                                size_t len) 
+{
+  librdf_world_open(world);
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri_string, string, NULL);
+
+  return librdf_new_node_from_uri_string_or_uri(world, uri_string, len, NULL);
 }
 
     
@@ -269,7 +300,7 @@ librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
 
-  return librdf_new_node_from_uri_string_or_uri(world, NULL, uri);
+  return librdf_new_node_from_uri_string_or_uri(world, NULL, 0, uri);
 }
 
 
@@ -300,7 +331,7 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
   if(!new_uri)
     return NULL;
 
-  new_node=librdf_new_node_from_uri_string_or_uri(world, NULL, new_uri);
+  new_node = librdf_new_node_from_uri_string_or_uri(world, NULL, 0, new_uri);
 
   librdf_free_uri(new_uri);
 
@@ -338,7 +369,7 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
   if(!new_uri)
     return NULL;
 
-  new_node=librdf_new_node_from_uri_string_or_uri(world, NULL, new_uri);
+  new_node = librdf_new_node_from_uri_string_or_uri(world, NULL, 0, new_uri);
   librdf_free_uri(new_uri);
   
   return new_node;

@@ -94,6 +94,8 @@ librdf_node* librdf_new_node(librdf_world* world);
 /* Create a new resource Node from URI string. */
 REDLAND_API
 librdf_node* librdf_new_node_from_uri_string(librdf_world* world, const unsigned char *uri_string);
+REDLAND_API
+librdf_node* librdf_new_node_from_counted_uri_string(librdf_world* world, const unsigned char *uri_string, size_t len);
 
 /* Create a new resource Node from URI object. */
 REDLAND_API
