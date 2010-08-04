@@ -269,9 +269,9 @@ librdf_new_node_from_uri_string(librdf_world *world,
  * Return value: a new #librdf_node object or NULL on failure
  **/
 librdf_node*
-librdf_new_node_from_uri_string(librdf_world *world, 
-                                const unsigned char *uri_string,
-                                size_t len) 
+librdf_new_node_from_counted_uri_string(librdf_world *world, 
+                                        const unsigned char *uri_string,
+                                        size_t len) 
 {
   librdf_world_open(world);
 
