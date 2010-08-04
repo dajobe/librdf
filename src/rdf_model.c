@@ -1960,7 +1960,7 @@ main(int argc, char *argv[])
 #ifdef HAVE_BDB_HASH
       "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'",
 #else
-      "hashes", "test", "hash-type='memory',dir='.',write='yes',new='yes',contexts='yes'",
+      "hashes", "test", "hash-type='memory',write='yes',new='yes',contexts='yes'",
 #endif
 #endif
 #ifdef STORAGE_TREES
@@ -2383,7 +2383,11 @@ int test_model_cloning(char const *program, librdf_world *world) {
     /* default is to test bdb disk hashes for cloning */
     storage_type="hashes";
     storage_name="test";
+#ifdef HAVE_BDB_HASH
     storage_options="hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'";
+#else
+    storage_options="hash-type='memory',write='yes',new='yes',contexts='yes'";
+#endif
   }
 
   fprintf(stderr, "%s: Creating new %s storage\n", program, storage_type);
