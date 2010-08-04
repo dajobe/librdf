@@ -317,8 +317,8 @@ if test "x$bdb_prefix" != "xno" ; then
     LIBS="-l$bdb_dbname $LIBS"
 
     AC_CHECK_HEADERS(db.h)
+    have_libdb=no
     if test "$ac_cv_header_db_h" = yes ; then
-      have_libdb=no
 
       AC_MSG_CHECKING(for BDB V1 dbopen)
       AC_TRY_LINK([#include <stdio.h>
