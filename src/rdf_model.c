@@ -1957,7 +1957,11 @@ main(int argc, char *argv[])
     const char* const storages[] = {
       "memory", NULL, "write='yes',new='yes',contexts='yes'",
 #ifdef STORAGE_HASHES
+#ifdef HAVE_BDB_HASH
       "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'",
+#else
+      "hashes", "test", "hash-type='memory',dir='.',write='yes',new='yes',contexts='yes'",
+#endif
 #endif
 #ifdef STORAGE_TREES
       "trees", "test", "contexts='yes'",
