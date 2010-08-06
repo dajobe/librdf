@@ -493,7 +493,10 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
 
 static unsigned char*
 librdf_parser_raptor_generate_id_handler(void *user_data,
+#ifdef HAVE_RAPTOR2_API
+#else
                                          raptor_genid_type type,
+#endif
                                          unsigned char *user_bnodeid) 
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)user_data;
@@ -602,8 +605,9 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
   raptor_parser_set_namespace_handler(pcontext->rdf_parser, pcontext,
                                       librdf_parser_raptor_namespace_handler);
 
-  raptor_parser_set_generate_id_handler(pcontext->rdf_parser, pcontext,
-                                        librdf_parser_raptor_generate_id_handler);
+  raptor_world_set_generate_bnodeid_handler(pcontext->parser->world->raptor_world_ptr,
+                                            pcontext,
+                                            librdf_parser_raptor_generate_id_handler);
 #else
   raptor_set_statement_handler(pcontext->rdf_parser, scontext,
                                librdf_parser_raptor_new_statement_handler);
@@ -800,8 +804,9 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   raptor_parser_set_namespace_handler(pcontext->rdf_parser, pcontext,
                                       librdf_parser_raptor_namespace_handler);
 
-  raptor_parser_set_generate_id_handler(pcontext->rdf_parser, pcontext,
-                                        librdf_parser_raptor_generate_id_handler);
+  raptor_world_set_generate_bnodeid_handler(pcontext->parser->world->raptor_world_ptr,
+                                            pcontext,
+                                            librdf_parser_raptor_generate_id_handler);
 #else
   raptor_set_statement_handler(pcontext->rdf_parser, scontext,
                                librdf_parser_raptor_new_statement_handler);
@@ -1075,8 +1080,9 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   raptor_parser_set_namespace_handler(pcontext->rdf_parser, pcontext,
                                       librdf_parser_raptor_namespace_handler);
 
-  raptor_parser_set_generate_id_handler(pcontext->rdf_parser, pcontext,
-                                        librdf_parser_raptor_generate_id_handler);
+  raptor_world_set_generate_bnodeid_handler(pcontext->parser->world->raptor_world_ptr,
+                                            pcontext,
+                                            librdf_parser_raptor_generate_id_handler);
 #else
   raptor_set_statement_handler(pcontext->rdf_parser, scontext,
                                librdf_parser_raptor_new_statement_handler);
