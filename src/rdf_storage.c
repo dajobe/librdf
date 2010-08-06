@@ -1988,7 +1988,11 @@ main(int argc, char *argv[])
   /* triples of arguments to librdf_new_storage */
   const char* const storages[] = {
 	"memory", NULL, "contexts='yes'",
+#ifdef HAVE_BDB_HASH
 	"hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'",
+#else
+	"hashes", "test", "hash-type='memory',write='yes',new='yes',contexts='yes'",
+#endif
     #ifdef STORAGE_TREES
 	    "trees", "test", "contexts='yes'",
     #endif

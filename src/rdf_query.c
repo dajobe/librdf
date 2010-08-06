@@ -666,10 +666,14 @@ main(int argc, char *argv[])
   /* create model and storage */
   if(1) {
     /* test in memory */
-    storage=librdf_new_storage(world, NULL, NULL, NULL);
+    storage = librdf_new_storage(world, NULL, NULL, NULL);
   } else {
     /* test on disk */
-    storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
+#ifdef HAVE_BDB_HASH
+    storage = librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'");
+#else
+    storage = librdf_new_storage(world, "file", "test.rdf", NULL);
+#endif
   }
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new storage\n", program);
