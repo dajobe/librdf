@@ -704,23 +704,34 @@ main(int argc, char *argv[])
   unsigned char* id;
   const char *program=librdf_basename((const char*)argv[0]);
 
-  /* Minimal setup-cleanup test */
+  /* Minimal setup-cleanup test without opening the world */
   fprintf(stdout, "%s: Creating new world\n", program);
   world = librdf_new_world();
   if(!world) {
     fprintf(stderr, "%s: librdf_new_world failed\n", program);
-    return(1);
+    return 1;
+  }
+  fprintf(stdout, "%s: Deleting world\n", program);
+  librdf_free_world(world);
+
+  /* Test id generation */
+  fprintf(stdout, "%s: Creating new world\n", program);
+  world = librdf_new_world();
+  if(!world) {
+    fprintf(stderr, "%s: librdf_new_world failed\n", program);
+    return 1;
   }
 
   fprintf(stdout, "%s: Generating an identifier\n", program);
   id = librdf_world_get_genid(world);
   if(id == NULL || strlen(id) < 6) {
     fprintf(stderr, "%s: librdf_world_get_genid failed\n", program);
-    return(1);
+    return 1;
   }
   fprintf(stdout, "%s: New identifier is: '%s'\n", program, id);
   LIBRDF_FREE(cstring, id);
 
+  fprintf(stdout, "%s: Deleting world\n", program);
   librdf_free_world(world);
 
   /* keep gcc -Wall happy */
