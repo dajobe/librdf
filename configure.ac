@@ -549,6 +549,7 @@ AM_CONDITIONAL(RAPTOR2, test "X$raptor2" = "Xyes")
 if test "X$raptor2" = "Xyes"; then
   AC_DEFINE(HAVE_RAPTOR2_API, 1, [Raptor2 API is available])
 fi
+AC_SUBST(HAVE_RAPTOR2_API)
 
 
 dnl Checks for modules
