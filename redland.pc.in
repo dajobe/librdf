@@ -7,6 +7,8 @@ plugindir=${libdir}/redland
 
 swig=${prefix}/share/redland/Redland.i
 
+have_raptor2_api=@HAVE_RAPTOR2_API@
+
 Name: Redland RDF API Library
 Description: Redland RDF API and triple store library
 Requires.private: @RAPTOR_PACKAGE@ >= @RAPTOR_MIN_VERSION@, rasqal >= @RASQAL_MIN_VERSION@, rasqal <= @RASQAL_MAX_VERSION@
