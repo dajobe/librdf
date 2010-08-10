@@ -453,6 +453,46 @@ dnl Checks for RDF parsers
 parser_modules=raptor
 rdf_parsers_available=
 
+# Check for rasqal before raptor so that we can see if rasqal was already
+# built with raptor2 and can then enforce raptor2 is required
+AC_MSG_CHECKING(for rasqal)
+
+RASQAL_MIN_VERSION=0.9.16
+RASQAL_MAX_VERSION=0.9.99
+AC_SUBST(RASQAL_MIN_VERSION)
+AC_SUBST(RASQAL_MAX_VERSION)
+if $PKG_CONFIG rasqal --exists; then
+  :
+else
+  AC_MSG_ERROR(Rasqal is not installed - see http://librdf.org/rasqal/ to get a version in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
+fi
+
+RASQAL_VERSION=`$PKG_CONFIG rasqal --modversion 2>/dev/null`
+
+if $PKG_CONFIG rasqal --atleast-version=$RASQAL_MIN_VERSION --max-version=$RASQAL_MAX_VERSION; then
+  :
+else
+  AC_MSG_ERROR(Installed rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
+fi
+
+LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG rasqal --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG rasqal --libs` $LIBRDF_EXTERNAL_LIBS"
+
+rdf_query="rasqal(system $RASQAL_VERSION)"
+AC_MSG_RESULT(system $RASQAL_VERSION)
+
+AC_MSG_CHECKING(if rasqal was built with raptor2)
+RASQAL_HAVE_RAPTOR2_API=`$PKG_CONFIG rasqal --variable=have_raptor2_api 2>/dev/null`
+if test "X$RASQAL_HAVE_RAPTOR2_API" = X1; then
+  AC_MSG_RESULT(yes - raptor2 is required)
+else
+  AC_MSG_RESULT(no - raptor1 or raptor2 are allowed)
+  RASQAL_HAVE_RAPTOR2_API=0
+fi
+
+
+
+
 # Check for raptor
 RAPTOR_MIN_VERSION=1.4.19
 RAPTOR2_MIN_VERSION=1.9.0
@@ -460,10 +500,16 @@ RAPTOR2_MIN_VERSION=1.9.0
 raptor2=no
 AC_ARG_ENABLE(raptor2, [  --enable-raptor2  Enable use of raptor2], raptor2="$enableval", raptor2="no")
 
+if test "$RASQAL_HAVE_RAPTOR2_API" = 1; then
+  raptor2=yes
+fi
+
+
 AC_MSG_CHECKING(for raptor)
 
 # When raptor2 is stable, this can be changed to prefer raptor2
 # For now an explicit configure --enable-raptor2 is required.
+# unless it is required because rasqal was built with raptor2
 if test "X$raptor2" = "Xyes"; then
   RAPTOR_MIN_VERSION=$RAPTOR2_MIN_VERSION
 
@@ -503,34 +549,6 @@ AM_CONDITIONAL(RAPTOR2, test "X$raptor2" = "Xyes")
 if test "X$raptor2" = "Xyes"; then
   AC_DEFINE(HAVE_RAPTOR2_API, 1, [Raptor2 API is available])
 fi
-
-
-# Check for rasqal
-AC_MSG_CHECKING(for rasqal)
-
-RASQAL_MIN_VERSION=0.9.16
-RASQAL_MAX_VERSION=0.9.99
-AC_SUBST(RASQAL_MIN_VERSION)
-AC_SUBST(RASQAL_MAX_VERSION)
-if $PKG_CONFIG rasqal --exists; then
-  :
-else
-  AC_MSG_ERROR(Rasqal is not installed - see http://librdf.org/rasqal/ to get a version in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
-fi
-
-RASQAL_VERSION=`$PKG_CONFIG rasqal --modversion 2>/dev/null`
-
-if $PKG_CONFIG rasqal --atleast-version=$RASQAL_MIN_VERSION --max-version=$RASQAL_MAX_VERSION; then
-  :
-else
-  AC_MSG_ERROR(Installed rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
-fi
-
-LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG rasqal --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
-LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG rasqal --libs` $LIBRDF_EXTERNAL_LIBS"
-
-rdf_query="rasqal(system $RASQAL_VERSION)"
-AC_MSG_RESULT(system $RASQAL_VERSION)
 
 
 dnl Checks for modules
