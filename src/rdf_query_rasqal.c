@@ -316,8 +316,14 @@ rasqal_redland_new_triples_source(rasqal_query* rdf_query,
   rasqal_redland_triples_source_user_data* rtsc=(rasqal_redland_triples_source_user_data*)user_data;
   raptor_sequence *seq;
   librdf_query_rasqal_context *context;
+  librdf_iterator* cit;
 
-  seq=rasqal_query_get_data_graph_sequence(rdf_query);
+  rtsc->world = world;
+  rtsc->query = (librdf_query*)rasqal_query_get_user_data(rdf_query);
+  context = (librdf_query_rasqal_context*)rtsc->query->context;
+  rtsc->model = context->model;
+
+  seq = rasqal_query_get_data_graph_sequence(rdf_query);
   
   /* FIXME: queries with data graphs in them (such as FROM in SPARQL)
    * are deleted, so that there are no unexpected data loads
@@ -329,11 +335,23 @@ rasqal_redland_new_triples_source(rasqal_query* rdf_query,
     }
   }
 
-  rtsc->world=world;
+  /* Add all contexts (named graphs) to the query so Rasqal can bind them */
+  cit = librdf_model_get_contexts(rtsc->model);
+  while(!librdf_iterator_end(cit)) {
+    librdf_node* node = (librdf_node*)librdf_iterator_get_object(cit);
+    librdf_uri* uri;
+    raptor_uri* source_uri;
 
-  rtsc->query=(librdf_query*)rasqal_query_get_user_data(rdf_query);
-  context=(librdf_query_rasqal_context*)rtsc->query->context;
-  rtsc->model=context->model;
+    uri = librdf_node_get_uri(node);
+    source_uri = (raptor_uri*)raptor_new_uri(world->raptor_world_ptr,
+                                             librdf_uri_as_string(uri));
+    rasqal_query_add_data_graph(rdf_query, source_uri, source_uri,
+                                RASQAL_DATA_GRAPH_NAMED);
+    raptor_free_uri(source_uri);
+    librdf_iterator_next(cit);
+  }
+  librdf_free_iterator(cit);
+
 
 #ifdef RASQAL_TRIPLES_SOURCE_MIN_VERSION
   rts->version = 1;
