@@ -1,3 +1,420 @@
+2010-08-20  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_rasqal.c: Try to construct a set of data graphs
+	that make rasqal queries with graphs work.
+
+	(rasqal_redland_new_triples_source): After deleteing any existing
+	graphs in the query string, add all the graph context uris as data
+	graphs into the query model.  This allows rasqal to iterate over
+	them and bind variables to graph names correctly.  This is a
+	workaround, as really rasqal + redland should work together to
+	allow abstracting this out of the triples-focused API.  Intended
+	to address Issue#000382
+	http://bugs.librdf.org/mantis/view.php?id=382
+
+2010-08-09  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac:
+	SUBST HAVE_RAPTOR2_API with define and conditional
+
+	* redland.pc.in:
+	Set have_raptor2_api var
+
+	* configure.ac:
+	AC_SUBST(HAVE_RAPTOR2_API)
+
+	* configure.ac: Check if rasqal was built with raptor2 API and
+	force raptor2 if it was.  This prevents trying to build librdf
+	with raptor1 if rasqal was built with raptor2.
+
+	* src/rdf_init.c: Keep the minimal rdf_init.c
+	librdf_new_world()..librdf_free_world() test minimal by not using
+	the librdf_world object for anything.  Create a separate rdf_world
+	object for other tests.
+
+2010-08-06  Nicholas J Humfrey <njh@aelius.com>
+
+	* src/rdf_node.c: Added test for librdf_new_node()
+
+	* src/rdf_parser_raptor.c: Update
+	librdf_parser_raptor_generate_id_handler() to handle new raptor
+	generate nodeid API
+
+2010-08-03  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_node.c:
+	(librdf_new_node_from_counted_uri_string): Define correctly
+
+	* src/rdf_query.c:
+	(main): use hash-type memory if BDB hash is not present.
+
+	* src/rdf_model.c:
+	(main): use hash-type memory if BDB hash is not present.
+
+	* src/rdf_storage.c:
+	(main): use hash-type memory if BDB hash is not present.
+
+	* src/rdf_model.c:
+	(main): Only try BDB hash if it's present.
+
+	* configure.ac:
+	move have_libdb=no earlier
+
+2010-08-02  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_node.c, src/rdf_node.h: Added
+	librdf_new_node_from_counted_uri_string() to build URI node
+
+	(librdf_new_node_from_counted_uri_string): Added
+
+	(librdf_new_node_from_uri_string_or_uri): Adjust to add len
+	parameter needed when passing in string.
+
+	(librdf_new_node_from_uri_string): Pass in strlen(uri_string).
+
+	* src/rdf_uri.c, src/rdf_uri.h: Added librdf_new_uri2() for
+	building URIs from a counted string.
+
+	(librdf_new_uri2): Added, using
+	raptor_new_uri_from_counted_string() when built with raptor2.
+	Clarify returns NULL if length is 0 too.
+
+	(librdf_new_uri): Wrapper to above, calling strlen.
+
+	* src/Makefile.am: adjust sqlite CPPFLAGS to ensure general
+	includes are first.
+
+2010-08-01  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_term.c:
+	(librdf_node_encode): For URI, ensure NUL is written at end
+
+	* src/rdf_stream.c:
+	(librdf_stream_write): Add space before context url
+
+2010-06-04  Lauri Aalto <laalto@iki.fi>
+
+	* src/Makefile.am, src/rdf_raptor_statement.c,
+	src/rdf_statement.c, src/rdf_statement_common.c:
+	
+	(librdf_statement_encode_parts2, librdf_init_statement,
+	librdf_finish_statement): Pulled some functionality common to both
+	librdf and raptor2 statements to rdf_statement_common.c. Now links
+	with LIBRDF_USE_RAPTOR_STATEMENT.
+
+	* src/rdf_storage_hashes.c, src/rdf_storage_list.c:
+	#ws
+
+	* src/rdf_raptor_statement.c:
+	file comment
+
+2010-06-03  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_statement.c:
+	(main): fix call of librdf_statement_decode2 in test
+
+	* src/rdf_statement.c:
+	(main): use librdf_statement_decode2 in test
+
+	* src/rdf_raptor_statement.c:
+	(librdf_statement_decode2): Call librdf_node_decode with world
+
+	* src/rdf_raptor_statement.c: Add librdf_statement_encode2 for
+	raptor2
+
+	* src/rdf_node.c:
+	(librdf_node_get_counted_blank_identifier): No need for strlen
+
+	* src/rdf_node.c:
+	(librdf_node_get_counted_blank_identifier): Add for raptor v1 node
+
+	* src/rdf_node.h, src/rdf_term.c:
+	(librdf_node_get_counted_blank_identifier): Added
+
+2010-06-02  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_node.c:
+	(librdf_new_node_from_blank_identifier): fix
+
+	* src/rdf_node.h, src/rdf_term.c:
+	(librdf_new_node_from_counted_blank_identifier): Implement for
+	raptor 2 API
+
+	* src/rdf_node.c, src/rdf_node.h:
+	(librdf_new_node_from_counted_blank_identifier): Added
+
+	* src/rdf_node.c, src/rdf_storage_hashes.c,
+	src/rdf_storage_list.c, src/rdf_storage_trees.c: Use
+	non-deprecated statement encode/decode functions for raptor V1
+
+	* src/rdf_raptor_statement.c, src/rdf_statement.c,
+	src/rdf_statement.h, src/rdf_storage_hashes.c: Added
+	librdf_statement_encode2, librdf_statement_encode_parts2,
+	librdf_statement_decode2 deprecating those without world
+	arg.
+
+	(librdf_statement_encode2, librdf_statement_encode_parts2,
+	librdf_statement_decode2): Added deprecating those without world
+	arg.
+
+	(librdf_statement_encode, librdf_statement_encode_parts,
+	librdf_statement_decode): Deprecated.
+
+	* src/rdf_iterator.c, src/rdf_stream.c:
+	Updated tests to use new
+	librdf_node_new_static_node_iterator()
+
+	* src/Makefile.am, src/rdf_node.c, src/rdf_node.h,
+	src/rdf_node_common.c, src/rdf_term.c: Moved
+	librdf_node_static_iterator code to new rdf_node_common.c module.
+
+	(librdf_node_new_static_node_iterator): Added, deprecating
+	librdf_node_static_iterator_create().
+
+	(librdf_node_static_iterator_create): Always fails when built with
+	raptor2 API.  Updated tests - all users of
+	librdf_node_static_iterator_create() - to use new function.
+
+	* src/librdf.h, src/rdf_node.h, src/rdf_raptor_statement.c,
+	src/rdf_uri.c: Rename USE_RAPTOR_* macros to LIBRDF_USE_RAPTOR_*
+
+	* src/librdf.h: tidy USE_RAPTOR_*
+
+	* src/rdf_term.c:
+	(librdf_new_node_from_typed_counted_literal): Use
+	raptor_new_term_from_counted_literal
+
+2010-05-26  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_storage_trees.c:
+	(librdf_storage_trees_node_compare):
+	librdf_node_get_literal_value_language()
+
+2010-05-25  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_term.c: Add checks for NULL world
+
+	* src/rdf_term.c:
+	(librdf_node_encode, librdf_node_decode, librdf_node_to_string,
+	librdf_node_to_counted_string, librdf_node_print,
+	librdf_node_equals): Implemented for librdf_node as raptor_term
+
+	* src/rdf_query_rasqal.c, src/rdf_serializer_raptor.c,
+	src/rdf_storage.c: Replace uses of statement->world for
+	librdf_world with alternatives.  Comment out some logging deep in
+	code refering to statement
+
+	* src/Makefile.am, src/librdf.h, src/rdf_raptor_statement.c: Use
+	rdf_raptor_statement.c for raptor2 with raptor_statement
+
+	Added USE_RAPTOR_STATEMENT macro to use librdf_statement as
+	typedef for raptor_statement.  Duplication of encode/decode
+	statement should probably be moved to shared code in a separate
+	module.  (node encode/decode too).
+
+2010-05-24  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_term.c: Remove strlen() and use raptor_term literal
+	string_len
+
+	* src/rdf_serializer.c:
+	(librdf_serializer_serialize_stream_to_iostream,
+	librdf_serializer_serialize_model_to_iostream): Document ownership
+	transfer of raptor_iostreams.  Addresses issue #372
+	http://bugs.librdf.org/mantis/view.php?id=372
+
+2010-05-19  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_term.c:
+	(librdf_node_write): Added USE_RAPTOR_TERM variant of the function
+	to make binaries link.
+
+	* src/rdf_term.c:
+	(librdf_node_get_type): Fixed warnings about librdf_node_type <->
+	raptor_term_type enums.
+
+2010-05-18  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_sqlite.c: code style
+
+	* src/rdf_storage_sqlite.c: code style
+
+	* src/rdf_init.c: code style
+
+	* src/rdf_init.c: 2010
+
+	* src/rdf_storage_trees.c:
+	(librdf_storage_trees_node_compare): Add raptor V2 API version.
+
+	* src/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_node_helper): Use storage->world
+
+	* src/rdf_storage_mysql.c: Use raptor_data_free_handler for
+	raptor_new_sequence calls (V2 API)
+
+	* src/rdf_raptor_internal.h: define raptor_data_free_handler for
+	raptor V2 API
+
+	* src/rdf_storage_trees.c: Update
+	librdf_storage_trees_node_compare for raptor 2 API.
+
+	(librdf_storage_trees_node_compare): Use raptor_term_compare with
+	raptor 2 API.  NOTE: This may be too weak to use in a sort
+	ordering.
+
+	* src/rdf_query_internal.h, src/rdf_query_rasqal.c,
+	src/rdf_query_virtuoso.c: Make redland_node_to_rasqal_literal work
+	with updated raptor2 raptor_term
+
+	(redland_node_to_rasqal_literal): Add world arg so that it works
+	when librdf_node does not have a librdf_world inside, when built
+	with raptor 2.  Uodate callers
+
+	* src/rdf_uri.c:
+	(librdf_new_uri_normalised_to_base): Rewrite to not know about
+	rdf_uri internals when using raptor_uri for raptor V2
+
+	* src/rdf_query_rasqal.c: Update to latest raptor_term blank field
+	structure.
+
+	* src/rdf_parser_raptor.c: Update to latest raptor_term blank
+	field structure.
+
+	* src/rdf_uri.c:
+	(librdf_new_uri_normalised_to_base): Support USE_RAPTOR_URI
+
+	* src/rdf_storage_mysql.c, src/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_node_helper,
+	librdf_storage_mysql_node_hash_common): node->world not available
+	with RAPTOR_USE_TERM, replace with storage->world
+
+	* src/rdf_query_internal.h, src/rdf_query_rasqal.c,
+	src/rdf_query_virtuoso.c:
+	(redland_node_to_rasqal_literal): Internal function gains
+	librdf_world* param. Required with USE_RAPTOR_TERM because
+	raptor_terms doesn't contain it unlike librdf_node.
+
+	* src/rdf_storage_trees.c:
+	(librdf_storage_trees_node_compare): Support USE_RAPTOR_TERM. Use
+	librdf_node_get_*() accessors instead of relying on librdf_node_s
+	internals.
+
+	* src/rdf_parser_raptor.c, src/rdf_query_rasqal.c: raptor2
+	raptor_term_blank_value
+
+2010-05-18  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_term.c: removed unnecessary #include with absolute path
+
+2010-05-16  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_term.c:
+	(librdf_node_get_blank_identifier): Update to latest raptor_term
+	fields.
+
+2010-05-12  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_term.c: Implement librdf_node_get_blank_identifier with
+	term
+
+2010-05-10  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_term.c: implement more rdf_node with raptor_term
+
+	* src/rdf_uri.c:
+	(librdf_new_uri_normalised_to_base): Use old code to implement for
+	raptor2 API.
+
+2010-05-07  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_term.c: open worlds
+
+	* src/rdf_term.c: do not dup autodocs for now
+
+	* src/Makefile.am, src/librdf.h, src/rdf_node.h, src/rdf_term.c:
+	Add skeleton code for rdf_node as typedef for raptor_term
+
+	* docs/tmpl/concepts.sgml, docs/tmpl/digest.sgml,
+	docs/tmpl/files.sgml, docs/tmpl/hash.sgml,
+	docs/tmpl/heuristics.sgml, docs/tmpl/iterator.sgml,
+	docs/tmpl/list.sgml, docs/tmpl/log.sgml, docs/tmpl/model.sgml,
+	docs/tmpl/node.sgml, docs/tmpl/parser.sgml, docs/tmpl/query.sgml,
+	docs/tmpl/query_results.sgml, docs/tmpl/section-general.sgml,
+	docs/tmpl/serializer.sgml, docs/tmpl/statement.sgml,
+	docs/tmpl/storage.sgml, docs/tmpl/stream.sgml,
+	docs/tmpl/unicode.sgml, docs/tmpl/unused.sgml, docs/tmpl/uri.sgml,
+	docs/tmpl/world.sgml: Update tmpls
+
+2010-05-03  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_model.c, src/rdf_parser.c, src/rdf_parser_raptor.c,
+	src/rdf_serializer.c, src/rdf_storage.c: Ported to raptor2 head -
+	funcptr typedef changes
+
+2010-04-28  Nicholas J Humfrey <njh@aelius.com>
+
+	* src/rdf_query_rasqal.c: Empty graph result set is not an error.
+
+2010-04-24  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_postgresql.c: Make
+	librdf_storage_postgresql_contains_statement
+	work.
+
+	(librdf_storage_postgresql_contains_statement): snprintf to the
+	query string.  Patch from Andrew Malton.
+
+	* src/rdf_uri.c: librdf_free_uri fix condition for C99
+
+	* docs/redland-sections.txt: more functions
+
+	* src/rdf_storage.c: autodocs
+
+	* docs/redland-sections.txt: add new functions
+
+	* build/shave-libtool.in, build/shave.in, build/shave.m4: Remove
+	rest of SHAVE
+
+	* configure.ac: remove build/shave*
+
+	* configure.ac: Switch to automake 1.11 silent rules
+
+2010-04-21  Nicholas J Humfrey <njh@aelius.com>
+
+	* src/rdf_storage.c: Bug fix for
+	librdf_storage_context_remove_statement() asseting that context
+	should be non-NULL instead of statement.
+
+2010-04-19  Nicholas J Humfrey <njh@aelius.com>
+
+	* docs/redland-chapter-storage-modules.xml: Fix for broken link in
+	documentation to the storage API page.
+
+2010-04-19  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_parser_raptor.c: Ported to raptor2 head. Syntax
+	description need_base_uri -> RAPTOR_SYNTAX_NEED_BASE_URI bit flag.
+
+2010-04-16  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_results.c:
+	(librdf_query_results_formatter_write): Autodocs notine using this
+	drains results
+
+2010-04-07  Lauri Aalto <laalto@iki.fi>
+
+	* configure.ac, redland.pc.in: Export raptor2 pkg-config
+	dependencies when building on raptor2.
+
+2010-04-06  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_parser_raptor.c, src/rdf_serializer_raptor.c: Ported to
+	raptor2 git head - use raptor_syntax_description for
+	parser/serializer discovery and inspection.
+
+	* configure.ac: Support building with libraptor2. Prefer
+	libraptor2 over libraptor.
+
 2010-04-01  Nicholas J Humfrey <njh@aelius.com>
 
 	* src/rdf_query.c, src/rdf_query.h: Added
