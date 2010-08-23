@@ -160,9 +160,6 @@ int librdf_hash_sync(librdf_hash* hash);
 /* get the file descriptor for the hash, if it is file based (for locking) */
 int librdf_hash_get_fd(librdf_hash* hash);
 
-/* init a hash from a string representation */
-int librdf_hash_from_string(librdf_hash* hash, const char *string);
-
 /* init a hash from an array of strings */
 int librdf_hash_from_array_of_strings(librdf_hash* hash, const char *array[]);
 
