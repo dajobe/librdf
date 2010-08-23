@@ -291,9 +291,9 @@ librdf_statement_encode2(librdf_world *world,
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
-  return librdf_statement_encode_parts(statement, NULL,
-                                       buffer, length,
-                                       LIBRDF_STATEMENT_ALL);
+  return librdf_statement_encode_parts2(world, statement, NULL,
+                                        buffer, length,
+                                        LIBRDF_STATEMENT_ALL);
 }
 
 size_t
