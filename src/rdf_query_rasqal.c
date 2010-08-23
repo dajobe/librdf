@@ -343,8 +343,12 @@ rasqal_redland_new_triples_source(rasqal_query* rdf_query,
     raptor_uri* source_uri;
 
     uri = librdf_node_get_uri(node);
+#ifdef RAPTOR_V2_AVAILABLE
     source_uri = (raptor_uri*)raptor_new_uri(world->raptor_world_ptr,
                                              librdf_uri_as_string(uri));
+#else
+    source_uri = (raptor_uri*)raptor_new_uri(librdf_uri_as_string(uri));
+#endif
     rasqal_query_add_data_graph(rdf_query, source_uri, source_uri,
                                 RASQAL_DATA_GRAPH_NAMED);
     raptor_free_uri(source_uri);
