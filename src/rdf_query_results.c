@@ -258,10 +258,10 @@ librdf_free_query_results(librdf_query_results* query_results)
  * librdf_query_results_to_counted_string2:
  * @query_results: #librdf_query_results object
  * @name: name of syntax to format to
- * @mime_type: mime type of syntax to format to
- * @format_uri: URI of syntax to format to
- * @base_uri: Base URI of output formatted syntax  or NULL
- * @length_p: Pointer to where to store length of string or NULL
+ * @mime_type: mime type of syntax to format to (or NULL)
+ * @format_uri: URI of syntax to format to (or NULL)
+ * @base_uri: Base URI of output formatted syntax (or NULL)
+ * @length_p: Pointer to where to store length of string (or NULL)
  *
  * Turn a query results into a string.
  * 
@@ -335,8 +335,8 @@ librdf_query_results_to_counted_string2(librdf_query_results *query_results,
  * librdf_query_results_to_counted_string:
  * @query_results: #librdf_query_results object
  * @format_uri: URI of syntax to format to
- * @base_uri: Base URI of output formatted syntax  or NULL
- * @length_p: Pointer to where to store length of string or NULL
+ * @base_uri: Base URI of output formatted syntax (or NULL)
+ * @length_p: Pointer to where to store length of string (or NULL)
  *
  * Turn a query results into a string.
  * 
@@ -373,13 +373,13 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
  * librdf_query_results_to_string2:
  * @query_results: #librdf_query_results object
  * @name: format name
- * @mime_type: format mime type
- * @format_uri: URI of syntax to format to
- * @base_uri: Base URI of output formatted syntax 
+ * @mime_type: format mime type (or NULL)
+ * @format_uri: URI of syntax to format to (or NULL)
+ * @base_uri: Base URI of output formatted syntax (or NULL)
  *
  * Turn a query results into a string.
  * 
- * See librdf_query_results_to_counted_string for information on the
+ * See librdf_query_results_to_counted_string2() for information on the
  * format_uri and base_uri parameters.
  *
  * The returned string must be freed by the caller
@@ -407,7 +407,7 @@ librdf_query_results_to_string2(librdf_query_results *query_results,
  * librdf_query_results_to_string:
  * @query_results: #librdf_query_results object
  * @format_uri: URI of syntax to format to
- * @base_uri: Base URI of output formatted syntax 
+ * @base_uri: Base URI of output formatted syntax (or NULL)
  *
  * Turn a query results into a string.
  * 
@@ -440,13 +440,15 @@ librdf_query_results_to_string(librdf_query_results *query_results,
  * librdf_query_results_to_file_handle2:
  * @query_results: #librdf_query_results object
  * @handle: file handle to write to
- * @format_uri: URI of syntax to format to
+ * @name: result format name (or NULL)
+ * @mime_type: result mime type (or NULL)
+ * @format_uri: URI of syntax to format to (or NULL)
  * @base_uri: Base URI of output formatted syntax 
  *
  * Write a query results to a FILE*.
  * 
- * See librdf_query_results_to_counted_string for information on the
- * format_uri and base_uri parameters.
+ * See librdf_query_results_to_counted_string() for information on
+ * the #format_uri and #base_uri parameters.
  *
  * Return value: non 0 on failure
  **/
@@ -496,12 +498,12 @@ librdf_query_results_to_file_handle2(librdf_query_results *query_results,
  * @query_results: #librdf_query_results object
  * @handle: file handle to write to
  * @format_uri: URI of syntax to format to
- * @base_uri: Base URI of output formatted syntax 
+ * @base_uri: Base URI of output formatted syntax (or NULL)
  *
  * Write a query results to a FILE*.
  * 
- * See librdf_query_results_to_counted_string for information on the
- * format_uri and base_uri parameters.
+ * See librdf_query_results_to_counted_string2() for information on
+ * the #format_uri and #base_uri parameters.
  *
  * @Deprecated: use librdf_query_results_to_file_handle() with extra
  * name and mime_type args.
@@ -525,16 +527,17 @@ librdf_query_results_to_file_handle(librdf_query_results *query_results,
 
 
 /**
- * librdf_query_results_to_file:
+ * librdf_query_results_to_file2:
  * @query_results: #librdf_query_results object
  * @name: filename to write to
- * @format_uri: URI of syntax to format to
- * @base_uri: Base URI of output formatted syntax 
+ * @mime_type: mime type (or NULL)
+ * @format_uri: URI of syntax to format to (or NULL)
+ * @base_uri: Base URI of output formatted syntax (or NULL)
  *
  * Write a query results to a file.
  * 
- * See librdf_query_results_to_counted_string for information on the
- * format_uri and base_uri parameters.
+ * See librdf_query_results_to_counted_string2() for information on
+ * the #format_uri and #base_uri parameters.
  *
  * Return value: non 0 on failure
  **/
@@ -574,12 +577,12 @@ librdf_query_results_to_file2(librdf_query_results *query_results,
  * @query_results: #librdf_query_results object
  * @name: filename to write to
  * @format_uri: URI of syntax to format to
- * @base_uri: Base URI of output formatted syntax 
+ * @base_uri: Base URI of output formatted syntax (or NULL)
  *
  * Write a query results to a file.
  * 
- * See librdf_query_results_to_counted_string for information on the
- * format_uri and base_uri parameters.
+ * See librdf_query_results_to_counted_string2() for information on
+ * the #format_uri and #base_uri parameters.
  *
  * @Deprecated: use librdf_query_results_to_file2() with extra mime_type
  * arg.
@@ -610,7 +613,8 @@ librdf_query_results_to_file(librdf_query_results *query_results,
  * Return value: non-0 if true
  **/
 int
-librdf_query_results_is_bindings(librdf_query_results* query_results) {
+librdf_query_results_is_bindings(librdf_query_results* query_results)
+{
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
 
   if(query_results->query->factory->results_is_bindings)
@@ -632,7 +636,8 @@ librdf_query_results_is_bindings(librdf_query_results* query_results) {
  * Return value: non-0 if true
  **/
 int
-librdf_query_results_is_boolean(librdf_query_results* query_results) {
+librdf_query_results_is_boolean(librdf_query_results* query_results)
+{
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
 
   if(query_results->query->factory->results_is_boolean)
@@ -651,7 +656,8 @@ librdf_query_results_is_boolean(librdf_query_results* query_results) {
  * Return value: non-0 if true
  **/
 int
-librdf_query_results_is_graph(librdf_query_results* query_results) {
+librdf_query_results_is_graph(librdf_query_results* query_results)
+{
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
 
   if(query_results->query->factory->results_is_graph)
@@ -694,12 +700,13 @@ librdf_query_results_is_syntax(librdf_query_results* query_results)
  * Get boolean query result.
  *
  * The return value is only meaningful if this is a boolean
- * query result - see #librdf_query_results_is_boolean
+ * query result - see librdf_query_results_is_boolean()
  *
  * Return value: boolean query result - >0 is true, 0 is false, <0 on error or finished
  */
 int
-librdf_query_results_get_boolean(librdf_query_results* query_results) {
+librdf_query_results_get_boolean(librdf_query_results* query_results)
+{
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, -1);
 
   if(query_results->query->factory->results_get_boolean)
@@ -716,12 +723,13 @@ librdf_query_results_get_boolean(librdf_query_results* query_results) {
  * Get a query result as an RDF graph in #librdf_stream form
  *
  * The return value is only meaningful if this is an RDF graph
- * query result - see #librdf_query_results_is_graph
+ * query result - see librdf_query_results_is_graph().
  *
  * Return value: a new #librdf_stream result or NULL on error
  */
 librdf_stream*
-librdf_query_results_as_stream(librdf_query_results* query_results) {
+librdf_query_results_as_stream(librdf_query_results* query_results)
+{
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, query_results, NULL);
 
   if(query_results->query->factory->results_as_stream)
@@ -845,7 +853,7 @@ librdf_free_query_results_formatter(librdf_query_results_formatter* formatter)
  * librdf_query_results_formatter_write:
  * @iostr: #raptor_iostream to write the query to
  * @formatter: #librdf_query_results_formatter object
- * @results: #librdf_query_results query results format
+ * @query_results: #librdf_query_results query results format
  * @base_uri: #librdf_uri base URI of the output format
  *
  * Write the query results using the given formatter to an iostream

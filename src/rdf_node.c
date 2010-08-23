@@ -1277,7 +1277,7 @@ librdf_node_to_counted_string(librdf_node* node, size_t* len_p)
 /**
  * librdf_node_write:
  * @node: the node
- * @iostream: iostream to write to
+ * @iostr: iostream to write to
  *
  * Write the node to an iostream
  * 
@@ -1803,7 +1803,7 @@ librdf_node_decode(librdf_world *world,
  * objects.  It is mostly intended for testing iterator code.
  * 
  * @deprecated: This will break when Redland is built with Raptor 2.  Use 
- * librdf_new_static_node_iterator() with a world argument.
+ * librdf_node_new_static_node_iterator() with a world argument.
  *
  * Return value: a #librdf_iterator serialization of the nodes or NULL on failure
  **/

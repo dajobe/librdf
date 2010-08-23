@@ -46,8 +46,7 @@ extern "C" {
  *
  * Used in fields arguments to methods such as the public
  * librdf_statement_encode_parts() librdf_statement_decode_parts()
- * librdf_new_stream_from_node_iterator() and the internal
- * librdf_storage_node_stream_to_node_create()
+ * librdf_new_stream_from_node_iterator().
  */
 typedef enum {
   LIBRDF_STATEMENT_SUBJECT   = 1 << 0,

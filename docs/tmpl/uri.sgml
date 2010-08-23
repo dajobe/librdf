@@ -40,6 +40,17 @@ filenames.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_new_uri2 ##### -->
+<para>
+
+</para>
+
+@world: 
+@uri_string: 
+@length: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_new_uri_from_uri ##### -->
 <para>
 

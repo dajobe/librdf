@@ -34,6 +34,180 @@
 </para>
 
 
+<!-- ##### MACRO SQL_DESC_COL_BOX_FLAGS ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO SQL_DESC_COL_DT_DT_TYPE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO SQL_DESC_COL_DV_TYPE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO SQL_DESC_COL_LITERAL_ATTR ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO SQL_DESC_COL_LITERAL_LANG ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO SQL_DESC_COL_LITERAL_TYPE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_BF_DEFAULT_ENC ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_BF_IRI ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_BF_UTF8 ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DT_TYPE_DATE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DT_TYPE_DATETIME ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DT_TYPE_TIME ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_DATE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_DATETIME ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_DOUBLE_FLOAT ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_IRI_ID ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_LONG_INT ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_NUMERIC ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_RDF ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_SINGLE_FLOAT ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_TIME ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_TIMESTAMP ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VIRTUOSO_DV_TIMESTAMP_OBJ ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VQUERY_RESULTS_BINDINGS ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VQUERY_RESULTS_BOOLEAN ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VQUERY_RESULTS_GRAPH ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VQUERY_RESULTS_SYNTAX ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO VQUERY_RESULTS_UNKNOWN ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### VARIABLE librdf_concept_ms_namespace_uri ##### -->
 <para>
 Internal.

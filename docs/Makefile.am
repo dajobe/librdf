@@ -68,6 +68,7 @@ IGNORE_HFILES= \
 	rdf_serializer_internal.h \
 	rdf_statement_internal.h \
 	rdf_storage_internal.h \
+	rdf_storage_virtuoso_internal.h \
 	rdf_stream_internal.h \
 	rdf_uri_internal.h
 	$(IGNORE_CFILES)

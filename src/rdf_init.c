@@ -534,7 +534,7 @@ static librdf_world* RDF_World;
  *
  * Use librdf_new_world() and librdf_world_open() on #librdf_world object
  * 
- * See librdf_world_set_digest_factory_name() for documentation on arguments.
+ * See librdf_world_set_digest() for documentation on arguments.
  **/
 void
 librdf_init_world(char *digest_factory_name, void* not_used2)

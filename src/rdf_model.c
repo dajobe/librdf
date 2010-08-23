@@ -1171,7 +1171,7 @@ librdf_model_print(librdf_model *model, FILE *fh)
 /**
  * librdf_model_write:
  * @model: the model object
- * @iostream: the iostream to write to
+ * @iostr: the iostream to write to
  *
  * Write a model to an iostream in a debug format.
  * 

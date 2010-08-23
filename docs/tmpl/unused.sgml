@@ -20,7 +20,35 @@ Do not read this, it is not in the document.
 <!-- ##### SECTION Image ##### -->
 
 
+<!-- ##### MACRO LIBRDF_USE_RAPTOR_STATEMENT ##### -->
+<para>
+Internal.
+</para>
+
+
+
+<!-- ##### MACRO LIBRDF_USE_RAPTOR_TERM ##### -->
+<para>
+Internal.
+</para>
+
+
+
+<!-- ##### MACRO LIBRDF_USE_RAPTOR_URI ##### -->
+<para>
+Internal.
+</para>
+
+
+
 <!-- ##### MACRO REDLAND_API ##### -->
+<para>
+Internal.
+</para>
+
+
+
+<!-- ##### MACRO REDLAND_CALLBACK_STDCALL ##### -->
 <para>
 Internal.
 </para>
@@ -232,5 +260,101 @@ Internal.
 
 @world: 
 @raptor_world_ptr: 
+
+
+<!-- ##### MACRO raptor_data_free_handler ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO raptor_iostream_counted_string_write ##### -->
+<para>
+
+</para>
+
+@string: 
+@len: 
+@iostr: 
+
+
+<!-- ##### MACRO raptor_iostream_string_write ##### -->
+<para>
+
+</para>
+
+@string: 
+@iostr: 
+
+
+<!-- ##### MACRO raptor_iostream_write_byte ##### -->
+<para>
+
+</para>
+
+@byte: 
+@iostr: 
+
+
+<!-- ##### MACRO raptor_iostream_write_bytes ##### -->
+<para>
+
+</para>
+
+@ptr: 
+@size: 
+@nmemb: 
+@iostr: 
+
+
+<!-- ##### MACRO raptor_locator_format ##### -->
+<para>
+
+</para>
+
+@buffer: 
+@length: 
+@locator: 
+
+
+<!-- ##### MACRO raptor_locator_print ##### -->
+<para>
+
+</para>
+
+@locator: 
+@fh: 
+
+
+<!-- ##### MACRO raptor_new_iostream_to_file_handle ##### -->
+<para>
+
+</para>
+
+@world: 
+@fh: 
+
+
+<!-- ##### MACRO raptor_new_iostream_to_string ##### -->
+<para>
+
+</para>
+
+@world: 
+@string_p: 
+@len_p: 
+@malloc: 
+
+
+<!-- ##### MACRO raptor_string_ntriples_write ##### -->
+<para>
+
+</para>
+
+@str: 
+@len: 
+@delim: 
+@iostr: 
 
 

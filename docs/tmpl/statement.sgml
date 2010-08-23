@@ -205,11 +205,37 @@ form for use in storage.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_statement_encode2 ##### -->
+<para>
+
+</para>
+
+@world: 
+@statement: 
+@buffer: 
+@length: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_statement_encode_parts ##### -->
 <para>
 
 </para>
 
+@statement: 
+@context_node: 
+@buffer: 
+@length: 
+@fields: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_statement_encode_parts2 ##### -->
+<para>
+
+</para>
+
+@world: 
 @statement: 
 @context_node: 
 @buffer: 
@@ -224,6 +250,19 @@ form for use in storage.
 </para>
 
 @statement: 
+@buffer: 
+@length: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_statement_decode2 ##### -->
+<para>
+
+</para>
+
+@world: 
+@statement: 
+@context_node: 
 @buffer: 
 @length: 
 @Returns: 

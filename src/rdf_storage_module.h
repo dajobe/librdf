@@ -40,9 +40,28 @@ extern "C" {
 typedef void* librdf_storage_instance;
 
 
+/**
+ * LIBRDF_STORAGE_MIN_INTERFACE_VERSION:
+ *
+ * Oldest support librdf storage module interface version.
+ *
+ */
 #define LIBRDF_STORAGE_MIN_INTERFACE_VERSION 1
+
+/**
+ * LIBRDF_STORAGE_MAX_INTERFACE_VERSION:
+ *
+ * Newest supported librdf storage module interface version.
+ *
+ */
 #define LIBRDF_STORAGE_MAX_INTERFACE_VERSION 1
 
+/**
+ * LIBRDF_STORAGE_INTERFACE_VERSION:
+ *
+ * Default librdf storage module interface version.
+ *
+ */
 #define LIBRDF_STORAGE_INTERFACE_VERSION LIBRDF_STORAGE_MAX_INTERFACE_VERSION
 
 /**

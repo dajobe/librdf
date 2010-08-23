@@ -22,6 +22,27 @@ the RDF model API and have the same name.
 <!-- ##### SECTION Image ##### -->
 
 
+<!-- ##### MACRO LIBRDF_STORAGE_INTERFACE_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBRDF_STORAGE_MAX_INTERFACE_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBRDF_STORAGE_MIN_INTERFACE_VERSION ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### TYPEDEF librdf_storage ##### -->
 <para>
 
@@ -42,6 +63,18 @@ the RDF model API and have the same name.
 @world: 
 @name: 
 @label: 
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
 @librdf_storage_factory*:
 @librdf_storage_factory*:
 @librdf_storage_factory*: 

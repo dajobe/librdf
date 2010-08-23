@@ -20,22 +20,13 @@ The (subject, predicate, object) parts of an RDF triple.
 <!-- ##### SECTION Image ##### -->
 
 
-<!-- ##### TYPEDEF librdf_node ##### -->
+<!-- ##### FUNCTION librdf_free_node ##### -->
 <para>
 
 </para>
 
+@node: 
 
-<!-- ##### ENUM librdf_node_type ##### -->
-<para>
-
-</para>
-
-@LIBRDF_NODE_TYPE_UNKNOWN: 
-@LIBRDF_NODE_TYPE_RESOURCE: 
-@LIBRDF_NODE_TYPE_LITERAL: 
-@LIBRDF_NODE_TYPE_BLANK: 
-@LIBRDF_NODE_TYPE_LAST: 
 
 <!-- ##### FUNCTION librdf_new_node ##### -->
 <para>
@@ -46,13 +37,94 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_new_node_from_uri_string ##### -->
+<!-- ##### FUNCTION librdf_new_node_from_blank_identifier ##### -->
+<para>
+
+</para>
+
+@world: 
+@identifier: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_new_node_from_counted_blank_identifier ##### -->
+<para>
+
+</para>
+
+@world: 
+@identifier: 
+@identifier_len: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_new_node_from_counted_uri_string ##### -->
 <para>
 
 </para>
 
 @world: 
 @uri_string: 
+@len: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_new_node_from_literal ##### -->
+<para>
+
+</para>
+
+@world: 
+@string: 
+@xml_language: 
+@is_wf_xml: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_new_node_from_node ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_new_node_from_normalised_uri_string ##### -->
+<para>
+
+</para>
+
+@world: 
+@uri_string: 
+@source_uri: 
+@base_uri: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_new_node_from_typed_counted_literal ##### -->
+<para>
+
+</para>
+
+@world: 
+@value: 
+@value_len: 
+@xml_language: 
+@xml_language_len: 
+@datatype_uri: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_new_node_from_typed_literal ##### -->
+<para>
+
+</para>
+
+@world: 
+@value: 
+@xml_language: 
+@datatype_uri: 
 @Returns: 
 
 
@@ -77,67 +149,56 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_new_node_from_normalised_uri_string ##### -->
+<!-- ##### FUNCTION librdf_new_node_from_uri_string ##### -->
 <para>
 
 </para>
 
 @world: 
 @uri_string: 
-@source_uri: 
-@base_uri: 
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_new_node_from_literal ##### -->
+<!-- ##### TYPEDEF librdf_node ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION librdf_node_decode ##### -->
 <para>
 
 </para>
 
 @world: 
-@string: 
-@xml_language: 
-@is_wf_xml: 
+@size_p: 
+@buffer: 
+@length: 
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_new_node_from_typed_literal ##### -->
+<!-- ##### FUNCTION librdf_node_encode ##### -->
 <para>
 
 </para>
 
-@world: 
-@value: 
-@xml_language: 
-@datatype_uri: 
+@node: 
+@buffer: 
+@length: 
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_new_node_from_typed_counted_literal ##### -->
+<!-- ##### FUNCTION librdf_node_equals ##### -->
 <para>
 
 </para>
 
-@world: 
-@value: 
-@value_len: 
-@xml_language: 
-@xml_language_len: 
-@datatype_uri: 
+@first_node: 
+@second_node: 
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_new_node_from_blank_identifier ##### -->
-<para>
-
-</para>
-
-@world: 
-@identifier: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_new_node_from_node ##### -->
+<!-- ##### FUNCTION librdf_node_get_blank_identifier ##### -->
 <para>
 
 </para>
@@ -146,24 +207,17 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_free_node ##### -->
+<!-- ##### FUNCTION librdf_node_get_counted_blank_identifier ##### -->
 <para>
 
 </para>
 
 @node: 
-
-
-<!-- ##### FUNCTION librdf_node_get_uri ##### -->
-<para>
-
-</para>
-
-@node: 
+@len_p: 
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_get_type ##### -->
+<!-- ##### FUNCTION librdf_node_get_li_ordinal ##### -->
 <para>
 
 </para>
@@ -200,7 +254,7 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_get_literal_value_language ##### -->
+<!-- ##### FUNCTION librdf_node_get_literal_value_datatype_uri ##### -->
 <para>
 
 </para>
@@ -218,7 +272,7 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_get_literal_value_datatype_uri ##### -->
+<!-- ##### FUNCTION librdf_node_get_literal_value_language ##### -->
 <para>
 
 </para>
@@ -227,7 +281,7 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_get_li_ordinal ##### -->
+<!-- ##### FUNCTION librdf_node_get_type ##### -->
 <para>
 
 </para>
@@ -236,25 +290,7 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_get_blank_identifier ##### -->
-<para>
-
-</para>
-
-@node: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_node_is_resource ##### -->
-<para>
-
-</para>
-
-@node: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_node_is_literal ##### -->
+<!-- ##### FUNCTION librdf_node_get_uri ##### -->
 <para>
 
 </para>
@@ -272,35 +308,51 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_encode ##### -->
+<!-- ##### FUNCTION librdf_node_is_literal ##### -->
 <para>
 
 </para>
 
 @node: 
-@buffer: 
-@length: 
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_decode ##### -->
+<!-- ##### FUNCTION librdf_node_is_resource ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_node_new_static_node_iterator ##### -->
 <para>
 
 </para>
 
 @world: 
-@size_p: 
-@buffer: 
-@length: 
+@nodes: 
+@size: 
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_to_string ##### -->
+<!-- ##### FUNCTION librdf_node_print ##### -->
 <para>
 
 </para>
 
 @node: 
+@fh: 
+
+
+<!-- ##### FUNCTION librdf_node_static_iterator_create ##### -->
+<para>
+
+</para>
+
+@nodes: 
+@size: 
 @Returns: 
 
 
@@ -314,34 +366,25 @@ The (subject, predicate, object) parts of an RDF triple.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_print ##### -->
+<!-- ##### FUNCTION librdf_node_to_string ##### -->
 <para>
 
 </para>
 
 @node: 
-@fh: 
+@Returns: 
 
 
-<!-- ##### FUNCTION librdf_node_equals ##### -->
+<!-- ##### ENUM librdf_node_type ##### -->
 <para>
 
 </para>
 
-@first_node: 
-@second_node: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_node_static_iterator_create ##### -->
-<para>
-
-</para>
-
-@nodes: 
-@size: 
-@Returns: 
-
+@LIBRDF_NODE_TYPE_UNKNOWN: 
+@LIBRDF_NODE_TYPE_RESOURCE: 
+@LIBRDF_NODE_TYPE_LITERAL: 
+@LIBRDF_NODE_TYPE_BLANK: 
+@LIBRDF_NODE_TYPE_LAST: 
 
 <!-- ##### FUNCTION librdf_node_write ##### -->
 <para>

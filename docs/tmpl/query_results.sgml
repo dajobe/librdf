@@ -302,7 +302,7 @@ based on the SPARQL XML results format which can also be written to a file.
 @query_results: 
 @name: 
 @mime_type: 
-@format_uri: 
+@uri: 
 @Returns: 
 
 
@@ -353,7 +353,7 @@ based on the SPARQL XML results format which can also be written to a file.
 
 @iostr: 
 @formatter: 
-@results: 
+@query_results: 
 @base_uri: 
 @Returns: 
 

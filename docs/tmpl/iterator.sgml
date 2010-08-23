@@ -76,6 +76,54 @@ return sequence of #librdf_node objects such as librdf_model_get_sources().
 @void*: 
 @void*: 
 @void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
 @void*: 
 @Returns: 
 

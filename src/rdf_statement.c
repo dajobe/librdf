@@ -442,7 +442,7 @@ librdf_statement_to_string(librdf_statement *statement)
 /**
  * librdf_statement_write:
  * @statement: the statement
- * @iostream: raptor iostream to write to
+ * @iostr: raptor iostream to write to
  *
  * Write the statement to an iostream
  * 
