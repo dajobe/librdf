@@ -53,10 +53,12 @@ When comparing to `0` or a `NULL` pointer, use the idiomatic form
 that has no comparison.
 
 GOOD:
+
   * `if(!ptr)`
   * `if(!index)`
 
 BAD:
+
   * `if(ptr == NULL)`
   * `if(index == 0)`
   * `if(0 == index)`
@@ -228,22 +230,24 @@ e.g.  `#spelling`  or `#ws`
 the latter is whitespace changes for some reason
 
 The changes will semi-automatically be added to the ChangeLog files
-following the GNU style, indented and word wrapped, which adds the list
-of files at the start.  So the commit message above ends up looking something
-like:
+following the GNU style, indented and word wrapped, and adding the list
+of files at the start.  So the commit message above ends up looking
+something like:
 
-      * (dir/file1.c, dir2/file2.c): First line summaries what commit does -
-      this goes into the GIT short log
-      
-      (function1, function2): what changed
-      
-      (function3): Added, deprecating function4()
-      
-      (function4): Deleted, replaced by function3()
-      
-      struct foo gains field ...
-      
-      struct bar loses field ...
-      
-      enum blah gains new value BLAH_2 which ...
+    2010-08-23  User Name <user@example.org>
+    
+            * dir/file1.c, dir2/file2.c: First line summaries what commit
+              does - this goes into the GIT short log
+
+              (function1, function2): what changed
+
+              (function3): Added, deprecating function4()
+
+              (function4): Deleted, replaced by function3()
+
+              struct foo gains field ...
+
+              struct bar loses field ...
+
+              enum blah gains new value BLAH_2 which ...
 
