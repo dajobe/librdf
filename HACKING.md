@@ -21,11 +21,18 @@ Should be:
 Code Style
 ==========
 
+Do not make large commits that only change code style unless
+you have previously agreed this or it is in code under major refactoring
+where a diff is not a large concern.  There is always `diff -b`
+
 
 Indenting
 ---------
 
 2 spaces.  No tabs.
+
+All code must be wrapped to 80 chars as far as is possible.  Function
+definitions or calls should indent the parameters to the left `(`.
 
 
 Expressions
@@ -41,6 +48,22 @@ BAD:
 
   * `a+=2*x`
   * `if(a<2)`
+
+When comparing to `0` or a `NULL` pointer, use the idiomatic form
+that has no comparison.
+
+GOOD:
+  * `if(!ptr)`
+  * `if(!index)`
+
+BAD:
+  * `if(ptr == NULL)`
+  * `if(index == 0)`
+  * `if(0 == index)`
+
+When comparing a variable to a constant, the code has currently used
+`if(var == constant)` rather than the slightly safer, and easier to
+compile check, `if(constant == var)`.
 
 
 Blocks
@@ -95,6 +118,79 @@ If using if else chains on an enumeration, don't do that, use a
 
 There should ALWAYS be a `default:` case.
 
+
+Functions
+---------
+
+Declare functions in this format:
+
+    returntype
+    functionname(type1 param1, type2 param2, ...)
+    {
+      type3 var1;
+      type4 var2;
+      
+      ... first line of code ...
+      
+      tidy:
+        ... cleanup code...
+      
+      return value;
+     }
+
+Notes:
+
+   * Declare one variable per line
+   * Declare all variables at the top of the function (K&R C style)
+   * You may declare variables in inner `{}` blocks.  There are some places
+     where `if(1) { ... var decls ...; more code }` is used.
+   * If a label is used it *MUST* be used only for cleanup, and going
+     forward in the code to the end of the function.
+   * Multiple `return` are allowed but for obvious error or result
+     returns.  Do not twist the code to enable a single return.
+
+
+Documentation
+-------------
+
+Public functions, types, enumerations and defines must have autodocs -
+the structured comment block before the definition.  This is read by
+`gtk-doc(1)` to generate reference API documentation.
+
+Format:
+
+    /**
+     * functionname:
+     * @param1: Description of first parameter
+     * @param2: Description of second parameter (or NULL)
+     * ... more params ...
+     *
+     * Short Description
+     *
+     * Long Description.
+     *
+     * Return value: return value
+     */
+     returntype
+     functionname(...)
+     {
+       ... body ...
+     }
+
+The _Short Description_ have several commmon forms:
+
+  * Constructor - creates a FOO object
+  * Destructor - destroys a FOO object
+  * Short description of regular function or method.
+  * INTERNAL - short description
+
+The latter is used for autodocs for internal functions either as
+internal documentation or for APIs that may one day be public.
+
+The _(or NULL)_ phrase is used for pointer parameters that may be
+omitted.  This is usually tested by the function as an assertion.
+In some functions there are more complex conditions on which optional
+parameters are allowed, these are described in the _Long Description_.
 
 
 Commit Messages
