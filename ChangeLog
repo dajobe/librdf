@@ -1,3 +1,38 @@
+2010-08-23  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_raptor_statement.c:
+	(librdf_statement_encode2): Use librdf_statement_encode_parts2
+	instead of deprecated librdf_statement_encode_parts.
+
+	* src/rdf_query_rasqal.c:
+	(rasqal_redland_new_triples_source): Make graph iteration fix work
+	with raptor v1 too
+
+2010-08-23  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_hash_internal.h:
+	removed duplicate declaration of
+	librdf_hash_from_string()
+
+2010-08-23  Nicholas J Humfrey <njh@aelius.com>
+
+	* src/rdf_hash.c: (librdf_hash_print, librdf_hash_print_keys,
+	librdf_hash_print_values): Fixed wrong order of arguments used to
+	fwrite()
+
+2010-08-22  Dave Beckett <dave@dajobe.org>
+
+	* docs/Makefile.am, docs/redland-sections.txt,
+	docs/tmpl/hash.sgml, docs/tmpl/iterator.sgml, docs/tmpl/list.sgml,
+	docs/tmpl/node.sgml, docs/tmpl/parser.sgml, docs/tmpl/query.sgml,
+	docs/tmpl/query_results.sgml, docs/tmpl/redland-unused.sgml,
+	docs/tmpl/serializer.sgml, docs/tmpl/statement.sgml,
+	docs/tmpl/storage.sgml, docs/tmpl/stream.sgml,
+	docs/tmpl/unused.sgml, docs/tmpl/uri.sgml, src/rdf_hash.h,
+	src/rdf_init.c, src/rdf_model.c, src/rdf_node.c, src/rdf_query.h,
+	src/rdf_query_results.c, src/rdf_statement.c, src/rdf_statement.h,
+	src/rdf_storage_module.h: Updated code for gtk-doc autodocs
+
 2010-08-20  Dave Beckett <dave@dajobe.org>
 
 	* src/rdf_query_rasqal.c: Try to construct a set of data graphs
