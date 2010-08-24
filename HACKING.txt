@@ -38,7 +38,7 @@ GOOD:
 
 BAD:
  * a+=2*x
- * if (a < 2)
+ * if(a<2)
 
 
 Blocks
@@ -76,7 +76,7 @@ switch(enum_var) {
     ... code ...
     break;
 
-  case ENUM_1:
+  case ENUM_2:
     ... code ...
     break;
 
