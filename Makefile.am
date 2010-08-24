@@ -42,6 +42,7 @@ README      NEWS      LICENSE.txt  TODO \
 README.html NEWS.html LICENSE.html TODO.html \
 RELEASE.html INSTALL.html FAQS.html \
 LICENSE-2.0.txt NOTICE \
+HACKING.md HACKING.html \
 redland.rdf.in \
 autogen.sh \
 redland-config.in \
@@ -57,6 +58,9 @@ LYNX=lynx
 
 HTML_TO_TEXT=TERM=vt100 $(LYNX) -dump $< | sed -e 's,file://localhost.*librdf/,,' > $@
 
+MARKDOWN=markdown
+MARKDOWN_TO_HTML=$(MARKDOWN) $<  > $@
+
 SUFFIXES = .html .txt
 
 .html.txt:
@@ -70,6 +74,10 @@ NEWS: NEWS.html
 
 TODO: TODO.html
 	$(HTML_TO_TEXT)
+
+HACKING.html: HACKING.md
+	$(MARKDOWN_TO_HTML)
+
 endif
 
 @SET_MAKE@
