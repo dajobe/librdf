@@ -126,6 +126,14 @@ and are usually lazily generated and consumed.
 @void*: 
 @void*: 
 @void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
+@void*:
+@void*: 
+@void*: 
+@void*, int: 
 @void*: 
 @Returns: 
 

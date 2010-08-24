@@ -56,6 +56,8 @@ Query result limits and offsets can be set.
 @librdf_query_factory*:
 @librdf_query_factory*:
 @librdf_query_factory*:
+@librdf_query_factory*:
+@librdf_query_factory*:
 @librdf_query_factory*: 
 
 

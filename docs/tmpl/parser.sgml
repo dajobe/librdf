@@ -105,6 +105,8 @@ by callbacks.
 @librdf_parser_factory*:
 @librdf_parser_factory*:
 @librdf_parser_factory*:
+@librdf_parser_factory*:
+@librdf_parser_factory*:
 @librdf_parser_factory*: 
 
 
@@ -230,6 +232,8 @@ by callbacks.
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...: 
 
 
@@ -240,6 +244,8 @@ by callbacks.
 
 @parser: 
 @user_data: 
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
