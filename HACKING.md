@@ -1,11 +1,11 @@
 Hacking Redland
 ===============
 
-Draft
+Draft 2010-08-24
 
 Dave Beckett
+
 http://www.dajobe.org/
-2010-08-24
 
 
 Commits
@@ -14,7 +14,7 @@ Commits
 Should be:
 
   * Licensed with the same license as Redland.
-  * GNU diff -u format patches prefered.
+  * Patches in GNU `diff -u` unifed context format preferred.
   * Include tests if they add new features.
 
 
@@ -34,20 +34,20 @@ Put spaces around operators in expressions, assignments, tests, conditions
 
 GOOD:
 
-  * a += 2 * x
-  * if (a < 2)
+  * `a += 2 * x`
+  * `if (a < 2)`
 
 BAD:
 
-  * a+=2*x
-  * if(a<2)
+  * `a+=2*x`
+  * `if(a<2)`
 
 
 Blocks
 ------
-In general add {}s around blocks in if/else when one of the blocks has
-more than 1 line of code.  Try not to mix, but the final case if it is
-one line, can be braceless.
+In general add {}s around blocks in if else chains when one of the blocks
+has more than 1 line of code.  Try not to mix, but the final case if it
+is one line, can be braceless.
 
     if(var == 1) {
       ... multiple lines of code ...
@@ -67,6 +67,7 @@ or
     if(var == 1) {
       ... multiple lines of code ...
     } else if (var == 2) {
+      ... multiple lines of code and / or more if conditions ...
     } else
       ... one line of code ...
 
@@ -74,8 +75,8 @@ or
 Switches
 --------
 
-If using if() else() blocks on an enumeration, don't do that, use a
-switch() which GCC can use to find missing cases when they get added.
+If using if else chains on an enumeration, don't do that, use a
+`switch()` which GCC can use to find missing cases when they get added.
 
     switch(enum_var) {
       case ENUM_1:
@@ -92,7 +93,7 @@ switch() which GCC can use to find missing cases when they get added.
         break;
     }
 
-There should ALWAYS be a default: case.
+There should ALWAYS be a `default:` case.
 
 
 
