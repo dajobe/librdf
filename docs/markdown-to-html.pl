@@ -51,6 +51,10 @@ pre
 HEADER
   }
 
+  # Fix markdown's removal of whitespace before first code line
+  # Assumes all code indents with 2 initial spaces
+  s%<pre><code>(.*)$%<pre><code>\n  $1%;
+
   print OUT "  $_";
 }
 close(IN);
