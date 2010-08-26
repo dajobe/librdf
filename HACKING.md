@@ -3,9 +3,7 @@ Hacking Redland
 
 Draft 2010-08-24
 
-Dave Beckett
-
-http://www.dajobe.org/
+[Dave Beckett](http://www.dajobe.org/)
 
 
 Commits
@@ -21,9 +19,10 @@ Should be:
 Code Style
 ----------
 
-Do not make large commits that only change code style unless
-you have previously agreed this or it is in code under major refactoring
-where a diff is not a large concern.  There is always `diff -b`
+Do not make large commits that only change code style unless you have
+previously had this agreed or it is in code under major refactoring
+where a diff is not a large concern.  There is always `diff -b` when
+large code style (whitespace) changes are made.
 
 
 ### Indenting
