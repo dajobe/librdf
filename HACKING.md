@@ -246,3 +246,9 @@ something like:
 
               enum blah gains new value BLAH_2 which ...
 
+
+<!--
+Local variables:
+mode: markdown
+End:
+-->
