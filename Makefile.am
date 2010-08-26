@@ -59,7 +59,7 @@ LYNX=lynx
 HTML_TO_TEXT=TERM=vt100 $(LYNX) -dump $< | sed -e 's,file://localhost.*librdf/,,' > $@
 
 MARKDOWN=markdown
-MARKDOWN_TO_HTML=$(MARKDOWN) $<  > $@
+MARKDOWN_TO_HTML=$(PERL) $(top_srcdir)/docs/markdown-to-html.pl $<  $@
 
 SUFFIXES = .html .txt
 
