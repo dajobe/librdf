@@ -19,22 +19,51 @@ my($input,$output)=@ARGV;
 
 die "$program: $input not found - $!\n" unless -r $input;
 
-our $cmd = "$MARKDOWN $input | tidy -quiet -asxhtml -indent -utf8 --show-warnings 0 --add-xml-decl yes --wrap 78 -output $output";
+open(IN, "$MARKDOWN $input |") or die "$program: pipe from $MARKDOWN $input failed - $\n";
+open(OUT, ">$output") or die "$program: Cannot create $output - $\n";
+my $title;
+while(<IN>) {
+  # Use first H1 to trigger head and title
+  if(!defined $title && m%<h1>([^<]+)</h1%) {
+    $title = $1;
 
-warn "$program: $cmd\n";
-system($cmd);
-our $status = $?;
-if ($? == -1) {
-  die "$program: system $cmd failed to execute: $!\n";
+    print OUT <<"HEADER";
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Redland RDF Application Framework - $title</title>
+  <style type="text/css">
+<!--
+pre
+{
+	margin: 1em 4em 1em 4em;
+	background-color: #eee;
+	padding: 0.5em;
+	border-color: #006;
+	border-width: 1px;
+	border-style: dotted;
 }
-elsif ($? & 127) {
-  die "$program: system $cmd child died with signal %d, %s coredump\n",
-  ($? & 127),  ($? & 128) ? 'with' : 'without';
-}
+-->
+  </style>
+</head>
+<body>
+HEADER
+  }
 
-$status = ($? >> 8);
-# Tidy exit status: 1 on warnings, 2 on errors
-die "$program: system $cmd failed returning exit $status\n"
-  if $status > 1;
+  print OUT "  $_";
+}
+close(IN);
+
+print OUT <<"FOOTER";
+<hr />
+
+<p>Copyright (C) 2010 <a href="http://www.dajobe.org/">Dave Beckett</a></p>
+
+</body>
+</html>
+FOOTER
+
+close(OUT);
 
 exit 0;
