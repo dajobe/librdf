@@ -58,9 +58,6 @@ LYNX=lynx
 
 HTML_TO_TEXT=TERM=vt100 $(LYNX) -dump $< | sed -e 's,file://localhost.*librdf/,,' > $@
 
-MARKDOWN=markdown
-MARKDOWN_TO_HTML=$(PERL) $(top_srcdir)/docs/markdown-to-html.pl $<  $@
-
 SUFFIXES = .html .txt
 
 .html.txt:
@@ -75,8 +72,8 @@ NEWS: NEWS.html
 TODO: TODO.html
 	$(HTML_TO_TEXT)
 
-HACKING.html: HACKING.md
-	$(MARKDOWN_TO_HTML)
+HACKING.html: HACKING.md $(top_srcdir)/docs/markdown-to-html.pl
+	$(PERL) $(top_srcdir)/docs/markdown-to-html.pl $<  $@
 
 endif
 
