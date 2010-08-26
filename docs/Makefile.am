@@ -107,7 +107,8 @@ EXTRA_DIST+= README.html README \
 storage.html \
 redland.pod \
 $(man_MANS) \
-version.xml.in
+version.xml.in \
+markdown-to-html.pl
 
 CLEANFILES+=README pod2htm* redland-decl.txt redland-decl-list.txt \
 $(FILTERED_HS)
