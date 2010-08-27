@@ -32,6 +32,12 @@ large code style (whitespace) changes are made.
 All code must be wrapped to 80 chars as far as is possible.  Function
 definitions or calls should indent the parameters to the left `(`.
 
+Use no space between a keyword followed by braces argument.
+For example, use `if(cond)` rather than `if (cond)` (ditto for
+while, do etc.) and
+`functionname(...)` rather than `functionname (...)` in
+both definition and calls of functions.
+
 
 ### Expressions
 
@@ -40,7 +46,7 @@ Put spaces around operators in expressions, assignments, tests, conditions
 GOOD:
 
   * `a += 2 * x`
-  * `if (a < 2)`
+  * `if(a < 2)`
 
 BAD:
 
@@ -89,7 +95,7 @@ or
 
     if(var == 1) {
       ... multiple lines of code ...
-    } else if (var == 2) {
+    } else if(var == 2) {
       ... multiple lines of code and / or more if conditions ...
     } else
       ... one line of code ...
