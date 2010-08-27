@@ -74,6 +74,10 @@ int librdf_hash_put_strings(librdf_hash* hash, const char *key, const char *valu
 REDLAND_API
 int librdf_hash_from_string(librdf_hash* hash, const char *string);
 
+/* make a string from a hash */
+REDLAND_API
+char* librdf_hash_to_string(librdf_hash* hash, const char *filter[]);
+
 REDLAND_API
 void librdf_hash_print(librdf_hash* hash, FILE *fh);
 REDLAND_API

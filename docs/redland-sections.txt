@@ -74,6 +74,7 @@ librdf_hash_print_keys
 librdf_hash_print_values
 librdf_hash_interpret_template
 librdf_hash_from_string
+librdf_hash_to_string
 </SECTION>
 
 <SECTION>

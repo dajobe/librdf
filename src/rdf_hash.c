@@ -1544,6 +1544,99 @@ librdf_hash_from_array_of_strings(librdf_hash* hash, const char **array)
 
 
 /**
+ * librdf_hash_to_string:
+ * @hash: #librdf_hash object
+ * @filter: NULL terminated list of keys to ignore
+ *
+ * Format the hash as a string, suitable for parsing by librdf_hash_from_string.
+ *
+ * Note: this method allocates a new string since this is a _to_ method
+ * and the caller must free the resulting memory.
+ *
+ * Return value: string representation of the hash or NULL on failure
+ **/
+char*
+librdf_hash_to_string(librdf_hash* hash, const char *filter[])
+{
+  librdf_hash_datum *key, *value;
+  librdf_iterator* iterator;
+  raptor_stringbuffer* sb;
+  char* result = NULL;
+  size_t len;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(hash, librdf_hash, NULL);
+
+  sb = raptor_new_stringbuffer();
+
+  key=librdf_new_hash_datum(hash->world, NULL, 0);
+  value=librdf_new_hash_datum(hash->world, NULL, 0);
+
+  iterator=librdf_hash_get_all(hash, key, value);
+  while(!librdf_iterator_end(iterator)) {
+    librdf_hash_datum *k, *v;
+    int key_is_filtered = 0;
+    size_t i;
+
+    k=(librdf_hash_datum *)librdf_iterator_get_key(iterator);
+    v=(librdf_hash_datum *)librdf_iterator_get_value(iterator);
+
+    /* Is this one of the keys that we are ignoring? */
+    if(filter) {
+      for(i=0; filter[i]; i++) {
+        size_t f_len = strlen(filter[i]);
+        if(f_len == k->size && strncmp(k->data, filter[i], f_len) == 0) {
+          key_is_filtered = 1;
+          break;
+        }
+      }
+    }
+
+    if(!key_is_filtered) {
+      if(raptor_stringbuffer_length(sb) > 0)
+        raptor_stringbuffer_append_counted_string(sb, (unsigned char*)", ", 2, 1);
+
+      raptor_stringbuffer_append_counted_string(sb, (unsigned char*)k->data, k->size, 1);
+      raptor_stringbuffer_append_counted_string(sb, (unsigned char*)"='", 2, 1);
+
+      for(i=0; i < v->size; i++) {
+        char c = ((char*)v->data)[i];
+        switch (c) {
+          case '\'':
+            raptor_stringbuffer_append_counted_string(sb, (unsigned char*)"\\'", 2, 1);
+            break;
+          case '\\':
+            raptor_stringbuffer_append_counted_string(sb, (unsigned char*)"\\\\", 2, 1);
+            break;
+          default:
+            raptor_stringbuffer_append_counted_string(sb, (unsigned char*)&c, 1, 1);
+            break;
+        }
+      }
+
+      raptor_stringbuffer_append_counted_string(sb, (unsigned char*)"'", 1, 1);
+    }
+
+    librdf_iterator_next(iterator);
+  }
+
+  if(iterator)
+    librdf_free_iterator(iterator);
+
+  librdf_free_hash_datum(value);
+  librdf_free_hash_datum(key);
+
+
+  /* Generate a string result */
+  len=raptor_stringbuffer_length(sb);
+  result=LIBRDF_MALLOC(cstring, len + 1);
+  raptor_stringbuffer_copy_to_string(sb, (unsigned char*)result, len);
+
+  raptor_free_stringbuffer(sb);
+  return result;
+}
+
+
+/**
  * librdf_hash_get_as_boolean:
  * @hash: #librdf_hash object
  * @key: key string to look up
@@ -1620,6 +1713,7 @@ librdf_hash_get_as_long (librdf_hash* hash, const char *key)
   LIBRDF_FREE(cstring, value);
   return lvalue;
 }
+
 
 /**
  * librdf_hash_put_strings:
@@ -1781,12 +1875,14 @@ main(int argc, char *argv[])
   const char *test_hash_delete_key="size";
   const unsigned char* template_string=(const unsigned char*)"the shape is %{shape} and the sides are %{sides} created by %{rubik}";
   const unsigned char* template_expected=(const unsigned char*)"the shape is cube and the sides are 6 created by ";
+  const char * filter_string[] = {"field1", NULL};
   int i,j;
   const char *type;
   librdf_hash_datum hd_key, hd_value; /* on stack */
   const char *program=librdf_basename((const char*)argv[0]);
   int b;
   long l;
+  char* string_result;
   unsigned char* template_result;
   librdf_world *world;
   
@@ -1941,14 +2037,14 @@ main(int argc, char *argv[])
     librdf_free_hash_datum(key_hd);
   }
 
-
   fprintf(stdout, "%s: Freeing hash\n", program);
   /* close() done automatically by free so not required */
   /* librdf_hash_close(h2); */
   librdf_free_hash(h2);
 
+
   h2=librdf_new_hash(world, NULL);
-  fprintf(stdout, "%s: Initialising hash from string >>%s<<\n", program, 
+  fprintf(stdout, "%s: Initialising hash from string >>%s<<\n", program,
           test_hash_string);
   librdf_hash_from_string (h2, test_hash_string);
   fprintf(stdout, "%s: resulting ", program);
@@ -1956,9 +2052,50 @@ main(int argc, char *argv[])
   fputc('\n', stdout);
   fprintf(stdout, "%s: values count %d\n", program, librdf_hash_values_count(h2));
 
+  fprintf(stdout, "%s: Converting hash back to a string\n", program);
+  string_result=librdf_hash_to_string(h2, NULL);
+
+  /* Order is not guaranteed, so sadly we can't just do a full string comparison */
+  if(!strstr(string_result, "field1='value1'")) {
+    fprintf(stdout, "%s: Did not see field1='value1' in the generated string >>%s<<\n",
+            program, string_result);
+    exit(1);
+  } else if(!strstr(string_result, "field2='\\'value2'")) {
+    fprintf(stdout, "%s: Did not see field2='\\'value2'' in the generated string >>%s<<\n",
+            program, string_result);
+    exit(1);
+  } else if(!strstr(string_result, "field3='\\\\'")) {
+    fprintf(stdout, "%s: Did not see field3='\\\\' in the generated string >>%s<<\n",
+            program, string_result);
+    exit(1);
+  } else if(!strstr(string_result, "field4='\\\\\\'")) {
+    fprintf(stdout, "%s: Did not see field4='\\\\\\' in the generated string >>%s<<\n",
+            program, string_result);
+    exit(1);
+  } else if(!strstr(string_result, "field5='a'")) {
+    fprintf(stdout, "%s: Did not see field5='a' in the generated string >>%s<<\n",
+            program, string_result);
+    exit(1);
+  } else {
+    fprintf(stdout, "%s: resulting in >>%s<<\n", program, string_result);
+  }
+  free(string_result);
+
+  fprintf(stdout, "%s: Converting hash back to a string with filter\n", program);
+  string_result=librdf_hash_to_string(h2, filter_string);
+  if(strstr(string_result, "field1")) {
+    fprintf(stdout, "%s: Was not expecting >>field1<< to be in the generated string >>%s<<\n",
+            program, string_result);
+    exit(1);
+  } else {
+    fprintf(stdout, "%s: resulting in >>%s<<\n", program, string_result);
+  }
+  free(string_result);
+
   librdf_free_hash(h2);
 
-   
+
+
   fprintf(stdout, "%s: Subtituting into template >>%s<<\n", program, 
           template_string);
   h2=librdf_new_hash(world, NULL);
