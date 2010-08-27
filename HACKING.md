@@ -3,13 +3,11 @@ Hacking Redland
 
 Draft 2010-08-24
 
-Dave Beckett
-
-http://www.dajobe.org/
+[Dave Beckett](http://www.dajobe.org/)
 
 
 Commits
-=======
+-------
 
 Should be:
 
@@ -19,15 +17,15 @@ Should be:
 
 
 Code Style
-==========
+----------
 
-Do not make large commits that only change code style unless
-you have previously agreed this or it is in code under major refactoring
-where a diff is not a large concern.  There is always `diff -b`
+Do not make large commits that only change code style unless you have
+previously had this agreed or it is in code under major refactoring
+where a diff is not a large concern.  There is always `diff -b` when
+large code style (whitespace) changes are made.
 
 
-Indenting
----------
+### Indenting
 
 2 spaces.  No tabs.
 
@@ -35,8 +33,8 @@ All code must be wrapped to 80 chars as far as is possible.  Function
 definitions or calls should indent the parameters to the left `(`.
 
 
-Expressions
------------
+### Expressions
+
 Put spaces around operators in expressions, assignments, tests, conditions
 
 GOOD:
@@ -68,8 +66,8 @@ When comparing a variable to a constant, the code has currently used
 compile check, `if(constant == var)`.
 
 
-Blocks
-------
+### Blocks
+
 In general add {}s around blocks in if else chains when one of the blocks
 has more than 1 line of code.  Try not to mix, but the final case if it
 is one line, can be braceless.
@@ -97,8 +95,7 @@ or
       ... one line of code ...
 
 
-Switches
---------
+### Switches
 
 If using if else chains on an enumeration, don't do that, use a
 `switch()` which GCC can use to find missing cases when they get added.
@@ -121,8 +118,7 @@ If using if else chains on an enumeration, don't do that, use a
 There should ALWAYS be a `default:` case.
 
 
-Functions
----------
+### Functions
 
 Declare functions in this format:
 
@@ -152,8 +148,7 @@ Notes:
      returns.  Do not twist the code to enable a single return.
 
 
-Documentation
--------------
+### Documentation
 
 Public functions, types, enumerations and defines must have autodocs -
 the structured comment block before the definition.  This is read by
@@ -196,7 +191,7 @@ parameters are allowed, these are described in the _Long Description_.
 
 
 Commit Messages
-===============
+---------------
 
 The general standard for redland libraries using GIT is a merge
 of the GIT standards format and GNU ChangeLog
@@ -251,3 +246,9 @@ something like:
 
               enum blah gains new value BLAH_2 which ...
 
+
+<!--
+Local variables:
+mode: markdown
+End:
+-->

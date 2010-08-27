@@ -2,7 +2,7 @@
  *
  * rdfproc.c - Redland RDF command processor
  *
- * Copyright (C) 2000-2007, David Beckett http://purl.org/net/dajobe/
+ * Copyright (C) 2000-2010, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -129,7 +129,7 @@ static command commands[]={
 
 #ifdef HAVE_GETOPT_LONG
 #define HELP_TEXT(short, long, description) "  -" #short ", --" long "  " description
-#define HELP_ARG(short, long) "--" #long
+#define HELP_ARG(short, long) "-" #short " / --" #long
 #else
 #define HELP_TEXT(short, long, description) "  -" #short "  " description
 #define HELP_ARG(short, long) "-" #short
@@ -612,6 +612,14 @@ main(int argc, char *argv[])
     librdf_hash_put_strings(options, "write", "yes");
     if(is_new)
       librdf_hash_put_strings(options, "new", "yes");
+  } else {
+    if(is_new) {
+      fprintf(stderr,
+              "%s: Cannot empty a new store during read-only command '%s'\n"
+              "%s: Retry without the " HELP_ARG(n, new) " option\n",
+              program,  cmd, program);
+      return(1);
+    }
   }
 
   librdf_hash_from_string(options, storage_options);
