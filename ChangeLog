@@ -1,3 +1,75 @@
+2010-08-26  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_sql.c:
+	(librdf_new_sql_config): Turn debug print into log action at level
+	debug.
+
+	* src/rdf_query_rasqal.c: Make rasqal query debugging display only
+	if LIBRDF_DEBUG > 1
+
+	* src/rdf_storage_sqlite.c: Make even less sqlite request debug
+	noise.
+
+	* src/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_exec): Make less debug noise.
+
+	* utils/rdfproc.c: Fail with error when giving -n to a read only
+	operation
+
+	Adjust HELP_ARG macro to print alternatives when have long getopt
+	support.
+
+	(main): Generate error if not writable and is_new is set.
+
+	Fixes Issue#0000383 http://bugs.librdf.org/mantis/view.php?id=383
+
+	* HACKING.md: # Add emacs mode at end
+
+	* HACKING.md: #words
+
+2010-08-25  Dave Beckett <dave@dajobe.org>
+
+	* Makefile.am: Add HACKING.md conversion dependent on script
+
+	* docs/markdown-to-html.pl: Fix <pre><code> markdown indenting
+
+	* docs/markdown-to-html.pl: Simplify converter - just add
+	header/footer, do not run tidy
+
+	* HACKING.md: Put headers down 1 level
+
+	* Makefile.am: Use docs/markdown-to-html.pl to convert HACKING.md
+
+	* docs/Makefile.am, docs/markdown-to-html.pl: Add
+	markdown-to-html.pl
+
+2010-08-24  Dave Beckett <dave@dajobe.org>
+
+	* HACKING.md: #more words
+
+	* HACKING.md: #more words
+
+	* HACKING.md: words
+
+	* .gitignore, HACKING.md, HACKING.txt, Makefile.am: Make
+	HACKING.html from HACKING.md
+
+	* HACKING.html, HACKING.txt: Markdown HACKING
+
+	* HACKING.html: Now in better markdown format
+
+	* HACKING.txt: typo
+
+	* HACKING.txt: HACKING
+
+	* src/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_open): Fix unlink (is new) logic
+
+	* docs/tmpl/iterator.sgml, docs/tmpl/list.sgml,
+	docs/tmpl/parser.sgml, docs/tmpl/query.sgml,
+	docs/tmpl/serializer.sgml, docs/tmpl/storage.sgml,
+	docs/tmpl/stream.sgml: Update templates
+
 2010-08-23  Dave Beckett <dave@dajobe.org>
 
 	* src/rdf_raptor_statement.c:
