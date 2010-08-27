@@ -381,7 +381,9 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
   if(!request)
     return 1;
 
+#if LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite exec '%s'\n", request);
+#endif
   
   status = sqlite_EXEC(context->db, (const char*)request, callback, arg,
                        &errmsg);
