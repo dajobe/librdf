@@ -150,13 +150,14 @@ librdf_new_sql_config(librdf_world* world,
   config->predicates_count=i;
   config->values=(char**)LIBRDF_CALLOC(cstring, sizeof(char*), 
                                        config->predicates_count);
-  
-  LIBRDF_DEBUG4("Attempting to open %s layout %s storage config file %s\n", 
-                storage_name, (layout ? layout: "(default)"), config->filename);
+
+  librdf_log(world, 0, LIBRDF_LOG_DEBUG, LIBRDF_FROM_STORAGE, NULL,
+             "Opening storage '%s' layout '%s' configuration file '%s'", 
+             storage_name, (layout ? layout: "(default)"), config->filename);
   
   if(access((const char*)config->filename, R_OK)) {
     librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Failed to open configuration file %s for storage %s layout %s - %s",
+               "Failed to open configuration file '%s' for storage '%s' layout '%s' - %s",
                config->filename, storage_name, (layout ? layout: "(default)"),
                strerror(errno));
     librdf_free_sql_config(config);
