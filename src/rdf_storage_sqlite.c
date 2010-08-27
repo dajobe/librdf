@@ -1316,7 +1316,9 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
     return NULL;
   }
 
+#if LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
+#endif
 
 #if REDLAND_SQLITE_API == 3
   status=sqlite3_prepare(context->db,
@@ -1788,7 +1790,9 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
     return NULL;
   }
 
+#if LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
+#endif
 
 #if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
@@ -2255,7 +2259,9 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
     return NULL;
   }
 
+#if LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
+#endif
 
 #if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
@@ -2717,7 +2723,9 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
     return NULL;
   }
 
+#if LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
+#endif
 
 #if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
