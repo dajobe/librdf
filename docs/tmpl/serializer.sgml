@@ -73,6 +73,8 @@ can be retrieved by callbacks.
 @librdf_serializer_factory*:
 @librdf_serializer_factory*:
 @librdf_serializer_factory*:
+@librdf_serializer_factory*:
+@librdf_serializer_factory*:
 @librdf_serializer_factory*: 
 
 
@@ -269,6 +271,8 @@ can be retrieved by callbacks.
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...: 
 
 
@@ -279,6 +283,8 @@ can be retrieved by callbacks.
 
 @serializer: 
 @user_data: 
+@void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:

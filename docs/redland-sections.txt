@@ -63,7 +63,6 @@ librdf_new_hash_from_string
 librdf_new_hash_from_array_of_strings
 librdf_new_hash_from_hash
 librdf_free_hash
-librdf_hash_from_string
 librdf_hash_get
 librdf_hash_get_as_boolean
 librdf_hash_get_as_long
