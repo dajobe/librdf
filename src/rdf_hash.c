@@ -1180,6 +1180,8 @@ librdf_hash_print(librdf_hash* hash, FILE *fh)
 
   key=librdf_new_hash_datum(hash->world, NULL, 0);
   value=librdf_new_hash_datum(hash->world, NULL, 0);
+  if(!key || !value)
+    return;
 
   iterator=librdf_hash_get_all(hash, key, value);
   while(!librdf_iterator_end(iterator)) {
@@ -1230,6 +1232,8 @@ librdf_hash_print_keys(librdf_hash* hash, FILE *fh)
   fputs("{\n", fh);
 
   key=librdf_new_hash_datum(hash->world, NULL, 0);
+  if(!key)
+    return;
 
   iterator=librdf_hash_keys(hash, key);
   while(!librdf_iterator_end(iterator)) {
@@ -1567,11 +1571,18 @@ librdf_hash_to_string(librdf_hash* hash, const char *filter[])
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(hash, librdf_hash, NULL);
 
   sb = raptor_new_stringbuffer();
+  if(!sb)
+    goto tidy;
 
   key=librdf_new_hash_datum(hash->world, NULL, 0);
   value=librdf_new_hash_datum(hash->world, NULL, 0);
+  if (!key || !value)
+    goto tidy;
 
   iterator=librdf_hash_get_all(hash, key, value);
+  if (!iterator)
+    goto tidy;
+
   while(!librdf_iterator_end(iterator)) {
     librdf_hash_datum *k, *v;
     int key_is_filtered = 0;
@@ -1579,6 +1590,8 @@ librdf_hash_to_string(librdf_hash* hash, const char *filter[])
 
     k=(librdf_hash_datum *)librdf_iterator_get_key(iterator);
     v=(librdf_hash_datum *)librdf_iterator_get_value(iterator);
+    if (!k || !v)
+      break;
 
     /* Is this one of the keys that we are ignoring? */
     if(filter) {
@@ -1619,19 +1632,23 @@ librdf_hash_to_string(librdf_hash* hash, const char *filter[])
     librdf_iterator_next(iterator);
   }
 
-  if(iterator)
-    librdf_free_iterator(iterator);
-
-  librdf_free_hash_datum(value);
-  librdf_free_hash_datum(key);
-
-
   /* Generate a string result */
   len=raptor_stringbuffer_length(sb);
   result=LIBRDF_MALLOC(cstring, len + 1);
-  raptor_stringbuffer_copy_to_string(sb, (unsigned char*)result, len);
+  if (result)
+    raptor_stringbuffer_copy_to_string(sb, (unsigned char*)result, len);
 
-  raptor_free_stringbuffer(sb);
+
+  tidy:
+  if(iterator)
+    librdf_free_iterator(iterator);
+  if(value)
+    librdf_free_hash_datum(value);
+  if(key)
+    librdf_free_hash_datum(key);
+  if(sb)
+    raptor_free_stringbuffer(sb);
+
   return result;
 }
 
