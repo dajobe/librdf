@@ -27,6 +27,230 @@ pre
 <p>Not yet released.
 </p>
 
+<!-- Updated to Changelog 2010-08-26 -->
+
+<p>The major change is to support for building with Raptor V2 APIs as
+well as the Raptor V1 APIs.  When built with Raptor V2 , librdf uses
+the Raptor V2 URI, Term and Statement to fully implement the librdf
+equivalents.  Specifically when this is enabled the following are
+typedefed as equivalent:</p>
+<ul>
+<li><code>librdf_uri</code> = <code>raptor_uri</code></li>
+<li><code>librdf_node</code> = <code>raptor_term</code></li>
+<li><code>librdf_statement</code> = <code>raptor_statement</code></li>
+</ul>
+
+<p>Issues Fixed:</p>
+<ul>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=124">Issue #0000124</a>: Node, Statement and Model to_string should use N3 syntax</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=321">Issue #0000321</a>: librdf_free_node after librdf_iterator_get_object in rdfproc</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=322">Issue #0000322</a>: rdfproc uses rasqal_ functions instead of librdf_ in option parsing</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=350">Issue #0000350</a>: Redland Tree Storage crashes when loading two specific, valid, RDFMXL files</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=372">Issue #0000372</a>: serialize_model_to_iostream closes iostream</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=382">Issue #0000382</a>: simple graph query returns no results</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=383">Issue #0000383</a>: rdfproc -n does not always make the store empty</li>
+</ul>
+
+<h3>Configuration and build changes</h3>
+
+<p>Added <code>--enable-raptor2</code> to enable librdf to build with
+Raptor V2.  This requires a rasqal built with Raptor V2 (with the
+<code>--enable-raptor2</code> argument to Rasqal's
+<code>configure</code>).  The librdf <code>configure</code> will
+check that Rasqal was built this way and only enable Raptor V2
+support if it will work.
+</p>
+
+<p>The minimum Raptor version is now 1.4.19 (or Raptor V2 beta 1.9.0+)
+</p>
+
+<p>Tests now use the in-memory storage if the BDB (Sleepycat DB)
+storage is not available.
+</p>
+
+<h3>Log Class Changes</h3>
+
+<p>Added a <code>LIBRDF_FROM_RAPTOR</code> log facility.
+</p>
+
+<h3>Model Class Changes</h3>
+
+<p>Added <code>librdf_model_write()</code> deprecating
+<code>librdf_model_print()</code> debug routine.
+</p>
+
+<h3>Node Class Changes</h3>
+
+<p>Added <code>librdf_new_node_from_counted_uri_string()</code>
+to make an RDF node from a URI string and length avoiding a strlen().
+</p>
+
+<p>Added <code>librdf_node_get_counted_blank_identifier()</code>
+to return ID with length.
+</p>
+
+<p>Added <code>librdf_new_node_from_counted_blank_identifier()</code>
+with counted ID string.
+</p>
+
+<p>Added <code>librdf_node_new_static_node_iterator()</code> with
+world arg added deprecating
+<code>librdf_node_static_iterator_create()</code> without it.
+</p>
+
+<p><code>librdf_node_write()</code> added to write a redland node to
+an iostream, formatted as N-Triples.</p>
+
+<p>Adjusted <code>librdf_node_print()</code> to use
+<code>librdf_node_write()</code>.  If anyone was relying on this
+unsupported debug format, this changes the result.  Intended to fix
+<a href="http://bugs.librdf.org/mantis/view.php?id=124">Issue#0000124</a>
+</p>
+
+<p>Deprecate <code>librdf_node_to_string()</code>,
+<code>librdf_node_to_counted_string()</code> for
+<code>librdf_node_write()</code> since these were really only meant
+for internal use.</p>
+
+<p>Adjusted <code>librdf_node_to_string()</code>,
+<code>librdf_node_to_counted_string()</code> to use construct an
+iostream to a string and use <code>librdf_node_write()</code> to
+create the strings.  Thus the format is now an N-Triples term rather
+than the older debug format.  These functions are still for debugging
+and deprecated for <code>librdf_node_write()</code>.
+</p>
+
+<h3>Query Class Changes</h3>
+
+<p>Fix rasqal query engine integration to allow querying over
+the Redland graph names (context URIs) and binding variables to the names.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=382">Issue #000382</a>.
+</p>
+
+<p>Added <code>librdf_query_languages_enumerate()</code> function
+to list supported query languages.
+</p>
+
+<p>Made the Virtuoso storage engine (name 'virtuoso') use the internal
+Rasqal query results formatting API rather than an internal copy of
+a few query result formatters.
+</p>
+
+<h3>Query Results Class Changes</h3>
+
+<p>Added
+<code>librdf_new_query_results_formatter2()</code> with
+name, mime type and fomrat URI args deprecating
+<code>librdf_new_query_results_formatter()</code> and
+<code>librdf_new_query_results_formatter_by_mime_type()</code>
+with a mixture.
+</p>
+
+<p>Altered all query result formatters to all take format name,
+mime_type and uri args.  Added
+<code>librdf_query_results_to_counted_string2()</code>,
+<code>librdf_query_results_to_string2()</code>,
+<code>librdf_query_results_to_file_handle2()</code>,
+<code>librdf_query_results_to_file2()</code> deprecating the
+functions without the 2 suffix.
+</p>
+
+<h3>Serializer Class Changes</h3>
+
+<p><code>librdf_serializer_serialize_stream_to_iostream()</code> and
+<code>librdf_serializer_serialize_model_to_iostream()</code> now
+document their ownership transfer of the <code>raptor_iostream</code>
+object.  Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=372">Issue #0000372</a>
+</p>
+
+<h3>Statement Class Changes</h3>
+
+<p>Added <code>librdf_statement_encode2()</code>,
+<code>librdf_statement_encode_parts2()</code>,
+<code>librdf_statement_decode2()</code> taking a world arg,
+deprecating those without the 2 suffx and no world arg.
+</p>
+
+<p>Added <code>librdf_statement_write()</code>
+using <code>librdf_node_write()</code> to format the statement as
+N-Triples.
+</p>
+
+<p>Adjusted <code>librdf_statement_to_string()</code> to 
+use librdf_statement_write() to write statement in N-Triples format
+rather than the previous format.
+</p>
+
+<h3>Stream Class Changes</h3>
+
+<p>Added <code>librdf_stream_write()</code> deprecating
+<code>librdf_stream_print()</code> debug routine.
+</p>
+
+<h3>Storage Class Changes</h3>
+
+<p><code>librdf_storage_context_remove_statement()</code> now checks
+that statement is non-NULL and allows NULL context.  Now matches
+function spec.
+</p>
+
+<p>Fix Postgresql storage (name 'postgresql') contains-statement method
+as called by <code>librdf_storage_contains_statement()</code>
+to work using patch from Andrew Malton - thanks.
+</p>
+
+<p>Fix Trees storage (name 'trees') crash bug when comparing nodes one of
+which has a language and the other doesn't.  <a
+href="http://bugs.librdf.org/mantis/view.php?id=350">Issue
+#0000350</a>.
+</p>
+
+<p>Made Virtuoso storage (name 'virtuoso') use the internal Rasqal
+query formatting API.  This is not using a very efficient mechanism
+since it results in about 3 copies of the result set: in librasqa;,
+librdf and virtuoso but it works.  Also update the storage to support
+newer Virtuoso versions such as recent ODBC extensions. Added support
+for
+<code>SQL_DESC_COL_LITERAL_LANG</code>
+<code>SQL_DESC_COL_LITERAL_TYPE</code> and
+<code>SQL_DESC_COL_BOX_FLAGS</code> from
+http://docs.openlinksw.com/virtuoso/odbcimplementation.html#virtodbcsparql
+</p>
+
+<h3>URI Class Changes</h3>
+
+<p>Added <code>librdf_new_uri2()</code> taking a counted URI string
+argument, avoiding strlen()s.
+</p>
+
+<h3>Internal changes</h3>
+
+<p><code>struct librdf_query_factory_s</code> methods
+<code>new_results_formatter</code> and
+<code>new_results_formatter_by_mime_type</code> are replaced by one
+<code>new_results_formatter</code> method that takes name, mime type
+and format URI args.  It also gains a
+<code>new_results_formatter2</code> factory method for query results
+formatting.  The only implementor of this factory is the internal
+Rasqal query results formatter.
+</p>
+
+<h3>Other changes</h3>
+
+<p>rdfproc(1) utility now fails with error when using -n (make a new
+storage) to a read only operation such as a query.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=383">Issue #0000383</a>.
+</p>
+
+<p>Switched to GIT source control.
+</p>
+
+<p>Added HACKING.md documenting code style.
+</p>
+
 
 <h2 id="rel1_0_10"><a name="rel1_0_10">Redland 1.0.10 Changes</a></h2>
 
