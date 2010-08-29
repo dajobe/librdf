@@ -814,31 +814,28 @@
 
 	* src/rdf_parser_raptor.c, src/rdf_statement.c,
 	src/rdf_statement.h, src/rdf_stream.c: Add
-	librdf_statement_write() to write to
-	iostream
+	librdf_statement_write() to write to iostream
 
-	(librdf_statement_write): Added using
-	librdf_node_write().
+	(librdf_statement_write): Added using librdf_node_write().
 
-	(librdf_statement_print): Use
-	above.
+	(librdf_statement_print): Use above.
 
 	(main): Update test code to write to iostream to stdout and use
 	librdf_statement_write()
 
 	(librdf_parser_raptor_new_statement_handler): Update to use
-	librdf_statement_write().  (librdf_stream_print): Updated to use
-	librdf_statement_write()
+	librdf_statement_write().
+
+	(librdf_stream_print): Updated to use librdf_statement_write()
 
 	* src/rdf_query.c:
 	(main): Use librdf_query_results_to_counted_string2()
 
 	* src/rdf_node.c:
-	(librdf_node_to_string, librdf_node_to_counted_string): Use
-	librdf_node_write (librdf_node_to_string,
-	librdf_node_to_counted_string): Alter these to construct an
-	iostream to a string and use librdf_node_write() to create the
-	strings.  These functions are still for debugging and deprecated.
+	(librdf_node_to_string, librdf_node_to_counted_string): Alter
+	these to construct an iostream to a string and use
+	librdf_node_write() to create the strings.  These functions are
+	still for debugging and deprecated.
 
 2010-02-15  Lauri Aalto <laalto@iki.fi>
 
