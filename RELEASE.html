@@ -226,19 +226,19 @@ that statement is non-NULL and allows NULL context.  Now matches
 function spec.
 </p>
 
-<p>Fix ostgresql storage (name 'postgresql'). Fix the
+<p>Storage Postgresql (name 'postgresql'). Fix the
 contains-statement method as called by
 <code>librdf_storage_contains_statement()</code> to work using patch
 from Andrew Malton - thanks.
 </p>
 
-<p>Trees storage (name 'trees'). Fix the crash bug when comparing
+<p>Storage Trees (name 'trees'). Fix the crash bug when comparing
 nodes one of which has a language and the other doesn't.
 
 <a href="http://bugs.librdf.org/mantis/view.php?id=350">Issue #0000350</a>.
 </p>
 
-<p>Virtuoso storage (name 'virtuoso'). Fix to use the internal Rasqal
+<p>Storage Virtuoso (name 'virtuoso'). Fix to use the internal Rasqal
 query formatting API to allow returning any result format.  This is
 not using a very efficient mechanism since it results in about 3
 copies of the result set: in librasqa;, librdf and virtuoso but it
