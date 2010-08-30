@@ -798,6 +798,34 @@ librdf_statement_decode(librdf_statement* statement,
 }
 
 
+/**
+ * librdf_statement_decode_parts:
+ * @statement: the statement to deserialise into
+ * @context_node: pointer to #librdf_node context_node to deserialise into
+ * @buffer: the buffer to use
+ * @length: buffer size
+ *
+ * Decodes a statement + context node from a buffer.
+ * 
+ * @Deprecated: Replaced by librdf_statement_decode2()
+ *
+ * Decodes the serialised statement (as created by librdf_statement_encode() )
+ * from the given buffer.  If a context node is found and context_node is
+ * not NULL, a pointer to the new #librdf_node is stored in *context_node.
+ * 
+ * Return value: number of bytes used or 0 on failure (bad encoding, allocation failure)
+ **/
+size_t
+librdf_statement_decode_parts(librdf_statement* statement, 
+                              librdf_node** context_node,
+                              unsigned char *buffer, size_t length)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
+
+  return librdf_statement_decode2(statement->world, statement, 
+                                  context_node, buffer, length);
+}
+
 #endif
 
 
