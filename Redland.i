@@ -2,7 +2,7 @@
  *
  * Redland.i - SWIG interface file for interfaces to Redland
  *
- * Copyright (C) 2000-2008 David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2010 David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005 University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -131,6 +131,8 @@ char* librdf_digest_to_string(librdf_digest* digest);
 %newobject librdf_new_hash_from_array_of_strings;
 librdf_hash* librdf_new_hash_from_string(librdf_world *world, const char* name, const char* string);
 librdf_hash* librdf_new_hash_from_array_of_strings(librdf_world *world, const char* name, const char* *string);
+%newobject librdf_hash_to_string;
+char* librdf_hash_to_string(librdf_hash* hash, const char *filter[]);
 void librdf_free_hash(librdf_hash *hash);
 
 /* rdf_init.h */
@@ -349,8 +351,11 @@ const char* librdf_query_results_get_binding_name(librdf_query_results* query_re
 librdf_node* librdf_query_results_get_binding_value_by_name(librdf_query_results* query_results, const char* name);
 int librdf_query_results_get_bindings_count(librdf_query_results* query_results);
 int librdf_query_results_to_file(librdf_query_results *query_results, const char* name, librdf_uri *format_uri, librdf_uri *base_uri);
+int librdf_query_results_to_file2(librdf_query_results *query_results, const char *name, const char *mime_type, librdf_uri *format_uri, librdf_uri *base_uri);
 %newobject librdf_query_results_to_string;
 char* librdf_query_results_to_string(librdf_query_results *query_results, librdf_uri *format_uri, librdf_uri *base_uri);
+%newobject librdf_query_results_to_string2;
+char* librdf_query_results_to_string2(librdf_query_results *query_results, const char *name, const char *mime_type, librdf_uri *format_uri, librdf_uri *base_uri);
 
 void librdf_free_query_results(librdf_query_results* query_results);
 
