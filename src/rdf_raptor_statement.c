@@ -38,6 +38,11 @@
 
 #include <redland.h>
 
+static size_t
+librdf_statement_encode_parts_internal(librdf_statement* statement, 
+                                       librdf_node* context_node,
+                                       unsigned char *buffer, size_t length,
+                                       librdf_statement_part fields);
 
 /* class methods */
 
@@ -303,17 +308,17 @@ librdf_statement_encode(librdf_statement* statement,
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
 
-  return librdf_statement_encode_parts(statement, NULL,
-                                       buffer, length,
-                                       LIBRDF_STATEMENT_ALL);
+  return librdf_statement_encode_parts_internal(statement, NULL,
+                                                buffer, length,
+                                                LIBRDF_STATEMENT_ALL);
 }
 
 
-size_t
-librdf_statement_encode_parts(librdf_statement* statement, 
-                              librdf_node* context_node,
-                              unsigned char *buffer, size_t length,
-                              librdf_statement_part fields)
+static size_t
+librdf_statement_encode_parts_internal(librdf_statement* statement, 
+                                       librdf_node* context_node,
+                                       unsigned char *buffer, size_t length,
+                                       librdf_statement_part fields)
 {
   size_t total_length = 0;
   size_t node_len;
@@ -424,9 +429,23 @@ librdf_statement_encode_parts(librdf_statement* statement,
 
 
 size_t
+librdf_statement_encode_parts(librdf_statement* statement, 
+                              librdf_node* context_node,
+                              unsigned char *buffer, size_t length,
+                              librdf_statement_part fields)
+{
+  return librdf_statement_encode_parts_internal(statement, context_node,
+                                                buffer, length, fields);
+}
+
+
+size_t
 librdf_statement_decode(librdf_statement* statement, 
                         unsigned char *buffer, size_t length)
 {
+  /* FIXME - this should not just fail */
+  LIBRDF_FATAL1(NULL, LIBRDF_FROM_STATEMENT,
+                "librdf_statement_decode() cannot be used with Raptor V2");
   return 0;
 }
 
