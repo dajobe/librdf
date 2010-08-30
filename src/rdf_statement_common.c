@@ -73,6 +73,7 @@ librdf_finish_statement(librdf_world *world)
 
 /**
  * librdf_statement_encode_parts2:
+ * @world: redland world object
  * @statement: statement to serialise
  * @context_node: #librdf_node context node (can be NULL)
  * @buffer: the buffer to use
