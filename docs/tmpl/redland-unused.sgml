@@ -220,12 +220,3 @@ Internal.
 </para>
 
 
-<!-- ##### FUNCTION librdf_hash_from_string ##### -->
-<para>
-
-</para>
-
-@hash: 
-@string: 
-@Returns: 
-

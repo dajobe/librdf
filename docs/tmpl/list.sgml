@@ -142,6 +142,8 @@ A simple list class used internally.
 @void* data1, void *data2:
 @void* data1, void *data2:
 @void* data1, void *data2:
+@void* data1, void *data2:
+@void* data1, void *data2:
 @void* data1, void *data2: 
 
 
@@ -160,6 +162,8 @@ A simple list class used internally.
 </para>
 
 @list: 
+@void *, void *:
+@void *, void *:
 @void *, void *:
 @void *, void *:
 @void *, void *:

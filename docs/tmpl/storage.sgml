@@ -81,6 +81,8 @@ the RDF model API and have the same name.
 @librdf_storage_factory*:
 @librdf_storage_factory*:
 @librdf_storage_factory*:
+@librdf_storage_factory*:
+@librdf_storage_factory*:
 @librdf_storage_factory*: 
 @Returns: 
 

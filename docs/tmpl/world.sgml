@@ -52,6 +52,24 @@ the library and cleanup of all allocated resources.
 @world: 
 
 
+<!-- ##### FUNCTION librdf_world_set_rasqal ##### -->
+<para>
+
+</para>
+
+@world: 
+@rasqal_world_ptr: 
+
+
+<!-- ##### FUNCTION librdf_world_get_rasqal ##### -->
+<para>
+
+</para>
+
+@world: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_world_init_mutex ##### -->
 <para>
 

@@ -163,6 +163,16 @@ disk and with persistence.  Keys may have multiple and duplicate values.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_hash_from_string ##### -->
+<para>
+
+</para>
+
+@hash: 
+@string: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_hash_to_string ##### -->
 <para>
 
