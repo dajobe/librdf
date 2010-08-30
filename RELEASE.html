@@ -27,7 +27,7 @@ pre
 <p>Not yet released.
 </p>
 
-<!-- Updated to Changelog 2010-08-26 -->
+<!-- Updated to Changelog 2010-08-29 -->
 
 <p>The major change is to support for building with Raptor V2 APIs as
 well as the Raptor V1 APIs.  When built with Raptor V2 , librdf uses
@@ -67,6 +67,13 @@ support if it will work.
 <p>Tests now use the in-memory storage if the BDB (Sleepycat DB)
 storage is not available.
 </p>
+
+<h3>Hash Class Changes</h3>
+
+<p>Added <code>librdf_hash_to_string()</code> function for converting
+a <code>librdf_hash</code> back ito a string, intended to be the
+opposite of <code>librdf_string_to_hash()</code> and takes a filter
+arg to help hide arguments such as 'password'.</p>
 
 <h3>Log Class Changes</h3>
 
