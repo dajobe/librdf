@@ -136,7 +136,7 @@ static command commands[]={
 #endif
 
 
-#define GETOPT_STRING "chno:pr:s:t:Tv"
+#define GETOPT_STRING "chno:pqr:s:t:TvV"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_options[] =
@@ -147,11 +147,13 @@ static struct option long_options[] =
   {"new", 0, 0, 'n'},
   {"output", 1, 0, 'o'},
   {"password", 0, 0, 'p'},
+  {"quiet", 0, 0, 'q'},
   {"results", 1, 0, 'r'},
   {"storage", 1, 0, 's'},
   {"storage-options", 1, 0, 't'},
   {"transactions", 0, 0, 'T'},
   {"version", 0, 0, 'v'},
+  {"verbose", 0, 0, 'V'},
   {NULL, 0, 0, 0}
 };
 #endif
@@ -260,6 +262,7 @@ main(int argc, char *argv[])
   int usage=0;
   int help=0;
   int is_new=0;
+  int verbosity = 1;
   char *identifier=NULL;
   char *cmd=NULL;
   char *name;
@@ -344,14 +347,24 @@ main(int argc, char *argv[])
 
       case 'o':
         if(optarg) {
-          if(!strcmp(optarg, "simple"))
+          if(!strcmp(optarg, "help")) {
+            fprintf(stderr, "%s: Valid serializers are:\n", program);
+            for(i=0; 1; i++) {
+              const char *format_name;
+              const char *format_label;
+              if(librdf_serializer_enumerate(world, i, 
+                                             &format_name, &format_label))
+                break;
+              printf("  %-20s  %s\n", format_name, format_label);
+            }
+            exit(0);
+          } else if(!strcmp(optarg, "simple")) {
+            fprintf(stderr, "%s: WARNING: The deprecated 'simple' output type has been replaced with N-Triples\n", program);
             output_serializer=NULL;
-          else {
+          } else {
             output_serializer=librdf_new_serializer(world, optarg, NULL, NULL);
             if(!output_serializer) {
-              fprintf(stderr, "%s: unknown output serializer `%s' for `" HELP_ARG(o, output) "'\n",
-                      program, optarg);
-              fprintf(stderr, "Valid arguments are:\n  `simple'   for a simple format (default)\n  `ntriples' for N-Triples\n");
+              fprintf(stderr, "%s: invalid argument `%s' for `" HELP_ARG(o, output) "'\nTry '%s " HELP_ARG(o, output) " help' for a list of valid serializers\n", program, optarg, program);
               usage=1;
             } else {
               output_storage = librdf_new_storage(world, NULL, NULL, NULL);
@@ -414,6 +427,10 @@ main(int argc, char *argv[])
         }
         break;
 
+     case 'q':
+      verbosity=0;
+      break;
+
       case 'r':
         if(optarg) {
           if(!strcmp(optarg, "help")) {
@@ -434,7 +451,7 @@ main(int argc, char *argv[])
             if(librdf_query_results_formats_check(world, optarg, NULL, NULL))
               results_format=optarg;
             else {
-              fprintf(stderr, "%s: invalid argument `%s' for `" HELP_ARG(r, results) "'\nTry '%s " HELP_ARG(r, results) " help' for a list of valid formats\n",
+              fprintf(stderr, "%s: invalid argument `%s' for `" HELP_ARG(r, results) "'\nTry '%s " HELP_ARG(r, results) " help' for a list of valid query result formats\n",
                       program, optarg, program);
               usage=1;
             }
@@ -464,6 +481,10 @@ main(int argc, char *argv[])
         fputs(librdf_version_string, stdout);
         fputc('\n', stdout);
         exit(0);
+
+     case 'V':
+      verbosity++;
+      break;
     }
     
   }
@@ -537,9 +558,21 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(c, "contexts        ", "Use Redland contexts"));
     puts(HELP_TEXT(h, "help            ", "Print this help, then exit"));
     puts(HELP_TEXT(n, "new             ", "Create a new store (default no)"));
-    puts(HELP_TEXT(o, "output FORMAT   ", "Set the triple output format to one of:"));
-    puts("    simple                  A simple format (default)\n    ntriples                N-Triples\n    rdfxml                  RDF/XML");
+    puts(HELP_TEXT(o, "output FORMAT   ", "Set the triple output format"));
+    for(i=0; 1; i++) {
+      const char *help_name;
+      const char *help_label;
+      if(librdf_serializer_enumerate(world, i, 
+                                     &help_name, &help_label))
+        break;
+      printf("    %-15s         %s", help_name, help_label);
+      if(!i)
+        puts(" (default)");
+      else
+        putchar('\n');
+    }
     puts(HELP_TEXT(p, "password        ", "Read storage option 'password' from standard input"));
+    puts(HELP_TEXT(q, "quiet           ", "Do not print information messages"));
     puts(HELP_TEXT(r, "results FORMAT  ", "Set the query results format"));
     for(i=0; 1; i++) {
       const char *help_name;
@@ -568,6 +601,7 @@ main(int argc, char *argv[])
     }
     printf(HELP_TEXT(t, "storage-options OPTIONS\n                        ", "Storage options (default \"%s\")\n"), default_storage_options);
     puts(HELP_TEXT(v, "version         ", "Print the Redland version"));
+    puts(HELP_TEXT(V, "verbose         ", "Increase message verbosity"));
     puts("\nCommands:");
     puts("  parse FILE|URI [SYNTAX [BASEURI [CONTEXT]]]");
     puts("  parse-stream FILE|URI [SYNTAX [BASEURI [CONTEXT]]]");
@@ -656,6 +690,8 @@ main(int argc, char *argv[])
   query=NULL;
   results=NULL;
 
+  rc=0;
+
   switch(type) {
     case CMD_PRINT:
       {
@@ -687,9 +723,10 @@ main(int argc, char *argv[])
         librdf_free_uri(uri);
         break;
       }
-      fprintf(stdout, "%s: Parsing URI %s with %s parser\n", program,
-              librdf_uri_as_string(uri), 
-              (argc > 1) ? argv[1] : "default");
+      if(verbosity)
+        fprintf(stderr, "%s: Parsing URI %s with %s parser\n", program,
+                librdf_uri_as_string(uri), 
+                (argc > 1) ? argv[1] : "default");
       
       if(argc >= 3 && argv[2]) {
         base_uri=NULL;
@@ -701,8 +738,9 @@ main(int argc, char *argv[])
             break;
           }
         }
-        fprintf(stderr, "%s: Using base URI %s\n", program,
-                (base_uri ? (const char*)librdf_uri_as_string(base_uri) : "NULL"));
+        if(verbosity)
+          fprintf(stderr, "%s: Using base URI %s\n", program,
+                  (base_uri ? (const char*)librdf_uri_as_string(base_uri) : "NULL"));
 
         target=NULL; /* context node */
         if(argc >= 4 && argv[3]) {
@@ -711,8 +749,9 @@ main(int argc, char *argv[])
           else
             target=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[3]);
         }
-        fprintf(stderr, "%s: Using context node %s\n", program,
-                (argv[3] ? argv[3] : "NULL"));
+        if(verbosity)
+          fprintf(stderr, "%s: Using context node %s\n", program,
+                  (argv[3] ? argv[3] : "NULL"));
       } else
         base_uri=librdf_new_uri_from_uri(uri);
 
@@ -752,7 +791,8 @@ main(int argc, char *argv[])
           target=NULL;
         }
         
-        fprintf(stderr, "%s: Added %d triples\n", program, count);
+        if(verbosity)
+          fprintf(stderr, "%s: Added %d triples\n", program, count);
         rc=1;
       }
 
@@ -782,13 +822,16 @@ main(int argc, char *argv[])
         }
 
         if((error_count >=0) && (warning_count >=0) &&
-           error_count+warning_count >0)
-          fprintf(stderr,
+           error_count+warning_count >0) {
+          fprintf(stdout,
                   "%s: The parsing returned %d errors and %d warnings\n", 
                   program, error_count, warning_count);
+        }
+        
          
         librdf_free_uri(error_count_uri);
         librdf_free_uri(warning_count_uri);
+        rc = (error_count == 0) ? 0 : 1;
       }
       
       librdf_free_parser(parser);
@@ -820,7 +863,8 @@ main(int argc, char *argv[])
         if(strcmp(argv[1], "-")) {
           uri=librdf_new_uri(world, (const unsigned char *)argv[1]);
           if(!uri) {
-            fprintf(stderr, "%s: Failed to create URI from %s\n", program, argv[1]);
+            fprintf(stderr, "%s: Failed to create URI from %s\n", program,
+                    argv[1]);
             break;
           }
         }
@@ -834,7 +878,8 @@ main(int argc, char *argv[])
           if(strcmp(argv[3], "-")) {
             base_uri=librdf_new_uri(world, (const unsigned char *)argv[3]);
             if(!base_uri) {
-              fprintf(stderr, "%s: Failed to create base URI from %s\n", program, argv[3]);
+              fprintf(stderr, "%s: Failed to create base URI from %s\n",
+                      program, argv[3]);
               break;
             }
           }
@@ -902,7 +947,8 @@ main(int argc, char *argv[])
         }
       }
 
-      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2], NULL);
+      query=librdf_new_query(world, name, uri, (const unsigned char *)argv[2],
+                             NULL);
       if(!query) {
         fprintf(stderr, "%s: Failed to create new query %s\n", program,
                 argv[2]);
@@ -925,10 +971,12 @@ main(int argc, char *argv[])
         raptor_iostream *iostr;
         librdf_query_results_formatter *formatter;
 
-        fprintf(stdout, "%s: Formatting query result as '%s':\n", program,
-                results_format);
+        if(verbosity)
+          fprintf(stderr, "%s: Formatting query result as '%s':\n", program,
+                  results_format);
 
-        iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stdout);
+        iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr,
+                                                   stdout);
         formatter = librdf_new_query_results_formatter2(results,
                                                         results_format,
                                                         NULL /* mime type */,
@@ -940,10 +988,13 @@ main(int argc, char *argv[])
         librdf_free_query_results_formatter(formatter);
         raptor_free_iostream(iostr);
       } else if(librdf_query_results_is_bindings(results)) {
-        fprintf(stdout, "%s: Query returned bindings results:\n", program);
+        if(verbosity)
+          fprintf(stderr, "%s: Query returned bindings results:\n", program);
         
         while(!librdf_query_results_finished(results)) {
-          fputs("result: [", stdout);
+          if(verbosity)
+            fputs("result: ", stdout);
+          fputs("[", stdout);
           for(i=0; i<librdf_query_results_get_bindings_count(results); i++) {
             librdf_node *value=librdf_query_results_get_binding_value(results, i);
             name=(char*)librdf_query_results_get_binding_name(results, i);
@@ -962,12 +1013,15 @@ main(int argc, char *argv[])
           librdf_query_results_next(results);
         }
 
-        fprintf(stdout, "%s: Query returned %d results\n", program, 
-                librdf_query_results_get_count(results));
+        if(verbosity)
+          fprintf(stderr, "%s: Query returned %d results\n", program, 
+                  librdf_query_results_get_count(results));
      } else if(librdf_query_results_is_boolean(results)) {
-       fprintf(stdout, "%s: Query returned boolean result: %s\n",
-               program,
-               librdf_query_results_get_boolean(results) ? "true" : "false");
+        if(verbosity)
+          fprintf(stderr, "%s: Query returned boolean result: %s\n",
+                  program,
+                  librdf_query_results_get_boolean(results) ? "true" : "false");
+        rc = !librdf_query_results_get_boolean(results);
      } else if(librdf_query_results_is_graph(results)) {
        librdf_storage* tmp_storage;
        librdf_model* tmp_model;
@@ -975,7 +1029,8 @@ main(int argc, char *argv[])
        tmp_storage=librdf_new_storage(world, NULL, NULL, NULL);
        tmp_model=librdf_new_model(world, tmp_storage, NULL);
 
-       fprintf(stdout, "%s: Query returned graph result:\n", program);
+       if(verbosity)
+         fprintf(stderr, "%s: Query returned graph result:\n", program);
        
        stream=librdf_query_results_as_stream(results);
        if(!stream) {
@@ -985,7 +1040,9 @@ main(int argc, char *argv[])
        librdf_model_add_statements(tmp_model, stream);
        librdf_free_stream(stream);
 
-       fprintf(stdout, "%s: Total %d triples\n", program, librdf_model_size(model));
+       if(verbosity)
+         fprintf(stderr, "%s: Total %d triples\n", program,
+                 librdf_model_size(model));
 
        serializer=librdf_new_serializer(world, 
                                         query_graph_serializer_syntax_name, 
@@ -1002,7 +1059,8 @@ main(int argc, char *argv[])
        librdf_free_model(tmp_model);
        librdf_free_storage(tmp_storage);
      } else {
-       fprintf(stdout, "%s: Query returned unknown result format\n", program);
+        if(verbosity)
+          fprintf(stderr, "%s: Query returned unknown result format\n", program);
        rc=1;
      }
       
@@ -1056,7 +1114,8 @@ main(int argc, char *argv[])
       
       if((type != CMD_FIND) && (type != CMD_MATCH)) {
         if(!source || !arc || !target) {
-          fprintf(stderr, "%s: cannot have missing triple parts for %s\n", program, cmd);
+          fprintf(stderr,
+                  "%s: cannot have missing triple parts for %s\n", program, cmd);
           librdf_free_statement(partial_statement);
         break;
         }
@@ -1065,11 +1124,17 @@ main(int argc, char *argv[])
     printmatching:
       switch(type) {
         case CMD_CONTAINS:
-          if(librdf_model_contains_statement(model, partial_statement))
-            fprintf(stdout, "%s: the graph contains the triple\n", program);
-        else
-          fprintf(stdout, "%s: the graph does not contain the triple\n", program);
-          break;
+         if(librdf_model_contains_statement(model, partial_statement)) {
+           if(verbosity)
+             fprintf(stderr, "%s: the graph contains the triple\n", program);
+           rc=0;
+         } else {
+           if(verbosity)
+             fprintf(stderr, "%s: the graph does not contain the triple\n",
+                     program);
+           rc=1;
+         }
+         break;
           
         case CMD_FIND:
         case CMD_MATCH:
@@ -1109,14 +1174,16 @@ main(int argc, char *argv[])
           }
 
           if(!stream) {
-            fprintf(stderr, "%s: %s returned no results (NULL stream)\n", program, commands[type].name);
+            fprintf(stderr, "%s: %s returned no results (NULL stream)\n",
+                    program, commands[type].name);
           } else {
             count=0;
             while(!librdf_stream_end(stream)) {
               librdf_statement *statement=librdf_stream_get_object(stream);
               context_node=(librdf_node*)librdf_stream_get_context(stream);
               if(!statement) {
-                fprintf(stderr, "%s: librdf_stream_next returned NULL\n", program);
+                fprintf(stderr, "%s: librdf_stream_next returned NULL\n",
+                        program);
                 break;
               }
 
@@ -1162,10 +1229,14 @@ main(int argc, char *argv[])
               fprintf(stderr, "%s: ERROR: Cannot add in context - model does not support contexts\n", program);
             rc=librdf_model_add_statement(model, partial_statement);
           }
-          if(rc)
-            fprintf(stdout, "%s: failed to add triple to the graph\n", program);
-          else
-            fprintf(stdout, "%s: added triple to the graph\n", program);
+          if(verbosity) {
+            if(rc)
+              fprintf(stderr, "%s: Failed to add triple to the graph\n", program);
+            else {
+              if(verbosity)
+                fprintf(stderr, "%s: Added triple to the graph\n", program);
+            }
+          }
           break;
           
         case CMD_REMOVE:
@@ -1180,10 +1251,14 @@ main(int argc, char *argv[])
             librdf_free_node(context_node);
           } else
             rc=librdf_model_remove_statement(model, partial_statement);
-          if(rc)
-            fprintf(stdout, "%s: failed to remove triple from the graph\n", program);
-          else
-            fprintf(stdout, "%s: removed triple from the graph\n", program);
+          if(verbosity) {
+            if(rc)
+              fprintf(stderr, "%s: failed to remove triple from the graph\n", program);
+            else {
+              if(verbosity)
+                fprintf(stderr, "%s: removed triple from the graph\n", program);
+            }
+          }
         break;
         
         default:
@@ -1374,7 +1449,9 @@ main(int argc, char *argv[])
         librdf_iterator_next(iterator);
       }
       librdf_free_iterator(iterator);
-      fprintf(stderr, "%s: matching arcs: %d\n", program, count);
+
+      if(verbosity)
+        fprintf(stderr, "%s: matching arcs: %d\n", program, count);
       
       librdf_free_node(source);
       break;
@@ -1389,10 +1466,13 @@ main(int argc, char *argv[])
       arc=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[1]);
       result=(type == CMD_HAS_ARC_IN) ? librdf_model_has_arc_in(model, arc, source) :
                                         librdf_model_has_arc_out(model, source, arc);
-      if(result)
-        fprintf(stdout, "%s: the graph contains the arc\n", program);
-      else
-        fprintf(stdout, "%s: the graph does not contain the arc\n", program);
+      if(verbosity) {
+        if(result) 
+          fprintf(stderr, "%s: the graph contains the arc\n", program);
+        else
+          fprintf(stderr, "%s: the graph does not contain the arc\n", program);
+      }
+      rc = !result;
       
       librdf_free_node(source);
       librdf_free_node(arc);
@@ -1408,10 +1488,15 @@ main(int argc, char *argv[])
       rc=librdf_model_context_remove_statements(model, context_node);
       librdf_free_node(context_node);
       
-      if(rc)
-        fprintf(stdout, "%s: failed to remove context triples from the graph\n", program);
-      else
-        fprintf(stdout, "%s: removed context triples from the graph\n", program);
+      if(verbosity) {
+        if(rc)
+          fprintf(stderr,
+                  "%s: failed to remove context triples from the graph\n",
+                  program);
+        else
+          fprintf(stderr, "%s: removed context triples from the graph\n",
+                  program);
+      }
       break;
 
 
@@ -1439,16 +1524,18 @@ main(int argc, char *argv[])
         librdf_iterator_next(iterator);
       }
       librdf_free_iterator(iterator);
-      fprintf(stderr, "%s: contexts: %d\n", program, count);
+
+      if(verbosity)
+        fprintf(stderr, "%s: contexts: %d\n", program, count);
       break;
 
 
     case CMD_SIZE:
       count=librdf_model_size(model);
       if(count >= 0)
-        fprintf(stderr, "%s: graph has %d triples\n", program, count);
+        fprintf(stdout, "%s: graph has %d triples\n", program, count);
       else
-        fprintf(stderr, "%s: graph has unknown number of triples\n", program);
+        fprintf(stdout, "%s: graph has unknown number of triples\n", program);
       break;
 
     default:
@@ -1489,5 +1576,5 @@ main(int argc, char *argv[])
 #endif
 	
   /* keep gcc -Wall happy */
-  return(0);
+  return(rc);
 }
