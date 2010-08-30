@@ -840,12 +840,13 @@ main(int argc, char *argv[])
   librdf_statement_write(statement, iostr);
   fputs("\n", stdout);
 
-  size=librdf_statement_encode(statement, NULL, 0);
+  size = librdf_statement_encode2(world, statement, NULL, 0);
   fprintf(stdout, "%s: Encoding statement requires %d bytes\n", program, size);
   buffer=(char*)LIBRDF_MALLOC(cstring, size);
 
   fprintf(stdout, "%s: Encoding statement in buffer\n", program);
-  size2=librdf_statement_encode(statement, (unsigned char*)buffer, size);
+  size2 = librdf_statement_encode2(world, statement,
+                                   (unsigned char*)buffer, size);
   if(size2 != size) {
     fprintf(stdout, "%s: Encoding statement used %d bytes, expected it to use %d\n", program, size2, size);
     return(1);
