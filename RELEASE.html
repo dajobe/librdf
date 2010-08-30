@@ -29,15 +29,12 @@ pre
 
 <!-- Updated to Changelog 2010-08-29 21:12 PST -->
 
-<p>The major change is to support for building with Raptor V2 APIs as
-well as the Raptor V1 APIs.  When built with Raptor V2 , librdf uses
-the Raptor V2 URI, Term and Statement to fully implement the librdf
-equivalents.  Specifically when this is enabled the following are
-typedefed as equivalent:</p>
+<p>The main changes in this release are:</p>
 <ul>
-<li><code>librdf_uri</code> = <code>raptor_uri</code></li>
-<li><code>librdf_node</code> = <code>raptor_term</code></li>
-<li><code>librdf_statement</code> = <code>raptor_statement</code></li>
+<li>Virtuoso storage backend querying now fully works</li>
+<li>Support building with Raptor V2 API as well as Raptor V1 API.  The Raptor V2 API is only used if <code>--enable-raptor2</code> is given to <code>configure</code>.</li>
+<li>Several new convenience APIs were added</li>
+<li>Several APIs were deprecated for better APIs calls</li>
 </ul>
 
 <p>Issues Fixed:</p>
@@ -59,13 +56,26 @@ typedefed as equivalent:</p>
 <li><a href="http://bugs.librdf.org/mantis/view.php?id=383">Issue #0000383</a>: rdfproc -n does not always make the store empty</li>
 </ul>
 
+<h3>Raptor V2 API support</h3>
+
+<p>This release adds support for building with Raptor V2 API as an
+alternate to the Raptor V1 API.  When built with Raptor V2 , librdf
+uses the Raptor V2 URI, Term and Statement to fully implement the
+librdf equivalents.  Specifically when this is enabled the following
+are typedefed as equivalent:</p>
+<ul>
+<li><code>librdf_uri</code> = <code>raptor_uri</code></li>
+<li><code>librdf_node</code> = <code>raptor_term</code></li>
+<li><code>librdf_statement</code> = <code>raptor_statement</code></li>
+</ul>
+
 <h3>Configuration and build changes</h3>
 
 <p>Added <code>--enable-raptor2</code> to enable librdf to build with
-Raptor V2.  This requires a rasqal built with Raptor V2 (with the
-<code>--enable-raptor2</code> argument to Rasqal's
+Raptor V2 API.  This requires a rasqal built with Raptor V2 API (with
+the <code>--enable-raptor2</code> argument to Rasqal's
 <code>configure</code>).  The librdf <code>configure</code> will
-check that Rasqal was built this way and only enable Raptor V2
+check that Rasqal was built this way and only enable Raptor V2 API
 support if it will work.
 </p>
 
@@ -102,7 +112,7 @@ arg to help hide arguments such as 'password'.</p>
 <h3>Node Class Changes</h3>
 
 <p>Added <code>librdf_new_node_from_counted_uri_string()</code>
-to make an RDF node from a URI string and length avoiding a strlen().
+to make an RDF node from a URI string and length avoiding a <code>strlen()</code>.
 </p>
 
 <p>Added <code>librdf_node_get_counted_blank_identifier()</code>
@@ -123,7 +133,7 @@ an iostream, formatted as N-Triples.</p>
 
 <p>Adjusted <code>librdf_node_print()</code> to use
 <code>librdf_node_write()</code>.  If anyone was relying on this
-unsupported debug format, this changes the result.  Intended to fix
+unsupported debug format, this changes the result.  Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=124">Issue#0000124</a>
 </p>
 
@@ -216,33 +226,37 @@ that statement is non-NULL and allows NULL context.  Now matches
 function spec.
 </p>
 
-<p>Fix Postgresql storage (name 'postgresql') contains-statement method
-as called by <code>librdf_storage_contains_statement()</code>
-to work using patch from Andrew Malton - thanks.
+<p>Fix ostgresql storage (name 'postgresql'). Fix the
+contains-statement method as called by
+<code>librdf_storage_contains_statement()</code> to work using patch
+from Andrew Malton - thanks.
 </p>
 
-<p>Fix Trees storage (name 'trees') crash bug when comparing nodes one of
-which has a language and the other doesn't.  <a
-href="http://bugs.librdf.org/mantis/view.php?id=350">Issue
-#0000350</a>.
+<p>Trees storage (name 'trees'). Fix the crash bug when comparing
+nodes one of which has a language and the other doesn't.
+
+<a href="http://bugs.librdf.org/mantis/view.php?id=350">Issue #0000350</a>.
 </p>
 
-<p>Made Virtuoso storage (name 'virtuoso') use the internal Rasqal
-query formatting API.  This is not using a very efficient mechanism
-since it results in about 3 copies of the result set: in librasqa;,
-librdf and virtuoso but it works.  Also update the storage to support
+<p>Virtuoso storage (name 'virtuoso'). Fix to use the internal Rasqal
+query formatting API to allow returning any result format.  This is
+not using a very efficient mechanism since it results in about 3
+copies of the result set: in librasqa;, librdf and virtuoso but it
+works and does not duplicate code.   Update the storage to support
 newer Virtuoso versions such as recent ODBC extensions. Added support
 for
 <code>SQL_DESC_COL_LITERAL_LANG</code>
 <code>SQL_DESC_COL_LITERAL_TYPE</code> and
 <code>SQL_DESC_COL_BOX_FLAGS</code> from
-http://docs.openlinksw.com/virtuoso/odbcimplementation.html#virtodbcsparql
+Virtuoso ODBC Implementation - 
+<a href="http://docs.openlinksw.com/virtuoso/odbcimplementation.html#virtodbcsparql">Virtuoso ODBC RDF Extensions for SPASQL</a>.
+Tested with Virtuoso 5.0.13 open source edition.
 </p>
 
 <h3>URI Class Changes</h3>
 
 <p>Added <code>librdf_new_uri2()</code> taking a counted URI string
-argument, avoiding strlen()s.
+argument, avoiding <code>strlen()</code>s.
 </p>
 
 <h3>Internal changes</h3>
