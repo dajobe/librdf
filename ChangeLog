@@ -1,7 +1,35 @@
 2010-08-29  Dave Beckett <dave@dajobe.org>
 
-	* src/rdf_hash.c:
-	Added checks for memory allocation errors to
+	* src/rdf_statement.c:
+	(main): Use non-deprecated librdf_statement_encode2() in test.
+
+	* utils/rdfproc.1: Update for -q, -V, -o help, -r help and -s help
+
+	* utils/rdfproc.c: Add -s help support
+
+	* utils/rdfproc.c:
+	Send non-result information messages to stderr
+	and add quiet -q and verbose -V options to suppress/activate them.
+
+	Added -q and -V options to rdfproc(1) based on patch in
+	http://bugs.librdf.org/mantis/view.php?id=334
+
+	Added verbosity variable set initially to 1, -q makes it 0, -V
+	increases it.
+
+	Add support for '-o help' to print list of serializers.
+
+	Print all serializers in help message below -o description.
+
+	Note that the 'simple' serializer is now N-Triples.
+
+	Set rc for parse command to 0 only if there are no errors.
+
+	Some code style fixes.
+
+	Fixes Issue#0000334 http://bugs.librdf.org/mantis/view.php?id=334
+
+	* src/rdf_hash.c: Added checks for memory allocation errors to
 	(librdf_hash_print, librdf_hash_print_keys, librdf_hash_to_string)
 
 2010-08-27  Dave Beckett <dave@dajobe.org>
