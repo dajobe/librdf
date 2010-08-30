@@ -2,10 +2,10 @@
 .\"
 .\" rdfproc.1 - Redland RDF processor utility manual page
 .\"
-.\" Copyright (C) 2003-2007 David Beckett - http://purl.org/net/dajobe/
+.\" Copyright (C) 2003-2010 David Beckett - http://www.dajobe.org/
 .\" Copyright (C) 2003-2005 University of Bristol - http://www.bristol.ac.uk/
 .\"
-.TH rdfproc 1 "2007-02-17"
+.TH rdfproc 1 "2010-08-29"
 .\" Please adjust this date whenever revising the manpage.
 .SH NAME
 rdfproc \- Redland RDF processor utility
@@ -48,9 +48,8 @@ Make a new store, overwriting any existing one.
 .TP
 .B \-o, \-\-output \fIFORMAT\fR
 Set the output FORMAT for sequences of triples, such as from a search
-(find command) to a Redland serializer.  At present the alternatives
-are  'simple' (the default one if this option is omitted), 'ntriples'
-or 'rdfxml'.
+(find command) to a Redland serializer. 
+Use \-h or \-o help to see the full list of supported formats.
 .TP
 .B \-p, \-\-password
 Read the storage option 'password' from standard input.  Terminated
@@ -58,18 +57,21 @@ by end of line ('\\n') or end of file.  This is equivalent
 to setting it using \-t or \-\-storage-options but does not
 require exposing the password in the argument list.
 .TP
+.B \-q, \-\-quiet
+Suppress informational messages (that go to stderr)
+.TP
 .B \-r, \-\-results \fIFORMAT\fR
 Set the query results syntax format.
+Use \-h or \-r help to see the full list of query result formats.
 .IP
 The exact list of formats depends on what libraptor(3) was built with
 but is given correct in the usage message with \-h.
 .TP
 .B \-s, \-\-storage \fITYPE\fR
-Set the Redland storage type (default 'hashes').  Alternatives
-are 'memory' which is always present
-and '3store', 'file', 'mysql', 'sqlite', 'uri' when support for those
-is compiled in If environment variable RDFPROC_STORAGE_TYPE is set,
+Set the Redland storage type (default 'hashes').
+If environment variable RDFPROC_STORAGE_TYPE is set,
 the storage type given here will override it.
+Use \-h or \-s help to see the full list of query result formats.
 .TP
 .B \-t, \-\-storage-options \fIOPTIONS\fR
 Set options for the the Redland storage, default is "hash-type='bdb',dir='.'"
@@ -81,6 +83,9 @@ options given here will be applied afterwards.
 .TP
 .B \-v, \-\-version
 Print the Redland version and exit.
+.TP
+.B \-V, \-\-verbose
+Show informational messages on stderr.
 .SH COMMANDS
 Where a node is allowed, such as \fINODE\fP, \fISUBJECT\fP,
 \fIPREDICATE\fP or \fIOBJECT\fP below, simple heuristics are used to
@@ -134,7 +139,7 @@ can be one of \fIrdfxml\fP (RDF/XML, default), \fIntriples\fP, \fIturtle\fP,
 use content hints and protocol information to work it out. (This list changes
 faster than this manual page)
 If \fIFILENAME\fP is a existing file, the appropriate URI will be
-generated for it.
+generated for it.  If parsing returns errors, the return code will be non-0.
 
 .IP "\fBparse-stream \fIURI|FILENAME\fP [\fISYNTAX\fP [\fIBASE URI\fP [\fICONTEXT\fP]]\fR"
 Streaming parse syntax at URI into the graph using \fISYNTAX\fP which
@@ -142,6 +147,7 @@ can be one of \fIrdfxml\fP (RDF/XML, default) or \fIntriples\fP.
 If \fIFILENAME\fP is an existing file, the appropriate URI will be
 generated for it.  If the optional \fICONTEXT\fI URI is given,
 the triples are added to that context.
+If parsing returns errors, the return code will be non-0.
 
 .IP "\fBprint\fR"
 Print the graph triples in a simple format showing context nodes
@@ -198,6 +204,6 @@ http://www.w3.org/TR/rdf-testcases/#ntriples
 redland(3), libraptor(3), rapper(1)
 .SH AUTHOR
 Dave Beckett - 
-.UR http://purl.org/net/dajobe/
-http://purl.org/net/dajobe/
+.UR http://www.dajobe.org/
+http://www.dajobe.org/
 .UE
