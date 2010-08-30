@@ -1,5 +1,36 @@
 2010-08-29  Dave Beckett <dave@dajobe.org>
 
+	* Redland.i:
+	Expose new functions that make sense to bindings API
+
+	Of the new functions in the 1.0.11 API, excluding all the ones
+	that rely on counted strings that make little sense for a
+	scripting API via SWIG, those that deal with
+	raptor_iostream (*_write) that leaves:
+
+	librdf_hash_from_string - OOPS, already was in API even though it
+	was internal!
+	librdf_hash_to_string - added
+	librdf_new_query_results_formatter2 - not added, formatter is not
+	in SWIG
+	librdf_node_new_static_node_iterator - not added, C level
+	librdf_query_languages_enumerate - not added, enumeration returns
+	by sideffects
+	librdf_query_results_to_file2 - added
+	librdf_query_results_to_file_handle2 - not added passing FH hard
+	in bindings.
+	librdf_query_results_to_string2 - added
+	librdf_statement_decode2 - not added, memory-focused
+	librdf_statement_encode2 - not added, memory-focused
+	librdf_statement_encode_parts2 - not added, memory-focused
+
+	* src/rdf_statement_common.c:
+	(librdf_statement_encode_parts2): autodocs
+
+	* src/rdf_statement.c:
+	(librdf_statement_decode_parts): Restored using
+	librdf_statement_decode2
+
 	* src/rdf_statement.c:
 	(main): Use non-deprecated librdf_statement_encode2() in test.
 
