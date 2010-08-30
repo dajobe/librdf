@@ -5,7 +5,7 @@
 	 xmlns="http://usefulinc.com/ns/doap#">
 
   <Project>
-    <name>Redland RDF Application Framework</name>
+    <name>Redland librdf RDF API Library</name>
     <homepage rdf:resource="http://librdf.org/" />
     <created>2000-06-21</created>
 

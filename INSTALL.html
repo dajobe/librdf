@@ -2,11 +2,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-  <title>Redland RDF Application Framework - Building and Installing from Source</title>
+  <title>Redland librdf RDF API Library - Building and Installing from Source</title>
 </head>
 <body>
 
-<h1>Redland RDF Application Framework - Building and Installing from Source</h1>
+<h1>Redland librdf RDF API Library - Building and Installing from Source</h1>
 
 
 <h2>1. Getting the sources</h2>
@@ -15,8 +15,8 @@
 tested versions are the sources shipped with each release and these
 are recommended as the first place to start.  If you want to get a
 newer set, then there are nightly snapshots made of the development
-sources, which may not yet be committed to Subversion.  For the latest
-developent sources, anonymous Subversion access is available but this may
+sources, which may not yet be committed to GIT.  For the latest
+developent sources, anonymous GIT access is available but this may
 require some configuring of developer tools that are not needed for
 the snapshot releases.</p>
 
@@ -41,15 +41,15 @@ for the details of installing them.
 </p>
 
 
-<h3>1.2. Getting the sources from Subversion</h3>
+<h3>1.2. Getting the sources from GIT</h3>
 
 <pre>
-  svn checkout http://svn.librdf.org/repository/librdf/trunk/ librdf
+  git clone git://github.com/dajobe/librdf.git
   cd librdf
 </pre>
 
 
-<p>At this stage, or after a <code>svn update</code> you will
+<p>At this stage, or after a <code>git pull</code> you will
 need to create the automake and autoconf derived files, as described
 below in <a href="#sec-create-configure">Create the configure program</a>
 by using the <code>autogen.sh</code> script.</p>
@@ -115,7 +115,7 @@ hand with:</p>
 <code>autogen.sh</code> enforces the minimums. At present development
 is being done with automake 1.10.2 (minimum version 1.7), autoconf
 2.63 (minimum version 2.54) and libtool 2.2.6 (minimum version 2.2.0).
-These are only needed when compiling from Subversion sources.
+These are only needed when compiling from GIT sources.
 autogen.sh enforces the requirements.</p>
 
 
