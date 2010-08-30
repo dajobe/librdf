@@ -66,11 +66,11 @@ C libraries or calling of C functions.</p>
 should be compilable on many different systems.  I have access to
 and have built it on (at various times):</p>
 
-<p>Redhat 7-9, Redhat Fedora Core 1-4, Gentoo, Debian 3.0/unstable
-GNU/Linux (x86); Solaris 2.5, 7, 8, 9 (Sparc); OSX 10.2, 10.3, 10.4
-(PPC); Debian GNU/Linux (DEC Alpha); FreeBSD 4.7-4.9 (x86); HP-UX 10,
-OpenBSD, NetBSD and more more.  The release announcements for
-the packages typically list the systems that it has been tested on..</p>
+<p>Redhat 7-9, RHEL 4, 5; Fedora Core 9-13, Gentoo ~ 2007-2009,
+Debian 3.0/unstable GNU/Linux (x86); Ubuntu 'D' - 'J' 9.04; Solaris
+2.5, 7-9 (Sparc); Open SOlaris 10 (Intel); OSX 10.2-10.4 (PPC); OSX
+10.4-10.6 (intel); Debian GNU/Linux (DEC Alpha); FreeBSD 4.7-4.9
+(x86); HP-UX 10, OpenBSD, NetBSD and more more.</p>
 
 <p>it configured, built and tested out of the box on all of these (C
 interface; the other language APIs depend on the particular support
@@ -93,6 +93,12 @@ in it.  Years later I realised there's an area of Bristol called
 Redcliffe, but that opportunity has passed.</p>
 </li>
 
+<li>Redlands?
+
+<p>No. It is named after Redland which is a region of Bristol, UK.
+Not related to an area near Los Angeles, California, USA.</p>
+</li>
+
 <li>Redmond?
 
 <p>No. It is named after Redland which is a region of Bristol, UK.
@@ -101,7 +107,7 @@ Not related to an area near Seattle, Washington State, USA.</p>
 
 <li>Where is the <em>LANG</em> higher-level language interface?
 
-<p>Redland provides 7 language interfaces (at 2004-01-30)
+<p>Redland provides multiple higher-leval language interfaces
 via <a href="http://www.swig.org/">SWIG</a>.  If SWIG does another
 language you want and supports it, you should be able to build one
 yourself relatively easily, following the existing scheme.</p>
@@ -110,10 +116,9 @@ yourself relatively easily, following the existing scheme.</p>
 
 <li>Does it support an RDF query language?<br />
 
-<p>Yes.  As of Redland 0.9.18, Redland ships with
-<a href="http://librdf.org/rasqal/">Rasqal</a>
-supporting RDQL.  Redland Bindings 0.9.18.1 provides APIS for querying
-and query results in several langauges.
+<p>Yes.  <a href="http://librdf.org/rasqal/">Rasqal</a>
+provides query language syntax, formatting and execution of both
+SPARQL 1.0 and RDQL.
 </p>
 
 </li>
@@ -139,15 +144,9 @@ using the standard configure and make system.
 </li>
 
 <li>Does it run on Apple OSX?<br />
-<p>Yes.  The most recent version of this operating system has most of
-the basic requirements for using Redland and Raptor - an XML parser
-(in 10.3 onwards). You may need to install the Apple Developer Tools/XCode
-to get all the standard GNU toolchain, make, autotools and other
-things needed to build from CVS.  Another alternative is to
-install the <a href="http://fink.sourceforge.net/">Fink</a> environment
-which also provides the developent tools.  Particular things needed
-include Berkeley/Sleepcat DB, libxml2 and would benefit from libcurl.
-</p>
+
+<p>Yes but may need some development libraries and headers from
+MacPorts or Fink.</p>
 </li>
 
 <li>Redland and Raptor - what are they?<br />
@@ -172,7 +171,7 @@ pronounced "rascal" - thanks to Phil McCarthy for the name.
 You can also blame 
 <a href="http://www.talklikeapirate.com/">Talk Like a Pirate Day</a>
 and
-<a href="http://pirates.movies.com/">Pirates of the Caribbean -- The Curse of The Black Pearl</a>.  Arrrr!
+<a href="htthttp://www.imdb.com/title/tt0325980/">Pirates of the Caribbean -- The Curse of The Black Pearl</a> (2003).  Arrrr!
 </p>
 </li>
 
