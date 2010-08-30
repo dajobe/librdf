@@ -1562,8 +1562,8 @@ librdf_hash_from_array_of_strings(librdf_hash* hash, const char **array)
 char*
 librdf_hash_to_string(librdf_hash* hash, const char *filter[])
 {
-  librdf_hash_datum *key, *value;
-  librdf_iterator* iterator;
+  librdf_hash_datum *key = NULL, *value = NULL;
+  librdf_iterator* iterator = NULL;
   raptor_stringbuffer* sb;
   char* result = NULL;
   size_t len;
