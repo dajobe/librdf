@@ -273,19 +273,17 @@ Rasqal query results formatter.
 
 <h3>Other changes</h3>
 
-<p>rdfproc(1) utility now send non-result information messages to
-stderr, indented to make this more useful for scripting.
-It also gains '-q' (--quiet) and '-V' options (--verbose)
-to control this output - entirely removing it (quiet) or being more verbose.
-That is '-q -v' is equivalent to the default verbosity.
-Change based on patch by Norman Gray in issue - thanks!
-Fixes Issue
+<p><code>rdfproc(1)</code> utility now send non-result information
+messages to stderr, indented to make this more useful for scripting.
+It also gains '-q' (--quiet) and '-V' options (--verbose) to control
+this output - entirely removing it (quiet) or being more verbose.
+That is '-q -v' is equivalent to the default verbosity.  Change based
+on patch by Norman Gray in issue - thanks!  Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=334">Issue #0000334</a>
 </p>
 
-<p>rdfproc(1) utility now fails with error when using -n (make a new
-storage) to a read only operation such as a query.
-Fixes
+<p><code>rdfproc(1)</code> utility now fails with error when using -n
+(make a new storage) to a read only operation such as a query.  Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=383">Issue #0000383</a>.
 </p>
 
