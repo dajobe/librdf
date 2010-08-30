@@ -461,8 +461,22 @@ main(int argc, char *argv[])
         
       case 's':
         if(optarg) {
+          if(!strcmp(optarg, "help")) {
+            fprintf(stderr, "%s: Valid storage names are:\n", program);
+            for(i=0; 1; i++) {
+              const char *format_name;
+              const char *format_label;
+              if(librdf_storage_enumerate(world, i,
+                                          &format_name, 
+                                          &format_label))
+                break;
+              printf("  %-10s  %s\n", format_name, format_label);
+            }
+            exit(0);
+          }
           if(!librdf_get_storage_factory(world, optarg)) {
-            fprintf(stderr, "%s: invalid storage `%s'\n", program, optarg);
+            fprintf(stderr, "%s: invalid argument `%s' for `" HELP_ARG(s, storage) "'\nTry '%s " HELP_ARG(s, storage) " help' for a list of valid storages\n",
+                    program, optarg, program);
             usage=1;
           } else
             storage_name=optarg;
