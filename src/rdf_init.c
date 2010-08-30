@@ -306,6 +306,45 @@ librdf_world_open(librdf_world *world)
 
 
 /**
+ * librdf_world_set_rasqal:
+ * @world: librdf_world object
+ * @rasqal_world_ptr: rasqal_world object
+ *
+ * Set the #rasqal_world instance to be used with this #librdf_world.
+ *
+ * If no rasqal_world instance is set with this function,
+ * librdf_world_open() creates a new instance.
+ *
+ * Ownership of the rasqal_world is not taken. If the rasqal library
+ * instance is set with this function, librdf_free_world() will not
+ * free it.
+ *
+ **/
+void
+librdf_world_set_rasqal(librdf_world* world, rasqal_world* rasqal_world_ptr)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(world, librdf_world);
+  world->rasqal_world_ptr = rasqal_world_ptr;
+}
+
+
+/**
+ * librdf_world_get_rasqal:
+ * @world: librdf_world object
+ *
+ * Get the #rasqal_world instance used by this #librdf_world.
+ *
+ * Return value: rasqal_world object or NULL on failure (e.g. not initialized)
+ **/
+rasqal_world*
+librdf_world_get_rasqal(librdf_world* world)
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
+  return world->rasqal_world_ptr;
+}
+
+
+/**
  * librdf_world_set_error:
  * @world: redland world object
  * @user_data: user data to pass to function
@@ -701,6 +740,7 @@ int
 main(int argc, char *argv[]) 
 {
   librdf_world *world;
+  rasqal_world *rasqal_world;
   unsigned char* id;
   const char *program=librdf_basename((const char*)argv[0]);
 
@@ -713,6 +753,30 @@ main(int argc, char *argv[])
   }
   fprintf(stdout, "%s: Deleting world\n", program);
   librdf_free_world(world);
+
+
+  /* Test setting and getting a the rasqal world */
+  fprintf(stdout, "%s: Setting and getting rasqal_world\n", program);
+  world = librdf_new_world();
+  if(!world) {
+    fprintf(stderr, "%s: librdf_new_world failed\n", program);
+    return 1;
+  }
+
+  rasqal_world = rasqal_new_world();
+  if(!rasqal_world) {
+    fprintf(stderr, "%s: rasqal_new_world failed\n", program);
+    return 1;
+  }
+
+  librdf_world_set_rasqal(world, rasqal_world);
+  if (librdf_world_get_rasqal(world) != rasqal_world) {
+    fprintf(stderr, "%s: librdf_world_set_rasqal/librdf_world_get_rasqal failed\n", program);
+    return 1;
+  }
+  rasqal_free_world(rasqal_world);
+  librdf_free_world(world);
+
 
   /* Test id generation */
   fprintf(stdout, "%s: Creating new world\n", program);

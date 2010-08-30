@@ -43,7 +43,13 @@ void librdf_world_open(librdf_world *world);
 
 REDLAND_API
 void librdf_world_init_mutex(librdf_world *world);
-  
+
+REDLAND_API
+void librdf_world_set_rasqal(librdf_world* world, rasqal_world* rasqal_world_ptr);
+
+REDLAND_API
+rasqal_world* librdf_world_get_rasqal(librdf_world* world);
+
 REDLAND_API
 void librdf_world_set_error(librdf_world* world, void *user_data, librdf_log_level_func error_handler);
 REDLAND_API

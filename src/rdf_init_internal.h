@@ -144,6 +144,7 @@ struct librdf_world_s
 
   /* rasqal world object */
   rasqal_world* rasqal_world_ptr;
+  int rasqal_world_allocated_here;
   
 #ifdef RAPTOR_V2_AVAILABLE
   /* raptor world object */
