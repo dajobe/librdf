@@ -1,5 +1,14 @@
 2010-08-29  Dave Beckett <dave@dajobe.org>
 
+	* LICENSE.html: Link to specific LGPL 2.1 version doc.  Wording
+	and formatting
+
+	* FAQS.html: More FAQS
+
+	* FAQS.html, INSTALL.html, LICENSE.html, NEWS.html, README.html,
+	RELEASE.html, TODO.html, configure.ac, redland.rdf.in: Use
+	'Redland librdf RDF API Library' as the title
+
 	* Redland.i:
 	Expose new functions that make sense to bindings API
 
