@@ -568,7 +568,7 @@ main(int argc, char *argv[])
     printf(title_format_string, librdf_version_string);
     puts(librdf_short_copyright_string);
     puts("Utility for processing RDF using the Redland library.");
-    puts("\nMain options:");
+    puts("\nOptions:");
     puts(HELP_TEXT(c, "contexts        ", "Use Redland contexts"));
     puts(HELP_TEXT(h, "help            ", "Print this help, then exit"));
     puts(HELP_TEXT(n, "new             ", "Create a new store (default no)"));
@@ -580,14 +580,14 @@ main(int argc, char *argv[])
                                      &help_name, &help_label))
         break;
       printf("    %-15s         %s", help_name, help_label);
-      if(!i)
+      if(!strcmp(help_name, query_graph_serializer_syntax_name))
         puts(" (default)");
       else
         putchar('\n');
     }
     puts(HELP_TEXT(p, "password        ", "Read storage option 'password' from standard input"));
     puts(HELP_TEXT(q, "quiet           ", "Do not print information messages"));
-    puts(HELP_TEXT(r, "results FORMAT  ", "Set the query results format"));
+    puts(HELP_TEXT(r, "results FORMAT  ", "Set the query results format (no default)"));
     for(i=0; 1; i++) {
       const char *help_name;
       const char *help_label;
@@ -595,11 +595,7 @@ main(int argc, char *argv[])
                                                 &help_name, &help_label, 
                                                 NULL, NULL))
         break;
-      printf("    %-10s              %s", help_name, help_label);
-      if(!i)
-        puts(" (default)");
-      else
-        putchar('\n');
+      printf("    %-10s              %s\n", help_name, help_label);
     }
     puts(HELP_TEXT(s, "storage TYPE    ", "Set the graph storage type"));
     for(i=0; 1; i++) {
@@ -608,7 +604,7 @@ main(int argc, char *argv[])
       if(librdf_storage_enumerate(world, i, &help_name, &help_label))
         break;
       printf("    %-10s              %s", help_name, help_label);
-      if(!i)
+      if(!strcmp(help_name, default_storage_name))
         puts(" (default)");
       else
         putchar('\n');
