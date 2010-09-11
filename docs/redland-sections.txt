@@ -165,6 +165,7 @@ librdf_model_context_remove_statements
 librdf_model_context_as_stream
 librdf_model_context_serialize
 librdf_model_contains_context
+librdf_model_supports_contexts
 librdf_model_query_execute
 librdf_model_sync
 librdf_model_get_storage

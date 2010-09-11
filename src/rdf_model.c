@@ -73,11 +73,17 @@ librdf_finish_model(librdf_world *world)
 }
 
 
-/*
- * librdf_model_supports_contexts - helper function to determine if this model supports contexts
+/**
+ * librdf_model_supports_contexts:
+ * @model: the model object
+ *
+ * Check if this model supports contexts
+ *
+ * Return value: non-0 if contexts are supported
  **/
-static REDLAND_INLINE int
-librdf_model_supports_contexts(librdf_model* model) {
+int
+librdf_model_supports_contexts(librdf_model* model)
+{
   return model->supports_contexts;
 }
 
