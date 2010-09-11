@@ -335,27 +335,28 @@ rasqal_redland_new_triples_source(rasqal_query* rdf_query,
     }
   }
 
-  /* Add all contexts (named graphs) to the query so Rasqal can bind them */
-  cit = librdf_model_get_contexts(rtsc->model);
-  while(!librdf_iterator_end(cit)) {
-    librdf_node* node = (librdf_node*)librdf_iterator_get_object(cit);
-    librdf_uri* uri;
-    raptor_uri* source_uri;
+  if(librdf_model_supports_contexts(rtsc->model)) {
+    /* Add all contexts (named graphs) to the query so Rasqal can bind them */
+    cit = librdf_model_get_contexts(rtsc->model);
+    while(!librdf_iterator_end(cit)) {
+      librdf_node* node = (librdf_node*)librdf_iterator_get_object(cit);
+      librdf_uri* uri;
+      raptor_uri* source_uri;
 
-    uri = librdf_node_get_uri(node);
+      uri = librdf_node_get_uri(node);
 #ifdef RAPTOR_V2_AVAILABLE
-    source_uri = (raptor_uri*)raptor_new_uri(world->raptor_world_ptr,
-                                             librdf_uri_as_string(uri));
+      source_uri = (raptor_uri*)raptor_new_uri(world->raptor_world_ptr,
+                                               librdf_uri_as_string(uri));
 #else
-    source_uri = (raptor_uri*)raptor_new_uri(librdf_uri_as_string(uri));
+      source_uri = (raptor_uri*)raptor_new_uri(librdf_uri_as_string(uri));
 #endif
-    rasqal_query_add_data_graph(rdf_query, source_uri, source_uri,
-                                RASQAL_DATA_GRAPH_NAMED);
-    raptor_free_uri(source_uri);
-    librdf_iterator_next(cit);
+      rasqal_query_add_data_graph(rdf_query, source_uri, source_uri,
+                                  RASQAL_DATA_GRAPH_NAMED);
+      raptor_free_uri(source_uri);
+      librdf_iterator_next(cit);
+    }
+    librdf_free_iterator(cit);
   }
-  librdf_free_iterator(cit);
-
 
 #ifdef RASQAL_TRIPLES_SOURCE_MIN_VERSION
   rts->version = 1;
