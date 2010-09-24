@@ -374,6 +374,8 @@ void librdf_free_serializer(librdf_serializer *serializer);
 int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer, const char* name, librdf_uri* inUriOrNull /* base_uri */, librdf_model* model);
 %newobject librdf_serializer_serialize_model_to_string;
 char* librdf_serializer_serialize_model_to_string(librdf_serializer* serializer, librdf_uri* inUriOrNull /* base_uri */, librdf_model* model);
+%newobject librdf_serializer_serialize_stream_to_string;
+char* librdf_serializer_serialize_stream_to_string(librdf_serializer *serializer, librdf_uri *base_uri, librdf_stream *stream);
 librdf_node* librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
 int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, librdf_node* value);
 int librdf_serializer_set_namespace(librdf_serializer* serializer, librdf_uri *nspace, const char*  prefix);
