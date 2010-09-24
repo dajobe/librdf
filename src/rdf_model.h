@@ -166,6 +166,8 @@ REDLAND_API REDLAND_DEPRECATED
 librdf_stream* librdf_model_context_serialize(librdf_model* model, librdf_node* context);
 REDLAND_API
 int librdf_model_contains_context(librdf_model* model, librdf_node* context);
+REDLAND_API
+int librdf_model_supports_contexts(librdf_model* model);
 
 /* query language */
 REDLAND_API
