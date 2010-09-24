@@ -129,7 +129,7 @@ main(int argc, char *argv[])
     }
   }
 
-  fprintf(stderr, "%s: query returned %d bytes string\n", program, length);
+  fprintf(stderr, "%s: query returned %ld bytes string\n", program, length);
   fwrite(string, sizeof(char), length, stdout);
 
   free(string);
