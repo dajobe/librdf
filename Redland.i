@@ -301,6 +301,8 @@ librdf_storage* librdf_new_storage_from_storage (librdf_storage* old_storage);
 void librdf_free_storage(librdf_storage *storage);
 
 /* rdf_parser.h */
+int librdf_parser_check_name(librdf_world* world, const char *name);
+
 %newobject librdf_new_parser;
 
 librdf_parser* librdf_new_parser(librdf_world *world, const char* name, const char* mime_type, librdf_uri *type_uri);
@@ -314,6 +316,7 @@ librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const
 int librdf_parser_parse_string_into_model(librdf_parser* parser, const char* string, librdf_uri* base_uri, librdf_model* model);
 librdf_stream* librdf_parser_parse_counted_string_as_stream(librdf_parser* parser, const char* string, size_t length, librdf_uri* base_uri);
 int librdf_parser_parse_counted_string_into_model(librdf_parser* parser, const char* string, size_t length, librdf_uri* base_uri, librdf_model* model);
+
 %newobject librdf_parser_get_feature;
 librdf_node* librdf_parser_get_feature(librdf_parser* parser, librdf_uri *feature);
 int librdf_parser_set_feature(librdf_parser* parser, librdf_uri *feature, librdf_node* value);
@@ -362,20 +365,26 @@ void librdf_free_query_results(librdf_query_results* query_results);
 int librdf_query_results_is_bindings(librdf_query_results *query_results);
 int librdf_query_results_is_boolean(librdf_query_results *query_results);
 int librdf_query_results_is_graph(librdf_query_results *query_results);
+int librdf_query_results_is_syntax(librdf_query_results* query_results);
 
 int librdf_query_results_get_boolean(librdf_query_results *query_results);
 
 
 /* rdf_serializer.h */
+int librdf_serializer_check_name(librdf_world* world, const char *name);
+
 %newobject librdf_new_serializer;
 
 librdf_serializer* librdf_new_serializer(librdf_world* world, const char* name, const char* mime_type, librdf_uri *type_uri);
 void librdf_free_serializer(librdf_serializer *serializer);
+
+int librdf_serializer_serialize_stream_to_file(librdf_serializer* serializer, const char *name, librdf_uri* base_uri, librdf_stream* stream);
 int librdf_serializer_serialize_model_to_file(librdf_serializer* serializer, const char* name, librdf_uri* inUriOrNull /* base_uri */, librdf_model* model);
-%newobject librdf_serializer_serialize_model_to_string;
-char* librdf_serializer_serialize_model_to_string(librdf_serializer* serializer, librdf_uri* inUriOrNull /* base_uri */, librdf_model* model);
 %newobject librdf_serializer_serialize_stream_to_string;
 char* librdf_serializer_serialize_stream_to_string(librdf_serializer *serializer, librdf_uri *base_uri, librdf_stream *stream);
+%newobject librdf_serializer_serialize_model_to_string;
+char* librdf_serializer_serialize_model_to_string(librdf_serializer* serializer, librdf_uri* inUriOrNull /* base_uri */, librdf_model* model);
+
 librdf_node* librdf_serializer_get_feature(librdf_serializer* serializer, librdf_uri *feature);
 int librdf_serializer_set_feature(librdf_serializer* serializer, librdf_uri *feature, librdf_node* value);
 int librdf_serializer_set_namespace(librdf_serializer* serializer, librdf_uri *nspace, const char*  prefix);
