@@ -1,5 +1,14 @@
 2010-09-25  Dave Beckett <dave@dajobe.org>
 
+	* src/rdf_query_results.c: autodocs for query results functions
+	explaining NULL args
+
+	* src/rdf_query_results.c:
+	(librdf_query_results_to_counted_string): All all NULL format args.
+
+	* Redland.i:
+	Export librdf_world_set_logger
+
 	* Redland.i: Remove unsigned char* for librdf_parser_guess_name2()
 	since SWIG hates that.
 
