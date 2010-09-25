@@ -431,6 +431,15 @@ serializing and querying.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_model_supports_contexts ##### -->
+<para>
+
+</para>
+
+@model: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_model_query_execute ##### -->
 <para>
 
