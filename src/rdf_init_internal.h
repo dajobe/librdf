@@ -2,7 +2,7 @@
  *
  * rdf_init_internal.h - Internal library initialisation / termination
  *
- * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2010, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -146,11 +146,9 @@ struct librdf_world_s
   rasqal_world* rasqal_world_ptr;
   int rasqal_world_allocated_here;
   
-#ifdef RAPTOR_V2_AVAILABLE
   /* raptor world object */
   raptor_world* raptor_world_ptr;
   int raptor_world_allocated_here;
-#endif
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);
