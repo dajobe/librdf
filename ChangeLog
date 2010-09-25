@@ -1,3 +1,16 @@
+2010-09-25  Dave Beckett <dave@dajobe.org>
+
+	* Redland.i: Remove unsigned char* for librdf_parser_guess_name2()
+	since SWIG hates that.
+
+	* Redland.i: Export librdf_model_add_typed_literal_statement() and
+	add arg defaults
+
+	* Redland.i: Export librdf_node_get_li_ordinal()
+
+	* Redland.i: Export librdf_new_node_from_uri_local_name() and
+	librdf_new_node_from_normalised_uri_string()
+
 2010-09-24  Dave Beckett <dave@dajobe.org>
 
 	* Redland.i:
