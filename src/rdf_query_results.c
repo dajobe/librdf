@@ -265,10 +265,16 @@ librdf_free_query_results(librdf_query_results* query_results)
  *
  * Turn a query results into a string.
  * 
- * One of @name, @mime_type or @format_uri must be given.
+ * A query results format can be named, have a mime type, or
+ * identified by a URI, all of which are optional.  The default
+ * query results format will be used if @name, @mime_type and
+ * @format_uri are all NULL.
  *
- * The base URI may be used for the generated syntax, depending
- * on the format.
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
+ *
+ * The @base_uri may be used for as the base URI the generated
+ * syntax, depending on the format.
  *
  * The returned string must be freed by the caller
  *
@@ -331,17 +337,20 @@ librdf_query_results_to_counted_string2(librdf_query_results *query_results,
 /**
  * librdf_query_results_to_counted_string:
  * @query_results: #librdf_query_results object
- * @format_uri: URI of syntax to format to
+ * @format_uri: URI of syntax to format to (or NULL)
  * @base_uri: Base URI of output formatted syntax (or NULL)
  * @length_p: Pointer to where to store length of string (or NULL)
  *
  * Turn a query results into a string.
  * 
- * Values of format_uri currently supported (via Rasqal) are:
- *  http://www.w3.org/TR/2004/WD-rdf-sparql-XMLres-20041221/
+ * The default query results format will be used if @format_uri is
+ * NULL.
  *
- * The base URI may be used for the generated syntax, depending
- * on the format.
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
+ *
+ * The @base_uri may be used for as the base URI the generated
+ * syntax, depending on the format.
  *
  * The returned string must be freed by the caller
  *
@@ -376,8 +385,16 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
  *
  * Turn a query results into a string.
  * 
- * See librdf_query_results_to_counted_string2() for information on the
- * format_uri and base_uri parameters.
+ * A query results format can be named, have a mime type, or
+ * identified by a URI, all of which are optional.  The default
+ * query results format will be used if @name, @mime_type and @format_uri
+ * are all NULL.
+ *
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
+ *
+ * The @base_uri may be used for as the base URI the generated
+ * syntax, depending on the format.
  *
  * The returned string must be freed by the caller
  *
@@ -408,8 +425,15 @@ librdf_query_results_to_string2(librdf_query_results *query_results,
  *
  * Turn a query results into a string.
  * 
- * See librdf_query_results_to_counted_string for information on the
- * format_uri and base_uri parameters.
+ * A query results format can be named, have a mime type, or
+ * identified by a URI, all of which are optional.  The default
+ * query results format will be used if @format_uri is NULL.
+ *
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
+ *
+ * The @base_uri may be used for as the base URI the generated
+ * syntax, depending on the format.
  *
  * The returned string must be freed by the caller
  *
@@ -444,8 +468,16 @@ librdf_query_results_to_string(librdf_query_results *query_results,
  *
  * Write a query results to a FILE*.
  * 
- * See librdf_query_results_to_counted_string() for information on
- * the #format_uri and #base_uri parameters.
+ * A query results format can be named, have a mime type, or
+ * identified by a URI, all of which are optional.  The default
+ * query results format will be used if @name, @mime_type and @format_uri
+ * are all NULL.
+ *
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
+ *
+ * The @base_uri may be used for as the base URI the generated syntax, depending
+ * on the format.
  *
  * Return value: non 0 on failure
  **/
@@ -499,8 +531,15 @@ librdf_query_results_to_file_handle2(librdf_query_results *query_results,
  *
  * Write a query results to a FILE*.
  * 
- * See librdf_query_results_to_counted_string2() for information on
- * the #format_uri and #base_uri parameters.
+ * A query results format can be named, have a mime type, or
+ * identified by a URI, all of which are optional.  The default
+ * query results format will be used if @format_uri is NULL.
+ *
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
+ *
+ * The @base_uri may be used for as the base URI the generated
+ * syntax, depending on the format.
  *
  * @Deprecated: use librdf_query_results_to_file_handle() with extra
  * name and mime_type args.
@@ -533,8 +572,16 @@ librdf_query_results_to_file_handle(librdf_query_results *query_results,
  *
  * Write a query results to a file.
  * 
- * See librdf_query_results_to_counted_string2() for information on
- * the #format_uri and #base_uri parameters.
+ * A query results format can be named, have a mime type, or
+ * identified by a URI, all of which are optional.  The default
+ * query results format will be used if @name, @mime_type and @format_uri
+ * are all NULL.
+ *
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
+ *
+ * The @base_uri may be used for as the base URI the generated
+ * syntax, depending on the format.
  *
  * Return value: non 0 on failure
  **/
@@ -578,8 +625,15 @@ librdf_query_results_to_file2(librdf_query_results *query_results,
  *
  * Write a query results to a file.
  * 
- * See librdf_query_results_to_counted_string2() for information on
- * the #format_uri and #base_uri parameters.
+ * A query results format can be named, have a mime type, or
+ * identified by a URI, all of which are optional.  The default
+ * query results format will be used if @format_uri is NULL.
+ *
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
+ *
+ * The @base_uri may be used for as the base URI the generated
+ * syntax, depending on the format.
  *
  * @Deprecated: use librdf_query_results_to_file2() with extra mime_type
  * arg.
@@ -746,8 +800,10 @@ librdf_query_results_as_stream(librdf_query_results* query_results)
  * Constructor - create a new librdf_query_results_formatter object by identified format.
  *
  * A query results format can be named, have a mime type, or
- * identified by a URI, both of which are optional.  The default
- * query results format will be used if all are NULL.
+ * identified by a URI, all of which are optional.  The default query
+ * results format will be used if @name, @mime_type and @uri are all
+ * NULL.
+ *
  * librdf_query_results_formats_enumerate() returns information on
  * the known query results names, labels and URIs.
  *
@@ -776,8 +832,10 @@ librdf_new_query_results_formatter2(librdf_query_results* query_results,
  *
  * A query results format can be named or identified by a URI, both
  * of which are optional.  The default query results format will be used
- * if both are NULL.  librdf_query_results_formats_enumerate() returns
- * information on the known query results names, labels and URIs.
+ * if @name and @uri are both NULL.
+ *
+ * librdf_query_results_formats_enumerate() returns information on
+ * the known query results names, labels and URIs.
  *
  * @Deprecated: for librdf_new_query_results_formatter2() with the
  * name, mime_type and format_uri args.
