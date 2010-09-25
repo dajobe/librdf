@@ -1,7 +1,7 @@
 2010-09-25  Dave Beckett  <dave@dajobe.org>
 
 	* Snapshotted redland_1_0_11 for 1.0.11 release
-	(GIT d0b311d77fc5c6007cc0714da065e043a6d6089e)
+	(GIT 8cad0a6d84eed0d98e20a23883dcf6fdedc47587)
 
 	* src/rdf_query_results.c: autodocs for query results functions
 	explaining NULL args
