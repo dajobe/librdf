@@ -38,6 +38,8 @@
 	* examples/Makefile.am, examples/example8.c: Add example8 which
 	formats sparql queries into triples or variable bindings
 
+	* Redland.i: Export librdf_serializer_serialize_stream_to_string()
+
 2010-09-10  Dave Beckett <dave@dajobe.org>
 
 	* src/rdf_query_rasqal.c: Fix runtime warning for models with no
