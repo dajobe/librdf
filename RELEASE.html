@@ -27,7 +27,7 @@ pre
 <p>Not yet released.
 </p>
 
-<!-- Updated to Changelog 2010-09-24 22:31 PST -->
+<!-- Updated to Changelog 2010-09-25 10:56 PST -->
 
 <p>The main changes in this release are:</p>
 <ul>
@@ -293,10 +293,14 @@ higher-level libraries bound to librdf via SWIG:</p>
 <ul>
   <li><code>librdf_hash_from_string()</code> to build a hash from a string; useful for encoding storage options.</li>
   <li><code>librdf_hash_to_string()</code> to turn a hash into a string; useful for decoding storage options.</li>
-  <li><code>librdf_query_results_to_file2()</code> supplementing the deprecated <code>librdf_query_results_to_file()</code></li>
-  <li><code>librdf_query_results_to_string2()</code> supplementing the deprecated <code>librdf_query_results_to_string()</code></li>
+  <li><code>librdf_model_add_typed_literal_statement()</code> to add a typed literal statement direct to a graph.</li>
+  <li><code>librdf_new_node_from_normalised_uri_string()</code> to create a URI node.</li>
+  <li><code>librdf_new_node_from_uri_local_name()</code> to create a URI node</li>
+  <li><code>librdf_node_get_li_ordinal()</code> to get the 1 from a rdf:_1 predicate node.</li>
   <li><code>librdf_parser_check_name()</code> for checking parser names.</li>
   <li><code>librdf_query_results_is_syntax()</code> to check if query result is a syntax.</li>
+  <li><code>librdf_query_results_to_file2()</code> supplementing the deprecated <code>librdf_query_results_to_file()</code></li>
+  <li><code>librdf_query_results_to_string2()</code> supplementing the deprecated <code>librdf_query_results_to_string()</code></li>
   <li><code>librdf_serializer_check_name()</code> for checking serializer names.</li>
   <li><code>librdf_serializer_serialize_stream_to_file()</code> to go along with it's pair that serializes a model to a file.</li>
   <li><code>librdf_serializer_serialize_stream_to_string()</code> to go along with the pair that serializes a model to string.</li>
