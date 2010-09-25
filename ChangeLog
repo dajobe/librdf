@@ -1,5 +1,14 @@
 2010-09-24  Dave Beckett <dave@dajobe.org>
 
+	* Redland.i:
+	Export more functions to SWIG
+
+	Export:
+	librdf_parser_check_name - for checking parser names
+	librdf_query_results_is_syntax - to check if query result is a syntax
+	librdf_serializer_check_name - for checking serializer names
+	librdf_serializer_serialize_stream_to_file - pair of ...model_to_file
+
 	* src/rdf_node.c:
 	(librdf_new_node_from_uri_string): Cast for strlen arg
 
