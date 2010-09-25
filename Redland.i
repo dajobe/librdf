@@ -197,6 +197,7 @@ char* librdf_node_get_literal_value_as_latin1(librdf_node* node);
 char* librdf_node_get_literal_value_language(librdf_node* node);
 librdf_uri* librdf_node_get_literal_value_datatype_uri(librdf_node* node);
 int librdf_node_get_literal_value_is_wf_xml(librdf_node* node);
+int librdf_node_get_li_ordinal(librdf_node* node);
 
 %newobject librdf_node_to_string;
 char *librdf_node_to_string(librdf_node* node);
