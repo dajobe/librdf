@@ -27,7 +27,7 @@ pre
 <p>Not yet released.
 </p>
 
-<!-- Updated to Changelog 2010-08-29 21:12 PST -->
+<!-- Updated to Changelog 2010-09-24 22:31 PST -->
 
 <p>The main changes in this release are:</p>
 <ul>
@@ -85,6 +85,9 @@ support if it will work.
 <p>Tests now use the in-memory storage if the BDB (Sleepycat DB)
 storage is not available.
 </p>
+
+<p>Updated to prevent an error when used with autoconf 2.68+</p>
+
 
 <h3>Hash Class Changes</h3>
 
@@ -156,6 +159,10 @@ and deprecated for <code>librdf_node_write()</code>.
 the Redland graph names (context URIs) and binding variables to the names.
 Fixes
 <a href="http://bugs.librdf.org/mantis/view.php?id=382">Issue #000382</a>.
+</p>
+
+<p>Fix query engine to prevent runtime warning for models with no
+contexts (graphs) when using GRAPH in a query.
 </p>
 
 <p>Added <code>librdf_query_languages_enumerate()</code> function
@@ -259,6 +266,14 @@ Tested with Virtuoso 5.0.13 open source edition.
 argument, avoiding <code>strlen()</code>s.
 </p>
 
+<h3>World Class Changes</h3>
+
+<p>Export <code>librdf_world_set_raptor()</code> and
+<code>librdf_world_get_raptor()</code> to get/set the raptor world.
+These are only used when librdf is built with Raptor V2.
+</p>
+
+
 <h3>Internal changes</h3>
 
 <p><code>struct librdf_query_factory_s</code> methods
@@ -293,13 +308,24 @@ on patch by Norman Gray in issue - thanks!  Fixes
 <p>Added HACKING.md documenting code style.
 </p>
 
-<p>Exposed 4 new functions that make sense to bindings API:</p>
+<p>Exposed several functions (some new) that make sense to bindings
+API via SWIG:</p>
 <ul>
-  <li>librdf_hash_from_string</li>
-  <li>librdf_hash_to_string</li>
-  <li>librdf_query_results_to_file2() supplementing deprecated librdf_query_results_to_file()</li>
-  <li>librdf_query_results_to_string2() supplementing deprecated librdf_query_results_to_string()</li>
+  <li><code>librdf_hash_from_string()</code></li>
+  <li><code>librdf_hash_to_string()</code></li>
+  <li><code>librdf_query_results_to_file2()</code> supplementing deprecated librdf_query_results_to_file()</li>
+  <li><code>librdf_query_results_to_string2()</code> supplementing deprecated librdf_query_results_to_string()</li>
+  <li><code>librdf_parser_check_name()</code> for checking parser names</li>
+  <li><code>librdf_query_results_is_syntax()</code> to check if query result is a syntax</li>
+  <li><code>librdf_serializer_check_name()</code> for checking serializer names</li>
+  <li><code>librdf_serializer_serialize_stream_to_file</code> to go along with it's pair that reads from a model.</li>
+  <li><code>librdf_serializer_serialize_stream_to_string()</code></li>
 </ul>
+
+<p>Added <code>examples/example8.c</code> to show how to serializer
+query results to strings when queries return either variable bindings
+or triples forms.
+</p>
 
 
 <h2 id="rel1_0_10"><a name="rel1_0_10">Redland 1.0.10 Changes</a></h2>
