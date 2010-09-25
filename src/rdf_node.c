@@ -253,7 +253,8 @@ librdf_new_node_from_uri_string(librdf_world *world,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri_string, string, NULL);
 
   return librdf_new_node_from_uri_string_or_uri(world, uri_string, 
-                                                strlen(uri_string), NULL);
+                                                strlen((const char*)uri_string),
+                                                NULL);
 }
 
     
