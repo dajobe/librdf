@@ -45,21 +45,22 @@
  * Set the #raptor_world instance to be used with this #librdf_world.
  *
  * If no raptor_world instance is set with this function,
- * librdf_world_open() creates a new instance.
+ * librdf_world_open() creates a new instance.  This function
+ * is only useful when librdf is built with the Raptor V2 APIs, which
+ * use this world object.  It has no effect with a Raptor V1 build.
  *
  * Ownership of the raptor_world is not taken. If the raptor library
  * instance is set with this function, librdf_free_world() will not
  * free it.
  *
  **/
-#ifdef RAPTOR_V2_AVAILABLE
 void
 librdf_world_set_raptor(librdf_world* world, raptor_world* raptor_world_ptr)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(world, librdf_world);
   world->raptor_world_ptr = raptor_world_ptr;
+  world->raptor_world_allocated_here = 0;
 }
-#endif
 
 
 /**
@@ -68,16 +69,16 @@ librdf_world_set_raptor(librdf_world* world, raptor_world* raptor_world_ptr)
  * 
  * Get the #raptor_world instance used by this #librdf_world.
  *
+ * This value is only used with the Raptor V2 APIs.
+ *
  * Return value: raptor_world object or NULL on failure (e.g. not initialized)
  **/
-#ifdef RAPTOR_V2_AVAILABLE
 raptor_world*
 librdf_world_get_raptor(librdf_world* world)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
   return world->raptor_world_ptr;
 }
-#endif
 
 
 #ifndef RAPTOR_V2_AVAILABLE
@@ -225,12 +226,16 @@ librdf_init_raptor(librdf_world* world)
   if(!world->raptor_world_ptr) {
     world->raptor_world_ptr = raptor_new_world();
     world->raptor_world_allocated_here = 1;
-    if(!world->raptor_world_ptr || raptor_world_open(world->raptor_world_ptr))
-      abort();
 
-    /* set up log handler */
-    raptor_world_set_log_handler(world->raptor_world_ptr, world, librdf_raptor_log_handler);
+    if(!world->raptor_world_ptr || raptor_world_open(world->raptor_world_ptr)) {
+      LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "failed to initialize raptor");
+      return;
+    }
   }
+
+  /* set up log handler */
+  raptor_world_set_log_handler(world->raptor_world_ptr, world,
+                               librdf_raptor_log_handler);
 #else
   raptor_init();
   raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
