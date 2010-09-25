@@ -1,7 +1,80 @@
+2010-09-24  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_node.c:
+	(librdf_new_node_from_uri_string): Cast for strlen arg
+
+	* src/rdf_raptor.h: Export librdf_world_set_raptor and
+	librdf_world_get_raptor for all raptors
+
+	* src/rdf_raptor.c: librdf_world_set_raptor and
+	librdf_world_get_raptor are public for all
+	raptors
+
+	(librdf_world_set_raptor): Export for V1 and
+	V2.
+
+	(librdf_world_get_raptor): Export for V1 and
+	V2.
+
+	(librdf_init_raptor): For V2 init, error and return but do not
+	abort on raptor world failure.
+
+	* src/rdf_init_internal.h: raptor_world_ptr and
+	raptor_world_allocated_here are always in struct.
+
+	* configure.ac: Use AC_LANG_SOURCE for gcc flag test
+
+	* examples/example8.c: Long int for size_t print
+
+	* examples/Makefile.am, examples/example8.c: Add example8 which
+	formats sparql queries into triples or variable bindings
+
+2010-09-10  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_rasqal.c:
+	Fix runtime warning for models with no
+	contexts (rasqal_redland_new_triples_source): use
+	librdf_model_supports_contexts() to only add graph names to models
+	that have contexts (graph names) to prevent a runtime warning.
+
+	* docs/redland-sections.txt, src/rdf_model.c, src/rdf_model.h:
+	Export librdf_model_supports_contexts to public API
+
+2010-08-30  Dave Beckett <dave@dajobe.org>
+
+	* utils/rdfproc.c:
+	Tidy help information - correct defaults
+
+	* docs/tmpl/hash.sgml, docs/tmpl/iterator.sgml,
+	docs/tmpl/list.sgml, docs/tmpl/parser.sgml, docs/tmpl/query.sgml,
+	docs/tmpl/redland-unused.sgml, docs/tmpl/serializer.sgml,
+	docs/tmpl/storage.sgml, docs/tmpl/stream.sgml, docs/tmpl/world.sgml:
+	
+	Updated generated SGML templates
+
+	* src/rdf_raptor_statement.c: Refactor to remove warning of call
+	to deprecated
+	librdf_statement_encode_parts
+
+	(librdf_statement_encode_parts_internal): Added
+
+	(librdf_statement_encode_parts, librdf_statement_encode_parts2):
+	Call
+	librdf_statement_encode_parts_internal
+
+	(librdf_statement_decode): Add fatal error if this function is
+	called, librdf with Raptor V2 cannot implement it.
+
+2010-08-30  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_hash.c:
+	(librdf_hash_to_string): Avoid using uninitialized pointers when
+	jumping to tidy block prematurely.
+
 2010-08-29  Dave Beckett <dave@dajobe.org>
 
-	* LICENSE.html: Link to specific LGPL 2.1 version doc.  Wording
-	and formatting
+	* LICENSE.html: or any newer versions.  Link to specific LGPL 2.1
+	version doc.  Wording and formatting
 
 	* FAQS.html: More FAQS
 
