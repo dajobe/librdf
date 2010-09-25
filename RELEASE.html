@@ -286,6 +286,22 @@ formatting.  The only implementor of this factory is the internal
 Rasqal query results formatter.
 </p>
 
+<h3>Language Bindings (SWIG) changes</h3>
+
+<p>Exposed several functions (some new) that make sense to
+higher-level libraries bound to librdf via SWIG:</p>
+<ul>
+  <li><code>librdf_hash_from_string()</code> to build a hash from a string; useful for encoding storage options.</li>
+  <li><code>librdf_hash_to_string()</code> to turn a hash into a string; useful for decoding storage options.</li>
+  <li><code>librdf_query_results_to_file2()</code> supplementing the deprecated <code>librdf_query_results_to_file()</code></li>
+  <li><code>librdf_query_results_to_string2()</code> supplementing the deprecated <code>librdf_query_results_to_string()</code></li>
+  <li><code>librdf_parser_check_name()</code> for checking parser names.</li>
+  <li><code>librdf_query_results_is_syntax()</code> to check if query result is a syntax.</li>
+  <li><code>librdf_serializer_check_name()</code> for checking serializer names.</li>
+  <li><code>librdf_serializer_serialize_stream_to_file()</code> to go along with it's pair that serializes a model to a file.</li>
+  <li><code>librdf_serializer_serialize_stream_to_string()</code> to go along with the pair that serializes a model to string.</li>
+</ul>
+
 <h3>Other changes</h3>
 
 <p><code>rdfproc(1)</code> utility now send non-result information
@@ -307,20 +323,6 @@ on patch by Norman Gray in issue - thanks!  Fixes
 
 <p>Added HACKING.md documenting code style.
 </p>
-
-<p>Exposed several functions (some new) that make sense to bindings
-API via SWIG:</p>
-<ul>
-  <li><code>librdf_hash_from_string()</code></li>
-  <li><code>librdf_hash_to_string()</code></li>
-  <li><code>librdf_query_results_to_file2()</code> supplementing deprecated librdf_query_results_to_file()</li>
-  <li><code>librdf_query_results_to_string2()</code> supplementing deprecated librdf_query_results_to_string()</li>
-  <li><code>librdf_parser_check_name()</code> for checking parser names</li>
-  <li><code>librdf_query_results_is_syntax()</code> to check if query result is a syntax</li>
-  <li><code>librdf_serializer_check_name()</code> for checking serializer names</li>
-  <li><code>librdf_serializer_serialize_stream_to_file</code> to go along with it's pair that reads from a model.</li>
-  <li><code>librdf_serializer_serialize_stream_to_string()</code></li>
-</ul>
 
 <p>Added <code>examples/example8.c</code> to show how to serializer
 query results to strings when queries return either variable bindings
