@@ -290,9 +290,6 @@ librdf_query_results_to_counted_string2(librdf_query_results *query_results,
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
-  if(!name && !mime_type && !format_uri)
-    return NULL;
-
   iostr = raptor_new_iostream_to_string(query_results->query->world->raptor_world_ptr,
                                         &string, &string_length, malloc);
   if(!iostr)
