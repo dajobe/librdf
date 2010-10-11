@@ -1,7 +1,47 @@
-2010-09-25  Dave Beckett  <dave@dajobe.org>
+2010-10-10  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_init.h: Include rasqal.h to get rasqal_world just in
+	case
+
+	* src/redland.h: Just include librdf.h
+
+	* src/librdf.h: Add raptor and rasqal includes here
+
+	* configure.ac: Use AC_LANG_SOURCE with AC_COMPILE_IFELSE for
+	mysql header
+
+	* NEWS.html, RELEASE.html, configure.ac, src/win32_rdf_config.h:
+	Bump version to 1.0.12
+
+2010-09-27  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac: RASQAL_MIN_VERSION should have been 0.9.19 for
+	some time
+
+2010-09-25  Dave Beckett <dave@dajobe.org>
 
 	* Snapshotted redland_1_0_11 for 1.0.11 release
 	(GIT 8cad0a6d84eed0d98e20a23883dcf6fdedc47587)
+
+	* RELEASE.html: 1.0.11
+
+	* src/rdf_query_results.c: autodocs for query results functions
+	explaining NULL args
+
+	* src/rdf_query_results.c:
+	(librdf_query_results_to_counted_string): Allow all NULL format
+	args.
+
+	* Redland.i: Remove unsigned char* for librdf_parser_guess_name2()
+	since SWIG hates that.
+
+	* Redland.i: Export librdf_model_add_typed_literal_statement and
+	add arg defaults
+
+	* Redland.i: Export librdf_node_get_li_ordinal
+
+	* Export librdf_new_node_from_node and
+	librdf_new_node_from_blank_identifier
 
 	* src/rdf_query_results.c: autodocs for query results functions
 	explaining NULL args
