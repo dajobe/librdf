@@ -310,10 +310,10 @@ rdf_uri_test: rdf_uri.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_uri.c librdf.la
 
 rdf_statement_test: rdf_statement.c librdf.la
-	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la
+	$(COMPILE_LINK) @LIBRDF_DIRECT_LIBS@ -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la
 
 rdf_model_test: rdf_model.c librdf.la
-	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_model.c librdf.la
+	$(COMPILE_LINK) @LIBRDF_DIRECT_LIBS@ -DSTANDALONE $(srcdir)/rdf_model.c librdf.la
 
 rdf_storage_test: rdf_storage.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_storage.c librdf.la
@@ -334,7 +334,7 @@ rdf_concepts_test: rdf_concepts.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_concepts.c librdf.la
 
 rdf_query_test: rdf_query.c rdf_query_results.c librdf.la
-	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_query.c $(srcdir)/rdf_query_results.c librdf.la
+	$(COMPILE_LINK) @LIBRDF_DIRECT_LIBS@ -lrasqal -DSTANDALONE $(srcdir)/rdf_query.c $(srcdir)/rdf_query_results.c librdf.la
 
 rdf_serializer_test: rdf_serializer.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_serializer.c librdf.la
@@ -349,7 +349,7 @@ rdf_avltree_test: rdf_avltree.c librdf.la
 	$(COMPILE_LINK) -DLIBRDF_DEBUG=2 -DSTANDALONE $(srcdir)/rdf_avltree.c librdf.la
 
 rdf_init_test: rdf_init.c librdf.la
-	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_init.c librdf.la
+	$(COMPILE_LINK) -lrasqal -DSTANDALONE $(srcdir)/rdf_init.c librdf.la
 
 @SET_MAKE@
 

@@ -28,12 +28,13 @@ AM_LDFLAGS=@LIBRDF_LDFLAGS@
 redland_db_upgrade_SOURCES = db_upgrade.c
 
 redland_virtuoso_test_SOURCES = redland-virtuoso-test.c
-redland_virtuoso_test_LDADD=@LIBRDF_LDFLAGS@ $(top_builddir)/src/librdf.la
+redland_virtuoso_test_LDADD= @LIBRDF_DIRECT_LIBS@ @LIBRDF_LDFLAGS@ $(top_builddir)/src/librdf.la
 
 rdfproc_SOURCES = rdfproc.c
 if GETOPT
 rdfproc_SOURCES += getopt.c rdfproc_getopt.h
 endif
+rdfproc_LDADD = @LIBRDF_DIRECT_LIBS@
 
 mysql-utils: $(MYSQL_UTILS)
 
