@@ -235,6 +235,8 @@ int librdf_statement_match(librdf_statement* statement, librdf_statement* partia
 %newobject librdf_statement_to_string;
 char *librdf_statement_to_string(librdf_statement *statement);
 
+int librdf_statement_is_complete(librdf_statement *statement);
+
 /* rdf_model.h */
 %newobject librdf_new_model;
 %newobject librdf_new_model_with_options;
