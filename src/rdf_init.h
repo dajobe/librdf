@@ -30,6 +30,12 @@
 #include <rdf_init_internal.h>
 #endif
 
+#ifndef LIBRDF_OBJC_FRAMEWORK
+#include <rasqal.h>
+#else
+#include <Redland/rasqal.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
