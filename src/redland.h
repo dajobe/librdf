@@ -2,7 +2,7 @@
  *
  * redland.h - Redland RDF Application Framework main header
  *
- * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2010, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -26,26 +26,10 @@
 #ifndef REDLAND_H
 #define REDLAND_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef LIBRDF_OBJC_FRAMEWORK
-/* Redland consists of */
-/* raptor */
-#include <raptor.h>
-/* rasqal */
-#include <rasqal.h>
-/* librdf */
 #include <librdf.h>
 #else
-#include <Redland/raptor.h>
-#include <Redland/rasqal.h>
 #include <Redland/librdf.h>
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif
