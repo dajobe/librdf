@@ -26,10 +26,6 @@
 #ifndef LIBRDF_H
 #define LIBRDF_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef LIBRDF_OBJC_FRAMEWORK
 /* raptor */
 #include <raptor.h>
@@ -39,6 +35,10 @@ extern "C" {
 #else
 #include <Redland/raptor.h>
 #include <Redland/rasqal.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #include <stdio.h>
