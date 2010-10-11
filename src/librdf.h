@@ -2,7 +2,7 @@
  *
  * redland.h - Redland RDF Application Framework public API
  *
- * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2010, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -28,6 +28,17 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef LIBRDF_OBJC_FRAMEWORK
+/* raptor */
+#include <raptor.h>
+/* rasqal: uses raptor */
+#include <rasqal.h>
+/* librdf: uses rasqal and raptor */
+#else
+#include <Redland/raptor.h>
+#include <Redland/rasqal.h>
 #endif
 
 #include <stdio.h>
