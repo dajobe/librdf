@@ -250,7 +250,8 @@ librdf_new_node_from_node(librdf_node *node)
 void
 librdf_free_node(librdf_node *node)
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN(node, librdf_node);
+  if(!node)
+    return;
 
   raptor_free_term(node);
 }
