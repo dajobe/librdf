@@ -1616,11 +1616,11 @@ librdf_storage_hashes_context_serialise_next_statement(void* context)
 static void*
 librdf_storage_hashes_context_serialise_get_statement(void* context, int flags)
 {
-  librdf_storage_hashes_context_serialise_stream_context* scontext=(librdf_storage_hashes_context_serialise_stream_context*)context;
+  librdf_storage_hashes_context_serialise_stream_context* scontext;
   librdf_hash_datum* v;
-  librdf_node** cnp=NULL;
   librdf_world* world;
 
+  scontext = (librdf_storage_hashes_context_serialise_stream_context*)context;
   world = scontext->storage->world;
 
   switch(flags) {
@@ -1628,33 +1628,25 @@ librdf_storage_hashes_context_serialise_get_statement(void* context, int flags)
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
 
       if(scontext->current_is_ok) {
-        if(flags==LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT)
+        if(flags == LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT)
           return &scontext->current;
         else
           return scontext->context_node;
       }
 
-      /* current stuff is out of date - get new cached answers */
-      if(scontext->index_contexts) {
-        if(scontext->context_node)
-          librdf_free_node(scontext->context_node);
-        scontext->context_node=NULL;
-        cnp=&scontext->context_node;
-      }
-      
       librdf_statement_clear(&scontext->current);
 
-      v=(librdf_hash_datum*)librdf_iterator_get_value(scontext->iterator);
+      v = (librdf_hash_datum*)librdf_iterator_get_value(scontext->iterator);
       
       /* decode value content and optional context */
-      if(!librdf_statement_decode2(world, &scontext->current, cnp,
+      if(!librdf_statement_decode2(world, &scontext->current, NULL,
                                    (unsigned char*)v->data, v->size)) {
         return NULL;
       }
       
-      scontext->current_is_ok=1;
+      scontext->current_is_ok = 1;
 
-      if(flags==LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT)
+      if(flags == LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT)
         return &scontext->current;
       else
         return scontext->context_node;
