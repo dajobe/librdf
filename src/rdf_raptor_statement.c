@@ -104,6 +104,9 @@ librdf_statement_clear(librdf_statement *statement)
 void
 librdf_free_statement(librdf_statement* statement)
 {
+  if(!statement)
+    return;
+  
   raptor_free_statement(statement);
 }
 
