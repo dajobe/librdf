@@ -93,6 +93,8 @@ int librdf_stream_next(librdf_stream* stream);
 REDLAND_API
 librdf_statement* librdf_stream_get_object(librdf_stream* stream);
 REDLAND_API
+librdf_node* librdf_stream_get_context2(librdf_stream* stream);
+REDLAND_API REDLAND_DEPRECATED
 void* librdf_stream_get_context(librdf_stream* stream);
 
 REDLAND_API

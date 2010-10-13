@@ -281,7 +281,7 @@ librdf_stream_get_object(librdf_stream* stream)
 
 
 /**
- * librdf_stream_get_context:
+ * librdf_stream_get_context2:
  * @stream: the #librdf_stream object
  *
  * Get the context of the current object on the stream.
@@ -293,8 +293,8 @@ librdf_stream_get_object(librdf_stream* stream)
  * 
  * Return value: The context node (can be NULL) or NULL if the stream has finished.
  **/
-void*
-librdf_stream_get_context(librdf_stream* stream) 
+librdf_node*
+librdf_stream_get_context2(librdf_stream* stream) 
 {
   if(stream->is_finished)
     return NULL;
@@ -305,8 +305,30 @@ librdf_stream_get_context(librdf_stream* stream)
   if(!stream->is_updating && !librdf_stream_update_current_statement(stream))
     return NULL;
 
-  return stream->get_method(stream->context, 
-                            LIBRDF_STREAM_GET_METHOD_GET_CONTEXT);
+  return (librdf_node*)stream->get_method(stream->context, 
+                                          LIBRDF_STREAM_GET_METHOD_GET_CONTEXT);
+}
+
+
+/**
+ * librdf_stream_get_context:
+ * @stream: the #librdf_stream object
+ *
+ * Get the context of the current object on the stream.
+ *
+ * This method returns a SHARED pointer to the current context node object
+ * which should be copied by the caller to preserve it if the stream
+ * is moved on librdf_stream_next or if it should last after the
+ * stream is closed.
+ * 
+ * @Deprecated: Use librdf_stream_get_context2() which returns a #librdf_node
+ *
+ * Return value: The context node (can be NULL) or NULL if the stream has finished.
+ **/
+void*
+librdf_stream_get_context(librdf_stream* stream) 
+{
+  return librdf_stream_get_context2(stream);
 }
 
 
@@ -634,7 +656,7 @@ librdf_stream_write(librdf_stream *stream, raptor_iostream *iostr)
     if(librdf_statement_write(statement, iostr))
       return 1;
     
-    context_node = (librdf_node*)librdf_stream_get_context(stream);
+    context_node = librdf_stream_get_context2(stream);
     if(context_node) {
       raptor_iostream_counted_string_write(" with context ", 14, iostr);
       librdf_node_write(context_node, iostr);
