@@ -1029,7 +1029,7 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
     int max = 3;
     
     statement = librdf_stream_get_object(statement_stream);
-    context_node = (librdf_node*)librdf_stream_get_context(statement_stream);
+    context_node = librdf_stream_get_context2(statement_stream);
 
     if(!statement) {
       status = 1;

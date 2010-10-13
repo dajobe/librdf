@@ -527,7 +527,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
   /* Contexts */
   if(bindings[3] && (parts & RASQAL_TRIPLE_ORIGIN)) {
     int bind=1;
-    librdf_node* context_node=(librdf_node*)librdf_stream_get_context(rtmc->stream);
+    librdf_node* context_node = librdf_stream_get_context2(rtmc->stream);
     
     if(bindings[0] == bindings[3]) {
       /* check matching (?x, ..., ...) in context ?x */
