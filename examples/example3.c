@@ -41,9 +41,12 @@ main(int argc, char *argv[])
   librdf_storage *storage;
   librdf_model* model;
   librdf_statement* statement;
+  raptor_world *raptor_world_ptr;
+  raptor_iostream* iostr;
   
   world=librdf_new_world();
   librdf_world_open(world);
+  raptor_world_ptr = librdf_world_get_raptor(world);
 
   model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", "test", "hash-type='bdb',dir='.'"), NULL);
 
@@ -56,7 +59,9 @@ main(int argc, char *argv[])
 
   librdf_free_statement(statement);
 
-  librdf_model_print(model, stdout);
+  iostr = raptor_new_iostream_to_file_handle(raptor_world_ptr, stdout);
+  librdf_model_write(model, iostr);
+  raptor_free_iostream(iostr);
   
   librdf_free_model(model);
   librdf_free_storage(storage);

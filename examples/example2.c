@@ -60,10 +60,12 @@ main(int argc, char *argv[])
   librdf_uri* uri;
   char *program=argv[0];
   int rc=0;
+  raptor_world *raptor_world_ptr;
+  raptor_iostream* iostr;
   
   world=librdf_new_world();
   librdf_world_open(world);
-
+  raptor_world_ptr = librdf_world_get_raptor(world);
 
   uri=librdf_new_uri(world, (const unsigned char*)"http://example.librdf.org/");
   
@@ -125,7 +127,9 @@ main(int argc, char *argv[])
   librdf_model_add_statement(model, statement);
 
   fprintf(stdout, "%s: Resulting model is:\n", program);
-  librdf_model_print(model, stdout);
+  iostr = raptor_new_iostream_to_file_handle(raptor_world_ptr, stdout);
+  librdf_model_write(model, iostr);
+  raptor_free_iostream(iostr);
 
   if(!librdf_model_contains_statement(model, statement)) {
     fprintf(stdout, "%s: Model does not contain statement\n", program);
@@ -139,7 +143,9 @@ main(int argc, char *argv[])
   librdf_model_remove_statement(model, statement);
 
   fprintf(stdout, "%s: Resulting model is:\n", program);
-  librdf_model_print(model, stdout);
+  iostr = raptor_new_iostream_to_file_handle(raptor_world_ptr, stdout);
+  librdf_model_write(model, iostr);
+  raptor_free_iostream(iostr);
 
  tidystatement:
   librdf_free_statement(statement);

@@ -55,7 +55,7 @@ main(int argc, char *argv[])
   if(!string)
     printf("Failed to serialize model\n");
   else {
-    printf("Made a %d byte string\n", strlen((char*)string));
+    printf("Made a %d byte string\n", (int)strlen((char*)string));
     free(string);
   }
 

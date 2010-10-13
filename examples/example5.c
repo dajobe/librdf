@@ -47,9 +47,11 @@ main(int argc, char *argv[])
   librdf_query_results* results;
   librdf_uri *uri;
   const unsigned char *query_string=NULL;
+  raptor_world *raptor_world_ptr;
   
   world=librdf_new_world();
   librdf_world_open(world);
+  raptor_world_ptr = librdf_world_get_raptor(world);
 
   if(argc !=3) {
     fprintf(stderr, "USAGE: %s CONTENT-URI QUERY-STRING\n", program);
@@ -65,7 +67,12 @@ main(int argc, char *argv[])
     return 1;
   }
 
-  parser_name=raptor_guess_parser_name(NULL, NULL, NULL, 0, librdf_uri_as_string(uri));
+#ifdef RAPTOR_V2_AVAILABLE
+  parser_name = raptor_world_guess_parser_name(raptor_world_ptr, NULL, NULL, NULL, 0, librdf_uri_as_string(uri));
+#else
+  parser_name = raptor_guess_parser_name(NULL, NULL, NULL, 0, librdf_uri_as_string(uri));
+#endif
+
   parser=librdf_new_parser(world, parser_name, NULL, NULL);
   librdf_parser_parse_into_model(parser, uri, NULL, model);
   librdf_free_parser(parser);

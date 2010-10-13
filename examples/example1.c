@@ -50,6 +50,8 @@ main(int argc, char *argv[])
   librdf_uri *uri;
   char *parser_name=NULL;
   int count;
+  raptor_world *raptor_world_ptr;
+  raptor_iostream* iostr;
 
   if(argc <2 || argc >3) {
     fprintf(stderr, "USAGE: %s: <RDF source URI> [rdf parser name]\n", program);
@@ -57,8 +59,9 @@ main(int argc, char *argv[])
   }
 
 
-  world=librdf_new_world();
+  world = librdf_new_world();
   librdf_world_open(world);
+  raptor_world_ptr = librdf_world_get_raptor(world);
 
   uri=librdf_new_uri(world, (const unsigned char*)argv[1]);
   if(!uri) {
@@ -109,10 +112,11 @@ main(int argc, char *argv[])
 
 
   /* Print out the model*/
-
-
   fprintf(stdout, "%s: Resulting model is:\n", program);
-  librdf_model_print(model, stdout);
+  iostr = raptor_new_iostream_to_file_handle(raptor_world_ptr, stdout);
+  librdf_model_write(model, iostr);
+  raptor_free_iostream(iostr);
+
 
   /* Construct the query predicate (arc) and object (target) 
    * and partial statement bits
