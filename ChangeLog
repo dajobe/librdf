@@ -1,4 +1,64 @@
+2010-10-13  Dave Beckett <dave@dajobe.org>
+
+	* examples/.gitignore:
+	ignore more
+
+	* examples/example1.c, examples/example2.c, examples/example3.c,
+	examples/example5.c, examples/example6.c: Update for raptor2 API
+	and librdf_stream_get_context2
+
+	* src/rdf_query_rasqal.c, src/rdf_storage.c,
+	src/rdf_storage_sqlite.c: Use librdf_stream_get_context2 replacing
+	librdf_stream_get_context with a cast
+
+	* src/rdf_stream.c, src/rdf_stream.h:
+	(librdf_stream_get_context2): Added deprecating
+	librdf_stream_get_context
+
+	(librdf_stream_get_context2): Returns a
+	librdf_node*
+
+	(librdf_stream_get_context): Deprecated for above.
+
+2010-10-12  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_hashes.c:
+	(librdf_storage_hashes_context_serialise_get_statement): Return
+	context node
+
+	Fixes Issue#0000393
+	http://bugs.librdf.org/mantis/view.php?id=393 with fix based on
+	patch in bug.  Thanks to Michael Stahl
+
+	* src/rdf_term.c:
+	(librdf_free_node): Allow NULL free
+
+	* src/rdf_raptor_statement.c:
+	(librdf_free_statement): Allow NULL free
+
 2010-10-10  Dave Beckett <dave@dajobe.org>
+
+	* utils/Makefile.am: Add @LIBRDF_DIRECT_LIBS@ to LDADD
+
+	* utils/Makefile.am: Remove rdfproc_LDADD
+
+	* Redland.i: Export librdf_statement_is_complete
+
+	* configure.ac, src/Makefile.am, utils/Makefile.am: Add linking of
+	-lraptor or -lraptor2 to handle newer GCC linkers
+
+	Fixes Issue#0000348 http://bugs.librdf.org/mantis/view.php?id=348 as
+	reported in Fedora with this change
+	http://fedoraproject.org/wiki/Features/ChangeInImplicitDSOLinking
+
+	See also http://bugs.librdf.org/mantis/view.php?id=347 for the
+	Rasqal equivalent.
+
+	* src/librdf.h: Lets assume OSX GCC precompiled headers are
+	working after many years
+
+	* src/librdf.h: Include headers outside extern "C" block -
+	included files do that too.
 
 	* src/rdf_init.h: Include rasqal.h to get rasqal_world just in
 	case
