@@ -218,6 +218,15 @@ and are usually lazily generated and consumed.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_stream_get_context2 ##### -->
+<para>
+
+</para>
+
+@stream: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_stream_add_map ##### -->
 <para>
 
