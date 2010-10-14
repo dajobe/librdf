@@ -99,6 +99,7 @@ librdf_iterator_have_elements
 librdf_iterator_next
 librdf_iterator_get_object
 librdf_iterator_get_context
+librdf_iterator_get_context2
 librdf_iterator_get_key
 librdf_iterator_get_value
 librdf_iterator_add_map
