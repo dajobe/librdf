@@ -523,7 +523,7 @@ librdf_query_results_to_file_handle2(librdf_query_results *query_results,
 
 #ifndef REDLAND_DISABLE_DEPRECATED
 /**
- * librdf_query_results_to_file_handle2:
+ * librdf_query_results_to_file_handle:
  * @query_results: #librdf_query_results object
  * @handle: file handle to write to
  * @format_uri: URI of syntax to format to
