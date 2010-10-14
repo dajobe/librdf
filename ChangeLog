@@ -1,4 +1,7 @@
-2010-10-13  Dave Beckett <dave@dajobe.org>
+2010-10-13  Dave Beckett  <dave@dajobe.org>
+
+	* Snapshotted redland_1_0_12 for 1.0.12 release (GIT
+	d0e92f81be57acdeaa4b0c4d8e121e49fb4bfc57)
 
 	* src/rdf_stream.c:
 	Replace one more librdf_stream_get_context()
