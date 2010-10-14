@@ -805,7 +805,7 @@ librdf_node_get_type_as_string(int type)
 /**
  * librdf_node_write:
  * @node: the node
- * @iostream: iostream to write to
+ * @iostr: iostream to write to
  *
  * Write the node to an iostream
  * 
