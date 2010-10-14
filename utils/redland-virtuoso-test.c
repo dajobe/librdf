@@ -639,7 +639,7 @@ main(int argc, char *argv[])
         count=0;
         while(!librdf_stream_end(stream)) {
           librdf_statement *stmt=librdf_stream_get_object(stream);
-          ctxt_node=(librdf_node*)librdf_stream_get_context(stream);
+          ctxt_node = librdf_stream_get_context2(stream);
           if(!stmt) {
               ok=0;
               endTest(ok, " librdf_stream_next returned NULL\n");
@@ -811,7 +811,7 @@ main(int argc, char *argv[])
         count=0;
         while(!librdf_stream_end(stream)) {
           librdf_statement *stmt=librdf_stream_get_object(stream);  /*returns SHARED pointer */
-          ctxt=(librdf_node*)librdf_stream_get_context(stream);
+          ctxt = librdf_stream_get_context2(stream);
           if(!stmt) {
               endTest(0, " librdf_stream_next returned NULL\n");
               break;

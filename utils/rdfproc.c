@@ -1190,7 +1190,7 @@ main(int argc, char *argv[])
             count=0;
             while(!librdf_stream_end(stream)) {
               librdf_statement *statement=librdf_stream_get_object(stream);
-              context_node=(librdf_node*)librdf_stream_get_context(stream);
+              context_node = librdf_stream_get_context2(stream);
               if(!statement) {
                 fprintf(stderr, "%s: librdf_stream_next returned NULL\n",
                         program);
