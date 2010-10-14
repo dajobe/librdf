@@ -596,7 +596,7 @@ librdf_stream_print(librdf_stream *stream, FILE *fh)
   
   while(!librdf_stream_end(stream)) {
     librdf_statement* statement = librdf_stream_get_object(stream);
-    librdf_node* context_node = (librdf_node*)librdf_stream_get_context(stream);
+    librdf_node* context_node = librdf_stream_get_context2(stream);
     if(!statement)
       break;
 
