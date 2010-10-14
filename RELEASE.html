@@ -27,6 +27,82 @@ pre
 <p>Not yet released.
 </p>
 
+<p>The main changes in this release are:</p>
+<ul>
+<li>Enable <code>librdf.h</code> to be used as the top-level header in addition to <code>redland.h</code></li>
+<li>Fix linking issues when building with GNU ld with DT_NEEDED disabled</li>
+</ul>
+
+<p>Issues Fixed:</p>
+<ul>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=329">Issue #0000329</a>: librdf_statement_is_complete is missing from the bindings (Redland.i)</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=348">Issue #0000348</a>: linking failure fix</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=391">Issue #0000391</a>: librdf_free_foo(0)</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=392">Issue #0000392</a>: librdf_stream_get_context returns void*</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=393">Issue #0000393</a>: librdf_storage_hashes_context_serialise_get_statement</li>
+</ul>
+
+
+<h3>General changes</h3>
+
+<p>The main header file for Redland librdf is <code>redland.h</code>
+but some applications used <code>librdf.h</code> direct, which no
+longer works in 1.0.11 since some Rasqal symbols were needed.
+<code>librdf.h</code> now includes the raptor and rasqal headers and
+<code>redland.h</code> is a simple wrapper around librdf.h
+</p>
+
+<p>Redland librdf now links with symbols in libraries used indirectly (only
+Raptor) to help systems that use GNU ld with a different linking
+model to previous versions.  This is quite technical and hard to
+understand but see Fedora's
+<a href="http://fedoraproject.org/wiki/Features/ChangeInImplicitDSOLinking">change in implicit DSO linking</a> and
+<a href="http://fedoraproject.org/wiki/UnderstandingDSOLinkChange">Understanding the (Proposed) Change to DSO Linking</a>
+that were introduced in Fedora Core 13 released in February 2010.
+Redland librdf was packed with patches to fix this, which are now merged
+into the sources.
+</p>
+
+
+<h3>Stream Class changes</h3>
+
+<p>Added <code>librdf_stream_get_context2()</code> returning a
+<code>librdf_node*</code> deprecating
+<code>librdf_stream_get_context()</code> that returns a void pointer.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=392">Issue #0000392</a>.
+</p>
+
+
+<h3>SWIG Bindings Interface</h3>
+
+<p>Export <code>librdf_statement_is_complete</code> to bindings languages.
+Fixes
+<a href="http://bugs.librdf.org/mantis/view.php?id=329">Issue #0000329</a>
+</p>
+
+<h3>Configuration changes</h3>
+
+<p>Rasqal minimum version has been 0.9.19 for some time but is now
+enforced in <code>configure</code>.</p>
+
+<p>Updated <code>configure</code> to work with newer autoconf that
+enforces <code>AC_LANG_SOURCE</code>.
+</p>
+
+<h3>Other changes</h3>
+
+<p>Updated examples to build with Raptor V2 also.
+</p>
+
+<p>The node and statement destructors for the Raptor V2 build now
+allow NULL pointers like the Raptor V1 versions.
+Related to
+<a href="http://bugs.librdf.org/mantis/view.php?id=391">Issue #0000391</a>
+which had already been fixed for other classes.
+</p>
+
+
 
 <h2 id="rel1_0_11"><a name="rel1_0_11">Redland 1.0.11 Changes</a></h2>
 
