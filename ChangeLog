@@ -1,5 +1,13 @@
 2010-10-13  Dave Beckett <dave@dajobe.org>
 
+	* src/rdf_stream.c:
+	Replace one more librdf_stream_get_context()
+
+	* docs/redland-sections.txt: Add librdf_stream_get_context2
+
+	* utils/rdfproc.c, utils/redland-virtuoso-test.c: Update rdfproc
+	and virtuoso test for librdf_stream_get_context2()
+
 	* examples/.gitignore:
 	ignore more
 
@@ -13,10 +21,9 @@
 
 	* src/rdf_stream.c, src/rdf_stream.h:
 	(librdf_stream_get_context2): Added deprecating
-	librdf_stream_get_context
+	librdf_stream_get_context()
 
-	(librdf_stream_get_context2): Returns a
-	librdf_node*
+	(librdf_stream_get_context2): Returns a librdf_node*
 
 	(librdf_stream_get_context): Deprecated for above.
 
