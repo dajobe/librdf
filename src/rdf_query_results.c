@@ -548,9 +548,9 @@ librdf_query_results_to_file_handle2(librdf_query_results *query_results,
  **/
 int
 librdf_query_results_to_file_handle(librdf_query_results *query_results, 
-                                     FILE *handle, 
-                                     librdf_uri *format_uri,
-                                     librdf_uri *base_uri)
+                                    FILE *handle, 
+                                    librdf_uri *format_uri,
+                                    librdf_uri *base_uri)
 {
   return librdf_query_results_to_file_handle2(query_results, 
                                               handle,
