@@ -65,6 +65,10 @@ librdf_stream* librdf_parser_parse_string_as_stream(librdf_parser* parser, const
 REDLAND_API
 int librdf_parser_parse_string_into_model(librdf_parser* parser, const unsigned char *string, librdf_uri* base_uri, librdf_model* model);
 REDLAND_API
+librdf_stream* librdf_parser_parse_iostream_as_stream(librdf_parser* parser, const raptor_iostream *iostream, librdf_uri* base_uri);
+REDLAND_API
+int librdf_parser_parse_iostream_into_model(librdf_parser* parser, const raptor_iostream *iostream, librdf_uri* base_uri, librdf_model* model);
+REDLAND_API
 librdf_stream* librdf_parser_parse_file_handle_as_stream(librdf_parser* parser, FILE* fh, int close_fh, librdf_uri* base_uri);
 REDLAND_API
 int librdf_parser_parse_file_handle_into_model(librdf_parser* parser, FILE *fh, int close_fh, librdf_uri* base_uri, librdf_model* model);

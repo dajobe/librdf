@@ -655,6 +655,59 @@ librdf_parser_parse_file_handle_into_model(librdf_parser* parser, FILE *fh,
 }
 
 
+/**
+ * librdf_parser_parse_iostream_as_stream:
+ * @parser: the parser
+ * @iostream: the iostream to parse
+ * @base_uri: the base URI to use or NULL
+ *
+ * Parse an iostream of content to a librdf_stream of statements.
+ * 
+ * Return value: #librdf_stream of statements or NULL
+ **/
+librdf_stream*
+librdf_parser_parse_iostream_as_stream(librdf_parser* parser, 
+                                       const raptor_iostream *iostream,
+                                       librdf_uri* base_uri) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
+  /* LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL); */
+
+  if(parser->factory->parse_iostream_as_stream)
+    return parser->factory->parse_iostream_as_stream(parser->context,
+                                                     iostream, base_uri);
+
+  return NULL;
+}
+
+
+/**
+ * librdf_parser_parse_iostream_into_model:
+ * @parser: the parser
+ * @iostream: the content to parse
+ * @base_uri: the base URI to use or NULL
+ * @model: the model to use
+ *
+ * Parse a iostream of content into an librdf_model.
+ * 
+ * Return value: non 0 on failure
+ **/
+int
+librdf_parser_parse_iostream_into_model(librdf_parser* parser, 
+                                        const raptor_iostream *iostream,
+                                        librdf_uri* base_uri, librdf_model* model) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
+  /* LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, 1); */
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
+
+  if(parser->factory->parse_iostream_into_model)
+    return parser->factory->parse_iostream_into_model(parser->context,
+                                                    iostream, base_uri, model);
+  
+  return 1;
+}
+
 #ifndef REDLAND_DISABLE_DEPRECATED
 /**
  * librdf_parser_set_error:
@@ -974,6 +1027,7 @@ main(int argc, char *argv[])
     librdf_model *model=NULL;
     librdf_parser* parser=NULL;
     librdf_stream *stream=NULL;
+    raptor_iostream *iostream=NULL;
     size_t length=strlen((const char*)file_content[i]);
     int size;
     char *accept_h;
@@ -1058,6 +1112,35 @@ main(int argc, char *argv[])
     }
     
 
+    fprintf(stderr, "%s: Adding %s as iostream, as stream\n", program, type);
+#ifdef RAPTOR_V2_AVAILABLE
+    iostream = raptor_new_iostream_from_string(world->raptor_world_ptr,
+                                               file_content[i],
+                                               length);
+#else
+    iostream = raptor_new_iostream_from_string(file_content[i],
+                                               length);
+#endif
+    if(!(stream=librdf_parser_parse_iostream_as_stream(parser, 
+                                                       iostream,
+                                                       uris[i]))) {
+      fprintf(stderr, "%s: Failed to parse RDF from iostream %d as stream\n", program, i);
+      failures++;
+      goto tidy_test;
+    }
+    librdf_model_add_statements(model, stream);
+    librdf_free_stream(stream);
+    stream=NULL;
+    
+    size=librdf_model_size(model);
+    fprintf(stderr, "%s: Model size is %d triples\n", program, size);
+    if(size != EXPECTED_TRIPLES_COUNT) {
+      fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
+              program, size, EXPECTED_TRIPLES_COUNT);
+      failures++;
+    }
+    
+
     fprintf(stderr, "%s: Adding %s counted string content\n", program, type);
     if(librdf_parser_parse_counted_string_into_model(parser, 
                                                      file_content[i],
@@ -1108,6 +1191,42 @@ main(int argc, char *argv[])
       goto tidy_test;
     }
 
+    /* test parsing iostream */
+    fprintf(stderr, "%s: Adding %s iostream content\n", program, type);
+#ifdef RAPTOR_V2_AVAILABLE
+    iostream = raptor_new_iostream_from_string(world->raptor_world_ptr,
+                                               file_content[i],
+                                               length);
+#else
+    iostream = raptor_new_iostream_from_string(file_content[i],
+                                               length);
+#endif
+    if(librdf_parser_parse_iostream_into_model(parser, 
+                                               iostream,
+                                               uris[i], model)) {
+      fprintf(stderr, "%s: Failed to parse RDF from iostream %d into model\n", program, i);
+      failures++;
+      goto tidy_test;
+    }
+
+    for(i=0; i < librdf_parser_get_namespaces_seen_count(parser); i++) {
+      const char* prefix=librdf_parser_get_namespaces_seen_prefix(parser, i);
+      librdf_uri* uri=librdf_parser_get_namespaces_seen_uri(parser, i);
+
+      fprintf(stderr, "%s: Saw namespace %d): prefix:%s URI:%s\n", program, i,
+              (!prefix ? "" : (const char*)prefix),
+              (!uri ? "(none)" : (const char*)librdf_uri_as_string(uri)));
+      
+    }
+
+    size=librdf_model_size(model);
+    fprintf(stderr, "%s: Model size is %d triples\n", program, size);
+    if(size != EXPECTED_TRIPLES_COUNT) {
+      fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
+              program, size, EXPECTED_TRIPLES_COUNT);
+      failures++;
+      goto tidy_test;
+    }
     
     fprintf(stderr, "%s: Freeing parser, model and storage\n", program);
   tidy_test:
