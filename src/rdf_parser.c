@@ -671,7 +671,7 @@ librdf_parser_parse_iostream_as_stream(librdf_parser* parser,
                                        librdf_uri* base_uri) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
-  /* LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL); */
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(iostream, raptor_iostream, NULL);
 
   if(parser->factory->parse_iostream_as_stream)
     return parser->factory->parse_iostream_as_stream(parser->context,
@@ -698,7 +698,7 @@ librdf_parser_parse_iostream_into_model(librdf_parser* parser,
                                         librdf_uri* base_uri, librdf_model* model) 
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
-  /* LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, 1); */
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(iostream, raptor_iostream, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 1);
 
   if(parser->factory->parse_iostream_into_model)

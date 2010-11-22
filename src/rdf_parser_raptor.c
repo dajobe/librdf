@@ -698,7 +698,7 @@ librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler(raptor_www *www,
  *
  * Retrieve the content at URI/string and parse it into a #librdf_stream.
  *
- * Only one of uri, string, and iostream may be given
+ * Precisely one of uri, string, and iostream must be non-NULL
  *
  **/
 static librdf_stream*
@@ -940,6 +940,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
           return NULL;
         }
       }
+      /* assert: 0 <= nread <= BUFLEN */
     } while(nread == BUFLEN);
 #endif
   } else {
@@ -1243,6 +1244,7 @@ librdf_parser_raptor_parse_into_model_common(void *context,
           return NULL;
         }
       }
+      /* assert: 0 <= nread <= BUFLEN */
     } while(nread == BUFLEN);
   }
 #endif
