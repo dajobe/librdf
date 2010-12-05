@@ -953,13 +953,16 @@ librdf_query_results_formats_check(librdf_world* world,
                                    const char *name, librdf_uri* uri,
                                    const char *mime_type)
 {
+  int flags = RASQAL_QUERY_RESULTS_FORMAT_FLAG_READER;
+  
   librdf_world_open(world);
 
   /* FIXME - this should use some kind of registration but for now
    * it is safe to assume Rasqal does it all
    */
-  return rasqal_query_results_formats_check(world->rasqal_world_ptr,
-                                            name, (raptor_uri*)uri, mime_type);
+  return rasqal_query_results_formats_check2(world->rasqal_world_ptr,
+                                             name, (raptor_uri*)uri, mime_type,
+                                             flags);
 }
 
 

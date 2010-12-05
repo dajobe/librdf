@@ -53,6 +53,14 @@ struct librdf_query_results_s
 };
 
 
+/* FIXME - remove when Rasqal minimum version is 0.9.21 or newer */
+#if !defined(RASQAL_VERSION) || RASQAL_VERSION < 921
+
+#define RASQAL_QUERY_RESULTS_FORMAT_FLAG_READER 0
+#define rasqal_query_results_formats_check2(world, name, uri, mime_type, flags) rasqal_query_results_formats_check(world, name, uri, mime_type)
+
+#endif
+
 #ifdef RASQAL_H
 /* rasqal.h will have defined this */
 #else
