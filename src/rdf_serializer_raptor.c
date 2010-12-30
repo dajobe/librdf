@@ -684,7 +684,8 @@ librdf_serializer_raptor_constructor(librdf_world *world)
     syntax_label = desc->label;
     if(desc->mime_types)
       mime_type = desc->mime_types[0].mime_type;
-    uri_string = (const unsigned char *)desc->uri_string;
+    if(desc->uri_strings)
+      uri_string = (const unsigned char *)desc->uri_strings[0];
 
 #else
     if(raptor_serializers_enumerate(i, &syntax_name, &syntax_label, 
