@@ -960,9 +960,15 @@ librdf_query_results_formats_check(librdf_world* world,
   /* FIXME - this should use some kind of registration but for now
    * it is safe to assume Rasqal does it all
    */
+#if RASQAL_VERSION >= 921
+  return rasqal_query_results_formats_check(world->rasqal_world_ptr,
+                                            name, (raptor_uri*)uri, mime_type,
+                                            flags);
+#else
   return rasqal_query_results_formats_check2(world->rasqal_world_ptr,
                                              name, (raptor_uri*)uri, mime_type,
                                              flags);
+#endif
 }
 
 
@@ -995,9 +1001,29 @@ librdf_query_results_formats_enumerate(librdf_world* world,
   /* FIXME - this should use some kind of registration but for now
    * it is safe to assume Rasqal does it all
    */
+#if RASQAL_VERSION >= 921
+  if(1) {
+    const raptor_syntax_description *desc;
+    desc = rasqal_world_get_query_results_format_description(world->rasqal_world_ptr, counter);
+    if(desc) {
+      /* First element of names, uri_strings, mime_types arrays is always the main one */
+      if(name && desc->names)
+        *name = desc->names[0];
+      if(label)
+        *name = desc->label;
+      if(uri_string && desc->uri_strings)
+        *uri_string = (const unsigned char *)desc->uri_strings[0];
+      if(mime_type && desc->mime_types)
+        *mime_type = desc->mime_types[0].mime_type;
+      return 0;
+    }
+  }
+  return -1;
+#else
   return rasqal_query_results_formats_enumerate(world->rasqal_world_ptr,
                                                 counter, name, label,
                                                 uri_string, mime_type,
                                                 /*flags=*/ NULL);
+#endif
 }
 

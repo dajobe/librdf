@@ -361,7 +361,7 @@ rasqal_redland_new_triples_source(rasqal_query* rdf_query,
                                             source_uri, source_uri,
                                             RASQAL_DATA_GRAPH_NAMED,
                                             NULL, NULL, NULL);
-        rasqal_query_add_data_graph2(rdf_query, dg);
+        rasqal_query_add_data_graph(rdf_query, dg);
       }
 #endif
 
@@ -1289,8 +1289,13 @@ librdf_query_rasqal_new_results_formatter(librdf_query_results* query_results,
   librdf_query_results_formatter* qrf;
 
   rasqal_world_ptr = query_results->query->world->rasqal_world_ptr;
-  
-#if RASQAL_VERSION >= 918
+
+#if RASQAL_VERSION >= 921
+  formatter = rasqal_new_query_results_formatter(rasqal_world_ptr,
+                                                 name,
+                                                 mime_type,
+                                                 (raptor_uri*)format_uri);
+#elif RASQAL_VERSION >= 918
   formatter = rasqal_new_query_results_formatter2(rasqal_world_ptr,
                                                   name,
                                                   mime_type,
