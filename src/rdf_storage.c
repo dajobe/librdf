@@ -503,9 +503,13 @@ librdf_new_storage(librdf_world *world,
   
   librdf_world_open(world);
 
-  factory=librdf_get_storage_factory(world, storage_name);
-  if(!factory)
+  factory = librdf_get_storage_factory(world, storage_name);
+  if(!factory) {
+    librdf_log(world, 
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "storage '%s' not found", name);
     return NULL;
+  }
 
   options_hash=librdf_new_hash(world, NULL);
   if(!options_hash)
@@ -549,9 +553,13 @@ librdf_new_storage_with_options(librdf_world *world,
   
   librdf_world_open(world);
 
-  factory=librdf_get_storage_factory(world, storage_name);
-  if(!factory)
+  factory = librdf_get_storage_factory(world, storage_name);
+  if(!factory) {
+    librdf_log(world, 
+               0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "storage '%s' not found", name);
     return NULL;
+  }
 
   options_hash=librdf_new_hash_from_hash(options);
   if(!options_hash)
