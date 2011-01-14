@@ -183,7 +183,7 @@ librdf_parser_register_factory(librdf_world *world,
 /**
  * librdf_get_parser_factory:
  * @world: redland world object
- * @name: the name of the factory (NULL or empty string if don't care)
+ * @name: the name of the factory (or NULL or empty string if don't care)
  * @mime_type: the MIME type of the syntax (NULL or empty if don't care)
  * @type_uri: URI of syntax (NULL if not used)
  *
@@ -323,7 +323,7 @@ librdf_parser_check_name(librdf_world* world, const char *name)
 /**
  * librdf_new_parser:
  * @world: redland world object
- * @name: the parser factory name
+ * @name: the parser factory name (or NULL or empty string if don't care)
  * @mime_type: the MIME type of the syntax (NULL if not used)
  * @type_uri: URI of syntax (NULL if not used)
  *
@@ -343,9 +343,23 @@ librdf_new_parser(librdf_world *world,
 
   librdf_world_open(world);
 
-  factory=librdf_get_parser_factory(world, name, mime_type, type_uri);
-  if(!factory)
+  factory = librdf_get_parser_factory(world, name, mime_type, type_uri);
+  if(!factory) {
+    if(name)
+      librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+                 "parser '%s' not found", name);
+    else if(mime_type)
+      librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+                 "parser for mime_type '%s' not found", mime_type);
+    else if(type_uri)
+      librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+                 "parser for type URI '%s' not found", 
+                 librdf_uri_as_string(type_uri));
+    else
+      librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+                 "default parser not found");
     return NULL;
+  }
 
   return librdf_new_parser_from_factory(world, factory);
 }
