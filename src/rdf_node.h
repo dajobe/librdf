@@ -62,7 +62,6 @@ extern "C" {
  * librdf_node_is_literal() or librdf_node_is_blank().
  *
  */
-#ifdef LIBRDF_USE_RAPTOR_TERM
 typedef enum {
   LIBRDF_NODE_TYPE_UNKNOWN   = RAPTOR_TERM_TYPE_UNKNOWN,
   LIBRDF_NODE_TYPE_RESOURCE  = RAPTOR_TERM_TYPE_URI,
@@ -70,16 +69,6 @@ typedef enum {
   LIBRDF_NODE_TYPE_BLANK     = RAPTOR_TERM_TYPE_BLANK,
   LIBRDF_NODE_TYPE_LAST      = LIBRDF_NODE_TYPE_BLANK
 } librdf_node_type;
-#else
-typedef enum {
-  LIBRDF_NODE_TYPE_UNKNOWN   = 0,  /* To catch uninitialised nodes */
-  LIBRDF_NODE_TYPE_RESOURCE  = 1,  /* rdf:Resource (& rdf:Property) - has a URI */
-  LIBRDF_NODE_TYPE_LITERAL   = 2,  /* rdf:Literal - has an XML string, language, XML space */
-  /* node type 3 is unused at present. Do not renumber this list. */
-  LIBRDF_NODE_TYPE_BLANK     = 4,  /* blank node has an identifier string */
-  LIBRDF_NODE_TYPE_LAST      = LIBRDF_NODE_TYPE_BLANK
-} librdf_node_type;
-#endif
 
 
 #ifdef LIBRDF_INTERNAL

@@ -33,26 +33,6 @@ extern "C" {
 void librdf_init_raptor(librdf_world* world);
 void librdf_finish_raptor(librdf_world* world);
 
-/* raptor1 -> raptor2 migration */
-/* use preprocessor macros to map raptor2 calls to raptor1 if raptor2 is not available */
-#ifndef RAPTOR_V2_AVAILABLE
-
-#define raptor_new_iostream_to_file_handle(world, fh) raptor_new_iostream_to_file_handle(fh)
-#define raptor_new_iostream_to_string(world, string_p, len_p, malloc) raptor_new_iostream_to_string(string_p, len_p, malloc)
-#define raptor_iostream_write_bytes(ptr, size, nmemb, iostr) raptor_iostream_write_bytes(iostr, ptr, size, nmemb)
-#define raptor_iostream_write_byte(byte, iostr) raptor_iostream_write_byte(iostr, byte)
-#define raptor_iostream_counted_string_write(string, len, iostr) raptor_iostream_write_counted_string(iostr, string, len)
-#define raptor_iostream_string_write(string, iostr) raptor_iostream_write_string(iostr, string)
-
-#define raptor_string_ntriples_write(str, len, delim, iostr) raptor_iostream_write_string_ntriples(iostr, str, len, delim)
-
-#define raptor_locator_format(buffer, length, locator) raptor_format_locator(buffer, length, locator)
-#define raptor_locator_print(locator, fh) raptor_print_locator(fh, locator)
-
-#define raptor_data_free_handler raptor_sequence_free_handler*
-#endif /* !RAPTOR_V2_AVAILABLE */
-
-
 #ifdef __cplusplus
 }
 #endif

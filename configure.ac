@@ -3,7 +3,7 @@ dnl
 dnl configure.ac - top level autoconf file for Redland
 dnl (Process this file with autoconf to produce a configure script.)
 dnl
-dnl Copyright (C) 2000-2010 David Beckett http://www.dajobe.org/
+dnl Copyright (C) 2000-2011 David Beckett http://www.dajobe.org/
 dnl Copyright (C) 2000-2005 University of Bristol, UK http://www.bristol.ac.uk/
 dnl 
 dnl This package is Free Software and part of Redland http://librdf.org/
@@ -25,7 +25,7 @@ dnl
 
 AC_INIT([Redland librdf RDF API Library], 1.0.13, http://bugs.librdf.org/, redland)
 AC_PREREQ(2.53)
-AC_CONFIG_SRCDIR(src/rdf_node.c)
+AC_CONFIG_SRCDIR(src/rdf_term.c)
 AC_REVISION($Revision$)dnl
 AM_CONFIG_HEADER(src/rdf_config.h)
 AC_CONFIG_AUX_DIR(build)
@@ -457,7 +457,7 @@ rdf_parsers_available=
 # built with raptor2 and can then enforce raptor2 is required
 AC_MSG_CHECKING(for rasqal)
 
-RASQAL_MIN_VERSION=0.9.19
+RASQAL_MIN_VERSION=0.9.22
 RASQAL_MAX_VERSION=0.9.99
 AC_SUBST(RASQAL_MIN_VERSION)
 AC_SUBST(RASQAL_MAX_VERSION)
@@ -481,79 +481,40 @@ LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG rasqal --libs` $LIBRDF_EXTERNAL_LIBS"
 rdf_query="rasqal(system $RASQAL_VERSION)"
 AC_MSG_RESULT(system $RASQAL_VERSION)
 
-AC_MSG_CHECKING(if rasqal was built with raptor2)
-RASQAL_HAVE_RAPTOR2_API=`$PKG_CONFIG rasqal --variable=have_raptor2_api 2>/dev/null`
-if test "X$RASQAL_HAVE_RAPTOR2_API" = X1; then
-  AC_MSG_RESULT(yes - raptor2 is required)
-else
-  AC_MSG_RESULT(no - raptor1 or raptor2 are allowed)
-  RASQAL_HAVE_RAPTOR2_API=0
-fi
-
-
-
 
 # Check for raptor
-RAPTOR_MIN_VERSION=1.4.19
-RAPTOR2_MIN_VERSION=1.9.2
+RAPTOR_MIN_VERSION=2.0.0
 
-raptor2=no
-AC_ARG_ENABLE(raptor2, [  --enable-raptor2  Enable use of raptor2], raptor2="$enableval", raptor2="no")
-
-if test "$RASQAL_HAVE_RAPTOR2_API" = 1; then
-  raptor2=yes
-fi
 
 
 AC_MSG_CHECKING(for raptor)
 
-# When raptor2 is stable, this can be changed to prefer raptor2
-# For now an explicit configure --enable-raptor2 is required.
-# unless it is required because rasqal was built with raptor2
-if test "X$raptor2" = "Xyes"; then
-  RAPTOR_MIN_VERSION=$RAPTOR2_MIN_VERSION
-
-  if $PKG_CONFIG raptor2 --exists; then
-    RAPTOR_CONFIG="$PKG_CONFIG raptor2"
-    RAPTOR_PACKAGE="raptor2"
-  else
-    AC_MSG_ERROR(Raptor2 is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
-  fi
+if $PKG_CONFIG raptor2 --exists; then
+  :
 else
-  if $PKG_CONFIG raptor --exists; then
-    RAPTOR_CONFIG="$PKG_CONFIG raptor"
-    RAPTOR_PACKAGE="raptor"
-  else
-    AC_MSG_ERROR(Raptor is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
-  fi
+  AC_MSG_ERROR(Raptor2 is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
 fi
 
-RAPTOR_VERSION=`$RAPTOR_CONFIG --modversion 2>/dev/null`
+RAPTOR_VERSION=`$PKG_CONFIG raptor2 --modversion 2>/dev/null`
 
-if $RAPTOR_CONFIG --atleast-version=$RAPTOR_MIN_VERSION; then
+if $PKG_CONFIG raptor2 --atleast-version=$RAPTOR_MIN_VERSION; then
   :
 else
   AC_MSG_ERROR(Installed raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
 fi
 
-LIBRDF_DIRECT_LIBS="`$RAPTOR_CONFIG --libs`"
+LIBRDF_DIRECT_LIBS="`$PKG_CONFIG raptor2 --libs`"
 
-LIBRDF_EXTERNAL_CPPFLAGS="`$RAPTOR_CONFIG --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG raptor2 --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
 LIBRDF_EXTERNAL_LIBS="$LIBRDF_DIRECT_LIBS $LIBRDF_EXTERNAL_LIBS"
 
 rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
 AC_MSG_RESULT(system $RAPTOR_VERSION)
 
 AC_SUBST(RAPTOR_MIN_VERSION)
-AC_SUBST(RAPTOR_PACKAGE)
 
-AM_CONDITIONAL(RAPTOR2, test "X$raptor2" = "Xyes")
-if test "X$raptor2" = "Xyes"; then
-  AC_DEFINE(HAVE_RAPTOR2_API, 1, [Raptor2 API is available])
-  HAVE_RAPTOR2_API=1
-else
-  HAVE_RAPTOR2_API=0
-fi
+dnl for redland.pc.in mostly
+HAVE_RAPTOR2_API=1
 AC_SUBST(HAVE_RAPTOR2_API)
 
 

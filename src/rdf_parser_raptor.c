@@ -126,11 +126,9 @@ librdf_parser_raptor_init(librdf_parser *parser, void *context)
   if(!pcontext->bnode_hash)
     return 1;
 
-#ifdef RAPTOR_V2_AVAILABLE
-  pcontext->rdf_parser = raptor_new_parser(parser->world->raptor_world_ptr, pcontext->parser_name);
-#else
-  pcontext->rdf_parser = raptor_new_parser(pcontext->parser_name);
-#endif
+  pcontext->rdf_parser = raptor_new_parser(parser->world->raptor_world_ptr,
+                                           pcontext->parser_name);
+
   if(!pcontext->rdf_parser)
     return 1;
 
@@ -154,11 +152,7 @@ librdf_parser_raptor_terminate(void *context)
     librdf_parser_raptor_serialise_finished(pcontext->stream_context);
 
   if(pcontext->www)
-#ifdef RAPTOR_V2_AVAILABLE
     raptor_free_www(pcontext->www);
-#else
-    raptor_www_free(pcontext->www);
-#endif
   
   if(pcontext->rdf_parser)
     raptor_free_parser(pcontext->rdf_parser);
@@ -182,9 +176,6 @@ librdf_parser_raptor_terminate(void *context)
  */
 static void
 librdf_parser_raptor_new_statement_handler(void *context,
-#ifndef RAPTOR_V2_AVAILABLE
-                                           const
-#endif
                                            raptor_statement *rstatement)
 {
   librdf_parser_raptor_stream_context* scontext=(librdf_parser_raptor_stream_context*)context;
@@ -197,29 +188,15 @@ librdf_parser_raptor_new_statement_handler(void *context,
   if(!statement)
     return;
 
-#ifdef RAPTOR_V2_AVAILABLE
   if(rstatement->subject->type == RAPTOR_TERM_TYPE_BLANK) {
     node = librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->subject->value.blank.string);
   } else if (rstatement->subject->type == RAPTOR_TERM_TYPE_URI) {
     node = librdf_new_node_from_uri(world, (librdf_uri*)rstatement->subject->value.uri);
-  }
-#else
-  if(rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
-    node = librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->subject);
-  } else if (rstatement->subject_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
-    node = librdf_new_node_from_uri(world, (librdf_uri*)rstatement->subject);
-  }
-#endif
-  else {
+  } else {
     librdf_log(world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
                "Unknown Raptor subject identifier type %d",
-#ifdef RAPTOR_V2_AVAILABLE
-               rstatement->subject->type
-#else
-               rstatement->subject_type
-#endif
-               );
+               rstatement->subject->type);
     librdf_free_statement(statement);
     return;
   }
@@ -235,36 +212,13 @@ librdf_parser_raptor_new_statement_handler(void *context,
   librdf_statement_set_subject(statement, node);
   
 
-#ifdef RAPTOR_V2_AVAILABLE
   if(rstatement->predicate->type == RAPTOR_TERM_TYPE_URI) {
     node = librdf_new_node_from_uri(world, (librdf_uri*)rstatement->predicate->value.uri);
-  }
-#else
-  if(rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_ORDINAL) {
-    /* FIXME - but only a little
-     * Do I really need to do log10(ordinal) [or /10 and count] + 1 ? 
-     * See also librdf_heuristic_gen_name for some code to repurpose.
-     */
-    char ordinal_buffer[100]; 
-    int ordinal = *(int*)rstatement->predicate;
-    sprintf(ordinal_buffer, "http://www.w3.org/1999/02/22-rdf-syntax-ns#_%d", ordinal);
-    
-    node = librdf_new_node_from_uri_string(world, (const unsigned char*)ordinal_buffer);
-  } else if (rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE ||
-             rstatement->predicate_type == RAPTOR_IDENTIFIER_TYPE_PREDICATE) {
-    node = librdf_new_node_from_uri(world, (librdf_uri*)rstatement->predicate);
-  }
-#endif
-  else {
+  } else {
     librdf_log(world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
                "Unknown Raptor predicate identifier type %d",
-#ifdef RAPTOR_V2_AVAILABLE
-               rstatement->predicate->type
-#else
-               rstatement->predicate_type
-#endif
-               );
+               rstatement->predicate->type);
     librdf_free_statement(statement);
     return;
   }
@@ -279,7 +233,6 @@ librdf_parser_raptor_new_statement_handler(void *context,
 
   librdf_statement_set_predicate(statement, node);
 
-#ifdef RAPTOR_V2_AVAILABLE
   if(rstatement->object->type == RAPTOR_TERM_TYPE_LITERAL) {
     node = librdf_new_node_from_typed_literal(world,
                                               rstatement->object->value.literal.string,
@@ -289,40 +242,11 @@ librdf_parser_raptor_new_statement_handler(void *context,
     node = librdf_new_node_from_blank_identifier(world, rstatement->object->value.blank.string);
   } else if(rstatement->object->type == RAPTOR_TERM_TYPE_URI) {
     node = librdf_new_node_from_uri(world, (librdf_uri*)rstatement->object->value.uri);
-  }
-#else
-  if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_LITERAL ||
-     rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL) {
-    int is_xml_literal = (rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_XML_LITERAL);
-    librdf_uri *datatype_uri = (librdf_uri*)rstatement->object_literal_datatype;
-    
-    if(is_xml_literal) {
-      node = librdf_new_node_from_literal(world,
-                                          (const unsigned char*)rstatement->object,
-                                          (const char*)rstatement->object_literal_language,
-                                          is_xml_literal);
-    } else {
-      node = librdf_new_node_from_typed_literal(world,
-                                                (const unsigned char*)rstatement->object,
-                                                (const char*)rstatement->object_literal_language,
-                                                datatype_uri);
-    }
-  } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_ANONYMOUS) {
-    node=librdf_new_node_from_blank_identifier(world, (const unsigned char*)rstatement->object);
-  } else if(rstatement->object_type == RAPTOR_IDENTIFIER_TYPE_RESOURCE) {
-    node=librdf_new_node_from_uri(world, (librdf_uri*)rstatement->object);
-  }
-#endif
-  else {
+  } else {
     librdf_log(world,
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
                "Unknown Raptor object identifier type %d",
-#ifdef RAPTOR_V2_AVAILABLE
-               rstatement->object->type
-#else
-               rstatement->object_type
-#endif
-               );
+               rstatement->object->type);
     librdf_free_statement(statement);
     return;
   }
@@ -408,36 +332,6 @@ librdf_parser_raptor_namespace_handler(void* user_data,
 }
 
 
-#ifndef RAPTOR_V2_AVAILABLE
-static void
-librdf_parser_raptor_error_handler(void *data, raptor_locator *locator,
-                                   const char *message) 
-{
-  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)data;
-
-  pcontext->errors++;
-
-  raptor_parse_abort(pcontext->rdf_parser);
-
-  librdf_log_simple(pcontext->parser->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, locator, message);
-}
-#endif
-
-
-#ifndef RAPTOR_V2_AVAILABLE
-static void
-librdf_parser_raptor_warning_handler(void *data, raptor_locator *locator,
-                                     const char *message) 
-{
-  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)data;
-
-  pcontext->warnings++;
-
-  librdf_log_simple(pcontext->parser->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_PARSER, locator, message);
-}
-#endif
-
-
 /* FIXME: Yeah?  What about it? */
 #define RAPTOR_IO_BUFFER_LEN 1024
 
@@ -461,13 +355,9 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
     int len, ret;
 
     len = fread(buffer, 1, RAPTOR_IO_BUFFER_LEN, context->fh);
-#ifdef RAPTOR_V2_AVAILABLE
     ret = raptor_parser_parse_chunk(context->pcontext->rdf_parser, buffer, len,
                                     (len < RAPTOR_IO_BUFFER_LEN));
-#else
-    ret = raptor_parse_chunk(context->pcontext->rdf_parser, buffer, len,
-                             (len < RAPTOR_IO_BUFFER_LEN));
-#endif
+
     if(ret) {
       status=(-1);
       break; /* failed and done */
@@ -493,10 +383,6 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
 
 static unsigned char*
 librdf_parser_raptor_generate_id_handler(void *user_data,
-#ifdef HAVE_RAPTOR2_API
-#else
-                                         raptor_genid_type type,
-#endif
                                          unsigned char *user_bnodeid) 
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)user_data;
@@ -539,14 +425,10 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
   librdf_stream *stream;
   int rc;
   int need_base_uri;
-
-#ifdef RAPTOR_V2_AVAILABLE
   const raptor_syntax_description *desc;
-#endif
 
   librdf_world_open(pcontext->parser->world);
 
-#ifdef RAPTOR_V2_AVAILABLE
   desc = raptor_parser_get_description(pcontext->rdf_parser);
   if(!desc) {
     librdf_log(pcontext->parser->world,
@@ -556,9 +438,6 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
     return NULL;
   }
   need_base_uri = desc->flags & RAPTOR_SYNTAX_NEED_BASE_URI;
-#else
-  need_base_uri = raptor_get_need_base_uri(pcontext->rdf_parser);
-#endif
 
   if(need_base_uri && !base_uri) {
     librdf_log(pcontext->parser->world,
@@ -591,15 +470,11 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
 
   if(pcontext->nspace_uris)
     raptor_free_sequence(pcontext->nspace_uris);
-#ifdef RAPTOR_V2_AVAILABLE
+
   pcontext->nspace_uris = raptor_new_sequence((raptor_data_free_handler)librdf_free_uri, NULL);
-#else
-  pcontext->nspace_uris = raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
-#endif
   if(!pcontext->nspace_uris)
     goto oom;
   
-#ifdef RAPTOR_V2_AVAILABLE
   raptor_parser_set_statement_handler(pcontext->rdf_parser, scontext,
                                       librdf_parser_raptor_new_statement_handler);
   raptor_parser_set_namespace_handler(pcontext->rdf_parser, pcontext,
@@ -608,20 +483,6 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
   raptor_world_set_generate_bnodeid_handler(pcontext->parser->world->raptor_world_ptr,
                                             pcontext,
                                             librdf_parser_raptor_generate_id_handler);
-#else
-  raptor_set_statement_handler(pcontext->rdf_parser, scontext,
-                               librdf_parser_raptor_new_statement_handler);
-  raptor_set_namespace_handler(pcontext->rdf_parser, pcontext,
-                               librdf_parser_raptor_namespace_handler);
-
-  raptor_set_error_handler(pcontext->rdf_parser, pcontext,
-                           librdf_parser_raptor_error_handler);
-  raptor_set_warning_handler(pcontext->rdf_parser, pcontext,
-                             librdf_parser_raptor_warning_handler);
-
-  raptor_set_generate_id_handler(pcontext->rdf_parser, pcontext,
-                                 librdf_parser_raptor_generate_id_handler);
-#endif
 
   
   
@@ -634,12 +495,9 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
                                  pcontext->parser);
 
   /* Start the parse */
-  stream=NULL;
-#ifdef RAPTOR_V2_AVAILABLE
+  stream = NULL;
+
   rc = raptor_parser_parse_start(pcontext->rdf_parser, (raptor_uri*)base_uri);
-#else
-  rc = raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
-#endif
   if(!rc) {
     /* start parsing; initialises scontext->statements, scontext->current */
     librdf_parser_raptor_get_next_statement(scontext);
@@ -677,11 +535,9 @@ librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler(raptor_www *www,
   int len = size*nmemb;
   int rc;
 
-#ifdef RAPTOR_V2_AVAILABLE
-  rc = raptor_parser_parse_chunk(scontext->pcontext->rdf_parser, (const unsigned char*)ptr, len, 0);
-#else
-  rc = raptor_parse_chunk(scontext->pcontext->rdf_parser, (const unsigned char*)ptr, len, 0);
-#endif
+  rc = raptor_parser_parse_chunk(scontext->pcontext->rdf_parser,
+                                 (const unsigned char*)ptr, len, 0);
+
   if(rc)
     raptor_www_abort(www, "Parsing failed");
 }
@@ -711,15 +567,11 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   librdf_stream *stream;
   int need_base_uri;
   int status;
-
-#ifdef RAPTOR_V2_AVAILABLE
   const raptor_syntax_description *desc;
-#endif
 
   if(!base_uri && uri)
     base_uri=uri;
   
-#ifdef RAPTOR_V2_AVAILABLE
   desc = raptor_parser_get_description(pcontext->rdf_parser);
   if(!desc) {
     librdf_log(pcontext->parser->world,
@@ -729,9 +581,6 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     return NULL;
   }
   need_base_uri = desc->flags & RAPTOR_SYNTAX_NEED_BASE_URI;
-#else
-  need_base_uri = raptor_get_need_base_uri(pcontext->rdf_parser);
-#endif
 
   if(need_base_uri && !base_uri) {
     librdf_log(pcontext->parser->world,
@@ -790,15 +639,11 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
 
   if(pcontext->nspace_uris)
     raptor_free_sequence(pcontext->nspace_uris);
-#ifdef RAPTOR_V2_AVAILABLE
+
   pcontext->nspace_uris = raptor_new_sequence((raptor_data_free_handler)librdf_free_uri, NULL);
-#else
-  pcontext->nspace_uris = raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
-#endif
   if(!pcontext->nspace_uris)
     goto oom;
   
-#ifdef RAPTOR_V2_AVAILABLE
   raptor_parser_set_statement_handler(pcontext->rdf_parser, scontext,
                                       librdf_parser_raptor_new_statement_handler);
   raptor_parser_set_namespace_handler(pcontext->rdf_parser, pcontext,
@@ -807,20 +652,6 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   raptor_world_set_generate_bnodeid_handler(pcontext->parser->world->raptor_world_ptr,
                                             pcontext,
                                             librdf_parser_raptor_generate_id_handler);
-#else
-  raptor_set_statement_handler(pcontext->rdf_parser, scontext,
-                               librdf_parser_raptor_new_statement_handler);
-  raptor_set_namespace_handler(pcontext->rdf_parser, pcontext,
-                               librdf_parser_raptor_namespace_handler);
-
-  raptor_set_error_handler(pcontext->rdf_parser, pcontext,
-                           librdf_parser_raptor_error_handler);
-  raptor_set_warning_handler(pcontext->rdf_parser, pcontext,
-                             librdf_parser_raptor_warning_handler);
-
-  raptor_set_generate_id_handler(pcontext->rdf_parser, pcontext,
-                                 librdf_parser_raptor_generate_id_handler);
-#endif
 
   if(pcontext->parser->uri_filter)
     raptor_parser_set_uri_filter(pcontext->rdf_parser,
@@ -830,15 +661,10 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   if(uri) {
     const char *accept_h;
 
-#ifdef RAPTOR_V2_AVAILABLE
     if(pcontext->www)
       raptor_free_www(pcontext->www);
+
     pcontext->www = raptor_new_www(pcontext->parser->world->raptor_world_ptr);
-#else
-    if(pcontext->www)
-      raptor_www_free(pcontext->www);
-    pcontext->www = raptor_www_new();
-#endif
     if(!pcontext->www)
       goto oom;
     
@@ -852,52 +678,33 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
                                        librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler,
                                        scontext);
 
-#ifdef RAPTOR_V2_AVAILABLE
     status = raptor_parser_parse_start(pcontext->rdf_parser, (raptor_uri*)base_uri);
-#else
-    status = raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
-#endif
     if(status) {
-#ifdef RAPTOR_V2_AVAILABLE
       raptor_free_www(pcontext->www);
-#else
-      raptor_www_free(pcontext->www);
-#endif
-      pcontext->www=NULL;
+
+      pcontext->www = NULL;
       librdf_parser_raptor_serialise_finished((void*)scontext);
       return NULL;
     }
     
     raptor_www_fetch(pcontext->www, (raptor_uri*)uri);
-#ifdef RAPTOR_V2_AVAILABLE
     raptor_parser_parse_chunk(pcontext->rdf_parser, NULL, 0, 1);
 
     raptor_free_www(pcontext->www);
-#else
-    raptor_parse_chunk(pcontext->rdf_parser, NULL, 0, 1);
-
-    raptor_www_free(pcontext->www);
-#endif
 
     pcontext->www = NULL;
   } else {
-#ifdef RAPTOR_V2_AVAILABLE
-    status = raptor_parser_parse_start(pcontext->rdf_parser, (raptor_uri*)base_uri);
-#else
-    status = raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
-#endif
+    status = raptor_parser_parse_start(pcontext->rdf_parser,
+                                       (raptor_uri*)base_uri);
     if(status) {
       librdf_parser_raptor_serialise_finished((void*)scontext);
       return NULL;
     }
     
     if(!length)
-      length=strlen((const char*)string);
-#ifdef RAPTOR_V2_AVAILABLE
+      length = strlen((const char*)string);
+
     raptor_parser_parse_chunk(pcontext->rdf_parser, string, length, 1);
-#else
-    raptor_parse_chunk(pcontext->rdf_parser, string, length, 1);
-#endif
   }
   
 
@@ -1017,15 +824,11 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
   librdf_parser_raptor_stream_context* scontext;
   int need_base_uri;
-
-#ifdef RAPTOR_V2_AVAILABLE
   const raptor_syntax_description *desc;
-#endif
 
   if(!base_uri)
     base_uri=uri;
 
-#ifdef RAPTOR_V2_AVAILABLE
   desc = raptor_parser_get_description(pcontext->rdf_parser);
   if(!desc) {
     librdf_log(pcontext->parser->world,
@@ -1035,9 +838,6 @@ librdf_parser_raptor_parse_into_model_common(void *context,
     return -1;
   }
   need_base_uri = desc->flags & RAPTOR_SYNTAX_NEED_BASE_URI;
-#else
-  need_base_uri = raptor_get_need_base_uri(pcontext->rdf_parser);
-#endif
   
   if(need_base_uri && !base_uri) {
     librdf_log(pcontext->parser->world,
@@ -1066,15 +866,11 @@ librdf_parser_raptor_parse_into_model_common(void *context,
 
   if(pcontext->nspace_uris)
     raptor_free_sequence(pcontext->nspace_uris);
-#ifdef RAPTOR_V2_AVAILABLE
+
   pcontext->nspace_uris = raptor_new_sequence((raptor_data_free_handler)librdf_free_uri, NULL);
-#else
-  pcontext->nspace_uris = raptor_new_sequence((raptor_sequence_free_handler*)librdf_free_uri, NULL);
-#endif
   if(!pcontext->nspace_uris)
     goto oom;
 
-#ifdef RAPTOR_V2_AVAILABLE
   raptor_parser_set_statement_handler(pcontext->rdf_parser, scontext,
                                       librdf_parser_raptor_new_statement_handler);
   raptor_parser_set_namespace_handler(pcontext->rdf_parser, pcontext,
@@ -1083,20 +879,6 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   raptor_world_set_generate_bnodeid_handler(pcontext->parser->world->raptor_world_ptr,
                                             pcontext,
                                             librdf_parser_raptor_generate_id_handler);
-#else
-  raptor_set_statement_handler(pcontext->rdf_parser, scontext,
-                               librdf_parser_raptor_new_statement_handler);
-  raptor_set_namespace_handler(pcontext->rdf_parser, pcontext,
-                               librdf_parser_raptor_namespace_handler);
-
-  raptor_set_error_handler(pcontext->rdf_parser, pcontext,
-                           librdf_parser_raptor_error_handler);
-  raptor_set_warning_handler(pcontext->rdf_parser, pcontext,
-                             librdf_parser_raptor_warning_handler);
-
-  raptor_set_generate_id_handler(pcontext->rdf_parser, pcontext,
-                                 librdf_parser_raptor_generate_id_handler);
-#endif
 
   /* direct into model */
   scontext->model=model;
@@ -1106,7 +888,6 @@ librdf_parser_raptor_parse_into_model_common(void *context,
                                  librdf_parser_raptor_relay_filter,
                                  pcontext->parser);
     
-#ifdef RAPTOR_V2_AVAILABLE
   if(uri) {
     status = raptor_parser_parse_uri(pcontext->rdf_parser, (raptor_uri*)uri,
                                      (raptor_uri*)base_uri);
@@ -1120,21 +901,6 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   } else {
     status = raptor_parser_parse_file_stream(pcontext->rdf_parser, fh, NULL, (raptor_uri*)base_uri);
   }
-#else
-  if(uri) {
-    status = raptor_parse_uri(pcontext->rdf_parser, (raptor_uri*)uri,
-                              (raptor_uri*)base_uri);
-  } else if (string != NULL) {
-    status = raptor_start_parse(pcontext->rdf_parser, (raptor_uri*)base_uri);
-    if(!status) {
-      if(!length)
-        length = strlen((const char*)string);
-      status = raptor_parse_chunk(pcontext->rdf_parser, string, length, 1);
-    }
-  } else {
-    status = raptor_parse_file_stream(pcontext->rdf_parser, fh, NULL, (raptor_uri*)base_uri);
-  }
-#endif
 
   librdf_parser_raptor_serialise_finished((void*)scontext);
 
@@ -1392,22 +1158,14 @@ librdf_parser_raptor_get_feature(void* context, librdf_uri *feature)
     return librdf_new_node_from_typed_literal(pcontext->parser->world,
                                               intbuffer, NULL, NULL);
   } else {
-#ifdef RAPTOR_V2_AVAILABLE
     /* raptor2: try a raptor option */
     raptor_option feature_i;
     feature_i = raptor_world_get_option_from_uri(pcontext->parser->world->raptor_world_ptr, (raptor_uri*)feature);
-#else
-    /* raptor1: try a raptor feature */
-    raptor_feature feature_i;
-    feature_i = raptor_feature_from_uri((raptor_uri*)feature);
-#endif
+
     if((int)feature_i >= 0) {
       int value;
-#ifdef RAPTOR_V2_AVAILABLE
+
       raptor_parser_get_option(pcontext->rdf_parser, feature_i, NULL, &value);
-#else
-      value = raptor_get_feature(pcontext->rdf_parser, feature_i);
-#endif
       sprintf((char*)intbuffer, "%d", value);
       return librdf_new_node_from_typed_literal(pcontext->parser->world,
                                                 intbuffer, NULL, NULL);
@@ -1423,22 +1181,14 @@ librdf_parser_raptor_set_feature(void* context,
                                  librdf_uri *feature, librdf_node *value) 
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
-#ifdef RAPTOR_V2_AVAILABLE
   raptor_option feature_i;
-#else
-  raptor_feature feature_i;
-#endif
   const unsigned char* value_s;
   
   if(!feature)
     return 1;
 
   /* try a raptor feature */
-#ifdef RAPTOR_V2_AVAILABLE
   feature_i = raptor_world_get_option_from_uri(pcontext->parser->world->raptor_world_ptr, (raptor_uri*)feature);
-#else
-  feature_i = raptor_feature_from_uri((raptor_uri*)feature);
-#endif
   if((int)feature_i < 0)
     return 1;
   
@@ -1447,13 +1197,8 @@ librdf_parser_raptor_set_feature(void* context,
   
   value_s=(const unsigned char*)librdf_node_get_literal_value(value);
 
-#ifdef RAPTOR_V2_AVAILABLE
   return raptor_parser_set_option(pcontext->rdf_parser, feature_i,
                                   (const char *)value_s, 0);
-#else
-  return raptor_parser_set_feature_string(pcontext->rdf_parser, feature_i,
-                                          value_s);
-#endif
 }
 
 
@@ -1571,7 +1316,6 @@ librdf_parser_raptor_constructor(librdf_world *world)
     const char *syntax_label = NULL;
     const char *mime_type = NULL;
     const unsigned char *uri_string = NULL;
-#ifdef RAPTOR_V2_AVAILABLE
     const raptor_syntax_description *desc;
 
     desc = raptor_world_get_parser_description(world->raptor_world_ptr, i);
@@ -1587,15 +1331,6 @@ librdf_parser_raptor_constructor(librdf_world *world)
       mime_type = desc->mime_types[0].mime_type;
     if(desc->uri_strings)
       uri_string = (const unsigned char *)desc->uri_strings[0];
-#else
-    if(raptor_syntaxes_enumerate(i, &syntax_name, &syntax_label, 
-                                 &mime_type, &uri_string)) {
-      /* reached the end of the parsers, now register the default one */
-      i = 0;
-      raptor_syntaxes_enumerate(i, &syntax_name, &syntax_label,
-                                &mime_type, &uri_string);
-    }
-#endif
 
     if(!strcmp(syntax_name, "rdfxml")) {
       /* legacy name - see librdf_parser_raptor_init */

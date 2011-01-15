@@ -80,10 +80,6 @@ struct librdf_node_s
 void librdf_init_node(librdf_world* world);
 void librdf_finish_node(librdf_world* world);
 
-#ifdef LIBRDF_DEBUG
-const char* librdf_node_get_type_as_string(int type);
-#endif
-
 /* exported public in error but never usable */
 librdf_digest* librdf_node_get_digest(librdf_node* node);
 

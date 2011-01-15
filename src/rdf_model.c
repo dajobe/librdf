@@ -128,11 +128,8 @@ librdf_model_register_factory(librdf_world *world,
 #endif
 
   if(!world->models) {
-#ifdef RAPTOR_V2_AVAILABLE
     world->models = raptor_new_sequence((raptor_data_free_handler)librdf_free_model_factory, NULL);
-#else
-    world->models = raptor_new_sequence((raptor_sequence_free_handler *)librdf_free_model_factory, NULL);
-#endif
+
     if(!world->models)
       goto oom;
   }
@@ -1697,14 +1694,10 @@ librdf_model_load(librdf_model* model, librdf_uri *uri,
     mime_type=NULL;
 
   if(!name)
-#ifdef RAPTOR_V2_AVAILABLE
     name = raptor_world_guess_parser_name(model->world->raptor_world_ptr,
                                           (raptor_uri*)type_uri, mime_type,
                                           NULL, 0, librdf_uri_as_string(uri));
-#else
-    name = raptor_guess_parser_name((raptor_uri*)type_uri, mime_type,
-                                    NULL, 0, librdf_uri_as_string(uri));
-#endif
+
   parser=librdf_new_parser(model->world, name, NULL, NULL);
   if(!parser)
     return 1;

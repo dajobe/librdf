@@ -81,99 +81,6 @@ librdf_world_get_raptor(librdf_world* world)
 }
 
 
-#ifndef RAPTOR_V2_AVAILABLE
-static raptor_uri*
-librdf_raptor_new_uri(void *context, const unsigned char *uri_string) 
-{
-  return (raptor_uri*)librdf_new_uri((librdf_world*)context, uri_string);
-}
-
-static raptor_uri*
-librdf_raptor_new_uri_from_uri_local_name(void *context,
-                                          raptor_uri *uri,
-                                          const unsigned char *local_name)
-{
-   return (raptor_uri*)librdf_new_uri_from_uri_local_name((librdf_uri*)uri, local_name);
-}
-
-static raptor_uri*
-librdf_raptor_new_uri_relative_to_base(void *context,
-                                       raptor_uri *base_uri,
-                                       const unsigned char *uri_string)
-{
-  return (raptor_uri*)librdf_new_uri_relative_to_base((librdf_uri*)base_uri, uri_string);
-}
-
-
-static raptor_uri*
-librdf_raptor_new_uri_for_rdf_concept(void *context, const char *name) 
-{
-  librdf_uri *uri=NULL;
-  librdf_get_concept_by_name((librdf_world*)context, 1, name, &uri, NULL);
-  if(!uri)
-    return NULL;
-  return (raptor_uri*)librdf_new_uri_from_uri(uri);
-}
-
-static void
-librdf_raptor_free_uri(void *context, raptor_uri *uri) 
-{
-  librdf_free_uri((librdf_uri*)uri);
-}
-
-
-static int
-librdf_raptor_uri_equals(void *context, raptor_uri* uri1, raptor_uri* uri2)
-{
-  return librdf_uri_equals((librdf_uri*)uri1, (librdf_uri*)uri2);
-}
-
-
-static int
-librdf_raptor_uri_compare(void *context, raptor_uri* uri1, raptor_uri* uri2)
-{
-  return librdf_uri_compare((librdf_uri*)uri1, (librdf_uri*)uri2);
-}
-
-
-static raptor_uri*
-librdf_raptor_uri_copy(void *context, raptor_uri *uri)
-{
-  return (raptor_uri*)librdf_new_uri_from_uri((librdf_uri*)uri);
-}
-
-
-static unsigned char*
-librdf_raptor_uri_as_string(void *context, raptor_uri *uri)
-{
-  return librdf_uri_as_string((librdf_uri*)uri);
-}
-
-
-static unsigned char*
-librdf_raptor_uri_as_counted_string(void *context, raptor_uri *uri, size_t *len_p)
-{
-  return librdf_uri_as_counted_string((librdf_uri*)uri, len_p);
-}
-
-
-static const raptor_uri_handler librdf_raptor_uri_handler = {
-  librdf_raptor_new_uri,
-  librdf_raptor_new_uri_from_uri_local_name,
-  librdf_raptor_new_uri_relative_to_base,
-  librdf_raptor_new_uri_for_rdf_concept,
-  librdf_raptor_free_uri,
-  librdf_raptor_uri_equals,
-  librdf_raptor_uri_copy,
-  librdf_raptor_uri_as_string,
-  librdf_raptor_uri_as_counted_string,
-  2,
-  librdf_raptor_uri_compare
-};
-#endif /* #ifndef RAPTOR_V2_AVAILABLE */
-
-
-#ifdef RAPTOR_V2_AVAILABLE
 static void
 librdf_raptor_log_handler(void *data, raptor_log_message *message)
 {
@@ -206,7 +113,6 @@ librdf_raptor_log_handler(void *data, raptor_log_message *message)
   librdf_log_simple(world, 0, level, LIBRDF_FROM_RAPTOR, message->locator,
                     message->text);
 }
-#endif /* RAPTOR_V2_AVAILABLE */
 
 
 /**
@@ -222,7 +128,6 @@ librdf_raptor_log_handler(void *data, raptor_log_message *message)
 void
 librdf_init_raptor(librdf_world* world)
 {
-#ifdef RAPTOR_V2_AVAILABLE
   if(!world->raptor_world_ptr) {
     world->raptor_world_ptr = raptor_new_world();
     world->raptor_world_allocated_here = 1;
@@ -236,10 +141,6 @@ librdf_init_raptor(librdf_world* world)
   /* set up log handler */
   raptor_world_set_log_handler(world->raptor_world_ptr, world,
                                librdf_raptor_log_handler);
-#else
-  raptor_init();
-  raptor_uri_set_handler(&librdf_raptor_uri_handler, world);
-#endif
 }
 
 
@@ -256,12 +157,8 @@ librdf_init_raptor(librdf_world* world)
 void
 librdf_finish_raptor(librdf_world* world)
 {
-#ifdef RAPTOR_V2_AVAILABLE
   if(world->raptor_world_ptr && world->raptor_world_allocated_here) {
     raptor_free_world(world->raptor_world_ptr);
     world->raptor_world_ptr = NULL;
   }
-#else
-  raptor_finish();
-#endif
 }

@@ -63,6 +63,8 @@ rdf_query_triples.c rdf_query_rasqal.c \
 rdf_serializer.c \
 rdf_serializer_raptor.c \
 rdf_log.c \
+rdf_node_common.c rdf_statement_common.c \
+rdf_term.c rdf_raptor_statement.c \
 redland.h librdf.h \
 rdf_internal.h \
 rdf_init.h \
@@ -98,13 +100,6 @@ rdf_statement_internal.h \
 rdf_storage_internal.h \
 rdf_stream_internal.h \
 rdf_uri_internal.h
-
-librdf_la_SOURCES += rdf_node_common.c rdf_statement_common.c
-if RAPTOR2
-librdf_la_SOURCES += rdf_term.c rdf_raptor_statement.c
-else
-librdf_la_SOURCES += rdf_node.c rdf_statement.c
-endif
 
 if MEMCMP
 librdf_la_SOURCES += memcmp.c
@@ -218,7 +213,7 @@ local_tests=rdf_storage_sql_test$(EXEEXT)
 
 EXTRA_PROGRAMS=$(local_tests)
 
-TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
+TESTS=rdf_term_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
 rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test \
@@ -294,8 +289,8 @@ test: check
 # rule for building tests in one step
 COMPILE_LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-rdf_node_test: rdf_node.c librdf.la
-	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_node.c librdf.la
+rdf_term_test: rdf_term.c librdf.la
+	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_term.c librdf.la
 
 rdf_cache_test: rdf_cache.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_cache.c librdf.la
@@ -309,8 +304,8 @@ rdf_hash_test: rdf_hash.c librdf.la
 rdf_uri_test: rdf_uri.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_uri.c librdf.la
 
-rdf_statement_test: rdf_statement.c librdf.la
-	$(COMPILE_LINK) @LIBRDF_DIRECT_LIBS@ -DSTANDALONE $(srcdir)/rdf_statement.c librdf.la
+rdf_statement_test: rdf_raptor_statement.c librdf.la
+	$(COMPILE_LINK) @LIBRDF_DIRECT_LIBS@ -DSTANDALONE $(srcdir)/rdf_raptor_statement.c librdf.la
 
 rdf_model_test: rdf_model.c librdf.la
 	$(COMPILE_LINK) @LIBRDF_DIRECT_LIBS@ -DSTANDALONE $(srcdir)/rdf_model.c librdf.la

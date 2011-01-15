@@ -48,51 +48,28 @@
 
 
 static void librdf_sql_config_store_triple(void *user_data,
-#ifndef RAPTOR_V2_AVAILABLE
-                                           const
-#endif
                                            raptor_statement *triple);
 
 
 static void
 librdf_sql_config_store_triple(void *user_data,
-#ifndef RAPTOR_V2_AVAILABLE
-                               const
-#endif
                                raptor_statement *triple)
 {
   librdf_sql_config* config=(librdf_sql_config*)user_data;
   int i;
   
   for(i=0; i < config->predicates_count; i++) {
-    if(
-#ifdef RAPTOR_V2_AVAILABLE
-       triple->predicate->type != RAPTOR_TERM_TYPE_URI ||
-       triple->object->type != RAPTOR_TERM_TYPE_LITERAL
-#else
-       triple->predicate_type != RAPTOR_IDENTIFIER_TYPE_RESOURCE ||
-       triple->object_type != RAPTOR_IDENTIFIER_TYPE_LITERAL
-#endif
-       )
+    if(triple->predicate->type != RAPTOR_TERM_TYPE_URI ||
+       triple->object->type != RAPTOR_TERM_TYPE_LITERAL)
       continue;
     
-#ifdef RAPTOR_V2_AVAILABLE
     if(!strcmp((const char*)raptor_uri_as_string(triple->predicate->value.uri),
                config->predicate_uri_strings[i])) {
       config->values[i] = strdup((const char *)triple->object->value.literal.string);
-# if LIBRDF_DEBUG > 1
+#if LIBRDF_DEBUG > 1
       LIBRDF_DEBUG3("Set config value %d to '%s'\n", i, config->values[i]);
-# endif
-    }
-#else
-    if(!strcmp((const char*)librdf_uri_as_string((librdf_uri*)triple->predicate),
-               config->predicate_uri_strings[i])) {
-      config->values[i] = strdup((char*)triple->object);
-# if LIBRDF_DEBUG > 1
-      LIBRDF_DEBUG3("Set config value %d to '%s'\n", i, config->values[i]);
-# endif
-    }
 #endif
+    }
   }
   
   return;
@@ -165,7 +142,6 @@ librdf_new_sql_config(librdf_world* world,
   }
   
   uri_string=raptor_uri_filename_to_uri_string(config->filename);
-#ifdef RAPTOR_V2_AVAILABLE
   uri = raptor_new_uri(world->raptor_world_ptr, uri_string);
   base_uri = raptor_uri_copy( uri);
 
@@ -175,17 +151,6 @@ librdf_new_sql_config(librdf_world* world,
                                       librdf_sql_config_store_triple);
 
   raptor_parser_parse_file(rdf_parser, uri, base_uri);
-#else
-  uri = raptor_new_uri(uri_string);
-  base_uri = raptor_uri_copy(uri);
-
-  rdf_parser = raptor_new_parser("turtle");
-
-  raptor_set_statement_handler(rdf_parser, config,
-                               librdf_sql_config_store_triple);
-
-  raptor_parse_file(rdf_parser, uri, base_uri);
-#endif
 
   raptor_free_parser(rdf_parser);
   

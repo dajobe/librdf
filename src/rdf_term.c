@@ -2,7 +2,7 @@
  *
  * rdf_term.c - RDF Term (RDF URI, Literal, Blank Node) Interface
  *
- * Copyright (C) 2010, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2010-2011, David Beckett http://www.dajobe.org/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
  * 
@@ -36,12 +36,13 @@
 #include <stdlib.h> /* for abort() as used in errors */
 #endif
 
-#define RAPTOR_WORLD_DECLARED 1
-#define RAPTOR_V2_AVAILABLE 1
-
 #include <redland.h>
 /* needed for utf8 functions and definition of 'byte' */
 #include <rdf_utf8.h>
+
+
+
+#ifndef STANDALONE
 
 /**
  * librdf_init_node:
@@ -71,6 +72,18 @@ librdf_finish_node(librdf_world* world)
 
 /* constructors */
 
+/**
+ * librdf_new_node:
+ * @world: redland world object
+ *
+ * Constructor - create a new #librdf_node object with a private identifier.
+ * 
+ * Calls librdf_new_node_from_blank_identifier(world, NULL) to
+ * construct a new redland blank node identifier and make a
+ * new librdf_node object for it.
+ *
+ * Return value: a new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node(librdf_world *world)
 {
@@ -82,24 +95,62 @@ librdf_new_node(librdf_world *world)
 }
 
 
+/**
+ * librdf_new_node_from_uri_string:
+ * @world: redland world object
+ * @uri_string: string representing a URI
+ *
+ * Constructor - create a new #librdf_node object from a URI string.
+ * 
+ * Return value: a new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_uri_string(librdf_world *world,
                                 const unsigned char *uri_string)
 {
-  raptor_uri* new_uri;
-  
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
 
   librdf_world_open(world);
 
-  new_uri = raptor_new_uri(world->raptor_world_ptr, uri_string);
-  if(!new_uri)
-    return NULL;
-  
-  return raptor_new_term_from_uri(world->raptor_world_ptr, new_uri);
+  return raptor_new_term_from_uri_string(world->raptor_world_ptr, uri_string);
 }
 
 
+/**
+ * librdf_new_node_from_counted_uri_string:
+ * @world: redland world object
+ * @uri_string: string representing a URI
+ * @len: length of string
+ *
+ * Constructor - create a new #librdf_node object from a counted URI string.
+ * 
+ * Return value: a new #librdf_node object or NULL on failure
+ **/
+librdf_node*
+librdf_new_node_from_counted_uri_string(librdf_world *world, 
+                                        const unsigned char *uri_string,
+                                        size_t len) 
+{
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
+
+  librdf_world_open(world);
+
+  return raptor_new_term_from_counted_uri_string(world->raptor_world_ptr, 
+                                                 uri_string, len);
+}
+
+
+/* Create a new (Resource) Node and set the URI. */
+
+/**
+ * librdf_new_node_from_uri:
+ * @world: redland world object
+ * @uri: #librdf_uri object
+ *
+ * Constructor - create a new resource #librdf_node object with a given URI.
+ *
+ * Return value: a new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
 {
@@ -111,6 +162,16 @@ librdf_new_node_from_uri(librdf_world *world, librdf_uri *uri)
 }
 
 
+/**
+ * librdf_new_node_from_uri_local_name:
+ * @world: redland world object
+ * @uri: #librdf_uri object
+ * @local_name: local name to append to URI
+ *
+ * Constructor - create a new resource #librdf_node object with a given URI and local name.
+ *
+ * Return value: a new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_uri_local_name(librdf_world *world,
                                     librdf_uri *uri,
@@ -134,6 +195,17 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
 }
 
 
+/**
+ * librdf_new_node_from_normalised_uri_string:
+ * @world: redland world object
+ * @uri_string: string representing a URI
+ * @source_uri: source URI
+ * @base_uri: base URI
+ *
+ * Constructor - create a new #librdf_node object from a URI string normalised to a new base URI.
+ * 
+ * Return value: a new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_normalised_uri_string(librdf_world *world,
                                            const unsigned char *uri_string,
@@ -155,6 +227,23 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
 }
 
 
+/**
+ * librdf_new_node_from_literal:
+ * @world: redland world object
+ * @string: literal string value
+ * @xml_language: literal XML language (or NULL, empty string)
+ * @is_wf_xml: non 0 if literal is XML
+ *
+ * Constructor - create a new literal #librdf_node object.
+ * 
+ * 0.9.12: xml_space argument deleted
+ *
+ * An @xml_language cannot be used when @is_wf_xml is non-0. If both
+ * are given, NULL is returned.  If @xml_language is the empty string,
+ * it is the equivalent to NULL.
+ *
+ * Return value: new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_literal(librdf_world *world,
                              const unsigned char *string,
@@ -175,6 +264,21 @@ librdf_new_node_from_literal(librdf_world *world,
 }
 
 
+/**
+ * librdf_new_node_from_typed_literal:
+ * @world: redland world object
+ * @value: literal string value
+ * @xml_language: literal XML language (or NULL, empty string)
+ * @datatype_uri: URI of typed literal datatype or NULL
+ *
+ * Constructor - create a new typed literal #librdf_node object.
+ * 
+ * Only one of @xml_language or @datatype_uri may be given.  If both
+ * are given, NULL is returned.  If @xml_language is the empty string,
+ * it is the equivalent to NULL.
+ *
+ * Return value: new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_typed_literal(librdf_world *world,
                                    const unsigned char *value,
@@ -191,6 +295,23 @@ librdf_new_node_from_typed_literal(librdf_world *world,
 }
 
 
+/**
+ * librdf_new_node_from_typed_counted_literal:
+ * @world: redland world object
+ * @value: literal string value
+ * @value_len: literal string value length
+ * @xml_language: literal XML language (or NULL, empty string)
+ * @xml_language_len: literal XML language length (not used if @xml_language is NULL)
+ * @datatype_uri: URI of typed literal datatype or NULL
+ *
+ * Constructor - create a new typed literal #librdf_node object.
+ * 
+ * Only one of @xml_language or @datatype_uri may be given.  If both
+ * are given, NULL is returned.  If @xml_language is the empty string,
+ * it is the equivalent to NULL.
+ *
+ * Return value: new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_typed_counted_literal(librdf_world *world,
                                            const unsigned char *value,
@@ -211,6 +332,19 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
 }
 
 
+/**
+ * librdf_new_node_from_counted_blank_identifier:
+ * @world: redland world object
+ * @identifier: blank node identifier or NULL
+ * @identifier_len: length of @identifier
+ *
+ * Constructor - create a new blank node #librdf_node object from a blank node counted length identifier.
+ *
+ * If no @identifier string is given, creates a new internal identifier
+ * and assigns it.
+ * 
+ * Return value: new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_counted_blank_identifier(librdf_world *world,
                                               const unsigned char *identifier,
@@ -225,6 +359,18 @@ librdf_new_node_from_counted_blank_identifier(librdf_world *world,
 }
 
 
+/**
+ * librdf_new_node_from_blank_identifier:
+ * @world: redland world object
+ * @identifier: blank node identifier or NULL
+ *
+ * Constructor - create a new blank node #librdf_node object from a blank node identifier.
+ *
+ * If no identifier string is given, creates a new internal identifier
+ * and assigns it.
+ * 
+ * Return value: new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_blank_identifier(librdf_world *world,
                                       const unsigned char *identifier)
@@ -238,6 +384,14 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
 }
 
 
+/**
+ * librdf_new_node_from_node:
+ * @node: #librdf_node object to copy
+ *
+ * Copy constructor - create a new librdf_node object from an existing librdf_node object.
+ * 
+ * Return value: a new #librdf_node object or NULL on failure
+ **/
 librdf_node*
 librdf_new_node_from_node(librdf_node *node)
 {
@@ -247,6 +401,13 @@ librdf_new_node_from_node(librdf_node *node)
 }
 
 
+/**
+ * librdf_free_node:
+ * @node: #librdf_node object
+ *
+ * Destructor - destroy an #librdf_node object.
+ * 
+ **/
 void
 librdf_free_node(librdf_node *node)
 {
@@ -257,6 +418,19 @@ librdf_free_node(librdf_node *node)
 }
 
 
+/* functions / methods */
+
+/**
+ * librdf_node_get_uri:
+ * @node: the node object
+ *
+ * Get the URI for a node object.
+ *
+ * Returns a pointer to the URI object held by the node, it must be
+ * copied if it is wanted to be used by the caller.
+ * 
+ * Return value: URI object or NULL if node has no URI.
+ **/
 librdf_uri*
 librdf_node_get_uri(librdf_node *node)
 {
@@ -269,6 +443,14 @@ librdf_node_get_uri(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_get_type:
+ * @node: the node object
+ *
+ * Get the type of the node.
+ * 
+ * Return value: the node type
+ **/
 librdf_node_type
 librdf_node_get_type(librdf_node *node)
 {
@@ -278,6 +460,17 @@ librdf_node_get_type(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_get_literal_value:
+ * @node: the node object
+ *
+ * Get the string literal value of the node.
+ * 
+ * Returns a pointer to the literal value held by the node, it must be
+ * copied if it is wanted to be used by the caller.
+ *
+ * Return value: the literal string or NULL if node is not a literal
+ **/
 unsigned char*
 librdf_node_get_literal_value(librdf_node *node)
 {
@@ -290,6 +483,18 @@ librdf_node_get_literal_value(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_get_literal_value_as_counted_string:
+ * @node: the node object
+ * @len_p: pointer to location to store length (or NULL)
+ *
+ * Get the string literal value of the node as a counted string.
+ * 
+ * Returns a pointer to the literal value held by the node, it must be
+ * copied if it is wanted to be used by the caller.
+ *
+ * Return value: the literal string or NULL if node is not a literal
+ **/
 unsigned char*
 librdf_node_get_literal_value_as_counted_string(librdf_node *node,
                                                 size_t *len_p)
@@ -306,6 +511,17 @@ librdf_node_get_literal_value_as_counted_string(librdf_node *node,
 }
 
 
+/**
+ * librdf_node_get_literal_value_as_latin1:
+ * @node: the node object
+ *
+ * Get the string literal value of the node as ISO Latin-1.
+ * 
+ * Returns a newly allocated string containing the conversion of the
+ * UTF-8 literal value held by the node.
+ *
+ * Return value: the literal string or NULL if node is not a literal
+ **/
 char*
 librdf_node_get_literal_value_as_latin1(librdf_node *node)
 {
@@ -322,6 +538,18 @@ librdf_node_get_literal_value_as_latin1(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_get_literal_value_language:
+ * @node: the node object
+ *
+ * Get the XML language of the node.
+ * 
+ * Returns a pointer to the literal language value held by the node, it must
+ * be copied if it is wanted to be used by the caller.
+ *
+ * Return value: the XML language string or NULL if node is not a literal
+ * or there is no XML language defined.
+ **/
 char*
 librdf_node_get_literal_value_language(librdf_node *node)
 {
@@ -334,6 +562,14 @@ librdf_node_get_literal_value_language(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_get_literal_value_is_wf_xml:
+ * @node: the node object
+ *
+ * Get the XML well-formness property of the node.
+ * 
+ * Return value: 0 if the XML literal is NOT well formed XML content, or the node is not a literal
+ **/
 int
 librdf_node_get_literal_value_is_wf_xml(librdf_node *node)
 {
@@ -358,6 +594,14 @@ librdf_node_get_literal_value_is_wf_xml(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_get_literal_value_datatype_uri:
+ * @node: the node object
+ *
+ * Get the typed literal datatype URI of the literal node.
+ * 
+ * Return value: shared URI of the datatyped literal or NULL if the node is not a literal, or has no datatype URI
+ **/
 librdf_uri*
 librdf_node_get_literal_value_datatype_uri(librdf_node *node)
 {
@@ -368,6 +612,14 @@ librdf_node_get_literal_value_datatype_uri(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_get_li_ordinal:
+ * @node: the node object
+ *
+ * Get the node li object ordinal value.
+ *
+ * Return value: the li ordinal value or < 1 on failure
+ **/
 int
 librdf_node_get_li_ordinal(librdf_node *node)
 {
@@ -387,6 +639,14 @@ librdf_node_get_li_ordinal(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_get_blank_identifier:
+ * @node: the node object
+ *
+ * Get the blank node identifier.
+ *
+ * Return value: the identifier value or NULL on failure
+ **/
 unsigned char*
 librdf_node_get_blank_identifier(librdf_node *node)
 {
@@ -394,6 +654,15 @@ librdf_node_get_blank_identifier(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_get_counted_blank_identifier:
+ * @node: the node object
+ * @len_p: pointer to variable to store length (or NULL)
+ *
+ * Get the blank node identifier with length.
+ *
+ * Return value: the identifier value or NULL on failure
+ **/
 unsigned char*
 librdf_node_get_counted_blank_identifier(librdf_node* node, size_t* len_p)
 {
@@ -402,6 +671,15 @@ librdf_node_get_counted_blank_identifier(librdf_node* node, size_t* len_p)
   return node->value.blank.string;
 }
 
+
+/**
+ * librdf_node_is_resource:
+ * @node: the node object
+ *
+ * Check node is a resource.
+ * 
+ * Return value: non-zero if the node is a resource (URI)
+ **/
 int
 librdf_node_is_resource(librdf_node *node)
 {
@@ -409,6 +687,14 @@ librdf_node_is_resource(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_is_literal:
+ * @node: the node object
+ *
+ * Check node is a literal.
+ * 
+ * Return value: non-zero if the node is a literal
+ **/
 int
 librdf_node_is_literal(librdf_node *node)
 {
@@ -416,6 +702,14 @@ librdf_node_is_literal(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_is_blank:
+ * @node: the node object
+ *
+ * Check node is a blank nodeID.
+ * 
+ * Return value: non-zero if the node is a blank nodeID
+ **/
 int
 librdf_node_is_blank(librdf_node *node)
 {
@@ -423,6 +717,23 @@ librdf_node_is_blank(librdf_node *node)
 }
 
 
+/**
+ * librdf_node_encode:
+ * @node: the node to serialise
+ * @buffer: the buffer to use
+ * @length: buffer size
+ *
+ * Serialise a node into a buffer.
+ * 
+ * Encodes the given node in the buffer, which must be of sufficient
+ * size.  If buffer is NULL, no work is done but the size of buffer
+ * required is returned.
+ * 
+ * If the node cannot be encoded due to restrictions of the encoding
+ * format, a redland error is generated
+ *
+ * Return value: the number of bytes written or 0 on failure.
+ **/
 size_t
 librdf_node_encode(librdf_node *node,
                    unsigned char *buffer, size_t length)
@@ -549,6 +860,20 @@ librdf_node_encode(librdf_node *node,
 }
 
 
+/**
+ * librdf_node_decode:
+ * @world: librdf_world
+ * @size_p: pointer to bytes used or NULL
+ * @buffer: the buffer to use
+ * @length: buffer size
+ *
+ * Deserialise a node from a buffer.
+ * 
+ * Decodes the serialised node (as created by librdf_node_encode() )
+ * from the given buffer.
+ * 
+ * Return value: new node or NULL on failure (bad encoding, allocation failure)
+ **/
 librdf_node*
 librdf_node_decode(librdf_world *world, size_t *size_p,
                    unsigned char *buffer, size_t length)
@@ -706,6 +1031,21 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
 }
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
+/**
+ * librdf_node_to_string:
+ * @node: the node object
+ *
+ * Format the node as a string in a debugging format.
+ * 
+ * Note a new string is allocated which must be freed by the caller.
+ * 
+ * @Deprecated: Use librdf_node_write() to write to #raptor_iostream
+ * which can be made to write to a string.  Use a #librdf_serializer
+ * to write proper syntax formats.
+ *
+ * Return value: a string value representing the node or NULL on failure
+ **/
 unsigned char*
 librdf_node_to_string(librdf_node *node)
 {
@@ -729,8 +1069,25 @@ librdf_node_to_string(librdf_node *node)
 
   return s;
 }
+#endif
 
 
+#ifndef REDLAND_DISABLE_DEPRECATED
+/**
+ * librdf_node_to_counted_string:
+ * @node: the node object
+ * @len_p: pointer to location to store length
+ *
+ * Format the node as a counted string in a debugging format.
+ * 
+ * Note a new string is allocated which must be freed by the caller.
+ *
+ * @Deprecated: Use librdf_node_write() to write to #raptor_iostream
+ * which can be made to write to a string.  Use a #librdf_serializer
+ * to write proper syntax formats.
+ *
+ * Return value: a string value representing the node or NULL on failure
+ **/
 unsigned char*
 librdf_node_to_counted_string(librdf_node *node, size_t *len_p)
 {
@@ -755,8 +1112,20 @@ librdf_node_to_counted_string(librdf_node *node, size_t *len_p)
 
   return s;
 }
+#endif
 
 
+/**
+ * librdf_node_print:
+ * @node: the node
+ * @fh: file handle
+ *
+ * Pretty print the node to a file descriptor.
+ * 
+ * This method is for debugging and the format of the output should
+ * not be relied on.
+ * 
+ **/
 void
 librdf_node_print(librdf_node *node, FILE *fh)
 {
@@ -778,6 +1147,18 @@ librdf_node_print(librdf_node *node, FILE *fh)
 }
 
 
+/**
+ * librdf_node_equals:
+ * @first_node: first #librdf_node node
+ * @second_node: second #librdf_node node
+ *
+ * Compare two librdf_node objects for equality.
+ * 
+ * Note - for literal nodes, XML language, XML space and well-formness are 
+ * presently ignored in the comparison.
+ * 
+ * Return value: non 0 if nodes are equal.  0 if not-equal or failure
+ **/
 int
 librdf_node_equals(librdf_node *first_node, librdf_node *second_node)
 {
@@ -785,19 +1166,25 @@ librdf_node_equals(librdf_node *first_node, librdf_node *second_node)
 }
 
 
-/* Deprecated. Always fails - use librdf_node_new_static_node_iterator()  */
+/**
+ * librdf_node_static_iterator_create:
+ * @nodes: static array of #librdf_node objects
+ * @size: size of array
+ *
+ * Create an iterator over an array of nodes (ALWAYS FAILS)
+ * 
+ * This legacy method used to create an iterator for an existing
+ * static array of librdf_node objects.  It was intended for testing
+ * iterator code.
+ * 
+ * @deprecated: always returns NULL. Use
+ * librdf_node_new_static_node_iterator()
+ *
+ * Return value: NULL
+ **/
 librdf_iterator*
 librdf_node_static_iterator_create(librdf_node **nodes, int size)
 {
-  return NULL;
-}
-
-
-/* for debugging */
-const char*
-librdf_node_get_type_as_string(int type)
-{
-  /* FIXME */
   return NULL;
 }
 
@@ -874,3 +1261,289 @@ librdf_node_write(librdf_node* node, raptor_iostream *iostr)
 
   return 0;
 }
+
+#endif /* STANDALONE */
+
+
+/* TEST CODE */
+
+
+#ifdef STANDALONE
+
+/* one more prototype */
+int main(int argc, char *argv[]);
+
+
+static void
+dump_node_as_C(FILE* fh, const char* var, void *buffer, int size) {
+  int i;
+  unsigned char* p=(unsigned char*)buffer;
+  
+  fprintf(fh, "const unsigned char %s[%d] = {", var, size);
+  for (i=0; i < size; i++) {
+    if(i)
+      fputs(", ", fh);
+    fprintf(fh, "0x%02x", p[i]);
+  }
+  fputs("};\n", fh);
+}
+
+  
+static int
+check_node(const char* program, const unsigned char *expected, 
+           void *buffer, size_t size) {
+  unsigned int i;
+  for(i=0; i< size; i++) {
+    unsigned char c=((unsigned char*)buffer)[i];
+    if(c != expected[i]) {
+      fprintf(stderr, "%s: Encoding node byte %d: 0x%02x expected 0x%02x\n",
+              program, i, c, expected[i]);
+      return(1);
+    }
+  }
+  return(0);
+}
+
+
+static const char *hp_string1="http://purl.org/net/dajobe/";
+static const char *hp_string2="http://purl.org/net/dajobe/";
+static const char *lit_string="Dave Beckett";
+static const char *genid="genid42";
+static const char *datatype_lit_string="Datatyped literal value";
+static const char *datatype_uri_string="http://example.org/datatypeURI";
+
+/* Node Encoded (type R) version of hp_string1 */
+static const unsigned char hp_uri_encoded[31] = {0x52, 0x00, 0x1b, 0x68, 0x74, 0x74, 0x70, 0x3a, 0x2f, 0x2f, 0x70, 0x75, 0x72, 0x6c, 0x2e, 0x6f, 0x72, 0x67, 0x2f, 0x6e, 0x65, 0x74, 0x2f, 0x64, 0x61, 0x6a, 0x6f, 0x62, 0x65, 0x2f, 0x00};
+
+/* Node Encoded (type M) version of typed literal with literal value
+ * datatype_lit_string and datatype URI datatype_uri_string */
+static const unsigned char datatyped_literal_M_encoded[61] = {0x4d, 0x00, 0x17, 0x00, 0x1e, 0x00, 0x44, 0x61, 0x74, 0x61, 0x74, 0x79, 0x70, 0x65, 0x64, 0x20, 0x6c, 0x69, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x20, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x00, 0x68, 0x74, 0x74, 0x70, 0x3a, 0x2f, 0x2f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x2e, 0x6f, 0x72, 0x67, 0x2f, 0x64, 0x61, 0x74, 0x61, 0x74, 0x79, 0x70, 0x65, 0x55, 0x52, 0x49, 0x00};
+
+/* Node Encoded (type N) version of big 100,000-length literal
+ * (just the first 32 bytes, the rest are 0x58 'X')
+ */
+const unsigned char big_literal_N_encoded[32] = {0x4e, 0x00, 0x01, 0x86, 0xa0, 0x00, 0x00, 0x00, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58};
+
+
+int
+main(int argc, char *argv[]) 
+{
+  librdf_node *node, *node2, *node3, *node4, *node5, *node6, *node7, *node8, *node9;
+  librdf_uri *uri, *uri2;
+  int size, size2;
+  unsigned char *buffer;
+  librdf_world *world;
+  size_t big_literal_length;
+  unsigned char *big_literal;
+  unsigned int i;
+  
+  const char *program=librdf_basename((const char*)argv[0]);
+	
+  world=librdf_new_world();
+  librdf_world_open(world);
+
+  fprintf(stderr, "%s: Creating home page node from string\n", program);
+  node=librdf_new_node_from_uri_string(world, (const unsigned char*)hp_string1);
+  if(!node) {
+    fprintf(stderr, "%s: librdf_new_node_from_uri_string failed\n", program);
+    return(1);
+  }
+  
+  fprintf(stdout, "%s: Home page URI is ", program);
+  librdf_uri_print(librdf_node_get_uri(node), stdout);
+  fputc('\n', stdout);
+  
+  fprintf(stdout, "%s: Creating URI from string '%s'\n", program, 
+          hp_string2);
+  uri=librdf_new_uri(world, (const unsigned char*)hp_string2);
+  fprintf(stdout, "%s: Setting node URI to new URI ", program);
+  librdf_uri_print(uri, stdout);
+  fputc('\n', stdout);
+  librdf_free_uri(uri);
+  
+  fprintf(stdout, "%s: Node is: ", program);
+  librdf_node_print(node, stdout);
+  fputc('\n', stdout);
+
+  size=librdf_node_encode(node, NULL, 0);
+  fprintf(stdout, "%s: Encoding node requires %d bytes\n", program, size);
+  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, size);
+
+  fprintf(stdout, "%s: Encoding node in buffer\n", program);
+  size2=librdf_node_encode(node, buffer, size);
+  if(size2 != size) {
+    fprintf(stderr, "%s: Encoding node used %d bytes, expected it to use %d\n", program, size2, size);
+    return(1);
+  }
+
+  if(0)
+    dump_node_as_C(stdout, "hp_uri_encoded", buffer, size);
+  if(check_node(program, hp_uri_encoded, buffer, size))
+    return(1);
+  
+    
+  fprintf(stdout, "%s: Creating new node\n", program);
+
+  fprintf(stdout, "%s: Decoding node from buffer\n", program);
+  if(!(node2=librdf_node_decode(world, NULL, buffer, size))) {
+    fprintf(stderr, "%s: Decoding node failed\n", program);
+    return(1);
+  }
+  LIBRDF_FREE(cstring, buffer);
+   
+  fprintf(stdout, "%s: New node is: ", program);
+  librdf_node_print(node2, stdout);
+  fputc('\n', stdout);
+ 
+  
+  fprintf(stdout, "%s: Creating new literal string node\n", program);
+  node3=librdf_new_node_from_literal(world, (const unsigned char*)lit_string, NULL, 0);
+  if(!node3) {
+    fprintf(stderr, "%s: librdf_new_node_from_literal failed\n", program);
+    return(1);
+  }
+
+  buffer=(unsigned char*)librdf_node_get_literal_value_as_latin1(node3);
+  if(!buffer) {
+    fprintf(stderr, "%s: Failed to get literal string value as Latin-1\n", program);
+    return(1);
+  }
+  fprintf(stdout, "%s: Node literal string value (Latin-1) is: '%s'\n",
+          program, buffer);
+  LIBRDF_FREE(cstring, buffer);
+  
+  fprintf(stdout, "%s: Creating new blank node with identifier %s\n", program, genid);
+  node4=librdf_new_node_from_blank_identifier(world, (const unsigned char*)genid);
+  if(!node4) {
+    fprintf(stderr, "%s: librdf_new_node_from_blank_identifier failed\n", program);
+    return(1);
+  }
+
+  buffer=librdf_node_get_blank_identifier(node4);
+  if(!buffer) {
+    fprintf(stderr, "%s: Failed to get blank node identifier\n", program);
+    return(1);
+  }
+  fprintf(stdout, "%s: Node identifier is: '%s'\n", program, buffer);
+  
+  node5=librdf_new_node_from_node(node4);
+  if(!node5) {
+    fprintf(stderr, "%s: Failed to make new blank node from old one\n", program);
+    return(1);
+  } 
+
+  buffer=librdf_node_get_blank_identifier(node5);
+  if(!buffer) {
+    fprintf(stderr, "%s: Failed to get copied blank node identifier\n", program);
+    return(1);
+  }
+  fprintf(stdout, "%s: Copied node identifier is: '%s'\n", program, buffer);
+
+  fprintf(stdout, "%s: Creating a new blank node with a generated identifier\n", program);
+  node6=librdf_new_node(world);
+  if(!node6) {
+    fprintf(stderr, "%s: librdf_new_node failed\n", program);
+    return(1);
+  }
+
+  buffer=librdf_node_get_blank_identifier(node6);
+  if(!buffer) {
+    fprintf(stderr, "%s: Failed to get blank node identifier\n", program);
+    return(1);
+  }
+  fprintf(stdout, "%s: Generated node identifier is: '%s'\n", program, buffer);
+
+  uri2=librdf_new_uri(world, (const unsigned char*)datatype_uri_string);
+  node7=librdf_new_node_from_typed_literal(world,
+                                           (const unsigned char*)datatype_lit_string,
+                                           NULL, uri2);
+  librdf_free_uri(uri2);
+
+  size=librdf_node_encode(node7, NULL, 0);
+  fprintf(stdout, "%s: Encoding typed node requires %d bytes\n", program, size);
+  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, size);
+
+  fprintf(stdout, "%s: Encoding typed node in buffer\n", program);
+  size2=librdf_node_encode(node7, (unsigned char*)buffer, size);
+  if(size2 != size) {
+    fprintf(stderr, "%s: Encoding typed node used %d bytes, expected it to use %d\n", program, size2, size);
+    return(1);
+  }
+
+  if(0)
+    dump_node_as_C(stdout, "datatyped_literal_M_encoded", buffer, size);
+  if(check_node(program, datatyped_literal_M_encoded, buffer, size))
+    return(1);
+  
+  fprintf(stdout, "%s: Decoding typed node from buffer\n", program);
+  if(!(node8=librdf_node_decode(world, NULL, (unsigned char*)buffer, size))) {
+    fprintf(stderr, "%s: Decoding typed node failed\n", program);
+    return(1);
+  }
+  LIBRDF_FREE(cstring, buffer);
+   
+  if(librdf_new_node_from_typed_literal(world, 
+                                        (const unsigned char*)"Datatyped literal value",
+                                        "en-GB", uri2)) {
+    fprintf(stderr, "%s: Unexpected success allowing a datatyped literal with a language\n", program);
+    return(1);
+  }
+    
+  if(librdf_new_node_from_literal(world, 
+                                  (const unsigned char*)"XML literal value",
+                                  "en-GB", 1)) {
+    fprintf(stderr, "%s: Unexpected success allowing an XML literal with a language\n", program);
+    return(1);
+  }
+    
+  big_literal_length=100000;
+  big_literal=(unsigned char *)LIBRDF_MALLOC(cstring, big_literal_length+1);
+  for(i=0; i<big_literal_length; i++)
+     big_literal[i]='X';
+
+  node9=librdf_new_node_from_typed_counted_literal(world,
+                                                   big_literal, big_literal_length,
+                                                   NULL, 0, NULL);
+  if(!node9) {
+    fprintf(stderr, "%s: Failed to make big %d byte literal\n", program,
+            (int)big_literal_length);
+    return(1);
+  }
+  LIBRDF_FREE(cstring, big_literal);
+
+  size=librdf_node_encode(node9, NULL, 0);
+  fprintf(stdout, "%s: Encoding big literal node requires %d bytes\n", program, size);
+  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, size);
+  fprintf(stdout, "%s: Encoding big literal node in buffer\n", program);
+  size2=librdf_node_encode(node9, (unsigned char*)buffer, size);
+  if(size2 != size) {
+    fprintf(stderr, "%s: Encoding big literal node used %d bytes, expected it to use %d\n", program, size2, size);
+    return(1);
+  }
+
+  /* Just check first 32 bytes */
+  if(0)
+    dump_node_as_C(stdout, "big_literal_N_encoded", buffer, 32);
+  if(check_node(program, big_literal_N_encoded, buffer, 32))
+    return(1);
+  LIBRDF_FREE(cstring, buffer);
+    
+
+  fprintf(stdout, "%s: Freeing nodes\n", program);
+  librdf_free_node(node9);
+  librdf_free_node(node8);
+  librdf_free_node(node7);
+  librdf_free_node(node6);
+  librdf_free_node(node5);
+  librdf_free_node(node4);
+  librdf_free_node(node3);
+  librdf_free_node(node2);
+  librdf_free_node(node);
+
+  librdf_free_world(world);
+
+  /* keep gcc -Wall happy */
+  return(0);
+}
+
+#endif
