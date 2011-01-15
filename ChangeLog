@@ -1,3 +1,51 @@
+2011-01-14  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_init.c: 2011
+
+	* src/rdf_serializer.c:
+	(librdf_new_serializer): Log failure to find a serializer for
+	name/type/uri
+
+	* src/rdf_parser.c:
+	(librdf_new_parser): Log failure to find a parser for
+	name/type/uri
+
+	* src/rdf_storage.c:
+	(librdf_new_storage, librdf_new_storage_with_options): Report
+	storage name not found errors
+
+2011-01-12  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_virtuoso.c: Fix for rasqal 0.9.22
+
+2011-01-11  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_query_rasqal.c, src/rdf_query_results.c: make librdf
+	build with rasqal master head
+
+2010-12-29  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_serializer_raptor.c:
+	Make raptor serializer work with
+	raptor V2 1.9.2+
+
+	* src/rdf_parser_raptor.c:
+	(librdf_parser_raptor_constructor): Update for Raptor V2 1.9.2
+
+	* configure.ac: Raptor V2 min version now 1.9.2
+
+2010-12-05  Dave Beckett <dave@dajobe.org>
+
+	* NEWS.html, RELEASE.html, configure.ac, src/win32_rdf_config.h:
+	Bump version to 1.0.13
+
+2010-12-04  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_internal.h, src/rdf_query_rasqal.c,
+	src/rdf_query_results.c:
+	Remove use of deprecated rasqal functions
+	conditioned on rasqal version
+
 2010-10-13  Dave Beckett  <dave@dajobe.org>
 
 	* Snapshotted redland_1_0_12 for 1.0.12 release (GIT
