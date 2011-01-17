@@ -167,12 +167,6 @@ REDLAND_API
 librdf_node* librdf_node_decode(librdf_world *world, size_t* size_p, unsigned char *buffer, size_t length);
 
 
-/* convert to a string */
-REDLAND_API
-unsigned char *librdf_node_to_string(librdf_node* node);
-REDLAND_API REDLAND_DEPRECATED
-unsigned char* librdf_node_to_counted_string(librdf_node* node, size_t* len_p);
-
 /* pretty print it */
 REDLAND_API
 int librdf_node_write(librdf_node* node, raptor_iostream *iostr);
