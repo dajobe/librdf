@@ -27,6 +27,49 @@ pre
 <p>Not yet released.
 </p>
 
+<p>Raptor minimum version is now 2.0.0.  Raptor V1 support was removed.</p>
+
+<p>Rsaqal minimum version is now 0.9.22.  Removed use of deprecated
+Rasqal functions that were conditioned on older rasqal versions.
+</p>
+
+<p>Add new generated version defines to librdf.h:
+<code>LIBRDF_VERSION</code>, <code>LIBRDF_VERSION_STRING</code>,
+<code>LIBRDF_VERSION_MAJOR</code>, <code>LIBRDF_VERSION_MAJOR</code>
+<code>LIBRDF_VERSION_MINOR</code> and
+<code>LIBRDF_VERSION_DECIMAL</code> (already in earlier versions).
+</p>
+
+
+<h3>Node class changes</h3>
+
+<p>Mark <code>librdf_node_to_string()</code> and
+<code>librdf_node_to_counted_string()</code> as deprecated.
+</p>
+
+
+<h3>Parser class changes</h3>
+
+<p><code>librdf_new_parser()</code> now logs failure to find a parser
+for the given name, type and/or uri rather than just returning NULL.
+</p>
+
+
+<h3>Serializer class changes</h3>
+
+<p><code>librdf_new_serializer()</code> now log failure to find a
+serializer by the given name, type and/or uri rather than just
+returning NULL.
+</p>
+
+
+<h3>Storage class changes</h3>
+
+<p><code>librdf_new_storage()</code>,
+<code>librdf_new_storage_with_options()</code> now log failure to
+find storage by the given name rather than just returning NULL.
+</p>
+
 
 <h2 id="rel1_0_12"><a name="rel1_0_12">Redland 1.0.12 Changes</a></h2>
 
@@ -3166,7 +3209,7 @@ method that gives no guarantees to when it is called.</p>
 
 <hr />
 
-<p>Copyright (C) 2000-2010 <a href="http://www.dajobe.org/">Dave Beckett</a><br />Copyright (C) 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
+<p>Copyright (C) 2000-2011 <a href="http://www.dajobe.org/">Dave Beckett</a><br />Copyright (C) 2000-2005 <a href="http://www.bristol.ac.uk/">University of Bristol</a></p>
 
 </body>
 </html>

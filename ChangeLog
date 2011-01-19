@@ -1,3 +1,34 @@
+2011-01-19  Dave Beckett <dave@dajobe.org>
+
+	* src/Makefile.am: remove librdf.h from librdf_la_SOURCES
+
+	* configure.ac, redland-config.in, src/.gitignore, src/librdf.h,
+	src/librdf.h.in: Subsititute version macros into librdf.h, now
+	created by configure
+
+2011-01-18  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_node.h: Mark librdf_node_to_string and
+	librdf_node_to_counted_string as deprecated not removed
+
+2011-01-17  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_node.h:
+	(librdf_node_to_string, librdf_node_to_counted_string): Removed
+	prototypes for functions no longer available.
+
+2011-01-15  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac, redland.pc.in, src/Makefile.am, src/librdf.h,
+	src/rdf_log.h, src/rdf_model.c, src/rdf_node.c, src/rdf_node.h,
+	src/rdf_node_internal.h, src/rdf_parser.c,
+	src/rdf_parser_raptor.c, src/rdf_query_rasqal.c, src/rdf_raptor.c,
+	src/rdf_raptor_internal.h, src/rdf_raptor_statement.c,
+	src/rdf_serializer.c, src/rdf_serializer_raptor.c,
+	src/rdf_statement.c, src/rdf_storage.c, src/rdf_storage_sql.c,
+	src/rdf_storage_trees.c, src/rdf_term.c, src/rdf_uri.c: Remove
+	Raptor 1 support, require Raptor 2.0.0 and Rasqal 0.9.22+
+
 2011-01-14  Dave Beckett <dave@dajobe.org>
 
 	* src/rdf_init.c: 2011
