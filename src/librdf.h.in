@@ -89,6 +89,47 @@ extern "C" {
 #endif
 
 
+/* Public defines */
+
+/**
+ * LIBRDF_VERSION:
+ *
+ * Redland librdf library version number
+ *
+ * Format: major * 10000 + minor * 100 + release
+ */
+#define LIBRDF_VERSION @LIBRDF_VERSION_DECIMAL@
+
+/**
+ * LIBRDF_VERSION_STRING:
+ *
+ * Redland librdf library version string
+ */
+#define LIBRDF_VERSION_STRING "@VERSION@"
+
+/**
+ * LIBRDF_VERSION_MAJOR:
+ *
+ * Redland librdf library major version
+ */
+#define LIBRDF_VERSION_MAJOR @LIBRDF_VERSION_MAJOR@
+
+/**
+ * LIBRDF_VERSION_MINOR:
+ *
+ * Redland librdf library minor version
+ */
+#define LIBRDF_VERSION_MINOR @LIBRDF_VERSION_MINOR@
+
+/**
+ * LIBRDF_VERSION_RELEASE:
+ *
+ * Redland librdf library release
+ */
+#define LIBRDF_VERSION_RELEASE @LIBRDF_VERSION_RELEASE@
+
+
+
 /* Public typedefs (references to private structures) */
 
 /**

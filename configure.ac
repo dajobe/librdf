@@ -50,7 +50,14 @@ AC_DEFINE_UNQUOTED(LIBRDF_VERSION_RELEASE, $version_release, [Release version nu
 AC_DEFINE_UNQUOTED(LIBRDF_VERSION_DECIMAL, $version_decimal, [Release version as a decimal])
 
 # for redland-config.in
+LIBRDF_VERSION_MAJOR=$version_major
+LIBRDF_VERSION_MINOR=$version_minor
+LIBRDF_VERSION_RELEASE=$version_release
 LIBRDF_VERSION_DECIMAL=$version_decimal
+AC_SUBST(LIBRDF_VERSION)
+AC_SUBST(LIBRDF_VERSION_MAJOR)
+AC_SUBST(LIBRDF_VERSION_MINOR)
+AC_SUBST(LIBRDF_VERSION_RELEASE)
 AC_SUBST(LIBRDF_VERSION_DECIMAL)
 
 
@@ -1275,6 +1282,7 @@ docs/Makefile
 docs/version.xml
 examples/Makefile
 src/Makefile
+src/librdf.h
 src/redland.spec
 src/win32/Makefile
 utils/Makefile

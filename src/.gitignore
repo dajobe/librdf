@@ -6,6 +6,8 @@
 .libs
 TAGS
 dmalloc*
+filtered_rdf_log.h
+librdf.h
 rdf_*_test
 rdf_*_test.exe
 rdf_config.h*
@@ -13,4 +15,3 @@ redland.spec
 run*
 stamp-h*
 test
-filtered_rdf_log.h

@@ -86,20 +86,8 @@ while test $# -gt 0; do
     --private-libs)
       args="$args --static --libs";
       ;;
-# Computed here
     --version-decimal)
-      version=`$PKGCONFIG $PACKAGE --modversion`
-      version_dec=0
-      for multiplier in 10000 100 1; do
-        version_part=`echo $version | sed -e 's/\..*$//'`
-        version_dec=`expr $multiplier \* $version_part + $version_dec`
-	if [ $version = $version_part ]; then
-          version=0
-        else
-          version=`echo $version | sed -e 's/^[^.]*\.//'`
-        fi
-      done
-      echo $version_dec
+      echo @LIBRDF_VERSION_DECIMAL@
       exit 0
       ;;
 # Other options are passed through
