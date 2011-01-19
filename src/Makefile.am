@@ -65,7 +65,7 @@ rdf_serializer_raptor.c \
 rdf_log.c \
 rdf_node_common.c rdf_statement_common.c \
 rdf_term.c rdf_raptor_statement.c \
-redland.h librdf.h \
+redland.h \
 rdf_internal.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
