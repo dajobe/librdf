@@ -72,8 +72,8 @@ NEWS: NEWS.html
 TODO: TODO.html
 	$(HTML_TO_TEXT)
 
-HACKING.html: HACKING.md $(top_srcdir)/docs/markdown-to-html.pl
-	$(PERL) $(top_srcdir)/docs/markdown-to-html.pl $<  $@
+HACKING.html: HACKING.md $(top_srcdir)/scripts/markdown-to-html.pl
+	$(PERL) $(top_srcdir)/scripts/markdown-to-html.pl $<  $@
 
 endif
 
