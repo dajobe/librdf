@@ -25,7 +25,7 @@ dnl
 
 AC_INIT([Redland librdf RDF API Library], 1.0.13, http://bugs.librdf.org/, redland)
 AC_PREREQ(2.53)
-AC_CONFIG_SRCDIR(src/rdf_term.c)
+AC_CONFIG_SRCDIR(src/rdf_node.c)
 AC_REVISION($Revision$)dnl
 AM_CONFIG_HEADER(src/rdf_config.h)
 AC_CONFIG_AUX_DIR(build)
