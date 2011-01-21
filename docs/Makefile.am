@@ -113,7 +113,6 @@ rasqal-changes.tsv
 
 CLEANFILES += README \
 pod2htm* \
-redland-changes.tsv \
 redland-decl.txt \
 redland-decl-list.txt \
 $(FILTERED_HS)
