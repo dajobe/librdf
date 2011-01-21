@@ -1281,6 +1281,7 @@ redland.rdf
 docs/Makefile
 docs/version.xml
 examples/Makefile
+scripts/Makefile
 src/Makefile
 src/librdf.h
 src/redland.spec

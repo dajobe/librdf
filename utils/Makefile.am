@@ -1,7 +1,6 @@
 MYSQL_UTILS=rdf-tree
 
 bin_PROGRAMS=redland-db-upgrade rdfproc
-noinst_SCRIPTS=touch-mtime.pl
 
 if STORAGE_VIRTUOSO
 noinst_PROGRAMS=redland-virtuoso-test
@@ -15,7 +14,6 @@ man_MANS = redland-db-upgrade.1 rdfproc.1
 
 EXTRA_DIST= rdfproc.html \
 $(man_MANS) \
-touch-mtime.pl \
 fix-groff-xhtml
 
 CLEANFILES=*.db $(EXTRA_PROGRAMS)
