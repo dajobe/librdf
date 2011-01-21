@@ -159,6 +159,6 @@ README: README.html
 
 if MAINTAINER_MODE
 redland-changes.xml: $(srcdir)/redland-changes.tsv $(srcdir)/../scripts/process-changes.pl
-	$(PERL) $(srcdir)/../scripts/process-changes.pl --package librdf --docbook-xml $@ $(PACKAGE) $(srcdir)/redland-changes.tsv
+	$(PERL) $(srcdir)/../scripts/process-changes.pl --package redland --docbook-xml $@ "Redland librdf" $(srcdir)/redland-changes.tsv
 
 endif
