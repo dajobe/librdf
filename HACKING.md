@@ -1,7 +1,7 @@
 Hacking Redland
 ===============
 
-Draft 2010-08-24
+2011-01-21
 
 [Dave Beckett](http://www.dajobe.org/)
 
@@ -31,6 +31,16 @@ large code style (whitespace) changes are made.
 
 All code must be wrapped to 80 chars as far as is possible.  Function
 definitions or calls should indent the parameters to the left `(`.
+
+Redland libraries use very long function names following the naming
+convention which can make linebreaking very hard.  In this case,
+indent function parameters on new lines 4 spaces after the function
+name like this:
+
+    var = function_name_with_very_long_name_that_is_hard_to_wrap_args(
+              argument1_with_very_long_name_or_expression,
+              argument2,
+              ..)
 
 Use no space between a keyword followed by braces argument.
 For example, use `if(cond)` rather than `if (cond)` (ditto for
@@ -146,12 +156,15 @@ Notes:
 
    * Declare one variable per line
    * Declare all variables at the top of the function (K&R C style)
-   * You may declare variables in inner `{}` blocks.  There are some places
-     where `if(1) { ... var decls ...; more code }` is used.
+   * You may declare variables in inner `{}` blocks.  The
+     form `if(1) { ... var decls ...; more code }` may be used but
+     a code rewrite is preferable.
    * If a label is used it *MUST* be used only for cleanup, and going
      forward in the code to the end of the function.
    * Multiple `return` are allowed but for obvious error or result
      returns.  Do not twist the code to enable a single return.
+   * `goto` may be used for resource cleanup and result return 
+     where control flow only goes forward.
 
 
 ### Documentation
@@ -199,7 +212,7 @@ parameters are allowed, these are described in the _Long Description_.
 Commit Messages
 ---------------
 
-The general standard for redland libraries using GIT is a merge
+The general standard for Redland libraries using GIT is a merge
 of the GIT standards format and GNU ChangeLog
 
     First line summaries what commit does - this goes into the GIT short log
