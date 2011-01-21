@@ -49,6 +49,7 @@
       <year>2008</year>
       <year>2009</year>
       <year>2010</year>
+      <year>2011</year>
       <holder>Dave Beckett</holder>
     </copyright>
     <copyright>
@@ -144,6 +145,8 @@
     <xi:include href="xml/uri.xml"/>
 
     <!-- <xi:include href="xml/unused.xml"/> -->
+
+    <xi:include href="redland-changes.xml"/>
   </part>
 
   <index id="indexes">
