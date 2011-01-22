@@ -326,6 +326,16 @@ based on the SPARQL XML results format which can also be written to a file.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_query_results_formats_get_description ##### -->
+<para>
+
+</para>
+
+@world: 
+@counter: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_query_results_formats_enumerate ##### -->
 <para>
 

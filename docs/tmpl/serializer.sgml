@@ -35,6 +35,16 @@ can be retrieved by callbacks.
 </para>
 
 
+<!-- ##### FUNCTION librdf_serializer_get_description ##### -->
+<para>
+
+</para>
+
+@world: 
+@counter: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_serializer_enumerate ##### -->
 <para>
 
@@ -57,6 +67,7 @@ can be retrieved by callbacks.
 @label: 
 @mime_type: 
 @uri_string: 
+@librdf_serializer_factory*:
 @librdf_serializer_factory*:
 @librdf_serializer_factory*:
 @librdf_serializer_factory*:
@@ -277,6 +288,7 @@ can be retrieved by callbacks.
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
+@void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...: 
 
 
@@ -287,6 +299,7 @@ can be retrieved by callbacks.
 
 @serializer: 
 @user_data: 
+@void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:
 @void *user_data, const char *msg, ...:

@@ -20,6 +20,41 @@ Version static variables.
 <!-- ##### SECTION Image ##### -->
 
 
+<!-- ##### MACRO LIBRDF_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBRDF_VERSION_MAJOR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBRDF_VERSION_MINOR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBRDF_VERSION_RELEASE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBRDF_VERSION_STRING ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### VARIABLE librdf_version_decimal ##### -->
 <para>
 
