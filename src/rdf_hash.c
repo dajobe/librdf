@@ -1597,7 +1597,8 @@ librdf_hash_to_string(librdf_hash* hash, const char *filter[])
     if(filter) {
       for(i=0; filter[i]; i++) {
         size_t f_len = strlen(filter[i]);
-        if(f_len == k->size && strncmp(k->data, filter[i], f_len) == 0) {
+        if(f_len == k->size && 
+           strncmp((const char*)k->data, filter[i], f_len) == 0) {
           key_is_filtered = 1;
           break;
         }
@@ -1634,7 +1635,7 @@ librdf_hash_to_string(librdf_hash* hash, const char *filter[])
 
   /* Generate a string result */
   len=raptor_stringbuffer_length(sb);
-  result=LIBRDF_MALLOC(cstring, len + 1);
+  result = (char*)LIBRDF_MALLOC(cstring, len + 1);
   if (result)
     raptor_stringbuffer_copy_to_string(sb, (unsigned char*)result, len);
 

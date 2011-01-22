@@ -788,7 +788,7 @@ main(int argc, char *argv[])
 
   fprintf(stdout, "%s: Generating an identifier\n", program);
   id = librdf_world_get_genid(world);
-  if(id == NULL || strlen(id) < 6) {
+  if(id == NULL || strlen((const char*)id) < 6) {
     fprintf(stderr, "%s: librdf_world_get_genid failed\n", program);
     return 1;
   }
