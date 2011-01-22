@@ -104,12 +104,12 @@ include $(top_srcdir)/gtk-doc.make
 man_MANS=redland.3
 
 # Other files to distribute
-EXTRA_DIST+= README.html README \
+EXTRA_DIST += README.html README \
 storage.html \
 redland.pod \
 $(man_MANS) \
 version.xml.in \
-rasqal-changes.tsv
+redland-changes.tsv
 
 CLEANFILES += README \
 pod2htm* \
