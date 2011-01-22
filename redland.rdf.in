@@ -15,15 +15,15 @@
     </shortdesc>
 
     <description xml:lang="en">
-      Redland is a library that provides a high-level interface for
-      the Resource Description Framework (RDF) allowing the RDF graph
-      to be parsed from XML, stored, queried and manipulated. Redland
-      implements each of the RDF concepts in its own class via an
-      object based API, reflected into the language APIs, currently
-      C#, Java, Objective-C, Perl, PHP, Python, Ruby and Tcl. Several
-      classes providing functionality such as for parsers, storage,
-      serializers and query languages are built as modules that can
-      be loaded at compile or run-time as required.
+      Redland librdf is a library that provides a high-level
+      interface for the Resource Description Framework (RDF) allowing
+      the RDF graph to be parsed from XML, stored, queried and
+      manipulated.  Redland librdf implements each of the RDF
+      concepts in its own class via an object based API, reflected
+      into the language APIs, currently C#, Java, Perl, PHP, Python,
+      Ruby and Tcl.  Several classes providing functionality such as
+      for parsers, storage are built as modules that can be loaded at
+      compile or run-time as required.
     </description>
 
     <maintainer>
@@ -37,7 +37,7 @@
     <release>
       <Version>
 	  <name>stable</name>
-	  <created>2005-02-01</created>
+	  <created>2011-01-22</created>
 	  <revision>@VERSION@</revision>
       </Version>
     </release>
@@ -70,11 +70,11 @@
 
     <!-- source repository -->
     <repository>
-      <CVSRepository>
-	  <anon-root>:pserver:anonymous@cvs.librdf.org/cvs/redland librdf</anon-root>
-	  <module>redland</module>
-	  <browse rdf:resource="http://cvs.librdf.org/cvsweb/redland/librdf/" />
-      </CVSRepository>
+      <GitRepository>
+	  <anon-root>git://github.com/dajobe/librdf.git</anon-root>
+	  <module>librdf</module>
+	  <browse rdf:resource="https://github.com/dajobe/librdf" />
+      </GitRepository>
     </repository>
 
   </Project>
