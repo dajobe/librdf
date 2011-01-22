@@ -131,8 +131,10 @@ int librdf_query_results_formatter_write(raptor_iostream *iostr, librdf_query_re
 
 REDLAND_API
 int librdf_query_results_formats_check(librdf_world* world, const char *name, librdf_uri* uri, const char *mime_type);
-REDLAND_API
+REDLAND_API REDLAND_DEPRECATED
 int librdf_query_results_formats_enumerate(librdf_world* world, const unsigned int counter, const char **name, const char **label, const unsigned char **uri_string, const char **mime_type);
+REDLAND_API
+const raptor_syntax_description* librdf_query_results_formats_get_description(librdf_world* world, unsigned int counter);
 
 #ifdef __cplusplus
 }

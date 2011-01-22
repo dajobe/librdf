@@ -42,8 +42,10 @@ extern "C" {
 REDLAND_API
 void librdf_serializer_register_factory(librdf_world *world, const char *name, const char *label, const char *mime_type, const unsigned char *uri_string, void (*factory) (librdf_serializer_factory*));
 
-REDLAND_API
+REDLAND_API REDLAND_DEPRECATED
 int librdf_serializer_enumerate(librdf_world* world, const unsigned int counter, const char **name, const char **label);
+REDLAND_API
+const raptor_syntax_description* librdf_serializer_get_description(librdf_world* world, unsigned int counter);
 REDLAND_API
 int librdf_serializer_check_name(librdf_world* world, const char *name);
 

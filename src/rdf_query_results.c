@@ -980,6 +980,9 @@ librdf_query_results_formats_check(librdf_world* world,
  * All returned strings are shared and must be copied if needed to be
  * used dynamically.
  * 
+ * @Deprecated: use librdf_query_results_formats_get_description() to
+ * return more information in a static structure.
+ *
  * Return value: non 0 on failure of if counter is out of range
  */
 int
@@ -1019,3 +1022,22 @@ librdf_query_results_formats_enumerate(librdf_world* world,
   return 0;
 }
 
+
+/**
+ * librdf_query_results_formats_get_description:
+ * @world: world object
+ * @counter: index into the list of query results formats
+ *
+ * Get query result formats descriptive syntax information
+ * 
+ * Return value: description or NULL if counter is out of range
+ **/
+const raptor_syntax_description*
+librdf_query_results_formats_get_description(librdf_world* world, 
+                                             unsigned int counter)
+{
+  librdf_world_open(world);
+
+  return rasqal_world_get_query_results_format_description(world->rasqal_world_ptr,
+                                                           counter);
+}

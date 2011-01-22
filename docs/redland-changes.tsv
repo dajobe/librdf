@@ -4,6 +4,9 @@
 #
 # Functions
 #
+1.0.12	-	-	-	1.0.13	const raptor_syntax_description*	librdf_parser_get_description	(librdf_world* world, unsigned int counter)	Deprecates librdf_parser_enumerate()
+1.0.12	-	-	-	1.0.13	const raptor_syntax_description*	librdf_query_results_formats_get_description	(librdf_world* world, unsigned int counter)	Deprecates librdf_query_results_formats_enumerate()
+1.0.12	-	-	-	1.0.13	const raptor_syntax_description*	librdf_serializer_get_description	(librdf_world* world, unsigned int counter)	Deprecates librdf_serializer_enumerate()
 #
 # Types
 #

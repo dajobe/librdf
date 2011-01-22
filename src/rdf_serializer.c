@@ -268,6 +268,8 @@ librdf_get_serializer_factory(librdf_world *world,
  *
  * Get information on serializers.
  * 
+ * @Deprecated: use librdf_serializer_get_description() to return more information in a static structure.
+ *
  * Return value: non 0 on failure of if counter is out of range
  **/
 int
@@ -289,6 +291,26 @@ librdf_serializer_enumerate(librdf_world* world,
   if(label)
     *label=factory->label;
   return 0;
+}
+
+
+/**
+ * librdf_serializer_get_description:
+ * @world: world object
+ * @counter: index into the list of serializers
+ *
+ * Get serializer descriptive syntax information
+ * 
+ * Return value: description or NULL if counter is out of range
+ **/
+const raptor_syntax_description*
+librdf_serializer_get_description(librdf_world* world, 
+                                  unsigned int counter)
+{
+  librdf_world_open(world);
+
+  return raptor_world_get_serializer_description(world->raptor_world_ptr,
+                                                 counter);
 }
 
 
