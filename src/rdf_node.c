@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <string.h>
 #ifdef HAVE_STDLIB_H
-#include <stdlib.h> /* for abort() as used in errors */
+#include <stdlib.h>
 #endif
 
 #include <redland.h>

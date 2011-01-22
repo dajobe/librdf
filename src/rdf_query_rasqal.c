@@ -35,7 +35,7 @@
 #include <string.h>
 #include <sys/types.h>
 #ifdef HAVE_STDLIB_H
-#include <stdlib.h> /* for abort() as used in errors */
+#include <stdlib.h>
 #endif
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
