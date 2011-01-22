@@ -237,6 +237,7 @@ librdf_node_write
 librdf_parser
 librdf_parser_factory
 librdf_parser_check_name
+librdf_parser_get_description
 librdf_parser_enumerate
 librdf_parser_guess_name
 librdf_parser_guess_name2
@@ -314,6 +315,7 @@ librdf_new_query_results_formatter_by_mime_type
 librdf_new_query_results_formatter2
 librdf_free_query_results_formatter
 librdf_query_results_formats_check
+librdf_query_results_formats_get_description
 librdf_query_results_formats_enumerate
 librdf_query_results_formatter
 librdf_query_results_formatter_write
@@ -323,6 +325,7 @@ librdf_query_results_formatter_write
 <FILE>serializer</FILE>
 librdf_serializer
 librdf_serializer_factory
+librdf_serializer_get_description
 librdf_serializer_enumerate
 librdf_serializer_register_factory
 librdf_new_serializer
