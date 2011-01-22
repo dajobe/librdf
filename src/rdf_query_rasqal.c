@@ -1280,16 +1280,21 @@ librdf_query_rasqal_constructor(librdf_world *world)
 
   rasqal_set_triples_source_factory(world->rasqal_world_ptr, rasqal_redland_register_triples_source_factory, world);
 
-  /* enumerate from query language 1, so the default parser 0 is done last */
-  for(i=1; 1; i++) {
-    const char *language_name=NULL;
-    const unsigned char *uri_string=NULL;
+  /* enumerate from query language 1, so the default query language 0
+   * is done last 
+   */
+  for(i = 1; 1; i++) {
+    const char *language_name = NULL;
+    const unsigned char *uri_string = NULL;
 
-    if(rasqal_languages_enumerate(world->rasqal_world_ptr, i, &language_name, NULL, &uri_string)) {
-      /* reached the end of the parsers, now register the default one */
-      i=0;
-      if(rasqal_languages_enumerate(world->rasqal_world_ptr, i, &language_name, NULL, &uri_string)) {
-        /* error - should really return an error code or fail with librdf_fatal() */
+    if(rasqal_languages_enumerate(world->rasqal_world_ptr, i, &language_name,
+                                  NULL, &uri_string)) {
+      /* reached the end of the query languages, now register the default one */
+      i = 0;
+
+      if(rasqal_languages_enumerate(world->rasqal_world_ptr, i, &language_name,
+                                    NULL, &uri_string)) {
+        LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
         return;
       }
     }
