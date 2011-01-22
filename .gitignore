@@ -5,7 +5,6 @@
 *.out
 *test
 .deps*
-ChangeLog*
 INSTALL
 INSTALL.txt
 LICENSE.txt

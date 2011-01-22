@@ -1,0 +1,608 @@
+2009-12-18  Dave Beckett <dave@dajobe.org>
+
+	* Add librdf.la to librdf_storage_virtuoso_la_LIBADD
+
+2009-12-16  Dave Beckett  <dave@dajobe.org>
+
+	* Snapshotted redland_1_0_10 for 1.0.10 release (SVN 15919)
+
+	* src/rdf_cache.c: (main): Free cache inside test loop
+
+2009-12-15  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_cache.c: Fixed rdf_cache_test deadlock with WITH_THREADS.
+	(librdf_free_cache_internal,librdf_cache_delete_internal): Pulled
+	functionality from librdf_free_cache(), librdf_cache_delete()
+	without mutex locking.
+	(librdf_new_cache): Call librdf_free_cache_internal() when already
+	holding a mutex lock.
+	(librdf_cache_cleanup): Call librdf_cache_delete_internal(), mutex
+	lock already held by librdf_cache_set_common().
+
+	* src/rdf_hash.c, src/rdf_init.c: (librdf_free_hash_datums): Do
+	not assume hash_datums mutex is initialized.
+	(main): Remove librdf_world_open() from minimum init-finish test
+	case.
+	Fixes issue http://bugs.librdf.org/mantis/view.php?id=317
+
+2009-12-14  Dave Beckett <dave@dajobe.org>
+
+	* NEWS.html, RELEASE.html: 1.0.10 notes updated for issue 317 fix
+
+	* src/rdf_init.c: (main): Call librdf_world_open(world) to make
+	the test run when threads are enabled.
+	Fixes Issue#0000317 http://bugs.librdf.org/mantis/view.php?id=317
+
+	* src/rdf_storage_trees.c: (librdf_storage_trees_node_compare):
+	Check language and datatype URI when comparing literals.
+	Fixes Issue#000311 http://bugs.librdf.org/mantis/view.php?id=311
+	with patch from Gregory Williams - Thanks!
+
+	* src/rdf_storage_trees.c:
+	(librdf_storage_trees_remove_statement_internal): Return 0 on
+	success (always).
+	Fixes Issue#000304 http://bugs.librdf.org/mantis/view.php?id=304
+
+2009-12-13  Dave Beckett <dave@dajobe.org>
+
+	* redland-config.in: Now a wrapper around pkg-config redland
+
+	* src/rdf_storage_postgresql.c: Casts for C++
+
+	* src/rdf_init.c: (librdf_basename): Casts for C++
+
+	* docs/tmpl/parser.sgml, docs/tmpl/serializer.sgml: Update docbook
+	tmpls
+
+	* build, build/shave-libtool.in, build/shave.in, build/shave.m4,
+	configure.ac: Enable SHAVE support for maintainer; move aux files
+	to build dir
+
+	* docs/redland-sections.txt: Add librdf_parser_check_name and
+	librdf_serializer_check_name
+
+	* src/rdf_storage_virtuoso.c: remove public autodocs from scanning
+
+	* configure.ac: Berkeley DB 4.8
+
+	* NEWS.html, RELEASE.html, configure.ac, src/win32_rdf_config.h:
+	Bump version to 1.0.10
+
+	* src/rdf_storage_virtuoso.c: Applied patch from 'lenrek' to "fix
+	seg fault on x86_64 machines" with virtuoso storage.
+
+	* src/rdf_query_rasqal.c: Use #ifdef
+	RASQAL_TRIPLES_SOURCE_MIN_VERSION and #ifdef
+	RASQAL_TRIPLES_SOURCE_FACTORY_MIN_VERSION from rasqal.h instead of
+	RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION defined locally by redland
+	configure.
+
+	* configure.ac: No need to define
+	RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION, can use other macros from
+	rasqal.h
+
+2009-12-12  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_cache.c: (librdf_cache_set_common): Call memset with
+	address of buffer, not address of pointer to buffer.
+
+	* src/rdf_query_rasqal.c: Use
+	RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION to set API version fields
+	when using rasqal 0.9.17+
+
+	* configure.ac: Define RASQAL_TRIPLE_SOURCES_HAVE_API_VERSION for
+	rasqal 0.9.17+
+
+	* autogen.sh: add space
+
+2009-11-29  Lauri Aalto <laalto@iki.fi>
+
+	* autogen.sh: Reduce autogen noise on systems where uname is not
+	in /usr/bin
+
+2009-11-17  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_query_rasqal.c:
+	(rasqal_literal_get_rdf_term_type): Cannot use enum
+	(RASQAL_LITERAL_UDT) with preprocessor, use
+	RASQAL_LITERAL_UDT_DEFINED instead.
+
+	* src/rdf_query_rasqal.c:
+	(rasqal_literal_get_rdf_term_type): Changed return type from int
+	to rasqal_literal_type enum to prevent int-enum conversion
+	warnings.
+
+2009-11-16  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_rasqal.c:
+	(rasqal_literal_get_rdf_term_type): Added when RASQAL_LITERAL_UDT
+	is not defined - rasqal is 0.9.16 or older.
+	(rasqal_literal_to_redland_node): Use above to replace
+	ever-growing if condition that is fragile when new literal types
+	are added.
+
+2009-11-16  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_query_rasqal.c:
+	(rasqal_literal_to_redland_node): Support RASQAL_LITERAL_UDT
+	user-defined datatype literals introduced in rasqal r15608.
+
+2009-10-14  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_postgresql.c:
+	Replace deprecated PQescapeString with PQescapeStringConn that
+	takes a PGconn connection handle and when encoding takes into
+	consideration any connection properties such as character
+	encodings in force.
+
+2009-10-10  Dave Beckett <dave@dajobe.org>
+
+	* utils/rdfproc.c:
+	CMD_PARSE: get the warning count from the warning_count_node, not
+	the (just freed) error_count_node
+
+2009-09-07  Dave Beckett <dave@dajobe.org>
+
+	* docs/redland-docs.xml: Make this newer legal docbook
+
+2009-08-30  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_rasqal.c: ws/indenting
+
+2009-08-26  Dave Beckett <dave@dajobe.org>
+
+	* utils: props
+
+2009-08-25  Dave Beckett <dave@dajobe.org>
+
+	* src/Makefile.am, src/rdf_query_virtuoso.c, src/rdf_storage.c,
+	src/rdf_storage_module.h, src/rdf_storage_virtuoso.c:
+	Remove virtuoso vsparql query part for now - should use some
+	rasqal parts that are not yet public
+
+	* utils/redland-virtuoso-test.c: cut the source down so it
+	compiles.  body seems to have been repeated, possibly by multiple
+	rebasing of original patches
+
+	* src/Makefile.am: copyright years
+
+	* utils/redland-virtuoso-test.c:
+	Add redland-virtuoso-test.c
+
+	* src/rdf_query_virtuoso.c, src/rdf_storage_virtuoso.c,
+	src/rdf_storage_virtuoso_internal.h:
+	Also add new Virtuoso storage files also from
+	http://bugs.librdf.org/mantis/view.php?id=284
+
+	* configure.ac, docs/redland-chapter-storage-modules.xml,
+	src/Makefile.am, src/rdf_query_internal.h, src/rdf_storage.c,
+	src/rdf_storage_internal.h, src/rdf_storage_module.h,
+	utils/Makefile.am:
+	Applied raw Virtuoso storage patch from
+	http://bugs.librdf.org/mantis/view.php?id=284 - does not compile
+	at this commit due to use of rasqal internals that are no longer
+	available to librdf.
+
+	* autogen.sh: Update common autogen.sh
+
+	* configure.ac: Add -W to CPPFLAGS not CFLAGS, so they are not
+	used in link lines
+
+	* src/Makefile.am: typo $
+
+	* configure.ac: Put modular build libltdl includes and libs into
+	INTERNAL macros
+
+	* redland-src-config.in: update for moved includes to src dir
+
+	* utils/Makefile.am: Add rule for librdf.la
+
+	* redland-src-config.in: make redland-src-config work for external
+	raptor and rasqal again
+
+2009-08-13  Lauri Aalto <laalto@iki.fi>
+
+	* src/Makefile.am, src/rdf_list.h: Install rdf_list.h header and
+	export its functions so that they can be used e.g. in external
+	storage modules.
+
+2009-08-12  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac, src/rdf_storage_sqlite.c, src/win32_rdf_config.h:
+	Change define SQLITE_API to REDLAND_SQLITE_API to allow redland to
+	compile with sqlite 3.6.17 or newer where the SQLITE_API macro is
+	defined.  Thanks to Samuli Suominen for the report and fix.
+
+2009-07-17  Dave Beckett <dave@dajobe.org>
+
+	* COPYING: Update GPL2 to latest version (white space changes)
+	used by rasqal, raptor
+
+2009-06-06  Lauri Aalto <laalto@iki.fi>
+
+	* configure.ac: Default to environment LIBS, CPPFLAGS,
+	LDFLAGS. Addresses issue at
+	http://bugs.gentoo.org/show_bug.cgi?id=267405
+
+2009-05-20  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac: Remove libltdlc.la from
+	LIBRDF_PKGCONFIG_PRIVATE_LIBS which ends up in pkgconfig
+	Libs.private field
+
+2009-05-01  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_file.c: Add storage option 'format' for uri and
+	file storages librdf_storage_file_instance gains format_name
+	field.
+	(librdf_storage_file_init): Validate the format values as legal
+	parser name and for file-storage, serializer name too.  Log a
+	warning if the type given is wrong.
+	(librdf_storage_file_terminate): Free format_name
+	(librdf_storage_file_sync): Use format_name for serializer for
+	file storage.
+
+	* src/rdf_parser.c, src/rdf_serializer.c:
+	(librdf_parser_check_name, librdf_serializer_check_name): fix
+	strcmp.
+
+	* src/rdf_parser.c:
+	(librdf_parser_check_name): fix assert
+
+	* src/rdf_serializer.c:
+	(librdf_serializer_check_name): fix assert
+
+	* src/rdf_serializer.c, src/rdf_serializer.h:
+	(librdf_serializer_check_name): Added to check if a serializer
+	name is known.
+
+	* src/rdf_parser.c, src/rdf_parser.h:
+	(librdf_parser_check_name): Added to check if a parser name is
+	valid.
+
+2009-04-28  Dave Robillard <dave@drobilla.net>
+
+	* src/Makefile.am: Make modular storage backends depend on librdf
+	library to avoid unresolved symbol errors when librdf itself is
+	dynamically loaded.
+
+	* autogen.sh: Don't lie about configure arguments.
+
+2009-04-14  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_storage.c:
+	(librdf_storage_register_factory): Clean up storage factory if
+	version check fails.
+
+2009-04-13  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage.c:
+	(librdf_memstr): Removed, no longer used
+	(ltdl_module_callback): More constrained tests for what is a legal
+	storage module name especially with debugging, to prevent false
+	warnings during 'make check'.
+
+	* src/Makefile.am:
+	Set storage module test dir to $(abs_builddir)/.libs
+
+	* src/rdf_storage.c:
+	(ltdl_module_callback): Only attempt to load .so files when
+	debugging. This should aid false error messages when testing with
+	'make check' in the source tree
+
+	* ChangeLog.1, ChangeLog.2, ChangeLog.3, ChangeLog.4, ChangeLog.6:
+	Add old changelogs
+
+	* src/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_init): Use res2 in PQresultErrorField()
+	call after setting it to the error code.
+
+2009-04-12  Dave Beckett  <dave@dajobe.org>
+
+	* Snapshotted redland_1_0_9 for 1.0.9 release (SVN 15143)
+
+	* INSTALL.html: Document --enable-debug
+
+	* configure.ac: Add --enable-debug to turn on LIBRDF_DEBUG without
+	the need for maintainer mode.
+	Removed unused STANDARD_CFLAGS subst.
+
+	* src/Makefile.am: Removed unused STANDARD_CFLAGS
+
+	* redland.pc.in: Add plugindir variable for the directory where
+	modules go
+
+	* Redland.i: Added librdf_parser_guess_name2() to SWIG API
+
+	* AUTHORS: Added Dave Robillard and Lauri Aalto
+
+	* INSTALL.html: Update to remove mention of raptor and rasqal
+	building inside.
+
+	* src/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_literal_helper): Init language_e_len to
+	prevent gcc warning about used when not initialised.
+
+	* docs/tmpl/iterator.sgml, docs/tmpl/parser.sgml,
+	docs/tmpl/stream.sgml: update sgml templates
+
+	* src/rdf_cache.c:
+	(librdf_cache_set_common): Initialise new_object to NULL and check
+	before freeing.
+
+	* src/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_init): Init res to NULL
+
+	* src/rdf_iterator.h, src/rdf_stream.h: autodocs
+
+	* docs/redland-sections.txt, docs/tmpl/parser.sgml,
+	docs/tmpl/storage.sgml: Update doc templates and sections
+
+	* docs/Makefile.am: Final filter build rule fix to make it works
+	with 'make distcheck'.
+	
+	This took hours of tricky make and VPATH debugging - info recorded
+	in makefile comments.
+
+2009-04-11  Dave Beckett <dave@dajobe.org>
+
+	* docs/Makefile.am: Adjust filter header rule to ensure it builds
+
+	* docs/Makefile.am: Make $(top_srcdir)/src/filtered_rdf_log.h rule
+	public
+
+	* src/rdf_storage.c, src/rdf_storage.h:
+	(librdf_storage_register_factory): Passes back an int status
+	value. Now checks for the interface version in the supported range
+	and fails if not.  Added some more parameter validation.
+
+	* configure.ac, src/rdf_storage_module.h: Move
+	LIBRDF_STORAGE_INTERFACE_VERSION to a macro and define max an min
+	storage interface versions LIBRDF_STORAGE_MIN_INTERFACE_VERSION
+	and LIBRDF_STORAGE_MAX_INTERFACE_VERSION
+
+	* src/rdf_parser.c, src/rdf_parser.h:
+	(librdf_parser_guess_name2): Added with new librdf_world* world
+	argument.
+	(librdf_parser_guess_name): Restored, but deprecated and uses the
+	above to do the work.  Makes existing librdf API the same as 1.0.8
+	in the absence of raptor V2 released.
+
+	* src/rdf_stream.h, src/rdf_stream_internal.h: Move
+	librdf_stream_get_method_flags public
+
+	* src/rdf_stream_internal.h: librdf_stream_get_method_flags added
+	for flags arg of stream get_method: aliases of iterator get_method
+	flags for the day that iterator and stream are merged.
+
+	* src/rdf_iterator.h: librdf_iterator_get_method_flags added for
+	flags arg of iterator get_method
+
+	* docs/tmpl/log.sgml, docs/tmpl/parser.sgml,
+	docs/tmpl/redland-unused.sgml, docs/tmpl/storage.sgml,
+	docs/tmpl/unused.sgml: Update sgml templates
+
+2009-04-10  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_mysql.c:
+	(librdf_storage_mysql_transaction_terminate): internal autodocs
+
+	* docs/redland-sections.txt: Remove internal macros from unused section
+
+	* src/rdf_cache.h: librdf_cache - autodoc
+
+	* src/rdf_storage_module.h: librdf_storage_instance - autodocs
+
+	* src/rdf_storage.c: (librdf_storage_set_instance,
+	librdf_storage_get_instance): autodocs
+
+	* docs/Makefile.am: Filter rdf_log.h before gtkdoc-scan gets there
+
+	* src/rdf_parser.h: autodocs - format librdf_parser_set_uri_filter
+	prototype so gtkdoc-scan can scan it
+
+	* src/rdf_log.c: (librdf_log): autodocs - document .../Varargs
+
+	* src/rdf_cache.c, src/rdf_storage.c: autodocs
+
+	* docs/redland-sections.txt: More docs
+
+	* docs/redland-sections.txt: update sections
+
+	* src/rdf_raptor.c, src/rdf_raptor.h, src/rdf_raptor_internal.h:
+	Convert to Unix LF
+
+2009-04-07  Dave Beckett <dave@dajobe.org>
+
+	* examples/Makefile.am, utils/Makefile.am: Split linker libs and
+	flags between LDADD and AM_LDFLAGS
+
+	* examples/Makefile.am: Add rule to make librdf.la
+
+	* docs/tmpl/log.sgml, docs/tmpl/parser.sgml,
+	docs/tmpl/redland-unused.sgml: Update templates
+
+	* docs/Makefile.am: Fix DOC_SOURCE_DIR
+
+	* Makefile.am, configure.ac, docs/Makefile.am,
+	examples/Makefile.am, librdf, redland-src-config.in, src,
+	utils/Makefile.am: Renamed dir librdf/ to src/
+
+2009-03-31  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh: Use LTDL_INIT in configure.ac to trigger --ltdl
+
+	* librdf/rdf_storage_postgresql.c: make postgresql storage
+	autodocs internal
+
+	* librdf/rdf_hash.c: librdf_hash_values_count autodocs
+
+	* librdf/rdf_storage_hashes.c: autodocs for
+	librdf_storage_hashes_close are internal
+
+	* librdf/rdf_storage_module.h: autodocs for storage factory types
+
+	* librdf/rdf_storage_file.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_list.c, librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_postgresql.c, librdf/rdf_storage_sqlite.c,
+	librdf/rdf_storage_trees.c, librdf/rdf_storage_tstore.c:
+	Fix autodocs for storage module registration functions to make them
+	internal
+
+	* configure.ac, NEWS.html, librdf/win32_rdf_config.h: Bump version
+	to 1.0.9
+
+	* autogen.sh, configure.ac: libtool V2 only. Minimum 2.2.0
+
+2009-03-30  Dave Beckett <dave@dajobe.org>
+
+	* docs/Makefile.am: (redland.3): Adjust sed to make NAME section
+	of generated manual more debian lintian friendly
+
+	* librdf/Makefile.am: Add rule to build
+	${top_build_prefix}libltdl/libltdlc.la and remove those to try to
+	build raptor and rasqal locally.
+
+2009-03-29  Dave Beckett <dave@dajobe.org>
+
+	* INSTALL.html, configure.ac, librdf/Makefile.am,
+	librdf/rdf_digest_openssl.c: Removed openssl digest support - not
+	used much and an extra large dependency. MD5 and SHA1 remain
+	builtin.
+
+	* librdf/rdf_hash.c:
+	(librdf_free_hash_datum): Debug print at level 2 or more
+
+	* librdf/rdf_storage_postgresql.c: Applied fixes from
+	Issue#0000286 to fix "Numerous leaks, potential NULL pointer use,
+	and dropped postgresql errors and buffer overruns in the
+	postgresql storage module" Rebased from original patch around
+	about SVN r14170 to current head, applied recent changes and fixed
+	ISO C90 problems by moving declarations and assertions to start of
+	blocks.
+	Fixes Issue#0000286 http://bugs.librdf.org/mantis/view.php?id=286
+
+	* librdf/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_get_contexts): Fix allocation of N
+	bytes not N x size_t bytes using patch from bug:
+	Fixes Issue#0000285 http://bugs.librdf.org/mantis/view.php?id=285
+	May also fix issue 102 according to bug.
+
+	(librdf_storage_postgresql_free_gccontext_row): Removes unused
+	function.  Unused because the memory the function frees belongs to a
+	PGresult struct and is freed when that struct is freed with the
+	appropriate postgresql API.
+
+	* librdf/rdf_statement.c:
+	(librdf_statement_encode_parts): Fix a buffer overrun error that
+	could occur with certain size buffers. 	A buffer size of 1 is sure
+	to write past the end of the buffer.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/rdf_hash.c: Protect world->hash_datums_list with
+	hash_datums_mutex when threading.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/rdf_init.c: 
+	(librdf_free_world): Destroy hash_datums_mutex and others in
+	reverse order when threading.
+	(librdf_world_init_mutex): Init hash_datums_mutex.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/rdf_init_internal.h: Add hash_datums_mutex for locking
+	hash_datums class when with threads.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/rdf_log.h: librdf_log_level_func and librdf_log_func
+	functions gain REDLAND_CALLBACK_STDCALL before function pointer to
+	allow windows to adjust the calling convention for C#
+	compatibility.
+	Based on patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/librdf.h: Added REDLAND_CALLBACK_STDCALL macro to prefix
+	selected callback function pointer definitions.  Enabled for
+	windows when USE_STDCALL_CALLBACKS is defined.
+
+	* librdf/rdf_uri.c: (librdf_new_uri): Clear key and value to all
+	zeros before use to make it easier to debug since not all fields
+	of the structure were used.
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* librdf/win32_rdf_config.h: win32: Add STDCALL_CALLBACKS
+	Enable HAVE_PTHREADS
+	Disable mysql storage
+	Patch from Lou Sakey 2008-07-31 to redland-dev
+
+	* configure.ac: hello Berkeley DB 4.7
+
+	* utils/Makefile.am: Add fix-groff-xhtml to dist
+
+	* utils/Makefile.am, utils/fix-groff-xhtml (from
+	/raptor/trunk/fix-groff-xhtml:15041): Copy in fix-groff-xhtml from
+	raptor
+
+	* configure.ac: libtool ltdl config that seems to work for V1 and V2
+
+2009-03-29  Dave Robillard <dave@drobilla.net>
+
+	* configure.ac, redland-src-config.in: Remove vestigial
+	--with-raptor=internal and --with-rasqal=internal configure
+	options.
+
+2009-03-29  Dave Beckett <dave@dajobe.org>
+
+	* Makefile.am: Add $(subdirs) to SUBDIRS if e.g. libltdl needs building
+
+	* configure.ac: Use LT_INIT LTDL_INIT and LT_CONFIG_LTDL_DIR to
+	initialize libtool and libltdl
+
+2009-03-29  Dave Robillard <dave@drobilla.net>
+
+	* librdf/rdf_init_internal.h, librdf/rdf_query_rasqal.c,
+	librdf/rdf_raptor.c, librdf/rdf_raptor.h: Compile against raptor
+	1.4.18.
+
+2009-03-29  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh: Delete libltdl dir early and always so it'll never
+	be used by autogen.sh and will always be re-generated by
+	libtoolize when needed.
+
+	* configure.ac: revert libltdl/Makefile
+
+	* configure.ac: Generate libltdl/Makefile
+
+2009-02-18  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage_file.c, librdf/rdf_storage_hashes.c,
+	librdf/rdf_storage_list.c, librdf/rdf_storage_mysql.c,
+	librdf/rdf_storage_postgresql.c, librdf/rdf_storage_sqlite.c,
+	librdf/rdf_storage_trees.c, librdf/rdf_storage_tstore.c: Check for
+	failures in storage instance allocation.
+
+2009-01-13  Lauri Aalto <laalto@iki.fi>
+
+	* librdf/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_literal_helper): Fixed whitespace in sql
+	expression.
+
+	* librdf/rdf_storage_sqlite.c: Do not write to the sqlite database
+	when just querying.
+	(librdf_storage_sqlite_uri_helper,
+	librdf_storage_sqlite_blank_helper,
+	librdf_storage_sqlite_literal_helper,
+	librdf_storage_sqlite_node_helper,
+	librdf_storage_sqlite_statement_helper,
+	librdf_storage_sqlite_statement_operator_helper): Take in an
+	add_new parameter to control whether to create new
+	uri/blank/literal ids.
+	(librdf_storage_sqlite_add_statements,
+	librdf_storage_sqlite_context_add_statement): add_new
+	(librdf_storage_sqlite_contains_statement): No add_new. Removed
+	FIXME note about the issue.
+	(librdf_storage_sqlite_find_statements): No add_new. Allow
+	negative node_ids in queries. (FIXME: should not exec queries that
+	are known to return nothing)
+	(librdf_storage_sqlite_context_remove_statement,
+	librdf_storage_sqlite_context_remove_statements,
+	librdf_storage_sqlite_context_serialise): No add_new.
