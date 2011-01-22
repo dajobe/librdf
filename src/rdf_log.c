@@ -199,19 +199,22 @@ librdf_fatal(librdf_world* world, int facility,
   char *buffer;
 
   /* Not passing NULL to snprintf since that seems to not be portable  */
-  size_t length=snprintf(empty_buffer, 1, "%s:%d:%s: fatal error: %s", 
-                         file, line, function, message);
+  size_t length = snprintf(empty_buffer, 1, "%s:%d:%s: fatal error: %s", 
+                           file, line, function, message);
   
   length++; /* add the length 1 passed in */
-  buffer=(char*)LIBRDF_MALLOC(cstring, length+1); /* for \0 */
-  if(!buffer)
-    abort();
-  
-  snprintf(buffer, length, "%s:%d:%s: fatal error: %s", 
-           file, line, function, message);
-  librdf_log(world, 0, LIBRDF_LOG_FATAL, (librdf_log_facility)facility, NULL,
-             "%s", buffer);
-  LIBRDF_FREE(cstring, buffer);
+  buffer = (char*)LIBRDF_MALLOC(cstring, length + 1); /* for \0 */
+  if(buffer)
+    snprintf(buffer, length, "%s:%d:%s: fatal error: %s", 
+             file, line, function, message);
+
+  librdf_log_simple(world, /* code */ 0, LIBRDF_LOG_FATAL, 
+                    (librdf_log_facility)facility, NULL,
+                    (buffer ? (const char*)buffer : message));
+
+  if(buffer)
+    LIBRDF_FREE(cstring, buffer);
+
   abort();
 }
 
