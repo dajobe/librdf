@@ -74,7 +74,8 @@ while test $# -gt 0; do
       args="$args --variable=swig";
       ;;
     --version)
-      args="$args --modversion";
+      echo @VERSION@
+      exit 0
       ;;
     --private-libs)
       args="$args --static --libs";
