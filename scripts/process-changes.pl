@@ -105,6 +105,9 @@ sub format_type_name_as_docbook_xml($) {
   my($name)=@_;
   
   my $escaped_name = $name; $escaped_name =~ s/_/-/g;
+  if($escaped_name =~ /^[-A-Z]+$/) {
+    $escaped_name .= ":CAPS";
+  }
   return qq{<link linkend="$escaped_name"><type>$name</type></link>};
 }
 
@@ -112,7 +115,10 @@ sub format_enum_name_as_docbook_xml($) {
   my($name)=@_;
   
   my $escaped_name = $name; $escaped_name =~ s/_/-/g;
-  return qq{<link linkend="$escaped_name:CAPS"><literal>$name</literal></link>};
+  if($escaped_name =~ /^[-A-Z]+$/) {
+    $escaped_name .= ":CAPS";
+  }
+  return qq{<link linkend="$escaped_name"><literal>$name</literal></link>};
 }
 
 
