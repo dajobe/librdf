@@ -115,7 +115,7 @@ while test $# -gt 0; do
   shift
 done
 
-raptor_config="pkg-config raptor"
+raptor_config="pkg-config raptor2"
 
 rasqal_config="pkg-config rasqal"
 
