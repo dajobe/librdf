@@ -1,4 +1,109 @@
+2011-01-22  Dave Beckett <dave@dajobe.org>
+
+	* Redland.i: Export syntax description functions for parser,
+	serializer and query results.
+
+	Export librdf_parser_get_description(),
+	librdf_query_results_formats_get_description() and
+	librdf_serializer_get_description() with const and unsigned
+	attributes removed since SWIG has tended to hate them.
+
+	* docs/redland-changes.tsv, src/rdf_parser.c, src/rdf_parser.h,
+	src/rdf_query.h, src/rdf_query_results.c, src/rdf_serializer.c,
+	src/rdf_serializer.h, utils/rdfproc.c: Add syntax descriptions for
+	parser, serializer and query result format.
+
+	Use raptor_syntax_description typdef from raptor2 to return a new
+	style way of listing syntax formats using a get_description method
+	on the static class.  Deprecates the old enumerate methods.
+
+	(librdf_parser_get_description): Added, deprecating
+	librdf_parser_enumerate().
+
+	(librdf_query_results_formats_get_description): Added, deprecating
+	librdf_query_results_formats_enumerate().
+
+	(librdf_serializer_get_description): Added, deprecating
+	librdf_serializer_enumerate().
+
+	Updated rdfproc to use new functions above.
+
+	Add function changes to redland-changes.tsv
+
+	Fixes Issue#0000325
+	http://bugs.librdf.org/mantis/view.php?id=325
+
+	* src/rdf_query_results.c: Remove Rasqal < 0.9.22 conditionals
+
+	(librdf_query_results_formats_check,
+	librdf_query_results_formats_enumerate): Remove #if conditions on
+	rasqal version.  Tidy code.
+
+	* src/rdf_query_rasqal.c, src/rdf_query_virtuoso.c: Remove Rasqal
+	< 0.9.22 conditionals
+
+	* redland.rdf.in: GIT
+
+	* configure.ac: Do not substitute LIBRDF_VERSION since VERSION is
+	already there
+
+	* redland-config.in: fix --version to work without pkg-config. Use
+	raptor2 package.  make --help and --version work before
+	installation to help make distcheck.
+
+	* Makefile.am: Add scripts to SUBDIRS
+
+	* docs/Makefile.am: redland-changes.tsv
+
+	* scripts/process-changes.pl: add linkend for uppercase
+	macros/enums
+
+	* Makefile.am: touch-mtime.pl moved
+
+2011-01-21  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac: Welcome back src/rdf_node.c
+
+	* Makefile.am: markdown-to-html.pl moved
+
+	* HACKING.md: more code style updates
+
+	* docs/Makefile.am: Remove redland-changes.tsv
+
+	* src/Makefile.am, src/rdf_node.c, src/rdf_raptor_statement.c,
+	src/rdf_statement.c, src/rdf_term.c: Rename
+	rdf_term/raptor_statement to rdf_node/statement to match class
+	names
+
+	* docs/redland-sections.txt: remove temporary raptor1 funcs from
+	unused. Add version macros
+
+	* scripts/Makefile.am: scripts automakefile
+
+	* docs/redland-changes.tsv, docs/redland-docs.xml,
+	scripts/process-changes.pl: Add redland changes since 1.0.12
+
+	Run process changes.  Add new types and typedefs.  Add changes
+	section to docs and update for 2011.
+
+	* docs/Makefile.am: fix package name
+
+	* configure.ac, docs/Makefile.am, docs/markdown-to-html.pl,
+	docs/redland-changes.tsv, scripts/markdown-to-html.pl,
+	scripts/touch-mtime.pl, utils/Makefile.am, utils/touch-mtime.pl:
+	Add scripts dir and generated redland changes
+
+	Add scripts dir and move scripts there.
+
+	Import process-changes.pl from rasqal.
+
+	Generate redland-changes.xml from redland-changes.tsv skeleton.
+
 2011-01-19  Dave Beckett <dave@dajobe.org>
+
+	* ChangeLog, FAQS.html, INSTALL.html, LICENSE.html, NEWS.html,
+	README.html, RELEASE.html, TODO.html, src/librdf.h.in: 1.0.13 and
+	2011
 
 	* src/Makefile.am: remove librdf.h from librdf_la_SOURCES
 
