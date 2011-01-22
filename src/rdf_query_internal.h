@@ -162,7 +162,7 @@ struct librdf_query_factory_s {
 
 
 /* module init */
-void librdf_init_query(librdf_world *world);
+int librdf_init_query(librdf_world *world);
 
 /* module terminate */
 void librdf_finish_query(librdf_world *world);
@@ -170,7 +170,7 @@ void librdf_finish_query(librdf_world *world);
 /* class methods */
 librdf_query_factory* librdf_get_query_factory(librdf_world *world, const char *name, librdf_uri* uri);
 
-void librdf_query_rasqal_constructor(librdf_world *world);
+int librdf_query_rasqal_constructor(librdf_world *world);
 
 #ifdef STORAGE_VIRTUOSO
 void librdf_init_query_virtuoso(librdf_world *world);

@@ -275,6 +275,8 @@ librdf_world_init_mutex(librdf_world* world)
 void
 librdf_world_open(librdf_world *world)
 {
+  int rc = 0;
+  
   if(world->opened++)
     return;
   
@@ -301,7 +303,15 @@ librdf_world_open(librdf_world *world)
   librdf_init_parser(world);
   librdf_init_serializer(world);
 
-  librdf_init_query(world);
+  rc = librdf_init_query(world);
+  if(rc)
+    goto failed;
+  
+  return;
+  
+failed:
+  /* should return an error state */
+  return;
 }
 
 

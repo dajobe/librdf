@@ -59,11 +59,15 @@ static void librdf_delete_query_factories(librdf_world *world);
  * compiled query modules.  Must be called before using any of the query
  * factory functions such as librdf_get_query_factory()
  **/
-void
+int
 librdf_init_query(librdf_world *world) 
 {
-  /* Always have query rasqal implementation available */
-  librdf_query_rasqal_constructor(world);
+  int rc;
+  
+  /* Always have rasqal implementation available */
+  rc = librdf_query_rasqal_constructor(world);
+  if(rc)
+    return rc;
 
 #ifdef MODULAR_LIBRDF
 #else
@@ -71,6 +75,8 @@ librdf_init_query(librdf_world *world)
   librdf_init_query_virtuoso(world);
 #endif
 #endif
+
+  return 0;
 }
 
 
