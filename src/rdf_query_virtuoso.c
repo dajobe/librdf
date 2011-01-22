@@ -1210,21 +1210,10 @@ librdf_query_virtuoso_new_results_formatter(librdf_query_results* query_results,
 
   rasqal_world_ptr = query_results->query->world->rasqal_world_ptr;
   
-#if RASQAL_VERSION >= 918
   formatter = rasqal_new_query_results_formatter(rasqal_world_ptr,
                                                  name,
                                                  mime_type,
                                                  (raptor_uri*)format_uri);
-#else
-  if(mime_type)
-    formatter = rasqal_new_query_results_formatter_by_mime_type(rasqal_world_ptr,
-                                                                mime_type);
-  else
-    formatter = rasqal_new_query_results_formatter(rasqal_world_ptr,
-                                                   name, 
-                                                   (raptor_uri*)format_uri);
-#endif
-
   if(!formatter)
     return NULL;
 
