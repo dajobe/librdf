@@ -62,8 +62,7 @@ static void librdf_delete_query_factories(librdf_world *world);
 void
 librdf_init_query(librdf_world *world) 
 {
-  /* Always have query triple, rasqal implementations available */
-  librdf_query_triples_constructor(world);
+  /* Always have query rasqal implementation available */
   librdf_query_rasqal_constructor(world);
 
 #ifdef MODULAR_LIBRDF
