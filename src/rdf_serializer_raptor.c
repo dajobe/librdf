@@ -226,7 +226,7 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
   }
 
   if (graph) {
-    if(librdf_node_is_resource(subject)) {
+    if(librdf_node_is_resource(graph)) {
       rstatement.graph = raptor_new_term_from_uri(raptor_serializer_get_world(rserializer),
                                                   (raptor_uri*)librdf_node_get_uri(graph));
     } else {
