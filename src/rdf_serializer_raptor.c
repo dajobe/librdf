@@ -169,7 +169,8 @@ librdf_serializer_raptor_set_namespace(void* context,
 
 static int
 librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
-                                             librdf_statement* statement)
+                                             librdf_statement* statement,
+                                             librdf_node* graph)
 {
   int rc = 1;
   raptor_statement rstatement;
@@ -224,7 +225,18 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
       goto exit;
   }
 
-  rstatement.graph = NULL;
+  if (graph) {
+    if(librdf_node_is_resource(subject)) {
+      rstatement.graph = raptor_new_term_from_uri(raptor_serializer_get_world(rserializer),
+                                                  (raptor_uri*)librdf_node_get_uri(graph));
+    } else {
+      /* FIXME - what to log here if anything? */
+      goto exit;
+    }
+  } else {
+    rstatement.graph = NULL;
+  }
+
   rc = raptor_serializer_serialize_statement(rserializer, &rstatement);
 
   exit:
@@ -259,9 +271,10 @@ librdf_serializer_raptor_serialize_stream_to_file_handle(void *context,
 
   rc=0;
   while(!librdf_stream_end(stream)) {
-    librdf_statement *statement=librdf_stream_get_object(stream);
-    rc=librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
-                                                    statement);
+    librdf_statement *statement = librdf_stream_get_object(stream);
+    librdf_node *graph = librdf_stream_get_context2(stream);
+    rc = librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer,
+                                                      statement, graph);
     if(rc)
       break;
     librdf_stream_next(stream);
@@ -333,9 +346,10 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
 
   rc=0;    
   while(!librdf_stream_end(stream)) {
-    librdf_statement *statement=librdf_stream_get_object(stream);
-    rc=librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
-                                                    statement);
+    librdf_statement *statement = librdf_stream_get_object(stream);
+    librdf_node *graph = librdf_stream_get_context2(stream);
+    rc = librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer,
+                                                      statement, graph);
     if(rc)
       break;
     librdf_stream_next(stream);
@@ -411,9 +425,10 @@ librdf_serializer_raptor_serialize_stream_to_iostream(void *context,
 
   rc=0;
   while(!librdf_stream_end(stream)) {
-    librdf_statement *statement=librdf_stream_get_object(stream);
-    rc=librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer, 
-                                                    statement);
+    librdf_statement *statement = librdf_stream_get_object(stream);
+    librdf_node *graph = librdf_stream_get_context2(stream);
+    rc = librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer,
+                                                      statement, graph);
     if(rc)
       break;
     librdf_stream_next(stream);
