@@ -66,6 +66,9 @@ Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=325">Issue #0000325</a>
 deprecating
 <code>librdf_query_results_formats_enumerate()</code>.</p>
 
+<p>Removed toy 'triples' query language.  Use 'sparql' instead.
+</p>
+
 
 <h3>Serializer class changes</h3>
 
@@ -97,6 +100,9 @@ find storage by the given name rather than just returning NULL.
 <code>LIBRDF_VERSION_DECIMAL</code> (already in earlier versions).
 </p>
 
+<p>Removed all code in user build of library that calls abort() and
+replaced with an error log, then failure.
+</p>
 
 
 <h2 id="rel1_0_12"><a name="rel1_0_12">Redland 1.0.12 Changes</a></h2>
