@@ -114,7 +114,6 @@ typedef struct librdf_stream_s librdf_stream;
 typedef struct librdf_parser_s librdf_parser;
 typedef struct librdf_serializer_s librdf_serializer;
 
-
 /* rdf_digest.h */
 %newobject librdf_new_digest;
 librdf_digest* librdf_new_digest(librdf_world *world, char *name);
@@ -311,7 +310,6 @@ librdf_storage* librdf_new_storage_from_storage (librdf_storage* old_storage);
 void librdf_free_storage(librdf_storage *storage);
 
 /* rdf_parser.h */
-raptor_syntax_description* librdf_parser_get_description(librdf_world* world, int counter);
 int librdf_parser_check_name(librdf_world* world, const char *name);
 
 %newobject librdf_new_parser;
@@ -353,8 +351,6 @@ int librdf_query_set_limit(librdf_query *query, int limit);
 int librdf_query_get_offset(librdf_query *query);
 int librdf_query_set_offset(librdf_query *query, int offset);
 
-raptor_syntax_description* librdf_query_results_formats_get_description(librdf_world* world, int counter); 
-
 %newobject librdf_query_results_as_stream;
 librdf_stream* librdf_query_results_as_stream(librdf_query_results* query_results);
 int librdf_query_results_get_count(librdf_query_results* query_results);
@@ -384,7 +380,6 @@ int librdf_query_results_get_boolean(librdf_query_results *query_results);
 
 
 /* rdf_serializer.h */
-raptor_syntax_description* librdf_serializer_get_description(librdf_world* world, int counter);
 int librdf_serializer_check_name(librdf_world* world, const char *name);
 
 %newobject librdf_new_serializer;
