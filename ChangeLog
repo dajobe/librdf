@@ -1,4 +1,61 @@
+2011-01-24  Dave Beckett <dave@dajobe.org>
+
+	* RELEASE.html: no SWIG interface changes
+
+	* Redland.i:
+	remove syntax description methods for now
+
 2011-01-22  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_init.c, src/rdf_query.c, src/rdf_query_internal.h,
+	src/rdf_query_rasqal.c: Pass on failure to initialise rasqal and
+	query system
+
+	(librdf_query_rasqal_constructor): Return error failure to
+	construct.
+
+	(librdf_init_query): Return error failure to init including from
+	librdf_query_rasqal_constructor()
+
+	* src/Makefile.am, src/rdf_query.c, src/rdf_query_internal.h,
+	src/rdf_query_triples.c: Remove triples query language
+
+	* src/rdf_log.c:
+	(librdf_fatal): Code tidy to call abort() just once and always
+	print the error.
+
+	* src/rdf_query_rasqal.c:
+	(librdf_query_rasqal_constructor): Call fatal error when query
+	lang reg fails.
+
+	* src/rdf_cache.c, src/rdf_concepts.c, src/rdf_digest.c,
+	src/rdf_hash_memory.c, src/rdf_init.c, src/rdf_log.c,
+	src/rdf_node.c, src/rdf_node_common.c, src/rdf_parser.c,
+	src/rdf_parser_raptor.c, src/rdf_query.c, src/rdf_query_rasqal.c,
+	src/rdf_query_results.c, src/rdf_query_virtuoso.c,
+	src/rdf_raptor.c, src/rdf_serializer.c,
+	src/rdf_statement_common.c, src/rdf_storage.c,
+	src/rdf_storage_file.c, src/rdf_storage_hashes.c,
+	src/rdf_storage_list.c, src/rdf_storage_mysql.c,
+	src/rdf_storage_postgresql.c, src/rdf_storage_sqlite.c,
+	src/rdf_storage_trees.c, src/rdf_storage_tstore.c,
+	src/rdf_storage_virtuoso.c, src/rdf_stream.c, src/rdf_uri.c: code
+	style
+
+	* src/rdf_hash.c, src/rdf_init.c: Casts for C++
+
+	* .gitignore, ChangeLog, ChangeLog.10, Makefile.am: Added
+	ChangeLog.10 for 2009
+
+	* docs/tmpl/iterator.sgml, docs/tmpl/list.sgml,
+	docs/tmpl/parser.sgml, docs/tmpl/query.sgml,
+	docs/tmpl/query_results.sgml, docs/tmpl/redland-unused.sgml,
+	docs/tmpl/section-general.sgml, docs/tmpl/serializer.sgml,
+	docs/tmpl/storage.sgml, docs/tmpl/stream.sgml,
+	docs/tmpl/unused.sgml: Update doc tmpls
+
+	* docs/redland-sections.txt: Add parser, serializer and query
+	result format get_description methods
 
 	* Redland.i: Export syntax description functions for parser,
 	serializer and query results.
