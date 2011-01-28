@@ -465,7 +465,7 @@ librdf_list_iterators_replace_node(librdf_list* list,
     next=node->next_ic;
     if(node->next == old_node) {
 #if LIBRDF_DEBUG > 2
-      LIBRDF_DEBUG3("Moved iterator %p pointing from next node %p to %p\n", 
+      LIBRDF_DEBUG4("Moved iterator %p pointing from next node %p to %p\n",
                     node->iterator, old_node, new_node);
 #endif
       node->next = new_node;
