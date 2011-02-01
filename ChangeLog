@@ -1,6 +1,29 @@
+2011-01-30  Dave Beckett <dave@dajobe.org>
+
+	* scripts/process-changes.pl: Import latest process-changes.pl
+	from rasqal
+
+2011-01-28  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_list.c:
+	(librdf_list_iterators_replace_node): Fixed debug print with
+	LIBRDF_DEBUG > 2.
+
+	Fixes Issue #0000419
+	http://bugs.librdf.org/mantis/view.php?id=419
+
+2011-01-25  Nicholas J Humfrey <njh@aelius.com>
+
+	* src/rdf_serializer_raptor.c: Corrected bad copy/paste of
+	librdf_node_is_resource() check in the raptor serializer code.
+
+	* src/rdf_serializer_raptor.c: Pass the graph context through to
+	the raptor serialiser, so that the graph is included in quad
+	serialisation formats.
+
 2011-01-24  Dave Beckett <dave@dajobe.org>
 
-	* RELEASE.html: no SWIG interface changes
+	* RELEASE.html: 1.0.13, no SWIG interface changes
 
 	* Redland.i:
 	remove syntax description methods for now
