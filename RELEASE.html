@@ -38,6 +38,7 @@ Rasqal functions that were conditioned on older rasqal versions.
 <ul>
   <li><a href="http://bugs.librdf.org/mantis/view.php?id=325">Issue #0000325</a>: Make mime_types and syntax URIs available in parser and serialiser enumerations</li>
   <li><a href="http://bugs.librdf.org/mantis/view.php?id=404">Issue #0000404</a>: Parsing errors when parsing RDFa</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=419">Issue #0000419</a>: Syntax error when debugging enabled</li>
 </ul>
 
 
@@ -80,6 +81,11 @@ returning NULL.
 <p>Added <code>librdf_serializer_get_description()</code> deprecating
 <code>librdf_serializer_enumerate()</code>.
 Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=325">Issue #0000325</a>
+</p>
+
+<p>The graph name is now provided to Raptor serializers so that they
+can write out quads, if supported. At present this works with the
+'nquads' serializer.
 </p>
 
 
