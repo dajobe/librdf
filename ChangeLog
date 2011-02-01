@@ -1,3 +1,8 @@
+2011-02-01  Dave Beckett  <dave@dajobe.org>
+
+	* Snapshotted redland_1_0_13 for 1.0.13 release (GIT commit
+	90ed9fc810fa1c2fb73ebe999204e46e29d116d0)
+
 2011-01-30  Dave Beckett <dave@dajobe.org>
 
 	* scripts/process-changes.pl: Import latest process-changes.pl
