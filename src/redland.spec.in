@@ -17,7 +17,7 @@ URL:       http://librdf.org/
 BuildRoot: /tmp/%{name}-%{version}
 BuildRequires: libxml2-devel >= 2.4.0
 BuildRequires: curl-devel
-BuildRequires: raptor-devel >= @RAPTOR_MIN_VERSION@
+BuildRequires: raptor2-devel >= @RAPTOR_MIN_VERSION@
 BuildRequires: rasqal-devel >= @RASQAL_MIN_VERSION@, rasqal-devel <= @RASQAL_MAX_VERSION@
 BuildRequires: perl >= 5.8.0
 BuildRequires: db4-devel
@@ -30,7 +30,7 @@ Packager:  Dave Beckett <dave@dajobe.org>
 Docdir: %{prefix}/doc
 Requires:  libxml2
 Requires:  curl
-Requires:  raptor
+Requires:  raptor2
 Requires:  rasqal
 Requires:  mysql
 
@@ -47,7 +47,7 @@ for RDF developers to start with.
 Summary: Libraries and header files for programs that use Redland.
 Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
-Requires: raptor >= @RAPTOR_MIN_VERSION@
+Requires: raptor2 >= @RAPTOR_MIN_VERSION@
 Requires: rasqal >= @RASQAL_MIN_VERSION@, rasqal <= @RASQAL_MAX_VERSION@
 
 %description devel
@@ -60,7 +60,7 @@ Header files for development with Redland
 
 %configure \
   --enable-release \
-  --with-raptor=system --with-rasqal=system --with-threestore=no
+  --with-threestore=no
 
 %{__make} OPTIMIZE="$RPM_OPT_FLAGS"
 
@@ -122,6 +122,10 @@ find $RPM_BUILD_ROOT -print | xargs chmod u+w
 %postun -p /sbin/ldconfig
 
 %changelog
+* Tue Feb 1 2011  Dave Beckett <dave@dajobe.org>
+- Require Raptor 2
+- Do not use removed configure options --with-raptor and --with-rasqal
+
 * Sun Dec 16 2007  Dave Beckett <dave@dajobe.org>
 - rasqal-devel has a max and a min version now
 - use macros like %{_bindir} and %{_includedir}
