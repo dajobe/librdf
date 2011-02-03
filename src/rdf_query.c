@@ -256,6 +256,9 @@ librdf_get_query_factory(librdf_world *world,
  * 
  * All returned strings are shared and must be copied if needed to be
  * used dynamically.
+ *
+ * @deprecated: use librdf_query_language_get_description() to return
+ * more information in a static structure.
  * 
  * Return value: non 0 on failure of if counter is out of range
  */
@@ -295,6 +298,24 @@ librdf_query_languages_enumerate(librdf_world* world,
   return 1;
 }
 
+/**
+ * librdf_query_language_get_description:
+ * @world: #librdf_world
+ * @counter: index into the list of query language syntaxes
+ *
+ * Get a query language syntax description.
+ *
+ * Return value: description or NULL if counter is out of range
+ */
+const raptor_syntax_description*
+librdf_query_language_get_description(librdf_world* world,
+                                      unsigned int counter)
+{
+  librdf_world_open(world);
+
+  return rasqal_world_get_query_language_description(world->raptor_world_ptr,
+                                                     counter);
+}
 
 /**
  * librdf_new_query:
