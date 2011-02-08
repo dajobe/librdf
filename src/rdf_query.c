@@ -313,7 +313,7 @@ librdf_query_language_get_description(librdf_world* world,
 {
   librdf_world_open(world);
 
-  return rasqal_world_get_query_language_description(world->raptor_world_ptr,
+  return rasqal_world_get_query_language_description(world->rasqal_world_ptr,
                                                      counter);
 }
 
@@ -680,13 +680,15 @@ main(int argc, char *argv[])
   /* list available query languages */
   fprintf(stdout, "%s: Enumerating query languages:\n", program);
   for (i = 0; 1; i++) {
+    const raptor_syntax_description* desc = NULL;
     const char *name;
     const unsigned char *uri;
     
-    if (librdf_query_languages_enumerate(world, i, &name, &uri))
+    desc = librdf_query_language_get_description(world, i);
+    if (!desc)
       break;
       
-    fprintf(stdout, " %s <%s>\n", name, (uri == NULL ? "" : (char*)uri));
+    fprintf(stdout, " %s <%s>\n", desc->names[0], desc->uri_strings_count ? desc->uri_strings[0] : "");
   }
 
   /* create model and storage */

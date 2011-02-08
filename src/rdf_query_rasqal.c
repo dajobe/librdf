@@ -1284,22 +1284,24 @@ librdf_query_rasqal_constructor(librdf_world *world)
    * is done last 
    */
   for(i = 1; 1; i++) {
-    const char *language_name = NULL;
-    const unsigned char *uri_string = NULL;
+    const raptor_syntax_description* desc = NULL;
+    const char* uri_string = NULL;
 
-    if(rasqal_languages_enumerate(world->rasqal_world_ptr, i, &language_name,
-                                  NULL, &uri_string)) {
+    desc = rasqal_world_get_query_language_description(world->rasqal_world_ptr, i);
+    if(!desc) {
       /* reached the end of the query languages, now register the default one */
       i = 0;
 
-      if(rasqal_languages_enumerate(world->rasqal_world_ptr, i, &language_name,
-                                    NULL, &uri_string)) {
+      desc = rasqal_world_get_query_language_description(world->rasqal_world_ptr, i);
+      if(!desc) {
         LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
         return 1;
       }
     }
 
-    librdf_query_register_factory(world, language_name, uri_string,
+    uri_string = desc->uri_strings_count ? desc->uri_strings[0] : NULL;
+
+    librdf_query_register_factory(world, desc->names[0], (const unsigned char*)uri_string,
                                   &librdf_query_rasqal_register_factory);
     
     if(!i) /* registered default query, end */
