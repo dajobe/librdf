@@ -1324,7 +1324,13 @@ librdf_parser_raptor_constructor(librdf_world *world)
       /* reached the end of the parsers, now register the default one */
       i = 0;
       desc = raptor_world_get_parser_description(world->raptor_world_ptr, i);
+      if(!desc) {
+        librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
+                   "Failed to find any Raptor parsers - Raptor may not be initialised correctly");
+        break;
+      }
     }
+
     syntax_name = desc->names[0];
     syntax_label = desc->label;
     if(desc->mime_types)
