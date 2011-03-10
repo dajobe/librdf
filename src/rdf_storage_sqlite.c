@@ -138,6 +138,7 @@ static void librdf_storage_sqlite_find_statements_finished(void* context);
 /* context functions */
 static int librdf_storage_sqlite_context_add_statement(librdf_storage* storage, librdf_node* context_node, librdf_statement* statement);
 static int librdf_storage_sqlite_context_remove_statement(librdf_storage* storage, librdf_node* context_node, librdf_statement* statement);
+static int librdf_storage_sqlite_context_contains_statement(librdf_storage* storage, librdf_node* context, librdf_statement* statement);
 static librdf_stream* librdf_storage_sqlite_context_serialise(librdf_storage* storage, librdf_node* context_node);
 
 /* context sqlite statement stream methods */
@@ -994,10 +995,6 @@ static int
 librdf_storage_sqlite_add_statement(librdf_storage* storage, 
                                     librdf_statement* statement)
 {
-  /* Do not add duplicate statements */
-  if(librdf_storage_sqlite_contains_statement(storage, statement))
-    return 0;
-
   return librdf_storage_sqlite_context_add_statement(storage, NULL, statement);
 }
 
@@ -1037,7 +1034,7 @@ librdf_storage_sqlite_add_statements(librdf_storage* storage,
     }
 
     /* Do not add duplicate statements */
-    if(librdf_storage_sqlite_contains_statement(storage, statement))
+    if(librdf_storage_sqlite_context_contains_statement(storage, context_node, statement))
       continue;
 
     if(librdf_storage_sqlite_statement_helper(storage,
@@ -1173,6 +1170,15 @@ static int
 librdf_storage_sqlite_contains_statement(librdf_storage* storage, 
                                          librdf_statement* statement)
 {
+  return librdf_storage_sqlite_context_contains_statement(storage, NULL, statement);
+}
+
+
+static int
+librdf_storage_sqlite_context_contains_statement(librdf_storage* storage,
+						 librdf_node* context_node,
+						 librdf_statement* statement)
+{
   raptor_stringbuffer *sb;
   unsigned char *request;
   int count = 0;
@@ -1190,7 +1196,7 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
                                     1);
 
   if(librdf_storage_sqlite_statement_operator_helper(storage, statement, 
-                                                     NULL, sb, 0)) {
+                                                     context_node, sb, 0)) {
     if(!begin)
       librdf_storage_sqlite_transaction_rollback(storage);
     raptor_free_stringbuffer(sb);
@@ -1201,10 +1207,10 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
   request = raptor_stringbuffer_as_string(sb);
   
   rc = librdf_storage_sqlite_exec(storage,
-                                request,
-                                librdf_storage_sqlite_get_1int_callback,
-                                &count,
-                                0);
+				  request,
+				  librdf_storage_sqlite_get_1int_callback,
+				  &count,
+				  0);
   
   raptor_free_stringbuffer(sb);
 
@@ -1989,6 +1995,10 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   int i;
   int rc, begin;
   int max=3;
+
+  /* Do not add duplicate statements */
+  if(librdf_storage_sqlite_context_contains_statement(storage, context_node, statement))
+    return 0;
 
   /* context = (librdf_storage_sqlite_instance*)storage->instance; */
 
