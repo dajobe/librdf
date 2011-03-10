@@ -198,11 +198,11 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
 /**
  * librdf_new_node_from_normalised_uri_string:
  * @world: redland world object
- * @uri_string: string representing a URI
+ * @uri_string: UTF-8 encoded string representing a URI
  * @source_uri: source URI
  * @base_uri: base URI
  *
- * Constructor - create a new #librdf_node object from a URI string normalised to a new base URI.
+ * Constructor - create a new #librdf_node object from a UTF-8 encoded URI string normalised to a new base URI.
  * 
  * Return value: a new #librdf_node object or NULL on failure
  **/
@@ -230,7 +230,7 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
 /**
  * librdf_new_node_from_literal:
  * @world: redland world object
- * @string: literal string value
+ * @string: literal UTF-8 encoded string value
  * @xml_language: literal XML language (or NULL, empty string)
  * @is_wf_xml: non 0 if literal is XML
  *
@@ -267,7 +267,7 @@ librdf_new_node_from_literal(librdf_world *world,
 /**
  * librdf_new_node_from_typed_literal:
  * @world: redland world object
- * @value: literal string value
+ * @value: literal UTF-8 encoded string value
  * @xml_language: literal XML language (or NULL, empty string)
  * @datatype_uri: URI of typed literal datatype or NULL
  *
@@ -298,7 +298,7 @@ librdf_new_node_from_typed_literal(librdf_world *world,
 /**
  * librdf_new_node_from_typed_counted_literal:
  * @world: redland world object
- * @value: literal string value
+ * @value: literal UTF-8 encoded string value
  * @value_len: literal string value length
  * @xml_language: literal XML language (or NULL, empty string)
  * @xml_language_len: literal XML language length (not used if @xml_language is NULL)
@@ -335,13 +335,13 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
 /**
  * librdf_new_node_from_counted_blank_identifier:
  * @world: redland world object
- * @identifier: blank node identifier or NULL
+ * @identifier: UTF-8 encoded blank node identifier or NULL
  * @identifier_len: length of @identifier
  *
  * Constructor - create a new blank node #librdf_node object from a blank node counted length identifier.
  *
- * If no @identifier string is given, creates a new internal identifier
- * and assigns it.
+ * If no @identifier string is given (NULL) this creates a new
+ * internal identifier and uses it.
  * 
  * Return value: new #librdf_node object or NULL on failure
  **/
@@ -362,12 +362,12 @@ librdf_new_node_from_counted_blank_identifier(librdf_world *world,
 /**
  * librdf_new_node_from_blank_identifier:
  * @world: redland world object
- * @identifier: blank node identifier or NULL
+ * @identifier: UTF-8 encoded blank node identifier or NULL
  *
  * Constructor - create a new blank node #librdf_node object from a blank node identifier.
  *
- * If no identifier string is given, creates a new internal identifier
- * and assigns it.
+ * If no @identifier string is given (NULL) this creates a new
+ * internal identifier and uses it.
  * 
  * Return value: new #librdf_node object or NULL on failure
  **/
@@ -448,6 +448,9 @@ librdf_node_get_uri(librdf_node *node)
  * @node: the node object
  *
  * Get the type of the node.
+ *
+ * See also librdf_node_is_resource(), librdf_node_is_literal() and
+ * librdf_node_is_blank() for testing individual types.
  * 
  * Return value: the node type
  **/
@@ -464,12 +467,12 @@ librdf_node_get_type(librdf_node *node)
  * librdf_node_get_literal_value:
  * @node: the node object
  *
- * Get the string literal value of the node.
+ * Get the literal value of the node as a UTF-8 encoded string.
  * 
- * Returns a pointer to the literal value held by the node, it must be
- * copied if it is wanted to be used by the caller.
+ * Returns a pointer to the UTF-8 encoded literal value held by the
+ * node, it must be copied if it is wanted to be used by the caller.
  *
- * Return value: the literal string or NULL if node is not a literal
+ * Return value: the UTF-8 encoded literal string or NULL if node is not a literal
  **/
 unsigned char*
 librdf_node_get_literal_value(librdf_node *node)
@@ -486,14 +489,15 @@ librdf_node_get_literal_value(librdf_node *node)
 /**
  * librdf_node_get_literal_value_as_counted_string:
  * @node: the node object
- * @len_p: pointer to location to store length (or NULL)
+ * @len_p: pointer to location to store the string length (or NULL)
  *
- * Get the string literal value of the node as a counted string.
+ * Get the literal value of the node as a counted UTF-8 encoded string.
  * 
- * Returns a pointer to the literal value held by the node, it must be
- * copied if it is wanted to be used by the caller.
+ * Returns a pointer to the UTF-8 encoded literal string value held
+ * by the node, it must be copied if it is wanted to be used by the
+ * caller.
  *
- * Return value: the literal string or NULL if node is not a literal
+ * Return value: the UTF-8 encoded literal string or NULL if node is not a literal
  **/
 unsigned char*
 librdf_node_get_literal_value_as_counted_string(librdf_node *node,
@@ -518,9 +522,10 @@ librdf_node_get_literal_value_as_counted_string(librdf_node *node,
  * Get the string literal value of the node as ISO Latin-1.
  * 
  * Returns a newly allocated string containing the conversion of the
- * UTF-8 literal value held by the node.
+ * node literal value held by the node into ISO Latin-1.  Discards
+ * characters outside the U+0000 to U+00FF range (inclusive).
  *
- * Return value: the literal string or NULL if node is not a literal
+ * Return value: the Latin-1 literal string or NULL if node is not a literal
  **/
 char*
 librdf_node_get_literal_value_as_latin1(librdf_node *node)
@@ -544,8 +549,9 @@ librdf_node_get_literal_value_as_latin1(librdf_node *node)
  *
  * Get the XML language of the node.
  * 
- * Returns a pointer to the literal language value held by the node, it must
- * be copied if it is wanted to be used by the caller.
+ * Returns a pointer to the literal language value held by the node,
+ * it must be copied if it is wanted to be used by the caller.
+ * Language strings are ASCII, not UTF-8 encoded Unicode.
  *
  * Return value: the XML language string or NULL if node is not a literal
  * or there is no XML language defined.
@@ -643,9 +649,9 @@ librdf_node_get_li_ordinal(librdf_node *node)
  * librdf_node_get_blank_identifier:
  * @node: the node object
  *
- * Get the blank node identifier.
+ * Get the blank node identifier as a UTF-8 encoded string.
  *
- * Return value: the identifier value or NULL on failure
+ * Return value: the UTF-8 encoded blank node identifier value or NULL on failure
  **/
 unsigned char*
 librdf_node_get_blank_identifier(librdf_node *node)
@@ -659,9 +665,9 @@ librdf_node_get_blank_identifier(librdf_node *node)
  * @node: the node object
  * @len_p: pointer to variable to store length (or NULL)
  *
- * Get the blank node identifier with length.
+ * Get the blank node identifier as a counted UTF-8 encoded string.
  *
- * Return value: the identifier value or NULL on failure
+ * Return value: the UTF-8 encoded blank node identifier value or NULL on failure
  **/
 unsigned char*
 librdf_node_get_counted_blank_identifier(librdf_node* node, size_t* len_p)
