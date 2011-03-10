@@ -1176,8 +1176,8 @@ librdf_storage_sqlite_contains_statement(librdf_storage* storage,
 
 static int
 librdf_storage_sqlite_context_contains_statement(librdf_storage* storage,
-						 librdf_node* context_node,
-						 librdf_statement* statement)
+                                                 librdf_node* context_node,
+                                                 librdf_statement* statement)
 {
   raptor_stringbuffer *sb;
   unsigned char *request;
@@ -1207,10 +1207,10 @@ librdf_storage_sqlite_context_contains_statement(librdf_storage* storage,
   request = raptor_stringbuffer_as_string(sb);
   
   rc = librdf_storage_sqlite_exec(storage,
-				  request,
-				  librdf_storage_sqlite_get_1int_callback,
-				  &count,
-				  0);
+                                  request,
+                                  librdf_storage_sqlite_get_1int_callback,
+                                  &count,
+                                  0);
   
   raptor_free_stringbuffer(sb);
 
