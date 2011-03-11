@@ -1,3 +1,114 @@
+2011-03-11  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_parser.c, src/rdf_parser.h, src/rdf_parser_internal.h,
+	src/rdf_parser_raptor.c: #trim trailing ws
+
+	* src/rdf_parser.c:
+	cast away compiler warnings
+
+	* src/rdf_parser_raptor.c:
+	(librdf_parser_raptor_parse_into_model_common): Reorder args so that
+	string and its length are next to each other.
+
+	* src/rdf_parser_raptor.c:
+	(librdf_parser_raptor_parse_iostream_as_stream): Autodocs
+
+	* src/rdf_parser_raptor.c:
+	(librdf_parser_raptor_parse_as_stream_common)
+	(librdf_parser_raptor_parse_into_model_common): Do not use
+	librdf_log() for programmer errors, just runtime errors.
+
+	* src/rdf_parser.c: bail out on encountering test failure
+
+	* src/rdf_parser.c: code style
+
+	* src/rdf_parser.c: #ws
+
+	* src/rdf_parser_raptor.c: fixed file name in boilerplate and
+	updated year
+
+	* src/rdf_parser.h, src/rdf_parser.c, src/rdf_parser_raptor.c:
+	(librdf_parser_parse_iostream_as_stream)
+	(librdf_parser_parse_iostream_into_model): Added two new API
+	functions contributed by nxg.Merged pull request
+	https://github.com/dajobe/librdf/pull/1 with the following
+	changes:
+	- Removed const qualifier from raptor_iostreams passed around.
+	- Fixed librdf_parser_raptor_parse_into_model_common() return type.
+	- Removed raptor1 support code as librdf no longer supports raptor1.
+
+	Fixes issue #0000375
+	http://bugs.librdf.org/mantis/view.php?id=375
+
+2011-03-10  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_storage_sqlite.c: #ws tabs to spaces
+
+	* src/rdf_storage_sqlite.c: sqlite storage: Do not add duplicate
+	statements if a context is given.
+
+	Fixes Issue #0000418
+	http://bugs.librdf.org/mantis/view.php?id=418
+
+2011-02-27  Dave Beckett <dave@dajobe.org>
+
+	* scripts/process-changes.pl:
+	Update to latest process-changes.pl
+
+2011-02-16  Dave Beckett <dave@dajobe.org>
+
+	* INSTALL.html: BDB is now owned by and distributed by Oracle
+
+2011-02-15  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_parser_raptor.c, src/rdf_serializer_raptor.c: Add sanity
+	check for raptor initialising that there are parsers and
+	serializers
+
+	(librdf_parser_raptor_constructor)
+	(librdf_serializer_raptor_constructor): If there is no default
+	parser/serializer (at index 0) then Raptor is probably broken so
+	return an error and stop initialising.
+
+2011-02-07  Dave Beckett <dave@dajobe.org>
+
+	* ChangeLog, ChangeLog.11, Makefile.am: Add ChangeLog.11 for 2010
+
+2011-02-06  Dave Beckett <dave@dajobe.org>
+
+	* LICENSE.html: Make GPL V2 or newer explicit.
+
+2011-02-04  Nicholas J Humfrey <njh@aelius.com>
+
+	* configure.ac: librdf now depends upon rasqal version 0.9.25 for
+	the new rasqal_world_get_query_language_description() function.
+
+2011-02-03  Nicholas J Humfrey <njh@aelius.com>
+
+	* src/rdf_query.c, src/rdf_query.h: 
+	(librdf_query_language_get_description): Added to return full
+	description of of the query language. Deprecated the
+	librdf_query_languages_enumerate() function.
+
+	(librdf_query_languages_enumerate): Deprecated for above.
+
+2011-02-02  Dave Beckett <dave@dajobe.org>
+
+	* redland.pc.in:
+	Revert 1e317023157f670816fe53d00c725fd407cf3451
+
+2011-02-01  Dave Beckett <dave@dajobe.org>
+
+	* src/redland.spec.in: Update spec for test RPM builds - Require
+	Raptor 2 - Do not use removed configure options --with-raptor and
+	--with-rasqal
+
+	* redland.pc.in:
+	Redland librdf requries raptor2 and rasqal
+
+	* NEWS.html, RELEASE.html, configure.ac:
+	Bumped version to 1.0.14
+
 2011-02-01  Dave Beckett  <dave@dajobe.org>
 
 	* Snapshotted redland_1_0_13 for 1.0.13 release (GIT commit
