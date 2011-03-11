@@ -841,9 +841,9 @@ librdf_parser_raptor_parse_iostream_as_stream(void *context,
  * @context: parser context
  * @uri: #librdf_uri URI of RDF content source, or NULL
  * @string: string content to parser, or NULL
+ * @length: length of the string or 0 if not yet counted
  * @fh: FILE* content source, or NULL
  * @iostream: iostream content, or NULL 
- * @length: length of the string or 0 if not yet counted
  * @base_uri: #librdf_uri URI of the content location or NULL
  * @model: #librdf_model of model
  *
@@ -859,9 +859,9 @@ static int
 librdf_parser_raptor_parse_into_model_common(void *context,
                                              librdf_uri *uri,
                                              const unsigned char *string,
+                                             size_t length,
                                              FILE *fh,
                                              raptor_iostream *iostream,
-                                             size_t length,
                                              librdf_uri *base_uri,
                                              librdf_model* model)
 {
@@ -985,7 +985,7 @@ librdf_parser_raptor_parse_uri_into_model(void *context, librdf_uri *uri,
                                           librdf_model* model)
 {
   return librdf_parser_raptor_parse_into_model_common(context, uri, 
-                                                      NULL, NULL, NULL, 0,
+                                                      NULL, 0, NULL, NULL,
                                                       base_uri, model);}
 
 
@@ -1009,7 +1009,7 @@ librdf_parser_raptor_parse_string_into_model(void *context,
                                              librdf_model* model)
 {
   return librdf_parser_raptor_parse_into_model_common(context, NULL,
-                                                      string, NULL, NULL, 0,
+                                                      string, 0, NULL, NULL,
                                                       base_uri, model);
 }
 
@@ -1034,7 +1034,7 @@ librdf_parser_raptor_parse_file_handle_into_model(void *context, FILE *fh,
                                                   librdf_model* model)
 {
   int status=librdf_parser_raptor_parse_into_model_common(context, NULL,
-                                                          NULL, fh, NULL, 0,
+                                                          NULL, 0, fh, NULL,
                                                           base_uri, model);
 
   if (close_fh)
@@ -1064,7 +1064,7 @@ librdf_parser_raptor_parse_counted_string_into_model(void *context,
                                                      librdf_model* model)
 {
   return librdf_parser_raptor_parse_into_model_common(context, NULL,
-                                                      string, NULL, NULL, length,
+                                                      string, length, NULL, NULL,
                                                       base_uri, model);
 }
 
@@ -1087,7 +1087,7 @@ librdf_parser_raptor_parse_iostream_into_model(void *context,
                                                librdf_model* model)
 {
   return librdf_parser_raptor_parse_into_model_common(context, NULL,
-                                                      NULL, NULL, iostream, 0,
+                                                      NULL, 0, NULL, iostream,
                                                       base_uri, model);
 }
 
