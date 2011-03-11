@@ -1146,7 +1146,7 @@ main(int argc, char *argv[])
 
     fprintf(stderr, "%s: Adding %s as iostream, as stream\n", program, type);
     iostream = raptor_new_iostream_from_string(world->raptor_world_ptr,
-                                               file_content[i],
+                                               (void *)file_content[i],
                                                length);
     stream = librdf_parser_parse_iostream_as_stream(parser, 
                                                     iostream,
@@ -1223,7 +1223,7 @@ main(int argc, char *argv[])
     /* test parsing iostream */
     fprintf(stderr, "%s: Adding %s iostream content\n", program, type);
     iostream = raptor_new_iostream_from_string(world->raptor_world_ptr,
-                                               file_content[i],
+                                               (void *)file_content[i],
                                                length);
     if(librdf_parser_parse_iostream_into_model(parser, 
                                                iostream,
