@@ -851,7 +851,7 @@ librdf_parser_raptor_parse_iostream_as_stream(void *context,
  *
  * Precisely one of uri, string, fh or iostream must be non-null.
  *
- * Parses the content at @uri, @string or @fh and store it in the given model.
+ * Parses the content at @uri, @string, @fh or @iostream and store it in the given model.
  *
  * Return value: non 0 on failure
  **/
