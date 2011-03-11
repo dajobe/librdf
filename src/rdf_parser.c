@@ -1096,20 +1096,22 @@ main(int argc, char *argv[])
 
     fprintf(stderr, "%s: Adding %s counted string content as stream\n", 
             program, type);
-    if(!(stream=librdf_parser_parse_counted_string_as_stream(parser, 
-                                                             file_content[i],
-                                                             length,
-                                                             uris[i]))) {
+    
+
+    stream = librdf_parser_parse_counted_string_as_stream(parser, 
+							  file_content[i],
+							  length,
+							  uris[i]);
+    if(!stream) {
       fprintf(stderr, "%s: Failed to parse RDF from counted string %d as stream\n", program, i);
       failures++;
       goto tidy_test;
     }
     librdf_model_add_statements(model, stream);
     librdf_free_stream(stream);
-    stream=NULL;
+    stream = NULL;
 
-
-    size=librdf_model_size(model);
+    size = librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
     if(size != EXPECTED_TRIPLES_COUNT) {
       fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
@@ -1119,19 +1121,20 @@ main(int argc, char *argv[])
     }
 
 
+    stream = librdf_parser_parse_string_as_stream(parser, 
+                                                  file_content[i],
+                                                  uris[i]);
+    if(!stream) {
     fprintf(stderr, "%s: Adding %s string content as stream\n", program, type);
-    if(!(stream=librdf_parser_parse_string_as_stream(parser, 
-                                                     file_content[i],
-                                                     uris[i]))) {
       fprintf(stderr, "%s: Failed to parse RDF from string %d as stream\n", program, i);
       failures++;
       goto tidy_test;
     }
     librdf_model_add_statements(model, stream);
     librdf_free_stream(stream);
-    stream=NULL;
+    stream = NULL;
     
-    size=librdf_model_size(model);
+    size = librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
     if(size != EXPECTED_TRIPLES_COUNT) {
       fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
@@ -1144,18 +1147,19 @@ main(int argc, char *argv[])
     iostream = raptor_new_iostream_from_string(world->raptor_world_ptr,
                                                file_content[i],
                                                length);
-    if(!(stream=librdf_parser_parse_iostream_as_stream(parser, 
-                                                       iostream,
-                                                       uris[i]))) {
+    stream = librdf_parser_parse_iostream_as_stream(parser, 
+                                                    iostream,
+						    uris[i]);
+    if(!stream) {
       fprintf(stderr, "%s: Failed to parse RDF from iostream %d as stream\n", program, i);
       failures++;
       goto tidy_test;
     }
     librdf_model_add_statements(model, stream);
     librdf_free_stream(stream);
-    stream=NULL;
+    stream = NULL;
     
-    size=librdf_model_size(model);
+    size = librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
     if(size != EXPECTED_TRIPLES_COUNT) {
       fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
@@ -1227,9 +1231,9 @@ main(int argc, char *argv[])
       goto tidy_test;
     }
 
-    for(i=0; i < librdf_parser_get_namespaces_seen_count(parser); i++) {
-      const char* prefix=librdf_parser_get_namespaces_seen_prefix(parser, i);
-      librdf_uri* uri=librdf_parser_get_namespaces_seen_uri(parser, i);
+    for(i = 0; i < librdf_parser_get_namespaces_seen_count(parser); i++) {
+      const char* prefix = librdf_parser_get_namespaces_seen_prefix(parser, i);
+      librdf_uri* uri = librdf_parser_get_namespaces_seen_uri(parser, i);
 
       fprintf(stderr, "%s: Saw namespace %d): prefix:%s URI:%s\n", program, i,
               (!prefix ? "" : (const char*)prefix),
@@ -1237,7 +1241,7 @@ main(int argc, char *argv[])
       
     }
 
-    size=librdf_model_size(model);
+    size = librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
     if(size != EXPECTED_TRIPLES_COUNT) {
       fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
