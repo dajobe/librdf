@@ -1140,6 +1140,7 @@ main(int argc, char *argv[])
       fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
               program, size, EXPECTED_TRIPLES_COUNT);
       failures++;
+      goto tidy_test;
     }
     
 
@@ -1165,6 +1166,7 @@ main(int argc, char *argv[])
       fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
               program, size, EXPECTED_TRIPLES_COUNT);
       failures++;
+      goto tidy_test;
     }
     
 
