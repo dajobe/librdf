@@ -719,12 +719,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
                                           (raptor_uri*)base_uri);
   } else {
     /* All three of URI, string and iostream are null.  That's a coding error. */
-    /* Clean up and report an error */
-    /* Is this the correct thing to do, here? */
     librdf_parser_raptor_serialise_finished((void*)scontext);
-    librdf_log(pcontext->parser->world,
-               0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
-               "Bad call in librdf_parser_raptor_parse_as_stream_common: this can't happen!");
     return NULL;
   }
   
@@ -954,13 +949,7 @@ librdf_parser_raptor_parse_into_model_common(void *context,
     status = raptor_parser_parse_iostream(pcontext->rdf_parser, iostream,  (raptor_uri*)base_uri);
   } else {
     /* All four of URI, string, fh and iostream are null.  That's a coding error. */
-    /* Clean up and report an error */
-    /* Is this the correct thing to do, here? */
-    librdf_parser_raptor_serialise_finished((void*)scontext);
-    librdf_log(pcontext->parser->world,
-               0, LIBRDF_LOG_FATAL, LIBRDF_FROM_PARSER, NULL,
-               "Bad call in librdf_parser_raptor_parse_into_model_common: this can't happen!");
-    return -1;
+    status = -1;
   }
 
   librdf_parser_raptor_serialise_finished((void*)scontext);
