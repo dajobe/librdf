@@ -4,22 +4,22 @@
  *
  * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
- * 
+ *
  * This package is Free Software and part of Redland http://librdf.org/
- * 
+ *
  * It is licensed under the following three licenses as alternatives:
  *   1. GNU Lesser General Public License (LGPL) V2.1 or any newer version
  *   2. GNU General Public License (GPL) V2 or any newer version
  *   3. Apache License, V2.0 or any newer version
- * 
+ *
  * You may not use this file except in compliance with at least one of
  * the above three licenses.
- * 
+ *
  * See LICENSE.html or LICENSE.txt at the top of this package for the
  * complete terms and further detail along with the license texts for
  * the licenses in COPYING.LIB, COPYING and LICENSE-2.0.txt respectively.
- * 
- * 
+ *
+ *
  */
 
 
@@ -50,7 +50,7 @@
  *
  **/
 void
-librdf_init_parser(librdf_world *world) 
+librdf_init_parser(librdf_world *world)
 {
   librdf_parser_raptor_constructor(world);
 }
@@ -64,7 +64,7 @@ librdf_init_parser(librdf_world *world)
  *
  **/
 void
-librdf_finish_parser(librdf_world *world) 
+librdf_finish_parser(librdf_world *world)
 {
   if(world->parsers) {
     raptor_free_sequence(world->parsers);
@@ -77,7 +77,7 @@ librdf_finish_parser(librdf_world *world)
 
 /* helper functions */
 static void
-librdf_free_parser_factory(librdf_parser_factory *factory) 
+librdf_free_parser_factory(librdf_parser_factory *factory)
 {
   if(factory->name)
     LIBRDF_FREE(cstring, factory->name);
@@ -101,12 +101,12 @@ librdf_free_parser_factory(librdf_parser_factory *factory)
  * @factory: function to be called to register the factor parameters
  *
  * Register a parser factory .
- * 
+ *
  **/
 REDLAND_EXTERN_C
 void
 librdf_parser_register_factory(librdf_world *world,
-                               const char *name, const char *label, 
+                               const char *name, const char *label,
                                const char *mime_type,
                                const unsigned char *uri_string,
                                void (*factory) (librdf_parser_factory*))
@@ -188,16 +188,16 @@ librdf_parser_register_factory(librdf_world *world,
  *
  * If all fields are NULL, this means any parser supporting
  * MIME Type "application/rdf+xml"
- * 
+ *
  * Return value: the factory or NULL if not found
  **/
 librdf_parser_factory*
 librdf_get_parser_factory(librdf_world *world,
                           const char *name, const char *mime_type,
-                          librdf_uri *type_uri) 
+                          librdf_uri *type_uri)
 {
   librdf_parser_factory *factory;
-  
+
   librdf_world_open(world);
 
   if(name && !*name)
@@ -218,7 +218,7 @@ librdf_get_parser_factory(librdf_world *world,
     }
   } else {
     int i;
-    
+
     for(i=0;
         (factory=(librdf_parser_factory*)raptor_sequence_get_at(world->parsers, i));
         i++) {
@@ -233,7 +233,7 @@ librdf_get_parser_factory(librdf_world *world,
         if(strcmp(factory->mime_type, mime_type))
           continue;
       }
-      
+
       /* URI may need to match */
       if(type_uri) {
         if(!factory->type_uri)
@@ -249,7 +249,7 @@ librdf_get_parser_factory(librdf_world *world,
     if(!factory)
       return NULL;
   }
-  
+
   return factory;
 }
 
@@ -262,7 +262,7 @@ librdf_get_parser_factory(librdf_world *world,
  * @label: pointer to store syntax readable label (or NULL)
  *
  * Get information on parsers.
- * 
+ *
  * @Deprecated: use librdf_parser_get_description() to return more information in a static structure.
  *
  * Return value: non 0 on failure of if counter is out of range
@@ -273,14 +273,14 @@ librdf_parser_enumerate(librdf_world* world,
                         const char **name, const char **label)
 {
   librdf_parser_factory *factory;
-  
+
   librdf_world_open(world);
 
   factory=(librdf_parser_factory*)raptor_sequence_get_at(world->parsers,
                                                          counter);
   if(!factory)
     return 1;
-  
+
   if(name)
     *name=factory->name;
   if(label)
@@ -295,11 +295,11 @@ librdf_parser_enumerate(librdf_world* world,
  * @counter: index into the list of parsers
  *
  * Get parser descriptive syntax information
- * 
+ *
  * Return value: description or NULL if counter is out of range
  **/
 const raptor_syntax_description*
-librdf_parser_get_description(librdf_world* world, 
+librdf_parser_get_description(librdf_world* world,
                               unsigned int counter)
 {
   librdf_world_open(world);
@@ -315,7 +315,7 @@ librdf_parser_get_description(librdf_world* world,
  * @name: name of parser
  *
  * Check if a parser name is known
- * 
+ *
  * Return value: non 0 if name is a known parser
  **/
 int
@@ -323,7 +323,7 @@ librdf_parser_check_name(librdf_world* world, const char *name)
 {
   librdf_parser_factory *factory;
   int i;
-  
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, char*, 0);
 
   librdf_world_open(world);
@@ -334,7 +334,7 @@ librdf_parser_check_name(librdf_world* world, const char *name)
     if(!strcmp(factory->name, name))
       return 1;
   }
-  
+
   return 0;
 }
 
@@ -347,14 +347,14 @@ librdf_parser_check_name(librdf_world* world, const char *name)
  * @type_uri: URI of syntax (NULL if not used)
  *
  * Constructor - create a new #librdf_parser object.
- * 
+ *
  * If all fields are NULL, this means any parser supporting
  * MIME Type "application/rdf+xml"
- * 
+ *
  * Return value: new #librdf_parser object or NULL
  **/
 librdf_parser*
-librdf_new_parser(librdf_world *world, 
+librdf_new_parser(librdf_world *world,
                   const char *name, const char *mime_type,
                   librdf_uri *type_uri)
 {
@@ -372,7 +372,7 @@ librdf_new_parser(librdf_world *world,
                  "parser for mime_type '%s' not found", mime_type);
     else if(type_uri)
       librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
-                 "parser for type URI '%s' not found", 
+                 "parser for type URI '%s' not found",
                  librdf_uri_as_string(type_uri));
     else
       librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_PARSER, NULL,
@@ -390,11 +390,11 @@ librdf_new_parser(librdf_world *world,
  * @factory: the parser factory to use to create this parser
  *
  * Constructor - create a new #librdf_parser object.
- * 
+ *
  * Return value: new #librdf_parser object or NULL
  **/
 librdf_parser*
-librdf_new_parser_from_factory(librdf_world *world, 
+librdf_new_parser_from_factory(librdf_world *world,
                                librdf_parser_factory *factory)
 {
   librdf_parser* d;
@@ -406,7 +406,7 @@ librdf_new_parser_from_factory(librdf_world *world,
   d=(librdf_parser*)LIBRDF_CALLOC(librdf_parser, 1, sizeof(librdf_parser));
   if(!d)
     return NULL;
-        
+
   d->context=(char*)LIBRDF_CALLOC(parser_context, 1, factory->context_length);
   if(!d->context) {
     librdf_free_parser(d);
@@ -414,7 +414,7 @@ librdf_new_parser_from_factory(librdf_world *world,
   }
 
   d->world=world;
-  
+
   d->factory=factory;
 
   if(factory->init && factory->init(d, d->context)) {
@@ -432,14 +432,14 @@ librdf_new_parser_from_factory(librdf_world *world,
  * @parser: the parser
  *
  * Destructor - destroys a #librdf_parser object.
- * 
+ *
  **/
 void
-librdf_free_parser(librdf_parser *parser) 
+librdf_free_parser(librdf_parser *parser)
 {
   if(!parser)
     return;
-  
+
   if(parser->context) {
     if(parser->factory->terminate)
       parser->factory->terminate(parser->context);
@@ -459,12 +459,12 @@ librdf_free_parser(librdf_parser *parser)
  * @base_uri: the base URI to use or NULL
  *
  * Parse a URI to a librdf_stream of statements.
- * 
+ *
  * Return value: #librdf_stream of statements or NULL
  **/
 librdf_stream*
 librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
-                              librdf_uri* base_uri) 
+                              librdf_uri* base_uri)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
@@ -490,12 +490,12 @@ librdf_parser_parse_as_stream(librdf_parser* parser, librdf_uri* uri,
  * @model: the model to use
  *
  * Parse a URI of content into an librdf_model.
- * 
+ *
  * Return value: non 0 on failure
  **/
 int
 librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
-                               librdf_uri* base_uri, librdf_model* model) 
+                               librdf_uri* base_uri, librdf_model* model)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, 1);
@@ -504,7 +504,7 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
   if(parser->factory->parse_uri_into_model)
     return parser->factory->parse_uri_into_model(parser->context,
                                                  uri, base_uri, model);
-  
+
   if(!librdf_uri_is_file_uri(uri)) {
     LIBRDF_DEBUG2("%s parser can only handle file: URIs\n", parser->factory->name);
     return 1;
@@ -521,13 +521,13 @@ librdf_parser_parse_into_model(librdf_parser* parser, librdf_uri* uri,
  * @base_uri: the base URI to use or NULL
  *
  * Parse a string of content to a librdf_stream of statements.
- * 
+ *
  * Return value: #librdf_stream of statements or NULL
  **/
 librdf_stream*
-librdf_parser_parse_string_as_stream(librdf_parser* parser, 
+librdf_parser_parse_string_as_stream(librdf_parser* parser,
                                      const unsigned char *string,
-                                     librdf_uri* base_uri) 
+                                     librdf_uri* base_uri)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL);
@@ -548,13 +548,13 @@ librdf_parser_parse_string_as_stream(librdf_parser* parser,
  * @model: the model to use
  *
  * Parse a string of content into an librdf_model.
- * 
+ *
  * Return value: non 0 on failure
  **/
 int
-librdf_parser_parse_string_into_model(librdf_parser* parser, 
+librdf_parser_parse_string_into_model(librdf_parser* parser,
                                       const unsigned char *string,
-                                      librdf_uri* base_uri, librdf_model* model) 
+                                      librdf_uri* base_uri, librdf_model* model)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, 1);
@@ -563,7 +563,7 @@ librdf_parser_parse_string_into_model(librdf_parser* parser,
   if(parser->factory->parse_string_into_model)
     return parser->factory->parse_string_into_model(parser->context,
                                                     string, base_uri, model);
-  
+
   return 1;
 }
 
@@ -576,18 +576,18 @@ librdf_parser_parse_string_into_model(librdf_parser* parser,
  * @base_uri: the base URI to use or NULL
  *
  * Parse a counted string of content to a librdf_stream of statements.
- * 
+ *
  * Return value: #librdf_stream of statements or NULL
  **/
 librdf_stream*
-librdf_parser_parse_counted_string_as_stream(librdf_parser* parser, 
+librdf_parser_parse_counted_string_as_stream(librdf_parser* parser,
                                              const unsigned char *string,
                                              size_t length,
                                              librdf_uri* base_uri)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, string, NULL);
-  LIBRDF_ASSERT_RETURN(length < 1, "string length is not greater than zero", 
+  LIBRDF_ASSERT_RETURN(length < 1, "string length is not greater than zero",
                        NULL);
 
   if(parser->factory->parse_counted_string_as_stream)
@@ -608,14 +608,14 @@ librdf_parser_parse_counted_string_as_stream(librdf_parser* parser,
  * @model: the model to use
  *
  * Parse a counted string of content into an librdf_model.
- * 
+ *
  * Return value: non 0 on failure
  **/
 int
-librdf_parser_parse_counted_string_into_model(librdf_parser* parser, 
+librdf_parser_parse_counted_string_into_model(librdf_parser* parser,
                                               const unsigned char *string,
                                               size_t length,
-                                              librdf_uri* base_uri, 
+                                              librdf_uri* base_uri,
                                               librdf_model* model)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
@@ -627,7 +627,7 @@ librdf_parser_parse_counted_string_into_model(librdf_parser* parser,
     return parser->factory->parse_counted_string_into_model(parser->context,
                                                             string, length,
                                                             base_uri, model);
-  
+
   return 1;
 }
 
@@ -640,7 +640,7 @@ librdf_parser_parse_counted_string_into_model(librdf_parser* parser,
  * @base_uri: the base URI to use (or NULL)
  *
  * Parse a FILE* handle of content to a #librdf_stream of statements.
- * 
+ *
  * Return value: #librdf_stream of statements or NULL
  **/
 librdf_stream*
@@ -667,13 +667,13 @@ librdf_parser_parse_file_handle_as_stream(librdf_parser* parser, FILE *fh,
  * @model: the model to write to
  *
  * Parse a FILE* handle of content into an #librdf_model.
- * 
+ *
  * Return value: non 0 on failure
  **/
 int
 librdf_parser_parse_file_handle_into_model(librdf_parser* parser, FILE *fh,
                                            int close_fh, librdf_uri* base_uri,
-					   librdf_model* model) 
+					   librdf_model* model)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(fh, FILE, 1);
@@ -695,13 +695,13 @@ librdf_parser_parse_file_handle_into_model(librdf_parser* parser, FILE *fh,
  * @base_uri: the base URI to use or NULL
  *
  * Parse an iostream of content to a librdf_stream of statements.
- * 
+ *
  * Return value: #librdf_stream of statements or NULL
  **/
 librdf_stream*
-librdf_parser_parse_iostream_as_stream(librdf_parser* parser, 
+librdf_parser_parse_iostream_as_stream(librdf_parser* parser,
                                        raptor_iostream *iostream,
-                                       librdf_uri* base_uri) 
+                                       librdf_uri* base_uri)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(iostream, raptor_iostream, NULL);
@@ -722,13 +722,13 @@ librdf_parser_parse_iostream_as_stream(librdf_parser* parser,
  * @model: the model to use
  *
  * Parse a iostream of content into an librdf_model.
- * 
+ *
  * Return value: non 0 on failure
  **/
 int
-librdf_parser_parse_iostream_into_model(librdf_parser* parser, 
+librdf_parser_parse_iostream_into_model(librdf_parser* parser,
                                         raptor_iostream *iostream,
-                                        librdf_uri* base_uri, librdf_model* model) 
+                                        librdf_uri* base_uri, librdf_model* model)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(iostream, raptor_iostream, 1);
@@ -737,7 +737,7 @@ librdf_parser_parse_iostream_into_model(librdf_parser* parser,
   if(parser->factory->parse_iostream_into_model)
     return parser->factory->parse_iostream_into_model(parser->context,
                                                       iostream, base_uri, model);
-  
+
   return 1;
 }
 
@@ -751,7 +751,7 @@ librdf_parser_parse_iostream_into_model(librdf_parser* parser,
  * @Deprecated: Does nothing
  *
  * Set the parser error handling function.
- * 
+ *
  **/
 REDLAND_EXTERN_C
 void
@@ -789,12 +789,12 @@ librdf_parser_set_warning(librdf_parser* parser, void *user_data,
  * @feature: #librdf_Uuri feature property
  *
  * Get the value of a parser feature.
- * 
+ *
  * Return value: new #librdf_node feature value or NULL if no such feature
  * exists or the value is empty.
  **/
 librdf_node*
-librdf_parser_get_feature(librdf_parser* parser, librdf_uri* feature) 
+librdf_parser_get_feature(librdf_parser* parser, librdf_uri* feature)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, NULL);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(feature, librdf_uri, NULL);
@@ -812,13 +812,13 @@ librdf_parser_get_feature(librdf_parser* parser, librdf_uri* feature)
  * @value: #librdf_node feature property value
  *
  * Set the value of a parser feature.
- * 
+ *
  * Return value: non 0 on failure (negative if no such feature)
  **/
-  
+
 int
-librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature, 
-                          librdf_node* value) 
+librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature,
+                          librdf_node* value)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(parser, librdf_parser, -1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(feature, librdf_uri, -1);
@@ -834,7 +834,7 @@ librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature,
 /**
  * librdf_parser_get_accept_header:
  * @parser: parser
- * 
+ *
  * Get an HTTP Accept value for the parser.
  *
  * The returned string must be freed by the caller such as with
@@ -857,15 +857,15 @@ librdf_parser_get_accept_header(librdf_parser* parser)
  * @mime_type: MIME type of syntax or NULL
  * @buffer: content buffer or NULL
  * @identifier: content identifier or NULL
- * 
+ *
  * Get a parser name for content with type or identifier
- * 
+ *
  * Return value: a parser name or NULL if nothing was guessable
  **/
 const char*
 librdf_parser_guess_name2(librdf_world* world,
                           const char *mime_type,
-                          const unsigned char *buffer, 
+                          const unsigned char *buffer,
                           const unsigned char *identifier)
 {
   int len = buffer ? strlen((const char *)buffer) : 0;
@@ -873,7 +873,7 @@ librdf_parser_guess_name2(librdf_world* world,
   /* can do nothing if called with no world */
   if(!world || !world->raptor_world_ptr)
     return NULL;
-  
+
   return raptor_world_guess_parser_name(world->raptor_world_ptr,
                                         NULL, mime_type, buffer,
                                         len,
@@ -887,14 +887,14 @@ librdf_parser_guess_name2(librdf_world* world,
  * @mime_type: MIME type of syntax or NULL
  * @buffer: content buffer or NULL
  * @identifier: content identifier or NULL
- * 
+ *
  * Get a parser name for content with type or identifier
- * 
+ *
  * Return value: a parser name or NULL if nothing was guessable
  **/
 const char*
 librdf_parser_guess_name(const char *mime_type,
-                         const unsigned char *buffer, 
+                         const unsigned char *buffer,
                          const unsigned char *identifier)
 {
   return librdf_parser_guess_name2(NULL, mime_type, buffer, identifier);
@@ -906,9 +906,9 @@ librdf_parser_guess_name(const char *mime_type,
  * librdf_parser_get_namespaces_seen_prefix:
  * @parser: #librdf_parser object
  * @offset: index into list of namespaces
- * 
+ *
  * Get the prefix of namespaces seen during parsing
- * 
+ *
  * Return value: prefix or NULL if no such namespace prefix
  **/
 const char*
@@ -924,9 +924,9 @@ librdf_parser_get_namespaces_seen_prefix(librdf_parser* parser, int offset)
  * librdf_parser_get_namespaces_seen_uri:
  * @parser: #librdf_parser object
  * @offset: index into list of namespaces
- * 
+ *
  * Get the uri of namespaces seen during parsing
- * 
+ *
  * Return value: uri or NULL if no such namespace uri
  **/
 librdf_uri*
@@ -940,9 +940,9 @@ librdf_parser_get_namespaces_seen_uri(librdf_parser* parser, int offset)
 /**
  * librdf_parser_get_namespaces_seen_count:
  * @parser: #librdf_parser object
- * 
+ *
  * Get the number of namespaces seen during parsing
- * 
+ *
  * Return value: uri or NULL if no such namespace uri
  **/
 int
@@ -959,7 +959,7 @@ librdf_parser_get_namespaces_seen_count(librdf_parser* parser)
  * @parser: #librdf_parser object
  * @filter: URI filter function
  * @user_data: User data to pass to filter function
- * 
+ *
  * Set URI filter function for retrieval during parsing.
 **/
 void
@@ -974,7 +974,7 @@ librdf_parser_set_uri_filter(librdf_parser* parser,
  * librdf_parser_get_uri_filter:
  * @parser: #librdf_parser object
  * @user_data_p: Pointer to user data to return
- * 
+ *
  * Get the current URI filter function for retrieval during parsing.
  *
  * Return value: current URI filter function
@@ -1029,7 +1029,7 @@ int main(int argc, char *argv[]);
 
 
 int
-main(int argc, char *argv[]) 
+main(int argc, char *argv[])
 {
   const char *test_parser_types[]={"rdfxml", "ntriples", "turtle", NULL};
   #define URI_STRING_COUNT 3
@@ -1041,7 +1041,7 @@ main(int argc, char *argv[])
   const char *program=librdf_basename((const char*)argv[0]);
   librdf_world *world;
   int failures;
-  
+
   world=librdf_new_world();
   librdf_world_open(world);
 
@@ -1062,7 +1062,7 @@ main(int argc, char *argv[])
 
     if(i>0)
       break;
-    
+
     fprintf(stderr, "%s: Testing parsing syntax '%s'\n", program, type);
 
     fprintf(stderr, "%s: Creating storage and model\n", program);
@@ -1092,13 +1092,13 @@ main(int argc, char *argv[])
       free(accept_h);
     } else
       fprintf(stderr, "%s: Parser has no accept header\n", program);
-    
 
-    fprintf(stderr, "%s: Adding %s counted string content as stream\n", 
+
+    fprintf(stderr, "%s: Adding %s counted string content as stream\n",
             program, type);
-    
 
-    stream = librdf_parser_parse_counted_string_as_stream(parser, 
+
+    stream = librdf_parser_parse_counted_string_as_stream(parser,
 							  file_content[i],
 							  length,
 							  uris[i]);
@@ -1121,7 +1121,7 @@ main(int argc, char *argv[])
     }
 
 
-    stream = librdf_parser_parse_string_as_stream(parser, 
+    stream = librdf_parser_parse_string_as_stream(parser,
                                                   file_content[i],
                                                   uris[i]);
     if(!stream) {
@@ -1133,7 +1133,7 @@ main(int argc, char *argv[])
     librdf_model_add_statements(model, stream);
     librdf_free_stream(stream);
     stream = NULL;
-    
+
     size = librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
     if(size != EXPECTED_TRIPLES_COUNT) {
@@ -1142,13 +1142,13 @@ main(int argc, char *argv[])
       failures++;
       goto tidy_test;
     }
-    
+
 
     fprintf(stderr, "%s: Adding %s as iostream, as stream\n", program, type);
     iostream = raptor_new_iostream_from_string(world->raptor_world_ptr,
                                                (void *)file_content[i],
                                                length);
-    stream = librdf_parser_parse_iostream_as_stream(parser, 
+    stream = librdf_parser_parse_iostream_as_stream(parser,
                                                     iostream,
 						    uris[i]);
     if(!stream) {
@@ -1159,7 +1159,7 @@ main(int argc, char *argv[])
     librdf_model_add_statements(model, stream);
     librdf_free_stream(stream);
     stream = NULL;
-    
+
     size = librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
     if(size != EXPECTED_TRIPLES_COUNT) {
@@ -1168,10 +1168,10 @@ main(int argc, char *argv[])
       failures++;
       goto tidy_test;
     }
-    
+
 
     fprintf(stderr, "%s: Adding %s counted string content\n", program, type);
-    if(librdf_parser_parse_counted_string_into_model(parser, 
+    if(librdf_parser_parse_counted_string_into_model(parser,
                                                      file_content[i],
                                                      length,
                                                      uris[i], model)) {
@@ -1179,7 +1179,7 @@ main(int argc, char *argv[])
       failures++;
       goto tidy_test;
     }
-    
+
     size=librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
     if(size != EXPECTED_TRIPLES_COUNT) {
@@ -1191,7 +1191,7 @@ main(int argc, char *argv[])
 
 
     fprintf(stderr, "%s: Adding %s string content\n", program, type);
-    if(librdf_parser_parse_string_into_model(parser, 
+    if(librdf_parser_parse_string_into_model(parser,
                                              file_content[i],
                                              uris[i], model)) {
       fprintf(stderr, "%s: Failed to parse RDF from string %d into model\n", program, i);
@@ -1207,9 +1207,9 @@ main(int argc, char *argv[])
       fprintf(stderr, "%s: Saw namespace %d): prefix:%s URI:%s\n", program, i,
               (!prefix ? "" : (const char*)prefix),
               (!uri ? "(none)" : (const char*)librdf_uri_as_string(uri)));
-      
+
     }
-    
+
 
     size=librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
@@ -1225,7 +1225,7 @@ main(int argc, char *argv[])
     iostream = raptor_new_iostream_from_string(world->raptor_world_ptr,
                                                (void *)file_content[i],
                                                length);
-    if(librdf_parser_parse_iostream_into_model(parser, 
+    if(librdf_parser_parse_iostream_into_model(parser,
                                                iostream,
                                                uris[i], model)) {
       fprintf(stderr, "%s: Failed to parse RDF from iostream %d into model\n", program, i);
@@ -1240,7 +1240,7 @@ main(int argc, char *argv[])
       fprintf(stderr, "%s: Saw namespace %d): prefix:%s URI:%s\n", program, i,
               (!prefix ? "" : (const char*)prefix),
               (!uri ? "(none)" : (const char*)librdf_uri_as_string(uri)));
-      
+
     }
 
     size = librdf_model_size(model);
@@ -1251,7 +1251,7 @@ main(int argc, char *argv[])
       failures++;
       goto tidy_test;
     }
-    
+
     fprintf(stderr, "%s: Freeing parser, model and storage\n", program);
   tidy_test:
     if(stream)
@@ -1263,15 +1263,15 @@ main(int argc, char *argv[])
     if(storage)
       librdf_free_storage(storage);
   }
-  
+
 
   fprintf(stderr, "%s: Freeing URIs\n", program);
   for (i=0; i<URI_STRING_COUNT; i++) {
     librdf_free_uri(uris[i]);
   }
-  
+
   librdf_free_world(world);
-  
+
   return failures;
 }
 
