@@ -736,7 +736,7 @@ librdf_parser_parse_iostream_into_model(librdf_parser* parser,
 
   if(parser->factory->parse_iostream_into_model)
     return parser->factory->parse_iostream_into_model(parser->context,
-                                                    iostream, base_uri, model);
+                                                      iostream, base_uri, model);
   
   return 1;
 }
