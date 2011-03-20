@@ -30,8 +30,11 @@
 extern "C" {
 #endif
 
-void librdf_init_raptor(librdf_world* world);
+int librdf_init_raptor(librdf_world* world);
 void librdf_finish_raptor(librdf_world* world);
+
+int librdf_raptor_free_bnode_hash(librdf_world* world);
+int librdf_raptor_reset_bnode_hash(librdf_world* world);
 
 #ifdef __cplusplus
 }

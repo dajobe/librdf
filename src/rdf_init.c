@@ -195,11 +195,12 @@ librdf_free_world(librdf_world *world)
   librdf_finish_node(world);
   librdf_finish_uri(world);
 
+  /* Uses rdf_hash so free before destroying hashes */
+  librdf_finish_raptor(world);
+
   librdf_finish_hash(world);
 
   librdf_finish_digest(world);
-
-  librdf_finish_raptor(world);
 
 #ifdef WITH_THREADS
 
@@ -282,15 +283,15 @@ librdf_world_open(librdf_world *world)
   
   librdf_world_init_mutex(world);
 
-  /* Initialize raptor library first. Used by many other classes. */
-  librdf_init_raptor(world);
-  
   /* Digests second, lots of things use these */
   librdf_init_digest(world);
 
   /* Hash next, needed for URIs */
   librdf_init_hash(world);
 
+  /* Initialize raptor; uses rdf_hash for bnode mapping */
+  librdf_init_raptor(world);
+  
   librdf_init_uri(world);
   librdf_init_node(world);
 

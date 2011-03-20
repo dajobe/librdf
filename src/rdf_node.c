@@ -375,15 +375,22 @@ librdf_node*
 librdf_new_node_from_blank_identifier(librdf_world *world,
                                       const unsigned char *identifier)
 {
+  const unsigned char *blank = identifier;
+  librdf_node* node = NULL;
+  
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
   
   librdf_world_open(world);
 
   if(!identifier)
-    identifier = librdf_world_get_genid(world);
+    blank = librdf_world_get_genid(world);
   
-  return raptor_new_term_from_blank(world->raptor_world_ptr,
-                                    identifier);
+  node = raptor_new_term_from_blank(world->raptor_world_ptr, blank);
+
+  if(!identifier)
+    LIBRDF_FREE(cstring, (char*)blank);
+
+  return node;
 }
 
 

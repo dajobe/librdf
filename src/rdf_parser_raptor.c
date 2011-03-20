@@ -52,7 +52,6 @@ static void librdf_parser_raptor_serialise_finished(void* context);
 
 typedef struct {
   librdf_parser *parser;        /* librdf parser object */
-  librdf_hash *bnode_hash;      /* bnode id (raptor=>internal) map */
   raptor_parser *rdf_parser;    /* source URI string (for raptor) */
   const char *parser_name;      /* raptor parser name to use */
 
@@ -119,18 +118,15 @@ librdf_parser_raptor_init(librdf_parser *parser, void *context)
    * from when there was just one parser
    */
   if(!strcmp(pcontext->parser_name, "raptor"))
-    pcontext->parser_name="rdfxml";
-
-  /* New in-memory hash for mapping bnode IDs */
-  pcontext->bnode_hash=librdf_new_hash(parser->world, NULL);
-  if(!pcontext->bnode_hash)
-    return 1;
+    pcontext->parser_name = "rdfxml";
 
   pcontext->rdf_parser = raptor_new_parser(parser->world->raptor_world_ptr,
                                            pcontext->parser_name);
 
   if(!pcontext->rdf_parser)
     return 1;
+
+  librdf_raptor_reset_bnode_hash(parser->world);
 
   return 0;
 }
@@ -148,6 +144,8 @@ librdf_parser_raptor_terminate(void *context)
 {
   librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)context;
 
+  librdf_raptor_free_bnode_hash(pcontext->parser->world);
+  
   if(pcontext->stream_context)
     librdf_parser_raptor_serialise_finished(pcontext->stream_context);
 
@@ -156,9 +154,6 @@ librdf_parser_raptor_terminate(void *context)
 
   if(pcontext->rdf_parser)
     raptor_free_parser(pcontext->rdf_parser);
-
-  if(pcontext->bnode_hash)
-    librdf_free_hash(pcontext->bnode_hash);
 
   if(pcontext->nspace_prefixes)
     raptor_free_sequence(pcontext->nspace_prefixes);
@@ -381,30 +376,6 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
 }
 
 
-static unsigned char*
-librdf_parser_raptor_generate_id_handler(void *user_data,
-                                         unsigned char *user_bnodeid)
-{
-  librdf_parser_raptor_context* pcontext=(librdf_parser_raptor_context*)user_data;
-  if(user_bnodeid) {
-    unsigned char *mapped_id=(unsigned char*)librdf_hash_get(pcontext->bnode_hash, (const char*)user_bnodeid);
-    if(!mapped_id) {
-      mapped_id=librdf_world_get_genid(pcontext->parser->world);
-      if(mapped_id && librdf_hash_put_strings(pcontext->bnode_hash, (char*)user_bnodeid, (char*)mapped_id)) {
-        /* error -> free mapped_id and return NULL */
-        LIBRDF_FREE(cstring, mapped_id);
-        mapped_id=NULL;
-      }
-    }
-    /* always free passed in bnodeid */
-    raptor_free_memory(user_bnodeid);
-    return mapped_id;
-  }
-  else
-    return librdf_world_get_genid(pcontext->parser->world);
-}
-
-
 /*
  * librdf_parser_raptor_parse_file_handle_as_stream:
  * @context: parser context
@@ -479,11 +450,6 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
                                       librdf_parser_raptor_new_statement_handler);
   raptor_parser_set_namespace_handler(pcontext->rdf_parser, pcontext,
                                       librdf_parser_raptor_namespace_handler);
-
-  raptor_world_set_generate_bnodeid_handler(pcontext->parser->world->raptor_world_ptr,
-                                            pcontext,
-                                            librdf_parser_raptor_generate_id_handler);
-
 
 
   scontext->fh=fh;
@@ -650,10 +616,6 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
                                       librdf_parser_raptor_new_statement_handler);
   raptor_parser_set_namespace_handler(pcontext->rdf_parser, pcontext,
                                       librdf_parser_raptor_namespace_handler);
-
-  raptor_world_set_generate_bnodeid_handler(pcontext->parser->world->raptor_world_ptr,
-                                            pcontext,
-                                            librdf_parser_raptor_generate_id_handler);
 
   if(pcontext->parser->uri_filter)
     raptor_parser_set_uri_filter(pcontext->rdf_parser,
@@ -920,10 +882,6 @@ librdf_parser_raptor_parse_into_model_common(void *context,
                                       librdf_parser_raptor_new_statement_handler);
   raptor_parser_set_namespace_handler(pcontext->rdf_parser, pcontext,
                                       librdf_parser_raptor_namespace_handler);
-
-  raptor_world_set_generate_bnodeid_handler(pcontext->parser->world->raptor_world_ptr,
-                                            pcontext,
-                                            librdf_parser_raptor_generate_id_handler);
 
   /* direct into model */
   scontext->model=model;
@@ -1202,6 +1160,8 @@ librdf_parser_raptor_serialise_finished(void* context)
 
     if(scontext->pcontext)
       scontext->pcontext->stream_context=NULL;
+
+    librdf_raptor_free_bnode_hash(scontext->pcontext->parser->world);
 
     LIBRDF_FREE(librdf_parser_raptor_context, scontext);
   }

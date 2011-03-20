@@ -149,6 +149,9 @@ struct librdf_world_s
   /* raptor world object */
   raptor_world* raptor_world_ptr;
   int raptor_world_allocated_here;
+
+  /* bnode id (raptor => internal) map during parsing */
+  librdf_hash *bnode_hash;
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);

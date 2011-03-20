@@ -115,6 +115,61 @@ librdf_raptor_log_handler(void *data, raptor_log_message *message)
 }
 
 
+int
+librdf_raptor_free_bnode_hash(librdf_world* world)
+{
+  if(world->bnode_hash) {
+    librdf_free_hash(world->bnode_hash);
+    world->bnode_hash = NULL;
+  }
+
+  return 0;
+}
+
+
+int
+librdf_raptor_reset_bnode_hash(librdf_world* world)
+{
+  librdf_raptor_free_bnode_hash(world);
+
+  world->bnode_hash = librdf_new_hash(world, NULL);
+  if(!world->bnode_hash)
+    return 1;
+
+  return 0;
+}
+
+static unsigned char*
+librdf_raptor_generate_id_handler(void *user_data,
+                                  unsigned char *user_bnodeid)
+{
+  librdf_world* world = (librdf_world*)user_data;
+
+  if(user_bnodeid && world->bnode_hash) {
+    unsigned char *mapped_id;
+
+    mapped_id = (unsigned char*)librdf_hash_get(world->bnode_hash,
+                                                (const char*)user_bnodeid);
+    if(!mapped_id) {
+      mapped_id = librdf_world_get_genid(world);
+
+      if(mapped_id &&
+         librdf_hash_put_strings(world->bnode_hash,
+                                 (char*)user_bnodeid, (char*)mapped_id)) {
+        /* error -> free mapped_id and return NULL */
+        LIBRDF_FREE(cstring, mapped_id);
+        mapped_id = NULL;
+      }
+    }
+    /* always free passed in bnodeid */
+    raptor_free_memory(user_bnodeid);
+
+    return mapped_id;
+  } else
+    return librdf_world_get_genid(world);
+}
+
+
 /**
  * librdf_init_raptor:
  * @world: librdf_world object
@@ -125,7 +180,7 @@ librdf_raptor_log_handler(void *data, raptor_log_message *message)
  * externally with librdf_world_set_raptor() (and using raptor v2 APIs).
  * Sets raptor uri handlers to work with #librdf_uri objects.
  **/
-void
+int
 librdf_init_raptor(librdf_world* world)
 {
   if(!world->raptor_world_ptr) {
@@ -134,13 +189,26 @@ librdf_init_raptor(librdf_world* world)
 
     if(!world->raptor_world_ptr || raptor_world_open(world->raptor_world_ptr)) {
       LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "failed to initialize raptor");
-      return;
+      return 1;
     }
   }
+
+  /* New in-memory hash for mapping bnode IDs */
+  world->bnode_hash = librdf_new_hash(world, NULL);
+  if(!world->bnode_hash)
+    return 1;
+
 
   /* set up log handler */
   raptor_world_set_log_handler(world->raptor_world_ptr, world,
                                librdf_raptor_log_handler);
+
+  /* set up blank node identifier generation handler */
+  raptor_world_set_generate_bnodeid_handler(world->raptor_world_ptr,
+                                            world,
+                                            librdf_raptor_generate_id_handler);
+
+  return 0;
 }
 
 
@@ -161,4 +229,7 @@ librdf_finish_raptor(librdf_world* world)
     raptor_free_world(world->raptor_world_ptr);
     world->raptor_world_ptr = NULL;
   }
+
+  if(world->bnode_hash)
+    librdf_free_hash(world->bnode_hash);
 }
