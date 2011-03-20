@@ -124,28 +124,6 @@ A simple list class used internally.
 </para>
 
 @list: 
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2:
-@void* data1, void *data2: 
 
 
 <!-- ##### FUNCTION librdf_list_get_iterator ##### -->
@@ -163,28 +141,6 @@ A simple list class used internally.
 </para>
 
 @list: 
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *:
-@void *, void *: 
 @user_data: 
 
 

@@ -67,28 +67,6 @@ can be retrieved by callbacks.
 @label: 
 @mime_type: 
 @uri_string: 
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*:
-@librdf_serializer_factory*: 
 
 
 <!-- ##### FUNCTION librdf_new_serializer ##### -->
@@ -268,28 +246,6 @@ can be retrieved by callbacks.
 
 @serializer: 
 @user_data: 
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...: 
 
 
 <!-- ##### FUNCTION librdf_serializer_set_warning ##### -->
@@ -299,28 +255,6 @@ can be retrieved by callbacks.
 
 @serializer: 
 @user_data: 
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...:
-@void *user_data, const char *msg, ...: 
 
 
 <!-- ##### FUNCTION librdf_serializer_get_feature ##### -->
