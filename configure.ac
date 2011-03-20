@@ -217,11 +217,11 @@ AC_CHECK_SIZEOF(unsigned long long, 8)
 dnl Checks for libraries.
 
 
-dnl Berkeley DB
-AC_ARG_WITH(bdb, [  --with-bdb=DIR          Berkeley DB install area (default=/usr)], bdb_prefix="$withval", bdb_prefix="none") 
-AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Berkeley DB lib directory (default=/usr/lib)], bdb_lib_dir="$withval", bdb_lib_dir="none") 
-AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Berkeley DB include directory (default=/usr/include)], bdb_include_dir="$withval", bdb_include_dir="none") 
-AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Berkeley DB library name (auto)], bdb_dbname="$withval", bdb_dbname="none")
+dnl Oracle Berkeley DB
+AC_ARG_WITH(bdb, [  --with-bdb=DIR          Oracle Berkeley DB install area (default=/usr)], bdb_prefix="$withval", bdb_prefix="none") 
+AC_ARG_WITH(bdb_lib, [  --with-bdb-lib=DIR      Oracle Berkeley DB lib directory (default=/usr/lib)], bdb_lib_dir="$withval", bdb_lib_dir="none") 
+AC_ARG_WITH(bdb_include, [  --with-bdb-include=DIR  Oracle Berkeley DB include directory (default=/usr/include)], bdb_include_dir="$withval", bdb_include_dir="none") 
+AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Oracle Berkeley DB library name (auto)], bdb_dbname="$withval", bdb_dbname="none")
 
 bdb_version=unknown
 bdb_available=Missing
@@ -253,7 +253,7 @@ if test "x$bdb_prefix" != "xno" ; then
     fi
 
     # Sigh!  And this still might not be good enough.
-    for bdbc_version in 4.8 4.7 4.6 4.5 4.4 4.3 4.2 4.1 4.0 4 3.3 3.2 3.1 3 2; do
+    for bdbc_version in 5.1 5.0 4.9 4.8 4.7 4.6 4.5 4.4 4.3 4.2 4.1 4.0 4 3.3 3.2 3.1 3 2; do
       bdbc_major=`echo $bdbc_version | sed -e 's/^\(.\).*$/\1/'`;
       bdbc_version2=`echo $bdbc_version | sed -e 's/^\(.\).\(.\)$/\1\2/'`
 
@@ -285,7 +285,7 @@ if test "x$bdb_prefix" != "xno" ; then
 
   fi
 
-  AC_MSG_CHECKING(BDB version)
+  AC_MSG_CHECKING([Oracle Berkeley DB (BDB) version])
   AC_MSG_RESULT($bdb_version)
   AC_MSG_CHECKING(location of BDB libs)
   AC_MSG_RESULT($bdb_lib_dir)
@@ -1308,10 +1308,10 @@ else
 fi
 
 AC_MSG_RESULT([
-  Berkeley/Sleepycat DB   : $bdb_available
-  Triple stores available : $storages_available
-  Triple stores enabled   :$storages_enabled
-  RDF parsers             :$rdf_parsers_available
-  RDF query               : $rdf_query
-  Content digests         :$digest_modules_available
+  Oracle Berkeley DB (BDB) : $bdb_available
+  Triple stores available  : $storages_available
+  Triple stores enabled    :$storages_enabled
+  RDF parsers              :$rdf_parsers_available
+  RDF query                : $rdf_query
+  Content digests          :$digest_modules_available
 ])

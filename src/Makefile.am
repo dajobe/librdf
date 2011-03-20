@@ -314,7 +314,7 @@ rdf_storage_test: rdf_storage.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_storage.c librdf.la
 
 rdf_parser_test: rdf_parser.c librdf.la
-	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_parser.c librdf.la
+	$(COMPILE_LINK) -lraptor2 -DSTANDALONE $(srcdir)/rdf_parser.c librdf.la
 
 rdf_files_test: rdf_files.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_files.c librdf.la
