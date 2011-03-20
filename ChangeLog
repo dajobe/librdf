@@ -1,3 +1,19 @@
+2011-03-20  Dave Beckett <dave@dajobe.org>
+
+	* docs/tmpl/iterator.sgml, docs/tmpl/list.sgml,
+	docs/tmpl/parser.sgml, docs/tmpl/query.sgml,
+	docs/tmpl/serializer.sgml, docs/tmpl/storage.sgml,
+	docs/tmpl/stream.sgml: Update tmpls to remove varargs autodocs
+	stupidity
+
+	* configure.ac: Add checks for Oracle Berkeley DB 5.1, 5.0 and 4.9
+	and updated messages with new name.  The 'bdb' storage seems to
+	work with same API, but new on-disk format that will require a use
+	of utils/db-upgrade.
+
+	* src/Makefile.am: Add -lraptor2 to rdf_parser_test
+	link line since it uses raptor2 symbols
+
 2011-03-11  Lauri Aalto <laalto@iki.fi>
 
 	* src/rdf_parser.c, src/rdf_parser.h, src/rdf_parser_internal.h,
