@@ -379,6 +379,9 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   
   librdf_world_open(world);
 
+  if(!identifier)
+    identifier = librdf_world_get_genid(world);
+  
   return raptor_new_term_from_blank(world->raptor_world_ptr,
                                     identifier);
 }
