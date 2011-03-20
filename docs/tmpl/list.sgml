@@ -124,6 +124,7 @@ A simple list class used internally.
 </para>
 
 @list: 
+@equals: 
 
 
 <!-- ##### FUNCTION librdf_list_get_iterator ##### -->
@@ -141,6 +142,7 @@ A simple list class used internally.
 </para>
 
 @list: 
+@fn: 
 @user_data: 
 
 

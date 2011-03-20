@@ -194,6 +194,7 @@ Internal.
 </para>
 
 @world: 
+@Returns: 
 
 
 <!-- ##### FUNCTION librdf_log ##### -->

@@ -65,6 +65,10 @@ return sequence of #librdf_node objects such as librdf_model_get_sources().
 
 @world: 
 @context: 
+@is_end_method: 
+@next_method: 
+@get_method: 
+@finished_method: 
 @Returns: 
 
 

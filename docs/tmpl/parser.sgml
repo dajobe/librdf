@@ -101,6 +101,7 @@ by callbacks.
 @label: 
 @mime_type: 
 @uri_string: 
+@factory: 
 
 
 <!-- ##### FUNCTION librdf_new_parser ##### -->
@@ -211,6 +212,7 @@ by callbacks.
 
 @parser: 
 @user_data: 
+@error_fn: 
 
 
 <!-- ##### FUNCTION librdf_parser_set_warning ##### -->
@@ -220,6 +222,7 @@ by callbacks.
 
 @parser: 
 @user_data: 
+@warning_fn: 
 
 
 <!-- ##### FUNCTION librdf_parser_parse_counted_string_as_stream ##### -->

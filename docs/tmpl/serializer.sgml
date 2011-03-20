@@ -67,6 +67,7 @@ can be retrieved by callbacks.
 @label: 
 @mime_type: 
 @uri_string: 
+@factory: 
 
 
 <!-- ##### FUNCTION librdf_new_serializer ##### -->
@@ -246,6 +247,7 @@ can be retrieved by callbacks.
 
 @serializer: 
 @user_data: 
+@error_fn: 
 
 
 <!-- ##### FUNCTION librdf_serializer_set_warning ##### -->
@@ -255,6 +257,7 @@ can be retrieved by callbacks.
 
 @serializer: 
 @user_data: 
+@warning_fn: 
 
 
 <!-- ##### FUNCTION librdf_serializer_get_feature ##### -->
