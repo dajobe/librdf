@@ -1660,36 +1660,42 @@ librdf_hash_to_string(librdf_hash* hash, const char *filter[])
  * @key: key string to look up
  *
  * Lookup a hash key and decode value as a boolean.
+ *
+ * False values: "no", "false"
+ * True values: "yes", "true"
  * 
  * Return value: >0 (for true), 0 (for false) or <0 (for key not found or not known boolean value)
  **/
 int
-librdf_hash_get_as_boolean (librdf_hash* hash, const char *key) 
+librdf_hash_get_as_boolean(librdf_hash* hash, const char *key) 
 {
-  int bvalue= (-1);
+  int bvalue = (-1);
   char *value;
 
-  value=librdf_hash_get(hash, key);
+  value = librdf_hash_get(hash, key);
   if(!value)
     /* does not exist - fail */
     return -1;
 
   switch(strlen(value)) {
   case 2: /* try 'no' */
-    if(*value=='n' && value[1]=='o')
-      bvalue=0;
+    if(*value == 'n' && value[1] == 'o')
+      bvalue = 0;
     break;
+
   case 3: /* try 'yes' */
-    if(*value=='y' && value[1]=='e' && value[2]=='s')
-      bvalue=1;
+    if(*value == 'y' && value[1] == 'e' && value[2] == 's')
+      bvalue = 1;
     break;
+
   case 4: /* try 'true' */
-    if(*value=='t' && value[1]=='r' && value[2]=='u' && value[3]=='e')
-      bvalue=1;
+    if(*value == 't' && value[1] == 'r' && value[2] == 'u' && value[3] == 'e')
+      bvalue = 1;
     break;
+
   case 5: /* try 'false' */
     if(!strncmp(value, "false", 5))
-      bvalue=1;
+      bvalue = 0;
     break;
   /* no need for default, bvalue is set above */
   }
