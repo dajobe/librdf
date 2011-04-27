@@ -1,4 +1,66 @@
+2011-04-05  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_hash.c:
+	(librdf_hash_get_as_boolean): 'false' string fixed to be a False
+	value.
+
 2011-03-20  Dave Beckett <dave@dajobe.org>
+
+	* docs/tmpl/iterator.sgml, docs/tmpl/list.sgml,
+	docs/tmpl/parser.sgml, docs/tmpl/query.sgml,
+	docs/tmpl/serializer.sgml, docs/tmpl/storage.sgml,
+	docs/tmpl/stream.sgml, docs/tmpl/unused.sgml: Update tmpls
+
+	* src/rdf_init.c, src/rdf_init_internal.h, src/rdf_node.c,
+	src/rdf_parser_raptor.c, src/rdf_raptor.c,
+	src/rdf_raptor_internal.h: Move raptor blank node ID generation to
+	hang off world object
+
+	librdf_world gains bnode_hash field moved from raptor parser
+	context.
+
+	(librdf_raptor_generate_id_handler): Added based on
+	librdf_parser_raptor_generate_id_handler().
+
+	(librdf_init_raptor, librdf_finish_raptor): Initialise and free
+	bnode hash once per redland world and use
+	librdf_raptor_generate_id_handler() to generate IDs.
+
+	(librdf_raptor_reset_bnode_hash): Added to remove and reset
+	current bnode ID hash map.
+
+	(librdf_raptor_free_bnode_hash): Added to empty current bnode ID
+	hash map.
+
+	(librdf_world_open, librdf_free_world): Move raptor init to after
+	hash module, free to before it, to allow bnode_hash to work.
+
+	(librdf_parser_raptor_init): Deleted bnode_hash code and use
+	librdf_raptor_reset_bnode_hash() to reset current world-wide hash.
+
+	(librdf_parser_raptor_terminate): Deleted bnode_hash code and use
+	librdf_raptor_free_bnode_hash() to empty current world-wide hash.
+
+	(librdf_parser_raptor_generate_id_handler): Deleted.
+
+	(librdf_parser_raptor_parse_file_handle_as_stream)
+	(librdf_parser_raptor_parse_as_stream_common): remove setting
+	bnode ID handler per-parser.
+
+	(librdf_parser_raptor_serialise_finished): empty bnode hash map at
+	end of parsing.
+
+	Fixes Issue #0000432
+	http://bugs.librdf.org/mantis/view.php?id=432
+
+	* src/rdf_node.c: Generating a blank node ID now directly uses
+	redland call.
+
+	(librdf_new_node_from_blank_identifier): Generate an identifier
+	using internal librdf_world_get_genid rather than let it fall to a
+	raptor genid handler.  Addresses part of
+	Issue #0000432
+	http://bugs.librdf.org/mantis/view.php?id=432
 
 	* docs/tmpl/iterator.sgml, docs/tmpl/list.sgml,
 	docs/tmpl/parser.sgml, docs/tmpl/query.sgml,
