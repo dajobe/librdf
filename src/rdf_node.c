@@ -1210,10 +1210,11 @@ librdf_node_static_iterator_create(librdf_node **nodes, int size)
  * @node: the node
  * @iostr: iostream to write to
  *
- * Write the node to an iostream
+ * Write the node to an iostream in N-Triples format.
  * 
- * This method is for debugging and the format of the output should
- * not be relied on.
+ * This method can be used to write a node in a relatively
+ * readable format.  To write more compact formats use a
+ * serializer to pick a syntax and serialize triples to it.
  *
  * Return value: non-0 on failure
  **/
