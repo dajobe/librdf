@@ -1,3 +1,8 @@
+2011-06-23  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_node.c:
+	(librdf_node_write): Always write N-Triples
+
 2011-04-05  Dave Beckett <dave@dajobe.org>
 
 	* src/rdf_hash.c:
