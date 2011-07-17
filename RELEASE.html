@@ -57,20 +57,14 @@ Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=432">Issue #0000432</a>
 
 <h3>Parser Class Changes</h3>
 
-<p>Do not use librdf_log() for programmer errors, just runtime errors.</p>
+<p>Do not report programmer errors via logging, just runtime
+errors.</p>
 
 <p>Added
 <code>librdf_parser_parse_iostream_as_stream()</code> and
 <code>librdf_parser_parse_iostream_into_model()</code>
-methods contributed by GitHub user 'nxg' via
-<a href="https://github.com/dajobe/librdf/pull/1">GitHub pull request #1</a>.
+from patch by Norman Gray with style fixes by Lauri Aalto.  Thanks.
 Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=375">Issue #0000375</a>
-</p>
-
-<p>FIXME: Confirm above	changes:
-- Removed const qualifier from raptor_iostreams passed around.
-- Fixed librdf_parser_raptor_parse_into_model_common() return type.
-- Removed raptor1 support code as librdf no longer supports raptor1.
 </p>
 
 
@@ -95,6 +89,9 @@ Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=418">Issue #0000418</a>
 </p>
 
 <h3>Other Changes</h3>
+
+<p>Removed raptor1 support code as librdf no longer supports
+raptor1.</p>
 
 <p>Updated RPM spec file to make Redland librdf package require
 Raptor V2 (raptor2 package) and Rasqal (rasqal package).
