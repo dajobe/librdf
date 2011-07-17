@@ -27,6 +27,84 @@ pre
 <p>Not yet released.
 </p>
 
+<p>Issues Fixed:</p>
+<ul>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000375</a>: Add functionality to parse from iostream (or similar)</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000418</a>: SQLite driver adds duplicate statements if a conext is given.</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000432</a>: Seg fault when getting a blank node after parsing RDF</li>
+</ul>
+
+<p>Rasqal minimum version is now 0.9.25 for use of the new
+<code>rasqal_world_get_query_language_description()</code> function.
+</p>
+
+<h3>Hash Class Changes</h3>
+
+<p>Fixed <code>librdf_hash_get_as_boolean()</code> 'false' string
+fixed to actually be a False value.
+</p>
+
+<h3>Node Class Changes</h3>
+
+<p><code>librdf_node_write()</code> is defined to now always write
+N-Triples format.</p>
+
+<p>Blank node ID generation and mapping from parsing is now
+consistently made across Redland librdf rather than relying on some
+Raptor defaults.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=432">Issue #0000432</a>
+</p>
+
+<h3>Parser Class Changes</h3>
+
+<p>Do not use librdf_log() for programmer errors, just runtime errors.</p>
+
+<p>Added
+<code>librdf_parser_parse_iostream_as_stream()</code> and
+<code>librdf_parser_parse_iostream_into_model()</code>
+methods contributed by GitHub user 'nxg' via
+<a href="https://github.com/dajobe/librdf/pull/1">GitHub pull request #1</a>.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=375">Issue #0000375</a>
+</p>
+
+<p>FIXME: Confirm above	changes:
+- Removed const qualifier from raptor_iostreams passed around.
+- Fixed librdf_parser_raptor_parse_into_model_common() return type.
+- Removed raptor1 support code as librdf no longer supports raptor1.
+</p>
+
+
+<h3>Query Class Changes</h3>
+
+<p>Added <code>librdf_query_language_get_description()</code> to
+return the full description of of the query language. Deprecates
+<code>librdf_query_languages_enumerate()</code>
+</p>
+
+
+<h3>Storage Class Changes</h3>
+
+<p>bdb storage: Add checks for Oracle Berkeley DB 5.1, 5.0 and 4.9
+and updated configure messages with new name.  The 5.x storage seems
+to work with same API, but has a new on-disk format that will require
+a use of the <code>db-upgrade(1)</code> utility in the utils directory.
+</p>
+
+<p>sqlite storage: Do not add duplicate statements if a context is given.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=418">Issue #0000418</a>.
+</p>
+
+<h3>Other Changes</h3>
+
+<p>Updated RPM spec file to make Redland librdf package require
+Raptor V2 (raptor2 package) and Rasqal (rasqal package).
+</p>
+
+<p>Add sanity checking when initialising Raptor so that there are
+always parsers and serializers, or something went very wrong and
+librdf will not work, so return an error.
+</p>
+
 
 <h2 id="rel1_0_13"><a name="rel1_0_13">Redland 1.0.13 Changes</a></h2>
 
