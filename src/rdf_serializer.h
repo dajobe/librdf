@@ -36,7 +36,7 @@
 extern "C" {
 #endif
 
-#include <raptor.h>
+#include <raptor2.h>
 
 /* class methods */
 REDLAND_API

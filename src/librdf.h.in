@@ -28,12 +28,12 @@
 
 #ifndef LIBRDF_OBJC_FRAMEWORK
 /* raptor */
-#include <raptor.h>
+#include <raptor2.h>
 /* rasqal: uses raptor */
 #include <rasqal.h>
 /* librdf: uses rasqal and raptor */
 #else
-#include <Redland/raptor.h>
+#include <Redland/raptor2.h>
 #include <Redland/rasqal.h>
 #endif
 

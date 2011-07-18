@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-#include <raptor.h>
+#include <raptor2.h>
 
 /**
  * librdf_log_level:
