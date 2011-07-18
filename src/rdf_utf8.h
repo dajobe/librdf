@@ -31,11 +31,7 @@
 extern "C" {
 #endif
 
-#ifndef LIBRDF_OBJC_FRAMEWORK
-#include <rdf_types.h>
-#else
-#include <Redland/rdf_types.h>
-#endif
+#include <raptor2.h>
 
 /**
  * librdf_unichar:
@@ -43,13 +39,18 @@ extern "C" {
  * Unicode codepoint.
  *
  */
-typedef u32 librdf_unichar;
+typedef raptor_unichar librdf_unichar;
 
-int librdf_unicode_char_to_utf8(librdf_unichar c, byte *output, int length);
-int librdf_utf8_to_unicode_char(librdf_unichar *output, const byte *input, int length);
-byte* librdf_utf8_to_latin1(const byte *input, int length, int *output_length);
-byte* librdf_latin1_to_utf8(const byte *input, int length, int *output_length);
-void librdf_utf8_print(const byte *input, int length, FILE *stream);
+REDLAND_API REDLAND_DEPRECATED
+int librdf_unicode_char_to_utf8(librdf_unichar c, unsigned char *output, int length);
+REDLAND_API REDLAND_DEPRECATED
+int librdf_utf8_to_unicode_char(librdf_unichar *output, const unsigned char *input, int length);
+REDLAND_API
+unsigned char* librdf_utf8_to_latin1(const unsigned char *input, int length, int *output_length);
+REDLAND_API
+unsigned char* librdf_latin1_to_utf8(const unsigned char *input, int length, int *output_length);
+REDLAND_API
+void librdf_utf8_print(const unsigned char *input, int length, FILE *stream);
 
 
 

@@ -548,7 +548,7 @@ librdf_node_get_literal_value_as_latin1(librdf_node *node)
   if(!node->value.literal.string)
     return NULL;
   
-  return (char*)librdf_utf8_to_latin1((const byte*)node->value.literal.string,
+  return (char*)librdf_utf8_to_latin1((const unsigned char*)node->value.literal.string,
                                       node->value.literal.string_len, NULL);
 }
 

@@ -344,6 +344,7 @@ extern const unsigned int librdf_version_decimal;
 #include <rdf_serializer.h>
 #include <rdf_stream.h>
 #include <rdf_query.h>
+#include <rdf_utf8.h>
 #else
 #include <Redland/rdf_log.h>
 #include <Redland/rdf_digest.h>
@@ -361,6 +362,7 @@ extern const unsigned int librdf_version_decimal;
 #include <Redland/rdf_serializer.h>
 #include <Redland/rdf_stream.h>
 #include <Redland/rdf_query.h>
+#include <Redland/rdf_utf8.h>
 #endif
 
 #ifdef __cplusplus
