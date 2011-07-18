@@ -1001,7 +1001,7 @@ librdf_hash_bdb_sync(void* context)
  *
  * Get the file description representing the hash.
  * 
- * Return value: the file descriptor
+ * Return value: the file descriptor or < 0 on failure
  **/
 static int
 librdf_hash_bdb_get_fd(void* context) 
@@ -1017,7 +1017,7 @@ librdf_hash_bdb_get_fd(void* context)
   ret=0;
   fd=db->fd(db);
 #endif
-  return fd;
+  return (ret ? -1 : fd);
 }
 
 
