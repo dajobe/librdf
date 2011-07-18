@@ -375,23 +375,26 @@ librdf_digest_get_digest_length(librdf_digest* digest)
  * Return value: a newly allocated string that represents the digest.
  * This must be released by the caller using free() 
  **/
-char *
+char*
 librdf_digest_to_string(librdf_digest* digest)
 {
-  unsigned char* data=digest->digest;
-  int mdlen=digest->factory->digest_length;
+  unsigned char* data = digest->digest;
+  int mdlen = digest->factory->digest_length;
   char* b;
   int i;
-        
-  b=(char*)LIBRDF_MALLOC(cstring, 1+(mdlen<<1));
-  if(!b)
+
+  b = (char*)LIBRDF_MALLOC(cstring, 1+(mdlen<<1));
+  if(!b) {
     LIBRDF_FATAL1(digest->world, LIBRDF_FROM_DIGEST, "Out of memory");
+    return NULL;
+  }
   
-  for(i=0; i<mdlen; i++)
+  for(i = 0; i<mdlen; i++)
     sprintf(b+(i<<1), "%02x", (unsigned int)data[i]);
-  b[i<<1]='\0';
+
+  b[i<<1] = '\0';
   
-  return(b);
+  return b;
 }
 
 
