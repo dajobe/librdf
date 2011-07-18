@@ -1259,7 +1259,6 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
                                               librdf_uri *base_uri)
 {
   librdf_query *query = query_results->query;
-  librdf_query_virtuoso_context *context;
   rasqal_variables_table *vt;
   rasqal_query_results *rasqal_qr;
   int rc;
@@ -1269,8 +1268,6 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_query_virtuoso_results_formatter_write \n");
 #endif
-
-  context = (librdf_query_virtuoso_context*)query->context;
 
   row_size = librdf_query_results_get_bindings_count(query_results);
   
