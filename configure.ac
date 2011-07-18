@@ -129,6 +129,23 @@ AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
 AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
 AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
 
+AC_CHECK_PROGS(RECHO, echo)
+RECHO_C=
+RECHO_N=
+case `$RECHO -n x` in
+  -n*)
+    case `$RECHO 'xy\c'` in
+      *c*)
+         ;;
+      xy)
+         RECHO_C='\c'
+         ;;
+    esac;;
+  *)
+    RECHO_N='-n'
+    ;;
+esac
+
 
 release_version=no
 AC_ARG_ENABLE(release, [  --enable-release        Turn on optimizations (for maintainer).  ], \
@@ -1269,6 +1286,10 @@ AC_SUBST(LIBRDF_PKGCONFIG_PRIVATE_LIBS)
 
 AC_SUBST(MEM)
 AC_SUBST(MEM_LIBS)
+
+AC_SUBST(RECHO)
+AC_SUBST(RECHO_N)
+AC_SUBST(RECHO_C)
 
 abs_top_srcdir=`cd $srcdir; pwd`
 AC_SUBST(abs_top_srcdir)

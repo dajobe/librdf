@@ -16,7 +16,7 @@ EXTRA_DIST= rdfproc.html \
 $(man_MANS) \
 fix-groff-xhtml
 
-CLEANFILES=*.db $(EXTRA_PROGRAMS)
+CLEANFILES=*.db $(EXTRA_PROGRAMS) *.plist
 
 AM_CPPFLAGS=@LIBRDF_INTERNAL_CPPFLAGS@ @LIBRDF_CPPFLAGS@ -I$(top_srcdir)/src @LIBRDF_EXTERNAL_CPPFLAGS@
 AM_CFLAGS=@CFLAGS@ $(MEM)
@@ -33,6 +33,14 @@ if GETOPT
 rdfproc_SOURCES += getopt.c rdfproc_getopt.h
 endif
 
+ANALYZE = clang
+ANALYZE_FLAGS = "--analyze"
+# Based on COMPILE target
+ANALYZE_COMMAND = $(ANALYZE) \
+        $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+        $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) \
+        $(ANALYZE_FLAGS)
+
 mysql-utils: $(MYSQL_UTILS)
 
 @MAINT@rdfproc.html: $(srcdir)/rdfproc.1 $(srcdir)/fix-groff-xhtml
@@ -40,3 +48,21 @@ mysql-utils: $(MYSQL_UTILS)
 
 $(top_builddir)/src/librdf.la:
 	cd $(top_builddir)/src && $(MAKE) librdf.la 
+
+if MAINTAINER_MODE
+# Run Clang static analyzer over sources.
+analyze: $(SOURCES)
+	@list='$(SOURCES)'; \
+	result=0; \
+	for file in $$list; do \
+	  if echo $$file | grep '\.c$$' >/dev/null 2>&1; then \
+	    $(RECHO) "Analyzing $$file"; \
+	    $(ANALYZE_COMMAND) $(srcdir)/$$file; \
+	    status=$$?; \
+	    if test $$status != 0; then \
+	      result=1; \
+	    fi; \
+	  fi; \
+	done; \
+	set -e; exit $$result
+endif
