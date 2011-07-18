@@ -486,7 +486,7 @@ librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
 #ifdef WITH_THREADS
       pthread_mutex_lock(world->mutex);
 #endif
-      world->genid_base = 1;
+      world->genid_base = i;
 #ifdef WITH_THREADS
       pthread_mutex_unlock(world->mutex);
 #endif
@@ -503,7 +503,7 @@ librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
 #ifdef WITH_THREADS
       pthread_mutex_lock(world->mutex);
 #endif
-      world->genid_counter = 1;
+      world->genid_counter = i;
 #ifdef WITH_THREADS
       pthread_mutex_unlock(world->mutex);
 #endif
