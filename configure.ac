@@ -302,7 +302,10 @@ if test "x$bdb_prefix" != "xno" ; then
 
     if test "$bdb_dbname" = none; then
       # Yuck, yuck, yuck - can't they create a bdb-config program like GNOME?
-      bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb*.a 2>/dev/null |sed -e 's/^lib//' -e 's/\.a$//' | head -1`
+      dnl need to change quotes to allow square brackets
+      changequote(<<, >>)dnl
+      bdb_dbname=`cd $bdb_lib_dir; ls -1 libdb[-0-9.]*.a libdb[-0-9.]*.{so,dylib}* 2>/dev/null | sed -e 's/^lib//' -e 's/\.a$//' -e 's/\.so.*$//' -e 's/\.dylib.*$//' | head -1`
+      changequote([, ])dnl
       if test "X$bdb_dbname" = X; then
 	AC_MSG_WARN(Cannot find the BDB library name from the files in $bdb_lib_dir)
 	AC_MSG_WARN(Assuming it is 'db' and will link like -ldb)
