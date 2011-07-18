@@ -826,8 +826,8 @@ librdf_hash_get_all_iterator_next_method(void* iterator)
 static void*
 librdf_hash_get_all_iterator_get_method(void* iterator, int flags) 
 {
-  librdf_hash_get_all_iterator_context* context=(librdf_hash_get_all_iterator_context*)iterator;
-  void *result=NULL;
+  librdf_hash_get_all_iterator_context* context = (librdf_hash_get_all_iterator_context*)iterator;
+  void *result = NULL;
   
   if(context->is_end)
     return NULL;
@@ -839,22 +839,22 @@ librdf_hash_get_all_iterator_get_method(void* iterator, int flags)
        * might as well return something useful to signify not-end-of-list.
        */
 
-      result=&context;
+      result = context;
       break;
 
     case LIBRDF_ITERATOR_GET_METHOD_GET_KEY:
-      result=&context->next_key;
+      result = &context->next_key;
       break;
       
     case LIBRDF_ITERATOR_GET_METHOD_GET_VALUE:
-      result=&context->next_value;
+      result = &context->next_value;
       break;
 
     default:
       librdf_log(context->hash->world, 
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
                  "Unknown iterator method flag %d", flags);
-      result=NULL;
+      result = NULL;
       break;
   }
 
@@ -1086,9 +1086,9 @@ librdf_hash_keys_iterator_next_method(void* iterator)
 static void*
 librdf_hash_keys_iterator_get_method(void* iterator, int flags) 
 {
-  librdf_hash_keys_iterator_context* context=(librdf_hash_keys_iterator_context*)iterator;
-  void *result=NULL;
-  
+  librdf_hash_keys_iterator_context* context = (librdf_hash_keys_iterator_context*)iterator;
+  void *result = NULL;
+
   if(context->is_end)
     return NULL;
 
@@ -1099,15 +1099,15 @@ librdf_hash_keys_iterator_get_method(void* iterator, int flags)
        * might as well return something useful to signify not-end-of-list.
        */
 
-      result=&context;
+      result = context;
       break;
       
     case LIBRDF_ITERATOR_GET_METHOD_GET_KEY:
-      result=&context->next_key;
+      result = &context->next_key;
       break;
       
     default:
-      result=NULL;
+      result = NULL;
   }
 
   return result;
