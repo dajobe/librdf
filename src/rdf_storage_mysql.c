@@ -1669,7 +1669,7 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
     librdf_storage_mysql_release_handle(storage, handle);
   }
 
-  return 0;
+  return rc;
 }
 
 
