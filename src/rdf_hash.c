@@ -1363,8 +1363,7 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
 
   p=string;
   key=NULL; key_len=0;
-  value=NULL; value_len=0;
-  backslashes=0;
+  value=NULL;
   state=HFS_PARSE_STATE_INIT;
   while(*p) {
 
@@ -1443,7 +1442,7 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
           break;
         }
         p++;
-        state=HFS_PARSE_STATE_VALUE;
+        /* state=HFS_PARSE_STATE_VALUE; */
         /* fall through to next state */
         
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
