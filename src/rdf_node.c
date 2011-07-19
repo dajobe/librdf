@@ -913,7 +913,6 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
   if (length < 1)
     return NULL;
 
-  total_length = 0;
   switch(buffer[0]) {
     case 'R': /* URI / Resource */
       /* min */
