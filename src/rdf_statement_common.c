@@ -198,10 +198,14 @@ librdf_statement_encode_parts2(librdf_world* world,
     node_len= librdf_node_encode(context_node, p, length);
     if(!node_len)
       return 0;
+
+    /* p and length changes never needed to be calculated [clang] */
+    /*
     if(p) {
       p += node_len;
       length -= node_len;
     }
+    */
 
     total_length += node_len;
   }
