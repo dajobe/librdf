@@ -197,7 +197,7 @@ SHA1Transform(u32 state[5], const unsigned char buffer[64])
   state[3] += d;
   state[4] += e;
   /* Wipe variables */
-  a = b = c = d = e = 0;
+  /* a = b = c = d = e = 0; */ /* CLANG: useless */
 }
 
 
@@ -265,7 +265,7 @@ SHA1Final(SHA1Context* context)
   }
 
   /* Wipe variables */
-  i = 0;	/* JHB */
+  /* i = 0; */	/* JHB */  /* CLANG: useless */
   memset(context->buffer, 0, 64);
   memset(context->state, 0, SHA1_DIGEST_LENGTH);
   memset(context->count, 0, 8);
