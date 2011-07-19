@@ -777,7 +777,6 @@ main(int argc, char *argv[])
         count=0;
         if(!(stream=librdf_parser_parse_as_stream(parser, uri, base_uri))) {
           fprintf(stderr, "%s: Failed to parse RDF as stream\n", program);
-          rc=1;
         } else {
           while(!librdf_stream_end(stream)) {
             librdf_statement *statement=librdf_stream_get_object(stream);
