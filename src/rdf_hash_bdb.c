@@ -987,11 +987,13 @@ librdf_hash_bdb_delete_key_value(void* context,
 static int
 librdf_hash_bdb_sync(void* context) 
 {
-  librdf_hash_bdb_context* bdb_context=(librdf_hash_bdb_context*)context;
-  DB* db=bdb_context->db;
+  librdf_hash_bdb_context* bdb_context = (librdf_hash_bdb_context*)context;
+  DB* db = bdb_context->db;
   int ret;
 
-  return (ret=db->sync(db, 0));
+  ret = db->sync(db, 0);
+  
+  return ret;
 }
 
 
