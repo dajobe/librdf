@@ -1398,7 +1398,6 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
 #endif
     if(status == SQLITE_BUSY) {
       /* FIXME - how to handle busy? */
-      status = SQLITE_ERROR;
       continue;
     }
     break;
@@ -2486,7 +2485,6 @@ librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_instance* sc
 #endif
     if(status == SQLITE_BUSY) {
       /* FIXME - how to handle busy? */
-      status = SQLITE_ERROR;
       continue;
     }
     break;
