@@ -179,6 +179,8 @@ librdf_raptor_generate_id_handler(void *user_data,
  * Initializes the raptor library unless a raptor instance is provided
  * externally with librdf_world_set_raptor() (and using raptor v2 APIs).
  * Sets raptor uri handlers to work with #librdf_uri objects.
+ *
+ * Return value: non-0 on failure
  **/
 int
 librdf_init_raptor(librdf_world* world)
