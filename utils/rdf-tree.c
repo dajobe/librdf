@@ -372,6 +372,7 @@ getoptions(int argc, char *argv[], librdf_world * world)
   };
 
   while((c = getopt_long(argc, argv, opts_short, opts_long, &i)) != -1) {
+    buffer = NULL;
     if(optarg) {
       buffer = malloc(strlen(optarg) + 1);
       if(!buffer) {
@@ -464,7 +465,7 @@ getoptions(int argc, char *argv[], librdf_world * world)
       if(i2 == 127)
 	break;
     };
-    opts.password[i2++] = 0;
+    opts.password[i2] = 0;
   };
 
   return optind;
