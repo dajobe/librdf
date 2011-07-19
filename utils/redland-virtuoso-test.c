@@ -348,16 +348,13 @@ int
 main(int argc, char *argv[])
 {
   librdf_world* world;
-  librdf_parser* parser;
-  librdf_serializer* serializer;
   librdf_storage *storage;
   librdf_model* model;
-  librdf_node *source, *arc, *target, *node;
+  librdf_node *node;
   librdf_node *subject, *predicate, *object;
   librdf_node* context_node=NULL;
   librdf_stream* stream;
   librdf_iterator* iterator;
-  librdf_uri *uri;
   librdf_uri *base_uri=NULL;
   librdf_query *query;
   librdf_query_results *results;
@@ -428,15 +425,9 @@ main(int argc, char *argv[])
   /* Do this or gcc moans */
   stream=NULL;
   iterator=NULL;
-  parser=NULL;
-  serializer=NULL;
-  source=NULL;
-  arc=NULL;
-  target=NULL;
   subject=NULL;
   predicate=NULL;
   object=NULL;
-  uri=NULL;
   node=NULL;
   query=NULL;
   results=NULL;
