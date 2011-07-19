@@ -81,7 +81,6 @@ rdf_heuristics.h rdf_files.h rdf_utf8.h \
 rdf_query.h \
 rdf_serializer.h \
 rdf_log.h \
-rdf_avltree_internal.h \
 rdf_concepts_internal.h \
 rdf_digest_internal.h \
 rdf_hash_internal.h \
