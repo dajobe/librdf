@@ -50,7 +50,6 @@ rdf_uri.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
 rdf_model.c rdf_model_storage.c \
 rdf_iterator.c rdf_concepts.c \
-rdf_avltree.c \
 rdf_cache.c \
 rdf_list.c \
 rdf_storage.c \
@@ -347,9 +346,6 @@ rdf_stream_test: rdf_stream.c librdf.la
 
 rdf_iterator_test: rdf_iterator.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_iterator.c librdf.la
-
-rdf_avltree_test: rdf_avltree.c librdf.la
-	$(COMPILE_LINK) -DLIBRDF_DEBUG=2 -DSTANDALONE $(srcdir)/rdf_avltree.c librdf.la
 
 rdf_init_test: rdf_init.c librdf.la
 	$(COMPILE_LINK) -lrasqal -DSTANDALONE $(srcdir)/rdf_init.c librdf.la

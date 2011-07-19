@@ -39,7 +39,6 @@
 #include <sys/types.h>
 
 #include <redland.h>
-#include "rdf_avltree_internal.h"
 
 /* Not yet fully implemented (namely iteration) */
 /*#define RDF_STORAGE_TREES_WITH_CONTEXTS 1*/
@@ -49,17 +48,17 @@ typedef struct
 #ifdef RDF_STORAGE_TREES_WITH_CONTEXTS
   librdf_node* context;
 #endif
-  librdf_avltree* spo_tree; /* Always present */
-  librdf_avltree* sop_tree; /* Optional */
-  librdf_avltree* ops_tree; /* Optional */
-  librdf_avltree* pso_tree; /* Optional */
+  raptor_avltree* spo_tree; /* Always present */
+  raptor_avltree* sop_tree; /* Optional */
+  raptor_avltree* ops_tree; /* Optional */
+  raptor_avltree* pso_tree; /* Optional */
 } librdf_storage_trees_graph;
 
 typedef struct
 {
   librdf_storage_trees_graph* graph; /* Statements without a context */
 #ifdef RDF_STORAGE_TREES_WITH_CONTEXTS
-  librdf_avltree* contexts; /* Tree of librdf_storage_trees_graph */
+  raptor_avltree* contexts; /* Tree of librdf_storage_trees_graph */
 #endif
   int index_sop;
   int index_ops;
@@ -212,7 +211,7 @@ librdf_storage_trees_size(librdf_storage* storage)
 {
   librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
 
-  return librdf_avltree_size(context->graph->spo_tree);
+  return raptor_avltree_size(context->graph->spo_tree);
 }
 
 
@@ -228,23 +227,23 @@ librdf_storage_trees_add_statement_internal(librdf_storage* storage,
   statement = librdf_new_statement_from_statement(statement);
     
   /* spo_tree owns statement */
-  status = librdf_avltree_add(graph->spo_tree, statement);
-  if (status == LIBRDF_AVLTREE_EXISTS)
+  status = raptor_avltree_add(graph->spo_tree, statement);
+  if (status > 0) /* item already exists; old item remains in tree */
     return 0;
-  else if (status != 0) /* LIBRDF_AVLTREE_ENOMEM */
+  else if (status < 0) /* failure */
     return status;
     
   /* others have null deleters */
   /* (XXX: corrupt model if insertions fail) */
 
   if (context->index_sop)
-    librdf_avltree_add(graph->sop_tree, statement);
+    raptor_avltree_add(graph->sop_tree, statement);
     
   if (context->index_ops)
-    librdf_avltree_add(graph->ops_tree, statement);
+    raptor_avltree_add(graph->ops_tree, statement);
     
   if (context->index_pso)
-    librdf_avltree_add(graph->pso_tree, statement);
+    raptor_avltree_add(graph->pso_tree, statement);
     
   return status;
 }
@@ -297,15 +296,15 @@ librdf_storage_trees_remove_statement_internal(librdf_storage_trees_graph* graph
                                                librdf_statement* statement) 
 {
   if (graph->sop_tree)
-    librdf_avltree_delete(graph->sop_tree, statement);
+    raptor_avltree_delete(graph->sop_tree, statement);
 
   if (graph->ops_tree)
-    librdf_avltree_delete(graph->ops_tree, statement);
+    raptor_avltree_delete(graph->ops_tree, statement);
 
   if (graph->pso_tree)
-    librdf_avltree_delete(graph->pso_tree, statement);
+    raptor_avltree_delete(graph->pso_tree, statement);
   
-  librdf_avltree_delete(graph->spo_tree, statement);
+  raptor_avltree_delete(graph->spo_tree, statement);
   
   return 0;
 }
@@ -335,13 +334,13 @@ librdf_storage_trees_contains_statement(librdf_storage* storage, librdf_statemen
 {
   librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
 
-  return (librdf_avltree_search(context->graph->spo_tree, statement) != NULL);
+  return (raptor_avltree_search(context->graph->spo_tree, statement) != NULL);
 }
 
 
 typedef struct {
   librdf_storage *storage;
-  librdf_iterator *iterator;
+  raptor_avltree_iterator *avltree_iterator;
 #ifdef RDF_STORAGE_TREES_WITH_CONTEXTS
   librdf_node *context_node;
 #endif
@@ -360,12 +359,14 @@ librdf_storage_trees_serialise_range(librdf_storage* storage, librdf_statement* 
   if(!scontext)
     return NULL;
     
-  scontext->iterator = NULL;
+  scontext->avltree_iterator = NULL;
 
   /* ?s ?p ?o */
   if (!range || (!range->subject && !range->predicate && !range->object)) {
-    scontext->iterator=librdf_avltree_get_iterator_start(storage->world, context->graph->spo_tree,
-        NULL, NULL);
+    scontext->avltree_iterator = raptor_new_avltree_iterator(context->graph->spo_tree,
+                                                             /* range */ NULL,
+                                                             /* range free */ NULL,
+                                                             1);
     if (range) {
       librdf_free_statement(range);
       range=NULL;
@@ -373,26 +374,34 @@ librdf_storage_trees_serialise_range(librdf_storage* storage, librdf_statement* 
   /* s ?p o */
   } else if (range->subject && !range->predicate && range->object) {
     if (context->index_sop)
-      scontext->iterator=librdf_avltree_get_iterator_start(storage->world, context->graph->sop_tree,
-        range, librdf_storage_trees_avl_free);
+      scontext->avltree_iterator = raptor_new_avltree_iterator(context->graph->sop_tree,
+                                                               range, 
+                                                               librdf_storage_trees_avl_free,
+                                                               1);
 	else
 		filter=1;
   /* s _ _ */
   } else if (range->subject) {
-    scontext->iterator=librdf_avltree_get_iterator_start(storage->world, context->graph->spo_tree,
-        range, librdf_storage_trees_avl_free);
+    scontext->avltree_iterator = raptor_new_avltree_iterator(context->graph->spo_tree,
+                                                             range,
+                                                             librdf_storage_trees_avl_free,
+                                                             1);
   /* ?s _ o */
   } else if (range->object) {
     if (context->index_ops)
-      scontext->iterator=librdf_avltree_get_iterator_start(storage->world, context->graph->ops_tree,
-          range, librdf_storage_trees_avl_free);
+      scontext->avltree_iterator = raptor_new_avltree_iterator(context->graph->ops_tree,
+                                                               range,
+                                                               librdf_storage_trees_avl_free,
+                                                               1);
 	else
 		filter=1;
   /* ?s p ?o */
   } else { /* range->predicate != NULL */
     if (context->index_pso)
-      scontext->iterator=librdf_avltree_get_iterator_start(storage->world, context->graph->pso_tree,
-          range, librdf_storage_trees_avl_free);
+      scontext->avltree_iterator = raptor_new_avltree_iterator(context->graph->pso_tree,
+                                                               range,
+                                                               librdf_storage_trees_avl_free,
+                                                               1);
 	else
 		filter=1;
   }
@@ -401,15 +410,17 @@ librdf_storage_trees_serialise_range(librdf_storage* storage, librdf_statement* 
    * Iterate over the entire model and filter the stream.
    * (With a fully indexed store, this will never happen) */
   if (filter) {
-    scontext->iterator=librdf_avltree_get_iterator_start(storage->world, context->graph->spo_tree,
-        range, librdf_storage_trees_avl_free);
+    scontext->avltree_iterator = raptor_new_avltree_iterator(context->graph->spo_tree,
+                                                     range,
+                                                     librdf_storage_trees_avl_free,
+                                                     1);
   }
 
 #ifdef RDF_STORAGE_TREES_WITH_CONTEXTS
   scontext->context_node=NULL;
 #endif
 
-  if(!scontext->iterator) {
+  if(!scontext->avltree_iterator) {
     LIBRDF_FREE(librdf_storage_trees_serialise_stream_context, scontext);
     return librdf_new_empty_stream(storage->world);
   }
@@ -453,7 +464,7 @@ librdf_storage_trees_serialise_end_of_stream(void* context)
 {
   librdf_storage_trees_serialise_stream_context* scontext=(librdf_storage_trees_serialise_stream_context*)context;
 
-  return librdf_iterator_end(scontext->iterator);
+  return raptor_avltree_iterator_is_end(scontext->avltree_iterator);
 }
 
 static int
@@ -461,7 +472,7 @@ librdf_storage_trees_serialise_next_statement(void* context)
 {
   librdf_storage_trees_serialise_stream_context* scontext=(librdf_storage_trees_serialise_stream_context*)context;
 
-  return librdf_iterator_next(scontext->iterator);
+  return raptor_avltree_iterator_next(scontext->avltree_iterator);
 }
 
 
@@ -470,15 +481,20 @@ librdf_storage_trees_serialise_get_statement(void* context, int flags)
 {
   librdf_storage_trees_serialise_stream_context* scontext=(librdf_storage_trees_serialise_stream_context*)context;
 
+  if(!scontext->avltree_iterator)
+    return NULL;
+
   switch(flags) {
-  case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
-    return (librdf_statement*)librdf_iterator_get_object(scontext->iterator);
+    case LIBRDF_ITERATOR_GET_METHOD_GET_OBJECT:
+      return (librdf_statement*)raptor_avltree_iterator_get(scontext->avltree_iterator);
+
 #ifdef RDF_STORAGE_TREES_WITH_CONTEXTS
-  case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
-   return scontext->context_node;
+    case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
+      return scontext->context_node;
 #endif
-  default:
-   return NULL;
+
+    default:
+      return NULL;
   }
 }
 
@@ -488,8 +504,8 @@ librdf_storage_trees_serialise_finished(void* context)
 {
   librdf_storage_trees_serialise_stream_context* scontext=(librdf_storage_trees_serialise_stream_context*)context;
 
-  if(scontext->iterator)
-    librdf_free_iterator(scontext->iterator);
+  if(scontext->avltree_iterator)
+    raptor_free_avltree_iterator(scontext->avltree_iterator);
 
   if(scontext->storage)
     librdf_storage_remove_reference(scontext->storage);
@@ -518,12 +534,12 @@ librdf_storage_trees_context_add_statement(librdf_storage* storage,
   
   librdf_storage_trees_graph* key=librdf_storage_trees_graph_new(storage, context_node);
   librdf_storage_trees_graph* graph=(librdf_storage_trees_graph*)
-    librdf_avltree_search(context->contexts, key);
+    raptor_avltree_search(context->contexts, key);
   
   if(graph) {
     librdf_storage_trees_graph_free(key);
   } else {
-    librdf_avltree_add(context->contexts, key);
+    raptor_avltree_add(context->contexts, key);
     graph=key;
   }
     
@@ -549,7 +565,7 @@ librdf_storage_trees_context_remove_statement(librdf_storage* storage,
   librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
   librdf_storage_trees_graph* key=librdf_storage_trees_graph_new(storage, context_node);
   librdf_storage_trees_graph* graph=(librdf_storage_trees_graph*)
-    librdf_avltree_search(context->contexts, &key);
+    raptor_avltree_search(context->contexts, &key);
   librdf_storage_trees_graph_free(key);
   if (graph) {
     return librdf_storage_trees_remove_statement_internal(graph, statement);
@@ -845,24 +861,29 @@ librdf_storage_trees_graph_new(librdf_storage* storage, librdf_node* context_nod
 #endif
 
   /* Always create SPO index */
-  graph->spo_tree=librdf_new_avltree(librdf_statement_compare_spo, librdf_storage_trees_avl_free);
+  graph->spo_tree = raptor_new_avltree(librdf_statement_compare_spo,
+                                       librdf_storage_trees_avl_free,
+                                       /* flags */ 0);
   if(!graph->spo_tree) {
     LIBRDF_FREE(librdf_storage_trees_graph, graph);
     return NULL;
   }
   
   if(context->index_sop)
-    graph->sop_tree=librdf_new_avltree(librdf_statement_compare_sop, NULL);
+    graph->sop_tree = raptor_new_avltree(librdf_statement_compare_sop, NULL,
+                                         /* flags */ 0);
   else
     graph->sop_tree=NULL;
 
   if(context->index_ops)
-    graph->ops_tree=librdf_new_avltree(librdf_statement_compare_ops, NULL);
+    graph->ops_tree = raptor_new_avltree(librdf_statement_compare_ops, NULL,
+                                         /* flags */ 0);
   else
     graph->ops_tree=NULL;
   
   if(context->index_pso)
-    graph->pso_tree=librdf_new_avltree(librdf_statement_compare_pso, NULL);
+    graph->pso_tree = raptor_new_avltree(librdf_statement_compare_pso, NULL,
+                                         /* flags */ 0);
   else
     graph->pso_tree=NULL;
 
@@ -892,19 +913,19 @@ librdf_storage_trees_graph_free(void* data)
   
   /* Extra index trees have null deleters (statements are shared) */
   if (graph->sop_tree)
-    librdf_free_avltree(graph->sop_tree);
+    raptor_free_avltree(graph->sop_tree);
   if (graph->ops_tree)
-    librdf_free_avltree(graph->ops_tree);
+    raptor_free_avltree(graph->ops_tree);
   if (graph->pso_tree)
-    librdf_free_avltree(graph->pso_tree);
+    raptor_free_avltree(graph->pso_tree);
 
   /* Free spo tree and statements */
-  librdf_free_avltree(graph->spo_tree);
+  raptor_free_avltree(graph->spo_tree);
 
-  graph->spo_tree=NULL;
-  graph->sop_tree=NULL;
-  graph->ops_tree=NULL;
-  graph->pso_tree=NULL;
+  graph->spo_tree = NULL;
+  graph->sop_tree = NULL;
+  graph->ops_tree = NULL;
+  graph->pso_tree = NULL;
 
   LIBRDF_FREE(librdf_storage_trees_graph, graph);
 }
