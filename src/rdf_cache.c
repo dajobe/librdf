@@ -285,9 +285,9 @@ librdf_cache_set_common(librdf_cache *cache,
   librdf_hash_datum key_hd, value_hd; /* on stack - not allocated */
   librdf_hash_datum *old_value;
   int i;
-  int id= -1;
-  librdf_cache_node* node;
-  int rc=0;
+  int id = -1;
+  librdf_cache_node* node = NULL;
+  int rc =0;
   
   if(!key || !value || !key_size || !value_size)
     return -1;
@@ -296,13 +296,13 @@ librdf_cache_set_common(librdf_cache *cache,
   pthread_mutex_lock(cache->world->mutex);
 #endif
   
-  key_hd.data=key;
-  key_hd.size=key_size;
+  key_hd.data = key;
+  key_hd.size = key_size;
 
   if(!(flags & SET_FLAG_OVERWRITE)) {
     /* if existing object found in hash, return it */
-    if((old_value=librdf_hash_get_one(cache->hash, &key_hd))) {
-      node=*(librdf_cache_node**)old_value->data;
+    if((old_value = librdf_hash_get_one(cache->hash, &key_hd))) {
+      node = *(librdf_cache_node**)old_value->data;
       
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       new_object = node->value;
@@ -311,7 +311,7 @@ librdf_cache_set_common(librdf_cache *cache,
       
       librdf_free_hash_datum(old_value);
       /* value already present */
-      rc=1;
+      rc = 1;
       goto unlock;
     }
   }
@@ -324,45 +324,51 @@ librdf_cache_set_common(librdf_cache *cache,
 
   if(!cache->capacity) {
     /* dynamic cache capacity */
-    node=(librdf_cache_node*)LIBRDF_CALLOC(librdf_cache_node, 1, sizeof(librdf_cache_node));
+    node = (librdf_cache_node*)LIBRDF_CALLOC(librdf_cache_node, 1, 
+                                             sizeof(*node));
     if(!node) {
-      rc=1;
+      rc = 1;
       goto unlock;
     }
-    id= -1;
+    id =  -1;
   } else {
     /* fixed cache capacity so eject some (static) nodes */
     if(cache->size == cache->capacity) {
       if(librdf_cache_cleanup(cache)) {
-        rc=1;
+        rc = 1;
         goto unlock;
       }
     }
     
-    for(i=0; i < cache->capacity; i++) {
-      node=&cache->nodes[i];
+    for(i = 0; i < cache->capacity; i++) {
+      node = &cache->nodes[i];
       if(!node->value) {
-        id=i;
+        id = i;
         break;
       }
     }
   }
+
+  if(!node) {
+    rc = 1;
+    goto unlock;
+  }
   
-  node->key=key;
-  node->key_size=key_size;
-  node->value=value;
-  node->value_size=value_size;
-  node->id=id;
-  node->usage=0;
+  node->key = key;
+  node->key_size = key_size;
+  node->value = value;
+  node->value_size = value_size;
+  node->id = id;
+  node->usage = 0;
   
-  value_hd.data=&node; value_hd.size=sizeof(node);
+  value_hd.data = &node; value_hd.size = sizeof(node);
   
   /* store in hash: key => (librdf_cache_node*) */
   if(librdf_hash_put(cache->hash, &key_hd, &value_hd)) {
     memset(node, '\0', sizeof(*node));
     if(new_object)
       LIBRDF_FREE(void, new_object);
-    rc= -1;
+    rc =  -1;
   }
 
   /* succeeded */
