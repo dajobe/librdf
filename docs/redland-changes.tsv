@@ -7,6 +7,14 @@
 1.0.12	-	-	-	1.0.13	const raptor_syntax_description*	librdf_parser_get_description	(librdf_world* world, unsigned int counter)	Deprecates librdf_parser_enumerate()
 1.0.12	-	-	-	1.0.13	const raptor_syntax_description*	librdf_query_results_formats_get_description	(librdf_world* world, unsigned int counter)	Deprecates librdf_query_results_formats_enumerate()
 1.0.12	-	-	-	1.0.13	const raptor_syntax_description*	librdf_serializer_get_description	(librdf_world* world, unsigned int counter)	Deprecates librdf_serializer_enumerate()
+1.0.13	-	-	-	1.0.14	int	librdf_parser_parse_iostream_as_stream	(librdf_parser* parser, raptor_iostream *iostream, librdf_uri* base_uri)	-
+1.0.13	-	-	-	1.0.14	int	librdf_parser_parse_iostream_into_model	(librdf_parser* parser, raptor_iostream *iostream, librdf_uri* base_uri, librdf_model* model)	-
+1.0.13	-	-	-	1.0.14	const raptor_syntax_description*	librdf_query_language_get_description	(librdf_world* world, unsigned int counter)	-
+1.0.13	-	-	-	1.0.14	int	librdf_unicode_char_to_utf8	(librdf_unichar c, unsigned char *output, int length)	Documented but deprecated for raptor_unicode_utf8_string_put_char()
+1.0.13	-	-	-	1.0.14	int	librdf_utf8_to_unicode_char	(librdf_unichar *output, const unsigned char *input, int length)	Documented but deprecated for raptor_unicode_utf8_string_get_char()
+1.0.13	-	-	-	1.0.14	unsigned char*	librdf_utf8_to_latin1	(const unsigned char *input, int length, int *output_length)	-
+1.0.13	-	-	-	1.0.14	unsigned char*	librdf_latin1_to_utf8	(const unsigned char *input, int length, int *output_length)	-
+1.0.13	-	-	-	1.0.14	void	librdf_utf8_print	(const unsigned char *input, int length, FILE *stream)	-
 #
 # Types
 #

@@ -255,6 +255,8 @@ librdf_parser_set_error
 librdf_parser_set_warning
 librdf_parser_parse_counted_string_as_stream
 librdf_parser_parse_counted_string_into_model
+librdf_parser_parse_iostream_as_stream
+librdf_parser_parse_iostream_into_model
 LIBRDF_PARSER_FEATURE_ERROR_COUNT
 LIBRDF_PARSER_FEATURE_WARNING_COUNT
 librdf_parser_get_feature
@@ -272,6 +274,7 @@ librdf_parser_set_uri_filter
 librdf_query
 librdf_query_factory
 librdf_query_register_factory
+librdf_query_language_get_description
 librdf_query_languages_enumerate
 librdf_new_query
 librdf_new_query_from_query
@@ -600,4 +603,6 @@ librdf_log
 librdf_log_simple
 librdf_world_get_raptor
 librdf_world_set_raptor
+librdf_raptor_free_bnode_hash
+librdf_raptor_reset_bnode_hash
 </SECTION>
