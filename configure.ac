@@ -243,6 +243,9 @@ AC_ARG_WITH(bdb_dbname, [  --with-bdb-dbname=NAME  Oracle Berkeley DB library na
 bdb_version=unknown
 bdb_available=Missing
 
+# debian multiarch
+multiarch=`dpkg-architecture -qDEB_HOST_MULTIARCH 2>/dev/null`
+
 if test "x$bdb_prefix" != "xno" ; then
 
   if test "x$bdb_prefix" = "xyes" ; then
@@ -282,7 +285,11 @@ if test "x$bdb_prefix" != "xno" ; then
 	    header_bdbc_version=`sed -ne 's/^.*DB_VERSION_STRING.*Berkeley DB \(...\).*/\1/p' $bdbc_incdir/db.h`
 	    if test "X$header_bdbc_version" = "X$bdbc_version" ; then 
 	      for bdbc_name in db-$bdbc_version db$bdbc_version db-$bdbc_version2 db$bdbc_version2; do
-	        for bdbc_libdir2 in $bdbc_libdir $bdbc_libdir/db$bdbc_version $bdbc_libdir/db$bdbc_version2; do
+	        bdbc_libdir_multiarch=
+	        if test "X$multiarch" != X; then
+	          bdbc_libdir_multiarch=$bdbc_libdir/$multiarch
+	        fi
+	        for bdbc_libdir2 in $bdbc_libdir_multiarch $bdbc_libdir $bdbc_libdir/db$bdbc_version $bdbc_libdir/db$bdbc_version2; do
 		  if test -r $bdbc_libdir2/lib$bdbc_name.a -o -r $bdbc_libdir2/lib$bdbc_name.so -o -r $bdbc_libdir2/lib$bdbc_name.dylib; then
 		    bdb_version=$bdbc_version
 		    bdb_prefix=$bdbc_prefix
