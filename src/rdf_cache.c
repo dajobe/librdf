@@ -303,9 +303,9 @@ librdf_cache_set_common(librdf_cache *cache,
     /* if existing object found in hash, return it */
     if((old_value=librdf_hash_get_one(cache->hash, &key_hd))) {
       node=*(librdf_cache_node**)old_value->data;
-      new_object=node->value;
       
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
+      new_object = node->value;
       LIBRDF_DEBUG2("Found existing object %p in hash\n", new_object);
 #endif
       
