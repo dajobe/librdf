@@ -1294,7 +1294,7 @@ librdf_storage_virtuoso_size(librdf_storage* storage)
   librdf_storage_virtuoso_instance *context;
   char model_size[]="select count(*) from(sparql define input:storage \"\" select * from named <%s> where { graph ?g {?s ?p ?o}})f";
   char *query;
-  int count;
+  int count = -1;
   int rc;
   librdf_storage_virtuoso_connection *handle;
 
