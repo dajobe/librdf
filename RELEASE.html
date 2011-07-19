@@ -88,7 +88,58 @@ a use of the <code>db-upgrade(1)</code> utility in the utils directory.
 Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=418">Issue #0000418</a>.
 </p>
 
+<h3>UTF8 Module</h3>
+
+<p>Made functions that were already declared in a public header file
+and documentation into part of the API.
+</p>
+
+<p>Added but deprecated for raptor equivalents (they are wrappers for them):
+<pre>
+  int librdf_unicode_char_to_utf8(librdf_unichar c,
+    unsigned char *output, int length);
+
+  int librdf_utf8_to_unicode_char(librdf_unichar *output,
+    const unsigned char *input, int length);
+</pre>
+
+<p>Added:</p>
+<pre>
+  unsigned char* librdf_utf8_to_latin1(const unsigned char *input,
+    int length, int *output_length);
+
+  unsigned char* librdf_latin1_to_utf8(const unsigned char *input,
+    int length, int *output_length);
+
+  void librdf_utf8_print(const unsigned char *input, int length,
+    FILE *stream);
+</pre>
+
 <h3>Other Changes</h3>
+
+<p>The internal Redland librdf avltree implementation was removed and
+the 'trees' storage changed to use the <code>raptor_avltree</code>
+API which has bug fixes beyond the Redland librdf version.
+</p>
+
+<p>Redland librdf was ran through the
+LLVM <a href="http://clang-analyzer.llvm.org/">clang</a> static code
+analyzer and several issues fixed, mostly in unused variables and
+values computed that were needed but also included a few use of
+uninitialized variables especially in error cases.  one problem
+fixed was in <code>librdf_world_set_feature()</code> to actually set
+the value for the genid base and genid counter features
+(<code>LIBRDF_WORLD_FEATURE_GENID_BASE</code> and
+<code>LIBRDF_WORLD_FEATURE_GENID_COUNTER</code> respectively)
+</p>
+
+<p><code>configure</code> now tries harder to find the Oracle
+Berkeley DB library using Debian multiarch directories if present.
+This is yet another heuristic and rather a hack.
+</p>
+
+<p>Use <code>raptor.h</code> header from Raptor V2.
+</p>
 
 <p>Removed raptor1 support code as librdf no longer supports
 raptor1.</p>
