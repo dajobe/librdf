@@ -1,5 +1,6 @@
 *.db
 *.o
+*.plist
 .deps
 .libs
 TAGS
