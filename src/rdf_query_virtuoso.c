@@ -1261,7 +1261,7 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
   librdf_query *query = query_results->query;
   rasqal_variables_table *vt;
   rasqal_query_results *rasqal_qr;
-  int rc;
+  int rc = 0;
   int row_size;
   int i;
   
