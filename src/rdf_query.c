@@ -506,15 +506,17 @@ librdf_query_remove_query_result(librdf_query *query,
                                  librdf_query_results* query_results)
 {
   librdf_query_results *cur, *prev=NULL;
-  for(cur=query->results; cur && cur != query_results; cur=cur->next)
-    prev=cur;
+  for(cur = query->results; cur && cur != query_results; cur = cur->next)
+    prev = cur;
   
-  if(cur == query_results) {
-    if(prev)
-      prev->next=cur->next;
+  if(cur != NULL) {
+    if(cur == query_results) {
+      if(prev)
+        prev->next = cur->next;
+    }
+    if(cur == query->results)
+      query->results = cur->next;
   }
-  if(cur == query->results && cur != NULL)
-    query->results=cur->next;
 
   /* remove reference and free if we are the last */
   librdf_free_query(query);
