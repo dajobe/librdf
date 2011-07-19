@@ -1,4 +1,177 @@
-2011-06-23  Dave Beckett <dave@dajobe.org>
+2011-07-18  Dave Beckett <dave@dajobe.org>
+
+	* docs/redland-changes.tsv, docs/redland-sections.txt:
+	1.0.14
+
+	* src/rdf_raptor.c:
+	autodocs
+
+	* configure.ac:
+	Look for debian multiarch dir for libs first
+
+	* src/Makefile.am:
+	Remove rdf_avltree_internal.h from dist
+
+	* utils/redland-virtuoso-test.c:
+	Remove variables only set once to NULL
+
+	* src/Makefile.am, src/rdf_avltree.c, src/rdf_avltree_internal.h,
+	src/rdf_storage_trees.c: Remove avltree module and use
+	raptor_avltree
+
+	Type changes:
+	- Use raptor_avltree not librdf_avltree
+	- Use raptor_avltree_iterator not librdf_iterator
+
+	Call changes:
+	- raptor_avltree_size replaces librdf_avltree_size
+	- raptor_avltree_add replaces librdf_avltree_add and return value
+	  is tri-value not an enum
+	- raptor_avltree_delete replaces librdf_avltree_delete
+	- raptor_avltree_search replaces librdf_avltree_search
+	- raptor_new_avltree_iterator replaces
+	  librdf_avltree_get_iterator_start, loses a world arg and gains a
+	  direction argument which is always 'forward' (1) in this module.
+	- raptor_avltree_iterator_is_end replaces librdf_iterator_end
+	- raptor_avltree_iterator_next replaces librdf_iterator_next
+	- raptor_avltree_iterator_get replaces librdf_iterator_get_object
+	- raptor_free_avltree_iterator replaces librdf_free_iterator
+	- raptor_new_avltree replaces librdf_new_tree and gains a flags
+	  argument.
+	- raptor_free_avltree replaces librdf_free_avltree
+
+	* utils/.gitignore:
+	Ignore *.plist
+
+	* src/.gitignore:
+	Ignore *.plist
+
+	* src/rdf_stream.c:
+	(librdf_stream_from_node_iterator_finished): Init 'world' carefully
+	[clang]
+
+	* src/rdf_storage_virtuoso.c:
+	(librdf_storage_virtuoso_size): init 'count' [clang]
+
+	* src/rdf_storage_sqlite.c:
+	Remove a couple of useless assignment to 'status' [clang]
+
+	Really should have a proper retry a few times then fail mechanism.
+	Storage option for sqlite store?
+
+	* src/rdf_statement_common.c:
+	(librdf_statement_encode_parts2): Remove useless assignment to 'p'
+	and 'length' [clang]
+
+	* src/rdf_statement.c:
+	(librdf_statement_encode_parts_internal): Remove useless assignment
+	to 'p' and 'length' [clang]
+
+	* src/rdf_query_virtuoso.c:
+	(librdf_query_virtuoso_results_formatter_write): init 'rc' [clang]
+
+	* src/rdf_query.c:
+	(librdf_query_remove_query_result): Protect lookup of NULL 'cur'
+	[clang]
+
+	* src/rdf_parser_raptor.c:
+	Take not of failure statuses [clang]
+
+	(librdf_parser_raptor_parse_as_stream_common): Error out when
+	status non-0
+
+	(librdf_parser_raptor_serialise_finished): Set world carefully to
+	avoid NULL pointer lookup.
+
+	* src/rdf_node.c:
+	(librdf_node_decode): Remove useless assignment to total_length
+	[clang]
+
+	* src/rdf_hash_bdb.c:
+	(librdf_hash_bdb_sync): Set and use ret var [clang]
+
+	* src/rdf_digest_sha1.c: SHA1 fixes [clang]
+
+	* src/rdf_cache.c:
+	(librdf_cache_set_common): Set node to NULL and code style [clang]
+
+	* src/rdf_cache.c:
+	(librdf_cache_set_common): move new_object assignment to in debug
+	ifdef [clang]
+
+	* utils/rdfproc.c:
+	Remove assignment of rc never read [clang]
+
+	* utils/rdf-tree.c:
+	Initialize buffer to NULL.  [clang]
+
+	* src/rdf_hash.c:
+	(librdf_hash_from_string): Do not set values that are never read
+	[clang]
+
+	* src/rdf_hash.c:
+	(librdf_hash_get_all_iterator_get_method)
+	(librdf_hash_keys_iterator_get_method): Return context, not
+	address of local context var. [clang]
+
+	* src/rdf_digest.c:
+	(librdf_digest_to_string): Return on malloc failure [CLANG]
+
+	* src/rdf_init.c:
+	(librdf_world_set_feature): Actually set the value for genid_base
+	and counter [clang]'
+
+	* src/rdf_query_virtuoso.c:
+	(librdf_query_virtuoso_results_formatter_write): Remove set but
+	unused context variable
+
+	* src/rdf_storage_mysql.c:
+	(librdf_storage_mysql_context_add_statement_helper): Use calculated
+	rc value in return
+
+	* src/rdf_hash_bdb.c:
+	(librdf_hash_bdb_get_fd): Use ret value to return failure
+
+	* configure.ac, src/Makefile.am, utils/Makefile.am: Add clang
+	support for maintainer with 'analyze' target.
+
+	configure.ac: Add RECHO substvar
+
+	* configure.ac: Guesing BDB libname looks for dynamic libs too and
+	tries to be specific
+
+2011-07-17  Dave Beckett <dave@dajobe.org>
+
+	* src/librdf.h.in, src/rdf_node.c, src/rdf_utf8.c, src/rdf_utf8.h:
+	Move UTF8 utility functions into public API
+
+	Make the rdf_utf8.h header (which was already shipped and
+	installed) usable: do not depend on rdf_types.h, use raptor
+	typedefs and replace byte with it's definition of unsigned char.
+
+	(librdf_unicode_char_to_utf8): Replaced and deprecated with
+	raptor_unicode_utf8_string_put_char.
+
+	(librdf_utf8_to_unicode_char): Replaced and deprecated with
+	raptor_unicode_utf8_string_get_char
+
+	Add stdlib.h for malloc definition.
+
+	Remove utf8 spec comment
+
+	(librdf_latin1_to_utf8): Free allocation on failure
+
+	(librdf_utf8_to_latin1): Free allocation on failure
+
+	Fixes Issue#0000447
+	http://bugs.librdf.org/mantis/view.php?id=447
+
+2011-07-17  Dave Beckett <dave@dajobe.org>
+
+	* src/librdf.h.in, src/rdf_log.h, src/rdf_serializer.h,
+	src/rdf_serializer_internal.h: Use raptor2.h not raptor.h
+
+2011-07-16  Dave Beckett <dave@dajobe.org>
 
 	* src/rdf_node.c:
 	(librdf_node_write): Always write N-Triples
