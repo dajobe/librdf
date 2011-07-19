@@ -679,6 +679,10 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     status = raptor_parser_parse_iostream(pcontext->rdf_parser,
                                           iostream,
                                           (raptor_uri*)base_uri);
+    if(status) {
+      librdf_parser_raptor_serialise_finished((void*)scontext);
+      return NULL;
+    }
   } else {
     /* All three of URI, string and iostream are null.  That's a coding error. */
     librdf_parser_raptor_serialise_finished((void*)scontext);
@@ -1145,6 +1149,7 @@ librdf_parser_raptor_serialise_finished(void* context)
 
   if(scontext) {
     librdf_statement* statement;
+    librdf_world* world = scontext->pcontext->parser ? scontext->pcontext->parser->world : NULL;
 
     if(scontext->current)
       librdf_free_statement(scontext->current);
@@ -1159,9 +1164,9 @@ librdf_parser_raptor_serialise_finished(void* context)
       fclose(scontext->fh);
 
     if(scontext->pcontext)
-      scontext->pcontext->stream_context=NULL;
+      scontext->pcontext->stream_context = NULL;
 
-    librdf_raptor_free_bnode_hash(scontext->pcontext->parser->world);
+    librdf_raptor_free_bnode_hash(world);
 
     LIBRDF_FREE(librdf_parser_raptor_context, scontext);
   }
