@@ -530,6 +530,7 @@ static void
 librdf_stream_from_node_iterator_finished(void* context)
 {
   librdf_stream_from_node_iterator_stream_context* scontext=(librdf_stream_from_node_iterator_stream_context*)context;
+  librdf_world* world = scontext->iterator ? scontext->iterator->world : NULL;
   
   if(scontext->iterator)
     librdf_free_iterator(scontext->iterator);
@@ -548,7 +549,7 @@ librdf_stream_from_node_iterator_finished(void* context)
 
       case LIBRDF_STATEMENT_ALL:
       default:
-        librdf_log(scontext->iterator->world,
+        librdf_log(world,
                    0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STREAM, NULL, 
                    "Illegal statement field %d seen", scontext->field);
     }
