@@ -1944,8 +1944,10 @@ main(int argc, char *argv[])
   librdf_world_open(world);
 
   /* Test model cloning first */
-  if(test_model_cloning(program, world))
-    return(1);
+  if(test_model_cloning(program, world)) {
+    status = 1;
+    goto tidy;
+  }
 
   /* Get storage configuration */
   storage_type=getenv("REDLAND_TEST_STORAGE_TYPE");
@@ -1993,6 +1995,7 @@ main(int argc, char *argv[])
     status = test_model(world, program, storage_type, storage_name, storage_options);
   }
 
+  tidy:
   librdf_free_world(world);
 
   return status;
@@ -2032,6 +2035,7 @@ test_model(librdf_world *world, const char *program,
   storage=librdf_new_storage(world, storage_type, storage_name, storage_options);
   if(!storage) {
     fprintf(stderr, "%s: WARNING: Failed to create new %s storage name %s with options %s\n", program, storage_type, storage_name, storage_options);
+    raptor_free_iostream(iostr);
     return(0);
   }
 
@@ -2123,13 +2127,15 @@ test_model(librdf_world *world, const char *program,
   librdf_statement_set_object(statement, literal_node);
   librdf_model_remove_statement(model, statement);
   librdf_statement_set_object(statement, NULL);
-
+  librdf_free_node(literal_node);
+  
   literal[4]='0' + (TEST_SIMILAR_COUNT / 2);
   fprintf(stderr, "%s: Removing statement with literal '%s'\n", program, literal);
   literal_node = librdf_new_node_from_literal(world, (const unsigned char*)literal, NULL, 0);
   librdf_statement_set_object(statement, literal_node);
   librdf_model_remove_statement(model, statement);
   librdf_statement_set_object(statement, NULL);
+  librdf_free_node(literal_node);
 
   literal[4]='0' + (TEST_SIMILAR_COUNT - 1);
   fprintf(stderr, "%s: Removing statement with literal '%s'\n", program, literal);
@@ -2137,6 +2143,7 @@ test_model(librdf_world *world, const char *program,
   librdf_statement_set_object(statement, literal_node);
   librdf_model_remove_statement(model, statement);
   librdf_statement_set_object(statement, NULL);
+  librdf_free_node(literal_node);
 
   librdf_free_statement(statement);
 
@@ -2178,7 +2185,7 @@ test_model(librdf_world *world, const char *program,
                                                      file_content[i], uris[i]))) {
       fprintf(stderr, "%s: Failed to parse RDF from %s as stream\n", program,
               librdf_uri_as_string(uris[i]));
-      exit(1);
+      return(1);
     }
     librdf_model_context_add_statements(model, nodes[i], stream);
     librdf_free_stream(stream);
@@ -2360,14 +2367,19 @@ done:
   fprintf(stderr, "%s: Freeing storage\n", program);
   librdf_free_storage(storage);
 
+  raptor_free_iostream(iostr);
+
   return status;
 }
 
-int test_model_cloning(char const *program, librdf_world *world) {
+int
+test_model_cloning(char const *program, librdf_world *world)
+{
+  int status = 0;
   librdf_storage *storage;
-  librdf_model *model1;
-  librdf_model *model2;
-  librdf_model *model3;
+  librdf_model *model1 = NULL;
+  librdf_model *model2 = NULL;
+  librdf_model *model3 = NULL;
   const char* storage_type;
   const char* storage_name;
   const char* storage_options;
@@ -2375,63 +2387,69 @@ int test_model_cloning(char const *program, librdf_world *world) {
   fprintf(stderr, "%s: Testing model cloning\n", program);
 
   /* Get storage configuration */
-  storage_type=getenv("REDLAND_TEST_CLONING_STORAGE_TYPE");
-  storage_name=getenv("REDLAND_TEST_CLONING_STORAGE_NAME");
-  storage_options=getenv("REDLAND_TEST_CLONING_STORAGE_OPTIONS");
+  storage_type = getenv("REDLAND_TEST_CLONING_STORAGE_TYPE");
+  storage_name = getenv("REDLAND_TEST_CLONING_STORAGE_NAME");
+  storage_options = getenv("REDLAND_TEST_CLONING_STORAGE_OPTIONS");
+
   if(!(storage_type && storage_name && storage_options)) {
     /* default is to test bdb disk hashes for cloning */
     storage_type="hashes";
     storage_name="test";
 #ifdef HAVE_BDB_HASH
-    storage_options="hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'";
+    storage_options = "hash-type='bdb',dir='.',write='yes',new='yes',contexts='yes'";
 #else
-    storage_options="hash-type='memory',write='yes',new='yes',contexts='yes'";
+    storage_options = "hash-type='memory',write='yes',new='yes',contexts='yes'";
 #endif
   }
 
   fprintf(stderr, "%s: Creating new %s storage\n", program, storage_type);
-  storage=librdf_new_storage(world, storage_type, storage_name, storage_options);
+  storage = librdf_new_storage(world, storage_type, storage_name, storage_options);
   if(!storage) {
     fprintf(stderr, "%s: Failed to create new %s storage name %s with options %s\n", program, storage_type, storage_name, storage_options);
     return 1;
   }
   
   fprintf(stderr, "%s: Creating new model for cloning\n", program);
-  model1=librdf_new_model(world, storage, NULL);
+  model1 = librdf_new_model(world, storage, NULL);
   if(!model1) {
     fprintf(stderr, "%s: Failed to create new model\n", program);
-    /* ok to leak memory */    
-    return 1;
+    status = 1;
+    goto tidy;
   }
   
   fprintf(stderr, "%s: Cloning model\n", program);
-  model2=librdf_new_model_from_model(model1);
+  model2 = librdf_new_model_from_model(model1);
   if(!model2) {
     fprintf(stderr, "%s: Failed to clone model\n", program);
-    /* ok to leak memory */    
-    return 1;
+    status = 1;
+    goto tidy;
   }
 
   /* Free original model now so we can test whether the clone is self-sufficient */
   fprintf(stderr, "%s: Freeing original model\n", program);
-  librdf_free_model(model1);
+  librdf_free_model(model1); model1 = NULL;
 
   fprintf(stderr, "%s: Cloning cloned model\n", program);
-  model3=librdf_new_model_from_model(model2);
+  model3 = librdf_new_model_from_model(model2);
   if(!model3) {
     fprintf(stderr, "%s: Failed to clone cloned model\n", program);
-    /* ok to leak memory */    
-    return 1;
+    status = 1;
+    goto tidy;
   }
 
-  fprintf(stderr, "%s: Freeing cloned models\n", program);  
-  librdf_free_model(model3);
-  librdf_free_model(model2);
+  tidy:
+  fprintf(stderr, "%s: Freeing models\n", program);  
+  if(model3)
+    librdf_free_model(model3);
+  if(model2)
+    librdf_free_model(model2);
+  if(model1)
+    librdf_free_model(model1);
   
   fprintf(stderr, "%s: Freeing %s storage\n", program, storage_type);  
   librdf_free_storage(storage);
-  
-  return 0;
+
+  return status;
 }
 
 #endif
