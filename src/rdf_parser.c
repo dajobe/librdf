@@ -1159,6 +1159,8 @@ main(int argc, char *argv[])
     librdf_model_add_statements(model, stream);
     librdf_free_stream(stream);
     stream = NULL;
+    raptor_free_iostream(iostream);
+    iostream = NULL;
 
     size = librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
