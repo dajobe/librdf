@@ -588,16 +588,8 @@ REDLAND_API
 REDLAND_CALLBACK_STDCALL
 REDLAND_PRINTF_FORMAT
 librdf_basename
-librdf_new_cache
-librdf_cache
-librdf_cache_add
-librdf_cache_delete
-librdf_cache_get
-librdf_cache_set
-librdf_cache_size
 librdf_concepts_index
 librdf_finish_raptor
-librdf_free_cache
 librdf_init_raptor
 librdf_log
 librdf_log_simple
