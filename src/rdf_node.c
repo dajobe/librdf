@@ -178,6 +178,7 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
                                     const unsigned char *local_name)
 {
   raptor_uri *new_uri;
+  librdf_node* node;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
 
@@ -191,7 +192,9 @@ librdf_new_node_from_uri_local_name(librdf_world *world,
   if(!new_uri)
     return NULL;
 
-  return raptor_new_term_from_uri(world->raptor_world_ptr, new_uri);
+  node = raptor_new_term_from_uri(world->raptor_world_ptr, new_uri);
+  raptor_free_uri(new_uri);
+  return node;
 }
 
 
@@ -213,6 +216,7 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
                                            librdf_uri *base_uri)
 {
   librdf_uri* new_uri;
+  librdf_node* node;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
   
@@ -223,7 +227,9 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
   if(!new_uri)
     return NULL;
 
-  return raptor_new_term_from_uri(world->raptor_world_ptr, new_uri);
+  node = raptor_new_term_from_uri(world->raptor_world_ptr, new_uri);
+  raptor_free_uri(new_uri);
+  return node;
 }
 
 
