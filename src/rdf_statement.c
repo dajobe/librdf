@@ -887,6 +887,7 @@ main(int argc, char *argv[])
   librdf_free_statement(statement2);
   librdf_free_statement(statement);
 
+  raptor_free_iostream(iostr);
 
   librdf_free_world(world);
   
