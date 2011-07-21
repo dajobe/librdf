@@ -50,7 +50,6 @@ rdf_uri.c \
 rdf_digest.c rdf_hash.c rdf_hash_cursor.c rdf_hash_memory.c \
 rdf_model.c rdf_model_storage.c \
 rdf_iterator.c rdf_concepts.c \
-rdf_cache.c \
 rdf_list.c \
 rdf_storage.c \
 rdf_storage_sql.c \
@@ -68,7 +67,6 @@ redland.h \
 rdf_internal.h \
 rdf_init.h \
 rdf_uri.h rdf_node.h rdf_statement.h rdf_concepts.h \
-rdf_cache.h \
 rdf_digest.h rdf_hash.h \
 rdf_types.h \
 rdf_model.h \
@@ -215,7 +213,7 @@ TESTS=rdf_node_test rdf_digest_test rdf_hash_test rdf_uri_test \
 rdf_statement_test rdf_model_test rdf_storage_test rdf_parser_test \
 rdf_files_test rdf_heuristics_test rdf_utf8_test rdf_concepts_test \
 rdf_query_test rdf_serializer_test rdf_stream_test rdf_iterator_test \
-rdf_init_test rdf_cache_test
+rdf_init_test
 
 # Set the place to find storage modules for testing
 TESTS_ENVIRONMENT=REDLAND_MODULE_PATH=$(abs_builddir)/.libs
@@ -297,9 +295,6 @@ COMPILE_LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(DEFS) $(DEFAULT_INCLUDE
 
 rdf_node_test: rdf_node.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_node.c librdf.la
-
-rdf_cache_test: rdf_cache.c librdf.la
-	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_cache.c librdf.la
 
 rdf_digest_test: rdf_digest.c librdf.la
 	$(COMPILE_LINK) -DSTANDALONE $(srcdir)/rdf_digest.c librdf.la
