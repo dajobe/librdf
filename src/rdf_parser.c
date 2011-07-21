@@ -1233,6 +1233,8 @@ main(int argc, char *argv[])
       goto tidy_test;
     }
 
+    raptor_free_iostream(iostream); iostream = NULL;
+
     for(i = 0; i < librdf_parser_get_namespaces_seen_count(parser); i++) {
       const char* prefix = librdf_parser_get_namespaces_seen_prefix(parser, i);
       librdf_uri* uri = librdf_parser_get_namespaces_seen_uri(parser, i);
