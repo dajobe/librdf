@@ -533,7 +533,7 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   if(!options)
     return 1;
   
-  context=(librdf_storage_mysql_instance*)LIBRDF_CALLOC(
+  context = (librdf_storage_mysql_instance*)LIBRDF_CALLOC(
     librdf_storage_mysql_instance, 1, sizeof(librdf_storage_mysql_instance));
 
   if(!context) {
@@ -543,56 +543,63 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   librdf_storage_set_instance(storage, context);
 
   /* Create digest */
-  if(!(context->digest=librdf_new_digest(storage->world,"MD5")))
+  if(!(context->digest = librdf_new_digest(storage->world,"MD5"))) {
+    librdf_free_hash(options);
     return 1;
+  }
 
   /* Save hash of model name */
-  context->model=librdf_storage_mysql_hash(storage, NULL, (char*)name, strlen(name));
+  context->model = librdf_storage_mysql_hash(storage, NULL, (char*)name,
+                                             strlen(name));
 
   /* Save connection parameters */
-  context->host=librdf_hash_get_del(options, "host");
-  context->port=librdf_hash_get_as_long(options, "port");
+  context->host = librdf_hash_get_del(options, "host");
+  context->port = librdf_hash_get_as_long(options, "port");
   if(context->port < 0)
     context->port=3306; /* default mysql port */
-  context->database=librdf_hash_get_del(options, "database");
-  context->user=librdf_hash_get_del(options, "user");
-  context->password=librdf_hash_get_del(options, "password");
+  context->database = librdf_hash_get_del(options, "database");
+  context->user = librdf_hash_get_del(options, "user");
+  context->password = librdf_hash_get_del(options, "password");
 
-  if(!context->host || !context->database || !context->user || !context->port
-     || !context->password)
+  if(!context->host || !context->database || !context->user || 
+     !context->port || !context->password) {
+    librdf_free_hash(options);
     return 1;
+  }
 
   /* Maintain merge table? */
-  context->merge=(librdf_hash_get_as_boolean(options, "merge")>0);
+  context->merge = (librdf_hash_get_as_boolean(options, "merge")>0);
 
   /* Reconnect? */
-  context->reconnect=(librdf_hash_get_as_boolean(options, "reconnect")>0);
+  context->reconnect = (librdf_hash_get_as_boolean(options, "reconnect")>0);
 
-  context->layout=librdf_hash_get_del(options, "layout");
+  context->layout = librdf_hash_get_del(options, "layout");
   if(!context->layout) {
-    context->layout=(char*)LIBRDF_MALLOC(cstring, strlen(default_layout)+1);
+    context->layout = (char*)LIBRDF_MALLOC(cstring, strlen(default_layout) + 1);
     strcpy(context->layout, default_layout);
   }
 
-  context->config_dir=librdf_hash_get_del(options, "config-dir");
+  context->config_dir = librdf_hash_get_del(options, "config-dir");
 
   /* Initialize MySQL connections */
   librdf_storage_mysql_init_connections(storage);
 
   /* Get MySQL connection handle */
-  handle=librdf_storage_mysql_get_handle(storage);
-  if(!handle)
+  handle = librdf_storage_mysql_get_handle(storage);
+  if(!handle) {
+    librdf_free_hash(options);
     return 1;
+  }
 
   /* Read SQL configuration */
-  context->config=librdf_new_sql_config_for_storage(storage, context->layout,
-                                                    context->config_dir);
+  context->config = librdf_new_sql_config_for_storage(storage, context->layout,
+                                                      context->config_dir);
   if(!context->config)
-    status= 1;
+    status = 1;
 
   if(!status) {
     char vars_str[50];
-    context->vars=librdf_new_hash(storage->world, NULL);
+    context->vars = librdf_new_hash(storage->world, NULL);
       
     sprintf(vars_str, "STATEMENTS_NAME='Statements" UINT64_T_FMT "'", 
             context->model);
@@ -607,10 +614,10 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
     for(table= DBCONFIG_CREATE_TABLE_STATEMENTS;
         table <= DBCONFIG_CREATE_TABLE_MODELS;
         table++) {
-      query=(char*)librdf_hash_interpret_template((const unsigned char*)context->config->values[table],
-                                                  context->vars, 
-                                                  (const unsigned char*)"$(", 
-                                                  (const unsigned char*)")");
+      query = (char*)librdf_hash_interpret_template((const unsigned char*)context->config->values[table],
+                                                    context->vars, 
+                                                    (const unsigned char*)"$(", 
+                                                    (const unsigned char*)")");
       
 #ifdef LIBRDF_DEBUG_SQL
       LIBRDF_DEBUG2("SQL: >>%s<<\n", query);
@@ -621,7 +628,7 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
                    NULL,
                    "MySQL table creation failed: %s",
                    mysql_error(handle));
-        status=-1;
+        status = -1;
         break;
       }
 
@@ -632,16 +639,16 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
 
   /* Create model if new and not existing, or check for existence */
   if(!status) {
-    if(!(escaped_name=(char*)LIBRDF_MALLOC(cstring,strlen(name)*2+1)))
-      status=1;
+    if(!(escaped_name = (char*)LIBRDF_MALLOC(cstring,strlen(name)*2+1)))
+      status = 1;
     mysql_real_escape_string(handle, escaped_name,
                              (const char*)name, strlen(name));
   }
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) {
     /* Create new model */
-    if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(create_model)+20+
-                                    strlen(escaped_name)+1)))
-      status=1;
+    if(!(query = (char*)LIBRDF_MALLOC(cstring,strlen(create_model)+20+
+                                      strlen(escaped_name)+1)))
+      status = 1;
     sprintf(query, create_model, context->model, escaped_name);
 
 #ifdef LIBRDF_DEBUG_SQL
@@ -652,18 +659,18 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "MySQL insert into Models table failed: %s",
                  mysql_error(handle));
-      status=-1;
+      status = -1;
     }
     /* Maintain merge table? */
     if(!status && context->merge)
-      status=librdf_storage_mysql_merge(storage);
+      status = librdf_storage_mysql_merge(storage);
   } else if(!status) {
     /* Check for model existence */
-    if(!(query=(char*)LIBRDF_MALLOC(cstring,strlen(check_model)+20+
-                                    strlen(escaped_name)+1)))
-      status=1;
+    if(!(query = (char*)LIBRDF_MALLOC(cstring,strlen(check_model)+20+
+                                      strlen(escaped_name)+1)))
+      status = 1;
     sprintf(query, check_model, context->model, name);
-    res=NULL;
+    res = NULL;
 
 #ifdef LIBRDF_DEBUG_SQL
     LIBRDF_DEBUG2("SQL: >>%s<<\n", query);
@@ -673,12 +680,12 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "MySQL select from Models table failed: %s",
                  mysql_error(handle));
-      status=-1;
+      status = -1;
     }
     if(!status && !(mysql_fetch_row(res))) {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "Unknown model: %s",name);
-      status=1;
+      status = 1;
     }
     if(res)
       mysql_free_result(res);
@@ -689,11 +696,11 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
     LIBRDF_FREE(cstring, escaped_name);
 
   /* Optimize loads? */
-  context->bulk=(librdf_hash_get_as_boolean(options, "bulk")>0);
+  context->bulk = (librdf_hash_get_as_boolean(options, "bulk")>0);
 
   /* Truncate model? */
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0))
-    status=librdf_storage_mysql_context_remove_statements(storage, NULL);
+    status = librdf_storage_mysql_context_remove_statements(storage, NULL);
 
   /* Unused options: write (always...) */
   librdf_free_hash(options);
