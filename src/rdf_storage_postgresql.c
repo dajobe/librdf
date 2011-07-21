@@ -515,8 +515,10 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
 
 
   /* Create digest */
-  if(!(context->digest=librdf_new_digest(storage->world,"MD5")))
+  if(!(context->digest=librdf_new_digest(storage->world,"MD5"))) {
+    librdf_free_hash(options);
     return 1;
+  }
 
   /* Save hash of model name */
   context->model=librdf_storage_postgresql_hash(storage, NULL, name, strlen(name));
@@ -541,8 +543,10 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   context->password=librdf_hash_get(options, "password");
 
   if(!context->host || !context->dbname || !context->user || !context->port
-     || !context->password)
+     || !context->password) {
+    librdf_free_hash(options);
     return 1;
+  }
    
   /* Maintain merge table? */
   context->merge=(librdf_hash_get_as_boolean(options, "merge")>0);
@@ -552,8 +556,10 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
 
   /* Get postgresql connection handle */
   handle=librdf_storage_postgresql_get_handle(storage);
-  if(!handle)
+  if(!handle) {
+    librdf_free_hash(options);
     return 1;
+  }
 
   /* Create tables, if new and not existing */
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) 
