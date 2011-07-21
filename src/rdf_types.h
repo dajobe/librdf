@@ -36,13 +36,17 @@ extern "C" {
 #ifndef HAVE_U64
   #if SIZEOF_UNSIGNED_INT == 8
     typedef unsigned int u64;
+    #define UINT64_T_FMT "%u"
   #elif SIZEOF_UNSIGNED_LONG == 8
     typedef unsigned long u64;
+    #define UINT64_T_FMT "%lu"
   #elif SIZEOF_UNSIGNED_LONG_LONG == 8
     #ifdef WIN32
       typedef __int64 u64;
+      #define UINT64_T_FMT "%I64u"
     #else
-       typedef unsigned long long u64;
+      typedef unsigned long long u64;
+      #define UINT64_T_FMT "%llu"
     #endif
   #else
     #error u64 type not defined
@@ -66,13 +70,6 @@ extern "C" {
   #else
     #error byte type not defined
   #endif
-#endif
-
-
-#ifdef WIN32
-#define UINT64_T_FMT "%I64u"
-#else
-#define UINT64_T_FMT "%llu"
 #endif
 
 
