@@ -226,6 +226,65 @@ Internal.
 </para>
 
 
+<!-- ##### TYPEDEF librdf_cache ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION librdf_cache_add ##### -->
+<para>
+
+</para>
+
+@cache: 
+@key: 
+@key_size: 
+@value: 
+@value_size: 
+@Returns: 
+
+<!-- ##### FUNCTION librdf_cache_delete ##### -->
+<para>
+
+</para>
+
+@cache: 
+@key: 
+@key_size: 
+@Returns: 
+
+<!-- ##### FUNCTION librdf_cache_get ##### -->
+<para>
+
+</para>
+
+@cache: 
+@key: 
+@key_size: 
+@value_size_p: 
+@Returns: 
+
+<!-- ##### FUNCTION librdf_cache_set ##### -->
+<para>
+
+</para>
+
+@cache: 
+@key: 
+@key_size: 
+@value: 
+@value_size: 
+@Returns: 
+
+<!-- ##### FUNCTION librdf_cache_size ##### -->
+<para>
+
+</para>
+
+@cache: 
+@Returns: 
+
 <!-- ##### VARIABLE librdf_concept_ms_namespace_uri ##### -->
 <para>
 Internal.
@@ -237,6 +296,24 @@ Internal.
 Internal.
 </para>
 
+
+<!-- ##### FUNCTION librdf_free_cache ##### -->
+<para>
+
+</para>
+
+@cache: 
+
+<!-- ##### FUNCTION librdf_new_cache ##### -->
+<para>
+
+</para>
+
+@world: 
+@capacity: 
+@flush_percent: 
+@flags: 
+@Returns: 
 
 <!-- ##### MACRO raptor_data_free_handler ##### -->
 <para>

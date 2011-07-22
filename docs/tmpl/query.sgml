@@ -45,6 +45,16 @@ Query result limits and offsets can be set.
 @factory: 
 
 
+<!-- ##### FUNCTION librdf_query_language_get_description ##### -->
+<para>
+
+</para>
+
+@world: 
+@counter: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_query_languages_enumerate ##### -->
 <para>
 

@@ -52,82 +52,6 @@ Internal.  You should not be reading this.
 @Returns: 
 
 
-<!-- ##### FUNCTION librdf_new_cache ##### -->
-<para>
-
-</para>
-
-@world: 
-@capacity: 
-@flush_percent: 
-@flags: 
-@Returns: 
-
-
-<!-- ##### TYPEDEF librdf_cache ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### FUNCTION librdf_cache_add ##### -->
-<para>
-
-</para>
-
-@cache: 
-@key: 
-@key_size: 
-@value: 
-@value_size: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_cache_delete ##### -->
-<para>
-
-</para>
-
-@cache: 
-@key: 
-@key_size: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_cache_get ##### -->
-<para>
-
-</para>
-
-@cache: 
-@key: 
-@key_size: 
-@value_size_p: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_cache_set ##### -->
-<para>
-
-</para>
-
-@cache: 
-@key: 
-@key_size: 
-@value: 
-@value_size: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_cache_size ##### -->
-<para>
-
-</para>
-
-@cache: 
-@Returns: 
-
-
 <!-- ##### ENUM librdf_concepts_index ##### -->
 <para>
 Internal.
@@ -178,14 +102,6 @@ Internal.
 </para>
 
 @world: 
-
-
-<!-- ##### FUNCTION librdf_free_cache ##### -->
-<para>
-
-</para>
-
-@cache: 
 
 
 <!-- ##### FUNCTION librdf_init_raptor ##### -->
@@ -240,5 +156,23 @@ Internal.
 
 @world: 
 @raptor_world_ptr: 
+
+
+<!-- ##### FUNCTION librdf_raptor_free_bnode_hash ##### -->
+<para>
+
+</para>
+
+@world: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_raptor_reset_bnode_hash ##### -->
+<para>
+
+</para>
+
+@world: 
+@Returns: 
 
 

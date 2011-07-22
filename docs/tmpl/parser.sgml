@@ -250,6 +250,29 @@ by callbacks.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_parser_parse_iostream_as_stream ##### -->
+<para>
+
+</para>
+
+@parser: 
+@iostream: 
+@base_uri: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_parser_parse_iostream_into_model ##### -->
+<para>
+
+</para>
+
+@parser: 
+@iostream: 
+@base_uri: 
+@model: 
+@Returns: 
+
+
 <!-- ##### MACRO LIBRDF_PARSER_FEATURE_ERROR_COUNT ##### -->
 <para>
 
