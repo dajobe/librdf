@@ -1375,7 +1375,7 @@ librdf_model_context_remove_statements(librdf_model* model,
     librdf_model_context_remove_statement(model, context, statement);
     librdf_stream_next(stream);
   }
-  librdf_free_stream(stream);  
+  librdf_free_stream(stream);
   return 0;
 }
 
@@ -2376,7 +2376,9 @@ int
 test_model_cloning(char const *program, librdf_world *world)
 {
   int status = 0;
-  librdf_storage *storage;
+  librdf_storage *storage1 = NULL;
+  librdf_storage *storage2 = NULL;
+  librdf_storage *storage3 = NULL;
   librdf_model *model1 = NULL;
   librdf_model *model2 = NULL;
   librdf_model *model3 = NULL;
@@ -2403,14 +2405,14 @@ test_model_cloning(char const *program, librdf_world *world)
   }
 
   fprintf(stderr, "%s: Creating new %s storage\n", program, storage_type);
-  storage = librdf_new_storage(world, storage_type, storage_name, storage_options);
-  if(!storage) {
+  storage1 = librdf_new_storage(world, storage_type, storage_name, storage_options);
+  if(!storage1) {
     fprintf(stderr, "%s: Failed to create new %s storage name %s with options %s\n", program, storage_type, storage_name, storage_options);
     return 1;
   }
   
   fprintf(stderr, "%s: Creating new model for cloning\n", program);
-  model1 = librdf_new_model(world, storage, NULL);
+  model1 = librdf_new_model(world, storage1, NULL);
   if(!model1) {
     fprintf(stderr, "%s: Failed to create new model\n", program);
     status = 1;
@@ -2424,6 +2426,7 @@ test_model_cloning(char const *program, librdf_world *world)
     status = 1;
     goto tidy;
   }
+  storage2 = librdf_model_get_storage(model2);
 
   /* Free original model now so we can test whether the clone is self-sufficient */
   fprintf(stderr, "%s: Freeing original model\n", program);
@@ -2436,9 +2439,10 @@ test_model_cloning(char const *program, librdf_world *world)
     status = 1;
     goto tidy;
   }
+  storage3 = librdf_model_get_storage(model3);
 
   tidy:
-  fprintf(stderr, "%s: Freeing models\n", program);  
+  fprintf(stderr, "%s: Freeing models\n", program);
   if(model3)
     librdf_free_model(model3);
   if(model2)
@@ -2446,8 +2450,12 @@ test_model_cloning(char const *program, librdf_world *world)
   if(model1)
     librdf_free_model(model1);
   
-  fprintf(stderr, "%s: Freeing %s storage\n", program, storage_type);  
-  librdf_free_storage(storage);
+  fprintf(stderr, "%s: Freeing %s storages\n", program, storage_type);
+  if(storage3)
+    librdf_free_storage(storage3);
+  if(storage2)
+    librdf_free_storage(storage2);
+  librdf_free_storage(storage1);
 
   return status;
 }
