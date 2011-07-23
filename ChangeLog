@@ -1,3 +1,82 @@
+2011-07-23  Dave Beckett <dave@dajobe.org>
+
+	* RELEASE.html:
+	1.0.14
+
+	* src/rdf_model.c:
+	(test_model_cloning): Free new storages from cloned models.
+
+	* src/rdf_storage_hashes.c:
+	(librdf_storage_hashes_clone): Copy storage fields in cloning.
+
+2011-07-22  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_hashes.c:
+	(librdf_storage_hashes_clone): Do not lose new_context memory
+
+	* src/rdf_storage_sqlite.c: Fixed
+	librdf_storage_sqlite_context_serialise_finished leak of a node
+	reference
+
+	(librdf_storage_sqlite_context_serialise_finished): Free the
+	context node in the context-serializing argument list.  Too many
+	use of 'context' error!
+
+	* docs/Makefile.am, docs/redland-sections.txt,
+	docs/tmpl/redland-unused.sgml, docs/tmpl/unused.sgml: Remove
+	internal funcs from docs Ignore rdf_raptor_internal.h for autodocs
+
+	* src/rdf_statement_internal.h: Remove unused struct
+	librdf_statement_s
+
+	* src/rdf_statement.c:
+	Restore librdf_statement_decode_parts to ABI
+
+	(librdf_statement_decode_parts): Add back. Although this has been
+	deprecated for librdf_statement_decode2() should not have been
+	removed.  Always fails.
+
+	* docs/tmpl/parser.sgml, docs/tmpl/query.sgml,
+	docs/tmpl/redland-unused.sgml, docs/tmpl/unused.sgml:
+	Update tmpls
+
+2011-07-21  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_types.h: Fixed printf format warnings on systems where
+	u64 is not unsigned long long.
+
+2011-07-20  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_model.c: Tidy up better during optional test failures
+	(such as no mysql db running)
+
+	* docs/redland-sections.txt: Remove internal cache unused docs
+
+	* src/Makefile.am, src/rdf_cache.c, src/rdf_cache.h,
+	src/rdf_internal.h: Remove rdf_cache internal module - not used
+
+	* src/rdf_parser.c:
+	(main): Free another iostream
+
+	* src/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_init): Free options on failures
+
+	* src/rdf_storage_mysql.c:
+	(librdf_storage_mysql_init): Free options on failures
+
+	* src/rdf_parser.c:
+	(main): Free iostream
+
+	* src/rdf_statement.c:
+	(main): Free iostream
+
+	* src/rdf_node.c: Fix URI reference leak in two librdf_node
+	constructors.
+
+	(librdf_new_node_from_uri_local_name)
+	(librdf_new_node_from_normalised_uri_string): Fix URI reference
+	leak due to raptor term constructor semantics.
+
 2011-07-18  Dave Beckett <dave@dajobe.org>
 
 	* docs/redland-changes.tsv, docs/redland-sections.txt:
