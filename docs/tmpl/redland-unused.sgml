@@ -297,12 +297,27 @@ Internal.
 </para>
 
 
+<!-- ##### FUNCTION librdf_finish_raptor ##### -->
+<para>
+
+</para>
+
+@world: 
+
 <!-- ##### FUNCTION librdf_free_cache ##### -->
 <para>
 
 </para>
 
 @cache: 
+
+<!-- ##### FUNCTION librdf_init_raptor ##### -->
+<para>
+
+</para>
+
+@world: 
+@Returns: 
 
 <!-- ##### FUNCTION librdf_new_cache ##### -->
 <para>
@@ -313,6 +328,22 @@ Internal.
 @capacity: 
 @flush_percent: 
 @flags: 
+@Returns: 
+
+<!-- ##### FUNCTION librdf_raptor_free_bnode_hash ##### -->
+<para>
+
+</para>
+
+@world: 
+@Returns: 
+
+<!-- ##### FUNCTION librdf_raptor_reset_bnode_hash ##### -->
+<para>
+
+</para>
+
+@world: 
 @Returns: 
 
 <!-- ##### MACRO raptor_data_free_handler ##### -->

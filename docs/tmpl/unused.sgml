@@ -96,23 +96,6 @@ Internal.
 @LIBRDF_CONCEPT_FIRST_S_ID: offset
 @LIBRDF_CONCEPT_LAST: offset
 
-<!-- ##### FUNCTION librdf_finish_raptor ##### -->
-<para>
-
-</para>
-
-@world: 
-
-
-<!-- ##### FUNCTION librdf_init_raptor ##### -->
-<para>
-
-</para>
-
-@world: 
-@Returns: 
-
-
 <!-- ##### FUNCTION librdf_log ##### -->
 <para>
 
@@ -156,23 +139,5 @@ Internal.
 
 @world: 
 @raptor_world_ptr: 
-
-
-<!-- ##### FUNCTION librdf_raptor_free_bnode_hash ##### -->
-<para>
-
-</para>
-
-@world: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_raptor_reset_bnode_hash ##### -->
-<para>
-
-</para>
-
-@world: 
-@Returns: 
 
 

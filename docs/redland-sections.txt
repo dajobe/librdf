@@ -589,12 +589,8 @@ REDLAND_CALLBACK_STDCALL
 REDLAND_PRINTF_FORMAT
 librdf_basename
 librdf_concepts_index
-librdf_finish_raptor
-librdf_init_raptor
 librdf_log
 librdf_log_simple
 librdf_world_get_raptor
 librdf_world_set_raptor
-librdf_raptor_free_bnode_hash
-librdf_raptor_reset_bnode_hash
 </SECTION>

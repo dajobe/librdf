@@ -65,6 +65,7 @@ IGNORE_HFILES= \
 	rdf_node_internal.h \
 	rdf_parser_internal.h \
 	rdf_query_internal.h \
+	rdf_raptor_internal.h \
 	rdf_serializer_internal.h \
 	rdf_statement_internal.h \
 	rdf_storage_internal.h \
