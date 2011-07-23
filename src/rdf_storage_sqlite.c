@@ -2433,6 +2433,9 @@ librdf_storage_sqlite_context_serialise_finished(void* context)
   if(scontext->context)
     librdf_free_node(scontext->context);
 
+  if(scontext->context_node)
+    librdf_free_node(scontext->context_node);
+
   scontext->sqlite_context->in_stream--;
   if(!scontext->sqlite_context->in_stream)
     librdf_storage_sqlite_query_flush(scontext->storage);
