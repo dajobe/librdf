@@ -718,6 +718,31 @@ librdf_statement_decode(librdf_statement* statement,
 
 
 /**
+ * librdf_statement_decode_parts:
+ * @statement: the statement to deserialise into
+ * @context_node: pointer to #librdf_node context_node to deserialise into
+ * @buffer: the buffer to use
+ * @length: buffer size
+ *
+ * Decodes a statement + context node from a buffer. (ALWAYS FAILS)
+ * 
+ * Used to decode the serialised statement as created by
+ * librdf_statement_encode() from the given buffer.
+ *
+ * @Deprecated: Replaced by librdf_statement_decode2() which works.
+ * 
+ * Return value: 0 signifying failure
+ **/
+size_t
+librdf_statement_decode_parts(librdf_statement* statement, 
+                              librdf_node** context_node,
+                              unsigned char *buffer, size_t length)
+{
+  return 0;
+}
+
+
+/**
  * librdf_statement_decode2:
  * @world: redland world
  * @statement: the statement to deserialise into
