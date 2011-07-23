@@ -32,15 +32,6 @@
 extern "C" {
 #endif
 
-struct librdf_statement_s
-{
-  librdf_world* world;
-  librdf_node* subject;
-  librdf_node* predicate;
-  librdf_node* object;
-};
-
-
 /* class methods */
 void librdf_init_statement(librdf_world *world);
 void librdf_finish_statement(librdf_world *world);
