@@ -24,7 +24,7 @@ pre
 
 <h2 id="rel1_0_14"><a name="rel1_0_14">Redland 1.0.14 Changes</a></h2>
 
-<p>Rasqal minimum version is now 0.9.25 for use of the new
+<p>Rasqal minimum version is now 0.9.25 for the new
 <code>rasqal_world_get_query_language_description()</code> function.
 </p>
 
@@ -33,10 +33,17 @@ pre
   <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000375</a>: Add functionality to parse from iostream (or similar)</li>
   <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000418</a>: SQLite driver adds duplicate statements if a conext is given.</li>
   <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000432</a>: Seg fault when getting a blank node after parsing RDF</li>
-  <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000447</a>: - 0000447</a>: fatal error: rdf_types.h: No such file or directory</li>
+  <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000447</a>: fatal error: rdf_types.h: No such file or directory</li>
 </ul>
 
 <h3>Hash Class Changes</h3>
+
+<p>BDB Hash (name 'bdb'): Add checks for Oracle Berkeley DB 5.1, 5.0
+and 4.9 and updated <code>configure</code> messages with the new
+name.  The 5.x storage has the same API but has a new on-disk format
+that will require a use of the <code>db-upgrade(1)</code> utility in
+the utils directory.
+</p>
 
 <p>Fixed <code>librdf_hash_get_as_boolean()</code> 'false' string
 fixed to actually be a False value.
@@ -84,7 +91,7 @@ return the full description of of the query language. Deprecates
 
 <h3>Statement Class Changes</h3>
 
-<p>Restored <code>(librdf_statement_decode_parts()</code> to the
+<p>Restored <code>librdf_statement_decode_parts()</code> to the
 public ABI/API which was accidently removed.  It has been deprecated
 for <code>librdf_statement_decode2()</code> for some time and now
 always fails.
@@ -93,14 +100,9 @@ always fails.
 
 <h3>Storage Class Changes</h3>
 
-<p>Storage BDB (name 'bdb'): Add checks for Oracle Berkeley DB 5.1, 5.0 and 4.9
-and updated configure messages with new name.  The 5.x storage seems
-to work with same API, but has a new on-disk format that will require
-a use of the <code>db-upgrade(1)</code> utility in the utils directory.
-</p>
-
 <p>Storage Hashes (name 'hashes'): Fixed a reference leak and shared
-values issue when cloning a storage.
+values issue when cloning a storage.  The BDB hash type (current
+default) was updated for Oracle DB 5.1; see above.
 </p>
 
 <p>Storage SQLite (name 'sqlite'):
@@ -116,7 +118,7 @@ Fixed a librdf_node reference leak when serializing model with context nodes.
 and documentation into part of the API.
 </p>
 
-<p>Added but deprecated for raptor equivalents (they are wrappers for them):
+<p>Added but deprecated for Raptor equivalents (they are wrappers for them):</p>
 <pre>
   int librdf_unicode_char_to_utf8(librdf_unichar c,
     unsigned char *output, int length);
@@ -139,9 +141,10 @@ and documentation into part of the API.
 
 <h3>Other Changes</h3>
 
-<p>The internal Redland librdf avltree implementation was removed and
-the 'trees' storage changed to use the <code>raptor_avltree</code>
-API which has bug fixes beyond the Redland librdf version.
+<p>The internal Redland librdf AVL Tree implementation was removed
+and the 'trees' storage changed to use the AVL Tree implementation in
+Raptor (<code>raptor_avltree</code>) which is newer and has bug fixes
+beyond the Redland librdf version.
 </p>
 
 <p>Redland librdf was ran through the
@@ -157,14 +160,17 @@ the value for the genid base and genid counter features
 
 <p><code>configure</code> now tries harder to find the Oracle
 Berkeley DB library using Debian multiarch directories if present.
-This is yet another heuristic and rather a hack.
+This is yet another heuristic and rather a hack.  For a consistent
+approach the <code>--with-bdb</code>, <code>--with-bdb-lib</code>,
+<code>--with-bdb-include</code> and <code>--with-bdb-dbname</code>
+options to <code>configure</code> should be used.
 </p>
 
 <p>Use <code>raptor.h</code> header from Raptor V2.
 </p>
 
-<p>Removed raptor1 support code as librdf no longer supports
-raptor1.</p>
+<p>Removed Raptor V1 support code as librdf no longer supports Raptor
+V1.</p>
 
 <p>Updated RPM spec file to make Redland librdf package require
 Raptor V2 (raptor2 package) and Rasqal (rasqal package).
