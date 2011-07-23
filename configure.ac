@@ -1315,6 +1315,7 @@ scripts/Makefile
 src/Makefile
 src/librdf.h
 src/redland.spec
+src/win32_rdf_config.h
 src/win32/Makefile
 utils/Makefile
 demos/Makefile
