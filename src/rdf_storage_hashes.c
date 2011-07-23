@@ -457,38 +457,35 @@ static int
 librdf_storage_hashes_clone(librdf_storage* new_storage, librdf_storage* old_storage)
 {
   librdf_storage_hashes_instance* old_context=(librdf_storage_hashes_instance*)old_storage->instance;
-  
-  librdf_storage_hashes_instance* new_context=(librdf_storage_hashes_instance*)LIBRDF_CALLOC(
-    librdf_storage_hashes_instance, 1, sizeof(librdf_storage_hashes_instance));
-  
-  librdf_storage_set_instance(new_storage, new_context);
-  
+  librdf_hash* new_options = NULL;
+  char* new_name = NULL;
+
   /* Bump up old context name if any */
   if(old_context->name) {  
-    new_context->name=librdf_heuristic_gen_name(old_context->name);
-    if(!new_context->name)
+    new_name = librdf_heuristic_gen_name(old_context->name);
+    if(!new_name)
       return 1;
   }
   
   /* This is always a copy of an in-memory hash */
-  new_context->options=librdf_new_hash_from_hash(old_context->options);
-  if(!new_context->options) {
-    if(new_context->name)
-      LIBRDF_FREE(cstring, new_context->name);
+  new_options = librdf_new_hash_from_hash(old_context->options);
+  if(!new_options) {
+    if(new_name)
+      LIBRDF_FREE(cstring, new_name);
     return 1;
   }
 
-  if(librdf_storage_hashes_init_common(new_storage, new_context->name,
+  if(librdf_storage_hashes_init_common(new_storage, new_name,
                                        old_context->hash_type,
                                        old_context->db_dir,
                                        old_context->indexes,
                                        old_context->mode,
                                        old_context->is_writable,
                                        old_context->is_new,
-                                       new_context->options)) {
-    librdf_free_hash(new_context->options);
-    if(new_context->name)
-      LIBRDF_FREE(cstring, new_context->name);
+                                       new_options)) {
+    librdf_free_hash(new_options);
+    if(new_name)
+      LIBRDF_FREE(cstring, new_name);
     return 1;
   }
 
