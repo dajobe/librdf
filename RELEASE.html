@@ -24,7 +24,8 @@ pre
 
 <h2 id="rel1_0_14"><a name="rel1_0_14">Redland 1.0.14 Changes</a></h2>
 
-<p>Not yet released.
+<p>Rasqal minimum version is now 0.9.25 for use of the new
+<code>rasqal_world_get_query_language_description()</code> function.
 </p>
 
 <p>Issues Fixed:</p>
@@ -34,10 +35,6 @@ pre
   <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000432</a>: Seg fault when getting a blank node after parsing RDF</li>
   <li><a href="http://bugs.librdf.org/mantis/view.php?id=">Issue #0000447</a>: - 0000447</a>: fatal error: rdf_types.h: No such file or directory</li>
 </ul>
-
-<p>Rasqal minimum version is now 0.9.25 for use of the new
-<code>rasqal_world_get_query_language_description()</code> function.
-</p>
 
 <h3>Hash Class Changes</h3>
 
@@ -55,6 +52,14 @@ consistently made across Redland librdf rather than relying on some
 Raptor defaults.
 Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=432">Issue #0000432</a>
 </p>
+
+<p>Fixed URI reference leak in
+<code>librdf_new_node_from_uri_local_name()</code>
+and 
+<code>librdf_new_node_from_normalised_uri_string()</code>
+constructors.
+</p>
+
 
 <h3>Parser Class Changes</h3>
 
@@ -77,17 +82,33 @@ return the full description of of the query language. Deprecates
 </p>
 
 
+<h3>Statement Class Changes</h3>
+
+<p>Restored <code>(librdf_statement_decode_parts()</code> to the
+public ABI/API which was accidently removed.  It has been deprecated
+for <code>librdf_statement_decode2()</code> for some time and now
+always fails.
+</p>
+
+
 <h3>Storage Class Changes</h3>
 
-<p>bdb storage: Add checks for Oracle Berkeley DB 5.1, 5.0 and 4.9
+<p>Storage BDB (name 'bdb'): Add checks for Oracle Berkeley DB 5.1, 5.0 and 4.9
 and updated configure messages with new name.  The 5.x storage seems
 to work with same API, but has a new on-disk format that will require
 a use of the <code>db-upgrade(1)</code> utility in the utils directory.
 </p>
 
-<p>sqlite storage: Do not add duplicate statements if a context is given.
-Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=418">Issue #0000418</a>.
+<p>Storage Hashes (name 'hashes'): Fixed a reference leak and shared
+values issue when cloning a storage.
 </p>
+
+<p>Storage SQLite (name 'sqlite'):
+Do not add duplicate statements if a context is given.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=418">Issue #0000418</a>.
+Fixed a librdf_node reference leak when serializing model with context nodes.
+</p>
+
 
 <h3>UTF8 Module</h3>
 
@@ -152,6 +173,10 @@ Raptor V2 (raptor2 package) and Rasqal (rasqal package).
 <p>Add sanity checking when initialising Raptor so that there are
 always parsers and serializers, or something went very wrong and
 librdf will not work, so return an error.
+</p>
+
+<p>Removed internal cache module that no code used, didn't seem to
+entirely work and was never in the public API.
 </p>
 
 
