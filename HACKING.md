@@ -166,6 +166,30 @@ Notes:
    * `goto` may be used for resource cleanup and result return 
      where control flow only goes forward.
 
+### Memory allocation
+
+Allocating a zeroed out block of memory or a set of objects (calloc)
+
+    var = LIBRDF_CALLOC(type, count, size)
+
+ Prefering when `count` = 1:
+
+    var = LIBRDF_CALLOC(type, 1, sizeof(*var))
+
+Allocating a block of memory:
+    
+    var = LIBRDF_MALLOC(type, size)
+
+Freeing memory:    
+
+    LIBRDF_FREE(type, var)
+    
+The reasoning here is to make allocs mostly fit into 1 line without
+too much boilerplate and duplication of types.
+
+The macro names vary by library such as `RAPTOR_CALLOC` and
+`RASQAL_CALLOC` for Raptor and Rasqal respectively.
+
 
 ### Documentation
 
