@@ -107,9 +107,9 @@ static int
 librdf_storage_tstore_init(librdf_storage* storage, const char *name,
                            librdf_hash* options)
 {
-  librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)LIBRDF_CALLOC(
-    librdf_storage_tstore_instance, 1, sizeof(librdf_storage_tstore_instance));
+  librdf_storage_tstore_instance* context;
 
+  context = LIBRDF_CALLOC(librdf_storage_tstore_instance*, 1, sizeof(*context));
   if(!context) {
     if(options)
       librdf_free_hash(options);
@@ -135,10 +135,13 @@ librdf_storage_tstore_init(librdf_storage* storage, const char *name,
 static void
 librdf_storage_tstore_terminate(librdf_storage* storage)
 {
-  if (context == NULL)
+  librdf_storage_tstore_instance *context;
+
+  context =(librdf_storage_tstore_instance*)storage->instance;
+  if(context == NULL)
     return;
 
-  LIBRDF_FREE(context);
+  LIBRDF_FREE(librdf_storage_tstore_instance*, context);
 }
 
 
@@ -146,7 +149,9 @@ librdf_storage_tstore_terminate(librdf_storage* storage)
 static int
 librdf_storage_tstore_open(librdf_storage* storage, librdf_model* model)
 {
-  librdf_storage_tstore_instance *context=(librdf_storage_tstore_instance*)storage->instance;
+  librdf_storage_tstore_instance *context;
+
+  context = (librdf_storage_tstore_instance*)storage->instance;
 
   if(context->host)
     context->rdfsql=rs_connect_remote(context->host,
@@ -279,7 +284,7 @@ librdf_storage_tstore_statement_as_rs_triple(librdf_statement *statement)
   librdf_node *subject_node=statement->subject;
   librdf_node *predicate_node=statement->predicate;
   librdf_node *object_node=statement->object;
-  rs_triple* triple=LIBRDF_MALLOC(rs_triple, sizeof(rs_triple));
+  rs_triple* triple = LIBRDF_MALLOC(rs_triple, sizeof(*triple));
 
   if(subject_node) {
     if(librdf_node_is_blank(subject_node))
@@ -326,7 +331,7 @@ librdf_storage_tstore_serialise(librdf_storage* storage)
   librdf_storage_tstore_serialise_stream_context* scontext;
   librdf_stream* stream;
   
-  scontext = LIBRDF_CALLOC(librdf_storage_tstore_serialise_stream_context, 1, sizeof(librdf_storage_tstore_serialise_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_storage_tstore_serialise_stream_context*, 1, sizeof(*scontext));
   if(!scontext)
     return NULL;
   
@@ -423,7 +428,7 @@ librdf_storage_tstore_serialise_finished(void* context)
   if(scontext->storage)
     librdf_storage_remove_reference(scontext->storage);
 
-  LIBRDF_FREE(librdf_storage_tstore_serialise_stream_context, scontext);
+  LIBRDF_FREE(librdf_storage_tstore_serialise_stream_context*, scontext);
 }
 
 
@@ -462,7 +467,8 @@ librdf_storage_tstore_find_statements(librdf_storage* storage, librdf_statement*
   if(!statement)
     return NULL;
 
-  scontext = LIBRDF_CALLOC(librdf_storage_tstore_find_stream_context, 1, sizeof(librdf_storage_tstore_find_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_storage_tstore_find_stream_context*, 1,
+                           sizeof(*scontext));
   if(!scontext)
     return NULL;
   
@@ -573,12 +579,12 @@ librdf_storage_tstore_find_finished(void* context)
 
   /* FIXME: as alloced in librdf_storage_tstore_statement_as_rs_triple */
   if(scontext->search_triple)
-    LIBRDF_FREE(rs_triple, scontext->search_triple);
+    LIBRDF_FREE(rs_triple*, scontext->search_triple);
 
   if(scontext->storage)
     librdf_storage_remove_reference(scontext->storage);
 
-  LIBRDF_FREE(librdf_storage_tstore_find_stream_context, scontext);
+  LIBRDF_FREE(librdf_storage_tstore_find_stream_context*, scontext);
 }
 
 /**
@@ -596,7 +602,7 @@ librdf_storage_tstore_context_add_statement(librdf_storage* storage,
                                             librdf_node* context_node,
                                             librdf_statement* statement) 
 {
-  librdf_storage_tstore_instance* context=(librdf_storage_tstore_instance*)storage->instance;
+  librdf_storage_tstore_instance* context;
   librdf_node *subject_node=statement->subject;
   librdf_node *predicate_node=statement->predicate;
   librdf_node *object_node=statement->object;
@@ -605,7 +611,8 @@ librdf_storage_tstore_context_add_statement(librdf_storage* storage,
   char *object;
   rs_obj_type type;
 
-  
+  context = (librdf_storage_tstore_instance*)storage->instance;
+
   if(librdf_node_is_blank(subject_node)) {
     subject=(char*)librdf_node_get_blank_identifier(subject_node);
   } else
@@ -713,9 +720,11 @@ librdf_storage_tstore_context_serialise_get_statement(void* context, int flags)
 static void
 librdf_storage_tstore_context_serialise_finished(void* context)
 {
-  librdf_storage_tstore_context_serialise_stream_context* scontext=(librdf_storage_tstore_context_serialise_stream_context*)context;
+  librdf_storage_tstore_context_serialise_stream_context* scontext;
+
+  scontext = (librdf_storage_tstore_context_serialise_stream_context*)context;
   
-  LIBRDF_FREE(librdf_storage_tstore_context_serialise_stream_context, scontext);
+  LIBRDF_FREE(librdf_storage_tstore_context_serialise_stream_context*, scontext);
 }
 #endif
 
