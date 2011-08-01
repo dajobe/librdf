@@ -897,7 +897,7 @@ librdf_storage_postgresql_size(librdf_storage* storage)
 
   /* Query for number of statements */
   query = LIBRDF_MALLOC(char*, strlen(model_size) + 20 + 1);
-  if(!query)) {
+  if(!query) {
     librdf_storage_postgresql_release_handle(storage, handle);
     return -1;
   }
@@ -2232,9 +2232,9 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
 
   /* Initialize get_contexts context */
-  if(!(gccontext=(librdf_storage_postgresql_get_contexts_context*)
-      LIBRDF_CALLOC(librdf_storage_postgresql_get_contexts_context,1,
-                    sizeof(librdf_storage_postgresql_get_contexts_context))))
+  gccontext = LIBRDF_CALLOC(librdf_storage_postgresql_get_contexts_context*, 1,
+                            sizeof(*gccontext));
+  if(!gccontext)
     return NULL;
   gccontext->storage=storage;
   librdf_storage_add_reference(gccontext->storage);
@@ -2276,7 +2276,7 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
 
   gccontext->current_rowno=0;
   gccontext->row = LIBRDF_CALLOC(char**, PQnfields(gccontext->results) + 1,
-                                 ssizeof(char*));
+                                 sizeof(char*));
   if(!gccontext->row) {
     librdf_storage_postgresql_get_contexts_finished((void*)gccontext);
     return NULL;

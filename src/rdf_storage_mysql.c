@@ -1238,7 +1238,7 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
   }
 
 
-  prow = LIBRDF_CALLOC(pending_row, 1, sizeof(*prow));
+  prow = LIBRDF_CALLOC(pending_row*, 1, sizeof(*prow));
   prow->key_len=1;
   prow->uints[0]=hash;
 
@@ -1654,7 +1654,7 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
     /* in a transaction */
     pending_row* prow;
     
-    prow = LIBRDF_CALLOC(pending_row, 1, sizeof(*prow));
+    prow = LIBRDF_CALLOC(pending_row*, 1, sizeof(*prow));
     prow->key_len=4;
     prow->uints[0]=subject;
     prow->uints[1]=predicate;
@@ -2528,7 +2528,7 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
 
   /* Initialize get_contexts context */
   gccontext = LIBRDF_CALLOC(librdf_storage_mysql_get_contexts_context*, 1,
-                            sizeof(*gcontext));
+                            sizeof(*gccontext));
   if(!gccontext)
     return NULL;
   gccontext->storage=storage;
