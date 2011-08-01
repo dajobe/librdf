@@ -317,7 +317,7 @@ librdf_parser_raptor_namespace_handler(void* user_data,
 
   prefix=raptor_namespace_get_counted_prefix(nspace, &prefix_length);
   if(prefix) {
-    nprefix=(unsigned char*)LIBRDF_MALLOC(cstring, prefix_length+1);
+    nprefix = LIBRDF_MALLOC(unsigned char*, prefix_length + 1);
     /* FIXME: what if nprefix alloc failed? now just pushes NULL to sequence */
     if(nprefix)
       strncpy((char*)nprefix, (const char*)prefix, prefix_length+1);
@@ -422,7 +422,8 @@ librdf_parser_raptor_parse_file_handle_as_stream(void *context,
   pcontext->errors=0;
   pcontext->warnings=0;
 
-  scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_parser_raptor_stream_context*, 1,
+                           sizeof(*scontext));
   if(!scontext)
     goto oom;
 
@@ -588,7 +589,8 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
   }
 
 
-  scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_parser_raptor_stream_context*, 1,
+                           sizeof(*scontext));
   if(!scontext)
     goto oom;
 
@@ -862,7 +864,8 @@ librdf_parser_raptor_parse_into_model_common(void *context,
   pcontext->errors=0;
   pcontext->warnings=0;
 
-  scontext=(librdf_parser_raptor_stream_context*)LIBRDF_CALLOC(librdf_parser_raptor_stream_context, 1, sizeof(librdf_parser_raptor_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_parser_raptor_stream_context*, 1,
+                           sizeof(*scontext));
   if(!scontext)
     goto oom;
 
@@ -1252,7 +1255,7 @@ librdf_parser_raptor_get_accept_header(void* context)
   if(!accept)
     return NULL;
   length=strlen(accept);
-  r_accept=(char*)LIBRDF_MALLOC(cstring, length+1);
+  r_accept = LIBRDF_MALLOC(char*, length + 1);
   strncpy(r_accept, accept, length+1);
   raptor_free_memory((void*)accept);
 

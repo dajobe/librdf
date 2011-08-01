@@ -183,8 +183,7 @@ librdf_new_hash_datum(librdf_world *world, void *data, size_t size)
   if((datum = world->hash_datums_list)) {
     world->hash_datums_list = datum->next;
   } else {
-    datum = (librdf_hash_datum*)LIBRDF_CALLOC(librdf_hash_datum, 1,
-                                              sizeof(librdf_hash_datum));
+    datum = LIBRDF_CALLOC(librdf_hash_datum*, 1, sizeof(*datum));
     if(datum)
       datum->world = world;
   }
@@ -219,7 +218,7 @@ librdf_free_hash_datum(librdf_hash_datum *datum)
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG2("Freeing datum data, %p\n", datum);
 #endif
-    LIBRDF_FREE(cstring, datum->data);
+    LIBRDF_FREE(char*, datum->data);
     datum->data = NULL;
   }
 
@@ -268,12 +267,11 @@ librdf_hash_register_factory(librdf_world *world, const char *name,
     }
   }
 
-  hash=(librdf_hash_factory*)LIBRDF_CALLOC(librdf_hash_factory, 1,
-                                           sizeof(librdf_hash_factory));
+  hash = LIBRDF_CALLOC(librdf_hash_factory*, 1, sizeof(*hash));
   if(!hash)
     goto oom;
   
-  hash->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
+  hash->name = LIBRDF_MALLOC(char*, strlen(name) + 1);
   if(!hash->name)
     goto oom_tidy;
   strcpy(hash->name, name);
@@ -380,12 +378,11 @@ librdf_new_hash_from_factory(librdf_world *world,
 
   librdf_world_open(world);
 
-  h=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
+  h = LIBRDF_CALLOC(librdf_hash*, 1, sizeof(*h));
   if(!h)
     return NULL;
   
-  h->context=(char*)LIBRDF_CALLOC(librdf_hash_context, 1,
-                                  factory->context_length);
+  h->context = LIBRDF_CALLOC(void*, 1, factory->context_length);
   if(!h->context) {
     librdf_free_hash(h);
     return NULL;
@@ -482,15 +479,14 @@ librdf_new_hash_from_hash(librdf_hash* old_hash)
 {
   librdf_hash* hash;
   
-  hash=(librdf_hash*)LIBRDF_CALLOC(librdf_hash, sizeof(librdf_hash), 1);
+  hash = LIBRDF_CALLOC(librdf_hash*, 1, sizeof(*hash));
   if(!hash)
     return NULL;
 
   hash->world=old_hash->world;
   hash->factory=old_hash->factory;
 
-  hash->context=(char*)LIBRDF_CALLOC(librdf_hash_context, 1,
-                                     hash->factory->context_length);
+  hash->context = LIBRDF_CALLOC(void*, 1, hash->factory->context_length);
   if(!hash->context) {
     librdf_free_hash(hash);
     return NULL;
@@ -507,7 +503,7 @@ librdf_new_hash_from_hash(librdf_hash* old_hash)
   if(hash->factory->clone(hash, hash->context, hash->identifier,
                           old_hash->context)) {
     if(hash->identifier)
-      LIBRDF_FREE(cstring, hash->identifier);
+      LIBRDF_FREE(char*, hash->identifier);
     librdf_free_hash(hash);
     return NULL;
   }
@@ -564,7 +560,7 @@ librdf_hash_open(librdf_hash* hash, const char *identifier,
   int status;
 
   if(identifier) {
-    hash->identifier=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+1);
+    hash->identifier = LIBRDF_MALLOC(char*, strlen(identifier) + 1);
     if(!hash->identifier)
       return 1;
     strcpy(hash->identifier, identifier);
@@ -591,7 +587,7 @@ librdf_hash_close(librdf_hash* hash)
 {
   hash->is_open=0;
   if(hash->identifier) {
-    LIBRDF_FREE(cstring,hash->identifier);
+    LIBRDF_FREE(char*, hash->identifier);
     hash->identifier=NULL;
   }
   return hash->factory->close(hash->context);
@@ -639,7 +635,7 @@ librdf_hash_get(librdf_hash* hash, const char *key)
 
   if(hd_value) {
     if(hd_value->data) {
-      value=(char*)LIBRDF_MALLOC(cstring, hd_value->size+1);
+      value = LIBRDF_MALLOC(char*, hd_value->size + 1);
       if(value) {
         /* Copy into new null terminated string for userland */
         memcpy(value, hd_value->data, hd_value->size);
@@ -690,7 +686,7 @@ librdf_hash_get_one(librdf_hash* hash, librdf_hash_datum *key)
   status=librdf_hash_cursor_get_next(cursor, key, value);
   if(!status) {
     /* value->data will point to SHARED area, so copy it */
-    new_value=(char*)LIBRDF_MALLOC(cstring, value->size);
+    new_value = LIBRDF_MALLOC(char*, value->size);
     if(new_value) {
       memcpy(new_value, value->data, value->size);
       value->data=new_value;
@@ -747,7 +743,8 @@ librdf_hash_get_all(librdf_hash* hash,
   int status;
   librdf_iterator* iterator;
   
-  context=(librdf_hash_get_all_iterator_context*)LIBRDF_CALLOC(librdf_hash_get_all_iterator_context, 1, sizeof(librdf_hash_get_all_iterator_context));
+  context = LIBRDF_CALLOC(librdf_hash_get_all_iterator_context*, 1,
+                          sizeof(*context));
   if(!context)
     return NULL;
 
@@ -1015,7 +1012,8 @@ librdf_hash_keys(librdf_hash* hash, librdf_hash_datum *key)
   int status;
   librdf_iterator* iterator;
   
-  context=(librdf_hash_keys_iterator_context*)LIBRDF_CALLOC(librdf_hash_keys_iterator_context, 1, sizeof(librdf_hash_keys_iterator_context));
+  context = LIBRDF_CALLOC(librdf_hash_keys_iterator_context*, 1,
+                          sizeof(*context));
   if(!context)
     return NULL;
 
@@ -1473,7 +1471,7 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
         /* ' at end of value found */
         value_len=p-value;
         real_value_len=value_len-backslashes;
-        new_value=(char*)LIBRDF_MALLOC(cstring, real_value_len+1);
+        new_value = LIBRDF_MALLOC(char*, real_value_len + 1);
         if(!new_value)
           return 1;
         for(i=0, to=new_value; i<(int)value_len; i++){
@@ -1492,7 +1490,7 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
         
         librdf_hash_put(hash, &hd_key, &hd_value);
         
-        LIBRDF_FREE(cstring, new_value);
+        LIBRDF_FREE(char*, new_value);
         
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
         LIBRDF_DEBUG1("after decoding ");
@@ -1634,7 +1632,7 @@ librdf_hash_to_string(librdf_hash* hash, const char *filter[])
 
   /* Generate a string result */
   len=raptor_stringbuffer_length(sb);
-  result = (char*)LIBRDF_MALLOC(cstring, len + 1);
+  result = LIBRDF_MALLOC(char*, len + 1);
   if (result)
     raptor_stringbuffer_copy_to_string(sb, (unsigned char*)result, len);
 
@@ -1699,7 +1697,7 @@ librdf_hash_get_as_boolean(librdf_hash* hash, const char *key)
   /* no need for default, bvalue is set above */
   }
 
-  LIBRDF_FREE(cstring, value);
+  LIBRDF_FREE(char*, value);
 
   return bvalue;
 }
@@ -1733,7 +1731,7 @@ librdf_hash_get_as_long (librdf_hash* hash, const char *key)
   if(end_ptr == value)
     lvalue= (-1);
 
-  LIBRDF_FREE(cstring, value);
+  LIBRDF_FREE(char*, value);
   return lvalue;
 }
 
@@ -1851,7 +1849,7 @@ librdf_hash_interpret_template(const unsigned char* template_string,
   /* Generate a string result */
   len=raptor_stringbuffer_length(sb);
   if(len) {
-    result=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
+    result = LIBRDF_MALLOC(unsigned char*, len + 1);
     raptor_stringbuffer_copy_to_string(sb, result, len);
   }
   
@@ -2035,7 +2033,7 @@ main(int argc, char *argv[])
       librdf_hash_datum *k=(librdf_hash_datum*)librdf_iterator_get_key(iterator);
       char *key_string;
       
-      key_string=(char*)LIBRDF_MALLOC(cstring, k->size+1);
+      key_string = LIBRDF_MALLOC(char*, k->size + 1);
       if(!key_string)
         break;
       strncpy(key_string, (char*)k->data, k->size);
@@ -2051,7 +2049,7 @@ main(int argc, char *argv[])
       l=librdf_hash_get_as_long(h2, key_string);
       fprintf(stdout, "%ld (decimal, -1 Bad)\n", l);
       
-      LIBRDF_FREE(cstring, key_string);
+      LIBRDF_FREE(char*, key_string);
       librdf_iterator_next(iterator);
     }
     if(iterator)
@@ -2134,7 +2132,7 @@ main(int argc, char *argv[])
   } else
     fprintf(stdout, "%s: resulting in >>%s<<\n", program, template_result);
 
-  LIBRDF_FREE(cstring, template_result);
+  LIBRDF_FREE(char*, template_result);
 
   librdf_free_hash(h2);
 

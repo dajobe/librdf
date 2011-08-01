@@ -61,13 +61,11 @@ librdf_new_hash_cursor (librdf_hash* hash)
   librdf_hash_cursor* cursor;
   void *cursor_context;
 
-  cursor=(librdf_hash_cursor*)LIBRDF_CALLOC(librdf_hash_cursor, 1, 
-                                            sizeof(librdf_hash_cursor));
+  cursor = LIBRDF_CALLOC(librdf_hash_cursor*, 1,  sizeof(*cursor));
   if(!cursor)
     return NULL;
 
-  cursor_context=(char*)LIBRDF_CALLOC(librdf_hash_cursor_context, 1,
-                                      hash->factory->cursor_context_length);
+  cursor_context = LIBRDF_CALLOC(void*, 1, hash->factory->cursor_context_length);
   if(!cursor_context) {
     LIBRDF_FREE(librdf_hash_cursor, cursor);
     return NULL;

@@ -142,7 +142,7 @@ librdf_new_world(void)
   struct timezone tz;
 #endif
 
-  world = (librdf_world*)LIBRDF_CALLOC(librdf_world, sizeof(*world), 1);
+  world = LIBRDF_CALLOC(librdf_world*, 1, sizeof(*world));
 
   if(!world)
     return NULL;
@@ -556,7 +556,7 @@ librdf_world_get_genid(librdf_world* world)
   while(tmppid /= 10)
     length++;
   
-  buffer = (unsigned char*)LIBRDF_MALLOC(cstring, length);
+  buffer = LIBRDF_MALLOC(unsigned char*, length);
   if(!buffer)
     return NULL;
 
@@ -804,7 +804,7 @@ main(int argc, char *argv[])
     return 1;
   }
   fprintf(stdout, "%s: New identifier is: '%s'\n", program, id);
-  LIBRDF_FREE(cstring, id);
+  LIBRDF_FREE(char*, id);
 
   fprintf(stdout, "%s: Deleting world\n", program);
   librdf_free_world(world);

@@ -86,7 +86,7 @@ librdf_new_list(librdf_world *world)
   
   librdf_world_open(world);
 
-  new_list=(librdf_list*)LIBRDF_CALLOC(librdf_list, 1, sizeof(librdf_list));
+  new_list = LIBRDF_CALLOC(librdf_list*, 1, sizeof(*new_list));
   if(!new_list)
     return NULL;
   
@@ -154,8 +154,7 @@ librdf_list_add(librdf_list* list, void *data)
   librdf_list_node* node;
   
   /* need new node */
-  node=(librdf_list_node*)LIBRDF_CALLOC(librdf_list_node, 1,
-                                        sizeof(librdf_list_node));
+  node = LIBRDF_CALLOC(librdf_list_node*, 1, sizeof(*node));
   if(!node)
     return 1;
   
@@ -199,8 +198,7 @@ librdf_list_unshift(librdf_list* list, void *data)
   librdf_list_node* node;
   
   /* need new node */
-  node=(librdf_list_node*)LIBRDF_CALLOC(librdf_list_node, 1,
-                                        sizeof(librdf_list_node));
+  node = LIBRDF_CALLOC(librdf_list_node*, 1, sizeof(*node));
   if(!node)
     return 1;
   
@@ -489,7 +487,7 @@ librdf_list_get_iterator(librdf_list* list)
   librdf_list_iterator_context* context;
   librdf_iterator* iterator;
 
-  context=(librdf_list_iterator_context*)LIBRDF_CALLOC(librdf_list_iterator_context, 1, sizeof(librdf_list_iterator_context));
+  context = LIBRDF_CALLOC(librdf_list_iterator_context*, 1, sizeof(*context));
   if(!context)
     return NULL;
 

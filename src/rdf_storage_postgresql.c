@@ -337,10 +337,10 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
     /* Allocate new buffer with two extra slots */
     int new_pool_size = context->connections_count+pool_increment;
     librdf_storage_postgresql_connection* connections;
-    if(!(connections=(librdf_storage_postgresql_connection*)
-        LIBRDF_CALLOC(librdf_storage_postgresql_connection,
-                      new_pool_size,
-                      sizeof(librdf_storage_postgresql_connection))))
+    connections = LIBRDF_CALLOC(librdf_storage_postgresql_connection*,
+                                new_pool_size,
+                                sizeof(librdf_storage_postgresql_connection));
+    if(!connections)
       return NULL;
 
     if (context->connections_count) {
@@ -367,7 +367,7 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
     + strlen(context->dbname)
     + strlen(context->user)
     + strlen(context->password);
-  conninfo = (char*)LIBRDF_MALLOC(cstring,coninfo_size);
+  conninfo = LIBRDF_MALLOC(char*,coninfo_size);
   if(conninfo) {
     sprintf(conninfo,coninfo_template,context->host,context->port,context->dbname,context->user,context->password);
     connection->handle=PQconnectdb(conninfo);
@@ -383,7 +383,7 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
         connection->handle=NULL;
       }
     }
-    LIBRDF_FREE(cstring,conninfo);
+    LIBRDF_FREE(char*, conninfo);
   }
 
   return connection->handle;
@@ -503,9 +503,8 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   if(!options)
     return 1;
 
-  context=(librdf_storage_postgresql_instance*)LIBRDF_CALLOC(
-    librdf_storage_postgresql_instance, 1, sizeof(librdf_storage_postgresql_instance));
-
+  context = LIBRDF_CALLOC(librdf_storage_postgresql_instance*, 1,
+                          sizeof(*context));
   if(!context) {
     librdf_free_hash(options);
     return 1;
@@ -528,7 +527,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   context->port=librdf_hash_get(options, "port");
   if(context->port==NULL ) 
   {
-     context->port=(char*)LIBRDF_MALLOC(cstring, 10);
+     context->port = LIBRDF_MALLOC(char*, 10);
      strcpy(context->port,"5432"); /* default postgresql port */
   }
   context->dbname=librdf_hash_get(options, "database");
@@ -536,7 +535,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
     context->dbname=librdf_hash_get(options, "dbname");
   context->user=librdf_hash_get(options, "user");
   if(context->user && !context->dbname) {
-     context->dbname=(char*)LIBRDF_MALLOC(cstring, strlen(context->user)+1);
+     context->dbname = LIBRDF_MALLOC(char*, strlen(context->user) + 1);
      strcpy(context->dbname, context->user); /* default dbname=user */
   }
 
@@ -564,7 +563,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   /* Create tables, if new and not existing */
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) 
   {
-    query=(char*)LIBRDF_MALLOC(cstring, strlen(create_table_statements)+(20*1)+1);
+    query = LIBRDF_MALLOC(char*, strlen(create_table_statements) + (20*1) + 1);
     if(! query) {
       status=1;
     } else {
@@ -588,14 +587,14 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
           status = -1;
         }
       }
-      LIBRDF_FREE(cstring,query);
+      LIBRDF_FREE(char*, query);
       query=NULL;
     }
   }
 
   /* Create model if new and not existing, or check for existence */
   if(!status) {
-    escaped_name=(char*)LIBRDF_MALLOC(cstring,strlen(name)*2+1);
+    escaped_name = LIBRDF_MALLOC(char*, strlen(name) * 2 + 1);
     if(!escaped_name)
       status=1;
     else {
@@ -613,7 +612,8 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   }
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) {
     /* Create new model */
-    query=(char*)LIBRDF_MALLOC(cstring,strlen(create_model)+20+ strlen(escaped_name)+1);
+    query = LIBRDF_MALLOC(char*,
+                          strlen(create_model) + 20 + strlen(escaped_name) + 1);
     if(!query)
       status=1;
     else {
@@ -633,7 +633,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
                    PQerrorMessage(handle));
         status=-1;
       }
-      LIBRDF_FREE(cstring,query);
+      LIBRDF_FREE(char*, query);
       query=NULL;
     }
     /* Maintain merge table? */
@@ -641,7 +641,8 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
       status=librdf_storage_postgresql_merge(storage);
   } else if(!status) {
     /* Check for model existence */
-    query=(char*)LIBRDF_MALLOC(cstring,strlen(check_model)+20+ strlen(escaped_name)+1);
+    query = LIBRDF_MALLOC(char*,
+                          strlen(check_model) + 20 + strlen(escaped_name) + 1);
     if(!query)
       status=1;
     else {
@@ -664,12 +665,12 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
                    "postgresql select from Models table failed: %s", PQerrorMessage(handle));
         status=-1;
       }
-      LIBRDF_FREE(cstring,query);
+      LIBRDF_FREE(char*, query);
       query=NULL;
     }
   }
   if(escaped_name)
-    LIBRDF_FREE(cstring, escaped_name);
+    LIBRDF_FREE(char*, escaped_name);
 
   /* Optimize loads? */
   context->bulk=(librdf_hash_get_as_boolean(options, "bulk")>0);
@@ -740,7 +741,7 @@ librdf_storage_postgresql_merge(librdf_storage* storage)
    }
 
   /* Allocate space for merge table generation query. */
-  query=(char*)LIBRDF_MALLOC(cstring, strlen(insert_statements)+ 50);
+  query = LIBRDF_MALLOC(char*, strlen(insert_statements) + 50);
   if(!query) {
     PQclear(res);
     librdf_storage_postgresql_release_handle(storage, handle);
@@ -756,14 +757,14 @@ librdf_storage_postgresql_merge(librdf_storage* storage)
         librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "postgresql merge table insert failed: %s",
                PQerrorMessage(handle));
-        LIBRDF_FREE(cstring, query);
+        LIBRDF_FREE(char*, query);
         PQclear(res);
         librdf_storage_postgresql_release_handle(storage, handle);
         return -1;
      }
   }
 
-  LIBRDF_FREE(cstring, query);
+  LIBRDF_FREE(char*, query);
   PQclear(res);
   librdf_storage_postgresql_release_handle(storage, handle);
 
@@ -789,19 +790,19 @@ librdf_storage_postgresql_terminate(librdf_storage* storage)
   librdf_storage_postgresql_finish_connections(storage);
 
   if(context->password)
-    LIBRDF_FREE(cstring,(char *)context->password);
+    LIBRDF_FREE(char*, (char*)context->password);
 
   if(context->user)
-    LIBRDF_FREE(cstring,(char *)context->user);
+    LIBRDF_FREE(char*, (char*)context->user);
 
   if(context->dbname)
-    LIBRDF_FREE(cstring,(char *)context->dbname);
+    LIBRDF_FREE(char*, (char*)context->dbname);
 
   if(context->port)
-    LIBRDF_FREE(cstring,(char *)context->port);
+    LIBRDF_FREE(char*, (char*)context->port);
 
   if(context->host)
-    LIBRDF_FREE(cstring,(char *)context->host);
+    LIBRDF_FREE(char*, (char*)context->host);
 
   if(context->digest)
     librdf_free_digest(context->digest);
@@ -895,8 +896,8 @@ librdf_storage_postgresql_size(librdf_storage* storage)
     return -1;
 
   /* Query for number of statements */
-  query=(char*)LIBRDF_MALLOC(cstring, strlen(model_size)+20+1);
-  if(!query) {
+  query = LIBRDF_MALLOC(char*, strlen(model_size) + 20 + 1);
+  if(!query)) {
     librdf_storage_postgresql_release_handle(storage, handle);
     return -1;
   }
@@ -911,13 +912,13 @@ librdf_storage_postgresql_size(librdf_storage* storage)
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "postgresql query for model size failed: %s", PQerrorMessage(handle));
     }
-    LIBRDF_FREE(cstring,query);
+    LIBRDF_FREE(char*, query);
     librdf_storage_postgresql_release_handle(storage, handle);
     return -1;
   }
   count=atol(PQgetvalue(res,0,0)); 
   PQclear(res);
-  LIBRDF_FREE(cstring,query);
+  LIBRDF_FREE(char*, query);
   librdf_storage_postgresql_release_handle(storage, handle);
 
   return count;
@@ -992,7 +993,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
       int add_status = 0;
       char *escaped_uri;
 
-      escaped_uri=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1);
+      escaped_uri = LIBRDF_MALLOC(char*, nodelen * 2 + 1);
       if(escaped_uri) {
         int error = 0;
         PQescapeStringConn(handle, escaped_uri,
@@ -1004,7 +1005,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                      PQerrorMessage(handle));
         }
 
-        query=(char*)LIBRDF_MALLOC(cstring, strlen(create_resource)+20+nodelen+1);
+        query = LIBRDF_MALLOC(char*, strlen(create_resource) + 20 + nodelen + 1);
         if(query) {
           sprintf(query, create_resource, hash, escaped_uri);
           if((res=PQexec(handle, query))) {
@@ -1024,9 +1025,9 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
             librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                        "postgresql insert into Resources failed");
           }
-          LIBRDF_FREE(cstring, query);
+          LIBRDF_FREE(char*, query);
         }
-        LIBRDF_FREE(cstring, escaped_uri);
+        LIBRDF_FREE(char*, escaped_uri);
       }
       if(!add_status) {
         librdf_storage_postgresql_release_handle(storage, handle);
@@ -1052,7 +1053,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
       datatypelen=strlen((const char*)datatype);
 
     /* Create composite node string for hash generation */
-    nodestring=(char*)LIBRDF_MALLOC(cstring, valuelen+langlen+datatypelen+3);
+    nodestring = LIBRDF_MALLOC(char*, valuelen + langlen + datatypelen + 3);
     if(!nodestring) {
       librdf_storage_postgresql_release_handle(storage, handle);
       return 0;
@@ -1066,14 +1067,14 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
       strcat(nodestring, (const char*)datatype);
     nodelen=valuelen+langlen+datatypelen+2;
     hash=librdf_storage_postgresql_hash(storage, "L", nodestring, nodelen);
-    LIBRDF_FREE(cstring,nodestring);
+    LIBRDF_FREE(char*, nodestring);
 
     if(add) {
       char create_literal[]="INSERT INTO Literals (ID,Value,Language,Datatype) VALUES (" UINT64_T_FMT ",'%s','%s','%s')";
       int add_status = 0;
       char *escaped_value, *escaped_lang, *escaped_datatype;
       
-      escaped_value=(char*)LIBRDF_MALLOC(cstring, valuelen*2+1);
+      escaped_value = LIBRDF_MALLOC(char*, valuelen * 2 + 1);
       if(escaped_value) {
         int error = 0;
         PQescapeStringConn(handle, escaped_value,
@@ -1085,7 +1086,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                      PQerrorMessage(handle));
         }
 
-        escaped_lang=(char*)LIBRDF_MALLOC(cstring, langlen*2+1);
+        escaped_lang = LIBRDF_MALLOC(char*, langlen * 2 + 1);
         if(escaped_lang) {
           if(lang) {
             PQescapeStringConn(handle, escaped_lang,
@@ -1099,7 +1100,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
           } else
             strcpy(escaped_lang,"");
 
-          escaped_datatype=(char*)LIBRDF_MALLOC(cstring, datatypelen*2+1);
+          escaped_datatype = LIBRDF_MALLOC(char*, datatypelen * 2 + 1);
           if(escaped_datatype) {
             if(datatype) {
               PQescapeStringConn(handle, escaped_datatype, 
@@ -1113,10 +1114,12 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
             } else
               strcpy(escaped_datatype,"");
 
-            if ((query=(char*)LIBRDF_MALLOC(cstring, strlen(create_literal)+
-                                            strlen(escaped_value)+
-                                            strlen(escaped_lang)+
-                                            strlen(escaped_datatype)+21))) {
+            query = LIBRDF_MALLOC(char*,
+                                  strlen(create_literal) +
+                                  strlen(escaped_value) +
+                                  strlen(escaped_lang) +
+                                  strlen(escaped_datatype) + 21);
+            if(query) {
               sprintf(query, create_literal, hash, escaped_value, escaped_lang, escaped_datatype);
               if((res=PQexec(handle, query))) {
                 if(PQresultStatus(res) == PGRES_COMMAND_OK) {
@@ -1135,13 +1138,13 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                 librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                            "postgresql insert into Resources failed");
               }
-              LIBRDF_FREE(cstring, query);
+              LIBRDF_FREE(char*, query);
             }
-            LIBRDF_FREE(cstring, escaped_datatype);
+            LIBRDF_FREE(char*, escaped_datatype);
           }
-          LIBRDF_FREE(cstring, escaped_lang);
+          LIBRDF_FREE(char*, escaped_lang);
         }
-        LIBRDF_FREE(cstring, escaped_value);
+        LIBRDF_FREE(char*, escaped_value);
       }
       if(!add_status) {
         librdf_storage_postgresql_release_handle(storage, handle);
@@ -1160,7 +1163,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
       int add_status = 0;
       char *escaped_name;
 
-      escaped_name=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1);
+      escaped_name = LIBRDF_MALLOC(char*, nodelen * 2 + 1);
       if(escaped_name) {
         int error = 0;
         PQescapeStringConn(handle, escaped_name,
@@ -1172,7 +1175,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                      PQerrorMessage(handle));
         }
 
-        query=(char*)LIBRDF_MALLOC(cstring, strlen(create_bnode)+20+nodelen+1);
+        query = LIBRDF_MALLOC(char*, strlen(create_bnode) + 20 + nodelen + 1);
         if(query) {
           sprintf(query, create_bnode, hash, escaped_name);
           if((res=PQexec(handle, query))) {
@@ -1192,9 +1195,9 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
             librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                        "postgresql insert into Bnodes failed");
           }
-          LIBRDF_FREE(cstring, query);
+          LIBRDF_FREE(char*, query);
         }
-        LIBRDF_FREE(cstring, escaped_name);
+        LIBRDF_FREE(char*, escaped_name);
       }
       if(!add_status) {
         librdf_storage_postgresql_release_handle(storage, handle);
@@ -1367,7 +1370,8 @@ librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
       char *query;
       PGresult *res;
 
-      if ((query=(char*)LIBRDF_MALLOC(cstring, strlen(insert_statement)+(20*5)+1))) {
+      query = LIBRDF_MALLOC(char*, strlen(insert_statement) + (20 * 5) + 1);
+      if(query) {
         sprintf(query, insert_statement, context->model, subject, predicate, object, ctxt);
         if((res=PQexec(handle, query))) {
           if(PQresultStatus(res) == PGRES_COMMAND_OK) {
@@ -1381,7 +1385,7 @@ librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                      "postgresql insert into Statements failed with error %s", PQerrorMessage(handle));
         }
-        LIBRDF_FREE(cstring,query);
+        LIBRDF_FREE(char*, query);
       }
     }
     librdf_storage_postgresql_release_handle(storage, handle);
@@ -1427,7 +1431,7 @@ librdf_storage_postgresql_contains_statement(librdf_storage* storage,
     if(subject && predicate && object) {
       char *query;
       size_t len = strlen(find_statement)+(20*4)+1;
-      query=(char*)LIBRDF_MALLOC(cstring, len);
+      query = LIBRDF_MALLOC(char*, len);
       if(query) {
         PGresult *res;
         snprintf(query, len, find_statement, context->model,
@@ -1443,7 +1447,7 @@ librdf_storage_postgresql_contains_statement(librdf_storage* storage,
           }
           PQclear(res);
         }
-        LIBRDF_FREE(cstring,query);
+        LIBRDF_FREE(char*, query);
       }
     }
     librdf_storage_postgresql_release_handle(storage, handle);
@@ -1509,13 +1513,14 @@ librdf_storage_postgresql_context_remove_statement(librdf_storage* storage,
       if(context_node) {
         ctxt=librdf_storage_postgresql_node_hash(storage,context_node,0);
         if(ctxt) {
-          query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement_with_context)+(20*5)+1);
-          if(query) {
+          query = LIBRDF_MALLOC(char*,
+                                strlen(delete_statement_with_context) + (20 * 5) + 1);
+  if(query) {
             sprintf(query, delete_statement_with_context, context->model, subject, predicate, object, ctxt);
           }
         }
       } else {
-        query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement)+(20*4)+1);
+        query = LIBRDF_MALLOC(char*, strlen(delete_statement) + (20 * 4) + 1);
         if(query) {
           sprintf(query, delete_statement, context->model, subject, predicate, object);
         }
@@ -1535,7 +1540,7 @@ librdf_storage_postgresql_context_remove_statement(librdf_storage* storage,
                    "postgresql delete from Statements failed");
         }
         
-        LIBRDF_FREE(cstring,query);
+        LIBRDF_FREE(char*, query);
       }    
     }
 
@@ -1573,13 +1578,13 @@ librdf_storage_postgresql_context_remove_statements(librdf_storage* storage,
     if(context_node) {
       ctxt=librdf_storage_postgresql_node_hash(storage,context_node,0);
       if(ctxt) {
-        query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_context)+(20*2)+1);
+        query = LIBRDF_MALLOC(char*, strlen(delete_context) + (20 * 2) + 1);
         if(query) {
           sprintf(query, delete_context, context->model, ctxt);
         }
       }
     } else {
-      query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_model)+(20)+1);
+      query = LIBRDF_MALLOC(char*, strlen(delete_model) + (20) + 1);
       if(query) {
         sprintf(query, delete_model, context->model);
       }
@@ -1599,7 +1604,7 @@ librdf_storage_postgresql_context_remove_statements(librdf_storage* storage,
                  "postgresql delete from Statements failed");
       }
       
-      LIBRDF_FREE(cstring,query);
+      LIBRDF_FREE(char*, query);
     }    
 
     librdf_storage_postgresql_release_handle(storage, handle);
@@ -1715,10 +1720,10 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
 
   /* Initialize sos context */
-  if(!(sos=(librdf_storage_postgresql_sos_context*)
-      LIBRDF_CALLOC(librdf_storage_postgresql_sos_context,1,
-                    sizeof(librdf_storage_postgresql_sos_context))))
+  sos = LIBRDF_CALLOC(librdf_storage_postgresql_sos_context*, 1, sizeof(*sos));
+  if(!sos)
     return NULL;
+
   sos->storage=storage;
   librdf_storage_add_reference(sos->storage);
 
@@ -1742,8 +1747,8 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
   }
 
   /* Construct query */
-  query=(char*)LIBRDF_MALLOC(cstring, 21);
-  if(!query) {
+  query = LIBRDF_MALLOC(char*, 21);
+  if(query) {
     librdf_storage_postgresql_find_statements_in_context_finished((void*)sos);
     return NULL;
   }
@@ -1902,7 +1907,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
 
   /* Start query... */
   sos->results=PQexec(sos->handle, query);
-  LIBRDF_FREE(cstring,query);
+  LIBRDF_FREE(char*, query);
   if (sos->results) {
     if (PQresultStatus(sos->results) != PGRES_TUPLES_OK) {
       librdf_log(sos->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
@@ -1918,7 +1923,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
   }
 
   sos->current_rowno=0;
-  sos->row=(char**)LIBRDF_CALLOC(cstring,sizeof(char *),PQnfields(sos->results)+1);
+  sos->row = LIBRDF_CALLOC(char**, PQnfields(sos->results) + 1, sizeof(char*));
   if(!sos->row) {
     librdf_storage_postgresql_find_statements_in_context_finished((void*)sos);
     return NULL;
@@ -1953,12 +1958,12 @@ librdf_storage_postgresql_find_statements_in_context_augment_query(char **query,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(addition, char, 1);
 
   /* Augment existing query, returning 0 on success. */
-  newquery=(char*)LIBRDF_MALLOC(cstring, strlen(*query)+strlen(addition)+1);
+  newquery = LIBRDF_MALLOC(char*, strlen(*query) + strlen(addition) + 1);
   if(!newquery)
       return 1;
   strcpy(newquery,*query);
   strcat(newquery,addition);
-  LIBRDF_FREE(cstring, *query);   
+  LIBRDF_FREE(char*, *query);   
   *query=newquery;
 
   return 0;
@@ -1992,10 +1997,10 @@ librdf_storage_postgresql_find_statements_in_context_next_statement(void* contex
        if(PQgetlength(sos->results,sos->current_rowno,i) > 0 ) {
          /* FIXME: why is this not copied? */
              /*
-           row[i]=(char*)LIBRDF_MALLOC(cstring, PQgetlength(sos->results,sos->current_rowno,i)+1);
+           row[i] = LIBRDF_MALLOC(char*, PQgetlength(sos->results,sos->current_rowno, i) + 1)
            if(!row[i])
               return 1;
-           strcpy(row[i],PQgetvalue(sos->results,sos->current_rowno,i));
+           strcpy(row[i], PQgetvalue(sos->results,sos->current_rowno, i));
              */
            row[i]=PQgetvalue(sos->results,sos->current_rowno,i);
 
@@ -2172,7 +2177,7 @@ librdf_storage_postgresql_find_statements_in_context_finished(void* context)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(context, void);
 
   if( sos->row )
-     LIBRDF_FREE(cstring,sos->row);
+     LIBRDF_FREE(char*, sos->row);
  
 
   if(sos->results)
@@ -2245,7 +2250,7 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   }
 
   /* Construct query */
-  query=(char*)LIBRDF_MALLOC(cstring,strlen(select_contexts)+21);
+  query = LIBRDF_MALLOC(char*, strlen(select_contexts) + 21);
   if(!query) {
     librdf_storage_postgresql_get_contexts_finished((void*)gccontext);
     return NULL;
@@ -2254,7 +2259,7 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
 
   /* Start query... */
   gccontext->results=PQexec(gccontext->handle, query);
-  LIBRDF_FREE(cstring,query);
+  LIBRDF_FREE(char*, query);
   if (gccontext->results) {
     if (PQresultStatus(gccontext->results) != PGRES_TUPLES_OK) {
       librdf_log(gccontext->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
@@ -2270,7 +2275,8 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   }
 
   gccontext->current_rowno=0;
-  gccontext->row=(char**)LIBRDF_CALLOC(cstring, sizeof(char*), PQnfields(gccontext->results)+1);
+  gccontext->row = LIBRDF_CALLOC(char**, PQnfields(gccontext->results) + 1,
+                                 ssizeof(char*));
   if(!gccontext->row) {
     librdf_storage_postgresql_get_contexts_finished((void*)gccontext);
     return NULL;
@@ -2320,10 +2326,10 @@ librdf_storage_postgresql_get_contexts_next_context(void* context)
        if(PQgetlength(gccontext->results,gccontext->current_rowno,i) > 0 ) {
          /* FIXME: why is this not copied? */
              /*
-           row[i]=(char*)LIBRDF_MALLOC(cstring, PQgetlength(gccontext->results,gccontext->current_rowno,i)+1);
-           if(!row[i])
+           row[i] = LIBRDF_MALLOC(char*, PQgetlength(gccontext->results, gccontext->current_rowno, i) + 1)
+           if(!row[i)
               return 1;
-           strcpy(row[i],PQgetvalue(gccontext->results,gccontext->current_rowno,i));
+           strcpy(row[i], PQgetvalue(gccontext->results, gccontext->current_rowno,i));
              */
            row[i]=PQgetvalue(gccontext->results,gccontext->current_rowno,i);
         }
@@ -2390,7 +2396,7 @@ librdf_storage_postgresql_free_gccontext_row(void* context)
 /*
   for(i=0;i<PQnfields(gccontext->results);i++) 
      if( gccontext->row[i] )
-         LIBRDF_FREE(cstring, gccontext->row[i]);
+         LIBRDF_FREE(char*, gccontext->row[i]);
 */
 }
 #endif
@@ -2404,7 +2410,7 @@ librdf_storage_postgresql_get_contexts_finished(void* context)
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(context, void);
 
   if( gccontext->row )
-      LIBRDF_FREE(cstring, gccontext->row);
+      LIBRDF_FREE(char*, gccontext->row);
 
   if(gccontext->results)
     PQclear(gccontext->results);

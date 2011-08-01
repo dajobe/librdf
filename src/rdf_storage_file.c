@@ -93,7 +93,7 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
   const char *format_name = (is_uri ? "guess" : "rdfxml");
   librdf_storage_file_instance* context;
 
-  context = (librdf_storage_file_instance*)LIBRDF_CALLOC(librdf_storage_file_instance, 1, sizeof(librdf_storage_file_instance));
+  context = LIBRDF_CALLOC(librdf_storage_file_instance*, 1, sizeof(*context));
   if(!context)
     goto done;
 
@@ -102,7 +102,7 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
   /* Cannot save contexts in a file; pass everything else on */
   contexts = librdf_hash_get_del(options, "contexts");
   if(contexts)
-    LIBRDF_FREE(cstring, contexts);
+    LIBRDF_FREE(char*, contexts);
 
   context->format_name = librdf_hash_get_del(options, "format");
   if(context->format_name) {
@@ -114,7 +114,7 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
       librdf_log(storage->world, 0, LIBRDF_LOG_WARN, LIBRDF_FROM_STORAGE, NULL,
                  "Ignoring storage %s format option '%s' - using default format '%s'",
                  storage->factory->name, context->format_name, format_name);
-      LIBRDF_FREE(cstring, context->format_name);
+      LIBRDF_FREE(char*, context->format_name);
       context->format_name = NULL;
     }
 
@@ -127,7 +127,7 @@ librdf_storage_file_init(librdf_storage* storage, const char *name,
     context->uri = librdf_new_uri(storage->world, (const unsigned char*)name);
   else {
     context->name_len = strlen(name);
-    name_copy = (char*)LIBRDF_MALLOC(cstring, context->name_len+1);
+    name_copy = LIBRDF_MALLOC(char*, context->name_len + 1);
     if(!name_copy)
       goto done;
     strcpy(name_copy,name);
@@ -182,10 +182,10 @@ librdf_storage_file_terminate(librdf_storage* storage)
   librdf_storage_file_sync(storage);
 
   if(context->format_name)
-    LIBRDF_FREE(cstring, context->format_name);
+    LIBRDF_FREE(char*, context->format_name);
 
   if(context->name)
-    LIBRDF_FREE(cstring, context->name);
+    LIBRDF_FREE(char*, context->name);
 
   if(context->uri)
     librdf_free_uri(context->uri);
@@ -297,7 +297,7 @@ librdf_storage_file_sync(librdf_storage *storage)
 
   if(!access((const char*)context->name, F_OK)) {
     /* name"~\0" */
-    backup_name=(char*)LIBRDF_MALLOC(cstring, context->name_len+2);
+    backup_name = LIBRDF_MALLOC(char*, context->name_len + 2);
     if(!backup_name)
       return 1;
     strcpy(backup_name, (const char*)context->name);
@@ -308,13 +308,13 @@ librdf_storage_file_sync(librdf_storage *storage)
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "rename of '%s' to '%s' failed - %s",
                  context->name, backup_name, strerror(errno));
-      LIBRDF_FREE(cstring, backup_name);
+      LIBRDF_FREE(char*, backup_name);
       return 1;
     }
   }
   
   /* name".new\0" */
-  new_name=(char*)LIBRDF_MALLOC(cstring, context->name_len+5);
+  new_name = LIBRDF_MALLOC(char*, context->name_len + 5);
   if(!new_name)
     return 1;
   strcpy(new_name, (const char*)context->name);
@@ -323,9 +323,9 @@ librdf_storage_file_sync(librdf_storage *storage)
   serializer = librdf_new_serializer(storage->world, context->format_name,
                                      NULL, NULL);
   if(!serializer) {
-    LIBRDF_FREE(cstring, new_name);
+    LIBRDF_FREE(char*, new_name);
     if(backup_name)
-      LIBRDF_FREE(cstring, backup_name);
+      LIBRDF_FREE(char*, backup_name);
     return 1;
   }
   
@@ -351,7 +351,7 @@ librdf_storage_file_sync(librdf_storage *storage)
     rc=1;
   }
 
-  LIBRDF_FREE(cstring, new_name);
+  LIBRDF_FREE(char*, new_name);
   
   /* restore backup on failure (fh=NULL) */
   if(!fh && backup_name && rename(backup_name, context->name) < 0) {
@@ -362,7 +362,7 @@ librdf_storage_file_sync(librdf_storage *storage)
   }
 
   if(backup_name)
-    LIBRDF_FREE(cstring, backup_name);
+    LIBRDF_FREE(char*, backup_name);
 
   context->changed=0;
 

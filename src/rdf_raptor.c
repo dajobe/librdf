@@ -157,7 +157,7 @@ librdf_raptor_generate_id_handler(void *user_data,
          librdf_hash_put_strings(world->bnode_hash,
                                  (char*)user_bnodeid, (char*)mapped_id)) {
         /* error -> free mapped_id and return NULL */
-        LIBRDF_FREE(cstring, mapped_id);
+        LIBRDF_FREE(char*, mapped_id);
         mapped_id = NULL;
       }
     }

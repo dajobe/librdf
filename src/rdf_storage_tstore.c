@@ -326,7 +326,7 @@ librdf_storage_tstore_serialise(librdf_storage* storage)
   librdf_storage_tstore_serialise_stream_context* scontext;
   librdf_stream* stream;
   
-  scontext=(librdf_storage_tstore_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_tstore_serialise_stream_context, 1, sizeof(librdf_storage_tstore_serialise_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_storage_tstore_serialise_stream_context, 1, sizeof(librdf_storage_tstore_serialise_stream_context));
   if(!scontext)
     return NULL;
   
@@ -462,7 +462,7 @@ librdf_storage_tstore_find_statements(librdf_storage* storage, librdf_statement*
   if(!statement)
     return NULL;
 
-  scontext=(librdf_storage_tstore_find_stream_context*)LIBRDF_CALLOC(librdf_storage_tstore_find_stream_context, 1, sizeof(librdf_storage_tstore_find_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_storage_tstore_find_stream_context, 1, sizeof(librdf_storage_tstore_find_stream_context));
   if(!scontext)
     return NULL;
   

@@ -137,7 +137,8 @@ librdf_node_new_static_node_iterator(librdf_world* world, librdf_node** nodes,
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(nodes, librdf_node**, NULL);
 
-  context = (librdf_node_static_iterator_context*)LIBRDF_CALLOC(librdf_node_static_iterator_context, 1, sizeof(*context));
+  context = LIBRDF_CALLOC(librdf_node_static_iterator_context*, 1,
+                          sizeof(*context));
   if(!context)
     return NULL;
 

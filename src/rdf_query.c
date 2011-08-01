@@ -165,12 +165,11 @@ librdf_query_register_factory(librdf_world *world, const char *name,
     }
   }
 
-  query=(librdf_query_factory*)LIBRDF_CALLOC(librdf_query_factory, 1,
-                                             sizeof(librdf_query_factory));
+  query = LIBRDF_CALLOC(librdf_query_factory*, 1, sizeof(*query));
   if(!query)
     goto oom;
 
-  query->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
+  query->name = LIBRDF_MALLOC(char*, strlen(name) + 1);
   if(!query->name)
     goto oom_tidy;
   strcpy(query->name, name);
@@ -372,15 +371,14 @@ librdf_new_query_from_query(librdf_query* old_query)
     return NULL;
   }
 
-  new_query=(librdf_query*)LIBRDF_CALLOC(librdf_query, 1, 
-                                         sizeof(librdf_query));
+  new_query = LIBRDF_CALLOC(librdf_query*, 1, sizeof(*new_query));
   if(!new_query)
     return NULL;
   
   new_query->usage=1;
 
-  new_query->context=(char*)LIBRDF_CALLOC(librdf_query_context, 1,
-                                          old_query->factory->context_length);
+  new_query->context = LIBRDF_CALLOC(void*, 1,
+                                     old_query->factory->context_length);
   if(!new_query->context) {
     librdf_free_query(new_query);
     return NULL;
@@ -436,7 +434,7 @@ librdf_new_query_from_factory(librdf_world *world,
     return NULL;
   }
   
-  query=(librdf_query*)LIBRDF_CALLOC(librdf_query, 1, sizeof(librdf_query));
+  query = LIBRDF_CALLOC(librdf_query*, 1, sizeof(*query));
   if(!query)
     return NULL;
 
@@ -444,8 +442,7 @@ librdf_new_query_from_factory(librdf_world *world,
 
   query->usage=1;
 
-  query->context=(char*)LIBRDF_CALLOC(librdf_query_context, 1,
-                                      factory->context_length);
+  query->context = LIBRDF_CALLOC(void*, 1, factory->context_length);
   if(!query->context) {
     librdf_free_query(query);
     return NULL;

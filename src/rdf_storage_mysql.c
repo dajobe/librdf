@@ -417,10 +417,10 @@ librdf_storage_mysql_get_handle(librdf_storage* storage)
   if (!connection) {
     /* Allocate new buffer with two extra slots */
     librdf_storage_mysql_connection* connections;
-    if(!(connections=(librdf_storage_mysql_connection*)
-        LIBRDF_CALLOC(librdf_storage_mysql_connection,
-                      context->connections_count+2,
-                      sizeof(librdf_storage_mysql_connection))))
+    connections = LIBRDF_CALLOC(librdf_storage_mysql_connection*,
+                                context->connections_count + 2,
+                                sizeof(librdf_storage_mysql_connection));
+    if(!connections)
       return NULL;
 
     if (context->connections_count) {
@@ -533,8 +533,8 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   if(!options)
     return 1;
   
-  context = (librdf_storage_mysql_instance*)LIBRDF_CALLOC(
-    librdf_storage_mysql_instance, 1, sizeof(librdf_storage_mysql_instance));
+  context = LIBRDF_CALLOC(librdf_storage_mysql_instance*, 1, 
+                          sizeof(librdf_storage_mysql_instance));
 
   if(!context) {
     librdf_free_hash(options);
@@ -575,7 +575,7 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
 
   context->layout = librdf_hash_get_del(options, "layout");
   if(!context->layout) {
-    context->layout = (char*)LIBRDF_MALLOC(cstring, strlen(default_layout) + 1);
+    context->layout = LIBRDF_MALLOC(char*, strlen(default_layout) + 1);
     strcpy(context->layout, default_layout);
   }
 
@@ -632,14 +632,14 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
         break;
       }
 
-      LIBRDF_FREE(cstring, query);
+      LIBRDF_FREE(char*, query);
     } /* end for */
     
   }
 
   /* Create model if new and not existing, or check for existence */
   if(!status) {
-    escaped_name = (char*)LIBRDF_MALLOC(cstring,strlen(name)*2+1);
+    escaped_name = LIBRDF_MALLOC(char*, strlen(name) * 2 + 1);
     if(!escaped_name)
       status = 1;
     mysql_real_escape_string(handle, escaped_name,
@@ -647,7 +647,7 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   }
   if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) {
     /* Create new model */
-    query = (char*)LIBRDF_MALLOC(cstring,strlen(create_model)+20+
+    query = LIBRDF_MALLOC(char*,strlen(create_model) + 20 + 
                                  strlen(escaped_name)+1);
     if(!query)
       status = 1;
@@ -668,8 +668,8 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
       status = librdf_storage_mysql_merge(storage);
   } else if(!status) {
     /* Check for model existence */
-    query = (char*)LIBRDF_MALLOC(cstring,strlen(check_model)+20+
-                                 strlen(escaped_name)+1);
+    query = LIBRDF_MALLOC(char*, 
+                          strlen(check_model) + 20 + strlen(escaped_name)+1);
     if(!query)
       status = 1;
     sprintf(query, check_model, context->model, name);
@@ -694,9 +694,9 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
       mysql_free_result(res);
   }
   if(query)
-    LIBRDF_FREE(cstring, query);
+    LIBRDF_FREE(char*, query);
   if(escaped_name)
-    LIBRDF_FREE(cstring, escaped_name);
+    LIBRDF_FREE(char*, escaped_name);
 
   /* Optimize loads? */
   context->bulk = (librdf_hash_get_as_boolean(options, "bulk")>0);
@@ -758,8 +758,8 @@ librdf_storage_mysql_merge(librdf_storage* storage)
     return -1;
   }
   /* Allocate space for merge table generation query. */
-  query=(char*)LIBRDF_MALLOC(cstring, strlen(create_table_statements)+
-                             mysql_num_rows(res)*31+2);
+  query = LIBRDF_MALLOC(char*, strlen(create_table_statements) + 
+                        mysql_num_rows(res)*31+2);
   if(!query) {
     librdf_storage_mysql_release_handle(storage, handle);
     return 1;
@@ -785,11 +785,11 @@ librdf_storage_mysql_merge(librdf_storage* storage)
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "MySQL merge table creation failed: %s",
                mysql_error(handle));
-    LIBRDF_FREE(cstring, query);
+    LIBRDF_FREE(char*, query);
     librdf_storage_mysql_release_handle(storage, handle);
     return -1;
   }
-  LIBRDF_FREE(cstring, query);
+  LIBRDF_FREE(char*, query);
   librdf_storage_mysql_release_handle(storage, handle);
 
   return 0;
@@ -816,10 +816,10 @@ librdf_storage_mysql_terminate(librdf_storage* storage)
   librdf_storage_mysql_finish_connections(storage);
 
   if(context->config_dir)
-    LIBRDF_FREE(cstring,(char *)context->config_dir);
+    LIBRDF_FREE(char*, (char*)context->config_dir);
 
   if(context->layout)
-    LIBRDF_FREE(cstring,(char *)context->layout);
+    LIBRDF_FREE(char*, (char*)context->layout);
 
   if(context->vars)
     librdf_free_hash(context->vars);
@@ -828,16 +828,16 @@ librdf_storage_mysql_terminate(librdf_storage* storage)
     librdf_free_sql_config(context->config);
 
   if(context->password)
-    LIBRDF_FREE(cstring,(char *)context->password);
+    LIBRDF_FREE(char*, (char*)context->password);
 
   if(context->user)
-    LIBRDF_FREE(cstring,(char *)context->user);
+    LIBRDF_FREE(char*, (char*)context->user);
 
   if(context->database)
-    LIBRDF_FREE(cstring,(char *)context->database);
+    LIBRDF_FREE(char*, (char*)context->database);
 
   if(context->host)
-    LIBRDF_FREE(cstring,(char *)context->host);
+    LIBRDF_FREE(char*, (char*)context->host);
 
   if(context->digest)
     librdf_free_digest(context->digest);
@@ -930,7 +930,7 @@ librdf_storage_mysql_size(librdf_storage* storage)
     return -1;
 
   /* Query for number of statements */
-  query=(char*)LIBRDF_MALLOC(cstring, strlen(model_size)+21);
+  query = LIBRDF_MALLOC(char*, strlen(model_size) + 21);
   if(!query) {
     librdf_storage_mysql_release_handle(storage, handle);
     return -1;
@@ -946,13 +946,13 @@ librdf_storage_mysql_size(librdf_storage* storage)
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "MySQL query for model size failed: %s",
                mysql_error(handle));
-    LIBRDF_FREE(cstring,query);
+    LIBRDF_FREE(char*, query);
     librdf_storage_mysql_release_handle(storage, handle);
     return -1;
   }
   count=atol(row[0]);
   mysql_free_result(res);
-  LIBRDF_FREE(cstring,query);
+  LIBRDF_FREE(char*, query);
   librdf_storage_mysql_release_handle(storage, handle);
 
   return count;
@@ -1027,7 +1027,7 @@ free_pending_row(pending_row* prow)
   int i;
   
   for(i=0; i < prow->strings_count; i++)
-    LIBRDF_FREE(cstring, prow->strings[i]);
+    LIBRDF_FREE(char*, prow->strings[i]);
 
   LIBRDF_FREE(pending_row, prow);
 }
@@ -1164,7 +1164,7 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
         datatype=librdf_uri_as_counted_string(dt, &datatypelen);
 
       /* Create composite node string for hash generation */
-      nodestring=(char*)LIBRDF_MALLOC(cstring, valuelen+langlen+datatypelen+3);
+      nodestring = LIBRDF_MALLOC(char*, valuelen + langlen + datatypelen + 3);
       if(!nodestring) {
         librdf_storage_mysql_release_handle(storage, handle);
         return 0;
@@ -1178,7 +1178,7 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
         strcat(nodestring, (const char*)datatype);
       nodelen=valuelen+langlen+datatypelen+2;
       hash=librdf_storage_mysql_hash(storage, "L", nodestring, nodelen);
-      LIBRDF_FREE(cstring, nodestring);
+      LIBRDF_FREE(char*, nodestring);
       break;
     
     case LIBRDF_NODE_TYPE_BLANK:
@@ -1238,13 +1238,13 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
   }
 
 
-  prow=(pending_row*)LIBRDF_CALLOC(pending_row, sizeof(pending_row), 1);
+  prow = LIBRDF_CALLOC(pending_row, 1, sizeof(*prow));
   prow->key_len=1;
   prow->uints[0]=hash;
 
   switch(type) {
    case LIBRDF_NODE_TYPE_RESOURCE:
-     escaped_uri=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1);
+     escaped_uri = LIBRDF_MALLOC(char*, nodelen * 2 + 1);
      if(!escaped_uri) {
        hash=0;
        goto tidy;
@@ -1258,9 +1258,9 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
      break;
   
     case LIBRDF_NODE_TYPE_LITERAL:
-      escaped_value=(char*)LIBRDF_MALLOC(cstring, valuelen*2+1);
-      escaped_lang=(char*)LIBRDF_MALLOC(cstring, langlen*2+1);
-      escaped_datatype=(char*)LIBRDF_MALLOC(cstring, datatypelen*2+1);
+      escaped_value = LIBRDF_MALLOC(char*, valuelen * 2 + 1);
+      escaped_lang = LIBRDF_MALLOC(char*, langlen * 2 + 1);
+      escaped_datatype = LIBRDF_MALLOC(char*, datatypelen * 2 + 1);
 
       if(!escaped_value || !escaped_lang || !escaped_datatype) {
         hash=0;
@@ -1289,7 +1289,7 @@ librdf_storage_mysql_node_hash_common(librdf_storage* storage,
       break;
       
     case LIBRDF_NODE_TYPE_BLANK:
-      escaped_name=(char*)LIBRDF_MALLOC(cstring, nodelen*2+1);
+      escaped_name = LIBRDF_MALLOC(char*, nodelen * 2 + 1);
       if(!escaped_name) {
         hash=0;
         goto tidy;
@@ -1398,7 +1398,7 @@ librdf_storage_mysql_start_bulk(librdf_storage* storage)
   if(!handle)
     return 1;
 
-  query=(char*)LIBRDF_MALLOC(cstring, strlen(disable_statement_keys)+21);
+  query = LIBRDF_MALLOC(char*, strlen(disable_statement_keys) + 21);
   if(!query) {
     librdf_storage_mysql_release_handle(storage, handle);
     return 1;
@@ -1415,7 +1415,7 @@ librdf_storage_mysql_start_bulk(librdf_storage* storage)
     librdf_storage_mysql_release_handle(storage, handle);
     return -1;
   }
-  LIBRDF_FREE(cstring,query);
+  LIBRDF_FREE(char*, query);
 
 #ifdef LIBRDF_DEBUG_SQL
   LIBRDF_DEBUG2("SQL: >>%s<<\n", query);
@@ -1429,8 +1429,8 @@ librdf_storage_mysql_start_bulk(librdf_storage* storage)
     return -1;
   }
 
-  query=(char*)LIBRDF_MALLOC(cstring, strlen(lock_tables)+
-                             strlen(lock_tables_extra)+21);
+  query = LIBRDF_MALLOC(char*, strlen(lock_tables) + 
+                        strlen(lock_tables_extra) + 21);
   if(!query) {
     librdf_storage_mysql_release_handle(storage, handle);
     return 1;
@@ -1446,11 +1446,11 @@ librdf_storage_mysql_start_bulk(librdf_storage* storage)
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "MySQL table locking failed: %s",
                mysql_error(handle));
-    LIBRDF_FREE(cstring,query);
+    LIBRDF_FREE(char*, query);
     librdf_storage_mysql_release_handle(storage, handle);
     return -1;
   }
-  LIBRDF_FREE(cstring,query);
+  LIBRDF_FREE(char*, query);
 
   librdf_storage_mysql_release_handle(storage, handle);
 
@@ -1492,7 +1492,7 @@ librdf_storage_mysql_stop_bulk(librdf_storage* storage)
     return 1;
   }
 
-  query=(char*)LIBRDF_MALLOC(cstring, strlen(enable_statement_keys)+21);
+  query = LIBRDF_MALLOC(char*, strlen(enable_statement_keys) + 21);
   if(!query) {
     librdf_storage_mysql_release_handle(storage, handle);
     return 1;
@@ -1509,7 +1509,7 @@ librdf_storage_mysql_stop_bulk(librdf_storage* storage)
     librdf_storage_mysql_release_handle(storage, handle);
     return -1;
   }
-  LIBRDF_FREE(cstring,query);
+  LIBRDF_FREE(char*, query);
 
 #ifdef LIBRDF_DEBUG_SQL
   LIBRDF_DEBUG2("SQL: >>%s<<\n", enable_literal_keys);
@@ -1654,7 +1654,7 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
     /* in a transaction */
     pending_row* prow;
     
-    prow=(pending_row*)LIBRDF_CALLOC(pending_row, sizeof(pending_row), 1);
+    prow = LIBRDF_CALLOC(pending_row, 1, sizeof(*prow));
     prow->key_len=4;
     prow->uints[0]=subject;
     prow->uints[1]=predicate;
@@ -1664,7 +1664,7 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
     
   } else {
     /* not a transaction - add statement to storage */
-    query=(char*)LIBRDF_MALLOC(cstring, strlen(insert_statement)+101);
+    query = LIBRDF_MALLOC(char*, strlen(insert_statement) + 101);
     if(!query) {
       rc=1;
       goto tidy;
@@ -1685,7 +1685,7 @@ librdf_storage_mysql_context_add_statement_helper(librdf_storage* storage,
 
   tidy:
   if(query)
-    LIBRDF_FREE(cstring,query);
+    LIBRDF_FREE(char*, query);
   if(handle) {    
     librdf_storage_mysql_release_handle(storage, handle);
   }
@@ -1732,7 +1732,7 @@ librdf_storage_mysql_contains_statement(librdf_storage* storage,
   }
 
   /* Check for statement */
-  query=(char*)LIBRDF_MALLOC(cstring, strlen(find_statement)+81);
+  query = LIBRDF_MALLOC(char*, strlen(find_statement) + 81);
   if(!query) {
     librdf_storage_mysql_release_handle(storage, handle);
     return 0;
@@ -1746,12 +1746,12 @@ librdf_storage_mysql_contains_statement(librdf_storage* storage,
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "MySQL query for statement failed: %s",
                mysql_error(handle));
-    LIBRDF_FREE(cstring,query);
+    LIBRDF_FREE(char*, query);
 
     librdf_storage_mysql_release_handle(storage, handle);
     return 0;
   }
-  LIBRDF_FREE(cstring, query);
+  LIBRDF_FREE(char*, query);
   if(!(res=mysql_store_result(handle)) ||
      !(mysql_fetch_row(res))) {
     if(res)
@@ -1833,7 +1833,7 @@ librdf_storage_mysql_context_remove_statement(librdf_storage* storage,
 
   /* Remove statement(s) from storage */
   if(context_node) {
-    query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement_with_context)+101);
+    query = LIBRDF_MALLOC(char*, strlen(delete_statement_with_context) + 101);
     if(!query) {
       librdf_storage_mysql_release_handle(storage, handle);
       return 1;
@@ -1841,7 +1841,7 @@ librdf_storage_mysql_context_remove_statement(librdf_storage* storage,
     sprintf(query, delete_statement_with_context, context->model, subject,
             predicate, object, ctxt);
   } else {
-    query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_statement)+81);
+    query = LIBRDF_MALLOC(char*, strlen(delete_statement) + 81);
     if(!query) {
       librdf_storage_mysql_release_handle(storage, handle);
       return 1;
@@ -1857,12 +1857,12 @@ librdf_storage_mysql_context_remove_statement(librdf_storage* storage,
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "MySQL delete from Statements failed: %s",
                mysql_error(handle));
-    LIBRDF_FREE(cstring,query);
+    LIBRDF_FREE(char*, query);
 
     librdf_storage_mysql_release_handle(storage, handle);
     return -1;
   }
-  LIBRDF_FREE(cstring,query);
+  LIBRDF_FREE(char*, query);
 
   librdf_storage_mysql_release_handle(storage, handle);
 
@@ -1907,14 +1907,14 @@ librdf_storage_mysql_context_remove_statements(librdf_storage* storage,
 
   /* Remove statement(s) from storage */
   if(context_node) {
-    query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_context)+61);
+    query = LIBRDF_MALLOC(char*, strlen(delete_context) + 61);
     if(!query) {
       librdf_storage_mysql_release_handle(storage, handle);
       return 1;
     }
     sprintf(query, delete_context, context->model, ctxt);
   } else {
-    query=(char*)LIBRDF_MALLOC(cstring, strlen(delete_model)+21);
+    query = LIBRDF_MALLOC(char*, strlen(delete_model) + 21);
     if(!query) {
       librdf_storage_mysql_release_handle(storage, handle);
       return 1;
@@ -1929,12 +1929,12 @@ librdf_storage_mysql_context_remove_statements(librdf_storage* storage,
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "MySQL delete of context from Statements failed: %s",
                mysql_error(handle));
-    LIBRDF_FREE(cstring,query);
+    LIBRDF_FREE(char*, query);
 
     librdf_storage_mysql_release_handle(storage, handle);
     return -1;
   }
-  LIBRDF_FREE(cstring,query);
+  LIBRDF_FREE(char*, query);
 
   /* Flush merge table when using delete without where... */
 #ifdef LIBRDF_DEBUG_SQL
@@ -2064,9 +2064,8 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
   librdf_stream *stream;
 
   /* Initialize sos context */
-  if(!(sos=(librdf_storage_mysql_sos_context*)
-      LIBRDF_CALLOC(librdf_storage_mysql_sos_context,1,
-                    sizeof(librdf_storage_mysql_sos_context))))
+  sos = LIBRDF_CALLOC(librdf_storage_mysql_sos_context*, 1, sizeof(*sos));
+  if(!sos)
     return NULL;
   sos->storage=storage;
   librdf_storage_add_reference(sos->storage);
@@ -2091,7 +2090,7 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
   }
 
   /* Construct query */
-  query=(char*)LIBRDF_MALLOC(cstring, 21);
+  query = LIBRDF_MALLOC(char*, 21);
   if(!query) {
     librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
     return NULL;
@@ -2259,7 +2258,7 @@ librdf_storage_mysql_find_statements_with_options(librdf_storage* storage,
     librdf_storage_mysql_find_statements_in_context_finished((void*)sos);
     return NULL;
   }
-  LIBRDF_FREE(cstring, query);
+  LIBRDF_FREE(char*, query);
 
   /* Get first statement, if any, and initialize stream */
   if(librdf_storage_mysql_find_statements_in_context_next_statement(sos) ||
@@ -2289,12 +2288,12 @@ librdf_storage_mysql_find_statements_in_context_augment_query(char **query,
   char *newquery;
 
   /* Augment existing query, returning 0 on success. */
-  newquery=(char*)LIBRDF_MALLOC(cstring, strlen(*query)+strlen(addition)+1);
+  newquery = LIBRDF_MALLOC(char*, strlen(*query) + strlen(addition) + 1);
   if(!newquery)
       return 1;
   strcpy(newquery,*query);
   strcat(newquery,addition);
-  LIBRDF_FREE(cstring, *query);
+  LIBRDF_FREE(char*, *query);
   *query=newquery;
 
   return 0;
@@ -2528,9 +2527,9 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   librdf_iterator* iterator;
 
   /* Initialize get_contexts context */
-  if(!(gccontext=(librdf_storage_mysql_get_contexts_context*)
-      LIBRDF_CALLOC(librdf_storage_mysql_get_contexts_context,1,
-                    sizeof(librdf_storage_mysql_get_contexts_context))))
+  gccontext = LIBRDF_CALLOC(librdf_storage_mysql_get_contexts_context*, 1,
+                            sizeof(*gcontext));
+  if(!gccontext)
     return NULL;
   gccontext->storage=storage;
   librdf_storage_add_reference(gccontext->storage);
@@ -2546,7 +2545,7 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   }
 
   /* Construct query */
-  query=(char*)LIBRDF_MALLOC(cstring,strlen(select_contexts)+21);
+  query = LIBRDF_MALLOC(char*, strlen(select_contexts) + 21);
   if(!query) {
     librdf_storage_mysql_get_contexts_finished((void*)gccontext);
     return NULL;
@@ -2565,7 +2564,7 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
     librdf_storage_mysql_get_contexts_finished((void*)gccontext);
     return NULL;
   }
-  LIBRDF_FREE(cstring, query);
+  LIBRDF_FREE(char*, query);
 
   /* Get first context, if any, and initialize iterator */
   if(librdf_storage_mysql_get_contexts_next_context(gccontext) ||

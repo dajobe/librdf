@@ -185,9 +185,7 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
     return 1;
   }
   
-  context = (librdf_storage_sqlite_instance*)LIBRDF_CALLOC(
-    librdf_storage_sqlite_instance, 1, sizeof(*context));
-
+  context = LIBRDF_CALLOC(librdf_storage_sqlite_instance*, 1, sizeof(*context));
   if(!context) {
     if(options)
       librdf_free_hash(options);
@@ -199,7 +197,7 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
   context->storage = storage;
 
   context->name_len = strlen(name);
-  name_copy = (char*)LIBRDF_MALLOC(cstring, context->name_len + 1);
+  name_copy = LIBRDF_MALLOC(char*, context->name_len + 1);
   if(!name_copy) {
     if(options)
       librdf_free_hash(options);
@@ -225,7 +223,7 @@ librdf_storage_sqlite_init(librdf_storage* storage, const char *name,
       }
     }
     
-    LIBRDF_FREE(cstring, synchronous);
+    LIBRDF_FREE(char*, synchronous);
 
   }
   
@@ -249,7 +247,7 @@ librdf_storage_sqlite_terminate(librdf_storage* storage)
     return;
 
   if(context->name)
-    LIBRDF_FREE(cstring, context->name);
+    LIBRDF_FREE(char*, context->name);
   
   LIBRDF_FREE(librdf_storage_sqlite_terminate, storage->instance);
 }
@@ -343,7 +341,7 @@ sqlite_string_escape(const unsigned char *raw, size_t raw_len, size_t *len_p)
   }
 
   len = raw_len + escapes + 2; /* for '' */
-  escaped = (unsigned char*)LIBRDF_MALLOC(cstring, len + 1);
+  escaped = LIBRDF_MALLOC(unsigned char*, len + 1);
   if(!escaped)
     return NULL;
 
@@ -399,13 +397,11 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
         sqlite_FREE(errmsg);
 
 
-      query = (librdf_storage_sqlite_query*)LIBRDF_CALLOC(
-        librdf_storage_sqlite_query, 1, sizeof(*query));
+      query = LIBRDF_CALLOC(librdf_storage_sqlite_query*, 1, sizeof(*query));
       if(!query)
         return 1;
 
-      query->query = (unsigned char*)LIBRDF_MALLOC(cstring,
-                                                   strlen((char *)request)+1);
+      query->query = LIBRDF_MALLOC(unsigned char*, strlen((char *)request) + 1);
       if(!query->query) {
         LIBRDF_FREE(librdf_storage_sqlite_query, query);
         return 1;
@@ -546,8 +542,7 @@ librdf_storage_sqlite_uri_helper(librdf_storage* storage,
   if(!uri_e)
     goto tidy;
   
-  expression = (unsigned char*)LIBRDF_MALLOC(cstring, 
-                                             strlen(field) + 3 + uri_e_len + 1);
+  expression = LIBRDF_MALLOC(unsigned char*, strlen(field) + 3 + uri_e_len + 1);
   if(!expression)
     goto tidy;
 
@@ -562,9 +557,9 @@ librdf_storage_sqlite_uri_helper(librdf_storage* storage,
 
   tidy:
   if(expression)
-    LIBRDF_FREE(cstring, expression);
+    LIBRDF_FREE(char*, expression);
   if(uri_e)
-    LIBRDF_FREE(cstring, uri_e);
+    LIBRDF_FREE(char*, uri_e);
 
   return id;
 }
@@ -587,8 +582,8 @@ librdf_storage_sqlite_blank_helper(librdf_storage* storage,
   if(!blank_e)
     goto tidy;
   
-  expression = (unsigned char*)LIBRDF_MALLOC(cstring,
-                                             strlen(field) + 3 + blank_e_len + 1);
+  expression = LIBRDF_MALLOC(unsigned char*,
+                             strlen(field) + 3 + blank_e_len + 1);
   if(!expression)
     goto tidy;
 
@@ -603,9 +598,9 @@ librdf_storage_sqlite_blank_helper(librdf_storage* storage,
 
   tidy:
   if(expression)
-    LIBRDF_FREE(cstring, expression);
+    LIBRDF_FREE(char*, expression);
   if(blank_e)
-    LIBRDF_FREE(cstring, blank_e);
+    LIBRDF_FREE(char*, blank_e);
 
   return id;
 }
@@ -697,9 +692,9 @@ librdf_storage_sqlite_literal_helper(librdf_storage* storage,
   if(sb)
     raptor_free_stringbuffer(sb);
   if(value_e)
-    LIBRDF_FREE(cstring, value_e);
+    LIBRDF_FREE(char*, value_e);
   if(language_e)
-    LIBRDF_FREE(cstring, language_e);
+    LIBRDF_FREE(char*, language_e);
   
   return id;
 }
@@ -1294,8 +1289,8 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   
   context = (librdf_storage_sqlite_instance*)storage->instance;
 
-  scontext = (librdf_storage_sqlite_serialise_stream_context*)LIBRDF_CALLOC(
-    librdf_storage_sqlite_serialise_stream_context, 1, sizeof(*scontext));
+  scontext = LIBRDF_CALLOC(librdf_storage_sqlite_serialise_stream_context*,
+                           1, sizeof(*scontext));
   if(!scontext)
     return NULL;
 
@@ -1730,8 +1725,8 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
   
   context = (librdf_storage_sqlite_instance*)storage->instance;
 
-  scontext = (librdf_storage_sqlite_find_statements_stream_context*)LIBRDF_CALLOC(
-    librdf_storage_sqlite_find_statements_stream_context, 1, sizeof(*scontext));
+  scontext = LIBRDF_CALLOC(librdf_storage_sqlite_find_statements_stream_context*,
+                           1, sizeof(*scontext));
   if(!scontext)
     return NULL;
 
@@ -2219,8 +2214,8 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
 
   context = (librdf_storage_sqlite_instance*)storage->instance;
 
-  scontext = (librdf_storage_sqlite_context_serialise_stream_context*)LIBRDF_CALLOC(
-    librdf_storage_sqlite_context_serialise_stream_context, 1, sizeof(*scontext));
+  scontext = LIBRDF_CALLOC(librdf_storage_sqlite_context_serialise_stream_context*,
+                           1, sizeof(*scontext));
   if(!scontext)
     return NULL;
 
@@ -2705,8 +2700,8 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
 
   context = (librdf_storage_sqlite_instance*)storage->instance;
 
-  icontext = (librdf_storage_sqlite_get_contexts_iterator_context*)LIBRDF_CALLOC(
-    librdf_storage_sqlite_get_contexts_iterator_context, 1, sizeof(*icontext));
+  icontext = LIBRDF_CALLOC(librdf_storage_sqlite_get_contexts_iterator_context*,
+                           1, sizeof(*icontext));
   if(!icontext)
     return NULL;
 
@@ -2928,7 +2923,7 @@ librdf_storage_sqlite_query_flush(librdf_storage *storage)
 
     librdf_storage_sqlite_exec(storage, query->query, NULL, NULL, 0);
 
-    LIBRDF_FREE(cstring, query->query);
+    LIBRDF_FREE(char*, query->query);
     LIBRDF_FREE(librdf_storage_sqlite_query, query);
   }
 

@@ -80,11 +80,11 @@ static void
 librdf_free_parser_factory(librdf_parser_factory *factory)
 {
   if(factory->name)
-    LIBRDF_FREE(cstring, factory->name);
+    LIBRDF_FREE(char*, factory->name);
   if(factory->label)
-    LIBRDF_FREE(cstring, factory->label);
+    LIBRDF_FREE(char*, factory->label);
   if(factory->mime_type)
-    LIBRDF_FREE(cstring, factory->mime_type);
+    LIBRDF_FREE(char*, factory->mime_type);
   if(factory->type_uri)
     librdf_free_uri(factory->type_uri);
   LIBRDF_FREE(librdf_parser_factory, factory);
@@ -126,18 +126,17 @@ librdf_parser_register_factory(librdf_world *world,
       goto oom;
   }
 
-  parser=(librdf_parser_factory*)LIBRDF_CALLOC(librdf_parser_factory, 1,
-                                               sizeof(librdf_parser_factory));
+  parser = LIBRDF_CALLOC(librdf_parser_factory*, 1, sizeof(*parser));
   if(!parser)
     goto oom;
 
-  parser->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
+  parser->name = LIBRDF_MALLOC(char*, strlen(name) + 1);
   if(!parser->name)
     goto oom_tidy;
   strcpy(parser->name, name);
 
   if(label) {
-    parser->label=(char*)LIBRDF_MALLOC(cstring, strlen(label)+1);
+    parser->label = LIBRDF_MALLOC(char*, strlen(label) + 1);
     if(!parser->label)
       goto oom_tidy;
     strcpy(parser->label, label);
@@ -145,7 +144,7 @@ librdf_parser_register_factory(librdf_world *world,
 
   /* register mime type if any */
   if(mime_type) {
-    parser->mime_type=(char*)LIBRDF_MALLOC(cstring, strlen(mime_type)+1);
+    parser->mime_type = LIBRDF_MALLOC(char*, strlen(mime_type) + 1);
     if(!parser->mime_type)
       goto oom_tidy;
     strcpy(parser->mime_type, mime_type);
@@ -403,11 +402,11 @@ librdf_new_parser_from_factory(librdf_world *world,
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_parser_factory, NULL);
 
-  d=(librdf_parser*)LIBRDF_CALLOC(librdf_parser, 1, sizeof(librdf_parser));
+  d = LIBRDF_CALLOC(librdf_parser*, 1, sizeof(*d));
   if(!d)
     return NULL;
 
-  d->context=(char*)LIBRDF_CALLOC(parser_context, 1, factory->context_length);
+  d->context = LIBRDF_CALLOC(void*, 1, factory->context_length);
   if(!d->context) {
     librdf_free_parser(d);
     return NULL;

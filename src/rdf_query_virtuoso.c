@@ -138,7 +138,7 @@ virtuoso_free_result(librdf_query* query)
   if(context->colNames) {
     for(i = 0; i < context->numCols; i++) {
       if(context->colNames[i])
-        LIBRDF_FREE(cstring, (char *)context->colNames[i]);
+        LIBRDF_FREE(char*, (char*)context->colNames[i]);
     }
     LIBRDF_FREE(cstrings, (char **)context->colNames);
   }
@@ -184,7 +184,7 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name,
   context->result_type = VQUERY_RESULTS_UNKNOWN;
 
   len = strlen((const char*)query_string);
-  query_string_copy = (unsigned char*)LIBRDF_MALLOC(cstring, len+1);
+  query_string_copy = LIBRDF_MALLOC(unsigned char*, len + 1);
   if(!query_string_copy)
     return 1;
   strcpy((char*)query_string_copy, (const char*)query_string);
@@ -231,7 +231,7 @@ librdf_query_virtuoso_terminate(librdf_query* query)
   SQLCloseCursor(context->vc->hstmt);
 
   if(context->query_string)
-    LIBRDF_FREE(cstring, context->query_string);
+    LIBRDF_FREE(char*, context->query_string);
 
   if(context->uri)
     librdf_free_uri(context->uri);
@@ -269,11 +269,11 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
   virtuoso_free_result(query);
   SQLCloseCursor(context->vc->hstmt);
 
-  cmd = (char*)LIBRDF_MALLOC(cstring, strlen(pref) +
-                                      strlen((char *)context->query_string) +1);
-  if(!cmd)
-    goto error;
-
+  cmd = LIBRDF_MALLOC(char*, 
+                      strlen(pref) + strlen((char *)context->query_string) + 1);
+  if(!cmd) {
+      goto error;
+  }
   strcpy(cmd, pref);
   strcat(cmd, (char *)context->query_string);
 
@@ -296,15 +296,14 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
   }
 
   if(context->numCols > 0) {
-    context->colNames  = (char**)LIBRDF_CALLOC(cstrings, context->numCols+1,
-                                               sizeof(char*));
+    context->colNames  = LIBRDF_CALLOC(char**, context->numCols + 1,
+                                       sizeof(char*));
     if(!context->colNames) {
       goto error;
     }
 
-    context->colValues  = (librdf_node **)LIBRDF_CALLOC(librdf_node**,
-                                                        context->numCols+1,
-                                                        sizeof(librdf_node*));
+    context->colValues  = LIBRDF_CALLOC(librdf_node**, context->numCols + 1,
+                                        sizeof(librdf_node*));
     if(!context->colValues) {
       goto error;
     }
@@ -321,7 +320,7 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
         goto error;
       }
 
-      context->colNames[icol-1]  = (char*)LIBRDF_CALLOC(cstring, 1, namelen + 1);
+      context->colNames[icol - 1]  = LIBRDF_CALLOC(char*, 1, namelen + 1);
       if(!context->colNames[icol-1])
         goto error;
 
@@ -333,8 +332,7 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
     context->eof = 0;
   }
 
-  results = (librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, 
-                                                 sizeof(*results));
+  results = LIBRDF_MALLOC(librdf_query_results*, sizeof(*results));
   if(!results) {
     SQLCloseCursor(context->vc->hstmt);
   } else {
@@ -349,13 +347,13 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
   fprintf(stderr, "librdf_query_virtuoso_execute OK\n");
 #endif
   if(cmd)
-    LIBRDF_FREE(cstring, (char *)cmd);
+    LIBRDF_FREE(char*, (char*)cmd);
 
   return results;
 
 error:
   if(cmd)
-    LIBRDF_FREE(cstring, (char *)cmd);
+    LIBRDF_FREE(char*, (char*)cmd);
   context->failed = 1;
   virtuoso_free_result(query);
   return NULL;
@@ -491,7 +489,7 @@ librdf_query_virtuoso_results_next(librdf_query_results *query_results)
       node = NULL;
     } else {
       node = context->vc->v_rdf2node(context->storage, context->vc, col, data);
-      LIBRDF_FREE(cstring, (char *) data);
+      LIBRDF_FREE(char*, (char*) data);
       if(!node)
 	return 2;
     }
@@ -971,7 +969,7 @@ librdf_query_virtuoso_query_results_update_statement(void* context)
     if(!data || is_null)
       goto fail;
     node = qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
-    LIBRDF_FREE(cstring, (char *)data);
+    LIBRDF_FREE(char*, (char*)data);
     if(!node)
       goto fail;
     scontext->graph=node;
@@ -982,7 +980,7 @@ librdf_query_virtuoso_query_results_update_statement(void* context)
   if(!data || is_null)
     goto fail;
   node = qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
-  LIBRDF_FREE(cstring, (char *)data);
+  LIBRDF_FREE(char*, (char*)data);
   if(!node)
     goto fail;
 
@@ -996,7 +994,7 @@ librdf_query_virtuoso_query_results_update_statement(void* context)
   if(!data || is_null)
     goto fail;
   node = qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
-  LIBRDF_FREE(cstring, (char *)data);
+  LIBRDF_FREE(char*, (char*)data);
   if(!node)
     goto fail;
 
@@ -1010,7 +1008,7 @@ librdf_query_virtuoso_query_results_update_statement(void* context)
   if(!data || is_null)
     goto fail;
   node = qcontext->vc->v_rdf2node(qcontext->storage, qcontext->vc, colNum, data);
-  LIBRDF_FREE(cstring, (char *)data);
+  LIBRDF_FREE(char*, (char*)data);
   if(!node)
     goto fail;
 
@@ -1141,7 +1139,8 @@ librdf_query_virtuoso_results_as_stream(librdf_query_results* query_results)
   if((context->result_type & VQUERY_RESULTS_GRAPH) == 0)
     return NULL;
 
-  scontext = (librdf_query_virtuoso_stream_context*)LIBRDF_CALLOC(librdf_query_virtuoso_stream_context, 1, sizeof(*scontext));
+  scontext = LIBRDF_CALLOC(librdf_query_virtuoso_stream_context*, 1,
+                           sizeof(*scontext));
   if(!scontext)
     return NULL;
 
@@ -1218,8 +1217,7 @@ librdf_query_virtuoso_new_results_formatter(librdf_query_results* query_results,
   if(!formatter)
     return NULL;
 
-  qrf = (librdf_query_results_formatter*)LIBRDF_MALLOC(query_results_formatter, 
-                                                       sizeof(*qrf));
+  qrf = LIBRDF_MALLOC(librdf_query_results_formatter*, sizeof(*qrf));
   if(!qrf) {
     rasqal_free_query_results_formatter(formatter);
     return NULL;
@@ -1279,7 +1277,7 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
     unsigned char *name_copy;
 
     name = librdf_query_results_get_binding_name(query_results, i);
-    name_copy = (unsigned char *)LIBRDF_MALLOC(cstring, strlen(name)+1);
+    name_copy = LIBRDF_MALLOC(unsigned char*, strlen(name) + 1);
     strcpy((char*)name_copy, (const char*)name);
     rasqal_variables_table_add(vt, RASQAL_VARIABLE_TYPE_NORMAL,
                                name_copy, NULL);

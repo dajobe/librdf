@@ -83,8 +83,7 @@ librdf_new_stream(librdf_world *world,
   
   librdf_world_open(world);
 
-  new_stream=(librdf_stream*)LIBRDF_CALLOC(librdf_stream, 1, 
-					   sizeof(librdf_stream));
+  new_stream = LIBRDF_CALLOC(librdf_stream*, 1, sizeof(*new_stream));
   if(!new_stream)
     return NULL;
 
@@ -370,7 +369,7 @@ librdf_stream_add_map(librdf_stream* stream,
     }
   }
 
-  map=(librdf_stream_map*)LIBRDF_CALLOC(librdf_stream_map, sizeof(librdf_stream_map), 1);
+  map = LIBRDF_CALLOC(librdf_stream_map*, 1, sizeof(*map));
   if(!map) {
     if(free_context && map_context)
       (*free_context)(map_context);
@@ -429,7 +428,8 @@ librdf_new_stream_from_node_iterator(librdf_iterator* iterator,
   librdf_stream_from_node_iterator_stream_context *scontext;
   librdf_stream *stream;
 
-  scontext=(librdf_stream_from_node_iterator_stream_context*)LIBRDF_CALLOC(librdf_stream_from_node_iterator_stream_context, 1, sizeof(librdf_stream_from_node_iterator_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_stream_from_node_iterator_stream_context*, 1,
+                           sizeof(*scontext));
   if(!scontext)
     return NULL;
 
@@ -705,8 +705,7 @@ librdf_new_empty_stream(librdf_world *world)
   
   librdf_world_open(world);
 
-  new_stream=(librdf_stream*)LIBRDF_CALLOC(librdf_stream, 1, 
-                                               sizeof(librdf_stream));
+  new_stream = LIBRDF_CALLOC(librdf_stream*, 1, sizeof(*new_stream));
   if(!new_stream)
     return NULL;
   

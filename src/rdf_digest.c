@@ -90,12 +90,11 @@ librdf_digest_register_factory(librdf_world *world, const char *name,
     }
   }
 
-  digest=(librdf_digest_factory*)LIBRDF_CALLOC(librdf_digest_factory, 1,
-                                               sizeof(librdf_digest_factory));
+  digest = LIBRDF_CALLOC(librdf_digest_factory*, 1, sizeof(*digest));
   if(!digest)
     goto oom;
 
-  digest->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
+  digest->name = LIBRDF_MALLOC(char*, strlen(name) + 1);
   if(!digest->name)
     goto oom_tidy;
   strcpy(digest->name, name);
@@ -211,20 +210,19 @@ librdf_new_digest_from_factory(librdf_world *world,
 
   librdf_world_open(world);
 
-  d=(librdf_digest*)LIBRDF_CALLOC(librdf_digest, 1, sizeof(librdf_digest));
+  d = LIBRDF_CALLOC(librdf_digest*, 1, sizeof(*d));
   if(!d)
     return NULL;
 
   d->world=world;
         
-  d->context=(char*)LIBRDF_CALLOC(digest_context, 1, factory->context_length);
+  d->context = LIBRDF_CALLOC(void*, 1, factory->context_length);
   if(!d->context) {
     librdf_free_digest(d);
     return NULL;
   }
         
-  d->digest=(unsigned char*)LIBRDF_CALLOC(digest_digest, 1,
-					  factory->digest_length);
+  d->digest = LIBRDF_CALLOC(unsigned char*, 1, factory->digest_length);
   if(!d->digest) {
     librdf_free_digest(d);
     return NULL;
@@ -383,7 +381,7 @@ librdf_digest_to_string(librdf_digest* digest)
   char* b;
   int i;
 
-  b = (char*)LIBRDF_MALLOC(cstring, 1+(mdlen<<1));
+  b = LIBRDF_MALLOC(char*, 1 + (mdlen<<1));
   if(!b) {
     LIBRDF_FATAL1(digest->world, LIBRDF_FROM_DIGEST, "Out of memory");
     return NULL;
@@ -414,7 +412,7 @@ librdf_digest_print(librdf_digest* digest, FILE* fh)
   if(!s)
     return;
   fputs(s, fh);
-  LIBRDF_FREE(cstring, s);
+  LIBRDF_FREE(char*, s);
 }
 
 
@@ -524,7 +522,7 @@ main(int argc, char *argv[])
       failures++;
     } else
       fprintf(stderr, "%s: %s digest is correct\n", program, answer->type);
-    LIBRDF_FREE(cstring, s);
+    LIBRDF_FREE(char*, s);
     
     fprintf(stdout, "%s: Freeing digest\n", program);
     librdf_free_digest(d);

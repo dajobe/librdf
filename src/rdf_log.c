@@ -132,11 +132,11 @@ librdf_log_simple(librdf_world* world, int code,
     int locator_len;
     locator_len = raptor_locator_format(NULL, 0, (raptor_locator*)locator);
     if(locator_len>0) {
-      char *buffer=(char*)LIBRDF_MALLOC(cstring, locator_len+2);
+      char *buffer = LIBRDF_MALLOC(char*, locator_len + 2);
       *buffer=' ';
       raptor_locator_format(buffer+1, locator_len, (raptor_locator*)locator);
       fputs(buffer, stderr);
-      LIBRDF_FREE(cstring, buffer);
+      LIBRDF_FREE(char*, buffer);
     }
   }
   
@@ -203,7 +203,7 @@ librdf_fatal(librdf_world* world, int facility,
                            file, line, function, message);
   
   length++; /* add the length 1 passed in */
-  buffer = (char*)LIBRDF_MALLOC(cstring, length + 1); /* for \0 */
+  buffer = LIBRDF_MALLOC(char*, length + 1); /* for \0 */
   if(buffer)
     snprintf(buffer, length, "%s:%d:%s: fatal error: %s", 
              file, line, function, message);
@@ -213,7 +213,7 @@ librdf_fatal(librdf_world* world, int facility,
                     (buffer ? (const char*)buffer : message));
 
   if(buffer)
-    LIBRDF_FREE(cstring, buffer);
+    LIBRDF_FREE(char*, buffer);
 
   abort();
 }

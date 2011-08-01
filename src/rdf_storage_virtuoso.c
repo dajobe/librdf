@@ -182,7 +182,7 @@ vGetDataCHAR(librdf_world *world, librdf_storage_virtuoso_connection *handle,
     char *pLongData = NULL;
     SQLLEN bufsize = len + 4;
 
-    pLongData = (char*)LIBRDF_MALLOC(cstring, bufsize);
+    pLongData = LIBRDF_MALLOC(char*, bufsize);
     if(pLongData == NULL) {
       librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL, 
                  "Not enough memory to allocate resultset element");
@@ -614,7 +614,7 @@ librdf_storage_virtuoso_node2string(librdf_storage *storage, librdf_node *node)
     char *uri = (char*)librdf_uri_as_counted_string(librdf_node_get_uri(node),
                                                     &nodelen);
 
-    ret = (char*)LIBRDF_MALLOC(cstring, nodelen + 3);
+    ret = LIBRDF_MALLOC(char*, nodelen + 3);
     if(!ret)
       goto end;
 
@@ -641,7 +641,7 @@ librdf_storage_virtuoso_node2string(librdf_storage *storage, librdf_node *node)
       datatypelen = strlen((const char*)datatype);
 
     /* Create composite node string for hash generation */
-    ret = (char*)LIBRDF_MALLOC(cstring, valuelen + langlen + datatypelen + 8);
+    ret = LIBRDF_MALLOC(char*, valuelen + langlen + datatypelen + 8);
     if(!ret)
       goto end;
 
@@ -660,7 +660,7 @@ librdf_storage_virtuoso_node2string(librdf_storage *storage, librdf_node *node)
   } else if(type == LIBRDF_NODE_TYPE_BLANK) {
     char *value = (char *)librdf_node_get_blank_identifier(node);
 
-    ret = (char*)LIBRDF_MALLOC(cstring, strlen(value) + 5);
+    ret = LIBRDF_MALLOC(char*, strlen(value) + 5);
     if(!ret)
       goto end;
 
@@ -705,7 +705,7 @@ librdf_storage_virtuoso_context2string(librdf_storage *storage,
   if(node) {
     ctxt_node = librdf_storage_virtuoso_node2string(storage, node);
   } else {
-    ctxt_node = (char*)LIBRDF_MALLOC(cstring, strlen(context->model_name) + 4);
+    ctxt_node = LIBRDF_MALLOC(char*, strlen(context->model_name) + 4);
     
     if(!ctxt_node)
       return NULL;
@@ -725,7 +725,7 @@ librdf_storage_virtuoso_fcontext2string(librdf_storage *storage,
   if(node) {
     ctxt_node = librdf_storage_virtuoso_node2string(storage, node);
   } else {
-    ctxt_node = (char*)LIBRDF_MALLOC(cstring, 5);
+    ctxt_node = LIBRDF_MALLOC(char*, 5);
     if(!ctxt_node)
       return NULL;
 
@@ -862,17 +862,19 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
   if(!connection) {
     /* Allocate new buffer with two extra slots */
     librdf_storage_virtuoso_connection** connections;
-    connections = (librdf_storage_virtuoso_connection**)LIBRDF_CALLOC(librdf_storage_virtuoso_connection*, context->connections_count + 2, sizeof(librdf_storage_virtuoso_connection*));
+    connections = LIBRDF_CALLOC(librdf_storage_virtuoso_connection**,
+                                context->connections_count + 2,
+                                sizeof(librdf_storage_virtuoso_connection*));
     if(!connections)
       return NULL;
 
-    connections[context->connections_count] = (librdf_storage_virtuoso_connection*) LIBRDF_CALLOC(librdf_storage_virtuoso_connection, 1, sizeof(librdf_storage_virtuoso_connection));
+    connections[context->connections_count] =  LIBRDF_CALLOC(librdf_storage_virtuoso_connection*, 1, sizeof(librdf_storage_virtuoso_connection));
     if(!connections[context->connections_count]) {
       LIBRDF_FREE(librdf_storage_virtuoso_connection**, connections);
       return NULL;
     }
 
-    connections[context->connections_count + 1] = (librdf_storage_virtuoso_connection*) LIBRDF_CALLOC(librdf_storage_virtuoso_connection, 1, sizeof(librdf_storage_virtuoso_connection));
+    connections[context->connections_count + 1] =  LIBRDF_CALLOC(librdf_storage_virtuoso_connection*, 1, sizeof(librdf_storage_virtuoso_connection));
     if(!connections[context->connections_count + 1]) {
       LIBRDF_FREE(librdf_storage_virtuoso_connection*, connections[context->connections_count]);
       LIBRDF_FREE(librdf_storage_virtuoso_connection**, connections);
@@ -1027,9 +1029,8 @@ librdf_storage_virtuoso_init(librdf_storage* storage, const char *name,
   librdf_storage_virtuoso_instance* context;
   int len = 0;
   
-  context = (librdf_storage_virtuoso_instance*)LIBRDF_CALLOC(
-    librdf_storage_virtuoso_instance, 1, sizeof(*context));
-
+  context = LIBRDF_CALLOC(librdf_storage_virtuoso_instance*, 
+                          1, sizeof(*context));
   storage->instance = context;
 
   /* Must have connection parameters passed as options */
@@ -1084,11 +1085,11 @@ librdf_storage_virtuoso_init(librdf_storage* storage, const char *name,
   if(context->charset)
     len += (strlen(context->charset) + strlen("CHARSET=;"));
 
-  context->conn_str = (char*)LIBRDF_MALLOC(cstring, len + 16);
+  context->conn_str = LIBRDF_MALLOC(char*, len + 16);
   if(!context->conn_str)
     return 1;
 
-  context->model_name = (char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
+  context->model_name = LIBRDF_MALLOC(char*, strlen(name) + 1);
   if(!context->model_name)
     return 1;
 
@@ -1170,28 +1171,28 @@ librdf_storage_virtuoso_terminate(librdf_storage* storage)
   librdf_storage_virtuoso_finish_connections(storage);
 
   if(context->password)
-    LIBRDF_FREE(cstring,(char *)context->password);
+    LIBRDF_FREE(char*, (char*)context->password);
 
   if(context->user)
-    LIBRDF_FREE(cstring,(char *)context->user);
+    LIBRDF_FREE(char*, (char*)context->user);
 
   if(context->model_name)
-    LIBRDF_FREE(cstring,(char *)context->model_name);
+    LIBRDF_FREE(char*, (char*)context->model_name);
 
   if(context->dsn)
-    LIBRDF_FREE(cstring,(char *)context->dsn);
+    LIBRDF_FREE(char*, (char*)context->dsn);
 
   if(context->database)
-    LIBRDF_FREE(cstring,(char *)context->database);
+    LIBRDF_FREE(char*, (char*)context->database);
 
   if(context->charset)
-    LIBRDF_FREE(cstring,(char *)context->charset);
+    LIBRDF_FREE(char*, (char*)context->charset);
 
   if(context->host)
-    LIBRDF_FREE(cstring,(char *)context->host);
+    LIBRDF_FREE(char*, (char*)context->host);
 
   if(context->conn_str)
-    LIBRDF_FREE(cstring,(char *)context->conn_str);
+    LIBRDF_FREE(char*, (char*)context->conn_str);
 
   if(context->transaction_handle)
     librdf_storage_virtuoso_transaction_rollback(storage);
@@ -1310,8 +1311,8 @@ librdf_storage_virtuoso_size(librdf_storage* storage)
     return -1;
 
   /* Query for number of statements */
-  query = (char*)LIBRDF_MALLOC(cstring, 
-                               strlen(model_size) + strlen(context->model_name) + 2);
+  query = LIBRDF_MALLOC(char*, 
+                        strlen(model_size) + strlen(context->model_name) + 2);
   if(!query) {
     librdf_storage_virtuoso_release_handle(storage, handle);
     return -1;
@@ -1339,7 +1340,7 @@ librdf_storage_virtuoso_size(librdf_storage* storage)
   SQLCloseCursor(handle->hstmt);
 
 end:
-  LIBRDF_FREE(cstring, query);
+  LIBRDF_FREE(char*, query);
   librdf_storage_virtuoso_release_handle(storage, handle);
 
   return count;
@@ -1504,7 +1505,7 @@ BindSP(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
     char *value = (char *)librdf_node_get_blank_identifier(node);
     char *bnode = NULL;
 
-    bnode = (char*)LIBRDF_MALLOC(cstring, strlen(value) + 5);
+    bnode = LIBRDF_MALLOC(char*, strlen(value) + 5);
     if(!bnode)
       return -1;
 
@@ -1563,7 +1564,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
      char *value = (char *)librdf_node_get_blank_identifier(node);
      char *bnode = NULL;
 
-     bnode = (char*)LIBRDF_MALLOC(cstring, strlen(value) + 5);
+     bnode = LIBRDF_MALLOC(char*, strlen(value) + 5);
      if(!bnode)
        return -1;
 
@@ -1754,11 +1755,11 @@ librdf_storage_virtuoso_context_add_statement_helper(librdf_storage* storage,
 end:
   SQLFreeStmt(handle->hstmt, SQL_RESET_PARAMS);
   if(subject)
-    LIBRDF_FREE(cstring, subject);
+    LIBRDF_FREE(char*, subject);
   if(predicate)
-    LIBRDF_FREE(cstring, predicate);
+    LIBRDF_FREE(char*, predicate);
   if(object)
-    LIBRDF_FREE(cstring, object);
+    LIBRDF_FREE(char*, object);
   if(handle)
     librdf_storage_virtuoso_release_handle(storage, handle);
 
@@ -1861,7 +1862,7 @@ librdf_storage_virtuoso_context_contains_statement(librdf_storage* storage,
     goto end;
   }
 
-  query = (char*)LIBRDF_MALLOC(cstring, strlen(find_statement)+ strlen(ctxt_node)+ strlen(subject) + strlen(predicate) + strlen(object)+1);
+  query = LIBRDF_MALLOC(char*, strlen(find_statement)+ strlen(ctxt_node)+ strlen(subject) + strlen(predicate) + strlen(object) + 1);
   if(!query) {
     ret = 0;
     goto end;
@@ -1894,15 +1895,15 @@ librdf_storage_virtuoso_context_contains_statement(librdf_storage* storage,
 
 end:
   if(query)
-    LIBRDF_FREE(cstring, query);
+    LIBRDF_FREE(char*, query);
   if(ctxt_node)
-    LIBRDF_FREE(cstring, ctxt_node);
+    LIBRDF_FREE(char*, ctxt_node);
   if(subject)
-    LIBRDF_FREE(cstring, subject);
+    LIBRDF_FREE(char*, subject);
   if(predicate)
-    LIBRDF_FREE(cstring, predicate);
+    LIBRDF_FREE(char*, predicate);
   if(object)
-    LIBRDF_FREE(cstring, object);
+    LIBRDF_FREE(char*, object);
   if(handle)
     librdf_storage_virtuoso_release_handle(storage, handle);
 
@@ -2034,7 +2035,7 @@ librdf_storage_virtuoso_context_remove_statement(librdf_storage* storage,
     predicate = librdf_storage_virtuoso_node2string(storage, npredicate);
     object = librdf_storage_virtuoso_node2string(storage, nobject);
 
-    query = (char*)LIBRDF_MALLOC(cstring, strlen(sdelete_match) +
+    query = LIBRDF_MALLOC(char*, strlen(sdelete_match) +
                                  strlen(ctxt_node)*2 + strlen(subject)*2 +
                                  strlen(predicate)*2 + strlen(object)*2 +1);
     if(!query) {
@@ -2062,15 +2063,15 @@ librdf_storage_virtuoso_context_remove_statement(librdf_storage* storage,
 end:
   SQLFreeStmt(handle->hstmt, SQL_RESET_PARAMS);
   if(query)
-    LIBRDF_FREE(cstring,query);
+    LIBRDF_FREE(char*, query);
   if(ctxt_node)
-    LIBRDF_FREE(cstring,ctxt_node);
+    LIBRDF_FREE(char*, ctxt_node);
   if(subject)
-    LIBRDF_FREE(cstring,subject);
+    LIBRDF_FREE(char*, subject);
   if(predicate)
-    LIBRDF_FREE(cstring,predicate);
+    LIBRDF_FREE(char*, predicate);
   if(object)
-    LIBRDF_FREE(cstring,object);
+    LIBRDF_FREE(char*, object);
   if(handle) {
     librdf_storage_virtuoso_release_handle(storage, handle);
   }
@@ -2138,7 +2139,7 @@ librdf_storage_virtuoso_context_remove_statements(librdf_storage* storage,
 end:
   SQLFreeStmt(handle->hstmt, SQL_RESET_PARAMS);
   if(ctxt_node)
-    LIBRDF_FREE(cstring, ctxt_node);
+    LIBRDF_FREE(char*, ctxt_node);
   if(handle) {
     librdf_storage_virtuoso_release_handle(storage, handle);
   }
@@ -2251,8 +2252,7 @@ librdf_storage_virtuoso_find_statements_in_context(librdf_storage* storage,
   fprintf(stderr, "librdf_storage_virtuoso_find_statements_in_context \n");
 #endif
   /* Initialize sos context */
-  sos = (librdf_storage_virtuoso_sos_context*)
-    LIBRDF_CALLOC(librdf_storage_virtuoso_sos_context, 1, sizeof(*sos));
+  sos = LIBRDF_CALLOC(librdf_storage_virtuoso_sos_context*, 1, sizeof(*sos));
   if(!sos)
     return NULL;
 
@@ -2284,21 +2284,21 @@ librdf_storage_virtuoso_find_statements_in_context(librdf_storage* storage,
     s_subject = librdf_storage_virtuoso_node2string(storage, subject);
     if(strlen(s_subject) == 0) {
       subject = NULL;
-      LIBRDF_FREE(cstring,(char *)s_subject);
+      LIBRDF_FREE(char*, (char*)s_subject);
     }
   }
   if(predicate) {
     s_predicate = librdf_storage_virtuoso_node2string(storage, predicate);
     if(strlen(s_predicate) == 0) {
       predicate = NULL;
-      LIBRDF_FREE(cstring,(char *)s_predicate);
+      LIBRDF_FREE(char*, (char*)s_predicate);
     }
   }
   if(object) {
     s_object = librdf_storage_virtuoso_node2string(storage, object);
     if(strlen(s_object) == 0) {
       object = NULL;
-      LIBRDF_FREE(cstring,(char *)s_object);
+      LIBRDF_FREE(char*, (char*)s_object);
     }
   }
 
@@ -2315,7 +2315,7 @@ librdf_storage_virtuoso_find_statements_in_context(librdf_storage* storage,
   if(!ctxt_node)
     goto end;
 
-  query = (char*)LIBRDF_MALLOC(cstring, strlen(find_statement)+
+  query = LIBRDF_MALLOC(char*, strlen(find_statement) + 
                                strlen(ctxt_node) + strlen(s_subject) +
                                strlen(s_predicate) + strlen(s_object)+1);
   if(!query) {
@@ -2359,15 +2359,15 @@ librdf_storage_virtuoso_find_statements_in_context(librdf_storage* storage,
 
 end:
   if(query)
-    LIBRDF_FREE(cstring,(char *)query);
+    LIBRDF_FREE(char*, (char*)query);
   if(ctxt_node)
-    LIBRDF_FREE(cstring,(char *)ctxt_node);
+    LIBRDF_FREE(char*, (char*)ctxt_node);
   if(subject)
-    LIBRDF_FREE(cstring,(char *)s_subject);
+    LIBRDF_FREE(char*, (char*)s_subject);
   if(predicate)
-    LIBRDF_FREE(cstring,(char *)s_predicate);
+    LIBRDF_FREE(char*, (char*)s_predicate);
   if(object)
-    LIBRDF_FREE(cstring,(char *)s_object);
+    LIBRDF_FREE(char*, (char*)s_object);
 
   return stream;
 }
@@ -2485,7 +2485,7 @@ librdf_storage_virtuoso_find_statements_in_context_next_statement(void* context)
           return 1;
 
         sos->current_context = rdf2node(sos->storage, sos->handle, colNum, data);
-        LIBRDF_FREE(cstring,(char *)data);
+        LIBRDF_FREE(char*, (char*)data);
         if(!sos->current_context)
           return 1;
 
@@ -2501,7 +2501,7 @@ librdf_storage_virtuoso_find_statements_in_context_next_statement(void* context)
           return 1;
 
         node = rdf2node(sos->storage, sos->handle, colNum, data);
-        LIBRDF_FREE(cstring,(char *)data);
+        LIBRDF_FREE(char*, (char*)data);
         if(!node)
           return 1;
 
@@ -2517,7 +2517,7 @@ librdf_storage_virtuoso_find_statements_in_context_next_statement(void* context)
           return 1;
 
         node = rdf2node(sos->storage, sos->handle, colNum, data);
-        LIBRDF_FREE(cstring,(char *)data);
+        LIBRDF_FREE(char*, (char*)data);
         if(!node)
           return 1;
 
@@ -2533,7 +2533,7 @@ librdf_storage_virtuoso_find_statements_in_context_next_statement(void* context)
           return 1;
 
         node = rdf2node(sos->storage, sos->handle, colNum, data);
-        LIBRDF_FREE(cstring,(char *)data);
+        LIBRDF_FREE(char*, (char*)data);
         if(!node)
           return 1;
 
@@ -2646,9 +2646,8 @@ librdf_storage_virtuoso_get_contexts(librdf_storage* storage)
   fprintf(stderr, "librdf_storage_virtuoso_get_contexts \n");
 #endif
   /* Initialize get_contexts context */
-  gccontext = (librdf_storage_virtuoso_get_contexts_context*)
-    LIBRDF_CALLOC(librdf_storage_virtuoso_get_contexts_context, 1,
-                  sizeof(*gccontext));
+  gccontext = LIBRDF_CALLOC(librdf_storage_virtuoso_get_contexts_context*, 1,
+                            sizeof(*gccontext));
   if(!gccontext)
     return NULL;
 
@@ -2756,7 +2755,7 @@ librdf_storage_virtuoso_get_contexts_next_context(void* context)
 
   gccontext->current_context = rdf2node(gccontext->storage, gccontext->handle,
                                         colNum, data);
-  LIBRDF_FREE(cstring,(char *)data);
+  LIBRDF_FREE(char*, (char*)data);
   if(!gccontext->current_context)
     return 1;
 

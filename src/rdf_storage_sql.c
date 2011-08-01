@@ -109,13 +109,12 @@ librdf_new_sql_config(librdf_world* world,
   
   librdf_world_open(world);
 
-  config=(librdf_sql_config*)LIBRDF_MALLOC(librdf_sql_config,
-                                           sizeof(librdf_sql_config));
+  config = LIBRDF_MALLOC(librdf_sql_config*, sizeof(*config));
 
   len=strlen(config_dir) + 1 + strlen(storage_name) + 4 + 1;
   if(layout)
     len+= strlen(layout) + 1;
-  config->filename=(char*)LIBRDF_MALLOC(cstring, len);
+  config->filename = LIBRDF_MALLOC(char*, len);
   if(layout)
     sprintf(config->filename, "%s/%s-%s.ttl", config_dir, storage_name, layout);
   else
@@ -125,7 +124,7 @@ librdf_new_sql_config(librdf_world* world,
   for(i=0; config->predicate_uri_strings[i]; i++)
     ;
   config->predicates_count=i;
-  config->values=(char**)LIBRDF_CALLOC(cstring, sizeof(char*), 
+  config->values = LIBRDF_CALLOC(char**, sizeof(char*), 
                                        config->predicates_count);
 
   librdf_log(world, 0, LIBRDF_LOG_DEBUG, LIBRDF_FROM_STORAGE, NULL,
@@ -221,13 +220,13 @@ librdf_free_sql_config(librdf_sql_config* config)
   if(config->values) {
     for(i=0; i < config->predicates_count; i++) {
       if(config->values[i])
-        LIBRDF_FREE(cstring, config->values[i]);
+        LIBRDF_FREE(char*, config->values[i]);
     }
-    LIBRDF_FREE(cstring, config->values);
+    LIBRDF_FREE(char*, config->values);
   }
 
   if(config->filename)
-    LIBRDF_FREE(cstring, config->filename);
+    LIBRDF_FREE(char*, config->filename);
 
-  LIBRDF_FREE(cstring, config);
+  LIBRDF_FREE(char*, config);
 }

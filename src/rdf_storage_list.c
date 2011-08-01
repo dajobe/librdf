@@ -109,10 +109,9 @@ librdf_storage_list_init(librdf_storage* storage, const char *name,
                          librdf_hash* options)
 {
   int index_contexts=0;
-  
-  librdf_storage_list_instance* context=(librdf_storage_list_instance*)LIBRDF_CALLOC(
-    librdf_storage_list_instance, 1, sizeof(librdf_storage_list_instance));
+  librdf_storage_list_instance* context;
 
+  context = LIBRDF_CALLOC(librdf_storage_list_instance*, 1, sizeof(*context));
   if(!context) {
     if(options)
       librdf_free_hash(options);
@@ -270,7 +269,7 @@ librdf_storage_list_add_statements(librdf_storage* storage,
     if(librdf_storage_list_contains_statement(storage, statement))
       continue;
 
-    sln=(librdf_storage_list_node*)LIBRDF_MALLOC(librdf_storage_list_node, sizeof(librdf_storage_list_node));
+    sln = LIBRDF_MALLOC(librdf_storage_list_node*, sizeof(*sln));
     if(!sln) {
       status=1;
       break;
@@ -341,7 +340,8 @@ librdf_storage_list_serialise(librdf_storage* storage)
   librdf_storage_list_serialise_stream_context* scontext;
   librdf_stream* stream;
   
-  scontext=(librdf_storage_list_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_list_serialise_stream_context, 1, sizeof(librdf_storage_list_serialise_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_storage_list_serialise_stream_context*, 1,
+                           sizeof(*scontext));
   if(!scontext)
     return NULL;
 
@@ -498,7 +498,7 @@ librdf_storage_list_context_add_statement(librdf_storage* storage,
   }
   
   /* Store statement + node in the storage_list */
-  sln=(librdf_storage_list_node*)LIBRDF_MALLOC(librdf_storage_list_node, sizeof(librdf_storage_list_node));
+  sln = LIBRDF_MALLOC(librdf_storage_list_node*, sizeof(*sln));
   if(!sln)
     return 1;
 
@@ -531,11 +531,11 @@ librdf_storage_list_context_add_statement(librdf_storage* storage,
   
   /* Store (context => statement) in the context hash */
   size=librdf_node_encode(context_node, NULL, 0);
-  key.data=(char*)LIBRDF_MALLOC(cstring, size);
+  key.data = LIBRDF_MALLOC(char*, size);
   key.size=librdf_node_encode(context_node, (unsigned char*)key.data, size);
 
   size=librdf_statement_encode2(world, statement, NULL, 0);
-  value.data=(char*)LIBRDF_MALLOC(cstring, size);
+  value.data = LIBRDF_MALLOC(char*, size);
   value.size=librdf_statement_encode2(world, statement, (unsigned char*)value.data, size);
 
   status=librdf_hash_put(context->contexts, &key, &value);
@@ -595,11 +595,11 @@ librdf_storage_list_context_remove_statement(librdf_storage* storage,
   
   /* Remove (context => statement) in the context hash */
   size=librdf_node_encode(context_node, NULL, 0);
-  key.data=(char*)LIBRDF_MALLOC(cstring, size);
+  key.data = LIBRDF_MALLOC(char*, size);
   key.size=librdf_node_encode(context_node, (unsigned char*)key.data, size);
 
   size=librdf_statement_encode2(world, statement, NULL, 0);
-  value.data=(char*)LIBRDF_MALLOC(cstring, size);
+  value.data = LIBRDF_MALLOC(char*, size);
   value.size=librdf_statement_encode2(world, statement, (unsigned char*)value.data, size);
 
   status=librdf_hash_delete(context->contexts, &key, &value);
@@ -645,7 +645,7 @@ librdf_storage_list_context_serialise(librdf_storage* storage,
     return NULL;
   }
   
-  scontext=(librdf_storage_list_context_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_list_context_serialise_stream_context, 1, sizeof(librdf_storage_list_context_serialise_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_storage_list_context_serialise_stream_context*, 1, sizeof(*scontext));
   if(!scontext)
     return NULL;
 
@@ -664,7 +664,7 @@ librdf_storage_list_context_serialise(librdf_storage* storage,
   scontext->context_node=librdf_new_node_from_node(context_node);
 
   size=librdf_node_encode(scontext->context_node, NULL, 0);
-  scontext->key->data=scontext->context_node_data=(char*)LIBRDF_MALLOC(cstring, size);
+  scontext->key->data = scontext->context_node_data=LIBRDF_MALLOC(char*, size);
   scontext->key->size=librdf_node_encode(scontext->context_node,
                                          (unsigned char*)scontext->key->data,
                                          size);
@@ -769,7 +769,7 @@ librdf_storage_list_context_serialise_finished(void* context)
   }
 
   if(scontext->context_node_data)
-    LIBRDF_FREE(cstring, scontext->context_node_data);
+    LIBRDF_FREE(char*, scontext->context_node_data);
 
   librdf_statement_clear(&scontext->current);
 
@@ -887,7 +887,8 @@ librdf_storage_list_get_contexts(librdf_storage* storage)
     return NULL;
   }
   
-  icontext=(librdf_storage_list_get_contexts_iterator_context*)LIBRDF_CALLOC(librdf_storage_list_get_contexts_iterator_context, 1, sizeof(librdf_storage_list_get_contexts_iterator_context));
+  icontext = LIBRDF_CALLOC(librdf_storage_list_get_contexts_iterator_context*,
+                           1, sizeof(*icontext));
   if(!icontext)
     return NULL;
 

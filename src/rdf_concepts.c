@@ -91,10 +91,10 @@ librdf_init_concepts(librdf_world *world)
     LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Failed to create M&S or Schema URIs");
 
   /* Create arrays for the M&S and Schema resource nodes and uris */
-  world->concept_uris=
-    (librdf_uri**)LIBRDF_CALLOC(ptrarray, LIBRDF_CONCEPT_LAST+1, sizeof(librdf_uri*));
-  world->concept_resources=
-    (librdf_node**)LIBRDF_CALLOC(ptrarray, LIBRDF_CONCEPT_LAST+1, sizeof(librdf_node*));
+  world->concept_uris = LIBRDF_CALLOC(librdf_uri**, LIBRDF_CONCEPT_LAST + 1,
+                                      sizeof(librdf_uri*));
+  world->concept_resources = LIBRDF_CALLOC(librdf_node**, LIBRDF_CONCEPT_LAST + 1,
+                                           sizeof(librdf_node*));
   if(!world->concept_uris || !world->concept_resources)
     LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Out of memory creating node/uri arrays");
 
@@ -256,13 +256,13 @@ librdf_finish_concepts(librdf_world *world)
       if(world->concept_resources[i])
         librdf_free_node(world->concept_resources[i]);
     }
-    LIBRDF_FREE(ptrarray, world->concept_resources);
+    LIBRDF_FREE(librdf_node**, world->concept_resources);
     world->concept_resources=NULL;
   }
 
   if(world->concept_uris) {
     /* uris were freed above, now just free the array */
-    LIBRDF_FREE(ptrarray, world->concept_uris);
+    LIBRDF_FREE(librdf_uri**, world->concept_uris);
     world->concept_uris=NULL;
   }
 }

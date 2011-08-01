@@ -136,7 +136,7 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
   utf8_byte_length = i;
 
 
-  output = (unsigned char*)LIBRDF_MALLOC(byte_string, utf8_byte_length + 1);
+  output = LIBRDF_MALLOC(unsigned char*, utf8_byte_length + 1);
   if(!output)
     return NULL;
   
@@ -196,7 +196,7 @@ librdf_latin1_to_utf8(const unsigned char *input, int length,
     utf8_length += size;
   }
 
-  output = (unsigned char*)LIBRDF_MALLOC(byte_string, utf8_length + 1);
+  output = LIBRDF_MALLOC(unsigned char*, utf8_length + 1);
   if(!output)
     return NULL;
   
@@ -351,8 +351,8 @@ main(int argc, char *argv[])
     fputs("' OK\n", stderr);
   }
 
-  LIBRDF_FREE(cstring, latin1_string);
-  LIBRDF_FREE(cstring, utf8_string);
+  LIBRDF_FREE(char*, latin1_string);
+  LIBRDF_FREE(char*, utf8_string);
 
 #ifdef LIBRDF_MEMORY_DEBUG 
   librdf_memory_report(stderr);

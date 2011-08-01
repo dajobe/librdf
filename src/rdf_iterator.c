@@ -69,8 +69,7 @@ librdf_new_iterator(librdf_world *world,
   
   librdf_world_open(world);
 
-  new_iterator=(librdf_iterator*)LIBRDF_CALLOC(librdf_iterator, 1, 
-                                               sizeof(librdf_iterator));
+  new_iterator = LIBRDF_CALLOC(librdf_iterator*, 1,  sizeof(*new_iterator));
   if(!new_iterator)
     return NULL;
   
@@ -397,7 +396,7 @@ librdf_iterator_add_map(librdf_iterator* iterator,
       return 1;
   }
 
-  map=(librdf_iterator_map*)LIBRDF_CALLOC(librdf_iterator_map, sizeof(librdf_iterator_map), 1);
+  map = LIBRDF_CALLOC(librdf_iterator_map*, 1, sizeof(*map));
   if(!map)
     return 1;
 
@@ -428,8 +427,7 @@ librdf_new_empty_iterator(librdf_world *world)
   
   librdf_world_open(world);
 
-  new_iterator=(librdf_iterator*)LIBRDF_CALLOC(librdf_iterator, 1, 
-                                               sizeof(librdf_iterator));
+  new_iterator = LIBRDF_CALLOC(librdf_iterator*, 1,  sizeof(*new_iterator));
   if(!new_iterator)
     return NULL;
   

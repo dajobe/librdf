@@ -356,17 +356,16 @@ librdf_storage_register_factory(librdf_world* world,
     }
   }
 
-  storage=(librdf_storage_factory*)LIBRDF_CALLOC(librdf_storage_factory, 1,
-                                                 sizeof(librdf_storage_factory));
+  storage = LIBRDF_CALLOC(librdf_storage_factory*, 1, sizeof(*storage));
   if(!storage)
     goto failed;
 
-  storage->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
+  storage->name = LIBRDF_MALLOC(char*, strlen(name) + 1);
   if(!storage->name)
     goto tidy;
   strcpy(storage->name, name);
 
-  storage->label=(char*)LIBRDF_MALLOC(cstring, strlen(label)+1);
+  storage->label = LIBRDF_MALLOC(char*, strlen(label) + 1);
   if(!storage->label)
     goto tidy;
   strcpy(storage->label, label);
@@ -597,8 +596,7 @@ librdf_new_storage_from_storage(librdf_storage* old_storage)
     return NULL;
   }
 
-  new_storage=(librdf_storage*)LIBRDF_CALLOC(librdf_storage, 1,
-                                             sizeof(librdf_storage));
+  new_storage = LIBRDF_CALLOC(librdf_storage*, 1, sizeof(*new_storage));
   if(!new_storage)
     return NULL;
   
@@ -659,8 +657,7 @@ librdf_new_storage_from_factory(librdf_world *world,
     return NULL;
   }
   
-  storage=(librdf_storage*)LIBRDF_CALLOC(librdf_storage, 1,
-                                         sizeof(librdf_storage));
+  storage = LIBRDF_CALLOC(librdf_storage*, 1, sizeof(*storage));
   if(!storage) {
     librdf_free_hash(options);
     return NULL;
@@ -1214,7 +1211,8 @@ librdf_storage_node_stream_to_node_create(librdf_storage* storage,
   if(!partial_statement)
     return NULL;
   
-  context=(librdf_storage_stream_to_node_iterator_context*)LIBRDF_CALLOC(librdf_storage_stream_to_node_iterator_context, 1, sizeof(librdf_storage_stream_to_node_iterator_context));
+  context = LIBRDF_CALLOC(librdf_storage_stream_to_node_iterator_context*, 1,
+                          sizeof(*context));
   if(!context) {
     librdf_free_statement(partial_statement);
     return NULL;

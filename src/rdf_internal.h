@@ -158,14 +158,14 @@ void* librdf_sign_calloc(size_t nmemb, size_t size);
 void* librdf_sign_realloc(void *ptr, size_t size);
 void librdf_sign_free(void *ptr);
   
-#define LIBRDF_MALLOC(type, size)   librdf_sign_malloc(size)
-#define LIBRDF_CALLOC(type, nmemb, size) librdf_sign_calloc(nmemb, size)
-#define LIBRDF_REALLOC(type, ptr, size) librdf_sign_realloc(ptr, size)
+#define LIBRDF_MALLOC(type, size)   (type)librdf_sign_malloc(size)
+#define LIBRDF_CALLOC(type, nmemb, size) (type)librdf_sign_calloc(nmemb, size)
+#define LIBRDF_REALLOC(type, ptr, size) (type)librdf_sign_realloc(ptr, size)
 #define LIBRDF_FREE(type, ptr)   librdf_sign_free(ptr)
 
 #else
-#define LIBRDF_MALLOC(type, size) malloc(size)
-#define LIBRDF_CALLOC(type, size, count) calloc(size, count)
+#define LIBRDF_MALLOC(type, size) (type)malloc(size)
+#define LIBRDF_CALLOC(type, size, count) (type)calloc(size, count)
 #define LIBRDF_FREE(type, ptr)   free(ptr)
 
 #endif

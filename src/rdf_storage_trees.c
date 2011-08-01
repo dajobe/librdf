@@ -119,9 +119,9 @@ librdf_storage_trees_init(librdf_storage* storage, const char *name,
   const int index_ops_option = librdf_hash_get_as_boolean(options, "index-ops") > 0;
   const int index_pso_option = librdf_hash_get_as_boolean(options, "index-pso") > 0;
 
-  librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)LIBRDF_CALLOC(
-    librdf_storage_trees_instance, 1, sizeof(librdf_storage_trees_instance));
+  librdf_storage_trees_instance* context;
 
+  context = LIBRDF_CALLOC(librdf_storage_trees_instance*, 1, sizeof(*context));
   if(!context) {
     if(options)
       librdf_free_hash(options);
@@ -355,7 +355,8 @@ librdf_storage_trees_serialise_range(librdf_storage* storage, librdf_statement* 
   librdf_stream* stream;
   int filter = 0;
   
-  scontext=(librdf_storage_trees_serialise_stream_context*)LIBRDF_CALLOC(librdf_storage_trees_serialise_stream_context, 1, sizeof(librdf_storage_trees_serialise_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_storage_trees_serialise_stream_context*, 1,
+                           sizeof(*scontext));
   if(!scontext)
     return NULL;
     
@@ -853,8 +854,9 @@ static librdf_storage_trees_graph*
 librdf_storage_trees_graph_new(librdf_storage* storage, librdf_node* context_node)
 {
   librdf_storage_trees_instance* context=(librdf_storage_trees_instance*)storage->instance;
-  librdf_storage_trees_graph* graph=(librdf_storage_trees_graph*)LIBRDF_MALLOC(
-    librdf_storage_trees_graph, sizeof(librdf_storage_trees_graph));
+  librdf_storage_trees_graph* graph;
+
+  graph = LIBRDF_MALLOC(librdf_storage_trees_graph*, sizeof(*graph));
   
 #ifdef RDF_STORAGE_TREES_WITH_CONTEXTS
   graph->context=(context_node ? librdf_new_node_from_node(context_node) : NULL);

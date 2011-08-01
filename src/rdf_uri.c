@@ -226,7 +226,7 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
   /* total bytes */
   len = uri_string_len + 1 + base_uri_string_length;
 
-  new_uri_string=(unsigned char*)LIBRDF_MALLOC(cstring, len);
+  new_uri_string = LIBRDF_MALLOC(unsigned char*, len);
   if(!new_uri_string)
     return NULL;
   strncpy((char*)new_uri_string, (const char*)base_uri_string,
@@ -236,7 +236,7 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
          (const char*)uri_string);
   
   new_uri = raptor_new_uri(raptor_uri_get_world(source_uri), new_uri_string);
-  LIBRDF_FREE(cstring, new_uri_string); /* always free this even on failure */
+  LIBRDF_FREE(char*, new_uri_string); /* always free this even on failure */
 
   return new_uri; /* new URI or NULL from librdf_new_uri failure */
 }

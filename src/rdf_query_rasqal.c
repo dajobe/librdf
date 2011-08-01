@@ -127,7 +127,7 @@ librdf_query_rasqal_init(librdf_query* query,
                                librdf_query_rasqal_log_handler);
 
   len=strlen((const char*)query_string);
-  query_string_copy=(unsigned char*)LIBRDF_MALLOC(cstring, len+1);
+  query_string_copy = LIBRDF_MALLOC(unsigned char*, len + 1);
   if(!query_string_copy)
     return 1;
   strcpy((char*)query_string_copy, (const char*)query_string);
@@ -149,7 +149,7 @@ librdf_query_rasqal_terminate(librdf_query* query)
     rasqal_free_query(context->rq);
 
   if(context->query_string)
-    LIBRDF_FREE(cstring, context->query_string);
+    LIBRDF_FREE(char*, context->query_string);
 
   if(context->uri)
     librdf_free_uri(context->uri);
@@ -598,7 +598,7 @@ rasqal_redland_init_triples_match(rasqal_triples_match* rtm,
   rtm->is_end=rasqal_redland_is_end;
   rtm->finish=rasqal_redland_finish_triples_match;
 
-  rtmc=(rasqal_redland_triples_match_context*)LIBRDF_CALLOC(rasqal_redland_triples_match_context, sizeof(rasqal_redland_triples_match_context), 1);
+  rtmc = LIBRDF_CALLOC(rasqal_redland_triples_match_context*, 1, sizeof(*rtmc));
   if(!rtmc)
     return 1;
 
@@ -710,7 +710,7 @@ librdf_query_rasqal_execute(librdf_query* query, librdf_model* model)
   if(!context->results)
     return NULL;
   
-  results=(librdf_query_results*)LIBRDF_MALLOC(librdf_query_results, sizeof(librdf_query_results));
+  results = LIBRDF_MALLOC(librdf_query_results*, sizeof(*results));
   if(!results) {
     rasqal_free_query_results(context->results);
     context->results=NULL;
@@ -1139,7 +1139,8 @@ librdf_query_rasqal_results_as_stream(librdf_query_results* query_results)
   if(!context->results)
     return NULL;
   
-  scontext=(librdf_query_rasqal_stream_context*)LIBRDF_CALLOC(librdf_query_rasqal_stream_context, 1, sizeof(librdf_query_rasqal_stream_context));
+  scontext = LIBRDF_CALLOC(librdf_query_rasqal_stream_context*, 1,
+                           sizeof(*context));
   if(!scontext)
     return NULL;
 
@@ -1182,8 +1183,7 @@ librdf_query_rasqal_new_results_formatter(librdf_query_results* query_results,
   if(!formatter)
     return NULL;
 
-  qrf = (librdf_query_results_formatter*)LIBRDF_MALLOC(query_results_formatter, 
-                                                       sizeof(*qrf));
+  qrf = LIBRDF_MALLOC(librdf_query_results_formatter*, sizeof(*qrf));
   if(!qrf) {
     rasqal_free_query_results_formatter(formatter);
     return NULL;

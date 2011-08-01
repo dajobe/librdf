@@ -145,17 +145,16 @@ librdf_model_register_factory(librdf_world *world,
     }
   }
 
-  model=(librdf_model_factory*)LIBRDF_CALLOC(librdf_model_factory, 1,
-                                             sizeof(librdf_model_factory));
+  model = LIBRDF_CALLOC(librdf_model_factory*, 1, sizeof(*model));
   if(!model)
     goto oom;
 
-  model->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
+  model->name = LIBRDF_MALLOC(char*, strlen(name) + 1);
   if(!model->name)
     goto oom_tidy;
   strcpy(model->name, name);
 
-  model->label=(char*)LIBRDF_MALLOC(cstring, strlen(label)+1);
+  model->label = LIBRDF_MALLOC(char*, strlen(label) + 1);
   if(!model->label)
     goto oom_tidy;
   strcpy(model->label, label);
@@ -322,7 +321,7 @@ librdf_new_model_with_options(librdf_world *world,
   if(!storage)
     return NULL;
   
-  model=(librdf_model*)LIBRDF_CALLOC(librdf_model, 1, sizeof(librdf_model));
+  model = LIBRDF_CALLOC(librdf_model*, 1, sizeof(*model));
   if(!model)
     return NULL;
   
@@ -334,7 +333,7 @@ librdf_new_model_with_options(librdf_world *world,
     return NULL;
   }
     
-  model->context=LIBRDF_CALLOC(data, 1, model->factory->context_length);
+  model->context = LIBRDF_CALLOC(void*, 1, model->factory->context_length);
 
   if(!model->context || model->factory->create(model, storage, options)) {
     if(model->context)

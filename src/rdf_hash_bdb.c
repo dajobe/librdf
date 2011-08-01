@@ -160,7 +160,7 @@ librdf_hash_bdb_open(void* context, const char *identifier,
   bdb_context->is_writable=is_writable;
   bdb_context->is_new=is_new;
   
-  file=(char*)LIBRDF_MALLOC(cstring, strlen(identifier)+4);
+  file = LIBRDF_MALLOC(char*, strlen(identifier) + 4);
   if(!file)
     return 1;
   sprintf(file, "%s.db", identifier);
@@ -200,7 +200,7 @@ librdf_hash_bdb_open(void* context, const char *identifier,
   if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
     librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "BDB V4.0+ open of '%s' failed - %s", file, db_strerror(ret));
-    LIBRDF_FREE(cstring, file);
+    LIBRDF_FREE(char*, file);
     return 1;
   }
 #else
@@ -213,7 +213,7 @@ librdf_hash_bdb_open(void* context, const char *identifier,
   if((ret=bdb->open(bdb, NULL, file, NULL, DB_BTREE, flags, mode))) {
     librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "BDB V4.1+ open of '%s' failed - %s", file, db_strerror(ret));
-    LIBRDF_FREE(cstring, file);
+    LIBRDF_FREE(char*, file);
     return 1;
   }
 #endif
@@ -235,7 +235,7 @@ librdf_hash_bdb_open(void* context, const char *identifier,
   if((ret=db_open(file, DB_BTREE, flags, mode, NULL, &bdb_info, &bdb))) {
     librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "BDB V2 open of '%s' failed - %d", file, ret);
-    LIBRDF_FREE(cstring, file);
+    LIBRDF_FREE(char*, file);
     return 1;
   }
 #else
@@ -254,7 +254,7 @@ librdf_hash_bdb_open(void* context, const char *identifier,
   if((bdb=dbopen(file, flags, mode, DB_BTREE, NULL)) == 0) {
     librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "BDB V1 open of '%s' failed - %d", file, ret);
-    LIBRDF_FREE(cstring, file);
+    LIBRDF_FREE(char*, file);
     return 1;
   }
   ret=0;
@@ -299,7 +299,7 @@ librdf_hash_bdb_close(void* context)
   /* V1 */
   ret=db->close(db);
 #endif
-  LIBRDF_FREE(cstring, bdb_context->file_name);
+  LIBRDF_FREE(char*, bdb_context->file_name);
   return ret;
 }
 
@@ -579,12 +579,12 @@ librdf_hash_bdb_cursor_get(void* context,
 
   /* Free previous key and values */
   if(cursor->last_key) {
-    LIBRDF_FREE(cstring, cursor->last_key);
+    LIBRDF_FREE(char*, cursor->last_key);
     cursor->last_key=NULL;
   }
     
   if(cursor->last_value) {
-    LIBRDF_FREE(cstring, cursor->last_value);
+    LIBRDF_FREE(char*, cursor->last_value);
     cursor->last_value=NULL;
   }
 
@@ -600,7 +600,7 @@ librdf_hash_bdb_cursor_get(void* context,
     return ret;
   }
   
-  cursor->last_key = key->data = LIBRDF_MALLOC(cstring, bdb_key.size);
+  cursor->last_key = key->data = LIBRDF_MALLOC(void*, bdb_key.size);
   if(!key->data) {
     /* always allocated by BDB using system malloc */
     if(flags != LIBRDF_HASH_CURSOR_SET)
@@ -613,7 +613,7 @@ librdf_hash_bdb_cursor_get(void* context,
   key->size = bdb_key.size;
 
   if(value) {
-    cursor->last_value = value->data = LIBRDF_MALLOC(cstring, bdb_value.size);
+    cursor->last_value = value->data = LIBRDF_MALLOC(void*, bdb_value.size);
     if(!value->data) {
       /* always allocated by BDB using system malloc */
       if(flags != LIBRDF_HASH_CURSOR_SET)
@@ -653,10 +653,10 @@ librdf_hash_bdb_cursor_finish(void* context)
     cursor->cursor->c_close(cursor->cursor);
 #endif
   if(cursor->last_key)
-    LIBRDF_FREE(cstring, cursor->last_key);
+    LIBRDF_FREE(char*, cursor->last_key);
     
   if(cursor->last_value)
-    LIBRDF_FREE(cstring, cursor->last_value);
+    LIBRDF_FREE(char*, cursor->last_value);
 }
 
 

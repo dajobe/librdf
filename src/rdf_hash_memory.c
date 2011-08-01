@@ -227,7 +227,7 @@ static void
 librdf_free_hash_memory_node(librdf_hash_memory_node* node) 
 {
   if(node->key)
-    LIBRDF_FREE(cstring, node->key);
+    LIBRDF_FREE(char*, node->key);
   if(node->values) {
     librdf_hash_memory_node_value *vnode, *next;
 
@@ -235,7 +235,7 @@ librdf_free_hash_memory_node(librdf_hash_memory_node* node)
     for(vnode=node->values; vnode; vnode=next) {
       next=vnode->next;
       if(vnode->value)
-        LIBRDF_FREE(cstring, vnode->value);
+        LIBRDF_FREE(char*, vnode->value);
       LIBRDF_FREE(librdf_hash_memory_node_value, vnode);
     }
   }
@@ -260,9 +260,9 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
   }
 
   /* allocate new table */
-  new_nodes=(librdf_hash_memory_node**)LIBRDF_CALLOC(librdf_hash_memory_nodes, 
-						     required_capacity,
-						     sizeof(librdf_hash_memory_node*));
+  new_nodes = LIBRDF_CALLOC(librdf_hash_memory_node**, 
+                            required_capacity,
+                            sizeof(librdf_hash_memory_node*));
   if(!new_nodes)
     return 1;
 
@@ -708,15 +708,14 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
     bucket=hash_key & (hash->capacity - 1);
 
     /* allocate new node */
-    node=(librdf_hash_memory_node*)LIBRDF_CALLOC(librdf_hash_memory_node, 1,
-                                                 sizeof(librdf_hash_memory_node));
+    node = LIBRDF_CALLOC(librdf_hash_memory_node*, 1, sizeof(*node));
     if(!node)
       return 1;
 
     node->hash_key=hash_key;
     
     /* allocate key for new node */
-    new_key=LIBRDF_MALLOC(cstring, key->size);
+    new_key = LIBRDF_MALLOC(void*, key->size);
     if(!new_key) {
       LIBRDF_FREE(librdf_hash_memory_node, node);
       return 1;
@@ -730,21 +729,21 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
   
   
   /* always allocate new value */
-  new_value=LIBRDF_MALLOC(cstring, value->size);
+  new_value = LIBRDF_MALLOC(void*, value->size);
   if(!new_value) {
     if(is_new_node) {
-      LIBRDF_FREE(cstring, new_key);
+      LIBRDF_FREE(char*, new_key);
       LIBRDF_FREE(librdf_hash_memory_node, node);
     }
     return 1;
   }
 
   /* always allocate new librdf_hash_memory_node_value */
-  vnode=(librdf_hash_memory_node_value*)LIBRDF_CALLOC(librdf_hash_memory_node_value, 1, sizeof(librdf_hash_memory_node_value));
+  vnode = LIBRDF_CALLOC(librdf_hash_memory_node_value*, 1, sizeof(*vnode));
   if(!vnode) {
-    LIBRDF_FREE(cstring, new_value);
+    LIBRDF_FREE(char*, new_value);
     if(is_new_node) {
-      LIBRDF_FREE(cstring, new_key);
+      LIBRDF_FREE(char*, new_key);
       LIBRDF_FREE(librdf_hash_memory_node, node);
     }
     return 1;

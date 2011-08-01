@@ -175,7 +175,7 @@ librdf_heuristic_gen_name(const char *name)
   if((l % 10) ==0) 
     len++;
 
-  new_name=(char*)LIBRDF_MALLOC(cstring, len+1); /* +1 for \0 */
+  new_name = LIBRDF_MALLOC(char*, len + 1); /* +1 for \0 */
   strncpy(new_name, name, offset+2);
   sprintf(new_name+offset+1, "%ld", l);
   return new_name;
@@ -230,13 +230,13 @@ main(int argc, char *argv[])
 #endif
       
       if(name != test_names[n])
-        LIBRDF_FREE(cstring, (char*)name);
+        LIBRDF_FREE(char*, (char*)name);
       /* copy them over */
       name=new_name;
     }
 
     if(name != test_names[n])
-      LIBRDF_FREE(cstring, name);
+      LIBRDF_FREE(char*, name);
   }
 
   return rc;

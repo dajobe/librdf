@@ -82,7 +82,7 @@ librdf_files_temporary_file_name(void)
 
   length=strlen(tmp_dir) + strlen(file_template) + 2; /* 2: / sep and \/0 */
   
-  name=(char*)LIBRDF_MALLOC(cstring, length);
+  name = LIBRDF_MALLOC(char*, length);
   if(!name)
     return NULL;
 
@@ -93,7 +93,7 @@ librdf_files_temporary_file_name(void)
   /* Proritise mkstemp() since GNU libc says: Never use mktemp(). */
   fd=mkstemp(name);
   if(fd<0) {
-    LIBRDF_FREE(cstring, name);
+    LIBRDF_FREE(char*, name);
     return NULL;
   }
   close(fd);
@@ -111,7 +111,7 @@ librdf_files_temporary_file_name(void)
   char *new_name;
 
   name=tmpnam(NULL); /* NULL ensures statically allocated */
-  new_name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
+  new_name = LIBRDF_MALLOC(char*, strlen(name) + 1);
   if(!new_name)
     return NULL;
   strcpy(new_name, name);

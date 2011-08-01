@@ -881,7 +881,7 @@ main(int argc, char *argv[])
 
   size = librdf_statement_encode2(world, statement, NULL, 0);
   fprintf(stdout, "%s: Encoding statement requires %d bytes\n", program, size);
-  buffer=(char*)LIBRDF_MALLOC(cstring, size);
+  buffer = LIBRDF_MALLOC(char*, size);
 
   fprintf(stdout, "%s: Encoding statement in buffer\n", program);
   size2 = librdf_statement_encode2(world, statement,
@@ -901,7 +901,7 @@ main(int argc, char *argv[])
     fprintf(stdout, "%s: Decoding statement failed\n", program);
     return(1);
   }
-  LIBRDF_FREE(cstring, buffer);
+  LIBRDF_FREE(char*, buffer);
    
   fprintf(stdout, "%s: New statement is: ", program);
   librdf_statement_write(statement, iostr);

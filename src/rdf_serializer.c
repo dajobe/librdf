@@ -84,11 +84,11 @@ static void
 librdf_free_serializer_factory(librdf_serializer_factory *factory) 
 {
   if(factory->name)
-    LIBRDF_FREE(cstring, factory->name);
+    LIBRDF_FREE(char*, factory->name);
   if(factory->label)
-    LIBRDF_FREE(cstring, factory->label);
+    LIBRDF_FREE(char*, factory->label);
   if(factory->mime_type)
-    LIBRDF_FREE(cstring, factory->mime_type);
+    LIBRDF_FREE(char*, factory->mime_type);
   if(factory->type_uri)
     librdf_free_uri(factory->type_uri);
   LIBRDF_FREE(librdf_serializer_factory, factory);
@@ -130,18 +130,17 @@ librdf_serializer_register_factory(librdf_world *world,
       goto oom;
   }
 
-  serializer=(librdf_serializer_factory*)LIBRDF_CALLOC(librdf_serializer_factory, 1,
-                                                       sizeof(librdf_serializer_factory));
+  serializer = LIBRDF_CALLOC(librdf_serializer_factory*, 1, sizeof(*serializer));
   if(!serializer)
     goto oom;
 
-  serializer->name=(char*)LIBRDF_MALLOC(cstring, strlen(name)+1);
+  serializer->name = LIBRDF_MALLOC(char*, strlen(name) + 1);
   if(!serializer->name)
     goto oom_tidy;
   strcpy(serializer->name, name);
 
   if(label) {
-    serializer->label=(char*)LIBRDF_MALLOC(cstring, strlen(label)+1);
+    serializer->label = LIBRDF_MALLOC(char*, strlen(label) + 1);
     if(!serializer->label)
       goto oom_tidy;
     strcpy(serializer->label, label);
@@ -149,7 +148,7 @@ librdf_serializer_register_factory(librdf_world *world,
 
   /* register mime type if any */
   if(mime_type) {
-    serializer->mime_type=(char*)LIBRDF_MALLOC(cstring, strlen(mime_type)+1);
+    serializer->mime_type = LIBRDF_MALLOC(char*, strlen(mime_type) + 1);
     if(!serializer->mime_type)
       goto oom_tidy;
     strcpy(serializer->mime_type, mime_type);
@@ -405,11 +404,11 @@ librdf_new_serializer_from_factory(librdf_world *world,
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(factory, librdf_serializer_factory, NULL);
 
-  d=(librdf_serializer*)LIBRDF_CALLOC(librdf_serializer, 1, sizeof(librdf_serializer));
+  d = LIBRDF_CALLOC(librdf_serializer*, 1, sizeof(*d));
   if(!d)
     return NULL;
         
-  d->context=(char*)LIBRDF_CALLOC(serializer_context, 1, factory->context_length);
+  d->context = LIBRDF_CALLOC(void*, 1, factory->context_length);
   if(!d->context) {
     librdf_free_serializer(d);
     return NULL;

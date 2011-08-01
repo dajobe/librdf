@@ -394,7 +394,7 @@ librdf_new_node_from_blank_identifier(librdf_world *world,
   node = raptor_new_term_from_blank(world->raptor_world_ptr, blank);
 
   if(!identifier)
-    LIBRDF_FREE(cstring, (char*)blank);
+    LIBRDF_FREE(char*, (char*)blank);
 
   return node;
 }
@@ -1389,7 +1389,7 @@ main(int argc, char *argv[])
 
   size=librdf_node_encode(node, NULL, 0);
   fprintf(stdout, "%s: Encoding node requires %d bytes\n", program, size);
-  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, size);
+  buffer = LIBRDF_MALLOC(unsigned char*, size);
 
   fprintf(stdout, "%s: Encoding node in buffer\n", program);
   size2=librdf_node_encode(node, buffer, size);
@@ -1411,7 +1411,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Decoding node failed\n", program);
     return(1);
   }
-  LIBRDF_FREE(cstring, buffer);
+  LIBRDF_FREE(char*, buffer);
    
   fprintf(stdout, "%s: New node is: ", program);
   librdf_node_print(node2, stdout);
@@ -1432,7 +1432,7 @@ main(int argc, char *argv[])
   }
   fprintf(stdout, "%s: Node literal string value (Latin-1) is: '%s'\n",
           program, buffer);
-  LIBRDF_FREE(cstring, buffer);
+  LIBRDF_FREE(char*, buffer);
   
   fprintf(stdout, "%s: Creating new blank node with identifier %s\n", program, genid);
   node4=librdf_new_node_from_blank_identifier(world, (const unsigned char*)genid);
@@ -1483,7 +1483,7 @@ main(int argc, char *argv[])
 
   size=librdf_node_encode(node7, NULL, 0);
   fprintf(stdout, "%s: Encoding typed node requires %d bytes\n", program, size);
-  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, size);
+  buffer = LIBRDF_MALLOC(unsigned char*, size);
 
   fprintf(stdout, "%s: Encoding typed node in buffer\n", program);
   size2=librdf_node_encode(node7, (unsigned char*)buffer, size);
@@ -1502,7 +1502,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "%s: Decoding typed node failed\n", program);
     return(1);
   }
-  LIBRDF_FREE(cstring, buffer);
+  LIBRDF_FREE(char*, buffer);
    
   if(librdf_new_node_from_typed_literal(world, 
                                         (const unsigned char*)"Datatyped literal value",
@@ -1519,7 +1519,7 @@ main(int argc, char *argv[])
   }
     
   big_literal_length=100000;
-  big_literal=(unsigned char *)LIBRDF_MALLOC(cstring, big_literal_length+1);
+  big_literal = LIBRDF_MALLOC(unsigned char*, big_literal_length + 1);
   for(i=0; i<big_literal_length; i++)
      big_literal[i]='X';
 
@@ -1531,11 +1531,11 @@ main(int argc, char *argv[])
             (int)big_literal_length);
     return(1);
   }
-  LIBRDF_FREE(cstring, big_literal);
+  LIBRDF_FREE(char*, big_literal);
 
   size=librdf_node_encode(node9, NULL, 0);
   fprintf(stdout, "%s: Encoding big literal node requires %d bytes\n", program, size);
-  buffer=(unsigned char*)LIBRDF_MALLOC(cstring, size);
+  buffer = LIBRDF_MALLOC(unsigned char*, size);
   fprintf(stdout, "%s: Encoding big literal node in buffer\n", program);
   size2=librdf_node_encode(node9, (unsigned char*)buffer, size);
   if(size2 != size) {
@@ -1548,7 +1548,7 @@ main(int argc, char *argv[])
     dump_node_as_C(stdout, "big_literal_N_encoded", buffer, 32);
   if(check_node(program, big_literal_N_encoded, buffer, 32))
     return(1);
-  LIBRDF_FREE(cstring, buffer);
+  LIBRDF_FREE(char*, buffer);
     
 
   fprintf(stdout, "%s: Freeing nodes\n", program);
