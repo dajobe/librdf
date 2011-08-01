@@ -269,10 +269,11 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
   virtuoso_free_result(query);
   SQLCloseCursor(context->vc->hstmt);
 
-  if(!(cmd = (char*)LIBRDF_MALLOC(cstring, strlen(pref)+
-                                  strlen((char *)context->query_string) +1))) {
-      goto error;
-    }
+  cmd = (char*)LIBRDF_MALLOC(cstring, strlen(pref) +
+                                      strlen((char *)context->query_string) +1);
+  if(!cmd)
+    goto error;
+
   strcpy(cmd, pref);
   strcat(cmd, (char *)context->query_string);
 

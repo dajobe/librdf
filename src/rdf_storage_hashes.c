@@ -779,7 +779,8 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
                                          NULL, 0, fields);
   if(!key_len)
     return 1;
-  if(!(key_buffer=(unsigned char*)LIBRDF_MALLOC(data, key_len)))
+  key_buffer=(unsigned char*)LIBRDF_MALLOC(data, key_len);
+  if(!key_buffer)
     return 1;
        
   if(!librdf_statement_encode_parts2(world, statement, NULL,
@@ -797,7 +798,8 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
     return 1;
   }
     
-  if(!(value_buffer=(unsigned char*)LIBRDF_MALLOC(data, value_len))) {
+  value_buffer=(unsigned char*)LIBRDF_MALLOC(data, value_len);
+  if(!value_buffer) {
     LIBRDF_FREE(data, key_buffer);
     return 1;
   }
@@ -1365,7 +1367,8 @@ librdf_storage_hashes_node_iterator_create(librdf_storage* storage,
     LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
     return NULL;
   }
-  if(!(key_buffer=(unsigned char*)LIBRDF_MALLOC(data, icontext->key.size))) {
+  key_buffer=(unsigned char*)LIBRDF_MALLOC(data, icontext->key.size);
+  if(!key_buffer) {
     LIBRDF_FREE(librdf_storage_hashes_node_iterator_context, icontext);
     return NULL;
   }
