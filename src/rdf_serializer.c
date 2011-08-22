@@ -914,7 +914,7 @@ struct log_data {
 } LogData;
 
 
-static int
+static int REDLAND_CALLBACK_STDCALL
 log_handler(void *user_data, librdf_log_message *message) 
 {
   struct log_data* ld=(struct log_data*)user_data;
