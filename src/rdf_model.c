@@ -2027,6 +2027,8 @@ test_model(librdf_world *world, const char *program,
   int remove_count=0;
   int status=0;
   raptor_iostream* iostr;
+  librdf_node* literal_node;
+  char literal[6];
 
   iostr = raptor_new_iostream_to_file_handle(world->raptor_world_ptr, stderr);
 
@@ -2116,8 +2118,6 @@ test_model(librdf_world *world, const char *program,
   librdf_statement_set_subject(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://example.org/"));
   librdf_statement_set_predicate(statement, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"));
 
-  librdf_node* literal_node;
-  char literal[6];
   strncpy(literal, "DaveX", 6);
 
   literal[4]='0';
