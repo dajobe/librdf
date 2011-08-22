@@ -16,3 +16,4 @@ redland.spec
 run*
 stamp-h*
 test
+win32_rdf_config.h
