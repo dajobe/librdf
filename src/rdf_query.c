@@ -653,7 +653,7 @@ ex:fido a ex:Dog ;\
 "
 #define DATA_LANGUAGE "turtle"
 #define DATA_BASE_URI "http://example.org/"
-#define QUERY_STRING "select ?x where (?x rdf:type ?y)";
+#define QUERY_STRING "select ?x where (?x rdf:type ?y)"
 #define QUERY_LANGUAGE "rdql"
 #define VARIABLES_COUNT 1
 
