@@ -28,7 +28,7 @@
 #endif
 
 #ifdef WIN32
-#include <win32_config.h>
+#include <win32_rdf_config.h>
 #endif
 
 #include <stdio.h>
@@ -43,7 +43,9 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include <redland.h>
 #include <raptor.h>
@@ -164,7 +166,7 @@ static const char *default_storage_name="hashes";
 static const char *default_storage_options="hash-type='bdb',dir='.'";
 
 
-static int
+static int REDLAND_CALLBACK_STDCALL
 log_handler(void *user_data, librdf_log_message *message) 
 {
   /* int code=message->code; */ /* The error code */
