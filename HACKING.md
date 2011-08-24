@@ -1,7 +1,7 @@
-Hacking Redland
-===============
+Hacking Redland librdf
+======================
 
-2011-01-21
+2011-08-23
 
 [Dave Beckett](http://www.dajobe.org/)
 
@@ -11,7 +11,7 @@ Commits
 
 Should be:
 
-  * Licensed with the same license as Redland.
+  * Licensed with the same license as Redland librdf.
   * Patches in GNU `diff -u` unifed context format preferred.
   * Include tests if they add new features.
 
@@ -47,6 +47,9 @@ For example, use `if(cond)` rather than `if (cond)` (ditto for
 while, do etc.) and
 `functionname(...)` rather than `functionname (...)` in
 both definition and calls of functions.
+
+There is nothing wrong with introducing a variable to break up a very
+long function call argument.
 
 
 ### Expressions
@@ -172,7 +175,7 @@ Allocating a zeroed out block of memory or a set of objects (calloc)
 
     var = LIBRDF_CALLOC(type, count, size)
 
- Prefering when `count` = 1:
+ Prefering when `count` = 1 this form:
 
     var = LIBRDF_CALLOC(type, 1, sizeof(*var))
 
@@ -232,6 +235,14 @@ omitted.  This is usually tested by the function as an assertion.
 In some functions there are more complex conditions on which optional
 parameters are allowed, these are described in the _Long Description_.
 
+The long description may also include a deprecation statement such as:
+
+    * @Deprecated: Use new_function() with foo = BAR
+
+This must be indented to the left and will be used by the
+`gtk-doc(1)` document generator to provide a link to the replacement
+function and usage.
+
 
 Commit Messages
 ---------------
@@ -260,9 +271,9 @@ it makes things easier to format later.
 Sometimes it's short enough (good) that it all can be done in the first
 line, pretty much only if it's a small change to a single function.
 
-If the change is trivial / typo and *IMPORTANT* NOT a commit to code,
-then the commit can start with '#'.  This may get filtered out of
-commit log message notifications and ChangeLog.
+If the change is trivial or a typo and (this is *IMPORTANT*) NOT a
+commit to code files, then the commit can start with '#'.  This may
+get filtered out of commit log message notifications and ChangeLog.
 
 e.g.  `#spelling`  or `#ws`
 the latter is whitespace changes for some reason
