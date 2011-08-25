@@ -587,6 +587,10 @@ rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
                                                 u_type);
       break;
 
+    case VIRTUOSO_DV_TIMESTAMP_OBJ: /* ? what is this */
+      return NULL;
+      break;
+
     case VIRTUOSO_DV_IRI_ID:
       node = librdf_new_node_from_literal(storage->world,
                                           (const unsigned char *)data,
