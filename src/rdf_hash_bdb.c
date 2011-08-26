@@ -192,7 +192,7 @@ librdf_hash_bdb_open(void* context, const char *identifier,
 
 #if defined(HAVE_BDB_OPEN_6_ARGS) || defined(HAVE_BDB_OPEN_7_ARGS)
 
-#ifdef HAVE_BDB_OPEN_6_ARGS  
+#if defined(HAVE_BDB_OPEN_6_ARGS) && !defined(HAVE_BDB_OPEN_7_ARGS)
 /* 
  * int DB->open(DB *db, const char *file,
  *              const char *database, DBTYPE type, u_int32_t flags, int mode);
