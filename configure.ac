@@ -380,13 +380,26 @@ if test "x$bdb_prefix" != "xno" ; then
 		  AC_MSG_RESULT(yes),
 		  AC_MSG_RESULT(no))
 
-      AC_MSG_CHECKING(for BDB V4.0 DB->open with 6 arguments)
+      have_bdb_open_7_args=no
+      AC_MSG_CHECKING(for BDB V4.1+ DB->open with 7 arguments)
       AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, DB_BTREE, 0, 0);],
-		  AC_DEFINE(HAVE_BDB_OPEN_6_ARGS, 1, [BDB has open method with 6 args])
+		   #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);],
+		  AC_DEFINE(HAVE_BDB_OPEN_7_ARGS, 1, [BDB has open method with 7 args])
 		  have_libdb=yes
+		  have_bdb_open_7_args=yes
 		  AC_MSG_RESULT(yes),
 		  AC_MSG_RESULT(no))
+
+      if test "$have_bdb_open_7_args" == Xno; then
+        # Cannot have 6 args if 7 args worked
+	AC_MSG_CHECKING(for BDB V4.0 DB->open with 6 arguments)
+	AC_TRY_LINK([#include <stdio.h>
+		     #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, DB_BTREE, 0, 0);],
+		    AC_DEFINE(HAVE_BDB_OPEN_6_ARGS, 1, [BDB has open method with 6 args])
+		    have_libdb=yes
+		    AC_MSG_RESULT(yes),
+		    AC_MSG_RESULT(no))
+      fi
 
       AC_MSG_CHECKING(for BDB DB->close with 2 arguments)
       AC_TRY_LINK([#include <stdio.h>
@@ -406,14 +419,6 @@ if test "x$bdb_prefix" != "xno" ; then
       AC_TRY_LINK([#include <stdio.h>
 		   #include <db.h>], [DB *bdb; bdb->set_flags(bdb, 0);],
 		  AC_DEFINE(HAVE_BDB_SET_FLAGS, 1, [BDB has set_flags method])
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
-
-      AC_MSG_CHECKING(for BDB V4.1+ DB->open with 7 arguments)
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);],
-		  AC_DEFINE(HAVE_BDB_OPEN_7_ARGS, 1, [BDB has open method with 7 args])
-		  have_libdb=yes
 		  AC_MSG_RESULT(yes),
 		  AC_MSG_RESULT(no))
 
