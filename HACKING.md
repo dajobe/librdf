@@ -169,6 +169,40 @@ Notes:
    * `goto` may be used for resource cleanup and result return 
      where control flow only goes forward.
 
+### C Pre-Processor (CPP) Macros
+
+Always define macros for internal constants and name the macros with
+the library prefix followed by a descriptive name in ALL CAPS such as:
+
+    #define LIBRDF_FOOBAR_BUFFER_SIZE 1234
+
+When evaluating macro symbols that may be undefined, always check the
+symbol is defined first.  Like this:
+
+    #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 42
+	   ... do complex debugging stuff ...
+	#endif
+
+This is not needed for macros that are known to be defined, such as those
+checked by `configure` e.g.
+
+    #if RAPTOR_VERSION_DECIMAL > 20100
+	   ... do stuff that requires a raptor2 version 2.1.0 or newer ...
+	#endif
+	
+since the above would be checked implicitly by `configure` using
+`pkg-config(1)` to validate Raptor 2 is present before getting to the
+code that tries to evaluate the value from `raptor2.h`.
+
+The debug macros that are used for printing out values when debugging
+is enabled do not need protection by `#if` or `#ifdef` and should be
+used like this:
+
+    LIBRDF_DEBUG1("Something wonderful happened\n");
+
+    LIBRDF_DEBUG2("Something %s happened\n", happening);
+
+
 ### Memory allocation
 
 Allocating a zeroed out block of memory or a set of objects (calloc)
