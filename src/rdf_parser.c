@@ -1088,7 +1088,7 @@ main(int argc, char *argv[])
     accept_h=librdf_parser_get_accept_header(parser);
     if(accept_h) {
       fprintf(stderr, "%s: Parser accept header: '%s'\n", program, accept_h);
-      free(accept_h);
+      librdf_free_memory(accept_h);
     } else
       fprintf(stderr, "%s: Parser has no accept header\n", program);
 
