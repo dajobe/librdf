@@ -836,8 +836,8 @@ librdf_parser_set_feature(librdf_parser* parser, librdf_uri* feature,
  *
  * Get an HTTP Accept value for the parser.
  *
- * The returned string must be freed by the caller such as with
- * raptor_free_memory().
+ * The returned string must be freed by the caller using
+ * librdf_free_memory().
  *
  * Return value: a new Accept: header string or NULL on failure
  **/

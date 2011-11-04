@@ -637,7 +637,7 @@ librdf_parser_raptor_parse_as_stream_common(void *context, librdf_uri *uri,
     accept_h=raptor_parser_get_accept_header(pcontext->rdf_parser);
     if(accept_h) {
       raptor_www_set_http_accept(pcontext->www, accept_h);
-      raptor_free_memory((char*)accept_h);
+      raptor_free_memory((void*)accept_h);
     }
 
     raptor_www_set_write_bytes_handler(pcontext->www,
