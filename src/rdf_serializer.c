@@ -618,6 +618,7 @@ librdf_serializer_serialize_model_to_file(librdf_serializer* serializer,
  * @length_p: pointer to store length or NULL
  *
  * Write a #librdf_stream to a counted string.
+ * Caller should free the string with librdf_free_memory().
  * 
  * Return value: stream as string or NULL on failure
  **/

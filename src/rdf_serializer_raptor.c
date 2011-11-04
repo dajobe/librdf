@@ -328,7 +328,7 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
                                         &string, &string_length,
                                         malloc);
   if(!iostr) {
-    free(string);
+    raptor_free_memory(string);
     return NULL;
   }
 
@@ -337,7 +337,7 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
 
   if(rc) {
     raptor_free_iostream(iostr);
-    free(string);
+    raptor_free_memory(string);
     return NULL;
   }
     
@@ -362,7 +362,7 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
   raptor_free_iostream(iostr);
 
   if(rc) {
-    free(string);
+    raptor_free_memory(string);
     return NULL;
   }
 
