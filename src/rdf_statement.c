@@ -353,7 +353,7 @@ librdf_statement_to_string(librdf_statement *statement)
   rc = librdf_statement_write(statement, iostr);
   raptor_free_iostream(iostr);
   if(rc) {
-    free(s);
+    raptor_free_memory(s);
     s = NULL;
   }
 
