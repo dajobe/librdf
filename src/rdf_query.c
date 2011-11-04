@@ -787,7 +787,7 @@ main(int argc, char *argv[])
   fprintf(stdout, "%s: Got query results string of length %d\n", program,
           (int)string_length);
 
-  free(string);
+  librdf_free_memory(string);
   
   librdf_free_query_results(results);
 

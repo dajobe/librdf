@@ -276,7 +276,8 @@ librdf_free_query_results(librdf_query_results* query_results)
  * The @base_uri may be used for as the base URI the generated
  * syntax, depending on the format.
  *
- * The returned string must be freed by the caller
+ * The returned string must be freed by the caller using
+ * librdf_free_memory().
  *
  * Return value: new string value or NULL on failure
  **/
@@ -352,7 +353,8 @@ librdf_query_results_to_counted_string2(librdf_query_results *query_results,
  * The @base_uri may be used for as the base URI the generated
  * syntax, depending on the format.
  *
- * The returned string must be freed by the caller
+ * The returned string must be freed by the caller using
+ * librdf_free_memory().
  *
  * @deprecated: Use librdf_query_results_to_counted_string2() with extra
  * name and mime-type args.
@@ -396,7 +398,8 @@ librdf_query_results_to_counted_string(librdf_query_results *query_results,
  * The @base_uri may be used for as the base URI the generated
  * syntax, depending on the format.
  *
- * The returned string must be freed by the caller
+ * The returned string must be freed by the caller using
+ * librdf_free_memory().
  *
  * Return value: new string value or NULL on failure
  **/
@@ -435,7 +438,8 @@ librdf_query_results_to_string2(librdf_query_results *query_results,
  * The @base_uri may be used for as the base URI the generated
  * syntax, depending on the format.
  *
- * The returned string must be freed by the caller
+ * The returned string must be freed by the caller using
+ * librdf_free_memory().
  *
  * @Deprecated: use librdf_query_results_to_string2() with extra name
  * and mime_type args.
