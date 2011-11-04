@@ -1720,7 +1720,7 @@ librdf_model_load(librdf_model* model, librdf_uri *uri,
  *
  * If the name field is NULL, the default serializer will be used.
  *
- * Note: the returned string must be freed by the caller.
+ * Note: the returned string must be freed by the caller using librdf_free_memory().
  *
  * Return value: new string or NULL on failure
  **/
@@ -2350,7 +2350,7 @@ test_model(librdf_world *world, const char *program,
     return 1;
   }
   librdf_free_uri(base_uri);
-  free(string);
+  librdf_free_memory(string);
   fprintf(stderr, "%s: Serialized OK\n", program);
 
   fprintf(stderr, "%s: Freeing URIs and Nodes\n", program);

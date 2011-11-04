@@ -649,6 +649,7 @@ librdf_serializer_serialize_stream_to_counted_string(librdf_serializer* serializ
  * @length_p: pointer to store length or NULL
  *
  * Write a serialized #librdf_model to a counted string.
+ * The returned string must be freed by the caller using librdf_free_memory().
  * 
  * Return value: non 0 on failure
  **/
@@ -702,6 +703,7 @@ librdf_serializer_serialize_stream_to_string(librdf_serializer* serializer,
  * @model: the #librdf_model model to use
  *
  * Write a serialized #librdf_model to a string.
+ * The returned string must be freed by the caller using librdf_free_memory().
  * 
  * Return value: NULL on failure
  **/
@@ -1031,8 +1033,7 @@ main(int argc, char *argv[])
     return 1;
   }
 
-  if(string)
-    free(string);
+  librdf_free_memory(string);
 
   librdf_free_uri(base_uri); base_uri=NULL;
   librdf_free_model(model); model=NULL;
@@ -1090,8 +1091,7 @@ main(int argc, char *argv[])
   }
   librdf_free_stream(stream);
 
-  if(string)
-    free(string);
+  librdf_free_memory(string);
 
 
   fprintf(stderr, "%s: Serializing stream to a file handle\n", program);
