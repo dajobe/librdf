@@ -1552,7 +1552,7 @@ librdf_hash_from_array_of_strings(librdf_hash* hash, const char **array)
  * Format the hash as a string, suitable for parsing by librdf_hash_from_string.
  *
  * Note: this method allocates a new string since this is a _to_ method
- * and the caller must free the resulting memory.
+ * and the caller must call librdf_free_memory() to free the resulting memory.
  *
  * Return value: string representation of the hash or NULL on failure
  **/
@@ -1632,7 +1632,7 @@ librdf_hash_to_string(librdf_hash* hash, const char *filter[])
 
   /* Generate a string result */
   len=raptor_stringbuffer_length(sb);
-  result = LIBRDF_MALLOC(char*, len + 1);
+  result = (char *)librdf_alloc_memory(len + 1);
   if (result)
     raptor_stringbuffer_copy_to_string(sb, (unsigned char*)result, len);
 
@@ -2100,7 +2100,7 @@ main(int argc, char *argv[])
   } else {
     fprintf(stdout, "%s: resulting in >>%s<<\n", program, string_result);
   }
-  free(string_result);
+  librdf_free_memory(string_result);
 
   fprintf(stdout, "%s: Converting hash back to a string with filter\n", program);
   string_result=librdf_hash_to_string(h2, filter_string);
@@ -2111,7 +2111,7 @@ main(int argc, char *argv[])
   } else {
     fprintf(stdout, "%s: resulting in >>%s<<\n", program, string_result);
   }
-  free(string_result);
+  librdf_free_memory(string_result);
 
   librdf_free_hash(h2);
 
