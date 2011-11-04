@@ -1,6 +1,7 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_init.c - Redland library initialisation / termination
+ * rdf_init.c - Redland library initialisation / termination and memory
+ *              management
  *
  * Copyright (C) 2000-2011, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
@@ -644,6 +645,21 @@ librdf_basename(const char *name)
     name = p+1;
 
   return name;
+}
+
+
+/**
+ * librdf_free_memory:
+ * @ptr: pointer to free
+ *
+ * Free memory allocated in the library.
+ * Required for some runtimes where memory must be freed within the same shared object
+ * it was allocated in.
+ */
+void
+librdf_free_memory(void *ptr)
+{
+  raptor_free_memory(ptr);
 }
 
 

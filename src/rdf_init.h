@@ -1,6 +1,7 @@
 /* -*- Mode: c; c-basic-offset: 2 -*-
  *
- * rdf_init.h - Overall library initialisation / termination prototypes
+ * rdf_init.h - Overall library initialisation / termination and memory
+ *              management prototypes
  *
  * Copyright (C) 2000-2008, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2004, University of Bristol, UK http://www.bristol.ac.uk/
@@ -65,6 +66,9 @@ void librdf_world_set_logger(librdf_world* world, void *user_data, librdf_log_fu
 
 REDLAND_API
 void librdf_world_set_digest(librdf_world* world, const char *name);
+
+REDLAND_API
+void librdf_free_memory(void *ptr);
 
 
 /**
