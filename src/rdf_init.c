@@ -663,6 +663,38 @@ librdf_free_memory(void *ptr)
 }
 
 
+/**
+ * librdf_alloc_memory:
+ * @size: alloc size
+ *
+ * Allocate memory inside the library similar to malloc().
+ * Required for some runtimes where memory must be freed within the same shared object
+ * it was allocated in.
+ *
+ * @return pointer to memory or NULL on failure
+ */
+void *librdf_alloc_memory(size_t size)
+{
+  return raptor_alloc_memory(size);
+}
+
+/**
+ * librdf_calloc_memory:
+ * @nmemb: number of members
+ * @size: size of member
+ *
+ * Allocate zeroed array of items inside the library similar to calloc().
+ * Required for some runtimes where memory must be freed within the same shared object
+ * it was allocated in.
+ * 
+ * @return pointer to memory or NULL on failure
+ */ 
+void *librdf_calloc_memory(size_t nmemb, size_t size)
+{
+  return raptor_calloc_memory(nmemb, size);
+}
+
+
 #if defined (LIBRDF_DEBUG) && defined(LIBRDF_MEMORY_SIGN)
 void*
 librdf_sign_malloc(size_t size)
