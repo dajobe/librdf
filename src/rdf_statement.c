@@ -72,11 +72,65 @@ librdf_new_statement(librdf_world *world)
  * @statement: #librdf_statement to copy
  *
  * Copy constructor - create a new librdf_statement from an existing librdf_statement.
+ * Creates a deep copy - changes to original statement nodes are not reflected in the copy.
  * 
  * Return value: a new #librdf_statement with copy or NULL on failure
  **/
 librdf_statement*
 librdf_new_statement_from_statement(librdf_statement* statement)
+{
+  raptor_term *subject = NULL;
+  raptor_term *predicate = NULL;
+  raptor_term *object = NULL;
+  raptor_term *graph = NULL;
+
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
+
+  if(!statement)
+    return NULL;
+
+  subject = raptor_term_copy(statement->subject);
+  if(statement->subject && !subject)
+    goto err;
+
+  predicate = raptor_term_copy(statement->predicate);
+  if(statement->predicate && !predicate)
+    goto err;
+
+  object = raptor_term_copy(statement->object);
+  if(statement->object && !object)
+    goto err;
+
+  graph = raptor_term_copy(statement->graph);
+  if(statement->graph && !graph)
+    goto err;
+
+  return raptor_new_statement_from_nodes(statement->world, subject, predicate, object, graph);
+
+ err:
+  if(graph)
+    raptor_free_term(graph);
+  if(object)
+    raptor_free_term(object);
+  if(predicate)
+    raptor_free_term(predicate);
+  if(subject)
+    raptor_free_term(subject);
+  return NULL;
+}
+
+
+/**
+ * librdf_new_statement_from_statement2:
+ * @statement: #librdf_statement to copy
+ *
+ * Copy constructor - create a new librdf_statement from an existing librdf_statement.
+ * Creates a shallow copy - changes to original statement nodes are reflected in the copy.
+ * 
+ * Return value: a new #librdf_statement with copy or NULL on failure
+ **/
+librdf_statement*
+librdf_new_statement_from_statement2(librdf_statement* statement)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, NULL);
 

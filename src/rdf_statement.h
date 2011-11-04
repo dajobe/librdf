@@ -66,9 +66,12 @@ typedef enum {
 REDLAND_API
 librdf_statement* librdf_new_statement(librdf_world* world);
 
-/* Create a new Statement from an existing Statement - CLONE */
+/* Create a new Statement from an existing Statement - DEEP CLONE */
 REDLAND_API
 librdf_statement* librdf_new_statement_from_statement(librdf_statement* statement);
+/* Create a new Statement from an existing Statement - SHALLOW CLONE */
+REDLAND_API
+librdf_statement* librdf_new_statement_from_statement2(librdf_statement* statement);
 /* Create a new Statement from existing Nodes */
 REDLAND_API
 librdf_statement* librdf_new_statement_from_nodes(librdf_world *world, librdf_node* subject, librdf_node* predicate, librdf_node* object);
