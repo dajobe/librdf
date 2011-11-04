@@ -1084,7 +1084,7 @@ librdf_node_to_string(librdf_node *node)
   rc = librdf_node_write(node, iostr);
   raptor_free_iostream(iostr);
   if(rc) {
-    free(s);
+    raptor_free_memory(s);
     s = NULL;
   }
 
@@ -1127,7 +1127,7 @@ librdf_node_to_counted_string(librdf_node *node, size_t *len_p)
   raptor_free_iostream(iostr);
 
   if(rc) {
-    free(s);
+    raptor_free_memory(s);
     s = NULL;
   }
 
