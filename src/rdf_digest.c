@@ -371,7 +371,7 @@ librdf_digest_get_digest_length(librdf_digest* digest)
  * Get a string representation of the digest object.
  * 
  * Return value: a newly allocated string that represents the digest.
- * This must be released by the caller using free() 
+ * This must be released by the caller using librdf_free_memory().
  **/
 char*
 librdf_digest_to_string(librdf_digest* digest)
@@ -381,7 +381,7 @@ librdf_digest_to_string(librdf_digest* digest)
   char* b;
   int i;
 
-  b = LIBRDF_MALLOC(char*, 1 + (mdlen<<1));
+  b = (char *)librdf_alloc_memory(1 + (mdlen<<1));
   if(!b) {
     LIBRDF_FATAL1(digest->world, LIBRDF_FROM_DIGEST, "Out of memory");
     return NULL;
