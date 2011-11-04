@@ -264,8 +264,9 @@ librdf_stream_next(librdf_stream* stream)
  *
  * This method returns a SHARED pointer to the current statement object
  * which should be copied by the caller to preserve it if the stream
- * is moved on librdf_stream_next or if it should last after the
- * stream is closed.
+ * is moved on librdf_stream_next() or if it should last after the
+ * stream is closed. librdf_new_statement_from_statement() can be used
+ * for copying the statement.
  * 
  * Return value: the current #librdf_statement object or NULL at end of stream.
  **/
