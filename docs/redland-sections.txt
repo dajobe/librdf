@@ -67,7 +67,6 @@ librdf_log_message_locator
 librdf_hash
 librdf_hash_cursor
 librdf_new_hash
-librdf_new_hash_from_factory
 librdf_new_hash_from_string
 librdf_new_hash_from_array_of_strings
 librdf_new_hash_from_hash

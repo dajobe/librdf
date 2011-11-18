@@ -126,7 +126,6 @@ void librdf_finish_hash(librdf_world *world);
 
 
 /* constructors */
-librdf_hash* librdf_new_hash(librdf_world *world, const char *name);
 librdf_hash* librdf_new_hash_from_factory(librdf_world *world, librdf_hash_factory* factory);
 
 /* methods */

@@ -56,7 +56,8 @@
 	(librdf_digest_to_string): Memory alloc/free in same shared object.
 
 	* src/rdf_init.c, src/rdf_init.h:
-	(librdf_alloc_memory,librdf_calloc_memory): Added new API functions.
+	(librdf_alloc_memory, librdf_calloc_memory): Added new API
+	functions.
 
 	* src/rdf_serializer.c, src/rdf_serializer_raptor.c:
 	(librdf_serializer_serialize_stream_to_counted_string): Document

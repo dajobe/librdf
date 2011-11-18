@@ -36,6 +36,8 @@ extern "C" {
 
 /* public constructors */
 REDLAND_API
+librdf_hash* librdf_new_hash(librdf_world *world, const char *name);
+REDLAND_API
 librdf_hash* librdf_new_hash_from_string(librdf_world *world, const char *name, const char *string);
 REDLAND_API
 librdf_hash* librdf_new_hash_from_array_of_strings(librdf_world *world, const char *name, const char **array);
