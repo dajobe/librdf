@@ -28,6 +28,69 @@ pre
 </p>
 
 
+<h3>General changes</h3>
+
+<p>Added new API functions <code>librdf_alloc_memory()</code>,
+<code>librdf_calloc_memory()</code> and <code>librdf_free_memory()</code>
+to allow freeing memory allocated inside librdf shared library, such
+as on windows with DLLs.  (Lauri Aalto)
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=475">Issue #0000475</a>
+</p>
+
+
+<h3>Hash class changes</h3>
+
+<p>BDB Hash now uses the newer 7 args open form in preference to the 6 args
+form. (Peter O'Gorman / pogma).
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=468">Issue #0000468</a>
+</p>
+
+
+<h3>Statement class changes</h3>
+
+<p>Reverted <code>librdf_new_statement_from_statement()</code> to the
+pre-<code>raptor_term</code> deep copy contract for the function.
+(Lauri Aalto)
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=478">Issue #0000478</a>
+</p>
+
+<p>Added <code>librdf_new_statement_from_statement2()</code>
+providing a shallow copy of statement which was the
+post-<code>raptor_term</code> semantics of
+<code>librdf_new_statement_from_statement()</code>.
+(Lauri Aalto)
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=478">Issue #0000478</a>
+</p>
+
+
+<h3>Storage class changes</h3>
+
+<p>Virtuoso storage:</p>
+<ul>
+<li>Added switch for VIRTUOSO_DV_TIMESTAMP_OBJ.</li>
+<li>Prevent virtuoso query being registered twice in non-modular build
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=461">Issue #0000461</a>.
+</li>
+</ul>
+
+
+<h3>Other changes</h3>
+
+<p>Portability changes were made to rdfproc for windows.</p>
+
+<p>Add the <code>REDLAND_CALLBACK_STDCALL</code> attribute macro in
+the serializer log handler for windows.</p>
+
+<p>Multiple librdf and <code>rdfproc(1)</code> changes to allocate
+and free memory using librdf_alloc_memory, librdf_calloc_memory and
+librdf_free_memory to ensure memory is allocated correctly across
+libraries (DLLs). (Lauri Aalto).
+</p>
+
+<p>Several code style changes were made.
+</p>
+
+
 <h2 id="rel1_0_14"><a name="rel1_0_14">Redland 1.0.14 Changes</a></h2>
 
 <p>Rasqal minimum version is now 0.9.25 for the new
