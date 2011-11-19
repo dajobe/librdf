@@ -123,6 +123,7 @@
 
     <xi:include href="redland-chapter-objects.xml"/>
     <xi:include href="xml/world.xml"/>
+    <xi:include href="xml/general.xml"/>
     <xi:include href="xml/concepts.xml"/>
     <xi:include href="xml/digest.xml"/>
     <xi:include href="xml/files.xml"/>

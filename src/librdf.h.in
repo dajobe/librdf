@@ -295,18 +295,62 @@ typedef struct librdf_serializer_factory_s librdf_serializer_factory;
 
 
 /* Public statics */
+
+/**
+ * librdf_short_copyright_string:
+ *
+ * Short copyright string (one line).
+ */
 REDLAND_API
 extern const char * const librdf_short_copyright_string;
+
+/**
+ * librdf_copyright_string:
+ *
+ * Copyright string (multiple lines).
+ */
 REDLAND_API
 extern const char * const librdf_copyright_string;
+
+/**
+ * librdf_version_string:
+ *
+ * Raptor version as a string.
+ */
 REDLAND_API
 extern const char * const librdf_version_string;
+
+/**
+ * librdf_version_major:
+ *
+ * Raptor major version number.
+ */
 REDLAND_API
 extern const unsigned int librdf_version_major;
+
+/**
+ * librdf_version_minor:
+ *
+ * Raptor minor version number.
+ */
 REDLAND_API
 extern const unsigned int librdf_version_minor;
+
+/**
+ * librdf_version_release:
+ *
+ * Rasqal release version number.
+ */
 REDLAND_API
 extern const unsigned int librdf_version_release;
+
+/**
+ * librdf_version_decimal:
+ *
+ * Rasqal version as a decimal number.
+ *
+ * Format: major * 10000 + minor * 100 + release
+ */
 REDLAND_API
 extern const unsigned int librdf_version_decimal;
 

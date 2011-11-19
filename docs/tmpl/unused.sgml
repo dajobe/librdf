@@ -107,7 +107,7 @@ Internal.
 @facility: 
 @locator: 
 @message: 
-@Varargs: 
+@...: 
 
 
 <!-- ##### FUNCTION librdf_log_simple ##### -->

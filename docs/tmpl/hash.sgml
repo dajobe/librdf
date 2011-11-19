@@ -33,6 +33,16 @@ disk and with persistence.  Keys may have multiple and duplicate values.
 </para>
 
 
+<!-- ##### FUNCTION librdf_new_hash ##### -->
+<para>
+
+</para>
+
+@world: 
+@name: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_new_hash_from_string ##### -->
 <para>
 

@@ -154,7 +154,7 @@ librdf_log_simple(librdf_world* world, int code,
  * @facility: #librdf_log_facility log facility
  * @locator: raptor_locator if available or NULL
  * @message: message to record
- * @Varargs: message parameters
+ * @...: message parameters
  *
  * Log a message.
  *

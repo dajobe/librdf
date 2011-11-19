@@ -653,9 +653,10 @@ librdf_basename(const char *name)
  * @ptr: pointer to free
  *
  * Free memory allocated in the library.
- * Required for some runtimes where memory must be freed within the same shared object
- * it was allocated in.
- */
+ *
+ * Required for some runtimes where memory must be freed within the same
+ * shared object it was allocated in.
+ **/
 void
 librdf_free_memory(void *ptr)
 {
@@ -668,12 +669,14 @@ librdf_free_memory(void *ptr)
  * @size: alloc size
  *
  * Allocate memory inside the library similar to malloc().
- * Required for some runtimes where memory must be freed within the same shared object
- * it was allocated in.
  *
- * @return pointer to memory or NULL on failure
- */
-void *librdf_alloc_memory(size_t size)
+ * Required for some runtimes where memory must be freed within the same
+ * shared object it was allocated in.
+ *
+ * Return value: pointer to memory or NULL on failure
+ **/
+void*
+librdf_alloc_memory(size_t size)
 {
   return raptor_alloc_memory(size);
 }
@@ -684,12 +687,14 @@ void *librdf_alloc_memory(size_t size)
  * @size: size of member
  *
  * Allocate zeroed array of items inside the library similar to calloc().
- * Required for some runtimes where memory must be freed within the same shared object
- * it was allocated in.
+ *
+ * Required for some runtimes where memory must be freed within the same
+ * shared object it was allocated in.
  * 
- * @return pointer to memory or NULL on failure
- */ 
-void *librdf_calloc_memory(size_t nmemb, size_t size)
+ * Return value: pointer to memory or NULL on failure
+ **/ 
+void*
+librdf_calloc_memory(size_t nmemb, size_t size)
 {
   return raptor_calloc_memory(nmemb, size);
 }

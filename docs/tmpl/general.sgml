@@ -1,12 +1,13 @@
 <!-- ##### SECTION Title ##### -->
-General library facilities
+General
 
 <!-- ##### SECTION Short_Description ##### -->
-Version static variables.
+Static variables and memory handling.
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-Version static variables.
+Static variables for version numbers and strings, copyright strings and
+home page.  Functions for in-library memory allocation and deallocation.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
@@ -77,6 +78,51 @@ Version static variables.
 <para>
 
 </para>
+
+
+<!-- ##### VARIABLE librdf_version_string ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE librdf_copyright_string ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE librdf_short_copyright_string ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION librdf_alloc_memory ##### -->
+<para>
+
+</para>
+
+@size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_calloc_memory ##### -->
+<para>
+
+</para>
+
+@nmemb: 
+@size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_free_memory ##### -->
+<para>
+
+</para>
+
+@ptr: 
 
 
 <!-- ##### MACRO REDLAND_DEPRECATED ##### -->

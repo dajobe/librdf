@@ -15,6 +15,10 @@
 1.0.13	-	-	-	1.0.14	unsigned char*	librdf_utf8_to_latin1	(const unsigned char *input, int length, int *output_length)	-
 1.0.13	-	-	-	1.0.14	unsigned char*	librdf_latin1_to_utf8	(const unsigned char *input, int length, int *output_length)	-
 1.0.13	-	-	-	1.0.14	void	librdf_utf8_print	(const unsigned char *input, int length, FILE *stream)	-
+1.0.14	-	-	-	1.0.15	void	librdf_free_memory	(void *ptr)	-
+1.0.14	-	-	-	1.0.15	void*	librdf_alloc_memory	(size_t size)	-
+1.0.14	-	-	-	1.0.15	void*	librdf_calloc_memory	(size_t nmemb, size_t size)	-
+1.0.14	-	-	-	1.0.15	librdf_statement*	librdf_new_statement_from_statement2	(librdf_statement* statement)	-
 #
 # Types
 #

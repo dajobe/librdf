@@ -70,9 +70,9 @@ void librdf_world_set_digest(librdf_world* world, const char *name);
 REDLAND_API
 void librdf_free_memory(void *ptr);
 REDLAND_API
-void *librdf_alloc_memory(size_t size);
+void* librdf_alloc_memory(size_t size);
 REDLAND_API
-void *librdf_calloc_memory(size_t nmemb, size_t size);
+void* librdf_calloc_memory(size_t nmemb, size_t size);
 
 /**
  * LIBRDF_WORLD_FEATURE_GENID_BASE:

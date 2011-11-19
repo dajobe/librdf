@@ -56,6 +56,15 @@ form for use in storage.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_new_statement_from_statement2 ##### -->
+<para>
+
+</para>
+
+@statement: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_new_statement_from_nodes ##### -->
 <para>
 

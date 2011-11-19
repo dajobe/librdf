@@ -1,5 +1,5 @@
 <SECTION>
-<FILE>section-general</FILE>
+<FILE>general</FILE>
 LIBRDF_VERSION
 LIBRDF_VERSION_MAJOR
 LIBRDF_VERSION_MINOR
@@ -9,6 +9,12 @@ librdf_version_decimal
 librdf_version_major
 librdf_version_release
 librdf_version_minor
+librdf_version_string
+librdf_copyright_string
+librdf_short_copyright_string
+librdf_alloc_memory
+librdf_calloc_memory
+librdf_free_memory
 REDLAND_DEPRECATED
 </SECTION>
 
@@ -360,6 +366,7 @@ librdf_statement
 librdf_statement_part
 librdf_new_statement
 librdf_new_statement_from_statement
+librdf_new_statement_from_statement2
 librdf_new_statement_from_nodes
 librdf_statement_init
 librdf_statement_clear
