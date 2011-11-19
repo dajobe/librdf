@@ -171,7 +171,13 @@ librdf_log(librdf_world* world, int code,
   
   va_start(arguments, message);
 
-  buffer=raptor_vsnprintf(message, arguments);
+#if RAPTOR_VERSION >= 20005
+  buffer = NULL;
+  if(raptor_vasprintf(&buffer, message, arguments) < 0)
+    buffer = NULL;
+#else
+  buffer = raptor_vsnprintf(message, arguments);
+#endif
   librdf_log_simple(world, code, level, facility, locator, buffer);
   if(buffer)
     raptor_free_memory(buffer);
