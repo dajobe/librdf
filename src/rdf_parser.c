@@ -942,7 +942,7 @@ librdf_parser_get_namespaces_seen_uri(librdf_parser* parser, int offset)
  *
  * Get the number of namespaces seen during parsing
  *
- * Return value: uri or NULL if no such namespace uri
+ * Return value: namespace count
  **/
 int
 librdf_parser_get_namespaces_seen_count(librdf_parser* parser)
