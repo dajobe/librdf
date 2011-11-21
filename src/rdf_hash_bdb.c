@@ -591,10 +591,12 @@ librdf_hash_bdb_cursor_get(void* context,
   
 
   if(ret) {
+#ifdef LIBRDF_DEBUG
 #ifdef DB_NOTFOUND
     /* V2 and V3 */
     if(ret != DB_NOTFOUND)
       LIBRDF_DEBUG2("BDB cursor error - %d\n", ret);
+#endif
 #endif
     key->data=NULL;
     return ret;
@@ -701,8 +703,10 @@ librdf_hash_bdb_put(void* context, librdf_hash_datum *key,
   /* V1 */
   ret=db->put(db, &bdb_key, &bdb_value, 0);
 #endif
+#ifdef LIBRDF_DEBUG
   if(ret)
     LIBRDF_DEBUG2("BDB put failed - %d\n", ret);
+#endif
 
   return (ret != 0);
 }
@@ -882,8 +886,10 @@ librdf_hash_bdb_delete_key(void* context, librdf_hash_datum *key)
   /* V1 */
   ret=bdb->del(bdb, &bdb_key, 0);
 #endif
+#ifdef LIBRDF_DEBUG
   if(ret)
     LIBRDF_DEBUG2("BDB del failed - %d\n", ret);
+#endif
 
   return (ret != 0);
 }
@@ -969,8 +975,10 @@ librdf_hash_bdb_delete_key_value(void* context,
   ret=bdb->del(bdb, &bdb_key, R_CURSOR);
 #endif
 
+#ifdef LIBRDF_DEBUG
   if(ret)
     LIBRDF_DEBUG2("BDB del failed - %d\n", ret);
+#endif
 
   return (ret != 0);
 }
