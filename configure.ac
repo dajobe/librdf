@@ -673,8 +673,8 @@ if test "X$MYSQL_CONFIG" != X; then
   CPPFLAGS="$LIBRDF_CPPFLAGS $mysql_cflags"
   AC_MSG_CHECKING(for mysql library)
   LIBMYSQL_VERSION=`$MYSQL_CONFIG --version`
-  libmysql_version_dec=`echo $LIBMYSQL_VERSION | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
-  libmysql_min_version_dec=`echo $libmysql_min_version | awk -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  libmysql_version_dec=`echo $LIBMYSQL_VERSION | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
+  libmysql_min_version_dec=`echo $libmysql_min_version | $AWK -F. '{printf("%d\n", 10000*$1 + 100*$2 + $3)};'`
   AC_MSG_RESULT(yes - version $LIBMYSQL_VERSION)
   if test $libmysql_version_dec -lt $libmysql_min_version_dec; then
     AC_MSG_WARN(Using libmysql $LIBMYSQL_VERSION is unsupported - $libmysql_min_version or newer recommended.)
