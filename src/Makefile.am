@@ -186,7 +186,7 @@ librdf_la_LIBADD = \
 
 librdf_la_DEPENDENCIES = \
 @DIGEST_OBJS@ @HASH_OBJS@ \
-@LIBRDF_INTERNAL_LIBS@
+@LIBRDF_INTERNAL_DEPS@
 
 EXTRA_librdf_la_SOURCES = rdf_hash_bdb.c \
 rdf_digest_md5.c rdf_digest_sha1.c \
