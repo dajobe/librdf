@@ -1027,65 +1027,78 @@ int main(int argc, char *argv[]);
 #define EXPECTED_TRIPLES_COUNT 3
 
 
+#define URI_STRING_COUNT 3
+static const char *test_parser_types[] = {
+  "rdfxml", "ntriples", "turtle",
+  NULL
+};
+
+static const unsigned char *file_uri_strings[URI_STRING_COUNT] = {
+  (const unsigned char*)"http://example.org/test1.rdf", 
+  (const unsigned char*)"http://example.org/test2.nt",
+  (const unsigned char*)"http://example.org/test3.ttl"
+};
+
+static const unsigned char *file_content[URI_STRING_COUNT] = {
+  (const unsigned char*)RDFXML_CONTENT,
+  (const unsigned char*)NTRIPLES_CONTENT,
+  (const unsigned char*)TURTLE_CONTENT
+};
+
 int
 main(int argc, char *argv[])
 {
-  const char *test_parser_types[]={"rdfxml", "ntriples", "turtle", NULL};
-  #define URI_STRING_COUNT 3
-  const unsigned char *file_uri_strings[URI_STRING_COUNT]={(const unsigned char*)"http://example.org/test1.rdf", (const unsigned char*)"http://example.org/test2.nt", (const unsigned char*)"http://example.org/test3.ttl"};
-  const unsigned char *file_content[URI_STRING_COUNT]={(const unsigned char*)RDFXML_CONTENT, (const unsigned char*)NTRIPLES_CONTENT, (const unsigned char*)TURTLE_CONTENT};
   librdf_uri* uris[URI_STRING_COUNT];
-  int i;
+  int testi;
   const char *type;
-  const char *program=librdf_basename((const char*)argv[0]);
+  const char *program = librdf_basename((const char*)argv[0]);
   librdf_world *world;
   int failures;
 
-  world=librdf_new_world();
+  world = librdf_new_world();
   librdf_world_open(world);
 
-  for (i=0; i<URI_STRING_COUNT; i++) {
-    uris[i]=librdf_new_uri(world, file_uri_strings[i]);
+  for (testi = 0; testi < URI_STRING_COUNT; testi++) {
+    uris[testi] = librdf_new_uri(world, file_uri_strings[testi]);
   }
 
-  failures=0;
-  for(i=0; (type=test_parser_types[i]); i++) {
-    librdf_storage* storage=NULL;
-    librdf_model *model=NULL;
-    librdf_parser* parser=NULL;
-    librdf_stream *stream=NULL;
-    raptor_iostream *iostream=NULL;
-    size_t length=strlen((const char*)file_content[i]);
+  failures = 0;
+  for(testi = 0; (type = test_parser_types[testi]); testi++) {
+    librdf_storage* storage = NULL;
+    librdf_model *model = NULL;
+    librdf_parser* parser = NULL;
+    librdf_stream *stream = NULL;
+    raptor_iostream *iostream = NULL;
+    size_t length = strlen((const char*)file_content[testi]);
     int size;
     char *accept_h;
-
-    if(i>0)
-      break;
+    int i;
 
     fprintf(stderr, "%s: Testing parsing syntax '%s'\n", program, type);
 
     fprintf(stderr, "%s: Creating storage and model\n", program);
-    storage=librdf_new_storage(world, NULL, NULL, NULL);
+    storage = librdf_new_storage(world, NULL, NULL, NULL);
     if(!storage) {
       fprintf(stderr, "%s: Failed to create new storage\n", program);
       return(1);
     }
-    model=librdf_new_model(world, storage, NULL);
+    model = librdf_new_model(world, storage, NULL);
     if(!model) {
       fprintf(stderr, "%s: Failed to create new model\n", program);
       return(1);
     }
 
     fprintf(stderr, "%s: Creating %s parser\n", program, type);
-    parser=librdf_new_parser(world, type, NULL, NULL);
+    parser = librdf_new_parser(world, type, NULL, NULL);
     if(!parser) {
-      fprintf(stderr, "%s: Failed to create new parser type %s\n", program, type);
-      failures++;
+      fprintf(stderr, "%s: WARNING Failed to create new parser named '%s'\n",
+              program, type);
+      /* This may not be an error if raptor is compiled without the parser */
       goto tidy_test;
     }
 
 
-    accept_h=librdf_parser_get_accept_header(parser);
+    accept_h = librdf_parser_get_accept_header(parser);
     if(accept_h) {
       fprintf(stderr, "%s: Parser accept header: '%s'\n", program, accept_h);
       librdf_free_memory(accept_h);
@@ -1098,11 +1111,13 @@ main(int argc, char *argv[])
 
 
     stream = librdf_parser_parse_counted_string_as_stream(parser,
-							  file_content[i],
+							  file_content[testi],
 							  length,
-							  uris[i]);
+							  uris[testi]);
     if(!stream) {
-      fprintf(stderr, "%s: Failed to parse RDF from counted string %d as stream\n", program, i);
+      fprintf(stderr,
+              "%s: Failed to parse RDF from counted string %d as stream\n",
+              program, testi);
       failures++;
       goto tidy_test;
     }
@@ -1121,11 +1136,12 @@ main(int argc, char *argv[])
 
 
     stream = librdf_parser_parse_string_as_stream(parser,
-                                                  file_content[i],
-                                                  uris[i]);
+                                                  file_content[testi],
+                                                  uris[testi]);
     if(!stream) {
     fprintf(stderr, "%s: Adding %s string content as stream\n", program, type);
-      fprintf(stderr, "%s: Failed to parse RDF from string %d as stream\n", program, i);
+      fprintf(stderr, "%s: Failed to parse RDF from string %d as stream\n",
+              program, testi);
       failures++;
       goto tidy_test;
     }
@@ -1145,13 +1161,14 @@ main(int argc, char *argv[])
 
     fprintf(stderr, "%s: Adding %s as iostream, as stream\n", program, type);
     iostream = raptor_new_iostream_from_string(world->raptor_world_ptr,
-                                               (void *)file_content[i],
+                                               (void *)file_content[testi],
                                                length);
     stream = librdf_parser_parse_iostream_as_stream(parser,
                                                     iostream,
-						    uris[i]);
+						    uris[testi]);
     if(!stream) {
-      fprintf(stderr, "%s: Failed to parse RDF from iostream %d as stream\n", program, i);
+      fprintf(stderr, "%s: Failed to parse RDF from iostream %d as stream\n",
+              program, testi);
       failures++;
       goto tidy_test;
     }
@@ -1173,15 +1190,17 @@ main(int argc, char *argv[])
 
     fprintf(stderr, "%s: Adding %s counted string content\n", program, type);
     if(librdf_parser_parse_counted_string_into_model(parser,
-                                                     file_content[i],
+                                                     file_content[testi],
                                                      length,
-                                                     uris[i], model)) {
-      fprintf(stderr, "%s: Failed to parse RDF from counted string %d into model\n", program, i);
+                                                     uris[testi], model)) {
+      fprintf(stderr, 
+              "%s: Failed to parse RDF from counted string %d into model\n", 
+              program, testi);
       failures++;
       goto tidy_test;
     }
 
-    size=librdf_model_size(model);
+    size = librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
     if(size != EXPECTED_TRIPLES_COUNT) {
       fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
@@ -1193,17 +1212,18 @@ main(int argc, char *argv[])
 
     fprintf(stderr, "%s: Adding %s string content\n", program, type);
     if(librdf_parser_parse_string_into_model(parser,
-                                             file_content[i],
-                                             uris[i], model)) {
-      fprintf(stderr, "%s: Failed to parse RDF from string %d into model\n", program, i);
+                                             file_content[testi],
+                                             uris[testi], model)) {
+      fprintf(stderr, "%s: Failed to parse RDF from string %d into model\n",
+              program, testi);
       failures++;
       goto tidy_test;
     }
 
 
-    for(i=0; i < librdf_parser_get_namespaces_seen_count(parser); i++) {
-      const char* prefix=librdf_parser_get_namespaces_seen_prefix(parser, i);
-      librdf_uri* uri=librdf_parser_get_namespaces_seen_uri(parser, i);
+    for(i = 0; i < librdf_parser_get_namespaces_seen_count(parser); i++) {
+      const char* prefix = librdf_parser_get_namespaces_seen_prefix(parser, i);
+      librdf_uri* uri = librdf_parser_get_namespaces_seen_uri(parser, i);
 
       fprintf(stderr, "%s: Saw namespace %d): prefix:%s URI:%s\n", program, i,
               (!prefix ? "" : (const char*)prefix),
@@ -1212,7 +1232,7 @@ main(int argc, char *argv[])
     }
 
 
-    size=librdf_model_size(model);
+    size = librdf_model_size(model);
     fprintf(stderr, "%s: Model size is %d triples\n", program, size);
     if(size != EXPECTED_TRIPLES_COUNT) {
       fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
@@ -1224,12 +1244,13 @@ main(int argc, char *argv[])
     /* test parsing iostream */
     fprintf(stderr, "%s: Adding %s iostream content\n", program, type);
     iostream = raptor_new_iostream_from_string(world->raptor_world_ptr,
-                                               (void *)file_content[i],
+                                               (void *)file_content[testi],
                                                length);
     if(librdf_parser_parse_iostream_into_model(parser,
                                                iostream,
-                                               uris[i], model)) {
-      fprintf(stderr, "%s: Failed to parse RDF from iostream %d into model\n", program, i);
+                                               uris[testi], model)) {
+      fprintf(stderr, "%s: Failed to parse RDF from iostream %d into model\n",
+              program, testi);
       failures++;
       goto tidy_test;
     }
@@ -1269,8 +1290,8 @@ main(int argc, char *argv[])
 
 
   fprintf(stderr, "%s: Freeing URIs\n", program);
-  for (i=0; i<URI_STRING_COUNT; i++) {
-    librdf_free_uri(uris[i]);
+  for (testi = 0; testi < URI_STRING_COUNT; testi++) {
+    librdf_free_uri(uris[testi]);
   }
 
   librdf_free_world(world);
