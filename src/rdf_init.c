@@ -162,8 +162,10 @@ librdf_new_world(void)
   world->ltdl_opened = !(lt_dlinit());
   if (world->ltdl_opened)
     lt_dlsetsearchpath(REDLAND_MODULE_PATH);
+#ifdef LIBRDF_DEBUG
   else
     LIBRDF_DEBUG1("lt_dlinit() failed\n");
+#endif
 #endif
 
   return world;
