@@ -19,6 +19,7 @@
 1.0.14	-	-	-	1.0.15	void*	librdf_alloc_memory	(size_t size)	-
 1.0.14	-	-	-	1.0.15	void*	librdf_calloc_memory	(size_t nmemb, size_t size)	-
 1.0.14	-	-	-	1.0.15	librdf_statement*	librdf_new_statement_from_statement2	(librdf_statement* statement)	-
+1.0.14	-	-	-	1.0.15	librdf_hash*	librdf_new_hash	(librdf_world *world, const char *name)	-
 #
 # Types
 #
