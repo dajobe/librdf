@@ -1,3 +1,57 @@
+2011-12-02  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac, src/Makefile.am: Add LIBRDF_INTERNAL_DEPS for
+	libtld dependencies not libs
+
+	Intended to fix Issue #0000485
+	http://bugs.librdf.org/mantis/view.php?id=485
+	but can't reproduce
+
+2011-11-23  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac: Use AWK
+
+2011-11-21  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_parser.c:
+	(librdf_parser_get_namespaces_seen_count): Fix return value
+	autodocs.
+
+	Fixes issue #0000483
+	http://bugs.librdf.org/mantis/view.php?id=483
+
+	* src/rdf_hash_bdb.c: eliminate empty if body warnings when debug
+	messages are disabled
+
+2011-11-18  Dave Beckett <dave@dajobe.org>
+
+	* docs/redland-changes.tsv, docs/redland-docs.xml,
+	docs/redland-sections.txt, docs/tmpl/general.sgml,
+	docs/tmpl/hash.sgml, docs/tmpl/log.sgml,
+	docs/tmpl/section-general.sgml, docs/tmpl/statement.sgml,
+	docs/tmpl/storage.sgml, docs/tmpl/unused.sgml, src/librdf.h.in,
+	src/rdf_init.c, src/rdf_init.h, src/rdf_log.c: autodocs and add
+	section general to the manual
+
+	* src/rdf_log.c:
+	(librdf_log): Use raptor_vasprintf for raptor >= 2.0.5
+
+	* configure.ac: Do not enable debug messages by default for
+	--enable-maintainer-mode This now requires the extra
+	--enable-debug option to configure or autogen.sh
+
+	* ChangeLog, docs/redland-sections.txt, src/rdf_hash.h,
+	src/rdf_hash_internal.h: Make librdf_new_hash public
+
+	* docs/redland-sections.txt: Add librdf_new_hash
+	librdf_new_hash_from_factory
+
+2011-11-17  Dave Beckett <dave@dajobe.org>
+
+	* NEWS.html, RELEASE.html: 1.0.15
+
+	* autogen.sh: Update autogen.sh
+
 2011-11-04  Lauri Aalto <laalto@iki.fi>
 
 	* src/rdf_statement.c, src/rdf_statement.h:
