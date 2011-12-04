@@ -1,6 +1,6 @@
 *.stamp
-.cvsignore
 README
+filtered_rdf_log.h
 html
 overview.pdf
 overview.png
