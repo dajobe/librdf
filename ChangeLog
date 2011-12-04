@@ -1,3 +1,41 @@
+2011-12-03  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac:
+	BDB 5.2
+
+2011-12-03  Dave Beckett <dave@dajobe.org>
+
+	* scripts/fix-gtkdoc-header.pl:
+	Add fix-gtkdoc-header.pl
+
+2011-12-03  Dave Beckett <dave@dajobe.org>
+
+	* docs/Makefile.am, scripts/Makefile.am:
+	Update gtkdoc config to
+	work in make distcheck
+
+2011-12-03  Dave Beckett <dave@dajobe.org>
+
+	* docs/Makefile.am:
+	Build filtered_rdf_log.h in builddir
+
+	* docs/.gitignore: filtered_rdf_log.h
+
+	* docs/redland-changes.tsv: Add librdf_new_hash
+
+	* src/rdf_parser.c:
+	Fix parser test to test 3 parsers
+
+	This can never have worked - it overwrote the 'i' variable.
+
+	Code style fixes.
+
+	If a parser constructor fails, just warn and skip in case raptor
+	does not have it installed.
+
+	* src/rdf_init.c:
+	(librdf_new_world): Handle else only if debugging
+
 2011-12-02  Dave Beckett <dave@dajobe.org>
 
 	* configure.ac, src/Makefile.am: Add LIBRDF_INTERNAL_DEPS for
