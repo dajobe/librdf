@@ -22,4 +22,5 @@
 EXTRA_DIST= \
 markdown-to-html.pl \
 process-changes.pl \
-touch-mtime.pl
+touch-mtime.pl \
+fix-gtkdoc-header.pl

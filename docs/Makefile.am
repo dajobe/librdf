@@ -32,20 +32,20 @@ DOC_MAIN_SGML_FILE=redland-docs.xml
 SCAN_OPTIONS= --deprecated-guards="LIBRDF_DISABLE_DEPRECATED"
 
 # The directory containing the source code. Relative to $(srcdir)
-DOC_SOURCE_DIR=../src
+DOC_SOURCE_DIR=$(top_srcdir)/src
 
-# Header files that are filtered from the originals which
-# are added to IGNORE_HFILES.  These must be absolute paths to
-# prevent issues with VPATH and 'make distcheck' (see below)
-FILTERED_HS=$(builddir)/filtered_rdf_log.h
 
 # Used for dependencies
-HFILE_GLOB=$(top_srcdir)/src/*.h $(FILTERED_HS)
+HFILE_GLOB=$(top_srcdir)/src/*.h $(builddir)/filtered_rdf_log.h
 CFILE_GLOB=$(top_srcdir)/src/*.c
 
 IGNORE_CFILES=
 
-# Headers to ignore
+# Use fixed version of rdf_log.h
+EXTRA_HFILES= $(builddir)/filtered_rdf_log.h
+
+# Headers to ignore: yes rdf_log.h is intended to be in this list
+# since it is added as a fixed file filtered_rdf_log.h by EXTRA_HFILES above
 IGNORE_HFILES= \
 	rdf_log.h \
 	rdf_config.h \
@@ -72,8 +72,6 @@ IGNORE_HFILES= \
 	rdf_storage_virtuoso_internal.h \
 	rdf_stream_internal.h \
 	rdf_uri_internal.h
-	$(IGNORE_CFILES)
-
 
 # CFLAGS and LDFLAGS for compiling scan program. Only needed
 # if $(DOC_MODULE).types is non-empty.
@@ -81,7 +79,7 @@ AM_CPPFLAGS =
 GTKDOC_LIBS =
 
 # Extra options to supply to gtkdoc-mkdb
-MKDB_OPTIONS=--sgml-mode --output-format=xml
+MKDB_OPTIONS=--sgml-mode --output-format=xml --ignore-files="$(IGNORE_CFILES)"
 
 # Extra options to supply to gtkdoc-mktmpl
 MKTMPL_OPTIONS=
@@ -116,29 +114,17 @@ version.xml.in \
 redland-changes.tsv
 
 DISTCLEANFILES += \
-$(FILTERED_HS)
+filtered_rdf_log.h
 
 CLEANFILES += README \
 pod2htm*
 
+$(builddir)/filtered_rdf_log.h: $(top_srcdir)/src/rdf_log.h $(srcdir)/../scripts/fix-gtkdoc-header.pl
+	$(PERL) $(srcdir)/../scripts/fix-gtkdoc-header.pl < $< > $@
 
 # Create some text files from HTML sources
 LYNX=lynx
 LYNXARGS=-dump -nolist
-
-
-# Used to remove things that gtkdoc-scan just cannot understand
-#
-# The
-#   gtkdoc-scan --ignore-decorators=DECS
-# feature does not help here.
-#
-# Fixes for 'make distcheck':
-# - Use absolute file path to prevent VPATH issues
-$(builddir)/filtered_rdf_log.h: $(top_srcdir)/src/rdf_log.h
-	$(SED) -e 's/REDLAND_CALLBACK_STDCALL *//' \
-	       -e 's/REDLAND_PRINTF_FORMAT.*;/;/' \
-	  $< > $@
 
 
 if MAINTAINER_MODE
