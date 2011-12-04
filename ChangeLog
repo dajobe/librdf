@@ -1,20 +1,11 @@
 2011-12-03  Dave Beckett <dave@dajobe.org>
 
-	* configure.ac:
-	BDB 5.2
+	* configure.ac: BDB 5.2
 
-2011-12-03  Dave Beckett <dave@dajobe.org>
+	* scripts/fix-gtkdoc-header.pl: Add fix-gtkdoc-header.pl
 
-	* scripts/fix-gtkdoc-header.pl:
-	Add fix-gtkdoc-header.pl
-
-2011-12-03  Dave Beckett <dave@dajobe.org>
-
-	* docs/Makefile.am, scripts/Makefile.am:
-	Update gtkdoc config to
+	* docs/Makefile.am, scripts/Makefile.am: Update gtkdoc config to
 	work in make distcheck
-
-2011-12-03  Dave Beckett <dave@dajobe.org>
 
 	* docs/Makefile.am:
 	Build filtered_rdf_log.h in builddir
@@ -39,7 +30,7 @@
 2011-12-02  Dave Beckett <dave@dajobe.org>
 
 	* configure.ac, src/Makefile.am: Add LIBRDF_INTERNAL_DEPS for
-	libtld dependencies not libs
+	libltd dependencies not libs
 
 	Intended to fix Issue #0000485
 	http://bugs.librdf.org/mantis/view.php?id=485
