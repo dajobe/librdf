@@ -126,8 +126,10 @@ void librdf_digest_final(librdf_digest* digest);
 char* librdf_digest_to_string(librdf_digest* digest);
 
 /* rdf_hash.h */
+%newobject librdf_new_hash;
 %newobject librdf_new_hash_from_string;
 %newobject librdf_new_hash_from_array_of_strings;
+librdf_hash* librdf_new_hash(librdf_world *world, const char *name);
 librdf_hash* librdf_new_hash_from_string(librdf_world *world, const char* name, const char* string);
 librdf_hash* librdf_new_hash_from_array_of_strings(librdf_world *world, const char* name, const char* *string);
 %newobject librdf_hash_to_string;
