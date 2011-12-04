@@ -1,4 +1,6 @@
-2011-12-03  Dave Beckett <dave@dajobe.org>
+2011-12-03  Dave Beckett  <dave@dajobe.org>
+
+	* Snapshotted redland_1_0_15 for 1.0.15 release (GIT b086a6be81252d6beed8051c788518fd1ef07ddf)
 
 	* configure.ac: BDB 5.2
 
