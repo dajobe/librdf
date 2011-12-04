@@ -27,6 +27,16 @@ pre
 <p>Not yet released.
 </p>
 
+<p>Issues Fixed:</p>
+<ul>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=461">0000461</a>: librdf error - query language vsparql already registered</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=468">0000468</a>: xlc on AIX configure tests for both HAVE_BDB_OPEN_7_ARGS and HAVE_BDB_OPEN_6_ARGS pass</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=475">0000475</a>: Freeing a counted_string returned by redland on a modern Windows system crashes</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=478">0000478</a>: Object returned from librdf_stream_get_object must be copied, but may not copiable</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=483">0000483</a>: Documentation of librdf_parser_get_namespaces_seen_count return is incorrect</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=485">0000485</a>: No rule to make target `-lltdl', needed by `librdf.la'.  Stop.</li>
+</ul>
+
 
 <h3>General changes</h3>
 
@@ -39,6 +49,9 @@ Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=475">Issue #0000475</a>
 
 
 <h3>Hash class changes</h3>
+
+<p>Export <code>librdf_new_hash()</code> to the public API.
+</p>
 
 <p>BDB Hash now uses the newer 7 args open form in preference to the 6 args
 form. (Peter O'Gorman / pogma).
@@ -75,6 +88,14 @@ Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=461">Issue #0000461</a>
 
 
 <h3>Other changes</h3>
+
+<p>Fixed the parser test to actually test 3 parsers rather than a
+non-deterministic number.  Emits warnings when parser constructor
+fails since a syntax may not be supported.</p>
+
+<p>Set up the libltdl build dependencies and linking flags properly.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=485">Issue #0000485</a>
+</p>
 
 <p>Portability changes were made to rdfproc for windows.</p>
 
