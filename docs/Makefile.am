@@ -37,7 +37,7 @@ DOC_SOURCE_DIR=../src
 # Header files that are filtered from the originals which
 # are added to IGNORE_HFILES.  These must be absolute paths to
 # prevent issues with VPATH and 'make distcheck' (see below)
-FILTERED_HS=$(abs_top_srcdir)/src/filtered_rdf_log.h
+FILTERED_HS=$(builddir)/filtered_rdf_log.h
 
 # Used for dependencies
 HFILE_GLOB=$(top_srcdir)/src/*.h $(FILTERED_HS)
@@ -100,6 +100,9 @@ HTML_IMAGES =
 # Extra options to supply to gtkdoc-fixref
 FIXXREF_OPTIONS=
 
+# gtkdoc might not define this
+DISTCLEANFILES=
+
 include $(top_srcdir)/gtk-doc.make
 
 man_MANS=redland.3
@@ -112,11 +115,11 @@ $(man_MANS) \
 version.xml.in \
 redland-changes.tsv
 
-CLEANFILES += README \
-pod2htm* \
-redland-decl.txt \
-redland-decl-list.txt \
+DISTCLEANFILES += \
 $(FILTERED_HS)
+
+CLEANFILES += README \
+pod2htm*
 
 
 # Create some text files from HTML sources
@@ -132,9 +135,7 @@ LYNXARGS=-dump -nolist
 #
 # Fixes for 'make distcheck':
 # - Use absolute file path to prevent VPATH issues
-# - chmod dir writable to allow writing to the normally read-only src dir
-$(abs_top_srcdir)/src/filtered_rdf_log.h: $(top_srcdir)/src/rdf_log.h
-	chmod u+w $(abs_top_srcdir)/src
+$(builddir)/filtered_rdf_log.h: $(top_srcdir)/src/rdf_log.h
 	$(SED) -e 's/REDLAND_CALLBACK_STDCALL *//' \
 	       -e 's/REDLAND_PRINTF_FORMAT.*;/;/' \
 	  $< > $@
