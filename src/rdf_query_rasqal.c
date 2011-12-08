@@ -153,6 +153,9 @@ librdf_query_rasqal_terminate(librdf_query* query)
 
   if(context->uri)
     librdf_free_uri(context->uri);
+
+  if(context->model)
+    librdf_free_model(context->model);
 }
 
 
@@ -696,7 +699,11 @@ librdf_query_rasqal_execute(librdf_query* query, librdf_model* model)
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
   librdf_query_results* results;
 
+  if (context->model)
+    librdf_free_model(context->model);
+  /* model is always non-NULL */
   context->model = model;
+  librdf_model_add_reference(model);
 
   /* This assumes raptor's URI implementation is librdf_uri */
   if(rasqal_query_prepare(context->rq, context->query_string, 
