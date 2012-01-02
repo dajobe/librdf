@@ -45,9 +45,7 @@
  * Set the #raptor_world instance to be used with this #librdf_world.
  *
  * If no raptor_world instance is set with this function,
- * librdf_world_open() creates a new instance.  This function
- * is only useful when librdf is built with the Raptor V2 APIs, which
- * use this world object.  It has no effect with a Raptor V1 build.
+ * librdf_world_open() creates a new instance.
  *
  * Ownership of the raptor_world is not taken. If the raptor library
  * instance is set with this function, librdf_free_world() will not
@@ -68,8 +66,6 @@ librdf_world_set_raptor(librdf_world* world, raptor_world* raptor_world_ptr)
  * @world: librdf_world object
  * 
  * Get the #raptor_world instance used by this #librdf_world.
- *
- * This value is only used with the Raptor V2 APIs.
  *
  * Return value: raptor_world object or NULL on failure (e.g. not initialized)
  **/
