@@ -27,6 +27,10 @@
 #ifndef LIBRDF_INIT_H
 #define LIBRDF_INIT_H
 
+typedef void (*librdf_raptor_init_handler)(void* user_data, raptor_world* raptor_world_ptr);
+typedef void (*librdf_rasqal_init_handler)(void* user_data, rasqal_world* rasqal_world_ptr);
+
+
 #ifdef LIBRDF_INTERNAL
 #include <rdf_init_internal.h>
 #endif
@@ -53,6 +57,11 @@ void librdf_world_init_mutex(librdf_world *world);
 
 REDLAND_API
 void librdf_world_set_rasqal(librdf_world* world, rasqal_world* rasqal_world_ptr);
+
+REDLAND_API
+void librdf_world_set_raptor_init_handler(librdf_world* world, void* user_data, librdf_raptor_init_handler handler);
+REDLAND_API
+void librdf_world_set_rasqal_init_handler(librdf_world* world, void* user_data, librdf_rasqal_init_handler handler);
 
 REDLAND_API
 rasqal_world* librdf_world_get_rasqal(librdf_world* world);

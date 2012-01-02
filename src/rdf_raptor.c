@@ -185,6 +185,11 @@ librdf_init_raptor(librdf_world* world)
     world->raptor_world_ptr = raptor_new_world();
     world->raptor_world_allocated_here = 1;
 
+    if(world->raptor_world_ptr && world->raptor_init_handler) {
+      world->raptor_init_handler(world->raptor_init_handler_user_data,
+                                 world->raptor_world_ptr);
+    }
+
     if(!world->raptor_world_ptr || raptor_world_open(world->raptor_world_ptr)) {
       LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "failed to initialize raptor");
       return 1;
@@ -207,6 +212,24 @@ librdf_init_raptor(librdf_world* world)
                                             librdf_raptor_generate_id_handler);
 
   return 0;
+}
+
+
+/**
+ * librdf_world_set_raptor_init_handler:
+ * @world: librdf_world object
+ * @user_data: user data
+ * @handler: handler to call
+ *
+ * Set the raptor initialization handler to be called if a new raptor_world is constructed.
+ */
+void
+librdf_world_set_raptor_init_handler(librdf_world* world, 
+                                     void* user_data,
+                                     librdf_raptor_init_handler handler)
+{
+  world->raptor_init_handler = handler;
+  world->raptor_init_handler_user_data = user_data;
 }
 
 

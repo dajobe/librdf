@@ -1278,6 +1278,11 @@ librdf_query_rasqal_constructor(librdf_world *world)
     /* Make sure rasqal works with the same raptor instance as everyone else. */
     rasqal_world_set_raptor(world->rasqal_world_ptr, world->raptor_world_ptr);
 
+    if(world->rasqal_world_ptr && world->rasqal_init_handler) {
+      world->rasqal_init_handler(world->rasqal_init_handler_user_data,
+                                 world->rasqal_world_ptr);
+    }
+
     if(rasqal_world_open(world->rasqal_world_ptr)) {
       LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
       return 1;
@@ -1342,6 +1347,24 @@ librdf_query_rasqal_constructor(librdf_world *world)
 #endif
 
   return 0;
+}
+
+
+/**
+ * librdf_world_set_rasqal_init_handler:
+ * @world: librdf_world object
+ * @user_data: user data
+ * @handler: handler to call
+ *
+ * Set the rasqal initialization handler to be called if a new rasqal_world is constructed.
+ */
+void
+librdf_world_set_rasqal_init_handler(librdf_world* world,
+                                     void* user_data,
+                                     librdf_rasqal_init_handler handler)
+{
+  world->rasqal_init_handler = handler;
+  world->rasqal_init_handler_user_data = user_data;
 }
 
 

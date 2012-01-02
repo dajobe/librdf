@@ -152,6 +152,12 @@ struct librdf_world_s
 
   /* bnode id (raptor => internal) map during parsing */
   librdf_hash *bnode_hash;
+
+  librdf_raptor_init_handler raptor_init_handler;
+  void* raptor_init_handler_user_data;
+
+  librdf_rasqal_init_handler rasqal_init_handler;
+  void* rasqal_init_handler_user_data;
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);

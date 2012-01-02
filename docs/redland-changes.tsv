@@ -20,6 +20,8 @@
 1.0.14	-	-	-	1.0.15	void*	librdf_calloc_memory	(size_t nmemb, size_t size)	-
 1.0.14	-	-	-	1.0.15	librdf_statement*	librdf_new_statement_from_statement2	(librdf_statement* statement)	-
 1.0.14	-	-	-	1.0.15	librdf_hash*	librdf_new_hash	(librdf_world *world, const char *name)	-
+1.0.15	-	-	-	1.0.16	void	librdf_world_set_raptor_init_handler	(librdf_world* world, void* user_data, librdf_raptor_init_handler handler)	-
+1.0.15	-	-	-	1.0.16	void	librdf_world_set_rasqal_init_handler	(librdf_world* world, void* user_data, librdf_rasqal_init_handler handler)	-
 #
 # Types
 #
@@ -31,6 +33,8 @@
 1.0.12	type	librdf_uri	-	1.0.13	type	librdf_uri	-	Now a typedef for raptor_uri
 1.0.12	type	librdf_node	-	1.0.13	type	librdf_node	-	Now a typedef for raptor_term
 1.0.12	type	librdf_statement	-	1.0.13	type	librdf_statement	-	Now a typedef for raptor_statement
+1.0.15	type	-	-	1.0.16	type	librdf_raptor_init_handler	-	-	
+1.0.15	type	-	-	1.0.16	type	librdf_rasqal_init_handler	-	-	
 #
 # Enums
 #
