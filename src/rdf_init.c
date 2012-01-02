@@ -339,6 +339,7 @@ librdf_world_set_rasqal(librdf_world* world, rasqal_world* rasqal_world_ptr)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN(world, librdf_world);
   world->rasqal_world_ptr = rasqal_world_ptr;
+  world->rasqal_world_allocated_here = 0;
 }
 
 
