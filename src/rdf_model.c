@@ -732,7 +732,7 @@ int
 librdf_model_contains_statement(librdf_model* model, librdf_statement* statement)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(model, librdf_model, 0);
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 0);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
 
   if(!librdf_statement_is_complete(statement))
     return 1;
