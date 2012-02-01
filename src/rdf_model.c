@@ -737,7 +737,7 @@ librdf_model_contains_statement(librdf_model* model, librdf_statement* statement
   if(!librdf_statement_is_complete(statement))
     return 1;
 
-  return model->factory->contains_statement(model, statement);
+  return model->factory->contains_statement(model, statement) ? -1 : 0;
 }
 
 
