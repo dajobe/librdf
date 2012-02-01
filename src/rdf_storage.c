@@ -965,23 +965,13 @@ int
 librdf_storage_contains_statement(librdf_storage* storage,
                                   librdf_statement* statement) 
 {
-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
+  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 0);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
 
-  /* subject can be a URI or blank node */
-  if(!statement->subject ||
-     (!librdf_node_is_resource(statement->subject) &&
-      !librdf_node_is_blank(statement->subject)))
-    return 1;
-  
-  /* predicate can only be a URI */
-  if(!statement->predicate || !librdf_node_is_resource(statement->predicate))
-     return 1;
-
-  if(!statement->object)
+  if(!librdf_statement_is_complete(statement))
     return 1;
 
-  return storage->factory->contains_statement(storage, statement);
+  return storage->factory->contains_statement(storage, statement) ? -1 : 0;
 }
 
 
