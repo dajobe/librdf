@@ -30,7 +30,7 @@ AC_REVISION($Revision$)dnl
 AM_CONFIG_HEADER(src/rdf_config.h)
 AC_CONFIG_AUX_DIR(build)
 AC_CONFIG_MACRO_DIR(build)
-AM_INIT_AUTOMAKE([1.11 check-news std-options -Wobsolete -Wportability -Wsyntax -Wunsupported])
+AM_INIT_AUTOMAKE([1.11 check-news std-options -Wobsolete -Wportability -Wsyntax -Wunsupported -Wextra-portability])
 AM_MAINTAINER_MODE
 
 AC_CANONICAL_HOST
@@ -100,6 +100,7 @@ AC_SUBST(LIBRDF_LIBTOOL_VERSION)
 
 dnl Checks for programs.
 AM_SANITY_CHECK
+AM_PROG_AR
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_INSTALL

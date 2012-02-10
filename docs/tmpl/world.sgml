@@ -117,6 +117,44 @@ the library and cleanup of all allocated resources.
 @name: 
 
 
+<!-- ##### USER_FUNCTION librdf_raptor_init_handler ##### -->
+<para>
+
+</para>
+
+@user_data: 
+@raptor_world_ptr: 
+
+
+<!-- ##### FUNCTION librdf_world_set_raptor_init_handler ##### -->
+<para>
+
+</para>
+
+@world: 
+@user_data: 
+@handler: 
+
+
+<!-- ##### USER_FUNCTION librdf_rasqal_init_handler ##### -->
+<para>
+
+</para>
+
+@user_data: 
+@rasqal_world_ptr: 
+
+
+<!-- ##### FUNCTION librdf_world_set_rasqal_init_handler ##### -->
+<para>
+
+</para>
+
+@world: 
+@user_data: 
+@handler: 
+
+
 <!-- ##### MACRO LIBRDF_WORLD_FEATURE_GENID_BASE ##### -->
 <para>
 
