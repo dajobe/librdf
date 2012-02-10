@@ -26,6 +26,8 @@ librdf_free_world
 librdf_world_open
 librdf_world_set_rasqal
 librdf_world_get_rasqal
+librdf_world_get_raptor
+librdf_world_set_raptor
 librdf_world_init_mutex
 librdf_world_set_error
 librdf_world_set_warning
