@@ -258,28 +258,6 @@ default when either no argument is given, or
 <code>--with-postgresql=no</code>, this store is disabled.
 </p></dd>
 
-<dt><code>--with-raptor=</code> <code>system</code> or <code>internal</code><br /></dt>
-<dd><p>
-This option tells redland to use either the system installed version
-of <a href="http://librdf.org/raptor/">raptor</a>
-or the internal version.  If the option is omittted,
-redland will guess and choose either the system one, if new enough or
-the internal one (always present).  If <code>--with-raptor=system</code>
-is used and redland discovers that the system raptor is too old,
-a warning will be given but the configuration will continue.
-</p></dd>
-
-<dt><code>--with-rasqal=</code> <code>system</code> or <code>internal</code><br /></dt>
-<dd><p>
-This option tells redland to use either the system installed version
-of <a href="http://librdf.org/rasqal/">rasqal</a>
-or the internal version.  If the option is omittted,
-redland will guess and choose either the system one, if new enough or
-the internal one (always present).  If <code>--with-rasqal=system</code>
-is used and redland discovers that the system rasqal is too old,
-a warning will be given but the configuration will continue.
-</p></dd>
-
 <dt><code>--with-sqlite=</code>(<code>yes</code>|<code>no</code>|<code>2</code>|<code>3</code>)<br /></dt>
 <dd><p>Enable use of <a href="http://www.sqlite.org/">SQLite</a>
 triple store backend with a particular version V2 or V3,
@@ -326,15 +304,23 @@ details.</p>
 
 <h3>2.3 Configuring</h3>
 
-<p>If everything is in the default place, do:</p>
+<p>The default configuration will install into /usr/local:
+</p>
 <pre>
    ./configure
 </pre>
 
-<p>More commonly you will be doing something like this, when
-giving the installation location of Berkeley/Sleeypcat DB:</p>
+<p>To install into the standard Unix / Linux (and also Cygwin) system
+directory, use:
+</p>
 <pre>
-   ./configure --with-bdb=/usr/local/berkeleydb
+   ./configure --prefix=/usr
+</pre>
+
+<p>Append to the line any additional options you need like this:
+</p>
+<pre>
+   ./configure --prefix=/usr --with-bdb=/usr/local/berkeleydb
 </pre>
 
 <p>If you are having problems with configuring several times when
@@ -347,9 +333,14 @@ of these:</p>
 
 <h3>2.4 Compiling</h3>
 
+<p>Compile the library and the <tt>rdfproc</tt> utility with:
+</p>
 <pre>
    make
 </pre>
+<p>Note: GNU make is probably required which may be called
+gmake or gnumake if your system has a different make available too.
+</p>
 
 
 <h2 id="sec-testing">2.5. Testing</h2>
