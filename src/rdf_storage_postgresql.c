@@ -7,17 +7,17 @@
  * Copyright (C) 2003-2005 Shi Wenzhong - email to shiwenzhong@hz.cn
  * Copyright (C) 2000-2009, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
- * 
+ *
  * This package is Free Software and part of Redland http://librdf.org/
- * 
+ *
  * It is licensed under the following three licenses as alternatives:
  *   1. GNU Lesser General Public License (LGPL) V2.1 or any newer version
  *   2. GNU General Public License (GPL) V2 or any newer version
  *   3. Apache License, V2.0 or any newer version
- * 
+ *
  * You may not use this file except in compliance with at least one of
  * the above three licenses.
- * 
+ *
  * See LICENSE.html or LICENSE.txt at the top of this package for the
  * complete terms and further detail along with the license texts for
  * the licenses in COPYING.LIB, COPYING and LICENSE-2.0.txt respectively.
@@ -83,7 +83,7 @@ typedef struct {
   librdf_digest *digest;
 
   PGconn* transaction_handle;
-  
+
 } librdf_storage_postgresql_instance;
 
 /* prototypes for local functions */
@@ -163,7 +163,7 @@ typedef struct {
   char **row;
 } librdf_storage_postgresql_get_contexts_context;
 
-static u64 librdf_storage_postgresql_hash(librdf_storage* storage, 
+static u64 librdf_storage_postgresql_hash(librdf_storage* storage,
                                           const char *type,
                                           const char *string, int length);
 static u64 librdf_storage_postgresql_node_hash(librdf_storage* storage,
@@ -221,13 +221,13 @@ librdf_storage_postgresql_hash(librdf_storage* storage, const char *type,
 
   /* (Re)initialize digest object */
   librdf_digest_init(context->digest);
-  
+
   /* Update digest with data */
   if(type)
     librdf_digest_update(context->digest, (unsigned char*)type, 1);
   librdf_digest_update(context->digest, (unsigned char*)string, length);
   librdf_digest_final(context->digest);
-  
+
   /* Copy first 8 bytes of digest into unsigned 64bit hash
    * using a method portable across big/little endianness
    *
@@ -237,7 +237,7 @@ librdf_storage_postgresql_hash(librdf_storage* storage, const char *type,
   hash = 0;
   for(i=0; i<8; i++)
     hash += ((u64) digest[i]) << (i*8);
-  
+
   return hash;
 }
 
@@ -311,7 +311,7 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
   char coninfo_template[] = "host=%s port=%s dbname=%s user=%s password=%s";
   size_t coninfo_size;
   char *conninfo;
-  
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, NULL);
 
   if(context->transaction_handle)
@@ -361,7 +361,7 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
   }
 
   /* Initialize closed postgresql connection handle */
-  coninfo_size = strlen(coninfo_template) 
+  coninfo_size = strlen(coninfo_template)
     + strlen(context->host)
     + strlen(context->port)
     + strlen(context->dbname)
@@ -495,7 +495,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   char *query=NULL;
   PGresult *res=NULL;
   PGconn *handle;
-  
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, char*, 1);
 
@@ -521,11 +521,11 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
 
   /* Save hash of model name */
   context->model=librdf_storage_postgresql_hash(storage, NULL, name, strlen(name));
- 
+
   /* Save connection parameters */
-  context->host=librdf_hash_get(options, "host"); 
+  context->host=librdf_hash_get(options, "host");
   context->port=librdf_hash_get(options, "port");
-  if(context->port==NULL ) 
+  if(context->port==NULL )
   {
      context->port = LIBRDF_MALLOC(char*, 10);
      strcpy(context->port,"5432"); /* default postgresql port */
@@ -546,7 +546,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
     librdf_free_hash(options);
     return 1;
   }
-   
+
   /* Maintain merge table? */
   context->merge=(librdf_hash_get_as_boolean(options, "merge")>0);
 
@@ -561,7 +561,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   }
 
   /* Create tables, if new and not existing */
-  if(!status && (librdf_hash_get_as_boolean(options, "new")>0)) 
+  if(!status && (librdf_hash_get_as_boolean(options, "new")>0))
   {
     query = LIBRDF_MALLOC(char*, strlen(create_table_statements) + (20*1) + 1);
     if(! query) {
@@ -676,7 +676,7 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   context->bulk=(librdf_hash_get_as_boolean(options, "bulk")>0);
 
   /* Truncate model? */
-   if(!status && (librdf_hash_get_as_boolean(options, "new")>0))  
+   if(!status && (librdf_hash_get_as_boolean(options, "new")>0))
     status=librdf_storage_postgresql_context_remove_statements(storage, NULL);
 
   /* Unused options: write (always...) */
@@ -809,7 +809,7 @@ librdf_storage_postgresql_terminate(librdf_storage* storage)
 
   if(context->transaction_handle)
     librdf_storage_postgresql_transaction_rollback(storage);
-  
+
   LIBRDF_FREE(librdf_storage_postgresql_instance, storage->instance);
 }
 
@@ -916,7 +916,7 @@ librdf_storage_postgresql_size(librdf_storage* storage)
     librdf_storage_postgresql_release_handle(storage, handle);
     return -1;
   }
-  count=atol(PQgetvalue(res,0,0)); 
+  count=atol(PQgetvalue(res,0,0));
   PQclear(res);
   LIBRDF_FREE(char*, query);
   librdf_storage_postgresql_release_handle(storage, handle);
@@ -1073,7 +1073,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
       char create_literal[]="INSERT INTO Literals (ID,Value,Language,Datatype) VALUES (" UINT64_T_FMT ",'%s','%s','%s')";
       int add_status = 0;
       char *escaped_value, *escaped_lang, *escaped_datatype;
-      
+
       escaped_value = LIBRDF_MALLOC(char*, valuelen * 2 + 1);
       if(escaped_value) {
         int error = 0;
@@ -1103,7 +1103,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
           escaped_datatype = LIBRDF_MALLOC(char*, datatypelen * 2 + 1);
           if(escaped_datatype) {
             if(datatype) {
-              PQescapeStringConn(handle, escaped_datatype, 
+              PQescapeStringConn(handle, escaped_datatype,
                                  (const char*)datatype, datatypelen,
                                  &error);
               if(error) {
@@ -1150,7 +1150,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
         librdf_storage_postgresql_release_handle(storage, handle);
         return 0;
       }
-    }      
+    }
 
   } else if(type==LIBRDF_NODE_TYPE_BLANK) {
     /* Get hash */
@@ -1167,7 +1167,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
       if(escaped_name) {
         int error = 0;
         PQescapeStringConn(handle, escaped_name,
-                           (const char*)name, nodelen, 
+                           (const char*)name, nodelen,
                            &error);
         if(error) {
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
@@ -1274,7 +1274,7 @@ librdf_storage_postgresql_context_add_statements(librdf_storage* storage,
     if(librdf_storage_postgresql_start_bulk(storage))
       return 1;
   }
-  
+
   /* Find hash for context, creating if necessary */
   if(context_node) {
     ctxt=librdf_storage_postgresql_node_hash(storage,context_node,1);
@@ -1285,13 +1285,13 @@ librdf_storage_postgresql_context_add_statements(librdf_storage* storage,
   while(!helper && !librdf_stream_end(statement_stream)) {
     librdf_statement* statement=librdf_stream_get_object(statement_stream);
     if(!context->bulk) {
-      /* Do not add duplicate statements 
+      /* Do not add duplicate statements
        * but do not check for this when in bulk mode.
        */
       if(librdf_storage_postgresql_contains_statement(storage, statement))
         continue;
     }
-    
+
     helper=librdf_storage_postgresql_context_add_statement_helper(storage, ctxt,
                                                              statement);
     librdf_stream_next(statement_stream);
@@ -1408,7 +1408,7 @@ static int
 librdf_storage_postgresql_contains_statement(librdf_storage* storage,
                                              librdf_statement* statement)
 {
-  librdf_storage_postgresql_instance* context = (librdf_storage_postgresql_instance*)storage->instance; 
+  librdf_storage_postgresql_instance* context = (librdf_storage_postgresql_instance*)storage->instance;
   char find_statement[]="SELECT 1 FROM Statements" UINT64_T_FMT " WHERE Subject=" UINT64_T_FMT " AND Predicate=" UINT64_T_FMT " AND Object=" UINT64_T_FMT " limit 1";
   u64 subject, predicate, object;
   PGconn *handle;
@@ -1435,7 +1435,7 @@ librdf_storage_postgresql_contains_statement(librdf_storage* storage,
       if(query) {
         PGresult *res;
         snprintf(query, len, find_statement, context->model,
-                 subject, predicate, object); 
+                 subject, predicate, object);
         if((res=PQexec(handle, query))) {
           if(PQresultStatus(res) == PGRES_TUPLES_OK) {
             if(PQntuples(res)) {
@@ -1451,7 +1451,7 @@ librdf_storage_postgresql_contains_statement(librdf_storage* storage,
       }
     }
     librdf_storage_postgresql_release_handle(storage, handle);
-  }    
+  }
 
   return status;
 }
@@ -1499,7 +1499,7 @@ librdf_storage_postgresql_context_remove_statement(librdf_storage* storage,
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(statement, librdf_statement, 1);
 
   if((handle=librdf_storage_postgresql_get_handle(storage))) {
-    
+
     /* Find hashes for nodes */
     subject=librdf_storage_postgresql_node_hash(storage,
                                            librdf_statement_get_subject(statement),0);
@@ -1539,14 +1539,14 @@ librdf_storage_postgresql_context_remove_statement(librdf_storage* storage,
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                    "postgresql delete from Statements failed");
         }
-        
+
         LIBRDF_FREE(char*, query);
-      }    
+      }
     }
 
     librdf_storage_postgresql_release_handle(storage, handle);
   }
-  
+
   return status;
 }
 
@@ -1603,13 +1603,13 @@ librdf_storage_postgresql_context_remove_statements(librdf_storage* storage,
         librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "postgresql delete from Statements failed");
       }
-      
+
       LIBRDF_FREE(char*, query);
-    }    
+    }
 
     librdf_storage_postgresql_release_handle(storage, handle);
   }
-  
+
   return status;
 }
 
@@ -1703,7 +1703,7 @@ librdf_storage_postgresql_find_statements_in_context(librdf_storage* storage, li
  * Return value: a #librdf_stream or NULL on failure
  **/
 static librdf_stream*
-librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage, 
+librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
                                                   librdf_statement* statement,
                                                   librdf_node* context_node,
                                                   librdf_hash* options)
@@ -1748,7 +1748,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
 
   /* Construct query */
   query = LIBRDF_MALLOC(char*, 21);
-  if(query) {
+  if(!query) {
     librdf_storage_postgresql_find_statements_in_context_finished((void*)sos);
     return NULL;
   }
@@ -1806,7 +1806,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
     }
     strcat(joins," LEFT JOIN Resources AS PredicateR ON S.Predicate=PredicateR.ID");
   }
- 
+
   /* Object */
   if(statement && object) {
     if(!sos->is_literal_match) {
@@ -1862,7 +1862,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
     strcat(joins," LEFT JOIN Bnodes AS ObjectB ON S.Object=ObjectB.ID");
     strcat(joins," LEFT JOIN Literals AS ObjectL ON S.Object=ObjectL.ID");
   }
- 
+
   /* Context */
   if(context_node) {
     sprintf(tmp,"S.Context=" UINT64_T_FMT "",
@@ -1963,7 +1963,7 @@ librdf_storage_postgresql_find_statements_in_context_augment_query(char **query,
       return 1;
   strcpy(newquery,*query);
   strcat(newquery,addition);
-  LIBRDF_FREE(char*, *query);   
+  LIBRDF_FREE(char*, *query);
   *query=newquery;
 
   return 0;
@@ -1989,7 +1989,7 @@ librdf_storage_postgresql_find_statements_in_context_next_statement(void* contex
   librdf_node *node;
   char **row=sos->row;
   int i;
- 
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, void, 1);
 
   if( sos->current_rowno < PQntuples(sos->results) ) {
@@ -2106,7 +2106,7 @@ librdf_storage_postgresql_find_statements_in_context_next_statement(void* contex
         librdf_statement_set_object(sos->current_statement,node);
         part+=5;
       }
-     
+
       /* Context - constant or from row? */
       if(sos->query_context) {
         sos->current_context=librdf_new_node_from_node(sos->query_context);
@@ -2178,14 +2178,14 @@ librdf_storage_postgresql_find_statements_in_context_finished(void* context)
 
   if( sos->row )
      LIBRDF_FREE(char*, sos->row);
- 
+
 
   if(sos->results)
     PQclear(sos->results);
 
   if(sos->handle)
     librdf_storage_postgresql_release_handle(sos->storage, sos->handle);
- 
+
   if(sos->current_statement)
     librdf_free_statement(sos->current_statement);
 
@@ -2318,7 +2318,7 @@ librdf_storage_postgresql_get_contexts_next_context(void* context)
   librdf_node *node;
   char **row=gccontext->row;
   int i;
-  
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(context, void, 1);
 
   if( gccontext->current_rowno < PQntuples(gccontext->results) ) {
@@ -2336,8 +2336,8 @@ librdf_storage_postgresql_get_contexts_next_context(void* context)
       else
            row[i]=NULL;
      }
-    gccontext->current_rowno=gccontext->current_rowno+1;  
-    
+    gccontext->current_rowno=gccontext->current_rowno+1;
+
     /* Free old context node, if allocated */
     if(gccontext->current_context)
       librdf_free_node(gccontext->current_context);
@@ -2394,7 +2394,7 @@ librdf_storage_postgresql_free_gccontext_row(void* context)
   librdf_storage_postgresql_get_contexts_context* gccontext=(librdf_storage_postgresql_get_contexts_context*)context;
 
 /*
-  for(i=0;i<PQnfields(gccontext->results);i++) 
+  for(i=0;i<PQnfields(gccontext->results);i++)
      if( gccontext->row[i] )
          LIBRDF_FREE(char*, gccontext->row[i]);
 */
@@ -2433,7 +2433,7 @@ librdf_storage_postgresql_get_contexts_finished(void* context)
  * librdf_storage_postgresql_get_feature:
  * @storage: #librdf_storage object
  * @feature: #librdf_uri feature property
- * 
+ *
  * INTERNAL - get the value of a storage feature
  *
  * Return value: #librdf_node feature value or NULL if no such feature
@@ -2453,7 +2453,7 @@ librdf_storage_postgresql_get_feature(librdf_storage* storage, librdf_uri* featu
   uri_string=librdf_uri_as_string(feature);
   if(!uri_string)
     return NULL;
-  
+
   if(!strcmp((const char*)uri_string, (const char*)LIBRDF_MODEL_FEATURE_CONTEXTS)) {
     /* Always have contexts */
     static const unsigned char value[2]="1";
@@ -2472,19 +2472,19 @@ librdf_storage_postgresql_get_feature(librdf_storage* storage, librdf_uri* featu
 /*
  * librdf_storage_postgresql_transaction_start:
  * @storage: the storage object
- * 
+ *
  * INTERNAL - Start a transaction
- * 
+ *
  * Return value: non-0 on failure
  **/
 static int
-librdf_storage_postgresql_transaction_start(librdf_storage* storage) 
+librdf_storage_postgresql_transaction_start(librdf_storage* storage)
 {
   librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
   const char query[]="START TRANSACTION";
   int status = 1;
   PGresult *res;
-  
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
 
   if(context->transaction_handle) {
@@ -2492,7 +2492,7 @@ librdf_storage_postgresql_transaction_start(librdf_storage* storage)
                "Postgresql transaction already started");
     return status;
   }
-  
+
   context->transaction_handle=librdf_storage_postgresql_get_handle(storage);
   if(!context->transaction_handle) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
@@ -2527,9 +2527,9 @@ librdf_storage_postgresql_transaction_start(librdf_storage* storage)
  * librdf_storage_postgresql_transaction_start_with_handle:
  * @storage: the storage object
  * @handle: the transaction object
- * 
+ *
  * INTERNAL - Start a transaction using an existing external transaction object.
- * 
+ *
  * Return value: non-0 on failure
  **/
 static int
@@ -2543,24 +2543,24 @@ librdf_storage_postgresql_transaction_start_with_handle(librdf_storage* storage,
 /*
  * librdf_storage_postgresql_transaction_commit:
  * @storage: the storage object
- * 
+ *
  * INTERNAL - Commit a transaction.
- * 
- * Return value: non-0 on failure 
+ *
+ * Return value: non-0 on failure
  **/
 static int
-librdf_storage_postgresql_transaction_commit(librdf_storage* storage) 
+librdf_storage_postgresql_transaction_commit(librdf_storage* storage)
 {
   librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
   const char query[]="COMMIT TRANSACTION";
   int status = 1;
   PGresult *res;
-  
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
 
   if(!context->transaction_handle)
     return status;
-  
+
   res = PQexec(context->transaction_handle, query);
   if (res) {
     if (PQresultStatus(res) == PGRES_COMMAND_OK) {
@@ -2577,7 +2577,7 @@ librdf_storage_postgresql_transaction_commit(librdf_storage* storage)
 
   librdf_storage_postgresql_release_handle(storage, context->transaction_handle);
   context->transaction_handle=NULL;
-  
+
   return status;
 }
 
@@ -2585,10 +2585,10 @@ librdf_storage_postgresql_transaction_commit(librdf_storage* storage)
 /*
  * librdf_storage_postgresql_transaction_rollback:
  * @storage: the storage object
- * 
+ *
  * INTERNAL - Rollback a transaction.
- * 
- * Return value: non-0 on failure 
+ *
+ * Return value: non-0 on failure
  **/
 static int
 librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
@@ -2597,12 +2597,12 @@ librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
   const char query[]="ROLLBACK TRANSACTION";
   int status = 1;
   PGresult *res;
-  
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 1);
 
   if(!context->transaction_handle)
     return status;
-  
+
   res = PQexec(context->transaction_handle, query);
   if (res) {
     if (PQresultStatus(res) == PGRES_COMMAND_OK) {
@@ -2619,7 +2619,7 @@ librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
 
   librdf_storage_postgresql_release_handle(storage, context->transaction_handle);
   context->transaction_handle=NULL;
-  
+
   return status;
 }
 
@@ -2627,13 +2627,13 @@ librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
 /*
  * librdf_storage_postgresql_transaction_get_handle:
  * @storage: the storage object
- * 
+ *
  * INTERNAL - Get the current transaction handle.
- * 
- * Return value: non-0 on success 
+ *
+ * Return value: non-0 on success
  **/
 static void*
-librdf_storage_postgresql_transaction_get_handle(librdf_storage* storage) 
+librdf_storage_postgresql_transaction_get_handle(librdf_storage* storage)
 {
   librdf_storage_postgresql_instance *context=(librdf_storage_postgresql_instance*)storage->instance;
 
