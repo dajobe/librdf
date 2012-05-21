@@ -27,6 +27,40 @@ pre
 <p>Not yet released.
 </p>
 
+<h3>Model class changes</h3>
+
+<p><code>librdf_model_contains_statement()</code> now returns &gt; 0
+only for invalid statements according to the API contract.
+NULL statements are considered invalid.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=489">Issue #0000489</a>
+</p>
+
+<h3>Storage class changes</h3>
+
+<p><code>librdf_storage_contains_statement()</code> now returns &gt;
+0 only for invalid statements according to the API contract.  Uses
+<code>librdf_statement_is_complete()</code> for testing statement
+validity.
+</p>
+
+<p>postgres storage - fixed bad malloc result test during query
+allocation that probably caused librdf_model_find_statements() to
+fail.  Fix from 'zoggy' on github - thanks.
+</p>
+
+
+<h3>World class changes</h3>
+
+<p>Added <code>librdf_world_set_raptor_init_handler()</code> and
+<code>librdf_world_set_rasqal_init_handler()</code> methods to set
+handlers for configuring internal raptor and rasqal after they have
+been constructed but before they are initialized; before
+<code>raptor_world_open()</code> or <code>rasqal_world_open()</code>
+are run, respectively.  Added new typedefs
+<code>librdf_raptor_init_handler</code> and
+<code>librdf_rasqal_init_handler</code> for the handlers.
+</p>
+
 
 <h2 id="rel1_0_15"><a name="rel1_0_15">Redland 1.0.15 changes</a></h2>
 

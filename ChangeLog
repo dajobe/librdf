@@ -1,14 +1,78 @@
+2012-05-17  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query.c: sparql
+
+2012-05-17  Dave Beckett <dave@dajobe.org>
+
+	* utils/rdfproc.1: typo
+
+2012-03-07  Dave Beckett <dave@dajobe.org>
+
+	* Merge pull request #2 from zoggy/master Fixing bad test on query
+	allocation (postgresql storage) + WS changes
+
+2012-02-13  Lauri Aalto <laalto@iki.fi>
+
+	* autogen.sh:
+	require automake 1.11.2+ for -Wextra-portability
+
+2012-02-11  Dave Beckett <dave@dajobe.org>
+
+	* INSTALL.html:
+	Doc corrections
+
+	Remove docs of --with-raptor=internal and --with-rasqal=internal
+	These were removed from configure.ac on Mon Mar 30 02:07:57 2009
+	+0000 in commit 94687555d3b328fc920dd8180b1b2a563199fea0 Emphasise
+	--prefix=/usr more
+
+2012-02-10  Dave Beckett <dave@dajobe.org>
+
+	* build/.gitignore, configure.ac, docs/tmpl/world.sgml: Add
+	automake option -Wextra-portability and AM_PROG_AR to make it
+	happy
+
+	* docs/redland-sections.txt: Remove librdf_world_get_raptor
+	librdf_world_set_raptor from unused
+
+	* docs/redland-sections.txt: add librdf_world_get_raptor
+	librdf_world_set_raptor
+
+2012-02-01  Lauri Aalto <laalto@iki.fi>
+
+	* src/rdf_storage.c:
+	(librdf_storage_contains_statement): Return >0 only for invalid
+	statements according to API contract.  Treat NULL storage as empty
+	storage not containing statements.  Use
+	librdf_statement_is_complete() for testing statement validity.
+
+	* src/rdf_model.c:
+	(librdf_model_contains_statement): Treat NULL statement as invalid
+
+	* src/rdf_model.c:
+	(librdf_model_contains_statement): Return >0 only for invalid
+	statements according to API contract.
+
+	Fixes Issue #0000489
+	http://bugs.librdf.org/mantis/view.php?id=489
+
 2012-01-02  Dave Beckett <dave@dajobe.org>
+
+	* ChangeLog, ChangeLog.12, FAQS.html, INSTALL.html, LICENSE.html,
+	Makefile.am, NEWS.html, README.html, RELEASE.html, TODO.html: 2012
 
 	* docs/redland-changes.tsv, docs/redland-sections.txt,
 	src/rdf_init.h, src/rdf_init_internal.h, src/rdf_query_rasqal.c,
-	src/rdf_raptor.c:
-	Add handlers to allow application code to
-	configure raptor and rasqal (librdf_world_set_raptor_init_handler,
-	librdf_world_set_rasqal_init_handler): Added methods to set handlers
-	for configuring internal raptor and rasqal after they have been
-	constructed but before they are initialized; before
-	raptor_world_open() or rasqal_world_open() are run, respectively.  Added librdf_raptor_init_handler and librdf_rasqal_init_handler
+	src/rdf_raptor.c: Add handlers to allow application code to
+	configure raptor and rasqal
+
+	(librdf_world_set_raptor_init_handler,
+	librdf_world_set_rasqal_init_handler): Added methods to set
+	handlers for configuring internal raptor and rasqal after they
+	have been constructed but before they are initialized; before
+	raptor_world_open() or rasqal_world_open() are run, respectively.
+
+	Added librdf_raptor_init_handler and librdf_rasqal_init_handler
 	typedefs for the handlers.
 
 2012-01-02  Dave Beckett <dave@dajobe.org>
