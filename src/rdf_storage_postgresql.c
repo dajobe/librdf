@@ -1288,8 +1288,10 @@ librdf_storage_postgresql_context_add_statements(librdf_storage* storage,
       /* Do not add duplicate statements
        * but do not check for this when in bulk mode.
        */
-      if(librdf_storage_postgresql_contains_statement(storage, statement))
+      if(librdf_storage_postgresql_contains_statement(storage, statement)) {
+        librdf_stream_next(statement_stream);
         continue;
+      }
     }
 
     helper=librdf_storage_postgresql_context_add_statement_helper(storage, ctxt,
