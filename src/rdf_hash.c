@@ -1714,19 +1714,19 @@ librdf_hash_get_as_boolean(librdf_hash* hash, const char *key)
  * Return value: >0 (for success), <0 (for key not found or not known boolean value)
  **/
 long
-librdf_hash_get_as_long (librdf_hash* hash, const char *key) 
+librdf_hash_get_as_long(librdf_hash* hash, const char *key) 
 {
-  int lvalue;
+  long lvalue;
   char *value;
   char *end_ptr;
   
-  value=librdf_hash_get(hash, key);
+  value = librdf_hash_get(hash, key);
   if(!value)
     /* does not exist - fail */
     return -1;
 
   /* Using special base 0 which allows decimal, hex and octal */
-  lvalue=strtol(value, &end_ptr, 0);
+  lvalue = strtol(value, &end_ptr, 0);
 
   /* nothing found, return error */
   if(end_ptr == value)
