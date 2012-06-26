@@ -53,7 +53,7 @@ struct librdf_digest_factory_s
 
 struct librdf_digest_s {
   librdf_world *world;
-  char *context;
+  void* context;
   unsigned char *digest;
   librdf_digest_factory* factory;
 };
