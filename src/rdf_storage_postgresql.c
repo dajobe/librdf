@@ -60,7 +60,7 @@ typedef struct {
 
 typedef struct {
   /* postgresql connection parameters */
-  const char *host;
+  char *host;
   char *port;
   char *dbname;
   char *user;
@@ -523,26 +523,35 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   context->model=librdf_storage_postgresql_hash(storage, NULL, name, strlen(name));
 
   /* Save connection parameters */
-  context->host=librdf_hash_get(options, "host");
-  context->port=librdf_hash_get(options, "port");
-  if(context->port==NULL )
-  {
+  context->host = librdf_hash_get(options, "host");
+  if(!context->host) {
+     context->host = LIBRDF_MALLOC(char*, 10);
+     strcpy(context->host,"localhost");
+  }
+
+  context->port = librdf_hash_get(options, "port");
+  if(!context->port) {
      context->port = LIBRDF_MALLOC(char*, 10);
      strcpy(context->port,"5432"); /* default postgresql port */
   }
-  context->dbname=librdf_hash_get(options, "database");
+
+  context->dbname = librdf_hash_get(options, "database");
   if(!context->dbname)
-    context->dbname=librdf_hash_get(options, "dbname");
-  context->user=librdf_hash_get(options, "user");
+    context->dbname = librdf_hash_get(options, "dbname");
+
+  context->user = librdf_hash_get(options, "user");
   if(context->user && !context->dbname) {
      context->dbname = LIBRDF_MALLOC(char*, strlen(context->user) + 1);
      strcpy(context->dbname, context->user); /* default dbname=user */
   }
 
-  context->password=librdf_hash_get(options, "password");
+  context->password = librdf_hash_get(options, "password");
 
   if(!context->host || !context->dbname || !context->user || !context->port
      || !context->password) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "%s storage requires database/dbname, user and password in options", 
+               storage->factory->name);
     librdf_free_hash(options);
     return 1;
   }
