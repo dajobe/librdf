@@ -526,7 +526,7 @@ librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
 unsigned char*
 librdf_world_get_genid(librdf_world* world)
 {
-  int id, tmpid, counter, tmpcounter, pid, tmppid;
+  unsigned long id, tmpid, counter, tmpcounter, pid, tmppid;
   int length;
   unsigned char *buffer;
 
@@ -564,7 +564,7 @@ librdf_world_get_genid(librdf_world* world)
   if(!buffer)
     return NULL;
 
-  sprintf((char*)buffer, "r%dr%dr%d", id, pid, counter);
+  sprintf((char*)buffer, "r%lur%lur%lu", id, pid, counter);
   return buffer;
 }
 

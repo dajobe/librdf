@@ -96,10 +96,10 @@ struct librdf_world_s
   int hash_load_factor;
 
   /* ID base from startup time */
-  long genid_base;
+  unsigned long genid_base;
 
   /* Unique counter from there */
-  long genid_counter;
+  unsigned long genid_counter;
 
 #ifdef WITH_THREADS
   /* mutex so we can lock around this when we need to */
