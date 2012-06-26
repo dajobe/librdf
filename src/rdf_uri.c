@@ -177,8 +177,8 @@ librdf_new_uri_normalised_to_base(const unsigned char *uri_string,
                                   librdf_uri* source_uri,
                                   librdf_uri* base_uri) 
 {
-  int uri_string_len;
-  int len;
+  size_t uri_string_len;
+  size_t len;
   unsigned char *new_uri_string;
   librdf_uri *new_uri;
   unsigned char* source_uri_string;
