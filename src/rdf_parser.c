@@ -867,7 +867,7 @@ librdf_parser_guess_name2(librdf_world* world,
                           const unsigned char *buffer,
                           const unsigned char *identifier)
 {
-  int len = buffer ? strlen((const char *)buffer) : 0;
+  size_t len = buffer ? strlen((const char *)buffer) : 0;
 
   /* can do nothing if called with no world */
   if(!world || !world->raptor_world_ptr)

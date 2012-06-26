@@ -347,7 +347,8 @@ librdf_parser_raptor_get_next_statement(librdf_parser_raptor_stream_context *con
 
   context->current=NULL;
   while(!feof(context->fh)) {
-    int len, ret;
+    size_t len;
+    int ret;
 
     len = fread(buffer, 1, RAPTOR_IO_BUFFER_LEN, context->fh);
     ret = raptor_parser_parse_chunk(context->pcontext->rdf_parser, buffer, len,
@@ -499,7 +500,7 @@ librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler(raptor_www *www,
                                                              size_t nmemb)
 {
   librdf_parser_raptor_stream_context* scontext = (librdf_parser_raptor_stream_context*)userdata;
-  int len = size*nmemb;
+  size_t len = size * nmemb;
   int rc;
 
   rc = raptor_parser_parse_chunk(scontext->pcontext->rdf_parser,

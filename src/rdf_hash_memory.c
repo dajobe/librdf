@@ -145,7 +145,7 @@ static void librdf_hash_memory_register_factory(librdf_hash_factory *factory);
 #define ONE_AT_A_TIME_HASH(hash,str,len) \
      do { \
         register const unsigned char *c_oneat = (unsigned char*)str+len-1; \
-        register int i_oneat = len; \
+        register size_t i_oneat = len; \
         register u32 hash_oneat = 0; \
         while (i_oneat--) { \
             hash_oneat += *c_oneat--; \

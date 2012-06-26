@@ -377,9 +377,9 @@ char*
 librdf_digest_to_string(librdf_digest* digest)
 {
   unsigned char* data = digest->digest;
-  int mdlen = digest->factory->digest_length;
+  size_t mdlen = digest->factory->digest_length;
   char* b;
-  int i;
+  size_t i;
 
   b = (char *)librdf_alloc_memory(1 + (mdlen<<1));
   if(!b) {
@@ -387,7 +387,7 @@ librdf_digest_to_string(librdf_digest* digest)
     return NULL;
   }
   
-  for(i = 0; i<mdlen; i++)
+  for(i = 0; i < mdlen; i++)
     sprintf(b+(i<<1), "%02x", (unsigned int)data[i]);
 
   b[i<<1] = '\0';
