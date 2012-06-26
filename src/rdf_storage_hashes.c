@@ -759,7 +759,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   int status;
   librdf_world* world = storage->world;
   
-  if(storage->index_contexts) {
+  if(context->index_contexts) {
     /* When we have contexts, we have to use find_statements for contains
      * since a statement is encoded in KEY/VALUE and the VALUE may
      * contain some context node.
