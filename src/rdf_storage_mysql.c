@@ -554,15 +554,24 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
 
   /* Save connection parameters */
   context->host = librdf_hash_get_del(options, "host");
+  if(!context->host) {
+     context->host = LIBRDF_MALLOC(char*, 10);
+     strcpy(context->host,"localhost");
+  }
+
   context->port = librdf_hash_get_as_long(options, "port");
   if(context->port < 0)
-    context->port=3306; /* default mysql port */
+    context->port = 3306; /* default mysql port */
+
   context->database = librdf_hash_get_del(options, "database");
   context->user = librdf_hash_get_del(options, "user");
   context->password = librdf_hash_get_del(options, "password");
 
   if(!context->host || !context->database || !context->user || 
      !context->port || !context->password) {
+    librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
+               "%s storage requires database, user and password in options", 
+               storage->factory->name);
     librdf_free_hash(options);
     return 1;
   }
