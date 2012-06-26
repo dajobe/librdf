@@ -36,6 +36,10 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
+/* for ptrdiff_t */
+#ifdef HAVE_STDDEF_H
+#include <stddef.h>
+#endif
 #include <sys/types.h>
 
 #include <redland.h>
@@ -685,7 +689,11 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
 
       case RAPTOR_TERM_TYPE_UNKNOWN:
       default:
-        return (char*)n2-(char*)n1; /* ? */
+        if(1) {
+          ptrdiff_t d;
+          d = LIBRDF_GOOD_CAST(char*, n2) - LIBRDF_GOOD_CAST(char*, n1);
+          return (d > 0) - (d < 0);
+        }
     }
   }
 }
