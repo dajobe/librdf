@@ -467,7 +467,7 @@ librdf_hash_bdb_cursor_get(void* context,
 
   /* Always initialise BDB version of key */
   bdb_key.data = (char*)key->data;
-  bdb_key.size = key->size;
+  bdb_key.size = LIBRDF_BAD_CAST(int, key->size);
   
 #ifdef DB_DBT_MALLOC
   /* BDB V2 or later? */
@@ -688,11 +688,11 @@ librdf_hash_bdb_put(void* context, librdf_hash_datum *key,
   
   /* Initialise BDB version of key */
   bdb_key.data = (char*)key->data;
-  bdb_key.size = key->size;
+  bdb_key.size = LIBRDF_BAD_CAST(int, key->size);
   
   /* Initialise BDB version of data */
   bdb_value.data = (char*)value->data;
-  bdb_value.size = value->size;
+  bdb_value.size = LIBRDF_BAD_CAST(int, value->size);
   
 #ifdef HAVE_BDB_DB_TXN
   /* V2/V3 prototype:
@@ -741,11 +741,11 @@ librdf_hash_bdb_exists(void* context, librdf_hash_datum *key,
   
   /* Initialise BDB version of key */
   bdb_key.data = (char*)key->data;
-  bdb_key.size = key->size;
+  bdb_key.size = LIBRDF_BAD_CAST(int, key->size);
 
   if(value) {
     bdb_value.data = (char*)value->data;
-    bdb_value.size = value->size;
+    bdb_value.size = LIBRDF_BAD_CAST(int, value->size);
   }
 	
 #ifdef HAVE_BDB_DB_TXN
@@ -877,7 +877,7 @@ librdf_hash_bdb_delete_key(void* context, librdf_hash_datum *key)
 
   /* Initialise BDB version of key */
   bdb_key.data = (char*)key->data;
-  bdb_key.size = key->size;
+  bdb_key.size = LIBRDF_BAD_CAST(int, key->size);
   
 #ifdef HAVE_BDB_DB_TXN
   /* V2/V3 */
@@ -922,10 +922,10 @@ librdf_hash_bdb_delete_key_value(void* context,
 
   /* Initialise BDB version of key */
   bdb_key.data = (char*)key->data;
-  bdb_key.size = key->size;
+  bdb_key.size = LIBRDF_BAD_CAST(int, key->size);
   
   bdb_value.data = (char*)value->data;
-  bdb_value.size = value->size;
+  bdb_value.size = LIBRDF_BAD_CAST(int, value->size);
   
 #ifdef HAVE_BDB_CURSOR
 #ifdef HAVE_BDB_CURSOR_4_ARGS
