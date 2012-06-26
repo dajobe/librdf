@@ -221,24 +221,25 @@ static void
 SHA1Update(SHA1Context* context, const unsigned char* data, size_t len)	/* JHB */
 {
   u32 i, j;	/* JHB */
+  u32 ulen = LIBRDF_BAD_CAST(u32, len);
 
   j = (context->count[0] >> 3) & 63;
-  if ((context->count[0] += len << 3) < (len << 3))
+  if ((context->count[0] += ulen << 3) < (ulen << 3))
     context->count[1]++;
 
-  context->count[1] += (len >> 29);
+  context->count[1] += (ulen >> 29);
 
-  if ((j + len) > 63) {
+  if ((j + ulen) > 63) {
     memcpy(&context->buffer[j], data, (i = 64-j));
     SHA1Transform(context->state, context->buffer);
-    for ( ; i + 63 < len; i += 64) {
+    for ( ; i + 63 < ulen; i += 64) {
       SHA1Transform(context->state, &data[i]);
     }
     j = 0;
   }
   else
     i = 0;
-  memcpy(&context->buffer[j], &data[i], len - i);
+  memcpy(&context->buffer[j], &data[i], ulen - i);
 }
 
 
