@@ -111,7 +111,7 @@ librdf_query_rasqal_init(librdf_query* query,
                          librdf_uri *base_uri)
 {
   librdf_query_rasqal_context *context=(librdf_query_rasqal_context*)query->context;
-  int len;
+  size_t len;
   unsigned char *query_string_copy;
   
   context->query = query;
@@ -126,7 +126,7 @@ librdf_query_rasqal_init(librdf_query* query,
   rasqal_world_set_log_handler(query->world->rasqal_world_ptr, query->world,
                                librdf_query_rasqal_log_handler);
 
-  len=strlen((const char*)query_string);
+  len = strlen((const char*)query_string);
   query_string_copy = LIBRDF_MALLOC(unsigned char*, len + 1);
   if(!query_string_copy)
     return 1;

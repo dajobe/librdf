@@ -188,7 +188,7 @@ librdf_storage_hashes_register(librdf_storage *storage,
                                const librdf_hash_descriptor *source_desc) 
 {
   librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
-  int len;
+  size_t len;
   char *full_name=NULL;
   int hash_index;
   librdf_hash_descriptor *desc;
@@ -204,9 +204,9 @@ librdf_storage_hashes_register(librdf_storage *storage,
   context->hash_descriptions[hash_index]=desc;
     
   if(name) {
-    len=strlen(desc->name) + 1 + strlen(name) + 1; /* "%s-%s\0" */
+    len = strlen(desc->name) + 1 + strlen(name) + 1; /* "%s-%s\0" */
     if(context->db_dir)
-      len+=strlen(context->db_dir) +1;
+      len += strlen(context->db_dir) +1;
     
     full_name = LIBRDF_MALLOC(char*, len);
     if(!full_name)
@@ -380,8 +380,10 @@ librdf_storage_hashes_init(librdf_storage* storage, const char *name,
   
   indexes=librdf_hash_get_del(options, "indexes");
   
-  if((mode=librdf_hash_get_as_long(options, "mode"))<0)
-    mode=0644; /* default mode */
+  /* POSIX open(2) modes are int so this cast is OKish */
+  mode = (int)librdf_hash_get_as_long(options, "mode");
+  if(mode < 0)
+    mode = 0644; /* default mode */
   
   if((is_writable=librdf_hash_get_as_boolean(options, "write"))<0)
     is_writable=1; /* default is WRITABLE */
@@ -632,7 +634,7 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
 
   for(i=0; i<context->hash_count; i++) {
     librdf_hash_datum hd_key, hd_value; /* on stack */
-    int key_len, value_len;
+    size_t key_len, value_len;
 
     /* ENCODE KEY */
 
@@ -640,7 +642,8 @@ librdf_storage_hashes_add_remove_statement(librdf_storage* storage,
     if(!fields)
       continue;
     
-    key_len=librdf_statement_encode_parts2(world, statement, NULL, NULL, 0, fields);
+    key_len = librdf_statement_encode_parts2(world, statement, NULL, NULL, 0,
+                                             fields);
     if(!key_len)
       return 1;
     if(librdf_storage_hashes_grow_buffer(&context->key_buffer, 
@@ -753,7 +756,7 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
   librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_hash_datum hd_key, hd_value; /* on stack */
   unsigned char *key_buffer, *value_buffer;
-  int key_len, value_len;
+  size_t key_len, value_len;
   int hash_index=context->all_statements_hash_index;
   librdf_statement_part fields;
   int status;
@@ -777,8 +780,8 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
 
   /* ENCODE KEY */
   fields=(librdf_statement_part)context->hash_descriptions[hash_index]->key_fields;
-  key_len=librdf_statement_encode_parts2(world, statement, NULL,
-                                         NULL, 0, fields);
+  key_len = librdf_statement_encode_parts2(world, statement, NULL,
+                                           NULL, 0, fields);
   if(!key_len)
     return 1;
   key_buffer = LIBRDF_MALLOC(unsigned char*, key_len);
@@ -793,8 +796,8 @@ librdf_storage_hashes_contains_statement(librdf_storage* storage, librdf_stateme
 
   /* ENCODE VALUE */
   fields=(librdf_statement_part)context->hash_descriptions[hash_index]->value_fields;
-  value_len=librdf_statement_encode_parts2(world, statement, NULL,
-                                           NULL, 0, fields);
+  value_len = librdf_statement_encode_parts2(world, statement, NULL,
+                                             NULL, 0, fields);
   if(!value_len) {
     LIBRDF_FREE(data, key_buffer);
     return 1;
@@ -1461,7 +1464,7 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
 {
   librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_hash_datum key, value; /* on stack - not allocated */
-  int size;
+  size_t size;
   int status;
   librdf_world* world = storage->world;
   
@@ -1475,12 +1478,12 @@ librdf_storage_hashes_context_add_statement(librdf_storage* storage,
                                                 statement, context_node, 1))
     return 1;
 
-  size=librdf_node_encode(context_node, NULL, 0);
+  size = librdf_node_encode(context_node, NULL, 0);
   key.data = LIBRDF_MALLOC(char*, size);
   key.size=librdf_node_encode(context_node, 
                                (unsigned char*)key.data, size);
 
-  size=librdf_statement_encode2(world, statement, NULL, 0);
+  size = librdf_statement_encode2(world, statement, NULL, 0);
 
   value.data = LIBRDF_MALLOC(char*, size);
   value.size=librdf_statement_encode2(world, statement, (unsigned char*)value.data, size);
@@ -1510,7 +1513,7 @@ librdf_storage_hashes_context_remove_statement(librdf_storage* storage,
 {
   librdf_storage_hashes_instance* context=(librdf_storage_hashes_instance*)storage->instance;
   librdf_hash_datum key, value; /* on stack - not allocated */
-  int size;
+  size_t size;
   int status;
   librdf_world* world = storage->world;
   
@@ -1523,12 +1526,12 @@ librdf_storage_hashes_context_remove_statement(librdf_storage* storage,
                                                 statement, context_node, 0))
     return 1;
   
-  size=librdf_node_encode(context_node, NULL, 0);
+  size = librdf_node_encode(context_node, NULL, 0);
   key.data = LIBRDF_MALLOC(char*, size);
   key.size=librdf_node_encode(context_node,
                                (unsigned char*)key.data, size);
 
-  size=librdf_statement_encode2(world, statement, NULL, 0);
+  size = librdf_statement_encode2(world, statement, NULL, 0);
 
   value.data = LIBRDF_MALLOC(char*, size);
   value.size=librdf_statement_encode2(world, statement, (unsigned char*)value.data, size);
