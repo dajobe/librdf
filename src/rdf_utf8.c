@@ -242,11 +242,13 @@ librdf_utf8_print(const unsigned char *input, int length, FILE *stream)
     int size = raptor_unicode_utf8_string_get_char(input, length - i, &c);
     if(size <= 0)
       return;
+
     if(c < 0x100) {
-      if(isprint(c))
-        fputc(c, stream);
+      int cchar = (int)c;
+      if(isprint(cchar))
+        fputc(cchar, stream);
       else
-        fprintf(stream, "\\u%02X", (unsigned int)c);
+        fprintf(stream, "\\u%02X", cchar);
     } else if (c < 0x10000)
       fprintf(stream, "\\u%04X", (unsigned int)c);
     else
