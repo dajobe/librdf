@@ -665,7 +665,7 @@ rasqal_redland_init_triples_match(rasqal_triples_match* rtm,
   if(!rtmc->qstatement)
     return 1;
 
-#if LIBDF_DEBUG > 1
+#if LIBRDF_DEBUG > 1
   LIBRDF_DEBUG1("query statement: ");
   librdf_statement_print(rtmc->qstatement, stderr);
   if(rtmc->origin) {
@@ -685,7 +685,7 @@ rasqal_redland_init_triples_match(rasqal_triples_match* rtm,
   if(!rtmc->stream)
     return 1;
 
-#if LIBDF_DEBUG > 1
+#if LIBRDF_DEBUG > 1
   LIBRDF_DEBUG1("rasqal_init_triples_match done\n");
 #endif
 
