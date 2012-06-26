@@ -173,6 +173,14 @@ void librdf_sign_free(void *ptr);
 /* Fatal errors - always happen */
 #define LIBRDF_FATAL1(world, facility, message) librdf_fatal(world, facility, __FILE__, __LINE__ , __func__, message)
 
+
+/* Safe casts: widening a value */
+#define LIBRDF_GOOD_CAST(t, v) (t)(v)
+
+/* Unsafe casts: narrowing a value */
+#define LIBRDF_BAD_CAST(t, v) (t)(v)
+
+
 #include <rdf_list.h>
 #include <rdf_files.h>
 #include <rdf_heuristics.h>
