@@ -3,7 +3,7 @@
  * rdf_init.c - Redland library initialisation / termination and memory
  *              management
  *
- * Copyright (C) 2000-2011, David Beckett http://www.dajobe.org/
+ * Copyright (C) 2000-2012, David Beckett http://www.dajobe.org/
  * Copyright (C) 2000-2005, University of Bristol, UK http://www.bristol.ac.uk/
  * 
  * This package is Free Software and part of Redland http://librdf.org/
@@ -69,9 +69,9 @@
 
 #ifndef STANDALONE
 
-const char * const librdf_short_copyright_string = "Copyright 2000-2011 David Beckett. Copyright 2000-2005 University of Bristol";
+const char * const librdf_short_copyright_string = "Copyright 2000-2012 David Beckett. Copyright 2000-2005 University of Bristol";
 
-const char * const librdf_copyright_string = "Copyright (C) 2000-2011 David Beckett - http://www.dajobe.org/\nCopyright (C) 2000-2005 University of Bristol - http://www.bristol.ac.uk/";
+const char * const librdf_copyright_string = "Copyright (C) 2000-2012 David Beckett - http://www.dajobe.org/\nCopyright (C) 2000-2005 University of Bristol - http://www.bristol.ac.uk/";
 
 /**
  * librdf_version_string:
