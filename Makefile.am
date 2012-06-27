@@ -36,10 +36,11 @@ DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
 # Subdirectories to build/install/distribute etc.
 SUBDIRS=$(subdirs) src examples utils demos docs data scripts
 
-EXTRA_DIST=ChangeLog ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
+EXTRA_DIST=\
+ChangeLog.1 ChangeLog.2 ChangeLog.3 ChangeLog.4 \
 ChangeLog.5 ChangeLog.6 ChangeLog.7 ChangeLog.8 ChangeLog.9 ChangeLog.10 \
 ChangeLog.11 ChangeLog.12 \
-README      NEWS      LICENSE.txt  TODO \
+README                LICENSE.txt  TODO \
 README.html NEWS.html LICENSE.html TODO.html \
 RELEASE.html INSTALL.html FAQS.html \
 LICENSE-2.0.txt NOTICE \
