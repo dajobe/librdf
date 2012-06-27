@@ -1,3 +1,213 @@
+2012-06-26  Dave Beckett <dave@dajobe.org>
+
+	* Makefile.am: EXTRA_DIST: Remove ChangeLog NEWS since they are in
+	dist by default
+
+	* src/rdf_storage_virtuoso.c:
+	Error path cleanups [clang]
+
+	(vGetDataCHAR): On query failure, free pLongData.
+
+	(librdf_storage_virtuoso_get_handle): On connection falloc
+	failure, free connections before returning.  Protect looking up
+	connection to make clang happier.
+
+	(librdf_storage_virtuoso_context_remove_statement): Protect
+	multiple strlens from a statement to prevent NULL lookup.
+
+	(librdf_storage_virtuoso_get_contexts0: Protect looking up storage
+	to make clang happier.
+
+	* src/rdf_storage_sqlite.c:
+	(librdf_storage_sqlite_query_flush): Add NULL storage check [clang]
+
+	* src/rdf_storage_list.c:
+	Error path cleanups [clang]
+
+	(librdf_storage_list_get_contexts): On alloc failure for key, free
+	icontext
+
+	* src/rdf_storage_hashes.c:
+	Error path cleanups [clang]
+
+	(librdf_storage_hashes_register): Protect from NULL source_desc to
+	make clang happier
+
+	(librdf_storage_hashes_init_common): Protect from NULL hash
+	descriptions to make clang happier
+
+	(librdf_storage_hashes_get_contexts): On alloc failure for key,
+	free icontext
+
+	* src/rdf_storage_file.c:
+	Error path cleanups [clang]
+
+	(librdf_storage_file_sync): free backup_name on failure
+
+	* src/rdf_query_virtuoso.c:
+	Error path cleanups [clang]
+
+	(librdf_query_virtuoso_execute): free results on failure
+
+	(librdf_query_virtuoso_results_as_stream): Free scontext on
+	failure
+
+	* src/rdf_query_rasqal.c: Fix allocation of stream context [clang]
+
+	(librdf_query_rasqal_results_as_stream): Allocate correct stream
+	context size.
+
+	* src/rdf_heuristics.c:
+	(librdf_heuristic_object_is_literal): Protect a lookup to make clang
+	happier
+
+	* src/rdf_hash.c:
+	Error path cleanups [clang]
+
+	(librdf_hash_keys_iterator_finished): Protect a lookup to make
+	clang happier
+
+	(librdf_hash_print): Free key on alloc failure of value
+
+	* src/rdf_storage_sqlite.c: Type length casts for sqlite3
+
+	(sqlite_string_escape): Turn sqlite rowid into narrower int (BAD
+	CAST)
+
+	(librdf_storage_sqlite_serialise)
+	(librdf_storage_sqlite_find_statements)
+	(librdf_storage_sqlite_context_serialise)
+	(librdf_storage_sqlite_get_contexts): Narrow known query string
+	lengths to int from size_t - good since we construct the query
+	strings inside this module.
+
+	* src/rdf_query_virtuoso.c, src/rdf_storage_virtuoso.c: bad casts
+	for narrowing size_t to SQLUINTEGER
+
+	(librdf_query_virtuoso_init, BindCtxt, BindSP, BindObject):
+	Multiple bad casts for turning size_t from a strlen into
+	SQLUINTEGER (which seems to be smaller).
+
+	* src/rdf_storage_postgresql.c: size_t for length
+
+	(librdf_storage_postgresql_hash)
+	(librdf_storage_postgresql_node_hash): Now take size_t args Update
+	callers
+
+	(librdf_storage_postgresql_size): Bad cast for turning PGgetvalue
+	into long via atol and then returning an int.
+
+	* src/rdf_hash_bdb.c:
+	LIBRDF_BAD_CAST BDB key sizes to int
+
+	* configure.ac, src/rdf_storage_trees.c: Use ptrdiff_t for
+	comparing void pointers
+
+	* src/rdf_query_rasqal.c, src/rdf_storage_hashes.c: size_t for len
+	in multiple places
+
+	query rasqal module:
+	(librdf_query_rasqal_init): size_t for len
+
+	storage hashes module:
+	(librdf_storage_hashes_register, librdf_storage_hashes_init)
+	(librdf_storage_hashes_add_remove_statement)
+	(librdf_storage_hashes_contains_statement)
+	(librdf_storage_hashes_context_add_statement)
+	(librdf_storage_hashes_context_remove_statement): size_t for len
+
+	* src/rdf_digest_sha1.c:
+	(SHA1Update): Bad cast a size_t len to u32 :/
+
+	* src/rdf_internal.h:
+	Add LIBRDF_GOOD_CAST LIBRDF_BAD_CAST
+
+	* src/rdf_utf8.c:
+	(librdf_utf8_print): Cast to char when in range
+
+	* src/rdf_hash.c:
+	(librdf_hash_get_as_long): strtol returns long (!)
+
+	* src/rdf_digest.c, src/rdf_hash.c, src/rdf_hash_memory.c,
+	src/rdf_parser.c, src/rdf_parser_raptor.c: Use size_t for len in
+	multiple places digest module
+
+	(librdf_digest_to_string): use size_t for mdlen and index.  hash
+	module
+
+	(librdf_hash_from_string): size_t for len and index var.
+
+	(macro ONE_AT_A_TIME_HASH): use size_t for len parser module
+
+	(librdf_parser_guess_name2)
+
+	(librdf_parser_raptor_get_next_statement)
+
+	(librdf_parser_raptor_parse_uri_as_stream_write_bytes_handler):
+	size_t for len
+
+	* src/rdf_digest_internal.h: Use void* for digest context
+	librdf_digest_s field context is void*
+
+	* src/rdf_uri.c:
+	(librdf_new_uri_normalised_to_base): size_t for len
+
+	* src/rdf_init.c, src/rdf_init_internal.h: Genid are now unsigned
+	long
+
+	(librdf_world_get_genid): Format as %lu
+
+	* src/rdf_query_rasqal.c: #if LIBRDF_DEBUG
+
+	* configure.ac: Update warnings
+
+	* src/rdf_storage_postgresql.c: Supply default host 'localhost'
+	for postgresql storage.
+
+	(librdf_storage_postgresql_init): Check for missing host and set
+	it to localhost.  Report required storage config parameters in
+	error failure message.
+
+	* src/rdf_storage_mysql.c: Supply default host 'localhost' for
+	mysql storage.
+
+	(librdf_storage_mysql_init): Check for missing host and set it to
+	localhost.  Report required storage config parameters in error
+	failure message.
+
+	* src/rdf_storage_hashes.c: Make statement present (ASK) work for
+	hashes storage and contexts
+
+	(librdf_storage_hashes_contains_statement): Get index contexts
+	flag from context not storage.  Why?  Not immediately clear at a
+	glance
+
+	Fixes Issue #0000515
+	http://bugs.librdf.org/mantis/view.php?id=515
+
+	* autogen.sh: autogen.sh updates
+	- Abort run if a configuring program fails.
+	- Generate NEWS with old timestamp if missing so automake can run
+	- small doc and message updates
+
+2012-06-19  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac: Search for BDB 5.3
+
+	* src/rdf_storage_postgresql.c: Make loading triples from a stream
+	to postgresql actually work
+
+	(librdf_storage_postgresql_context_add_statements): Skip to next
+	statement in non bulk mode.
+
+2012-06-17  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh: Support NOCONFIGURE variable, like Lib{XML2,XSLT}
+
+2012-05-20  Dave Beckett <dave@dajobe.org>
+
+	* ChangeLog, RELEASE.html: 1.0.16
+
 2012-05-17  Dave Beckett <dave@dajobe.org>
 
 	* src/rdf_query.c: sparql
