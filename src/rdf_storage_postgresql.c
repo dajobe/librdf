@@ -165,9 +165,9 @@ typedef struct {
 
 static u64 librdf_storage_postgresql_hash(librdf_storage* storage,
                                           const char *type,
-                                          const char *string, int length);
+                                          const char *string, size_t length);
 static u64 librdf_storage_postgresql_node_hash(librdf_storage* storage,
-                                               librdf_node* node,int add);
+                                               librdf_node* node, int add);
 static int librdf_storage_postgresql_start_bulk(librdf_storage* storage);
 static int librdf_storage_postgresql_stop_bulk(librdf_storage* storage);
 static int librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
@@ -209,15 +209,17 @@ static int librdf_storage_postgresql_transaction_rollback(librdf_storage* storag
  **/
 static u64
 librdf_storage_postgresql_hash(librdf_storage* storage, const char *type,
-                               const char *string, int length)
+                               const char *string, size_t length)
 {
-  librdf_storage_postgresql_instance* context=(librdf_storage_postgresql_instance*)storage->instance;
+  librdf_storage_postgresql_instance* context;
   u64 hash;
   byte* digest;
   int i;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, 0);
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(string, char*, 0);
+
+  context = (librdf_storage_postgresql_instance*)storage->instance;
 
   /* (Re)initialize digest object */
   librdf_digest_init(context->digest);
@@ -520,7 +522,8 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
   }
 
   /* Save hash of model name */
-  context->model=librdf_storage_postgresql_hash(storage, NULL, name, strlen(name));
+  context->model = librdf_storage_postgresql_hash(storage, NULL, name,
+                                                  strlen(name));
 
   /* Save connection parameters */
   context->host = librdf_hash_get(options, "host");
@@ -894,7 +897,7 @@ librdf_storage_postgresql_size(librdf_storage* storage)
   char model_size[]="SELECT COUNT(*) FROM Statements" UINT64_T_FMT;
   char *query;
   PGresult *res;
-  int count;
+  long count;
   PGconn *handle;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(storage, librdf_storage, -1);
@@ -925,12 +928,12 @@ librdf_storage_postgresql_size(librdf_storage* storage)
     librdf_storage_postgresql_release_handle(storage, handle);
     return -1;
   }
-  count=atol(PQgetvalue(res,0,0));
+  count = atol(PQgetvalue(res,0,0));
   PQclear(res);
   LIBRDF_FREE(char*, query);
   librdf_storage_postgresql_release_handle(storage, handle);
 
-  return count;
+  return LIBRDF_BAD_CAST(int, count);
 }
 
 
@@ -995,7 +998,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
   if(type==LIBRDF_NODE_TYPE_RESOURCE) {
     /* Get hash */
     unsigned char *uri=librdf_uri_as_counted_string(librdf_node_get_uri(node), &nodelen);
-    hash=librdf_storage_postgresql_hash(storage, "R", (char*)uri, nodelen);
+    hash = librdf_storage_postgresql_hash(storage, "R", (char*)uri, nodelen);
 
     if(add) {
       char create_resource[]="INSERT INTO Resources (ID,URI) VALUES (" UINT64_T_FMT ",'%s')";
@@ -1075,7 +1078,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
     if(datatype)
       strcat(nodestring, (const char*)datatype);
     nodelen=valuelen+langlen+datatypelen+2;
-    hash=librdf_storage_postgresql_hash(storage, "L", nodestring, nodelen);
+    hash = librdf_storage_postgresql_hash(storage, "L", nodestring, nodelen);
     LIBRDF_FREE(char*, nodestring);
 
     if(add) {
@@ -1163,9 +1166,9 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
 
   } else if(type==LIBRDF_NODE_TYPE_BLANK) {
     /* Get hash */
-    unsigned char *name=librdf_node_get_blank_identifier(node);
-    nodelen=strlen((const char*)name);
-    hash=librdf_storage_postgresql_hash(storage, "B", (char*)name, nodelen);
+    unsigned char *name = librdf_node_get_blank_identifier(node);
+    nodelen = strlen((const char*)name);
+    hash = librdf_storage_postgresql_hash(storage, "B", (char*)name, nodelen);
 
     if(add) {
       char create_bnode[]="INSERT INTO Bnodes (ID,Name) VALUES (" UINT64_T_FMT ",'%s')";
