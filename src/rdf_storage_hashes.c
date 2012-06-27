@@ -193,6 +193,9 @@ librdf_storage_hashes_register(librdf_storage *storage,
   int hash_index;
   librdf_hash_descriptor *desc;
 
+  if(!source_desc)
+    return 1;
+
   desc = LIBRDF_MALLOC(librdf_hash_descriptor*, sizeof(*desc));
   if(!desc)
     return 1;
@@ -331,8 +334,14 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
   context->all_statements_hash_index= -1;
 
   for(i=0; i<context->hash_count; i++) {
-    int key_fields=context->hash_descriptions[i]->key_fields;
-    int value_fields=context->hash_descriptions[i]->value_fields;
+    int key_fields;
+    int value_fields;
+
+    if(!context->hash_descriptions[i])
+      continue;
+
+    key_fields = context->hash_descriptions[i]->key_fields;
+    value_fields = context->hash_descriptions[i]->value_fields;
 
     if(context->all_statements_hash_index <0 &&
        ((key_fields|value_fields)==(LIBRDF_STATEMENT_SUBJECT|LIBRDF_STATEMENT_PREDICATE|LIBRDF_STATEMENT_OBJECT))) {
@@ -1854,8 +1863,10 @@ librdf_storage_hashes_get_contexts(librdf_storage* storage)
     return NULL;
 
   icontext->key=librdf_new_hash_datum(storage->world, NULL, 0);
-  if(!icontext->key)
+  if(!icontext->key) {
+    LIBRDF_FREE(librdf_storage_hashes_get_contexts_iterator_context, icontext);
     return NULL;
+  }
   
   icontext->iterator=librdf_hash_keys(context->hashes[context->contexts_index],
                                       icontext->key);
