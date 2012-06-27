@@ -53,15 +53,8 @@
 #define LIBRDF_DEBUG3(msg, arg1, arg2) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, __func__, arg1, arg2);} while(0)
 #define LIBRDF_DEBUG4(msg, arg1, arg2, arg3) do {fprintf(stderr, "%s:%d:%s: " msg, __FILE__, __LINE__, __func__, arg1, arg2, arg3);} while(0)
 
-#if defined(HAVE_DMALLOC_H) && defined(LIBRDF_MEMORY_DEBUG_DMALLOC)
-void* librdf_system_malloc(size_t size);
-void librdf_system_free(void *ptr);
-#define SYSTEM_MALLOC(size)   librdf_system_malloc(size)
-#define SYSTEM_FREE(ptr)   librdf_system_free(ptr)
-#else
 #define SYSTEM_MALLOC(size)   malloc(size)
 #define SYSTEM_FREE(ptr)   free(ptr)
-#endif
 
 #ifndef LIBRDF_ASSERT_DIE
 #define LIBRDF_ASSERT_DIE abort();
@@ -138,37 +131,14 @@ void librdf_system_free(void *ptr);
 
 
 /* for the memory allocation functions */
-#if defined(HAVE_DMALLOC_H) && defined(LIBRDF_MEMORY_DEBUG_DMALLOC)
-#ifdef HAVE_STDLIB_H
-#include <stdlib.h>
-#undef HAVE_STDLIB_H
-#endif
-#include <dmalloc.h>
-#endif
-
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #undef HAVE_STDLIB_H
 #endif
 
-#if defined(LIBRDF_MEMORY_SIGN)
-#define LIBRDF_SIGN_KEY 0x04Ed1A7D
-void* librdf_sign_malloc(size_t size);
-void* librdf_sign_calloc(size_t nmemb, size_t size);
-void* librdf_sign_realloc(void *ptr, size_t size);
-void librdf_sign_free(void *ptr);
-  
-#define LIBRDF_MALLOC(type, size)   (type)librdf_sign_malloc(size)
-#define LIBRDF_CALLOC(type, nmemb, size) (type)librdf_sign_calloc(nmemb, size)
-#define LIBRDF_REALLOC(type, ptr, size) (type)librdf_sign_realloc(ptr, size)
-#define LIBRDF_FREE(type, ptr)   librdf_sign_free(ptr)
-
-#else
 #define LIBRDF_MALLOC(type, size) (type)malloc(size)
 #define LIBRDF_CALLOC(type, size, count) (type)calloc(size, count)
 #define LIBRDF_FREE(type, ptr)   free(ptr)
-
-#endif
 
 /* Fatal errors - always happen */
 #define LIBRDF_FATAL1(world, facility, message) librdf_fatal(world, facility, __FILE__, __LINE__ , __func__, message)

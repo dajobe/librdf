@@ -1,9 +1,9 @@
 dnl -*- Mode: autoconf -*-
 dnl
-dnl configure.ac - top level autoconf file for Redland
+dnl configure.ac - top level autoconf file for Redland librdf
 dnl (Process this file with autoconf to produce a configure script.)
 dnl
-dnl Copyright (C) 2000-2011 David Beckett http://www.dajobe.org/
+dnl Copyright (C) 2000-2012 David Beckett http://www.dajobe.org/
 dnl Copyright (C) 2000-2005 University of Bristol, UK http://www.bristol.ac.uk/
 dnl 
 dnl This package is Free Software and part of Redland http://librdf.org/
@@ -508,7 +508,7 @@ LIBS="$LIBRDF_LIBS"
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h dmalloc.h time.h sys/time.h sys/stat.h getopt.h stddef.h)
+AC_CHECK_HEADERS(errno.h stdlib.h unistd.h string.h fcntl.h time.h sys/time.h sys/stat.h getopt.h stddef.h)
 AC_HEADER_TIME
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -1261,33 +1261,6 @@ LIBRDF_PKGCONFIG_PRIVATE_LIBS=`echo $LIBRDF_LIBS | sed -e 's, ..top_build_prefix
 
 # Make final changes to cflags
 CFLAGS="-DLIBRDF_INTERNAL=1 $CFLAGS"
-MEM=
-MEM_LIBS=
-AC_ARG_WITH(dmalloc, [  --with-dmalloc          Use dmalloc debugging library (default=no)], use_dmalloc="$withval", use_dmalloc="no") 
-AC_MSG_CHECKING(using dmalloc library)
-if test "$USE_MAINTAINER_MODE" = yes; then
-  if test "$ac_cv_header_dmalloc_h" = yes; then
-    if test "X$use_dmalloc" = Xauto; then
-      use_dmalloc=yes
-    fi
-  else
-    use_dmalloc=no
-  fi
-else
-  use_dmalloc=no
-fi
-AC_MSG_RESULT($use_dmalloc)
-if test $use_dmalloc = yes; then
-  MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
-  MEM_LIBS=-ldmalloc
-fi
-AC_ARG_WITH(memory-signing, [  --with-memory-signing   Sign allocated memory (default=no)], use_memory_signing="$withval", use_memory_signing="no")
-AC_MSG_CHECKING(using memory signing)
-AC_MSG_RESULT($use_memory_signing)
-if test $use_memory_signing = yes; then
-  MEM=-DLIBRDF_MEMORY_SIGN=1
-  MEM_LIBS=
-fi
 
 assert=yes
 AC_ARG_ENABLE(assertions, [  --enable-assertions     Perform run time assertion checks (default yes).  ], assert=$enableval)

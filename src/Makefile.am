@@ -196,7 +196,7 @@ EXTRA_DIST=\
 redland.spec redland.spec.in
 
 librdf_la_LDFLAGS = -version-info @LIBRDF_LIBTOOL_VERSION@ \
-@LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@ $(MEM_LIBS)
+@LIBRDF_LDFLAGS@ @LIBRDF_EXTERNAL_LIBS@
 
 pkgdata_DATA=
 if STORAGE_MYSQL
@@ -220,23 +220,6 @@ TESTS_ENVIRONMENT=REDLAND_MODULE_PATH=$(abs_builddir)/.libs
 
 CLEANFILES=$(TESTS) $(local_tests) test test*.db test.rdf *.plist
 
-# Memory debugging alternatives
-MEM=@MEM@
-MEM_LIBS=@MEM_LIBS@
-
-# 1) None (use standard functions directly)
-#MEM=
-#MEM_LIBS=
-
-# 2) Use internal memory debug
-#MEM=-DLIBRDF_MEMORY_DEBUG=1
-#MEM_LIBS=
-
-# 3) Use dmalloc library
-#MEM=-DLIBRDF_MEMORY_DEBUG_DMALLOC=1
-#MEM_LIBS=-ldmalloc
-
-
 # Use tar, whatever it is called (better be GNU tar though)
 TAR=@TAR@
 
@@ -244,7 +227,7 @@ TAR=@TAR@
 CC=@CC@
 
 AM_CPPFLAGS=@LIBRDF_INTERNAL_CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_EXTERNAL_CPPFLAGS@
-AM_CFLAGS=@LIBRDF_INTERNAL_CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_EXTERNAL_CPPFLAGS@ $(MEM)
+AM_CFLAGS=@LIBRDF_INTERNAL_CPPFLAGS@ @LIBRDF_CPPFLAGS@ @LIBRDF_EXTERNAL_CPPFLAGS@
 
 AM_CPPFLAGS += -DPKGDATADIR="\"$(pkgdatadir)\""
 if MODULAR_LIBRDF
