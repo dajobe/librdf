@@ -315,8 +315,11 @@ librdf_storage_file_sync(librdf_storage *storage)
   
   /* name".new\0" */
   new_name = LIBRDF_MALLOC(char*, context->name_len + 5);
-  if(!new_name)
+  if(!new_name) {
+    LIBRDF_FREE(char*, backup_name);
     return 1;
+  }
+
   strcpy(new_name, (const char*)context->name);
   strcpy(new_name+context->name_len, ".new");
 
