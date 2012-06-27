@@ -892,9 +892,11 @@ librdf_storage_list_get_contexts(librdf_storage* storage)
   if(!icontext)
     return NULL;
 
-  icontext->key=librdf_new_hash_datum(storage->world, NULL, 0);
-  if(!icontext->key)
+  icontext->key = librdf_new_hash_datum(storage->world, NULL, 0);
+  if(!icontext->key) {
+    LIBRDF_FREE(librdf_storage_list_get_contexts_iterator_context, icontext);
     return NULL;
+  }
   
   icontext->storage=storage;
   librdf_storage_add_reference(icontext->storage);
