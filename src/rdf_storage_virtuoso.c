@@ -194,6 +194,7 @@ vGetDataCHAR(librdf_world *world, librdf_storage_virtuoso_connection *handle,
     } else {
       rc = SQLGetData(handle->hstmt, col, SQL_C_CHAR, pLongData, bufsize, &len);
       if(!SQL_SUCCEEDED(rc)) {
+        LIBRDF_FREE(char*, pLongData);
         rdf_virtuoso_ODBC_Errors("SQLGetData()", world, handle);
         return NULL;
       }
@@ -897,15 +898,21 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
     /* Update buffer size and reset new connections */
     context->connections_count += 2;
     connection = connections[context->connections_count - 2];
+    if(!connection) {
+      LIBRDF_FREE(librdf_storage_virtuoso_connection**, connections);
+      return NULL;
+    }
+    
     connection->status = VIRTUOSO_CONNECTION_CLOSED;
     connection->henv = NULL;
     connection->hdbc = NULL;
     connection->hstmt = NULL;
+
     connections[context->connections_count - 1]->status = VIRTUOSO_CONNECTION_CLOSED;
     connections[context->connections_count - 1]->henv = NULL;
     connections[context->connections_count - 1]->hdbc = NULL;
     connections[context->connections_count - 1]->hstmt = NULL;
-    context->connections=connections;
+    context->connections = connections;
   }
 
   /* Initialize closed Virtuoso connection handle */
@@ -953,20 +960,22 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
   return connection;
 
 end:
-  if(connection->hstmt) {
-    SQLFreeHandle(SQL_HANDLE_STMT, connection->hstmt);
-    connection->hstmt = NULL;
-  }
+  if(connection) {
+    if(connection->hstmt) {
+      SQLFreeHandle(SQL_HANDLE_STMT, connection->hstmt);
+      connection->hstmt = NULL;
+    }
 
-  if(connection->hdbc) {
-    SQLDisconnect(connection->hdbc);
-    SQLFreeHandle(SQL_HANDLE_DBC, connection->hdbc);
-    connection->hdbc = NULL;
-  }
+    if(connection->hdbc) {
+      SQLDisconnect(connection->hdbc);
+      SQLFreeHandle(SQL_HANDLE_DBC, connection->hdbc);
+      connection->hdbc = NULL;
+    }
 
-  if(connection->henv) {
-    SQLFreeHandle(SQL_HANDLE_ENV, connection->henv);
-    connection->henv = NULL;
+    if(connection->henv) {
+      SQLFreeHandle(SQL_HANDLE_ENV, connection->henv);
+      connection->henv = NULL;
+    }
   }
 
   return NULL;
@@ -2039,9 +2048,11 @@ librdf_storage_virtuoso_context_remove_statement(librdf_storage* storage,
     predicate = librdf_storage_virtuoso_node2string(storage, npredicate);
     object = librdf_storage_virtuoso_node2string(storage, nobject);
 
-    query = LIBRDF_MALLOC(char*, strlen(sdelete_match) +
-                                 strlen(ctxt_node)*2 + strlen(subject)*2 +
-                                 strlen(predicate)*2 + strlen(object)*2 +1);
+    if(subject && predicate && object)
+      query = LIBRDF_MALLOC(char*, strlen(sdelete_match) +
+                            strlen(ctxt_node)*2 + strlen(subject)*2 +
+                            strlen(predicate)*2 + strlen(object)*2 +1);
+
     if(!query) {
       ret = 1;
       goto end;
@@ -2645,6 +2656,9 @@ librdf_storage_virtuoso_get_contexts(librdf_storage* storage)
   char find_statement[]="DB.DBA.SPARQL_SELECT_KNOWN_GRAPHS()";
   int rc = 0;
   librdf_iterator *iterator = NULL;
+
+  if(!storage)
+    return NULL;
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "librdf_storage_virtuoso_get_contexts \n");
