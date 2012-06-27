@@ -2909,6 +2909,9 @@ librdf_storage_sqlite_query_flush(librdf_storage *storage)
   librdf_storage_sqlite_instance* context;
   int begin;
 
+  if(!storage)
+    return;
+
   context = (librdf_storage_sqlite_instance*)storage->instance;
 
   if(!context->in_stream_queries)
