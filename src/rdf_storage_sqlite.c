@@ -333,7 +333,7 @@ sqlite_string_escape(const unsigned char *raw, size_t raw_len, size_t *len_p)
   int escapes = 0;
   unsigned char *p;
   unsigned char *escaped;
-  int len;
+  size_t len;
 
   for(p = (unsigned char*)raw, len = (int)raw_len; len > 0; p++, len--) {
     if(*p == '\'')
@@ -479,7 +479,7 @@ librdf_storage_sqlite_set_helper(librdf_storage *storage,
   if(rc)
     return -1;
 
-  return sqlite_last_insert_rowid(context->db);
+  return LIBRDF_BAD_CAST(int, sqlite_last_insert_rowid(context->db));
 }
 
 
@@ -1322,11 +1322,11 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 #endif
 
 #if REDLAND_SQLITE_API == 3
-  status=sqlite3_prepare(context->db,
-                         (const char*)request,
-                         raptor_stringbuffer_length(sb),
-                         &scontext->vm,
-                         &scontext->zTail);
+  status = sqlite3_prepare(context->db,
+                           (const char*)request,
+                           LIBRDF_GOOD_CAST(int, raptor_stringbuffer_length(sb)),
+                           &scontext->vm,
+                           &scontext->zTail);
   if(status != SQLITE_OK)
     errmsg = (char*)sqlite3_errmsg(context->db);
 #endif
@@ -1796,10 +1796,10 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
 
 #if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
-                         (const char*)request,
-                         raptor_stringbuffer_length(sb),
-                         &scontext->vm,
-                         &scontext->zTail);
+                           (const char*)request,
+                           LIBRDF_GOOD_CAST(int, raptor_stringbuffer_length(sb)),
+                           &scontext->vm,
+                           &scontext->zTail);
   if(status != SQLITE_OK)
     errmsg = (char*)sqlite3_errmsg(context->db);
 #endif
@@ -2269,10 +2269,10 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
 
 #if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
-                         (const char*)request,
-                         raptor_stringbuffer_length(sb),
-                         &scontext->vm,
-                         &scontext->zTail);
+                           (const char*)request,
+                           LIBRDF_GOOD_CAST(int, raptor_stringbuffer_length(sb)),
+                           &scontext->vm,
+                           &scontext->zTail);
   if(status != SQLITE_OK)
     errmsg = (char*)sqlite3_errmsg(context->db);
 #endif
@@ -2736,7 +2736,7 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
 #if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
                            (const char*)request,
-                           raptor_stringbuffer_length(sb),
+                           LIBRDF_GOOD_CAST(int, raptor_stringbuffer_length(sb)),
                            &icontext->vm,
                            &icontext->zTail);
   if(status != SQLITE_OK)
