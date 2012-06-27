@@ -162,7 +162,7 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name,
                            librdf_uri *base_uri)
 {
   librdf_query_virtuoso_context *context;
-  int len;
+  size_t len;
   unsigned char *query_string_copy;
   char *seps={(char *)" \t\n\r\f"};
   char *token;

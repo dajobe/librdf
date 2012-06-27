@@ -1031,7 +1031,7 @@ librdf_storage_virtuoso_init(librdf_storage* storage, const char *name,
                              librdf_hash* options)
 {
   librdf_storage_virtuoso_instance* context;
-  int len = 0;
+  size_t len = 0;
   
   context = LIBRDF_CALLOC(librdf_storage_virtuoso_instance*, 
                           1, sizeof(*context));
@@ -1475,7 +1475,7 @@ BindCtxt(librdf_storage* storage, librdf_storage_virtuoso_connection *handle, SQ
   int rc;
 
   *ind = SQL_NTS;
-  ulen = strlen(data);
+  ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(data));
   rc = SQLBindParameter(handle->hstmt, col, SQL_PARAM_INPUT, SQL_C_CHAR,
                         SQL_VARCHAR, ulen, 0,(SQLPOINTER)data, 0, ind);
   if(!SQL_SUCCEEDED(rc))
@@ -1499,7 +1499,7 @@ BindSP(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
   *ind = SQL_NTS;
   if(type == LIBRDF_NODE_TYPE_RESOURCE) {
     char *uri = (char *)librdf_uri_as_string(librdf_node_get_uri(node));
-    ulen = strlen(uri);
+    ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(uri));
 
     rc = SQLBindParameter(handle->hstmt, col, SQL_PARAM_INPUT, SQL_C_CHAR,
                           SQL_VARCHAR, ulen, 0, uri, 0, ind);
@@ -1516,7 +1516,7 @@ BindSP(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
     strcpy(bnode, "_:");
     strcat(bnode, value);
     *data = bnode;
-    ulen = strlen(bnode);
+    ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(bnode));
 
     rc = SQLBindParameter(handle->hstmt, col, SQL_PARAM_INPUT, SQL_C_CHAR,
                           SQL_VARCHAR, ulen, 0, bnode, 0, ind);
@@ -1552,7 +1552,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
      if(!SQL_SUCCEEDED(rc))
        goto error;
 
-     ulen = strlen(uri);
+     ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(uri));
      *ind2 = SQL_NTS;
      rc = SQLBindParameter(handle->hstmt, col+1, SQL_PARAM_INPUT, SQL_C_CHAR,
                            SQL_VARCHAR, ulen, 0, uri, 0, ind2);
@@ -1583,7 +1583,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
      if(!SQL_SUCCEEDED(rc))
        goto error;
 
-     ulen = strlen(bnode);
+     ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(bnode));
      *ind2 = SQL_NTS;
      rc = SQLBindParameter(handle->hstmt, col+1, SQL_PARAM_INPUT, SQL_C_CHAR,
                            SQL_VARCHAR, ulen, 0, bnode, 0, ind2);
@@ -1610,13 +1610,13 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
                              SQL_INTEGER, 0, 0, iData, 0, ind1);
        if(!SQL_SUCCEEDED(rc))
          goto error;
-       ulen = strlen(value);
+       ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(value));
        *ind2 = SQL_NTS;
        rc = SQLBindParameter(handle->hstmt, col+1, SQL_PARAM_INPUT, SQL_C_CHAR,
                              SQL_VARCHAR, ulen, 0, value, 0, ind2);
        if(!SQL_SUCCEEDED(rc))
          goto error;
-       ulen = strlen(lang);
+       ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(lang));
        *ind3 = SQL_NTS;
        rc = SQLBindParameter(handle->hstmt, col + 2, SQL_PARAM_INPUT, SQL_C_CHAR,
                              SQL_VARCHAR, ulen, 0, lang, 0, ind3);
@@ -1630,14 +1630,14 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
                              SQL_INTEGER, 0, 0, iData, 0, ind1);
        if(!SQL_SUCCEEDED(rc))
          goto error;
-       ulen = strlen(value);
+       ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(value));
        *ind2 = SQL_NTS;
        rc = SQLBindParameter(handle->hstmt, col+1, SQL_PARAM_INPUT, SQL_C_CHAR,
                              SQL_VARCHAR, ulen, 0, value, 0, ind2);
        if(!SQL_SUCCEEDED(rc))
          goto error;
        datatype = (char *)librdf_uri_as_string(dt);
-       ulen = strlen(datatype);
+       ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(datatype));
        *ind3 = SQL_NTS;
        rc = SQLBindParameter(handle->hstmt, col + 2, SQL_PARAM_INPUT, SQL_C_CHAR,
                              SQL_VARCHAR, ulen, 0, datatype, 0, ind3);
@@ -1651,7 +1651,7 @@ BindObject(librdf_storage* storage, librdf_storage_virtuoso_connection *handle,
                              SQL_INTEGER, 0, 0, iData, 0, ind1);
        if(!SQL_SUCCEEDED(rc))
          goto error;
-       ulen = strlen(value);
+       ulen = LIBRDF_BAD_CAST(SQLUINTEGER, strlen(value));
        *ind2 = SQL_NTS;
        rc = SQLBindParameter(handle->hstmt, col+1, SQL_PARAM_INPUT, SQL_C_CHAR,
                              SQL_VARCHAR, ulen, 0, value, 0, ind2);
