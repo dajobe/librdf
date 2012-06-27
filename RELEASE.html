@@ -43,9 +43,25 @@ Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=489">Issue #0000489</a>
 validity.
 </p>
 
-<p>postgres storage - fixed bad malloc result test during query
-allocation that probably caused librdf_model_find_statements() to
-fail.  Fix from 'zoggy' on github - thanks.
+<p>hashes storage: Make matching a statement work when using graph
+names (redland contexts).
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=515">Issue
+#0000515</a>
+</p>
+
+<p>mysql storage: Defaulted storage configuration host to 'localhost'
+if it is not given.  Opening a store with missing configuration now
+reports the required keys.
+</p>
+
+<p>postgres storage: Fixed a bad malloc result test during query
+allocation that probably caused
+<code>librdf_model_find_statements()</code> to fail.  Fix from
+'zoggy' on github - thanks.  Made loading triples from a stream to
+postgresql actually work via
+<code>librdf_model_add_statements()</code>.  Defaulted storage
+configuration host to 'localhost' if it is not given.  Opening a
+store with missing configuration now reports the required keys.
 </p>
 
 
@@ -60,6 +76,23 @@ are run, respectively.  Added new typedefs
 <code>librdf_raptor_init_handler</code> and
 <code>librdf_rasqal_init_handler</code> for the handlers.
 </p>
+
+<h3>Other changes</h3>
+
+<p>Multiple portability fixes for building out of the source tree.
+Out of source tree 'make check' and 'make dist' should both work.
+Thanks to Daniel Richard G. for the patches.
+</p>
+
+<p>Multiple internal error path cleanup issues and int/size_t issues
+found via clang static analyzer.</p>
+
+<p>configure now looks for Oracle DB (aka Sleepycat DB aka Berkeley
+DB) 5.3</p>
+
+<p>autogen.sh now supports the NOCONFIGURE variable like
+Lib{XML2,XSLT}, aborts the run if an progrma fails and creates the
+NEWS if it does not exist to aid building from GIT and 'make dist'.</p>
 
 
 <h2 id="rel1_0_15"><a name="rel1_0_15">Redland 1.0.15 changes</a></h2>
