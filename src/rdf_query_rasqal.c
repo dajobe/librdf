@@ -1147,7 +1147,7 @@ librdf_query_rasqal_results_as_stream(librdf_query_results* query_results)
     return NULL;
   
   scontext = LIBRDF_CALLOC(librdf_query_rasqal_stream_context*, 1,
-                           sizeof(*context));
+                           sizeof(*scontext));
   if(!scontext)
     return NULL;
 
