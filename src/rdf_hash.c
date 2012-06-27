@@ -1120,7 +1120,8 @@ librdf_hash_keys_iterator_finished(void* iterator)
   if(context->cursor)
     librdf_free_hash_cursor(context->cursor);
 
-  context->key->data=NULL;
+  if(context->key)
+    context->key->data = NULL;
 
   LIBRDF_FREE(librdf_hash_keys_iterator_context, context);
 }
@@ -1176,10 +1177,14 @@ librdf_hash_print(librdf_hash* hash, FILE *fh)
   fputs(hash->factory->name, fh);
   fputs(" hash: {\n", fh);
 
-  key=librdf_new_hash_datum(hash->world, NULL, 0);
-  value=librdf_new_hash_datum(hash->world, NULL, 0);
-  if(!key || !value)
+  key = librdf_new_hash_datum(hash->world, NULL, 0);
+  if(!key)
     return;
+  value = librdf_new_hash_datum(hash->world, NULL, 0);
+  if(!value) {
+    librdf_free_hash_datum(key);
+    return;
+  }
 
   iterator=librdf_hash_get_all(hash, key, value);
   while(!librdf_iterator_end(iterator)) {
