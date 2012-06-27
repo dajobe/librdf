@@ -102,6 +102,9 @@ librdf_heuristic_object_is_literal(const char *object)
 {
   int object_is_literal=1; /* assume the worst */
 
+  if(!object)
+    return 0;
+
   if(librdf_heuristic_is_blank_node(object))
     return 0;
   
