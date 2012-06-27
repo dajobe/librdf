@@ -248,7 +248,7 @@ static librdf_query_results*
 librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
 {
   librdf_query_virtuoso_context *context;
-  librdf_query_results* results;
+  librdf_query_results* results = NULL;
   int rc = 0;
   SQLUSMALLINT icol;
   char pref[]="sparql define output:format '_JAVA_' ";
@@ -354,6 +354,9 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
 error:
   if(cmd)
     LIBRDF_FREE(char*, (char*)cmd);
+  if(results)
+    LIBRDF_FREE(librdf_query_results*, results);
+
   context->failed = 1;
   virtuoso_free_result(query);
   return NULL;
@@ -1148,8 +1151,10 @@ librdf_query_virtuoso_results_as_stream(librdf_query_results* query_results)
   scontext->qcontext=context;
   scontext->numCols=context->numCols;
   scontext->statement= librdf_new_statement(query->world);
-  if(!scontext->statement)
+  if(!scontext->statement) {
+    LIBRDF_FREE(librdf_query_virtuoso_stream_context, scontext);
     return NULL;
+  }
 
   col = 0;
   if(scontext->numCols > 3) {
