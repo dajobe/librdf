@@ -75,11 +75,11 @@ typedef struct
   /* this many buckets used */
   int size;
   /* this many keys */
-  unsigned int keys;
+  int keys;
   /* this many values */
-  unsigned int values;
+  int values;
   /* total array size */
-  unsigned int capacity;
+  int capacity;
 
   /* array load factor expressed out of 1000.
    * Always true: (size/capacity * 1000) < load_factor,
@@ -94,7 +94,7 @@ typedef struct
 static const int librdf_hash_default_load_factor=750;
 
 /* starting capacity - MUST BE POWER OF 2 */
-static const unsigned int librdf_hash_initial_capacity = 8;
+static const int librdf_hash_initial_capacity=8;
 
 
 /* prototypes for local functions */
@@ -187,7 +187,7 @@ librdf_hash_memory_find_node(librdf_hash_memory_context* hash,
 			     librdf_hash_memory_node** prev) 
 {
   librdf_hash_memory_node* node;
-  unsigned int bucket;
+  int bucket;
   u32 hash_key;
 
   /* empty hash */
@@ -197,15 +197,15 @@ librdf_hash_memory_find_node(librdf_hash_memory_context* hash,
   ONE_AT_A_TIME_HASH(hash_key, key, key_len);
 
   if(prev)
-    *prev = NULL;
+    *prev=NULL;
 
   /* find slot in table */
-  bucket = hash_key & (hash->capacity - 1);
+  bucket=hash_key & (hash->capacity - 1);
   if(user_bucket)
-    *user_bucket = bucket;
+    *user_bucket=bucket;
 
   /* check if there is a list present */ 
-  node = hash->nodes[bucket];
+  node=hash->nodes[bucket];
   if(!node)
     /* no list there */
     return NULL;
@@ -214,10 +214,9 @@ librdf_hash_memory_find_node(librdf_hash_memory_context* hash,
   while(node) {
     if(key_len == node->key_len && !memcmp(key, node->key, key_len))
       break;
-
     if(prev)
-      *prev = node;
-    node = node->next;
+      *prev=node;
+    node=node->next;
   }
 
   return node;
@@ -233,8 +232,8 @@ librdf_free_hash_memory_node(librdf_hash_memory_node* node)
     librdf_hash_memory_node_value *vnode, *next;
 
     /* Empty the list of values */
-    for(vnode = node->values; vnode; vnode = next) {
-      next = vnode->next;
+    for(vnode=node->values; vnode; vnode=next) {
+      next=vnode->next;
       if(vnode->value)
         LIBRDF_FREE(char*, vnode->value);
       LIBRDF_FREE(librdf_hash_memory_node_value, vnode);
@@ -246,18 +245,18 @@ librdf_free_hash_memory_node(librdf_hash_memory_node* node)
 
 static int
 librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
-  unsigned int required_capacity = 0;
+  int required_capacity=0;
   librdf_hash_memory_node **new_nodes;
-  unsigned int i;
+  int i;
 
   if (hash->capacity) {
     /* big enough */
     if((1000 * hash->keys) < (hash->load_factor * hash->capacity))
       return 0;
     /* grow hash (keeping it a power of two) */
-    required_capacity = hash->capacity << 1;
+    required_capacity=hash->capacity << 1;
   } else {
-    required_capacity = librdf_hash_initial_capacity;
+    required_capacity=librdf_hash_initial_capacity;
   }
 
   /* allocate new table */
@@ -270,27 +269,27 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
 
   /* it is a new hash empty hash - we are done */
   if(!hash->size) {
-    hash->capacity = required_capacity;
-    hash->nodes = new_nodes;
+    hash->capacity=required_capacity;
+    hash->nodes=new_nodes;
     return 0;
   }
   
 
-  for(i = 0; i < hash->capacity; i++) {
-    librdf_hash_memory_node *node = hash->nodes[i];
+  for(i=0; i<hash->capacity; i++) {
+    librdf_hash_memory_node *node=hash->nodes[i];
       
     /* walk all attached nodes */
     while(node) {
       librdf_hash_memory_node *next;
       int bucket;
 
-      next = node->next;
+      next=node->next;
       /* find slot in new table */
-      bucket = node->hash_key & (required_capacity - 1);
-      node->next = new_nodes[bucket];
-      new_nodes[bucket] = node;
+      bucket=node->hash_key & (required_capacity - 1);
+      node->next=new_nodes[bucket];
+      new_nodes[bucket]=node;
 
-      node = next;
+      node=next;
     }
   }
 
@@ -298,8 +297,8 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
   LIBRDF_FREE(librdf_hash_memory_nodes, hash->nodes);
 
   /* attach new one */
-  hash->capacity = required_capacity;
-  hash->nodes = new_nodes;
+  hash->capacity=required_capacity;
+  hash->nodes=new_nodes;
 
   return 0;
 }
@@ -320,11 +319,10 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
 static int
 librdf_hash_memory_create(librdf_hash* hash, void* context) 
 {
-  librdf_hash_memory_context* hcontext = (librdf_hash_memory_context*)context;
+  librdf_hash_memory_context* hcontext=(librdf_hash_memory_context*)context;
 
-  hcontext->hash = hash;
-  hcontext->load_factor = librdf_hash_default_load_factor;
-
+  hcontext->hash=hash;
+  hcontext->load_factor=librdf_hash_default_load_factor;
   return librdf_hash_memory_expand_size(hcontext);
 }
 
@@ -340,22 +338,22 @@ librdf_hash_memory_create(librdf_hash* hash, void* context)
 static int
 librdf_hash_memory_destroy(void* context) 
 {
-  librdf_hash_memory_context* hcontext = (librdf_hash_memory_context*)context;
+  librdf_hash_memory_context* hcontext=(librdf_hash_memory_context*)context;
 
   if(hcontext->nodes) {
-    unsigned int i;
+    int i;
   
-    for(i = 0; i < hcontext->capacity; i++) {
-      librdf_hash_memory_node *node = hcontext->nodes[i];
+    for(i=0; i<hcontext->capacity; i++) {
+      librdf_hash_memory_node *node=hcontext->nodes[i];
       
       /* this entry is used */
       if(node) {
         librdf_hash_memory_node *next;
         /* free all attached nodes */
         while(node) {
-          next = node->next;
+          next=node->next;
           librdf_free_hash_memory_node(node);
-          node = next;
+          node=next;
         }
       }
     }
@@ -409,15 +407,15 @@ static int
 librdf_hash_memory_clone(librdf_hash *hash, void* context, char *new_identifer,
                          void *old_context) 
 {
-  librdf_hash_memory_context* hcontext = (librdf_hash_memory_context*)context;
-  librdf_hash_memory_context* old_hcontext = (librdf_hash_memory_context*)old_context;
+  librdf_hash_memory_context* hcontext=(librdf_hash_memory_context*)context;
+  librdf_hash_memory_context* old_hcontext=(librdf_hash_memory_context*)old_context;
   librdf_hash_datum *key, *value;
   librdf_iterator *iterator;
-  int status = 0;
+  int status=0;
   
   /* copy data fields that might change */
-  hcontext->hash = hash;
-  hcontext->load_factor = old_hcontext->load_factor;
+  hcontext->hash=hash;
+  hcontext->load_factor=old_hcontext->load_factor;
 
   /* Don't need to deal with new_identifier - not used for memory hashes */
 
@@ -426,13 +424,13 @@ librdf_hash_memory_clone(librdf_hash *hash, void* context, char *new_identifer,
    * code is tested and works
    */
 
-  key = librdf_new_hash_datum(hash->world, NULL, 0);
-  value = librdf_new_hash_datum(hash->world, NULL, 0);
+  key=librdf_new_hash_datum(hash->world, NULL, 0);
+  value=librdf_new_hash_datum(hash->world, NULL, 0);
 
-  iterator = librdf_hash_get_all(old_hcontext->hash, key, value);
+  iterator=librdf_hash_get_all(old_hcontext->hash, key, value);
   while(!librdf_iterator_end(iterator)) {
-    librdf_hash_datum* k = (librdf_hash_datum*)librdf_iterator_get_key(iterator);
-    librdf_hash_datum* v = (librdf_hash_datum*)librdf_iterator_get_value(iterator);
+    librdf_hash_datum* k= (librdf_hash_datum*)librdf_iterator_get_key(iterator);
+    librdf_hash_datum* v= (librdf_hash_datum*)librdf_iterator_get_value(iterator);
 
     if(librdf_hash_memory_put(hcontext, k, v)) {
       status=1;
@@ -461,7 +459,7 @@ librdf_hash_memory_clone(librdf_hash *hash, void* context, char *new_identifer,
 static int
 librdf_hash_memory_values_count(void *context) 
 {
-  librdf_hash_memory_context* hash = (librdf_hash_memory_context*)context;
+  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
 
   return hash->values;
 }
@@ -470,7 +468,7 @@ librdf_hash_memory_values_count(void *context)
 
 typedef struct {
   librdf_hash_memory_context* hash;
-  unsigned int current_bucket;
+  int current_bucket;
   librdf_hash_memory_node* current_node;
   librdf_hash_memory_node_value *current_value;
 } librdf_hash_memory_cursor_context;
@@ -489,8 +487,7 @@ typedef struct {
 static int
 librdf_hash_memory_cursor_init(void *cursor_context, void *hash_context) 
 {
-  librdf_hash_memory_cursor_context *cursor;
-  cursor = (librdf_hash_memory_cursor_context*)cursor_context;
+  librdf_hash_memory_cursor_context *cursor=(librdf_hash_memory_cursor_context*)cursor_context;
 
   cursor->hash = (librdf_hash_memory_context*)hash_context;
   return 0;
@@ -514,41 +511,40 @@ librdf_hash_memory_cursor_get(void* context,
                               librdf_hash_datum *value,
                               unsigned int flags)
 {
-  librdf_hash_memory_cursor_context *cursor;
-  librdf_hash_memory_node_value *vnode = NULL;
+  librdf_hash_memory_cursor_context *cursor=(librdf_hash_memory_cursor_context*)context;
+  librdf_hash_memory_node_value *vnode=NULL;
   librdf_hash_memory_node *node;
   
-  cursor = (librdf_hash_memory_cursor_context*)context;
 
   /* First step, make sure cursor->current_node points to a valid node,
      if possible */
 
   /* Move to start of hash if necessary  */
   if(flags == LIBRDF_HASH_CURSOR_FIRST) {
-    unsigned int i;
+    int i;
     
-    cursor->current_node = NULL;
+    cursor->current_node=NULL;
     /* find first used bucket (with keys) */
-    cursor->current_bucket = 0;
+    cursor->current_bucket=0;
 
-    for(i = 0; i < cursor->hash->capacity; i++)
+    for(i=0; i< cursor->hash->capacity; i++)
       if((cursor->current_node=cursor->hash->nodes[i])) {
-        cursor->current_bucket = i;
+        cursor->current_bucket=i;
         break;
       }
 
     if(cursor->current_node)
-      cursor->current_value = cursor->current_node->values;
+      cursor->current_value=cursor->current_node->values;
   }
 
   /* If still have no current node, try to find it from the key */
   if(!cursor->current_node && key && key->data) {
-    cursor->current_node = librdf_hash_memory_find_node(cursor->hash,
-                                                        (char*)key->data,
-                                                        key->size,
-                                                        NULL, NULL);
+    cursor->current_node=librdf_hash_memory_find_node(cursor->hash,
+                                                      (char*)key->data,
+                                                      key->size,
+                                                      NULL, NULL);
     if(cursor->current_node)
-      cursor->current_value = cursor->current_node->values;
+      cursor->current_value=cursor->current_node->values;
   }
 
 
@@ -591,19 +587,19 @@ librdf_hash_memory_cursor_get(void* context,
 
       /* FALLTHROUGH */
     case LIBRDF_HASH_CURSOR_NEXT_VALUE:
-      vnode  =cursor->current_value;
+      vnode=cursor->current_value;
       
       /* copy value */
-      value->data = vnode->value;
-      value->size = vnode->value_len;
+      value->data=vnode->value;
+      value->size=vnode->value_len;
       
       /* move on */
-      cursor->current_value = vnode->next;
+      cursor->current_value=vnode->next;
       break;
       
     case LIBRDF_HASH_CURSOR_FIRST:
     case LIBRDF_HASH_CURSOR_NEXT:
-      node = cursor->current_node;
+      node=cursor->current_node;
 
       /* get key */
       key->data= node->key;
@@ -614,11 +610,11 @@ librdf_hash_memory_cursor_get(void* context,
         vnode=cursor->current_value;
         
         /* get value */
-        value->data = vnode->value;
-        value->size = vnode->value_len;
+        value->data=vnode->value;
+        value->size=vnode->value_len;
 
         /* move on */
-        cursor->current_value = vnode->next;
+        cursor->current_value=vnode->next;
         
         /* stop here if there are more values, otherwise need next
          * key & values so drop through and move to the next node
@@ -628,23 +624,20 @@ librdf_hash_memory_cursor_get(void* context,
       }
       
       /* move on to next node in current bucket */
-      node = cursor->current_node->next;
-      if(!node) {
-        unsigned int i;
+      if(!(node=cursor->current_node->next)) {
+        int i;
         
         /* end of list - move to next used bucket */
-        for(i = cursor->current_bucket + 1; i < cursor->hash->capacity; i++) {
-          node = cursor->hash->nodes[i];
-          if(node) {
-            cursor->current_bucket = i;
+        for(i=cursor->current_bucket+1; i< cursor->hash->capacity; i++)
+          if((node=cursor->hash->nodes[i])) {
+            cursor->current_bucket=i;
             break;
           }
-        }
+        
       }
       
-      cursor->current_node = node;
-      if(cursor)
-        cursor->current_value = node->values;
+      if((cursor->current_node=node))
+        cursor->current_value=node->values;
       
       break;
     default:
@@ -688,11 +681,11 @@ static int
 librdf_hash_memory_put(void* context, librdf_hash_datum *key, 
 		       librdf_hash_datum *value) 
 {
-  librdf_hash_memory_context* hash = (librdf_hash_memory_context*)context;
+  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
   librdf_hash_memory_node *node;
   librdf_hash_memory_node_value *vnode;
   u32 hash_key;
-  void *new_key = NULL;
+  void *new_key=NULL;
   void *new_value;
   int bucket= (-1);
   int is_new_node;
@@ -702,24 +695,24 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
     return 1;
   
   /* find node for key */
-  node = librdf_hash_memory_find_node(hash,
-                                      key->data, key->size,
-                                      NULL, NULL);
+  node=librdf_hash_memory_find_node(hash,
+				    key->data, key->size,
+				    NULL, NULL);
 
-  is_new_node = (node == NULL);
+  is_new_node=(node == NULL);
   
   /* not found - new key */
   if(is_new_node) {
     ONE_AT_A_TIME_HASH(hash_key, key->data, key->size);
 
-    bucket = hash_key & (hash->capacity - 1);
+    bucket=hash_key & (hash->capacity - 1);
 
     /* allocate new node */
     node = LIBRDF_CALLOC(librdf_hash_memory_node*, 1, sizeof(*node));
     if(!node)
       return 1;
 
-    node->hash_key = hash_key;
+    node->hash_key=hash_key;
     
     /* allocate key for new node */
     new_key = LIBRDF_MALLOC(void*, key->size);
@@ -730,8 +723,8 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
 
     /* copy new key */
     memcpy(new_key, key->data, key->size);
-    node->key = new_key;
-    node->key_len = key->size;
+    node->key=new_key;
+    node->key_len=key->size;
   }
   
   
@@ -760,22 +753,22 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
 
 
   /* put new value node in list */
-  vnode->next = node->values;
-  node->values = vnode;
+  vnode->next=node->values;
+  node->values=vnode;
 
   /* note that in counter */
   node->values_count++;
  
   /* copy new value */
   memcpy(new_value, value->data, value->size);
-  vnode->value = new_value;
-  vnode->value_len = value->size;
+  vnode->value=new_value;
+  vnode->value_len=value->size;
 
 
   /* now update buckets and hash counts */
   if(is_new_node) {
-    node->next = hash->nodes[bucket];
-    hash->nodes[bucket] = node;
+    node->next=hash->nodes[bucket];
+    hash->nodes[bucket]=node;
   
     hash->keys++;
   }
@@ -805,13 +798,13 @@ static int
 librdf_hash_memory_exists(void* context, 
                           librdf_hash_datum *key, librdf_hash_datum *value)
 {
-  librdf_hash_memory_context* hash = (librdf_hash_memory_context*)context;
+  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
   librdf_hash_memory_node* node;
   librdf_hash_memory_node_value *vnode;
   
-  node = librdf_hash_memory_find_node(hash,
-                                      (char*)key->data, key->size,
-                                      NULL, NULL);
+  node=librdf_hash_memory_find_node(hash,
+				    (char*)key->data, key->size,
+				    NULL, NULL);
   /* key not found */
   if(!node)
     return 0;
@@ -821,7 +814,7 @@ librdf_hash_memory_exists(void* context,
     return 1;
 
   /* search for value in list of values */
-  for(vnode = node->values; vnode; vnode = vnode->next) {
+  for(vnode=node->values; vnode; vnode=vnode->next) {
     if(value->size == vnode->value_len && 
        !memcmp(value->data, vnode->value, value->size))
       break;
@@ -846,27 +839,27 @@ static int
 librdf_hash_memory_delete_key_value(void* context, librdf_hash_datum *key,
                                     librdf_hash_datum *value)
 {
-  librdf_hash_memory_context* hash = (librdf_hash_memory_context*)context;
+  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
   librdf_hash_memory_node *node, *prev, *next;
   librdf_hash_memory_node_value *vnode, *vprev;
   int bucket;
   
-  node = librdf_hash_memory_find_node(hash, 
-                                      (char*)key->data, key->size,
-                                      &bucket, &prev);
+  node=librdf_hash_memory_find_node(hash, 
+				    (char*)key->data, key->size,
+				    &bucket, &prev);
   /* key not found anywhere */
   if(!node)
     return 1;
 
   /* search for value in list of values */
-  vnode = node->values;
-  vprev = NULL;
+  vnode=node->values;
+  vprev=NULL;
   while(vnode) {
     if(value->size == vnode->value_len && 
        !memcmp(value->data, vnode->value, value->size))
       break;
-    vprev = vnode;
-    vnode = vnode->next;
+    vprev=vnode;
+    vnode=vnode->next;
   }
 
   /* key/value combination not found */
@@ -876,9 +869,9 @@ librdf_hash_memory_delete_key_value(void* context, librdf_hash_datum *key,
   /* found - delete it from list */
   if(!vprev) {
     /* at start of list so delete from there */
-    node->values = vnode->next;
+    node->values=vnode->next;
   } else
-    vprev->next = vnode->next;
+    vprev->next=vnode->next;
 
   /* free value and value node */
   if(vnode->value)
@@ -901,9 +894,9 @@ librdf_hash_memory_delete_key_value(void* context, librdf_hash_datum *key,
     if(!(hash->nodes[bucket]=node->next))
       /* hash bucket occupancy is one less if bucket is now empty */
       hash->size--;
-    next = NULL;
+    next=NULL;
   } else
-    next = prev->next = node->next;
+    next=prev->next=node->next;
   
   /* free node */
   librdf_free_hash_memory_node(node);
@@ -913,15 +906,15 @@ librdf_hash_memory_delete_key_value(void* context, librdf_hash_datum *key,
     /* no - so was last value for that key, reduce key count */
     hash->keys--;
   } else {
-    int found = 0;
+    int found=0;
     
-    node = next;
+    node=next;
     while(node) {
       if(key->size == node->key_len && !memcmp(key, node->key, key->size)){
         found=1;
         break;
       }
-      node = node->next;
+      node=node->next;
     }
     
     /* no further key values found - so was last value for that key */
@@ -945,13 +938,13 @@ librdf_hash_memory_delete_key_value(void* context, librdf_hash_datum *key,
 static int
 librdf_hash_memory_delete_key(void* context, librdf_hash_datum *key) 
 {
-  librdf_hash_memory_context* hash = (librdf_hash_memory_context*)context;
+  librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
   librdf_hash_memory_node *node, *prev;
   int bucket;
   
-  node = librdf_hash_memory_find_node(hash, 
-                                      (char*)key->data, key->size,
-                                      &bucket, &prev);
+  node=librdf_hash_memory_find_node(hash, 
+				    (char*)key->data, key->size,
+				    &bucket, &prev);
   /* not found anywhere */
   if(!node)
     return 1;
@@ -959,15 +952,15 @@ librdf_hash_memory_delete_key(void* context, librdf_hash_datum *key)
   /* search list from here */
   if(!prev) {
     /* is at start of list, so delete from there */
-    if(!(hash->nodes[bucket] = node->next))
+    if(!(hash->nodes[bucket]=node->next))
       /* hash bucket occupancy is one less if bucket is now empty */
       hash->size--;
   } else
-    prev->next = node->next;
+    prev->next=node->next;
 
   /* update hash counts */
   hash->keys--;
-  hash->values -= node->values_count;
+  hash->values-= node->values_count;
   
   /* free node */
   librdf_free_hash_memory_node(node);
@@ -1063,7 +1056,7 @@ librdf_init_hash_memory(librdf_world *world)
 {
   /* use default load factor */
   if(world->hash_load_factor <= 0 || world->hash_load_factor > 999)
-    world->hash_load_factor = librdf_hash_default_load_factor;
+    world->hash_load_factor=librdf_hash_default_load_factor;
 
   librdf_hash_register_factory(world,
                                "memory", &librdf_hash_memory_register_factory);
