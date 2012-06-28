@@ -1349,7 +1349,7 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
   size_t key_len;
   const char *value;
   size_t value_len;
-  int backslashes;
+  size_t backslashes;
   int saw_backslash;
   librdf_hfs_parse_state state;
   size_t real_value_len;
@@ -1475,7 +1475,7 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
         
         /* ' at end of value found */
         value_len = LIBRDF_GOOD_CAST(size_t, p - value);
-        real_value_len = LIBRDF_GOOD_CAST(size_t, value_len - backslashes);
+        real_value_len = value_len - backslashes;
         new_value = LIBRDF_MALLOC(char*, real_value_len + 1);
         if(!new_value)
           return 1;
