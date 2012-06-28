@@ -211,7 +211,7 @@ main(int argc, char *argv[])
   for(n=0; (name=(char*)test_names[n]); n++) {
     int i;
     
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     fprintf(stdout, "%s: Generating %d new names from '%s'\n", program, 
             NAMES_COUNT, name);
 #endif
@@ -219,7 +219,7 @@ main(int argc, char *argv[])
     for(i=0; i< NAMES_COUNT; i++) {
       char *new_name;
       
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       fprintf(stdout, "Generating name from '%s'\n", name);
 #endif
       new_name=librdf_heuristic_gen_name(name);
@@ -228,7 +228,7 @@ main(int argc, char *argv[])
         rc=1;
         break;
       }
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       fprintf(stdout, "  result was '%s'\n", new_name);
 #endif
       

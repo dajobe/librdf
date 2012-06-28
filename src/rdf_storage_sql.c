@@ -66,7 +66,7 @@ librdf_sql_config_store_triple(void *user_data,
     if(!strcmp((const char*)raptor_uri_as_string(triple->predicate->value.uri),
                config->predicate_uri_strings[i])) {
       config->values[i] = strdup((const char *)triple->object->value.literal.string);
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG3("Set config value %d to '%s'\n", i, config->values[i]);
 #endif
     }

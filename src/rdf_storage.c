@@ -213,13 +213,13 @@ ltdl_module_callback(const char* filename, void* data)
        )
      || strchr(name, '-')
      ) {
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
     LIBRDF_DEBUG3("not storage module file %s (%s)\n", name, filename);
 #endif
     return 0;
   }
 
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG3("LOADING storage module file %s (%s)\n", name, filename);
 #endif
 
