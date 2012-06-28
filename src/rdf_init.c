@@ -155,7 +155,7 @@ librdf_new_world(void)
 
 #ifdef HAVE_GETTIMEOFDAY
   if(!gettimeofday(&tv, &tz)) {
-    world->genid_base = tv.tv_sec;
+    world->genid_base = LIBRDF_GOOD_CAST(unsigned long, tv.tv_sec);
   } else
     world->genid_base = 1;
 #else
