@@ -453,18 +453,21 @@ librdf_storage_enumerate(librdf_world* world,
                          const char **name, const char **label)
 {
   librdf_storage_factory *factory;
+  int ioffset = LIBRDF_GOOD_CAST(int, counter);
   
   librdf_world_open(world);
 
-  factory=(librdf_storage_factory*)raptor_sequence_get_at(world->storages,
-                                                          counter);
+  factory = (librdf_storage_factory*)raptor_sequence_get_at(world->storages,
+                                                            ioffset);
   if(!factory)
     return 1;
   
   if(name)
-    *name=factory->name;
+    *name = factory->name;
+
   if(label)
-    *label=factory->label;
+    *label = factory->label;
+
   return 0;
 }
 
