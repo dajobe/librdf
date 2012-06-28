@@ -649,7 +649,7 @@ librdf_storage_trees_node_compare(librdf_node* n1, librdf_node* n2)
   if (n1 == n2) {
     return 0;
   } else if (n1->type != n2->type) {
-    return n2->type - n1->type;
+    return LIBRDF_GOOD_CAST(int, n2->type) - LIBRDF_GOOD_CAST(int, n1->type);
   } else {
     switch (n1->type) {
       case RAPTOR_TERM_TYPE_URI:
