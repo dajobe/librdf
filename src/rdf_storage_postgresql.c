@@ -337,27 +337,28 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
   /* Expand connection pool if no closed connection was found */
   if (!connection) {
     /* Allocate new buffer with two extra slots */
-    int new_pool_size = context->connections_count+pool_increment;
+    int new_pool_size = context->connections_count + pool_increment;
     librdf_storage_postgresql_connection* connections;
     connections = LIBRDF_CALLOC(librdf_storage_postgresql_connection*,
-                                new_pool_size,
+                                LIBRDF_GOOD_CAST(size_t, new_pool_size),
                                 sizeof(librdf_storage_postgresql_connection));
     if(!connections)
       return NULL;
 
-    if (context->connections_count) {
+    if(context->connections_count) {
       /* Copy old buffer to new */
-      memcpy(connections, context->connections, sizeof(librdf_storage_postgresql_connection)*context->connections_count);
+      memcpy(connections, context->connections,
+             sizeof(librdf_storage_postgresql_connection) * context->connections_count);
       /* Free old buffer */
       LIBRDF_FREE(librdf_storage_postgresql_connection*, context->connections);
     }
 
     /* Initialize expanded pool */
-    context->connections=connections;
-    connection=&(context->connections[context->connections_count]);
+    context->connections = connections;
+    connection = &(context->connections[context->connections_count]);
     while (context->connections_count < new_pool_size) {
-      context->connections[context->connections_count].status=LIBRDF_STORAGE_POSTGRESQL_CONNECTION_CLOSED;
-      context->connections[context->connections_count].handle=NULL;
+      context->connections[context->connections_count].status = LIBRDF_STORAGE_POSTGRESQL_CONNECTION_CLOSED;
+      context->connections[context->connections_count].handle = NULL;
       context->connections_count++;
     }
   }
