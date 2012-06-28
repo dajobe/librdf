@@ -131,10 +131,11 @@ librdf_log_simple(librdf_world* world, int code,
   if(locator) {
     int locator_len;
     locator_len = raptor_locator_format(NULL, 0, (raptor_locator*)locator);
-    if(locator_len>0) {
-      char *buffer = LIBRDF_MALLOC(char*, locator_len + 2);
+    if(locator_len > 0) {
+      size_t slocator_len = LIBRDF_GOOD_CAST(size_t, locator_len);
+      char *buffer = LIBRDF_MALLOC(char*, slocator_len + 2);
       *buffer=' ';
-      raptor_locator_format(buffer+1, locator_len, (raptor_locator*)locator);
+      raptor_locator_format(buffer + 1, slocator_len, (raptor_locator*)locator);
       fputs(buffer, stderr);
       LIBRDF_FREE(char*, buffer);
     }
@@ -203,15 +204,18 @@ librdf_fatal(librdf_world* world, int facility,
 {
   char empty_buffer[1];
   char *buffer;
+  int length;
+  size_t slength;
 
   /* Not passing NULL to snprintf since that seems to not be portable  */
-  size_t length = snprintf(empty_buffer, 1, "%s:%d:%s: fatal error: %s", 
-                           file, line, function, message);
+  length = snprintf(empty_buffer, 1, "%s:%d:%s: fatal error: %s", 
+                    file, line, function, message);
+  slength = LIBRDF_GOOD_CAST(size_t, length);
   
-  length++; /* add the length 1 passed in */
-  buffer = LIBRDF_MALLOC(char*, length + 1); /* for \0 */
+  slength++; /* add the length 1 passed in */
+  buffer = LIBRDF_MALLOC(char*, slength + 1); /* for \0 */
   if(buffer)
-    snprintf(buffer, length, "%s:%d:%s: fatal error: %s", 
+    snprintf(buffer, slength, "%s:%d:%s: fatal error: %s", 
              file, line, function, message);
 
   librdf_log_simple(world, /* code */ 0, LIBRDF_LOG_FATAL, 
