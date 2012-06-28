@@ -73,6 +73,11 @@ const char * const librdf_short_copyright_string = "Copyright 2000-2012 David Be
 
 const char * const librdf_copyright_string = "Copyright (C) 2000-2012 David Beckett - http://www.dajobe.org/\nCopyright (C) 2000-2005 University of Bristol - http://www.bristol.ac.uk/";
 
+const char * const librdf_license_string = "LGPL 2.1 or newer, GPL 2 or newer, Apache 2.0 or newer.\nSee http://librdf.org/LICENSE.html for full terms.";
+
+const char * const librdf_home_url_string = "http://librdf.org/";
+
+
 /**
  * librdf_version_string:
  *

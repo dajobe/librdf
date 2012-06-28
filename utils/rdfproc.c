@@ -556,8 +556,13 @@ main(int argc, char *argv[])
   if(usage) {
     if(usage>1) {
       fprintf(stderr, title_format_string, librdf_version_string);
-      fputs(librdf_short_copyright_string, stderr);
+      fputs("Redland librdf home page: ", stderr);
+      fputs(librdf_home_url_string, stderr);
       fputc('\n', stderr);
+      fputs(librdf_copyright_string, stderr);
+      fputs("\nLicense: ", stderr);
+      fputs(librdf_license_string, stderr);
+      fputs("\n\n", stderr);
     }
     fprintf(stderr, "Try `%s " HELP_ARG(h, help) "' for more information.\n",
                     program);

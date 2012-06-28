@@ -12,6 +12,8 @@ librdf_version_minor
 librdf_version_string
 librdf_copyright_string
 librdf_short_copyright_string
+librdf_license_string
+librdf_home_url_string
 librdf_alloc_memory
 librdf_calloc_memory
 librdf_free_memory
