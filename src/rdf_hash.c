@@ -1396,7 +1396,7 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
           p++;
         if(!*p)
           break;
-        key_len=p-key;
+        key_len = LIBRDF_GOOD_CAST(size_t, p - key);
         
         /* if 1st char is not space or alpha, move on */
         if(!key_len) {
@@ -1474,8 +1474,8 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
           return 1;
         
         /* ' at end of value found */
-        value_len = p-value;
-        real_value_len = value_len - backslashes;
+        value_len = LIBRDF_GOOD_CAST(size_t, p - value);
+        real_value_len = LIBRDF_GOOD_CAST(size_t, value_len - backslashes);
         new_value = LIBRDF_MALLOC(char*, real_value_len + 1);
         if(!new_value)
           return 1;
@@ -1820,7 +1820,7 @@ librdf_hash_interpret_template(const unsigned char* template_string,
       raptor_stringbuffer_append_counted_string(sb, template_string, len, 1);
       break;
     }
-    len2=p-template_string;
+    len2 = LIBRDF_GOOD_CAST(size_t, p - template_string);
     if(len2)
       raptor_stringbuffer_append_counted_string(sb, template_string, len2, 1);
 
@@ -1835,7 +1835,7 @@ librdf_hash_interpret_template(const unsigned char* template_string,
       break;
 
     /* now have key */
-    len2= s - (unsigned char*)key.data;
+    len2 = LIBRDF_GOOD_CAST(size_t, s - (unsigned char*)key.data);
     key.size= len2;
 
     /* move past key and suffix */
