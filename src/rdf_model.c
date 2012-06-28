@@ -238,18 +238,21 @@ librdf_model_enumerate(librdf_world* world,
                        const char **name, const char **label)
 {
   librdf_model_factory *factory;
-  
+  int ioffset = LIBRDF_GOOD_CAST(int, counter);
+
   librdf_world_open(world);
 
-  factory=(librdf_model_factory*)raptor_sequence_get_at(world->models,
-                                                        counter);
+  factory = (librdf_model_factory*)raptor_sequence_get_at(world->models,
+                                                          ioffset);
   if(!factory)
     return 1;
   
   if(name)
-    *name=factory->name;
+    *name = factory->name;
+
   if(label)
-    *label=factory->label;
+    *label = factory->label;
+
   return 0;
 }
 
