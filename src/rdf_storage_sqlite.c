@@ -330,12 +330,12 @@ librdf_storage_sqlite_get_1int_callback(void *arg,
 static unsigned char *
 sqlite_string_escape(const unsigned char *raw, size_t raw_len, size_t *len_p) 
 {
-  int escapes = 0;
+  size_t escapes = 0;
   unsigned char *p;
   unsigned char *escaped;
   size_t len;
 
-  for(p = (unsigned char*)raw, len = (int)raw_len; len > 0; p++, len--) {
+  for(p = (unsigned char*)raw, len = raw_len; len > 0; p++, len--) {
     if(*p == '\'')
       escapes++;
   }
