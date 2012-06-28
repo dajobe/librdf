@@ -49,11 +49,12 @@
  * librdf_unicode_char_to_utf8:
  * @c: Unicode character
  * @output: UTF-8 string buffer or NULL
- * @length: buffer size
+ * @length: buffer size (will be truncated to size_t)
  *
  * Convert a Unicode character to UTF-8 encoding.
  * 
- * @deprecated: Use raptor_unicode_utf8_string_put_char()
+ * @deprecated: Use raptor_unicode_utf8_string_put_char() noting that
+ * the length argument is a size_t.
  *
  * If buffer is NULL, then will calculate the length rather than
  * perform it.  This can be used by the caller to allocate space
@@ -64,8 +65,8 @@
 int
 librdf_unicode_char_to_utf8(librdf_unichar c, unsigned char *output, int length)
 {
-  return raptor_unicode_utf8_string_put_char((raptor_unichar)c, output,
-                                             (size_t)length);
+  return raptor_unicode_utf8_string_put_char(c, output,
+                                             LIBRDF_BAD_CAST(size_t, length));
 }
 
 
@@ -74,11 +75,12 @@ librdf_unicode_char_to_utf8(librdf_unichar c, unsigned char *output, int length)
  * librdf_utf8_to_unicode_char:
  * @output: Pointer to the Unicode character or NULL
  * @input: UTF-8 string buffer
- * @length: buffer size
+ * @length: buffer size (will be truncated to size_t)
  *
  * Convert an UTF-8 encoded buffer to a Unicode character.
  * 
- * @deprecated: Use raptor_unicode_utf8_string_get_char() noting that the arg order has changed to input, length, output.
+ * @deprecated: Use raptor_unicode_utf8_string_get_char() noting that
+ * the arg order has changed to input, length (a size_t), output.
  *
  * If @output is NULL, then will calculate the number of bytes that
  * will be used from the input buffer and not perform the conversion.
@@ -89,14 +91,16 @@ int
 librdf_utf8_to_unicode_char(librdf_unichar *output, const unsigned char *input,
                             int length)
 {
-  return raptor_unicode_utf8_string_get_char(input, length, output);
+  return raptor_unicode_utf8_string_get_char(input,
+                                             LIBRDF_BAD_CAST(size_t, length),
+                                             output);
 }
 
 
 /**
  * librdf_utf8_to_latin1:
  * @input: UTF-8 string buffer
- * @length: buffer size
+ * @length: buffer size (will be truncated to size_t)
  * @output_length: Pointer to variable to store resulting string length or NULL
  *
  * Convert a UTF-8 string to ISO Latin-1.
@@ -122,7 +126,8 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
 
   i = 0;
   while(input[i]) {
-    int size = raptor_unicode_utf8_string_get_char(&input[i], length-i, NULL);
+    size_t slen = LIBRDF_BAD_CAST(size_t, length - i);
+    int size = raptor_unicode_utf8_string_get_char(&input[i], slen, NULL);
     if(size <= 0)
       return NULL;
     utf8_char_length++;
@@ -144,7 +149,9 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
   i = 0; j = 0;
   while(i < utf8_byte_length) {
     librdf_unichar c;
-    int size = raptor_unicode_utf8_string_get_char(&input[i], length - i, &c);
+    size_t slen = LIBRDF_BAD_CAST(size_t, length - i);
+
+    int size = raptor_unicode_utf8_string_get_char(&input[i], slen, &c);
     if(size <= 0) {
       LIBRDF_FREE(byte_string, output);
       return NULL;
@@ -166,7 +173,7 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
 /**
  * librdf_latin1_to_utf8:
  * @input: ISO Latin-1 string buffer
- * @length: buffer size
+ * @length: buffer size (will be truncated to size_t)
  * @output_length: Pointer to variable to store resulting string length or NULL
  *
  * Convert an ISO Latin-1 encoded string to UTF-8.
@@ -189,8 +196,8 @@ librdf_latin1_to_utf8(const unsigned char *input, int length,
   unsigned char *output;
 
   for(i = 0; input[i]; i++) {
-    int size = raptor_unicode_utf8_string_put_char(input[i], NULL,
-                                                   (size_t)(length - i));
+    size_t slen = LIBRDF_BAD_CAST(size_t, length - i);
+    int size = raptor_unicode_utf8_string_put_char(input[i], NULL, slen);
     if(size <= 0)
       return NULL;
     utf8_length += size;
@@ -203,8 +210,9 @@ librdf_latin1_to_utf8(const unsigned char *input, int length,
 
   j = 0;
   for(i = 0; input[i]; i++) {
+    size_t slen = LIBRDF_BAD_CAST(size_t, length - i);
     int size = raptor_unicode_utf8_string_put_char(input[i], &output[j],
-                                                   (size_t)(length - i));
+                                                   slen);
     if(size <= 0) {
       LIBRDF_FREE(byte_string, output);
       return NULL;
@@ -223,7 +231,7 @@ librdf_latin1_to_utf8(const unsigned char *input, int length,
 /**
  * librdf_utf8_print:
  * @input: UTF-8 string buffer
- * @length: buffer size
+ * @length: buffer size (will be truncated to size_t)
  * @stream: FILE* stream
  *
  * Print a UTF-8 string to a stream.
@@ -239,7 +247,9 @@ librdf_utf8_print(const unsigned char *input, int length, FILE *stream)
   
   while(i < length && *input) {
     librdf_unichar c;
-    int size = raptor_unicode_utf8_string_get_char(input, length - i, &c);
+    size_t slen = LIBRDF_BAD_CAST(size_t, length - i);
+
+    int size = raptor_unicode_utf8_string_get_char(input, slen, &c);
     if(size <= 0)
       return;
 
