@@ -145,42 +145,42 @@ char *
 librdf_heuristic_gen_name(const char *name) 
 {
   char *new_name;
-  const char *p=name;
+  const char *p = name;
   size_t len;
   size_t offset;
-  long l=-1L;
+  long l = -1L;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(name, cstring, NULL);
 
   /* Move to last character of name */
-  len=strlen(name);
-  offset=len-1;
-  p=name+offset;
+  len = strlen(name);
+  offset = len - 1;
+  p = name + offset;
 
   /* Move p to last non number char */
   if(isdigit((int)*p)) {
-    while(p>name && isdigit((int)*p))
+    while(p > name && isdigit((int)*p))
       p--;
-    l=strtol(p+1, (char**)NULL, 10);
-    offset=p-name;
+    l = strtol(p + 1, (char**)NULL, 10);
+    offset = LIBRDF_GOOD_CAST(size_t, p - name);
   }
    
-  if(l<0)
-    l=0;
+  if(l < 0)
+    l = 0;
   l++;
 
   /* +1 to required length if no digit was found */
-  if(offset == len-1) 
+  if(offset == len - 1) 
     len++;
 
   /* +1 to required length if an extra digit is needed -
    * number now ends in 0.  Note l is never 0. */
-  if((l % 10) ==0) 
+  if((l % 10) == 0) 
     len++;
 
   new_name = LIBRDF_MALLOC(char*, len + 1); /* +1 for \0 */
-  strncpy(new_name, name, offset+2);
-  sprintf(new_name+offset+1, "%ld", l);
+  strncpy(new_name, name, offset + 2);
+  sprintf(new_name + offset + 1, "%ld", l);
   return new_name;
 }
 
