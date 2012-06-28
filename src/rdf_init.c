@@ -488,14 +488,14 @@ librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
     if(!librdf_node_is_resource(value))
       rc=1;
     else {
-      int i = atoi((const char*)librdf_node_get_literal_value(value));
-      if(i < 1)
-        i = 1;
+      long lid = atol((const char*)librdf_node_get_literal_value(value));
+      if(lid < 1)
+        lid = 1;
 
 #ifdef WITH_THREADS
       pthread_mutex_lock(world->mutex);
 #endif
-      world->genid_base = i;
+      world->genid_base = LIBRDF_GOOD_CAST(unsigned long, lid);
 #ifdef WITH_THREADS
       pthread_mutex_unlock(world->mutex);
 #endif
@@ -505,14 +505,14 @@ librdf_world_set_feature(librdf_world* world, librdf_uri* feature,
     if(!librdf_node_is_resource(value))
       rc = 1;
     else {
-      int i = atoi((const char*)librdf_node_get_literal_value(value));
-      if(i < 1)
-        i = 1;
+      long lid = atol((const char*)librdf_node_get_literal_value(value));
+      if(lid < 1)
+        lid = 1;
 
 #ifdef WITH_THREADS
       pthread_mutex_lock(world->mutex);
 #endif
-      world->genid_counter = i;
+      world->genid_counter = LIBRDF_GOOD_CAST(unsigned long, lid);
 #ifdef WITH_THREADS
       pthread_mutex_unlock(world->mutex);
 #endif
@@ -532,7 +532,7 @@ unsigned char*
 librdf_world_get_genid(librdf_world* world)
 {
   unsigned long id, tmpid, counter, tmpcounter, pid, tmppid;
-  int length;
+  size_t length;
   unsigned char *buffer;
 
   /* This is read-only and thread safe */
@@ -549,7 +549,7 @@ librdf_world_get_genid(librdf_world* world)
   /* Add the process ID to the seed to differentiate between
    * simultaneously executed child processes.
    */
-  pid = (int) getpid();
+  pid = LIBRDF_GOOD_CAST(unsigned long, getpid());
   if(!pid)
     pid = 1;
   tmppid = pid;
