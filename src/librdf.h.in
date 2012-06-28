@@ -315,7 +315,7 @@ extern const char * const librdf_copyright_string;
 /**
  * librdf_version_string:
  *
- * Raptor version as a string.
+ * Redland librdf version as a string.
  */
 REDLAND_API
 extern const char * const librdf_version_string;
@@ -323,7 +323,7 @@ extern const char * const librdf_version_string;
 /**
  * librdf_version_major:
  *
- * Raptor major version number.
+ * Redland librdf major version number.
  */
 REDLAND_API
 extern const unsigned int librdf_version_major;
@@ -331,7 +331,7 @@ extern const unsigned int librdf_version_major;
 /**
  * librdf_version_minor:
  *
- * Raptor minor version number.
+ * Redland librdf minor version number.
  */
 REDLAND_API
 extern const unsigned int librdf_version_minor;
@@ -339,7 +339,7 @@ extern const unsigned int librdf_version_minor;
 /**
  * librdf_version_release:
  *
- * Rasqal release version number.
+ * Redland librdf release version number.
  */
 REDLAND_API
 extern const unsigned int librdf_version_release;
@@ -347,12 +347,28 @@ extern const unsigned int librdf_version_release;
 /**
  * librdf_version_decimal:
  *
- * Rasqal version as a decimal number.
+ * Redland librdf version as a decimal number.
  *
  * Format: major * 10000 + minor * 100 + release
  */
 REDLAND_API
 extern const unsigned int librdf_version_decimal;
+
+/**
+ * librdf_license_string:
+ *
+ * Redland librdf license string.
+ */
+REDLAND_API
+extern const char * const librdf_license_string;
+
+/**
+ * librdf_home_url_string:
+ *
+ * Redland librdf home page URL.
+ */
+REDLAND_API
+extern const char * const librdf_home_url_string;
 
 /* Required for va_list in error handler function registrations
  * which are in the public API
