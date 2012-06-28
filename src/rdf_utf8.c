@@ -118,10 +118,10 @@ unsigned char*
 librdf_utf8_to_latin1(const unsigned char *input, int length,
                       int *output_length)
 {
-  int utf8_char_length = 0;
-  int utf8_byte_length = 0;
-  int i;
-  int j;
+  size_t utf8_char_length = 0;
+  size_t utf8_byte_length = 0;
+  size_t i;
+  size_t j;
   unsigned char *output;
 
   i = 0;
@@ -132,7 +132,7 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
       return NULL;
     utf8_char_length++;
 
-    i += size;
+    i += LIBRDF_GOOD_CAST(size_t, size);
   }
 
   /* This is a maximal length; since chars may be discarded, the
@@ -159,12 +159,13 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
 
     if(c < 0x100) /* Discards characters! */
       output[j++] = c;
-    i += size;
+
+    i += LIBRDF_GOOD_CAST(size_t, size);
   } 
   output[j] = '\0';
 
   if(output_length)
-    *output_length = j;
+    *output_length = LIBRDF_BAD_CAST(int, j);
   
   return output;
 }
@@ -190,9 +191,9 @@ unsigned char*
 librdf_latin1_to_utf8(const unsigned char *input, int length,
                       int *output_length)
 {
-  int utf8_length = 0;
-  int i;
-  int j;
+  size_t utf8_length = 0;
+  size_t i;
+  size_t j;
   unsigned char *output;
 
   for(i = 0; input[i]; i++) {
@@ -200,7 +201,8 @@ librdf_latin1_to_utf8(const unsigned char *input, int length,
     int size = raptor_unicode_utf8_string_put_char(input[i], NULL, slen);
     if(size <= 0)
       return NULL;
-    utf8_length += size;
+
+    utf8_length += LIBRDF_GOOD_CAST(size_t, size);
   }
 
   output = LIBRDF_MALLOC(unsigned char*, utf8_length + 1);
@@ -217,12 +219,13 @@ librdf_latin1_to_utf8(const unsigned char *input, int length,
       LIBRDF_FREE(byte_string, output);
       return NULL;
     }
-    j += size;
+
+    j += LIBRDF_GOOD_CAST(size_t, size);
   } 
   output[j] = '\0';
 
   if(output_length)
-    *output_length=j;
+    *output_length = LIBRDF_BAD_CAST(int, j);
   
   return output;
 }
