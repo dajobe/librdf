@@ -418,7 +418,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
   if(!statement)
     return (rasqal_triple_parts)0;
   
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG1("  matched statement ");
   librdf_statement_print(statement, stderr);
   fputc('\n', stderr);
@@ -427,7 +427,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
   /* set 1 or 2 variable values from the fields of statement */
 
   if(bindings[0] && (parts & RASQAL_TRIPLE_SUBJECT)) {
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG1("binding subject to variable\n");
 #endif
     l = redland_node_to_rasqal_literal(world,
@@ -442,11 +442,11 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
       if(!librdf_node_equals(librdf_statement_get_subject(statement),
                              librdf_statement_get_predicate(statement)))
         return (rasqal_triple_parts)0;
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG1("subject and predicate values match\n");
 #endif
     } else {
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG1("binding predicate to variable\n");
 #endif
       l = redland_node_to_rasqal_literal(world,
@@ -465,7 +465,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
                              librdf_statement_get_object(statement)))
         return (rasqal_triple_parts)0;
       bind=0;
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG1("subject and object values match\n");
 #endif
     }
@@ -479,13 +479,13 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
                              librdf_statement_get_object(statement)))
         return (rasqal_triple_parts)0;
       bind=0;
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG1("predicate and object values match\n");
 #endif
     }
     
     if(bind) {
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG1("binding object to variable\n");
 #endif
       l = redland_node_to_rasqal_literal(world,
@@ -506,7 +506,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
                              context_node))
         return (rasqal_triple_parts)0;
       bind=0;
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG1("subject and context values match\n");
 #endif
     }
@@ -517,7 +517,7 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
                              context_node))
         return (rasqal_triple_parts)0;
       bind=0;
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG1("predicate and context values match\n");
 #endif
     }
@@ -528,13 +528,13 @@ rasqal_redland_bind_match(struct rasqal_triples_match_s* rtm,
                              context_node))
         return (rasqal_triple_parts)0;
       bind=0;
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG1("object and context values match\n");
 #endif
     }
 
     if(bind) {
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
       LIBRDF_DEBUG1("binding origin to variable\n");
 #endif
       if(context_node)
@@ -665,7 +665,7 @@ rasqal_redland_init_triples_match(rasqal_triples_match* rtm,
   if(!rtmc->qstatement)
     return 1;
 
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG1("query statement: ");
   librdf_statement_print(rtmc->qstatement, stderr);
   if(rtmc->origin) {
@@ -685,7 +685,7 @@ rasqal_redland_init_triples_match(rasqal_triples_match* rtm,
   if(!rtmc->stream)
     return 1;
 
-#if LIBRDF_DEBUG > 1
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
   LIBRDF_DEBUG1("rasqal_init_triples_match done\n");
 #endif
 
