@@ -125,7 +125,7 @@ librdf_new_sql_config(librdf_world* world,
     ;
   config->predicates_count=i;
   config->values = LIBRDF_CALLOC(char**, sizeof(char*), 
-                                       config->predicates_count);
+                                 LIBRDF_GOOD_CAST(size_t, config->predicates_count));
 
   librdf_log(world, 0, LIBRDF_LOG_DEBUG, LIBRDF_FROM_STORAGE, NULL,
              "Opening storage '%s' layout '%s' configuration file '%s'", 
