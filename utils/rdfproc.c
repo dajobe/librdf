@@ -274,7 +274,7 @@ main(int argc, char *argv[])
   int type;
   int result;
   char *p;
-  int i;
+  unsigned int i;
   int rc;
   int transactions=0;
   char *storage_name=(char*)default_storage_name;
@@ -351,7 +351,7 @@ main(int argc, char *argv[])
         if(optarg) {
           if(!strcmp(optarg, "help")) {
             fprintf(stderr, "%s: Valid serializers are:\n", program);
-            for(i=0; 1; i++) {
+            for(i = 0; 1; i++) {
               const raptor_syntax_description* desc;
               
               desc = librdf_serializer_get_description(world, i);
@@ -438,7 +438,7 @@ main(int argc, char *argv[])
         if(optarg) {
           if(!strcmp(optarg, "help")) {
             fprintf(stderr, "%s: Valid query result formats are:\n", program);
-            for(i=0; 1; i++) {
+            for(i = 0; 1; i++) {
               const raptor_syntax_description* desc;
               
               desc = librdf_query_results_formats_get_description(world, i);
@@ -464,13 +464,14 @@ main(int argc, char *argv[])
         if(optarg) {
           if(!strcmp(optarg, "help")) {
             fprintf(stderr, "%s: Valid storage names are:\n", program);
-            for(i=0; 1; i++) {
+            for(i = 0; 1; i++) {
               const char *format_name;
               const char *format_label;
               if(librdf_storage_enumerate(world, i,
                                           &format_name, 
                                           &format_label))
                 break;
+
               printf("  %-10s  %s\n", format_name, format_label);
             }
             exit(0);
@@ -527,7 +528,7 @@ main(int argc, char *argv[])
   
   cmd=argv[0];
   
-  for(i=0; commands[i].name; i++)
+  for(i = 0; commands[i].name; i++)
     if(!strcmp(cmd, commands[i].name)) {
       cmd_index=i;
       break;
@@ -579,7 +580,7 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(h, "help            ", "Print this help, then exit"));
     puts(HELP_TEXT(n, "new             ", "Create a new store (default no)"));
     puts(HELP_TEXT(o, "output FORMAT   ", "Set the triple output format"));
-    for(i=0; 1; i++) {
+    for(i = 0; 1; i++) {
       const raptor_syntax_description* desc;
       
       desc = librdf_serializer_get_description(world, i);
@@ -595,7 +596,7 @@ main(int argc, char *argv[])
     puts(HELP_TEXT(p, "password        ", "Read storage option 'password' from standard input"));
     puts(HELP_TEXT(q, "quiet           ", "Do not print information messages"));
     puts(HELP_TEXT(r, "results FORMAT  ", "Set the query results format (no default)"));
-    for(i=0; 1; i++) {
+    for(i = 0; 1; i++) {
       const raptor_syntax_description* desc;
       
       desc = librdf_query_results_formats_get_description(world, i);
@@ -605,11 +606,12 @@ main(int argc, char *argv[])
       printf("    %-10s              %s\n", desc->names[0], desc->label);
     }
     puts(HELP_TEXT(s, "storage TYPE    ", "Set the graph storage type"));
-    for(i=0; 1; i++) {
+    for(i = 0; 1; i++) {
       const char *help_name;
       const char *help_label;
       if(librdf_storage_enumerate(world, i, &help_name, &help_label))
         break;
+
       printf("    %-10s              %s", help_name, help_label);
       if(!strcmp(help_name, default_storage_name))
         puts(" (default)");
@@ -1011,9 +1013,12 @@ main(int argc, char *argv[])
           if(verbosity)
             fputs("result: ", stdout);
           fputs("[", stdout);
-          for(i=0; i<librdf_query_results_get_bindings_count(results); i++) {
-            librdf_node *value=librdf_query_results_get_binding_value(results, i);
-            name=(char*)librdf_query_results_get_binding_name(results, i);
+          for(i = 0; 1 ; i++) {
+            librdf_node *value = librdf_query_results_get_binding_value(results, i);
+            if(!value)
+              break;
+            
+            name = (char*)librdf_query_results_get_binding_name(results, i);
 
             if(i>0)
               fputs(", ", stdout);
