@@ -118,6 +118,7 @@ unsigned char*
 librdf_utf8_to_latin1(const unsigned char *input, int length,
                       int *output_length)
 {
+  size_t slength = LIBRDF_BAD_CAST(size_t, length);
   size_t utf8_char_length = 0;
   size_t utf8_byte_length = 0;
   size_t i;
@@ -126,10 +127,10 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
 
   i = 0;
   while(input[i]) {
-    size_t slen = LIBRDF_BAD_CAST(size_t, length - i);
-    int size = raptor_unicode_utf8_string_get_char(&input[i], slen, NULL);
+    int size = raptor_unicode_utf8_string_get_char(&input[i], slength - i, NULL);
     if(size <= 0)
       return NULL;
+
     utf8_char_length++;
 
     i += LIBRDF_GOOD_CAST(size_t, size);
@@ -149,9 +150,8 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
   i = 0; j = 0;
   while(i < utf8_byte_length) {
     librdf_unichar c;
-    size_t slen = LIBRDF_BAD_CAST(size_t, length - i);
 
-    int size = raptor_unicode_utf8_string_get_char(&input[i], slen, &c);
+    int size = raptor_unicode_utf8_string_get_char(&input[i], slength - i, &c);
     if(size <= 0) {
       LIBRDF_FREE(byte_string, output);
       return NULL;
@@ -191,14 +191,14 @@ unsigned char*
 librdf_latin1_to_utf8(const unsigned char *input, int length,
                       int *output_length)
 {
+  size_t slength = LIBRDF_BAD_CAST(size_t, length);
   size_t utf8_length = 0;
   size_t i;
   size_t j;
   unsigned char *output;
 
   for(i = 0; input[i]; i++) {
-    size_t slen = LIBRDF_BAD_CAST(size_t, length - i);
-    int size = raptor_unicode_utf8_string_put_char(input[i], NULL, slen);
+    int size = raptor_unicode_utf8_string_put_char(input[i], NULL, slength - i);
     if(size <= 0)
       return NULL;
 
@@ -212,9 +212,8 @@ librdf_latin1_to_utf8(const unsigned char *input, int length,
 
   j = 0;
   for(i = 0; input[i]; i++) {
-    size_t slen = LIBRDF_BAD_CAST(size_t, length - i);
     int size = raptor_unicode_utf8_string_put_char(input[i], &output[j],
-                                                   slen);
+                                                   slength - i);
     if(size <= 0) {
       LIBRDF_FREE(byte_string, output);
       return NULL;
