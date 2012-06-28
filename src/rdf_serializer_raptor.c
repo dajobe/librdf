@@ -506,7 +506,7 @@ librdf_serializer_raptor_register_factory(librdf_serializer_factory *factory)
 void
 librdf_serializer_raptor_constructor(librdf_world *world)
 {
-  int i;
+  unsigned int i;
   
   /* enumerate from serializer 1, so the default serializer 0 is done last */
   for(i = 1; 1; i++) {
