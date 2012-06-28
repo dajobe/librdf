@@ -272,18 +272,21 @@ librdf_parser_enumerate(librdf_world* world,
                         const char **name, const char **label)
 {
   librdf_parser_factory *factory;
-
+  int ioffset = LIBRDF_GOOD_CAST(int, counter);
+  
   librdf_world_open(world);
 
-  factory=(librdf_parser_factory*)raptor_sequence_get_at(world->parsers,
-                                                         counter);
+  factory = (librdf_parser_factory*)raptor_sequence_get_at(world->parsers,
+                                                           ioffset);
   if(!factory)
     return 1;
-
+  
   if(name)
-    *name=factory->name;
+    *name = factory->name;
+
   if(label)
-    *label=factory->label;
+    *label = factory->label;
+
   return 0;
 }
 
