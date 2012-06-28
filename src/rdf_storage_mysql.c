@@ -251,7 +251,7 @@ typedef struct {
 } librdf_storage_mysql_get_contexts_context;
 
 static u64 librdf_storage_mysql_hash(librdf_storage* storage, const char *type,
-                                     const char *string, int length);
+                                     const char *string, size_t length);
 
 #define NODE_HASH_MODE_GET_HASH 0
 #define NODE_HASH_MODE_STORE_NODE 1
@@ -302,7 +302,7 @@ void librdf_storage_module_register_factory(librdf_world *world);
  **/
 static u64
 librdf_storage_mysql_hash(librdf_storage* storage, const char *type,
-                          const char *string, int length)
+                          const char *string, size_t length)
 {
   librdf_storage_mysql_instance* context=(librdf_storage_mysql_instance*)storage->instance;
   u64 hash;
