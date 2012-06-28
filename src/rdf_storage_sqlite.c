@@ -380,7 +380,7 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
   if(!request)
     return 1;
 
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite exec '%s'\n", request);
 #endif
   
@@ -1317,7 +1317,7 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
     return NULL;
   }
 
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 #endif
 
@@ -1400,7 +1400,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
 
   if(status == SQLITE_ROW) {
     /* FIXME - turn row data into statement, scontext->context */
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
     int i;
 #endif
     librdf_node* node;
@@ -1422,7 +1422,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
  9  contextUri
 */
 
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
     for(i = 0; i < sqlite3_column_count(vm); i++)
       fprintf(stderr, "%s, ", sqlite3_column_name(vm, i));
     fputc('\n', stderr);
@@ -1790,7 +1790,7 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
     return NULL;
   }
 
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 #endif
 
@@ -2263,7 +2263,7 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
     return NULL;
   }
 
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 #endif
 
@@ -2490,12 +2490,12 @@ librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_instance* sc
 
   if(status == SQLITE_ROW) {
     /* Turns row data into scontext->context */
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
     int i;
 #endif
     const unsigned char *uri_string;
 
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
     for(i = 0; i < sqlite3_column_count(vm); i++)
       fprintf(stderr, "%s, ", sqlite3_column_name(vm, i));
     fputc('\n', stderr);
@@ -2729,7 +2729,7 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
     return NULL;
   }
 
-#if LIBRDF_DEBUG > 2
+#if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 2
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 #endif
 
