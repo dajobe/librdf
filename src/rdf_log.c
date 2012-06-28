@@ -197,6 +197,7 @@ librdf_log(librdf_world* world, int code,
  * If world is NULL, the error ocurred in redland startup before
  * the world was created.
  **/
+REDLAND_NORETURN
 void
 librdf_fatal(librdf_world* world, int facility,
              const char *file, int line, const char *function,

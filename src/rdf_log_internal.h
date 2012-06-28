@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+REDLAND_NORETURN
 void librdf_fatal(librdf_world* world, int facility, const char *file, int line, const char *function, const char *message);
 
 void librdf_test_error(librdf_world* world, const char *message);
