@@ -280,7 +280,8 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
 
 
   /* Start allocating the arrays */
-  context->hashes = LIBRDF_CALLOC(librdf_hash**, hash_count,
+  context->hashes = LIBRDF_CALLOC(librdf_hash**,
+                                  LIBRDF_GOOD_CAST(size_t, hash_count),
                                   sizeof(librdf_hash*));
   if(!context->hashes) {
     if(context->name)
@@ -289,7 +290,7 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
   }
 
   context->hash_descriptions = LIBRDF_CALLOC(librdf_hash_descriptor**,
-                                             hash_count,
+                                             LIBRDF_GOOD_CAST(size_t, hash_count),
                                              sizeof(librdf_hash_descriptor*));
   if(!context->hash_descriptions) {
     LIBRDF_FREE(librdf_hash, context->hashes);
@@ -298,7 +299,9 @@ librdf_storage_hashes_init_common(librdf_storage* storage, const char *name,
     return 1;
   }
   
-  context->names = LIBRDF_CALLOC(char**, hash_count, sizeof(char*));
+  context->names = LIBRDF_CALLOC(char**,
+                                 LIBRDF_GOOD_CAST(size_t, hash_count),
+                                 sizeof(char*));
   if(!context->names) {
     LIBRDF_FREE(librdf_hash, context->hashes);
     LIBRDF_FREE(librdf_hash_descriptor, context->hash_descriptions);
