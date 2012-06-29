@@ -42,6 +42,7 @@
 #include <stdlib.h>
 #endif
 #include <sys/types.h>
+#include <limits.h>
 
 #include <redland.h>
 #include <rdf_types.h>
@@ -136,11 +137,11 @@ typedef struct {
 
 typedef struct {
   /* MySQL connection parameters */
-  const char *host;
-  int port;
-  const char *database;
-  const char *user;
-  const char *password;
+  char *host;
+  unsigned int port;
+  char *database;
+  char *user;
+  char *password;
 
   /* Array of virtual MySQL connections */
   librdf_storage_mysql_connection *connections;
@@ -418,14 +419,15 @@ librdf_storage_mysql_get_handle(librdf_storage* storage)
     /* Allocate new buffer with two extra slots */
     librdf_storage_mysql_connection* connections;
     connections = LIBRDF_CALLOC(librdf_storage_mysql_connection*,
-                                context->connections_count + 2,
+                                LIBRDF_GOOD_CAST(size_t, context->connections_count + 2),
                                 sizeof(librdf_storage_mysql_connection));
     if(!connections)
       return NULL;
 
     if (context->connections_count) {
       /* Copy old buffer to new */
-      memcpy(connections, context->connections, sizeof(librdf_storage_mysql_connection)*context->connections_count);
+      memcpy(connections, context->connections, 
+             sizeof(librdf_storage_mysql_connection) * LIBRDF_GOOD_CAST(size_t, context->connections_count));
       /* Free old buffer */
       LIBRDF_FREE(librdf_storage_mysql_connection*, context->connections);
     }
@@ -528,6 +530,7 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   MYSQL_RES *res;
   MYSQL *handle;
   const char* default_layout="v1";
+  long lport;
 
   /* Must have connection parameters passed as options */
   if(!options)
@@ -556,12 +559,14 @@ librdf_storage_mysql_init(librdf_storage* storage, const char *name,
   context->host = librdf_hash_get_del(options, "host");
   if(!context->host) {
      context->host = LIBRDF_MALLOC(char*, 10);
-     strcpy(context->host,"localhost");
+     strcpy(context->host, "localhost");
   }
 
-  context->port = librdf_hash_get_as_long(options, "port");
-  if(context->port < 0)
+  lport = librdf_hash_get_as_long(options, "port");
+  if(lport < 0 || lport > INT_MAX)
     context->port = 3306; /* default mysql port */
+  else
+    context->port = LIBRDF_GOOD_CAST(unsigned int, lport);
 
   context->database = librdf_hash_get_del(options, "database");
   context->user = librdf_hash_get_del(options, "user");
@@ -825,10 +830,10 @@ librdf_storage_mysql_terminate(librdf_storage* storage)
   librdf_storage_mysql_finish_connections(storage);
 
   if(context->config_dir)
-    LIBRDF_FREE(char*, (char*)context->config_dir);
+    LIBRDF_FREE(char*, context->config_dir);
 
   if(context->layout)
-    LIBRDF_FREE(char*, (char*)context->layout);
+    LIBRDF_FREE(char*, context->layout);
 
   if(context->vars)
     librdf_free_hash(context->vars);
@@ -837,16 +842,16 @@ librdf_storage_mysql_terminate(librdf_storage* storage)
     librdf_free_sql_config(context->config);
 
   if(context->password)
-    LIBRDF_FREE(char*, (char*)context->password);
+    LIBRDF_FREE(char*, context->password);
 
   if(context->user)
-    LIBRDF_FREE(char*, (char*)context->user);
+    LIBRDF_FREE(char*, context->user);
 
   if(context->database)
-    LIBRDF_FREE(char*, (char*)context->database);
+    LIBRDF_FREE(char*, context->database);
 
   if(context->host)
-    LIBRDF_FREE(char*, (char*)context->host);
+    LIBRDF_FREE(char*, context->host);
 
   if(context->digest)
     librdf_free_digest(context->digest);
