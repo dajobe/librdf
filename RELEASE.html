@@ -27,6 +27,11 @@ pre
 <p>Not yet released.
 </p>
 
+<p>
+Requires <a href="http://librdf.org/raptor/">Raptor</a> 2.0.7 or newer<br />
+</p>
+
+
 <h3>Model class changes</h3>
 
 <p><code>librdf_model_contains_statement()</code> now returns &gt; 0
@@ -65,6 +70,16 @@ store with missing configuration now reports the required keys.
 </p>
 
 
+<h3>Unicode module changes</h3>
+
+<p>Added <code>librdf_latin1_to_utf8_2()</code> with size_t args.
+Deprecates librdf_latin1_to_utf8().</p>
+
+<p>Added <code>librdf_utf8_to_latin1_2()</code> with size_t args and
+new default arg for replacing out of range characters. Deprecates
+librdf_utf8_to_latin1().</p>
+
+
 <h3>World class changes</h3>
 
 <p>Added <code>librdf_world_set_raptor_init_handler()</code> and
@@ -77,7 +92,23 @@ are run, respectively.  Added new typedefs
 <code>librdf_rasqal_init_handler</code> for the handlers.
 </p>
 
+<h3>Other API changes</h3>
+
+<p>Added <code>librdf_license_string</code> and
+<code>librdf_home_url_string</code> static strings to public API
+following Raptor and Rasqal naming convention.
+</p>
+
 <h3>Other changes</h3>
+
+<p>Multiple internal fixes for signed int conversions especially
+around size_t and allocation.</p>
+
+<p>Removed old debugging memory allocation options
+<code>--with-dmalloc</code> for dmalloc and
+<code>--with-memory-signing</code> for internal signing of memory
+blocks.  Valgrind and static analyzers replace this.
+</p>
 
 <p>Multiple portability fixes for building out of the source tree.
 Out of source tree 'make check' and 'make dist' should both work.
