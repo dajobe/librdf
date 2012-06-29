@@ -22,6 +22,8 @@
 1.0.14	-	-	-	1.0.15	librdf_hash*	librdf_new_hash	(librdf_world *world, const char *name)	-
 1.0.15	-	-	-	1.0.16	void	librdf_world_set_raptor_init_handler	(librdf_world* world, void* user_data, librdf_raptor_init_handler handler)	-
 1.0.15	-	-	-	1.0.16	void	librdf_world_set_rasqal_init_handler	(librdf_world* world, void* user_data, librdf_rasqal_init_handler handler)	-
+1.0.15	-	-	-	1.0.16	unsigned char*	librdf_utf8_to_latin1_2	(const unsigned char *input, size_t length, char discard, size_t *output_length)	Replaces librdf_utf8_to_latin1()
+1.0.15	-	-	-	1.0.16	unsigned char*	librdf_latin1_to_utf8_2	(const unsigned char *input, size_t length, size_t *output_length)	Replaces librdf_latin1_to_utf8()
 #
 # Types
 #

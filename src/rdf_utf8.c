@@ -98,27 +98,28 @@ librdf_utf8_to_unicode_char(librdf_unichar *output, const unsigned char *input,
 
 
 /**
- * librdf_utf8_to_latin1:
+ * librdf_utf8_to_latin1_2:
  * @input: UTF-8 string buffer
- * @length: buffer size (will be truncated to size_t)
+ * @length: buffer size
+ * @discard: character to use to replace out of range characters or NUL (\0) to discard
  * @output_length: Pointer to variable to store resulting string length or NULL
  *
  * Convert a UTF-8 string to ISO Latin-1.
  * 
  * Converts the given UTF-8 string to the ISO Latin-1 subset of
- * Unicode (characters 0x00-0xff), discarding any out of range
- * characters.
+ * Unicode (characters 0x00-0xff).  Out of range characters are
+ * replaced with @discard unless it is NUL (\0).
  *
- * If the @output_length pointer is not NULL, the returned string
- * length will be stored there.
+ * If @output_length is not NULL, the returned string length will be
+ * stored there.
  *
  * Return value: pointer to new ISO Latin-1 string or NULL on failure
  **/
 unsigned char*
-librdf_utf8_to_latin1(const unsigned char *input, int length,
-                      int *output_length)
+librdf_utf8_to_latin1_2(const unsigned char *input, size_t length,
+                        char discard,
+                        size_t *output_length)
 {
-  size_t slength = LIBRDF_BAD_CAST(size_t, length);
   size_t utf8_char_length = 0;
   size_t utf8_byte_length = 0;
   size_t i;
@@ -127,7 +128,7 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
 
   i = 0;
   while(input[i]) {
-    int size = raptor_unicode_utf8_string_get_char(&input[i], slength - i, NULL);
+    int size = raptor_unicode_utf8_string_get_char(&input[i], length - i, NULL);
     if(size <= 0)
       return NULL;
 
@@ -151,21 +152,120 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
   while(i < utf8_byte_length) {
     librdf_unichar c;
 
-    int size = raptor_unicode_utf8_string_get_char(&input[i], slength - i, &c);
+    int size = raptor_unicode_utf8_string_get_char(&input[i], length - i, &c);
     if(size <= 0) {
       LIBRDF_FREE(byte_string, output);
       return NULL;
     }
 
-    if(c < 0x100) /* Discards characters! */
+    if(c < 0x100)
       output[j++] = c;
-
+    else {
+      if(discard)
+        output[j++] = discard;
+    }
     i += LIBRDF_GOOD_CAST(size_t, size);
   } 
   output[j] = '\0';
 
   if(output_length)
-    *output_length = LIBRDF_BAD_CAST(int, j);
+    *output_length = j;
+  
+  return output;
+}
+
+
+/**
+ * librdf_utf8_to_latin1:
+ * @input: UTF-8 string buffer
+ * @length: buffer size (will be truncated to size_t)
+ * @output_length: Pointer to variable to store resulting string length or NULL
+ *
+ * Convert a UTF-8 string to ISO Latin-1.
+ * 
+ * Converts the given UTF-8 string to the ISO Latin-1 subset of
+ * Unicode (characters 0x00-0xff), discarding any out of range
+ * characters.
+ *
+ * @deprecated for librdf_utf8_to_latin1_2() that takes and returns
+ * size_t sizes and allows replacing of out of range characters.
+ *
+ * If @output_length is not NULL, the returned string length
+ * will be stored there.
+ *
+ * Return value: pointer to new ISO Latin-1 string or NULL on failure
+ **/
+unsigned char*
+librdf_utf8_to_latin1(const unsigned char *input, int length,
+                      int *output_length)
+{
+  unsigned char* output_buffer;
+  size_t soutput_length = 0;
+
+  output_buffer = librdf_utf8_to_latin1_2(input,
+                                          LIBRDF_BAD_CAST(size_t, length),
+                                          '\0',
+                                          &soutput_length);
+  if(output_length)
+    *output_length = LIBRDF_BAD_CAST(int, soutput_length);
+
+  return output_buffer;
+}
+
+
+/**
+ * librdf_latin1_to_utf8_2:
+ * @input: ISO Latin-1 string buffer
+ * @length: buffer size
+ * @output_length: Pointer to variable to store resulting string length or NULL
+ *
+ * Convert an ISO Latin-1 encoded string to UTF-8.
+ * 
+ * Converts the given ISO Latin-1 string to an UTF-8 encoded string
+ * representing the same content.  This is lossless.
+ * 
+ * If @output_length is not NULL, the returned string length will be
+ * stored there.
+ *
+ * Return value: pointer to new UTF-8 string or NULL on failure
+ **/
+unsigned char*
+librdf_latin1_to_utf8_2(const unsigned char *input, size_t length,
+                        size_t *output_length)
+{
+  size_t utf8_length = 0;
+  size_t i;
+  size_t j;
+  unsigned char *output;
+
+  for(i = 0; input[i]; i++) {
+    int size = raptor_unicode_utf8_string_put_char(input[i], NULL, length - i);
+    if(size <= 0)
+      return NULL;
+
+    utf8_length += LIBRDF_GOOD_CAST(size_t, size);
+  }
+
+  output = LIBRDF_MALLOC(unsigned char*, utf8_length + 1);
+  if(!output)
+    return NULL;
+  
+
+  j = 0;
+  for(i = 0; input[i]; i++) {
+    int size = raptor_unicode_utf8_string_put_char(input[i], &output[j],
+                                                   length - i);
+    if(size <= 0) {
+      LIBRDF_FREE(byte_string, output);
+      return NULL;
+    }
+
+    j += LIBRDF_GOOD_CAST(size_t, size);
+  } 
+  output[j] = '\0';
+
+  if(output_length)
+    *output_length = j;
   
   return output;
 }
@@ -182,8 +282,11 @@ librdf_utf8_to_latin1(const unsigned char *input, int length,
  * Converts the given ISO Latin-1 string to an UTF-8 encoded string
  * representing the same content.  This is lossless.
  * 
- * If the output_length pointer is not NULL, the returned string
- * length will be stored there.
+ * @deprecated for librdf_latin1_to_utf8_2() that takes and returns
+ * size_t sizes.
+ *
+ * If @output_length is not NULL, the returned string length will be
+ * stored there.
  *
  * Return value: pointer to new UTF-8 string or NULL on failure
  **/
@@ -191,44 +294,17 @@ unsigned char*
 librdf_latin1_to_utf8(const unsigned char *input, int length,
                       int *output_length)
 {
-  size_t slength = LIBRDF_BAD_CAST(size_t, length);
-  size_t utf8_length = 0;
-  size_t i;
-  size_t j;
-  unsigned char *output;
+  unsigned char* output_buffer;
+  size_t soutput_length = 0;
 
-  for(i = 0; input[i]; i++) {
-    int size = raptor_unicode_utf8_string_put_char(input[i], NULL, slength - i);
-    if(size <= 0)
-      return NULL;
-
-    utf8_length += LIBRDF_GOOD_CAST(size_t, size);
-  }
-
-  output = LIBRDF_MALLOC(unsigned char*, utf8_length + 1);
-  if(!output)
-    return NULL;
-  
-
-  j = 0;
-  for(i = 0; input[i]; i++) {
-    int size = raptor_unicode_utf8_string_put_char(input[i], &output[j],
-                                                   slength - i);
-    if(size <= 0) {
-      LIBRDF_FREE(byte_string, output);
-      return NULL;
-    }
-
-    j += LIBRDF_GOOD_CAST(size_t, size);
-  } 
-  output[j] = '\0';
-
+  output_buffer = librdf_latin1_to_utf8_2(input,
+                                          LIBRDF_BAD_CAST(size_t, length),
+                                          &soutput_length);
   if(output_length)
-    *output_length = LIBRDF_BAD_CAST(int, j);
-  
-  return output;
-}
+    *output_length = LIBRDF_BAD_CAST(int, soutput_length);
 
+  return output_buffer;
+}
 
 /**
  * librdf_utf8_print:
@@ -311,15 +387,16 @@ main(int argc, char *argv[])
   
   int i;
   unsigned char *latin1_string;
-  int latin1_string_length;
+  size_t latin1_string_length;
   unsigned char *utf8_string;
-  int utf8_string_length;
+  size_t utf8_string_length;
   int failures = 0;
   int verbose = 0;
 
-  latin1_string=librdf_utf8_to_latin1(test_utf8_string, 
-                                      test_utf8_string_length,
-                                      &latin1_string_length);
+  latin1_string = librdf_utf8_to_latin1_2(test_utf8_string, 
+                                          test_utf8_string_length,
+                                          '\0',
+                                          &latin1_string_length);
   if(!latin1_string) {
     fprintf(stderr, "%s: librdf_utf8_to_latin1 FAILED to convert UTF-8 string '", program);
     librdf_bad_string_print(test_utf8_string, test_utf8_string_length, stderr);
@@ -343,8 +420,8 @@ main(int argc, char *argv[])
   }
   
 
-  utf8_string=librdf_latin1_to_utf8(latin1_string, latin1_string_length,
-                                    &utf8_string_length);
+  utf8_string = librdf_latin1_to_utf8_2(latin1_string, latin1_string_length,
+                                        &utf8_string_length);
   if(!utf8_string) {
     fprintf(stderr, "%s: librdf_latin1_to_utf8 FAILED to convert Latin-1 string '%s' to UTF-8\n", program, latin1_string);
     failures++;

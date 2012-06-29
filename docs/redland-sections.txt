@@ -484,7 +484,9 @@ librdf_unichar
 librdf_unicode_char_to_utf8
 librdf_utf8_to_unicode_char
 librdf_utf8_to_latin1
+librdf_utf8_to_latin1_2
 librdf_latin1_to_utf8
+librdf_latin1_to_utf8_2
 librdf_utf8_print
 </SECTION>
 
