@@ -48,7 +48,7 @@ int librdf_utf8_to_unicode_char(librdf_unichar *output, const unsigned char *inp
 REDLAND_API
 unsigned char* librdf_latin1_to_utf8_2(const unsigned char *input, size_t length, size_t *output_length);
 REDLAND_API
-unsigned char* librdf_utf8_to_latin1_2(const unsigned char *input, size_t length, char discard, size_t *output_length);
+unsigned char* librdf_utf8_to_latin1_2(const unsigned char *input, size_t length, unsigned char discard, size_t *output_length);
 REDLAND_API REDLAND_DEPRECATED
 unsigned char* librdf_utf8_to_latin1(const unsigned char *input, int length, int *output_length);
 REDLAND_API REDLAND_DEPRECATED

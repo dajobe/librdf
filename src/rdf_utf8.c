@@ -117,7 +117,7 @@ librdf_utf8_to_unicode_char(librdf_unichar *output, const unsigned char *input,
  **/
 unsigned char*
 librdf_utf8_to_latin1_2(const unsigned char *input, size_t length,
-                        char discard,
+                        unsigned char discard,
                         size_t *output_length)
 {
   size_t utf8_char_length = 0;
