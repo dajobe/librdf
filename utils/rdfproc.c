@@ -62,6 +62,7 @@ static  char *program=NULL;
 
 
 enum command_type {
+  CMD_NONE,
   CMD_PRINT,
   CMD_CONTAINS,
   CMD_FIND,
@@ -99,6 +100,7 @@ typedef struct
 } command;
 
 static command commands[]={
+  {CMD_NONE, "(none)", 0, 0, 0,},
   {CMD_PRINT, "print", 0, 0, 0,},
   {CMD_CONTAINS, "contains", 3, 3, 0},
   {CMD_FIND, "find", 3, 4, 0},
@@ -269,7 +271,7 @@ main(int argc, char *argv[])
   char *cmd=NULL;
   char *name;
   char *mime_type;
-  int cmd_index= -1;
+  unsigned cmd_index = 0;
   int count;
   int type;
   int result;
@@ -528,12 +530,12 @@ main(int argc, char *argv[])
   
   cmd=argv[0];
   
-  for(i = 0; commands[i].name; i++)
+  for(i = 1; commands[i].name; i++)
     if(!strcmp(cmd, commands[i].name)) {
-      cmd_index=i;
+      cmd_index = i;
       break;
     }
-  if(cmd_index<0) {
+  if(!cmd_index) {
     fprintf(stderr, "%s: No such command `%s'\n", program, argv[0]);
     usage=1;
     goto usage;
@@ -659,7 +661,7 @@ main(int argc, char *argv[])
     exit(0);
   }
   
-  type=commands[cmd_index].type;
+  type = commands[cmd_index].type;
 
   if(commands[cmd_index].write) {
     librdf_hash_put_strings(options, "write", "yes");
@@ -840,7 +842,7 @@ main(int argc, char *argv[])
         }
 
         if((error_count >=0) && (warning_count >=0) &&
-           error_count+warning_count >0) {
+           error_count+warning_count > 0) {
           fprintf(stdout,
                   "%s: The parsing returned %d errors and %d warnings\n", 
                   program, error_count, warning_count);
@@ -1020,7 +1022,7 @@ main(int argc, char *argv[])
             
             name = (char*)librdf_query_results_get_binding_name(results, i);
 
-            if(i>0)
+            if(i > 0)
               fputs(", ", stdout);
             fprintf(stdout, "%s=", name);
             if(value) {
