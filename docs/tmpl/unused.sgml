@@ -123,21 +123,3 @@ Internal.
 @message: 
 
 
-<!-- ##### FUNCTION librdf_world_get_raptor ##### -->
-<para>
-
-</para>
-
-@world: 
-@Returns: 
-
-
-<!-- ##### FUNCTION librdf_world_set_raptor ##### -->
-<para>
-
-</para>
-
-@world: 
-@raptor_world_ptr: 
-
-

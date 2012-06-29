@@ -62,7 +62,30 @@ with loss to Latin-1.
 @Returns: 
 
 
+<!-- ##### FUNCTION librdf_utf8_to_latin1_2 ##### -->
+<para>
+
+</para>
+
+@input: 
+@length: 
+@discard: 
+@output_length: 
+@Returns: 
+
+
 <!-- ##### FUNCTION librdf_latin1_to_utf8 ##### -->
+<para>
+
+</para>
+
+@input: 
+@length: 
+@output_length: 
+@Returns: 
+
+
+<!-- ##### FUNCTION librdf_latin1_to_utf8_2 ##### -->
 <para>
 
 </para>

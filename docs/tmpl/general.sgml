@@ -98,6 +98,18 @@ home page.  Functions for in-library memory allocation and deallocation.
 </para>
 
 
+<!-- ##### VARIABLE librdf_license_string ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE librdf_home_url_string ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### FUNCTION librdf_alloc_memory ##### -->
 <para>
 
