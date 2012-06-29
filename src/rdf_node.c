@@ -765,7 +765,7 @@ librdf_node_encode(librdf_node *node,
   size_t total_length = 0;
   unsigned char *string;
   size_t string_length;
-  unsigned char language_length = 0;
+  size_t language_length = 0;
   unsigned char *datatype_uri_string = NULL;
   size_t datatype_uri_length = 0;
   
@@ -796,7 +796,7 @@ librdf_node_encode(librdf_node *node,
       string = (unsigned char*)node->value.literal.string;
       string_length = node->value.literal.string_len;
       if(node->value.literal.language)
-        language_length = node->value.literal.language_len;
+        language_length = LIBRDF_GOOD_CAST(size_t, node->value.literal.language_len);
 
       if(node->value.literal.datatype) {
         datatype_uri_string = librdf_uri_as_counted_string(node->value.literal.datatype, &datatype_uri_length);
@@ -905,7 +905,7 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
   int is_wf_xml;
   size_t string_length;
   size_t total_length;
-  unsigned char language_length;
+  size_t language_length;
   unsigned char *datatype_uri_string = NULL;
   size_t datatype_uri_length;
   librdf_uri* datatype_uri = NULL;
@@ -953,7 +953,7 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
                                                         buffer + 6,
                                                         string_length,
                                                         (const char*)language,
-                                                        language_length,
+                                                        LIBRDF_GOOD_CAST(unsigned char, language_length),
                                                         is_wf_xml ? LIBRDF_RS_XMLLiteral_URI(world) : NULL);
     
     break;
@@ -965,7 +965,7 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
       
       string_length = (buffer[1] << 8) | buffer[2];
       datatype_uri_length = (buffer[3] << 8) | buffer[4];
-      language_length =buffer[5];
+      language_length = buffer[5];
 
       total_length = 6 + string_length + 1; /* +1 for \0 at end */
       if(datatype_uri_length) {
@@ -984,7 +984,7 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
                                                         buffer + 6,
                                                         string_length,
                                                         (const char*)language,
-                                                        language_length,
+                                                        LIBRDF_GOOD_CAST(unsigned char, language_length),
                                                         datatype_uri);
       if(datatype_uri)
         librdf_free_uri(datatype_uri);
@@ -1020,7 +1020,7 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
                                                         buffer + 8,
                                                         string_length,
                                                         (const char*)language,
-                                                        language_length,
+                                                        LIBRDF_GOOD_CAST(size_t, language_length),
                                                         datatype_uri);
       if(datatype_uri)
         librdf_free_uri(datatype_uri);
