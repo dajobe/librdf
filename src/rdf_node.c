@@ -546,6 +546,7 @@ librdf_node_get_literal_value_as_counted_string(librdf_node *node,
 char*
 librdf_node_get_literal_value_as_latin1(librdf_node *node)
 {
+  int islen;
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(node, librdf_node, NULL);
 
   if(node->type != RAPTOR_TERM_TYPE_LITERAL)
@@ -554,8 +555,9 @@ librdf_node_get_literal_value_as_latin1(librdf_node *node)
   if(!node->value.literal.string)
     return NULL;
   
-  return (char*)librdf_utf8_to_latin1((const unsigned char*)node->value.literal.string,
-                                      node->value.literal.string_len, NULL);
+  islen = LIBRDF_BAD_CAST(int, node->value.literal.string_len);
+  return (char*)librdf_utf8_to_latin1_2((const unsigned char*)node->value.literal.string,
+                                        islen, '\0', NULL);
 }
 
 
