@@ -1,3 +1,221 @@
+2012-06-28  Dave Beckett <dave@dajobe.org>
+
+	* docs/tmpl/general.sgml, docs/tmpl/unicode.sgml,
+	docs/tmpl/unused.sgml, docs/tmpl/world.sgml: Update tmpls
+
+	* src/rdf_storage_mysql.c:
+	Code fixes [gcc warnings]
+
+	librdf_storage_mysql_instance: Use char* for all char* fields
+
+	(librdf_storage_mysql_get_handle): Cast size_t connections count
+	array computations [gcc warnings]
+
+	(librdf_storage_mysql_init): Get port as a long and use it if it
+	was set it fits into int
+
+	(librdf_storage_mysql_terminate): Remove un-necessary casts for
+	non-const char* configuration variables.
+
+	* src/rdf_node.c: Use size_t for language length in internal
+	calculations [gcc warnings]
+
+	(librdf_node_encode, librdf_node_decode): use size_t casts to help
+	code clarity and mix of size_t and char-promoted-to-int warnings.
+
+	* src/rdf_node.c:
+	(librdf_node_get_literal_value_as_latin1): Use size_t for len
+
+	* utils/rdfproc.c: Add a none command and use index 0 as not found
+	sentinel
+
+	* docs/redland-changes.tsv, src/rdf_utf8.c, src/rdf_utf8.h:
+	(librdf_utf8_to_latin1_2): unsigned char discard arg
+
+	* src/rdf_node.c:
+	(librdf_node_get_literal_value_as_latin1): Use
+	librdf_utf8_to_latin1_2()
+
+	* docs/redland-changes.tsv, docs/redland-sections.txt,
+	src/rdf_utf8.c, src/rdf_utf8.h: Deprecate latin1/utf8 routines
+	that use int sizes
+
+	(librdf_latin1_to_utf8_2): Added deprecating librdf_latin1_to_utf8
+
+	(librdf_utf8_to_latin1_2): Added deprecating librdf_utf8_to_latin1
+
+	* src/rdf_query_virtuoso.c: Code cleanups for strcpy and size_t
+	[gcc warnings]
+
+	(librdf_query_virtuoso_init): Replace strcpy for known length
+	strings with memcpy
+
+	(librdf_query_virtuoso_execute): Capture strlens and use memcpy
+	twice rather than strcpy and strcat.  Cast context->numCols to
+	size_t for array calloc [gcc warnings].
+	Use size_t for col names length.
+
+	(librdf_query_virtuoso_results_formatter_write): Use memcpy
+	Replace strcpy for known length string with memcpy
+
+	* src/rdf_hash_memory.c: Revert
+	d2d6a7a54342deff47ee686fda8d9b87e17ffefa - broke hash memory
+
+	* utils/rdfproc.c: unsigned int i for indexing [gcc warnings]
+
+	* src/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_get_handle): pool size casting [gcc
+	warnings]
+
+	* src/rdf_storage_mysql.c:
+	(librdf_storage_mysql_hash): Use size_t length arg [gcc warnings]
+
+	* src/rdf_log.c, src/rdf_log_internal.h: Mark librdf_fatal as
+	REDLAND_NORETURN [gcc warnings]
+
+	* src/librdf.h.in: Add REDLAND_NORETURN using gcc 3.2+ attribute
+	__noreturn__
+
+	* src/rdf_utf8.c: Simplify size_t UTF to/from latin1 work [gcc
+	warnings]
+
+	(librdf_utf8_to_latin1, librdf_latin1_to_utf8): Make a slength
+	first then do everything in size_t
+
+	* src/rdf_utf8.c: Do UTF to/from latin1 work in size_t and make
+	bad casts at end
+
+	(librdf_utf8_to_latin1, librdf_latin1_to_utf8): Truncate final
+	results after working in size_t
+
+	* src/rdf_hash_memory.c: unsigned int for keys, values, capacity
+	and bucket sizes [gcc warnings]
+
+	(librdf_hash_memory_find_node): u32 for hash_key computation but
+	then put in an unsigned int bucket
+
+	Rest of code: Code style fixes
+	- many whitespace added around operators.
+	- pulled assigments out of if - broke long lines
+
+	* src/rdf_storage_sqlite.c:
+	(sqlite_string_escape): Use size_t for lengths [gcc warnings]
+
+	* src/rdf_storage_trees.c: Good int cast comparing node types [gcc
+	warning]
+
+	(librdf_storage_trees_node_compare): Cast to ints is ok when
+	comparing node types.
+
+	* src/rdf_storage_hashes.c:
+	(librdf_storage_hashes_init_common): Good casts to size_t [gcc
+	warnings]
+
+	* src/rdf_log.c: Good casts to size_t from int for log lengths
+	[gcc warnings]
+
+	log messages are short
+
+	(librdf_log_simple, librdf_fatal): Add
+	size_t length variables for rewriting more clearly.
+
+	* src/rdf_serializer_raptor.c: unsigned int for indexing [gcc
+	warnings]
+
+	(librdf_serializer_raptor_constructor): unsigned int it
+
+	* src/rdf_utf8.c: Many bad size_t casts for utf8/latin1 work [gcc
+	warnings]
+
+	(librdf_unicode_char_to_utf8, librdf_utf8_to_unicode_char,
+	librdf_utf8_to_latin1, librdf_latin1_to_utf8): Added casts and
+	updated docs with warnings.  Turned some existing bad casts into
+	explicit ones.
+
+	* src/rdf_heuristics.c, src/rdf_parser_raptor.c,
+	src/rdf_storage.c, src/rdf_storage_sql.c: More fixes for #if
+	LIBRDF_DEBUG when it is not defined.
+
+	* src/rdf_heuristics.c:
+	(librdf_heuristic_gen_name): Good cast for length calc [gcc
+	warnings] Code style fixes
+
+	* src/rdf_storage_sql.c:
+	(librdf_new_sql_config): Good cast for predicates count [gcc
+	warnings]
+
+	* src/rdf_serializer.c:
+	(librdf_serializer_enumerate): Good cast for signed seq offset [gcc
+	warnings]
+
+	* src/rdf_parser.c:
+	(librdf_parser_enumerate): Good cast for signed seq offset [gcc
+	warnings]
+
+	* src/rdf_storage.c:
+	(librdf_storage_enumerate): Good cast for signed seq offset [gcc
+	warnings]
+
+	* src/rdf_model.c:
+	(librdf_model_enumerate): Good cast for signed seq offset [gcc
+	warnings]
+
+	* src/rdf_init.c:
+	(librdf_new_world): Good cast signed long time_t to unsigned long
+
+	* src/rdf_hash.c:
+	(librdf_hash_from_string): Do pointer arithmetic in size_t [gcc
+	warnings]
+
+	* src/rdf_hash.c: Good casts to size_t between pointers that
+	increase [gcc warnings]
+
+	(librdf_hash_from_string, librdf_hash_interpret_template): Add
+	good casts from pointer arithmetic (int) to size_t that will
+	always be positive.
+
+	* src/rdf_storage_sqlite.c: Protect #if use of undefined
+	LIBRDF_DEBUG
+
+	* src/rdf_query_rasqal.c: Protect #if use of undefined
+	LIBRDF_DEBUG
+
+	* src/rdf_list.c: Protect #if use of undefined LIBRDF_DEBUG
+
+	* src/rdf_init.c: long and size_t fixes
+
+	(librdf_world_set_feature): use long for time_t
+
+	(librdf_world_get_genid): Calculate length in size_t
+
+	* src/librdf.h.in:
+	Add prototypes for license and home url strings
+
+	* docs/redland-changes.tsv, docs/redland-sections.txt,
+	src/rdf_init.c, utils/rdfproc.c: Add license and home url constant
+	strings to API
+
+	Added librdf_license_string and librdf_home_url_string to public
+	API following Raptor and Rasqal naming convention.
+
+	(rdfproc main): Use in help.
+
+2012-06-27  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac:
+	Require raptor 2.0.7+
+
+	* INSTALL.html, configure.ac, examples/Makefile.am,
+	src/Makefile.am, src/rdf_init.c, src/rdf_internal.h,
+	src/win32_rdf_config.h.in, utils/Makefile.am: Remove dmalloc and
+	memory signing
+
+	Removed --with-dmalloc and --with-memory-signing configure options.
+
+	* src/rdf_init.c: 2012
+
+	* NEWS.html, RELEASE.html: 1.0.16
+
 2012-06-26  Dave Beckett <dave@dajobe.org>
 
 	* Makefile.am: EXTRA_DIST: Remove ChangeLog NEWS since they are in
