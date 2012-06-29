@@ -187,7 +187,7 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name,
   query_string_copy = LIBRDF_MALLOC(unsigned char*, len + 1);
   if(!query_string_copy)
     return 1;
-  strcpy((char*)query_string_copy, (const char*)query_string);
+  memcpy(query_string_copy, query_string, len + 1);
 
   token = strtok((char*)query_string_copy, seps);
 
@@ -208,7 +208,7 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name,
     token = strtok(NULL, seps);
   }
 
-  strcpy((char*)query_string_copy, (const char*)query_string);
+  memcpy(query_string_copy, query_string, len + 1);
   context->query_string = query_string_copy;
   if(base_uri)
     context->uri=librdf_new_uri_from_uri(base_uri);
@@ -253,6 +253,8 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
   SQLUSMALLINT icol;
   char pref[]="sparql define output:format '_JAVA_' ";
   char *cmd = NULL;
+  size_t pref_len;
+  size_t query_string_len;
 
   context = (librdf_query_virtuoso_context*)query->context;
 
@@ -269,13 +271,14 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
   virtuoso_free_result(query);
   SQLCloseCursor(context->vc->hstmt);
 
-  cmd = LIBRDF_MALLOC(char*, 
-                      strlen(pref) + strlen((char *)context->query_string) + 1);
+  pref_len = strlen(pref);
+  query_string_len = strlen((char *)context->query_string);
+  cmd = LIBRDF_MALLOC(char*, pref_len + query_string_len + 1);
   if(!cmd) {
-      goto error;
+    goto error;
   }
-  strcpy(cmd, pref);
-  strcat(cmd, (char *)context->query_string);
+  memcpy(cmd, pref, pref_len);
+  memcpy(cmd + pref_len, context->query_string, query_string_len + 1);
 
 #ifdef VIRTUOSO_STORAGE_DEBUG
   fprintf(stderr, "SQL>>%s\n", cmd);
@@ -296,13 +299,15 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
   }
 
   if(context->numCols > 0) {
-    context->colNames  = LIBRDF_CALLOC(char**, context->numCols + 1,
+    context->colNames  = LIBRDF_CALLOC(char**,
+                                       LIBRDF_GOOD_CAST(size_t, context->numCols + 1),
                                        sizeof(char*));
     if(!context->colNames) {
       goto error;
     }
 
-    context->colValues  = LIBRDF_CALLOC(librdf_node**, context->numCols + 1,
+    context->colValues  = LIBRDF_CALLOC(librdf_node**, 
+                                        LIBRDF_GOOD_CAST(size_t, context->numCols + 1),
                                         sizeof(librdf_node*));
     if(!context->colValues) {
       goto error;
@@ -310,6 +315,7 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
 
     for(icol = 1; icol<= context->numCols; icol++) {
       SQLSMALLINT namelen;
+      size_t snamelen;
       SQLCHAR name[255];
 
       rc = SQLColAttributes(context->vc->hstmt, icol, SQL_COLUMN_LABEL, name,
@@ -320,11 +326,12 @@ librdf_query_virtuoso_execute(librdf_query* query, librdf_model* model)
         goto error;
       }
 
-      context->colNames[icol - 1]  = LIBRDF_CALLOC(char*, 1, namelen + 1);
+      snamelen = LIBRDF_GOOD_CAST(size_t, namelen);
+      context->colNames[icol - 1]  = LIBRDF_MALLOC(char*, snamelen + 1);
       if(!context->colNames[icol-1])
         goto error;
 
-      strcpy(context->colNames[icol-1], (char *)name);
+      memcpy(context->colNames[icol-1], name, snamelen + 1);
     }
 
     context->colNames[context->numCols] = NULL;
@@ -1279,11 +1286,13 @@ librdf_query_virtuoso_results_formatter_write(raptor_iostream *iostr,
   vt = rasqal_new_variables_table(query->world->rasqal_world_ptr);
   for(i = 0 ; i < row_size; i++) {
     const char *name;
+    size_t name_len;
     unsigned char *name_copy;
 
     name = librdf_query_results_get_binding_name(query_results, i);
-    name_copy = LIBRDF_MALLOC(unsigned char*, strlen(name) + 1);
-    strcpy((char*)name_copy, (const char*)name);
+    name_len = strlen(name);
+    name_copy = LIBRDF_MALLOC(unsigned char*, name_len + 1);
+    memcpy(name_copy, name, name_len + 1);
     rasqal_variables_table_add(vt, RASQAL_VARIABLE_TYPE_NORMAL,
                                name_copy, NULL);
   }
