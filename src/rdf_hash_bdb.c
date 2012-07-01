@@ -144,7 +144,7 @@ librdf_hash_bdb_open(void* context, const char *identifier,
   DB* bdb;
   char *file;
   int ret;
-  int flags;
+  u_int32_t flags = 0;
 
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(identifier, cstring, 1);
   
@@ -681,6 +681,7 @@ librdf_hash_bdb_put(void* context, librdf_hash_datum *key,
   DBT bdb_value;
   DBT bdb_key;
   int ret;
+  u_int32_t flags = 0;
 
   /* docs say you must zero DBT's before use */
   memset(&bdb_value, 0, sizeof(DBT));
@@ -698,10 +699,10 @@ librdf_hash_bdb_put(void* context, librdf_hash_datum *key,
   /* V2/V3 prototype:
    * int DB->put(DB *db, DB_TXN *txnid, DBT *key, DBT *data, u_int32_t flags); 
    */
-  ret=db->put(db, NULL, &bdb_key, &bdb_value, 0);
+  ret = db->put(db, NULL, &bdb_key, &bdb_value, flags);
 #else
   /* V1 */
-  ret=db->put(db, &bdb_key, &bdb_value, 0);
+  ret = db->put(db, &bdb_key, &bdb_value, flags);
 #endif
 #ifdef LIBRDF_DEBUG
   if(ret)
@@ -734,6 +735,7 @@ librdf_hash_bdb_exists(void* context, librdf_hash_datum *key,
   DBT bdb_key;
   DBT bdb_value;
   int ret;
+  u_int32_t flags = 0;
   
   /* docs say you must zero DBT's before use */
   memset(&bdb_key, 0, sizeof(DBT));
@@ -751,7 +753,9 @@ librdf_hash_bdb_exists(void* context, librdf_hash_datum *key,
 #ifdef HAVE_BDB_DB_TXN
 #ifdef DB_GET_BOTH
   /* later V2 (sigh)/V3 */
-  ret=db->get(db, NULL, &bdb_key, &bdb_value, (value ? DB_GET_BOTH : 0));
+  if(value)
+    flags = DB_GET_BOTH;
+  ret = db->get(db, NULL, &bdb_key, &bdb_value, flags);
   if(ret == DB_NOTFOUND)
     ret= 0;
   else if(ret) /* failed */
@@ -762,7 +766,7 @@ librdf_hash_bdb_exists(void* context, librdf_hash_datum *key,
   /* earlier V2 */
   if(!value) {
     /* don't care about value, can use standard get */
-    ret=db->get(db, NULL, &bdb_key, &bdb_value, 0);
+    ret = db->get(db, NULL, &bdb_key, &bdb_value, flags);
     if(ret == DB_NOTFOUND)
       ret= 0;
     else if(ret) /* failed */
@@ -872,6 +876,7 @@ librdf_hash_bdb_delete_key(void* context, librdf_hash_datum *key)
   DB* bdb=bdb_context->db;
   DBT bdb_key;
   int ret;
+  u_int32_t flags = 0;
 
   memset(&bdb_key, 0, sizeof(DBT));
 
@@ -881,10 +886,10 @@ librdf_hash_bdb_delete_key(void* context, librdf_hash_datum *key)
   
 #ifdef HAVE_BDB_DB_TXN
   /* V2/V3 */
-  ret=bdb->del(bdb, NULL, &bdb_key, 0);
+  ret = bdb->del(bdb, NULL, &bdb_key, flags);
 #else
   /* V1 */
-  ret=bdb->del(bdb, &bdb_key, 0);
+  ret = bdb->del(bdb, &bdb_key, flags);
 #endif
 #ifdef LIBRDF_DEBUG
   if(ret)
@@ -913,6 +918,7 @@ librdf_hash_bdb_delete_key_value(void* context,
   DB* bdb=bdb_context->db;
   DBT bdb_key, bdb_value;
   int ret;
+  u_int32_t flags = 0;
 #ifdef HAVE_BDB_CURSOR
   DBC* dbc;
 #endif
@@ -932,7 +938,7 @@ librdf_hash_bdb_delete_key_value(void* context,
   /* V3 prototype:
    * int DB->cursor(DB *db, DB_TXN *txnid, DBC **cursorp, u_int32_t flags);
    */
-  if(bdb->cursor(bdb, NULL, &dbc, 0))
+  if(bdb->cursor(bdb, NULL, &dbc, flags))
     return 1;
 #else
   /* V2 prototype:
@@ -947,11 +953,11 @@ librdf_hash_bdb_delete_key_value(void* context,
    */
 #ifdef DB_GET_BOTH
   /* later V2 (sigh) / V3 */
-  ret=dbc->c_get(dbc, &bdb_key, &bdb_value, DB_GET_BOTH);
+  flags = DB_GET_BOTH;
 #else
   /* earlier V2 probably gives a memory leak */
-  ret=dbc->c_get(dbc, &bdb_key, &bdb_value, 0);
 #endif
+  ret = dbc->c_get(dbc, &bdb_key, &bdb_value, flags);
   if(ret) {
     dbc->c_close(dbc);
     return 1;
