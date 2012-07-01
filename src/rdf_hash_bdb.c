@@ -169,7 +169,8 @@ librdf_hash_bdb_open(void* context, const char *identifier,
   /* V3 prototype:
    * int db_create(DB **dbp, DB_ENV *dbenv, u_int32_t flags);
    */
-  if((ret=db_create(&bdb, NULL, 0))) {
+  ret = db_create(&bdb, NULL, flags);
+  if(ret) {
     LIBRDF_DEBUG2("Failed to create BDB context - %d\n", ret);
     return 1;
   }
@@ -185,7 +186,7 @@ librdf_hash_bdb_open(void* context, const char *identifier,
    * int DB->open(DB *db, const char *file, const char *database,
    *              DBTYPE type, u_int32_t flags, int mode);
    */
-  flags=is_writable ? DB_CREATE : DB_RDONLY;
+  flags = is_writable ? DB_CREATE : DB_RDONLY;
   if(is_new)
     flags |= DB_TRUNCATE;
 #endif
@@ -197,7 +198,8 @@ librdf_hash_bdb_open(void* context, const char *identifier,
  * int DB->open(DB *db, const char *file,
  *              const char *database, DBTYPE type, u_int32_t flags, int mode);
  */
-  if((ret=bdb->open(bdb, file, NULL, DB_BTREE, flags, mode))) {
+  ret = bdb->open(bdb, file, NULL, DB_BTREE, flags, mode);
+  if(ret) {
     librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "BDB V4.0+ open of '%s' failed - %s", file, db_strerror(ret));
     LIBRDF_FREE(char*, file);
@@ -210,7 +212,8 @@ librdf_hash_bdb_open(void* context, const char *identifier,
  * int DB->open(DB *db, DB_TXN *txnid, const char *file,
  *              const char *database, DBTYPE type, u_int32_t flags, int mode);
  */
-  if((ret=bdb->open(bdb, NULL, file, NULL, DB_BTREE, flags, mode))) {
+  ret = bdb->open(bdb, NULL, file, NULL, DB_BTREE, flags, mode);
+  if(ret) {
     librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "BDB V4.1+ open of '%s' failed - %s", file, db_strerror(ret));
     LIBRDF_FREE(char*, file);
@@ -228,11 +231,12 @@ librdf_hash_bdb_open(void* context, const char *identifier,
   memset(&bdb_info, 0, sizeof(DB_INFO));
   bdb_info.flags=DB_DUP;
  
-  flags=is_writable ? DB_CREATE : DB_RDONLY;
+  flags = is_writable ? DB_CREATE : DB_RDONLY;
   if(is_new)
     flags |= DB_TRUNCATE;
 
-  if((ret=db_open(file, DB_BTREE, flags, mode, NULL, &bdb_info, &bdb))) {
+  ret = db_open(file, DB_BTREE, flags, mode, NULL, &bdb_info, &bdb);
+  if(ret) {
     librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "BDB V2 open of '%s' failed - %d", file, ret);
     LIBRDF_FREE(char*, file);
@@ -243,15 +247,16 @@ librdf_hash_bdb_open(void* context, const char *identifier,
   /* V1 prototype:
     const char *file, int flags, int mode, DBTYPE, const void *openinfo
   */
-  flags=is_writable ? O_RDWR|O_CREAT : O_RDONLY
+  flags = is_writable ? O_RDWR | O_CREAT : O_RDONLY
 
-  flags|=R_DUP;
+  flags |= R_DUP;
 
   /* There does not seem to be a V1 flag for truncate */ 
   if(is_new)
     remove(file);
 
-  if((bdb=dbopen(file, flags, mode, DB_BTREE, NULL)) == 0) {
+  bdb = dbopen(file, flags, mode, DB_BTREE, NULL);
+  if(!bdb) {
     librdf_log(bdb_context->hash->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "BDB V1 open of '%s' failed - %d", file, ret);
     LIBRDF_FREE(char*, file);
