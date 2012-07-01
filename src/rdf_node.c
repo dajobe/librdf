@@ -927,7 +927,7 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
       if(length < 3)
         return NULL;
 
-      string_length = (buffer[1] << 8) | buffer[2];
+      string_length = LIBRDF_GOOD_CAST(size_t, (buffer[1] << 8) | buffer[2]);
       total_length = 3 + string_length + 1;
       
       node = librdf_new_node_from_uri_string(world, buffer + 3);
@@ -940,8 +940,8 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
         return NULL;
       
       is_wf_xml = (buffer[1] & 0xf0)>>8;
-      string_length = (buffer[2] << 8) | buffer[3];
-      language_length = buffer[5];
+      string_length = LIBRDF_GOOD_CAST(size_t, (buffer[2] << 8) | buffer[3]);
+      language_length = LIBRDF_GOOD_CAST(size_t, buffer[5]);
 
       total_length = 6 + string_length + 1; /* +1 for \0 at end */
       if(language_length) {
@@ -963,8 +963,8 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
       if(length < 6)
         return NULL;
       
-      string_length = (buffer[1] << 8) | buffer[2];
-      datatype_uri_length = (buffer[3] << 8) | buffer[4];
+      string_length = LIBRDF_GOOD_CAST(size_t, (buffer[1] << 8) | buffer[2]);
+      datatype_uri_length = LIBRDF_GOOD_CAST(size_t, (buffer[3] << 8) | buffer[4]);
       language_length = buffer[5];
 
       total_length = 6 + string_length + 1; /* +1 for \0 at end */
@@ -1035,7 +1035,7 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
       if(length < 3)
         return NULL;
       
-      string_length = (buffer[1] << 8) | buffer[2];
+      string_length = LIBRDF_GOOD_CAST(size_t, (buffer[1] << 8) | buffer[2]);
 
       total_length = 3 + string_length + 1; /* +1 for \0 at end */
       
