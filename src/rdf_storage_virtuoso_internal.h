@@ -82,6 +82,8 @@ typedef struct
 } librdf_query_virtuoso_context;
 
 
+#define LIBRDF_VIRTUOSO_CONTEXT_DSN_SIZE 4096
+
 typedef struct {
   /* Virtuoso connection parameters */
   librdf_storage *storage;
@@ -110,6 +112,10 @@ typedef struct {
 
   librdf_storage_virtuoso_connection *transaction_handle;
 
+  /* for output connection DSN from SQLDriverConnect() as called by
+   * librdf_storage_virtuoso_get_handle() 
+   */
+  UCHAR outdsn[LIBRDF_VIRTUOSO_CONTEXT_DSN_SIZE];
 } librdf_storage_virtuoso_instance;
 
 

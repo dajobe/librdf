@@ -838,7 +838,6 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
   int i;
   int rc;
   short buflen;
-  char outdsn[4096];
 
   context = (librdf_storage_virtuoso_instance*)storage->instance;
 
@@ -935,7 +934,8 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
   }
 
   rc = SQLDriverConnect(connection->hdbc, 0,(UCHAR *) context->conn_str,
-                        SQL_NTS, (UCHAR *) outdsn, sizeof(outdsn),
+                        SQL_NTS, context->outdsn,
+                        LIBRDF_VIRTUOSO_CONTEXT_DSN_SIZE,
                         &buflen, SQL_DRIVER_COMPLETE);
   if(!SQL_SUCCEEDED(rc)) {
     rdf_virtuoso_ODBC_Errors("SQLConnect()", storage->world, connection);
