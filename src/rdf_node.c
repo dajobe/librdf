@@ -999,8 +999,8 @@ librdf_node_decode(librdf_world *world, size_t *size_p,
       if(length < 8)
         return NULL;
       
-      string_length = (buffer[1] << 24) | (buffer[2] << 16) | (buffer[3] << 8) | buffer[4];
-      datatype_uri_length = (buffer[5] << 8) | buffer[6];
+      string_length = LIBRDF_GOOD_CAST(size_t, (buffer[1] << 24) | (buffer[2] << 16) | (buffer[3] << 8) | buffer[4]);
+      datatype_uri_length = LIBRDF_GOOD_CAST(size_t, (buffer[5] << 8) | buffer[6]);
       language_length = buffer[7];
 
       total_length = 8 + string_length + 1; /* +1 for \0 at end */
