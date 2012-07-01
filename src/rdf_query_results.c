@@ -163,6 +163,10 @@ librdf_query_results_get_binding_value(librdf_query_results *query_results,
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
 
+  /* FIXME - offset really should be an unsigned int */
+  if(offset < 0)
+    return NULL;
+
   if(query_results->query->factory->results_get_binding_value)
     return query_results->query->factory->results_get_binding_value(query_results, offset);
   else
@@ -183,6 +187,10 @@ const char*
 librdf_query_results_get_binding_name(librdf_query_results *query_results, int offset)
 {
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(query_results, librdf_query_results, NULL);
+
+  /* FIXME - offset really should be an unsigned int */
+  if(offset < 0)
+    return NULL;
 
   if(query_results->query->factory->results_get_binding_name)
     return query_results->query->factory->results_get_binding_name(query_results, offset);
