@@ -1012,15 +1012,19 @@ main(int argc, char *argv[])
           fprintf(stderr, "%s: Query returned bindings results:\n", program);
         
         while(!librdf_query_results_finished(results)) {
+          int v_idx;
+          
           if(verbosity)
             fputs("result: ", stdout);
           fputs("[", stdout);
-          for(i = 0; 1 ; i++) {
-            librdf_node *value = librdf_query_results_get_binding_value(results, i);
+          for(v_idx = 0; 1 ; v_idx++) {
+            librdf_node *value;
+
+            value = librdf_query_results_get_binding_value(results, v_idx);
             if(!value)
               break;
             
-            name = (char*)librdf_query_results_get_binding_name(results, i);
+            name = (char*)librdf_query_results_get_binding_name(results, v_idx);
 
             if(i > 0)
               fputs(", ", stdout);
