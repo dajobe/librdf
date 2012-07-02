@@ -1,4 +1,71 @@
+2012-07-01  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_virtuoso.c: Good casts for calloc / memcpy
+	calculations [gcc warnings]
+
+	(librdf_storage_virtuoso_get_handle): Good cast to size_t for
+	figuring out the byte sizes.
+
+	* src/rdf_storage_virtuoso.c, src/rdf_storage_virtuoso_internal.h:
+	Use SQLUSMALLINT for ODBC column integer [gcc warnings]
+
+	(vGetDataCHAR, vGetDataINT, rdf2node): Take SQLUSMALLINT col
+	instead of short col.
+
+	(librdf_storage_virtuoso_find_statements_in_context_next_statement)
+	(librdf_storage_virtuoso_get_contexts_next_context): Use
+	SQLUSMALLINT colNum
+
+	* src/rdf_storage_postgresql.c:
+	(librdf_storage_postgresql_get_handle): Cast for memcpy [gcc
+	warnings]
+
+	* src/rdf_storage_postgresql.c:
+	Good casts for PQnfields to size_t [gcc warnings]
+
+	(librdf_storage_postgresql_find_statements_with_options): Good
+	casts in calloc.
+
+	* src/rdf_storage_virtuoso.c, src/rdf_storage_virtuoso_internal.h:
+	Move 4K Virtuoso output DSN buffer from stack to storage context.
+
+	Added LIBRDF_VIRTUOSO_CONTEXT_DSN_SIZE macro
+
+	librdf_storage_virtuoso_instance gains field outdsn
+
+	(librdf_storage_virtuoso_get_handle): Use above when calling
+	SQLDriverConnect()
+
+	* src/rdf_hash_bdb.c: BDB DBT field size is a u_int32_t so cast
+	bad to that
+
+	* src/rdf_node.c:
+	(librdf_node_decode): Casts from binary to size_t are good [gcc
+	warnings]
+
+	* src/rdf_node.c:
+	(librdf_node_decode): Casts from binary to size_t are good [gcc
+	warnings]
+
+	* src/rdf_hash_bdb.c: Code style
+
+	* src/rdf_query_results.c: Range check of index for query results
+	value/name gets
+
+	(librdf_query_results_get_binding_value)
+	(librdf_query_results_get_binding_name): Fail with negative offset
+	always and note FIXME that this should be an unsigned int in
+	future.
+
+	* src/rdf_hash_bdb.c: Use u_int32_t to store BDB flags [gcc
+	warnings]
+
+	* utils/rdfproc.c: Use int v_idx for indexing into result values
+	and names
+
 2012-06-28  Dave Beckett <dave@dajobe.org>
+
+	* RELEASE.html: 1.0.16
 
 	* docs/tmpl/general.sgml, docs/tmpl/unicode.sgml,
 	docs/tmpl/unused.sgml, docs/tmpl/world.sgml: Update tmpls
