@@ -161,7 +161,7 @@ rdf_virtuoso_ODBC_Errors(const char *where, librdf_world *world,
  */
 static char*
 vGetDataCHAR(librdf_world *world, librdf_storage_virtuoso_connection *handle,
-             SQLUSMALLINT col, int *is_null)
+             int col, int *is_null)
 {
   int rc;
   SQLLEN len;
@@ -169,7 +169,8 @@ vGetDataCHAR(librdf_world *world, librdf_storage_virtuoso_connection *handle,
 
   *is_null = 0;
 
-  rc = SQLGetData(handle->hstmt, col, SQL_C_CHAR, buf, 0, &len);
+  rc = SQLGetData(handle->hstmt, LIBRDF_GOOD_CAST(SQLUSMALLINT, col),
+                  SQL_C_CHAR, buf, 0, &len);
   if(!SQL_SUCCEEDED(rc)) {
     rdf_virtuoso_ODBC_Errors("SQLGetData()", world, handle);
     return NULL;
@@ -182,7 +183,7 @@ vGetDataCHAR(librdf_world *world, librdf_storage_virtuoso_connection *handle,
     char *pLongData = NULL;
     SQLLEN bufsize = len + 4;
 
-    pLongData = LIBRDF_MALLOC(char*, bufsize);
+    pLongData = LIBRDF_MALLOC(char*, LIBRDF_GOOD_CAST(size_t, bufsize));
     if(pLongData == NULL) {
       librdf_log(world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL, 
                  "Not enough memory to allocate resultset element");
@@ -219,7 +220,7 @@ vGetDataCHAR(librdf_world *world, librdf_storage_virtuoso_connection *handle,
  */
 static int
 vGetDataINT(librdf_world *world, librdf_storage_virtuoso_connection *handle,
-            SQLUSMALLINT col, int *is_null, int *val)
+            int col, int *is_null, int *val)
 {
   int rc;
   SQLLEN len;
@@ -404,7 +405,7 @@ end:
  */
 static librdf_node*
 rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
-         SQLUSMALLINT col, char *data)
+         int col, char *data)
 {
   librdf_node *node = NULL;
 #if 0
