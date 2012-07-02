@@ -867,7 +867,7 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
     /* Allocate new buffer with two extra slots */
     librdf_storage_virtuoso_connection** connections;
     connections = LIBRDF_CALLOC(librdf_storage_virtuoso_connection**,
-                                context->connections_count + 2,
+                                LIBRDF_GOOD_CAST(size_t, context->connections_count + 2),
                                 sizeof(librdf_storage_virtuoso_connection*));
     if(!connections)
       return NULL;
@@ -889,7 +889,7 @@ librdf_storage_virtuoso_get_handle(librdf_storage* storage)
       /* Copy old buffer to new */
       memcpy(connections, context->connections,
              sizeof(librdf_storage_virtuoso_connection*) * 
-             context->connections_count);
+             LIBRDF_GOOD_CAST(size_t, context->connections_count));
       /* Free old buffer */
       LIBRDF_FREE(librdf_storage_virtuoso_connection**, context->connections);
     }
