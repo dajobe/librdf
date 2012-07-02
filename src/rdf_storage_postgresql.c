@@ -348,7 +348,7 @@ librdf_storage_postgresql_get_handle(librdf_storage* storage)
     if(context->connections_count) {
       /* Copy old buffer to new */
       memcpy(connections, context->connections,
-             sizeof(librdf_storage_postgresql_connection) * context->connections_count);
+             sizeof(librdf_storage_postgresql_connection) * LIBRDF_GOOD_CAST(size_t, context->connections_count));
       /* Free old buffer */
       LIBRDF_FREE(librdf_storage_postgresql_connection*, context->connections);
     }
