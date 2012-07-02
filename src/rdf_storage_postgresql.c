@@ -1938,7 +1938,7 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
   }
 
   sos->current_rowno=0;
-  sos->row = LIBRDF_CALLOC(char**, PQnfields(sos->results) + 1, sizeof(char*));
+  sos->row = LIBRDF_CALLOC(char**, LIBRDF_GOOD_CAST(size_t, PQnfields(sos->results) + 1), sizeof(char*));
   if(!sos->row) {
     librdf_storage_postgresql_find_statements_in_context_finished((void*)sos);
     return NULL;
@@ -2290,8 +2290,7 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   }
 
   gccontext->current_rowno=0;
-  gccontext->row = LIBRDF_CALLOC(char**, PQnfields(gccontext->results) + 1,
-                                 sizeof(char*));
+  gccontext->row = LIBRDF_CALLOC(char**, LIBRDF_GOOD_CAST(size_t, PQnfields(gccontext->results) + 1), sizeof(char*));
   if(!gccontext->row) {
     librdf_storage_postgresql_get_contexts_finished((void*)gccontext);
     return NULL;
