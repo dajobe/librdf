@@ -44,9 +44,9 @@ struct librdf_storage_virtuoso_connection_s {
   librdf_hash *h_type;
 
   void (*v_release_connection)(librdf_storage* storage, librdf_storage_virtuoso_connection *handle);
-  librdf_node* (*v_rdf2node)(librdf_storage *storage, librdf_storage_virtuoso_connection *handle, short col, char *data);
-  char* (*v_GetDataCHAR)(librdf_world *world, librdf_storage_virtuoso_connection *handle, short col, int *is_null);
-  int (*v_GetDataINT)(librdf_world *world, librdf_storage_virtuoso_connection *handle, short col, int *is_null, int *val);
+  librdf_node* (*v_rdf2node)(librdf_storage *storage, librdf_storage_virtuoso_connection *handle, SQLUSMALLINT col, char *data);
+  char* (*v_GetDataCHAR)(librdf_world *world, librdf_storage_virtuoso_connection *handle, SQLUSMALLINT col, int *is_null);
+  int (*v_GetDataINT)(librdf_world *world, librdf_storage_virtuoso_connection *handle, SQLUSMALLINT col, int *is_null, int *val);
 };
 
 

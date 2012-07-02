@@ -161,7 +161,7 @@ rdf_virtuoso_ODBC_Errors(const char *where, librdf_world *world,
  */
 static char*
 vGetDataCHAR(librdf_world *world, librdf_storage_virtuoso_connection *handle,
-             short col, int *is_null)
+             SQLUSMALLINT col, int *is_null)
 {
   int rc;
   SQLLEN len;
@@ -219,7 +219,7 @@ vGetDataCHAR(librdf_world *world, librdf_storage_virtuoso_connection *handle,
  */
 static int
 vGetDataINT(librdf_world *world, librdf_storage_virtuoso_connection *handle,
-            short col, int *is_null, int *val)
+            SQLUSMALLINT col, int *is_null, int *val)
 {
   int rc;
   SQLLEN len;
@@ -404,7 +404,7 @@ end:
  */
 static librdf_node*
 rdf2node(librdf_storage *storage, librdf_storage_virtuoso_connection *handle,
-         short col, char *data)
+         SQLUSMALLINT col, char *data)
 {
   librdf_node *node = NULL;
 #if 0
@@ -2427,7 +2427,7 @@ librdf_storage_virtuoso_find_statements_in_context_next_statement(void* context)
   librdf_storage_virtuoso_sos_context* sos = (librdf_storage_virtuoso_sos_context*)context;
   librdf_node *subject = NULL, *predicate = NULL, *object = NULL;
   librdf_node *node;
-  short colNum;
+  SQLUSMALLINT colNum;
   short numCols;
   int rc;
 
@@ -2735,7 +2735,7 @@ librdf_storage_virtuoso_get_contexts_next_context(void* context)
 {
   librdf_storage_virtuoso_get_contexts_context* gccontext;
   int rc;
-  short colNum;
+  SQLUSMALLINT colNum;
   short numCols;
   char *data;
   int is_null;
