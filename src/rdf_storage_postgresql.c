@@ -589,14 +589,16 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
           if (PQresultStatus(res2) != PGRES_COMMAND_OK) {
             if (0 != strncmp("42P07", PQresultErrorField(res2, PG_DIAG_SQLSTATE), strlen("42P07"))) {
               librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                       "postgresql table creation failed with error %s", PQresultErrorMessage(res2));
+                         "postgresql table creation failed: %s",
+                         PQresultErrorMessage(res2));
               status = -1;
             }
           }
           PQclear(res2);
         } else {
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "postgresql table creation failed with error: %s", PQerrorMessage(handle));
+                     "postgresql table creation failed: %s",
+                     PQerrorMessage(handle));
           status = -1;
         }
       }
@@ -635,7 +637,8 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
         if (PQresultStatus(res) != PGRES_COMMAND_OK) {
           if (0 != strncmp("23505", PQresultErrorField(res, PG_DIAG_SQLSTATE), strlen("23505"))) {
             librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "postgresql table creation failed with error %s", PQresultErrorMessage(res));
+                       "postgresql table creation failed with error %s",
+                       PQresultErrorMessage(res));
             status = -1;
           }
         }
@@ -664,18 +667,20 @@ librdf_storage_postgresql_init(librdf_storage* storage, const char *name,
       if((res=PQexec(handle, query))) {
         if (PQresultStatus(res) != PGRES_TUPLES_OK) {
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "postgresql insert into Models table failed: %s", PQresultErrorMessage(res));
+                     "postgresql insert into Models table failed: %s",
+                     PQresultErrorMessage(res));
           status=-1;
         }
         if(!status && !(PQntuples(res))) {
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "Unknown model: %s",name);
+                     "postgresql failed to find model '%s'", name);
           status=1;
         }
         PQclear(res);
       } else {
         librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "postgresql select from Models table failed: %s", PQerrorMessage(handle));
+                   "postgresql select from Models table failed: %s",
+                   PQerrorMessage(handle));
         status=-1;
       }
       LIBRDF_FREE(char*, query);
@@ -918,12 +923,14 @@ librdf_storage_postgresql_size(librdf_storage* storage)
   if(!(res=PQexec(handle, query)) || !(PQntuples(res))) {
     if (res) {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "postgresql query for model size failed: %s", PQresultErrorMessage(res));
+                 "postgresql query for model size failed: %s",
+                 PQresultErrorMessage(res));
       PQclear(res);
     }
     else {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "postgresql query for model size failed: %s", PQerrorMessage(handle));
+                 "postgresql query for model size failed: %s",
+                 PQerrorMessage(handle));
     }
     LIBRDF_FREE(char*, query);
     librdf_storage_postgresql_release_handle(storage, handle);
@@ -1014,7 +1021,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                            &error);
         if(error) {
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "postgresql escapeStringConn() failed with error : %s",
+                     "postgresql escapeStringConn() failed: %s",
                      PQerrorMessage(handle));
         }
 
@@ -1030,7 +1037,8 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                 add_status = 1;
               } else {
                 librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                         "postgresql insert into Resources failed with error %s", PQresultErrorMessage(res));
+                           "postgresql insert into Resources failed: %s",
+                           PQresultErrorMessage(res));
               }
             }
             PQclear(res);
@@ -1095,7 +1103,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                            &error);
         if(error) {
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "postgresql escapeStringConn() failed with error %s",
+                     "postgresql escapeStringConn() failed: %s",
                      PQerrorMessage(handle));
         }
 
@@ -1107,7 +1115,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                                &error);
             if(error) {
               librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                         "postgresql escapeStringConn() failed with error %s",
+                         "postgresql escapeStringConn() failed: %s",
                          PQerrorMessage(handle));
             }
           } else
@@ -1121,7 +1129,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                                  &error);
               if(error) {
                 librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                           "postgresql escapeStringConn() failed with error %s",
+                           "postgresql escapeStringConn() failed: %s",
                            PQerrorMessage(handle));
               }
             } else
@@ -1143,7 +1151,8 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                     add_status = 1;
                   } else {
                     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                             "postgresql insert into Resources failed with error %s", PQresultErrorMessage(res));
+                               "postgresql insert into Resources failed: %s",
+                               PQresultErrorMessage(res));
                   }
                 }
                 PQclear(res);
@@ -1184,7 +1193,7 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                            &error);
         if(error) {
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "postgresql escapeStringConn() failed with error %s",
+                     "postgresql escapeStringConn() failed: %s",
                      PQerrorMessage(handle));
         }
 
@@ -1200,7 +1209,8 @@ librdf_storage_postgresql_node_hash(librdf_storage* storage,
                 add_status = 1;
               } else {
                 librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                         "postgresql insert into Resources failed with error %s", PQresultErrorMessage(res));
+                           "postgresql insert into Resources failed: %s",
+                           PQresultErrorMessage(res));
               }
             }
             PQclear(res);
@@ -1393,12 +1403,14 @@ librdf_storage_postgresql_context_add_statement_helper(librdf_storage* storage,
             status = 0;
           } else {
             librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "postgresql insert into Statements failed with error %s", PQresultErrorMessage(res));
+                       "postgresql insert into Statements failed: %s",
+                       PQresultErrorMessage(res));
           }
           PQclear(res);
         } else {
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "postgresql insert into Statements failed with error %s", PQerrorMessage(handle));
+                     "postgresql insert into Statements failed: %s",
+                     PQerrorMessage(handle));
         }
         LIBRDF_FREE(char*, query);
       }
@@ -1458,7 +1470,8 @@ librdf_storage_postgresql_contains_statement(librdf_storage* storage,
             }
           } else {
             librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "postgresql insert into Statements failed with error %s", PQresultErrorMessage(res));
+                       "postgresql insert into Statements failed: %s",
+                       PQresultErrorMessage(res));
           }
           PQclear(res);
         }
@@ -1547,7 +1560,8 @@ librdf_storage_postgresql_context_remove_statement(librdf_storage* storage,
             status = 0;
           } else {
             librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                     "postgresql delete from Statements failed with error %s", PQresultErrorMessage(res));
+                       "postgresql delete from Statements failed: %s",
+                       PQresultErrorMessage(res));
           }
           PQclear(res);
         } else {
@@ -1611,7 +1625,8 @@ librdf_storage_postgresql_context_remove_statements(librdf_storage* storage,
           status = 0;
         } else {
           librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                   "postgresql delete from Statements failed with error %s", PQresultErrorMessage(res));
+                     "postgresql delete from Statements failed: %s",
+                     PQresultErrorMessage(res));
         }
         PQclear(res);
       } else {
@@ -1926,13 +1941,15 @@ librdf_storage_postgresql_find_statements_with_options(librdf_storage* storage,
   if (sos->results) {
     if (PQresultStatus(sos->results) != PGRES_TUPLES_OK) {
       librdf_log(sos->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "postgresql query failed: %s", PQresultErrorMessage(sos->results));
+                 "postgresql query failed: %s",
+                 PQresultErrorMessage(sos->results));
       librdf_storage_postgresql_find_statements_in_context_finished((void*)sos);
       return NULL;
     }
   } else {
     librdf_log(sos->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "postgresql query failed: %s", PQerrorMessage(sos->handle));
+               "postgresql query failed: %s",
+               PQerrorMessage(sos->handle));
     librdf_storage_postgresql_find_statements_in_context_finished((void*)sos);
     return NULL;
   }
@@ -2278,13 +2295,15 @@ LEFT JOIN Literals AS L ON S.Context=L.ID";
   if (gccontext->results) {
     if (PQresultStatus(gccontext->results) != PGRES_TUPLES_OK) {
       librdf_log(gccontext->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "postgresql query failed: %s", PQresultErrorMessage(gccontext->results));
+                 "postgresql query failed: %s",
+                 PQresultErrorMessage(gccontext->results));
       librdf_storage_postgresql_get_contexts_finished((void*)gccontext);
       return NULL;
     }
   } else {
     librdf_log(gccontext->storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "postgresql query failed: %s", PQerrorMessage(gccontext->handle));
+               "postgresql query failed: %s",
+               PQerrorMessage(gccontext->handle));
     librdf_storage_postgresql_get_contexts_finished((void*)gccontext);
     return NULL;
   }
@@ -2503,7 +2522,7 @@ librdf_storage_postgresql_transaction_start(librdf_storage* storage)
 
   if(context->transaction_handle) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Postgresql transaction already started");
+               "postgresql transaction already started");
     return status;
   }
 
@@ -2520,12 +2539,14 @@ librdf_storage_postgresql_transaction_start(librdf_storage* storage)
       status = 0;
     } else {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Postgresql query failed: %s", PQresultErrorMessage(res));
+                 "postgresql query failed: %s",
+                 PQresultErrorMessage(res));
     }
     PQclear(res);
   } else {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Postgresql query failed: %s", PQerrorMessage(context->transaction_handle));
+               "postgresql query failed: %s",
+               PQerrorMessage(context->transaction_handle));
   }
 
   if (0 != status) {
@@ -2581,12 +2602,14 @@ librdf_storage_postgresql_transaction_commit(librdf_storage* storage)
       status = 0;
     } else {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Postgresql commit query failed: %s", PQresultErrorMessage(res));
+                 "postgresql commit query failed: %s",
+                 PQresultErrorMessage(res));
     }
     PQclear(res);
   } else {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Postgresql commit query failed: %s", PQerrorMessage(context->transaction_handle));
+               "postgresql commit query failed: %s",
+               PQerrorMessage(context->transaction_handle));
   }
 
   librdf_storage_postgresql_release_handle(storage, context->transaction_handle);
@@ -2623,12 +2646,14 @@ librdf_storage_postgresql_transaction_rollback(librdf_storage* storage)
       status = 0;
     } else {
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-                 "Postgresql commit query failed: %s", PQresultErrorMessage(res));
+                 "postgresql commit query failed: %s",
+                 PQresultErrorMessage(res));
     }
     PQclear(res);
   } else {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "Postgresql commit query failed: %s", PQerrorMessage(context->transaction_handle));
+               "postgresql commit query failed: %s",
+               PQerrorMessage(context->transaction_handle));
   }
 
   librdf_storage_postgresql_release_handle(storage, context->transaction_handle);
