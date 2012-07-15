@@ -2699,7 +2699,8 @@ librdf_storage_postgresql_register_factory(librdf_storage_factory *factory)
 void
 librdf_storage_module_register_factory(librdf_world *world)
 {
-  librdf_storage_register_factory(world, "postgresql", "postgresql database store",
+  librdf_storage_register_factory(world, "postgresql",
+                                  "PostgreSQL database store",
                                   &librdf_storage_postgresql_register_factory);
 }
 
@@ -2714,7 +2715,8 @@ librdf_storage_module_register_factory(librdf_world *world)
 void
 librdf_init_storage_postgresql(librdf_world *world)
 {
-  librdf_storage_register_factory(world, "postgresql", "postgresql database store",
+  librdf_storage_register_factory(world, "postgresql", 
+                                  "PostgreSQL database store",
                                   &librdf_storage_postgresql_register_factory);
 }
 
