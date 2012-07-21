@@ -85,10 +85,13 @@ librdf_init_concepts(librdf_world *world)
   int i;
 
   /* Create the Unique URI objects */
-  world->concept_ms_namespace_uri=librdf_new_uri(world, librdf_concept_ms_namespace);
-  world->concept_schema_namespace_uri=librdf_new_uri(world, librdf_concept_schema_namespace);
-  if(!world->concept_ms_namespace_uri || !world->concept_schema_namespace_uri)
-    LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Failed to create M&S or Schema URIs");
+  world->concept_ms_namespace_uri = librdf_new_uri(world, librdf_concept_ms_namespace);
+  world->concept_schema_namespace_uri = librdf_new_uri(world, librdf_concept_schema_namespace);
+  world->xsd_namespace_uri = librdf_new_uri(world, raptor_xmlschema_datatypes_namespace_uri);
+  if(!world->concept_ms_namespace_uri ||
+     !world->concept_schema_namespace_uri ||
+     !world->xsd_namespace_uri)
+    LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Out of memory creating namespace URIs");
 
   /* Create arrays for the M&S and Schema resource nodes and uris */
   world->concept_uris = LIBRDF_CALLOC(librdf_uri**, LIBRDF_CONCEPT_LAST + 1,
@@ -240,14 +243,19 @@ librdf_finish_concepts(librdf_world *world)
   /* Free resources and set pointers to NULL so that they are cleared
    * in case the concepts module is initialised again in the same process. */
 
+  if(world->xsd_namespace_uri) {
+    librdf_free_uri(world->xsd_namespace_uri);
+    world->xsd_namespace_uri = NULL;
+  }
+
   if(world->concept_ms_namespace_uri) {
     librdf_free_uri(world->concept_ms_namespace_uri);
-    world->concept_ms_namespace_uri=NULL;
+    world->concept_ms_namespace_uri = NULL;
   }
 
   if(world->concept_schema_namespace_uri) {
     librdf_free_uri(world->concept_schema_namespace_uri);
-    world->concept_schema_namespace_uri=NULL;
+    world->concept_schema_namespace_uri = NULL;
   }
 
   if(world->concept_resources) {

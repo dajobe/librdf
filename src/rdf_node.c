@@ -233,6 +233,98 @@ librdf_new_node_from_normalised_uri_string(librdf_world *world,
 }
 
 
+#define LIBRDF_XSD_BOOLEAN_TRUE (const unsigned char*)"true"
+#define LIBRDF_XSD_BOOLEAN_TRUE_LEN 4
+#define LIBRDF_XSD_BOOLEAN_FALSE (const unsigned char*)"false"
+#define LIBRDF_XSD_BOOLEAN_FALSE_LEN 5
+
+static int
+librdf_xsd_boolean_value_from_string(const unsigned char* string,
+                                     unsigned int len)
+{
+  int integer = 0;
+
+  /* FIXME
+   * Strictly only {true, false, 1, 0} are allowed according to
+   * http://www.w3.org/TR/xmlschema-2/#boolean
+   */
+  if((len == LIBRDF_XSD_BOOLEAN_TRUE_LEN &&
+     (!strcmp(LIBRDF_GOOD_CAST(const char*, string), "true") ||
+      !strcmp(LIBRDF_GOOD_CAST(const char*, string), "TRUE"))
+      )
+     ||
+     (len == 1 &&
+      !strcmp(LIBRDF_GOOD_CAST(const char*, string), "1")
+      )
+     )
+     integer = 1;
+
+  return integer;
+}
+
+
+/*
+ * librdf_node_normalize:
+ * @world: world
+ * @node: node
+ *
+ * INTERNAL - Normalize the literal of datatyped literals to canonical form
+ *
+ * Currently handles xsd:boolean. 
+ *
+ * FIXME: This should be in Raptor or Rasqal since
+ * librdf_xsd_boolean_value_from_string and the canonicalization was
+ * ripped out of Rasqal.
+ *
+ * Return value: new node (or same one if no action was taken)
+ */
+static librdf_node*
+librdf_node_normalize(librdf_world* world, librdf_node* node)
+{
+  if(node->value.literal.datatype) {
+    librdf_uri* dt_uri;
+
+    dt_uri = librdf_new_uri_from_uri_local_name(world->xsd_namespace_uri,
+                                                LIBRDF_GOOD_CAST(const unsigned char*, "boolean"));
+    if(raptor_uri_equals(node->value.literal.datatype, dt_uri)) {
+      const unsigned char* value;
+      size_t value_len;
+      int bvalue;
+
+      bvalue = librdf_xsd_boolean_value_from_string(node->value.literal.string,
+                                                    node->value.literal.string_len);
+
+      value = bvalue ? LIBRDF_XSD_BOOLEAN_TRUE :
+                       LIBRDF_XSD_BOOLEAN_FALSE;
+      value_len = bvalue ? LIBRDF_XSD_BOOLEAN_TRUE_LEN :
+                           LIBRDF_XSD_BOOLEAN_FALSE_LEN;
+
+      if(node->value.literal.string_len != value_len ||
+         strcmp(LIBRDF_GOOD_CAST(const char*, node->value.literal.string),
+                LIBRDF_GOOD_CAST(const char*, value))) {
+        /* If literal is not canonical, replace the node */
+        librdf_free_node(node);
+        node = NULL;
+
+        /* Have to use Raptor constructor here since
+         * librdf_new_node_from_typed_counted_literal() calls this
+         */
+        node = raptor_new_term_from_counted_literal(world->raptor_world_ptr,
+                                                    value, value_len,
+                                                    dt_uri,
+                                                    (const unsigned char*)NULL,
+                                                    (unsigned char)0);
+      }
+    }
+
+    if(dt_uri)
+      librdf_free_uri(dt_uri);
+  }
+
+  return node;
+}
+
+
 /**
  * librdf_new_node_from_literal:
  * @world: redland world object
@@ -257,6 +349,7 @@ librdf_new_node_from_literal(librdf_world *world,
                              int is_wf_xml)
 {
   librdf_uri* datatype_uri;
+  librdf_node* n;
   
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
   
@@ -264,9 +357,10 @@ librdf_new_node_from_literal(librdf_world *world,
 
   datatype_uri = (is_wf_xml ?  LIBRDF_RS_XMLLiteral_URI(world) : NULL);
 
-  return raptor_new_term_from_literal(world->raptor_world_ptr,
-                                      string, datatype_uri,
-                                      (const unsigned char*)xml_language);
+  n = raptor_new_term_from_literal(world->raptor_world_ptr,
+                                   string, datatype_uri,
+                                   (const unsigned char*)xml_language);
+  return librdf_node_normalize(world, n);
 }
 
 
@@ -291,13 +385,16 @@ librdf_new_node_from_typed_literal(librdf_world *world,
                                    const char *xml_language,
                                    librdf_uri *datatype_uri)
 {
+  librdf_node* n;
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
   
   librdf_world_open(world);
 
-  return raptor_new_term_from_literal(world->raptor_world_ptr,
-                                      value, datatype_uri,
-                                      (const unsigned char*)xml_language);
+  n = raptor_new_term_from_literal(world->raptor_world_ptr,
+                                   value, datatype_uri,
+                                   (const unsigned char*)xml_language);
+  return librdf_node_normalize(world, n);
 }
 
 
@@ -312,6 +409,8 @@ librdf_new_node_from_typed_literal(librdf_world *world,
  *
  * Constructor - create a new typed literal #librdf_node object.
  * 
+ * Takes copies of the passed in @value, @datatype_uri and @xml_language.
+ *
  * Only one of @xml_language or @datatype_uri may be given.  If both
  * are given, NULL is returned.  If @xml_language is the empty string,
  * it is the equivalent to NULL.
@@ -326,15 +425,18 @@ librdf_new_node_from_typed_counted_literal(librdf_world *world,
                                            size_t xml_language_len,
                                            librdf_uri *datatype_uri)
 {
+  librdf_node* n;
+
   LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, librdf_world, NULL);
   
   librdf_world_open(world);
 
-  return raptor_new_term_from_counted_literal(world->raptor_world_ptr,
-                                              value, value_len,
-                                              datatype_uri,
-                                              (const unsigned char*)xml_language,
-                                              (unsigned char)xml_language_len);
+  n = raptor_new_term_from_counted_literal(world->raptor_world_ptr,
+                                           value, value_len,
+                                           datatype_uri,
+                                           (const unsigned char*)xml_language,
+                                           (unsigned char)xml_language_len);
+  return librdf_node_normalize(world, n);
 }
 
 

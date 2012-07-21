@@ -158,6 +158,8 @@ struct librdf_world_s
 
   librdf_rasqal_init_handler rasqal_init_handler;
   void* rasqal_init_handler_user_data;
+
+  librdf_uri* xsd_namespace_uri;
 };
 
 unsigned char* librdf_world_get_genid(librdf_world* world);

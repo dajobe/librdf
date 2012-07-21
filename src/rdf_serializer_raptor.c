@@ -172,76 +172,7 @@ librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
                                              librdf_statement* statement,
                                              librdf_node* graph)
 {
-  int rc = 1;
-  raptor_statement rstatement;
-  librdf_node *subject, *predicate, *object;
-
-  raptor_statement_init(&rstatement, raptor_serializer_get_world(rserializer));
-
-  subject = librdf_statement_get_subject(statement);
-  predicate = librdf_statement_get_predicate(statement);
-  object = librdf_statement_get_object(statement);
-
-  if(librdf_node_is_blank(subject)) {
-    rstatement.subject = raptor_new_term_from_blank(raptor_serializer_get_world(rserializer),
-                                                    librdf_node_get_blank_identifier(subject));
-  } else if(librdf_node_is_resource(subject)) {
-    rstatement.subject = raptor_new_term_from_uri(raptor_serializer_get_world(rserializer),
-                                                  (raptor_uri*)librdf_node_get_uri(subject));
-  } else {
-    /* FIXME - what to log here if anything? */
-    goto exit;
-  }
-
-  if(!librdf_node_is_resource(predicate)) {
-    /* FIXME - what to log here if anything? */
-    goto exit;
-  }
-
-  rstatement.predicate = raptor_new_term_from_uri(raptor_serializer_get_world(rserializer),
-                                                  (raptor_uri*)librdf_node_get_uri(predicate));
-
-  switch(librdf_node_get_type(object)) {
-    case LIBRDF_NODE_TYPE_LITERAL:
-      rstatement.object = raptor_new_term_from_literal(raptor_serializer_get_world(rserializer),
-                                                       librdf_node_get_literal_value(object),
-                                                       (raptor_uri*)librdf_node_get_literal_value_datatype_uri(object),
-                                                       (const unsigned char*)librdf_node_get_literal_value_language(object));
-      break;
-
-    case LIBRDF_NODE_TYPE_BLANK:
-      rstatement.object = raptor_new_term_from_blank(raptor_serializer_get_world(rserializer),
-                                                     librdf_node_get_blank_identifier(object));
-      break;
-
-    case LIBRDF_NODE_TYPE_RESOURCE:
-      rstatement.object = raptor_new_term_from_uri(raptor_serializer_get_world(rserializer),
-                                                   (raptor_uri*)librdf_node_get_uri(object));
-      break;
-
-    case LIBRDF_NODE_TYPE_UNKNOWN:
-    default:
-    /* FIXME - what to log here if anything? */
-      goto exit;
-  }
-
-  if (graph) {
-    if(librdf_node_is_resource(graph)) {
-      rstatement.graph = raptor_new_term_from_uri(raptor_serializer_get_world(rserializer),
-                                                  (raptor_uri*)librdf_node_get_uri(graph));
-    } else {
-      /* FIXME - what to log here if anything? */
-      goto exit;
-    }
-  } else {
-    rstatement.graph = NULL;
-  }
-
-  rc = raptor_serializer_serialize_statement(rserializer, &rstatement);
-
-  exit:
-  raptor_free_statement(&rstatement);
-  return rc;
+  return raptor_serializer_serialize_statement(rserializer, statement);
 }
 
 
