@@ -1,4 +1,46 @@
+2012-07-21  Dave Beckett <dave@dajobe.org>
+
+	* configure.ac, src/Makefile.am: Add Rasqal libs to
+	@LIBRDF_DIRECT_LIBS@ and use in all src test cases
+
+	* src/rdf_node.c:
+	(librdf_node_normalize): Do nothing for NULL node
+
+	* src/rdf_concepts.c, src/rdf_init_internal.h, src/rdf_node.c,
+	src/rdf_serializer_raptor.c: Normalize librdf_node boolean values
+	on construction
+
+	Add a quick fix to normalize the literal strings for xsd:boolean in
+	the same fashion as rasqal does when invoking raptor.
+
+	This code really should be calling a raptor or rasqal datatype-aware
+	normalizer but will work.
+
+	Fixes Issue #0000443
+	http://bugs.librdf.org/mantis/view.php?id=443
+
+	(librdf_xsd_boolean_value_from_string): Added from rasqal XSD
+	routine
+
+	(librdf_node_normalize): Added internal normalize node r outine,
+	just handing xsd:boolean.
+
+	(librdf_new_node_from_literal, librdf_new_node_from_typed_literal)
+	(librdf_new_node_from_typed_counted_literal): Update all node
+	constructors to call librdf_node_normalize().  Big downside: makes
+	all construction slightly slower but raptor_uri_equals should be a
+	pointer compare.
+
+2012-07-15  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_postgresql.c: Tidy librdf_log call messages
+
+	* src/rdf_storage_postgresql.c: The name is PostgreSQL
+
 2012-07-01  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_storage_virtuoso.c, src/rdf_storage_virtuoso_internal.h:
+	More virtuoso column type changes - use wider int for u/short
 
 	* src/rdf_storage_virtuoso.c: Good casts for calloc / memcpy
 	calculations [gcc warnings]
