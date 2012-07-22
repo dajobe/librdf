@@ -281,6 +281,9 @@ librdf_xsd_boolean_value_from_string(const unsigned char* string,
 static librdf_node*
 librdf_node_normalize(librdf_world* world, librdf_node* node)
 {
+  if(!node)
+    return NULL;
+  
   if(node->value.literal.datatype) {
     librdf_uri* dt_uri;
 
