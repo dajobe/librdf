@@ -169,8 +169,7 @@ librdf_serializer_raptor_set_namespace(void* context,
 
 static int
 librdf_serializer_raptor_serialize_statement(raptor_serializer *rserializer,
-                                             librdf_statement* statement,
-                                             librdf_node* graph)
+                                             librdf_statement* statement)
 {
   return raptor_serializer_serialize_statement(rserializer, statement);
 }
@@ -204,8 +203,10 @@ librdf_serializer_raptor_serialize_stream_to_file_handle(void *context,
   while(!librdf_stream_end(stream)) {
     librdf_statement *statement = librdf_stream_get_object(stream);
     librdf_node *graph = librdf_stream_get_context2(stream);
+    statement->graph = graph;
     rc = librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer,
-                                                      statement, graph);
+                                                      statement);
+    statement->graph = NULL;
     if(rc)
       break;
     librdf_stream_next(stream);
@@ -279,8 +280,10 @@ librdf_serializer_raptor_serialize_stream_to_counted_string(void *context,
   while(!librdf_stream_end(stream)) {
     librdf_statement *statement = librdf_stream_get_object(stream);
     librdf_node *graph = librdf_stream_get_context2(stream);
+    statement->graph = graph;
     rc = librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer,
-                                                      statement, graph);
+                                                      statement);
+    statement->graph = NULL;
     if(rc)
       break;
     librdf_stream_next(stream);
@@ -358,8 +361,10 @@ librdf_serializer_raptor_serialize_stream_to_iostream(void *context,
   while(!librdf_stream_end(stream)) {
     librdf_statement *statement = librdf_stream_get_object(stream);
     librdf_node *graph = librdf_stream_get_context2(stream);
+    statement->graph = graph;
     rc = librdf_serializer_raptor_serialize_statement(scontext->rdf_serializer,
-                                                      statement, graph);
+                                                      statement);
+    statement->graph = NULL;
     if(rc)
       break;
     librdf_stream_next(stream);
