@@ -23,11 +23,11 @@ dnl
 dnl 
 
 
-AC_INIT([Redland librdf RDF API Library], 1.0.16, http://bugs.librdf.org/, redland)
-AC_PREREQ(2.53)
+AC_INIT([Redland librdf RDF API Library],[1.0.16],[http://bugs.librdf.org/],[redland])
+AC_PREREQ([2.62])
 AC_CONFIG_SRCDIR(src/rdf_node.c)
 AC_REVISION($Revision$)dnl
-AM_CONFIG_HEADER(src/rdf_config.h)
+AC_CONFIG_HEADERS([src/rdf_config.h])
 AC_CONFIG_AUX_DIR(build)
 AC_CONFIG_MACRO_DIR(build)
 AM_INIT_AUTOMAKE([1.11 check-news std-options -Wobsolete -Wportability -Wsyntax -Wunsupported -Wextra-portability])
@@ -403,92 +403,70 @@ if test "x$bdb_prefix" != "xno" ; then
     if test "$ac_cv_header_db_h" = yes ; then
 
       AC_MSG_CHECKING(for BDB V1 dbopen)
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [dbopen(NULL, 0, 0, DB_BTREE, NULL);],
-		  AC_DEFINE(HAVE_DBOPEN, 1, [BDB has dbopen method])
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		   #include <db.h>]], [[dbopen(NULL, 0, 0, DB_BTREE, NULL);]])],[AC_DEFINE(HAVE_DBOPEN, 1, BDB has dbopen method)
 		  if test $have_libdb = no; then
 		    bdb_available="Version 1.x - not supported"
 		    have_libdb=no
 		  fi
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
+		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
       AC_MSG_CHECKING(for BDB V2 db_open)
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [db_open(NULL, DB_BTREE, 0, 0, NULL, NULL, NULL);],
-		  AC_DEFINE(HAVE_DB_OPEN, 1, [BDB has db_open method])
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		   #include <db.h>]], [[db_open(NULL, DB_BTREE, 0, 0, NULL, NULL, NULL);]])],[AC_DEFINE(HAVE_DB_OPEN, 1, BDB has db_open method)
 		  have_libdb=yes
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
+		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
       AC_MSG_CHECKING(for BDB V3/V4.x db_create)
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [db_create(NULL, NULL, 0);],
-		  AC_DEFINE(HAVE_DB_CREATE, 1, [BDB has db_create method])
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		   #include <db.h>]], [[db_create(NULL, NULL, 0);]])],[AC_DEFINE(HAVE_DB_CREATE, 1, BDB has db_create method)
 		  have_libdb=yes
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
+		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
       have_bdb_open_7_args=no
       AC_MSG_CHECKING(for BDB V4.1+ DB->open with 7 arguments)
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);],
-		  AC_DEFINE(HAVE_BDB_OPEN_7_ARGS, 1, [BDB has open method with 7 args])
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		   #include <db.h>]], [[DB *bdb; bdb->open(bdb, NULL, NULL, NULL, DB_BTREE, 0, 0);]])],[AC_DEFINE(HAVE_BDB_OPEN_7_ARGS, 1, BDB has open method with 7 args)
 		  have_libdb=yes
 		  have_bdb_open_7_args=yes
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
+		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
       if test "$have_bdb_open_7_args" == Xno; then
         # Cannot have 6 args if 7 args worked
 	AC_MSG_CHECKING(for BDB V4.0 DB->open with 6 arguments)
-	AC_TRY_LINK([#include <stdio.h>
-		     #include <db.h>], [DB *bdb; bdb->open(bdb, NULL, NULL, DB_BTREE, 0, 0);],
-		    AC_DEFINE(HAVE_BDB_OPEN_6_ARGS, 1, [BDB has open method with 6 args])
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		     #include <db.h>]], [[DB *bdb; bdb->open(bdb, NULL, NULL, DB_BTREE, 0, 0);]])],[AC_DEFINE(HAVE_BDB_OPEN_6_ARGS, 1, BDB has open method with 6 args)
 		    have_libdb=yes
-		    AC_MSG_RESULT(yes),
-		    AC_MSG_RESULT(no))
+		    AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
       fi
 
       AC_MSG_CHECKING(for BDB DB->close with 2 arguments)
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [DB *bdb; bdb->close(bdb, 0);],
-		  AC_DEFINE(HAVE_BDB_CLOSE_2_ARGS, 1, [BDB has close method with 2 args])
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		   #include <db.h>]], [[DB *bdb; bdb->close(bdb, 0);]])],[AC_DEFINE(HAVE_BDB_CLOSE_2_ARGS, 1, BDB has close method with 2 args)
+		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
       AC_MSG_CHECKING(for BDB DB->fd with 2 arguments)
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [DB *bdb; bdb->fd(bdb, 0);],
-		  AC_DEFINE(HAVE_BDB_FD_2_ARGS, 1, [BDB has fd method with 2 args])
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		   #include <db.h>]], [[DB *bdb; bdb->fd(bdb, 0);]])],[AC_DEFINE(HAVE_BDB_FD_2_ARGS, 1, BDB has fd method with 2 args)
+		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
       AC_MSG_CHECKING(for BDB DB->set_flags)
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [DB *bdb; bdb->set_flags(bdb, 0);],
-		  AC_DEFINE(HAVE_BDB_SET_FLAGS, 1, [BDB has set_flags method])
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		   #include <db.h>]], [[DB *bdb; bdb->set_flags(bdb, 0);]])],[AC_DEFINE(HAVE_BDB_SET_FLAGS, 1, BDB has set_flags method)
+		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
       AC_MSG_CHECKING(whether DB_TXN defined in db.h)
       dnl In BDB, DB_TXN is a pointer to a structure never defined
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [DB_TXN* ptr=(DB_TXN*)NULL],
-		  AC_DEFINE(HAVE_BDB_DB_TXN, 1, [BDB defines DB_TXN])
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		   #include <db.h>]], [[DB_TXN* ptr=(DB_TXN*)NULL]])],[AC_DEFINE(HAVE_BDB_DB_TXN, 1, BDB defines DB_TXN)
+		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
       AC_MSG_CHECKING(whether DBC defined in db.h)
-      AC_TRY_LINK([#include <db.h>], [size_t len=sizeof(DBC)],
-		  AC_DEFINE(HAVE_BDB_CURSOR, 1, [BDB defines DBC])
-		  AC_MSG_RESULT(yes),
-		  AC_MSG_RESULT(no))
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <db.h>]], [[size_t len=sizeof(DBC)]])],[AC_DEFINE(HAVE_BDB_CURSOR, 1, BDB defines DBC)
+		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
       AC_MSG_CHECKING(number of arguments to db_cursor)
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <db.h>], [DB* db; db->cursor(db, NULL, NULL, 0);],
-		  AC_DEFINE(HAVE_BDB_CURSOR_4_ARGS, 1, [BDB cursor method has 4 arguments])
-		  AC_MSG_RESULT(4),
-		  AC_MSG_RESULT(3))
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
+		   #include <db.h>]], [[DB* db; db->cursor(db, NULL, NULL, 0);]])],[AC_DEFINE(HAVE_BDB_CURSOR_4_ARGS, 1, BDB cursor method has 4 arguments)
+		  AC_MSG_RESULT(4)],[AC_MSG_RESULT(3)])
     fi
 
     if test "$have_libdb" = yes; then
@@ -853,9 +831,9 @@ ODBC_LIBS=
 if test "$found_odbc" = "no"
 then
 AC_ARG_WITH(iodbc, [dnl
-AC_HELP_STRING([--with-iodbc(=DIR)], [Select iODBC support])
-  AC_HELP_STRING([], [DIR is the iODBC base install directory])
-  AC_HELP_STRING([], [(default=/usr/local)])
+AS_HELP_STRING([--with-iodbc(=DIR)],[Select iODBC support])
+  AS_HELP_STRING([],[DIR is the iODBC base install directory])
+  AS_HELP_STRING([],[(default=/usr/local)])
 ] , [
     if test "$withval" = "yes"
     then
@@ -897,9 +875,9 @@ fi
 if test "$found_odbc" = "no"
 then
 AC_ARG_WITH(unixodbc, [dnl
-AC_HELP_STRING([--with-unixodbc(=DIR)], [Select UnixODBC support])
-  AC_HELP_STRING([], [DIR is the UnixODBC base install directory])
-  AC_HELP_STRING([], [(default=/usr/local)])
+AS_HELP_STRING([--with-unixodbc(=DIR)],[Select UnixODBC support])
+  AS_HELP_STRING([],[DIR is the UnixODBC base install directory])
+  AS_HELP_STRING([],[(default=/usr/local)])
 ], [
     if test "$withval" = "yes"
     then
@@ -926,9 +904,9 @@ fi
 if test "$found_odbc" = "no"
 then
 AC_ARG_WITH(datadirect, [dnl
-AC_HELP_STRING([--with-datadirect(=DIR)], [Select DataDirect support])
-  AC_HELP_STRING([], [DIR is the DataDirect base install directory])
-  AC_HELP_STRING([], [(default=/usr/local)])
+AS_HELP_STRING([--with-datadirect(=DIR)],[Select DataDirect support])
+  AS_HELP_STRING([],[DIR is the DataDirect base install directory])
+  AS_HELP_STRING([],[(default=/usr/local)])
 ], [
     if test "$withval" = "yes"
     then
@@ -955,8 +933,8 @@ fi
 if test "$found_odbc" = "no"
 then
 AC_ARG_WITH(odbc-include, [dnl
-AC_HELP_STRING([--with-odbc-inc=DIR], [Specify custom ODBC include directory])
-  AC_HELP_STRING([], [(default=/usr/local/include)])
+AS_HELP_STRING([--with-odbc-inc=DIR],[Specify custom ODBC include directory])
+  AS_HELP_STRING([],[(default=/usr/local/include)])
 ], [
     if test "$withval" = "yes"
     then
@@ -975,8 +953,8 @@ AC_HELP_STRING([--with-odbc-inc=DIR], [Specify custom ODBC include directory])
 
 
 AC_ARG_WITH(odbc-lib, [dnl
-AC_HELP_STRING([--with-odbc-lib=DIR], [Specify custom ODBC lib directory])
-  AC_HELP_STRING([], [(default=/usr/local/lib)])dnl
+AS_HELP_STRING([--with-odbc-lib=DIR],[Specify custom ODBC lib directory])
+  AS_HELP_STRING([],[(default=/usr/local/lib)])dnl
 ], [
     if test "$withval" = "yes"
     then
