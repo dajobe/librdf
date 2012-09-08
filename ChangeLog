@@ -1,3 +1,26 @@
+2012-08-31  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh, configure.ac: Update autogen.sh and configure.ac via
+	autoupdate
+
+	* autogen.sh: autogen.sh: Added -Wall to aclocal and autoconf
+	invocations
+
+2012-08-26  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_serializer_raptor.c: Set statement graph during
+	serializing with raptor Issue seen: serializing to N-Quads did not
+	work in redstore.
+
+	(librdf_serializer_raptor_serialize_statement):
+	Lose useless graph parameter.
+
+	(librdf_serializer_raptor_serialize_stream_to_file_handle,
+	librdf_serializer_raptor_serialize_stream_to_counted_string,
+	(librdf_serializer_raptor_serialize_stream_to_iostream): Set and
+	restore the statement graph around call to
+	librdf_serializer_raptor_serialize_statement.
+
 2012-07-21  Dave Beckett <dave@dajobe.org>
 
 	* configure.ac, src/Makefile.am: Add Rasqal libs to
