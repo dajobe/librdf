@@ -24,7 +24,6 @@ config.cache
 config.log
 config.status
 configure
-dmalloc*
 gtk-doc.make
 libltdl
 libtool
@@ -37,6 +36,7 @@ redland.rdf
 redland-config
 redland-src-config
 releases
+setup*.sh
 saved
 stamp-h*
 test*
