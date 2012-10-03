@@ -40,6 +40,30 @@ NULL statements are considered invalid.
 Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=489">Issue #0000489</a>
 </p>
 
+
+<h3>Node class changes</h3>
+
+<p>All the constructors now normalize the nodes (Raptor terms) so
+that equality is a cheap pointer comparison.
+Fixes <a href="http://bugs.librdf.org/mantis/view.php?id=443">Issue #0000443</a>.
+</p>
+
+
+<h3>Query class changes</h3>
+
+<p><code>librdf_query_results_get_binding_value()</code> and
+<code>librdf_query_results_get_binding_name()</code> now fail when
+called with negative offsets.
+</p>
+
+
+<h3>Serializer class changes</h3>
+
+<p>Serializing (using Raptor) now sets the statement graph field to
+make serializing to N-Quads work.
+</p>
+
+
 <h3>Storage class changes</h3>
 
 <p><code>librdf_storage_contains_statement()</code> now returns &gt;
@@ -92,6 +116,7 @@ are run, respectively.  Added new typedefs
 <code>librdf_rasqal_init_handler</code> for the handlers.
 </p>
 
+
 <h3>Other API changes</h3>
 
 <p>Added <code>librdf_license_string</code> and
@@ -99,7 +124,10 @@ are run, respectively.  Added new typedefs
 following Raptor and Rasqal naming convention.
 </p>
 
+
 <h3>Other changes</h3>
+
+<p>Multiple fixes for newer GCC warnings.</p>
 
 <p>Multiple internal fixes for signed int conversions especially
 around size_t and allocation.</p>
