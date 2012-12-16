@@ -280,9 +280,18 @@ librdf_storage_load_module(librdf_world *world,
   
   lt_dlhandle module = lt_dlopenext(lib_name);
 
-  if (module) {
+  if(module) {
+    const lt_dlinfo* info = lt_dlgetinfo(module);
+    
+    if(info->ref_count > 1) {
+      /* Already loaded so ignore */
+      lt_dlclose(module);
+      module = NULL;
+      return module;
+    }
+
     init = (init_func_t*)lt_dlsym(module, init_func_name);
-    if (init) {
+    if(init) {
       init(world);
     } else {
       LIBRDF_DEBUG2("Failed to initialize storage module %s\n", lib_name);
@@ -349,10 +358,22 @@ librdf_storage_register_factory(librdf_world* world,
       (storage=(librdf_storage_factory*)raptor_sequence_get_at(world->storages, i));
       i++) {
     if(!strcmp(storage->name, name)) {
+#if 1
+      /* Choosing to ignore this error since it probably is caused by
+       * scanning a directory of storage modules and finding a .la
+       * file (libtool) as well as the .so (module) and trying to
+       * load the same module twice.
+       *
+       * See bug http://bugs.librdf.org/mantis/view.php?id=460 for
+       * context
+       */
+      return 0;
+#else
       librdf_log(world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "storage %s already registered", storage->name);
       return 1;
+#endif
     }
   }
 
