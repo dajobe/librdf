@@ -1168,7 +1168,7 @@ librdf_parser_raptor_serialise_finished(void* context)
     if(scontext->pcontext)
       scontext->pcontext->stream_context = NULL;
 
-    librdf_raptor_free_bnode_hash(world);
+    librdf_raptor_reset_bnode_hash(world);
 
     LIBRDF_FREE(librdf_parser_raptor_context, scontext);
   }
