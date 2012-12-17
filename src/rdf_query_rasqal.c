@@ -205,11 +205,8 @@ rasqal_literal_to_redland_node(librdf_world *world, rasqal_literal* l)
   else if (type == RASQAL_LITERAL_BLANK)
     return librdf_new_node_from_blank_identifier(world,
                                                  (unsigned char*)l->string);
-  else {
-    LIBRDF_DEBUG2("Could not convert literal type %d to librdf_node", type);
-    abort();
-  }
 
+  LIBRDF_DEBUG2("Could not convert literal type %d to librdf_node\n", type);
   return NULL;
 }
 

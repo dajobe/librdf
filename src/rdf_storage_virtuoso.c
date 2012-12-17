@@ -2575,7 +2575,8 @@ librdf_storage_virtuoso_find_statements_in_context_get_statement(void* context,
       return sos->current_context;
 
     default:
-      abort();
+      LIBRDF_DEBUG2("Unknown flags %d\n", flags);
+      return NULL;
   }
 }
 

@@ -2481,7 +2481,8 @@ librdf_storage_mysql_find_statements_in_context_get_statement(void* context, int
     case LIBRDF_ITERATOR_GET_METHOD_GET_CONTEXT:
       return sos->current_context;
     default:
-      abort();
+      LIBRDF_DEBUG2("Unknown flags %d\n", flags);
+      return NULL;
   }
 }
 
