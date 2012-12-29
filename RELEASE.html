@@ -66,6 +66,9 @@ make serializing to N-Quads work.
 
 <h3>Storage class changes</h3>
 
+<p>Loading the same storage multiple times no longer gives a runtime
+error.</p>
+
 <p><code>librdf_storage_contains_statement()</code> now returns &gt;
 0 only for invalid statements according to the API contract.  Uses
 <code>librdf_statement_is_complete()</code> for testing statement
