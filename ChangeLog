@@ -1,3 +1,35 @@
+2012-12-16  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_rasqal.c, src/rdf_storage_mysql.c,
+	src/rdf_storage_postgresql.c, src/rdf_storage_virtuoso.c: Remove
+	abort() from regular code
+
+	* src/rdf_storage.c: Attempt to load a storage module only once
+
+	This bug is probably caused by scanning a directory of storage
+	modules and finding a .la file (libtool) as well as the .so (module)
+	and trying to load the same module twice via
+	librdf_storage_register_factory that calls
+	librdf_storage_load_module.
+
+	Fixing by two changes:
+
+	(librdf_storage_load_module): If the dynamically loaded module has
+	a >1 ref count, it is already loaded so do not initialise it (that
+	eventually calls the initialisation function below).
+
+	(librdf_storage_register_factory): If it gets to this stage and
+	finds the same module name twice, ignore this error.
+
+	Fixes Issue #0000460
+	http://bugs.librdf.org/mantis/view.php?id=460
+
+	* src/rdf_parser_raptor.c: Reset bnode hash at end of parsing - do
+	not free it
+
+	Fixes Issue #0000518
+	http://bugs.librdf.org/mantis/view.php?id=518
+
 2012-08-31  Dave Beckett <dave@dajobe.org>
 
 	* autogen.sh, configure.ac: Update autogen.sh and configure.ac via
