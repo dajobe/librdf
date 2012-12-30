@@ -1,5 +1,8 @@
 2012-12-29  Dave Beckett <dave@dajobe.org>
 
+	* Snapshotted redland_1_0_16 for 1.0.16 release (GIT
+	c8281fff2c618b63d338b296d4d8e352a5de1101)
+
 	* src/rdf_query_rasqal.c:
 	(rasqal_literal_to_redland_node): Add fix for integer subtype
 
