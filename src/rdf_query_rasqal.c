@@ -193,7 +193,15 @@ rasqal_literal_to_redland_node(librdf_world *world, rasqal_literal* l)
   if(!l)
     return NULL;
   
-  type = rasqal_literal_get_rdf_term_type(l);
+  /* FIXME: Workaround for Issue #0000519
+   * http://bugs.librdf.org/mantis/view.php?id=519
+   *
+   * Remove this 'if' when RASQAL_MIN_VERSION is 0.9.30 or larger
+   */
+  if(l->type == RASQAL_LITERAL_INTEGER_SUBTYPE)
+    type = RASQAL_LITERAL_STRING;
+  else
+    type = rasqal_literal_get_rdf_term_type(l);
 
   if(type == RASQAL_LITERAL_URI)
     return librdf_new_node_from_uri(world, (librdf_uri*)l->value.uri);
