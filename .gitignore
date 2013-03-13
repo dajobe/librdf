@@ -3,6 +3,7 @@
 *.gz
 *.log
 *.out
+*.trs
 *test
 .deps*
 INSTALL
