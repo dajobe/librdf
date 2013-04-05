@@ -122,7 +122,7 @@ AC_CHECK_PROGS(TAR, gnutar gtar tar)
 
 AC_CHECK_PROGS(PERL, perl)
 # Gnome
-AC_CHECK_PROGS(PKG_CONFIG, pkg-config)
+PKG_PROG_PKG_CONFIG
 
 
 AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
@@ -512,62 +512,39 @@ rdf_parsers_available=
 
 # Check for rasqal before raptor so that we can see if rasqal was already
 # built with raptor2 and can then enforce raptor2 is required
-AC_MSG_CHECKING(for rasqal)
 
 RASQAL_MIN_VERSION=0.9.25
 RASQAL_MAX_VERSION=0.9.99
 AC_SUBST(RASQAL_MIN_VERSION)
 AC_SUBST(RASQAL_MAX_VERSION)
-if $PKG_CONFIG rasqal --exists; then
-  :
-else
+PKG_CHECK_MODULES([RASQAL],[rasqal >= $RASQAL_MIN_VERSION rasqal <= $RASQAL_MAX_VERSION],[
+  RASQAL_VERSION=`$PKG_CONFIG rasqal --modversion 2>/dev/null`
+],[
   AC_MSG_ERROR(Rasqal is not installed - see http://librdf.org/rasqal/ to get a version in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
-fi
+])
 
-RASQAL_VERSION=`$PKG_CONFIG rasqal --modversion 2>/dev/null`
-
-if $PKG_CONFIG rasqal --atleast-version=$RASQAL_MIN_VERSION --max-version=$RASQAL_MAX_VERSION; then
-  :
-else
-  AC_MSG_ERROR(Installed rasqal $RASQAL_VERSION is not in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
-fi
-
-LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG rasqal --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
-LIBRDF_EXTERNAL_LIBS="`$PKG_CONFIG rasqal --libs` $LIBRDF_EXTERNAL_LIBS"
+LIBRDF_EXTERNAL_CPPFLAGS="$RASQAL_CFLAGS $LIBRDF_EXTERNAL_CPPFLAGS"
+LIBRDF_EXTERNAL_LIBS="$RASQAL_LIBS $LIBRDF_EXTERNAL_LIBS"
 
 rdf_query="rasqal(system $RASQAL_VERSION)"
-AC_MSG_RESULT(system $RASQAL_VERSION)
 
 
 # Check for raptor
 RAPTOR_MIN_VERSION=2.0.7
 
-
-
-AC_MSG_CHECKING(for raptor)
-
-if $PKG_CONFIG raptor2 --exists; then
-  :
-else
+PKG_CHECK_MODULES([RAPTOR2],[raptor2 >= $RAPTOR_MIN_VERSION],[
+  RAPTOR_VERSION=`$PKG_CONFIG raptor2 --modversion 2>/dev/null`
+],[
   AC_MSG_ERROR(Raptor2 is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
-fi
+])
 
-RAPTOR_VERSION=`$PKG_CONFIG raptor2 --modversion 2>/dev/null`
+LIBRDF_DIRECT_LIBS="$LIBRDF_DIRECT_LIBS $RAPTOR2_LIBS"
+LIBRDF_DIRECT_LIBS="$LIBRDF_DIRECT_LIBS $RASQAL_LIBS"
 
-if $PKG_CONFIG raptor2 --atleast-version=$RAPTOR_MIN_VERSION; then
-  :
-else
-  AC_MSG_ERROR(Installed raptor $RAPTOR_VERSION is too old - need $RAPTOR_MIN_VERSION)
-fi
-
-LIBRDF_DIRECT_LIBS="$LIBRDF_DIRECT_LIBS `$PKG_CONFIG raptor2 --libs`"
-LIBRDF_DIRECT_LIBS="$LIBRDF_DIRECT_LIBS `$PKG_CONFIG rasqal --libs`"
-
-LIBRDF_EXTERNAL_CPPFLAGS="`$PKG_CONFIG raptor2 --cflags` $LIBRDF_EXTERNAL_CPPFLAGS"
+LIBRDF_EXTERNAL_CPPFLAGS="$RAPTOR2_CFLAGS $LIBRDF_EXTERNAL_CPPFLAGS"
 LIBRDF_EXTERNAL_LIBS="$LIBRDF_DIRECT_LIBS $LIBRDF_EXTERNAL_LIBS"
 
 rdf_parsers_available="$parser_available raptor(system $RAPTOR_VERSION)"
-AC_MSG_RESULT(system $RAPTOR_VERSION)
 
 AC_SUBST(RAPTOR_MIN_VERSION)
 
