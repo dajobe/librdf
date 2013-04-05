@@ -506,14 +506,6 @@ LDFLAGS="$LIBRDF_LDFLAGS"
 LIBS="$LIBRDF_LIBS"
 
 
-dnl Checks for XML parsers
-
-# At present this is for passing on to raptor and not used here
-AC_ARG_WITH(xml-parser, [  --with-xml-parser=NAME  Use XML parser - expat, libxml (default=libxml)], xml_parser="$withval", xml_parser="libxml") 
-
-
-
-
 dnl Checks for RDF parsers
 parser_modules=raptor
 rdf_parsers_available=
@@ -593,8 +585,6 @@ AC_MSG_RESULT($digest_modules)
 
 DIGEST_OBJS=
 DIGEST_SRCS=
-
-AC_ARG_WITH(openssl-digests, [  --with-openssl-digests  Use openssl digests (default=yes)], enable_openssl_digests="no", enable_openssl_digests="no") 
 
 digest_modules_available=
 
