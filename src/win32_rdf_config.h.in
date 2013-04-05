@@ -245,9 +245,6 @@ extern "C" {
 /* The size of a `unsigned long long', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_LONG_LONG 8
 
-/* SQLite API version */
-#define REDLAND_SQLITE_API 3
-
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 

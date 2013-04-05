@@ -692,51 +692,22 @@ fi
 
 
 
-AC_ARG_WITH(sqlite, [  --with-sqlite(=yes|no|2|3) Enable SQLite store with version (default=auto)], sqlite_api_version="$withval", sqlite_api_version="auto")
-AC_ARG_WITH(sqlite-version, [  --with-sqlite-version(=yes|no|2|3) SQLite version to use (default=auto)], sqlite_api_version="$withval")
-if test "x$sqlite_api_version" = "xyes" ; then
-  sqlite_api_version="auto"
-fi
+AC_ARG_WITH(sqlite, [  --with-sqlite(=yes|no) Enable SQLite store (default=auto)], with_sqlite="$withval", with_sqlite="auto")
 
-AC_MSG_CHECKING(for sqlite library versions available)
-sqlite_versions=
-if test "X$PKG_CONFIG" != X ; then
-  sqlite_version=`$PKG_CONFIG sqlite3 --modversion 2>/dev/null`
-  if test "X$sqlite_version" != X; then
-    if test "X$sqlite_api_version" = Xauto; then
-      sqlite_api_version=3
-    fi
-    sqlite_versions=$sqlite_version
-  fi
-  sqlite_version=`$PKG_CONFIG sqlite --modversion 2>/dev/null`
-  if test "X$sqlite_version" != X; then
-    if test "X$sqlite_api_version" = Xauto; then
-      sqlite_api_version=2
-    fi
-    sqlite_versions="$sqlite_version $sqlite_versions"
-  fi
-fi
-AC_MSG_RESULT($sqlite_versions)
-
-if test "X$sqlite_api_version" = Xauto; then
-  sqlite_api_version=no
+if test "X$with_sqlite" != Xno; then
+  PKG_CHECK_MODULES([SQLITE],[sqlite3],[
+    SQLITE_VERSION=`$PKG_CONFIG sqlite3 --modversion`
+    with_sqlite=yes
+  ],[with_sqlite=no])
 fi
 
 AC_MSG_CHECKING(using sqlite library)
-if test "X$sqlite_api_version" != Xno ; then
-  if test "$sqlite_api_version" = 3; then
-    SQLITE_CONFIG="$PKG_CONFIG sqlite3"
-  else
-    SQLITE_CONFIG="$PKG_CONFIG sqlite"
-  fi
-  sqlite_version=`$SQLITE_CONFIG --modversion 2>/dev/null`
-  AC_DEFINE_UNQUOTED(REDLAND_SQLITE_API, $sqlite_api_version, [SQLite API version])
-
-  storages_available="$storages_available sqlite($sqlite_version)"
+if test "X$with_sqlite" != Xno ; then
+  storages_available="$storages_available sqlite($SQLITE_VERSION)"
   sqlite_storage_available=yes
-  AC_MSG_RESULT(yes - version $sqlite_version)
+  AC_MSG_RESULT(yes - version $SQLITE_VERSION)
 
-  CPPFLAGS="$LIBRDF_CPPFLAGS `$SQLITE_CONFIG --cflags`"
+  CPPFLAGS="$LIBRDF_CPPFLAGS $SQLITE_CFLAGS"
   AC_CHECK_HEADERS(sqlite3.h sqlite.h)
   CPPFLAGS="$LIBRDF_CPPFLAGS"
 else
@@ -1092,10 +1063,6 @@ if test $mysql_storage  = yes; then
   MYSQL_CPPFLAGS=`$MYSQL_CONFIG --cflags | sed -e "s/'//g" -e "s/-O[A-Za-z0-9]*//" `
   MYSQL_LIBS="$LIBRDF_LIBS $mysql_libs"
 fi
-if test $sqlite_storage  = yes; then
-  SQLITE_CPPFLAGS="`$SQLITE_CONFIG --cflags`"
-  SQLITE_LIBS="`$SQLITE_CONFIG --libs`"
-fi
 if test $tstore_storage  = yes; then
   TSTORE_CPPFLAGS="`$TSTORE_CONFIG --cflags` `$PKG_CONFIG glib --cflags`"
   TSTORE_LIBS="`$TSTORE_CONFIG --libs` `$PKG_CONFIG glib --libs`"
@@ -1116,7 +1083,7 @@ fi
 
 AC_SUBST(MYSQL_CPPFLAGS)
 AC_SUBST(MYSQL_LIBS)
-AC_SUBST(SQLITE_CPPFLAGS)
+AC_SUBST(SQLITE_CFLAGS)
 AC_SUBST(SQLITE_LIBS)
 AC_SUBST(TSTORE_CPPFLAGS)
 AC_SUBST(TSTORE_LIBS)
@@ -1132,7 +1099,7 @@ if test "$modular" = yes; then
   LIBRDF_INTERNAL_DEPS="$LIBRDF_INTERNAL_DEPS $LTDLDEPS"
   AC_DEFINE(MODULAR_LIBRDF, 1, [Build storage backends as modules])
 else
-  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $MYSQL_CPPFLAGS $SQLITE_CPPFLAGS $TSTORE_CPPFLAGS $POSTGRESQL_CPPFLAGS $VIRTUOSO_CPPFLAGS"
+  LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $MYSQL_CPPFLAGS $SQLITE_CFLAGS $TSTORE_CPPFLAGS $POSTGRESQL_CPPFLAGS $VIRTUOSO_CPPFLAGS"
   LIBRDF_LIBS="$LIBRDF_LIBS $MYSQL_LIBS $SQLITE_LIBS $TSTORE_LIBS $POSTGRESQL_LIBS $VIRTUOSO_LIBS"
 fi
 

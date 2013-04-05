@@ -41,41 +41,10 @@
 #endif
 #include <sys/types.h>
 
+#include <sqlite3.h>
+
 #include <redland.h>
 #include <rdf_storage.h>
-
-
-#if REDLAND_SQLITE_API == 3
-#include <sqlite3.h>
-#define sqlite_DB sqlite3
-#define sqlite_STATEMENT sqlite3_stmt
-
-#define sqlite_EXEC sqlite3_exec
-#define sqlite_CLOSE sqlite3_close
-#define sqlite_FREE sqlite3_free
-#define sqlite_callback sqlite3_callback
-#define sqlite_last_insert_rowid sqlite3_last_insert_rowid
-#endif
-
-#if REDLAND_SQLITE_API == 2
-#include <sqlite.h>
-#define sqlite_DB sqlite
-#define sqlite_STATEMENT sqlite_vm
-
-#define sqlite_EXEC sqlite_exec
-#define sqlite_CLOSE sqlite_close
-#define sqlite_FREE free
-#endif
-
-
-#if REDLAND_SQLITE_API == 3
-  #define GET_COLUMN_VALUE_TEXT(vm, col) sqlite3_column_text(vm, col)
-  #define GET_COLUMN_VALUE_INT(vm, col) sqlite3_column_int(vm, col)
-#endif
-#if REDLAND_SQLITE_API == 2
-  #define GET_COLUMN_VALUE_TEXT(vm, col) (unsigned char*)pazValue[col]
-  #define GET_COLUMN_VALUE_INT(vm, col) atoi(pazValue[col])
-#endif
 
 
 static const char* const sqlite_synchronous_flags[4] = {
@@ -94,7 +63,7 @@ typedef struct
 {
   librdf_storage *storage;
 
-  sqlite_DB *db;
+  sqlite3 *db;
 
   int is_new;
   
@@ -271,7 +240,7 @@ typedef struct
  * the table. Or if the largest key is 2147483647, then the column
  * will be filled with a random integer. Either way, the INTEGER
  * PRIMARY KEY column will be assigned a unique integer. You can
- * retrieve this integer using the sqlite_last_insert_rowid() API
+ * retrieve this integer using the sqlite3_last_insert_rowid() API
  * function or using the last_insert_rowid() SQL function in a
  * subsequent SELECT statement.
  */
@@ -367,7 +336,7 @@ sqlite_string_escape(const unsigned char *raw, size_t raw_len, size_t *len_p)
 static int
 librdf_storage_sqlite_exec(librdf_storage* storage, 
                            unsigned char *request,
-                           sqlite_callback callback, void *arg,
+                           sqlite3_callback callback, void *arg,
                            int fail_ok)
 {
   librdf_storage_sqlite_instance* context;
@@ -384,7 +353,7 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
   LIBRDF_DEBUG2("SQLite exec '%s'\n", request);
 #endif
   
-  status = sqlite_EXEC(context->db, (const char*)request, callback, arg,
+  status = sqlite3_exec(context->db, (const char*)request, callback, arg,
                        &errmsg);
   if(fail_ok)
     status = SQLITE_OK;
@@ -392,9 +361,9 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
   if(status != SQLITE_OK) {
     if(status == SQLITE_LOCKED && !callback && context->in_stream) {
       librdf_storage_sqlite_query *query;
-      /* error message from sqlite_EXEC needs to be freed on both sqlite 2 and 3 */
+      /* error message from sqlite3_exec needs to be freed on both sqlite 2 and 3 */
       if(errmsg)
-        sqlite_FREE(errmsg);
+        sqlite3_free(errmsg);
 
 
       query = LIBRDF_CALLOC(librdf_storage_sqlite_query*, 1, sizeof(*query));
@@ -426,9 +395,9 @@ librdf_storage_sqlite_exec(librdf_storage* storage,
       librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s SQL exec '%s' failed - %s (%d)",
                  context->name, request, errmsg, status);
-      /* error message from sqlite_EXEC needs to be freed on both sqlite 2 and 3 */
+      /* error message from sqlite3_exec needs to be freed on both sqlite 2 and 3 */
       if(errmsg)
-        sqlite_FREE(errmsg);
+        sqlite3_free(errmsg);
     }
   }
 
@@ -479,7 +448,7 @@ librdf_storage_sqlite_set_helper(librdf_storage *storage,
   if(rc)
     return -1;
 
-  return LIBRDF_BAD_CAST(int, sqlite_last_insert_rowid(context->db));
+  return LIBRDF_BAD_CAST(int, sqlite3_last_insert_rowid(context->db));
 }
 
 
@@ -812,9 +781,6 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
   librdf_storage_sqlite_instance* context;
   int rc = SQLITE_OK;
   char *errmsg = NULL;
-#if REDLAND_SQLITE_API == 2
-  int mode = 0;
-#endif
   int db_file_exists = 0;
   
   context = (librdf_storage_sqlite_instance*)storage->instance;
@@ -825,24 +791,15 @@ librdf_storage_sqlite_open(librdf_storage* storage, librdf_model* model)
   if(context->is_new && db_file_exists)
     unlink(context->name);
 
-#if REDLAND_SQLITE_API == 3
   context->db = NULL;
   rc = sqlite3_open(context->name, &context->db);
   if(rc != SQLITE_OK)
     errmsg = (char*)sqlite3_errmsg(context->db);
-#endif
-#if REDLAND_SQLITE_API == 2
-  context->db=sqlite_open(context->name, mode, &errmsg);
-  if(context->db == NULL)
-    rc = sqlITE_ERROR;
-#endif
+
   if(rc != SQLITE_OK) {
     librdf_log(storage->world, 0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                "SQLite database %s open failed - %s", 
                context->name, errmsg);
-#if REDLAND_SQLITE_API == 2
-    sqlite_FREE(errmsg);
-#endif
     librdf_storage_sqlite_close(storage);
     return 1;
   }
@@ -962,7 +919,7 @@ librdf_storage_sqlite_close(librdf_storage* storage)
   context = (librdf_storage_sqlite_instance*)storage->instance;
 
   if(context->db) {
-    sqlite_CLOSE(context->db);
+    sqlite3_close(context->db);
     context->db = NULL;
   }
 
@@ -1271,7 +1228,7 @@ typedef struct {
   librdf_node* context;
 
   /* OUT from sqlite3_prepare (V3) or sqlite_compile (V2) */
-  sqlite_STATEMENT *vm;
+  sqlite3_stmt *vm;
   const char *zTail;
 } librdf_storage_sqlite_serialise_stream_context;
 
@@ -1321,7 +1278,6 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 #endif
 
-#if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
                            (const char*)request,
                            LIBRDF_GOOD_CAST(int, raptor_stringbuffer_length(sb)),
@@ -1329,14 +1285,6 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
                            &scontext->zTail);
   if(status != SQLITE_OK)
     errmsg = (char*)sqlite3_errmsg(context->db);
-#endif
-#if REDLAND_SQLITE_API == 2  
-  status=sqlite_compile(context->db,
-                        (const char*)request,
-                        &scontext->zTail,
-                        &scontext->vm,
-                        &errmsg);
-#endif
 
   raptor_free_stringbuffer(sb);
 
@@ -1366,16 +1314,11 @@ librdf_storage_sqlite_serialise(librdf_storage* storage)
 
 static int
 librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
-                                      sqlite_STATEMENT *vm,
+                                      sqlite3_stmt *vm,
                                       librdf_statement **statement,
                                       librdf_node **context_node)
 {
   int status = SQLITE_BUSY;
-#if REDLAND_SQLITE_API == 2
-  int pN;
-  const char **pazValue;   /* Column data */
-  const char **pazColName; /* Column names and datatypes */
-#endif
   int result = 0;
   
   /*
@@ -1385,12 +1328,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
    * SQLITE_MISUSE.
   */
   do {
-#if REDLAND_SQLITE_API == 3
     status = sqlite3_step(vm);
-#endif
-#if REDLAND_SQLITE_API == 2
-    status = sqlite_step(vm, &pN, &pazValue, &pazColName);
-#endif
     if(status == SQLITE_BUSY) {
       /* FIXME - how to handle busy? */
       continue;
@@ -1444,12 +1382,12 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
     librdf_statement_clear(*statement);
 
     /* subject */
-    uri_string = GET_COLUMN_VALUE_TEXT(vm, 0);
+    uri_string = sqlite3_column_text(vm, 0);
     if(uri_string)
       node = librdf_new_node_from_uri_string(scontext->storage->world,
                                              uri_string);
     else {
-      blank = GET_COLUMN_VALUE_TEXT(vm, 1);
+      blank = sqlite3_column_text(vm, 1);
       node = librdf_new_node_from_blank_identifier(scontext->storage->world,
                                                    blank);
     }
@@ -1460,7 +1398,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
     librdf_statement_set_subject(*statement, node);
 
 
-    uri_string = GET_COLUMN_VALUE_TEXT(vm, 2);
+    uri_string = sqlite3_column_text(vm, 2);
     node = librdf_new_node_from_uri_string(scontext->storage->world,
                                            uri_string);
     if(!node)
@@ -1469,8 +1407,8 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
 
     librdf_statement_set_predicate(*statement, node);
 
-    uri_string = GET_COLUMN_VALUE_TEXT(vm, 3);
-    blank = GET_COLUMN_VALUE_TEXT(vm, 4);
+    uri_string = sqlite3_column_text(vm, 3);
+    blank = sqlite3_column_text(vm, 4);
     if(uri_string)
       node = librdf_new_node_from_uri_string(scontext->storage->world,
                                              uri_string);
@@ -1478,12 +1416,12 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
       node = librdf_new_node_from_blank_identifier(scontext->storage->world,
                                                    blank);
     else {
-      const unsigned char *literal = GET_COLUMN_VALUE_TEXT(vm, 5);
-      const unsigned char *language = GET_COLUMN_VALUE_TEXT(vm, 6);
+      const unsigned char *literal = sqlite3_column_text(vm, 5);
+      const unsigned char *language = sqlite3_column_text(vm, 6);
       librdf_uri *datatype = NULL;
       
-      /* int datatype_id= GET_COLUMN_VALUE_INT(vm, 7); */
-      uri_string = GET_COLUMN_VALUE_TEXT(vm, 8);
+      /* int datatype_id= sqlite3_column_int(vm, 7); */
+      uri_string = sqlite3_column_text(vm, 8);
       if(uri_string) {
         datatype = librdf_new_uri(scontext->storage->world, uri_string);
         if(!datatype)
@@ -1505,7 +1443,7 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
 
     librdf_statement_set_object(*statement, node);
 
-    uri_string = GET_COLUMN_VALUE_TEXT(vm, 9);
+    uri_string = sqlite3_column_text(vm, 9);
     if(uri_string) {
       node = librdf_new_node_from_uri_string(scontext->storage->world,
                                              uri_string);
@@ -1525,22 +1463,15 @@ librdf_storage_sqlite_get_next_common(librdf_storage_sqlite_instance* scontext,
   if(status == SQLITE_ERROR) {
     char *errmsg = NULL;
 
-#if REDLAND_SQLITE_API == 3
     status = sqlite3_finalize(vm);
     if(status != SQLITE_OK)
       errmsg = (char*)sqlite3_errmsg(scontext->db);
-#endif
-#if REDLAND_SQLITE_API == 2
-    status = sqlite_finalize(vm, &errmsg);
-#endif
+
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->name, errmsg, status);
-#if REDLAND_SQLITE_API == 2
-      sqlite_FREE(errmsg);
-#endif
     }
     result = -1;
   }
@@ -1638,22 +1569,15 @@ librdf_storage_sqlite_serialise_finished(void* context)
     char *errmsg = NULL;
     int status;
     
-#if REDLAND_SQLITE_API == 3
     status = sqlite3_finalize(scontext->vm);
     if(status != SQLITE_OK)
       errmsg = (char*)sqlite3_errmsg(scontext->sqlite_context->db);
-#endif
-#if REDLAND_SQLITE_API == 2
-    status = sqlite_finalize(scontext->vm, &errmsg);
-#endif
+
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
-#if REDLAND_SQLITE_API == 2
-      sqlite_FREE(errmsg);
-#endif
     }
   }
 
@@ -1686,7 +1610,7 @@ typedef struct {
   librdf_node* context;
 
   /* OUT from sqlite3_prepare (V3) or sqlite_compile (V2) */
-  sqlite_STATEMENT *vm;
+  sqlite3_stmt *vm;
   const char *zTail;
 } librdf_storage_sqlite_find_statements_stream_context;
 
@@ -1794,7 +1718,6 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 #endif
 
-#if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
                            (const char*)request,
                            LIBRDF_GOOD_CAST(int, raptor_stringbuffer_length(sb)),
@@ -1802,14 +1725,6 @@ librdf_storage_sqlite_find_statements(librdf_storage* storage,
                            &scontext->zTail);
   if(status != SQLITE_OK)
     errmsg = (char*)sqlite3_errmsg(context->db);
-#endif
-#if REDLAND_SQLITE_API == 2  
-  status = sqlite_compile(context->db,
-                          (const char*)request,
-                          &scontext->zTail, 
-                          &scontext->vm,
-                          &errmsg);
-#endif
 
   raptor_free_stringbuffer(sb);
 
@@ -1926,22 +1841,15 @@ librdf_storage_sqlite_find_statements_finished(void* context)
     char *errmsg = NULL;
     int status;
     
-#if REDLAND_SQLITE_API == 3
     status = sqlite3_finalize(scontext->vm);
     if(status != SQLITE_OK)
       errmsg = (char*)sqlite3_errmsg(scontext->sqlite_context->db);
-#endif
-#if REDLAND_SQLITE_API == 2
-    status = sqlite_finalize(scontext->vm, &errmsg);
-#endif
+
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
-#if REDLAND_SQLITE_API == 2
-      sqlite_FREE(errmsg);
-#endif
     }
   }
 
@@ -2183,7 +2091,7 @@ typedef struct {
   librdf_node* context;
 
   /* OUT from sqlite3_prepare (V3) or sqlite_compile (V2) */
-  sqlite_STATEMENT *vm;
+  sqlite3_stmt *vm;
   const char *zTail;
 } librdf_storage_sqlite_context_serialise_stream_context;
 
@@ -2267,7 +2175,6 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 #endif
 
-#if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
                            (const char*)request,
                            LIBRDF_GOOD_CAST(int, raptor_stringbuffer_length(sb)),
@@ -2275,14 +2182,6 @@ librdf_storage_sqlite_context_serialise(librdf_storage* storage,
                            &scontext->zTail);
   if(status != SQLITE_OK)
     errmsg = (char*)sqlite3_errmsg(context->db);
-#endif
-#if REDLAND_SQLITE_API == 2  
-  status = sqlite_compile(context->db,
-                        (const char*)request,
-                        &scontext->zTail,
-                        &scontext->vm,
-                        &errmsg);
-#endif
 
   raptor_free_stringbuffer(sb);
 
@@ -2400,22 +2299,15 @@ librdf_storage_sqlite_context_serialise_finished(void* context)
     char *errmsg = NULL;
     int status;
     
-#if REDLAND_SQLITE_API == 3
     status = sqlite3_finalize(scontext->vm);
     if(status != SQLITE_OK)
       errmsg = (char*)sqlite3_errmsg(scontext->sqlite_context->db);
-#endif
-#if REDLAND_SQLITE_API == 2
-    status = sqlite_finalize(scontext->vm, &errmsg);
-#endif
+
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->sqlite_context->name, errmsg, status);
-#if REDLAND_SQLITE_API == 2
-      sqlite_FREE(errmsg);
-#endif
     }
   }
 
@@ -2449,7 +2341,7 @@ typedef struct {
   librdf_node *current;
 
   /* OUT from sqlite3_prepare (V3) or sqlite_compile (V2) */
-  sqlite_STATEMENT *vm;
+  sqlite3_stmt *vm;
   const char *zTail;
 } librdf_storage_sqlite_get_contexts_iterator_context;
 
@@ -2457,15 +2349,10 @@ typedef struct {
 
 static int
 librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_instance* scontext,
-                                              sqlite_STATEMENT *vm,
+                                              sqlite3_stmt *vm,
                                               librdf_node **context_node)
 {
   int status = SQLITE_BUSY;
-#if REDLAND_SQLITE_API == 2
-  int pN;
-  const char **pazValue;   /* Column data */
-  const char **pazColName; /* Column names and datatypes */
-#endif
   int result = 0;
   
   /*
@@ -2475,12 +2362,7 @@ librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_instance* sc
    * SQLITE_MISUSE.
   */
   do {
-#if REDLAND_SQLITE_API == 3
     status = sqlite3_step(vm);
-#endif
-#if REDLAND_SQLITE_API == 2
-    status = sqlite_step(vm, &pN, &pazValue, &pazColName);
-#endif
     if(status == SQLITE_BUSY) {
       /* FIXME - how to handle busy? */
       continue;
@@ -2509,7 +2391,7 @@ librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_instance* sc
     fputc('\n', stderr);
 #endif
 
-    uri_string = GET_COLUMN_VALUE_TEXT(vm, 0);
+    uri_string = sqlite3_column_text(vm, 0);
     if(uri_string) {
       librdf_node *node;
       node = librdf_new_node_from_uri_string(scontext->storage->world,
@@ -2530,22 +2412,15 @@ librdf_storage_sqlite_get_next_context_common(librdf_storage_sqlite_instance* sc
   if(status == SQLITE_ERROR) {
     char *errmsg = NULL;
 
-#if REDLAND_SQLITE_API == 3
     status = sqlite3_finalize(vm);
     if(status != SQLITE_OK)
       errmsg = (char*)sqlite3_errmsg(scontext->db);
-#endif
-#if REDLAND_SQLITE_API == 2
-    status = sqlite_finalize(vm, &errmsg);
-#endif
+
     if(status != SQLITE_OK) {
       librdf_log(scontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  scontext->name, errmsg, status);
-#if REDLAND_SQLITE_API == 2
-      sqlite_FREE(errmsg);
-#endif
     }
     result = -1;
   }
@@ -2650,22 +2525,15 @@ librdf_storage_sqlite_get_contexts_finished(void* iterator)
     char *errmsg = NULL;
     int status;
     
-#if REDLAND_SQLITE_API == 3
     status = sqlite3_finalize(icontext->vm);
     if(status != SQLITE_OK)
       errmsg = (char*)sqlite3_errmsg(icontext->sqlite_context->db);
-#endif
-#if REDLAND_SQLITE_API == 2
-    status = sqlite_finalize(icontext->vm, &errmsg);
-#endif
+
     if(status != SQLITE_OK) {
       librdf_log(icontext->storage->world,
                  0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
                  "SQLite database %s finalize failed - %s (%d)", 
                  icontext->sqlite_context->name, errmsg, status);
-#if REDLAND_SQLITE_API == 2
-      sqlite_FREE(errmsg);
-#endif
     }
   }
 
@@ -2733,7 +2601,6 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
   LIBRDF_DEBUG2("SQLite prepare '%s'\n", request);
 #endif
 
-#if REDLAND_SQLITE_API == 3
   status = sqlite3_prepare(context->db,
                            (const char*)request,
                            LIBRDF_GOOD_CAST(int, raptor_stringbuffer_length(sb)),
@@ -2741,14 +2608,6 @@ librdf_storage_sqlite_get_contexts(librdf_storage* storage)
                            &icontext->zTail);
   if(status != SQLITE_OK)
     errmsg = (char*)sqlite3_errmsg(context->db);
-#endif
-#if REDLAND_SQLITE_API == 2  
-  status = sqlite_compile(context->db,
-                          (const char*)request,
-                          &icontext->zTail,
-                          &icontext->vm,
-                          &errmsg);
-#endif
 
   raptor_free_stringbuffer(sb);
 
