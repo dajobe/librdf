@@ -1,4 +1,63 @@
+2013-04-05  Dave Beckett <dave@dajobe.org>
+
+	* src/win32_rdf_config.h.in: Make win32_rdf_config.h work on
+	MSVC2008
+
+	Patch from Michael Stahl
+
+	Fixes Issue #0000542
+	http://bugs.librdf.org/mantis/view.php?id=542
+
+	* configure.ac, src/Makefile.am, src/rdf_storage_sqlite.c,
+	src/win32_rdf_config.h.in: Remove SQLITE V2 support and switch to
+	PKG_CHECK_MODULES in configure
+
+	- Remove ancient sqlite V2 API support, removing lots of conditional
+	code.
+	- Alter configure to use PKG_CHECK_MODULES for sqlite3 and then
+	the SQLITE_CFLAGS and SQLITE_LIBS envars
+
+	* build/pkg.m4, configure.ac: Use PKG_CHECK_MODULES() for calling
+	and overriding pkg-config
+
+	- macro is in build/pkg.m4 from pkg-config 0.28
+	- Use <PREFIX>_CFLAGS and <PREFIX>_LIBS envars.
+	- Enables overriding of pkg-config if needed.
+
+	Patch from Michael Stahl
+
+	Fixes Issue #0000541
+	http://bugs.librdf.org/mantis/view.php?id=541
+
+	* configure.ac: remove obsolete
+	--with-xml-parser/--with-openssl-digests
+
+	Patch from Michael Stahl
+
+	Fixes Issue #0000540
+	http://bugs.librdf.org/mantis/view.php?id=540
+
+2013-03-12  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh:
+	Handle variations of header macro
+
+	* .gitignore, build/.gitignore: Ignore more
+
+2013-02-27  Dave Beckett <dave@dajobe.org>
+
+	* Merge pull request #3 from olberger/master Fixing the deprecated
+	TYPE= construct
+
+2013-01-02  Dave Beckett <dave@dajobe.org>
+
+	* FAQS.html, INSTALL.html, LICENSE.html, NEWS.html, README.html,
+	RELEASE.html, TODO.html, configure.ac:
+	Bumped version to 1.0.17
+
 2012-12-29  Dave Beckett <dave@dajobe.org>
+
+	* NEWS.html: 1.0.16
 
 	* Snapshotted redland_1_0_16 for 1.0.16 release (GIT
 	c8281fff2c618b63d338b296d4d8e352a5de1101)
