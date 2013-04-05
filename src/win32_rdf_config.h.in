@@ -43,7 +43,8 @@ extern "C" {
 #define HAVE_STRICMP 1
 
 /* MS names for these functions */
-#define vsnprintf _vsnprintf
+// next line breaks build on wntmsci12
+//#define vsnprintf _vsnprintf
 #define snprintf _snprintf
 #define access _access
 #define stricmp _stricmp
@@ -251,6 +252,10 @@ extern "C" {
 /* Building file storage */
 #define STORAGE_FILE 1
 
+#define STORAGE_HASHES 1
+#define STORAGE_MEMORY 1
+#define STORAGE_TREES 1
+
 /* Building MySQL storage */
 /* #define STORAGE_MYSQL 1 */
 
@@ -270,7 +275,7 @@ extern "C" {
 #define VERSION "@VERSION@"
 
 /* Use POSIX threads */
-#define WITH_THREADS
+#undef WITH_THREADS
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
