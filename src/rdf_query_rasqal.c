@@ -1096,7 +1096,9 @@ librdf_query_rasqal_query_results_next_statement(void* context)
     scontext->statement=NULL;
   }
 
-  scontext->finished=rasqal_query_results_next_triple(scontext->qcontext->results);
+  scontext->finished = !scontext->qcontext->results;
+  if(!scontext->finished)
+    scontext->finished=rasqal_query_results_next_triple(scontext->qcontext->results);
   if(!scontext->finished)
     librdf_query_rasqal_query_results_update_statement(scontext);
   
