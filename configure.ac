@@ -431,7 +431,7 @@ if test "x$bdb_prefix" != "xno" ; then
 		  have_bdb_open_7_args=yes
 		  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
-      if test "$have_bdb_open_7_args" == Xno; then
+      if test "X$have_bdb_open_7_args" = Xno; then
         # Cannot have 6 args if 7 args worked
 	AC_MSG_CHECKING(for BDB V4.0 DB->open with 6 arguments)
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
@@ -469,7 +469,7 @@ if test "x$bdb_prefix" != "xno" ; then
 		  AC_MSG_RESULT(4)],[AC_MSG_RESULT(3)])
     fi
 
-    if test "$have_libdb" = yes; then
+    if test "X$have_libdb" = Xyes; then
       bdb_available="Version $bdb_version (library $bdb_dbname in $bdb_lib_dir)"
       LIBRDF_LIBS="$LIBRDF_LIBS $nLDFLAGS -l$bdb_dbname"
       LIBRDF_CPPFLAGS="$LIBRDF_CPPFLAGS $nCPPFLAGS"
@@ -603,7 +603,7 @@ done
 
 REDLAND_MODULE_PATH=""
 AC_ARG_WITH(module-path, [  --with-module-path=PATH Default search path for modules (default=/usr/local/lib/redland:${libdir}/redland], REDLAND_MODULE_PATH="$witheval")
-if test "x$REDLAND_MODULE_PATH" == "x"; then
+if test "x$REDLAND_MODULE_PATH" = "x"; then
 	REDLAND_MODULE_PATH=$libdir"/redland"
 	if test "x$prefix" != "xNONE"; then
 		REDLAND_MODULE_PATH="/usr/local/lib/redland:"$REDLAND_MODULE_PATH
@@ -612,7 +612,7 @@ fi
 AC_SUBST(REDLAND_MODULE_PATH)
 
 storages_available="memory file hashes(memory) trees"
-if test "$have_libdb" = yes; then
+if test "x$have_libdb" = xyes; then
   storages_available="$storages_available hashes(bdb $bdb_version)"
 fi
 
