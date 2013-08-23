@@ -65,7 +65,7 @@ static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
   "XMLLiteral",
 
   /* RDF S */
-  "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"
+  "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf",
 
   /* RDF 1.1 */
   "HTML", "langString"
