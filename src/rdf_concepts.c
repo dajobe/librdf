@@ -66,6 +66,9 @@ static const char* const librdf_concept_tokens[LIBRDF_CONCEPT_LAST+1]={
 
   /* RDF S */
   "Class", "ConstraintProperty", "ConstraintResource", "Container", "ContainerMembershipProperty", "Literal", "Resource", "comment", "domain", "isDefinedBy", "label", "range", "seeAlso", "subClassOf", "subPropertyOf"
+
+  /* RDF 1.1 */
+  "HTML", "langString"
 };
 
 
@@ -102,17 +105,18 @@ librdf_init_concepts(librdf_world *world)
     LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Out of memory creating node/uri arrays");
 
   /* Create the M&S and Schema resource nodes */
-  for (i=0; i<= LIBRDF_CONCEPT_LAST; i++) {
-    librdf_uri* ns_uri=(i < LIBRDF_CONCEPT_FIRST_S_ID) ? world->concept_ms_namespace_uri :
-      world->concept_schema_namespace_uri;
-    const unsigned char * token=(const unsigned char *)librdf_concept_tokens[i];
+  for (i = 0; i <= LIBRDF_CONCEPT_LAST; i++) {
+    librdf_uri* ns_uri = (LIBRDF_CONCEPT_FIRST_S_ID <= i &&
+                          i <= LIBRDF_CONCEPT_LAST_S_ID) ?
+      world->concept_schema_namespace_uri : world->concept_ms_namespace_uri;
+    const unsigned char * token = (const unsigned char *)librdf_concept_tokens[i];
 
-    world->concept_resources[i]=librdf_new_node_from_uri_local_name(world, ns_uri, token);
+    world->concept_resources[i] = librdf_new_node_from_uri_local_name(world, ns_uri, token);
     if(!world->concept_resources[i])
       LIBRDF_FATAL1(world, LIBRDF_FROM_CONCEPTS, "Failed to create Node from URI\n");
 
     /* keep shared copy of URI from node */
-    world->concept_uris[i]=librdf_node_get_uri(world->concept_resources[i]);
+    world->concept_uris[i] = librdf_node_get_uri(world->concept_resources[i]);
   }
 }
 
@@ -169,18 +173,22 @@ librdf_get_concept_by_name(librdf_world *world, int is_ms,
                            librdf_uri **uri_p, librdf_node **node_p)
 {
   int i;
-  int start=is_ms ? 0 : LIBRDF_CONCEPT_FIRST_S_ID;
-  int last=is_ms ? LIBRDF_CONCEPT_FIRST_S_ID : LIBRDF_CONCEPT_LAST;
 
   librdf_world_open(world);
 
-  for (i=start; i< last; i++)
+  for (i=0; i < LIBRDF_CONCEPT_LAST; i++) {
+    int this_is_ms = !(LIBRDF_CONCEPT_FIRST_S_ID <= i && 
+                       i <= LIBRDF_CONCEPT_LAST_S_ID);
+    if(this_is_ms != is_ms)
+      continue;
+
     if(!strcmp(librdf_concept_tokens[i], name)) {
       if(uri_p)
         *uri_p=world->concept_uris[i];
       if(node_p)
         *node_p=world->concept_resources[i];
     }
+  }
 }
 
 

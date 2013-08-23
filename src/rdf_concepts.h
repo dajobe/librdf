@@ -83,8 +83,12 @@ typedef enum {
 
   /* first entry from schema namespace */
   LIBRDF_CONCEPT_FIRST_S_ID = LIBRDF_CONCEPT_S_Class,
+  LIBRDF_CONCEPT_LAST_S_ID = LIBRDF_CONCEPT_S_subPropertyOf,
 
-  LIBRDF_CONCEPT_LAST = LIBRDF_CONCEPT_S_subPropertyOf,
+  LIBRDF_CONCEPT_RDF11_HTML,
+  LIBRDF_CONCEPT_RDF11_langString,
+
+  LIBRDF_CONCEPT_LAST = LIBRDF_CONCEPT_RDF11_langString,
 } librdf_concepts_index;
 
 
@@ -698,6 +702,24 @@ librdf_uri* librdf_get_concept_uri_by_index(librdf_world *world, librdf_concepts
  */
 #define LIBRDF_S_Class_URI(world) \
   librdf_get_concept_uri_by_index(world, LIBRDF_CONCEPT_S_Class)
+
+
+/**
+ * LIBRDF_RDF11_HTML:
+ *
+ * RDF 1.1 namespace concept HTML
+ */
+#define LIBRDF_RDF11_HTML(world) \
+  librdf_get_concept_resource_by_index(world, LIBRDF_CONCEPT_RDF11_HTML)
+
+
+/**
+ * LIBRDF_RDF11_langString:
+ *
+ * RDF 1.1 namespace concept langString
+ */
+#define LIBRDF_RDF11_langString(world) \
+  librdf_get_concept_resource_by_index(world, LIBRDF_CONCEPT_RDF11_langString)
 
 
 /**
