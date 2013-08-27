@@ -88,7 +88,7 @@ typedef enum {
   LIBRDF_CONCEPT_RDF11_HTML,
   LIBRDF_CONCEPT_RDF11_langString,
 
-  LIBRDF_CONCEPT_LAST = LIBRDF_CONCEPT_RDF11_langString,
+  LIBRDF_CONCEPT_LAST = LIBRDF_CONCEPT_RDF11_langString
 } librdf_concepts_index;
 
 
