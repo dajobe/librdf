@@ -522,7 +522,7 @@ librdf_new_storage(librdf_world *world,
   if(!factory) {
     librdf_log(world, 
                0, LIBRDF_LOG_ERROR, LIBRDF_FROM_STORAGE, NULL,
-               "storage '%s' not found", name);
+               "storage '%s' not found", storage_name);
     return NULL;
   }
 
