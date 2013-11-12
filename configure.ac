@@ -690,13 +690,12 @@ if test "X$MYSQL_CONFIG" != X; then
     mysql_storage_available=yes
   fi
 
-AC_MSG_CHECKING(whether MYSQL_OPT_RECONNECT is declared)
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <mysql.h>
-int x=MYSQL_OPT_RECONNECT;])],
-   AC_DEFINE(HAVE_MYSQL_OPT_RECONNECT, 1, [have MYSQL_OPT_RECONNECT declared])
-   AC_MSG_RESULT(yes),
-   AC_MSG_RESULT(no))
-
+  AC_MSG_CHECKING(whether MYSQL_OPT_RECONNECT is declared)
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <mysql.h>
+    int x=MYSQL_OPT_RECONNECT;])],
+    AC_DEFINE(HAVE_MYSQL_OPT_RECONNECT, 1, [have MYSQL_OPT_RECONNECT declared])
+    AC_MSG_RESULT(yes),
+    AC_MSG_RESULT(no))
 
   LIBS="$LIBRDF_LIBS"
   CPPFLAGS="$LIBRDF_CPPFLAGS"
