@@ -45,6 +45,11 @@
 
 #include <redland.h>
 
+#if defined(__APPLE__)
+/* Ignore /usr/include/sql.h deprecated warnings on OSX 10.8 */
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 #include <sql.h>
 #include <sqlext.h>
 
