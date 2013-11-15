@@ -45,7 +45,7 @@ main(int argc, char *argv[])
   char *program = argv[0];
   librdf_world* world;
   librdf_storage *storage;
-  librdf_model* model;
+  librdf_model* model = NULL;
   const char *parser_name;
   librdf_parser* parser;
   librdf_query* query;
