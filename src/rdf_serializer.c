@@ -945,7 +945,9 @@ log_handler(void *user_data, librdf_log_message *message)
 }
 
 
-#define EXPECTED_ERRORS 3
+#define EXPECTED_ERRORS1 3
+/* Extra error is another UTF-8 encoding error */
+#define EXPECTED_ERRORS2 4
 #define EXPECTED_WARNINGS 0
 
 #define SYNTAX_TYPE "ntriples"
@@ -1029,10 +1031,14 @@ main(int argc, char *argv[])
   string=librdf_serializer_serialize_model_to_counted_string(serializer,
                                                              base_uri, model,
                                                              &string_length);
-#define EXPECTED_BAD_STRING_LENGTH 382
-  if(string_length != EXPECTED_BAD_STRING_LENGTH) {
-    fprintf(stderr, "%s: Serialising model to RDF/XML returned string '%s' size %d, expected %d\n", program, string,
-            (int)string_length, EXPECTED_BAD_STRING_LENGTH);
+#define EXPECTED_BAD_STRING_LENGTH1 382
+/* Raptor 2.0.11 changed the serialization slightly */
+#define EXPECTED_BAD_STRING_LENGTH2 378
+  if(string_length != EXPECTED_BAD_STRING_LENGTH1 && 
+     string_length != EXPECTED_BAD_STRING_LENGTH2) {
+    fprintf(stderr, "%s: Serialising model to RDF/XML returned string '%s' size %d, expected %d or %d\n", program, string,
+            (int)string_length,
+            EXPECTED_BAD_STRING_LENGTH1, EXPECTED_BAD_STRING_LENGTH2);
     return 1;
   }
 
@@ -1043,9 +1049,9 @@ main(int argc, char *argv[])
   librdf_free_storage(storage); storage=NULL;
   
 
-  if(LogData.errors != EXPECTED_ERRORS) {
-    fprintf(stderr, "%s: Serialising to RDF/XML returned %d errors, expected %d\n", program,
-            LogData.errors, EXPECTED_ERRORS);
+  if(LogData.errors != EXPECTED_ERRORS1 && LogData.errors != EXPECTED_ERRORS2) {
+    fprintf(stderr, "%s: Serialising to RDF/XML returned %d errors, expected %d or %d\n", program,
+            LogData.errors, EXPECTED_ERRORS1, EXPECTED_ERRORS2);
     return 1;
   }
 
