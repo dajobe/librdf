@@ -1,3 +1,17 @@
+2013-12-12  Dave Beckett <dave@dajobe.org>
+
+	* scripts/process-changes.pl: Add version_for_sort to sort
+	versionwise
+
+2013-11-24  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_serializer.c: Handle raptor stricter checks in
+	serializing
+
+	* examples/example8.c: Initialise model vars to NULL for error
+	path
+	[llvm]
+
 2013-11-13  Dave Beckett <dave@dajobe.org>
 
 	* src/rdf_query_virtuoso.c, src/rdf_storage_virtuoso.c: Ignore

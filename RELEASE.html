@@ -27,6 +27,41 @@ pre
 <p>Not yet released.
 </p>
 
+<p>Issues Fixed:</p>
+<ul>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=529">0000529</a>: MySql storage error on initial creation</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=540">0000540</a>: configure: remove obsolete  --with-xml-parser/--with-openssl-digests</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=541">0000541</a>: configure pkg-config checks not overridable</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=542">0000542</a>: win32_rdf_config.h doesn't work on MSVC2008</li>
+<li><a href="http://bugs.librdf.org/mantis/view.php?id=543">0000543</a>: assertion in rasqal_query_results_next_triple called from librdf_query_rasqal_query_results_next_statement</li>
+</ul>
+
+<h2>Concept class changes</h2>
+
+<p>Added <code>rdf:HTML</code> and <code>rdf:langString</code> from
+RDF 1.1.</p>
+
+<h2>Storage class changes</h2>
+
+<p>Update deprecated MySQL engine type syntax.  Patch from olberger on github.
+</p>
+
+<h2>Configuration and build fixes</h2>
+
+<p>Make configure restore CPPFLAGS after virtuoso test.  Helps
+portabilty and Debian hardening.
+</p>
+
+<p>Fixes to Win32 builds with MSVC2008 from Michael Stahl.</p>
+
+<h2>Internal fixes</h2>
+
+<p>Several alignment and error path fixes from clang and llvm.</p>
+
+<p>Fix <code>rasqal_query_results_next_triple()</code> call with NULL.
+Patch from Michael Stahl.</p>
+
+
 
 <h2 id="rel1_0_16"><a name="rel1_0_16">Redland 1.0.16 changes</a></h2>
 
