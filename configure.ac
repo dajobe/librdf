@@ -532,7 +532,7 @@ AC_SUBST(RASQAL_MAX_VERSION)
 PKG_CHECK_MODULES([RASQAL],[rasqal >= $RASQAL_MIN_VERSION rasqal <= $RASQAL_MAX_VERSION],[
   RASQAL_VERSION=`$PKG_CONFIG rasqal --modversion 2>/dev/null`
 ],[
-  AC_MSG_ERROR(Rasqal is not installed - see http://librdf.org/rasqal/ to get a version in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
+  AC_MSG_ERROR(Rasqal is not installed or too old - see http://librdf.org/rasqal/ to get a version in range $RASQAL_MIN_VERSION to $RASQAL_MAX_VERSION)
 ])
 
 LIBRDF_EXTERNAL_CPPFLAGS="$RASQAL_CFLAGS $LIBRDF_EXTERNAL_CPPFLAGS"
@@ -547,7 +547,7 @@ RAPTOR_MIN_VERSION=2.0.7
 PKG_CHECK_MODULES([RAPTOR2],[raptor2 >= $RAPTOR_MIN_VERSION],[
   RAPTOR_VERSION=`$PKG_CONFIG raptor2 --modversion 2>/dev/null`
 ],[
-  AC_MSG_ERROR(Raptor2 is not installed - see http://librdf.org/raptor/ to get a version newer than $RAPTOR_MIN_VERSION)
+  AC_MSG_ERROR(Raptor2 is not installed or too old - see http://librdf.org/raptor/ to get version $RAPTOR_MIN_VERSION or newer)
 ])
 
 LIBRDF_DIRECT_LIBS="$LIBRDF_DIRECT_LIBS $RAPTOR2_LIBS"
