@@ -94,6 +94,9 @@ Internal.
 @LIBRDF_CONCEPT_S_subClassOf: offset
 @LIBRDF_CONCEPT_S_subPropertyOf: offset
 @LIBRDF_CONCEPT_FIRST_S_ID: offset
+@LIBRDF_CONCEPT_LAST_S_ID: 
+@LIBRDF_CONCEPT_RDF11_HTML: 
+@LIBRDF_CONCEPT_RDF11_langString: 
 @LIBRDF_CONCEPT_LAST: offset
 
 <!-- ##### FUNCTION librdf_log ##### -->
