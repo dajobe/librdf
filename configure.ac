@@ -23,7 +23,7 @@ dnl
 dnl 
 
 
-AC_INIT([Redland librdf RDF API Library],[1.0.17],[http://bugs.librdf.org/],[redland])
+AC_INIT([Redland librdf RDF API Library],[1.0.18],[http://bugs.librdf.org/],[redland])
 AC_PREREQ([2.62])
 AC_CONFIG_SRCDIR(src/rdf_node.c)
 AC_REVISION($Revision$)dnl
