@@ -1507,12 +1507,6 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
         p++;
 
         break;
-        
-      default:
-        librdf_log(hash->world, 
-                   0, LIBRDF_LOG_ERROR, LIBRDF_FROM_HASH, NULL,
-                   "No such state %d", state);
-        return 1;
     }
   }
   return 0;

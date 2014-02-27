@@ -694,7 +694,6 @@ librdf_query_virtuoso_results_get_binding_value_by_name(librdf_query_results *qu
   for(col = 0; col < context->numCols; col++) {
     if(!strcmp((const char*)name, (const char*)context->colNames[col])) {
       return context->colValues[col];
-      break;
     }
   }
 

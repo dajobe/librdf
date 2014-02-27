@@ -1252,7 +1252,6 @@ librdf_storage_hashes_node_iterator_get_method(void* iterator, int flags)
       librdf_statement_set_predicate(&context->statement2, node);
       librdf_statement_set_object(&context->statement2, librdf_statement_get_object(&context->statement));
       return (void*)&context->statement2;
-      break;
       
     default: /* error */
       librdf_log(context->iterator->world,

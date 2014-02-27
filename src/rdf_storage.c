@@ -414,7 +414,6 @@ librdf_storage_register_factory(librdf_world* world,
 
   failed:
   LIBRDF_FATAL1(world, LIBRDF_FROM_STORAGE, "Registering storage failed");
-  return 1;
 }
 
 

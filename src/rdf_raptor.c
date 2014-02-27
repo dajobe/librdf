@@ -192,7 +192,6 @@ librdf_init_raptor(librdf_world* world)
 
     if(!world->raptor_world_ptr || raptor_world_open(world->raptor_world_ptr)) {
       LIBRDF_FATAL1(world, LIBRDF_FROM_PARSER, "failed to initialize raptor");
-      return 1;
     }
   }
 

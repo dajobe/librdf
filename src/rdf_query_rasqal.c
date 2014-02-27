@@ -1279,7 +1279,6 @@ librdf_query_rasqal_constructor(librdf_world *world)
 
     if(!world->rasqal_world_ptr) {
       LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
-      return 1;
     }
 
     /* Make sure rasqal works with the same raptor instance as everyone else. */
@@ -1292,7 +1291,6 @@ librdf_query_rasqal_constructor(librdf_world *world)
 
     if(rasqal_world_open(world->rasqal_world_ptr)) {
       LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
-      return 1;
     }
   }
 
@@ -1314,7 +1312,6 @@ librdf_query_rasqal_constructor(librdf_world *world)
       desc = rasqal_world_get_query_language_description(world->rasqal_world_ptr, i);
       if(!desc) {
         LIBRDF_FATAL1(world, LIBRDF_FROM_QUERY, "failed to initialize rasqal");
-        return 1;
       }
     }
 
