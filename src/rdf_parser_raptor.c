@@ -266,19 +266,17 @@ librdf_parser_raptor_new_statement_handler(void *context,
 #endif
 
   if(scontext->model) {
-	if(librdf_model_supports_contexts(scontext->model) &&
-	   rstatement->graph &&
-	   rstatement->graph->type == RAPTOR_TERM_TYPE_URI)
-	{
-	  node = librdf_new_node_from_uri(world, (librdf_uri*)rstatement->graph->value.uri);
-	  rc = librdf_model_context_add_statement(scontext->model, node, statement);
-	  librdf_free_node(node);
-	}
-	else
-	{
-	  rc=librdf_model_add_statement(scontext->model, statement);
-	}
-	librdf_free_statement(statement);
+    if(librdf_model_supports_contexts(scontext->model) &&
+       rstatement->graph &&
+       (rstatement->graph->type == RAPTOR_TERM_TYPE_URI ||
+        rstatement->graph->type == RAPTOR_TERM_TYPE_BLANK)) {
+      node = librdf_new_node_from_uri(world, (librdf_uri*)rstatement->graph->value.uri);
+      rc = librdf_model_context_add_statement(scontext->model, node, statement);
+      librdf_free_node(node);
+    } else {
+      rc = librdf_model_add_statement(scontext->model, statement);
+    }
+    librdf_free_statement(statement);
   } else {
     rc=librdf_list_add(scontext->statements, statement);
     if(rc)
