@@ -3102,6 +3102,9 @@ librdf_storage_module_register_factory(librdf_world *world)
   librdf_storage_register_factory(world, "virtuoso",
                                   "OpenLink Virtuoso Universal Server store",
                                   &librdf_storage_virtuoso_register_factory);
+  /* also register the virtuoso query engine seeing
+   * as rdf_query_virtuoso is linked into this module/DSO */
+  librdf_init_query_virtuoso(world);
 }
 
 #else
@@ -3118,6 +3121,8 @@ librdf_init_storage_virtuoso(librdf_world *world)
   librdf_storage_register_factory(world, "virtuoso",
                                   "OpenLink Virtuoso Universal Server store",
                                   &librdf_storage_virtuoso_register_factory);
+  /* in the monolithic case virtuoso's query engine is
+   * registered separately in librdf_init_query() */
 }
 
 #endif
