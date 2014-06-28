@@ -1899,8 +1899,9 @@ librdf_storage_sqlite_context_add_statement(librdf_storage* storage,
   int max=3;
 
   /* Do not add duplicate statements */
-  if(librdf_storage_sqlite_context_contains_statement(storage, context_node, statement))
-    return 0;
+  rc = librdf_storage_sqlite_context_contains_statement(storage, context_node, statement);
+  if(rc != 0)
+    return rc < 0 ? rc : 0; /* return error or 'found' */
 
   /* context = (librdf_storage_sqlite_instance*)storage->instance; */
 
