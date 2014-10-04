@@ -160,12 +160,12 @@ version/name your system uses).</p>
 
 <p>If the value is <code>no</code>, the BDB backend store is disabled.</p>
 
-<p>Berkeley DB was also known as Sleepycat DB (after version 2 before
-being bought by Oracle) and is distributed and supported by
-<a href="http://www.oracle.com/technetwork/database/berkeleydb/downloads/index.html">Oracle</a>
-Versions 4.1.25, 4.1.24, 4.0.14, 3.3.11, 3.2.9, 3.1.17, 3.1.14, 2.7.7
-and 2.4.14 have been tested and work.  Some systems do not come
-installed with a working Berkeley DB so on those systems,
+<p>Berkeley DB (also known as Sleepycat DB) is distributed and supported by
+<a href="http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/downloads/index.html">Oracle</a>.
+Versions between 2.4 to 5.3 should work.  Version 6 onwards will not
+be supported due to the change to the AGPL license, which would
+probably force Redland librdf to be AGPL licensed.  Some systems do
+not come installed with a working Berkeley DB so on those systems,
 Redland will have no persistent storage unless BDB is built
 separately and enabled via this option.</p>
 
