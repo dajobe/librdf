@@ -169,7 +169,7 @@ librdf_query_virtuoso_init(librdf_query* query, const char *name,
   librdf_query_virtuoso_context *context;
   size_t len;
   unsigned char *query_string_copy;
-  char *seps={(char *)" \t\n\r\f"};
+  const char *const seps={(const char *)" \t\n\r\f"};
   char *token;
 
   context = (librdf_query_virtuoso_context*)query->context;
