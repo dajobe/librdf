@@ -368,7 +368,7 @@ main(int argc, char *argv[])
   const char* identifier;
   const char* results_format;
   librdf_statement* statement=NULL;
-  char* query_cmd=NULL;
+  const char* query_cmd=NULL;
   char* s;
 
 
@@ -783,7 +783,7 @@ main(int argc, char *argv[])
 
 
   /***** Test 18 *****/
-  query_cmd=(char *)"CONSTRUCT {?s ?p ?o} FROM <http://red> WHERE {?s ?p ?o}";
+  query_cmd=(const char *)"CONSTRUCT {?s ?p ?o} FROM <http://red> WHERE {?s ?p ?o}";
   startTest(18, " Exec:  QUERY \"%s\" \n", query_cmd);
   {
     query=librdf_new_query(world, (char *)"vsparql", NULL, (const unsigned char *)query_cmd, NULL);
@@ -830,7 +830,7 @@ main(int argc, char *argv[])
 
 
   /***** Test 19 *****/
-  query_cmd=(char *)"SELECT * WHERE {graph <http://red> { ?s ?p ?o }}";
+  query_cmd=(const char *)"SELECT * WHERE {graph <http://red> { ?s ?p ?o }}";
   startTest(19, " Exec1:  QUERY_AS_BINDINGS \"%s\" \n", query_cmd);
   {
     query=librdf_new_query(world, (char *)"vsparql", NULL, (const unsigned char *)query_cmd, NULL);
@@ -866,7 +866,7 @@ main(int argc, char *argv[])
 
 
   /***** Test 20 *****/
-  query_cmd=(char *)"SELECT * WHERE {graph <http://red> { ?s ?p ?o }}";
+  query_cmd=(const char *)"SELECT * WHERE {graph <http://red> { ?s ?p ?o }}";
   startTest(20, " Exec2:  QUERY_AS_BINDINGS \"%s\" \n", query_cmd);
   {
     query=librdf_new_query(world, (char *)"vsparql", NULL, (const unsigned char *)query_cmd, NULL);
