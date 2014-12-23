@@ -1,0 +1,54 @@
+# see
+#   http://docs.travis-ci.com/user/getting-started/
+#   http://docs.travis-ci.com/user/languages/c/
+#   http://docs.travis-ci.com/user/build-configuration/
+#   http://docs.travis-ci.com/user/multi-os/
+#
+
+language: c
+
+branches:
+  only:
+    - master
+
+# matrix of compilers
+compiler:
+  - gcc
+#  - clang
+#  - c++
+
+# matrix of OSes (feature flagged; not enabled now)
+os:
+  - linux
+  - osx
+
+# matrix of raptor & rasqal versions
+env:
+  - RAPTOR_INSTALL_VERSION=2.0.7 RASQAL_INSTALL_VERSION=0.9.33
+  - RAPTOR_INSTALL_VERSION=2.0.15 RASQAL_INSTALL_VERSION=0.9.33
+  - RAPTOR_INSTALL_VERSION=2.0.7 RASQAL_INSTALL_VERSION=0.9.25
+  - RAPTOR_INSTALL_VERSION=2.0.15 RASQAL_INSTALL_VERSION=0.9.25
+
+# overall matrix configuration
+#matrix:
+#  allow_failures:
+#    - os: osx
+#
+#  exclude:
+#    - compiler: c++
+#      env: RAPTOR_INSTALL_VERSION=2.0.7
+#    - compiler: clang
+#      env: RAPTOR_INSTALL_VERSION=2.0.7
+
+
+# Install raptor and rasqal extra dependencies too (libyajl-dev)
+# since we may build raptor and rasqal from tarballs
+install:
+  - env | sort
+  - if [ "$TRAVIS_OS_NAME" = "" ]; then TRAVIS_OS_NAME=linux; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./scripts/install-bison3.sh; sudo apt-get update -qq -y; sudo apt-get install -qq -y gtk-doc-tools libraptor2-dev librasqal3-dev libgmp-dev libmhash-dev libpcre3-dev uuid-dev libyajl-dev libgmp-dev; fi
+  - raptor_min_version=`awk -F= '/RAPTOR_MIN_VERSION=/{print $2}' configure.ac` && ./scripts/install-raptor.sh $raptor_min_version $RAPTOR_INSTALL_VERSION
+  - rasqal_min_version=`awk -F= '/RASQAL_MIN_VERSION=/{print $2}' configure.ac` && ./scripts/install-rasqal.sh $rasqal_min_version $RASQAL_INSTALL_VERSION
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; brew install raptor rasqal bison gtk-doc yajl mhash pcre; fi
+
+script: ./autogen.sh && make && make test
