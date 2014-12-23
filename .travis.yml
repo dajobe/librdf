@@ -46,7 +46,7 @@ env:
 install:
   - env | sort
   - if [ "$TRAVIS_OS_NAME" = "" ]; then TRAVIS_OS_NAME=linux; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./scripts/install-bison3.sh; sudo apt-get update -qq -y; sudo apt-get install -qq -y gtk-doc-tools libraptor2-dev librasqal3-dev libgmp-dev libmhash-dev libpcre3-dev uuid-dev libyajl-dev libgmp-dev; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./scripts/install-bison3.sh; sudo apt-get update -qq -y; sudo apt-get install -qq -y gtk-doc-tools libraptor2-dev libgmp-dev libmhash-dev libpcre3-dev uuid-dev libyajl-dev libgmp-dev; fi
   - raptor_min_version=`awk -F= '/RAPTOR_MIN_VERSION=/{print $2}' configure.ac` && ./scripts/install-raptor.sh $raptor_min_version $RAPTOR_INSTALL_VERSION
   - rasqal_min_version=`awk -F= '/RASQAL_MIN_VERSION=/{print $2}' configure.ac` && ./scripts/install-rasqal.sh $rasqal_min_version $RASQAL_INSTALL_VERSION
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; brew install raptor rasqal bison gtk-doc yajl mhash pcre; fi
