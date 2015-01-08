@@ -3,7 +3,7 @@
 #
 # Intended for use with travis CI; see .travis.yml at the root
 
-set -ex
+set -x
 
 PACKAGE=rasqal
 MIN_VERSION=$1
@@ -23,6 +23,7 @@ else
     wget -O $FILE $URL || curl -o $FILE $URL
     tar -x -z -f $FILE && rm $FILE
     cd $PACKAGE-$INSTALL_VERSION
+    set -e
     ./configure --prefix=/usr
     make
     sudo make install
