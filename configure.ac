@@ -524,7 +524,7 @@ rdf_parsers_available=
 # Check for rasqal before raptor so that we can see if rasqal was already
 # built with raptor2 and can then enforce raptor2 is required
 
-RASQAL_MIN_VERSION=0.9.25
+RASQAL_MIN_VERSION=0.9.26
 RASQAL_MAX_VERSION=0.9.99
 AC_SUBST(RASQAL_MIN_VERSION)
 AC_SUBST(RASQAL_MAX_VERSION)
