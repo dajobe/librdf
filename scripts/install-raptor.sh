@@ -3,7 +3,7 @@
 #
 # Intended for use with travis CI; see .travis.yml at the root
 
-set -x
+set -ex
 
 PACKAGE=raptor2
 MIN_VERSION=$1
@@ -22,6 +22,9 @@ else
     mkdir $BUILD_DIR && cd $BUILD_DIR
     wget -O $FILE $URL || curl -o $FILE $URL
     tar -x -z -f $FILE && rm $FILE
-    cd $PACKAGE-$INSTALL_VERSION && ./configure --prefix=/usr && make && sudo make install
+    cd $PACKAGE-$INSTALL_VERSION
+    ./configure --prefix=/usr
+    make
+    sudo make install
     cd / && rm -rf $BUILD_DIR
 fi
