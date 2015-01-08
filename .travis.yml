@@ -51,4 +51,4 @@ install:
   - rasqal_min_version=`awk -F= '/RASQAL_MIN_VERSION=/{print $2}' configure.ac` && ./scripts/install-rasqal.sh $rasqal_min_version $RASQAL_INSTALL_VERSION
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; brew install raptor rasqal bison gtk-doc yajl mhash pcre; fi
 
-script: ./autogen.sh && make && make test
+script: ./autogen.sh && make && make check
