@@ -1389,6 +1389,8 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
     LIBRDF_DEBUG3("state %d at %s\n", state, p);
 #endif
 
+        /* fallthrough */
+
         /* start of key */
       case HFS_PARSE_STATE_KEY:
         key=p;
@@ -1451,6 +1453,8 @@ librdf_hash_from_string(librdf_hash* hash, const char *string)
 #if defined(LIBRDF_DEBUG) && LIBRDF_DEBUG > 1
     LIBRDF_DEBUG3("state %d at %s\n", state, p);
 #endif
+
+        /* fallthrough */
 
         /* got key\s+=\s+" now reading value */
       case HFS_PARSE_STATE_VALUE:
