@@ -62,6 +62,7 @@ struct librdf_hash_memory_node_s
   u32 hash_key;
   librdf_hash_memory_node_value *values;
   size_t values_count;
+>>>>>>> 86f72ee6 (Use unsigned int for hash fields)
 };
 typedef struct librdf_hash_memory_node_s librdf_hash_memory_node;
 
@@ -202,10 +203,10 @@ librdf_hash_memory_find_node(librdf_hash_memory_context* hash,
   /* find slot in table */
   bucket = hash_key & (hash->capacity - 1);
   if(user_bucket)
-    *user_bucket=bucket;
+    *user_bucket = bucket;
 
   /* check if there is a list present */ 
-  node=hash->nodes[bucket];
+  node = hash->nodes[bucket];
   if(!node)
     /* no list there */
     return NULL;
@@ -254,7 +255,7 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
     if((1000 * hash->keys) < (hash->load_factor * hash->capacity))
       return 0;
     /* grow hash (keeping it a power of two) */
-    required_capacity=hash->capacity << 1;
+    required_capacity = hash->capacity << 1;
   } else {
     required_capacity = librdf_hash_initial_capacity;
   }
@@ -283,7 +284,7 @@ librdf_hash_memory_expand_size(librdf_hash_memory_context* hash) {
       librdf_hash_memory_node *next;
       size_t bucket;
 
-      next=node->next;
+      next = node->next;
       /* find slot in new table */
       bucket = node->hash_key & (required_capacity - 1);
       node->next=new_nodes[bucket];
@@ -461,7 +462,7 @@ librdf_hash_memory_values_count(void *context)
 {
   librdf_hash_memory_context* hash=(librdf_hash_memory_context*)context;
 
-  return hash->values;
+  return LIBRDF_BAD_CAST(int, hash->values);
 }
 
 
@@ -527,9 +528,9 @@ librdf_hash_memory_cursor_get(void* context,
     /* find first used bucket (with keys) */
     cursor->current_bucket = 0;
 
-    for(i=0; i< cursor->hash->capacity; i++)
+    for(i = 0; i < cursor->hash->capacity; i++)
       if((cursor->current_node=cursor->hash->nodes[i])) {
-        cursor->current_bucket=i;
+        cursor->current_bucket = i;
         break;
       }
 
@@ -628,9 +629,9 @@ librdf_hash_memory_cursor_get(void* context,
         size_t i;
         
         /* end of list - move to next used bucket */
-        for(i=cursor->current_bucket+1; i< cursor->hash->capacity; i++)
-          if((node=cursor->hash->nodes[i])) {
-            cursor->current_bucket=i;
+        for(i = cursor->current_bucket+1; i< cursor->hash->capacity; i++)
+          if((node = cursor->hash->nodes[i])) {
+            cursor->current_bucket = i;
             break;
           }
         
@@ -767,8 +768,8 @@ librdf_hash_memory_put(void* context, librdf_hash_datum *key,
 
   /* now update buckets and hash counts */
   if(is_new_node) {
-    node->next=hash->nodes[bucket];
-    hash->nodes[bucket]=node;
+    node->next = hash->nodes[bucket];
+    hash->nodes[bucket] = node;
   
     hash->keys++;
   }
@@ -1056,7 +1057,7 @@ librdf_init_hash_memory(librdf_world *world)
 {
   /* use default load factor */
   if(world->hash_load_factor <= 0 || world->hash_load_factor > 999)
-    world->hash_load_factor=librdf_hash_default_load_factor;
+    world->hash_load_factor = LIBRDF_BAD_CAST(int, librdf_hash_default_load_factor);
 
   librdf_hash_register_factory(world,
                                "memory", &librdf_hash_memory_register_factory);
