@@ -369,3 +369,10 @@
 <NAME>LIBRDF_URI_RDF_SCHEMA</NAME>
 #define LIBRDF_URI_RDF_SCHEMA
 </MACRO>
+
+<MACRO>
+<NAME>librdf_concepts_index</NAME>
+typedef enum {
+  LIBRDF_CONCEPT_LAST
+}
+</MACRO>
