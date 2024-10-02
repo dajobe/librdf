@@ -1254,10 +1254,10 @@ librdf_query_virtuoso_free_results_formatter(librdf_query_results_formatter* qrf
 
 
 /**
- * librdf_query_results_formatter_write:
+ * librdf_query_virtuoso_results_formatter_write:
  * @iostr: #raptor_iostream to write the query to
- * @formatter: #librdf_query_results_formatter object
- * @results: #librdf_query_results query results format
+ * @qrf: #librdf_query_results_formatter object
+ * @query_results: #librdf_query_results query results format
  * @base_uri: #librdf_uri base URI of the output format
  *
  * Write the query results using the given formatter to an iostream
