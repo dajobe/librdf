@@ -593,6 +593,8 @@ LIBRDF_S_subPropertyOf
 LIBRDF_S_subPropertyOf_URI
 LIBRDF_URI_RDF_MS
 LIBRDF_URI_RDF_SCHEMA
+LIBRDF_RDF11_HTML
+LIBRDF_RDF11_langString
 </SECTION>
 
 <SECTION>
@@ -604,9 +606,11 @@ librdf_files_temporary_file_name
 <FILE>unused</FILE>
 REDLAND_API
 REDLAND_CALLBACK_STDCALL
+REDLAND_NORETURN
 REDLAND_PRINTF_FORMAT
 librdf_basename
 librdf_concepts_index
 librdf_log
 librdf_log_simple
+librdf_storage_factory_s
 </SECTION>

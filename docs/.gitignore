@@ -12,6 +12,7 @@ redland-undeclared.txt
 redland-undocumented.txt
 redland-unused.txt
 redland.3
+redland.actions
 redland.args
 redland.hierarchy
 redland.interfaces
