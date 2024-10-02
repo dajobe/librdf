@@ -972,9 +972,16 @@ librdf_query_results_formats_check(librdf_world* world,
   /* FIXME - this should use some kind of registration but for now
    * it is safe to assume Rasqal does it all
    */
-  return rasqal_query_results_formats_check(world->rasqal_world_ptr,
-                                            name, (raptor_uri*)uri, mime_type,
-                                            flags);
+#if RASQAL_VERSION >= 933
+  /* Raqal 0.9.33 function returns correct boolean sense */
+  return rasqal_query_results_formats_check2(world->rasqal_world_ptr,
+                                             name, (raptor_uri*)uri, mime_type,
+                                             flags);
+#else
+  return !rasqal_query_results_formats_check(world->rasqal_world_ptr,
+                                             name, (raptor_uri*)uri, mime_type,
+                                             flags);
+#endif
 }
 
 
