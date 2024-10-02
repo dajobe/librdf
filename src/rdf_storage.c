@@ -72,6 +72,12 @@ librdf_storage_load_module(librdf_world *world,
 #endif
 
 
+static void
+rdf_storage_lt_dlclose_wrapper(void* data) {
+  (void)lt_dlclose((lt_dlhandle)data);
+}
+
+
 /**
  * librdf_init_storage:
  * @world: redland world object
@@ -103,8 +109,7 @@ librdf_init_storage(librdf_world *world)
 #ifdef MODULAR_LIBRDF
 
   if (!world->storage_modules)
-    world->storage_modules = raptor_new_sequence(
-        (raptor_data_free_handler)lt_dlclose, NULL);
+    world->storage_modules = raptor_new_sequence(rdf_storage_lt_dlclose_wrapper, NULL);
 
   librdf_storage_load_all_modules(world);
 
