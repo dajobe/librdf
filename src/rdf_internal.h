@@ -137,7 +137,7 @@
 #endif
 
 #define LIBRDF_MALLOC(type, size) (type)malloc(size)
-#define LIBRDF_CALLOC(type, size, count) (type)calloc(size, count)
+#define LIBRDF_CALLOC(type, count, size) (type)calloc(count, size)
 #define LIBRDF_FREE(type, ptr)   free(ptr)
 
 /* Fatal errors - always happen */
