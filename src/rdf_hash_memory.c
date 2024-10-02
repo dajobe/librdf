@@ -62,7 +62,6 @@ struct librdf_hash_memory_node_s
   u32 hash_key;
   librdf_hash_memory_node_value *values;
   size_t values_count;
->>>>>>> 86f72ee6 (Use unsigned int for hash fields)
 };
 typedef struct librdf_hash_memory_node_s librdf_hash_memory_node;
 
