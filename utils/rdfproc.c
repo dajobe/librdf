@@ -1393,16 +1393,23 @@ main(int argc, char *argv[])
     case CMD_ARC:
       if(!node) {
         if(librdf_heuristic_is_blank_node(argv[0]))
-          source=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
+          source = librdf_new_node_from_blank_identifier(world,
+                     (const unsigned char *)librdf_heuristic_get_blank_node(argv[0]));
         else
-          source=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[0]);
-      if(librdf_heuristic_is_blank_node(argv[1]))
-        target=librdf_new_node_from_blank_identifier(world, (const unsigned char *)librdf_heuristic_get_blank_node(argv[1]));
-      else if(librdf_heuristic_object_is_literal(argv[1]))
-        target=librdf_new_node_from_literal(world, (const unsigned char *)argv[1], NULL, 0);
-      else
-        target=librdf_new_node_from_uri_string(world, (const unsigned char *)argv[1]);
-        node=librdf_model_get_arc(model, source, target);
+          source = librdf_new_node_from_uri_string(world,
+                     (const unsigned char *)argv[0]);
+
+        if(librdf_heuristic_is_blank_node(argv[1]))
+          target = librdf_new_node_from_blank_identifier(world,
+                     (const unsigned char *)librdf_heuristic_get_blank_node(argv[1]));
+        else if(librdf_heuristic_object_is_literal(argv[1]))
+          target = librdf_new_node_from_literal(world,
+                     (const unsigned char *)argv[1], NULL, 0);
+        else
+          target = librdf_new_node_from_uri_string(world,
+                                                   (const unsigned char *)argv[1]);
+
+        node = librdf_model_get_arc(model, source, target);
         if(!node) {
           fprintf(stderr, "Failed to get arc\n");
           librdf_free_node(source);
