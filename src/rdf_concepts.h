@@ -34,6 +34,11 @@
 extern "C" {
 #endif
 
+/**
+ * librdf_concepts_index:
+ *
+ * Indexes into RDF concepts array for every term in RDF namespaces.
+ */
 typedef enum {
   LIBRDF_CONCEPT_MS_Alt,
   LIBRDF_CONCEPT_MS_Bag,
