@@ -120,7 +120,6 @@ librdf_utf8_to_latin1_2(const unsigned char *input, size_t length,
                         unsigned char discard,
                         size_t *output_length)
 {
-  size_t utf8_char_length = 0;
   size_t utf8_byte_length = 0;
   size_t i;
   size_t j;
@@ -131,8 +130,6 @@ librdf_utf8_to_latin1_2(const unsigned char *input, size_t length,
     int size = raptor_unicode_utf8_string_get_char(&input[i], length - i, NULL);
     if(size <= 0)
       return NULL;
-
-    utf8_char_length++;
 
     i += LIBRDF_GOOD_CAST(size_t, size);
   }
