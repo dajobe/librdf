@@ -46,7 +46,6 @@ main(int argc, char *argv[])
   char *program=argv[0];
   char *name;
   char *new_name;
-  int count;
 
   if(argc < 2 || argc >3) {
     fprintf(stderr, "USAGE: %s: <Redland BDB name> [new DB name]\n", program);
@@ -103,7 +102,7 @@ main(int argc, char *argv[])
             program);
     return(1);
   } else {
-    count=0;
+    int count = 0;
     while(!librdf_stream_end(stream)) {
       librdf_statement *statement=librdf_stream_get_object(stream);
       if(!statement) {
@@ -117,6 +116,7 @@ main(int argc, char *argv[])
       count++;
     }
     librdf_free_stream(stream);  
+    fprintf(stderr, "%s: stream returned %d statements\n", program, count);
   }
 
       
