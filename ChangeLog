@@ -1,4 +1,174 @@
-2013-12-28  Dave Beckett  <dave@dajobe.org>
+2024-10-18  Dave Beckett <dave@dajobe.org>
+
+	* utils/db_upgrade.c: Use count var
+
+2024-10-15  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_utf8.c: Remove unused utf8_char_length
+
+2024-10-02  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_query_results.c:
+	Replace deprecated rasqal function call
+	(librdf_query_results_formats_check): Replace deprecated function
+	with replacement rasqal_query_results_formats_check2 and correct
+	return sense of older function.
+
+2024-10-01  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_hash_memory.c: fix
+
+	* docs/redland-overrides.txt: Add librdf_concepts_index
+
+	* utils/rdfproc.c: Fix misleading indenting
+
+	* src/rdf_concepts.h: gtkdoc comment
+
+	* src/rdf_hash_memory.c: Use unsigned int for hash fields Prevents
+	warnings and issues with int to unsigned int casts.
+
+	* src/rdf_parser_raptor.c:
+	Use raptor 2.0.16 raptor_www_set_http_accept2
+	(librdf_parser_raptor_parse_as_stream_common): Call
+	raptor_www_set_http_accept2() instead of
+	raptor_www_set_http_accept() for newer raptor.
+
+	* src/rdf_query_virtuoso.c: gtkdoc args format fix
+
+	* src/rdf_storage.c: Fix lt_dlclose callign convention
+	(rdf_storage_lt_dlclose_wrapper): Add wrapper to do casting.
+
+	* src/rdf_internal.h, src/rdf_storage_sql.c:
+	Fix inverted calloc
+	args calls This is a syntax fix, does not change calling semantics
+
+	* FAQS.html, INSTALL.html, LICENSE.html, NEWS.html, README.html,
+	RELEASE.html, TODO.html, docs/.gitignore, docs/redland-docs.xml,
+	docs/redland-sections.txt:
+	2024
+
+	* src/rdf_hash_memory.c: Use size_t type for all sizes
+
+	* src/rdf_digest_md5.c:
+	(MD5Update): Use size_t
+
+	* src/rdf_hash.c: add switch fallthrough markers to avoid compiler
+	warnings
+
+	* configure.ac, src/rdf_init.c, src/rdf_log.c: Remove obsolete
+	autoconf macros
+
+	* autogen.sh: Update autogen.sh to improve find configure
+
+2023-03-01  Dave Beckett <dave@dajobe.org>
+
+	* build/.gitignore: ignore ltargz.m4
+
+2024-06-13  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh: Update autogen.sh from rasqal
+
+2023-03-01  Dave Beckett <dave@dajobe.org>
+
+	* scripts/process-changes.pl: Update with version from rasqal
+
+2015-02-01  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh: Handle updated glibtoolize (OSX) name in --version
+
+2015-01-08  Dave Beckett <dave@dajobe.org>
+
+	* scripts/install-raptor.sh, scripts/install-rasqal.sh: Exit on
+	error at configure / make stage
+
+	* .travis.yml, README.html, configure.ac:
+	Rasqal 0.9.26 is base now.
+	Does not build with GMP.
+
+	* scripts/install-raptor.sh, scripts/install-rasqal.sh: Exit on
+	error immediately
+
+2015-01-07  Dave Beckett <dave@dajobe.org>
+
+	* .travis.yml: make check
+
+2014-12-22  Dave Beckett <dave@dajobe.org>
+
+	* .travis.yml: Never install rasqal package to force it to always
+	build.
+
+	* .travis.yml, scripts/install-raptor.sh, scripts/install-rasqal.sh:
+	Travis-CI attempt
+
+2014-10-09  Dave Beckett <dave@dajobe.org>
+
+	* Merge pull request #10 from hroptatyr/compiler-support Intel C
+	compiler (icc) support
+
+	* configure.ac:
+	Always use AC_LANG_WERROR when checking for compiler
+	warning flags Many gcc-compatible compilers (icc, clang, etc.) verbosely ignore
+	gcc command line flags issuing a warning of some sort.  Catch these
+	warnings and turn them into errors when checking for support of
+	specific warning flags.
+
+2014-10-04  Dave Beckett <dave@dajobe.org>
+
+	* INSTALL.html: html
+
+	* INSTALL.html: BDB up to 5.x
+
+2014-08-02  Dave Beckett <dave@dajobe.org>
+
+	* INSTALL.html:
+	Update fink url
+
+	* INSTALL.html, README.html:
+	Bye bye sf
+
+2014-06-28  Dave Beckett <dave@dajobe.org>
+
+	* Merge pull request #8 from mro/develop a fix in sqlite storage
+	when ‘contains’ check within add_statement returns an error.
+
+2014-05-29  Dave Beckett <dave@dajobe.org>
+
+	* Merge pull request #7 from hroptatyr/fix/init-query-virtuoso
+	Load virtuoso query engine (vsparql) in modular builds as well
+
+2014-05-09  Dave Beckett <dave@dajobe.org>
+
+	* Merge pull request #6 from stbergmann/master Missing NUL
+
+2014-03-05  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_parser_raptor.c:
+	(librdf_parser_raptor_new_statement_handler): Allow blank node graph
+	names.
+
+2014-03-05  Dave Beckett <dave@dajobe.org>
+
+	* Merge pull request #5 from nevali/master When the parser
+	provides quads and contexts are enabled....  Will fix in a new
+	commit: allow blank node graph URIs
+
+2014-02-27  Dave Beckett <dave@dajobe.org>
+
+	* src/rdf_hash.c, src/rdf_query_rasqal.c:
+	* src/rdf_query_virtuoso.c, src/rdf_raptor.c, src/rdf_storage.c:
+	* src/rdf_storage_hashes.c, src/rdf_storage_virtuoso.c: Fix
+	unreachable codes - break after return mostly
+
+	* configure.ac: Add -Wunreachable-code
+
+2014-02-24  Dave Beckett <dave@dajobe.org>
+
+	* autogen.sh: update autogen.sh
+
+2013-12-28  Dave Beckett <dave@dajobe.org>
+
+	* NEWS.html, RELEASE.html, configure.ac:
+	Bumped version to 1.0.18
 
 	* Snapshotted redland_1_0_17 for 1.0.17 release (GIT e5c2c5f99a4ae18dc9ca62b971797ca7f9c1ab9a)
 
