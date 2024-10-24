@@ -27,6 +27,48 @@ pre
 <p>Not yet released.
 </p>
 
+<h2>Merged pull requests</h2>
+<ul>
+  <li>#10 from hroptatyr:
+  Intel C compiler (icc) support
+  </li>
+  <li>#8 from mro:
+  Develop a fix in sqlite storage when ‘contains’ check within
+  add_statement returns an error.
+  </li>
+  <li>#7 from hroptatyr:
+  Load virtuoso query engine (vsparql) in modular builds as well
+  </li>
+  <li>#6 from stbergmann:
+  Missing NUL
+  </li>
+</ul>
+
+<h2>Portability fixes</h2>
+
+<p>General autogen.sh improvements across all Redland libraries</p>
+
+<p>Removed obsolete autoconf macros from configure.ac.</p>
+
+<p>Use size_t for all MD5 buffer sizes instead of ints.</p>
+
+<p>Fix redland calloc() macro for calling convention.  Syntax only fix.</p>
+
+<p>Fixes for newer gcc, clang - removing unreachable code, changed but
+never used variables.
+</p>
+
+<p>Update to support raptor 2.0.16 or later
+raptor_www_set_http_accept2() as well as raptor_www_set_http_accept()
+for older.
+</p>
+
+<p>Updated to support rasqal 0.9.33 or later
+rasqal_query_results_formats_check() as well as fix
+broken query_results_formats_check() calling convention.</p>
+
+<p>Use unsigned int for sizes in hash memory storage internals.</p>
+
 
 <h2 id="rel1_0_17"><a name="rel1_0_17">Redland 1.0.17 changes</a></h2>
 
