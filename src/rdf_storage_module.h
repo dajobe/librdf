@@ -215,7 +215,7 @@ struct librdf_storage_factory_s {
   librdf_iterator* (*get_contexts)(librdf_storage* storage);
 
   /* Get a feature */
-  librdf_node* (*get_feature)(librdf_storage* storaage, librdf_uri* feature);
+  librdf_node* (*get_feature)(librdf_storage* storage, librdf_uri* feature);
   
   /* Set a feature */
   int (*set_feature)(librdf_storage* storage, librdf_uri* feature, librdf_node* value);
