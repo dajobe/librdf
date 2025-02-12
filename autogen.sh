@@ -38,8 +38,6 @@
 #
 # This script is in the public domain
 #
-# disabling these because the variables are defined in an eval.
-# shellcheck disable=SC2034,SC2154
 
 # Directory for the sources
 SRCDIR=${SRCDIR-.}
@@ -50,39 +48,41 @@ CONFIG_DIR=${CONFIG_DIR-../config}
 # GIT sub modules file
 GITMODULES='.gitmodules'
 
-autogen_get_version="$PWD/autogen-get-version.pl"
-tmp1=$(mktemp)
-trap 'rm -f $autogen_get_version $tmp1' 0 1
-
-
 # The programs required for configuring which will be searched for
 # in the current PATH.
 # Set an envariable of the same name in uppercase, to override scan
 #
 programs="automake aclocal autoconf autoheader libtoolize"
-gtkdoc_args=
-ltdl_args=
-silent_args=
+confs=$(find . -name configure.ac -print | grep -v /releases/)
 
-# Using a temporary file for find output not find | while so we can
-# change variables outside subshell
-find "." -name "configure.ac" -print | \
-  grep -v /releases/ > "$tmp1"
-while IFS= read -r conf; do
-  if grep "^GTK_DOC_CHECK" "$conf" >/dev/null; then
+gtkdoc_args=
+for conf in $confs; do
+  if grep "^GTK_DOC_CHECK" "$conf" >/dev/null 2>&1; then
     programs="$programs gtkdocize"
     gtkdoc_args="--enable-gtk-doc"
+    break
   fi
-  if grep "^AC_CHECK_PROGS.SWIG" "$conf" >/dev/null; then
+done
+for conf in $confs; do
+  if grep "^AC_CHECK_PROGS.SWIG" "$conf" >/dev/null 2>&1; then
     programs="$programs swig"
+    break
   fi
-  if grep "^AC_LIBLTDL_" "$conf" >/dev/null; then
+done
+ltdl_args=
+for conf in $confs; do
+  if grep "^AC_LIBLTDL_" "$conf" >/dev/null 2>&1; then
     ltdl_args="--ltdl"
+    break
   fi
-  if grep "^AM_SILENT_RULES" "$conf" >/dev/null; then
+done
+silent_args=
+for conf in $confs; do
+  if grep "^AM_SILENT_RULES" "$conf" >/dev/null 2>&1; then
     silent_args="--enable-silent-rules"
+    break
   fi
-done < "$tmp1"
+done
 
 # Some dependencies for autotools:
 # automake 1.13 requires autoconf 2.65
@@ -142,10 +142,11 @@ for my \$varg (qw(--version -version)) {
   while(<PIPE>) {
     chomp;
     next if @vnums; # drain pipe if we got a vnums
-    # Add optional leading g
-    next unless /^g?\$mname/i;
-    my(\$v)=/(\S+)\$/i; \$v =~ s/-.*\$//;
-    @vnums=grep { defined \$_ && !/^\s*\$/} map { s/\D//g; \$_; } split(/\./, \$v);
+    # Allow optional leading g and expect "PROGRAM-NAME (DESCRIPTION) VERSION-STRING"
+    if(/^g?\$mname \(.*?\)\s+(\S+)/i) {
+      my \$v = \$1; \$v =~ s/-.*\$//;
+      @vnums=grep { defined \$_ && !/^\s*\$/} map { s/\D//g; \$_; } split(/\./, \$v);
+    }
   }
   close(PIPE);
   last if @vnums;
@@ -157,6 +158,9 @@ print "\$vn\n";
 exit 0;
 EOF
 
+autogen_get_version="$PWD/autogen-get-version.pl"
+
+trap 'rm -f $autogen_get_version' 0 1
 
 
 update_prog_version() {
@@ -307,108 +311,124 @@ fi
 
 here="$PWD"
 
-find "$SRCDIR" -name configure.ac -print | \
-  grep -v /releases/ > "$tmp1"
-while IFS= read -r coin; do
+# Extract AC_CONFIG_SUBDIRS from main configure.ac
+config_subdirs=""
+if test -f "$SRCDIR/configure.ac"; then
+  config_subdirs=$(sed -n -e 's/^AC_CONFIG_SUBDIRS(\[\([^]]*\)\]).*/\1/p' "$SRCDIR/configure.ac" | tr -d ' ')
+fi
+
+# Process main directory and any AC_CONFIG_SUBDIRS
+dirs_to_process="$SRCDIR"
+for subdir in $config_subdirs; do
+  dirs_to_process="$dirs_to_process $SRCDIR/$subdir"
+done
+
+for dir in $dirs_to_process; do
   status=0
-  dir=$(dirname "$coin")
+  if test ! -f "$dir/configure.ac"; then
+    echo "$program: Skipping $dir -- no configure.ac found"
+    continue
+  fi
   if test -f "$dir/NO-AUTO-GEN"; then
     echo "$program: Skipping $dir -- flagged as no auto-generation"
-  else
-    echo " "
-    echo "$program: Processing directory $dir"
-    cd "$dir" || exit 1
-
-      # Ensure that these are created by the versions on this system
-      # (indirectly via automake)
-      $DRYRUN rm -f ltconfig ltmain.sh libtool stamp-h*
-      # Made by automake
-      $DRYRUN rm -f missing depcomp
-      # automake junk
-      $DRYRUN rm -rf autom4te*.cache
-
-      config_macro_dir=$(sed -ne 's/^AC_CONFIG_MACRO_DIR(\([^)]*\).*/\1/p' configure.ac)
-      if test -z "$config_macro_dir"; then
-	config_macro_dir=.
-      else
-        aclocal_args="$aclocal_args -I $config_macro_dir "
-      fi
-
-      config_aux_dir=$(sed -ne 's/^AC_CONFIG_AUX_DIR(\([^)]*\).*/\1/p' configure.ac)
-      if test -z "$config_aux_dir"; then
-	config_aux_dir=.
-      fi
-
-      if test -n "$config_dir"; then
-        echo "$program: Updating config.guess and config.sub"
-	for file in config.guess config.sub; do
-	  cfile="$config_dir/$file"
-          xfile="$config_aux_dir/$file"
-	  if test -f "$cfile"; then
-	    $DRYRUN rm -f "$xfile"
-	    $DRYRUN cp -p "$cfile" "$xfile"
-	  fi
-	done
-      fi
-
-      echo "$program: Running $libtoolize $libtoolize_args"
-      $DRYRUN rm -f ltmain.sh libtool
-      eval "$DRYRUN $libtoolize $libtoolize_args"
-      status=$?
-      if test "$status" != 0; then
-	  break
-      fi
-
-      if grep "^GTK_DOC_CHECK" configure.ac >/dev/null; then
-        # gtkdocize junk
-        $DRYRUN rm -rf gtk-doc.make
-        echo "$program: Running $gtkdocize $gtkdocize_args"
-        eval "$DRYRUN $gtkdocize $gtkdocize_args"
-        status=$?
-	if test "$status" != 0; then
-	    break
-	fi
-      fi
-
-      for docs in NEWS README; do
-	if test ! -f "$docs"; then
-	  echo "$program: Creating empty $docs file to allow configure to work"
-	  $DRYRUN touch -t 200001010000 "$docs"
-	fi
-      done
-
-      echo "$program: Running $aclocal $aclocal_args"
-      eval "$DRYRUN $aclocal $aclocal_args"
-      if grep "^A[CM]_CONFIG_HEADER" configure.ac >/dev/null; then
-	echo "$program: Running $autoheader"
-	$DRYRUN "$autoheader"
-        status=$?
-	if test "$status" != 0; then
-	    break
-	fi
-      fi
-      echo "$program: Running $automake $automake_args"
-      eval "$DRYRUN $automake $automake_args"
-      status=$?
-      if test "$status" != 0; then
-	  break
-      fi
-
-      echo "$program: Running $autoconf $autoconf_args"
-      eval "$DRYRUN $autoconf $autoconf_args"
-      status=$?
-      if test "$status" != 0; then
-	  break
-      fi
-    cd "$here" || exit 1
+    continue
   fi
+  
+  echo " "
+  echo "$program: Processing directory $dir"
+  cd "$dir" || exit 1
+
+  # Ensure that these are created by the versions on this system
+  # (indirectly via automake)
+  $DRYRUN rm -f ltconfig ltmain.sh libtool stamp-h*
+  # Made by automake
+  $DRYRUN rm -f missing depcomp
+  # automake junk
+  $DRYRUN rm -rf autom4te*.cache
+
+  config_macro_dir=$(sed -ne 's/^AC_CONFIG_MACRO_DIR(\([^)]*\).*/\1/p' configure.ac)
+  if test -z "$config_macro_dir"; then
+    config_macro_dir=.
+  else
+    aclocal_args="$aclocal_args -I $config_macro_dir "
+  fi
+
+  config_aux_dir=$(sed -ne 's/^AC_CONFIG_AUX_DIR(\([^)]*\).*/\1/p' configure.ac)
+  if test -z "$config_aux_dir"; then
+    config_aux_dir=.
+  fi
+
+  if test -n "$config_dir"; then
+    echo "$program: Updating config.guess and config.sub"
+    for file in config.guess config.sub; do
+      cfile="$config_dir/$file"
+      xfile="$config_aux_dir/$file"
+      if test -f "$cfile"; then
+        $DRYRUN rm -f "$xfile"
+        $DRYRUN cp -p "$cfile" "$xfile"
+      fi
+    done
+  fi
+
+  echo "$program: Running $libtoolize $libtoolize_args"
+  $DRYRUN rm -f ltmain.sh libtool
+  eval "$DRYRUN $libtoolize $libtoolize_args"
+  status=$?
+  if test "$status" != 0; then
+    break
+  fi
+
+  if grep "^GTK_DOC_CHECK" configure.ac >/dev/null; then
+    # gtkdocize junk
+    $DRYRUN rm -rf gtk-doc.make
+    if test -n "$gtkdocize"; then
+      echo "$program: Running $gtkdocize $gtkdocize_args"
+      eval "$DRYRUN $gtkdocize $gtkdocize_args"
+      status=$?
+      if test "$status" != 0; then
+        break
+      fi
+    fi
+  fi
+
+  for docs in NEWS README; do
+    if test ! -f "$docs"; then
+      echo "$program: Creating empty $docs file to allow configure to work"
+      $DRYRUN touch -t 200001010000 "$docs"
+    fi
+  done
+
+  echo "$program: Running $aclocal $aclocal_args"
+  eval "$DRYRUN $aclocal $aclocal_args"
+  if grep "^A[CM]_CONFIG_HEADER" configure.ac >/dev/null; then
+    echo "$program: Running $autoheader"
+    $DRYRUN "$autoheader"
+    status=$?
+    if test "$status" != 0; then
+      break
+    fi
+  fi
+  echo "$program: Running $automake $automake_args"
+  eval "$DRYRUN $automake $automake_args"
+  status=$?
+  if test "$status" != 0; then
+    break
+  fi
+
+  echo "$program: Running $autoconf $autoconf_args"
+  eval "$DRYRUN $autoconf $autoconf_args"
+  status=$?
+  if test "$status" != 0; then
+    break
+  fi
+  cd "$here" || exit 1
 
   if test "$status" != 0; then
     echo "$program: FAILED to configure $dir"
     exit "$status"
   fi
 
-done < "$tmp1"
+done
 
 
 
