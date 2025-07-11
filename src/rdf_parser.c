@@ -1138,11 +1138,11 @@ main(int argc, char *argv[])
     }
 
 
+    fprintf(stderr, "%s: Adding %s string content as stream\n", program, type);
     stream = librdf_parser_parse_string_as_stream(parser,
                                                   file_content[testi],
                                                   uris[testi]);
     if(!stream) {
-    fprintf(stderr, "%s: Adding %s string content as stream\n", program, type);
       fprintf(stderr, "%s: Failed to parse RDF from string %d as stream\n",
               program, testi);
       failures++;
