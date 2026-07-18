@@ -910,7 +910,7 @@ librdf_hash_memory_delete_key_value(void* context, librdf_hash_datum *key,
     
     node=next;
     while(node) {
-      if(key->size == node->key_len && !memcmp(key, node->key, key->size)){
+      if(key->size == node->key_len && !memcmp(key->data, node->key, key->size)){
         found=1;
         break;
       }
