@@ -1017,7 +1017,6 @@ int main(int argc, char *argv[]);
 "<http://purl.org/net/dajobe/> <http://purl.org/dc/elements/1.1/description> \"The generic home page of Dave Beckett.\" .\n" \
 "<http://purl.org/net/dajobe/> <http://purl.org/dc/elements/1.1/title> \"Dave Beckett's Home Page\" . \n"
 
-
 #define TURTLE_CONTENT \
 "@prefix dc: <http://purl.org/dc/elements/1.1/> .\n" \
 "\n" \
@@ -1028,6 +1027,28 @@ int main(int argc, char *argv[]);
 
 /* All the examples above give the same three triples */
 #define EXPECTED_TRIPLES_COUNT 3
+
+
+#define RDFXML_CONTENT_2 \
+"<?xml version=\"1.0\"?>\n" \
+"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n" \
+"         xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n" \
+"  <rdf:Description rdf:about=\"http://purl.org/net/dajobe/\">\n" \
+"    <dc:title>Dave Beckett's Home Page</dc:title>\n" \
+"  </rdf:Description>\n" \
+"</rdf:RDF>"
+
+#define NTRIPLES_CONTENT_2 \
+"<http://purl.org/net/dajobe/> <http://purl.org/dc/elements/1.1/title> \"Dave Beckett's Home Page\" . \n"
+
+#define TURTLE_CONTENT_2 \
+"@prefix dc: <http://purl.org/dc/elements/1.1/> .\n" \
+"\n" \
+"<http://purl.org/net/dajobe/>\n" \
+"      dc:title \"Dave Beckett's Home Page\" . \n"
+
+/* All the examples above give the same single triple */
+#define EXPECTED_TRIPLES_COUNT_2 1
 
 
 #define URI_STRING_COUNT 3
@@ -1046,6 +1067,12 @@ static const unsigned char *file_content[URI_STRING_COUNT] = {
   (const unsigned char*)RDFXML_CONTENT,
   (const unsigned char*)NTRIPLES_CONTENT,
   (const unsigned char*)TURTLE_CONTENT
+};
+
+static const unsigned char *file_content_2[URI_STRING_COUNT] = {
+  (const unsigned char*)RDFXML_CONTENT_2,
+  (const unsigned char*)NTRIPLES_CONTENT_2,
+  (const unsigned char*)TURTLE_CONTENT_2
 };
 
 int
@@ -1073,6 +1100,7 @@ main(int argc, char *argv[])
     librdf_stream *stream = NULL;
     raptor_iostream *iostream = NULL;
     size_t length = strlen((const char*)file_content[testi]);
+    size_t length_2 = strlen((const char*)file_content_2[testi]);
     int size;
     char *accept_h;
     int i;
@@ -1138,11 +1166,49 @@ main(int argc, char *argv[])
     }
 
 
+    /* Clear the model */
+    librdf_free_model(model);
+    model = librdf_new_model(world, storage, NULL);
+    if(!model) {
+      fprintf(stderr, "%s: Failed to create new model\n", program);
+      return(1);
+    }
+
+
+    /* Try parsing a different string, to make sure the previous one hasn't
+     * been kept in the buffer */
+    fprintf(stderr, "%s: Adding %s different counted string content as stream\n",
+            program, type);
+    stream = librdf_parser_parse_counted_string_as_stream(parser,
+							  file_content_2[testi],
+							  length_2,
+							  uris[testi]);
+    if(!stream) {
+      fprintf(stderr,
+              "%s: Failed to parse RDF from counted string %d as stream\n",
+              program, testi);
+      failures++;
+      goto tidy_test;
+    }
+    librdf_model_add_statements(model, stream);
+    librdf_free_stream(stream);
+    stream = NULL;
+
+    size = librdf_model_size(model);
+    fprintf(stderr, "%s: Model size is %d triples\n", program, size);
+    if(size != EXPECTED_TRIPLES_COUNT_2) {
+      fprintf(stderr, "%s: Returned %d triples, not %d as expected\n",
+              program, size, EXPECTED_TRIPLES_COUNT_2);
+      failures++;
+      goto tidy_test;
+    }
+
+
+    fprintf(stderr, "%s: Adding %s string content as stream\n", program, type);
     stream = librdf_parser_parse_string_as_stream(parser,
                                                   file_content[testi],
                                                   uris[testi]);
     if(!stream) {
-    fprintf(stderr, "%s: Adding %s string content as stream\n", program, type);
       fprintf(stderr, "%s: Failed to parse RDF from string %d as stream\n",
               program, testi);
       failures++;
