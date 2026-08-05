@@ -580,9 +580,20 @@ librdf_new_storage_with_options(librdf_world *world,
     return NULL;
   }
 
-  options_hash=librdf_new_hash_from_hash(options);
-  if(!options_hash)
-    return NULL;
+  if (options) {
+    options_hash=librdf_new_hash_from_hash(options);
+    if(!options_hash)
+      return NULL;
+  } else {
+    options_hash=librdf_new_hash(world, NULL);
+    if(!options_hash)
+      return NULL;
+
+    if(librdf_hash_open(options_hash, NULL, 0, 1, 1, NULL)) {
+      librdf_free_hash(options_hash);
+      return NULL;
+    }
+  }
 
   if(librdf_hash_open(options_hash, NULL, 0, 1, 1, NULL)) {
     librdf_free_hash(options_hash);
